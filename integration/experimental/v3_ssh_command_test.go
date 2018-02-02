@@ -30,24 +30,24 @@ var _ = Describe("v3-ssh command", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("v3-ssh", "--help")
 
-			Eventually(session.Out).Should(Say(`NAME:`))
-			Eventually(session.Out).Should(Say(`ssh - SSH to an application container instance`))
-			Eventually(session.Out).Should(Say(`USAGE:`))
-			Eventually(session.Out).Should(Say(`cf v3-ssh APP_NAME \[--process PROCESS\] \[-i INDEX\] \[-c COMMAND\]\n`))
-			Eventually(session.Out).Should(Say(`\[-L \[BIND_ADDRESS:\]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT\]\.\.\. \[--skip-remote-execution\]`))
-			Eventually(session.Out).Should(Say(`\[--disable-pseudo-tty \| --force-pseudo-tty \| --request-pseudo-tty\] \[--skip-host-validation\]`))
-			Eventually(session.Out).Should(Say(`OPTIONS:`))
-			Eventually(session.Out).Should(Say(`--app-instance-index, -i\s+App process instance index \(Default: 0\)`))
-			Eventually(session.Out).Should(Say(`--command, -c\s+Command to run`))
-			Eventually(session.Out).Should(Say(`--disable-pseudo-tty, -T\s+Disable pseudo-tty allocation`))
-			Eventually(session.Out).Should(Say(`--force-pseudo-tty\s+Force pseudo-tty allocation`))
-			Eventually(session.Out).Should(Say(`-L\s+Local port forward specification`))
-			Eventually(session.Out).Should(Say(`--process\s+App process name \(Default: web\)`))
-			Eventually(session.Out).Should(Say(`--request-pseudo-tty, -t\s+Request pseudo-tty allocation`))
-			Eventually(session.Out).Should(Say(`--skip-host-validation, -k\s+Skip host key validation\. Not recommended!`))
-			Eventually(session.Out).Should(Say(`--skip-remote-execution, -N\s+Do not execute a remote command`))
-			Eventually(session.Out).Should(Say(`SEE ALSO:`))
-			Eventually(session.Out).Should(Say(`allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled`))
+			Eventually(session).Should(Say(`NAME:`))
+			Eventually(session).Should(Say(`ssh - SSH to an application container instance`))
+			Eventually(session).Should(Say(`USAGE:`))
+			Eventually(session).Should(Say(`cf v3-ssh APP_NAME \[--process PROCESS\] \[-i INDEX\] \[-c COMMAND\]\n`))
+			Eventually(session).Should(Say(`\[-L \[BIND_ADDRESS:\]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT\]\.\.\. \[--skip-remote-execution\]`))
+			Eventually(session).Should(Say(`\[--disable-pseudo-tty \| --force-pseudo-tty \| --request-pseudo-tty\] \[--skip-host-validation\]`))
+			Eventually(session).Should(Say(`OPTIONS:`))
+			Eventually(session).Should(Say(`--app-instance-index, -i\s+App process instance index \(Default: 0\)`))
+			Eventually(session).Should(Say(`--command, -c\s+Command to run`))
+			Eventually(session).Should(Say(`--disable-pseudo-tty, -T\s+Disable pseudo-tty allocation`))
+			Eventually(session).Should(Say(`--force-pseudo-tty\s+Force pseudo-tty allocation`))
+			Eventually(session).Should(Say(`-L\s+Local port forward specification`))
+			Eventually(session).Should(Say(`--process\s+App process name \(Default: web\)`))
+			Eventually(session).Should(Say(`--request-pseudo-tty, -t\s+Request pseudo-tty allocation`))
+			Eventually(session).Should(Say(`--skip-host-validation, -k\s+Skip host key validation\. Not recommended!`))
+			Eventually(session).Should(Say(`--skip-remote-execution, -N\s+Do not execute a remote command`))
+			Eventually(session).Should(Say(`SEE ALSO:`))
+			Eventually(session).Should(Say(`allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled`))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -57,14 +57,14 @@ var _ = Describe("v3-ssh command", func() {
 			session := helpers.CF("v3-ssh")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-ssh", appName)
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -141,7 +141,7 @@ var _ = Describe("v3-ssh command", func() {
 
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("v3-ssh", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -156,7 +156,7 @@ var _ = Describe("v3-ssh command", func() {
 
 			It("fails with no targeted space error message", func() {
 				session := helpers.CF("v3-ssh", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -175,7 +175,7 @@ var _ = Describe("v3-ssh command", func() {
 		Context("when the app does not exist", func() {
 			It("it displays the app does not exist", func() {
 				session := helpers.CF("v3-ssh", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
 				Eventually(session).Should(Exit(1))
 			})
@@ -215,7 +215,7 @@ var _ = Describe("v3-ssh command", func() {
 							It("the remote shell is not TTY", func() {
 								// we echo hello because a successful ssh call returns the status
 								session := helpers.CF("v3-ssh", appName, "-c tty;", "-c echo hello")
-								Eventually(session.Out).Should(Say("not a tty"))
+								Eventually(session).Should(Say("not a tty"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -223,7 +223,7 @@ var _ = Describe("v3-ssh command", func() {
 						Context("when disable-pseudo-tty is specified", func() {
 							It("the remote shell is not TTY", func() {
 								session := helpers.CF("v3-ssh", appName, "--disable-pseudo-tty", "-c tty;", "-c echo hello")
-								Eventually(session.Out).Should(Say("not a tty"))
+								Eventually(session).Should(Say("not a tty"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -231,8 +231,8 @@ var _ = Describe("v3-ssh command", func() {
 						Context("when force-pseudo-tty is specified", func() {
 							It("the remote shell is TTY", func() {
 								session := helpers.CF("v3-ssh", appName, "--force-pseudo-tty", "-c tty;", "-c echo hello")
-								Eventually(session.Out).ShouldNot(Say("not a tty"))
-								Eventually(session.Out).Should(Say("/dev/*"))
+								Eventually(session).ShouldNot(Say("not a tty"))
+								Eventually(session).Should(Say("/dev/*"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -240,7 +240,7 @@ var _ = Describe("v3-ssh command", func() {
 						Context("when request-pseudo-tty is specified", func() {
 							It("the remote shell is not TTY", func() {
 								session := helpers.CF("v3-ssh", appName, "--request-pseudo-tty", "-c tty;", "-c echo hello")
-								Eventually(session.Out).Should(Say("not a tty"))
+								Eventually(session).Should(Say("not a tty"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -259,7 +259,7 @@ var _ = Describe("v3-ssh command", func() {
 								buffer.Write([]byte("echo hello\n"))
 								buffer.Write([]byte("exit\n"))
 								session := helpers.CFWithStdin(buffer, "v3-ssh", appName)
-								Eventually(session.Out).Should(Say("not a tty"))
+								Eventually(session).Should(Say("not a tty"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -270,7 +270,7 @@ var _ = Describe("v3-ssh command", func() {
 								buffer.Write([]byte("echo hello\n"))
 								buffer.Write([]byte("exit\n"))
 								session := helpers.CFWithStdin(buffer, "v3-ssh", appName, "--disable-pseudo-tty")
-								Eventually(session.Out).Should(Say("not a tty"))
+								Eventually(session).Should(Say("not a tty"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -281,8 +281,8 @@ var _ = Describe("v3-ssh command", func() {
 								buffer.Write([]byte("echo hello\n"))
 								buffer.Write([]byte("exit\n"))
 								session := helpers.CFWithStdin(buffer, "v3-ssh", appName, "--force-pseudo-tty")
-								Eventually(session.Out).ShouldNot(Say("not a tty"))
-								Eventually(session.Out).Should(Say("/dev/*"))
+								Eventually(session).ShouldNot(Say("not a tty"))
+								Eventually(session).Should(Say("/dev/*"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -293,7 +293,7 @@ var _ = Describe("v3-ssh command", func() {
 								buffer.Write([]byte("echo hello\n"))
 								buffer.Write([]byte("exit\n"))
 								session := helpers.CFWithStdin(buffer, "v3-ssh", appName, "--request-pseudo-tty")
-								Eventually(session.Out).Should(Say("not a tty"))
+								Eventually(session).Should(Say("not a tty"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -305,18 +305,18 @@ var _ = Describe("v3-ssh command", func() {
 				session := helpers.CF("v3-ssh", appName, "-c", "ps aux;", "-c", "env")
 				// To verify we ssh'd into the web process we examine processes
 				// that were launched tha are unique to that process
-				Eventually(session.Out).Should(Say("vcap.*ruby"))
-				Eventually(session.Out).Should(Say("INSTANCE_INDEX=0"))
+				Eventually(session).Should(Say("vcap.*ruby"))
+				Eventually(session).Should(Say("INSTANCE_INDEX=0"))
 				Eventually(session).Should(Exit(0))
 			})
 
 			Context("when commands to run are specified", func() {
 				It("ssh's to the default container and runs the commands", func() {
 					session := helpers.CF("v3-ssh", appName, "-c", "ls;", "-c", "echo $USER")
-					Eventually(session.Out).Should(Say("app"))
-					Eventually(session.Out).Should(Say("deps"))
-					Eventually(session.Out).Should(Say("logs"))
-					Eventually(session.Out).Should(Say("vcap"))
+					Eventually(session).Should(Say("app"))
+					Eventually(session).Should(Say("deps"))
+					Eventually(session).Should(Say("logs"))
+					Eventually(session).Should(Say("vcap"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -329,7 +329,7 @@ var _ = Describe("v3-ssh command", func() {
 
 				It("prints an error message", func() {
 					session := helpers.CF("v3-ssh", appName)
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say(fmt.Sprintf("Application '%s' is not in the STARTED state", appName)))
 					Eventually(session).Should(Exit(1))
 				})
@@ -372,7 +372,7 @@ var _ = Describe("v3-ssh command", func() {
 				Context("when the process does not exist", func() {
 					It("displays the process does not exist", func() {
 						session := helpers.CF("v3-ssh", appName, "--process", "fake-process")
-						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Process fake-process not found"))
 						Eventually(session).Should(Exit(1))
 					})
@@ -385,8 +385,8 @@ var _ = Describe("v3-ssh command", func() {
 
 					It("ssh's to the process's default index", func() {
 						session := helpers.CF("v3-ssh", appName, "--process", "console", "-c", "ps aux;", "-c", "env")
-						Eventually(session.Out).Should(Say("vcap.*irb"))
-						Eventually(session.Out).Should(Say("INSTANCE_INDEX=0"))
+						Eventually(session).Should(Say("vcap.*irb"))
+						Eventually(session).Should(Say("INSTANCE_INDEX=0"))
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -394,7 +394,7 @@ var _ = Describe("v3-ssh command", func() {
 						Context("when the index does not exist", func() {
 							It("returns an instance not found error", func() {
 								session := helpers.CF("v3-ssh", appName, "--process", "console", "-i", "1", "-c", "ps aux;", "-c", "env")
-								Eventually(session.Out).Should(Say("FAILED"))
+								Eventually(session).Should(Say("FAILED"))
 								Eventually(session.Err).Should(Say("Instance %d of process console not found", 1))
 								Eventually(session).Should(Exit(1))
 							})
@@ -403,8 +403,8 @@ var _ = Describe("v3-ssh command", func() {
 						Context("when the index exists", func() {
 							It("ssh's to the provided index", func() {
 								session := helpers.CF("v3-ssh", appName, "--process", "console", "-i", "0", "-c", "ps aux;", "-c", "env")
-								Eventually(session.Out).Should(Say("vcap.*irb"))
-								Eventually(session.Out).Should(Say("INSTANCE_INDEX=0"))
+								Eventually(session).Should(Say("vcap.*irb"))
+								Eventually(session).Should(Say("INSTANCE_INDEX=0"))
 								Eventually(session).Should(Exit(0))
 							})
 						})

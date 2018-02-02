@@ -27,18 +27,18 @@ var _ = Describe("v3-set-health-check command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-set-health-check", "--help")
 
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-set-health-check - Change type of health check performed on an app's process"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say(`cf v3-set-health-check APP_NAME \(process \| port \| http \[--endpoint PATH\]\) \[--process PROCESS\]`))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("v3-set-health-check - Change type of health check performed on an app's process"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say(`cf v3-set-health-check APP_NAME \(process \| port \| http \[--endpoint PATH\]\) \[--process PROCESS\]`))
 
-				Eventually(session.Out).Should(Say("EXAMPLES:"))
-				Eventually(session.Out).Should(Say("cf v3-set-health-check worker-app process --process worker"))
-				Eventually(session.Out).Should(Say("cf v3-set-health-check my-web-app http --endpoint /foo"))
+				Eventually(session).Should(Say("EXAMPLES:"))
+				Eventually(session).Should(Say("cf v3-set-health-check worker-app process --process worker"))
+				Eventually(session).Should(Say("cf v3-set-health-check my-web-app http --endpoint /foo"))
 
-				Eventually(session.Out).Should(Say("OPTIONS:"))
-				Eventually(session.Out).Should(Say(`--endpoint\s+Path on the app \(Default: /\)`))
-				Eventually(session.Out).Should(Say(`--process\s+App process to update \(Default: web\)`))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say(`--endpoint\s+Path on the app \(Default: /\)`))
+				Eventually(session).Should(Say(`--process\s+App process to update \(Default: web\)`))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -50,7 +50,7 @@ var _ = Describe("v3-set-health-check command", func() {
 			session := helpers.CF("v3-set-health-check")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `APP_NAME` and `HEALTH_CHECK_TYPE` were not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -60,14 +60,14 @@ var _ = Describe("v3-set-health-check command", func() {
 			session := helpers.CF("v3-set-health-check", appName)
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `HEALTH_CHECK_TYPE` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-set-health-check", appName, "port")
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -144,7 +144,7 @@ var _ = Describe("v3-set-health-check command", func() {
 
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("v3-set-health-check", appName, "port")
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -159,7 +159,7 @@ var _ = Describe("v3-set-health-check command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("v3-set-health-check", appName, "port")
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -187,15 +187,15 @@ var _ = Describe("v3-set-health-check command", func() {
 
 			It("displays the health check types for each process", func() {
 				session := helpers.CF("v3-set-health-check", appName, "http", "--endpoint", "/healthcheck", "--process", "console")
-				Eventually(session.Out).Should(Say("Updating health check type for app %s process console in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say("TIP: An app restart is required for the change to take effect\\."))
+				Eventually(session).Should(Say("Updating health check type for app %s process console in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("TIP: An app restart is required for the change to take effect\\."))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("v3-get-health-check", appName)
-				Eventually(session.Out).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say(`process\s+health check\s+endpoint \(for http\)\n`))
-				Eventually(session.Out).Should(Say(`web\s+port\s+\n`))
-				Eventually(session.Out).Should(Say(`console\s+http\s+/healthcheck`))
+				Eventually(session).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`process\s+health check\s+endpoint \(for http\)\n`))
+				Eventually(session).Should(Say(`web\s+port\s+\n`))
+				Eventually(session).Should(Say(`console\s+http\s+/healthcheck`))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -209,9 +209,9 @@ var _ = Describe("v3-set-health-check command", func() {
 
 				It("returns a process not found error", func() {
 					session := helpers.CF("v3-set-health-check", appName, "http", "--endpoint", "/healthcheck", "--process", "nonexistant-type")
-					Eventually(session.Out).Should(Say("Updating health check type for app %s process nonexistant-type in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("Updating health check type for app %s process nonexistant-type in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session.Err).Should(Say("Process nonexistant-type not found"))
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -222,9 +222,9 @@ var _ = Describe("v3-set-health-check command", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("v3-set-health-check", invalidAppName, "port")
 
-				Eventually(session.Out).Should(Say("Updating health check type for app %s process web in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Updating health check type for app %s process web in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 
 				Eventually(session).Should(Exit(1))
 			})

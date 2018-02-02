@@ -13,23 +13,23 @@ var _ = Describe("auth command", func() {
 	Context("Help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("auth", "--help")
-			Eventually(session.Out).Should(Say("NAME:"))
-			Eventually(session.Out).Should(Say("auth - Authenticate non-interactively\n\n"))
+			Eventually(session).Should(Say("NAME:"))
+			Eventually(session).Should(Say("auth - Authenticate non-interactively\n\n"))
 
-			Eventually(session.Out).Should(Say("USAGE:"))
-			Eventually(session.Out).Should(Say("cf auth USERNAME PASSWORD\n"))
-			Eventually(session.Out).Should(Say("cf auth CLIENT_ID CLIENT_SECRET --client-credentials\n\n"))
+			Eventually(session).Should(Say("USAGE:"))
+			Eventually(session).Should(Say("cf auth USERNAME PASSWORD\n"))
+			Eventually(session).Should(Say("cf auth CLIENT_ID CLIENT_SECRET --client-credentials\n\n"))
 
-			Eventually(session.Out).Should(Say("WARNING:"))
-			Eventually(session.Out).Should(Say("Providing your password as a command line option is highly discouraged"))
-			Eventually(session.Out).Should(Say("Your password may be visible to others and may be recorded in your shell history\n\n"))
+			Eventually(session).Should(Say("WARNING:"))
+			Eventually(session).Should(Say("Providing your password as a command line option is highly discouraged"))
+			Eventually(session).Should(Say("Your password may be visible to others and may be recorded in your shell history\n\n"))
 
-			Eventually(session.Out).Should(Say("EXAMPLES:"))
-			Eventually(session.Out).Should(Say("cf auth name@example\\.com \"my password\" \\(use quotes for passwords with a space\\)"))
-			Eventually(session.Out).Should(Say("cf auth name@example\\.com \\\"\\\\\"password\\\\\"\\\" \\(escape quotes if used in password\\)\n\n"))
+			Eventually(session).Should(Say("EXAMPLES:"))
+			Eventually(session).Should(Say("cf auth name@example\\.com \"my password\" \\(use quotes for passwords with a space\\)"))
+			Eventually(session).Should(Say("cf auth name@example\\.com \\\"\\\\\"password\\\\\"\\\" \\(escape quotes if used in password\\)\n\n"))
 
-			Eventually(session.Out).Should(Say("SEE ALSO:"))
-			Eventually(session.Out).Should(Say("api, login, target"))
+			Eventually(session).Should(Say("SEE ALSO:"))
+			Eventually(session).Should(Say("api, login, target"))
 
 			Eventually(session).Should(Exit(0))
 		})
@@ -39,7 +39,7 @@ var _ = Describe("auth command", func() {
 		It("errors-out with the help information", func() {
 			session := helpers.CF("auth")
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `USERNAME` and `PASSWORD` were not provided\n\n"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 
 			Eventually(session).Should(Exit(1))
 		})
@@ -49,7 +49,7 @@ var _ = Describe("auth command", func() {
 		It("errors-out with a password required error and the help information", func() {
 			session := helpers.CF("auth", "some-user")
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PASSWORD` was not provided\n\n"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 
 			Eventually(session).Should(Exit(1))
 		})
@@ -60,7 +60,7 @@ var _ = Describe("auth command", func() {
 			session := helpers.CF("auth", "some-username", "some-password", "-a", "api.bosh-lite.com")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: unknown flag `a'"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 
 			Eventually(session).Should(Exit(1))
 		})
@@ -74,7 +74,7 @@ var _ = Describe("auth command", func() {
 		It("displays an error message", func() {
 			session := helpers.CF("auth", "some-username", "some-password")
 
-			Eventually(session.Out).Should(Say("FAILED"))
+			Eventually(session).Should(Say("FAILED"))
 			Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
 
 			Eventually(session).Should(Exit(1))
@@ -91,9 +91,9 @@ var _ = Describe("auth command", func() {
 			It("clears the cached tokens and target info, then displays an error message", func() {
 				session := helpers.CF("auth", "some-username", "some-password")
 
-				Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
-				Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
 				Eventually(session).Should(Exit(1))
 
@@ -116,10 +116,10 @@ var _ = Describe("auth command", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("auth", username, password)
 
-				Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
-				Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say("Use 'cf target' to view or set your target org and space"))
+				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -136,9 +136,9 @@ var _ = Describe("auth command", func() {
 			It("clears the cached tokens and target info, then displays an error message", func() {
 				session := helpers.CF("auth", "some-client-id", "some-client-secret", "--client-credentials")
 
-				Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
-				Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
 				Eventually(session).Should(Exit(1))
 
@@ -161,10 +161,10 @@ var _ = Describe("auth command", func() {
 				clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
 				session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
 
-				Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
-				Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say("Use 'cf target' to view or set your target org and space"))
+				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
 
 				Eventually(session).Should(Exit(0))
 			})

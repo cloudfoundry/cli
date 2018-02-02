@@ -42,25 +42,25 @@ var _ = Describe("install-plugin command", func() {
 			It("displays command usage to stdout", func() {
 				session := helpers.CF("install-plugin", "--help")
 
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("install-plugin - Install CLI plugin"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf install-plugin PLUGIN_NAME \\[-r REPO_NAME\\] \\[-f\\]"))
-				Eventually(session.Out).Should(Say("cf install-plugin LOCAL-PATH/TO/PLUGIN | URL \\[-f\\]"))
-				Eventually(session.Out).Should(Say(""))
-				Eventually(session.Out).Should(Say("WARNING:"))
-				Eventually(session.Out).Should(Say("Plugins are binaries written by potentially untrusted authors."))
-				Eventually(session.Out).Should(Say("Install and use plugins at your own risk."))
-				Eventually(session.Out).Should(Say(""))
-				Eventually(session.Out).Should(Say("EXAMPLES:"))
-				Eventually(session.Out).Should(Say("cf install-plugin ~/Downloads/plugin-foobar"))
-				Eventually(session.Out).Should(Say("cf install-plugin https://example.com/plugin-foobar_linux_amd64"))
-				Eventually(session.Out).Should(Say("cf install-plugin -r My-Repo plugin-echo"))
-				Eventually(session.Out).Should(Say("OPTIONS:"))
-				Eventually(session.Out).Should(Say("-f\\s+Force install of plugin without confirmation"))
-				Eventually(session.Out).Should(Say("-r\\s+Restrict search for plugin to this registered repository"))
-				Eventually(session.Out).Should(Say("SEE ALSO:"))
-				Eventually(session.Out).Should(Say("add-plugin-repo, list-plugin-repos, plugins"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("install-plugin - Install CLI plugin"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf install-plugin PLUGIN_NAME \\[-r REPO_NAME\\] \\[-f\\]"))
+				Eventually(session).Should(Say("cf install-plugin LOCAL-PATH/TO/PLUGIN | URL \\[-f\\]"))
+				Eventually(session).Should(Say(""))
+				Eventually(session).Should(Say("WARNING:"))
+				Eventually(session).Should(Say("Plugins are binaries written by potentially untrusted authors."))
+				Eventually(session).Should(Say("Install and use plugins at your own risk."))
+				Eventually(session).Should(Say(""))
+				Eventually(session).Should(Say("EXAMPLES:"))
+				Eventually(session).Should(Say("cf install-plugin ~/Downloads/plugin-foobar"))
+				Eventually(session).Should(Say("cf install-plugin https://example.com/plugin-foobar_linux_amd64"))
+				Eventually(session).Should(Say("cf install-plugin -r My-Repo plugin-echo"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("-f\\s+Force install of plugin without confirmation"))
+				Eventually(session).Should(Say("-r\\s+Restrict search for plugin to this registered repository"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("add-plugin-repo, list-plugin-repos, plugins"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -71,7 +71,7 @@ var _ = Describe("install-plugin command", func() {
 		It("errors and displays usage", func() {
 			session := helpers.CF("install-plugin")
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PLUGIN_NAME_OR_LOCATION` was not provided"))
-			Eventually(session.Out).Should(Say("USAGE:"))
+			Eventually(session).Should(Say("USAGE:"))
 
 			Eventually(session).Should(Exit(1))
 		})
@@ -103,9 +103,9 @@ var _ = Describe("install-plugin command", func() {
 			It("fails and reports the file is not a valid CLI plugin", func() {
 				session := helpers.CF("install-plugin", pluginPath, "-f")
 
-				Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-				Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+				Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("File is not a valid cf CLI plugin binary\\."))
 
 				Eventually(session).Should(Exit(1))
@@ -125,11 +125,11 @@ var _ = Describe("install-plugin command", func() {
 				It("installs the plugin and cleans up all temp files", func() {
 					session := helpers.CF("install-plugin", pluginPath, "-f")
 
-					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-					Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
-					Eventually(session.Out).Should(Say("OK"))
-					Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+					Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+					Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
+					Eventually(session).Should(Say("Installing plugin some-plugin\\.\\.\\."))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 
 					Eventually(session).Should(Exit(0))
 
@@ -155,7 +155,7 @@ var _ = Describe("install-plugin command", func() {
 
 					It("installs the plugin", func() {
 						session := helpers.CF("install-plugin", pluginPath, "-f")
-						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+						Eventually(session).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -168,10 +168,10 @@ var _ = Describe("install-plugin command", func() {
 					It("uninstalls the existing plugin and installs the plugin", func() {
 						session := helpers.CF("install-plugin", pluginPath, "-f")
 
-						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
-						Eventually(session.Out).Should(Say("CLI-MESSAGE-UNINSTALL"))
-						Eventually(session.Out).Should(Say("Plugin some-plugin successfully uninstalled\\."))
-						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+						Eventually(session).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
+						Eventually(session).Should(Say("CLI-MESSAGE-UNINSTALL"))
+						Eventually(session).Should(Say("Plugin some-plugin successfully uninstalled\\."))
+						Eventually(session).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 
 						Eventually(session).Should(Exit(0))
 					})
@@ -183,8 +183,8 @@ var _ = Describe("install-plugin command", func() {
 						Eventually(session.Err).Should(Say("Plugin some/path/that/does/not/exist not found on disk or in any registered repo\\."))
 						Eventually(session.Err).Should(Say("Use 'cf repo-plugins' to list plugins available in the repos\\."))
 
-						Consistently(session.Out).ShouldNot(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-						Consistently(session.Out).ShouldNot(Say("Install and use plugins at your own risk\\."))
+						Consistently(session).ShouldNot(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+						Consistently(session).ShouldNot(Say("Install and use plugins at your own risk\\."))
 
 						Eventually(session).Should(Exit(1))
 					})
@@ -256,10 +256,10 @@ var _ = Describe("install-plugin command", func() {
 						It("tells the user about the conflict and fails", func() {
 							session := helpers.CF("install-plugin", "-f", pluginPath)
 
-							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin some-plugin v1\\.1\\.1 could not be installed as it contains commands with names that are already used: version"))
 
 							Eventually(session).Should(Exit(1))
@@ -278,10 +278,10 @@ var _ = Describe("install-plugin command", func() {
 						It("tells the user about the conflict and fails", func() {
 							session := helpers.CF("install-plugin", "-f", pluginPath)
 
-							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin some-plugin v1\\.1\\.1 could not be installed as it contains commands with names that are already used: cups"))
 
 							Eventually(session).Should(Exit(1))
@@ -305,10 +305,10 @@ var _ = Describe("install-plugin command", func() {
 						It("tells the user about the conflict and fails", func() {
 							session := helpers.CF("install-plugin", "-f", pluginPath)
 
-							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin new-plugin v1\\.1\\.1 could not be installed as it contains commands with names that are already used: existing-command\\."))
 
 							Eventually(session).Should(Exit(1))
@@ -332,10 +332,10 @@ var _ = Describe("install-plugin command", func() {
 						It("tells the user about the conflict and fails", func() {
 							session := helpers.CF("install-plugin", "-f", pluginPath)
 
-							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin new-plugin v1\\.1\\.1 could not be installed as it contains commands with aliases that are already used: existing-command\\."))
 
 							Eventually(session).Should(Exit(1))
@@ -357,10 +357,10 @@ var _ = Describe("install-plugin command", func() {
 						It("tells the user about the conflict and fails", func() {
 							session := helpers.CF("install-plugin", "-f", pluginPath)
 
-							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin some-plugin v1\\.1\\.1 could not be installed as it contains commands with aliases that are already used: version"))
 
 							Eventually(session).Should(Exit(1))
@@ -379,10 +379,10 @@ var _ = Describe("install-plugin command", func() {
 						It("tells the user about the conflict and fails", func() {
 							session := helpers.CF("install-plugin", "-f", pluginPath)
 
-							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin some-plugin v1\\.1\\.1 could not be installed as it contains commands with aliases that are already used: cups"))
 
 							Eventually(session).Should(Exit(1))
@@ -406,10 +406,10 @@ var _ = Describe("install-plugin command", func() {
 						It("tells the user about the conflict and fails", func() {
 							session := helpers.CF("install-plugin", "-f", pluginPath)
 
-							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin new-plugin v1\\.1\\.1 could not be installed as it contains commands with aliases that are already used: existing-command\\."))
 
 							Eventually(session).Should(Exit(1))
@@ -433,10 +433,10 @@ var _ = Describe("install-plugin command", func() {
 						It("tells the user about the conflict and fails", func() {
 							session := helpers.CF("install-plugin", "-f", pluginPath)
 
-							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin new-plugin v1\\.1\\.1 could not be installed as it contains commands with aliases that are already used: existing-alias\\."))
 
 							Eventually(session).Should(Exit(1))
@@ -462,10 +462,10 @@ var _ = Describe("install-plugin command", func() {
 						It("tells the user about the conflict and fails", func() {
 							session := helpers.CF("install-plugin", "-f", pluginPath)
 
-							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin new-plugin v1\\.1\\.1 could not be installed as it contains commands with names and aliases that are already used: existing-command, existing-alias\\."))
 
 							Eventually(session).Should(Exit(1))
@@ -484,12 +484,12 @@ var _ = Describe("install-plugin command", func() {
 					It("installs the plugin", func() {
 						session := helpers.CFWithStdin(buffer, "install-plugin", pluginPath)
 
-						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", helpers.ConvertPathToRegularExpression(pluginPath)))
-						Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
-						Eventually(session.Out).Should(Say("OK"))
-						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+						Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+						Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
+						Eventually(session).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", helpers.ConvertPathToRegularExpression(pluginPath)))
+						Eventually(session).Should(Say("Installing plugin some-plugin\\.\\.\\."))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 
 						Eventually(session).Should(Exit(0))
 
@@ -514,7 +514,7 @@ var _ = Describe("install-plugin command", func() {
 						It("fails and tells the user how to force a reinstall", func() {
 							session := helpers.CFWithStdin(buffer, "install-plugin", pluginPath)
 
-							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin some-plugin 1\\.0\\.0 could not be installed\\. A plugin with that name is already installed\\."))
 							Eventually(session.Err).Should(Say("TIP: Use 'cf install-plugin -f' to force a reinstall\\."))
 
@@ -532,10 +532,10 @@ var _ = Describe("install-plugin command", func() {
 					It("does not install the plugin", func() {
 						session := helpers.CFWithStdin(buffer, "install-plugin", pluginPath)
 
-						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: n", helpers.ConvertPathToRegularExpression(pluginPath)))
-						Eventually(session.Out).Should(Say("Plugin installation cancelled\\."))
+						Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+						Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
+						Eventually(session).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: n", helpers.ConvertPathToRegularExpression(pluginPath)))
+						Eventually(session).Should(Say("Plugin installation cancelled\\."))
 
 						Eventually(session).Should(Exit(0))
 					})
@@ -548,11 +548,11 @@ var _ = Describe("install-plugin command", func() {
 						It("does not uninstall the existing plugin", func() {
 							session := helpers.CFWithStdin(buffer, "install-plugin", pluginPath)
 
-							Eventually(session.Out).Should(Say("Plugin installation cancelled\\."))
+							Eventually(session).Should(Say("Plugin installation cancelled\\."))
 
-							Consistently(session.Out).ShouldNot(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
-							Consistently(session.Out).ShouldNot(Say("CLI-MESSAGE-UNINSTALL"))
-							Consistently(session.Out).ShouldNot(Say("Plugin some-plugin successfully uninstalled\\."))
+							Consistently(session).ShouldNot(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
+							Consistently(session).ShouldNot(Say("CLI-MESSAGE-UNINSTALL"))
+							Consistently(session).ShouldNot(Say("Plugin some-plugin successfully uninstalled\\."))
 
 							Eventually(session).Should(Exit(0))
 						})
@@ -568,13 +568,13 @@ var _ = Describe("install-plugin command", func() {
 					It("does not install the plugin and does not create a bad state", func() {
 						session := helpers.CFWithStdin(buffer, "install-plugin", pluginPath)
 
-						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]:", helpers.ConvertPathToRegularExpression(pluginPath)))
+						Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+						Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
+						Eventually(session).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]:", helpers.ConvertPathToRegularExpression(pluginPath)))
 
 						session.Interrupt()
 
-						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session).Should(Say("FAILED"))
 
 						// There is a timing issue -- the exit code may be either 1 (processed error), 2 (config writing error), or 130 (Ctrl-C)
 						Eventually(session).Should(SatisfyAny(Exit(1), Exit(2), Exit(130)))
@@ -639,15 +639,15 @@ var _ = Describe("install-plugin command", func() {
 				It("installs the plugin", func() {
 					session := helpers.CF("install-plugin", "-f", server.URL(), "-k")
 
-					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+					Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+					Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-					Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
+					Eventually(session).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
+					Eventually(session).Should(Say("\\d.* .*B / ?"))
 
-					Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
-					Eventually(session.Out).Should(Say("OK"))
-					Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+					Eventually(session).Should(Say("Installing plugin some-plugin\\.\\.\\."))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 
 					Eventually(session).Should(Exit(0))
 				})
@@ -669,9 +669,9 @@ var _ = Describe("install-plugin command", func() {
 					It("installs the plugin", func() {
 						session := helpers.CF("install-plugin", "-f", fmt.Sprintf("%s/redirect", server.URL()), "-k")
 
-						Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
-						Eventually(session.Out).Should(Say("OK"))
-						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+						Eventually(session).Should(Say("Installing plugin some-plugin\\.\\.\\."))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 
 						Eventually(session).Should(Exit(0))
 					})
@@ -685,17 +685,17 @@ var _ = Describe("install-plugin command", func() {
 					It("uninstalls and reinstalls the plugin", func() {
 						session := helpers.CF("install-plugin", "-f", server.URL(), "-k")
 
-						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+						Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+						Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
 
-						Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-						Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
+						Eventually(session).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
+						Eventually(session).Should(Say("\\d.* .*B / ?"))
 
-						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
-						Eventually(session.Out).Should(Say("CLI-MESSAGE-UNINSTALL"))
-						Eventually(session.Out).Should(Say("Plugin some-plugin successfully uninstalled\\."))
-						Eventually(session.Out).Should(Say("OK"))
-						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+						Eventually(session).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
+						Eventually(session).Should(Say("CLI-MESSAGE-UNINSTALL"))
+						Eventually(session).Should(Say("Plugin some-plugin successfully uninstalled\\."))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 
 						Eventually(session).Should(Exit(0))
 					})
@@ -715,8 +715,8 @@ var _ = Describe("install-plugin command", func() {
 				It("displays an appropriate error", func() {
 					session := helpers.CF("install-plugin", "-f", server.URL(), "-k")
 
-					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Download attempt failed; server returned 404 Not Found"))
 					Eventually(session.Err).Should(Say("Unable to install; plugin is not available from the given URL\\."))
 
@@ -748,8 +748,8 @@ var _ = Describe("install-plugin command", func() {
 				It("tells the user that the file is not a plugin and fails", func() {
 					session := helpers.CF("install-plugin", "-f", server.URL(), "-k")
 
-					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("File is not a valid cf CLI plugin binary\\."))
 
 					Eventually(session).Should(Exit(1))
@@ -794,16 +794,16 @@ var _ = Describe("install-plugin command", func() {
 				It("installs the plugin", func() {
 					session := helpers.CFWithStdin(buffer, "install-plugin", server.URL(), "-k")
 
-					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-					Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", server.URL()))
+					Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+					Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
+					Eventually(session).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", server.URL()))
 
-					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-					Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
+					Eventually(session).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
+					Eventually(session).Should(Say("\\d.* .*B / ?"))
 
-					Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
-					Eventually(session.Out).Should(Say("OK"))
-					Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+					Eventually(session).Should(Say("Installing plugin some-plugin\\.\\.\\."))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 
 					Eventually(session).Should(Exit(0))
 				})
@@ -816,14 +816,14 @@ var _ = Describe("install-plugin command", func() {
 					It("fails and tells the user how to force a reinstall", func() {
 						session := helpers.CFWithStdin(buffer, "install-plugin", server.URL(), "-k")
 
-						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", server.URL()))
+						Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+						Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
+						Eventually(session).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", server.URL()))
 
-						Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-						Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
+						Eventually(session).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
+						Eventually(session).Should(Say("\\d.* .*B / ?"))
 
-						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Plugin some-plugin 1\\.0\\.0 could not be installed\\. A plugin with that name is already installed\\."))
 						Eventually(session.Err).Should(Say("TIP: Use 'cf install-plugin -f' to force a reinstall\\."))
 						Eventually(session).Should(Exit(1))
@@ -840,10 +840,10 @@ var _ = Describe("install-plugin command", func() {
 				It("does not install the plugin", func() {
 					session := helpers.CFWithStdin(buffer, "install-plugin", server.URL())
 
-					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-					Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: n", server.URL()))
-					Eventually(session.Out).Should(Say("Plugin installation cancelled\\."))
+					Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+					Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
+					Eventually(session).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: n", server.URL()))
+					Eventually(session).Should(Say("Plugin installation cancelled\\."))
 
 					Eventually(session).Should(Exit(0))
 
@@ -860,13 +860,13 @@ var _ = Describe("install-plugin command", func() {
 				It("does not install the plugin and does not create a bad state", func() {
 					session := helpers.CFWithStdin(buffer, "install-plugin", pluginPath)
 
-					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-					Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]:", helpers.ConvertPathToRegularExpression(pluginPath)))
+					Eventually(session).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+					Eventually(session).Should(Say("Install and use plugins at your own risk\\."))
+					Eventually(session).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]:", helpers.ConvertPathToRegularExpression(pluginPath)))
 
 					session.Interrupt()
 
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 
 					// There is a timing issue -- the exit code may be either 1 (processed error), 2 (config writing error), or 130 (Ctrl-C)
 					Eventually(session).Should(SatisfyAny(Exit(1), Exit(2), Exit(130)))

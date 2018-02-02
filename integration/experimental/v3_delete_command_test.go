@@ -40,14 +40,14 @@ var _ = Describe("v3-delete command", func() {
 			session := helpers.CF("v3-delete")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-delete", appName)
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -124,7 +124,7 @@ var _ = Describe("v3-delete command", func() {
 
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("v3-delete", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -139,7 +139,7 @@ var _ = Describe("v3-delete command", func() {
 
 			It("fails with no targeted space error message", func() {
 				session := helpers.CF("v3-delete", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -160,9 +160,9 @@ var _ = Describe("v3-delete command", func() {
 				It("it displays the app does not exist", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CF("v3-delete", appName, "-f")
-					Eventually(session.Out).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
-					Eventually(session.Out).Should(Say("App %s does not exist", appName))
-					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("App %s does not exist", appName))
+					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -182,10 +182,10 @@ var _ = Describe("v3-delete command", func() {
 					It("it displays the app does not exist", func() {
 						username, _ := helpers.GetCredentials()
 						session := helpers.CFWithStdin(buffer, "v3-delete", appName)
-						Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session.Out).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
-						Eventually(session.Out).Should(Say("App %s does not exist", appName))
-						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
+						Eventually(session).Should(Say("App %s does not exist", appName))
+						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -197,8 +197,8 @@ var _ = Describe("v3-delete command", func() {
 
 					It("does not delete the app", func() {
 						session := helpers.CFWithStdin(buffer, "v3-delete", appName)
-						Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session.Out).Should(Say("Delete cancelled"))
+						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("Delete cancelled"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -210,8 +210,8 @@ var _ = Describe("v3-delete command", func() {
 
 					It("does not delete the app", func() {
 						session := helpers.CFWithStdin(buffer, "v3-delete", appName)
-						Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session.Out).Should(Say("Delete cancelled"))
+						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("Delete cancelled"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -226,9 +226,9 @@ var _ = Describe("v3-delete command", func() {
 
 					It("asks again", func() {
 						session := helpers.CFWithStdin(buffer, "v3-delete", appName)
-						Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session.Out).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
-						Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
+						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -245,7 +245,7 @@ var _ = Describe("v3-delete command", func() {
 			It("deletes the app", func() {
 				session := helpers.CF("v3-delete", appName, "-f")
 				username, _ := helpers.GetCredentials()
-				Eventually(session.Out).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
+				Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 

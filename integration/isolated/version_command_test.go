@@ -55,7 +55,7 @@ var _ = Describe("version command", func() {
 				GinkgoWriter)
 			Expect(err).ToNot(HaveOccurred())
 
-			Eventually(session.Out).Should(Say(expectedOutput))
+			Eventually(session).Should(Say(expectedOutput))
 			Eventually(session).Should(Exit(0))
 
 			CleanupBuildArtifacts()

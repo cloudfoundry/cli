@@ -21,14 +21,14 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("add-plugin-repo", "--help", "-k")
 
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("add-plugin-repo - Add a new plugin repository"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf add-plugin-repo REPO_NAME URL"))
-				Eventually(session.Out).Should(Say("EXAMPLES"))
-				Eventually(session.Out).Should(Say("cf add-plugin-repo ExampleRepo https://example\\.com/repo"))
-				Eventually(session.Out).Should(Say("SEE ALSO:"))
-				Eventually(session.Out).Should(Say("install-plugin, list-plugin-repos"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("add-plugin-repo - Add a new plugin repository"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf add-plugin-repo REPO_NAME URL"))
+				Eventually(session).Should(Say("EXAMPLES"))
+				Eventually(session).Should(Say("cf add-plugin-repo ExampleRepo https://example\\.com/repo"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("install-plugin, list-plugin-repos"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -40,7 +40,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				session := helpers.CF("add-plugin-repo", "-k")
 
 				Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `REPO_NAME` and `URL` were not provided"))
-				Eventually(session.Out).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -50,7 +50,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				session := helpers.CF("add-plugin-repo", "repo-name", "-k")
 
 				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `URL` was not provided"))
-				Eventually(session.Out).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -87,7 +87,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		It("succeeds and exits 0", func() {
 			session := helpers.CF("add-plugin-repo", "repo1", serverURL, "-k")
 
-			Eventually(session.Out).Should(Say("%s added as repo1", serverURL))
+			Eventually(session).Should(Say("%s added as repo1", serverURL))
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -99,7 +99,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("allows the duplicate repo URL", func() {
 				session := helpers.CF("add-plugin-repo", "some-repo", serverURL, "-k")
 
-				Eventually(session.Out).Should(Say("%s added as some-repo", serverURL))
+				Eventually(session).Should(Say("%s added as some-repo", serverURL))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -113,7 +113,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				It("succeeds and exists 0", func() {
 					session := helpers.CF("add-plugin-repo", "rEPo1", serverURL, "-k")
 
-					Eventually(session.Out).Should(Say("%s already registered as repo1", serverURL))
+					Eventually(session).Should(Say("%s already registered as repo1", serverURL))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -131,7 +131,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "repo1", serverURL, "-k")
 
-					Eventually(session.Out).Should(Say("%s already registered as repo1", serverURL))
+					Eventually(session).Should(Say("%s already registered as repo1", serverURL))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -140,7 +140,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "repo1", fmt.Sprintf("%s/", serverURL), "-k")
 
-					Eventually(session.Out).Should(Say("%s already registered as repo1", serverURL))
+					Eventually(session).Should(Say("%s already registered as repo1", serverURL))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -164,7 +164,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "some-repo", fmt.Sprintf("%s/some-path/list", serverURL), "-k")
 
-					Eventually(session.Out).Should(Say("%s/some-path/list added as some-repo", serverURL))
+					Eventually(session).Should(Say("%s/some-path/list added as some-repo", serverURL))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -173,7 +173,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "some-repo", fmt.Sprintf("%s/some-path", serverURL), "-k")
 
-					Eventually(session.Out).Should(Say("%s/some-path added as some-repo", serverURL))
+					Eventually(session).Should(Say("%s/some-path added as some-repo", serverURL))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -182,7 +182,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "some-repo", fmt.Sprintf("%s/some-path/", serverURL), "-k")
 
-					Eventually(session.Out).Should(Say("%s/some-path/ added as some-repo", serverURL))
+					Eventually(session).Should(Say("%s/some-path/ added as some-repo", serverURL))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -207,7 +207,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", "ftp://example.com/repo", "-k")
 
 				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from ftp://example\\.com/repo: Get ftp://example\\.com/repo/list: unsupported protocol scheme \"ftp\""))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -217,7 +217,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", "cfpluginrepothatdoesnotexist.cf-app.com", "-k")
 
 				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from https://cfpluginrepothatdoesnotexist\\.cf-app\\.com: Get https://cfpluginrepothatdoesnotexist\\.cf-app\\.com/list: dial tcp: lookup cfpluginrepothatdoesnotexist\\.cf-app\\.com.*: no such host"))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -235,7 +235,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from https://127\\.0\\.0\\.1:\\d{1,5}"))
 				Eventually(session.Err).Should(Say("HTTP Response: 404"))
 				Eventually(session.Err).Should(Say("HTTP Response Body: foobar"))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -249,7 +249,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", server.URL(), "-k")
 
 				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from https://127\\.0\\.0\\.1:\\d{1,5}: invalid character '}' looking for beginning of value"))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 		})

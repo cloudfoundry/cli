@@ -15,10 +15,10 @@ var _ = Describe("get-health-check command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("get-health-check", "--help")
 
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("   get-health-check - Show the type of health check performed on an app"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("   cf get-health-check APP_NAME"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("   get-health-check - Show the type of health check performed on an app"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("   cf get-health-check APP_NAME"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -53,7 +53,7 @@ var _ = Describe("get-health-check command", func() {
 					session := helpers.CF("get-health-check")
 
 					Eventually(session.Err).Should(Say("Incorrect Usage:"))
-					Eventually(session.Out).Should(Say("NAME:"))
+					Eventually(session).Should(Say("NAME:"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -64,9 +64,9 @@ var _ = Describe("get-health-check command", func() {
 					session := helpers.CF("get-health-check", appName, "extra")
 					username, _ := helpers.GetCredentials()
 
-					Eventually(session.Out).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
 					Eventually(session.Err).Should(Say("App %s not found", appName))
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -78,9 +78,9 @@ var _ = Describe("get-health-check command", func() {
 				session := helpers.CF("get-health-check", appName)
 				username, _ := helpers.GetCredentials()
 
-				Eventually(session.Out).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
+				Eventually(session).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -107,10 +107,10 @@ var _ = Describe("get-health-check command", func() {
 				It("shows an endpoint", func() {
 					session := helpers.CF("get-health-check", appName)
 
-					Eventually(session.Out).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
-					Eventually(session.Out).Should(Say("\n\n"))
-					Eventually(session.Out).Should(Say("health check type:          http"))
-					Eventually(session.Out).Should(Say("endpoint \\(for http type\\):   /"))
+					Eventually(session).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("\n\n"))
+					Eventually(session).Should(Say("health check type:          http"))
+					Eventually(session).Should(Say("endpoint \\(for http type\\):   /"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -123,10 +123,10 @@ var _ = Describe("get-health-check command", func() {
 				It("show the custom endpoint", func() {
 					session := helpers.CF("get-health-check", appName)
 
-					Eventually(session.Out).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
-					Eventually(session.Out).Should(Say("\n\n"))
-					Eventually(session.Out).Should(Say("health check type:          http"))
-					Eventually(session.Out).Should(Say("endpoint \\(for http type\\):   /some-endpoint"))
+					Eventually(session).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("\n\n"))
+					Eventually(session).Should(Say("health check type:          http"))
+					Eventually(session).Should(Say("endpoint \\(for http type\\):   /some-endpoint"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -139,10 +139,10 @@ var _ = Describe("get-health-check command", func() {
 				It("does not show an endpoint", func() {
 					session := helpers.CF("get-health-check", appName)
 
-					Eventually(session.Out).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
-					Eventually(session.Out).Should(Say("\n\n"))
-					Eventually(session.Out).Should(Say("health check type:          none"))
-					Eventually(session.Out).Should(Say("(?m)endpoint \\(for http type\\):   $"))
+					Eventually(session).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("\n\n"))
+					Eventually(session).Should(Say("health check type:          none"))
+					Eventually(session).Should(Say("(?m)endpoint \\(for http type\\):   $"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -155,10 +155,10 @@ var _ = Describe("get-health-check command", func() {
 				It("does not show an endpoint", func() {
 					session := helpers.CF("get-health-check", appName)
 
-					Eventually(session.Out).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
-					Eventually(session.Out).Should(Say("\n\n"))
-					Eventually(session.Out).Should(Say("health check type:          port"))
-					Eventually(session.Out).Should(Say("(?m)endpoint \\(for http type\\):   $"))
+					Eventually(session).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("\n\n"))
+					Eventually(session).Should(Say("health check type:          port"))
+					Eventually(session).Should(Say("(?m)endpoint \\(for http type\\):   $"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -171,10 +171,10 @@ var _ = Describe("get-health-check command", func() {
 				It("does not show an endpoint", func() {
 					session := helpers.CF("get-health-check", appName)
 
-					Eventually(session.Out).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
-					Eventually(session.Out).Should(Say("\n\n"))
-					Eventually(session.Out).Should(Say("health check type:          process"))
-					Eventually(session.Out).Should(Say("(?m)endpoint \\(for http type\\):   $"))
+					Eventually(session).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("\n\n"))
+					Eventually(session).Should(Say("health check type:          process"))
+					Eventually(session).Should(Say("(?m)endpoint \\(for http type\\):   $"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -188,10 +188,10 @@ var _ = Describe("get-health-check command", func() {
 				It("does not show an endpoint", func() {
 					session := helpers.CF("get-health-check", appName)
 
-					Eventually(session.Out).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
-					Eventually(session.Out).Should(Say("\n\n"))
-					Eventually(session.Out).Should(Say("health check type:          process"))
-					Eventually(session.Out).Should(Say("(?m)endpoint \\(for http type\\):   $"))
+					Eventually(session).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("\n\n"))
+					Eventually(session).Should(Say("health check type:          process"))
+					Eventually(session).Should(Say("(?m)endpoint \\(for http type\\):   $"))
 					Eventually(session).Should(Exit(0))
 				})
 			})

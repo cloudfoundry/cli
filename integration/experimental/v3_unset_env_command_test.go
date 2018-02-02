@@ -31,12 +31,12 @@ var _ = Describe("v3-unset-env command", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("v3-unset-env", "--help")
 
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-unset-env - Remove an env variable from an app"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-unset-env APP_NAME ENV_VAR_NAME"))
-				Eventually(session.Out).Should(Say("SEE ALSO:"))
-				Eventually(session.Out).Should(Say("v3-apps, v3-env, v3-restart, v3-set-env, v3-stage"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("v3-unset-env - Remove an env variable from an app"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf v3-unset-env APP_NAME ENV_VAR_NAME"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("v3-apps, v3-env, v3-restart, v3-set-env, v3-stage"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -47,7 +47,7 @@ var _ = Describe("v3-unset-env command", func() {
 			session := helpers.CF("v3-unset-env")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `APP_NAME` and `ENV_VAR_NAME` were not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -57,14 +57,14 @@ var _ = Describe("v3-unset-env command", func() {
 			session := helpers.CF("v3-unset-env", appName)
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `ENV_VAR_NAME` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-unset-env", appName, envVarName)
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -141,7 +141,7 @@ var _ = Describe("v3-unset-env command", func() {
 
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("v3-unset-env", appName, envVarName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -156,7 +156,7 @@ var _ = Describe("v3-unset-env command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("v3-unset-env", appName, envVarName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -176,9 +176,9 @@ var _ = Describe("v3-unset-env command", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("v3-unset-env", invalidAppName, envVarName)
 
-				Eventually(session.Out).Should(Say("Removing env variable %s from app %s in org %s / space %s as %s\\.\\.\\.", envVarName, invalidAppName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Removing env variable %s from app %s in org %s / space %s as %s\\.\\.\\.", envVarName, invalidAppName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -194,9 +194,9 @@ var _ = Describe("v3-unset-env command", func() {
 				It("returns a warning indicating variable was not set", func() {
 					session := helpers.CF("v3-unset-env", appName, envVarName)
 
-					Eventually(session.Out).Should(Say("Removing env variable %s from app %s in org %s / space %s as %s\\.\\.\\.", envVarName, appName, orgName, spaceName, userName))
-					Eventually(session.Out).Should(Say("Env variable %s was not set.", envVarName))
-					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session).Should(Say("Removing env variable %s from app %s in org %s / space %s as %s\\.\\.\\.", envVarName, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("Env variable %s was not set.", envVarName))
+					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -209,12 +209,12 @@ var _ = Describe("v3-unset-env command", func() {
 				It("overrides the value of the existing environment variable", func() {
 					session := helpers.CF("v3-unset-env", appName, envVarName)
 
-					Eventually(session.Out).Should(Say("Removing env variable %s from app %s in org %s / space %s as %s\\.\\.\\.", envVarName, appName, orgName, spaceName, userName))
-					Eventually(session.Out).Should(Say("OK"))
-					Eventually(session.Out).Should(Say("TIP: Use 'cf v3-stage %s' to ensure your env variable changes take effect\\.", appName))
+					Eventually(session).Should(Say("Removing env variable %s from app %s in org %s / space %s as %s\\.\\.\\.", envVarName, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("TIP: Use 'cf v3-stage %s' to ensure your env variable changes take effect\\.", appName))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
-					Eventually(session.Out).ShouldNot(Say(`"%s"`, envVarName))
+					Eventually(session).ShouldNot(Say(`"%s"`, envVarName))
 					Eventually(session).Should(Exit(0))
 				})
 			})

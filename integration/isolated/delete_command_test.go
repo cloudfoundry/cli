@@ -60,7 +60,7 @@ var _ = XDescribe("delete command", func() {
 				session := helpers.CF("delete")
 
 				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-				Eventually(session.Out).Should(Say("NAME:"))
+				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -71,10 +71,10 @@ var _ = XDescribe("delete command", func() {
 				buffer.Write([]byte("y\n"))
 				session := helpers.CFWithStdin(buffer, "delete")
 
-				Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-				Eventually(session.Out).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say("App %s does not exist.", appName))
+				Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+				Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("App %s does not exist.", appName))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -104,9 +104,9 @@ var _ = XDescribe("delete command", func() {
 
 					It("deletes the app", func() {
 						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session.Out).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 						Eventually(helpers.CF("app", appName)).Should(Exit(1))
 					})
@@ -119,9 +119,9 @@ var _ = XDescribe("delete command", func() {
 
 					It("does not delete the app", func() {
 						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session.Out).Should(Say("Delete cancelled"))
-						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("Delete cancelled"))
+						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 						Eventually(helpers.CF("app", appName)).Should(Exit(0))
 					})
@@ -134,9 +134,9 @@ var _ = XDescribe("delete command", func() {
 
 					It("does not delete the app", func() {
 						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session.Out).Should(Say("Delete cancelled"))
-						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("Delete cancelled"))
+						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 						Eventually(helpers.CF("app", appName)).Should(Exit(0))
 					})
@@ -152,9 +152,9 @@ var _ = XDescribe("delete command", func() {
 
 					It("asks again", func() {
 						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session.Out).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
-						Eventually(session.Out).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
+						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
 						Eventually(session).Should(Exit(0))
 						Eventually(helpers.CF("app", appName)).Should(Exit(0))
 					})
@@ -164,9 +164,9 @@ var _ = XDescribe("delete command", func() {
 			Context("when the -f flag is provided", func() {
 				It("deletes the app without prompting", func() {
 					session := helpers.CF("delete", appName, "-f")
-					Eventually(session.Out).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-					Eventually(session.Out).Should(Say("Delete cancelled"))
-					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("Delete cancelled"))
+					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("app", appName)).Should(Exit(1))
 				})

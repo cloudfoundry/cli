@@ -60,7 +60,7 @@ var _ = Describe("app command", func() {
 				session := helpers.CF("app")
 
 				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-				Eventually(session.Out).Should(Say("NAME:"))
+				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -71,7 +71,7 @@ var _ = Describe("app command", func() {
 					appName := helpers.PrefixedRandomName("app")
 					session := helpers.CF("app", appName)
 
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("App %s not found", appName))
 					Eventually(session).Should(Exit(1))
 				})
@@ -82,7 +82,7 @@ var _ = Describe("app command", func() {
 					appName := helpers.PrefixedRandomName("app")
 					session := helpers.CF("app", "--guid", appName)
 
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("App %s not found", appName))
 					Eventually(session).Should(Exit(1))
 				})

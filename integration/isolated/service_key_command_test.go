@@ -54,8 +54,8 @@ var _ = Describe("service-key command", func() {
 
 		It("outputs an error message and exits 1", func() {
 			session := helpers.CF("service-key", serviceInstance, "some-service-key")
-			Eventually(session.Out).Should(Say("FAILED"))
-			Eventually(session.Out).Should(Say(fmt.Sprintf("No service key some-service-key found for service instance %s", serviceInstance)))
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Say(fmt.Sprintf("No service key some-service-key found for service instance %s", serviceInstance)))
 			Eventually(session).Should(Exit(1))
 		})
 

@@ -47,14 +47,14 @@ var _ = Describe("v3-create-package command", func() {
 			session := helpers.CF("v3-create-package")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-create-package", appName)
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -63,7 +63,7 @@ var _ = Describe("v3-create-package command", func() {
 			session := helpers.CF("v3-create-package", appName, "-p")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `-p'"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -73,7 +73,7 @@ var _ = Describe("v3-create-package command", func() {
 			session := helpers.CF("v3-create-package", appName, "-p", "path/that/does/not/exist")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'path/that/does/not/exist' does not exist."))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -151,7 +151,7 @@ var _ = Describe("v3-create-package command", func() {
 
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("v3-create-package", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -166,7 +166,7 @@ var _ = Describe("v3-create-package command", func() {
 
 			It("fails with no targeted space error message", func() {
 				session := helpers.CF("v3-create-package", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -370,9 +370,9 @@ var _ = Describe("v3-create-package command", func() {
 				It("displays an error and exits 1", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session := helpers.CF("v3-create-package", appName, "-o", PublicDockerImage, "-p", appDir)
-						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --docker-image, -o, -p"))
-						Eventually(session.Out).Should(Say("NAME:"))
+						Eventually(session).Should(Say("NAME:"))
 						Eventually(session).Should(Exit(1))
 					})
 				})

@@ -20,35 +20,35 @@ var _ = Describe("help command", func() {
 			session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 
-			Eventually(session.Out).Should(Say("Cloud Foundry command line tool"))
-			Eventually(session.Out).Should(Say("\\[global options\\] command \\[arguments...\\] \\[command options\\]"))
-			Eventually(session.Out).Should(Say("Before getting started:"))
-			Eventually(session.Out).Should(Say("  config\\s+login,l\\s+target,t"))
-			Eventually(session.Out).Should(Say("Application lifecycle:"))
-			Eventually(session.Out).Should(Say("  apps,a\\s+run-task,rt\\s+events"))
-			Eventually(session.Out).Should(Say("  restage,rg\\s+scale"))
+			Eventually(session).Should(Say("Cloud Foundry command line tool"))
+			Eventually(session).Should(Say("\\[global options\\] command \\[arguments...\\] \\[command options\\]"))
+			Eventually(session).Should(Say("Before getting started:"))
+			Eventually(session).Should(Say("  config\\s+login,l\\s+target,t"))
+			Eventually(session).Should(Say("Application lifecycle:"))
+			Eventually(session).Should(Say("  apps,a\\s+run-task,rt\\s+events"))
+			Eventually(session).Should(Say("  restage,rg\\s+scale"))
 
-			Eventually(session.Out).Should(Say("Services integration:"))
-			Eventually(session.Out).Should(Say("  marketplace,m\\s+create-user-provided-service,cups"))
-			Eventually(session.Out).Should(Say("  services,s\\s+update-user-provided-service,uups"))
+			Eventually(session).Should(Say("Services integration:"))
+			Eventually(session).Should(Say("  marketplace,m\\s+create-user-provided-service,cups"))
+			Eventually(session).Should(Say("  services,s\\s+update-user-provided-service,uups"))
 
-			Eventually(session.Out).Should(Say("Route and domain management:"))
-			Eventually(session.Out).Should(Say("  routes,r\\s+delete-route\\s+create-domain"))
-			Eventually(session.Out).Should(Say("  domains\\s+map-route"))
+			Eventually(session).Should(Say("Route and domain management:"))
+			Eventually(session).Should(Say("  routes,r\\s+delete-route\\s+create-domain"))
+			Eventually(session).Should(Say("  domains\\s+map-route"))
 
-			Eventually(session.Out).Should(Say("Space management:"))
-			Eventually(session.Out).Should(Say("  spaces\\s+create-space\\s+set-space-role"))
+			Eventually(session).Should(Say("Space management:"))
+			Eventually(session).Should(Say("  spaces\\s+create-space\\s+set-space-role"))
 
-			Eventually(session.Out).Should(Say("Org management:"))
-			Eventually(session.Out).Should(Say("  orgs,o\\s+set-org-role"))
+			Eventually(session).Should(Say("Org management:"))
+			Eventually(session).Should(Say("  orgs,o\\s+set-org-role"))
 
-			Eventually(session.Out).Should(Say("CLI plugin management:"))
-			Eventually(session.Out).Should(Say("  install-plugin    list-plugin-repos"))
-			Eventually(session.Out).Should(Say("Global options:"))
-			Eventually(session.Out).Should(Say("  --help, -h                         Show help"))
-			Eventually(session.Out).Should(Say("  -v                                 Print API request diagnostics to stdout"))
+			Eventually(session).Should(Say("CLI plugin management:"))
+			Eventually(session).Should(Say("  install-plugin    list-plugin-repos"))
+			Eventually(session).Should(Say("Global options:"))
+			Eventually(session).Should(Say("  --help, -h                         Show help"))
+			Eventually(session).Should(Say("  -v                                 Print API request diagnostics to stdout"))
 
-			Eventually(session.Out).Should(Say("Use 'cf help -a' to see all commands\\."))
+			Eventually(session).Should(Say("Use 'cf help -a' to see all commands\\."))
 			Eventually(session).Should(Exit(0))
 		},
 
@@ -103,19 +103,19 @@ var _ = Describe("help command", func() {
 	Describe("commands that appear in cf help -a", func() {
 		It("includes run-task", func() {
 			session := helpers.CF("help", "-a")
-			Eventually(session.Out).Should(Say("run-task\\s+Run a one-off task on an app"))
+			Eventually(session).Should(Say("run-task\\s+Run a one-off task on an app"))
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("includes list-task", func() {
 			session := helpers.CF("help", "-a")
-			Eventually(session.Out).Should(Say("tasks\\s+List tasks of an app"))
+			Eventually(session).Should(Say("tasks\\s+List tasks of an app"))
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("includes terminate-task", func() {
 			session := helpers.CF("help", "-a")
-			Eventually(session.Out).Should(Say("terminate-task\\s+Terminate a running task of an app"))
+			Eventually(session).Should(Say("terminate-task\\s+Terminate a running task of an app"))
 			Eventually(session).Should(Exit(0))
 		})
 	})

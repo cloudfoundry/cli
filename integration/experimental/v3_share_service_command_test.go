@@ -36,15 +36,15 @@ var _ = PDescribe("v3-share-service command", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-share-service", "--help")
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-share-service - Share a service instance with another space"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-share-service SERVICE_INSTANCE -s OTHER_SPACE \\[-o OTHER_ORG\\]"))
-				Eventually(session.Out).Should(Say("OPTIONS:"))
-				Eventually(session.Out).Should(Say("-o\\s+Org of the other space \\(Default: targeted org\\)"))
-				Eventually(session.Out).Should(Say("-s\\s+Space to share the service instance into"))
-				Eventually(session.Out).Should(Say("SEE ALSO:"))
-				Eventually(session.Out).Should(Say("bind-service, service, services, v3-unshare-service"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("v3-share-service - Share a service instance with another space"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf v3-share-service SERVICE_INSTANCE -s OTHER_SPACE \\[-o OTHER_ORG\\]"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("-o\\s+Org of the other space \\(Default: targeted org\\)"))
+				Eventually(session).Should(Say("-s\\s+Space to share the service instance into"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("bind-service, service, services, v3-unshare-service"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -55,7 +55,7 @@ var _ = PDescribe("v3-share-service command", func() {
 			session := helpers.CF("v3-share-service", "-s", sharedToSpaceName)
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `SERVICE_INSTANCE` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -65,14 +65,14 @@ var _ = PDescribe("v3-share-service command", func() {
 			session := helpers.CF("v3-share-service")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required flag `-s' was not specified"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -149,7 +149,7 @@ var _ = PDescribe("v3-share-service command", func() {
 
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -164,7 +164,7 @@ var _ = PDescribe("v3-share-service command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
 			})

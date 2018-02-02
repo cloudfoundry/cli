@@ -35,7 +35,7 @@ var _ = Describe("error handling", func() {
 
 				Eventually(session.Err).Should(Say("the required argument `SPACE` was not provided"))
 				Consistently(session.Err).ShouldNot(Say("the required argument `SPACE` was not provided"))
-				Consistently(session.Out).ShouldNot(Say("the required argument `SPACE` was not provided"))
+				Consistently(session).ShouldNot(Say("the required argument `SPACE` was not provided"))
 				Eventually(session).Should(Exit(1))
 			})
 		})

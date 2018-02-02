@@ -29,12 +29,12 @@ var _ = Describe("v3-stage command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-stage", "--help")
 
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("   v3-stage - Create a new droplet for an app"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("   cf v3-stage APP_NAME --package-guid PACKAGE_GUID"))
-				Eventually(session.Out).Should(Say("OPTIONS:"))
-				Eventually(session.Out).Should(Say("   --package-guid      The guid of the package to stage"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("   v3-stage - Create a new droplet for an app"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("   cf v3-stage APP_NAME --package-guid PACKAGE_GUID"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("   --package-guid      The guid of the package to stage"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -46,7 +46,7 @@ var _ = Describe("v3-stage command", func() {
 			session := helpers.CF("v3-stage", "--package-guid", "some-package-guid")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -56,7 +56,7 @@ var _ = Describe("v3-stage command", func() {
 			session := helpers.CF("v3-stage", "some-app")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required flag `--package-guid' was not specified"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 
 			Eventually(session).Should(Exit(1))
 		})
@@ -64,7 +64,7 @@ var _ = Describe("v3-stage command", func() {
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -141,7 +141,7 @@ var _ = Describe("v3-stage command", func() {
 
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -156,7 +156,7 @@ var _ = Describe("v3-stage command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -194,11 +194,11 @@ var _ = Describe("v3-stage command", func() {
 				session := helpers.CF("v3-stage", appName, "--package-guid", packageGUID)
 				userName, _ := helpers.GetCredentials()
 
-				Eventually(session.Out).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say("Package staged"))
-				Eventually(session.Out).Should(Say("droplet guid:\\s+%s", helpers.GUIDRegex))
-				Eventually(session.Out).Should(Say("state:\\s+staged"))
-				Eventually(session.Out).Should(Say("created:\\s+%s", helpers.UserFriendlyDateRegex))
+				Eventually(session).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Package staged"))
+				Eventually(session).Should(Say("droplet guid:\\s+%s", helpers.GUIDRegex))
+				Eventually(session).Should(Say("state:\\s+staged"))
+				Eventually(session).Should(Say("created:\\s+%s", helpers.UserFriendlyDateRegex))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -209,9 +209,9 @@ var _ = Describe("v3-stage command", func() {
 				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				userName, _ := helpers.GetCredentials()
 
-				Eventually(session.Out).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 
 				Eventually(session).Should(Exit(1))
 			})
@@ -226,9 +226,9 @@ var _ = Describe("v3-stage command", func() {
 				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				userName, _ := helpers.GetCredentials()
 
-				Eventually(session.Out).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("Unable to use package\\. Ensure that the package exists and you have access to it\\."))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 		})

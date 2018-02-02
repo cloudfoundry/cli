@@ -43,7 +43,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			session := helpers.CF("v3-restart-app-instance")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `APP_NAME` and `INDEX` were not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -53,14 +53,14 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			session := helpers.CF("v3-restart-app-instance", appName)
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `INDEX` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-restart-app-instance", appName, "1")
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -137,7 +137,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("v3-restart-app-instance", appName, "1")
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -152,7 +152,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 
 			It("fails with no targeted space error message", func() {
 				session := helpers.CF("v3-restart-app-instance", appName, "1")
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -174,7 +174,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 		Context("when app does not exist", func() {
 			It("fails with error", func() {
 				session := helpers.CF("v3-restart-app-instance", appName, "0", "--process", "some-process")
-				Eventually(session.Out).Should(Say("Restarting instance 0 of process some-process of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Restarting instance 0 of process some-process of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
 				Eventually(session).Should(Exit(1))
 			})
@@ -194,8 +194,8 @@ var _ = Describe("v3-restart-app-instance command", func() {
 					firstAppTable := helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
 					session := helpers.CF("v3-restart-app-instance", appName, "0")
-					Eventually(session.Out).Should(Say("Restarting instance 0 of process web of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
-					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session).Should(Say("Restarting instance 0 of process web of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
 					Eventually(func() string {
@@ -221,7 +221,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 				Context("when the process type does not exist", func() {
 					It("fails with error", func() {
 						session := helpers.CF("v3-restart-app-instance", appName, "0", "--process", "unknown-process")
-						Eventually(session.Out).Should(Say("Restarting instance 0 of process unknown-process of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say("Restarting instance 0 of process unknown-process of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
 						Eventually(session.Err).Should(Say("Process unknown-process not found"))
 						Eventually(session).Should(Exit(1))
 					})
@@ -258,8 +258,8 @@ var _ = Describe("v3-restart-app-instance command", func() {
 
 							By("restarting worker process instance")
 							session = helpers.CF("v3-restart-app-instance", appName, "0", "--process", "console")
-							Eventually(session.Out).Should(Say("Restarting instance 0 of process console of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
-							Eventually(session.Out).Should(Say("OK"))
+							Eventually(session).Should(Say("Restarting instance 0 of process console of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
 							By("waiting for restarted process instance to come up")
@@ -286,7 +286,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 					Context("when instance index does not exist", func() {
 						It("fails with error", func() {
 							session := helpers.CF("v3-restart-app-instance", appName, "42", "--process", constant.ProcessTypeWeb)
-							Eventually(session.Out).Should(Say("Restarting instance 42 of process web of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say("Restarting instance 42 of process web of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
 							Eventually(session.Err).Should(Say("Instance 42 of process web not found"))
 							Eventually(session).Should(Exit(1))
 						})

@@ -27,10 +27,10 @@ var _ = Describe("v3-stop-application command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-stop", "--help")
 
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-stop - Stop an app"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-stop APP_NAME"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("v3-stop - Stop an app"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf v3-stop APP_NAME"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -42,14 +42,14 @@ var _ = Describe("v3-stop-application command", func() {
 			session := helpers.CF("v3-stop")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-stop", appName)
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -126,7 +126,7 @@ var _ = Describe("v3-stop-application command", func() {
 
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("v3-stop", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -141,7 +141,7 @@ var _ = Describe("v3-stop-application command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("v3-stop", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -168,8 +168,8 @@ var _ = Describe("v3-stop-application command", func() {
 				userName, _ := helpers.GetCredentials()
 
 				session := helpers.CF("v3-stop", appName)
-				Eventually(session.Out).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("OK"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -183,7 +183,7 @@ var _ = Describe("v3-stop-application command", func() {
 					session := helpers.CF("v3-stop", appName)
 
 					Eventually(session.Err).Should(Say("App %s is already stopped", appName))
-					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session).Should(Say("OK"))
 
 					Eventually(session).Should(Exit(0))
 				})
@@ -195,7 +195,7 @@ var _ = Describe("v3-stop-application command", func() {
 					session := helpers.CF("v3-stop", invalidAppName)
 
 					Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 
 					Eventually(session).Should(Exit(1))
 				})

@@ -13,14 +13,14 @@ var _ = Describe("feature-flags command", func() {
 		Context("when --help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("feature-flags", "--help")
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("\\s+feature-flags - Retrieve list of feature flags with status"))
-				Eventually(session.Out).Should(Say(""))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("\\s+cf feature-flags"))
-				Eventually(session.Out).Should(Say(""))
-				Eventually(session.Out).Should(Say("SEE ALSO:"))
-				Eventually(session.Out).Should(Say("\\s+disable-feature-flag, enable-feature-flag"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("\\s+feature-flags - Retrieve list of feature flags with status"))
+				Eventually(session).Should(Say(""))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("\\s+cf feature-flags"))
+				Eventually(session).Should(Say(""))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("\\s+disable-feature-flag, enable-feature-flag"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -33,7 +33,7 @@ var _ = Describe("feature-flags command", func() {
 
 		It("displays an error message and exits 1", func() {
 			session := helpers.CF("feature-flags")
-			Eventually(session.Out).Should(Say("FAILED"))
+			Eventually(session).Should(Say("FAILED"))
 			Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
 			Eventually(session).Should(Exit(1))
 		})
@@ -46,7 +46,7 @@ var _ = Describe("feature-flags command", func() {
 
 		It("displays an error and exits 1", func() {
 			session := helpers.CF("feature-flags")
-			Eventually(session.Out).Should(Say("FAILED"))
+			Eventually(session).Should(Say("FAILED"))
 			Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
 			Eventually(session).Should(Exit(1))
 		})
@@ -60,10 +60,10 @@ var _ = Describe("feature-flags command", func() {
 		It("displays a list of feature flags with current state and exits 0", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CF("feature-flags")
-			Eventually(session.Out).Should(Say("Retrieving status of all flagged features as %s\\.\\.\\.", username))
-			Eventually(session.Out).Should(Say(""))
-			Eventually(session.Out).Should(Say("features\\s+state"))
-			Eventually(session.Out).Should(Say("[a-z_]+\\s+(enabled|disabled)"))
+			Eventually(session).Should(Say("Retrieving status of all flagged features as %s\\.\\.\\.", username))
+			Eventually(session).Should(Say(""))
+			Eventually(session).Should(Say("features\\s+state"))
+			Eventually(session).Should(Say("[a-z_]+\\s+(enabled|disabled)"))
 			Eventually(session).Should(Exit(0))
 		})
 	})

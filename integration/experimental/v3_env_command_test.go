@@ -31,12 +31,12 @@ var _ = Describe("v3-env command", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("v3-env", "--help")
 
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-env - Show all env variables for an app"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-env APP_NAME"))
-				Eventually(session.Out).Should(Say("SEE ALSO:"))
-				Eventually(session.Out).Should(Say("running-environment-variable-group, staging-environment-variable-group, v3-app, v3-apps, v3-set-env, v3-unset-env"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("v3-env - Show all env variables for an app"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf v3-env APP_NAME"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("running-environment-variable-group, staging-environment-variable-group, v3-app, v3-apps, v3-set-env, v3-unset-env"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -47,14 +47,14 @@ var _ = Describe("v3-env command", func() {
 			session := helpers.CF("v3-env")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-env", appName)
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -131,7 +131,7 @@ var _ = Describe("v3-env command", func() {
 
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("v3-env", appName, envVarName, envVarValue)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -146,7 +146,7 @@ var _ = Describe("v3-env command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("v3-env", appName, envVarName, envVarValue)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -170,9 +170,9 @@ var _ = Describe("v3-env command", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("v3-env", invalidAppName)
 
-				Eventually(session.Out).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -204,19 +204,19 @@ var _ = Describe("v3-env command", func() {
 			It("displays the environment variables", func() {
 				By("displaying env variables when they are set")
 				session := helpers.CF("v3-env", appName)
-				Eventually(session.Out).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say("System-Provided:"))
-				Eventually(session.Out).Should(Say("VCAP_SERVICES"))
-				Eventually(session.Out).Should(Say("VCAP_APPLICATION"))
+				Eventually(session).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("System-Provided:"))
+				Eventually(session).Should(Say("VCAP_SERVICES"))
+				Eventually(session).Should(Say("VCAP_APPLICATION"))
 
-				Eventually(session.Out).Should(Say("User-Provided:"))
-				Eventually(session.Out).Should(Say(`user-provided-env-name: "user-provided-env-value"`))
+				Eventually(session).Should(Say("User-Provided:"))
+				Eventually(session).Should(Say(`user-provided-env-name: "user-provided-env-value"`))
 
-				Eventually(session.Out).Should(Say("Running Environment Variable Groups:"))
-				Eventually(session.Out).Should(Say(`running-env-name: "running-env-value"`))
+				Eventually(session).Should(Say("Running Environment Variable Groups:"))
+				Eventually(session).Should(Say(`running-env-name: "running-env-value"`))
 
-				Eventually(session.Out).Should(Say("Staging Environment Variable Groups:"))
-				Eventually(session.Out).Should(Say(`staging-env-name: "staging-env-value"`))
+				Eventually(session).Should(Say("Staging Environment Variable Groups:"))
+				Eventually(session).Should(Say(`staging-env-name: "staging-env-value"`))
 				Eventually(session).Should(Exit(0))
 
 				By("displaying help messages when they are not set")
@@ -226,16 +226,16 @@ var _ = Describe("v3-env command", func() {
 				Eventually(helpers.CF("set-staging-environment-variable-group", `{}`)).Should(Exit(0))
 
 				session = helpers.CF("v3-env", appName)
-				Eventually(session.Out).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say("System-Provided:"))
-				Eventually(session.Out).ShouldNot(Say("VCAP_SERVICES"))
-				Eventually(session.Out).Should(Say("VCAP_APPLICATION"))
+				Eventually(session).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("System-Provided:"))
+				Eventually(session).ShouldNot(Say("VCAP_SERVICES"))
+				Eventually(session).Should(Say("VCAP_APPLICATION"))
 
-				Eventually(session.Out).Should(Say("No user-provided env variables have been set"))
+				Eventually(session).Should(Say("No user-provided env variables have been set"))
 
-				Eventually(session.Out).Should(Say("No running env variables have been set"))
+				Eventually(session).Should(Say("No running env variables have been set"))
 
-				Eventually(session.Out).Should(Say("No staging env variables have been set"))
+				Eventually(session).Should(Say("No staging env variables have been set"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

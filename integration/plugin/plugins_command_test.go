@@ -35,22 +35,22 @@ var _ = Describe("plugins command", func() {
 	Context("when no plugins are installed", func() {
 		It("displays an empty table", func() {
 			session := helpers.CF("plugins")
-			Eventually(session.Out).Should(Say("Listing installed plugins..."))
-			Eventually(session.Out).Should(Say(""))
-			Eventually(session.Out).Should(Say("plugin\\s+version\\s+command name\\s+command help"))
-			Eventually(session.Out).Should(Say(""))
-			Eventually(session.Out).Should(Say("Use 'cf repo-plugins' to list plugins in registered repos available to install\\."))
-			Consistently(session.Out).ShouldNot(Say("[a-za-z0-9]+"))
+			Eventually(session).Should(Say("Listing installed plugins..."))
+			Eventually(session).Should(Say(""))
+			Eventually(session).Should(Say("plugin\\s+version\\s+command name\\s+command help"))
+			Eventually(session).Should(Say(""))
+			Eventually(session).Should(Say("Use 'cf repo-plugins' to list plugins in registered repos available to install\\."))
+			Consistently(session).ShouldNot(Say("[a-za-z0-9]+"))
 			Eventually(session).Should(Exit(0))
 		})
 
 		Context("when the --checksum flag is provided", func() {
 			It("displays an empty checksum table", func() {
 				session := helpers.CF("plugins", "--checksum")
-				Eventually(session.Out).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
-				Eventually(session.Out).Should(Say(""))
-				Eventually(session.Out).Should(Say("plugin\\s+version\\s+sha1"))
-				Consistently(session.Out).ShouldNot(Say("[a-za-z0-9]+"))
+				Eventually(session).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
+				Eventually(session).Should(Say(""))
+				Eventually(session).Should(Say("plugin\\s+version\\s+sha1"))
+				Consistently(session).ShouldNot(Say("[a-za-z0-9]+"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -94,8 +94,8 @@ var _ = Describe("plugins command", func() {
 				Eventually(session).Should(Say("i-should-be-sorted-second\\s+1\\.0\\.0\\s+some-command\\s+some-command"))
 				Eventually(session).Should(Say("i-should-be-sorted-second\\s+1\\.0\\.0\\s+Some-other-command\\s+some-other-command"))
 				Eventually(session).Should(Say("sorted-third\\s+2\\.0\\.1\\s+banana-command\\s+banana-command"))
-				Eventually(session.Out).Should(Say(""))
-				Eventually(session.Out).Should(Say("Use 'cf repo-plugins' to list plugins in registered repos available to install\\."))
+				Eventually(session).Should(Say(""))
+				Eventually(session).Should(Say("Use 'cf repo-plugins' to list plugins in registered repos available to install\\."))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -109,7 +109,7 @@ var _ = Describe("plugins command", func() {
 
 			It("displays N/A for the plugin's version", func() {
 				session := helpers.CF("plugins")
-				Eventually(session.Out).Should(Say("some-plugin\\s+N/A"))
+				Eventually(session).Should(Say("some-plugin\\s+N/A"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -123,7 +123,7 @@ var _ = Describe("plugins command", func() {
 
 			It("displays the command name and it's alias", func() {
 				session := helpers.CF("plugins")
-				Eventually(session.Out).Should(Say("some-plugin\\s+1\\.0\\.0\\s+banana-command, bc"))
+				Eventually(session).Should(Say("some-plugin\\s+1\\.0\\.0\\s+banana-command, bc"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -141,10 +141,10 @@ var _ = Describe("plugins command", func() {
 			It("displays the sha1 value for each installed plugin", func() {
 				calculatedSha := helpers.Sha1Sum(installedPluginPath)
 				session := helpers.CF("plugins", "--checksum")
-				Eventually(session.Out).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
-				Eventually(session.Out).Should(Say(""))
-				Eventually(session.Out).Should(Say("plugin\\s+version\\s+sha1"))
-				Eventually(session.Out).Should(Say("some-plugin\\s+1\\.0\\.0\\s+%s", calculatedSha))
+				Eventually(session).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
+				Eventually(session).Should(Say(""))
+				Eventually(session).Should(Say("plugin\\s+version\\s+sha1"))
+				Eventually(session).Should(Say("some-plugin\\s+1\\.0\\.0\\s+%s", calculatedSha))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -154,7 +154,7 @@ var _ = Describe("plugins command", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					session := helpers.CF("plugins", "--checksum")
-					Eventually(session.Out).Should(Say("some-plugin\\s+1\\.0\\.0\\s+N/A"))
+					Eventually(session).Should(Say("some-plugin\\s+1\\.0\\.0\\s+N/A"))
 					Eventually(session).Should(Exit(0))
 				})
 			})

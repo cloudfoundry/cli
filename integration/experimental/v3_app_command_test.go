@@ -31,10 +31,10 @@ var _ = Describe("v3-app command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-app", "--help")
 
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-app - Display health and status for an app"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-app APP_NAME [--guid]"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("v3-app - Display health and status for an app"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf v3-app APP_NAME [--guid]"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("--guid\\s+Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."))
 
@@ -48,14 +48,14 @@ var _ = Describe("v3-app command", func() {
 			session := helpers.CF("v3-app")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-app", appName)
-		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 
@@ -132,7 +132,7 @@ var _ = Describe("v3-app command", func() {
 
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("v3-app", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -147,7 +147,7 @@ var _ = Describe("v3-app command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("v3-app", appName)
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -178,17 +178,17 @@ var _ = Describe("v3-app command", func() {
 				userName, _ := helpers.GetCredentials()
 
 				session := helpers.CF("v3-app", appName)
-				Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
-				Eventually(session.Out).Should(Say("name:\\s+%s", appName))
-				Eventually(session.Out).Should(Say("requested state:\\s+started"))
-				Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
-				Eventually(session.Out).Should(Say("memory usage:\\s+\\d+[KMG] x 1"))
-				Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
-				Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
-				Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile"))
-				Eventually(session.Out).Should(Say("web:1/1"))
-				Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+				Eventually(session).Should(Say("name:\\s+%s", appName))
+				Eventually(session).Should(Say("requested state:\\s+started"))
+				Eventually(session).Should(Say("processes:\\s+web:1/1"))
+				Eventually(session).Should(Say("memory usage:\\s+\\d+[KMG] x 1"))
+				Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+				Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+				Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
+				Eventually(session).Should(Say("web:1/1"))
+				Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -203,9 +203,9 @@ var _ = Describe("v3-app command", func() {
 
 					session := helpers.CF("v3-app", appName)
 
-					Eventually(session.Out).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-					Consistently(session.Out).ShouldNot(Say(`state\s+since\s+cpu\s+memory\s+disk`))
-					Eventually(session.Out).Should(Say("There are no running instances of this app"))
+					Eventually(session).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Consistently(session).ShouldNot(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+					Eventually(session).Should(Say("There are no running instances of this app"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -249,17 +249,17 @@ var _ = Describe("v3-app command", func() {
 				userName, _ := helpers.GetCredentials()
 
 				session := helpers.CF("v3-app", appName)
-				Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
-				Eventually(session.Out).Should(Say("name:\\s+%s", appName))
-				Eventually(session.Out).Should(Say("requested state:\\s+started"))
-				Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
-				Eventually(session.Out).Should(Say("memory usage:\\s+\\d+[KMG] x 1"))
-				Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
-				Eventually(session.Out).Should(Say("stack:\\s+"))
-				Eventually(session.Out).Should(Say("docker image:\\s+cloudfoundry/diego-docker-app-custom"))
-				Eventually(session.Out).Should(Say("web:1/1"))
-				Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+				Eventually(session).Should(Say("name:\\s+%s", appName))
+				Eventually(session).Should(Say("requested state:\\s+started"))
+				Eventually(session).Should(Say("processes:\\s+web:1/1"))
+				Eventually(session).Should(Say("memory usage:\\s+\\d+[KMG] x 1"))
+				Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+				Eventually(session).Should(Say("stack:\\s+"))
+				Eventually(session).Should(Say("docker image:\\s+cloudfoundry/diego-docker-app-custom"))
+				Eventually(session).Should(Say("web:1/1"))
+				Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -271,9 +271,9 @@ var _ = Describe("v3-app command", func() {
 				session := helpers.CF("v3-app", invalidAppName)
 				userName, _ := helpers.GetCredentials()
 
-				Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 
 				Eventually(session).Should(Exit(1))
 			})
@@ -283,7 +283,7 @@ var _ = Describe("v3-app command", func() {
 					appName := helpers.PrefixedRandomName("invalid-app")
 					session := helpers.CF("v3-app", "--guid", appName)
 
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("App %s not found", appName))
 					Eventually(session).Should(Exit(1))
 				})

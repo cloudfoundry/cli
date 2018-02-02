@@ -35,7 +35,7 @@ var _ = Describe("update-buildpack command", func() {
 		It("outputs an error message to the user, provides help text, and exits 1", func() {
 			session := CF("update-buildpack", "some-buildpack", "-i", "not-an-integer")
 			Eventually(session.Err).Should(Say("Incorrect Usage: invalid argument for flag `-i' \\(expected int\\)"))
-			Eventually(session.Out).Should(Say("cf update-buildpack BUILDPACK")) // help
+			Eventually(session).Should(Say("cf update-buildpack BUILDPACK")) // help
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -66,9 +66,9 @@ var _ = Describe("update-buildpack command", func() {
 
 		It("outputs an error message to the user, provides help text, and exits 1", func() {
 			session := CF("update-buildpack", "some-buildpack", "-p", "https://example.com/bogus.tgz")
-			Eventually(session.Out).Should(Say("Failed to create a local temporary zip file for the buildpack"))
-			Eventually(session.Out).Should(Say("FAILED"))
-			Eventually(session.Out).Should(Say("Couldn't write zip file: zip: not a valid zip file"))
+			Eventually(session).Should(Say("Failed to create a local temporary zip file for the buildpack"))
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Say("Couldn't write zip file: zip: not a valid zip file"))
 			Eventually(session).Should(Exit(1))
 		})
 	})

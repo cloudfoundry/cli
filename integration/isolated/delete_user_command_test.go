@@ -44,9 +44,9 @@ var _ = Describe("delete-user command", func() {
 
 			It("errors with DuplicateUsernameError", func() {
 				session := helpers.CF("delete-user", "-f", newUser)
-				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("Error deleting user %s", newUser))
-				Eventually(session.Out).Should(Say("The user exists in multiple origins."))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Say("Error deleting user %s", newUser))
+				Eventually(session).Should(Say("The user exists in multiple origins."))
 				Eventually(session).Should(Exit(1))
 			})
 		})

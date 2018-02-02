@@ -60,7 +60,7 @@ var _ = Describe("terminate-task command", func() {
 			It("fails to terminate task and outputs an error message", func() {
 				session := helpers.CF("terminate-task", appName, "1")
 				Eventually(session.Err).Should(Say(fmt.Sprintf("App %s not found", appName)))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -76,8 +76,8 @@ var _ = Describe("terminate-task command", func() {
 				It("outputs an error message to the user, provides help text, and exits 1", func() {
 					session := helpers.CF("terminate-task", appName, "not-an-integer")
 					Eventually(session.Err).Should(Say("Incorrect usage: Value for TASK_ID must be integer"))
-					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Out).Should(Say("terminate-task APP_NAME TASK_ID")) // help
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Say("terminate-task APP_NAME TASK_ID")) // help
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -96,9 +96,9 @@ var _ = Describe("terminate-task command", func() {
 
 					session := helpers.CF("terminate-task", appName, "1")
 					userName, _ := helpers.GetCredentials()
-					Eventually(session.Out).Should(Say(
+					Eventually(session).Should(Say(
 						fmt.Sprintf("Terminating task 1 of app %s in org %s / space %s as %s..", appName, orgName, spaceName, userName)))
-					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -119,7 +119,7 @@ var _ = Describe("terminate-task command", func() {
 
 					session := helpers.CF("terminate-task", appName, "1")
 					Eventually(session.Err).Should(Say("Task state is SUCCEEDED and therefore cannot be canceled"))
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -140,7 +140,7 @@ var _ = Describe("terminate-task command", func() {
 
 					session := helpers.CF("terminate-task", appName, "1")
 					Eventually(session.Err).Should(Say("Task state is FAILED and therefore cannot be canceled"))
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -149,7 +149,7 @@ var _ = Describe("terminate-task command", func() {
 				It("fails to terminate the task and prints an error", func() {
 					session := helpers.CF("terminate-task", appName, "1")
 					Eventually(session.Err).Should(Say("Task sequence ID 1 not found."))
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
 			})

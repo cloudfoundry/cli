@@ -341,7 +341,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 					})
 
 					session := helpers.CF("app", appName)
-					Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("name:\\s+%s", appName))
 					Eventually(session).Should(Exit(0))
 				})
 			})

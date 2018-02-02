@@ -57,7 +57,7 @@ var _ = XDescribe("restart command", func() {
 			It("tells the user that the start is not found and exits 1", func() {
 				session := helpers.CF("restart", appName, "0")
 
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
 				Eventually(session).Should(Exit(1))
 			})
@@ -72,7 +72,7 @@ var _ = XDescribe("restart command", func() {
 				It("restarts app instance", func() {
 					session := helpers.CF("restart", appName)
 					Eventually(session).Should(Say("Restarting instance %d of the app %s in org %s / space %s as %s\\.\\.\\.", 10, appName, orgName, spaceName, userName))
-					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
 			})

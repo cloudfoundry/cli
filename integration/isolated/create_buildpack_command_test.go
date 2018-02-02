@@ -32,7 +32,7 @@ var _ = Describe("create-buildpack command", func() {
 		It("outputs an error message to the user, provides help text, and exits 1", func() {
 			session := CF("create-buildpack", "some-buildpack", "some-file", "not-an-integer")
 			Eventually(session.Err).Should(Say("Incorrect usage: Value for POSITION must be integer"))
-			Eventually(session.Out).Should(Say("cf create-buildpack BUILDPACK PATH POSITION")) // help
+			Eventually(session).Should(Say("cf create-buildpack BUILDPACK PATH POSITION")) // help
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -52,9 +52,9 @@ var _ = Describe("create-buildpack command", func() {
 
 		It("outputs an error message to the user, provides help text, and exits 1", func() {
 			session := CF("create-buildpack", "some-buildpack", "https://example.com/bogus.tgz", "1")
-			Eventually(session.Out).Should(Say("Failed to create a local temporary zip file for the buildpack"))
-			Eventually(session.Out).Should(Say("FAILED"))
-			Eventually(session.Out).Should(Say("Couldn't write zip file: zip: not a valid zip file"))
+			Eventually(session).Should(Say("Failed to create a local temporary zip file for the buildpack"))
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Say("Couldn't write zip file: zip: not a valid zip file"))
 			Eventually(session).Should(Exit(1))
 		})
 	})

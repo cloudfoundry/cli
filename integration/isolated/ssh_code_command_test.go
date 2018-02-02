@@ -38,7 +38,7 @@ var _ = Describe("ssh-code command", func() {
 
 		It("returns a one time passcode for ssh", func() {
 			session := helpers.CF("ssh-code")
-			Eventually(session.Out).Should(Say("[A-Za-z0-9]+"))
+			Eventually(session).Should(Say("[A-Za-z0-9]+"))
 			Eventually(session).Should(Exit(0))
 		})
 	})

@@ -67,7 +67,7 @@ var _ = Describe("delete-service command", func() {
 
 			It("should display an error message that the service instance's keys, bindings, and shares must first be deleted", func() {
 				session := helpers.CF("delete-service", serviceInstanceName, "-f")
-				Eventually(session.Out).Should(Say("Cannot delete service instance. Service keys, bindings, and shares must first be deleted."))
+				Eventually(session).Should(Say("Cannot delete service instance. Service keys, bindings, and shares must first be deleted."))
 				Eventually(session).Should(Exit(1))
 			})
 		})

@@ -32,7 +32,7 @@ func CheckEnvironmentTargetedCorrectly(targetedOrganizationRequired bool, target
 	if targetedOrganizationRequired {
 		By("errors if org is not targeted")
 		session := CF(command...)
-		Eventually(session.Out).Should(Say("FAILED"))
+		Eventually(session).Should(Say("FAILED"))
 		Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 		Eventually(session).Should(Exit(1))
 
@@ -40,7 +40,7 @@ func CheckEnvironmentTargetedCorrectly(targetedOrganizationRequired bool, target
 			By("errors if space is not targeted")
 			TargetOrg(testOrg)
 			session := CF(command...)
-			Eventually(session.Out).Should(Say("FAILED"))
+			Eventually(session).Should(Say("FAILED"))
 			Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 			Eventually(session).Should(Exit(1))
 		}

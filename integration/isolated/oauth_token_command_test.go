@@ -15,12 +15,12 @@ var _ = Describe("oauth-token command", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("oauth-token", "--help")
 
-			Eventually(session.Out).Should(Say("NAME:"))
-			Eventually(session.Out).Should(Say("oauth-token - Retrieve and display the OAuth token for the current session"))
-			Eventually(session.Out).Should(Say("USAGE:"))
-			Eventually(session.Out).Should(Say("cf oauth-token"))
-			Eventually(session.Out).Should(Say("SEE ALSO:"))
-			Eventually(session.Out).Should(Say("curl"))
+			Eventually(session).Should(Say("NAME:"))
+			Eventually(session).Should(Say("oauth-token - Retrieve and display the OAuth token for the current session"))
+			Eventually(session).Should(Say("USAGE:"))
+			Eventually(session).Should(Say("cf oauth-token"))
+			Eventually(session).Should(Say("SEE ALSO:"))
+			Eventually(session).Should(Say("curl"))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -46,7 +46,7 @@ var _ = Describe("oauth-token command", func() {
 			It("displays an error and exits 1", func() {
 				session := helpers.CF("oauth-token")
 
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("The token expired, was revoked, or the token ID is incorrect\\. Please log back in to re-authenticate\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -63,7 +63,7 @@ var _ = Describe("oauth-token command", func() {
 			It("displays an error and exits 1", func() {
 				session := helpers.CF("oauth-token")
 
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
 				Eventually(session).Should(Exit(1))
 			})
@@ -73,7 +73,7 @@ var _ = Describe("oauth-token command", func() {
 			It("refreshes the access token and displays it", func() {
 				session := helpers.CF("oauth-token")
 
-				Eventually(session.Out).Should(Say("bearer .+"))
+				Eventually(session).Should(Say("bearer .+"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

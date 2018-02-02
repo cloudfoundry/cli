@@ -17,12 +17,12 @@ var _ = Describe("uninstall-plugin command", func() {
 		Context("when --help flag is provided", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("uninstall-plugin", "--help")
-				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("uninstall-plugin - Uninstall CLI plugin"))
-				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf uninstall-plugin PLUGIN-NAME"))
-				Eventually(session.Out).Should(Say("SEE ALSO:"))
-				Eventually(session.Out).Should(Say("plugins"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("uninstall-plugin - Uninstall CLI plugin"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf uninstall-plugin PLUGIN-NAME"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("plugins"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -49,24 +49,24 @@ var _ = Describe("uninstall-plugin command", func() {
 		Context("when no errors are encountered", func() {
 			It("does not list the plugin after it is uninstalled", func() {
 				session := helpers.CF("uninstall-plugin", "banana-plugin-name-1")
-				Eventually(session.Out).Should(Say("Uninstalling plugin banana-plugin-name-1\\.\\.\\."))
+				Eventually(session).Should(Say("Uninstalling plugin banana-plugin-name-1\\.\\.\\."))
 				// Test that RPC works
-				Eventually(session.Out).Should(Say("[0-9]{1,5} CLI-MESSAGE-UNINSTALL"))
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say("Plugin banana-plugin-name-1 2\\.0\\.1 successfully uninstalled\\."))
+				Eventually(session).Should(Say("[0-9]{1,5} CLI-MESSAGE-UNINSTALL"))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Plugin banana-plugin-name-1 2\\.0\\.1 successfully uninstalled\\."))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("plugins")
-				Consistently(session.Out).ShouldNot(Say("banana-plugin-name-1"))
-				Eventually(session.Out).Should(Say("banana-plugin-name-2"))
+				Consistently(session).ShouldNot(Say("banana-plugin-name-1"))
+				Eventually(session).Should(Say("banana-plugin-name-2"))
 				Eventually(session).Should(Exit(0))
 			})
 
 			It("matches the plugin name case insensitive", func() {
 				session := helpers.CF("uninstall-plugin", "BaNaNa-PlUgIn-NaMe-1")
-				Eventually(session.Out).Should(Say("Uninstalling plugin banana-plugin-name-1\\.\\.\\."))
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say("Plugin banana-plugin-name-1 2\\.0\\.1 successfully uninstalled\\."))
+				Eventually(session).Should(Say("Uninstalling plugin banana-plugin-name-1\\.\\.\\."))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Plugin banana-plugin-name-1 2\\.0\\.1 successfully uninstalled\\."))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -80,9 +80,9 @@ var _ = Describe("uninstall-plugin command", func() {
 
 			It("exits with an error but still uninstalls the plugin", func() {
 				session := helpers.CF("uninstall-plugin", "failing-plugin")
-				Eventually(session.Out).Should(Say("Uninstalling plugin failing-plugin\\.\\.\\."))
+				Eventually(session).Should(Say("Uninstalling plugin failing-plugin\\.\\.\\."))
 				Eventually(session.Err).Should(Say("I'm failing...I'm failing..."))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("The plugin's uninstall method returned an unexpected error\\."))
 				Eventually(session.Err).Should(Say("The plugin uninstall will proceed\\. Contact the plugin author if you need help\\."))
 				Eventually(session.Err).Should(Say("exit status 1"))
@@ -94,9 +94,9 @@ var _ = Describe("uninstall-plugin command", func() {
 				Expect(os.IsNotExist(err)).To(BeTrue())
 
 				session = helpers.CF("plugins")
-				Eventually(session.Out).Should(Say("banana-plugin-name-1"))
-				Eventually(session.Out).Should(Say("banana-plugin-name-2"))
-				Consistently(session.Out).ShouldNot(Say("failing-plugin"))
+				Eventually(session).Should(Say("banana-plugin-name-1"))
+				Eventually(session).Should(Say("banana-plugin-name-2"))
+				Consistently(session).ShouldNot(Say("failing-plugin"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
