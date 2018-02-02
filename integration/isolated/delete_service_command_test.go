@@ -42,7 +42,7 @@ var _ = Describe("delete-service command", func() {
 				servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 				broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
 				broker.Push()
-				broker.Configure()
+				broker.Configure(true)
 				broker.Create()
 
 				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))

@@ -25,7 +25,7 @@
                 "longDescription": "A long time ago, in a galaxy far far away..."
               },
               "displayName": "The Fake Broker",
-              "shareable": true
+              "shareable": "<shareable-service>"
             },
             "dashboard_client": {
               "id": "<sso-test>",

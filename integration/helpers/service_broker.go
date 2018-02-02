@@ -90,9 +90,9 @@ func (b ServiceBroker) Push() {
 	Eventually(CF("start", b.Name)).Should(Exit(0))
 }
 
-func (b ServiceBroker) Configure() {
+func (b ServiceBroker) Configure(shareable bool) {
 	uri := fmt.Sprintf("http://%s.%s%s", b.Name, b.AppsDomain, "/config")
-	body := strings.NewReader(b.ToJSON())
+	body := strings.NewReader(b.ToJSON(shareable))
 	req, err := http.NewRequest("POST", uri, body)
 	Expect(err).ToNot(HaveOccurred())
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -108,6 +108,12 @@ func (b ServiceBroker) Create() {
 	Eventually(CF("service-brokers")).Should(And(Exit(0), Say(b.Name)))
 }
 
+func (b ServiceBroker) Update() {
+	appURI := fmt.Sprintf("http://%s.%s", b.Name, b.AppsDomain)
+	Eventually(CF("update-service-broker", b.Name, "username", "password", appURI)).Should(Exit(0))
+	Eventually(CF("service-brokers")).Should(And(Exit(0), Say(b.Name)))
+}
+
 func (b ServiceBroker) Delete() {
 	Eventually(CF("delete-service-broker", b.Name, "-f")).Should(Exit(0))
 	Eventually(CF("service-brokers")).Should(And(Exit(0), Not(Say(b.Name))))
@@ -119,7 +125,7 @@ func (b ServiceBroker) Destroy() {
 	Eventually(CF("delete", b.Name, "-f", "-r")).Should(Exit(0))
 }
 
-func (b ServiceBroker) ToJSON() string {
+func (b ServiceBroker) ToJSON(shareable bool) string {
 	bytes, err := ioutil.ReadFile(NewAssets().ServiceBroker + "/cats.json")
 	Expect(err).To(BeNil())
 
@@ -141,6 +147,7 @@ func (b ServiceBroker) ToJSON() string {
 		"<fake-async-plan-2>", b.AsyncPlans[1].Name,
 		"<fake-async-plan-2-guid>", b.AsyncPlans[1].ID,
 		"\"<fake-plan-schema>\"", string(planSchema),
+		"\"<shareable-service>\"", fmt.Sprintf("%t", shareable),
 	)
 
 	return replacer.Replace(string(bytes))

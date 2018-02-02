@@ -276,7 +276,7 @@ var _ = Describe("bind-service command", func() {
 				BeforeEach(func() {
 					broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
 					broker.Push()
-					broker.Configure()
+					broker.Configure(true)
 					broker.Create()
 
 					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))

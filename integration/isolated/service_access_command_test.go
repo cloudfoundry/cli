@@ -31,7 +31,7 @@ var _ = Describe("service-access command", func() {
 			)
 
 			serviceBroker.Push()
-			serviceBroker.Configure()
+			serviceBroker.Configure(true)
 			serviceBroker.Create()
 		})
 
