@@ -59,7 +59,7 @@
 //
 // No inline-relations-depth And summary Endpoints
 //
-// This package will not use ever use 'inline-relations-depth' or the
+// This package will not ever use 'inline-relations-depth' or the
 // '/summary' endpoints for any operations. These requests can be extremely
 // taxing on the Cloud Controller and are avoided at all costs. Additionally,
 // the objects returned back from these requests can become extremely
