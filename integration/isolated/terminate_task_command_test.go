@@ -92,7 +92,7 @@ var _ = Describe("terminate-task command", func() {
 				It("terminates the task", func() {
 					tasksSession := helpers.CF("tasks", appName)
 					Eventually(tasksSession).Should(Exit(0))
-					Expect(tasksSession.Out).To(Say("1\\s+[a-zA-Z-0-9]+\\s+RUNNING"))
+					Expect(tasksSession).To(Say("1\\s+[a-zA-Z-0-9]+\\s+RUNNING"))
 
 					session := helpers.CF("terminate-task", appName, "1")
 					userName, _ := helpers.GetCredentials()

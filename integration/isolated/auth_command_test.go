@@ -100,13 +100,13 @@ var _ = Describe("auth command", func() {
 				// Verify that the user is not logged-in
 				targetSession1 := helpers.CF("target")
 				Eventually(targetSession1.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
-				Eventually(targetSession1.Out).Should(Say("FAILED"))
+				Eventually(targetSession1).Should(Say("FAILED"))
 				Eventually(targetSession1).Should(Exit(1))
 
 				// Verify that neither org nor space is targeted
 				helpers.LoginCF()
 				targetSession2 := helpers.CF("target")
-				Eventually(targetSession2.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
+				Eventually(targetSession2).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
 				Eventually(targetSession2).Should(Exit(0))
 			})
 		})
@@ -145,13 +145,13 @@ var _ = Describe("auth command", func() {
 				// Verify that the user is not logged-in
 				targetSession1 := helpers.CF("target")
 				Eventually(targetSession1.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
-				Eventually(targetSession1.Out).Should(Say("FAILED"))
+				Eventually(targetSession1).Should(Say("FAILED"))
 				Eventually(targetSession1).Should(Exit(1))
 
 				// Verify that neither org nor space is targeted
 				helpers.LoginCF()
 				targetSession2 := helpers.CF("target")
-				Eventually(targetSession2.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
+				Eventually(targetSession2).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
 				Eventually(targetSession2).Should(Exit(0))
 			})
 		})

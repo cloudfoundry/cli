@@ -138,13 +138,13 @@ var _ = Describe("install-plugin command", func() {
 					pluginsSession := helpers.CF("plugins", "--checksum")
 					expectedSha := helpers.Sha1Sum(installedPath)
 
-					Eventually(pluginsSession.Out).Should(Say("some-plugin\\s+1\\.0\\.0\\s+%s", expectedSha))
+					Eventually(pluginsSession).Should(Say("some-plugin\\s+1\\.0\\.0\\s+%s", expectedSha))
 					Eventually(pluginsSession).Should(Exit(0))
 
 					Eventually(helpers.CF("some-command")).Should(Exit(0))
 
 					helpSession := helpers.CF("help")
-					Eventually(helpSession.Out).Should(Say("some-command"))
+					Eventually(helpSession).Should(Say("some-command"))
 					Eventually(helpSession).Should(Exit(0))
 				})
 
@@ -496,13 +496,13 @@ var _ = Describe("install-plugin command", func() {
 						pluginsSession := helpers.CF("plugins", "--checksum")
 						expectedSha := helpers.Sha1Sum(
 							generic.ExecutableFilename(filepath.Join(homeDir, ".cf/plugins/some-plugin")))
-						Eventually(pluginsSession.Out).Should(Say("some-plugin\\s+1.0.0\\s+%s", expectedSha))
+						Eventually(pluginsSession).Should(Say("some-plugin\\s+1.0.0\\s+%s", expectedSha))
 						Eventually(pluginsSession).Should(Exit(0))
 
 						Eventually(helpers.CF("some-command")).Should(Exit(0))
 
 						helpSession := helpers.CF("help")
-						Eventually(helpSession.Out).Should(Say("some-command"))
+						Eventually(helpSession).Should(Say("some-command"))
 						Eventually(helpSession).Should(Exit(0))
 					})
 
@@ -584,7 +584,7 @@ var _ = Describe("install-plugin command", func() {
 
 						// make sure a retry of the plugin install works
 						retrySession := helpers.CF("install-plugin", pluginPath, "-f")
-						Eventually(retrySession.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+						Eventually(retrySession).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 						Eventually(retrySession).Should(Exit(0))
 					})
 				})
@@ -878,7 +878,7 @@ var _ = Describe("install-plugin command", func() {
 
 					// make sure a retry of the plugin install works
 					retrySession := helpers.CF("install-plugin", pluginPath, "-f")
-					Eventually(retrySession.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+					Eventually(retrySession).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 					Eventually(retrySession).Should(Exit(0))
 				})
 			})
