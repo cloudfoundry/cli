@@ -322,16 +322,16 @@ var _ = Describe("Domain Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSharedDomainsArgsForCall(0)).To(ConsistOf(ccv2.Filter{
-						Type:     ccv2.NameFilter,
-						Operator: ccv2.InOperator,
+						Type:     constant.NameFilter,
+						Operator: constant.InOperator,
 						Values:   domainNames,
 					}))
 
 					Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
 					passedOrgGUID, filters := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
 					Expect(filters).To(ConsistOf(ccv2.Filter{
-						Type:     ccv2.NameFilter,
-						Operator: ccv2.InOperator,
+						Type:     constant.NameFilter,
+						Operator: constant.InOperator,
 						Values:   domainNames,
 					}))
 					Expect(passedOrgGUID).To(Equal(orgGUID))

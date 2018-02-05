@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
 // ServiceInstance represents an instance of a service.
@@ -24,8 +25,8 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(name string, spaceGUID strin
 		spaceGUID,
 		true,
 		ccv2.Filter{
-			Type:     ccv2.NameFilter,
-			Operator: ccv2.EqualOperator,
+			Type:     constant.NameFilter,
+			Operator: constant.EqualOperator,
 			Values:   []string{name},
 		})
 
@@ -45,8 +46,8 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(name string, spaceGUID strin
 func (actor Actor) GetServiceInstancesByApplication(appGUID string) ([]ServiceInstance, Warnings, error) {
 	var allWarnings Warnings
 	bindings, apiWarnings, err := actor.CloudControllerClient.GetServiceBindings(ccv2.Filter{
-		Type:     ccv2.AppGUIDFilter,
-		Operator: ccv2.EqualOperator,
+		Type:     constant.AppGUIDFilter,
+		Operator: constant.EqualOperator,
 		Values:   []string{appGUID},
 	})
 	allWarnings = append(allWarnings, apiWarnings...)

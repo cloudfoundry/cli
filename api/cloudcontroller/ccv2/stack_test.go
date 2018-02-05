@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -140,7 +141,7 @@ var _ = Describe("Stack", func() {
 				It("returns paginated results and all warnings", func() {
 					stacks, warnings, err := client.GetStacks(Filter{
 						Type:     "some-query",
-						Operator: EqualOperator,
+						Operator: constant.EqualOperator,
 						Values:   []string{"some-value"},
 					})
 

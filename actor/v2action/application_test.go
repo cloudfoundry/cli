@@ -330,13 +330,13 @@ var _ = Describe("Application Actions", func() {
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.Filter{
 					ccv2.Filter{
-						Type:     ccv2.NameFilter,
-						Operator: ccv2.EqualOperator,
+						Type:     constant.NameFilter,
+						Operator: constant.EqualOperator,
 						Values:   []string{"some-app"},
 					},
 					ccv2.Filter{
-						Type:     ccv2.SpaceGUIDFilter,
-						Operator: ccv2.EqualOperator,
+						Type:     constant.SpaceGUIDFilter,
+						Operator: constant.EqualOperator,
 						Values:   []string{"some-space-guid"},
 					},
 				}))
@@ -406,8 +406,8 @@ var _ = Describe("Application Actions", func() {
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.Filter{
 					ccv2.Filter{
-						Type:     ccv2.SpaceGUIDFilter,
-						Operator: ccv2.EqualOperator,
+						Type:     constant.SpaceGUIDFilter,
+						Operator: constant.EqualOperator,
 						Values:   []string{"some-space-guid"},
 					},
 				}))

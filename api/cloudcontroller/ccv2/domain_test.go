@@ -205,8 +205,8 @@ var _ = Describe("Domain", func() {
 
 			It("returns the shared domain and warnings", func() {
 				domains, warnings, err := client.GetSharedDomains(Filter{
-					Type:     NameFilter,
-					Operator: InOperator,
+					Type:     constant.NameFilter,
+					Operator: constant.InOperator,
 					Values:   []string{"domain-name-1", "domain-name-2", "domain-name-3", "domain-name-4"},
 				})
 				Expect(err).NotTo(HaveOccurred())
@@ -373,8 +373,8 @@ var _ = Describe("Domain", func() {
 				)
 
 				client.GetOrganizationPrivateDomains("some-org-guid", Filter{
-					Type:     NameFilter,
-					Operator: EqualOperator,
+					Type:     constant.NameFilter,
+					Operator: constant.EqualOperator,
 					Values:   []string{"private-domain-name"},
 				})
 			})

@@ -258,8 +258,8 @@ var _ = Describe("Application", func() {
 		Context("when apps exist", func() {
 			It("returns all the queried apps", func() {
 				apps, warnings, err := client.GetApplications(Filter{
-					Type:     SpaceGUIDFilter,
-					Operator: EqualOperator,
+					Type:     constant.SpaceGUIDFilter,
+					Operator: constant.EqualOperator,
 					Values:   []string{"some-space-guid"},
 				})
 				Expect(err).NotTo(HaveOccurred())
@@ -698,8 +698,8 @@ var _ = Describe("Application", func() {
 
 			It("returns all the applications and all warnings", func() {
 				apps, warnings, err := client.GetRouteApplications("some-route-guid", Filter{
-					Type:     SpaceGUIDFilter,
-					Operator: EqualOperator,
+					Type:     constant.SpaceGUIDFilter,
+					Operator: constant.EqualOperator,
 					Values:   []string{"some-space-guid"},
 				})
 				Expect(err).NotTo(HaveOccurred())

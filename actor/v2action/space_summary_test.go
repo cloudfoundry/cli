@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -273,13 +274,13 @@ var _ = Describe("Space Summary Actions", func() {
 					filters := fakeCloudControllerClient.GetSpacesArgsForCall(0)
 					Expect(filters).To(ConsistOf(
 						ccv2.Filter{
-							Type:     ccv2.NameFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.NameFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{"some-space"},
 						},
 						ccv2.Filter{
-							Type:     ccv2.OrganizationGUIDFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.OrganizationGUIDFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{"some-org-guid"},
 						},
 					))
@@ -288,8 +289,8 @@ var _ = Describe("Space Summary Actions", func() {
 					filters = fakeCloudControllerClient.GetApplicationsArgsForCall(0)
 					Expect(filters).To(ConsistOf(
 						ccv2.Filter{
-							Type:     ccv2.SpaceGUIDFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.SpaceGUIDFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{"some-space-guid"},
 						},
 					))
@@ -854,13 +855,13 @@ var _ = Describe("Space Summary Actions", func() {
 					filters := fakeCloudControllerClient.GetSpacesArgsForCall(0)
 					Expect(filters).To(ConsistOf(
 						ccv2.Filter{
-							Type:     ccv2.NameFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.NameFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{"some-space"},
 						},
 						ccv2.Filter{
-							Type:     ccv2.OrganizationGUIDFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.OrganizationGUIDFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{"some-org-guid"},
 						},
 					))
@@ -869,8 +870,8 @@ var _ = Describe("Space Summary Actions", func() {
 					filters = fakeCloudControllerClient.GetApplicationsArgsForCall(0)
 					Expect(filters).To(ConsistOf(
 						ccv2.Filter{
-							Type:     ccv2.SpaceGUIDFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.SpaceGUIDFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{"some-space-guid"},
 						},
 					))

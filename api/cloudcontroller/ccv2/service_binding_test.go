@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -147,8 +148,8 @@ var _ = Describe("Service Binding", func() {
 		Context("when service bindings exist", func() {
 			It("returns all the queried service bindings", func() {
 				serviceBindings, warnings, err := client.GetServiceBindings(Filter{
-					Type:     AppGUIDFilter,
-					Operator: EqualOperator,
+					Type:     constant.AppGUIDFilter,
+					Operator: constant.EqualOperator,
 					Values:   []string{"some-app-guid"},
 				})
 				Expect(err).NotTo(HaveOccurred())

@@ -564,13 +564,13 @@ var _ = Describe("Route Actions", func() {
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
 					ccv2.Filter{
-						Type:     ccv2.OrganizationGUIDFilter,
-						Operator: ccv2.EqualOperator,
+						Type:     constant.OrganizationGUIDFilter,
+						Operator: constant.EqualOperator,
 						Values:   []string{"some-org-guid"},
 					},
 					ccv2.Filter{
-						Type:     ccv2.NameFilter,
-						Operator: ccv2.EqualOperator,
+						Type:     constant.NameFilter,
+						Operator: constant.EqualOperator,
 						Values:   []string{"some-space"},
 					}))
 
@@ -683,8 +683,8 @@ var _ = Describe("Route Actions", func() {
 						Expect(orgGUID).To(Equal("some-org-guid"))
 						Expect(queries).To(HaveLen(1))
 						Expect(queries[0]).To(Equal(ccv2.Filter{
-							Type:     ccv2.NameFilter,
-							Operator: ccv2.InOperator,
+							Type:     constant.NameFilter,
+							Operator: constant.InOperator,
 							Values:   []string{"some-domain"},
 						}))
 					})
@@ -741,8 +741,8 @@ var _ = Describe("Route Actions", func() {
 							Expect(orgGUID).To(Equal("some-org-guid"))
 							Expect(queries).To(HaveLen(1))
 							Expect(queries[0]).To(Equal(ccv2.Filter{
-								Type:     ccv2.NameFilter,
-								Operator: ccv2.InOperator,
+								Type:     constant.NameFilter,
+								Operator: constant.InOperator,
 								Values:   []string{"some-domain"},
 							}))
 
@@ -787,8 +787,8 @@ var _ = Describe("Route Actions", func() {
 							Expect(orgGUID).To(Equal("some-org-guid"))
 							Expect(queries).To(HaveLen(1))
 							Expect(queries[0]).To(Equal(ccv2.Filter{
-								Type:     ccv2.NameFilter,
-								Operator: ccv2.InOperator,
+								Type:     constant.NameFilter,
+								Operator: constant.InOperator,
 								Values:   []string{"some-domain"},
 							}))
 
@@ -1419,18 +1419,18 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Filter{
 						{
-							Type:     ccv2.DomainGUIDFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.DomainGUIDFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{domain.GUID},
 						},
 						{
-							Type:     ccv2.HostFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.HostFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{""},
 						},
 						{
-							Type:     ccv2.PathFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.PathFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{""},
 						},
 					}))
@@ -1464,18 +1464,18 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Filter{
 						{
-							Type:     ccv2.DomainGUIDFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.DomainGUIDFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{domain.GUID},
 						},
 						{
-							Type:     ccv2.HostFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.HostFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{inputRoute.Host},
 						},
 						{
-							Type:     ccv2.PathFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.PathFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{""},
 						},
 					}))
@@ -1509,18 +1509,18 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Filter{
 						{
-							Type:     ccv2.DomainGUIDFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.DomainGUIDFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{domain.GUID},
 						},
 						{
-							Type:     ccv2.HostFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.HostFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{inputRoute.Host},
 						},
 						{
-							Type:     ccv2.PathFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.PathFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{inputRoute.Path},
 						},
 					}))
@@ -1554,23 +1554,23 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Filter{
 						{
-							Type:     ccv2.DomainGUIDFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.DomainGUIDFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{domain.GUID},
 						},
 						{
-							Type:     ccv2.HostFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.HostFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{inputRoute.Host},
 						},
 						{
-							Type:     ccv2.PathFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.PathFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{inputRoute.Path},
 						},
 						{
-							Type:     ccv2.PortFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.PortFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{fmt.Sprint(inputRoute.Port.Value)},
 						},
 					}))
@@ -1608,23 +1608,23 @@ var _ = Describe("Route Actions", func() {
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Filter{
 						{
-							Type:     ccv2.DomainGUIDFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.DomainGUIDFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{domain.GUID},
 						},
 						{
-							Type:     ccv2.HostFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.HostFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{inputRoute.Host},
 						},
 						{
-							Type:     ccv2.PathFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.PathFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{inputRoute.Path},
 						},
 						{
-							Type:     ccv2.PortFilter,
-							Operator: ccv2.EqualOperator,
+							Type:     constant.PortFilter,
+							Operator: constant.EqualOperator,
 							Values:   []string{fmt.Sprint(inputRoute.Port.Value)},
 						},
 					}))

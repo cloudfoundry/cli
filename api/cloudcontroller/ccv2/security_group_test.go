@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -172,7 +173,7 @@ var _ = Describe("Security Groups", func() {
 				It("returns paginated results and all warnings", func() {
 					securityGroups, warnings, err := client.GetSecurityGroups(Filter{
 						Type:     "some-query",
-						Operator: EqualOperator,
+						Operator: constant.EqualOperator,
 						Values:   []string{"some-value"},
 					})
 
@@ -327,7 +328,7 @@ var _ = Describe("Security Groups", func() {
 			It("returns the running security groups and all warnings", func() {
 				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid", Filter{
 					Type:     "some-query",
-					Operator: EqualOperator,
+					Operator: constant.EqualOperator,
 					Values:   []string{"some-value"},
 				})
 				Expect(err).NotTo(HaveOccurred())
@@ -516,7 +517,7 @@ var _ = Describe("Security Groups", func() {
 			It("returns the staging security groups and all warnings", func() {
 				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid", Filter{
 					Type:     "some-query",
-					Operator: EqualOperator,
+					Operator: constant.EqualOperator,
 					Values:   []string{"some-value"},
 				})
 				Expect(err).NotTo(HaveOccurred())

@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -163,20 +164,20 @@ var _ = Describe("Space", func() {
 
 								Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 								Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv2.Filter{{
-									Type:     ccv2.NameFilter,
-									Operator: ccv2.EqualOperator,
+									Type:     constant.NameFilter,
+									Operator: constant.EqualOperator,
 									Values:   []string{"some-org"},
 								}}))
 
 								Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 								Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv2.Filter{{
-									Type:     ccv2.NameFilter,
-									Operator: ccv2.EqualOperator,
+									Type:     constant.NameFilter,
+									Operator: constant.EqualOperator,
 									Values:   []string{"some-space"},
 								},
 									{
-										Type:     ccv2.OrganizationGUIDFilter,
-										Operator: ccv2.EqualOperator,
+										Type:     constant.OrganizationGUIDFilter,
+										Operator: constant.EqualOperator,
 										Values:   []string{"some-org-guid"},
 									},
 								}))
@@ -238,8 +239,8 @@ var _ = Describe("Space", func() {
 					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(
 						[]ccv2.Filter{
 							{
-								Type:     ccv2.OrganizationGUIDFilter,
-								Operator: ccv2.EqualOperator,
+								Type:     constant.OrganizationGUIDFilter,
+								Operator: constant.EqualOperator,
 								Values:   []string{"some-org-guid"},
 							},
 						}))
@@ -299,13 +300,13 @@ var _ = Describe("Space", func() {
 					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
 						[]ccv2.Filter{
 							{
-								Type:     ccv2.OrganizationGUIDFilter,
-								Operator: ccv2.EqualOperator,
+								Type:     constant.OrganizationGUIDFilter,
+								Operator: constant.EqualOperator,
 								Values:   []string{"some-org-guid"},
 							},
 							{
-								Type:     ccv2.NameFilter,
-								Operator: ccv2.EqualOperator,
+								Type:     constant.NameFilter,
+								Operator: constant.EqualOperator,
 								Values:   []string{"some-space"},
 							},
 						}))

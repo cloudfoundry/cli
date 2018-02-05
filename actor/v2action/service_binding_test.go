@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -194,13 +195,13 @@ var _ = Describe("Service Binding Actions", func() {
 				Expect(fakeCloudControllerClient.GetServiceBindingsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetServiceBindingsArgsForCall(0)).To(ConsistOf([]ccv2.Filter{
 					ccv2.Filter{
-						Type:     ccv2.AppGUIDFilter,
-						Operator: ccv2.EqualOperator,
+						Type:     constant.AppGUIDFilter,
+						Operator: constant.EqualOperator,
 						Values:   []string{"some-app-guid"},
 					},
 					ccv2.Filter{
-						Type:     ccv2.ServiceInstanceGUIDFilter,
-						Operator: ccv2.EqualOperator,
+						Type:     constant.ServiceInstanceGUIDFilter,
+						Operator: constant.EqualOperator,
 						Values:   []string{"some-service-instance-guid"},
 					},
 				}))

@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -398,8 +399,8 @@ var _ = Describe("Route", func() {
 
 			It("returns all the routes and all warnings", func() {
 				routes, warnings, err := client.GetRoutes(Filter{
-					Type:     OrganizationGUIDFilter,
-					Operator: EqualOperator,
+					Type:     constant.OrganizationGUIDFilter,
+					Operator: constant.EqualOperator,
 					Values:   []string{"some-org-guid"},
 				})
 				Expect(err).NotTo(HaveOccurred())
@@ -551,8 +552,8 @@ var _ = Describe("Route", func() {
 
 			It("returns all the routes and all warnings", func() {
 				routes, warnings, err := client.GetApplicationRoutes("some-app-guid", Filter{
-					Type:     OrganizationGUIDFilter,
-					Operator: EqualOperator,
+					Type:     constant.OrganizationGUIDFilter,
+					Operator: constant.EqualOperator,
 					Values:   []string{"some-org-guid"},
 				})
 				Expect(err).NotTo(HaveOccurred())
@@ -721,8 +722,8 @@ var _ = Describe("Route", func() {
 
 			It("returns all the routes and all warnings", func() {
 				routes, warnings, err := client.GetSpaceRoutes("some-space-guid", Filter{
-					Type:     SpaceGUIDFilter,
-					Operator: EqualOperator,
+					Type:     constant.SpaceGUIDFilter,
+					Operator: constant.EqualOperator,
 					Values:   []string{"some-space-guid"},
 				})
 				Expect(err).NotTo(HaveOccurred())

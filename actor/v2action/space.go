@@ -3,6 +3,7 @@ package v2action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
 // Space represents a CLI Space
@@ -38,8 +39,8 @@ func (actor Actor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgNam
 // GetOrganizationSpaces returns a list of spaces in the specified org
 func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, error) {
 	ccv2Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv2.Filter{
-		Type:     ccv2.OrganizationGUIDFilter,
-		Operator: ccv2.EqualOperator,
+		Type:     constant.OrganizationGUIDFilter,
+		Operator: constant.EqualOperator,
 		Values:   []string{orgGUID},
 	})
 	if err != nil {
@@ -58,13 +59,13 @@ func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, err
 func (actor Actor) GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (Space, Warnings, error) {
 	ccv2Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
 		ccv2.Filter{
-			Type:     ccv2.NameFilter,
-			Operator: ccv2.EqualOperator,
+			Type:     constant.NameFilter,
+			Operator: constant.EqualOperator,
 			Values:   []string{spaceName},
 		},
 		ccv2.Filter{
-			Type:     ccv2.OrganizationGUIDFilter,
-			Operator: ccv2.EqualOperator,
+			Type:     constant.OrganizationGUIDFilter,
+			Operator: constant.EqualOperator,
 			Values:   []string{orgGUID},
 		},
 	)

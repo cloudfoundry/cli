@@ -80,8 +80,8 @@ func (actor Actor) GetDomainsByNameAndOrganization(domainNames []string, orgGUID
 	// batched (based on character length?) and loop over them.
 
 	sharedDomains, warnings, err := actor.CloudControllerClient.GetSharedDomains(ccv2.Filter{
-		Type:     ccv2.NameFilter,
-		Operator: ccv2.InOperator,
+		Type:     constant.NameFilter,
+		Operator: constant.InOperator,
 		Values:   domainNames,
 	})
 	allWarnings = append(allWarnings, warnings...)
@@ -97,8 +97,8 @@ func (actor Actor) GetDomainsByNameAndOrganization(domainNames []string, orgGUID
 	privateDomains, warnings, err := actor.CloudControllerClient.GetOrganizationPrivateDomains(
 		orgGUID,
 		ccv2.Filter{
-			Type:     ccv2.NameFilter,
-			Operator: ccv2.InOperator,
+			Type:     constant.NameFilter,
+			Operator: constant.InOperator,
 			Values:   domainNames,
 		})
 	allWarnings = append(allWarnings, warnings...)

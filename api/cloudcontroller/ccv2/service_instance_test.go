@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -251,8 +252,8 @@ var _ = Describe("Service Instance", func() {
 		Context("when service instances exist", func() {
 			It("returns all the queried service instances", func() {
 				serviceInstances, warnings, err := client.GetServiceInstances(Filter{
-					Type:     SpaceGUIDFilter,
-					Operator: EqualOperator,
+					Type:     constant.SpaceGUIDFilter,
+					Operator: constant.EqualOperator,
 					Values:   []string{"some-space-guid"},
 				})
 				Expect(err).NotTo(HaveOccurred())
@@ -361,8 +362,8 @@ var _ = Describe("Service Instance", func() {
 			Context("when service instances exist", func() {
 				It("returns all the queried service instances", func() {
 					serviceInstances, warnings, err := client.GetSpaceServiceInstances("some-space-guid", true, Filter{
-						Type:     NameFilter,
-						Operator: EqualOperator,
+						Type:     constant.NameFilter,
+						Operator: constant.EqualOperator,
 						Values:   []string{"foobar"},
 					})
 					Expect(err).NotTo(HaveOccurred())
@@ -417,8 +418,8 @@ var _ = Describe("Service Instance", func() {
 			Context("when service instances exist", func() {
 				It("returns all the queried service instances", func() {
 					serviceInstances, warnings, err := client.GetSpaceServiceInstances("some-space-guid", false, Filter{
-						Type:     NameFilter,
-						Operator: EqualOperator,
+						Type:     constant.NameFilter,
+						Operator: constant.EqualOperator,
 						Values:   []string{"foobar"},
 					})
 					Expect(err).NotTo(HaveOccurred())
