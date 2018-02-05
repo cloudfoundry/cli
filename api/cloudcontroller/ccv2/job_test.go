@@ -16,6 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/ccv2fakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -28,27 +29,27 @@ var _ = Describe("Job", func() {
 
 	Describe("Job", func() {
 		DescribeTable("Finished",
-			func(status JobStatus, expected bool) {
+			func(status constant.JobStatus, expected bool) {
 				job := Job{Status: status}
 				Expect(job.Finished()).To(Equal(expected))
 			},
 
-			Entry("when failed, it returns false", JobStatusFailed, false),
-			Entry("when finished, it returns true", JobStatusFinished, true),
-			Entry("when queued, it returns false", JobStatusQueued, false),
-			Entry("when running, it returns false", JobStatusRunning, false),
+			Entry("when failed, it returns false", constant.JobStatusFailed, false),
+			Entry("when finished, it returns true", constant.JobStatusFinished, true),
+			Entry("when queued, it returns false", constant.JobStatusQueued, false),
+			Entry("when running, it returns false", constant.JobStatusRunning, false),
 		)
 
 		DescribeTable("Failed",
-			func(status JobStatus, expected bool) {
+			func(status constant.JobStatus, expected bool) {
 				job := Job{Status: status}
 				Expect(job.Failed()).To(Equal(expected))
 			},
 
-			Entry("when failed, it returns true", JobStatusFailed, true),
-			Entry("when finished, it returns false", JobStatusFinished, false),
-			Entry("when queued, it returns false", JobStatusQueued, false),
-			Entry("when running, it returns false", JobStatusRunning, false),
+			Entry("when failed, it returns true", constant.JobStatusFailed, true),
+			Entry("when finished, it returns false", constant.JobStatusFinished, false),
+			Entry("when queued, it returns false", constant.JobStatusQueued, false),
+			Entry("when running, it returns false", constant.JobStatusRunning, false),
 		)
 	})
 
@@ -325,7 +326,7 @@ var _ = Describe("Job", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
-				Expect(job.Status).To(Equal(JobStatusQueued))
+				Expect(job.Status).To(Equal(constant.JobStatusQueued))
 			})
 		})
 
@@ -363,7 +364,7 @@ var _ = Describe("Job", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
-				Expect(job.Status).To(Equal(JobStatusFailed))
+				Expect(job.Status).To(Equal(constant.JobStatusFailed))
 				Expect(job.Error).To(Equal("Use of entity>error is deprecated in favor of entity>error_details."))
 				Expect(job.ErrorDetails.Description).To(Equal("some-error"))
 			})
@@ -402,7 +403,7 @@ var _ = Describe("Job", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
-				Expect(job.Status).To(Equal(JobStatusQueued))
+				Expect(job.Status).To(Equal(constant.JobStatusQueued))
 			})
 		})
 
@@ -463,7 +464,7 @@ var _ = Describe("Job", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
-				Expect(job.Status).To(Equal(JobStatusQueued))
+				Expect(job.Status).To(Equal(constant.JobStatusQueued))
 			})
 		})
 
@@ -569,7 +570,7 @@ var _ = Describe("Job", func() {
 					Expect(warnings).To(ConsistOf("this is a warning"))
 					Expect(job).To(Equal(Job{
 						GUID:   "job-guid",
-						Status: JobStatusQueued,
+						Status: constant.JobStatusQueued,
 					}))
 				})
 			})
@@ -630,7 +631,7 @@ var _ = Describe("Job", func() {
 					Expect(warnings).To(ConsistOf("this is a warning"))
 					Expect(job).To(Equal(Job{
 						GUID:   "job-guid",
-						Status: JobStatusQueued,
+						Status: constant.JobStatusQueued,
 					}))
 				})
 			})
@@ -805,7 +806,7 @@ var _ = Describe("Job", func() {
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(job).To(Equal(Job{
 					GUID:   "job-guid",
-					Status: JobStatusQueued,
+					Status: constant.JobStatusQueued,
 				}))
 			})
 		})

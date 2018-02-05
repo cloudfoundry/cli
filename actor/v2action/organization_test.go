@@ -205,7 +205,7 @@ var _ = Describe("Org Actions", func() {
 
 				job = ccv2.Job{
 					GUID:   "some-job-guid",
-					Status: ccv2.JobStatusFinished,
+					Status: constant.JobStatusFinished,
 				}
 
 				fakeCloudControllerClient.DeleteOrganizationReturns(

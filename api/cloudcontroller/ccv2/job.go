@@ -10,6 +10,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -20,23 +21,6 @@ type Reader interface {
 	io.Reader
 }
 
-// JobStatus is the current state of a job.
-type JobStatus string
-
-const (
-	// JobStatusFailed is when the job is no longer running due to a failure.
-	JobStatusFailed JobStatus = "failed"
-
-	// JobStatusFinished is when the job is no longer and it was successful.
-	JobStatusFinished JobStatus = "finished"
-
-	// JobStatusQueued is when the job is waiting to be run.
-	JobStatusQueued JobStatus = "queued"
-
-	// JobStatusRunning is when the job is running.
-	JobStatusRunning JobStatus = "running"
-)
-
 // Job represents a Cloud Controller Job.
 type Job struct {
 	Error        string
@@ -44,7 +28,7 @@ type Job struct {
 		Description string
 	}
 	GUID   string
-	Status JobStatus
+	Status constant.JobStatus
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Job response.
@@ -67,18 +51,18 @@ func (job *Job) UnmarshalJSON(data []byte) error {
 	job.Error = ccJob.Entity.Error
 	job.ErrorDetails.Description = ccJob.Entity.ErrorDetails.Description
 	job.GUID = ccJob.Entity.GUID
-	job.Status = JobStatus(ccJob.Entity.Status)
+	job.Status = constant.JobStatus(ccJob.Entity.Status)
 	return nil
 }
 
 // Finished returns true when the job has completed successfully.
 func (job Job) Finished() bool {
-	return job.Status == JobStatusFinished
+	return job.Status == constant.JobStatusFinished
 }
 
 // Failed returns true when the job has completed with an error/failure.
 func (job Job) Failed() bool {
-	return job.Status == JobStatusFailed
+	return job.Status == constant.JobStatusFailed
 }
 
 // DeleteOrganization deletes the Organization associated with the provided
