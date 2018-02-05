@@ -371,8 +371,6 @@ var _ = Describe("Job", func() {
 	})
 
 	Describe("DeleteOrganization", func() {
-		var client *Client
-
 		BeforeEach(func() {
 			client = NewTestClient()
 		})
@@ -434,8 +432,6 @@ var _ = Describe("Job", func() {
 	})
 
 	Describe("DeleteSpace", func() {
-		var client *Client
-
 		BeforeEach(func() {
 			client = NewTestClient()
 		})
