@@ -65,10 +65,10 @@ func (job Job) Failed() bool {
 	return job.Status == constant.JobStatusFailed
 }
 
-// DeleteOrganization deletes the Organization associated with the provided
+// DeleteOrganizationJob deletes the Organization associated with the provided
 // GUID. It will return the Cloud Controller job that is assigned to the
 // Organization deletion.
-func (client *Client) DeleteOrganization(guid string) (Job, Warnings, error) {
+func (client *Client) DeleteOrganizationJob(guid string) (Job, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteOrganizationRequest,
 		URIParams:   Params{"organization_guid": guid},
@@ -90,10 +90,9 @@ func (client *Client) DeleteOrganization(guid string) (Job, Warnings, error) {
 	return job, response.Warnings, err
 }
 
-// DeleteSpace deletes the Space associated with the provided
-// GUID. It will return the Cloud Controller job that is assigned to the
-// Space deletion.
-func (client *Client) DeleteSpace(guid string) (Job, Warnings, error) {
+// DeleteSpaceJob deletes the Space associated with the provided GUID. It will
+// return the Cloud Controller job that is assigned to the Space deletion.
+func (client *Client) DeleteSpaceJob(guid string) (Job, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteSpaceRequest,
 		URIParams:   Params{"space_guid": guid},

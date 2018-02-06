@@ -11,30 +11,43 @@
 //
 // Method Naming Conventions
 //
-// The client takes a '<Action Name><Top Level Endpoint><Return Value>'
-// approach to method names.  If the <Top Level Endpoint> and <Return Value>
-// are similar, they do not need to be repeated. If a GUID is required for the
-// <Top Level Endpoint>, the pluralization is removed from said endpoint in the
-// method name.
+// The client takes a '<Action Name><Top Level Endpoint><nth... level
+// endpoint><Return Value>' approach to method names.  If the <Top Level
+// Endpoint> and <Return Value> are similar, they do not need to be repeated.
+// If a GUID is required for the <Top Level Endpoint>, the pluralization is
+// removed from said endpoint in the method name.
 //
 // For Example:
 //   Method Name: GetApplication
 //   Endpoint: /v2/applications/:guid
-//   Action Name: Get
+//   Action Name: GET
 //   Top Level Endpoint: applications
 //   Return Value: Application
 //
 //   Method Name: GetServiceInstances
 //   Endpoint: /v2/service_instances
-//   Action Name: Get
+//   Action Name: GET
 //   Top Level Endpoint: service_instances
 //   Return Value: []ServiceInstance
 //
 //   Method Name: GetSpaceServiceInstances
 //   Endpoint: /v2/spaces/:guid/service_instances
-//   Action Name: Get
+//   Action Name: GET
 //   Top Level Endpoint: spaces
 //   Return Value: []ServiceInstance
+//
+//   Method Name: UpdateRouteApplication
+//   Endpoint: /v2/routes/:route_guid/apps/:app_guid
+//   Action Name: PUT
+//   Top Level Endpoint: routes
+//   Second Level Endpoint: Application
+//   Return Value: Route
+//
+//   Method Name: DeleteSpaceJob
+//   Endpoint: /v2/spaces/:space_guid
+//   Action Name: DELETE
+//   Top Level Endpoint: spaces
+//   Return Value: Job
 //
 // Use the following table to determine which HTTP Command equates to which
 // Action Name:

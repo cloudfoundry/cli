@@ -59,7 +59,7 @@ func (actor Actor) DeleteOrganization(orgName string) (Warnings, error) {
 		return allWarnings, err
 	}
 
-	job, deleteWarnings, err := actor.CloudControllerClient.DeleteOrganization(org.GUID)
+	job, deleteWarnings, err := actor.CloudControllerClient.DeleteOrganizationJob(org.GUID)
 	allWarnings = append(allWarnings, deleteWarnings...)
 	if err != nil {
 		return allWarnings, err

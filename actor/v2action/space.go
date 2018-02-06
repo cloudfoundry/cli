@@ -24,7 +24,7 @@ func (actor Actor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgNam
 		return allWarnings, err
 	}
 
-	job, deleteWarnings, err := actor.CloudControllerClient.DeleteSpace(space.GUID)
+	job, deleteWarnings, err := actor.CloudControllerClient.DeleteSpaceJob(space.GUID)
 	allWarnings = append(allWarnings, Warnings(deleteWarnings)...)
 	if err != nil {
 		return allWarnings, err

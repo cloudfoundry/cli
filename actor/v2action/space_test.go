@@ -117,7 +117,7 @@ var _ = Describe("Space", func() {
 
 						BeforeEach(func() {
 							expectedErr = errors.New("some delete space error")
-							fakeCloudControllerClient.DeleteSpaceReturns(
+							fakeCloudControllerClient.DeleteSpaceJobReturns(
 								ccv2.Job{},
 								ccv2.Warnings{"warning-5", "warning-6"},
 								expectedErr,
@@ -132,7 +132,7 @@ var _ = Describe("Space", func() {
 
 					Context("when the delete returns a job", func() {
 						BeforeEach(func() {
-							fakeCloudControllerClient.DeleteSpaceReturns(
+							fakeCloudControllerClient.DeleteSpaceJobReturns(
 								ccv2.Job{GUID: "some-job-guid"},
 								ccv2.Warnings{"warning-5", "warning-6"},
 								nil,
@@ -182,8 +182,8 @@ var _ = Describe("Space", func() {
 									},
 								}))
 
-								Expect(fakeCloudControllerClient.DeleteSpaceCallCount()).To(Equal(1))
-								Expect(fakeCloudControllerClient.DeleteSpaceArgsForCall(0)).To(Equal("some-space-guid"))
+								Expect(fakeCloudControllerClient.DeleteSpaceJobCallCount()).To(Equal(1))
+								Expect(fakeCloudControllerClient.DeleteSpaceJobArgsForCall(0)).To(Equal("some-space-guid"))
 
 								Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
 								Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(ccv2.Job{GUID: "some-job-guid"}))

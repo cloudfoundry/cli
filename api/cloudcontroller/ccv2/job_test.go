@@ -371,9 +371,19 @@ var _ = Describe("Job", func() {
 		})
 	})
 
-	Describe("DeleteOrganization", func() {
+	Describe("DeleteOrganizationJob", func() {
+		var (
+			job        Job
+			warnings   Warnings
+			executeErr error
+		)
+
 		BeforeEach(func() {
 			client = NewTestClient()
+		})
+
+		JustBeforeEach(func() {
+			job, warnings, executeErr = client.DeleteOrganizationJob("some-organization-guid")
 		})
 
 		Context("when no errors are encountered", func() {
@@ -398,12 +408,12 @@ var _ = Describe("Job", func() {
 			})
 
 			It("deletes the Organization and returns all warnings", func() {
-				job, warnings, err := client.DeleteOrganization("some-organization-guid")
-
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
-				Expect(job.GUID).To(Equal("job-guid"))
-				Expect(job.Status).To(Equal(constant.JobStatusQueued))
+				Expect(job).To(Equal(Job{
+					GUID:   "job-guid",
+					Status: constant.JobStatusQueued,
+				}))
 			})
 		})
 
@@ -422,9 +432,7 @@ var _ = Describe("Job", func() {
 			})
 
 			It("returns an error and all warnings", func() {
-				_, warnings, err := client.DeleteOrganization("some-organization-guid")
-
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
+				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The Organization could not be found: some-organization-guid",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
@@ -432,9 +440,19 @@ var _ = Describe("Job", func() {
 		})
 	})
 
-	Describe("DeleteSpace", func() {
+	Describe("DeleteSpaceJob", func() {
+		var (
+			job        Job
+			warnings   Warnings
+			executeErr error
+		)
+
 		BeforeEach(func() {
 			client = NewTestClient()
+		})
+
+		JustBeforeEach(func() {
+			job, warnings, executeErr = client.DeleteSpaceJob("some-space-guid")
 		})
 
 		Context("when no errors are encountered", func() {
@@ -459,12 +477,12 @@ var _ = Describe("Job", func() {
 			})
 
 			It("deletes the Space and returns all warnings", func() {
-				job, warnings, err := client.DeleteSpace("some-space-guid")
-
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
-				Expect(job.GUID).To(Equal("job-guid"))
-				Expect(job.Status).To(Equal(constant.JobStatusQueued))
+				Expect(job).To(Equal(Job{
+					GUID:   "job-guid",
+					Status: constant.JobStatusQueued,
+				}))
 			})
 		})
 
@@ -483,9 +501,7 @@ var _ = Describe("Job", func() {
 			})
 
 			It("returns an error and all warnings", func() {
-				_, warnings, err := client.DeleteSpace("some-space-guid")
-
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
+				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The Space could not be found: some-space-guid",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
