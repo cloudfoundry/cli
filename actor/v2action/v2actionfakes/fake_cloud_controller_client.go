@@ -772,17 +772,17 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
-	ResourceMatchStub        func(resourcesToMatch []ccv2.Resource) ([]ccv2.Resource, ccv2.Warnings, error)
-	resourceMatchMutex       sync.RWMutex
-	resourceMatchArgsForCall []struct {
+	PutResourceMatchStub        func(resourcesToMatch []ccv2.Resource) ([]ccv2.Resource, ccv2.Warnings, error)
+	putResourceMatchMutex       sync.RWMutex
+	putResourceMatchArgsForCall []struct {
 		resourcesToMatch []ccv2.Resource
 	}
-	resourceMatchReturns struct {
+	putResourceMatchReturns struct {
 		result1 []ccv2.Resource
 		result2 ccv2.Warnings
 		result3 error
 	}
-	resourceMatchReturnsOnCall map[int]struct {
+	putResourceMatchReturnsOnCall map[int]struct {
 		result1 []ccv2.Resource
 		result2 ccv2.Warnings
 		result3 error
@@ -3669,59 +3669,59 @@ func (fake *FakeCloudControllerClient) RemoveSpaceFromStagingSecurityGroupReturn
 	}{result1, result2}
 }
 
-func (fake *FakeCloudControllerClient) ResourceMatch(resourcesToMatch []ccv2.Resource) ([]ccv2.Resource, ccv2.Warnings, error) {
+func (fake *FakeCloudControllerClient) PutResourceMatch(resourcesToMatch []ccv2.Resource) ([]ccv2.Resource, ccv2.Warnings, error) {
 	var resourcesToMatchCopy []ccv2.Resource
 	if resourcesToMatch != nil {
 		resourcesToMatchCopy = make([]ccv2.Resource, len(resourcesToMatch))
 		copy(resourcesToMatchCopy, resourcesToMatch)
 	}
-	fake.resourceMatchMutex.Lock()
-	ret, specificReturn := fake.resourceMatchReturnsOnCall[len(fake.resourceMatchArgsForCall)]
-	fake.resourceMatchArgsForCall = append(fake.resourceMatchArgsForCall, struct {
+	fake.putResourceMatchMutex.Lock()
+	ret, specificReturn := fake.putResourceMatchReturnsOnCall[len(fake.putResourceMatchArgsForCall)]
+	fake.putResourceMatchArgsForCall = append(fake.putResourceMatchArgsForCall, struct {
 		resourcesToMatch []ccv2.Resource
 	}{resourcesToMatchCopy})
-	fake.recordInvocation("ResourceMatch", []interface{}{resourcesToMatchCopy})
-	fake.resourceMatchMutex.Unlock()
-	if fake.ResourceMatchStub != nil {
-		return fake.ResourceMatchStub(resourcesToMatch)
+	fake.recordInvocation("PutResourceMatch", []interface{}{resourcesToMatchCopy})
+	fake.putResourceMatchMutex.Unlock()
+	if fake.PutResourceMatchStub != nil {
+		return fake.PutResourceMatchStub(resourcesToMatch)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.resourceMatchReturns.result1, fake.resourceMatchReturns.result2, fake.resourceMatchReturns.result3
+	return fake.putResourceMatchReturns.result1, fake.putResourceMatchReturns.result2, fake.putResourceMatchReturns.result3
 }
 
-func (fake *FakeCloudControllerClient) ResourceMatchCallCount() int {
-	fake.resourceMatchMutex.RLock()
-	defer fake.resourceMatchMutex.RUnlock()
-	return len(fake.resourceMatchArgsForCall)
+func (fake *FakeCloudControllerClient) PutResourceMatchCallCount() int {
+	fake.putResourceMatchMutex.RLock()
+	defer fake.putResourceMatchMutex.RUnlock()
+	return len(fake.putResourceMatchArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) ResourceMatchArgsForCall(i int) []ccv2.Resource {
-	fake.resourceMatchMutex.RLock()
-	defer fake.resourceMatchMutex.RUnlock()
-	return fake.resourceMatchArgsForCall[i].resourcesToMatch
+func (fake *FakeCloudControllerClient) PutResourceMatchArgsForCall(i int) []ccv2.Resource {
+	fake.putResourceMatchMutex.RLock()
+	defer fake.putResourceMatchMutex.RUnlock()
+	return fake.putResourceMatchArgsForCall[i].resourcesToMatch
 }
 
-func (fake *FakeCloudControllerClient) ResourceMatchReturns(result1 []ccv2.Resource, result2 ccv2.Warnings, result3 error) {
-	fake.ResourceMatchStub = nil
-	fake.resourceMatchReturns = struct {
+func (fake *FakeCloudControllerClient) PutResourceMatchReturns(result1 []ccv2.Resource, result2 ccv2.Warnings, result3 error) {
+	fake.PutResourceMatchStub = nil
+	fake.putResourceMatchReturns = struct {
 		result1 []ccv2.Resource
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) ResourceMatchReturnsOnCall(i int, result1 []ccv2.Resource, result2 ccv2.Warnings, result3 error) {
-	fake.ResourceMatchStub = nil
-	if fake.resourceMatchReturnsOnCall == nil {
-		fake.resourceMatchReturnsOnCall = make(map[int]struct {
+func (fake *FakeCloudControllerClient) PutResourceMatchReturnsOnCall(i int, result1 []ccv2.Resource, result2 ccv2.Warnings, result3 error) {
+	fake.PutResourceMatchStub = nil
+	if fake.putResourceMatchReturnsOnCall == nil {
+		fake.putResourceMatchReturnsOnCall = make(map[int]struct {
 			result1 []ccv2.Resource
 			result2 ccv2.Warnings
 			result3 error
 		})
 	}
-	fake.resourceMatchReturnsOnCall[i] = struct {
+	fake.putResourceMatchReturnsOnCall[i] = struct {
 		result1 []ccv2.Resource
 		result2 ccv2.Warnings
 		result3 error
@@ -4389,8 +4389,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.removeSpaceFromRunningSecurityGroupMutex.RUnlock()
 	fake.removeSpaceFromStagingSecurityGroupMutex.RLock()
 	defer fake.removeSpaceFromStagingSecurityGroupMutex.RUnlock()
-	fake.resourceMatchMutex.RLock()
-	defer fake.resourceMatchMutex.RUnlock()
+	fake.putResourceMatchMutex.RLock()
+	defer fake.putResourceMatchMutex.RUnlock()
 	fake.restageApplicationMutex.RLock()
 	defer fake.restageApplicationMutex.RUnlock()
 	fake.targetCFMutex.RLock()

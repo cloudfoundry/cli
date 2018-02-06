@@ -17,7 +17,19 @@ var _ = Describe("Resource", func() {
 		client = NewTestClient()
 	})
 
-	Describe("ResourceMatch", func() {
+	Describe("PutResourceMatch", func() {
+		var (
+			resourcesToMatch []Resource
+
+			matchedResources []Resource
+			warnings         Warnings
+			executeErr       error
+		)
+
+		JustBeforeEach(func() {
+			matchedResources, warnings, executeErr = client.PutResourceMatch(resourcesToMatch)
+		})
+
 		Context("when resource matching is successful", func() {
 			BeforeEach(func() {
 				responseBody := `[
@@ -64,10 +76,8 @@ var _ = Describe("Resource", func() {
 						RespondWith(http.StatusCreated, responseBody, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
-			})
 
-			It("returns the resources and warnings", func() {
-				resourcesToMatch := []Resource{
+				resourcesToMatch = []Resource{
 					{
 						Filename: "some-file-1",
 						Mode:     0744,
@@ -87,9 +97,10 @@ var _ = Describe("Resource", func() {
 						Size:     3,
 					},
 				}
-				matchedResources, warnings, err := client.ResourceMatch(resourcesToMatch)
+			})
 
-				Expect(err).ToNot(HaveOccurred())
+			It("returns the resources and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
 				Expect(matchedResources).To(ConsistOf(
@@ -124,8 +135,7 @@ var _ = Describe("Resource", func() {
 			})
 
 			It("returns an error", func() {
-				_, warnings, err := client.ResourceMatch(nil)
-				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V2ErrorResponse: ccerror.V2ErrorResponse{
 						Code:        10001,

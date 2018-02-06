@@ -57,16 +57,16 @@ func (r Resource) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccResource)
 }
 
-// ResourceMatch returns the resources that exist on the cloud foundry instance
+// PutResourceMatch returns the resources that exist on the cloud foundry instance
 // from the set of resources given.
-func (client *Client) ResourceMatch(resourcesToMatch []Resource) ([]Resource, Warnings, error) {
+func (client *Client) PutResourceMatch(resourcesToMatch []Resource) ([]Resource, Warnings, error) {
 	body, err := json.Marshal(resourcesToMatch)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutResourceMatch,
+		RequestName: internal.PutResourceMatchRequest,
 		Body:        bytes.NewReader(body),
 	})
 	if err != nil {

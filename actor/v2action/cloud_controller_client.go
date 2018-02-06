@@ -57,7 +57,7 @@ type CloudControllerClient interface {
 	PollJob(job ccv2.Job) (ccv2.Warnings, error)
 	RemoveSpaceFromRunningSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	RemoveSpaceFromStagingSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
-	ResourceMatch(resourcesToMatch []ccv2.Resource) ([]ccv2.Resource, ccv2.Warnings, error)
+	PutResourceMatch(resourcesToMatch []ccv2.Resource) ([]ccv2.Resource, ccv2.Warnings, error)
 	RestageApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error)
 	UpdateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)

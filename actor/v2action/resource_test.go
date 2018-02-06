@@ -71,7 +71,7 @@ var _ = Describe("Resource Actions", func() {
 
 			It("does not send folders", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeCloudControllerClient.ResourceMatchCallCount()).To(Equal(0))
+				Expect(fakeCloudControllerClient.PutResourceMatchCallCount()).To(Equal(0))
 			})
 
 			It("returns all folders [in order] in unmatchedResources", func() {
@@ -93,8 +93,8 @@ var _ = Describe("Resource Actions", func() {
 
 			It("sends non-zero sized files", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeCloudControllerClient.ResourceMatchCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.ResourceMatchArgsForCall(0)).To(ConsistOf(
+				Expect(fakeCloudControllerClient.PutResourceMatchCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.PutResourceMatchArgsForCall(0)).To(ConsistOf(
 					ccv2.Resource{Filename: "file-1", Mode: 0744, Size: 11, SHA1: "some-sha-1"},
 					ccv2.Resource{Filename: "file-3", Mode: 0744, Size: 13, SHA1: "some-sha-3"},
 					ccv2.Resource{Filename: "file-4", Mode: 0744, Size: 14, SHA1: "some-sha-4"},
@@ -111,7 +111,7 @@ var _ = Describe("Resource Actions", func() {
 
 			Context("when some files are matched", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.ResourceMatchReturns(
+					fakeCloudControllerClient.PutResourceMatchReturns(
 						[]ccv2.Resource{
 							ccv2.Resource{Size: 14, SHA1: "some-sha-4"},
 							ccv2.Resource{Size: 13, SHA1: "some-sha-3"},
@@ -146,10 +146,10 @@ var _ = Describe("Resource Actions", func() {
 
 		Context("when sending a large number of files/folders", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.ResourceMatchReturnsOnCall(
+				fakeCloudControllerClient.PutResourceMatchReturnsOnCall(
 					0, nil, ccv2.Warnings{"warnings-1"}, nil,
 				)
-				fakeCloudControllerClient.ResourceMatchReturnsOnCall(
+				fakeCloudControllerClient.PutResourceMatchReturnsOnCall(
 					1, nil, ccv2.Warnings{"warnings-2"}, nil,
 				)
 
@@ -163,9 +163,9 @@ var _ = Describe("Resource Actions", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("warnings-1", "warnings-2"))
 
-				Expect(fakeCloudControllerClient.ResourceMatchCallCount()).To(Equal(2))
-				Expect(fakeCloudControllerClient.ResourceMatchArgsForCall(0)).To(HaveLen(MaxResourceMatchChunkSize))
-				Expect(fakeCloudControllerClient.ResourceMatchArgsForCall(1)).To(HaveLen(2))
+				Expect(fakeCloudControllerClient.PutResourceMatchCallCount()).To(Equal(2))
+				Expect(fakeCloudControllerClient.PutResourceMatchArgsForCall(0)).To(HaveLen(MaxResourceMatchChunkSize))
+				Expect(fakeCloudControllerClient.PutResourceMatchArgsForCall(1)).To(HaveLen(2))
 			})
 
 		})
@@ -175,10 +175,10 @@ var _ = Describe("Resource Actions", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("things are taking tooooooo long")
-				fakeCloudControllerClient.ResourceMatchReturnsOnCall(
+				fakeCloudControllerClient.PutResourceMatchReturnsOnCall(
 					0, nil, ccv2.Warnings{"warnings-1"}, nil,
 				)
-				fakeCloudControllerClient.ResourceMatchReturnsOnCall(
+				fakeCloudControllerClient.PutResourceMatchReturnsOnCall(
 					1, nil, ccv2.Warnings{"warnings-2"}, expectedErr,
 				)
 

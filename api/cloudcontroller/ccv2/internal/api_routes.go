@@ -16,18 +16,18 @@ import (
 // The const name should always be the const value + Request.
 const (
 	DeleteOrganizationRequest                            = "DeleteOrganization"
-	DeleteRouteAppRequest                                = "DeleteRouteAppRequest"
+	DeleteRouteAppRequest                                = "DeleteRouteApp"
 	DeleteRouteRequest                                   = "DeleteRoute"
 	DeleteRunningSecurityGroupSpaceRequest               = "DeleteRunningSecurityGroupSpace"
 	DeleteSecurityGroupSpaceRequest                      = "DeleteSecurityGroupSpace"
 	DeleteServiceBindingRequest                          = "DeleteServiceBinding"
-	DeleteSpaceRequest                                   = "DeleteSpaceRequest"
+	DeleteSpaceRequest                                   = "DeleteSpace"
 	DeleteStagingSecurityGroupSpaceRequest               = "DeleteStagingSecurityGroupSpace"
 	GetAppInstancesRequest                               = "GetAppInstances"
 	GetAppRequest                                        = "GetApp"
 	GetAppRoutesRequest                                  = "GetAppRoutes"
-	GetAppStatsRequest                                   = "GetAppStats"
 	GetAppsRequest                                       = "GetApps"
+	GetAppStatsRequest                                   = "GetAppStats"
 	GetConfigFeatureFlagsRequest                         = "GetConfigFeatureFlags"
 	GetInfoRequest                                       = "GetInfo"
 	GetJobRequest                                        = "GetJob"
@@ -42,14 +42,14 @@ const (
 	GetRouteRouteMappingsRequest                         = "GetRouteRouteMappings"
 	GetRoutesRequest                                     = "GetRoutes"
 	GetSecurityGroupRunningSpacesRequest                 = "GetSecurityGroupRunningSpaces"
-	GetSecurityGroupStagingSpacesRequest                 = "GetSecurityGroupStagingSpaces"
 	GetSecurityGroupsRequest                             = "GetSecurityGroups"
+	GetSecurityGroupStagingSpacesRequest                 = "GetSecurityGroupStagingSpaces"
 	GetServiceBindingsRequest                            = "GetServiceBindings"
 	GetServiceInstanceRequest                            = "GetServiceInstance"
 	GetServiceInstanceServiceBindingsRequest             = "GetServiceInstanceServiceBindings"
-	GetServiceInstancesRequest                           = "GetServiceInstances"
 	GetServiceInstanceSharedFromRequest                  = "GetServiceInstanceSharedFrom"
 	GetServiceInstanceSharedToRequest                    = "GetServiceInstanceSharedTo"
+	GetServiceInstancesRequest                           = "GetServiceInstances"
 	GetServicePlanRequest                                = "GetServicePlan"
 	GetServiceRequest                                    = "GetService"
 	GetSharedDomainRequest                               = "GetSharedDomain"
@@ -58,8 +58,8 @@ const (
 	GetSpaceRoutesRequest                                = "GetSpaceRoutes"
 	GetSpaceRunningSecurityGroupsRequest                 = "GetSpaceRunningSecurityGroups"
 	GetSpaceServiceInstancesRequest                      = "GetSpaceServiceInstances"
-	GetSpaceStagingSecurityGroupsRequest                 = "GetSpaceStagingSecurityGroups"
 	GetSpacesRequest                                     = "GetSpaces"
+	GetSpaceStagingSecurityGroupsRequest                 = "GetSpaceStagingSecurityGroups"
 	GetStackRequest                                      = "GetStack"
 	GetStacksRequest                                     = "GetStacks"
 	GetUserProvidedServiceInstanceServiceBindingsRequest = "GetUserProvidedServiceInstanceServiceBindings"
@@ -72,7 +72,7 @@ const (
 	PutAppBitsRequest                                    = "PutAppBits"
 	PutAppRequest                                        = "PutApp"
 	PutDropletRequest                                    = "PutDroplet"
-	PutResourceMatch                                     = "PutResourceMatch"
+	PutResourceMatchRequest                              = "PutResourceMatch"
 	PutRouteAppRequest                                   = "PutRouteApp"
 	PutRunningSecurityGroupSpaceRequest                  = "PutRunningSecurityGroupSpace"
 	PutStagingSecurityGroupSpaceRequest                  = "PutStagingSecurityGroupSpace"
@@ -100,7 +100,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/organizations/:organization_guid/private_domains", Method: http.MethodGet, Name: GetOrganizationPrivateDomainsRequest},
 	{Path: "/v2/private_domains/:private_domain_guid", Method: http.MethodGet, Name: GetPrivateDomainRequest},
 	{Path: "/v2/quota_definitions/:organization_quota_guid", Method: http.MethodGet, Name: GetOrganizationQuotaDefinitionRequest},
-	{Path: "/v2/resource_match", Method: http.MethodPut, Name: PutResourceMatch},
+	{Path: "/v2/resource_match", Method: http.MethodPut, Name: PutResourceMatchRequest},
 	{Path: "/v2/routes", Method: http.MethodGet, Name: GetRoutesRequest},
 	{Path: "/v2/routes", Method: http.MethodPost, Name: PostRouteRequest},
 	{Path: "/v2/routes/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
