@@ -29,6 +29,18 @@ func (s ServiceInstanceSummary) IsShareable() bool {
 	return s.ServiceInstanceSharingFeatureFlag && s.Service.Extra.Shareable
 }
 
+func (s ServiceInstanceSummary) IsNotShared() bool {
+	return s.ServiceInstanceShareType == ServiceInstanceIsNotShared
+}
+
+func (s ServiceInstanceSummary) IsSharedFrom() bool {
+	return s.ServiceInstanceShareType == ServiceInstanceIsSharedFrom
+}
+
+func (s ServiceInstanceSummary) IsSharedTo() bool {
+	return s.ServiceInstanceShareType == ServiceInstanceIsSharedTo
+}
+
 func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUID string) (ServiceInstanceSummary, Warnings, error) {
 	serviceInstanceSummary := ServiceInstanceSummary{}
 
