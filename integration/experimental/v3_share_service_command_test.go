@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = PDescribe("v3-share-service command", func() {
+var _ = Describe("v3-share-service command", func() {
 	var (
 		sourceOrgName     string
 		sourceSpaceName   string
@@ -211,9 +211,31 @@ var _ = PDescribe("v3-share-service command", func() {
 			})
 
 			Context("when I want to share my service instance to a space in another org", func() {
+				AfterEach(func() {
+					Eventually(helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName, "-f")).Should(Exit(0))
+				})
+
 				It("shares the service instance from my targeted space with the share-to org/space", func() {
+					username, _ := helpers.GetCredentials()
 					session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
+					Eventually(session.Out).Should(Say("Sharing service instance %s into org %s / space %s as %s\\.\\.\\.", serviceInstance, sharedToOrgName, sharedToSpaceName, username))
+					Eventually(session.Out).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
+				})
+
+				Context("when the service instance is already shared with that space", func() {
+					BeforeEach(func() {
+						Eventually(helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)).Should(Exit(0))
+					})
+
+					It("displays a warning and exits 0", func() {
+						session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
+						Consistently(session.Out).ShouldNot(Say("FAILED"))
+						Eventually(session.Out).Should(Say("OK"))
+
+						Eventually(session.Err).Should(Say("Service instance %s is already shared with that space\\.", serviceInstance))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 
@@ -222,9 +244,31 @@ var _ = PDescribe("v3-share-service command", func() {
 					helpers.CreateSpace(sharedToSpaceName)
 				})
 
+				AfterEach(func() {
+					Eventually(helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-f")).Should(Exit(0))
+				})
+
 				It("shares the service instance from my targeted space with the share-to space", func() {
+					username, _ := helpers.GetCredentials()
 					session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
+					Eventually(session.Out).Should(Say("Sharing service instance %s into org %s / space %s as %s\\.\\.\\.", serviceInstance, sourceOrgName, sharedToSpaceName, username))
+					Eventually(session.Out).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
+				})
+
+				Context("when the service instance is already shared with that space", func() {
+					BeforeEach(func() {
+						Eventually(helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)).Should(Exit(0))
+					})
+
+					It("displays a warning and exits 0", func() {
+						session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
+						Consistently(session.Out).ShouldNot(Say("FAILED"))
+						Eventually(session.Out).Should(Say("OK"))
+
+						Eventually(session.Err).Should(Say("Service instance %s is already shared with that space\\.", serviceInstance))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 
