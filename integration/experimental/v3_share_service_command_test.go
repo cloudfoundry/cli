@@ -247,6 +247,7 @@ var _ = PDescribe("v3-share-service command", func() {
 			})
 
 			Context("when I am a SpaceAuditor in the space I want to share into", func() {
+				var sharedToSpaceGUID string
 				BeforeEach(func() {
 					user := helpers.NewUsername()
 					password := helpers.NewPassword()
@@ -254,6 +255,8 @@ var _ = PDescribe("v3-share-service command", func() {
 					Eventually(helpers.CF("set-space-role", user, sourceOrgName, sourceSpaceName, "SpaceDeveloper")).Should(Exit(0))
 					Eventually(helpers.CF("set-space-role", user, sharedToOrgName, sharedToSpaceName, "SpaceAuditor")).Should(Exit(0))
 					Eventually(helpers.CF("auth", user, password)).Should(Exit(0))
+					Eventually(helpers.CF("target", "-o", sharedToOrgName, "-s", sharedToSpaceName)).Should(Exit(0))
+					sharedToSpaceGUID = helpers.GetSpaceGUID(sharedToSpaceName)
 					Eventually(helpers.CF("target", "-o", sourceOrgName, "-s", sourceSpaceName)).Should(Exit(0))
 				})
 
@@ -264,7 +267,8 @@ var _ = PDescribe("v3-share-service command", func() {
 				It("fails with an unauthorized error", func() {
 					session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
+					Eventually(session.Err).Should(Say("Unable to share service instance %s with spaces \\['%s'\\].", serviceInstance, sharedToSpaceGUID))
+					Eventually(session.Err).Should(Say("Write permission is required in order to share a service instance with a space"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
