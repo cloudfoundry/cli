@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -42,10 +42,11 @@ var _ = Describe("share-service Command", func() {
 		}
 
 		cmd.RequiredArgs.ServiceInstance = "some-service-instance"
+		cmd.SpaceName = "some-space"
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionShareServiceV3)
+		fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionShareServiceV3)
 	})
 
 	JustBeforeEach(func() {
@@ -54,7 +55,7 @@ var _ = Describe("share-service Command", func() {
 
 	Context("when the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
+			fakeActor.CloudControllerV3APIVersionReturns("0.0.0")
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
@@ -65,7 +66,7 @@ var _ = Describe("share-service Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	Context("when the environment is not correctly setup", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -88,11 +89,10 @@ var _ = Describe("share-service Command", func() {
 			})
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				GUID: "some-space-guid",
-				Name: "some-space",
 			})
 		})
 
-		Context("when getting the current user returns an error", func() {
+		Context("when an error occurs getting the current user", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -107,19 +107,18 @@ var _ = Describe("share-service Command", func() {
 			})
 		})
 
-		Context("when the current user is set correctly", func() {
+		Context("when no errors occur getting the current user", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})
 
-			Context("when using the currently targeted org", func() {
-				Context("when the sharing is successful", func() {
+			Context("when '-o' (org name) is not provided", func() {
+				Context("when no errors occur sharing the service instance", func() {
 					BeforeEach(func() {
-						cmd.SpaceName = "some-space"
-						fakeActor.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameReturns(
-							v3action.Warnings{"share-service-warning"},
+						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns(
+							v2v3action.Warnings{"share-service-warning"},
 							nil)
 					})
 
@@ -128,41 +127,61 @@ var _ = Describe("share-service Command", func() {
 
 						Expect(testUI.Out).To(Say("Sharing service instance some-service-instance into org some-org / space some-space as some-user\\.\\.\\."))
 						Expect(testUI.Out).To(Say("OK"))
+
 						Expect(testUI.Err).To(Say("share-service-warning"))
 
-						Expect(fakeActor.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameCallCount()).To(Equal(1))
-						serviceInstanceNameArg, sourceSpaceGUIDArg, orgGUIDArg, spaceNameArg := fakeActor.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall(0)
+						Expect(fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationCallCount()).To(Equal(1))
+						spaceNameArg, serviceInstanceNameArg, sourceSpaceGUIDArg, orgGUIDArg := fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall(0)
+						Expect(spaceNameArg).To(Equal("some-space"))
 						Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
 						Expect(sourceSpaceGUIDArg).To(Equal("some-space-guid"))
 						Expect(orgGUIDArg).To(Equal("some-org-guid"))
-						Expect(spaceNameArg).To(Equal("some-space"))
 					})
 				})
 
-				Context("when the sharing is unsuccessful", func() {
+				Context("when an error occurs sharing the service instance", func() {
+					var expectedErr error
+
 					BeforeEach(func() {
-						cmd.SpaceName = "some-space"
-						fakeActor.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameReturns(
-							v3action.Warnings{"share-service-warning"},
-							errors.New("sharing failed"))
+						expectedErr = errors.New("sharing failed")
+						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns(
+							v2v3action.Warnings{"share-service-warning"},
+							expectedErr)
 					})
 
-					It("does not share the service instance with the provided space and displays all warnings", func() {
-						Expect(executeErr).To(MatchError("sharing failed"))
+					It("returns the error, and displays all warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
 
 						Expect(testUI.Out).ToNot(Say("OK"))
 						Expect(testUI.Err).To(Say("share-service-warning"))
 					})
 				})
+
+				Context("when the service instance is already shared to the space", func() {
+					BeforeEach(func() {
+						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns(
+							v2v3action.Warnings{"Service instance some-service-instance is already shared with that space."},
+							actionerror.ServiceInstanceAlreadySharedError{})
+					})
+
+					It("does not return an error and displays all warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("OK"))
+						Expect(testUI.Err).To(Say("Service instance some-service-instance is already shared with that space."))
+					})
+				})
 			})
 
-			Context("when using a specified org", func() {
+			Context("when -o (org name) is provided", func() {
+				BeforeEach(func() {
+					cmd.OrgName = "some-other-org"
+				})
+
 				Context("when the sharing is successful", func() {
 					BeforeEach(func() {
-						cmd.SpaceName = "some-space"
-						cmd.OrgName = "some-other-org"
-						fakeActor.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturns(
-							v3action.Warnings{"share-service-warning"},
+						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns(
+							v2v3action.Warnings{"share-service-warning"},
 							nil)
 					})
 
@@ -171,31 +190,48 @@ var _ = Describe("share-service Command", func() {
 
 						Expect(testUI.Out).To(Say("Sharing service instance some-service-instance into org some-other-org / space some-space as some-user\\.\\.\\."))
 						Expect(testUI.Out).To(Say("OK"))
+
 						Expect(testUI.Err).To(Say("share-service-warning"))
 
-						Expect(fakeActor.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameCallCount()).To(Equal(1))
-						serviceInstanceNameArg, sourceSpaceGUID, orgName, spaceNameArg := fakeActor.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall(0)
+						Expect(fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameCallCount()).To(Equal(1))
+						spaceNameArg, serviceInstanceNameArg, sourceSpaceGUID, orgName := fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall(0)
+						Expect(spaceNameArg).To(Equal("some-space"))
 						Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
 						Expect(sourceSpaceGUID).To(Equal("some-space-guid"))
 						Expect(orgName).To(Equal("some-other-org"))
-						Expect(spaceNameArg).To(Equal("some-space"))
 					})
 				})
 
-				Context("when the sharing is unsuccessful", func() {
+				Context("when an error occurs sharing the service instance", func() {
+					var expectedErr error
+
 					BeforeEach(func() {
-						cmd.SpaceName = "some-space"
-						cmd.OrgName = "some-other-org"
-						fakeActor.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturns(
-							v3action.Warnings{"share-service-warning"},
-							errors.New("sharing failed"))
+						expectedErr = errors.New("sharing failed")
+						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns(
+							v2v3action.Warnings{"share-service-warning"},
+							expectedErr)
 					})
 
-					It("does not share the service instance with the provided space and displays all warnings", func() {
-						Expect(executeErr).To(MatchError("sharing failed"))
+					It("returns the error and displays all warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
 
 						Expect(testUI.Out).ToNot(Say("OK"))
 						Expect(testUI.Err).To(Say("share-service-warning"))
+					})
+				})
+
+				Context("when the service instance is already shared to the space", func() {
+					BeforeEach(func() {
+						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns(
+							v2v3action.Warnings{"Service instance some-service-instance is already shared with that space."},
+							actionerror.ServiceInstanceAlreadySharedError{})
+					})
+
+					It("does not return an error and displays all warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("OK"))
+						Expect(testUI.Err).To(Say("Service instance some-service-instance is already shared with that space."))
 					})
 				})
 			})

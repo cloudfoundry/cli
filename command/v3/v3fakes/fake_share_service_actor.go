@@ -4,200 +4,200 @@ package v3fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/command/v3"
 )
 
 type FakeShareServiceActor struct {
-	ShareServiceInstanceInSpaceByOrganizationAndSpaceNameStub        func(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgGUID string, sharedToSpaceName string) (v3action.Warnings, error)
-	shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex       sync.RWMutex
-	shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall []struct {
-		serviceInstanceName string
-		sourceSpaceGUID     string
-		sharedToOrgGUID     string
+	ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameStub        func(sharedToSpaceName string, serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string) (v2v3action.Warnings, error)
+	shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameMutex       sync.RWMutex
+	shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall []struct {
 		sharedToSpaceName   string
-	}
-	shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturns struct {
-		result1 v3action.Warnings
-		result2 error
-	}
-	shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturnsOnCall map[int]struct {
-		result1 v3action.Warnings
-		result2 error
-	}
-	ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameStub        func(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string, sharedToSpaceName string) (v3action.Warnings, error)
-	shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex       sync.RWMutex
-	shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall []struct {
 		serviceInstanceName string
 		sourceSpaceGUID     string
 		sharedToOrgName     string
+	}
+	shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns struct {
+		result1 v2v3action.Warnings
+		result2 error
+	}
+	shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturnsOnCall map[int]struct {
+		result1 v2v3action.Warnings
+		result2 error
+	}
+	ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationStub        func(sharedToSpaceName string, serviceInstanceName string, sourceSpaceGUID string, sharedToOrgGUID string) (v2v3action.Warnings, error)
+	shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationMutex       sync.RWMutex
+	shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall []struct {
 		sharedToSpaceName   string
+		serviceInstanceName string
+		sourceSpaceGUID     string
+		sharedToOrgGUID     string
 	}
-	shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturns struct {
-		result1 v3action.Warnings
+	shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns struct {
+		result1 v2v3action.Warnings
 		result2 error
 	}
-	shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturnsOnCall map[int]struct {
-		result1 v3action.Warnings
+	shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturnsOnCall map[int]struct {
+		result1 v2v3action.Warnings
 		result2 error
 	}
-	CloudControllerAPIVersionStub        func() string
-	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	CloudControllerV3APIVersionStub        func() string
+	cloudControllerV3APIVersionMutex       sync.RWMutex
+	cloudControllerV3APIVersionArgsForCall []struct{}
+	cloudControllerV3APIVersionReturns     struct {
 		result1 string
 	}
-	cloudControllerAPIVersionReturnsOnCall map[int]struct {
+	cloudControllerV3APIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgGUID string, sharedToSpaceName string) (v3action.Warnings, error) {
-	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.Lock()
-	ret, specificReturn := fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturnsOnCall[len(fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall)]
-	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall = append(fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall, struct {
-		serviceInstanceName string
-		sourceSpaceGUID     string
-		sharedToOrgGUID     string
+func (fake *FakeShareServiceActor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationName(sharedToSpaceName string, serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string) (v2v3action.Warnings, error) {
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameMutex.Lock()
+	ret, specificReturn := fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturnsOnCall[len(fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall)]
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall = append(fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall, struct {
 		sharedToSpaceName   string
-	}{serviceInstanceName, sourceSpaceGUID, sharedToOrgGUID, sharedToSpaceName})
-	fake.recordInvocation("ShareServiceInstanceInSpaceByOrganizationAndSpaceName", []interface{}{serviceInstanceName, sourceSpaceGUID, sharedToOrgGUID, sharedToSpaceName})
-	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.Unlock()
-	if fake.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameStub != nil {
-		return fake.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameStub(serviceInstanceName, sourceSpaceGUID, sharedToOrgGUID, sharedToSpaceName)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturns.result1, fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturns.result2
-}
-
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndSpaceNameCallCount() int {
-	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.RLock()
-	defer fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.RUnlock()
-	return len(fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall)
-}
-
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall(i int) (string, string, string, string) {
-	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.RLock()
-	defer fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.RUnlock()
-	return fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].serviceInstanceName, fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].sourceSpaceGUID, fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].sharedToOrgGUID, fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].sharedToSpaceName
-}
-
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndSpaceNameReturns(result1 v3action.Warnings, result2 error) {
-	fake.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameStub = nil
-	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturns = struct {
-		result1 v3action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndSpaceNameReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
-	fake.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameStub = nil
-	if fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturnsOnCall == nil {
-		fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturnsOnCall = make(map[int]struct {
-			result1 v3action.Warnings
-			result2 error
-		})
-	}
-	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturnsOnCall[i] = struct {
-		result1 v3action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string, sharedToSpaceName string) (v3action.Warnings, error) {
-	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.Lock()
-	ret, specificReturn := fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturnsOnCall[len(fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall)]
-	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall = append(fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall, struct {
 		serviceInstanceName string
 		sourceSpaceGUID     string
 		sharedToOrgName     string
-		sharedToSpaceName   string
-	}{serviceInstanceName, sourceSpaceGUID, sharedToOrgName, sharedToSpaceName})
-	fake.recordInvocation("ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName", []interface{}{serviceInstanceName, sourceSpaceGUID, sharedToOrgName, sharedToSpaceName})
-	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.Unlock()
-	if fake.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameStub != nil {
-		return fake.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameStub(serviceInstanceName, sourceSpaceGUID, sharedToOrgName, sharedToSpaceName)
+	}{sharedToSpaceName, serviceInstanceName, sourceSpaceGUID, sharedToOrgName})
+	fake.recordInvocation("ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationName", []interface{}{sharedToSpaceName, serviceInstanceName, sourceSpaceGUID, sharedToOrgName})
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameMutex.Unlock()
+	if fake.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameStub != nil {
+		return fake.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameStub(sharedToSpaceName, serviceInstanceName, sourceSpaceGUID, sharedToOrgName)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturns.result1, fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturns.result2
+	return fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns.result1, fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns.result2
 }
 
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameCallCount() int {
-	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.RLock()
-	defer fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.RUnlock()
-	return len(fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall)
+func (fake *FakeShareServiceActor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameCallCount() int {
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameMutex.RLock()
+	defer fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameMutex.RUnlock()
+	return len(fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall)
 }
 
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall(i int) (string, string, string, string) {
-	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.RLock()
-	defer fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.RUnlock()
-	return fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].serviceInstanceName, fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].sourceSpaceGUID, fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].sharedToOrgName, fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].sharedToSpaceName
+func (fake *FakeShareServiceActor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall(i int) (string, string, string, string) {
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameMutex.RLock()
+	defer fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameMutex.RUnlock()
+	return fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall[i].sharedToSpaceName, fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall[i].serviceInstanceName, fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall[i].sourceSpaceGUID, fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameArgsForCall[i].sharedToOrgName
 }
 
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturns(result1 v3action.Warnings, result2 error) {
-	fake.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameStub = nil
-	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturns = struct {
-		result1 v3action.Warnings
+func (fake *FakeShareServiceActor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns(result1 v2v3action.Warnings, result2 error) {
+	fake.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameStub = nil
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns = struct {
+		result1 v2v3action.Warnings
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
-	fake.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameStub = nil
-	if fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturnsOnCall == nil {
-		fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturnsOnCall = make(map[int]struct {
-			result1 v3action.Warnings
+func (fake *FakeShareServiceActor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturnsOnCall(i int, result1 v2v3action.Warnings, result2 error) {
+	fake.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameStub = nil
+	if fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturnsOnCall == nil {
+		fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturnsOnCall = make(map[int]struct {
+			result1 v2v3action.Warnings
 			result2 error
 		})
 	}
-	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturnsOnCall[i] = struct {
-		result1 v3action.Warnings
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturnsOnCall[i] = struct {
+		result1 v2v3action.Warnings
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeShareServiceActor) CloudControllerAPIVersion() string {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
-	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
-	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
+func (fake *FakeShareServiceActor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganization(sharedToSpaceName string, serviceInstanceName string, sourceSpaceGUID string, sharedToOrgGUID string) (v2v3action.Warnings, error) {
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationMutex.Lock()
+	ret, specificReturn := fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturnsOnCall[len(fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall)]
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall = append(fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall, struct {
+		sharedToSpaceName   string
+		serviceInstanceName string
+		sourceSpaceGUID     string
+		sharedToOrgGUID     string
+	}{sharedToSpaceName, serviceInstanceName, sourceSpaceGUID, sharedToOrgGUID})
+	fake.recordInvocation("ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganization", []interface{}{sharedToSpaceName, serviceInstanceName, sourceSpaceGUID, sharedToOrgGUID})
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationMutex.Unlock()
+	if fake.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationStub != nil {
+		return fake.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationStub(sharedToSpaceName, serviceInstanceName, sourceSpaceGUID, sharedToOrgGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns.result1, fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns.result2
+}
+
+func (fake *FakeShareServiceActor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationCallCount() int {
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationMutex.RLock()
+	defer fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationMutex.RUnlock()
+	return len(fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall)
+}
+
+func (fake *FakeShareServiceActor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall(i int) (string, string, string, string) {
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationMutex.RLock()
+	defer fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationMutex.RUnlock()
+	return fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall[i].sharedToSpaceName, fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall[i].serviceInstanceName, fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall[i].sourceSpaceGUID, fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationArgsForCall[i].sharedToOrgGUID
+}
+
+func (fake *FakeShareServiceActor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns(result1 v2v3action.Warnings, result2 error) {
+	fake.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationStub = nil
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns = struct {
+		result1 v2v3action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeShareServiceActor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturnsOnCall(i int, result1 v2v3action.Warnings, result2 error) {
+	fake.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationStub = nil
+	if fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturnsOnCall == nil {
+		fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturnsOnCall = make(map[int]struct {
+			result1 v2v3action.Warnings
+			result2 error
+		})
+	}
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturnsOnCall[i] = struct {
+		result1 v2v3action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeShareServiceActor) CloudControllerV3APIVersion() string {
+	fake.cloudControllerV3APIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerV3APIVersionReturnsOnCall[len(fake.cloudControllerV3APIVersionArgsForCall)]
+	fake.cloudControllerV3APIVersionArgsForCall = append(fake.cloudControllerV3APIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("CloudControllerV3APIVersion", []interface{}{})
+	fake.cloudControllerV3APIVersionMutex.Unlock()
+	if fake.CloudControllerV3APIVersionStub != nil {
+		return fake.CloudControllerV3APIVersionStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	return fake.cloudControllerV3APIVersionReturns.result1
 }
 
-func (fake *FakeShareServiceActor) CloudControllerAPIVersionCallCount() int {
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	return len(fake.cloudControllerAPIVersionArgsForCall)
+func (fake *FakeShareServiceActor) CloudControllerV3APIVersionCallCount() int {
+	fake.cloudControllerV3APIVersionMutex.RLock()
+	defer fake.cloudControllerV3APIVersionMutex.RUnlock()
+	return len(fake.cloudControllerV3APIVersionArgsForCall)
 }
 
-func (fake *FakeShareServiceActor) CloudControllerAPIVersionReturns(result1 string) {
-	fake.CloudControllerAPIVersionStub = nil
-	fake.cloudControllerAPIVersionReturns = struct {
+func (fake *FakeShareServiceActor) CloudControllerV3APIVersionReturns(result1 string) {
+	fake.CloudControllerV3APIVersionStub = nil
+	fake.cloudControllerV3APIVersionReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeShareServiceActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
-	fake.CloudControllerAPIVersionStub = nil
-	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
-		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+func (fake *FakeShareServiceActor) CloudControllerV3APIVersionReturnsOnCall(i int, result1 string) {
+	fake.CloudControllerV3APIVersionStub = nil
+	if fake.cloudControllerV3APIVersionReturnsOnCall == nil {
+		fake.cloudControllerV3APIVersionReturnsOnCall = make(map[int]struct {
 			result1 string
 		})
 	}
-	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
+	fake.cloudControllerV3APIVersionReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -205,12 +205,12 @@ func (fake *FakeShareServiceActor) CloudControllerAPIVersionReturnsOnCall(i int,
 func (fake *FakeShareServiceActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.RLock()
-	defer fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.RUnlock()
-	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.RLock()
-	defer fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.RUnlock()
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameMutex.RLock()
+	defer fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameMutex.RUnlock()
+	fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationMutex.RLock()
+	defer fake.shareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationMutex.RUnlock()
+	fake.cloudControllerV3APIVersionMutex.RLock()
+	defer fake.cloudControllerV3APIVersionMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
