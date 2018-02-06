@@ -255,9 +255,9 @@ var _ = PDescribe("v3-share-service command", func() {
 					Eventually(helpers.CF("set-space-role", user, sourceOrgName, sourceSpaceName, "SpaceDeveloper")).Should(Exit(0))
 					Eventually(helpers.CF("set-space-role", user, sharedToOrgName, sharedToSpaceName, "SpaceAuditor")).Should(Exit(0))
 					Eventually(helpers.CF("auth", user, password)).Should(Exit(0))
-					Eventually(helpers.CF("target", "-o", sharedToOrgName, "-s", sharedToSpaceName)).Should(Exit(0))
+					helpers.TargetOrgAndSpace(sharedToOrgName, sharedToOrgName)
 					sharedToSpaceGUID = helpers.GetSpaceGUID(sharedToSpaceName)
-					Eventually(helpers.CF("target", "-o", sourceOrgName, "-s", sourceSpaceName)).Should(Exit(0))
+					helpers.TargetOrgAndSpace(sourceOrgName, sourceSpaceName)
 				})
 
 				AfterEach(func() {
