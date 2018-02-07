@@ -399,7 +399,7 @@ var _ = Describe("v3-unshare-service command", func() {
 			BeforeEach(func() {
 				broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
 				broker.Push()
-				broker.Configure()
+				broker.Configure(true)
 				broker.Create()
 				user = helpers.NewUsername()
 				password = helpers.NewPassword()
