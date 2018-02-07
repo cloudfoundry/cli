@@ -6,7 +6,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -90,7 +89,7 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 		return err
 	}
 
-	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() {
+	if serviceInstanceSummary.IsManaged() {
 		cmd.displayManagedServiceInstanceSummary(serviceInstanceSummary)
 		cmd.displayManagedServiceInstanceLastOperation(serviceInstanceSummary)
 		return nil

@@ -50,168 +50,191 @@ var _ = Describe("Service Instance Actions", func() {
 		})
 
 		Context("when no errors occur getting the service instance", func() {
-			BeforeEach(func() {
-				fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(
-					v2action.ServiceInstance{
-						GUID:        "some-service-instance-guid",
-						ServiceGUID: "some-service-guid",
-					},
-					v2action.Warnings{"get-service-instance-warning"},
-					nil)
-			})
-
-			Context("when no errors occur getting the service", func() {
-				BeforeEach(func() {
-					fakeV2Actor.GetServiceReturns(
-						v2action.Service{
-							Extra: ccv2.ServiceExtra{
-								Shareable: true,
-							},
-						},
-						v2action.Warnings{"get-service-warning"},
-						nil)
-				})
-
-				Context("when no errors occur getting feature flags", func() {
+			Context("when no errors occur getting the space we are sharing to", func() {
+				Context("when the service instance is a managed service instance", func() {
 					BeforeEach(func() {
-						fakeV2Actor.GetFeatureFlagsReturns(
-							[]v2action.FeatureFlag{
-								{
-									Name:    "some-feature-flag",
-									Enabled: true,
-								},
-								{
-									Name:    "service_instance_sharing",
-									Enabled: true,
-								},
+						fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(
+							v2action.ServiceInstance{
+								GUID:        "some-service-instance-guid",
+								ServiceGUID: "some-service-guid",
+								Type:        ccv2.ManagedService,
 							},
-							v2action.Warnings{"get-feature-flags-warning"},
+							v2action.Warnings{"get-service-instance-warning"},
+							nil)
+
+						fakeV2Actor.GetSpaceByOrganizationAndNameReturns(
+							v2action.Space{
+								GUID: "not-shared-space-guid",
+							},
+							v2action.Warnings{"get-space-warning"},
 							nil)
 					})
 
-					Context("when no errors occur getting the spaces the service instance is shared to", func() {
+					Context("when no errors occur getting the service", func() {
 						BeforeEach(func() {
-							fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceReturns(
-								[]v2action.ServiceInstanceSharedTo{
-									{SpaceGUID: "already-shared-space-guid-1"},
-									{SpaceGUID: "already-shared-space-guid-2"},
+							fakeV2Actor.GetServiceReturns(
+								v2action.Service{
+									Extra: ccv2.ServiceExtra{
+										Shareable: true,
+									},
 								},
-								v2action.Warnings{"get-service-instance-shared-tos-warning"},
+								v2action.Warnings{"get-service-warning"},
 								nil)
 						})
 
-						Context("when no errors occur getting the space we are sharing to", func() {
+						Context("when no errors occur getting feature flags", func() {
 							BeforeEach(func() {
-								fakeV2Actor.GetSpaceByOrganizationAndNameReturns(
-									v2action.Space{
-										GUID: "not-shared-space-guid",
+								fakeV2Actor.GetFeatureFlagsReturns(
+									[]v2action.FeatureFlag{
+										{
+											Name:    "some-feature-flag",
+											Enabled: true,
+										},
+										{
+											Name:    "service_instance_sharing",
+											Enabled: true,
+										},
 									},
-									v2action.Warnings{"get-space-warning"},
+									v2action.Warnings{"get-feature-flags-warning"},
 									nil)
 							})
 
-							Context("when the service instance is NOT already shared with this space", func() {
-								Context("when no errors occur sharing the service instance to this space", func() {
-									BeforeEach(func() {
-										fakeV3Actor.ShareServiceInstanceToSpacesReturns(
-											v3action.RelationshipList{
-												GUIDs: []string{"some-space-guid"},
-											},
-											v3action.Warnings{"share-service-instance-warning"},
-											nil)
+							Context("when no errors occur getting the spaces the service instance is shared to", func() {
+								BeforeEach(func() {
+									fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceReturns(
+										[]v2action.ServiceInstanceSharedTo{
+											{SpaceGUID: "already-shared-space-guid-1"},
+											{SpaceGUID: "already-shared-space-guid-2"},
+										},
+										v2action.Warnings{"get-service-instance-shared-tos-warning"},
+										nil)
+								})
+
+								Context("when the service instance is NOT already shared with this space", func() {
+									Context("when no errors occur sharing the service instance to this space", func() {
+										BeforeEach(func() {
+											fakeV3Actor.ShareServiceInstanceToSpacesReturns(
+												v3action.RelationshipList{
+													GUIDs: []string{"some-space-guid"},
+												},
+												v3action.Warnings{"share-service-instance-warning"},
+												nil)
+										})
+
+										It("shares the service instance to this space and returns all warnings", func() {
+											Expect(shareErr).ToNot(HaveOccurred())
+											Expect(warnings).To(ConsistOf(
+												"get-service-instance-warning",
+												"get-space-warning",
+												"get-service-warning",
+												"get-feature-flags-warning",
+												"get-service-instance-shared-tos-warning",
+												"share-service-instance-warning"))
+
+											Expect(fakeV2Actor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+											serviceInstanceNameArg, spaceGUIDArg := fakeV2Actor.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+											Expect(serviceInstanceNameArg).To(Equal(serviceInstanceName))
+											Expect(spaceGUIDArg).To(Equal(sourceSpaceGUID))
+
+											Expect(fakeV2Actor.GetServiceCallCount()).To(Equal(1))
+											Expect(fakeV2Actor.GetServiceArgsForCall(0)).To(Equal("some-service-guid"))
+
+											Expect(fakeV2Actor.GetFeatureFlagsCallCount()).To(Equal(1))
+
+											Expect(fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceCallCount()).To(Equal(1))
+											Expect(fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceArgsForCall(0)).To(Equal("some-service-instance-guid"))
+
+											Expect(fakeV2Actor.GetSpaceByOrganizationAndNameCallCount()).To(Equal(1))
+											orgGUIDArg, spaceNameArg := fakeV2Actor.GetSpaceByOrganizationAndNameArgsForCall(0)
+											Expect(orgGUIDArg).To(Equal(shareToOrgGUID))
+											Expect(spaceNameArg).To(Equal(shareToSpaceName))
+
+											Expect(fakeV3Actor.ShareServiceInstanceToSpacesCallCount()).To(Equal(1))
+											serviceInstanceGUIDArg, spaceGUIDsArg := fakeV3Actor.ShareServiceInstanceToSpacesArgsForCall(0)
+											Expect(serviceInstanceGUIDArg).To(Equal("some-service-instance-guid"))
+											Expect(spaceGUIDsArg).To(Equal([]string{"not-shared-space-guid"}))
+										})
 									})
 
-									It("shares the service instance to this space and returns all warnings", func() {
-										Expect(shareErr).ToNot(HaveOccurred())
-										Expect(warnings).To(ConsistOf(
-											"get-service-instance-warning",
-											"get-service-warning",
-											"get-feature-flags-warning",
-											"get-service-instance-shared-tos-warning",
-											"get-space-warning",
-											"share-service-instance-warning"))
+									Context("when an error occurs sharing the service instance to this space", func() {
+										var expectedErr error
 
-										Expect(fakeV2Actor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
-										serviceInstanceNameArg, spaceGUIDArg := fakeV2Actor.GetServiceInstanceByNameAndSpaceArgsForCall(0)
-										Expect(serviceInstanceNameArg).To(Equal(serviceInstanceName))
-										Expect(spaceGUIDArg).To(Equal(sourceSpaceGUID))
+										BeforeEach(func() {
+											expectedErr = errors.New("share service instance error")
+											fakeV3Actor.ShareServiceInstanceToSpacesReturns(
+												v3action.RelationshipList{},
+												v3action.Warnings{"share-service-instance-warning"},
+												expectedErr)
+										})
 
-										Expect(fakeV2Actor.GetServiceCallCount()).To(Equal(1))
-										Expect(fakeV2Actor.GetServiceArgsForCall(0)).To(Equal("some-service-guid"))
-
-										Expect(fakeV2Actor.GetFeatureFlagsCallCount()).To(Equal(1))
-
-										Expect(fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceCallCount()).To(Equal(1))
-										Expect(fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceArgsForCall(0)).To(Equal("some-service-instance-guid"))
-
-										Expect(fakeV2Actor.GetSpaceByOrganizationAndNameCallCount()).To(Equal(1))
-										orgGUIDArg, spaceNameArg := fakeV2Actor.GetSpaceByOrganizationAndNameArgsForCall(0)
-										Expect(orgGUIDArg).To(Equal(shareToOrgGUID))
-										Expect(spaceNameArg).To(Equal(shareToSpaceName))
-
-										Expect(fakeV3Actor.ShareServiceInstanceToSpacesCallCount()).To(Equal(1))
-										serviceInstanceGUIDArg, spaceGUIDsArg := fakeV3Actor.ShareServiceInstanceToSpacesArgsForCall(0)
-										Expect(serviceInstanceGUIDArg).To(Equal("some-service-instance-guid"))
-										Expect(spaceGUIDsArg).To(Equal([]string{"not-shared-space-guid"}))
+										It("returns the error and all warnings", func() {
+											Expect(shareErr).To(MatchError(expectedErr))
+											Expect(warnings).To(ConsistOf(
+												"get-service-instance-warning",
+												"get-service-warning",
+												"get-feature-flags-warning",
+												"get-service-instance-shared-tos-warning",
+												"get-space-warning",
+												"share-service-instance-warning"))
+										})
 									})
 								})
 
-								Context("when an error occurs sharing the service instance to this space", func() {
-									var expectedErr error
-
+								Context("when the service instance IS already shared with this space", func() {
 									BeforeEach(func() {
-										expectedErr = errors.New("share service instance error")
-										fakeV3Actor.ShareServiceInstanceToSpacesReturns(
-											v3action.RelationshipList{},
-											v3action.Warnings{"share-service-instance-warning"},
-											expectedErr)
+										fakeV2Actor.GetSpaceByOrganizationAndNameReturns(
+											v2action.Space{
+												GUID: "already-shared-space-guid-2",
+											},
+											v2action.Warnings{"get-space-warning"},
+											nil)
 									})
 
-									It("returns the error and all warnings", func() {
-										Expect(shareErr).To(MatchError(expectedErr))
+									It("returns a ServiceInstanceAlreadySharedError and all warnings", func() {
+										Expect(shareErr).To(MatchError(actionerror.ServiceInstanceAlreadySharedError{}))
 										Expect(warnings).To(ConsistOf(
 											"get-service-instance-warning",
 											"get-service-warning",
 											"get-feature-flags-warning",
 											"get-service-instance-shared-tos-warning",
 											"get-space-warning",
-											"share-service-instance-warning"))
+											"Service instance some-service-instance is already shared with that space.",
+										))
 									})
 								})
 							})
 
-							Context("when the service instance IS already shared with this space", func() {
+							Context("when an error occurs getting the spaces the service instance is shared to", func() {
+								var expectedErr error
+
 								BeforeEach(func() {
-									fakeV2Actor.GetSpaceByOrganizationAndNameReturns(
-										v2action.Space{
-											GUID: "already-shared-space-guid-2",
-										},
-										v2action.Warnings{"get-space-warning"},
-										nil)
+									expectedErr = errors.New("get shared to spaces error")
+									fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceReturns(
+										nil,
+										v2action.Warnings{"get-service-instance-shared-tos-warning"},
+										expectedErr)
 								})
 
-								It("returns a ServiceInstanceAlreadySharedError and all warnings", func() {
-									Expect(shareErr).To(MatchError(actionerror.ServiceInstanceAlreadySharedError{}))
+								It("returns the error and all warnings", func() {
+									Expect(shareErr).To(MatchError(expectedErr))
 									Expect(warnings).To(ConsistOf(
 										"get-service-instance-warning",
+										"get-space-warning",
 										"get-service-warning",
 										"get-feature-flags-warning",
-										"get-service-instance-shared-tos-warning",
-										"get-space-warning",
-										"Service instance some-service-instance is already shared with that space.",
-									))
+										"get-service-instance-shared-tos-warning"))
 								})
 							})
 						})
 
-						Context("when an error occurs getting the space we are sharing to", func() {
+						Context("when an error occurs getting feature flags", func() {
 							var expectedErr error
 
 							BeforeEach(func() {
-								expectedErr = errors.New("get space error")
-								fakeV2Actor.GetSpaceByOrganizationAndNameReturns(
-									v2action.Space{},
-									v2action.Warnings{"get-space-warning"},
+								expectedErr = errors.New("get feature flags error")
+								fakeV2Actor.GetFeatureFlagsReturns(
+									nil,
+									v2action.Warnings{"get-feature-flag-warning"},
 									expectedErr)
 							})
 
@@ -219,22 +242,21 @@ var _ = Describe("Service Instance Actions", func() {
 								Expect(shareErr).To(MatchError(expectedErr))
 								Expect(warnings).To(ConsistOf(
 									"get-service-instance-warning",
+									"get-space-warning",
 									"get-service-warning",
-									"get-feature-flags-warning",
-									"get-service-instance-shared-tos-warning",
-									"get-space-warning"))
+									"get-feature-flag-warning"))
 							})
 						})
 					})
 
-					Context("when an error occurs getting the spaces the service instance is shared to", func() {
+					Context("when an error occurs getting the service", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
-							expectedErr = errors.New("get shared to spaces error")
-							fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceReturns(
-								nil,
-								v2action.Warnings{"get-service-instance-shared-tos-warning"},
+							expectedErr = errors.New("get service error")
+							fakeV2Actor.GetServiceReturns(
+								v2action.Service{},
+								v2action.Warnings{"get-service-warning"},
 								expectedErr)
 						})
 
@@ -242,42 +264,177 @@ var _ = Describe("Service Instance Actions", func() {
 							Expect(shareErr).To(MatchError(expectedErr))
 							Expect(warnings).To(ConsistOf(
 								"get-service-instance-warning",
+								"get-space-warning",
+								"get-service-warning"))
+						})
+					})
+
+					Context("when service sharing is globally disabled, and service sharing is disabled by the service broker", func() {
+						BeforeEach(func() {
+							fakeV2Actor.GetServiceReturns(
+								v2action.Service{
+									Extra: ccv2.ServiceExtra{
+										Shareable: false,
+									},
+								},
+								v2action.Warnings{"get-service-warning"},
+								nil)
+
+							fakeV2Actor.GetFeatureFlagsReturns(
+								[]v2action.FeatureFlag{
+									{
+										Name:    "some-feature-flag",
+										Enabled: true,
+									},
+									{
+										Name:    "service_instance_sharing",
+										Enabled: false,
+									},
+								},
+								v2action.Warnings{"get-feature-flags-warning"},
+								nil)
+						})
+
+						It("returns ServiceInstanceNotShareableError and all warnings", func() {
+							Expect(shareErr).To(MatchError(actionerror.ServiceInstanceNotShareableError{
+								FeatureFlagEnabled:          false,
+								ServiceBrokerSharingEnabled: false}))
+							Expect(warnings).To(ConsistOf(
+								"get-service-instance-warning",
+								"get-space-warning",
 								"get-service-warning",
-								"get-feature-flags-warning",
-								"get-service-instance-shared-tos-warning"))
+								"get-feature-flags-warning"))
+						})
+					})
+
+					Context("when service sharing is globally enabled, and service sharing is disabled by the service broker", func() {
+						BeforeEach(func() {
+							fakeV2Actor.GetServiceReturns(
+								v2action.Service{
+									Extra: ccv2.ServiceExtra{
+										Shareable: false,
+									},
+								},
+								v2action.Warnings{"get-service-warning"},
+								nil)
+
+							fakeV2Actor.GetFeatureFlagsReturns(
+								[]v2action.FeatureFlag{
+									{
+										Name:    "some-feature-flag",
+										Enabled: true,
+									},
+									{
+										Name:    "service_instance_sharing",
+										Enabled: true,
+									},
+								},
+								v2action.Warnings{"get-feature-flags-warning"},
+								nil)
+						})
+
+						It("returns ServiceInstanceNotShareableError and all warnings", func() {
+							Expect(shareErr).To(MatchError(actionerror.ServiceInstanceNotShareableError{
+								FeatureFlagEnabled:          true,
+								ServiceBrokerSharingEnabled: false}))
+							Expect(warnings).To(ConsistOf(
+								"get-service-instance-warning",
+								"get-space-warning",
+								"get-service-warning",
+								"get-feature-flags-warning"))
+						})
+					})
+
+					Context("when service sharing is globally disabled, and service sharing is enabled by the service broker", func() {
+						BeforeEach(func() {
+							fakeV2Actor.GetServiceReturns(
+								v2action.Service{
+									Extra: ccv2.ServiceExtra{
+										Shareable: true,
+									},
+								},
+								v2action.Warnings{"get-service-warning"},
+								nil)
+
+							fakeV2Actor.GetFeatureFlagsReturns(
+								[]v2action.FeatureFlag{
+									{
+										Name:    "some-feature-flag",
+										Enabled: true,
+									},
+									{
+										Name:    "service_instance_sharing",
+										Enabled: false,
+									},
+								},
+								v2action.Warnings{"get-feature-flags-warning"},
+								nil)
+						})
+
+						It("returns ServiceInstanceNotShareableError and all warnings", func() {
+							Expect(shareErr).To(MatchError(actionerror.ServiceInstanceNotShareableError{
+								FeatureFlagEnabled:          false,
+								ServiceBrokerSharingEnabled: true}))
+							Expect(warnings).To(ConsistOf(
+								"get-service-instance-warning",
+								"get-space-warning",
+								"get-service-warning",
+								"get-feature-flags-warning"))
 						})
 					})
 				})
 
-				Context("when an error occurs getting feature flags", func() {
-					var expectedErr error
-
+				Context("when the service instance is not a managed service instance", func() {
 					BeforeEach(func() {
-						expectedErr = errors.New("get feature flags error")
-						fakeV2Actor.GetFeatureFlagsReturns(
-							nil,
-							v2action.Warnings{"get-feature-flag-warning"},
-							expectedErr)
+						fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(
+							v2action.ServiceInstance{
+								GUID:        "some-service-instance-guid",
+								ServiceGUID: "some-service-guid",
+								Type:        ccv2.UserProvidedService,
+							},
+							v2action.Warnings{"get-service-instance-warning"},
+							nil)
+
+						fakeV2Actor.GetSpaceByOrganizationAndNameReturns(
+							v2action.Space{
+								GUID: "some-space",
+							},
+							v2action.Warnings{"get-space-warning"},
+							nil)
+
+						fakeV3Actor.ShareServiceInstanceToSpacesReturns(
+							v3action.RelationshipList{},
+							v3action.Warnings{"share-service-instance-warning"},
+							errors.New("User-provided services cannot be shared"))
 					})
 
-					It("returns the error and all warnings", func() {
-						Expect(shareErr).To(MatchError(expectedErr))
+					It("always returns the error and warnings", func() {
+						Expect(shareErr).To(MatchError("User-provided services cannot be shared"))
 						Expect(warnings).To(ConsistOf(
 							"get-service-instance-warning",
-							"get-service-warning",
-							"get-feature-flag-warning"))
+							"get-space-warning",
+							"share-service-instance-warning"))
+
+						Expect(fakeV2Actor.GetServiceCallCount()).To(Equal(0))
+						Expect(fakeV2Actor.GetFeatureFlagsCallCount()).To(Equal(0))
+						Expect(fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceCallCount()).To(Equal(0))
 					})
 				})
 			})
 
-			Context("when an error occurs getting the service", func() {
+			Context("when an error occurs getting the space we are sharing to", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					expectedErr = errors.New("get service error")
-					fakeV2Actor.GetServiceReturns(
-						v2action.Service{},
-						v2action.Warnings{"get-service-warning"},
+					fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(
+						v2action.ServiceInstance{},
+						v2action.Warnings{"get-service-instance-warning"},
+						nil)
+
+					expectedErr = errors.New("get space error")
+					fakeV2Actor.GetSpaceByOrganizationAndNameReturns(
+						v2action.Space{},
+						v2action.Warnings{"get-space-warning"},
 						expectedErr)
 				})
 
@@ -285,118 +442,7 @@ var _ = Describe("Service Instance Actions", func() {
 					Expect(shareErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf(
 						"get-service-instance-warning",
-						"get-service-warning"))
-				})
-			})
-
-			Context("when service sharing is globally disabled, and service sharing is disabled by the service broker", func() {
-				BeforeEach(func() {
-					fakeV2Actor.GetServiceReturns(
-						v2action.Service{
-							Extra: ccv2.ServiceExtra{
-								Shareable: false,
-							},
-						},
-						v2action.Warnings{"get-service-warning"},
-						nil)
-
-					fakeV2Actor.GetFeatureFlagsReturns(
-						[]v2action.FeatureFlag{
-							{
-								Name:    "some-feature-flag",
-								Enabled: true,
-							},
-							{
-								Name:    "service_instance_sharing",
-								Enabled: false,
-							},
-						},
-						v2action.Warnings{"get-feature-flags-warning"},
-						nil)
-				})
-
-				It("returns ServiceInstanceNotShareableError and all warnings", func() {
-					Expect(shareErr).To(MatchError(actionerror.ServiceInstanceNotShareableError{
-						FeatureFlagEnabled:          false,
-						ServiceBrokerSharingEnabled: false}))
-					Expect(warnings).To(ConsistOf(
-						"get-service-instance-warning",
-						"get-service-warning",
-						"get-feature-flags-warning"))
-				})
-			})
-
-			Context("when service sharing is globally enabled, and service sharing is disabled by the service broker", func() {
-				BeforeEach(func() {
-					fakeV2Actor.GetServiceReturns(
-						v2action.Service{
-							Extra: ccv2.ServiceExtra{
-								Shareable: false,
-							},
-						},
-						v2action.Warnings{"get-service-warning"},
-						nil)
-
-					fakeV2Actor.GetFeatureFlagsReturns(
-						[]v2action.FeatureFlag{
-							{
-								Name:    "some-feature-flag",
-								Enabled: true,
-							},
-							{
-								Name:    "service_instance_sharing",
-								Enabled: true,
-							},
-						},
-						v2action.Warnings{"get-feature-flags-warning"},
-						nil)
-				})
-
-				It("returns ServiceInstanceNotShareableError and all warnings", func() {
-					Expect(shareErr).To(MatchError(actionerror.ServiceInstanceNotShareableError{
-						FeatureFlagEnabled:          true,
-						ServiceBrokerSharingEnabled: false}))
-					Expect(warnings).To(ConsistOf(
-						"get-service-instance-warning",
-						"get-service-warning",
-						"get-feature-flags-warning"))
-				})
-			})
-
-			Context("when service sharing is globally disabled, and service sharing is enabled by the service broker", func() {
-				BeforeEach(func() {
-					fakeV2Actor.GetServiceReturns(
-						v2action.Service{
-							Extra: ccv2.ServiceExtra{
-								Shareable: true,
-							},
-						},
-						v2action.Warnings{"get-service-warning"},
-						nil)
-
-					fakeV2Actor.GetFeatureFlagsReturns(
-						[]v2action.FeatureFlag{
-							{
-								Name:    "some-feature-flag",
-								Enabled: true,
-							},
-							{
-								Name:    "service_instance_sharing",
-								Enabled: false,
-							},
-						},
-						v2action.Warnings{"get-feature-flags-warning"},
-						nil)
-				})
-
-				It("returns ServiceInstanceNotShareableError and all warnings", func() {
-					Expect(shareErr).To(MatchError(actionerror.ServiceInstanceNotShareableError{
-						FeatureFlagEnabled:          false,
-						ServiceBrokerSharingEnabled: true}))
-					Expect(warnings).To(ConsistOf(
-						"get-service-instance-warning",
-						"get-service-warning",
-						"get-feature-flags-warning"))
+						"get-space-warning"))
 				})
 			})
 		})
@@ -468,8 +514,16 @@ var _ = Describe("Service Instance Actions", func() {
 					v2action.ServiceInstance{
 						GUID:        "some-service-instance-guid",
 						ServiceGUID: "some-service-guid",
+						Type:        ccv2.ManagedService,
 					},
 					v2action.Warnings{"get-service-instance-warning"},
+					nil)
+
+				fakeV2Actor.GetSpaceByOrganizationAndNameReturns(
+					v2action.Space{
+						GUID: "not-shared-space-guid",
+					},
+					v2action.Warnings{"get-space-warning"},
 					nil)
 
 				fakeV2Actor.GetServiceReturns(
@@ -503,13 +557,6 @@ var _ = Describe("Service Instance Actions", func() {
 					v2action.Warnings{"get-service-instance-shared-tos-warning"},
 					nil)
 
-				fakeV2Actor.GetSpaceByOrganizationAndNameReturns(
-					v2action.Space{
-						GUID: "not-shared-space-guid",
-					},
-					v2action.Warnings{"get-space-warning"},
-					nil)
-
 				fakeV3Actor.ShareServiceInstanceToSpacesReturns(
 					v3action.RelationshipList{
 						GUIDs: []string{"some-space-guid"},
@@ -523,10 +570,10 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(warnings).To(ConsistOf(
 					"get-org-warning",
 					"get-service-instance-warning",
+					"get-space-warning",
 					"get-service-warning",
 					"get-feature-flags-warning",
 					"get-service-instance-shared-tos-warning",
-					"get-space-warning",
 					"share-service-instance-warning"))
 
 				Expect(fakeV3Actor.GetOrganizationByNameCallCount()).To(Equal(1))
@@ -537,6 +584,11 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(serviceInstanceNameArg).To(Equal(serviceInstanceName))
 				Expect(spaceGUIDArg).To(Equal(sourceSpaceGUID))
 
+				Expect(fakeV2Actor.GetSpaceByOrganizationAndNameCallCount()).To(Equal(1))
+				orgGUIDArg, spaceNameArg := fakeV2Actor.GetSpaceByOrganizationAndNameArgsForCall(0)
+				Expect(orgGUIDArg).To(Equal("some-org-guid"))
+				Expect(spaceNameArg).To(Equal(shareToSpaceName))
+
 				Expect(fakeV2Actor.GetServiceCallCount()).To(Equal(1))
 				Expect(fakeV2Actor.GetServiceArgsForCall(0)).To(Equal("some-service-guid"))
 
@@ -544,11 +596,6 @@ var _ = Describe("Service Instance Actions", func() {
 
 				Expect(fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceCallCount()).To(Equal(1))
 				Expect(fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceArgsForCall(0)).To(Equal("some-service-instance-guid"))
-
-				Expect(fakeV2Actor.GetSpaceByOrganizationAndNameCallCount()).To(Equal(1))
-				orgGUIDArg, spaceNameArg := fakeV2Actor.GetSpaceByOrganizationAndNameArgsForCall(0)
-				Expect(orgGUIDArg).To(Equal("some-org-guid"))
-				Expect(spaceNameArg).To(Equal(shareToSpaceName))
 
 				Expect(fakeV3Actor.ShareServiceInstanceToSpacesCallCount()).To(Equal(1))
 				serviceInstanceGUIDArg, spaceGUIDsArg := fakeV3Actor.ShareServiceInstanceToSpacesArgsForCall(0)

@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -23,6 +24,26 @@ var _ = Describe("Service Instance Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
+	})
+
+	Describe("ServiceInstance", func() {
+		DescribeTable("IsManaged",
+			func(iType ccv2.ServiceInstanceType, expected bool) {
+				Expect(ServiceInstance{Type: iType}.IsManaged()).To(Equal(expected))
+			},
+
+			Entry("return true for managed service", ccv2.ManagedService, true),
+			Entry("return false for any other type of service", ccv2.UserProvidedService, false),
+		)
+
+		DescribeTable("IsUserProvided",
+			func(iType ccv2.ServiceInstanceType, expected bool) {
+				Expect(ServiceInstance{Type: iType}.IsUserProvided()).To(Equal(expected))
+			},
+
+			Entry("return true for UserProvidedService service", ccv2.UserProvidedService, true),
+			Entry("return false for any other type of service", ccv2.ManagedService, false),
+		)
 	})
 
 	Describe("GetServiceInstance", func() {

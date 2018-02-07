@@ -12,6 +12,14 @@ import (
 // ServiceInstance represents an instance of a service.
 type ServiceInstance ccv2.ServiceInstance
 
+func (instance ServiceInstance) IsManaged() bool {
+	return ccv2.ServiceInstance(instance).Managed()
+}
+
+func (instance ServiceInstance) IsUserProvided() bool {
+	return ccv2.ServiceInstance(instance).UserProvided()
+}
+
 func (actor Actor) GetServiceInstance(guid string) (ServiceInstance, Warnings, error) {
 	instance, warnings, err := actor.CloudControllerClient.GetServiceInstance(guid)
 	if _, ok := err.(ccerror.ResourceNotFoundError); ok {

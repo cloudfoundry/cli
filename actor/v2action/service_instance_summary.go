@@ -57,7 +57,7 @@ func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUI
 		bindingsErr      error
 	)
 
-	if ccv2.ServiceInstance(serviceInstance).Managed() {
+	if serviceInstance.IsManaged() {
 		sharedWarnings, sharedErr := actor.getAndSetSharedInformation(&serviceInstanceSummary, spaceGUID)
 		allWarnings = append(allWarnings, sharedWarnings...)
 		if sharedErr != nil {

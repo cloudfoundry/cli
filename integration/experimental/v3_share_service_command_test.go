@@ -77,17 +77,8 @@ var _ = Describe("v3-share-service command", func() {
 	})
 
 	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
-			BeforeEach(func() {
-				helpers.UnsetAPI()
-			})
-
-			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
-				Eventually(session).Should(Exit(1))
-			})
+		It("fails with the appropriate errors", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 		})
 
 		Context("when the v3 api does not exist", func() {
@@ -124,48 +115,6 @@ var _ = Describe("v3-share-service command", func() {
 				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.36\\.0 or higher\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when not logged in", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-			})
-
-			It("fails with not logged in message", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when there is no org set", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-				helpers.LoginCF()
-			})
-
-			It("fails with no org targeted error message", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when there is no space set", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-				helpers.LoginCF()
-				helpers.TargetOrg(ReadOnlyOrg)
-			})
-
-			It("fails with no space targeted error message", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -354,13 +303,13 @@ var _ = Describe("v3-share-service command", func() {
 
 		Context("when I try to share a user-provided-service", func() {
 			BeforeEach(func() {
-				helpers.CF("create-user-provided-service", serviceInstance, "-p", "\"foo, bar\"")
+				helpers.CF("create-user-provided-service", serviceInstance, "-p", `{"username":"admin","password":"pa55woRD"}`)
 			})
 
 			It("fails with only managed services can be shared", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
+				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Specified instance not found or not a managed service instance. Sharing is not supported for user provided services."))
+				Eventually(session.Err).Should(Say("User-provided services cannot be shared"))
 				Eventually(session).Should(Exit(1))
 			})
 		})

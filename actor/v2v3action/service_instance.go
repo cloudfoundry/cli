@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -33,28 +34,32 @@ func (actor Actor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganization(
 		return allWarnings, err
 	}
 
-	_, warnings, err := actor.isServiceInstanceShareableByService(serviceInstance.ServiceGUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	serviceInstanceSharedTos, warningsV2, err := actor.V2Actor.GetServiceInstanceSharedTosByServiceInstance(serviceInstance.GUID)
-	allWarnings = append(allWarnings, warningsV2...)
-	if err != nil {
-		return allWarnings, err
-	}
-
 	shareToSpace, warningsV2, err := actor.V2Actor.GetSpaceByOrganizationAndName(shareToOrgGUID, shareToSpaceName)
 	allWarnings = append(allWarnings, warningsV2...)
 	if err != nil {
 		return allWarnings, err
 	}
 
-	for _, sharedTo := range serviceInstanceSharedTos {
-		if sharedTo.SpaceGUID == shareToSpace.GUID {
-			allWarnings = append(allWarnings, fmt.Sprintf("Service instance %s is already shared with that space.", serviceInstanceName))
-			return allWarnings, actionerror.ServiceInstanceAlreadySharedError{}
+	if serviceInstance.IsManaged() {
+		var warnings Warnings
+		_, warnings, err = actor.isServiceInstanceShareableByService(serviceInstance.ServiceGUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return allWarnings, err
+		}
+
+		var serviceInstanceSharedTos []v2action.ServiceInstanceSharedTo
+		serviceInstanceSharedTos, warningsV2, err = actor.V2Actor.GetServiceInstanceSharedTosByServiceInstance(serviceInstance.GUID)
+		allWarnings = append(allWarnings, warningsV2...)
+		if err != nil {
+			return allWarnings, err
+		}
+
+		for _, sharedTo := range serviceInstanceSharedTos {
+			if sharedTo.SpaceGUID == shareToSpace.GUID {
+				allWarnings = append(allWarnings, fmt.Sprintf("Service instance %s is already shared with that space.", serviceInstanceName))
+				return allWarnings, actionerror.ServiceInstanceAlreadySharedError{}
+			}
 		}
 	}
 
