@@ -99,6 +99,11 @@ func ConvertToTranslatableError(err error) error {
 		return SecurityGroupNotFoundError(e)
 	case actionerror.ServiceInstanceNotFoundError:
 		return ServiceInstanceNotFoundError(e)
+	case actionerror.ServiceInstanceNotShareableError:
+		return ServiceInstanceNotShareableError{
+			FeatureFlagEnabled:          e.FeatureFlagEnabled,
+			ServiceBrokerSharingEnabled: e.ServiceBrokerSharingEnabled,
+		}
 	case actionerror.ServiceInstanceNotSharedToSpaceError:
 		return ServiceInstanceNotSharedToSpaceError{ServiceInstanceName: e.ServiceInstanceName}
 	case actionerror.SharedServiceInstanceNotFoundError:

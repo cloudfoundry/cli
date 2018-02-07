@@ -204,6 +204,14 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.ServiceInstanceNotFoundError{Name: "some-service-instance"},
 			ServiceInstanceNotFoundError{Name: "some-service-instance"}),
 
+		Entry("actionerror.ServiceInstanceNotShareableError -> ServiceInstanceNotShareableError",
+			actionerror.ServiceInstanceNotShareableError{
+				FeatureFlagEnabled:          true,
+				ServiceBrokerSharingEnabled: false},
+			ServiceInstanceNotShareableError{
+				FeatureFlagEnabled:          true,
+				ServiceBrokerSharingEnabled: false}),
+
 		Entry("actionerror.SharedServiceInstanceNotFoundError -> SharedServiceInstanceNotFoundError",
 			actionerror.SharedServiceInstanceNotFoundError{},
 			SharedServiceInstanceNotFoundError{}),

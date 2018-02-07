@@ -101,6 +101,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("RoutePathWithTCPDomainError", RoutePathWithTCPDomainError{}),
 		Entry("RunTaskError", RunTaskError{}),
 		Entry("SecurityGroupNotFoundError", SecurityGroupNotFoundError{}),
+		Entry("ServiceInstanceNotShareableError", ServiceInstanceNotShareableError{}),
 		Entry("ServiceInstanceNotFoundError", ServiceInstanceNotFoundError{}),
 		Entry("SharedServiceInstanceNotFoundError", SharedServiceInstanceNotFoundError{}),
 		Entry("SpaceNotFoundError", SpaceNotFoundError{}),

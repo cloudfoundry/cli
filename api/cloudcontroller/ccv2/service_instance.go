@@ -24,6 +24,7 @@ type ServiceInstance struct {
 	GUID            string
 	Name            string
 	SpaceGUID       string
+	ServiceGUID     string
 	ServicePlanGUID string
 	Type            ServiceInstanceType
 	Tags            []string
@@ -46,6 +47,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 		Entity   struct {
 			Name            string   `json:"name"`
 			SpaceGUID       string   `json:"space_guid"`
+			ServiceGUID     string   `json:"service_guid"`
 			ServicePlanGUID string   `json:"service_plan_guid"`
 			Type            string   `json:"type"`
 			Tags            []string `json:"tags"`
@@ -67,6 +69,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	serviceInstance.GUID = ccServiceInstance.Metadata.GUID
 	serviceInstance.Name = ccServiceInstance.Entity.Name
 	serviceInstance.SpaceGUID = ccServiceInstance.Entity.SpaceGUID
+	serviceInstance.ServiceGUID = ccServiceInstance.Entity.ServiceGUID
 	serviceInstance.ServicePlanGUID = ccServiceInstance.Entity.ServicePlanGUID
 	serviceInstance.Type = ServiceInstanceType(ccServiceInstance.Entity.Type)
 	serviceInstance.Tags = ccServiceInstance.Entity.Tags

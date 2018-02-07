@@ -9,8 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/shared"
-	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
 //go:generate counterfeiter . ServiceActor
@@ -37,7 +37,7 @@ func (cmd *ServiceCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := sharedV2.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
@@ -138,10 +138,13 @@ func (cmd ServiceCommand) displayManagedServiceInstanceSummary(serviceInstanceSu
 }
 
 func (cmd ServiceCommand) displayManagedServiceInstanceSharedWithInformation(serviceInstanceSummary v2action.ServiceInstanceSummary) {
-	shared.DisplayServiceInstanceNotShareable(
-		cmd.UI,
-		serviceInstanceSummary.ServiceInstanceSharingFeatureFlag,
-		serviceInstanceSummary.Service.Extra.Shareable)
+	if !serviceInstanceSummary.ServiceInstanceSharingFeatureFlag || !serviceInstanceSummary.Service.Extra.Shareable {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText(translatableerror.ServiceInstanceNotShareableError{
+			FeatureFlagEnabled:          serviceInstanceSummary.ServiceInstanceSharingFeatureFlag,
+			ServiceBrokerSharingEnabled: serviceInstanceSummary.Service.Extra.Shareable,
+		}.Error())
+	}
 
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText("shared with spaces:")

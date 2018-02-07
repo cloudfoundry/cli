@@ -129,6 +129,7 @@ var _ = Describe("Service Instance", func() {
 				"entity": {
 					"name": "some-service-name",
 					"space_guid": "some-space-guid",
+					"service_guid": "some-service-guid",
 					"service_plan_guid": "some-service-plan-guid",
 					"type": "managed_service_instance",
 					"tags": [
@@ -163,6 +164,7 @@ var _ = Describe("Service Instance", func() {
 					GUID:            "some-service-guid",
 					Name:            "some-service-name",
 					SpaceGUID:       "some-space-guid",
+					ServiceGUID:     "some-service-guid",
 					ServicePlanGUID: "some-service-plan-guid",
 					Type:            ManagedService,
 					Tags:            []string{"tag-1", "tag-2"},
@@ -192,6 +194,7 @@ var _ = Describe("Service Instance", func() {
 						"entity": {
 							"name": "some-service-name-1",
 							"space_guid": "some-space-guid",
+					"service_guid": "some-service-guid",
 							"type": "managed_service_instance"
 						}
 					},
@@ -260,10 +263,11 @@ var _ = Describe("Service Instance", func() {
 
 				Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
 					{
-						Name:      "some-service-name-1",
-						GUID:      "some-service-guid-1",
-						SpaceGUID: "some-space-guid",
-						Type:      ManagedService,
+						Name:        "some-service-name-1",
+						GUID:        "some-service-guid-1",
+						SpaceGUID:   "some-space-guid",
+						ServiceGUID: "some-service-guid",
+						Type:        ManagedService,
 					},
 					{
 						Name:      "some-service-name-2",
@@ -302,6 +306,7 @@ var _ = Describe("Service Instance", func() {
 							"entity": {
 								"name": "some-service-name-1",
 								"space_guid": "some-space-guid",
+					"service_guid": "some-service-guid",
 								"type": "managed_service_instance"
 							}
 						},
@@ -369,7 +374,7 @@ var _ = Describe("Service Instance", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
-						{Name: "some-service-name-1", GUID: "some-service-guid-1", SpaceGUID: "some-space-guid", Type: ManagedService},
+						{Name: "some-service-name-1", GUID: "some-service-guid-1", SpaceGUID: "some-space-guid", ServiceGUID: "some-service-guid", Type: ManagedService},
 						{Name: "some-service-name-2", GUID: "some-service-guid-2", SpaceGUID: "some-space-guid", Type: UserProvidedService},
 						{Name: "some-service-name-3", GUID: "some-service-guid-3", SpaceGUID: "some-space-guid", Type: ManagedService},
 						{Name: "some-service-name-4", GUID: "some-service-guid-4", SpaceGUID: "some-space-guid", Type: UserProvidedService},

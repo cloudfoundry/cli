@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 func (actor Actor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationName(shareToSpaceName string, serviceInstanceName string, sourceSpaceGUID string, shareToOrgName string) (Warnings, error) {
@@ -32,6 +33,12 @@ func (actor Actor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganization(
 		return allWarnings, err
 	}
 
+	_, warnings, err := actor.isServiceInstanceShareableByService(serviceInstance.ServiceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
 	serviceInstanceSharedTos, warningsV2, err := actor.V2Actor.GetServiceInstanceSharedTosByServiceInstance(serviceInstance.GUID)
 	allWarnings = append(allWarnings, warningsV2...)
 	if err != nil {
@@ -54,4 +61,36 @@ func (actor Actor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganization(
 	_, warningsV3, err := actor.V3Actor.ShareServiceInstanceToSpaces(serviceInstance.GUID, []string{shareToSpace.GUID})
 	allWarnings = append(allWarnings, warningsV3...)
 	return allWarnings, err
+}
+
+func (actor Actor) isServiceInstanceShareableByService(serviceGUID string) (bool, Warnings, error) {
+	var allWarnings Warnings
+
+	service, warningsV2, err := actor.V2Actor.GetService(serviceGUID)
+	allWarnings = append(allWarnings, warningsV2...)
+	if err != nil {
+		return false, allWarnings, err
+	}
+
+	featureFlags, warningsV2, err := actor.V2Actor.GetFeatureFlags()
+	allWarnings = append(allWarnings, warningsV2...)
+	if err != nil {
+		return false, allWarnings, err
+	}
+
+	var featureFlagEnabled bool
+	for _, flag := range featureFlags {
+		if flag.Name == string(ccv2.FeatureFlagServiceInstanceSharing) {
+			featureFlagEnabled = flag.Enabled
+		}
+	}
+
+	if !featureFlagEnabled || !service.Extra.Shareable {
+		return false, allWarnings, actionerror.ServiceInstanceNotShareableError{
+			FeatureFlagEnabled:          featureFlagEnabled,
+			ServiceBrokerSharingEnabled: service.Extra.Shareable,
+		}
+	}
+
+	return true, allWarnings, nil
 }

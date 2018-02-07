@@ -157,6 +157,26 @@ var _ = Describe("share-service Command", func() {
 					})
 				})
 
+				Context("when the service instance is not shareable", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = actionerror.ServiceInstanceNotShareableError{
+							FeatureFlagEnabled:          true,
+							ServiceBrokerSharingEnabled: false}
+						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns(
+							v2v3action.Warnings{"share-service-instance-warning"},
+							expectedErr)
+					})
+
+					It("returns ServiceInstanceNotShareableError and displays all warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+
+						Expect(testUI.Out).ToNot(Say("OK"))
+						Expect(testUI.Err).To(Say("share-service-instance-warning"))
+					})
+				})
+
 				Context("when the service instance is already shared to the space", func() {
 					BeforeEach(func() {
 						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns(
@@ -178,7 +198,7 @@ var _ = Describe("share-service Command", func() {
 					cmd.OrgName = "some-other-org"
 				})
 
-				Context("when the sharing is successful", func() {
+				Context("when no errors occur sharing the service instance", func() {
 					BeforeEach(func() {
 						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns(
 							v2v3action.Warnings{"share-service-warning"},
@@ -217,6 +237,26 @@ var _ = Describe("share-service Command", func() {
 
 						Expect(testUI.Out).ToNot(Say("OK"))
 						Expect(testUI.Err).To(Say("share-service-warning"))
+					})
+				})
+
+				Context("when the service instance is not shareable", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = actionerror.ServiceInstanceNotShareableError{
+							FeatureFlagEnabled:          false,
+							ServiceBrokerSharingEnabled: true}
+						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns(
+							v2v3action.Warnings{"share-service-instance-warning"},
+							expectedErr)
+					})
+
+					It("returns ServiceInstanceNotShareableError and displays all warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+
+						Expect(testUI.Out).ToNot(Say("OK"))
+						Expect(testUI.Err).To(Say("share-service-instance-warning"))
 					})
 				})
 
