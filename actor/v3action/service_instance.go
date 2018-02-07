@@ -7,45 +7,6 @@ import (
 
 type ServiceInstance ccv3.ServiceInstance
 
-func (actor Actor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string, sharedToSpaceName string) (Warnings, error) {
-	organization, allWarnings, err := actor.GetOrganizationByName(sharedToOrgName)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	warnings, err := actor.ShareServiceInstanceInSpaceByOrganizationAndSpaceName(serviceInstanceName, sourceSpaceGUID, organization.GUID, sharedToSpaceName)
-	allWarnings = append(allWarnings, warnings...)
-
-	if err != nil {
-		return allWarnings, err
-	}
-
-	return allWarnings, nil
-}
-
-func (actor Actor) ShareServiceInstanceInSpaceByOrganizationAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, orgGUID string, spaceName string) (Warnings, error) {
-	serviceInstance, allWarnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, sourceSpaceGUID)
-
-	if _, ok := err.(actionerror.ServiceInstanceNotFoundError); ok == true {
-		return allWarnings, actionerror.SharedServiceInstanceNotFoundError{}
-	}
-
-	if err != nil {
-		return allWarnings, err
-	}
-
-	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	_, apiWarnings, err := actor.CloudControllerClient.ShareServiceInstanceToSpaces(serviceInstance.GUID, []string{space.GUID})
-	allWarnings = append(allWarnings, apiWarnings...)
-
-	return allWarnings, err
-}
-
 func (actor Actor) UnshareServiceInstanceFromSpace(serviceInstanceName string, sourceSpaceGUID string, sharedToSpaceGUID string) (Warnings, error) {
 	serviceInstance, allWarnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, sourceSpaceGUID)
 
