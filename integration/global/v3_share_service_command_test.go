@@ -1,4 +1,4 @@
-package experimental
+package global
 
 import (
 	"fmt"
@@ -138,8 +138,8 @@ var _ = Describe("v3-share-service command", func() {
 		})
 
 		AfterEach(func() {
-			helpers.QuickDeleteOrg(sourceOrgName)
 			helpers.QuickDeleteOrg(sharedToOrgName)
+			helpers.QuickDeleteOrg(sourceOrgName)
 		})
 
 		Context("when there is a managed service instance in my current targeted space", func() {
@@ -288,6 +288,55 @@ var _ = Describe("v3-share-service command", func() {
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say(fmt.Sprintf("A service instance called %s already exists in %s", serviceInstance, sharedToSpaceName)))
 					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			Context("when the service instance is NOT shareable", func() {
+				Context("due to global settings", func() {
+					BeforeEach(func() {
+						helpers.DisableFeatureFlag("service_instance_sharing")
+					})
+
+					AfterEach(func() {
+						helpers.EnableFeatureFlag("service_instance_sharing")
+					})
+
+					It("should display that the service instance feature flag is disabled and exit 1", func() {
+						session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
+						Eventually(session.Err).Should(Say(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				Context("due to service broker settings", func() {
+					BeforeEach(func() {
+						broker.Configure(false)
+						broker.Update()
+					})
+
+					It("should display that service instance sharing is disabled for this service and exit 1", func() {
+						session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
+						Eventually(session.Err).Should(Say("Service instance sharing is disabled for this service."))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				Context("due to global settings AND service broker settings", func() {
+					BeforeEach(func() {
+						helpers.DisableFeatureFlag("service_instance_sharing")
+						broker.Configure(false)
+						broker.Update()
+					})
+
+					AfterEach(func() {
+						helpers.EnableFeatureFlag("service_instance_sharing")
+					})
+
+					It("should display that service instance sharing is disabled for this service and exit 1", func() {
+						session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
+						Eventually(session.Err).Should(Say(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform. Also, service instance sharing is disabled for this service.`))
+						Eventually(session).Should(Exit(1))
+					})
 				})
 			})
 		})
