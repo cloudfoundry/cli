@@ -56,7 +56,7 @@ type InstallPluginCommand struct {
 	SkipSSLValidation    bool                   `short:"k" hidden:"true" description:"Skip SSL certificate validation"`
 	Force                bool                   `short:"f" description:"Force install of plugin without confirmation"`
 	RegisteredRepository string                 `short:"r" description:"Restrict search for plugin to this registered repository"`
-	usage                interface{}            `usage:"CF_NAME install-plugin PLUGIN_NAME [-r REPO_NAME] [-f]\nCF_NAME install-plugin LOCAL-PATH/TO/PLUGIN | URL [-f]\n\nWARNING:\n   Plugins are binaries written by potentially untrusted authors.\n   Install and use plugins at your own risk.\n\nEXAMPLES:\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\n   CF_NAME install-plugin -r My-Repo plugin-echo"`
+	usage                interface{}            `usage:"CF_NAME install-plugin PLUGIN_NAME [-r REPO_NAME] [-f]\n   CF_NAME install-plugin LOCAL-PATH/TO/PLUGIN | URL [-f]\n\nWARNING:\n   Plugins are binaries written by potentially untrusted authors.\n   Install and use plugins at your own risk.\n\nEXAMPLES:\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\n   CF_NAME install-plugin -r My-Repo plugin-echo"`
 	relatedCommands      interface{}            `related_commands:"add-plugin-repo, list-plugin-repos, plugins"`
 	UI                   command.UI
 	Config               command.Config
