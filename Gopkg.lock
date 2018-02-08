@@ -244,6 +244,7 @@
   revision = "6c46eb8334b30dc55b42f1a1c725d5ce97375390"
 
 [[projects]]
+  branch = "master"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -262,8 +263,7 @@
     "matchers/support/goraph/util",
     "types"
   ]
-  revision = "003f63b7f4cff3fc95357005358af2de0f5fe152"
-  version = "v1.3.0"
+  revision = "a9c79f175573664afefe4fe0f3827c66263abcbb"
 
 [[projects]]
   name = "github.com/opencontainers/go-digest"
@@ -316,7 +316,7 @@
     "ssh",
     "ssh/terminal"
   ]
-  revision = "3d37316aaa6bd9929127ac9a527abf408178ea7b"
+  revision = "5119cf507ed5294cc409c092980c7497ee5d6fd2"
 
 [[projects]]
   branch = "master"
@@ -327,7 +327,7 @@
     "html/charset",
     "websocket"
   ]
-  revision = "0ed95abb35c445290478a5348a7b38bb154135fd"
+  revision = "f5dfe339be1d06f81b22525fe34671ee7d2c8904"
 
 [[projects]]
   branch = "master"
@@ -336,7 +336,7 @@
     "unix",
     "windows"
   ]
-  revision = "03467258950d845cd1877eab69461b98e8c09219"
+  revision = "37707fdb30a5b38865cfb95e5aab41707daec7fd"
 
 [[projects]]
   branch = "master"
@@ -360,7 +360,7 @@
     "transform",
     "unicode/cldr"
   ]
-  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
+  revision = "4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1"
 
 [[projects]]
   name = "gopkg.in/cheggaaa/pb.v1"
