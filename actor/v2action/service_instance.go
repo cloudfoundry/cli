@@ -94,14 +94,12 @@ func (actor Actor) GetServiceInstancesBySpace(spaceGUID string) ([]ServiceInstan
 
 func (actor Actor) GetSharedToSpaceGUID(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string, sharedToSpaceName string) (string, Warnings, error) {
 	serviceInstance, allWarnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, sourceSpaceGUID)
-
 	if err != nil {
 		return "", allWarnings, err
 	}
 
 	sharedTos, warnings, err := actor.GetServiceInstanceSharedTosByServiceInstance(serviceInstance.GUID)
 	allWarnings = append(allWarnings, warnings...)
-
 	if err != nil {
 		return "", allWarnings, err
 	}

@@ -46,16 +46,18 @@ type V3UnshareServiceCommand struct {
 func (cmd *V3UnshareServiceCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
 
-	client, _, err := shared.NewClients(config, ui, true)
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
+
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionShareServiceV3}
 		}
 		return err
 	}
-	cmd.Actor = v3action.NewActor(client, config, nil, nil)
+	cmd.Actor = v3action.NewActor(ccClient, config, sharedActor, uaaClient)
 
 	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {
@@ -67,13 +69,13 @@ func (cmd *V3UnshareServiceCommand) Setup(config command.Config, ui command.UI) 
 }
 
 func (cmd V3UnshareServiceCommand) Execute(args []string) error {
+	cmd.UI.DisplayText(command.ExperimentalWarning)
+	cmd.UI.DisplayNewline()
+
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionShareServiceV3)
 	if err != nil {
 		return err
 	}
-
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
@@ -86,13 +88,13 @@ func (cmd V3UnshareServiceCommand) Execute(args []string) error {
 	}
 
 	orgName := cmd.Config.TargetedOrganization().Name
-
 	if cmd.OrgName != "" {
 		orgName = cmd.OrgName
 	}
 
 	if !cmd.Force {
-		cmd.UI.DisplayWarning("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working.\n")
+		cmd.UI.DisplayWarning("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working.")
+		cmd.UI.DisplayNewline()
 
 		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really unshare the service instance?", map[string]interface{}{
 			"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
@@ -117,19 +119,16 @@ func (cmd V3UnshareServiceCommand) Execute(args []string) error {
 
 	sharedToSpaceGUID, warningsV2, err := cmd.ActorV2.GetSharedToSpaceGUID(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID, orgName, cmd.SpaceName)
 	cmd.UI.DisplayWarnings(warningsV2)
-
 	if err != nil {
 		return err
 	}
 
 	warnings, err := cmd.Actor.UnshareServiceInstanceFromSpace(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID, sharedToSpaceGUID)
 	cmd.UI.DisplayWarnings(warnings)
-
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayOK()
-
 	return nil
 }
