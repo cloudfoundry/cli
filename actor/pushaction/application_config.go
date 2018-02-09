@@ -124,7 +124,7 @@ func (actor Actor) configureRoutes(manifestApp manifest.Application, orgGUID str
 		routes, warnings, err := actor.CalculateRoutes(manifestApp.Routes, orgGUID, spaceGUID, config.CurrentRoutes)
 		config.DesiredRoutes = routes
 		return config, warnings, err
-	case manifestApp.RandomRoute && len(config.CurrentRoutes) > 0:
+	case len(config.CurrentRoutes) > 0 && (manifestApp.RandomRoute || manifestApp.Domain == ""):
 		config.DesiredRoutes = config.CurrentRoutes
 		return config, nil, nil
 	case manifestApp.RandomRoute:

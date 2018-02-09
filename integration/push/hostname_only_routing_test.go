@@ -108,6 +108,14 @@ var _ = Describe("push with hostname", func() {
 					Eventually(session).Should(Say("name:\\s+%s", appName))
 					Eventually(session).Should(Say("routes:\\s+%s", route))
 					Eventually(session).Should(Exit(0))
+
+					By("does not remap default route after")
+					helpers.WithHelloWorldApp(func(dir string) {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
+						Eventually(session).Should(Say("routes:"))
+						Consistently(session).ShouldNot(Say("(?i)\\+\\s+.*%s.*", defaultSharedDomain()))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 
