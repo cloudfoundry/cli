@@ -210,6 +210,8 @@ var _ = Describe("Routes", func() {
 				"c.b.a.com",
 				"d.c.b.a.com",
 				"a.com/some-path",
+				"*.f.e.com",
+				"*.e.com",
 			}
 			orgGUID = "some-org-guid"
 			spaceGUID = "some-space-guid"
@@ -237,6 +239,8 @@ var _ = Describe("Routes", func() {
 					fakeV2Actor.GetDomainsByNameAndOrganizationReturns([]v2action.Domain{
 						{GUID: "domain-guid-1", Name: "a.com"},
 						{GUID: "domain-guid-2", Name: "b.a.com"},
+						{GUID: "domain-guid-3", Name: "f.e.com"},
+						{GUID: "domain-guid-4", Name: "e.com"},
 					}, v2action.Warnings{"domain-warnings-1", "domains-warnings-2"}, nil)
 				})
 
@@ -267,7 +271,7 @@ var _ = Describe("Routes", func() {
 
 					It("returns new and existing routes", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2", "find-route-warning", "find-route-warning", "find-route-warning", "find-route-warning", "find-route-warning"))
+						Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2", "find-route-warning", "find-route-warning", "find-route-warning", "find-route-warning", "find-route-warning", "find-route-warning", "find-route-warning"))
 						Expect(calculatedRoutes).To(ConsistOf(
 							v2action.Route{
 								Domain: v2action.Domain{
@@ -317,14 +321,30 @@ var _ = Describe("Routes", func() {
 								},
 								Path:      "/some-path",
 								SpaceGUID: spaceGUID,
+							},
+							v2action.Route{
+								Host: "*",
+								Domain: v2action.Domain{
+									GUID: "domain-guid-3",
+									Name: "f.e.com",
+								},
+								SpaceGUID: spaceGUID,
+							},
+							v2action.Route{
+								Host: "*",
+								Domain: v2action.Domain{
+									GUID: "domain-guid-4",
+									Name: "e.com",
+								},
+								SpaceGUID: spaceGUID,
 							}))
 
 						Expect(fakeV2Actor.GetDomainsByNameAndOrganizationCallCount()).To(Equal(1))
 						domains, passedOrgGUID := fakeV2Actor.GetDomainsByNameAndOrganizationArgsForCall(0)
-						Expect(domains).To(ConsistOf("a.com", "b.a.com", "c.b.a.com", "d.c.b.a.com"))
+						Expect(domains).To(ConsistOf("a.com", "b.a.com", "c.b.a.com", "d.c.b.a.com", "*.f.e.com", "f.e.com", "*.e.com", "e.com"))
 						Expect(passedOrgGUID).To(Equal(orgGUID))
 
-						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(5))
+						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(7))
 						// One check is enough here - checking 4th call since it's the only
 						// existing one.
 						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(3)).To(Equal(v2action.Route{
@@ -394,13 +414,15 @@ var _ = Describe("Routes", func() {
 				fakeV2Actor.GetDomainsByNameAndOrganizationReturns([]v2action.Domain{
 					{GUID: "domain-guid-1", Name: "a.com"},
 					{GUID: "domain-guid-2", Name: "b.a.com"},
+					{GUID: "domain-guid-3", Name: "f.e.com"},
+					{GUID: "domain-guid-4", Name: "e.com"},
 				}, v2action.Warnings{"domain-warnings-1", "domains-warnings-2"}, nil)
 				fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"find-route-warning"}, actionerror.RouteNotFoundError{})
 			})
 
 			It("does not lookup known routes", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2", "find-route-warning", "find-route-warning", "find-route-warning", "find-route-warning"))
+				Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2", "find-route-warning", "find-route-warning", "find-route-warning", "find-route-warning", "find-route-warning", "find-route-warning"))
 				Expect(calculatedRoutes).To(ConsistOf(
 					v2action.Route{
 						Domain: v2action.Domain{
@@ -441,11 +463,27 @@ var _ = Describe("Routes", func() {
 						},
 						Path:      "/some-path",
 						SpaceGUID: spaceGUID,
+					},
+					v2action.Route{
+						Host: "*",
+						Domain: v2action.Domain{
+							GUID: "domain-guid-3",
+							Name: "f.e.com",
+						},
+						SpaceGUID: spaceGUID,
+					},
+					v2action.Route{
+						Host: "*",
+						Domain: v2action.Domain{
+							GUID: "domain-guid-4",
+							Name: "e.com",
+						},
+						SpaceGUID: spaceGUID,
 					}))
 
 				Expect(fakeV2Actor.GetDomainsByNameAndOrganizationCallCount()).To(Equal(1))
 				domains, passedOrgGUID := fakeV2Actor.GetDomainsByNameAndOrganizationArgsForCall(0)
-				Expect(domains).To(ConsistOf("a.com", "b.a.com", "c.b.a.com"))
+				Expect(domains).To(ConsistOf("a.com", "b.a.com", "c.b.a.com", "*.f.e.com", "f.e.com", "*.e.com", "e.com"))
 				Expect(passedOrgGUID).To(Equal(orgGUID))
 			})
 		})

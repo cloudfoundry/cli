@@ -42,7 +42,13 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 	mergedApps = actor.setSaneEndpoint(mergedApps)
 
 	log.Debugf("merged app settings: %#v", mergedApps)
-	return mergedApps, actor.validateMergedSettings(mergedApps)
+
+	err = actor.validateMergedSettings(mergedApps)
+	if err != nil {
+		log.Errorln("validation error post merge:", err)
+		return nil, err
+	}
+	return mergedApps, nil
 }
 
 func (Actor) selectApp(appName string, apps []manifest.Application) ([]manifest.Application, error) {
@@ -150,6 +156,7 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 
 func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 	for i, app := range apps {
+		log.WithField("index", i).Info("validating app")
 		if app.Name == "" {
 			log.WithField("index", i).Error("does not contain an app name")
 			return actionerror.MissingNameError{}

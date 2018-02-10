@@ -249,6 +249,53 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		{Name: "some-name-2"},
 	}
 
+	DescribeTable("valid manifest settings",
+		func(settings CommandLineSettings, apps []manifest.Application, expectedErr error) {
+			currentDirectory, err := os.Getwd()
+			Expect(err).ToNot(HaveOccurred())
+
+			if settings.ProvidedAppPath == RealPath {
+				settings.ProvidedAppPath = currentDirectory
+			}
+
+			for i, app := range apps {
+				if app.Path == RealPath {
+					apps[i].Path = currentDirectory
+				}
+			}
+
+			_, err = actor.MergeAndValidateSettingsAndManifests(settings, apps)
+			Expect(err).ToNot(HaveOccurred())
+		},
+
+		Entry("valid route with a port",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:   "some-name-1",
+				Path:   RealPath,
+				Routes: []string{"www.hardknox.cli.fun:1234"},
+			}},
+			nil),
+
+		Entry("valid route with crazy characters",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:   "some-name-1",
+				Path:   RealPath,
+				Routes: []string{"www.hardknox.cli.fun/foo_1+2.html"},
+			}},
+			nil),
+
+		Entry("ValidRoute with a star",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:   "some-name-1",
+				Path:   RealPath,
+				Routes: []string{"*.hardknox.cli.fun"},
+			}},
+			nil),
+	)
+
 	DescribeTable("validation errors",
 		func(settings CommandLineSettings, apps []manifest.Application, expectedErr error) {
 			currentDirectory, err := os.Getwd()
@@ -265,11 +312,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			}
 
 			_, err = actor.MergeAndValidateSettingsAndManifests(settings, apps)
-			if expectedErr == nil {
-				Expect(err).ToNot(HaveOccurred())
-			} else {
-				Expect(err).To(MatchError(expectedErr))
-			}
+			Expect(err).To(MatchError(expectedErr))
 		},
 
 		Entry("CommandLineOptionsWithMultipleAppsError",
@@ -391,15 +434,6 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				DockerUsername: "some-username",
 			}},
 			actionerror.DockerPasswordNotSetError{}),
-
-		Entry("ValidRoute",
-			CommandLineSettings{},
-			[]manifest.Application{{
-				Name:   "some-name-1",
-				Path:   RealPath,
-				Routes: []string{"www.hardknox.cli.fun:1234/foo_1+2.html"},
-			}},
-			nil),
 
 		Entry("InvalidRoute",
 			CommandLineSettings{},

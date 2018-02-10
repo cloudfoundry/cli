@@ -22,7 +22,7 @@ type Actor struct {
 }
 
 const ProtocolRegexp = "^https?://|^tcp://"
-const URLRegexp = "^(?:https?://|tcp://)?(?:[\\w-]+\\.)+\\w+(?:\\:\\d+)?(?:/.*)*(?:\\.\\w+)?$"
+const URLRegexp = "^(?:https?://|tcp://)?(?:(?:[\\w-]+\\.)|(?:[*]\\.))+\\w+(?:\\:\\d+)?(?:/.*)*(?:\\.\\w+)?$"
 
 // NewActor returns a new actor.
 func NewActor(v2Actor V2Actor, sharedActor SharedActor) *Actor {
