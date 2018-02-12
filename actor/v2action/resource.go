@@ -62,7 +62,7 @@ func (actor Actor) ResourceMatch(allResources []Resource) ([]Resource, []Resourc
 			break
 		}
 
-		returnedResources, warnings, err := actor.CloudControllerClient.PutResourceMatch(chunk)
+		returnedResources, warnings, err := actor.CloudControllerClient.UpdateResourceMatch(chunk)
 		allWarnings = append(allWarnings, warnings...)
 
 		if err != nil {

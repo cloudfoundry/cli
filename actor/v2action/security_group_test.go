@@ -1200,7 +1200,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			Context("when binding the space does not return an error", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.AssociateSpaceWithRunningSecurityGroupReturns(
+					fakeCloudControllerClient.UpdateSecurityGroupSpaceReturns(
 						ccv2.Warnings{"warning-1", "warning-2"},
 						nil,
 					)
@@ -1209,8 +1209,8 @@ var _ = Describe("Security Group Actions", func() {
 				It("returns warnings and no error", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-					Expect(fakeCloudControllerClient.AssociateSpaceWithRunningSecurityGroupCallCount()).To(Equal(1))
-					securityGroupGUID, spaceGUID := fakeCloudControllerClient.AssociateSpaceWithRunningSecurityGroupArgsForCall(0)
+					Expect(fakeCloudControllerClient.UpdateSecurityGroupSpaceCallCount()).To(Equal(1))
+					securityGroupGUID, spaceGUID := fakeCloudControllerClient.UpdateSecurityGroupSpaceArgsForCall(0)
 					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
@@ -1220,7 +1220,7 @@ var _ = Describe("Security Group Actions", func() {
 				var returnedError error
 				BeforeEach(func() {
 					returnedError = errors.New("associate-space-error")
-					fakeCloudControllerClient.AssociateSpaceWithRunningSecurityGroupReturns(
+					fakeCloudControllerClient.UpdateSecurityGroupSpaceReturns(
 						ccv2.Warnings{"warning-1", "warning-2"},
 						returnedError,
 					)
@@ -1240,7 +1240,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			Context("when binding the space does not return an error", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.AssociateSpaceWithStagingSecurityGroupReturns(
+					fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceReturns(
 						ccv2.Warnings{"warning-1", "warning-2"},
 						nil,
 					)
@@ -1249,8 +1249,8 @@ var _ = Describe("Security Group Actions", func() {
 				It("returns warnings and no error", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-					Expect(fakeCloudControllerClient.AssociateSpaceWithStagingSecurityGroupCallCount()).To(Equal(1))
-					securityGroupGUID, spaceGUID := fakeCloudControllerClient.AssociateSpaceWithStagingSecurityGroupArgsForCall(0)
+					Expect(fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceCallCount()).To(Equal(1))
+					securityGroupGUID, spaceGUID := fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceArgsForCall(0)
 					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
@@ -1260,7 +1260,7 @@ var _ = Describe("Security Group Actions", func() {
 				var returnedError error
 				BeforeEach(func() {
 					returnedError = errors.New("associate-space-error")
-					fakeCloudControllerClient.AssociateSpaceWithStagingSecurityGroupReturns(
+					fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceReturns(
 						ccv2.Warnings{"warning-1", "warning-2"},
 						returnedError,
 					)

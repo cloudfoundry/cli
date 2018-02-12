@@ -161,7 +161,7 @@ var _ = Describe("Space", func() {
 		})
 	})
 
-	Describe("GetStagingSpacesBySecurityGroup", func() {
+	Describe("GetSecurityGroupStagingSpaces", func() {
 		Context("when no errors are encountered", func() {
 			Context("when results are paginated", func() {
 				BeforeEach(func() {
@@ -232,7 +232,7 @@ var _ = Describe("Space", func() {
 				})
 
 				It("returns paginated results and all warnings", func() {
-					spaces, warnings, err := client.GetStagingSpacesBySecurityGroup("security-group-guid")
+					spaces, warnings, err := client.GetSecurityGroupStagingSpaces("security-group-guid")
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(spaces).To(Equal([]Space{
@@ -285,7 +285,7 @@ var _ = Describe("Space", func() {
 			})
 
 			It("returns an error and all warnings", func() {
-				_, warnings, err := client.GetStagingSpacesBySecurityGroup("security-group-guid")
+				_, warnings, err := client.GetSecurityGroupStagingSpaces("security-group-guid")
 
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
@@ -371,7 +371,7 @@ var _ = Describe("Space", func() {
 				})
 
 				It("returns paginated results and all warnings", func() {
-					spaces, warnings, err := client.GetRunningSpacesBySecurityGroup("security-group-guid")
+					spaces, warnings, err := client.GetSecurityGroupSpaces("security-group-guid")
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(spaces).To(Equal([]Space{
@@ -424,7 +424,7 @@ var _ = Describe("Space", func() {
 			})
 
 			It("returns an error and all warnings", func() {
-				_, warnings, err := client.GetRunningSpacesBySecurityGroup("security-group-guid")
+				_, warnings, err := client.GetSecurityGroupSpaces("security-group-guid")
 
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,

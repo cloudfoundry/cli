@@ -57,9 +57,9 @@ func (r Resource) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccResource)
 }
 
-// PutResourceMatch returns the resources that exist on the cloud foundry instance
+// UpdateResourceMatch returns the resources that exist on the cloud foundry instance
 // from the set of resources given.
-func (client *Client) PutResourceMatch(resourcesToMatch []Resource) ([]Resource, Warnings, error) {
+func (client *Client) UpdateResourceMatch(resourcesToMatch []Resource) ([]Resource, Warnings, error) {
 	body, err := json.Marshal(resourcesToMatch)
 	if err != nil {
 		return nil, nil, err

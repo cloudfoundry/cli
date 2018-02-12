@@ -17,7 +17,7 @@ var _ = Describe("Resource", func() {
 		client = NewTestClient()
 	})
 
-	Describe("PutResourceMatch", func() {
+	Describe("UpdateResourceMatch", func() {
 		var (
 			resourcesToMatch []Resource
 
@@ -27,7 +27,7 @@ var _ = Describe("Resource", func() {
 		)
 
 		JustBeforeEach(func() {
-			matchedResources, warnings, executeErr = client.PutResourceMatch(resourcesToMatch)
+			matchedResources, warnings, executeErr = client.UpdateResourceMatch(resourcesToMatch)
 		})
 
 		Context("when resource matching is successful", func() {

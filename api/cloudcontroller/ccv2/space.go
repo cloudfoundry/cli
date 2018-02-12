@@ -70,9 +70,9 @@ func (client *Client) GetSpaces(filters ...Filter) ([]Space, Warnings, error) {
 	return fullSpacesList, warnings, err
 }
 
-// GetStagingSpacesBySecurityGroup returns a list of Spaces based on the provided
+// GetSecurityGroupStagingSpaces returns a list of Spaces based on the provided
 // SecurityGroup GUID.
-func (client *Client) GetStagingSpacesBySecurityGroup(securityGroupGUID string) ([]Space, Warnings, error) {
+func (client *Client) GetSecurityGroupStagingSpaces(securityGroupGUID string) ([]Space, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSecurityGroupStagingSpacesRequest,
 		URIParams:   map[string]string{"security_group_guid": securityGroupGUID},
@@ -97,11 +97,11 @@ func (client *Client) GetStagingSpacesBySecurityGroup(securityGroupGUID string) 
 	return fullSpacesList, warnings, err
 }
 
-// GetRunningSpacesBySecurityGroup returns a list of Spaces based on the provided
+// GetSecurityGroupSpaces returns a list of Spaces based on the provided
 // SecurityGroup GUID.
-func (client *Client) GetRunningSpacesBySecurityGroup(securityGroupGUID string) ([]Space, Warnings, error) {
+func (client *Client) GetSecurityGroupSpaces(securityGroupGUID string) ([]Space, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetSecurityGroupRunningSpacesRequest,
+		RequestName: internal.GetSecurityGroupSpacesRequest,
 		URIParams:   map[string]string{"security_group_guid": securityGroupGUID},
 	})
 	if err != nil {

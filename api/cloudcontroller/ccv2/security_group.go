@@ -71,9 +71,12 @@ func (securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (client *Client) AssociateSpaceWithRunningSecurityGroup(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+// UpdateSecurityGroupSpace associates a security group in the running phase
+// for the lifecycle, specified by its GUID, from a space, which is also
+// specified by its GUID.
+func (client *Client) UpdateSecurityGroupSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutRunningSecurityGroupSpaceRequest,
+		RequestName: internal.PutSecurityGroupSpaceRequest,
 		URIParams: Params{
 			"security_group_guid": securityGroupGUID,
 			"space_guid":          spaceGUID,
@@ -90,9 +93,12 @@ func (client *Client) AssociateSpaceWithRunningSecurityGroup(securityGroupGUID s
 	return response.Warnings, err
 }
 
-func (client *Client) AssociateSpaceWithStagingSecurityGroup(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+// UpdateSecurityGroupStagingSpace associates a security group in the staging
+// phase for the lifecycle, specified by its GUID, from a space, which is also
+// specified by its GUID.
+func (client *Client) UpdateSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutStagingSecurityGroupSpaceRequest,
+		RequestName: internal.PutSecurityGroupStagingSpaceRequest,
 		URIParams: Params{
 			"security_group_guid": securityGroupGUID,
 			"space_guid":          spaceGUID,
@@ -135,15 +141,15 @@ func (client *Client) GetSecurityGroups(filters ...Filter) ([]SecurityGroup, War
 	return securityGroupsList, warnings, err
 }
 
-// GetSpaceRunningSecurityGroupsBySpace returns the running Security Groups
-// associated with the provided Space GUID.
-func (client *Client) GetSpaceRunningSecurityGroupsBySpace(spaceGUID string, filters ...Filter) ([]SecurityGroup, Warnings, error) {
-	return client.getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID, internal.GetSpaceRunningSecurityGroupsRequest, filters)
+// GetSpaceSecurityGroups returns the running Security Groups associated with
+// the provided Space GUID.
+func (client *Client) GetSpaceSecurityGroups(spaceGUID string, filters ...Filter) ([]SecurityGroup, Warnings, error) {
+	return client.getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID, internal.GetSpaceSecurityGroupsRequest, filters)
 }
 
-// GetSpaceStagingSecurityGroupsBySpace returns the staging Security Groups
+// GetSpaceStagingSecurityGroups returns the staging Security Groups
 // associated with the provided Space GUID.
-func (client *Client) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string, filters ...Filter) ([]SecurityGroup, Warnings, error) {
+func (client *Client) GetSpaceStagingSecurityGroups(spaceGUID string, filters ...Filter) ([]SecurityGroup, Warnings, error) {
 	return client.getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID, internal.GetSpaceStagingSecurityGroupsRequest, filters)
 }
 
@@ -173,12 +179,12 @@ func (client *Client) getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID string
 	return securityGroupsList, warnings, err
 }
 
-// RemoveSpaceRunningFromSecurityGroup disassociates a security group in the
-// running phase fo the lifecycle, specified by its GUID, from a space, which
-// is also specified by its GUID.
-func (client *Client) RemoveSpaceFromRunningSecurityGroup(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+// DeleteSecurityGroupSpace disassociates a security group in the running phase
+// for the lifecycle, specified by its GUID, from a space, which is also
+// specified by its GUID.
+func (client *Client) DeleteSecurityGroupSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteRunningSecurityGroupSpaceRequest,
+		RequestName: internal.DeleteSecurityGroupSpaceRequest,
 		URIParams: Params{
 			"security_group_guid": securityGroupGUID,
 			"space_guid":          spaceGUID,
@@ -195,12 +201,12 @@ func (client *Client) RemoveSpaceFromRunningSecurityGroup(securityGroupGUID stri
 	return response.Warnings, err
 }
 
-// RemoveSpaceStagingFromSecurityGroup disassociates a security group in the
+// DeleteSecurityGroupStagingSpace disassociates a security group in the
 // staging phase fo the lifecycle, specified by its GUID, from a space, which
 // is also specified by its GUID.
-func (client *Client) RemoveSpaceFromStagingSecurityGroup(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+func (client *Client) DeleteSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteStagingSecurityGroupSpaceRequest,
+		RequestName: internal.DeleteSecurityGroupStagingSpaceRequest,
 		URIParams: Params{
 			"security_group_guid": securityGroupGUID,
 			"space_guid":          spaceGUID,
