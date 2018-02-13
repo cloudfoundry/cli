@@ -86,7 +86,7 @@ var _ = Describe("Space Summary Actions", func() {
 						ccv2.Warnings{"warning-9", "warning-10"},
 						nil)
 
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-shared-security-group",
@@ -126,7 +126,7 @@ var _ = Describe("Space Summary Actions", func() {
 						ccv2.Warnings{"warning-11", "warning-12"},
 						nil)
 
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-staging-security-group",
@@ -305,13 +305,13 @@ var _ = Describe("Space Summary Actions", func() {
 					spaceQuotaGUID := fakeCloudControllerClient.GetSpaceQuotaArgsForCall(0)
 					Expect(spaceQuotaGUID).To(Equal("some-space-quota-guid"))
 
-					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 					Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
 					Expect(queriesRunning).To(BeNil())
 
-					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 					Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
 					Expect(queriesStaging).To(BeNil())
 				})
@@ -590,7 +590,7 @@ var _ = Describe("Space Summary Actions", func() {
 						nil,
 						nil)
 
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-1", "warning-2"},
 						expectedErr)
@@ -661,12 +661,12 @@ var _ = Describe("Space Summary Actions", func() {
 						nil,
 						nil)
 
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						nil,
 						nil)
 
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-1", "warning-2"},
 						expectedErr)
@@ -740,7 +740,7 @@ var _ = Describe("Space Summary Actions", func() {
 						ccv2.Warnings{"warning-9", "warning-10"},
 						nil)
 
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-shared-security-group",
@@ -886,12 +886,12 @@ var _ = Describe("Space Summary Actions", func() {
 					spaceQuotaGUID := fakeCloudControllerClient.GetSpaceQuotaArgsForCall(0)
 					Expect(spaceQuotaGUID).To(Equal("some-space-quota-guid"))
 
-					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUID, filters = fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUID, filters = fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 					Expect(filters).To(BeNil())
 
-					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(0))
 				})
 			})
 		})

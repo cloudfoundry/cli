@@ -74,7 +74,7 @@ var _ = Describe("Security Group Actions", func() {
 			Context("when the error is generic", func() {
 				BeforeEach(func() {
 					returnedError = errors.New("get-spaces-error")
-					fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturns(
+					fakeCloudControllerClient.GetSecurityGroupSpacesReturns(
 						nil,
 						ccv2.Warnings{"warning-3", "warning-4"},
 						returnedError,
@@ -86,15 +86,15 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(0)).To(Equal("security-group-guid-1"))
 				})
 			})
 
 			Context("when the error is a resource not found error", func() {
 				BeforeEach(func() {
 					returnedError = ccerror.ResourceNotFoundError{Message: "could not find security group"}
-					fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturns(
+					fakeCloudControllerClient.GetSecurityGroupSpacesReturns(
 						nil,
 						ccv2.Warnings{"warning-3", "warning-4"},
 						returnedError,
@@ -125,7 +125,7 @@ var _ = Describe("Security Group Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturns(
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturns(
 					nil,
 					ccv2.Warnings{"warning-3", "warning-4"},
 					nil,
@@ -135,7 +135,7 @@ var _ = Describe("Security Group Actions", func() {
 			Context("when the error is generic", func() {
 				BeforeEach(func() {
 					returnedError = errors.New("get-staging-spaces-error")
-					fakeCloudControllerClient.GetStagingSpacesBySecurityGroupReturns(
+					fakeCloudControllerClient.GetSecurityGroupStagingSpacesReturns(
 						nil,
 						ccv2.Warnings{"warning-5", "warning-6"},
 						returnedError,
@@ -154,17 +154,17 @@ var _ = Describe("Security Group Actions", func() {
 					))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(0)).To(Equal("security-group-guid-1"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(0)).To(Equal("security-group-guid-1"))
 				})
 			})
 
 			Context("when the error is a resource not found error", func() {
 				BeforeEach(func() {
 					returnedError = ccerror.ResourceNotFoundError{Message: "could not find security group"}
-					fakeCloudControllerClient.GetStagingSpacesBySecurityGroupReturns(
+					fakeCloudControllerClient.GetSecurityGroupStagingSpacesReturns(
 						nil,
 						ccv2.Warnings{"warning-5", "warning-6"},
 						returnedError,
@@ -201,7 +201,7 @@ var _ = Describe("Security Group Actions", func() {
 					ccv2.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturns(
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturns(
 					[]ccv2.Space{
 						{
 							GUID:             "space-guid-11",
@@ -212,7 +212,7 @@ var _ = Describe("Security Group Actions", func() {
 					ccv2.Warnings{"warning-3", "warning-4"},
 					nil,
 				)
-				fakeCloudControllerClient.GetStagingSpacesBySecurityGroupReturns(
+				fakeCloudControllerClient.GetSecurityGroupStagingSpacesReturns(
 					[]ccv2.Space{
 						{
 							GUID:             "space-guid-12",
@@ -240,10 +240,10 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4", "warning-5", "warning-6", "warning-7", "warning-8"))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(0)).To(Equal("security-group-guid-1"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(0)).To(Equal("security-group-guid-1"))
 					Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-11"))
 				})
@@ -456,7 +456,7 @@ var _ = Describe("Security Group Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(0,
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturnsOnCall(0,
 					[]ccv2.Space{
 						{
 							GUID:             "space-guid-13",
@@ -478,7 +478,7 @@ var _ = Describe("Security Group Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetStagingSpacesBySecurityGroupReturnsOnCall(0,
+				fakeCloudControllerClient.GetSecurityGroupStagingSpacesReturnsOnCall(0,
 					[]ccv2.Space{
 						{
 							GUID:             "space-guid-13",
@@ -500,7 +500,7 @@ var _ = Describe("Security Group Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(1,
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturnsOnCall(1,
 					[]ccv2.Space{
 						{
 							GUID:             "space-guid-21",
@@ -521,12 +521,12 @@ var _ = Describe("Security Group Actions", func() {
 					ccv2.Warnings{"warning-7", "warning-8"},
 					nil,
 				)
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(2,
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturnsOnCall(2,
 					[]ccv2.Space{},
 					ccv2.Warnings{"warning-9", "warning-10"},
 					nil,
 				)
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(3,
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturnsOnCall(3,
 					[]ccv2.Space{
 						{
 							GUID:             "space-guid-31",
@@ -547,17 +547,17 @@ var _ = Describe("Security Group Actions", func() {
 					ccv2.Warnings{"warning-11", "warning-12"},
 					nil,
 				)
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(4,
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturnsOnCall(4,
 					[]ccv2.Space{},
 					ccv2.Warnings{"warning-31", "warning-32"},
 					nil,
 				)
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(5,
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturnsOnCall(5,
 					[]ccv2.Space{},
 					ccv2.Warnings{"warning-33", "warning-34"},
 					nil,
 				)
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(6,
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturnsOnCall(6,
 					[]ccv2.Space{},
 					ccv2.Warnings{"warning-35", "warning-36"},
 					nil,
@@ -755,23 +755,23 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
 
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(7))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(1)).To(Equal("security-group-guid-2"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(2)).To(Equal("security-group-guid-3"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(3)).To(Equal("security-group-guid-4"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(4)).To(Equal("security-group-guid-5"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(5)).To(Equal("security-group-guid-6"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(6)).To(Equal("security-group-guid-7"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesCallCount()).To(Equal(7))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(0)).To(Equal("security-group-guid-1"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(1)).To(Equal("security-group-guid-2"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(2)).To(Equal("security-group-guid-3"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(3)).To(Equal("security-group-guid-4"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(4)).To(Equal("security-group-guid-5"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(5)).To(Equal("security-group-guid-6"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(6)).To(Equal("security-group-guid-7"))
 
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupCallCount()).To(Equal(7))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(1)).To(Equal("security-group-guid-2"))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(2)).To(Equal("security-group-guid-3"))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(3)).To(Equal("security-group-guid-4"))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(4)).To(Equal("security-group-guid-5"))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(5)).To(Equal("security-group-guid-6"))
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(6)).To(Equal("security-group-guid-7"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesCallCount()).To(Equal(7))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(0)).To(Equal("security-group-guid-1"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(1)).To(Equal("security-group-guid-2"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(2)).To(Equal("security-group-guid-3"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(3)).To(Equal("security-group-guid-4"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(4)).To(Equal("security-group-guid-5"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(5)).To(Equal("security-group-guid-6"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(6)).To(Equal("security-group-guid-7"))
 
 					Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(6))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-13"))
@@ -908,16 +908,16 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
 
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(7))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(1)).To(Equal("security-group-guid-2"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(2)).To(Equal("security-group-guid-3"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(3)).To(Equal("security-group-guid-4"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(4)).To(Equal("security-group-guid-5"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(5)).To(Equal("security-group-guid-6"))
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(6)).To(Equal("security-group-guid-7"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesCallCount()).To(Equal(7))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(0)).To(Equal("security-group-guid-1"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(1)).To(Equal("security-group-guid-2"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(2)).To(Equal("security-group-guid-3"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(3)).To(Equal("security-group-guid-4"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(4)).To(Equal("security-group-guid-5"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(5)).To(Equal("security-group-guid-6"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(6)).To(Equal("security-group-guid-7"))
 
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesCallCount()).To(Equal(0))
 
 					Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(6))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-13"))
@@ -984,13 +984,13 @@ var _ = Describe("Security Group Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(0,
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturnsOnCall(0,
 					nil,
 					ccv2.Warnings{"warning-3", "warning-4"},
 					ccerror.ResourceNotFoundError{Message: "running-error-1"},
 				)
 
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(1,
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturnsOnCall(1,
 					[]ccv2.Space{
 						{
 							GUID:             "space-guid-13",
@@ -1012,13 +1012,13 @@ var _ = Describe("Security Group Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetStagingSpacesBySecurityGroupReturnsOnCall(0,
+				fakeCloudControllerClient.GetSecurityGroupStagingSpacesReturnsOnCall(0,
 					[]ccv2.Space{},
 					ccv2.Warnings{"warning-7", "warning-8"},
 					ccerror.ResourceNotFoundError{Message: "staging-error-1"},
 				)
 
-				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(2,
+				fakeCloudControllerClient.GetSecurityGroupSpacesReturnsOnCall(2,
 					[]ccv2.Space{
 						{
 							GUID:             "space-guid-11",
@@ -1030,7 +1030,7 @@ var _ = Describe("Security Group Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetStagingSpacesBySecurityGroupReturnsOnCall(1,
+				fakeCloudControllerClient.GetSecurityGroupStagingSpacesReturnsOnCall(1,
 					[]ccv2.Space{
 						{
 							GUID:             "space-guid-12",
@@ -1082,14 +1082,14 @@ var _ = Describe("Security Group Actions", func() {
 				Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
 
-				Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(3))
-				Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
-				Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(1)).To(Equal("security-group-guid-2"))
-				Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(2)).To(Equal("security-group-guid-3"))
+				Expect(fakeCloudControllerClient.GetSecurityGroupSpacesCallCount()).To(Equal(3))
+				Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(0)).To(Equal("security-group-guid-1"))
+				Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(1)).To(Equal("security-group-guid-2"))
+				Expect(fakeCloudControllerClient.GetSecurityGroupSpacesArgsForCall(2)).To(Equal("security-group-guid-3"))
 
-				Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupCallCount()).To(Equal(2))
-				Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-2"))
-				Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(1)).To(Equal("security-group-guid-3"))
+				Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesCallCount()).To(Equal(2))
+				Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(0)).To(Equal("security-group-guid-2"))
+				Expect(fakeCloudControllerClient.GetSecurityGroupStagingSpacesArgsForCall(1)).To(Equal("security-group-guid-3"))
 
 				Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-13"))
@@ -1277,7 +1277,7 @@ var _ = Describe("Security Group Actions", func() {
 	Describe("GetSpaceRunningSecurityGroupsBySpace", func() {
 		Context("when the space exists and there are no errors", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+				fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{
 						{
 							Name: "some-shared-security-group",
@@ -1305,8 +1305,8 @@ var _ = Describe("Security Group Actions", func() {
 						},
 					}))
 
-				Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-				spaceGUID, queries := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+				Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+				spaceGUID, queries := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 				Expect(spaceGUID).To(Equal("space-guid"))
 				Expect(queries).To(BeNil())
 			})
@@ -1314,7 +1314,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when the space does not exist", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+				fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 					nil,
 					nil,
 					ccerror.ResourceNotFoundError{})
@@ -1331,7 +1331,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("banana")
-				fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+				fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 					nil,
 					ccv2.Warnings{"warning-1", "warning-2"},
 					expectedErr)
@@ -1348,7 +1348,7 @@ var _ = Describe("Security Group Actions", func() {
 	Describe("GetSpaceStagingSecurityGroupsBySpace", func() {
 		Context("when the space exists and there are no errors", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{
 						{
 							Name: "some-shared-security-group",
@@ -1376,8 +1376,8 @@ var _ = Describe("Security Group Actions", func() {
 						},
 					}))
 
-				Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-				spaceGUID, queries := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+				Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+				spaceGUID, queries := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 				Expect(spaceGUID).To(Equal("space-guid"))
 				Expect(queries).To(BeNil())
 			})
@@ -1385,7 +1385,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when the space does not exist", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 					nil,
 					nil,
 					ccerror.ResourceNotFoundError{})
@@ -1402,7 +1402,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("banana")
-				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 					nil,
 					ccv2.Warnings{"warning-1", "warning-2"},
 					expectedErr)
@@ -1487,7 +1487,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			Context("when the security group is bound to running", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-security-group",
@@ -1504,7 +1504,7 @@ var _ = Describe("Security Group Actions", func() {
 
 					BeforeEach(func() {
 						returnedError = errors.New("get-security-groups-error")
-						fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+						fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 							[]ccv2.SecurityGroup{
 								{
 									Name: "some-security-group",
@@ -1527,7 +1527,7 @@ var _ = Describe("Security Group Actions", func() {
 
 					BeforeEach(func() {
 						returnedError = errors.New("associate-space-error")
-						fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupReturns(
+						fakeCloudControllerClient.DeleteSecurityGroupSpaceReturns(
 							ccv2.Warnings{"warning-5", "warning-6"},
 							returnedError)
 					})
@@ -1547,7 +1547,7 @@ var _ = Describe("Security Group Actions", func() {
 
 				Context("when no errors are encountered", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupReturns(
+						fakeCloudControllerClient.DeleteSecurityGroupSpaceReturns(
 							ccv2.Warnings{"warning-5", "warning-6"},
 							nil)
 					})
@@ -1570,8 +1570,8 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUID, queries := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUID, queries := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 						Expect(queries).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -1579,26 +1579,26 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(0))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(1))
-						securityGroupGUID, spaceGUID := fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupArgsForCall(0)
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(1))
+						securityGroupGUID, spaceGUID := fakeCloudControllerClient.DeleteSecurityGroupSpaceArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(0))
 					})
 				})
 			})
 
 			Context("when the security group is bound to neither running nor staging", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-3", "warning-4"},
 						nil,
 					)
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-5", "warning-6"},
 						nil,
@@ -1617,8 +1617,8 @@ var _ = Describe("Security Group Actions", func() {
 						}))
 						Expect(err).ToNot(HaveOccurred())
 
-						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 						Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
 						Expect(queriesRunning).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -1626,8 +1626,8 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 						Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
 						Expect(queriesStaging).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -1635,20 +1635,20 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
-						Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(0))
 					})
 				})
 			})
 
 			Context("when the security group is bound to staging", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-3", "warning-4"},
 						nil,
 					)
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-security-group",
@@ -1674,8 +1674,8 @@ var _ = Describe("Security Group Actions", func() {
 						Lifecycle: lifecycle,
 					}))
 
-					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 					Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
 					Expect(queriesRunning).To(Equal([]ccv2.Filter{{
 						Type:     constant.NameFilter,
@@ -1683,8 +1683,8 @@ var _ = Describe("Security Group Actions", func() {
 						Values:   []string{"some-security-group"},
 					}}))
 
-					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 					Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
 					Expect(queriesStaging).To(Equal([]ccv2.Filter{{
 						Type:     constant.NameFilter,
@@ -1692,8 +1692,8 @@ var _ = Describe("Security Group Actions", func() {
 						Values:   []string{"some-security-group"},
 					}}))
 
-					Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(0))
 				})
 			})
 		})
@@ -1716,7 +1716,7 @@ var _ = Describe("Security Group Actions", func() {
 
 				BeforeEach(func() {
 					returnedError = errors.New("get-space-staging-security-groups-error")
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-3", "warning-4"},
 						returnedError,
@@ -1731,7 +1731,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			Context("when the security group is bound to staging", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-security-group",
@@ -1748,7 +1748,7 @@ var _ = Describe("Security Group Actions", func() {
 
 					BeforeEach(func() {
 						returnedError = errors.New("associate-space-error")
-						fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupReturns(
+						fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceReturns(
 							ccv2.Warnings{"warning-5", "warning-6"},
 							returnedError)
 					})
@@ -1768,7 +1768,7 @@ var _ = Describe("Security Group Actions", func() {
 
 				Context("when no errors are encountered", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupReturns(
+						fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceReturns(
 							ccv2.Warnings{"warning-5", "warning-6"},
 							nil)
 					})
@@ -1791,8 +1791,8 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUID, queries := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUID, queries := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 						Expect(queries).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -1800,26 +1800,26 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(0))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(1))
-						securityGroupGUID, spaceGUID := fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupArgsForCall(0)
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(1))
+						securityGroupGUID, spaceGUID := fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(0))
 					})
 				})
 			})
 
 			Context("when the security group is bound to neither running nor staging", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-3", "warning-4"},
 						nil,
 					)
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-5", "warning-6"},
 						nil,
@@ -1838,8 +1838,8 @@ var _ = Describe("Security Group Actions", func() {
 							"warning-6",
 						}))
 
-						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 						Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
 						Expect(queriesStaging).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -1847,8 +1847,8 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 						Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
 						Expect(queriesRunning).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -1856,20 +1856,20 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
-						Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(0))
 					})
 				})
 			})
 
 			Context("when the security group is bound to running", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-3", "warning-4"},
 						nil,
 					)
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-security-group",
@@ -1896,8 +1896,8 @@ var _ = Describe("Security Group Actions", func() {
 						Lifecycle: lifecycle,
 					}))
 
-					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 					Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
 					Expect(queriesStaging).To(Equal([]ccv2.Filter{{
 						Type:     constant.NameFilter,
@@ -1905,8 +1905,8 @@ var _ = Describe("Security Group Actions", func() {
 						Values:   []string{"some-security-group"},
 					}}))
 
-					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 					Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
 					Expect(queriesRunning).To(Equal([]ccv2.Filter{{
 						Type:     constant.NameFilter,
@@ -1914,8 +1914,8 @@ var _ = Describe("Security Group Actions", func() {
 						Values:   []string{"some-security-group"},
 					}}))
 
-					Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(0))
 				})
 			})
 
@@ -1923,13 +1923,13 @@ var _ = Describe("Security Group Actions", func() {
 				var returnedError error
 
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-3", "warning-4"},
 						nil,
 					)
 					returnedError = errors.New("get-space-running-security-groups-error")
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-security-group",
@@ -2068,7 +2068,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			Context("when the security group is bound to running", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-security-group",
@@ -2085,7 +2085,7 @@ var _ = Describe("Security Group Actions", func() {
 
 					BeforeEach(func() {
 						returnedError = errors.New("associate-space-error")
-						fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupReturns(
+						fakeCloudControllerClient.DeleteSecurityGroupSpaceReturns(
 							ccv2.Warnings{"warning-9", "warning-10"},
 							returnedError)
 					})
@@ -2109,7 +2109,7 @@ var _ = Describe("Security Group Actions", func() {
 
 				Context("when no errors are encountered", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupReturns(
+						fakeCloudControllerClient.DeleteSecurityGroupSpaceReturns(
 							ccv2.Warnings{"warning-9", "warning-10"},
 							nil)
 					})
@@ -2154,8 +2154,8 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-org-guid"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUID, queries := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUID, queries := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 						Expect(queries).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -2163,26 +2163,26 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(0))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(1))
-						securityGroupGUID, spaceGUID := fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupArgsForCall(0)
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(1))
+						securityGroupGUID, spaceGUID := fakeCloudControllerClient.DeleteSecurityGroupSpaceArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(0))
 					})
 				})
 			})
 
 			Context("when the security group is bound to neither running nor staging", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-7", "warning-8"},
 						nil,
 					)
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-9", "warning-10"},
 						nil,
@@ -2205,8 +2205,8 @@ var _ = Describe("Security Group Actions", func() {
 						}))
 						Expect(err).ToNot(HaveOccurred())
 
-						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 						Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
 						Expect(queriesRunning).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -2214,8 +2214,8 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 						Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
 						Expect(queriesStaging).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -2223,20 +2223,20 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
-						Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(0))
 					})
 				})
 			})
 
 			Context("when the security group is bound to staging", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-7", "warning-8"},
 						nil,
 					)
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-security-group",
@@ -2266,8 +2266,8 @@ var _ = Describe("Security Group Actions", func() {
 						Lifecycle: lifecycle,
 					}))
 
-					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 					Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
 					Expect(queriesRunning).To(Equal([]ccv2.Filter{{
 						Type:     constant.NameFilter,
@@ -2275,8 +2275,8 @@ var _ = Describe("Security Group Actions", func() {
 						Values:   []string{"some-security-group"},
 					}}))
 
-					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 					Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
 					Expect(queriesStaging).To(Equal([]ccv2.Filter{{
 						Type:     constant.NameFilter,
@@ -2284,8 +2284,8 @@ var _ = Describe("Security Group Actions", func() {
 						Values:   []string{"some-security-group"},
 					}}))
 
-					Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(0))
 				})
 			})
 		})
@@ -2319,7 +2319,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			Context("when the security group is bound to staging", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-security-group",
@@ -2335,7 +2335,7 @@ var _ = Describe("Security Group Actions", func() {
 					var returnedError error
 
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+						fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 							[]ccv2.SecurityGroup{
 								{
 									Name: "some-security-group",
@@ -2346,7 +2346,7 @@ var _ = Describe("Security Group Actions", func() {
 							nil,
 						)
 						returnedError = errors.New("associate-space-error")
-						fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupReturns(
+						fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceReturns(
 							ccv2.Warnings{"warning-9", "warning-10"},
 							returnedError)
 					})
@@ -2370,7 +2370,7 @@ var _ = Describe("Security Group Actions", func() {
 
 				Context("when no errors are encountered", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupReturns(
+						fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceReturns(
 							ccv2.Warnings{"warning-9", "warning-10"},
 							nil)
 					})
@@ -2415,8 +2415,8 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-org-guid"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUID, queries := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUID, queries := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 						Expect(queries).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -2424,26 +2424,26 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(0))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(1))
-						securityGroupGUID, spaceGUID := fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupArgsForCall(0)
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(1))
+						securityGroupGUID, spaceGUID := fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(0))
 					})
 				})
 			})
 
 			Context("when the security group is bound to neither running nor staging", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-7", "warning-8"},
 						nil,
 					)
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-9", "warning-10"},
 						nil,
@@ -2466,8 +2466,8 @@ var _ = Describe("Security Group Actions", func() {
 							"warning-10",
 						}))
 
-						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 						Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
 						Expect(queriesStaging).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -2475,8 +2475,8 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-						spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+						Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+						spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 						Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
 						Expect(queriesRunning).To(Equal([]ccv2.Filter{{
 							Type:     constant.NameFilter,
@@ -2484,20 +2484,20 @@ var _ = Describe("Security Group Actions", func() {
 							Values:   []string{"some-security-group"},
 						}}))
 
-						Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
-						Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(0))
 					})
 				})
 			})
 
 			Context("when the security group is bound to running", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
 						ccv2.Warnings{"warning-7", "warning-8"},
 						nil,
 					)
-					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
 							{
 								Name: "some-security-group",
@@ -2528,8 +2528,8 @@ var _ = Describe("Security Group Actions", func() {
 						Lifecycle: lifecycle,
 					}))
 
-					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsArgsForCall(0)
 					Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
 					Expect(queriesStaging).To(Equal([]ccv2.Filter{{
 						Type:     constant.NameFilter,
@@ -2537,8 +2537,8 @@ var _ = Describe("Security Group Actions", func() {
 						Values:   []string{"some-security-group"},
 					}}))
 
-					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
+					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceSecurityGroupsArgsForCall(0)
 					Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
 					Expect(queriesRunning).To(Equal([]ccv2.Filter{{
 						Type:     constant.NameFilter,
@@ -2546,8 +2546,8 @@ var _ = Describe("Security Group Actions", func() {
 						Values:   []string{"some-security-group"},
 					}}))
 
-					Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.DeleteSecurityGroupSpaceCallCount()).To(Equal(0))
 				})
 			})
 		})

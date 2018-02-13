@@ -300,7 +300,7 @@ var _ = Describe("Space", func() {
 		})
 	})
 
-	Describe("GetRunningSpacesBySecurityGroup", func() {
+	Describe("GetSecurityGroupSpaces", func() {
 		Context("when no errors are encountered", func() {
 			Context("when results are paginated", func() {
 				BeforeEach(func() {
