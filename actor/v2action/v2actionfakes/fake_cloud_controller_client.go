@@ -548,17 +548,17 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetSpaceQuotaStub        func(guid string) (ccv2.SpaceQuota, ccv2.Warnings, error)
-	getSpaceQuotaMutex       sync.RWMutex
-	getSpaceQuotaArgsForCall []struct {
+	GetSpaceQuotaDefinitionStub        func(guid string) (ccv2.SpaceQuota, ccv2.Warnings, error)
+	getSpaceQuotaDefinitionMutex       sync.RWMutex
+	getSpaceQuotaDefinitionArgsForCall []struct {
 		guid string
 	}
-	getSpaceQuotaReturns struct {
+	getSpaceQuotaDefinitionReturns struct {
 		result1 ccv2.SpaceQuota
 		result2 ccv2.Warnings
 		result3 error
 	}
-	getSpaceQuotaReturnsOnCall map[int]struct {
+	getSpaceQuotaDefinitionReturnsOnCall map[int]struct {
 		result1 ccv2.SpaceQuota
 		result2 ccv2.Warnings
 		result3 error
@@ -2865,54 +2865,54 @@ func (fake *FakeCloudControllerClient) GetSharedDomainsReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuota(guid string) (ccv2.SpaceQuota, ccv2.Warnings, error) {
-	fake.getSpaceQuotaMutex.Lock()
-	ret, specificReturn := fake.getSpaceQuotaReturnsOnCall[len(fake.getSpaceQuotaArgsForCall)]
-	fake.getSpaceQuotaArgsForCall = append(fake.getSpaceQuotaArgsForCall, struct {
+func (fake *FakeCloudControllerClient) GetSpaceQuotaDefinition(guid string) (ccv2.SpaceQuota, ccv2.Warnings, error) {
+	fake.getSpaceQuotaDefinitionMutex.Lock()
+	ret, specificReturn := fake.getSpaceQuotaDefinitionReturnsOnCall[len(fake.getSpaceQuotaDefinitionArgsForCall)]
+	fake.getSpaceQuotaDefinitionArgsForCall = append(fake.getSpaceQuotaDefinitionArgsForCall, struct {
 		guid string
 	}{guid})
-	fake.recordInvocation("GetSpaceQuota", []interface{}{guid})
-	fake.getSpaceQuotaMutex.Unlock()
-	if fake.GetSpaceQuotaStub != nil {
-		return fake.GetSpaceQuotaStub(guid)
+	fake.recordInvocation("GetSpaceQuotaDefinition", []interface{}{guid})
+	fake.getSpaceQuotaDefinitionMutex.Unlock()
+	if fake.GetSpaceQuotaDefinitionStub != nil {
+		return fake.GetSpaceQuotaDefinitionStub(guid)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getSpaceQuotaReturns.result1, fake.getSpaceQuotaReturns.result2, fake.getSpaceQuotaReturns.result3
+	return fake.getSpaceQuotaDefinitionReturns.result1, fake.getSpaceQuotaDefinitionReturns.result2, fake.getSpaceQuotaDefinitionReturns.result3
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotaCallCount() int {
-	fake.getSpaceQuotaMutex.RLock()
-	defer fake.getSpaceQuotaMutex.RUnlock()
-	return len(fake.getSpaceQuotaArgsForCall)
+func (fake *FakeCloudControllerClient) GetSpaceQuotaDefinitionCallCount() int {
+	fake.getSpaceQuotaDefinitionMutex.RLock()
+	defer fake.getSpaceQuotaDefinitionMutex.RUnlock()
+	return len(fake.getSpaceQuotaDefinitionArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotaArgsForCall(i int) string {
-	fake.getSpaceQuotaMutex.RLock()
-	defer fake.getSpaceQuotaMutex.RUnlock()
-	return fake.getSpaceQuotaArgsForCall[i].guid
+func (fake *FakeCloudControllerClient) GetSpaceQuotaDefinitionArgsForCall(i int) string {
+	fake.getSpaceQuotaDefinitionMutex.RLock()
+	defer fake.getSpaceQuotaDefinitionMutex.RUnlock()
+	return fake.getSpaceQuotaDefinitionArgsForCall[i].guid
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotaReturns(result1 ccv2.SpaceQuota, result2 ccv2.Warnings, result3 error) {
-	fake.GetSpaceQuotaStub = nil
-	fake.getSpaceQuotaReturns = struct {
+func (fake *FakeCloudControllerClient) GetSpaceQuotaDefinitionReturns(result1 ccv2.SpaceQuota, result2 ccv2.Warnings, result3 error) {
+	fake.GetSpaceQuotaDefinitionStub = nil
+	fake.getSpaceQuotaDefinitionReturns = struct {
 		result1 ccv2.SpaceQuota
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceQuotaReturnsOnCall(i int, result1 ccv2.SpaceQuota, result2 ccv2.Warnings, result3 error) {
-	fake.GetSpaceQuotaStub = nil
-	if fake.getSpaceQuotaReturnsOnCall == nil {
-		fake.getSpaceQuotaReturnsOnCall = make(map[int]struct {
+func (fake *FakeCloudControllerClient) GetSpaceQuotaDefinitionReturnsOnCall(i int, result1 ccv2.SpaceQuota, result2 ccv2.Warnings, result3 error) {
+	fake.GetSpaceQuotaDefinitionStub = nil
+	if fake.getSpaceQuotaDefinitionReturnsOnCall == nil {
+		fake.getSpaceQuotaDefinitionReturnsOnCall = make(map[int]struct {
 			result1 ccv2.SpaceQuota
 			result2 ccv2.Warnings
 			result3 error
 		})
 	}
-	fake.getSpaceQuotaReturnsOnCall[i] = struct {
+	fake.getSpaceQuotaDefinitionReturnsOnCall[i] = struct {
 		result1 ccv2.SpaceQuota
 		result2 ccv2.Warnings
 		result3 error
@@ -4359,8 +4359,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSharedDomainMutex.RUnlock()
 	fake.getSharedDomainsMutex.RLock()
 	defer fake.getSharedDomainsMutex.RUnlock()
-	fake.getSpaceQuotaMutex.RLock()
-	defer fake.getSpaceQuotaMutex.RUnlock()
+	fake.getSpaceQuotaDefinitionMutex.RLock()
+	defer fake.getSpaceQuotaDefinitionMutex.RUnlock()
 	fake.getSpaceRoutesMutex.RLock()
 	defer fake.getSpaceRoutesMutex.RUnlock()
 	fake.getSpaceSecurityGroupsMutex.RLock()

@@ -9,7 +9,7 @@ import (
 type SpaceQuota ccv2.SpaceQuota
 
 func (actor Actor) GetSpaceQuota(guid string) (SpaceQuota, Warnings, error) {
-	spaceQuota, warnings, err := actor.CloudControllerClient.GetSpaceQuota(guid)
+	spaceQuota, warnings, err := actor.CloudControllerClient.GetSpaceQuotaDefinition(guid)
 
 	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
 		return SpaceQuota{}, Warnings(warnings), actionerror.SpaceQuotaNotFoundError{GUID: guid}

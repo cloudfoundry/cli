@@ -42,7 +42,7 @@ type CloudControllerClient interface {
 	GetServicePlan(servicePlanGUID string) (ccv2.ServicePlan, ccv2.Warnings, error)
 	GetSharedDomain(domainGUID string) (ccv2.Domain, ccv2.Warnings, error)
 	GetSharedDomains(filters ...ccv2.Filter) ([]ccv2.Domain, ccv2.Warnings, error)
-	GetSpaceQuota(guid string) (ccv2.SpaceQuota, ccv2.Warnings, error)
+	GetSpaceQuotaDefinition(guid string) (ccv2.SpaceQuota, ccv2.Warnings, error)
 	GetSpaceRoutes(spaceGUID string, filters ...ccv2.Filter) ([]ccv2.Route, ccv2.Warnings, error)
 	GetSpaceSecurityGroups(spaceGUID string, filters ...ccv2.Filter) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, filters ...ccv2.Filter) ([]ccv2.ServiceInstance, ccv2.Warnings, error)

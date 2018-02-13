@@ -78,7 +78,7 @@ var _ = Describe("Space Summary Actions", func() {
 						ccv2.Warnings{"warning-7", "warning-8"},
 						nil)
 
-					fakeCloudControllerClient.GetSpaceQuotaReturns(
+					fakeCloudControllerClient.GetSpaceQuotaDefinitionReturns(
 						ccv2.SpaceQuota{
 							GUID: "some-space-quota-guid",
 							Name: "some-space-quota",
@@ -301,8 +301,8 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(includeUserProvidedServices).To(BeTrue())
 					Expect(filters).To(BeNil())
 
-					Expect(fakeCloudControllerClient.GetSpaceQuotaCallCount()).To(Equal(1))
-					spaceQuotaGUID := fakeCloudControllerClient.GetSpaceQuotaArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceQuotaDefinitionCallCount()).To(Equal(1))
+					spaceQuotaGUID := fakeCloudControllerClient.GetSpaceQuotaDefinitionArgsForCall(0)
 					Expect(spaceQuotaGUID).To(Equal("some-space-quota-guid"))
 
 					Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))
@@ -330,7 +330,7 @@ var _ = Describe("Space Summary Actions", func() {
 					})
 
 					It("does not request space quota information or return a space quota name", func() {
-						Expect(fakeCloudControllerClient.GetSpaceQuotaCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetSpaceQuotaDefinitionCallCount()).To(Equal(0))
 						Expect(spaceSummary.SpaceQuotaName).To(Equal(""))
 					})
 				})
@@ -519,7 +519,7 @@ var _ = Describe("Space Summary Actions", func() {
 						nil,
 						nil)
 
-					fakeCloudControllerClient.GetSpaceQuotaReturns(
+					fakeCloudControllerClient.GetSpaceQuotaDefinitionReturns(
 						ccv2.SpaceQuota{},
 						ccv2.Warnings{"warning-1", "warning-2"},
 						expectedErr)
@@ -582,7 +582,7 @@ var _ = Describe("Space Summary Actions", func() {
 						nil,
 						nil)
 
-					fakeCloudControllerClient.GetSpaceQuotaReturns(
+					fakeCloudControllerClient.GetSpaceQuotaDefinitionReturns(
 						ccv2.SpaceQuota{
 							GUID: "some-space-quota-guid",
 							Name: "some-space-quota",
@@ -653,7 +653,7 @@ var _ = Describe("Space Summary Actions", func() {
 						nil,
 						nil)
 
-					fakeCloudControllerClient.GetSpaceQuotaReturns(
+					fakeCloudControllerClient.GetSpaceQuotaDefinitionReturns(
 						ccv2.SpaceQuota{
 							GUID: "some-space-quota-guid",
 							Name: "some-space-quota",
@@ -732,7 +732,7 @@ var _ = Describe("Space Summary Actions", func() {
 						ccv2.Warnings{"warning-7", "warning-8"},
 						nil)
 
-					fakeCloudControllerClient.GetSpaceQuotaReturns(
+					fakeCloudControllerClient.GetSpaceQuotaDefinitionReturns(
 						ccv2.SpaceQuota{
 							GUID: "some-space-quota-guid",
 							Name: "some-space-quota",
@@ -882,8 +882,8 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(includeUserProvidedServices).To(BeTrue())
 					Expect(filters).To(BeNil())
 
-					Expect(fakeCloudControllerClient.GetSpaceQuotaCallCount()).To(Equal(1))
-					spaceQuotaGUID := fakeCloudControllerClient.GetSpaceQuotaArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetSpaceQuotaDefinitionCallCount()).To(Equal(1))
+					spaceQuotaGUID := fakeCloudControllerClient.GetSpaceQuotaDefinitionArgsForCall(0)
 					Expect(spaceQuotaGUID).To(Equal("some-space-quota-guid"))
 
 					Expect(fakeCloudControllerClient.GetSpaceSecurityGroupsCallCount()).To(Equal(1))

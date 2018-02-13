@@ -17,7 +17,7 @@ var _ = Describe("Space Quotas", func() {
 		client = NewTestClient()
 	})
 
-	Describe("GetSpaceQuota", func() {
+	Describe("GetSpaceQuotaDefinition", func() {
 		Context("when no errors are encountered", func() {
 			BeforeEach(func() {
 				response := `{
@@ -39,7 +39,7 @@ var _ = Describe("Space Quotas", func() {
 			})
 
 			It("returns the Space Quota", func() {
-				spaceQuota, warnings, err := client.GetSpaceQuota("space-quota-guid")
+				spaceQuota, warnings, err := client.GetSpaceQuotaDefinition("space-quota-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 				Expect(spaceQuota).To(Equal(SpaceQuota{

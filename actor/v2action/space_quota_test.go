@@ -26,7 +26,7 @@ var _ = Describe("SpaceQuota Actions", func() {
 	Describe("GetSpaceQuota", func() {
 		Context("when the space quota exists", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpaceQuotaReturns(
+				fakeCloudControllerClient.GetSpaceQuotaDefinitionReturns(
 					ccv2.SpaceQuota{
 						GUID: "some-space-quota-guid",
 						Name: "some-space-quota",
@@ -45,15 +45,15 @@ var _ = Describe("SpaceQuota Actions", func() {
 				}))
 				Expect(warnings).To(ConsistOf("warning-1"))
 
-				Expect(fakeCloudControllerClient.GetSpaceQuotaCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetSpaceQuotaArgsForCall(0)).To(Equal(
+				Expect(fakeCloudControllerClient.GetSpaceQuotaDefinitionCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpaceQuotaDefinitionArgsForCall(0)).To(Equal(
 					"some-space-quota-guid"))
 			})
 		})
 
 		Context("when the space quota does not exist", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpaceQuotaReturns(ccv2.SpaceQuota{}, nil, ccerror.ResourceNotFoundError{})
+				fakeCloudControllerClient.GetSpaceQuotaDefinitionReturns(ccv2.SpaceQuota{}, nil, ccerror.ResourceNotFoundError{})
 			})
 
 			It("returns an SpaceQuotaNotFoundError", func() {
@@ -67,7 +67,7 @@ var _ = Describe("SpaceQuota Actions", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("some space quota error")
-				fakeCloudControllerClient.GetSpaceQuotaReturns(ccv2.SpaceQuota{}, ccv2.Warnings{"warning-1", "warning-2"}, expectedErr)
+				fakeCloudControllerClient.GetSpaceQuotaDefinitionReturns(ccv2.SpaceQuota{}, ccv2.Warnings{"warning-1", "warning-2"}, expectedErr)
 			})
 
 			It("returns the error and warnings", func() {
