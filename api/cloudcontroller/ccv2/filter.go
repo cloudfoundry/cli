@@ -11,9 +11,14 @@ import (
 // Filter is a type of filter that can be passed to specific request to narrow
 // down the return set.
 type Filter struct {
-	Type     constant.FilterType
+	// Type is the component that determines what the query is filtered by.
+	Type constant.FilterType
+
+	// Operator is the component that determines how the the query will be filtered.
 	Operator constant.FilterOperator
-	Values   []string
+
+	// Values is the component that determines what values are filtered.
+	Values []string
 }
 
 func (filter Filter) format() string {

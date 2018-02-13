@@ -11,11 +11,23 @@ import (
 
 // Domain represents a Cloud Controller Domain.
 type Domain struct {
-	GUID            string
-	Name            string
+	// GUID is the unique domain identifier.
+	GUID string
+
+	// Name is the name given to the domain.
+	Name string
+
+	// RouterGroupGUID is the unique identier of the router group this domain is
+	// assigned to.
 	RouterGroupGUID string
+
+	// RouterGroupType is the type of router group this domain is assigned to. It
+	// can be of type `tcp` or `http`.
 	RouterGroupType constant.RouterGroupType
-	Type            constant.DomainType
+
+	// DomainType is the access type of the domain. It can be either a domain
+	// private to a single org or it can be a domain shared to all orgs.
+	Type constant.DomainType
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Domain response.

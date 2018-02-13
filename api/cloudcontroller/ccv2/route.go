@@ -16,12 +16,24 @@ import (
 
 // Route represents a Cloud Controller Route.
 type Route struct {
-	GUID       string        `json:"-"`
-	Host       string        `json:"host,omitempty"`
-	Path       string        `json:"path,omitempty"`
-	Port       types.NullInt `json:"port,omitempty"`
-	DomainGUID string        `json:"domain_guid"`
-	SpaceGUID  string        `json:"space_guid"`
+
+	// GUID is the unique Route identifier.
+	GUID string `json:"-"`
+
+	// Host is the hostname of the route.
+	Host string `json:"host,omitempty"`
+
+	// Path is the path of the route.
+	Path string `json:"path,omitempty"`
+
+	// Port is the port number of the route.
+	Port types.NullInt `json:"port,omitempty"`
+
+	// DomainGUID is the unique Domain identifier.
+	DomainGUID string `json:"domain_guid"`
+
+	// SpaceGUID is the unique Space identifier.
+	SpaceGUID string `json:"space_guid"`
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Route response.

@@ -65,7 +65,7 @@ var _ = Describe("Space Quotas", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				_, warnings, err := client.GetSpaceQuota("some-space-quota-guid")
+				_, warnings, err := client.GetSpaceQuotaDefinition("some-space-quota-guid")
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "The space quota could not be found: some-space-quota-guid"}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})

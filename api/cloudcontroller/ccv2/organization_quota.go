@@ -9,7 +9,11 @@ import (
 
 // OrganizationQuota is the definition of a quota for an organization.
 type OrganizationQuota struct {
+
+	// GUID is the unique OrganizationQuota identifier.
 	GUID string
+
+	// Name is the name of the OrganizationQuota.
 	Name string
 }
 
@@ -31,7 +35,7 @@ func (application *OrganizationQuota) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// GetOrganizaitonQuota gets an organization quota (quota definition) from the API.
+// GetOrganizationQuota gets an organization quota (quota definition) from the API.
 func (client *Client) GetOrganizationQuota(guid string) (OrganizationQuota, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationQuotaDefinitionRequest,

@@ -23,11 +23,20 @@ type Reader interface {
 
 // Job represents a Cloud Controller Job.
 type Job struct {
-	Error        string
+
+	// Error is the error a job returns if it failed. It is otherwise empty.
+	Error string
+
+	// ErrorDetails is a detailed description of a job failure returned by the
+	// Cloud Controller.
 	ErrorDetails struct {
 		Description string
 	}
-	GUID   string
+
+	// GUID is the unique job identifier.
+	GUID string
+
+	// Status is the current state of the job.
 	Status constant.JobStatus
 }
 
@@ -193,6 +202,9 @@ func (client *Client) UploadApplicationPackage(appGUID string, existingResources
 	return client.uploadNewAndExistingResources(appGUID, existingResources, newResources, newResourcesLength)
 }
 
+// UploadDroplet defines and uploads a previously staged droplet that an
+// application will run, using a multipart PUT request. The uploaded file
+// should be a gzipped tar file.
 func (client *Client) UploadDroplet(appGUID string, droplet io.Reader, dropletLength int64) (Job, Warnings, error) {
 	contentLength, err := client.calculateDropletRequestSize(dropletLength)
 	if err != nil {

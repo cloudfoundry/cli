@@ -10,9 +10,19 @@ import (
 
 // Organization represents a Cloud Controller Organization.
 type Organization struct {
-	GUID                        string
-	Name                        string
-	QuotaDefinitionGUID         string
+
+	// GUID is the unique Organization identifier.
+	GUID string
+
+	// Name is the organization's name.
+	Name string
+
+	// QuotaDefinitionGUID is unique identifier of the quota assigned to this
+	// organization.
+	QuotaDefinitionGUID string
+
+	// DefaultIsolationSegmentGUID is the unique identifier of the isolation
+	// segment this organization is tagged with.
 	DefaultIsolationSegmentGUID string
 }
 
