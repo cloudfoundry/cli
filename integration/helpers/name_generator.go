@@ -21,7 +21,7 @@ func NewServiceBrokerName() string {
 }
 
 func NewPassword() string {
-	return PrefixedRandomName("password")
+	return PrefixedRandomName("INTEGRATION-PASSWORD")
 }
 
 func NewSecurityGroupName(infix ...string) string {
@@ -37,7 +37,7 @@ func NewSpaceName() string {
 }
 
 func NewUsername() string {
-	return PrefixedRandomName("integration-user")
+	return PrefixedRandomName("INTEGRATION-USER")
 }
 
 func PrefixedRandomName(namePrefix string) string {
