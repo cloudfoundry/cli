@@ -24,7 +24,6 @@ const (
 
 	// DefaultStartupTimeout is the default timeout for application starting.
 	DefaultStartupTimeout = 5 * time.Minute
-	// DefaultPingerThrottle = 5 * time.Second
 
 	// DefaultTarget is the default CFConfig value for Target.
 	DefaultTarget = ""
@@ -44,3 +43,18 @@ const (
 	// DefaultRetryCount is the default number of request retries.
 	DefaultRetryCount = 2
 )
+
+// NOAARequestRetryCount returns the number of request retries.
+func (*Config) NOAARequestRetryCount() int {
+	return DefaultNOAARetryCount
+}
+
+// PollingInterval returns the time between polls.
+func (config *Config) PollingInterval() time.Duration {
+	return DefaultPollingInterval
+}
+
+// RequestRetryCount returns the number of request retries.
+func (*Config) RequestRetryCount() int {
+	return DefaultRetryCount
+}

@@ -4,7 +4,6 @@ package configv3
 import (
 	"path/filepath"
 	"strconv"
-	"time"
 
 	"code.cloudfoundry.org/cli/version"
 )
@@ -37,11 +36,6 @@ type detectedSettings struct {
 	currentDirectory string
 	terminalWidth    int
 	tty              bool
-}
-
-// PollingInterval returns the time between polls.
-func (config *Config) PollingInterval() time.Duration {
-	return DefaultPollingInterval
 }
 
 // Verbose returns true if verbose should be displayed to terminal, in addition
@@ -109,14 +103,4 @@ func (config *Config) TerminalWidth() int {
 
 func (config *Config) BinaryVersion() string {
 	return version.VersionString()
-}
-
-// RequestRetryCount returns the number of request retries.
-func (*Config) RequestRetryCount() int {
-	return DefaultRetryCount
-}
-
-// NOAARequestRetryCount returns the number of request retries.
-func (*Config) NOAARequestRetryCount() int {
-	return DefaultNOAARetryCount
 }
