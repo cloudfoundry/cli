@@ -42,7 +42,7 @@ var _ = Describe("api command", func() {
 					space = "the-space"
 
 					userConfig := configv3.Config{
-						ConfigFile: configv3.CFConfig{
+						ConfigFile: configv3.JSONConfig{
 							Target:      target,
 							APIVersion:  apiVersion,
 							AccessToken: "bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiI3YzZkMDA2MjA2OTI0NmViYWI0ZjBmZjY3NGQ3Zjk4OSIsInN1YiI6Ijk1MTliZTNlLTQ0ZDktNDBkMC1hYjlhLWY0YWNlMTFkZjE1OSIsInNjb3BlIjpbIm9wZW5pZCIsInJvdXRpbmcucm91dGVyX2dyb3Vwcy53cml0ZSIsInNjaW0ucmVhZCIsImNsb3VkX2NvbnRyb2xsZXIuYWRtaW4iLCJ1YWEudXNlciIsInJvdXRpbmcucm91dGVyX2dyb3Vwcy5yZWFkIiwiY2xvdWRfY29udHJvbGxlci5yZWFkIiwicGFzc3dvcmQud3JpdGUiLCJjbG91ZF9jb250cm9sbGVyLndyaXRlIiwiZG9wcGxlci5maXJlaG9zZSIsInNjaW0ud3JpdGUiXSwiY2xpZW50X2lkIjoiY2YiLCJjaWQiOiJjZiIsImF6cCI6ImNmIiwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9pZCI6Ijk1MTliZTNlLTQ0ZDktNDBkMC1hYjlhLWY0YWNlMTFkZjE1OSIsIm9yaWdpbiI6InVhYSIsInVzZXJfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbiIsImF1dGhfdGltZSI6MTQ3MzI4NDU3NywicmV2X3NpZyI6IjZiMjdkYTZjIiwiaWF0IjoxNDczMjg0NTc3LCJleHAiOjE0NzMyODUxNzcsImlzcyI6Imh0dHBzOi8vdWFhLmJvc2gtbGl0ZS5jb20vb2F1dGgvdG9rZW4iLCJ6aWQiOiJ1YWEiLCJhdWQiOlsiY2YiLCJvcGVuaWQiLCJyb3V0aW5nLnJvdXRlcl9ncm91cHMiLCJzY2ltIiwiY2xvdWRfY29udHJvbGxlciIsInVhYSIsInBhc3N3b3JkIiwiZG9wcGxlciJdfQ.OcH_w9yIKJkEcTZMThIs-qJAHk3G0JwNjG-aomVH9hKye4ciFO6IMQMLKmCBrrAQVc7ST1SZZwq7gv12Dq__6Jp-hai0a2_ADJK-Vc9YXyNZKgYTWIeVNGM1JGdHgFSrBR2Lz7IIrH9HqeN8plrKV5HzU8uI9LL4lyOCjbXJ9cM",
@@ -83,7 +83,7 @@ var _ = Describe("api command", func() {
 			BeforeEach(func() {
 
 				userConfig := configv3.Config{
-					ConfigFile: configv3.CFConfig{
+					ConfigFile: configv3.JSONConfig{
 						ConfigVersion: 3,
 						Target:        "https://api.fake.com",
 						APIVersion:    "2.59.0",
@@ -110,7 +110,7 @@ var _ = Describe("api command", func() {
 				rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 				Expect(err).NotTo(HaveOccurred())
 
-				var configFile configv3.CFConfig
+				var configFile configv3.JSONConfig
 				err = json.Unmarshal(rawConfig, &configFile)
 				Expect(err).NotTo(HaveOccurred())
 
@@ -215,7 +215,7 @@ var _ = Describe("api command", func() {
 			rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 			Expect(err).NotTo(HaveOccurred())
 
-			var configFile configv3.CFConfig
+			var configFile configv3.JSONConfig
 			err = json.Unmarshal(rawConfig, &configFile)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -246,7 +246,7 @@ var _ = Describe("api command", func() {
 			rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 			Expect(err).NotTo(HaveOccurred())
 
-			var configFile configv3.CFConfig
+			var configFile configv3.JSONConfig
 			err = json.Unmarshal(rawConfig, &configFile)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -261,7 +261,7 @@ var _ = Describe("api command", func() {
 		rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 		Expect(err).NotTo(HaveOccurred())
 
-		var configFile configv3.CFConfig
+		var configFile configv3.JSONConfig
 		err = json.Unmarshal(rawConfig, &configFile)
 		Expect(err).NotTo(HaveOccurred())
 

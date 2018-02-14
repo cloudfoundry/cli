@@ -11,7 +11,7 @@ var _ = Describe("PluginRepository", func() {
 	Describe("PluginRepositories", func() {
 		It("returns sorted plugin repositories", func() {
 			config := Config{
-				ConfigFile: CFConfig{
+				ConfigFile: JSONConfig{
 					PluginRepositories: []PluginRepository{
 						{Name: "S-repo", URL: "S-repo.com"},
 						{Name: "repo-2", URL: "repo2.com"},
@@ -31,7 +31,7 @@ var _ = Describe("PluginRepository", func() {
 	Describe("AddPluginRepository", func() {
 		It("adds the repo name and url to the list of repositories", func() {
 			config := Config{
-				ConfigFile: CFConfig{
+				ConfigFile: JSONConfig{
 					PluginRepositories: []PluginRepository{
 						{Name: "S-repo", URL: "S-repo.com"},
 						{Name: "repo-2", URL: "repo2.com"},

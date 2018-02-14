@@ -542,7 +542,7 @@ var _ = Describe("Config", func() {
 		Describe("APIVersion", func() {
 			It("returns the api version", func() {
 				config := Config{
-					ConfigFile: CFConfig{
+					ConfigFile: JSONConfig{
 						APIVersion: "2.59.0",
 					},
 				}
@@ -554,7 +554,7 @@ var _ = Describe("Config", func() {
 		Describe("MinCLIVersion", func() {
 			It("returns the minimum CLI version the CC requires", func() {
 				config := Config{
-					ConfigFile: CFConfig{
+					ConfigFile: JSONConfig{
 						MinCLIVersion: "1.0.0",
 					},
 				}
@@ -570,7 +570,7 @@ var _ = Describe("Config", func() {
 					Name: "some-org",
 				}
 				config := Config{
-					ConfigFile: CFConfig{
+					ConfigFile: JSONConfig{
 						TargetedOrganization: organization,
 					},
 				}
@@ -586,7 +586,7 @@ var _ = Describe("Config", func() {
 					Name: "some-space",
 				}
 				config := Config{
-					ConfigFile: CFConfig{
+					ConfigFile: JSONConfig{
 						TargetedSpace: space,
 					},
 				}
@@ -664,7 +664,7 @@ var _ = Describe("Config", func() {
 
 		BeforeEach(func() {
 			config = &Config{
-				ConfigFile: CFConfig{
+				ConfigFile: JSONConfig{
 					ConfigVersion: 3,
 					Target:        "foo.com",
 					ColorEnabled:  "true",
@@ -683,7 +683,7 @@ var _ = Describe("Config", func() {
 				file, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 				Expect(err).ToNot(HaveOccurred())
 
-				var writtenCFConfig CFConfig
+				var writtenCFConfig JSONConfig
 				err = json.Unmarshal(file, &writtenCFConfig)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -698,7 +698,7 @@ var _ = Describe("Config", func() {
 		Describe("SetTargetInformation", func() {
 			It("sets the api target and other related endpoints", func() {
 				config := Config{
-					ConfigFile: CFConfig{
+					ConfigFile: JSONConfig{
 						TargetedOrganization: Organization{
 							GUID: "this-is-a-guid",
 							Name: "jo bobo jim boo",
