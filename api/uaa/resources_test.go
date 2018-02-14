@@ -12,24 +12,19 @@ import (
 
 var _ = Describe("SetupResources", func() {
 	var (
-		client            *Client
+		client     *Client
+		fakeConfig *uaafakes.FakeConfig
+
 		setupResourcesErr error
-		fakeStore         *uaafakes.FakeUAAEndpointStore
 	)
 
-	JustBeforeEach(func() {
-		fakeStore = new(uaafakes.FakeUAAEndpointStore)
-		setupResourcesErr = client.SetupResources(fakeStore, server.URL())
+	BeforeEach(func() {
+		fakeConfig = NewTestConfig()
+		client = NewClient(fakeConfig)
 	})
 
-	BeforeEach(func() {
-		client = NewClient(Config{
-			AppName:           "CF CLI UAA API Test",
-			AppVersion:        "Unknown",
-			ClientID:          "client-id",
-			ClientSecret:      "client-secret",
-			SkipSSLValidation: true,
-		})
+	JustBeforeEach(func() {
+		setupResourcesErr = client.SetupResources(server.URL())
 	})
 
 	Context("when the authentication server returns an error", func() {
@@ -44,7 +39,7 @@ var _ = Describe("SetupResources", func() {
 
 		It("returns the error", func() {
 			Expect(setupResourcesErr).To(HaveOccurred())
-			Expect(fakeStore.SetUAAEndpointCallCount()).To(Equal(0))
+			Expect(fakeConfig.SetUAAEndpointCallCount()).To(Equal(0))
 		})
 	})
 
@@ -67,8 +62,8 @@ var _ = Describe("SetupResources", func() {
 
 			It("sets the UAA endpoint to the UAA link and does not return an error", func() {
 				Expect(setupResourcesErr).ToNot(HaveOccurred())
-				Expect(fakeStore.SetUAAEndpointCallCount()).To(Equal(1))
-				Expect(fakeStore.SetUAAEndpointArgsForCall(0)).To(Equal("https://uaa.bosh-lite.com"))
+				Expect(fakeConfig.SetUAAEndpointCallCount()).To(Equal(1))
+				Expect(fakeConfig.SetUAAEndpointArgsForCall(0)).To(Equal("https://uaa.bosh-lite.com"))
 			})
 		})
 
@@ -88,8 +83,8 @@ var _ = Describe("SetupResources", func() {
 
 			It("sets the UAA endpoint to the bootstrap endpoint and does not return an error", func() {
 				Expect(setupResourcesErr).ToNot(HaveOccurred())
-				Expect(fakeStore.SetUAAEndpointCallCount()).To(Equal(1))
-				Expect(fakeStore.SetUAAEndpointArgsForCall(0)).To(Equal(server.URL()))
+				Expect(fakeConfig.SetUAAEndpointCallCount()).To(Equal(1))
+				Expect(fakeConfig.SetUAAEndpointArgsForCall(0)).To(Equal(server.URL()))
 			})
 		})
 	})

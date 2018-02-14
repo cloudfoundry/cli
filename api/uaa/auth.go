@@ -39,7 +39,7 @@ func (client Client) Authenticate(ID string, secret string, grantType constant.G
 	if err != nil {
 		return "", "", err
 	}
-	request.SetBasicAuth(client.id, client.secret)
+	request.SetBasicAuth(client.config.UAAOAuthClient(), client.config.UAAOAuthClientSecret())
 
 	responseBody := AuthResponse{}
 	response := Response{

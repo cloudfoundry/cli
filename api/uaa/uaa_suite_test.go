@@ -28,7 +28,6 @@ var (
 
 	TestAuthorizationResource string
 	TestUAAResource           string
-	TestSuiteFakeStore        *uaafakes.FakeUAAEndpointStore
 )
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -57,21 +56,24 @@ var _ = BeforeEach(func() {
 	server.Reset()
 })
 
-func NewTestUAAClientAndStore() *Client {
+func NewTestConfig() *uaafakes.FakeConfig {
+	config := new(uaafakes.FakeConfig)
+	config.BinaryNameReturns("CF CLI UAA API Test")
+	config.BinaryVersionReturns("Unknown")
+	config.UAAOAuthClientReturns("client-id")
+	config.UAAOAuthClientSecretReturns("client-secret")
+	config.SkipSSLValidationReturns(true)
+	return config
+}
+
+func NewTestUAAClientAndStore(config Config) *Client {
 	SetupBootstrapResponse()
 
-	client := NewClient(Config{
-		AppName:           "CF CLI UAA API Test",
-		AppVersion:        "Unknown",
-		ClientID:          "client-id",
-		ClientSecret:      "client-secret",
-		SkipSSLValidation: true,
-	})
+	client := NewClient(config)
 
 	// the 'uaaServer' is discovered via the bootstrapping when we hit the /login
 	// endpoint on 'server'
-	TestSuiteFakeStore = new(uaafakes.FakeUAAEndpointStore)
-	err := client.SetupResources(TestSuiteFakeStore, server.URL())
+	err := client.SetupResources(server.URL())
 	Expect(err).ToNot(HaveOccurred())
 
 	return client

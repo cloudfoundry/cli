@@ -24,8 +24,8 @@ func (refreshTokenResponse RefreshedTokens) AuthorizationToken() string {
 // RefreshAccessToken refreshes the current access token.
 func (client *Client) RefreshAccessToken(refreshToken string) (RefreshedTokens, error) {
 	body := strings.NewReader(url.Values{
-		"client_id":     {client.id},
-		"client_secret": {client.secret},
+		"client_id":     {client.config.UAAOAuthClient()},
+		"client_secret": {client.config.UAAOAuthClientSecret()},
 		"grant_type":    {"refresh_token"},
 		"refresh_token": {refreshToken},
 	}.Encode())
@@ -39,7 +39,7 @@ func (client *Client) RefreshAccessToken(refreshToken string) (RefreshedTokens, 
 		return RefreshedTokens{}, err
 	}
 
-	request.SetBasicAuth(client.id, client.secret)
+	request.SetBasicAuth(client.config.UAAOAuthClient(), client.config.UAAOAuthClientSecret())
 
 	var refreshResponse RefreshedTokens
 	response := Response{

@@ -58,14 +58,7 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 		return nil, nil, translatableerror.UAAEndpointNotFoundError{}
 	}
 
-	uaaClient := uaa.NewClient(uaa.Config{
-		AppName:           config.BinaryName(),
-		AppVersion:        config.BinaryVersion(),
-		ClientID:          config.UAAOAuthClient(),
-		ClientSecret:      config.UAAOAuthClientSecret(),
-		DialTimeout:       config.DialTimeout(),
-		SkipSSLValidation: config.SkipSSLValidation(),
-	})
+	uaaClient := uaa.NewClient(config)
 
 	if verbose {
 		uaaClient.WrapConnection(uaaWrapper.NewRequestLogger(ui.RequestLoggerTerminalDisplay()))
@@ -78,7 +71,7 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
-	err = uaaClient.SetupResources(config, ccClient.UAA())
+	err = uaaClient.SetupResources(ccClient.UAA())
 	if err != nil {
 		return nil, nil, err
 	}

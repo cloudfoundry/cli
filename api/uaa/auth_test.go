@@ -6,6 +6,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,10 +16,14 @@ import (
 var _ = Describe("Auth", func() {
 	var (
 		client *Client
+
+		fakeConfig *uaafakes.FakeConfig
 	)
 
 	BeforeEach(func() {
-		client = NewTestUAAClientAndStore()
+		fakeConfig = NewTestConfig()
+
+		client = NewTestUAAClientAndStore(fakeConfig)
 	})
 
 	Describe("Authenticate", func() {

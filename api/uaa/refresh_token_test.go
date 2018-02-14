@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -12,10 +13,16 @@ import (
 )
 
 var _ = Describe("UAA Client", func() {
-	var client *Client
+	var (
+		client *Client
+
+		fakeConfig *uaafakes.FakeConfig
+	)
 
 	BeforeEach(func() {
-		client = NewTestUAAClientAndStore()
+		fakeConfig = NewTestConfig()
+
+		client = NewTestUAAClientAndStore(fakeConfig)
 	})
 
 	Describe("RefreshAccessToken", func() {
