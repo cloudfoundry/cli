@@ -50,6 +50,49 @@ var _ = Describe("JSONConfig", func() {
 		})
 	})
 
+	Describe("CurrentUser", func() {
+		Context("when using client credentials and the user token is set", func() {
+			It("returns the user", func() {
+				config := Config{
+					ConfigFile: JSONConfig{
+						AccessToken: AccessTokenForClientUsers,
+					},
+				}
+
+				user, err := config.CurrentUser()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(user).To(Equal(User{
+					Name: "potato-face",
+				}))
+			})
+		})
+
+		Context("when using user/password and the user token is set", func() {
+			It("returns the user", func() {
+				config := Config{
+					ConfigFile: JSONConfig{
+						AccessToken: AccessTokenForHumanUsers,
+					},
+				}
+
+				user, err := config.CurrentUser()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(user).To(Equal(User{
+					Name: "admin",
+				}))
+			})
+		})
+
+		Context("when the user token is blank", func() {
+			It("returns the user", func() {
+				var config Config
+				user, err := config.CurrentUser()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(user).To(Equal(User{}))
+			})
+		})
+	})
+
 	Describe("HasTargetedOrganization", func() {
 		Context("when an organization is targeted", func() {
 			It("returns true", func() {

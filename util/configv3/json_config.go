@@ -1,6 +1,10 @@
 package configv3
 
-import "time"
+import (
+	"time"
+
+	"github.com/SermoDigital/jose/jws"
+)
 
 // JSONConfig represents .cf/config.json.
 type JSONConfig struct {
@@ -55,6 +59,11 @@ type Space struct {
 	AllowSSH bool   `json:"AllowSSH"`
 }
 
+// User represents the user information provided by the JWT access token.
+type User struct {
+	Name string
+}
+
 // AccessToken returns the access token for making authenticated API calls.
 func (config *Config) AccessToken() string {
 	return config.ConfigFile.AccessToken
@@ -65,17 +74,23 @@ func (config *Config) APIVersion() string {
 	return config.ConfigFile.APIVersion
 }
 
-// HasTargetedOrganization returns true if the organization is set
+// CurrentUser returns user information decoded from the JWT access token in
+// .cf/config.json.
+func (config *Config) CurrentUser() (User, error) {
+	return decodeUserFromJWT(config.ConfigFile.AccessToken)
+}
+
+// HasTargetedOrganization returns true if the organization is set.
 func (config *Config) HasTargetedOrganization() bool {
 	return config.ConfigFile.TargetedOrganization.GUID != ""
 }
 
-// HasTargetedSpace returns true if the space is set
+// HasTargetedSpace returns true if the space is set.
 func (config *Config) HasTargetedSpace() bool {
 	return config.ConfigFile.TargetedSpace.GUID != ""
 }
 
-// MinCLIVersion returns the minimum CLI version requried by the CC
+// MinCLIVersion returns the minimum CLI version requried by the CC.
 func (config *Config) MinCLIVersion() string {
 	return config.ConfigFile.MinCLIVersion
 }
@@ -96,24 +111,24 @@ func (config *Config) RefreshToken() string {
 	return config.ConfigFile.RefreshToken
 }
 
-// SetAccessToken sets the current access token
+// SetAccessToken sets the current access token.
 func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken
 }
 
-// SetOrganizationInformation sets the currently targeted organization
+// SetOrganizationInformation sets the currently targeted organization.
 func (config *Config) SetOrganizationInformation(guid string, name string) {
 	config.ConfigFile.TargetedOrganization.GUID = guid
 	config.ConfigFile.TargetedOrganization.Name = name
 	config.ConfigFile.TargetedOrganization.QuotaDefinition = QuotaDefinition{}
 }
 
-// SetRefreshToken sets the current refresh token
+// SetRefreshToken sets the current refresh token.
 func (config *Config) SetRefreshToken(refreshToken string) {
 	config.ConfigFile.RefreshToken = refreshToken
 }
 
-// SetSpaceInformation sets the currently targeted space
+// SetSpaceInformation sets the currently targeted space.
 func (config *Config) SetSpaceInformation(guid string, name string, allowSSH bool) {
 	config.ConfigFile.TargetedSpace.GUID = guid
 	config.ConfigFile.TargetedSpace.Name = name
@@ -121,7 +136,7 @@ func (config *Config) SetSpaceInformation(guid string, name string, allowSSH boo
 }
 
 // SetTargetInformation sets the currently targeted CC API and related other
-// related API URLs
+// related API URLs.
 func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool) {
 	config.ConfigFile.Target = api
 	config.ConfigFile.APIVersion = apiVersion
@@ -135,7 +150,7 @@ func (config *Config) SetTargetInformation(api string, apiVersion string, auth s
 	config.UnsetSpaceInformation()
 }
 
-// SetTokenInformation sets the current token/user information
+// SetTokenInformation sets the current token/user information.
 func (config *Config) SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string) {
 	config.ConfigFile.AccessToken = accessToken
 	config.ConfigFile.RefreshToken = refreshToken
@@ -143,7 +158,7 @@ func (config *Config) SetTokenInformation(accessToken string, refreshToken strin
 }
 
 // SetUAAEndpoint sets the UAA endpoint that is obtained from hitting
-// <AuthorizationEndpoint>/login
+// <AuthorizationEndpoint>/login.
 func (config *Config) SetUAAEndpoint(uaaEndpoint string) {
 	config.ConfigFile.UAAEndpoint = uaaEndpoint
 }
@@ -165,12 +180,12 @@ func (config *Config) Target() string {
 	return config.ConfigFile.Target
 }
 
-// TargetedOrganization returns the currently targeted organization
+// TargetedOrganization returns the currently targeted organization.
 func (config *Config) TargetedOrganization() Organization {
 	return config.ConfigFile.TargetedOrganization
 }
 
-// TargetedSpace returns the currently targeted space
+// TargetedSpace returns the currently targeted space.
 func (config *Config) TargetedSpace() Space {
 	return config.ConfigFile.TargetedSpace
 }
@@ -185,13 +200,36 @@ func (config *Config) UAAOAuthClientSecret() string {
 	return config.ConfigFile.UAAOAuthClientSecret
 }
 
-// UnsetOrganizationInformation resets the organization values to default
+// UnsetOrganizationInformation resets the organization values to default.
 func (config *Config) UnsetOrganizationInformation() {
 	config.SetOrganizationInformation("", "")
 
 }
 
-// UnsetSpaceInformation resets the space values to default
+// UnsetSpaceInformation resets the space values to default.
 func (config *Config) UnsetSpaceInformation() {
 	config.SetSpaceInformation("", "", false)
+}
+
+func decodeUserFromJWT(accessToken string) (User, error) {
+	if accessToken == "" {
+		return User{}, nil
+	}
+
+	token, err := jws.ParseJWT([]byte(accessToken[7:]))
+	if err != nil {
+		return User{}, err
+	}
+
+	claims := token.Claims()
+
+	var ID string
+	if claims.Has("user_name") {
+		ID = claims.Get("user_name").(string)
+	} else {
+		ID = claims.Get("client_id").(string)
+	}
+	return User{
+		Name: ID,
+	}, nil
 }
