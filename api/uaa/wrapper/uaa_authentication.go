@@ -108,5 +108,6 @@ func skipAuthenticationHeader(request *http.Request, body []byte) bool {
 	return strings.Contains(request.URL.String(), "/oauth/token") &&
 		request.Method == http.MethodPost &&
 		(strings.Contains(stringBody, "grant_type=refresh_token") ||
-			strings.Contains(stringBody, "grant_type=password"))
+			strings.Contains(stringBody, "grant_type=password") ||
+			strings.Contains(stringBody, "grant_type=client_credentials"))
 }

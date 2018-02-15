@@ -84,7 +84,7 @@ var _ = Describe("Auth", func() {
 							verifyRequestHost(TestAuthorizationResource),
 							VerifyRequest(http.MethodPost, "/oauth/token"),
 							VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
-							VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
+							VerifyHeaderKV("Authorization"),
 							VerifyBody([]byte(fmt.Sprintf("client_id=%s&client_secret=%s&grant_type=%s", identity, secret, grantType))),
 							RespondWith(http.StatusOK, response),
 						))

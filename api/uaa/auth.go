@@ -38,10 +38,14 @@ func (client Client) Authenticate(ID string, secret string, grantType constant.G
 		},
 		Body: strings.NewReader(requestBody.Encode()),
 	})
+
 	if err != nil {
 		return "", "", err
 	}
-	request.SetBasicAuth(client.config.UAAOAuthClient(), client.config.UAAOAuthClientSecret())
+
+	if grantType == constant.GrantTypePassword {
+		request.SetBasicAuth(client.config.UAAOAuthClient(), client.config.UAAOAuthClientSecret())
+	}
 
 	responseBody := AuthResponse{}
 	response := Response{

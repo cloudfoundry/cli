@@ -20,5 +20,6 @@ type Config interface {
 	Target() string
 	UnsetOrganizationInformation()
 	UnsetSpaceInformation()
+	UnsetUAAGrantType()
 	Verbose() (bool, []string)
 }

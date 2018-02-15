@@ -223,6 +223,11 @@ func (config *Config) UnsetSpaceInformation() {
 	config.SetSpaceInformation("", "", false)
 }
 
+// UnsetUAAGrantType resets the grant type to the default (password is empty grant type)
+func (config *Config) UnsetUAAGrantType() {
+	config.SetUAAGrantType("")
+}
+
 func decodeUserFromJWT(accessToken string) (User, error) {
 	if accessToken == "" {
 		return User{}, nil

@@ -454,4 +454,17 @@ var _ = Describe("JSONConfig", func() {
 			Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
 		})
 	})
+
+	Describe("UnsetUAAGrantType", func() {
+		config := Config{}
+		BeforeEach(func() {
+			config.SetUAAGrantType("some-grant-type")
+		})
+
+		It("resets the org GUID and name", func() {
+			config.UnsetUAAGrantType()
+
+			Expect(config.ConfigFile.UAAGrantType).To(Equal(""))
+		})
+	})
 })

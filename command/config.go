@@ -56,6 +56,7 @@ type Config interface {
 	UAAGrantType() string
 	UnsetOrganizationInformation()
 	UnsetSpaceInformation()
+	UnsetUAAGrantType()
 	Verbose() (bool, []string)
 	WritePluginConfig() error
 }

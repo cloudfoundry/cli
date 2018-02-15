@@ -120,6 +120,9 @@ type FakeConfig struct {
 	UnsetSpaceInformationStub               func()
 	unsetSpaceInformationMutex              sync.RWMutex
 	unsetSpaceInformationArgsForCall        []struct{}
+	UnsetUAAGrantTypeStub                   func()
+	unsetUAAGrantTypeMutex                  sync.RWMutex
+	unsetUAAGrantTypeArgsForCall            []struct{}
 	VerboseStub                             func() (bool, []string)
 	verboseMutex                            sync.RWMutex
 	verboseArgsForCall                      []struct{}
@@ -615,6 +618,22 @@ func (fake *FakeConfig) UnsetSpaceInformationCallCount() int {
 	return len(fake.unsetSpaceInformationArgsForCall)
 }
 
+func (fake *FakeConfig) UnsetUAAGrantType() {
+	fake.unsetUAAGrantTypeMutex.Lock()
+	fake.unsetUAAGrantTypeArgsForCall = append(fake.unsetUAAGrantTypeArgsForCall, struct{}{})
+	fake.recordInvocation("UnsetUAAGrantType", []interface{}{})
+	fake.unsetUAAGrantTypeMutex.Unlock()
+	if fake.UnsetUAAGrantTypeStub != nil {
+		fake.UnsetUAAGrantTypeStub()
+	}
+}
+
+func (fake *FakeConfig) UnsetUAAGrantTypeCallCount() int {
+	fake.unsetUAAGrantTypeMutex.RLock()
+	defer fake.unsetUAAGrantTypeMutex.RUnlock()
+	return len(fake.unsetUAAGrantTypeArgsForCall)
+}
+
 func (fake *FakeConfig) Verbose() (bool, []string) {
 	fake.verboseMutex.Lock()
 	ret, specificReturn := fake.verboseReturnsOnCall[len(fake.verboseArgsForCall)]
@@ -691,6 +710,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.unsetOrganizationInformationMutex.RUnlock()
 	fake.unsetSpaceInformationMutex.RLock()
 	defer fake.unsetSpaceInformationMutex.RUnlock()
+	fake.unsetUAAGrantTypeMutex.RLock()
+	defer fake.unsetUAAGrantTypeMutex.RUnlock()
 	fake.verboseMutex.RLock()
 	defer fake.verboseMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
