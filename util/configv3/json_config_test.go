@@ -269,6 +269,14 @@ var _ = Describe("JSONConfig", func() {
 	Describe("SetUAAEndpoint", func() {
 		It("sets the UAA endpoint", func() {
 			var config Config
+			config.SetUAAGrantType("some-uaa-grant-type")
+			Expect(config.ConfigFile.UAAGrantType).To(Equal("some-uaa-grant-type"))
+		})
+	})
+
+	Describe("SetUAAEndpoint", func() {
+		It("sets the UAA endpoint", func() {
+			var config Config
 			config.SetUAAEndpoint("some-uaa-endpoint.com")
 			Expect(config.ConfigFile.UAAEndpoint).To(Equal("some-uaa-endpoint.com"))
 		})
@@ -397,6 +405,24 @@ var _ = Describe("JSONConfig", func() {
 
 		It("returns the client secret", func() {
 			Expect(config.UAAOAuthClientSecret()).To(Equal("some-client-secret"))
+		})
+	})
+
+	Describe("UAAGrantType", func() {
+		var config *Config
+
+		BeforeEach(func() {
+			rawConfig := ` { "UAAGrantType": "some-grant-type" }`
+			setConfig(homeDir, rawConfig)
+
+			var err error
+			config, err = LoadConfig()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config).ToNot(BeNil())
+		})
+
+		It("returns the client secret", func() {
+			Expect(config.UAAGrantType()).To(Equal("some-grant-type"))
 		})
 	})
 

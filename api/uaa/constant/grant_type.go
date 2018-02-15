@@ -8,5 +8,6 @@ const (
 	// authentication.
 	GrantTypeClientCredentials GrantType = "client_credentials"
 	// GrantTypePassword is used for user's username/password authentication.
-	GrantTypePassword GrantType = "password"
+	GrantTypePassword     GrantType = "password"
+	GrantTypeRefreshToken GrantType = "refresh_token"
 )

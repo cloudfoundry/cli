@@ -73,6 +73,11 @@ type FakeConfig struct {
 		refreshToken   string
 		sshOAuthClient string
 	}
+	SetUAAGrantTypeStub        func(uaaGrantType string)
+	setUAAGrantTypeMutex       sync.RWMutex
+	setUAAGrantTypeArgsForCall []struct {
+		uaaGrantType string
+	}
 	SkipSSLValidationStub        func() bool
 	skipSSLValidationMutex       sync.RWMutex
 	skipSSLValidationArgsForCall []struct{}
@@ -394,6 +399,30 @@ func (fake *FakeConfig) SetTokenInformationArgsForCall(i int) (string, string, s
 	return fake.setTokenInformationArgsForCall[i].accessToken, fake.setTokenInformationArgsForCall[i].refreshToken, fake.setTokenInformationArgsForCall[i].sshOAuthClient
 }
 
+func (fake *FakeConfig) SetUAAGrantType(uaaGrantType string) {
+	fake.setUAAGrantTypeMutex.Lock()
+	fake.setUAAGrantTypeArgsForCall = append(fake.setUAAGrantTypeArgsForCall, struct {
+		uaaGrantType string
+	}{uaaGrantType})
+	fake.recordInvocation("SetUAAGrantType", []interface{}{uaaGrantType})
+	fake.setUAAGrantTypeMutex.Unlock()
+	if fake.SetUAAGrantTypeStub != nil {
+		fake.SetUAAGrantTypeStub(uaaGrantType)
+	}
+}
+
+func (fake *FakeConfig) SetUAAGrantTypeCallCount() int {
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
+	return len(fake.setUAAGrantTypeArgsForCall)
+}
+
+func (fake *FakeConfig) SetUAAGrantTypeArgsForCall(i int) string {
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
+	return fake.setUAAGrantTypeArgsForCall[i].uaaGrantType
+}
+
 func (fake *FakeConfig) SkipSSLValidation() bool {
 	fake.skipSSLValidationMutex.Lock()
 	ret, specificReturn := fake.skipSSLValidationReturnsOnCall[len(fake.skipSSLValidationArgsForCall)]
@@ -648,6 +677,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()
 	defer fake.setTokenInformationMutex.RUnlock()
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
 	fake.skipSSLValidationMutex.RLock()
 	defer fake.skipSSLValidationMutex.RUnlock()
 	fake.stagingTimeoutMutex.RLock()

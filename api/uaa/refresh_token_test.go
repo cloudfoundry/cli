@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 
 	. "github.com/onsi/ginkgo"
@@ -32,11 +33,49 @@ var _ = Describe("UAA Client", func() {
 			returnedRefreshToken string
 		)
 
-		BeforeEach(func() {
-			returnedAccessToken = "I-ACCESS-TOKEN"
-			sentRefreshToken = "I-R-REFRESH-TOKEN"
-			returnedRefreshToken = "I-R-NEW-REFRESH-TOKEN"
-			response := fmt.Sprintf(`{
+		Context("when the provided grant_type is client_credentials", func() {
+			BeforeEach(func() {
+				fakeConfig.UAAGrantTypeReturns(string(constant.GrantTypeClientCredentials))
+
+				returnedAccessToken = "I-ACCESS-TOKEN"
+				response := fmt.Sprintf(`{
+				"access_token": "%s",
+				"token_type": "bearer",
+				"expires_in": 599,
+				"scope": "cloud_controller.read password.write cloud_controller.write openid uaa.user",
+				"jti": "4150c08afa2848278e5ad57201024e32"
+			}`, returnedAccessToken)
+
+				server.AppendHandlers(
+					CombineHandlers(
+						verifyRequestHost(TestAuthorizationResource),
+						VerifyRequest(http.MethodPost, "/oauth/token"),
+						VerifyHeaderKV("Accept", "application/json"),
+						VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
+						VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
+						VerifyBody([]byte(fmt.Sprintf("client_id=client-id&client_secret=client-secret&grant_type=%s", constant.GrantTypeClientCredentials))),
+						RespondWith(http.StatusOK, response),
+					))
+			})
+
+			It("refreshes the tokens", func() {
+				token, err := client.RefreshAccessToken(sentRefreshToken)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(token).To(Equal(RefreshedTokens{
+					AccessToken: returnedAccessToken,
+					Type:        "bearer",
+				}))
+
+				Expect(server.ReceivedRequests()).To(HaveLen(2))
+			})
+		})
+
+		Context("when the provided grant_type is not client_credentials", func() {
+			BeforeEach(func() {
+				returnedAccessToken = "I-ACCESS-TOKEN"
+				sentRefreshToken = "I-R-REFRESH-TOKEN"
+				returnedRefreshToken = "I-R-NEW-REFRESH-TOKEN"
+				response := fmt.Sprintf(`{
 				"access_token": "%s",
 				"token_type": "bearer",
 				"refresh_token": "%s",
@@ -45,28 +84,29 @@ var _ = Describe("UAA Client", func() {
 				"jti": "4150c08afa2848278e5ad57201024e32"
 			}`, returnedAccessToken, returnedRefreshToken)
 
-			server.AppendHandlers(
-				CombineHandlers(
-					verifyRequestHost(TestAuthorizationResource),
-					VerifyRequest(http.MethodPost, "/oauth/token"),
-					VerifyHeaderKV("Accept", "application/json"),
-					VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
-					VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
-					VerifyBody([]byte(fmt.Sprintf("client_id=client-id&client_secret=client-secret&grant_type=refresh_token&refresh_token=%s", sentRefreshToken))),
-					RespondWith(http.StatusOK, response),
-				))
-		})
+				server.AppendHandlers(
+					CombineHandlers(
+						verifyRequestHost(TestAuthorizationResource),
+						VerifyRequest(http.MethodPost, "/oauth/token"),
+						VerifyHeaderKV("Accept", "application/json"),
+						VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
+						VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
+						VerifyBody([]byte(fmt.Sprintf("client_id=client-id&client_secret=client-secret&grant_type=%s&refresh_token=%s", constant.GrantTypeRefreshToken, sentRefreshToken))),
+						RespondWith(http.StatusOK, response),
+					))
+			})
 
-		It("refreshes the tokens", func() {
-			token, err := client.RefreshAccessToken(sentRefreshToken)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(token).To(Equal(RefreshedTokens{
-				AccessToken:  returnedAccessToken,
-				RefreshToken: returnedRefreshToken,
-				Type:         "bearer",
-			}))
+			It("refreshes the tokens", func() {
+				token, err := client.RefreshAccessToken(sentRefreshToken)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(token).To(Equal(RefreshedTokens{
+					AccessToken:  returnedAccessToken,
+					RefreshToken: returnedRefreshToken,
+					Type:         "bearer",
+				}))
 
-			Expect(server.ReceivedRequests()).To(HaveLen(2))
+				Expect(server.ReceivedRequests()).To(HaveLen(2))
+			})
 		})
 	})
 })

@@ -42,6 +42,7 @@ type Config interface {
 	SetSpaceInformation(guid string, name string, allowSSH bool)
 	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
+	SetUAAGrantType(uaaGrantType string)
 	SetUAAEndpoint(uaaEndpoint string)
 	SkipSSLValidation() bool
 	SSHOAuthClient() string
@@ -52,6 +53,7 @@ type Config interface {
 	TargetedSpace() configv3.Space
 	UAAOAuthClient() string
 	UAAOAuthClientSecret() string
+	UAAGrantType() string
 	UnsetOrganizationInformation()
 	UnsetSpaceInformation()
 	Verbose() (bool, []string)

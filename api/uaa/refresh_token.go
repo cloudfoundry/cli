@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/api/uaa/internal"
 )
 
@@ -23,12 +24,19 @@ func (refreshTokenResponse RefreshedTokens) AuthorizationToken() string {
 
 // RefreshAccessToken refreshes the current access token.
 func (client *Client) RefreshAccessToken(refreshToken string) (RefreshedTokens, error) {
-	body := strings.NewReader(url.Values{
+	values := url.Values{
 		"client_id":     {client.config.UAAOAuthClient()},
 		"client_secret": {client.config.UAAOAuthClientSecret()},
-		"grant_type":    {"refresh_token"},
-		"refresh_token": {refreshToken},
-	}.Encode())
+	}
+
+	if client.config.UAAGrantType() != "" {
+		values.Add("grant_type", client.config.UAAGrantType())
+	} else {
+		values.Add("grant_type", string(constant.GrantTypeRefreshToken))
+		values.Add("refresh_token", refreshToken)
+	}
+
+	body := strings.NewReader(values.Encode())
 
 	request, err := client.newRequest(requestOptions{
 		RequestName: internal.PostOAuthTokenRequest,

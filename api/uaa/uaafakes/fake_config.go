@@ -54,6 +54,15 @@ type FakeConfig struct {
 	uAAOAuthClientSecretReturnsOnCall map[int]struct {
 		result1 string
 	}
+	UAAGrantTypeStub        func() string
+	uAAGrantTypeMutex       sync.RWMutex
+	uAAGrantTypeArgsForCall []struct{}
+	uAAGrantTypeReturns     struct {
+		result1 string
+	}
+	uAAGrantTypeReturnsOnCall map[int]struct {
+		result1 string
+	}
 	SetUAAEndpointStub        func(uaaEndpoint string)
 	setUAAEndpointMutex       sync.RWMutex
 	setUAAEndpointArgsForCall []struct {
@@ -272,6 +281,46 @@ func (fake *FakeConfig) UAAOAuthClientSecretReturnsOnCall(i int, result1 string)
 	}{result1}
 }
 
+func (fake *FakeConfig) UAAGrantType() string {
+	fake.uAAGrantTypeMutex.Lock()
+	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
+	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct{}{})
+	fake.recordInvocation("UAAGrantType", []interface{}{})
+	fake.uAAGrantTypeMutex.Unlock()
+	if fake.UAAGrantTypeStub != nil {
+		return fake.UAAGrantTypeStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.uAAGrantTypeReturns.result1
+}
+
+func (fake *FakeConfig) UAAGrantTypeCallCount() int {
+	fake.uAAGrantTypeMutex.RLock()
+	defer fake.uAAGrantTypeMutex.RUnlock()
+	return len(fake.uAAGrantTypeArgsForCall)
+}
+
+func (fake *FakeConfig) UAAGrantTypeReturns(result1 string) {
+	fake.UAAGrantTypeStub = nil
+	fake.uAAGrantTypeReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) UAAGrantTypeReturnsOnCall(i int, result1 string) {
+	fake.UAAGrantTypeStub = nil
+	if fake.uAAGrantTypeReturnsOnCall == nil {
+		fake.uAAGrantTypeReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uAAGrantTypeReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) SetUAAEndpoint(uaaEndpoint string) {
 	fake.setUAAEndpointMutex.Lock()
 	fake.setUAAEndpointArgsForCall = append(fake.setUAAEndpointArgsForCall, struct {
@@ -349,6 +398,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.uAAOAuthClientMutex.RUnlock()
 	fake.uAAOAuthClientSecretMutex.RLock()
 	defer fake.uAAOAuthClientSecretMutex.RUnlock()
+	fake.uAAGrantTypeMutex.RLock()
+	defer fake.uAAGrantTypeMutex.RUnlock()
 	fake.setUAAEndpointMutex.RLock()
 	defer fake.setUAAEndpointMutex.RUnlock()
 	fake.skipSSLValidationMutex.RLock()

@@ -19,6 +19,7 @@ type JSONConfig struct {
 	SSHOAuthClient           string             `json:"SSHOAuthClient"`
 	UAAOAuthClient           string             `json:"UAAOAuthClient"`
 	UAAOAuthClientSecret     string             `json:"UAAOAuthClientSecret"`
+	UAAGrantType             string             `json:"UAAGrantType"`
 	RefreshToken             string             `json:"RefreshToken"`
 	TargetedOrganization     Organization       `json:"OrganizationFields"`
 	TargetedSpace            Space              `json:"SpaceFields"`
@@ -157,6 +158,12 @@ func (config *Config) SetTokenInformation(accessToken string, refreshToken strin
 	config.ConfigFile.SSHOAuthClient = sshOAuthClient
 }
 
+// SetUAAGrantType sets the UAA grant type for logging in and refreshing the
+// token.
+func (config *Config) SetUAAGrantType(uaaGrantType string) {
+	config.ConfigFile.UAAGrantType = uaaGrantType
+}
+
 // SetUAAEndpoint sets the UAA endpoint that is obtained from hitting
 // <AuthorizationEndpoint>/login.
 func (config *Config) SetUAAEndpoint(uaaEndpoint string) {
@@ -198,6 +205,11 @@ func (config *Config) UAAOAuthClient() string {
 // UAAOAuthClientSecret returns the CLI's UAA client secret.
 func (config *Config) UAAOAuthClientSecret() string {
 	return config.ConfigFile.UAAOAuthClientSecret
+}
+
+// UAAGrantType returns the grant type of the supplied UAA credentials.
+func (config *Config) UAAGrantType() string {
+	return config.ConfigFile.UAAGrantType
 }
 
 // UnsetOrganizationInformation resets the organization values to default.

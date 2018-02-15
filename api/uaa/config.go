@@ -22,6 +22,9 @@ type Config interface {
 	// UAAOAuthClientSecret is the UAA client secret the client will use.
 	UAAOAuthClientSecret() string
 
+	// UAAGrantType returns the grant type of the supplied UAA credentials.
+	UAAGrantType() string
+
 	// SetUAAEndpoint sets the UAA endpoint that is obtained from hitting
 	// <AuthorizationEndpoint>/login.
 	SetUAAEndpoint(uaaEndpoint string)
