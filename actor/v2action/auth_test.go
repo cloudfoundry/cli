@@ -64,6 +64,7 @@ var _ = Describe("Auth Actions", func() {
 
 					Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
 					Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+					Expect(fakeConfig.UnsetUAAClientCredentialsCallCount()).To(Equal(1))
 					Expect(fakeConfig.UnsetUAAGrantTypeCallCount()).To(Equal(1))
 					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(0))
 				})
@@ -74,7 +75,11 @@ var _ = Describe("Auth Actions", func() {
 					grantType = constant.GrantTypeClientCredentials
 				})
 
-				It("stores the grant type", func() {
+				It("stores the grant type and the client credentials", func() {
+					Expect(fakeConfig.SetUAAClientCredentialsCallCount()).To(Equal(1))
+					client, clientSecret := fakeConfig.SetUAAClientCredentialsArgsForCall(0)
+					Expect(client).To(Equal("some-username"))
+					Expect(clientSecret).To(Equal("some-password"))
 					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(1))
 					Expect(fakeConfig.SetUAAGrantTypeArgsForCall(0)).To(Equal(string(constant.GrantTypeClientCredentials)))
 				})
@@ -104,6 +109,7 @@ var _ = Describe("Auth Actions", func() {
 
 				Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
 				Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+				Expect(fakeConfig.UnsetUAAClientCredentialsCallCount()).To(Equal(1))
 			})
 		})
 	})

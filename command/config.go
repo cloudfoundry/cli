@@ -42,6 +42,7 @@ type Config interface {
 	SetSpaceInformation(guid string, name string, allowSSH bool)
 	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
+	SetUAAClientCredentials(client string, clientSecret string)
 	SetUAAGrantType(uaaGrantType string)
 	SetUAAEndpoint(uaaEndpoint string)
 	SkipSSLValidation() bool
@@ -56,6 +57,7 @@ type Config interface {
 	UAAGrantType() string
 	UnsetOrganizationInformation()
 	UnsetSpaceInformation()
+	UnsetUAAClientCredentials()
 	UnsetUAAGrantType()
 	Verbose() (bool, []string)
 	WritePluginConfig() error

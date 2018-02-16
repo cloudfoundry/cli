@@ -117,6 +117,12 @@ func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken
 }
 
+// SetUAAClientCredentials sets the client credentials.
+func (config *Config) SetUAAClientCredentials(client string, clientSecret string) {
+	config.ConfigFile.UAAOAuthClient = client
+	config.ConfigFile.UAAOAuthClientSecret = clientSecret
+}
+
 // SetOrganizationInformation sets the currently targeted organization.
 func (config *Config) SetOrganizationInformation(guid string, name string) {
 	config.ConfigFile.TargetedOrganization.GUID = guid
@@ -223,7 +229,14 @@ func (config *Config) UnsetSpaceInformation() {
 	config.SetSpaceInformation("", "", false)
 }
 
-// UnsetUAAGrantType resets the grant type to the default (password is empty grant type)
+// UnsetUAAClientCredentials resets the client credentials to the default (cf:
+// is the default credential for password grant type).
+func (config *Config) UnsetUAAClientCredentials() {
+	config.SetUAAClientCredentials("cf", "")
+}
+
+// UnsetUAAGrantType resets the grant type to the default (password is empty
+// grant type).
 func (config *Config) UnsetUAAGrantType() {
 	config.SetUAAGrantType("")
 }

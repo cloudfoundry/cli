@@ -13,6 +13,7 @@ type Config interface {
 	SetRefreshToken(refreshToken string)
 	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
+	SetUAAClientCredentials(client string, clientSecret string)
 	SetUAAGrantType(uaaGrantType string)
 	SkipSSLValidation() bool
 	StagingTimeout() time.Duration
@@ -20,6 +21,7 @@ type Config interface {
 	Target() string
 	UnsetOrganizationInformation()
 	UnsetSpaceInformation()
+	UnsetUAAClientCredentials()
 	UnsetUAAGrantType()
 	Verbose() (bool, []string)
 }

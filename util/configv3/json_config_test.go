@@ -266,6 +266,15 @@ var _ = Describe("JSONConfig", func() {
 		})
 	})
 
+	Describe("SetUAAClientCredentials", func() {
+		It("sets the UAA client credentials", func() {
+			var config Config
+			config.SetUAAClientCredentials("some-uaa-client", "some-uaa-client-secret")
+			Expect(config.ConfigFile.UAAOAuthClient).To(Equal("some-uaa-client"))
+			Expect(config.ConfigFile.UAAOAuthClientSecret).To(Equal("some-uaa-client-secret"))
+		})
+	})
+
 	Describe("SetUAAEndpoint", func() {
 		It("sets the UAA endpoint", func() {
 			var config Config
@@ -452,6 +461,20 @@ var _ = Describe("JSONConfig", func() {
 			Expect(config.ConfigFile.TargetedSpace.GUID).To(Equal(""))
 			Expect(config.ConfigFile.TargetedSpace.Name).To(Equal(""))
 			Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
+		})
+	})
+
+	Describe("UnsetUAAClientCredentials", func() {
+		config := Config{}
+		BeforeEach(func() {
+			config.SetUAAClientCredentials("some-client", "some-client-secret")
+		})
+
+		It("resets the org GUID and name", func() {
+			config.UnsetUAAClientCredentials()
+
+			Expect(config.ConfigFile.UAAOAuthClient).To(Equal("cf"))
+			Expect(config.ConfigFile.UAAOAuthClientSecret).To(Equal(""))
 		})
 	})
 

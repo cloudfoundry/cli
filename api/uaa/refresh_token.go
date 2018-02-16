@@ -29,6 +29,7 @@ func (client *Client) RefreshAccessToken(refreshToken string) (RefreshedTokens, 
 		"client_secret": {client.config.UAAOAuthClientSecret()},
 	}
 
+	// An empty grant_type implies that the authentication grant_type is 'password'
 	if client.config.UAAGrantType() != "" {
 		values.Add("grant_type", client.config.UAAGrantType())
 	} else {
@@ -47,7 +48,9 @@ func (client *Client) RefreshAccessToken(refreshToken string) (RefreshedTokens, 
 		return RefreshedTokens{}, err
 	}
 
-	request.SetBasicAuth(client.config.UAAOAuthClient(), client.config.UAAOAuthClientSecret())
+	if client.config.UAAGrantType() != string(constant.GrantTypeClientCredentials) {
+		request.SetBasicAuth(client.config.UAAOAuthClient(), client.config.UAAOAuthClientSecret())
+	}
 
 	var refreshResponse RefreshedTokens
 	response := Response{

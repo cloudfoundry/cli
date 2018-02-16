@@ -52,7 +52,7 @@ var _ = Describe("UAA Client", func() {
 						VerifyRequest(http.MethodPost, "/oauth/token"),
 						VerifyHeaderKV("Accept", "application/json"),
 						VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
-						VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
+						VerifyHeaderKV("Authorization"),
 						VerifyBody([]byte(fmt.Sprintf("client_id=client-id&client_secret=client-secret&grant_type=%s", constant.GrantTypeClientCredentials))),
 						RespondWith(http.StatusOK, response),
 					))

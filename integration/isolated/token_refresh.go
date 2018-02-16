@@ -58,7 +58,7 @@ var _ = Describe("Token Refreshing", func() {
 		})
 	})
 
-	PDescribe("client grant type", func() {
+	Describe("client grant type", func() {
 		BeforeEach(func() {
 			helpers.LoginCFWithClientCredentials()
 		})
