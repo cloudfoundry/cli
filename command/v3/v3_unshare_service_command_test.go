@@ -177,7 +177,7 @@ var _ = Describe("unshare-service Command", func() {
 
 						It("does not return an error, displays that the service instance is not shared and displays all warnings", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).To(Say("Failed to unshare service instance 'some-service-instance'\\. Ensure the space and specified org exist and that the service instance has been shared to this space\\."))
+							Expect(testUI.Out).To(Say("Service instance some-service-instance is not shared with space some-shared-to-space in organization some-org\\."))
 							Expect(testUI.Out).To(Say("OK"))
 							Expect(testUI.Err).To(Say("unshare-service-warning"))
 						})

@@ -118,7 +118,11 @@ func (cmd V3UnshareServiceCommand) Execute(args []string) error {
 	if err != nil {
 		switch err.(type) {
 		case actionerror.ServiceInstanceNotSharedToSpaceError:
-			cmd.UI.DisplayText(err.Error())
+			cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} is not shared with space {{.SpaceName}} in organization {{.OrgName}}.", map[string]interface{}{
+				"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
+				"SpaceName":           cmd.SharedToSpaceName,
+				"OrgName":             orgName,
+			})
 		default:
 			return err
 		}
