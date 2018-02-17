@@ -9,6 +9,7 @@ import (
 type V3Actor interface {
 	GetOrganizationByName(orgName string) (v3action.Organization, v3action.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (v3action.RelationshipList, v3action.Warnings, error)
+	UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID string, spaceGUID string) (v3action.Warnings, error)
 
 	CloudControllerAPIVersion() string
 }

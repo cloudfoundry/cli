@@ -40,6 +40,20 @@ type FakeV3Actor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
+	UnshareServiceInstanceByServiceInstanceAndSpaceStub        func(serviceInstanceGUID string, spaceGUID string) (v3action.Warnings, error)
+	unshareServiceInstanceByServiceInstanceAndSpaceMutex       sync.RWMutex
+	unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall []struct {
+		serviceInstanceGUID string
+		spaceGUID           string
+	}
+	unshareServiceInstanceByServiceInstanceAndSpaceReturns struct {
+		result1 v3action.Warnings
+		result2 error
+	}
+	unshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall map[int]struct {
+		result1 v3action.Warnings
+		result2 error
+	}
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
 	cloudControllerAPIVersionArgsForCall []struct{}
@@ -167,6 +181,58 @@ func (fake *FakeV3Actor) ShareServiceInstanceToSpacesReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID string, spaceGUID string) (v3action.Warnings, error) {
+	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Lock()
+	ret, specificReturn := fake.unshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall[len(fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall)]
+	fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall = append(fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall, struct {
+		serviceInstanceGUID string
+		spaceGUID           string
+	}{serviceInstanceGUID, spaceGUID})
+	fake.recordInvocation("UnshareServiceInstanceByServiceInstanceAndSpace", []interface{}{serviceInstanceGUID, spaceGUID})
+	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.Unlock()
+	if fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub != nil {
+		return fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub(serviceInstanceGUID, spaceGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.unshareServiceInstanceByServiceInstanceAndSpaceReturns.result1, fake.unshareServiceInstanceByServiceInstanceAndSpaceReturns.result2
+}
+
+func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpaceCallCount() int {
+	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RLock()
+	defer fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RUnlock()
+	return len(fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall)
+}
+
+func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpaceArgsForCall(i int) (string, string) {
+	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RLock()
+	defer fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RUnlock()
+	return fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall[i].serviceInstanceGUID, fake.unshareServiceInstanceByServiceInstanceAndSpaceArgsForCall[i].spaceGUID
+}
+
+func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpaceReturns(result1 v3action.Warnings, result2 error) {
+	fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub = nil
+	fake.unshareServiceInstanceByServiceInstanceAndSpaceReturns = struct {
+		result1 v3action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV3Actor) UnshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
+	fake.UnshareServiceInstanceByServiceInstanceAndSpaceStub = nil
+	if fake.unshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall == nil {
+		fake.unshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v3action.Warnings
+			result2 error
+		})
+	}
+	fake.unshareServiceInstanceByServiceInstanceAndSpaceReturnsOnCall[i] = struct {
+		result1 v3action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV3Actor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
@@ -214,6 +280,8 @@ func (fake *FakeV3Actor) Invocations() map[string][][]interface{} {
 	defer fake.getOrganizationByNameMutex.RUnlock()
 	fake.shareServiceInstanceToSpacesMutex.RLock()
 	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
+	fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RLock()
+	defer fake.unshareServiceInstanceByServiceInstanceAndSpaceMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

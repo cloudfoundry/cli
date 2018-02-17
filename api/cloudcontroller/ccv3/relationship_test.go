@@ -310,7 +310,7 @@ var _ = Describe("Relationship", func() {
 		})
 	})
 
-	Describe("UnshareServiceInstanceFromSpace", func() {
+	Describe("DeleteServiceInstanceRelationshipsSharedSpace", func() {
 		var (
 			serviceInstanceGUID string
 			spaceGUID           string
@@ -325,10 +325,10 @@ var _ = Describe("Relationship", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = client.UnshareServiceInstanceFromSpace(serviceInstanceGUID, spaceGUID)
+			warnings, executeErr = client.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID, spaceGUID)
 		})
 
-		Context("when the delete is successful", func() {
+		Context("when no errors occur deleting the shared space relationship", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -338,23 +338,23 @@ var _ = Describe("Relationship", func() {
 				)
 			})
 
-			It("returns all warnings", func() {
+			It("does not return any errors and returns all warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		Context("when an error occurs deleting the shared space relationship", func() {
 			BeforeEach(func() {
 				response := `{
-					"errors": [
-						{
-							"code": 10008,
-							"detail": "The request is semantically invalid: command presence",
-							"title": "CF-UnprocessableEntity"
-						}
-					]
-				}`
+						"errors": [
+							{
+								"code": 10008,
+								"detail": "The request is semantically invalid: command presence",
+								"title": "CF-UnprocessableEntity"
+							}
+						]
+					}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodDelete, "/v3/service_instances/some-service-instance-guid/relationships/shared_spaces/some-space-guid"),

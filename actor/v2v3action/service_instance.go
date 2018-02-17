@@ -2,6 +2,7 @@ package v2v3action
 
 import (
 	"fmt"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -98,4 +99,36 @@ func (actor Actor) isServiceInstanceShareableByService(serviceGUID string) (bool
 	}
 
 	return true, allWarnings, nil
+}
+
+func (actor Actor) UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpace(sharedToOrgName string, sharedToSpaceName string, serviceInstanceName string, currentlyTargetedSpaceGUID string) (Warnings, error) {
+	var allWarnings Warnings
+	serviceInstance, warningsV2, err := actor.V2Actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, currentlyTargetedSpaceGUID)
+	allWarnings = append(allWarnings, warningsV2...)
+	if err != nil {
+		if _, ok := err.(actionerror.ServiceInstanceNotFoundError); ok {
+			return allWarnings, actionerror.SharedServiceInstanceNotFoundError{}
+		}
+		return allWarnings, err
+	}
+
+	sharedTos, warningsV2, err := actor.V2Actor.GetServiceInstanceSharedTosByServiceInstance(serviceInstance.GUID)
+	allWarnings = append(allWarnings, warningsV2...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	sharedToSpaceGUID := ""
+	for _, sharedTo := range sharedTos {
+		if strings.EqualFold(sharedTo.SpaceName, sharedToSpaceName) && strings.EqualFold(sharedTo.OrganizationName, sharedToOrgName) {
+			sharedToSpaceGUID = sharedTo.SpaceGUID
+		}
+	}
+	if sharedToSpaceGUID == "" {
+		return allWarnings, actionerror.ServiceInstanceNotSharedToSpaceError{ServiceInstanceName: serviceInstanceName}
+	}
+
+	warningsV3, err := actor.V3Actor.UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstance.GUID, sharedToSpaceGUID)
+	allWarnings = append(allWarnings, warningsV3...)
+	return allWarnings, err
 }

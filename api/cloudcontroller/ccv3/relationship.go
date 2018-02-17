@@ -157,17 +157,18 @@ func (client *Client) PatchOrganizationDefaultIsolationSegment(orgGUID string, i
 	return relationship, response.Warnings, err
 }
 
-// UnshareServiceInstanceFromSpace will delete the sharing relationship between
-// the service instance and the space provided.
-func (client *Client) UnshareServiceInstanceFromSpace(serviceInstanceGUID string, spaceGUID string) (Warnings, error) {
-	request, _ := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteServiceInstanceRelationshipSharedSpacesRequest,
+// DeleteServiceInstanceRelationshipsSharedSpace will delete the sharing relationship
+// between the service instance and the shared-to space provided.
+func (client *Client) DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, spaceGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteServiceInstanceRelationshipsSharedSpaceRequest,
 		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID, "space_guid": spaceGUID},
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	response := cloudcontroller.Response{}
-
-	err := client.connection.Make(request, &response)
-
+	err = client.connection.Make(request, &response)
 	return response.Warnings, err
 }

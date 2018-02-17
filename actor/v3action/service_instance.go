@@ -7,20 +7,6 @@ import (
 
 type ServiceInstance ccv3.ServiceInstance
 
-func (actor Actor) UnshareServiceInstanceFromSpace(serviceInstanceName string, sourceSpaceGUID string, sharedToSpaceGUID string) (Warnings, error) {
-	serviceInstance, allWarnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, sourceSpaceGUID)
-	if err != nil {
-		if _, ok := err.(actionerror.ServiceInstanceNotFoundError); ok {
-			return allWarnings, actionerror.SharedServiceInstanceNotFoundError{}
-		}
-		return allWarnings, err
-	}
-
-	apiWarnings, err := actor.CloudControllerClient.UnshareServiceInstanceFromSpace(serviceInstance.GUID, sharedToSpaceGUID)
-	allWarnings = append(allWarnings, apiWarnings...)
-	return allWarnings, err
-}
-
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (ServiceInstance, Warnings, error) {
 	serviceInstances, warnings, err := actor.CloudControllerClient.GetServiceInstances(
 		ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceInstanceName}},
@@ -37,4 +23,9 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, 
 
 	//Handle multiple serviceInstances being returned as GetServiceInstances arnt filtered by space
 	return ServiceInstance(serviceInstances[0]), Warnings(warnings), nil
+}
+
+func (actor Actor) UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID, sharedToSpaceGUID)
+	return Warnings(warnings), err
 }

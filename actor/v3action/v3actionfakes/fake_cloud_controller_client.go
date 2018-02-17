@@ -187,6 +187,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	DeleteServiceInstanceRelationshipsSharedSpaceStub        func(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error)
+	deleteServiceInstanceRelationshipsSharedSpaceMutex       sync.RWMutex
+	deleteServiceInstanceRelationshipsSharedSpaceArgsForCall []struct {
+		serviceInstanceGUID string
+		sharedToSpaceGUID   string
+	}
+	deleteServiceInstanceRelationshipsSharedSpaceReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	deleteServiceInstanceRelationshipsSharedSpaceReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	EntitleIsolationSegmentToOrganizationsStub        func(isoGUID string, orgGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	entitleIsolationSegmentToOrganizationsMutex       sync.RWMutex
 	entitleIsolationSegmentToOrganizationsArgsForCall []struct {
@@ -642,20 +656,6 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Application
 		result2 ccv3.Warnings
 		result3 error
-	}
-	UnshareServiceInstanceFromSpaceStub        func(serviceInstanceGUID string, spaceGUID string) (ccv3.Warnings, error)
-	unshareServiceInstanceFromSpaceMutex       sync.RWMutex
-	unshareServiceInstanceFromSpaceArgsForCall []struct {
-		serviceInstanceGUID string
-		spaceGUID           string
-	}
-	unshareServiceInstanceFromSpaceReturns struct {
-		result1 ccv3.Warnings
-		result2 error
-	}
-	unshareServiceInstanceFromSpaceReturnsOnCall map[int]struct {
-		result1 ccv3.Warnings
-		result2 error
 	}
 	UpdateApplicationStub        func(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
 	updateApplicationMutex       sync.RWMutex
@@ -1361,6 +1361,58 @@ func (fake *FakeCloudControllerClient) DeleteIsolationSegmentReturnsOnCall(i int
 		})
 	}
 	fake.deleteIsolationSegmentReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error) {
+	fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.Lock()
+	ret, specificReturn := fake.deleteServiceInstanceRelationshipsSharedSpaceReturnsOnCall[len(fake.deleteServiceInstanceRelationshipsSharedSpaceArgsForCall)]
+	fake.deleteServiceInstanceRelationshipsSharedSpaceArgsForCall = append(fake.deleteServiceInstanceRelationshipsSharedSpaceArgsForCall, struct {
+		serviceInstanceGUID string
+		sharedToSpaceGUID   string
+	}{serviceInstanceGUID, sharedToSpaceGUID})
+	fake.recordInvocation("DeleteServiceInstanceRelationshipsSharedSpace", []interface{}{serviceInstanceGUID, sharedToSpaceGUID})
+	fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.Unlock()
+	if fake.DeleteServiceInstanceRelationshipsSharedSpaceStub != nil {
+		return fake.DeleteServiceInstanceRelationshipsSharedSpaceStub(serviceInstanceGUID, sharedToSpaceGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.deleteServiceInstanceRelationshipsSharedSpaceReturns.result1, fake.deleteServiceInstanceRelationshipsSharedSpaceReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceRelationshipsSharedSpaceCallCount() int {
+	fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RLock()
+	defer fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RUnlock()
+	return len(fake.deleteServiceInstanceRelationshipsSharedSpaceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceRelationshipsSharedSpaceArgsForCall(i int) (string, string) {
+	fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RLock()
+	defer fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RUnlock()
+	return fake.deleteServiceInstanceRelationshipsSharedSpaceArgsForCall[i].serviceInstanceGUID, fake.deleteServiceInstanceRelationshipsSharedSpaceArgsForCall[i].sharedToSpaceGUID
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceRelationshipsSharedSpaceReturns(result1 ccv3.Warnings, result2 error) {
+	fake.DeleteServiceInstanceRelationshipsSharedSpaceStub = nil
+	fake.deleteServiceInstanceRelationshipsSharedSpaceReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceInstanceRelationshipsSharedSpaceReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.DeleteServiceInstanceRelationshipsSharedSpaceStub = nil
+	if fake.deleteServiceInstanceRelationshipsSharedSpaceReturnsOnCall == nil {
+		fake.deleteServiceInstanceRelationshipsSharedSpaceReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.deleteServiceInstanceRelationshipsSharedSpaceReturnsOnCall[i] = struct {
 		result1 ccv3.Warnings
 		result2 error
 	}{result1, result2}
@@ -3000,58 +3052,6 @@ func (fake *FakeCloudControllerClient) StopApplicationReturnsOnCall(i int, resul
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UnshareServiceInstanceFromSpace(serviceInstanceGUID string, spaceGUID string) (ccv3.Warnings, error) {
-	fake.unshareServiceInstanceFromSpaceMutex.Lock()
-	ret, specificReturn := fake.unshareServiceInstanceFromSpaceReturnsOnCall[len(fake.unshareServiceInstanceFromSpaceArgsForCall)]
-	fake.unshareServiceInstanceFromSpaceArgsForCall = append(fake.unshareServiceInstanceFromSpaceArgsForCall, struct {
-		serviceInstanceGUID string
-		spaceGUID           string
-	}{serviceInstanceGUID, spaceGUID})
-	fake.recordInvocation("UnshareServiceInstanceFromSpace", []interface{}{serviceInstanceGUID, spaceGUID})
-	fake.unshareServiceInstanceFromSpaceMutex.Unlock()
-	if fake.UnshareServiceInstanceFromSpaceStub != nil {
-		return fake.UnshareServiceInstanceFromSpaceStub(serviceInstanceGUID, spaceGUID)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fake.unshareServiceInstanceFromSpaceReturns.result1, fake.unshareServiceInstanceFromSpaceReturns.result2
-}
-
-func (fake *FakeCloudControllerClient) UnshareServiceInstanceFromSpaceCallCount() int {
-	fake.unshareServiceInstanceFromSpaceMutex.RLock()
-	defer fake.unshareServiceInstanceFromSpaceMutex.RUnlock()
-	return len(fake.unshareServiceInstanceFromSpaceArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) UnshareServiceInstanceFromSpaceArgsForCall(i int) (string, string) {
-	fake.unshareServiceInstanceFromSpaceMutex.RLock()
-	defer fake.unshareServiceInstanceFromSpaceMutex.RUnlock()
-	return fake.unshareServiceInstanceFromSpaceArgsForCall[i].serviceInstanceGUID, fake.unshareServiceInstanceFromSpaceArgsForCall[i].spaceGUID
-}
-
-func (fake *FakeCloudControllerClient) UnshareServiceInstanceFromSpaceReturns(result1 ccv3.Warnings, result2 error) {
-	fake.UnshareServiceInstanceFromSpaceStub = nil
-	fake.unshareServiceInstanceFromSpaceReturns = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeCloudControllerClient) UnshareServiceInstanceFromSpaceReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
-	fake.UnshareServiceInstanceFromSpaceStub = nil
-	if fake.unshareServiceInstanceFromSpaceReturnsOnCall == nil {
-		fake.unshareServiceInstanceFromSpaceReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Warnings
-			result2 error
-		})
-	}
-	fake.unshareServiceInstanceFromSpaceReturnsOnCall[i] = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
-}
-
 func (fake *FakeCloudControllerClient) UpdateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error) {
 	fake.updateApplicationMutex.Lock()
 	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
@@ -3244,6 +3244,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteApplicationProcessInstanceMutex.RUnlock()
 	fake.deleteIsolationSegmentMutex.RLock()
 	defer fake.deleteIsolationSegmentMutex.RUnlock()
+	fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RLock()
+	defer fake.deleteServiceInstanceRelationshipsSharedSpaceMutex.RUnlock()
 	fake.entitleIsolationSegmentToOrganizationsMutex.RLock()
 	defer fake.entitleIsolationSegmentToOrganizationsMutex.RUnlock()
 	fake.getApplicationDropletCurrentMutex.RLock()
@@ -3304,8 +3306,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.startApplicationMutex.RUnlock()
 	fake.stopApplicationMutex.RLock()
 	defer fake.stopApplicationMutex.RUnlock()
-	fake.unshareServiceInstanceFromSpaceMutex.RLock()
-	defer fake.unshareServiceInstanceFromSpaceMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.updateTaskMutex.RLock()
