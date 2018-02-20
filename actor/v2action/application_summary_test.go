@@ -36,13 +36,13 @@ var _ = Describe("Application Summary Actions", func() {
 		var (
 			actor                     *Actor
 			fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
-			app                       ccv2.Application
+			ccApp                     ccv2.Application
 		)
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 			actor = NewActor(fakeCloudControllerClient, nil, nil)
-			app = ccv2.Application{
+			ccApp = ccv2.Application{
 				GUID: "some-app-guid",
 				Name: "some-app",
 			}
@@ -66,16 +66,16 @@ var _ = Describe("Application Summary Actions", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv2.Application{app},
+					[]ccv2.Application{ccApp},
 					ccv2.Warnings{"app-warning"},
 					nil)
 			})
 
 			Context("when the application is STARTED", func() {
 				BeforeEach(func() {
-					app.State = constant.ApplicationStarted
+					ccApp.State = constant.ApplicationStarted
 					fakeCloudControllerClient.GetApplicationsReturns(
-						[]ccv2.Application{app},
+						[]ccv2.Application{ccApp},
 						ccv2.Warnings{"app-warning"},
 						nil)
 				})
@@ -136,7 +136,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 			Context("when the application is not STARTED", func() {
 				BeforeEach(func() {
-					app.State = constant.ApplicationStopped
+					ccApp.State = constant.ApplicationStopped
 				})
 
 				It("does not try and get application instance information", func() {
