@@ -13,6 +13,7 @@ type CloudControllerClient interface {
 	AssignSpaceToIsolationSegment(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	CloudControllerAPIVersion() string
 	CreateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
+	CreateApplicationActionsApplyManifestByApplication(rawManifest []byte, appGUID string) (string, ccv3.Warnings, error)
 	CreateApplicationProcessScale(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
 	CreateApplicationTask(appGUID string, task ccv3.Task) (ccv3.Task, ccv3.Warnings, error)
 	CreateBuild(build ccv3.Build) (ccv3.Build, ccv3.Warnings, error)

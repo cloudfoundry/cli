@@ -67,6 +67,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreateApplicationActionsApplyManifestByApplicationStub        func(rawManifest []byte, appGUID string) (string, ccv3.Warnings, error)
+	createApplicationActionsApplyManifestByApplicationMutex       sync.RWMutex
+	createApplicationActionsApplyManifestByApplicationArgsForCall []struct {
+		rawManifest []byte
+		appGUID     string
+	}
+	createApplicationActionsApplyManifestByApplicationReturns struct {
+		result1 string
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createApplicationActionsApplyManifestByApplicationReturnsOnCall map[int]struct {
+		result1 string
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CreateApplicationProcessScaleStub        func(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
 	createApplicationProcessScaleMutex       sync.RWMutex
 	createApplicationProcessScaleArgsForCall []struct {
@@ -931,6 +947,66 @@ func (fake *FakeCloudControllerClient) CreateApplicationReturnsOnCall(i int, res
 	}
 	fake.createApplicationReturnsOnCall[i] = struct {
 		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationActionsApplyManifestByApplication(rawManifest []byte, appGUID string) (string, ccv3.Warnings, error) {
+	var rawManifestCopy []byte
+	if rawManifest != nil {
+		rawManifestCopy = make([]byte, len(rawManifest))
+		copy(rawManifestCopy, rawManifest)
+	}
+	fake.createApplicationActionsApplyManifestByApplicationMutex.Lock()
+	ret, specificReturn := fake.createApplicationActionsApplyManifestByApplicationReturnsOnCall[len(fake.createApplicationActionsApplyManifestByApplicationArgsForCall)]
+	fake.createApplicationActionsApplyManifestByApplicationArgsForCall = append(fake.createApplicationActionsApplyManifestByApplicationArgsForCall, struct {
+		rawManifest []byte
+		appGUID     string
+	}{rawManifestCopy, appGUID})
+	fake.recordInvocation("CreateApplicationActionsApplyManifestByApplication", []interface{}{rawManifestCopy, appGUID})
+	fake.createApplicationActionsApplyManifestByApplicationMutex.Unlock()
+	if fake.CreateApplicationActionsApplyManifestByApplicationStub != nil {
+		return fake.CreateApplicationActionsApplyManifestByApplicationStub(rawManifest, appGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createApplicationActionsApplyManifestByApplicationReturns.result1, fake.createApplicationActionsApplyManifestByApplicationReturns.result2, fake.createApplicationActionsApplyManifestByApplicationReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationActionsApplyManifestByApplicationCallCount() int {
+	fake.createApplicationActionsApplyManifestByApplicationMutex.RLock()
+	defer fake.createApplicationActionsApplyManifestByApplicationMutex.RUnlock()
+	return len(fake.createApplicationActionsApplyManifestByApplicationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationActionsApplyManifestByApplicationArgsForCall(i int) ([]byte, string) {
+	fake.createApplicationActionsApplyManifestByApplicationMutex.RLock()
+	defer fake.createApplicationActionsApplyManifestByApplicationMutex.RUnlock()
+	return fake.createApplicationActionsApplyManifestByApplicationArgsForCall[i].rawManifest, fake.createApplicationActionsApplyManifestByApplicationArgsForCall[i].appGUID
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationActionsApplyManifestByApplicationReturns(result1 string, result2 ccv3.Warnings, result3 error) {
+	fake.CreateApplicationActionsApplyManifestByApplicationStub = nil
+	fake.createApplicationActionsApplyManifestByApplicationReturns = struct {
+		result1 string
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationActionsApplyManifestByApplicationReturnsOnCall(i int, result1 string, result2 ccv3.Warnings, result3 error) {
+	fake.CreateApplicationActionsApplyManifestByApplicationStub = nil
+	if fake.createApplicationActionsApplyManifestByApplicationReturnsOnCall == nil {
+		fake.createApplicationActionsApplyManifestByApplicationReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createApplicationActionsApplyManifestByApplicationReturnsOnCall[i] = struct {
+		result1 string
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -3228,6 +3304,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
 	defer fake.createApplicationMutex.RUnlock()
+	fake.createApplicationActionsApplyManifestByApplicationMutex.RLock()
+	defer fake.createApplicationActionsApplyManifestByApplicationMutex.RUnlock()
 	fake.createApplicationProcessScaleMutex.RLock()
 	defer fake.createApplicationProcessScaleMutex.RUnlock()
 	fake.createApplicationTaskMutex.RLock()

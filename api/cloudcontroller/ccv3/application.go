@@ -140,6 +140,27 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 	return responseApp, response.Warnings, err
 }
 
+// CreateApplicationActionsApplyManifestByApplication applies the manifest to
+// the given application.
+func (client *Client) CreateApplicationActionsApplyManifestByApplication(rawManifest []byte, appGUID string) (string, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostApplicationManifest,
+		URIParams:   map[string]string{"app_guid": appGUID},
+		Body:        bytes.NewReader(rawManifest),
+	})
+
+	if err != nil {
+		return "", nil, err
+	}
+
+	request.Header.Set("Content-Type", "application/x-yaml")
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return response.ResourceLocationURL, response.Warnings, err
+}
+
 // DeleteApplication deletes the app with the given app GUID.
 func (client *Client) DeleteApplication(appGUID string) (string, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{

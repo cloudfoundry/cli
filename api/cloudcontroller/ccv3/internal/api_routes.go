@@ -42,6 +42,7 @@ const (
 	PatchApplicationUserProvidedEnvironmentVariablesRequest = "PatchApplicationUserProvidedEnvironmentVariablesRequest"
 	PatchOrganizationDefaultIsolationSegmentRequest         = "PatchOrganizationDefaultIsolationSegmentRequest"
 	PatchSpaceRelationshipIsolationSegmentRequest           = "PatchSpaceRelationshipIsolationSegmentRequest"
+	PostApplicationManifest                                 = "PostApplicationManifest"
 	PostApplicationProcessScaleRequest                      = "PostApplicationProcessScale"
 	PostApplicationRequest                                  = "PostApplicationRequest"
 	PostApplicationStartRequest                             = "PostApplicationStart"
@@ -84,6 +85,7 @@ var APIRoutes = []Route{
 	{Path: "/:app_guid", Method: http.MethodDelete, Name: DeleteApplicationRequest, Resource: AppsResource},
 	{Path: "/:app_guid", Method: http.MethodPatch, Name: PatchApplicationRequest, Resource: AppsResource},
 	{Path: "/:app_guid/actions/start", Method: http.MethodPost, Name: PostApplicationStartRequest, Resource: AppsResource},
+	{Path: "/:app_guid/actions/apply_manifest", Method: http.MethodPost, Name: PostApplicationManifest, Resource: AppsResource},
 	{Path: "/:app_guid/actions/stop", Method: http.MethodPost, Name: PostApplicationStopRequest, Resource: AppsResource},
 	{Path: "/:app_guid/droplets/current", Method: http.MethodGet, Name: GetApplicationDropletCurrentRequest, Resource: AppsResource},
 	{Path: "/:app_guid/env", Method: http.MethodGet, Name: GetApplicationEnvironmentVariables, Resource: AppsResource},

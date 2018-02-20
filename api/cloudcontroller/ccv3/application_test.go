@@ -20,136 +20,138 @@ var _ = Describe("Application", func() {
 		client = NewTestClient()
 	})
 
-	Describe("MarshalJSON", func() {
-		var (
-			app      Application
-			appBytes []byte
-			err      error
-		)
+	Describe("Application", func() {
+		Describe("MarshalJSON", func() {
+			var (
+				app      Application
+				appBytes []byte
+				err      error
+			)
 
-		BeforeEach(func() {
-			app = Application{}
-		})
-
-		JustBeforeEach(func() {
-			appBytes, err = app.MarshalJSON()
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		Context("when no lifecycle is provided", func() {
 			BeforeEach(func() {
 				app = Application{}
 			})
 
-			It("omits the lifecycle from the JSON", func() {
-				Expect(string(appBytes)).To(Equal("{}"))
-			})
-		})
-
-		Context("when lifecycle type docker is provided", func() {
-			BeforeEach(func() {
-				app = Application{
-					LifecycleType: constant.DockerAppLifecycleType,
-				}
+			JustBeforeEach(func() {
+				appBytes, err = app.MarshalJSON()
+				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("sets lifecycle type to docker with empty data", func() {
-				Expect(string(appBytes)).To(MatchJSON(`{"lifecycle":{"type":"docker","data":{}}}`))
-			})
-		})
+			Context("when no lifecycle is provided", func() {
+				BeforeEach(func() {
+					app = Application{}
+				})
 
-		Context("when lifecycle type buildpack is provided", func() {
-			BeforeEach(func() {
-				app.LifecycleType = constant.BuildpackAppLifecycleType
-			})
-
-			Context("when no buildpacks are provided", func() {
 				It("omits the lifecycle from the JSON", func() {
 					Expect(string(appBytes)).To(Equal("{}"))
 				})
 			})
 
-			Context("when default buildpack is provided", func() {
+			Context("when lifecycle type docker is provided", func() {
 				BeforeEach(func() {
-					app.LifecycleBuildpacks = []string{"default"}
+					app = Application{
+						LifecycleType: constant.DockerAppLifecycleType,
+					}
 				})
 
-				It("sets the lifecycle buildpack to be empty in the JSON", func() {
-					Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+				It("sets lifecycle type to docker with empty data", func() {
+					Expect(string(appBytes)).To(MatchJSON(`{"lifecycle":{"type":"docker","data":{}}}`))
 				})
 			})
 
-			Context("when null buildpack is provided", func() {
+			Context("when lifecycle type buildpack is provided", func() {
 				BeforeEach(func() {
-					app.LifecycleBuildpacks = []string{"null"}
+					app.LifecycleType = constant.BuildpackAppLifecycleType
 				})
 
-				It("sets the Lifecycle buildpack to be empty in the JSON", func() {
-					Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+				Context("when no buildpacks are provided", func() {
+					It("omits the lifecycle from the JSON", func() {
+						Expect(string(appBytes)).To(Equal("{}"))
+					})
+				})
+
+				Context("when default buildpack is provided", func() {
+					BeforeEach(func() {
+						app.LifecycleBuildpacks = []string{"default"}
+					})
+
+					It("sets the lifecycle buildpack to be empty in the JSON", func() {
+						Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+					})
+				})
+
+				Context("when null buildpack is provided", func() {
+					BeforeEach(func() {
+						app.LifecycleBuildpacks = []string{"null"}
+					})
+
+					It("sets the Lifecycle buildpack to be empty in the JSON", func() {
+						Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+					})
+				})
+
+				Context("when other buildpacks are provided", func() {
+					BeforeEach(func() {
+						app.LifecycleBuildpacks = []string{"some-buildpack"}
+					})
+
+					It("sets them in the JSON", func() {
+						Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`))
+					})
 				})
 			})
-
-			Context("when other buildpacks are provided", func() {
-				BeforeEach(func() {
-					app.LifecycleBuildpacks = []string{"some-buildpack"}
-				})
-
-				It("sets them in the JSON", func() {
-					Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`))
-				})
-			})
-		})
-	})
-
-	Describe("UnmarshalJSON", func() {
-		var (
-			app      Application
-			appBytes []byte
-			err      error
-		)
-
-		BeforeEach(func() {
-			appBytes = []byte("{}")
 		})
 
-		JustBeforeEach(func() {
-			err = json.Unmarshal(appBytes, &app)
-			Expect(err).ToNot(HaveOccurred())
-		})
+		Describe("UnmarshalJSON", func() {
+			var (
+				app      Application
+				appBytes []byte
+				err      error
+			)
 
-		Context("when no lifecycle is provided", func() {
 			BeforeEach(func() {
 				appBytes = []byte("{}")
 			})
 
-			It("omits the lifecycle from the JSON", func() {
-				Expect(app).To(Equal(Application{}))
+			JustBeforeEach(func() {
+				err = json.Unmarshal(appBytes, &app)
+				Expect(err).ToNot(HaveOccurred())
 			})
-		})
 
-		Context("when lifecycle type docker is provided", func() {
-			BeforeEach(func() {
-				appBytes = []byte(`{"lifecycle":{"type":"docker","data":{}}}`)
-			})
-			It("sets the lifecycle type to docker with empty data", func() {
-				Expect(app).To(Equal(Application{
-					LifecycleType: constant.DockerAppLifecycleType,
-				}))
-			})
-		})
-
-		Context("when lifecycle type buildpack is provided", func() {
-
-			Context("when other buildpacks are provided", func() {
+			Context("when no lifecycle is provided", func() {
 				BeforeEach(func() {
-					appBytes = []byte(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`)
+					appBytes = []byte("{}")
 				})
 
-				It("sets them in the JSON", func() {
+				It("omits the lifecycle from the JSON", func() {
+					Expect(app).To(Equal(Application{}))
+				})
+			})
+
+			Context("when lifecycle type docker is provided", func() {
+				BeforeEach(func() {
+					appBytes = []byte(`{"lifecycle":{"type":"docker","data":{}}}`)
+				})
+				It("sets the lifecycle type to docker with empty data", func() {
 					Expect(app).To(Equal(Application{
-						LifecycleType:       constant.BuildpackAppLifecycleType,
-						LifecycleBuildpacks: []string{"some-buildpack"},
+						LifecycleType: constant.DockerAppLifecycleType,
 					}))
+				})
+			})
+
+			Context("when lifecycle type buildpack is provided", func() {
+
+				Context("when other buildpacks are provided", func() {
+					BeforeEach(func() {
+						appBytes = []byte(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`)
+					})
+
+					It("sets them in the JSON", func() {
+						Expect(app).To(Equal(Application{
+							LifecycleType:       constant.BuildpackAppLifecycleType,
+							LifecycleBuildpacks: []string{"some-buildpack"},
+						}))
+					})
 				})
 			})
 		})
@@ -262,6 +264,91 @@ var _ = Describe("Application", func() {
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
 								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "App not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("CreateApplicationActionsApplyManifestByApplication", func() {
+		Context("when the manifest application is successful", func() {
+			var expectedBody []byte
+			var expectedJobURL string
+
+			BeforeEach(func() {
+				expectedBody = []byte("fake-yaml-body")
+				expectedJobURL = "i-am-a-job-url"
+				response := ""
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/actions/apply_manifest"),
+						VerifyHeaderKV("Content-type", "application/x-yaml"),
+						VerifyBody(expectedBody),
+						RespondWith(http.StatusAccepted, response, http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+							"Location":      {expectedJobURL},
+						}),
+					),
+				)
+			})
+
+			It("returns the job URL and warnings", func() {
+				jobURL, warnings, err := client.CreateApplicationActionsApplyManifestByApplication(
+					expectedBody,
+					"some-app-guid",
+				)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(jobURL).To(Equal(expectedJobURL))
+			})
+		})
+
+		Context("when the manifest application fails", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 1001,
+      "detail": "Request invalid due to parse error: invalid request body",
+      "title": "CF-MessageParseError"
+    },
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/actions/apply_manifest"),
+						VerifyHeaderKV("Content-type", "application/x-yaml"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				_, warnings, err := client.CreateApplicationActionsApplyManifestByApplication(nil, "some-app-guid")
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   1001,
+								Detail: "Request invalid due to parse error: invalid request body",
+								Title:  "CF-MessageParseError",
 							},
 							{
 								Code:   10010,
