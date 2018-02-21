@@ -64,8 +64,6 @@ var _ = Describe("Auth Actions", func() {
 
 					Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
 					Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
-					Expect(fakeConfig.UnsetUAAClientCredentialsCallCount()).To(Equal(1))
-					Expect(fakeConfig.UnsetUAAGrantTypeCallCount()).To(Equal(1))
 					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(0))
 				})
 			})
@@ -109,7 +107,6 @@ var _ = Describe("Auth Actions", func() {
 
 				Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
 				Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
-				Expect(fakeConfig.UnsetUAAClientCredentialsCallCount()).To(Equal(1))
 			})
 		})
 	})
