@@ -316,7 +316,7 @@
     "ssh",
     "ssh/terminal"
   ]
-  revision = "5119cf507ed5294cc409c092980c7497ee5d6fd2"
+  revision = "432090b8f568c018896cd8a0fb0345872bbac6ce"
 
 [[projects]]
   branch = "master"
@@ -327,7 +327,7 @@
     "html/charset",
     "websocket"
   ]
-  revision = "f5dfe339be1d06f81b22525fe34671ee7d2c8904"
+  revision = "cbe0f9307d0156177f9dd5dc85da1a31abc5f2fb"
 
 [[projects]]
   branch = "master"
@@ -360,7 +360,7 @@
     "transform",
     "unicode/cldr"
   ]
-  revision = "4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1"
+  revision = "9e2b64d659da1afe07ce1c9c1dfefc09d188f21e"
 
 [[projects]]
   name = "gopkg.in/cheggaaa/pb.v1"
