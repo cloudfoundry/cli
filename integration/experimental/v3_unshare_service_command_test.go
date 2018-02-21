@@ -394,7 +394,7 @@ var _ = Describe("v3-unshare-service command", func() {
 				It("returns a permission error on an attempt to unshare the service", func() {
 					session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName, "-f")
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Specified instance not found or not a managed service instance\\. Sharing is not supported for user provided services\\."))
+					Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
