@@ -14,7 +14,6 @@ import (
 func (actor Actor) Authenticate(ID string, secret string, grantType constant.GrantType) error {
 	actor.Config.UnsetOrganizationInformation()
 	actor.Config.UnsetSpaceInformation()
-	actor.Config.UnsetUAAClientCredentials()
 
 	accessToken, refreshToken, err := actor.UAAClient.Authenticate(ID, secret, grantType)
 	if err != nil {
@@ -25,9 +24,7 @@ func (actor Actor) Authenticate(ID string, secret string, grantType constant.Gra
 	accessToken = fmt.Sprintf("bearer %s", accessToken)
 	actor.Config.SetTokenInformation(accessToken, refreshToken, "")
 
-	if grantType == constant.GrantTypePassword {
-		actor.Config.UnsetUAAGrantType()
-	} else {
+	if grantType != constant.GrantTypePassword {
 		actor.Config.SetUAAGrantType(string(grantType))
 		actor.Config.SetUAAClientCredentials(ID, secret)
 	}
