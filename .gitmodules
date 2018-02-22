@@ -1,3 +1,0 @@
-[submodule "cli-i18n"]
-	path = cli-i18n
-	url = https://github.com/cloudfoundry/cli-i18n
