@@ -28,7 +28,7 @@ Further documentation is at the [docs page for the
 CLI](https://docs.cloudfoundry.org/cf-cli).
 
 If you have any questions, ask away on the #cli channel in [our Slack
-community](http://slack.cloudfoundry.org/) and the
+community](https://slack.cloudfoundry.org/) and the
 [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/)
 mailing list, or [open a GitHub issue](https://github.com/cloudfoundry/cli/issues/new).  You can follow our development progress
 on [Pivotal Tracker](https://www.pivotaltracker.com/n/projects/892938).
@@ -47,7 +47,7 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 
 ### Installing using a package manager
 
-**Mac OS X** and **Linux** using [Homebrew](http://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap):
+**Mac OS X** and **Linux** using [Homebrew](https://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap):
 
 ```sh
 brew install cloudfoundry/tap/cf-cli
@@ -58,7 +58,7 @@ brew install cloudfoundry/tap/cf-cli
 ```sh
 # ...first add the Cloud Foundry Foundation public key and package repository to your system
 wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
-echo "deb http://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
 # ...then, update your local package index, then finally install the cf CLI
 sudo apt-get update
 sudo apt-get install cf-cli
@@ -104,7 +104,7 @@ Follow these download links for [Mac OS X 64 bit](https://packages.cloudfoundry.
 * In Cygwin and Git Bash on Windows, interactive password prompts (in `cf login`) do not work (see [issue #171](https://github.com/cloudfoundry/cli/issues/171)). Please use alternative commands (`cf api` and `cf auth` to `cf login`) to work around this.
 * API tracing to terminal (using `CF_TRACE=true`, `-v` option or `cf config --trace`) doesn't work well with some CLI plugin commands. Trace to file works fine. On Linux, `CF_TRACE=/dev/stdout` works too. See e.g. [this Diego-Enabler plugin issue](https://github.com/cloudfoundry-incubator/Diego-Enabler/issues/6).
 * .cfignore used in `cf push` must be in UTF8 encoding for CLI to interpret correctly.
-* On Linux, when encountering message "bash: .cf: No such file or directory", ensure that you're using the correct binary or installer for your architecture. See http://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists
+* On Linux, when encountering message "bash: .cf: No such file or directory", ensure that you're using the correct binary or installer for your architecture. See https://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists
 
 ## Filing Issues & Feature Requests
 
