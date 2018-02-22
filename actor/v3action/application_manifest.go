@@ -1,5 +1,10 @@
 package v3action
 
+import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+)
+
 //go:generate counterfeiter . ManifestParser
 
 type ManifestParser interface {
@@ -34,6 +39,9 @@ func (actor Actor) ApplyApplicationManifest(parser ManifestParser, spaceGUID str
 		pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
 		allWarnings = append(allWarnings, pollWarnings...)
 		if err != nil {
+			if newErr, ok := err.(ccerror.JobFailedError); ok {
+				return allWarnings, actionerror.ApplicationManifestError{Message: newErr.Message}
+			}
 			return allWarnings, err
 		}
 	}

@@ -3,8 +3,10 @@ package v3action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	. "github.com/onsi/ginkgo"
@@ -105,7 +107,7 @@ var _ = Describe("Application Manifest Actions", func() {
 							})
 						})
 
-						Context("when polling returns an error", func() {
+						Context("when polling returns a generic error", func() {
 							var expectedErr error
 
 							BeforeEach(func() {
@@ -118,6 +120,23 @@ var _ = Describe("Application Manifest Actions", func() {
 
 							It("reports a polling error", func() {
 								Expect(executeErr).To(Equal(expectedErr))
+								Expect(warnings).To(Equal(Warnings{"app-1-warning", "apply-manifest-1-warning", "poll-1-warning"}))
+							})
+						})
+
+						Context("when polling returns an job failed error", func() {
+							var expectedErr error
+
+							BeforeEach(func() {
+								expectedErr = ccerror.JobFailedError{Message: "some-job-failed"}
+								fakeCloudControllerClient.PollJobReturns(
+									ccv3.Warnings{"poll-1-warning"},
+									expectedErr,
+								)
+							})
+
+							It("reports a polling error", func() {
+								Expect(executeErr).To(Equal(actionerror.ApplicationManifestError{Message: "some-job-failed"}))
 								Expect(warnings).To(Equal(Warnings{"app-1-warning", "apply-manifest-1-warning", "poll-1-warning"}))
 							})
 						})

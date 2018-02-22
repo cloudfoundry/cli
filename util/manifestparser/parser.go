@@ -45,6 +45,12 @@ func (parser *Parser) Parse(manifestPath string) error {
 		return errors.New("must have at least one application")
 	}
 
+	for _, application := range parser.Applications {
+		if application.Name == "" {
+			return errors.New("Found an application with no name specified")
+		}
+	}
+
 	return nil
 }
 

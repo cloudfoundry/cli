@@ -31,7 +31,7 @@ type V3ApplyManifestActor interface {
 
 type V3ApplyManifestCommand struct {
 	PathToManifest flag.PathWithExistenceCheck `short:"f" description:"Path to app manifest" required:"true"`
-	usage          interface{}                 `usage:"CF_NAME v3-apply-manifest -f APP_MANIFESTPATH"`
+	usage          interface{}                 `usage:"CF_NAME v3-apply-manifest -f APP_MANIFEST_PATH"`
 
 	UI          command.UI
 	Config      command.Config
