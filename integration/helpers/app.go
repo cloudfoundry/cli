@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"archive/zip"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
+	yaml "gopkg.in/yaml.v2"
 )
 
 func WithManifest(manifest map[string]interface{}, f func(manifestDir string)) {
@@ -155,7 +155,7 @@ func AppGUID(appName string) string {
 }
 
 func WriteManifest(path string, manifest map[string]interface{}) {
-	body, err := json.Marshal(manifest)
+	body, err := yaml.Marshal(manifest)
 	Expect(err).ToNot(HaveOccurred())
 	err = ioutil.WriteFile(path, body, 0666)
 	Expect(err).ToNot(HaveOccurred())

@@ -202,8 +202,8 @@ var _ = PDescribe("v3-apply-manifest command", func() {
 					helpers.WriteManifest(manifestPath, map[string]interface{}{
 						"applications": []map[string]interface{}{
 							{
-								"instances": 3,
 								"name":      invalidAppName,
+								"instances": 3,
 							},
 						},
 					})
