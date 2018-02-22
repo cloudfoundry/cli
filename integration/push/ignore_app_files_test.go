@@ -38,9 +38,9 @@ var _ = Describe("ignoring files while gathering resources", func() {
 					err = ioutil.WriteFile(cfIgnoreFilePath, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
-					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp)
+					session := helpers.DebugCustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp, "--no-start")
 
-					Eventually(session).Should(Say("50[0-9] B / 50[0-9] B"))
+					Eventually(session.Err).Should(Say("zipped_file_count=4"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -62,9 +62,9 @@ var _ = Describe("ignoring files while gathering resources", func() {
 						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp)
+						session := helpers.DebugCustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp, "--no-start")
 
-						Eventually(session).Should(Say("28[0-9] B / 28[0-9] B"))
+						Eventually(session.Err).Should(Say("zipped_file_count=2"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -85,9 +85,9 @@ var _ = Describe("ignoring files while gathering resources", func() {
 						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("/file*"), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp)
+						session := helpers.DebugCustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp, "--no-start")
 
-						Eventually(session).Should(Say("28[0-9] B / 28[0-9] B"))
+						Eventually(session.Err).Should(Say("zipped_file_count=2"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -113,9 +113,9 @@ var _ = Describe("ignoring files while gathering resources", func() {
 				err = os.Setenv("CF_TRACE", traceFilePath)
 				Expect(err).ToNot(HaveOccurred())
 
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp)
+				session := helpers.DebugCustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp, "--no-start")
 
-				Eventually(session).Should(Say("28[0-9] B / 28[0-9] B"))
+				Eventually(session.Err).Should(Say("zipped_file_count=2"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

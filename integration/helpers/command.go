@@ -59,6 +59,15 @@ func CustomCF(cfEnv CFEnv, args ...string) *Session {
 	return session
 }
 
+func DebugCustomCF(cfEnv CFEnv, args ...string) *Session {
+	if cfEnv.EnvVars == nil {
+		cfEnv.EnvVars = map[string]string{}
+	}
+	cfEnv.EnvVars["CF_LOG_LEVEL"] = "debug"
+
+	return CustomCF(cfEnv, args...)
+}
+
 func CFWithStdin(stdin io.Reader, args ...string) *Session {
 	WriteCommand(args)
 	command := exec.Command("cf", args...)
