@@ -18,7 +18,7 @@ Note: All contributions must be sent using GitHub Pull Requests.
 
 # Development Environment Setup
 
-## Install Golang 1.9 or higher
+## Install Golang 1.10 or higher
 
 Documentation on installing GoLang and setting the `GOROOT`, `GOPATH` and `PATH` environment variables can be found [here](https://golang.org/doc/install). While the CF CLI might be compatible with other versions of GoLang, this is the only version that the `cli` binary is built and tested with.
 
