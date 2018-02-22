@@ -11,6 +11,7 @@ import (
 
 var _ = Describe("JSONConfig", func() {
 	var homeDir string
+	var config *Config
 
 	BeforeEach(func() {
 		homeDir = setup()
@@ -21,8 +22,6 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("AccessToken", func() {
-		var config *Config
-
 		BeforeEach(func() {
 			rawConfig := `{ "AccessToken":"some-token" }`
 			setConfig(homeDir, rawConfig)
@@ -40,7 +39,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("APIVersion", func() {
 		It("returns the api version", func() {
-			config := Config{
+			config = &Config{
 				ConfigFile: JSONConfig{
 					APIVersion: "2.59.0",
 				},
@@ -53,7 +52,7 @@ var _ = Describe("JSONConfig", func() {
 	Describe("CurrentUser", func() {
 		Context("when using client credentials and the user token is set", func() {
 			It("returns the user", func() {
-				config := Config{
+				config = &Config{
 					ConfigFile: JSONConfig{
 						AccessToken: AccessTokenForClientUsers,
 					},
@@ -69,7 +68,7 @@ var _ = Describe("JSONConfig", func() {
 
 		Context("when using user/password and the user token is set", func() {
 			It("returns the user", func() {
-				config := Config{
+				config = &Config{
 					ConfigFile: JSONConfig{
 						AccessToken: AccessTokenForHumanUsers,
 					},
@@ -85,7 +84,7 @@ var _ = Describe("JSONConfig", func() {
 
 		Context("when the user token is blank", func() {
 			It("returns the user", func() {
-				var config Config
+				config = new(Config)
 				user, err := config.CurrentUser()
 				Expect(err).ToNot(HaveOccurred())
 				Expect(user).To(Equal(User{}))
@@ -96,7 +95,7 @@ var _ = Describe("JSONConfig", func() {
 	Describe("HasTargetedOrganization", func() {
 		Context("when an organization is targeted", func() {
 			It("returns true", func() {
-				config := Config{}
+				config = new(Config)
 				config.SetOrganizationInformation("guid-value-1", "my-org-name")
 				Expect(config.HasTargetedOrganization()).To(BeTrue())
 			})
@@ -104,7 +103,7 @@ var _ = Describe("JSONConfig", func() {
 
 		Context("when an organization is not targeted", func() {
 			It("returns false", func() {
-				config := Config{}
+				config = new(Config)
 				Expect(config.HasTargetedOrganization()).To(BeFalse())
 			})
 		})
@@ -113,7 +112,7 @@ var _ = Describe("JSONConfig", func() {
 	Describe("HasTargetedSpace", func() {
 		Context("when an space is targeted", func() {
 			It("returns true", func() {
-				config := Config{}
+				config = new(Config)
 				config.SetSpaceInformation("guid-value-1", "my-org-name", true)
 				Expect(config.HasTargetedSpace()).To(BeTrue())
 			})
@@ -121,7 +120,7 @@ var _ = Describe("JSONConfig", func() {
 
 		Context("when an space is not targeted", func() {
 			It("returns false", func() {
-				config := Config{}
+				config = new(Config)
 				Expect(config.HasTargetedSpace()).To(BeFalse())
 			})
 		})
@@ -129,7 +128,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("MinCLIVersion", func() {
 		It("returns the minimum CLI version the CC requires", func() {
-			config := Config{
+			config = &Config{
 				ConfigFile: JSONConfig{
 					MinCLIVersion: "1.0.0",
 				},
@@ -140,8 +139,6 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("OverallPollingTimeout", func() {
-		var config *Config
-
 		Context("when AsyncTimeout is set in config", func() {
 			BeforeEach(func() {
 				rawConfig := `{ "AsyncTimeout":5 }`
@@ -160,8 +157,6 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("RefreshToken", func() {
-		var config *Config
-
 		BeforeEach(func() {
 			rawConfig := `{ "RefreshToken":"some-token" }`
 			setConfig(homeDir, rawConfig)
@@ -179,7 +174,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SetAccessToken", func() {
 		It("sets the authentication token information", func() {
-			var config Config
+			config = new(Config)
 			config.SetAccessToken("I am the access token")
 			Expect(config.ConfigFile.AccessToken).To(Equal("I am the access token"))
 		})
@@ -187,7 +182,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SetOrganizationInformation", func() {
 		It("sets the organization GUID and name", func() {
-			config := Config{}
+			config = new(Config)
 			config.SetOrganizationInformation("guid-value-1", "my-org-name")
 
 			Expect(config.ConfigFile.TargetedOrganization.GUID).To(Equal("guid-value-1"))
@@ -197,7 +192,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SetRefreshToken", func() {
 		It("sets the refresh token information", func() {
-			var config Config
+			config = new(Config)
 			config.SetRefreshToken("I am the refresh token")
 			Expect(config.ConfigFile.RefreshToken).To(Equal("I am the refresh token"))
 		})
@@ -205,7 +200,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SetSpaceInformation", func() {
 		It("sets the space GUID, name, and AllowSSH", func() {
-			config := Config{}
+			config = new(Config)
 			config.SetSpaceInformation("guid-value-1", "my-org-name", true)
 
 			Expect(config.ConfigFile.TargetedSpace.GUID).To(Equal("guid-value-1"))
@@ -216,7 +211,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SetTargetInformation", func() {
 		It("sets the api target and other related endpoints", func() {
-			config := Config{
+			config = &Config{
 				ConfigFile: JSONConfig{
 					TargetedOrganization: Organization{
 						GUID: "this-is-a-guid",
@@ -257,7 +252,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SetTokenInformation", func() {
 		It("sets the authentication token information", func() {
-			var config Config
+			config = new(Config)
 			config.SetTokenInformation("I am the access token", "I am the refresh token", "I am the SSH OAuth client")
 
 			Expect(config.ConfigFile.AccessToken).To(Equal("I am the access token"))
@@ -268,7 +263,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SetUAAClientCredentials", func() {
 		It("sets the UAA client credentials", func() {
-			var config Config
+			config = new(Config)
 			config.SetUAAClientCredentials("some-uaa-client", "some-uaa-client-secret")
 			Expect(config.ConfigFile.UAAOAuthClient).To(Equal("some-uaa-client"))
 			Expect(config.ConfigFile.UAAOAuthClientSecret).To(Equal("some-uaa-client-secret"))
@@ -277,7 +272,7 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SetUAAEndpoint", func() {
 		It("sets the UAA endpoint", func() {
-			var config Config
+			config = new(Config)
 			config.SetUAAGrantType("some-uaa-grant-type")
 			Expect(config.ConfigFile.UAAGrantType).To(Equal("some-uaa-grant-type"))
 		})
@@ -285,15 +280,13 @@ var _ = Describe("JSONConfig", func() {
 
 	Describe("SetUAAEndpoint", func() {
 		It("sets the UAA endpoint", func() {
-			var config Config
+			config = new(Config)
 			config.SetUAAEndpoint("some-uaa-endpoint.com")
 			Expect(config.ConfigFile.UAAEndpoint).To(Equal("some-uaa-endpoint.com"))
 		})
 	})
 
 	Describe("SkipSSLValidation", func() {
-		var config *Config
-
 		BeforeEach(func() {
 			rawConfig := `{ "SSLDisabled":true }`
 			setConfig(homeDir, rawConfig)
@@ -310,8 +303,6 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("SSHOAuthClient", func() {
-		var config *Config
-
 		BeforeEach(func() {
 			rawConfig := `{ "SSHOAuthClient":"some-ssh-client" }`
 			setConfig(homeDir, rawConfig)
@@ -328,8 +319,6 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("Target", func() {
-		var config *Config
-
 		BeforeEach(func() {
 			rawConfig := `{ "Target":"https://api.foo.com" }`
 			setConfig(homeDir, rawConfig)
@@ -351,7 +340,7 @@ var _ = Describe("JSONConfig", func() {
 				GUID: "some-guid",
 				Name: "some-org",
 			}
-			config := Config{
+			config = &Config{
 				ConfigFile: JSONConfig{
 					TargetedOrganization: organization,
 				},
@@ -367,7 +356,7 @@ var _ = Describe("JSONConfig", func() {
 				GUID: "some-guid",
 				Name: "some-space",
 			}
-			config := Config{
+			config = &Config{
 				ConfigFile: JSONConfig{
 					TargetedSpace: space,
 				},
@@ -378,8 +367,6 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("UAAOAuthClient", func() {
-		var config *Config
-
 		BeforeEach(func() {
 			rawConfig := `{ "UAAOAuthClient":"some-client" }`
 			setConfig(homeDir, rawConfig)
@@ -396,8 +383,6 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("UAAOAuthClientSecret", func() {
-		var config *Config
-
 		BeforeEach(func() {
 			rawConfig := `
 					{
@@ -418,8 +403,6 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("UAAGrantType", func() {
-		var config *Config
-
 		BeforeEach(func() {
 			rawConfig := ` { "UAAGrantType": "some-grant-type" }`
 			setConfig(homeDir, rawConfig)
@@ -435,59 +418,63 @@ var _ = Describe("JSONConfig", func() {
 		})
 	})
 
-	Describe("UnsetOrganizationInformation", func() {
-		config := Config{}
+	Describe("UnsetUserInformation", func() {
 		BeforeEach(func() {
+			config = new(Config)
+			config.SetAccessToken("some-access-token")
+			config.SetRefreshToken("some-refresh-token")
+			config.SetUAAGrantType("client-credentials")
+			config.SetUAAClientCredentials("some-client", "some-client-secret")
 			config.SetOrganizationInformation("some-org-guid", "some-org")
+			config.SetSpaceInformation("guid-value-1", "my-org-name", true)
+		})
+
+		It("resets all user information", func() {
+			config.UnsetUserInformation()
+
+			Expect(config.ConfigFile.AccessToken).To(BeEmpty())
+			Expect(config.ConfigFile.RefreshToken).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedOrganization.GUID).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedOrganization.Name).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
+			Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
+			Expect(config.ConfigFile.UAAGrantType).To(BeEmpty())
+			Expect(config.ConfigFile.UAAOAuthClient).To(Equal(DefaultUAAOAuthClient))
+			Expect(config.ConfigFile.UAAOAuthClientSecret).To(Equal(DefaultUAAOAuthClientSecret))
+		})
+	})
+
+	Describe("UnsetOrganizationAndSpaceInformation", func() {
+		BeforeEach(func() {
+			config = new(Config)
+			config.SetOrganizationInformation("some-org-guid", "some-org")
+			config.SetSpaceInformation("guid-value-1", "my-org-name", true)
 		})
 
 		It("resets the org GUID and name", func() {
-			config.UnsetOrganizationInformation()
+			config.UnsetOrganizationAndSpaceInformation()
 
-			Expect(config.ConfigFile.TargetedOrganization.GUID).To(Equal(""))
-			Expect(config.ConfigFile.TargetedOrganization.Name).To(Equal(""))
+			Expect(config.ConfigFile.TargetedOrganization.GUID).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedOrganization.Name).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
 		})
 	})
 
 	Describe("UnsetSpaceInformation", func() {
-		config := Config{}
 		BeforeEach(func() {
+			config = new(Config)
 			config.SetSpaceInformation("guid-value-1", "my-org-name", true)
 		})
 
 		It("resets the space GUID, name, and AllowSSH to default values", func() {
 			config.UnsetSpaceInformation()
 
-			Expect(config.ConfigFile.TargetedSpace.GUID).To(Equal(""))
-			Expect(config.ConfigFile.TargetedSpace.Name).To(Equal(""))
+			Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
 			Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
-		})
-	})
-
-	Describe("UnsetUAAClientCredentials", func() {
-		config := Config{}
-		BeforeEach(func() {
-			config.SetUAAClientCredentials("some-client", "some-client-secret")
-		})
-
-		It("resets the org GUID and name", func() {
-			config.UnsetUAAClientCredentials()
-
-			Expect(config.ConfigFile.UAAOAuthClient).To(Equal("cf"))
-			Expect(config.ConfigFile.UAAOAuthClientSecret).To(Equal(""))
-		})
-	})
-
-	Describe("UnsetUAAGrantType", func() {
-		config := Config{}
-		BeforeEach(func() {
-			config.SetUAAGrantType("some-grant-type")
-		})
-
-		It("resets the org GUID and name", func() {
-			config.UnsetUAAGrantType()
-
-			Expect(config.ConfigFile.UAAGrantType).To(Equal(""))
 		})
 	})
 })

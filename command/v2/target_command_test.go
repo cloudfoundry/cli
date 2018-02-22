@@ -119,7 +119,7 @@ var _ = Describe("target Command", func() {
 				Expect(checkTargetedOrg).To(BeFalse())
 				Expect(checkTargetedSpace).To(BeFalse())
 
-				Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
+				Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(0))
 				Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(0))
 			})
 		})
@@ -136,7 +136,7 @@ var _ = Describe("target Command", func() {
 				It("returns the same error", func() {
 					Expect(executeErr).To(MatchError(someErr))
 
-					Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
+					Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(0))
 					Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(0))
 				})
 			})
@@ -252,8 +252,7 @@ var _ = Describe("target Command", func() {
 								Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: "some-space"}))
 
 								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
-								Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
-								Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+								Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(0))
 							})
 						})
 					})
@@ -263,8 +262,7 @@ var _ = Describe("target Command", func() {
 							Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
-							Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
-							Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+							Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(0))
 						})
 					})
 				})
@@ -286,8 +284,7 @@ var _ = Describe("target Command", func() {
 							Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org"}))
 
 							Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
-							Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
-							Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+							Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
 						})
 					})
 
@@ -334,8 +331,7 @@ var _ = Describe("target Command", func() {
 								Expect(orgName).To(Equal("some-org"))
 								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 
-								Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
-								Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(2))
+								Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
 							})
 						})
 
@@ -455,8 +451,7 @@ var _ = Describe("target Command", func() {
 								Expect(testUI.Err).To(Say("warning-2"))
 								Expect(testUI.Err).To(Say("warning-3"))
 
-								Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
-								Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(2))
+								Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
 							})
 						})
 					})
@@ -527,8 +522,7 @@ var _ = Describe("target Command", func() {
 								Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 
-								Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
-								Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+								Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
 							})
 						})
 					})
@@ -547,8 +541,7 @@ var _ = Describe("target Command", func() {
 							Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 
-							Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
-							Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+							Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
 						})
 					})
 				})

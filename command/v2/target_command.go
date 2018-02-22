@@ -109,8 +109,7 @@ func (cmd *TargetCommand) Execute(args []string) error {
 
 func (cmd TargetCommand) clearTargets() {
 	if cmd.Organization != "" {
-		cmd.Config.UnsetOrganizationInformation()
-		cmd.Config.UnsetSpaceInformation()
+		cmd.Config.UnsetOrganizationAndSpaceInformation()
 	} else if cmd.Space != "" {
 		cmd.Config.UnsetSpaceInformation()
 	}

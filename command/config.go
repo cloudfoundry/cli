@@ -55,10 +55,9 @@ type Config interface {
 	UAAOAuthClient() string
 	UAAOAuthClientSecret() string
 	UAAGrantType() string
-	UnsetOrganizationInformation()
+	UnsetUserInformation()
+	UnsetOrganizationAndSpaceInformation()
 	UnsetSpaceInformation()
-	UnsetUAAClientCredentials()
-	UnsetUAAGrantType()
 	Verbose() (bool, []string)
 	WritePluginConfig() error
 }

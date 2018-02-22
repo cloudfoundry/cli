@@ -36,15 +36,6 @@ type FakeConfig struct {
 	refreshTokenReturnsOnCall map[int]struct {
 		result1 string
 	}
-	SSHOAuthClientStub        func() string
-	sSHOAuthClientMutex       sync.RWMutex
-	sSHOAuthClientArgsForCall []struct{}
-	sSHOAuthClientReturns     struct {
-		result1 string
-	}
-	sSHOAuthClientReturnsOnCall map[int]struct {
-		result1 string
-	}
 	SetAccessTokenStub        func(accessToken string)
 	setAccessTokenMutex       sync.RWMutex
 	setAccessTokenArgsForCall []struct {
@@ -93,6 +84,15 @@ type FakeConfig struct {
 	skipSSLValidationReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	SSHOAuthClientStub        func() string
+	sSHOAuthClientMutex       sync.RWMutex
+	sSHOAuthClientArgsForCall []struct{}
+	sSHOAuthClientReturns     struct {
+		result1 string
+	}
+	sSHOAuthClientReturnsOnCall map[int]struct {
+		result1 string
+	}
 	StagingTimeoutStub        func() time.Duration
 	stagingTimeoutMutex       sync.RWMutex
 	stagingTimeoutArgsForCall []struct{}
@@ -120,22 +120,16 @@ type FakeConfig struct {
 	targetReturnsOnCall map[int]struct {
 		result1 string
 	}
-	UnsetOrganizationInformationStub        func()
-	unsetOrganizationInformationMutex       sync.RWMutex
-	unsetOrganizationInformationArgsForCall []struct{}
-	UnsetSpaceInformationStub               func()
-	unsetSpaceInformationMutex              sync.RWMutex
-	unsetSpaceInformationArgsForCall        []struct{}
-	UnsetUAAClientCredentialsStub           func()
-	unsetUAAClientCredentialsMutex          sync.RWMutex
-	unsetUAAClientCredentialsArgsForCall    []struct{}
-	UnsetUAAGrantTypeStub                   func()
-	unsetUAAGrantTypeMutex                  sync.RWMutex
-	unsetUAAGrantTypeArgsForCall            []struct{}
-	VerboseStub                             func() (bool, []string)
-	verboseMutex                            sync.RWMutex
-	verboseArgsForCall                      []struct{}
-	verboseReturns                          struct {
+	UnsetOrganizationAndSpaceInformationStub        func()
+	unsetOrganizationAndSpaceInformationMutex       sync.RWMutex
+	unsetOrganizationAndSpaceInformationArgsForCall []struct{}
+	UnsetSpaceInformationStub                       func()
+	unsetSpaceInformationMutex                      sync.RWMutex
+	unsetSpaceInformationArgsForCall                []struct{}
+	VerboseStub                                     func() (bool, []string)
+	verboseMutex                                    sync.RWMutex
+	verboseArgsForCall                              []struct{}
+	verboseReturns                                  struct {
 		result1 bool
 		result2 []string
 	}
@@ -263,46 +257,6 @@ func (fake *FakeConfig) RefreshTokenReturnsOnCall(i int, result1 string) {
 		})
 	}
 	fake.refreshTokenReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) SSHOAuthClient() string {
-	fake.sSHOAuthClientMutex.Lock()
-	ret, specificReturn := fake.sSHOAuthClientReturnsOnCall[len(fake.sSHOAuthClientArgsForCall)]
-	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct{}{})
-	fake.recordInvocation("SSHOAuthClient", []interface{}{})
-	fake.sSHOAuthClientMutex.Unlock()
-	if fake.SSHOAuthClientStub != nil {
-		return fake.SSHOAuthClientStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.sSHOAuthClientReturns.result1
-}
-
-func (fake *FakeConfig) SSHOAuthClientCallCount() int {
-	fake.sSHOAuthClientMutex.RLock()
-	defer fake.sSHOAuthClientMutex.RUnlock()
-	return len(fake.sSHOAuthClientArgsForCall)
-}
-
-func (fake *FakeConfig) SSHOAuthClientReturns(result1 string) {
-	fake.SSHOAuthClientStub = nil
-	fake.sSHOAuthClientReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) SSHOAuthClientReturnsOnCall(i int, result1 string) {
-	fake.SSHOAuthClientStub = nil
-	if fake.sSHOAuthClientReturnsOnCall == nil {
-		fake.sSHOAuthClientReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.sSHOAuthClientReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -500,6 +454,46 @@ func (fake *FakeConfig) SkipSSLValidationReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeConfig) SSHOAuthClient() string {
+	fake.sSHOAuthClientMutex.Lock()
+	ret, specificReturn := fake.sSHOAuthClientReturnsOnCall[len(fake.sSHOAuthClientArgsForCall)]
+	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("SSHOAuthClient", []interface{}{})
+	fake.sSHOAuthClientMutex.Unlock()
+	if fake.SSHOAuthClientStub != nil {
+		return fake.SSHOAuthClientStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.sSHOAuthClientReturns.result1
+}
+
+func (fake *FakeConfig) SSHOAuthClientCallCount() int {
+	fake.sSHOAuthClientMutex.RLock()
+	defer fake.sSHOAuthClientMutex.RUnlock()
+	return len(fake.sSHOAuthClientArgsForCall)
+}
+
+func (fake *FakeConfig) SSHOAuthClientReturns(result1 string) {
+	fake.SSHOAuthClientStub = nil
+	fake.sSHOAuthClientReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) SSHOAuthClientReturnsOnCall(i int, result1 string) {
+	fake.SSHOAuthClientStub = nil
+	if fake.sSHOAuthClientReturnsOnCall == nil {
+		fake.sSHOAuthClientReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.sSHOAuthClientReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) StagingTimeout() time.Duration {
 	fake.stagingTimeoutMutex.Lock()
 	ret, specificReturn := fake.stagingTimeoutReturnsOnCall[len(fake.stagingTimeoutArgsForCall)]
@@ -620,20 +614,20 @@ func (fake *FakeConfig) TargetReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
-func (fake *FakeConfig) UnsetOrganizationInformation() {
-	fake.unsetOrganizationInformationMutex.Lock()
-	fake.unsetOrganizationInformationArgsForCall = append(fake.unsetOrganizationInformationArgsForCall, struct{}{})
-	fake.recordInvocation("UnsetOrganizationInformation", []interface{}{})
-	fake.unsetOrganizationInformationMutex.Unlock()
-	if fake.UnsetOrganizationInformationStub != nil {
-		fake.UnsetOrganizationInformationStub()
+func (fake *FakeConfig) UnsetOrganizationAndSpaceInformation() {
+	fake.unsetOrganizationAndSpaceInformationMutex.Lock()
+	fake.unsetOrganizationAndSpaceInformationArgsForCall = append(fake.unsetOrganizationAndSpaceInformationArgsForCall, struct{}{})
+	fake.recordInvocation("UnsetOrganizationAndSpaceInformation", []interface{}{})
+	fake.unsetOrganizationAndSpaceInformationMutex.Unlock()
+	if fake.UnsetOrganizationAndSpaceInformationStub != nil {
+		fake.UnsetOrganizationAndSpaceInformationStub()
 	}
 }
 
-func (fake *FakeConfig) UnsetOrganizationInformationCallCount() int {
-	fake.unsetOrganizationInformationMutex.RLock()
-	defer fake.unsetOrganizationInformationMutex.RUnlock()
-	return len(fake.unsetOrganizationInformationArgsForCall)
+func (fake *FakeConfig) UnsetOrganizationAndSpaceInformationCallCount() int {
+	fake.unsetOrganizationAndSpaceInformationMutex.RLock()
+	defer fake.unsetOrganizationAndSpaceInformationMutex.RUnlock()
+	return len(fake.unsetOrganizationAndSpaceInformationArgsForCall)
 }
 
 func (fake *FakeConfig) UnsetSpaceInformation() {
@@ -650,38 +644,6 @@ func (fake *FakeConfig) UnsetSpaceInformationCallCount() int {
 	fake.unsetSpaceInformationMutex.RLock()
 	defer fake.unsetSpaceInformationMutex.RUnlock()
 	return len(fake.unsetSpaceInformationArgsForCall)
-}
-
-func (fake *FakeConfig) UnsetUAAClientCredentials() {
-	fake.unsetUAAClientCredentialsMutex.Lock()
-	fake.unsetUAAClientCredentialsArgsForCall = append(fake.unsetUAAClientCredentialsArgsForCall, struct{}{})
-	fake.recordInvocation("UnsetUAAClientCredentials", []interface{}{})
-	fake.unsetUAAClientCredentialsMutex.Unlock()
-	if fake.UnsetUAAClientCredentialsStub != nil {
-		fake.UnsetUAAClientCredentialsStub()
-	}
-}
-
-func (fake *FakeConfig) UnsetUAAClientCredentialsCallCount() int {
-	fake.unsetUAAClientCredentialsMutex.RLock()
-	defer fake.unsetUAAClientCredentialsMutex.RUnlock()
-	return len(fake.unsetUAAClientCredentialsArgsForCall)
-}
-
-func (fake *FakeConfig) UnsetUAAGrantType() {
-	fake.unsetUAAGrantTypeMutex.Lock()
-	fake.unsetUAAGrantTypeArgsForCall = append(fake.unsetUAAGrantTypeArgsForCall, struct{}{})
-	fake.recordInvocation("UnsetUAAGrantType", []interface{}{})
-	fake.unsetUAAGrantTypeMutex.Unlock()
-	if fake.UnsetUAAGrantTypeStub != nil {
-		fake.UnsetUAAGrantTypeStub()
-	}
-}
-
-func (fake *FakeConfig) UnsetUAAGrantTypeCallCount() int {
-	fake.unsetUAAGrantTypeMutex.RLock()
-	defer fake.unsetUAAGrantTypeMutex.RUnlock()
-	return len(fake.unsetUAAGrantTypeArgsForCall)
 }
 
 func (fake *FakeConfig) Verbose() (bool, []string) {
@@ -736,8 +698,6 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.pollingIntervalMutex.RUnlock()
 	fake.refreshTokenMutex.RLock()
 	defer fake.refreshTokenMutex.RUnlock()
-	fake.sSHOAuthClientMutex.RLock()
-	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
 	fake.setRefreshTokenMutex.RLock()
@@ -752,20 +712,18 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setUAAGrantTypeMutex.RUnlock()
 	fake.skipSSLValidationMutex.RLock()
 	defer fake.skipSSLValidationMutex.RUnlock()
+	fake.sSHOAuthClientMutex.RLock()
+	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.stagingTimeoutMutex.RLock()
 	defer fake.stagingTimeoutMutex.RUnlock()
 	fake.startupTimeoutMutex.RLock()
 	defer fake.startupTimeoutMutex.RUnlock()
 	fake.targetMutex.RLock()
 	defer fake.targetMutex.RUnlock()
-	fake.unsetOrganizationInformationMutex.RLock()
-	defer fake.unsetOrganizationInformationMutex.RUnlock()
+	fake.unsetOrganizationAndSpaceInformationMutex.RLock()
+	defer fake.unsetOrganizationAndSpaceInformationMutex.RUnlock()
 	fake.unsetSpaceInformationMutex.RLock()
 	defer fake.unsetSpaceInformationMutex.RUnlock()
-	fake.unsetUAAClientCredentialsMutex.RLock()
-	defer fake.unsetUAAClientCredentialsMutex.RUnlock()
-	fake.unsetUAAGrantTypeMutex.RLock()
-	defer fake.unsetUAAGrantTypeMutex.RUnlock()
 	fake.verboseMutex.RLock()
 	defer fake.verboseMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

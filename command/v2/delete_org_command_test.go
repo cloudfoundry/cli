@@ -250,7 +250,7 @@ var _ = Describe("delete-org Command", func() {
 
 					It("clears the targeted org and space from the config", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeActor.ClearOrganizationAndSpaceCallCount()).To(Equal(1))
+						Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
 					})
 				})
 
@@ -261,7 +261,7 @@ var _ = Describe("delete-org Command", func() {
 
 					It("does not clear the targeted org and space from the config", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeActor.ClearOrganizationAndSpaceCallCount()).To(Equal(0))
+						Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(0))
 					})
 				})
 			})

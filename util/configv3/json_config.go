@@ -153,8 +153,7 @@ func (config *Config) SetTargetInformation(api string, apiVersion string, auth s
 	config.ConfigFile.RoutingEndpoint = routing
 	config.ConfigFile.SkipSSLValidation = skipSSLValidation
 
-	config.UnsetOrganizationInformation()
-	config.UnsetSpaceInformation()
+	config.UnsetOrganizationAndSpaceInformation()
 }
 
 // SetTokenInformation sets the current token/user information.
@@ -218,27 +217,28 @@ func (config *Config) UAAGrantType() string {
 	return config.ConfigFile.UAAGrantType
 }
 
-// UnsetOrganizationInformation resets the organization values to default.
-func (config *Config) UnsetOrganizationInformation() {
-	config.SetOrganizationInformation("", "")
+// UnsetUserInformation resets the access token, refresh token, UAA grant type,
+// UAA client credentials, and targeted org/space information.
+func (config *Config) UnsetUserInformation() {
+	config.SetAccessToken("")
+	config.SetRefreshToken("")
+	config.SetUAAGrantType("")
+	config.SetUAAClientCredentials(DefaultUAAOAuthClient, DefaultUAAOAuthClientSecret)
 
+	config.UnsetOrganizationAndSpaceInformation()
+
+}
+
+// UnsetOrganizationAndSpaceInformation resets the organization and space
+// values to default.
+func (config *Config) UnsetOrganizationAndSpaceInformation() {
+	config.SetOrganizationInformation("", "")
+	config.UnsetSpaceInformation()
 }
 
 // UnsetSpaceInformation resets the space values to default.
 func (config *Config) UnsetSpaceInformation() {
 	config.SetSpaceInformation("", "", false)
-}
-
-// UnsetUAAClientCredentials resets the client credentials to the default (cf:
-// is the default credential for password grant type).
-func (config *Config) UnsetUAAClientCredentials() {
-	config.SetUAAClientCredentials("cf", "")
-}
-
-// UnsetUAAGrantType resets the grant type to the default (password is empty
-// grant type).
-func (config *Config) UnsetUAAGrantType() {
-	config.SetUAAGrantType("")
 }
 
 func decodeUserFromJWT(accessToken string) (User, error) {
