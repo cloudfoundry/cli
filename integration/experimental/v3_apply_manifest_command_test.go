@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("v3-apply-manifest command", func() {
+var _ = PDescribe("v3-apply-manifest command", func() {
 	var (
 		orgName      string
 		spaceName    string
