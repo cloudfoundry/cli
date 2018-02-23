@@ -17,9 +17,8 @@ import (
 //go:generate counterfeiter . ManifestParser
 
 type ManifestParser interface {
-	AppNames() []string
+	v3action.ManifestParser
 	Parse(manifestPath string) error
-	RawManifest(name string) ([]byte, error)
 }
 
 //go:generate counterfeiter . V3ApplyManifestActor
