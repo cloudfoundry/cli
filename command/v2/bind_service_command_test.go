@@ -134,7 +134,7 @@ var _ = Describe("bind-service Command", func() {
 					})
 
 					It("displays flavor text", func() {
-						Expect(testUI.Out).To(Say("Binding service some-service to app some-app in org some-org / space some-space as some-user..."))
+						Expect(testUI.Out).To(Say("Binding service some-service to app some-app with binding name some-binding-name in org some-org / space some-space as some-user..."))
 
 						Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 					})

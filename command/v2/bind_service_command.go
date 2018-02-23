@@ -21,7 +21,7 @@ type BindServiceActor interface {
 
 type BindServiceCommand struct {
 	RequiredArgs     flag.BindServiceArgs          `positional-args:"yes"`
-	BindingName      string                        `long:"name" description:"Name to expose service instance to app process with (Default: service instance name)"`
+	BindingName      string                        `long:"binding-name" description:"Name to expose service instance to app process with (Default: service instance name)"`
 	ParametersAsJSON flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
 	usage            interface{}                   `usage:"CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"permissions\": \"read-only\"\n   }\n\nEXAMPLES:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json"`
 	relatedCommands  interface{}                   `related_commands:"services"`
@@ -64,9 +64,15 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...", map[string]interface{}{
+	template := "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+	if cmd.BindingName != "" {
+		template = "Binding service {{.ServiceName}} to app {{.AppName}} with binding name {{.BindingName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+	}
+
+	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
 		"ServiceName": cmd.RequiredArgs.ServiceInstanceName,
 		"AppName":     cmd.RequiredArgs.AppName,
+		"BindingName": cmd.BindingName,
 		"OrgName":     cmd.Config.TargetedOrganization().Name,
 		"SpaceName":   cmd.Config.TargetedSpace().Name,
 		"CurrentUser": user.Name,
