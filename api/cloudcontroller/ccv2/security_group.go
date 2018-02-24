@@ -8,30 +8,34 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
-// SecurityGroupLifecycle represents the lifecycle phase of a security group
-// binding.
-type SecurityGroupLifecycle string
-
-const (
-	// SecurityGroupLifecycleRunning indicates the lifecycle phase running.
-	SecurityGroupLifecycleRunning SecurityGroupLifecycle = "running"
-
-	// SecurityGroupLifecycleStaging indicates the lifecycle phase staging.
-	SecurityGroupLifecycleStaging SecurityGroupLifecycle = "staging"
-)
-
+// SecurityGroupRule represents a Cloud Controller Security Group Role.
 type SecurityGroupRule struct {
+	// Description is a short message discribing the rule.
 	Description string
+
+	// Destination is the destination CIDR or range of IPs.
 	Destination string
-	Ports       string
-	Protocol    string
+
+	// Ports is the port or port range.
+	Ports string
+
+	// Protocol can be tcp, icmp, udp, all.
+	Protocol string
 }
 
+// SecurityGroup represents a Cloud Controller Security Group.
 type SecurityGroup struct {
-	GUID           string
-	Name           string
-	Rules          []SecurityGroupRule
+	// GUID is the unique Security Group identifier.
+	GUID string
+	// Name is the Security Group's name.
+	Name string
+	// Rules are the Security Group Rules associated with this Security Group.
+	Rules []SecurityGroupRule
+	// RunningDefault is true when this Security Group is applied to all running
+	// apps in the CF instance.
 	RunningDefault bool
+	// StagingDefault is true when this Security Group is applied to all staging
+	// apps in the CF instance.
 	StagingDefault bool
 }
 
@@ -115,6 +119,8 @@ func (client *Client) UpdateSecurityGroupStagingSpace(securityGroupGUID string, 
 	return response.Warnings, err
 }
 
+// GetSecurityGroups returns a list of Security Groups based off the provided
+// filters.
 func (client *Client) GetSecurityGroups(filters ...Filter) ([]SecurityGroup, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSecurityGroupsRequest,

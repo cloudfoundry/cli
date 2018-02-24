@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -120,7 +120,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					securityGroupName, spaceGUID, lifecycle := fakeActor.UnbindSecurityGroupByNameAndSpaceArgsForCall(0)
 					Expect(securityGroupName).To(Equal("some-security-group"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(lifecycle).To(Equal(ccv2.SecurityGroupLifecycle("some-lifecycle")))
+					Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycle("some-lifecycle")))
 				})
 
 				Context("when the actor returns a security group not found error", func() {
@@ -219,7 +219,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					Expect(securityGroupName).To(Equal("some-security-group"))
 					Expect(orgName).To(Equal("some-org"))
 					Expect(spaceName).To(Equal("some-space"))
-					Expect(lifecycle).To(Equal(ccv2.SecurityGroupLifecycle("some-lifecycle")))
+					Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycle("some-lifecycle")))
 				})
 			})
 
@@ -244,7 +244,7 @@ var _ = Describe("unbind-security-group Command", func() {
 						v2action.Warnings{"unbind warning"},
 						actionerror.SecurityGroupNotBoundError{
 							Name:      "some-security-group",
-							Lifecycle: ccv2.SecurityGroupLifecycle("some-lifecycle"),
+							Lifecycle: constant.SecurityGroupLifecycle("some-lifecycle"),
 						})
 				})
 
@@ -299,7 +299,7 @@ var _ = Describe("unbind-security-group Command", func() {
 
 	Context("when lifecycle is 'running'", func() {
 		BeforeEach(func() {
-			cmd.Lifecycle = flag.SecurityGroupLifecycle(ccv2.SecurityGroupLifecycleRunning)
+			cmd.Lifecycle = flag.SecurityGroupLifecycle(constant.SecurityGroupLifecycleRunning)
 			fakeActor.CloudControllerAPIVersionReturns("2.34.0")
 		})
 
@@ -310,7 +310,7 @@ var _ = Describe("unbind-security-group Command", func() {
 
 	Context("when lifecycle is 'staging'", func() {
 		BeforeEach(func() {
-			cmd.Lifecycle = flag.SecurityGroupLifecycle(ccv2.SecurityGroupLifecycleStaging)
+			cmd.Lifecycle = flag.SecurityGroupLifecycle(constant.SecurityGroupLifecycleStaging)
 		})
 
 		Context("when the version check fails", func() {

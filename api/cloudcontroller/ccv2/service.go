@@ -7,15 +7,25 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+// Service represents a Cloud Controller Service.
 type Service struct {
-	GUID             string
-	Label            string
-	Description      string
+	// GUID is the unique Service identifier.
+	GUID string
+	// Label is the name of the service.
+	Label string
+	// Description is a short blurb describing the service.
+	Description string
+	// DocumentationURL is a url that points to a documentation page for the
+	// service.
 	DocumentationURL string
-	Extra            ServiceExtra
+	// Extra is a field with extra data pertaining to the service.
+	Extra ServiceExtra
 }
 
+// ServiceExtra contains extra service related properties.
 type ServiceExtra struct {
+	// Shareable is true if the service is shareable across organizations and
+	// spaces.
 	Shareable bool
 }
 

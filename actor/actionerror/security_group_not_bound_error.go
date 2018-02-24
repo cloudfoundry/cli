@@ -3,13 +3,13 @@ package actionerror
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
 // SecurityGroupNotBoundError is returned when a requested security group is
 // not bound in the requested lifecycle phase to the requested space.
 type SecurityGroupNotBoundError struct {
-	Lifecycle ccv2.SecurityGroupLifecycle
+	Lifecycle constant.SecurityGroupLifecycle
 	Name      string
 }
 

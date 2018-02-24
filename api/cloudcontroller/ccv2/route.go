@@ -102,10 +102,11 @@ func (client *Client) DeleteRouteApplication(routeGUID string, appGUID string) (
 }
 
 // CreateRoute creates the route with the given properties; SpaceGUID and
-// DomainGUID are required. Set generatePort true to generate a random port on
-// the cloud controller. generatePort takes precedence over manually specified
-// port. Setting the port and generatePort only works with CC API 2.53.0 or
-// higher and when TCP router groups are enabled.
+// DomainGUID are required Route properties. Additional configuration rules:
+// - generatePort = true to generate a random port on the cloud controller.
+// - generatePort takes precedence over the provided port. Setting the port and
+// generatePort only works with CC API 2.53.0 or higher and when TCP router
+// groups are enabled.
 func (client *Client) CreateRoute(route Route, generatePort bool) (Route, Warnings, error) {
 	body, err := json.Marshal(route)
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -16,8 +16,8 @@ import (
 
 type UnbindSecurityGroupActor interface {
 	CloudControllerAPIVersion() string
-	UnbindSecurityGroupByNameAndSpace(securityGroupName string, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (v2action.Warnings, error)
-	UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securityGroupName string, orgName string, spaceName string, lifecycle ccv2.SecurityGroupLifecycle) (v2action.Warnings, error)
+	UnbindSecurityGroupByNameAndSpace(securityGroupName string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (v2action.Warnings, error)
+	UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securityGroupName string, orgName string, spaceName string, lifecycle constant.SecurityGroupLifecycle) (v2action.Warnings, error)
 }
 
 type UnbindSecurityGroupCommand struct {
@@ -48,7 +48,7 @@ func (cmd *UnbindSecurityGroupCommand) Setup(config command.Config, ui command.U
 
 func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 	var err error
-	if ccv2.SecurityGroupLifecycle(cmd.Lifecycle) == ccv2.SecurityGroupLifecycleStaging {
+	if constant.SecurityGroupLifecycle(cmd.Lifecycle) == constant.SecurityGroupLifecycleStaging {
 		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
 		if err != nil {
 			switch e := err.(type) {
@@ -84,7 +84,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 			"SpaceName":         space.Name,
 			"Username":          user.Name,
 		})
-		warnings, err = cmd.Actor.UnbindSecurityGroupByNameAndSpace(cmd.RequiredArgs.SecurityGroupName, space.GUID, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
+		warnings, err = cmd.Actor.UnbindSecurityGroupByNameAndSpace(cmd.RequiredArgs.SecurityGroupName, space.GUID, constant.SecurityGroupLifecycle(cmd.Lifecycle))
 
 	case cmd.RequiredArgs.OrganizationName != "" && cmd.RequiredArgs.SpaceName != "":
 		err = cmd.SharedActor.CheckTarget(false, false)
@@ -98,7 +98,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 			"SpaceName":         cmd.RequiredArgs.SpaceName,
 			"Username":          user.Name,
 		})
-		warnings, err = cmd.Actor.UnbindSecurityGroupByNameOrganizationNameAndSpaceName(cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName, cmd.RequiredArgs.SpaceName, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
+		warnings, err = cmd.Actor.UnbindSecurityGroupByNameOrganizationNameAndSpaceName(cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName, cmd.RequiredArgs.SpaceName, constant.SecurityGroupLifecycle(cmd.Lifecycle))
 
 	default:
 		return translatableerror.ThreeRequiredArgumentsError{

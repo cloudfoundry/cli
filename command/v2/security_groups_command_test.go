@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -110,19 +110,19 @@ var _ = Describe("security-groups Command", func() {
 						SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-1"},
 						Organization:  &v2action.Organization{Name: "org-11"},
 						Space:         &v2action.Space{Name: "space-111"},
-						Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						Lifecycle:     constant.SecurityGroupLifecycleRunning,
 					},
 					{
 						SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-1"},
 						Organization:  &v2action.Organization{Name: "org-12"},
 						Space:         &v2action.Space{Name: "space-121"},
-						Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						Lifecycle:     constant.SecurityGroupLifecycleRunning,
 					},
 					{
 						SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-1"},
 						Organization:  &v2action.Organization{Name: "org-12"},
 						Space:         &v2action.Space{Name: "space-122"},
-						Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+						Lifecycle:     constant.SecurityGroupLifecycleStaging,
 					},
 					{
 						SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-2"},
@@ -133,7 +133,7 @@ var _ = Describe("security-groups Command", func() {
 						SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-3"},
 						Organization:  &v2action.Organization{Name: "org-31"},
 						Space:         &v2action.Space{Name: "space-311"},
-						Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						Lifecycle:     constant.SecurityGroupLifecycleRunning,
 					},
 					{
 						SecurityGroup: &v2action.SecurityGroup{
@@ -142,7 +142,7 @@ var _ = Describe("security-groups Command", func() {
 						},
 						Organization: &v2action.Organization{Name: ""},
 						Space:        &v2action.Space{Name: ""},
-						Lifecycle:    ccv2.SecurityGroupLifecycleRunning,
+						Lifecycle:    constant.SecurityGroupLifecycleRunning,
 					},
 					{
 						SecurityGroup: &v2action.SecurityGroup{
@@ -151,7 +151,7 @@ var _ = Describe("security-groups Command", func() {
 						},
 						Organization: &v2action.Organization{Name: ""},
 						Space:        &v2action.Space{Name: ""},
-						Lifecycle:    ccv2.SecurityGroupLifecycleStaging,
+						Lifecycle:    constant.SecurityGroupLifecycleStaging,
 					},
 				}
 				fakeActor.GetSecurityGroupsWithOrganizationSpaceAndLifecycleReturns(secGroups, v2action.Warnings{"warning-1", "warning-2"}, nil)

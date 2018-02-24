@@ -3,13 +3,13 @@ package actionerror
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
 // InvalidLifecycleError is returned when the lifecycle specified is neither
 // running nor staging.
 type InvalidLifecycleError struct {
-	Lifecycle ccv2.SecurityGroupLifecycle
+	Lifecycle constant.SecurityGroupLifecycle
 }
 
 func (e InvalidLifecycleError) Error() string {

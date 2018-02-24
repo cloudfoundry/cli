@@ -3,7 +3,7 @@ package v2
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -14,7 +14,7 @@ import (
 //go:generate counterfeiter . BindSecurityGroupActor
 
 type BindSecurityGroupActor interface {
-	BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (v2action.Warnings, error)
+	BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (v2action.Warnings, error)
 	CloudControllerAPIVersion() string
 	GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error)
 	GetOrganizationSpaces(orgGUID string) ([]v2action.Space, v2action.Warnings, error)
@@ -50,7 +50,7 @@ func (cmd *BindSecurityGroupCommand) Setup(config command.Config, ui command.UI)
 
 func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 	var err error
-	if ccv2.SecurityGroupLifecycle(cmd.Lifecycle) == ccv2.SecurityGroupLifecycleStaging {
+	if constant.SecurityGroupLifecycle(cmd.Lifecycle) == constant.SecurityGroupLifecycleStaging {
 		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
 		if err != nil {
 			switch e := err.(type) {
@@ -114,7 +114,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 			"username":       user.Name,
 		})
 
-		warnings, err = cmd.Actor.BindSecurityGroupToSpace(securityGroup.GUID, space.GUID, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
+		warnings, err = cmd.Actor.BindSecurityGroupToSpace(securityGroup.GUID, space.GUID, constant.SecurityGroupLifecycle(cmd.Lifecycle))
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err

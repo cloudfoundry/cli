@@ -18,19 +18,19 @@ type SecurityGroupWithOrganizationSpaceAndLifecycle struct {
 	SecurityGroup *SecurityGroup
 	Organization  *Organization
 	Space         *Space
-	Lifecycle     ccv2.SecurityGroupLifecycle
+	Lifecycle     constant.SecurityGroupLifecycle
 }
 
-func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (Warnings, error) {
+func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
 	var (
 		warnings ccv2.Warnings
 		err      error
 	)
 
 	switch lifecycle {
-	case ccv2.SecurityGroupLifecycleRunning:
+	case constant.SecurityGroupLifecycleRunning:
 		warnings, err = actor.CloudControllerClient.UpdateSecurityGroupSpace(securityGroupGUID, spaceGUID)
-	case ccv2.SecurityGroupLifecycleStaging:
+	case constant.SecurityGroupLifecycleStaging:
 		warnings, err = actor.CloudControllerClient.UpdateSecurityGroupStagingSpace(securityGroupGUID, spaceGUID)
 	default:
 		err = actionerror.InvalidLifecycleError{Lifecycle: lifecycle}
@@ -63,7 +63,7 @@ func (actor Actor) GetSecurityGroupByName(securityGroupName string) (SecurityGro
 
 type SpaceWithLifecycle struct {
 	ccv2.Space
-	Lifecycle ccv2.SecurityGroupLifecycle
+	Lifecycle constant.SecurityGroupLifecycle
 }
 
 func (actor Actor) getSecurityGroupSpacesAndAssignedLifecycles(securityGroupGUID string, includeStaging bool) ([]SpaceWithLifecycle, Warnings, error) {
@@ -79,7 +79,7 @@ func (actor Actor) getSecurityGroupSpacesAndAssignedLifecycles(securityGroupGUID
 	}
 
 	for _, space := range runningSpaces {
-		spacesWithLifecycles = append(spacesWithLifecycles, SpaceWithLifecycle{Space: space, Lifecycle: ccv2.SecurityGroupLifecycleRunning})
+		spacesWithLifecycles = append(spacesWithLifecycles, SpaceWithLifecycle{Space: space, Lifecycle: constant.SecurityGroupLifecycleRunning})
 	}
 
 	if includeStaging {
@@ -90,7 +90,7 @@ func (actor Actor) getSecurityGroupSpacesAndAssignedLifecycles(securityGroupGUID
 		}
 
 		for _, space := range stagingSpaces {
-			spacesWithLifecycles = append(spacesWithLifecycles, SpaceWithLifecycle{Space: space, Lifecycle: ccv2.SecurityGroupLifecycleStaging})
+			spacesWithLifecycles = append(spacesWithLifecycles, SpaceWithLifecycle{Space: space, Lifecycle: constant.SecurityGroupLifecycleStaging})
 		}
 	}
 
@@ -133,7 +133,7 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 					SecurityGroup: &securityGroup,
 					Organization:  &Organization{},
 					Space:         &Space{},
-					Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+					Lifecycle:     constant.SecurityGroupLifecycleRunning,
 				})
 		}
 
@@ -143,7 +143,7 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 					SecurityGroup: &securityGroup,
 					Organization:  &Organization{},
 					Space:         &Space{},
-					Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+					Lifecycle:     constant.SecurityGroupLifecycleStaging,
 				})
 		}
 
@@ -245,8 +245,8 @@ func (actor Actor) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string) ([]Sec
 	return processSecurityGroups(spaceGUID, ccv2SecurityGroups, Warnings(warnings), err)
 }
 
-func (actor Actor) UnbindSecurityGroupByNameAndSpace(securityGroupName string, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (Warnings, error) {
-	if lifecycle != ccv2.SecurityGroupLifecycleRunning && lifecycle != ccv2.SecurityGroupLifecycleStaging {
+func (actor Actor) UnbindSecurityGroupByNameAndSpace(securityGroupName string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
+	if lifecycle != constant.SecurityGroupLifecycleRunning && lifecycle != constant.SecurityGroupLifecycleStaging {
 		return nil, actionerror.InvalidLifecycleError{Lifecycle: lifecycle}
 	}
 
@@ -264,8 +264,8 @@ func (actor Actor) UnbindSecurityGroupByNameAndSpace(securityGroupName string, s
 	return allWarnings, err
 }
 
-func (actor Actor) UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securityGroupName string, orgName string, spaceName string, lifecycle ccv2.SecurityGroupLifecycle) (Warnings, error) {
-	if lifecycle != ccv2.SecurityGroupLifecycleRunning && lifecycle != ccv2.SecurityGroupLifecycleStaging {
+func (actor Actor) UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securityGroupName string, orgName string, spaceName string, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
+	if lifecycle != constant.SecurityGroupLifecycleRunning && lifecycle != constant.SecurityGroupLifecycleStaging {
 		return nil, actionerror.InvalidLifecycleError{Lifecycle: lifecycle}
 	}
 
@@ -294,8 +294,8 @@ func (actor Actor) UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securit
 	return allWarnings, err
 }
 
-func (actor Actor) unbindSecurityGroupAndSpace(securityGroup SecurityGroup, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (Warnings, error) {
-	if lifecycle == ccv2.SecurityGroupLifecycleRunning {
+func (actor Actor) unbindSecurityGroupAndSpace(securityGroup SecurityGroup, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (Warnings, error) {
+	if lifecycle == constant.SecurityGroupLifecycleRunning {
 		return actor.doUnbind(securityGroup, spaceGUID, lifecycle,
 			actor.isRunningSecurityGroupBoundToSpace,
 			actor.isStagingSecurityGroupBoundToSpace,
@@ -310,7 +310,7 @@ func (actor Actor) unbindSecurityGroupAndSpace(securityGroup SecurityGroup, spac
 
 func (Actor) doUnbind(securityGroup SecurityGroup,
 	spaceGUID string,
-	lifecycle ccv2.SecurityGroupLifecycle,
+	lifecycle constant.SecurityGroupLifecycle,
 	requestedPhaseSecurityGroupBoundToSpace func(string, string) (bool, Warnings, error),
 	otherPhaseSecurityGroupBoundToSpace func(string, string) (bool, Warnings, error),
 	removeSpaceFromPhaseSecurityGroup func(string, string) (ccv2.Warnings, error)) (Warnings, error) {
@@ -338,7 +338,7 @@ func (Actor) doUnbind(securityGroup SecurityGroup,
 	return allWarnings, err
 }
 
-func extractSecurityGroupRules(securityGroup SecurityGroup, lifecycle ccv2.SecurityGroupLifecycle) []SecurityGroupRule {
+func extractSecurityGroupRules(securityGroup SecurityGroup, lifecycle constant.SecurityGroupLifecycle) []SecurityGroupRule {
 	securityGroupRules := make([]SecurityGroupRule, len(securityGroup.Rules))
 
 	for i, rule := range securityGroup.Rules {

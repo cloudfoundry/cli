@@ -3,14 +3,14 @@ package v2action
 import (
 	"sort"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
 type SecurityGroupRule struct {
 	Name        string
 	Description string
 	Destination string
-	Lifecycle   ccv2.SecurityGroupLifecycle
+	Lifecycle   constant.SecurityGroupLifecycle
 	Ports       string
 	Protocol    string
 }
@@ -88,7 +88,7 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 
 	for _, securityGroup := range securityGroups {
 		runningSecurityGroupNames = append(runningSecurityGroupNames, securityGroup.Name)
-		securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, ccv2.SecurityGroupLifecycleRunning)...)
+		securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, constant.SecurityGroupLifecycleRunning)...)
 	}
 
 	sort.Strings(runningSecurityGroupNames)
@@ -102,7 +102,7 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 
 		for _, securityGroup := range securityGroups {
 			stagingSecurityGroupNames = append(stagingSecurityGroupNames, securityGroup.Name)
-			securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, ccv2.SecurityGroupLifecycleStaging)...)
+			securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, constant.SecurityGroupLifecycleStaging)...)
 		}
 
 		sort.Strings(stagingSecurityGroupNames)

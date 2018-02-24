@@ -50,7 +50,7 @@ func (org *Organization) UnmarshalJSON(data []byte) error {
 //go:generate go run $GOPATH/src/code.cloudfoundry.org/cli/util/codegen/generate.go Organization codetemplates/delete_async_by_guid.go.template delete_organization.go
 //go:generate go run $GOPATH/src/code.cloudfoundry.org/cli/util/codegen/generate.go Organization codetemplates/delete_async_by_guid_test.go.template delete_organization_test.go
 
-// GetOrganization returns an Organization associated with the provided guid.
+// GetOrganization returns an Organization associated with the provided GUID.
 func (client *Client) GetOrganization(guid string) (Organization, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationRequest,

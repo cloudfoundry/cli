@@ -641,67 +641,67 @@ var _ = Describe("Security Group Actions", func() {
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrg11,
 							Space:         &expectedSpace11,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrg11,
 							Space:         &expectedSpace11,
-							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+							Lifecycle:     constant.SecurityGroupLifecycleStaging,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrg12,
 							Space:         &expectedSpace12,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrg12,
 							Space:         &expectedSpace12,
-							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+							Lifecycle:     constant.SecurityGroupLifecycleStaging,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrg13,
 							Space:         &expectedSpace13,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrg13,
 							Space:         &expectedSpace13,
-							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+							Lifecycle:     constant.SecurityGroupLifecycleStaging,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup2,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+							Lifecycle:     constant.SecurityGroupLifecycleStaging,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup2,
 							Organization:  &expectedOrg11,
 							Space:         &expectedSpace22,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup2,
 							Organization:  &expectedOrg21,
 							Space:         &expectedSpace21,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup2,
 							Organization:  &expectedOrg23,
 							Space:         &expectedSpace23,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup3,
@@ -712,43 +712,43 @@ var _ = Describe("Security Group Actions", func() {
 							SecurityGroup: &expectedSecurityGroup4,
 							Organization:  &expectedOrg11,
 							Space:         &expectedSpace32,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup4,
 							Organization:  &expectedOrg23,
 							Space:         &expectedSpace31,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup4,
 							Organization:  &expectedOrg33,
 							Space:         &expectedSpace33,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup5,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup6,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+							Lifecycle:     constant.SecurityGroupLifecycleStaging,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup7,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup7,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+							Lifecycle:     constant.SecurityGroupLifecycleStaging,
 						},
 					}
 					Expect(secGroupOrgSpaces).To(Equal(expected))
@@ -812,49 +812,49 @@ var _ = Describe("Security Group Actions", func() {
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrg11,
 							Space:         &expectedSpace11,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrg12,
 							Space:         &expectedSpace12,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup1,
 							Organization:  &expectedOrg13,
 							Space:         &expectedSpace13,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup2,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+							Lifecycle:     constant.SecurityGroupLifecycleStaging,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup2,
 							Organization:  &expectedOrg11,
 							Space:         &expectedSpace22,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup2,
 							Organization:  &expectedOrg21,
 							Space:         &expectedSpace21,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup2,
 							Organization:  &expectedOrg23,
 							Space:         &expectedSpace23,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup3,
@@ -865,43 +865,43 @@ var _ = Describe("Security Group Actions", func() {
 							SecurityGroup: &expectedSecurityGroup4,
 							Organization:  &expectedOrg11,
 							Space:         &expectedSpace32,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup4,
 							Organization:  &expectedOrg23,
 							Space:         &expectedSpace31,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup4,
 							Organization:  &expectedOrg33,
 							Space:         &expectedSpace33,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup5,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup6,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+							Lifecycle:     constant.SecurityGroupLifecycleStaging,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup7,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+							Lifecycle:     constant.SecurityGroupLifecycleRunning,
 						},
 						{
 							SecurityGroup: &expectedSecurityGroup7,
 							Organization:  &expectedOrgAll,
 							Space:         &expectedSpaceAll,
-							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+							Lifecycle:     constant.SecurityGroupLifecycleStaging,
 						},
 					}
 					Expect(secGroupOrgSpaces).To(Equal(expected))
@@ -1069,13 +1069,13 @@ var _ = Describe("Security Group Actions", func() {
 						SecurityGroup: &expectedSecurityGroup3,
 						Organization:  &expectedOrg13,
 						Space:         &expectedSpace11,
-						Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						Lifecycle:     constant.SecurityGroupLifecycleRunning,
 					},
 					{
 						SecurityGroup: &expectedSecurityGroup3,
 						Organization:  &expectedOrg13,
 						Space:         &expectedSpace12,
-						Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+						Lifecycle:     constant.SecurityGroupLifecycleStaging,
 					},
 				}
 				Expect(secGroupOrgSpaces).To(Equal(expected))
@@ -1174,7 +1174,7 @@ var _ = Describe("Security Group Actions", func() {
 
 	Describe("BindSecurityGroupToSpace", func() {
 		var (
-			lifecycle ccv2.SecurityGroupLifecycle
+			lifecycle constant.SecurityGroupLifecycle
 			err       error
 			warnings  []string
 		)
@@ -1195,7 +1195,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when the lifecycle is running", func() {
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 			})
 
 			Context("when binding the space does not return an error", func() {
@@ -1235,7 +1235,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when the lifecycle is staging", func() {
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleStaging
+				lifecycle = constant.SecurityGroupLifecycleStaging
 			})
 
 			Context("when binding the space does not return an error", func() {
@@ -1418,7 +1418,7 @@ var _ = Describe("Security Group Actions", func() {
 
 	Describe("UnbindSecurityGroupByNameAndSpace", func() {
 		var (
-			lifecycle ccv2.SecurityGroupLifecycle
+			lifecycle constant.SecurityGroupLifecycle
 			warnings  Warnings
 			err       error
 		)
@@ -1439,7 +1439,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when the security group is not found", func() {
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleStaging
+				lifecycle = constant.SecurityGroupLifecycleStaging
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{},
@@ -1457,7 +1457,7 @@ var _ = Describe("Security Group Actions", func() {
 			var returnedError error
 
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 
 				returnedError = errors.New("get-security-groups-error")
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
@@ -1474,7 +1474,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when the requested lifecycle is running", func() {
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{{
@@ -1700,7 +1700,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when the requested lifecycle is staging", func() {
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleStaging
+				lifecycle = constant.SecurityGroupLifecycleStaging
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{{
@@ -1951,7 +1951,7 @@ var _ = Describe("Security Group Actions", func() {
 
 	Describe("UnbindSecurityGroupByNameOrganizationNameAndSpaceName", func() {
 		var (
-			lifecycle ccv2.SecurityGroupLifecycle
+			lifecycle constant.SecurityGroupLifecycle
 			warnings  []string
 			err       error
 		)
@@ -1972,7 +1972,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when the security group is not found", func() {
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{},
@@ -1988,7 +1988,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when an error is encountered getting the organization", func() {
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{{
@@ -2011,7 +2011,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when an error is encountered getting the space", func() {
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{{
@@ -2041,7 +2041,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when the requested lifecycle is running", func() {
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleRunning
+				lifecycle = constant.SecurityGroupLifecycleRunning
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{{
@@ -2292,7 +2292,7 @@ var _ = Describe("Security Group Actions", func() {
 
 		Context("when the requested lifecycle is staging", func() {
 			BeforeEach(func() {
-				lifecycle = ccv2.SecurityGroupLifecycleStaging
+				lifecycle = constant.SecurityGroupLifecycleStaging
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{{

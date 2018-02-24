@@ -14,8 +14,11 @@ type Params map[string]string
 
 // requestOptions contains all the options to create an HTTP request.
 type requestOptions struct {
-	// URIParams are the list URI route parameters
-	URIParams Params
+	// Body is the request body
+	Body io.ReadSeeker
+
+	// Method is the HTTP method of the request.
+	Method string
 
 	// Query is a list of HTTP query parameters
 	Query url.Values
@@ -25,11 +28,9 @@ type requestOptions struct {
 
 	// URI is the URI of the request.
 	URI string
-	// Method is the HTTP method of the request.
-	Method string
 
-	// Body is the request body
-	Body io.ReadSeeker
+	// URIParams are the list URI route parameters
+	URIParams Params
 }
 
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.

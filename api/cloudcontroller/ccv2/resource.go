@@ -10,12 +10,14 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+// Resource represents a Cloud Controller Resource.
 type Resource struct {
 
 	// Filename is the name of the resource.
 	Filename string `json:"fn"`
 
-	// Mode is the operating system file mode of the resource.
+	// Mode is the operating system file mode (aka file permissions) of the
+	// resource.
 	Mode os.FileMode `json:"mode"`
 
 	// SHA1 represents the SHA-1 hash of the resource.

@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -69,7 +69,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 	Context("when lifecycle is 'running'", func() {
 		BeforeEach(func() {
-			cmd.Lifecycle = flag.SecurityGroupLifecycle(ccv2.SecurityGroupLifecycleRunning)
+			cmd.Lifecycle = flag.SecurityGroupLifecycle(constant.SecurityGroupLifecycleRunning)
 		})
 
 		Context("when checking target fails", func() {
@@ -234,7 +234,7 @@ var _ = Describe("bind-security-group Command", func() {
 						securityGroupGUID, spaceGUID, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
-						Expect(lifecycle).To(Equal(ccv2.SecurityGroupLifecycleRunning))
+						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleRunning))
 					})
 				})
 
@@ -356,11 +356,11 @@ var _ = Describe("bind-security-group Command", func() {
 						securityGroupGUID, spaceGUID, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 						Expect(spaceGUID).To(Equal("some-space-guid-1"))
-						Expect(lifecycle).To(Equal(ccv2.SecurityGroupLifecycleRunning))
+						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleRunning))
 						securityGroupGUID, spaceGUID, lifecycle = fakeActor.BindSecurityGroupToSpaceArgsForCall(1)
 						Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 						Expect(spaceGUID).To(Equal("some-space-guid-2"))
-						Expect(lifecycle).To(Equal(ccv2.SecurityGroupLifecycleRunning))
+						Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleRunning))
 					})
 				})
 
@@ -483,7 +483,7 @@ var _ = Describe("bind-security-group Command", func() {
 							securityGroupGUID, spaceGUID, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
 							Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 							Expect(spaceGUID).To(Equal("some-space-guid"))
-							Expect(lifecycle).To(Equal(ccv2.SecurityGroupLifecycleStaging))
+							Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleStaging))
 						})
 					})
 				})
@@ -564,11 +564,11 @@ var _ = Describe("bind-security-group Command", func() {
 							securityGroupGUID, spaceGUID, lifecycle := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
 							Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 							Expect(spaceGUID).To(Equal("some-space-guid-1"))
-							Expect(lifecycle).To(Equal(ccv2.SecurityGroupLifecycleStaging))
+							Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleStaging))
 							securityGroupGUID, spaceGUID, lifecycle = fakeActor.BindSecurityGroupToSpaceArgsForCall(1)
 							Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
 							Expect(spaceGUID).To(Equal("some-space-guid-2"))
-							Expect(lifecycle).To(Equal(ccv2.SecurityGroupLifecycleStaging))
+							Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycleStaging))
 						})
 					})
 

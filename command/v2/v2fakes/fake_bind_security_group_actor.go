@@ -5,17 +5,17 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/command/v2"
 )
 
 type FakeBindSecurityGroupActor struct {
-	BindSecurityGroupToSpaceStub        func(securityGroupGUID string, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (v2action.Warnings, error)
+	BindSecurityGroupToSpaceStub        func(securityGroupGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (v2action.Warnings, error)
 	bindSecurityGroupToSpaceMutex       sync.RWMutex
 	bindSecurityGroupToSpaceArgsForCall []struct {
 		securityGroupGUID string
 		spaceGUID         string
-		lifecycle         ccv2.SecurityGroupLifecycle
+		lifecycle         constant.SecurityGroupLifecycle
 	}
 	bindSecurityGroupToSpaceReturns struct {
 		result1 v2action.Warnings
@@ -99,13 +99,13 @@ type FakeBindSecurityGroupActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (v2action.Warnings, error) {
+func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (v2action.Warnings, error) {
 	fake.bindSecurityGroupToSpaceMutex.Lock()
 	ret, specificReturn := fake.bindSecurityGroupToSpaceReturnsOnCall[len(fake.bindSecurityGroupToSpaceArgsForCall)]
 	fake.bindSecurityGroupToSpaceArgsForCall = append(fake.bindSecurityGroupToSpaceArgsForCall, struct {
 		securityGroupGUID string
 		spaceGUID         string
-		lifecycle         ccv2.SecurityGroupLifecycle
+		lifecycle         constant.SecurityGroupLifecycle
 	}{securityGroupGUID, spaceGUID, lifecycle})
 	fake.recordInvocation("BindSecurityGroupToSpace", []interface{}{securityGroupGUID, spaceGUID, lifecycle})
 	fake.bindSecurityGroupToSpaceMutex.Unlock()
@@ -124,7 +124,7 @@ func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceCallCount() int 
 	return len(fake.bindSecurityGroupToSpaceArgsForCall)
 }
 
-func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceArgsForCall(i int) (string, string, ccv2.SecurityGroupLifecycle) {
+func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceArgsForCall(i int) (string, string, constant.SecurityGroupLifecycle) {
 	fake.bindSecurityGroupToSpaceMutex.RLock()
 	defer fake.bindSecurityGroupToSpaceMutex.RUnlock()
 	return fake.bindSecurityGroupToSpaceArgsForCall[i].securityGroupGUID, fake.bindSecurityGroupToSpaceArgsForCall[i].spaceGUID, fake.bindSecurityGroupToSpaceArgsForCall[i].lifecycle

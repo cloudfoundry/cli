@@ -11,8 +11,11 @@ import (
 
 // ServiceBinding represents a Cloud Controller Service Binding.
 type ServiceBinding struct {
-	GUID                string
-	AppGUID             string
+	// GUID is the unique Service Binding identifier.
+	GUID string
+	// AppGUID is the associated application GUID.
+	AppGUID string
+	// ServiceInstanceGUID is the associated service GUID.
 	ServiceInstanceGUID string
 }
 
@@ -44,7 +47,8 @@ type serviceBindingRequestBody struct {
 	Parameters          map[string]interface{} `json:"parameters"`
 }
 
-// CreateServiceBinding creates a service binding
+// CreateServiceBinding creates a link between an application and a service
+// instance, also known as a Service Binding.
 func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID string, parameters map[string]interface{}) (ServiceBinding, Warnings, error) {
 	requestBody := serviceBindingRequestBody{
 		ServiceInstanceGUID: serviceInstanceGUID,
