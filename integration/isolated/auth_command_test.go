@@ -81,7 +81,7 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when no flags are set", func() {
+	Context("when no flags are set (logging in with password grant type)", func() {
 		Context("when the user provides an invalid username/password combo", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
@@ -167,6 +167,25 @@ var _ = Describe("auth command", func() {
 				Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
 
 				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	Context("when a user authenticates with valid client credentials", func() {
+		BeforeEach(func() {
+			clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
+			session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
+			Eventually(session).Should(Exit(0))
+		})
+
+		Context("when a different user authenticates with valid password credentials", func() {
+			It("should fail authentication and displays an error informing the user they need to log out", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("auth", username, password)
+
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Service account currently logged in\\. Use 'cf logout' to log out service account and try again\\."))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})

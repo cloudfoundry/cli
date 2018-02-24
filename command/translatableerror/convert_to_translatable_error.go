@@ -73,6 +73,8 @@ func ConvertToTranslatableError(err error) error {
 		return NotLoggedInError(e)
 	case actionerror.OrganizationNotFoundError:
 		return OrganizationNotFoundError(e)
+	case actionerror.PasswordGrantTypeLogoutRequiredError:
+		return PasswordGrantTypeLogoutRequiredError(e)
 	case actionerror.PluginCommandsConflictError:
 		return PluginCommandsConflictError(e)
 	case actionerror.PluginInvalidError:

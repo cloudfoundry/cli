@@ -80,6 +80,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("NotLoggedInError", NotLoggedInError{}),
 		Entry("OrgNotFoundError", OrganizationNotFoundError{}),
 		Entry("ParseArgumentError", ParseArgumentError{}),
+		Entry("PasswordGrantTypeLogoutRequiredError", PasswordGrantTypeLogoutRequiredError{}),
 		Entry("PluginAlreadyInstalledError", PluginAlreadyInstalledError{}),
 		Entry("PluginBinaryRemoveFailedError", PluginBinaryRemoveFailedError{}),
 		Entry("PluginBinaryUninstallError", PluginBinaryUninstallError{}),

@@ -138,6 +138,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.OrganizationNotFoundError{Name: "some-org"},
 			OrganizationNotFoundError{Name: "some-org"}),
 
+		Entry("actionerror.PasswordGrantTypeLogoutRequiredError -> PasswordGrantTypeLogoutRequiredError",
+			actionerror.PasswordGrantTypeLogoutRequiredError{},
+			PasswordGrantTypeLogoutRequiredError{}),
+
 		Entry("actionerror.PluginCommandConflictError -> PluginCommandConflictError",
 			actionerror.PluginCommandsConflictError{
 				PluginName:     "some-plugin",

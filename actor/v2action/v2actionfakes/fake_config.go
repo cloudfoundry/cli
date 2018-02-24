@@ -120,6 +120,15 @@ type FakeConfig struct {
 	targetReturnsOnCall map[int]struct {
 		result1 string
 	}
+	UAAGrantTypeStub        func() string
+	uAAGrantTypeMutex       sync.RWMutex
+	uAAGrantTypeArgsForCall []struct{}
+	uAAGrantTypeReturns     struct {
+		result1 string
+	}
+	uAAGrantTypeReturnsOnCall map[int]struct {
+		result1 string
+	}
 	UnsetOrganizationAndSpaceInformationStub        func()
 	unsetOrganizationAndSpaceInformationMutex       sync.RWMutex
 	unsetOrganizationAndSpaceInformationArgsForCall []struct{}
@@ -614,6 +623,46 @@ func (fake *FakeConfig) TargetReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
+func (fake *FakeConfig) UAAGrantType() string {
+	fake.uAAGrantTypeMutex.Lock()
+	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
+	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct{}{})
+	fake.recordInvocation("UAAGrantType", []interface{}{})
+	fake.uAAGrantTypeMutex.Unlock()
+	if fake.UAAGrantTypeStub != nil {
+		return fake.UAAGrantTypeStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.uAAGrantTypeReturns.result1
+}
+
+func (fake *FakeConfig) UAAGrantTypeCallCount() int {
+	fake.uAAGrantTypeMutex.RLock()
+	defer fake.uAAGrantTypeMutex.RUnlock()
+	return len(fake.uAAGrantTypeArgsForCall)
+}
+
+func (fake *FakeConfig) UAAGrantTypeReturns(result1 string) {
+	fake.UAAGrantTypeStub = nil
+	fake.uAAGrantTypeReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) UAAGrantTypeReturnsOnCall(i int, result1 string) {
+	fake.UAAGrantTypeStub = nil
+	if fake.uAAGrantTypeReturnsOnCall == nil {
+		fake.uAAGrantTypeReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uAAGrantTypeReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) UnsetOrganizationAndSpaceInformation() {
 	fake.unsetOrganizationAndSpaceInformationMutex.Lock()
 	fake.unsetOrganizationAndSpaceInformationArgsForCall = append(fake.unsetOrganizationAndSpaceInformationArgsForCall, struct{}{})
@@ -720,6 +769,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.startupTimeoutMutex.RUnlock()
 	fake.targetMutex.RLock()
 	defer fake.targetMutex.RUnlock()
+	fake.uAAGrantTypeMutex.RLock()
+	defer fake.uAAGrantTypeMutex.RUnlock()
 	fake.unsetOrganizationAndSpaceInformationMutex.RLock()
 	defer fake.unsetOrganizationAndSpaceInformationMutex.RUnlock()
 	fake.unsetSpaceInformationMutex.RLock()

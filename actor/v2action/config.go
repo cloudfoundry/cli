@@ -19,6 +19,7 @@ type Config interface {
 	StagingTimeout() time.Duration
 	StartupTimeout() time.Duration
 	Target() string
+	UAAGrantType() string
 	UnsetOrganizationAndSpaceInformation()
 	UnsetSpaceInformation()
 	Verbose() (bool, []string)
