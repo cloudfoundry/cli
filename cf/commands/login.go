@@ -190,6 +190,10 @@ func (cmd Login) authenticateSSO(c flags.FlagContext) error {
 }
 
 func (cmd Login) authenticate(c flags.FlagContext) error {
+	if cmd.config.UAAGrantType() == "client_credentials" {
+		return errors.New(T("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
+	}
+
 	usernameFlagValue := c.String("u")
 	passwordFlagValue := c.String("p")
 

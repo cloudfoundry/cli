@@ -59,4 +59,23 @@ var _ = Describe("login command", func() {
 			Eventually(session).Should(Exit(1))
 		})
 	})
+
+	Context("when a user authenticates with valid client credentials", func() {
+		BeforeEach(func() {
+			clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
+			session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
+			Eventually(session).Should(Exit(0))
+		})
+
+		Context("when a different user logs in with valid password credentials", func() {
+			It("should fail log in and display an error informing the user they need to log out", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-u", username, "p", password)
+
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Say("Service account currently logged in\\. Use 'cf logout' to log out service account and try again\\."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+	})
 })

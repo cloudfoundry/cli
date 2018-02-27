@@ -29,6 +29,7 @@ type Data struct {
 	AccessToken              string
 	UAAOAuthClient           string
 	UAAOAuthClientSecret     string
+	UAAGrantType             string
 	SSHOAuthClient           string
 	RefreshToken             string
 	OrganizationFields       models.OrganizationFields

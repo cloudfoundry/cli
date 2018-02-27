@@ -843,5 +843,22 @@ var _ = Describe("Login Command", func() {
 
 			})
 		})
+
+		Describe("when a previous user authenticated with a client grant type", func() {
+			BeforeEach(func() {
+				Config.SetUAAGrantType("client_credentials")
+			})
+
+			Context("when the current user logs in with a password grant type", func() {
+				BeforeEach(func() {
+					Flags = []string{"-u", "the-user-name", "-p", "the-password"}
+				})
+
+				It("displays an error informing the user to log out and returns an error", func() {
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"Service account currently logged in. Use 'cf logout' to log out service account and try again."}))
+				})
+			})
+		})
 	})
 })

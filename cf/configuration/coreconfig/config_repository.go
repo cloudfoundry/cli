@@ -125,6 +125,8 @@ type ReadWriter interface {
 	SetPluginRepo(models.PluginRepo)
 	UnSetPluginRepo(int)
 	SetCLIVersion(string)
+	SetUAAGrantType(string)
+	UAAGrantType() string
 }
 
 //go:generate counterfeiter . Repository
@@ -565,5 +567,19 @@ func (c *ConfigRepository) SetPluginRepo(repo models.PluginRepo) {
 func (c *ConfigRepository) UnSetPluginRepo(index int) {
 	c.write(func() {
 		c.data.PluginRepos = append(c.data.PluginRepos[:index], c.data.PluginRepos[index+1:]...)
+	})
+}
+
+func (c *ConfigRepository) UAAGrantType() string {
+	grantType := ""
+	c.read(func() {
+		grantType = c.data.UAAGrantType
+	})
+	return grantType
+}
+
+func (c *ConfigRepository) SetUAAGrantType(grantType string) {
+	c.write(func() {
+		c.data.UAAGrantType = grantType
 	})
 }

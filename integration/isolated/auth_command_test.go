@@ -179,7 +179,7 @@ var _ = Describe("auth command", func() {
 		})
 
 		Context("when a different user authenticates with valid password credentials", func() {
-			It("should fail authentication and displays an error informing the user they need to log out", func() {
+			It("should fail authentication and display an error informing the user they need to log out", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("auth", username, password)
 
