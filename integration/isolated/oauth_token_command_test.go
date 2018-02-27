@@ -31,7 +31,7 @@ var _ = Describe("oauth-token command", func() {
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	Context("when the environment is setup correctly and user is logged in with password grant", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})
@@ -70,6 +70,53 @@ var _ = Describe("oauth-token command", func() {
 		})
 
 		Context("when the refresh token and oauth creds are valid", func() {
+			It("refreshes the access token and displays it", func() {
+				session := helpers.CF("oauth-token")
+
+				Eventually(session).Should(Say("bearer .+"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	Context("when the environment is setup correctly and user is logged in with client credentials grant", func() {
+		BeforeEach(func() {
+			helpers.LoginCFWithClientCredentials()
+		})
+
+		Context("when the oauth client ID and secret combination is invalid", func() {
+			BeforeEach(func() {
+				helpers.SetConfig(func(conf *configv3.Config) {
+					conf.ConfigFile.UAAOAuthClient = "foo"
+					conf.ConfigFile.UAAOAuthClientSecret = "bar"
+				})
+			})
+
+			It("displays an error and exits 1", func() {
+				session := helpers.CF("oauth-token")
+
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when the access token is invalid", func() {
+			BeforeEach(func() {
+				helpers.SetConfig(func(conf *configv3.Config) {
+					conf.ConfigFile.AccessToken = "invalid-access-token"
+				})
+			})
+
+			It("refreshes the access token and displays it", func() {
+				session := helpers.CF("oauth-token")
+
+				Eventually(session).Should(Say("bearer .+"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("when the oauth creds are valid", func() {
 			It("refreshes the access token and displays it", func() {
 				session := helpers.CF("oauth-token")
 
