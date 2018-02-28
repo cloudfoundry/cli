@@ -24,6 +24,153 @@ var _ = Describe("Service Instance Summary Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
 
+	Describe("GetServiceInstancesSummaryBySpace", func() {
+		var (
+			serviceInstancesSummary []ServiceInstanceSummary
+			warnings                Warnings
+			executeErr              error
+		)
+
+		JustBeforeEach(func() {
+			serviceInstancesSummary, warnings, executeErr = actor.GetServiceInstancesSummaryBySpace("some-space-GUID")
+		})
+
+		Context("when an error is encountered getting a space's service instances", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("get by space service instance summary error")
+				fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
+					[]ccv2.ServiceInstance{},
+					ccv2.Warnings{"get-by-space-service-instances-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("get-by-space-service-instances-warning"))
+			})
+		})
+
+		Context("when no errors are encountered getting a space's service instances", func() {
+			var (
+				serviceInstance1 ccv2.ServiceInstance
+				serviceInstance2 ccv2.ServiceInstance
+				application1     ccv2.Application
+				application2     ccv2.Application
+				bindings1        []ccv2.ServiceBinding
+				bindings2        []ccv2.ServiceBinding
+			)
+
+			BeforeEach(func() {
+				serviceInstance1 = ccv2.ServiceInstance{
+					GUID:            "some-si-GUID-1",
+					Name:            "some-si-name-1",
+					ServiceGUID:     "some-service-GUID-1",
+					ServicePlanGUID: "some-si-sp-GUID-1",
+					Type:            constant.ServiceInstanceTypeManagedService,
+					LastOperation: ccv2.LastOperation{
+						Type:  "some-lo-type",
+						State: "some-lo-state",
+					},
+				}
+				serviceInstance2 = ccv2.ServiceInstance{
+					GUID:            "some-si-GUID-3",
+					Name:            "some-si-name-3",
+					ServiceGUID:     "some-service-GUID-3",
+					ServicePlanGUID: "some-si-sp-GUID-2",
+					Type:            constant.ServiceInstanceTypeUserProvidedService,
+					LastOperation: ccv2.LastOperation{
+						Type:  "some-lo-type",
+						State: "some-lo-state",
+					},
+				}
+
+				fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
+					[]ccv2.ServiceInstance{serviceInstance2, serviceInstance1},
+					ccv2.Warnings{"get-by-space-service-instances-warning"},
+					nil)
+
+				bindings1 = []ccv2.ServiceBinding{
+					{
+						AppGUID:             "2-app-GUID",
+						ServiceInstanceGUID: "some-si-GUID-1",
+						GUID:                "some-sb-GUID-1",
+					},
+					{
+						AppGUID:             "1-app-GUID",
+						ServiceInstanceGUID: "some-si-GUID-3",
+						GUID:                "some-sb-GUID-2",
+					}}
+				bindings2 = []ccv2.ServiceBinding{
+					{
+						AppGUID:             "1-app-GUID",
+						ServiceInstanceGUID: "some-si-GUID-1",
+						GUID:                "some-sb-GUID-1",
+					}}
+				fakeCloudControllerClient.GetServiceInstanceServiceBindingsReturns(
+					bindings1,
+					ccv2.Warnings{"some-bindings-warning"},
+					nil)
+				fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsReturns(
+					bindings2,
+					ccv2.Warnings{"some-bindings-warning"},
+					nil)
+
+				application1 = ccv2.Application{Name: "1-app-name", GUID: "1-app-GUID"}
+				application2 = ccv2.Application{Name: "2-app-name", GUID: "2-app-GUID"}
+
+				fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
+					switch appGUID {
+					case application1.GUID:
+						return application1, ccv2.Warnings{"some-get-app-warning"}, nil
+					case application2.GUID:
+						return application2, ccv2.Warnings{"some-get-app-warning"}, nil
+					default:
+						Fail("got an app guid that does not exist")
+					}
+
+					return ccv2.Application{}, nil, nil
+				}
+			})
+
+			It("returns the service instances summary and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(serviceInstancesSummary).To(Equal(
+					[]ServiceInstanceSummary{
+						{
+							ServiceInstance:   ServiceInstance(serviceInstance1),
+							BoundApplications: []string{"1-app-name", "2-app-name"},
+						},
+						{
+							ServiceInstance:   ServiceInstance(serviceInstance2),
+							BoundApplications: []string{"1-app-name"},
+						}}))
+				Expect(warnings).To(ConsistOf("get-by-space-service-instances-warning",
+					"some-get-app-warning", "some-get-app-warning", "some-get-app-warning",
+					"some-bindings-warning", "some-bindings-warning"))
+
+				Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
+				passedSpaceGUID, includeUPS, filters := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
+				Expect(passedSpaceGUID).To(Equal("some-space-GUID"))
+				Expect(includeUPS).To(BeTrue())
+				Expect(filters).To(BeEmpty())
+
+				Expect(fakeCloudControllerClient.GetConfigFeatureFlagsCallCount()).To(Equal(0))
+
+				//Managed expectations
+				Expect(fakeCloudControllerClient.GetServicePlanCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsCallCount()).To(Equal(1))
+				//User-Provided expectations
+				Expect(fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsCallCount()).To(Equal(1))
+				//Both types expectations
+				Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(3))
+			})
+		})
+
+	})
+
 	Describe("ServiceInstanceSummary", func() {
 		var summary ServiceInstanceSummary
 
@@ -668,6 +815,21 @@ var _ = Describe("Service Instance Summary Actions", func() {
 						[]ccv2.ServiceInstance{returnedServiceInstance},
 						ccv2.Warnings{"get-space-service-instance-warning"},
 						nil)
+				})
+
+				Context("getting the service bindings errors", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsReturns(
+							nil,
+							ccv2.Warnings{"some-get-user-provided-si-bindings-warnings"},
+							errors.New("some-get-user-provided-si-bindings-error"))
+					})
+
+					It("should return the error and return all warnings", func() {
+						Expect(summaryErr).To(MatchError("some-get-user-provided-si-bindings-error"))
+						Expect(summaryWarnings).To(ConsistOf("some-get-user-provided-si-bindings-warnings",
+							"get-space-service-instance-warning"))
+					})
 				})
 
 				Context("when no errors are encountered getting the service bindings", func() {

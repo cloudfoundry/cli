@@ -1,8 +1,11 @@
 package v2action
 
 import (
+	"sort"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/util/sorting"
 )
 
 type ServiceInstanceShareType string
@@ -41,63 +44,41 @@ func (s ServiceInstanceSummary) IsSharedTo() bool {
 	return s.ServiceInstanceShareType == ServiceInstanceIsSharedTo
 }
 
+func (actor Actor) GetServiceInstancesSummaryBySpace(spaceGUID string) ([]ServiceInstanceSummary, Warnings, error) {
+	serviceInstances, warnings, err := actor.CloudControllerClient.GetSpaceServiceInstances(
+		spaceGUID,
+		true)
+	allWarnings := Warnings(warnings)
+
+	var summaryInstances []ServiceInstanceSummary
+	for _, instance := range serviceInstances {
+		serviceInstanceSummary, summaryInfoWarnings, summaryInfoErr := actor.getSummaryInfoCompositeForInstance(
+			spaceGUID,
+			ServiceInstance(instance),
+			false)
+		allWarnings = append(allWarnings, summaryInfoWarnings...)
+		if summaryInfoErr != nil {
+			return nil, allWarnings, summaryInfoErr
+		}
+		summaryInstances = append(summaryInstances, serviceInstanceSummary)
+	}
+
+	sort.Slice(summaryInstances, func(i, j int) bool {
+		return sorting.LessIgnoreCase(summaryInstances[i].Name, summaryInstances[j].Name)
+	})
+
+	return summaryInstances, allWarnings, err
+}
+
 func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUID string) (ServiceInstanceSummary, Warnings, error) {
-	serviceInstanceSummary := ServiceInstanceSummary{}
-
-	serviceInstance, instanceWarnings, instanceErr := actor.GetServiceInstanceByNameAndSpace(name, spaceGUID)
+	serviceInstance, instanceWarnings, err := actor.GetServiceInstanceByNameAndSpace(name, spaceGUID)
 	allWarnings := Warnings(instanceWarnings)
-	if instanceErr != nil {
-		return serviceInstanceSummary, allWarnings, instanceErr
-	}
-	serviceInstanceSummary.ServiceInstance = serviceInstance
-
-	var (
-		serviceBindings  []ServiceBinding
-		bindingsWarnings Warnings
-		bindingsErr      error
-	)
-
-	if serviceInstance.IsManaged() {
-		sharedWarnings, sharedErr := actor.getAndSetSharedInformation(&serviceInstanceSummary, spaceGUID)
-		allWarnings = append(allWarnings, sharedWarnings...)
-		if sharedErr != nil {
-			return serviceInstanceSummary, allWarnings, sharedErr
-		}
-
-		servicePlan, planWarnings, planErr := actor.GetServicePlan(serviceInstance.ServicePlanGUID)
-		allWarnings = append(allWarnings, planWarnings...)
-		if planErr != nil {
-			return serviceInstanceSummary, allWarnings, planErr
-		}
-		serviceInstanceSummary.ServicePlan = servicePlan
-
-		service, serviceWarnings, serviceErr := actor.GetService(servicePlan.ServiceGUID)
-		allWarnings = append(allWarnings, serviceWarnings...)
-		if serviceErr != nil {
-			return serviceInstanceSummary, allWarnings, serviceErr
-		}
-		serviceInstanceSummary.Service = service
-
-		serviceBindings, bindingsWarnings, bindingsErr = actor.GetServiceBindingsByServiceInstance(serviceInstance.GUID)
-	} else {
-		serviceBindings, bindingsWarnings, bindingsErr = actor.GetServiceBindingsByUserProvidedServiceInstance(serviceInstance.GUID)
+	if err != nil {
+		return ServiceInstanceSummary{}, allWarnings, err
 	}
 
-	allWarnings = append(allWarnings, bindingsWarnings...)
-	if bindingsErr != nil {
-		return serviceInstanceSummary, allWarnings, bindingsErr
-	}
-
-	for _, serviceBinding := range serviceBindings {
-		app, appWarnings, appErr := actor.GetApplication(serviceBinding.AppGUID)
-		allWarnings = append(allWarnings, appWarnings...)
-		if appErr != nil {
-			return serviceInstanceSummary, allWarnings, appErr
-		}
-		serviceInstanceSummary.BoundApplications = append(serviceInstanceSummary.BoundApplications, app.Name)
-	}
-
-	return serviceInstanceSummary, allWarnings, nil
+	serviceInstanceSummary, warnings, err := actor.getSummaryInfoCompositeForInstance(spaceGUID, serviceInstance, true)
+	return serviceInstanceSummary, append(allWarnings, warnings...), err
 }
 
 // getAndSetSharedInformation gets a service instance's shared from or shared to information,
@@ -163,4 +144,66 @@ func (actor Actor) getAndSetSharedInformation(summary *ServiceInstanceSummary, s
 	}
 
 	return allWarnings, nil
+}
+
+func (actor Actor) getSummaryInfoCompositeForInstance(spaceGUID string, serviceInstance ServiceInstance,
+	retrieveSharedInfo bool) (ServiceInstanceSummary, Warnings, error) {
+	serviceInstanceSummary := ServiceInstanceSummary{ServiceInstance: serviceInstance}
+	var (
+		serviceBindings []ServiceBinding
+		allWarnings     Warnings
+	)
+
+	if serviceInstance.IsManaged() {
+		if retrieveSharedInfo {
+			sharedWarnings, err := actor.getAndSetSharedInformation(&serviceInstanceSummary, spaceGUID)
+			allWarnings = Warnings(sharedWarnings)
+			if err != nil {
+				return serviceInstanceSummary, allWarnings, err
+			}
+		}
+
+		servicePlan, planWarnings, err := actor.GetServicePlan(serviceInstance.ServicePlanGUID)
+		allWarnings = append(allWarnings, planWarnings...)
+		if err != nil {
+			return serviceInstanceSummary, allWarnings, err
+		}
+		serviceInstanceSummary.ServicePlan = servicePlan
+
+		service, serviceWarnings, err := actor.GetService(servicePlan.ServiceGUID)
+		allWarnings = append(allWarnings, serviceWarnings...)
+		if err != nil {
+			return serviceInstanceSummary, allWarnings, err
+		}
+		serviceInstanceSummary.Service = service
+
+		var bindingsWarnings Warnings
+		serviceBindings, bindingsWarnings, err = actor.GetServiceBindingsByServiceInstance(serviceInstance.GUID)
+		allWarnings = append(allWarnings, bindingsWarnings...)
+		if err != nil {
+			return serviceInstanceSummary, allWarnings, err
+		}
+	} else {
+		var bindingsWarnings Warnings
+		var err error
+		serviceBindings, bindingsWarnings, err = actor.GetServiceBindingsByUserProvidedServiceInstance(serviceInstance.GUID)
+		allWarnings = append(allWarnings, bindingsWarnings...)
+		if err != nil {
+			return serviceInstanceSummary, allWarnings, err
+		}
+	}
+
+	for _, serviceBinding := range serviceBindings {
+		app, appWarnings, err := actor.GetApplication(serviceBinding.AppGUID)
+		allWarnings = append(allWarnings, appWarnings...)
+		if err != nil {
+			return serviceInstanceSummary, allWarnings, err
+		}
+		serviceInstanceSummary.BoundApplications = append(serviceInstanceSummary.BoundApplications, app.Name)
+	}
+
+	sort.Slice(serviceInstanceSummary.BoundApplications,
+		sorting.SortAlphabeticFunc(serviceInstanceSummary.BoundApplications))
+
+	return serviceInstanceSummary, allWarnings, nil
 }

@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
-// UI is the interface to STDOUT
+// UI is the interface to STDOUT, STDERR, and STDIN.
 type UI interface {
 	DisplayBoolPrompt(defaultResponse bool, template string, templateValues ...map[string]interface{}) (bool, error)
 	DisplayPasswordPrompt(template string, templateValues ...map[string]interface{}) (string, error)
