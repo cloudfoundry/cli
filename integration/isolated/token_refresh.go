@@ -72,7 +72,7 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			Context("when running a v2 command", func() {
+			Context("when running a v2 refactored command", func() {
 				Context("when the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						session := helpers.CF("unbind-service", "app", "service")
@@ -85,7 +85,19 @@ var _ = Describe("Token Refreshing", func() {
 					It("refreshes the token", func() {
 						username := helpers.NewUsername()
 						session := helpers.CF("create-user", username, helpers.NewPassword())
-						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			Context("when running a v2 unrefactored command", func() {
+				Context("when the cloud controller client encounters an invalid token response", func() {
+					It("refreshes the token", func() {
+						username, _ := helpers.GetCredentials()
+						session := helpers.CF("quotas")
+						Eventually(session).Should(Say("Getting quotas as %s", username))
+						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
 				})

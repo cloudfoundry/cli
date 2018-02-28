@@ -182,9 +182,17 @@ func (uaa UAARepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[strin
 
 func (uaa UAARepository) RefreshAuthToken() (string, error) {
 	data := url.Values{
-		"refresh_token": {uaa.config.RefreshToken()},
-		"grant_type":    {"refresh_token"},
-		"scope":         {""},
+		"client_id":     {uaa.config.UAAOAuthClient()},
+		"client_secret": {uaa.config.UAAOAuthClientSecret()},
+	}
+
+	// An empty grant_type implies that the authentication grant_type is 'password'
+	if uaa.config.UAAGrantType() != "" {
+		data.Add("grant_type", "client_credentials")
+	} else {
+		data.Add("grant_type", "refresh_token")
+		data.Add("refresh_token", uaa.config.RefreshToken())
+		data.Add("scope", "")
 	}
 
 	apiErr := uaa.getAuthToken(data)
@@ -194,6 +202,8 @@ func (uaa UAARepository) RefreshAuthToken() (string, error) {
 }
 
 func (uaa UAARepository) getAuthToken(data url.Values) error {
+	var accessToken string
+
 	type uaaErrorResponse struct {
 		Code        string `json:"error"`
 		Description string `json:"error_description"`
@@ -207,8 +217,13 @@ func (uaa UAARepository) getAuthToken(data url.Values) error {
 	}
 
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthenticationEndpoint())
-	accessToken := "Basic " + base64.StdEncoding.EncodeToString([]byte(uaa.config.UAAOAuthClient()+":"+uaa.config.UAAOAuthClientSecret()))
+
+	if uaa.config.UAAGrantType() != "client_credentials" {
+		accessToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(uaa.config.UAAOAuthClient()+":"+uaa.config.UAAOAuthClientSecret()))
+	}
+
 	request, err := uaa.gateway.NewRequest("POST", path, accessToken, strings.NewReader(data.Encode()))
+
 	if err != nil {
 		return fmt.Errorf("%s: %s", T("Failed to start oauth request"), err.Error())
 	}

@@ -62,7 +62,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 			Describe("when login succeeds", func() {
 				BeforeEach(func() {
-					setupTestServer(successfulLoginRequest)
+					setupTestServer(successfulPasswordLoginRequest)
 				})
 
 				It("stores the access and refresh tokens in the config", func() {
@@ -198,20 +198,47 @@ var _ = Describe("AuthenticationRepository", func() {
 		})
 
 		Describe("refreshing the auth token", func() {
-			var apiErr error
+			var (
+				apiErr      error
+				accessToken string
+			)
 
 			JustBeforeEach(func() {
-				_, apiErr = auth.RefreshAuthToken()
+				accessToken, apiErr = auth.RefreshAuthToken()
+			})
+
+			Context("when the user is authenticated with client credentials grant", func() {
+				BeforeEach(func() {
+					config.SetUAAGrantType("client_credentials")
+					setupTestServer(successfulClientCredentialsLoginRequest)
+				})
+
+				It("uses client credentials to refresh the access token", func() {
+					Expect(accessToken).To(Equal("BEARER my_new_access_token"))
+				})
+			})
+
+			Context("when the user is authenticated with password grant", func() {
+				BeforeEach(func() {
+					config.SetUAAGrantType("")
+					setupTestServer(successfulPasswordRefreshTokenRequest)
+				})
+
+				It("uses the refresh token to refresh the access token", func() {
+					Expect(accessToken).To(Equal("BEARER my_new_access_token"))
+				})
 			})
 
 			Context("when the refresh token has expired", func() {
 				BeforeEach(func() {
 					setupTestServer(refreshTokenExpiredRequestError)
 				})
+
 				It("the returns the reauthentication error message", func() {
 					Expect(apiErr.Error()).To(Equal("Authentication has expired.  Please log back in to re-authenticate.\n\nTIP: Use `cf login -a <endpoint> -u <user> -o <org> -s <space>` to log back in and re-authenticate."))
 				})
 			})
+
 			Context("when there is a UAA error", func() {
 				BeforeEach(func() {
 					setupTestServer(errorLoginRequest)
@@ -325,17 +352,22 @@ var _ = Describe("AuthenticationRepository", func() {
 	})
 })
 
-var authHeaders = http.Header{
+var passwordGrantTypeAuthHeaders = http.Header{
 	"accept":        {"application/json"},
 	"content-type":  {"application/x-www-form-urlencoded"},
 	"authorization": {"Basic " + base64.StdEncoding.EncodeToString([]byte("cf:"))},
 }
 
-var successfulLoginRequest = testnet.TestRequest{
+var clientGrantTypeAuthHeaders = http.Header{
+	"accept":       {"application/json"},
+	"content-type": {"application/x-www-form-urlencoded"},
+}
+
+var successfulPasswordLoginRequest = testnet.TestRequest{
 	Method:  "POST",
 	Path:    "/oauth/token",
-	Header:  authHeaders,
-	Matcher: successfulLoginMatcher,
+	Header:  passwordGrantTypeAuthHeaders,
+	Matcher: successfulPasswordLoginMatcher,
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `
@@ -348,7 +380,40 @@ var successfulLoginRequest = testnet.TestRequest{
 } `},
 }
 
-var successfulLoginMatcher = func(request *http.Request) {
+var successfulClientCredentialsLoginRequest = testnet.TestRequest{
+	Method:  "POST",
+	Path:    "/oauth/token",
+	Header:  clientGrantTypeAuthHeaders,
+	Matcher: successfulClientCredentialsLoginMatcher,
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
+{
+  "access_token": "my_new_access_token",
+  "token_type": "BEARER",
+  "scope": "openid",
+  "expires_in": 98765
+} `},
+}
+
+var successfulPasswordRefreshTokenRequest = testnet.TestRequest{
+	Method:  "POST",
+	Path:    "/oauth/token",
+	Header:  passwordGrantTypeAuthHeaders,
+	Matcher: successfulPasswordRefreshTokenLoginMatcher,
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
+{
+  "access_token": "my_new_access_token",
+  "token_type": "BEARER",
+  "refresh_token": "my_refresh_token",
+  "scope": "openid",
+  "expires_in": 98765
+} `},
+}
+
+var successfulPasswordLoginMatcher = func(request *http.Request) {
 	err := request.ParseForm()
 	if err != nil {
 		Fail(fmt.Sprintf("Failed to parse form: %s", err))
@@ -359,6 +424,26 @@ var successfulLoginMatcher = func(request *http.Request) {
 	Expect(request.Form.Get("password")).To(Equal("bar"))
 	Expect(request.Form.Get("grant_type")).To(Equal("password"))
 	Expect(request.Form.Get("scope")).To(Equal(""))
+}
+
+var successfulClientCredentialsLoginMatcher = func(request *http.Request) {
+	err := request.ParseForm()
+	if err != nil {
+		Fail(fmt.Sprintf("Failed to parse form: %s", err))
+		return
+	}
+
+	Expect(request.Form.Get("grant_type")).To(Equal("client_credentials"))
+}
+
+var successfulPasswordRefreshTokenLoginMatcher = func(request *http.Request) {
+	err := request.ParseForm()
+	if err != nil {
+		Fail(fmt.Sprintf("Failed to parse form: %s", err))
+		return
+	}
+
+	Expect(request.Form.Get("grant_type")).To(Equal("refresh_token"))
 }
 
 var unsuccessfulLoginRequest = testnet.TestRequest{
