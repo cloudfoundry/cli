@@ -7,9 +7,17 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+// ServicePlan represents a predefined set of configurations for a Cloud
+// Controller service object.
 type ServicePlan struct {
-	GUID        string
-	Name        string
+	//GUID is the unique identifier of the service plan.
+	GUID string
+
+	// Name is the name of the service plan.
+	Name string
+
+	// ServiceGUID is the unique identifier of the service that the service
+	// plan belongs to.
 	ServiceGUID string
 }
 
