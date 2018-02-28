@@ -181,13 +181,12 @@ func (uaa UAARepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[strin
 }
 
 func (uaa UAARepository) RefreshAuthToken() (string, error) {
-	data := url.Values{
-		"client_id":     {uaa.config.UAAOAuthClient()},
-		"client_secret": {uaa.config.UAAOAuthClientSecret()},
-	}
+	data := url.Values{}
 
 	// An empty grant_type implies that the authentication grant_type is 'password'
 	if uaa.config.UAAGrantType() != "" {
+		data.Add("client_id", uaa.config.UAAOAuthClient())
+		data.Add("client_secret", uaa.config.UAAOAuthClientSecret())
 		data.Add("grant_type", "client_credentials")
 	} else {
 		data.Add("grant_type", "refresh_token")
