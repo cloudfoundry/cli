@@ -18,9 +18,10 @@ type AuthActor interface {
 
 type AuthCommand struct {
 	RequiredArgs      flag.Authentication `positional-args:"yes"`
-	ClientCredentials bool                `long:"client-credentials" description:"Use (non-user) service account (also called client credentials)."`
-	usage             interface{}         `usage:"CF_NAME auth USERNAME PASSWORD\n   CF_NAME auth CLIENT_ID CLIENT_SECRET --client-credentials\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\nEXAMPLES:\n   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"`
-	relatedCommands   interface{}         `related_commands:"api, login, target"`
+	ClientCredentials bool                `long:"client-credentials" hidden:"true" description:"Use (non-user) service account (also called client credentials)."`
+	// usage           interface{} `usage:"CF_NAME auth USERNAME PASSWORD\n   CF_NAME auth CLIENT_ID CLIENT_SECRET --client-credentials\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\nEXAMPLES:\n   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"`
+	usage           interface{} `usage:"CF_NAME auth USERNAME PASSWORD\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\nEXAMPLES:\n   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"`
+	relatedCommands interface{} `related_commands:"api, login, target"`
 
 	UI     command.UI
 	Config command.Config
