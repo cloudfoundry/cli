@@ -10,8 +10,13 @@ import (
 
 // Stack represents a Cloud Controller Stack.
 type Stack struct {
-	GUID        string
-	Name        string
+	// GUID is the unique stack identifier.
+	GUID string
+
+	// Name is the name given to the stack.
+	Name string
+
+	// Description is the description of the stack.
 	Description string
 }
 

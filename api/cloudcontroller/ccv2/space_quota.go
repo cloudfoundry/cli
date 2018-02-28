@@ -7,8 +7,14 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+// SpaceQuota represents the Cloud Controller configured quota assigned to the
+// space.
 type SpaceQuota struct {
+
+	// GUID is the unique space quota identifier.
 	GUID string
+
+	// Name is the name given to the space quota.
 	Name string
 }
 
