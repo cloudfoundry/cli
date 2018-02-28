@@ -180,15 +180,17 @@ var _ = Describe("share-service Command", func() {
 				Context("when the service instance is already shared to the space", func() {
 					BeforeEach(func() {
 						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns(
-							v2v3action.Warnings{"Service instance some-service-instance is already shared with that space."},
+							v2v3action.Warnings{"share-service-warning"},
 							actionerror.ServiceInstanceAlreadySharedError{})
 					})
 
 					It("does not return an error and displays all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
+						Expect(testUI.Out).To(Say("Service instance some-service-instance is already shared with that space."))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Err).To(Say("Service instance some-service-instance is already shared with that space."))
+
+						Expect(testUI.Err).To(Say("share-service-warning"))
 					})
 				})
 			})
@@ -263,15 +265,17 @@ var _ = Describe("share-service Command", func() {
 				Context("when the service instance is already shared to the space", func() {
 					BeforeEach(func() {
 						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns(
-							v2v3action.Warnings{"Service instance some-service-instance is already shared with that space."},
+							v2v3action.Warnings{"share-service-warning"},
 							actionerror.ServiceInstanceAlreadySharedError{})
 					})
 
 					It("does not return an error and displays all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
+						Expect(testUI.Out).To(Say("Service instance some-service-instance is already shared with that space."))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Err).To(Say("Service instance some-service-instance is already shared with that space."))
+
+						Expect(testUI.Err).To(Say("share-service-warning"))
 					})
 				})
 			})

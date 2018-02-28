@@ -180,9 +180,8 @@ var _ = Describe("v3-share-service command", func() {
 					It("displays a warning and exits 0", func() {
 						session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
 						Consistently(session.Out).ShouldNot(Say("FAILED"))
+						Eventually(session.Out).Should(Say("Service instance %s is already shared with that space\\.", serviceInstance))
 						Eventually(session.Out).Should(Say("OK"))
-
-						Eventually(session.Err).Should(Say("Service instance %s is already shared with that space\\.", serviceInstance))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -213,9 +212,8 @@ var _ = Describe("v3-share-service command", func() {
 					It("displays a warning and exits 0", func() {
 						session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 						Consistently(session.Out).ShouldNot(Say("FAILED"))
+						Eventually(session.Out).Should(Say("Service instance %s is already shared with that space\\.", serviceInstance))
 						Eventually(session.Out).Should(Say("OK"))
-
-						Eventually(session.Err).Should(Say("Service instance %s is already shared with that space\\.", serviceInstance))
 						Eventually(session).Should(Exit(0))
 					})
 				})

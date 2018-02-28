@@ -107,7 +107,12 @@ func (cmd V3ShareServiceCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		if _, ok := err.(actionerror.ServiceInstanceAlreadySharedError); !ok {
+		switch err.(type) {
+		case actionerror.ServiceInstanceAlreadySharedError:
+			cmd.UI.DisplayText("Service instance {{.ServiceInstanceName}} is already shared with that space.", map[string]interface{}{
+				"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
+			})
+		default:
 			return err
 		}
 	}

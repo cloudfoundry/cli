@@ -198,7 +198,6 @@ var _ = Describe("Service Instance Actions", func() {
 											"get-feature-flags-warning",
 											"get-service-instance-shared-tos-warning",
 											"get-space-warning",
-											"Service instance some-service-instance is already shared with that space.",
 										))
 									})
 								})

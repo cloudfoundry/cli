@@ -1,7 +1,6 @@
 package v2v3action
 
 import (
-	"fmt"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -58,7 +57,6 @@ func (actor Actor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganization(
 
 		for _, sharedTo := range serviceInstanceSharedTos {
 			if sharedTo.SpaceGUID == shareToSpace.GUID {
-				allWarnings = append(allWarnings, fmt.Sprintf("Service instance %s is already shared with that space.", serviceInstanceName))
 				return allWarnings, actionerror.ServiceInstanceAlreadySharedError{}
 			}
 		}
