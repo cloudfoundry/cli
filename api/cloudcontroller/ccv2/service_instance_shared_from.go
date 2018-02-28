@@ -5,11 +5,19 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
-// ServiceInstanceSharedFrom is the struct representation of a share_from
-// object in Cloud Controller.
+// ServiceInstanceSharedFrom represents a Cloud Controller relationship object
+// that describes a service instance in another space (and possibly org) that
+// this service instance is **shared from**.
 type ServiceInstanceSharedFrom struct {
-	SpaceGUID        string `json:"space_guid"`
-	SpaceName        string `json:"space_name"`
+	// SpaceGUID is the unique identifier of the space that this service is
+	// shared from.
+	SpaceGUID string `json:"space_guid"`
+
+	// SpaceName is the name of the space that this service is shared from.
+	SpaceName string `json:"space_name"`
+
+	// OrganizationName is the name of the organization that this service is
+	// shared from.
 	OrganizationName string `json:"organization_name"`
 }
 
