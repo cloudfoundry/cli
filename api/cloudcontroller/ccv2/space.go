@@ -9,10 +9,21 @@ import (
 
 // Space represents a Cloud Controller Space.
 type Space struct {
-	GUID                     string
-	OrganizationGUID         string
-	Name                     string
-	AllowSSH                 bool
+	// GUID is the unique space identifier.
+	GUID string
+
+	// OrganizationGUID is the unique identifier of the organization this space
+	// belongs to.
+	OrganizationGUID string
+
+	// Name is the name given to the space.
+	Name string
+
+	// AllowSSH specifies whether SSH is enabled for this space.
+	AllowSSH bool
+
+	// SpaceQuotaDefinitionGUID is the unique identifier of the space quota
+	// defined for this space.
 	SpaceQuotaDefinitionGUID string
 }
 
