@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2v3action/v2v3actionfakes"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -57,7 +58,7 @@ var _ = Describe("Service Instance Actions", func() {
 							v2action.ServiceInstance{
 								GUID:        "some-service-instance-guid",
 								ServiceGUID: "some-service-guid",
-								Type:        ccv2.ManagedService,
+								Type:        constant.ServiceInstanceTypeManagedService,
 							},
 							v2action.Warnings{"get-service-instance-warning"},
 							nil)
@@ -389,7 +390,7 @@ var _ = Describe("Service Instance Actions", func() {
 							v2action.ServiceInstance{
 								GUID:        "some-service-instance-guid",
 								ServiceGUID: "some-service-guid",
-								Type:        ccv2.UserProvidedService,
+								Type:        constant.ServiceInstanceTypeUserProvidedService,
 							},
 							v2action.Warnings{"get-service-instance-warning"},
 							nil)
@@ -513,7 +514,7 @@ var _ = Describe("Service Instance Actions", func() {
 					v2action.ServiceInstance{
 						GUID:        "some-service-instance-guid",
 						ServiceGUID: "some-service-guid",
-						Type:        ccv2.ManagedService,
+						Type:        constant.ServiceInstanceTypeManagedService,
 					},
 					v2action.Warnings{"get-service-instance-warning"},
 					nil)

@@ -28,21 +28,21 @@ var _ = Describe("Service Instance Actions", func() {
 
 	Describe("ServiceInstance", func() {
 		DescribeTable("IsManaged",
-			func(iType ccv2.ServiceInstanceType, expected bool) {
+			func(iType constant.ServiceInstanceType, expected bool) {
 				Expect(ServiceInstance{Type: iType}.IsManaged()).To(Equal(expected))
 			},
 
-			Entry("return true for managed service", ccv2.ManagedService, true),
-			Entry("return false for any other type of service", ccv2.UserProvidedService, false),
+			Entry("return true for managed service", constant.ServiceInstanceTypeManagedService, true),
+			Entry("return false for any other type of service", constant.ServiceInstanceTypeUserProvidedService, false),
 		)
 
 		DescribeTable("IsUserProvided",
-			func(iType ccv2.ServiceInstanceType, expected bool) {
+			func(iType constant.ServiceInstanceType, expected bool) {
 				Expect(ServiceInstance{Type: iType}.IsUserProvided()).To(Equal(expected))
 			},
 
-			Entry("return true for UserProvidedService service", ccv2.UserProvidedService, true),
-			Entry("return false for any other type of service", ccv2.ManagedService, false),
+			Entry("return true for UserProvidedService service", constant.ServiceInstanceTypeUserProvidedService, true),
+			Entry("return false for any other type of service", constant.ServiceInstanceTypeManagedService, false),
 		)
 	})
 

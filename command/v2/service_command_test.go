@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
@@ -245,7 +246,7 @@ var _ = Describe("service Command", func() {
 							returnedSummary = v2action.ServiceInstanceSummary{
 								ServiceInstance: v2action.ServiceInstance{
 									Name:         "some-service-instance",
-									Type:         ccv2.ManagedService,
+									Type:         constant.ServiceInstanceTypeManagedService,
 									Tags:         []string{"tag-1", "tag-2", "tag-3"},
 									DashboardURL: "some-dashboard",
 									LastOperation: ccv2.LastOperation{
@@ -528,7 +529,7 @@ var _ = Describe("service Command", func() {
 								v2action.ServiceInstanceSummary{
 									ServiceInstance: v2action.ServiceInstance{
 										Name: "some-service-instance",
-										Type: ccv2.UserProvidedService,
+										Type: constant.ServiceInstanceTypeUserProvidedService,
 									},
 									BoundApplications: []string{"app-1", "app-2", "app-3"},
 								},

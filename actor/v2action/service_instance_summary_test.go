@@ -132,7 +132,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 					returnedServiceInstance = ccv2.ServiceInstance{
 						GUID:            "some-service-instance-guid",
 						Name:            "some-service-instance",
-						Type:            ccv2.ManagedService,
+						Type:            constant.ServiceInstanceTypeManagedService,
 						Tags:            []string{"tag-1", "tag-2"},
 						DashboardURL:    "some-dashboard",
 						ServicePlanGUID: "some-service-plan-guid",
@@ -662,7 +662,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 					returnedServiceInstance = ccv2.ServiceInstance{
 						GUID: "some-user-provided-service-instance-guid",
 						Name: "some-user-provided-service-instance",
-						Type: ccv2.UserProvidedService,
+						Type: constant.ServiceInstanceTypeUserProvidedService,
 					}
 					fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
 						[]ccv2.ServiceInstance{returnedServiceInstance},

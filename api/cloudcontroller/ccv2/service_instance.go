@@ -5,39 +5,64 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
-)
-
-// ServiceInstanceType is the type of the Service Instance.
-type ServiceInstanceType string
-
-const (
-	// UserProvidedService is a Service Instance that is created by a user.
-	UserProvidedService ServiceInstanceType = "user_provided_service_instance"
-
-	// ManagedService is a Service Instance that is managed by a service broker.
-	ManagedService ServiceInstanceType = "managed_service_instance"
 )
 
 // ServiceInstance represents a Cloud Controller Service Instance.
 type ServiceInstance struct {
-	GUID            string
-	Name            string
-	SpaceGUID       string
-	ServiceGUID     string
+	// GUID is the unique service instance identifier.
+	GUID string
+
+	// Name is the name given to the service instance.
+	Name string
+
+	// SpaceGUID is the unique identifier of the space that this service instance
+	// belongs to.
+	SpaceGUID string
+
+	// ServiceGUID is the unique identifier of the service that this service
+	// instance belongs to.
+	ServiceGUID string
+
+	// ServicePlanGUID is the unique identifier of the service plan that this
+	// service instance belongs to.
 	ServicePlanGUID string
-	Type            ServiceInstanceType
-	Tags            []string
-	DashboardURL    string
-	LastOperation   LastOperation
+
+	// Type is the type of service instance.
+	Type constant.ServiceInstanceType
+
+	// Tags is a list of all tags for the service instance.
+	Tags []string
+
+	// DashboardURL is the service-broker provided URL to access administrative
+	// features of the service instance.
+	DashboardURL string
+
+	// LastOperation is the status of the last operation requested on the service
+	// instance.
+	LastOperation LastOperation
 }
 
 type LastOperation struct {
-	Type        string
-	State       string
+	// Type is the type of operation that was last performed or currently being
+	// performed on the service instance.
+	Type string
+
+	// State is the status of the last operation or current operation being
+	// performed on the service instance.
+	State string
+
+	// Description is the service broker-provided description of the operation.
 	Description string
-	UpdatedAt   string
-	CreatedAt   string
+
+	// UpdatedAt is the timestamp that the Cloud Controller last checked the
+	// service instance state from the broker.
+	UpdatedAt string
+
+	// CreatedAt is the timestamp that the Cloud Controller created the service
+	// instance from the broker.
+	CreatedAt string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service Instance response.
@@ -71,7 +96,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	serviceInstance.SpaceGUID = ccServiceInstance.Entity.SpaceGUID
 	serviceInstance.ServiceGUID = ccServiceInstance.Entity.ServiceGUID
 	serviceInstance.ServicePlanGUID = ccServiceInstance.Entity.ServicePlanGUID
-	serviceInstance.Type = ServiceInstanceType(ccServiceInstance.Entity.Type)
+	serviceInstance.Type = constant.ServiceInstanceType(ccServiceInstance.Entity.Type)
 	serviceInstance.Tags = ccServiceInstance.Entity.Tags
 	serviceInstance.DashboardURL = ccServiceInstance.Entity.DashboardURL
 	serviceInstance.LastOperation = LastOperation(ccServiceInstance.Entity.LastOperation)
@@ -81,12 +106,12 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 // UserProvided returns true if the Service Instance is a user provided
 // service.
 func (serviceInstance ServiceInstance) UserProvided() bool {
-	return serviceInstance.Type == UserProvidedService
+	return serviceInstance.Type == constant.ServiceInstanceTypeUserProvidedService
 }
 
 // Managed returns true if the Service Instance is a managed service.
 func (serviceInstance ServiceInstance) Managed() bool {
-	return serviceInstance.Type == ManagedService
+	return serviceInstance.Type == constant.ServiceInstanceTypeManagedService
 }
 
 // GetServiceInstance returns the service instance with the given GUID. This
