@@ -128,7 +128,7 @@ var _ = Describe("share-service command", func() {
 			helpers.CreateOrgAndSpace(sharedToOrgName, sharedToSpaceName)
 			setupCF(sourceOrgName, sourceSpaceName)
 
-			domain = defaultSharedDomain()
+			domain = helpers.DefaultSharedDomain()
 		})
 
 		AfterEach(func() {
