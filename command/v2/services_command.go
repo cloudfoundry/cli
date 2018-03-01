@@ -52,11 +52,11 @@ func (cmd ServicesCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.UserName}}...",
+	cmd.UI.DisplayTextWithFlavor("Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
-			"OrgName":   cmd.Config.TargetedOrganization().Name,
-			"SpaceName": cmd.Config.TargetedSpace().Name,
-			"UserName":  user.Name,
+			"OrgName":     cmd.Config.TargetedOrganization().Name,
+			"SpaceName":   cmd.Config.TargetedSpace().Name,
+			"CurrentUser": user.Name,
 		})
 	cmd.UI.DisplayNewline()
 
@@ -71,9 +71,13 @@ func (cmd ServicesCommand) Execute(args []string) error {
 		return nil
 	}
 
-	table := [][]string{
-		{"name", "service", "plan", "bound apps", "last operation"},
-	}
+	table := [][]string{{
+		cmd.UI.TranslateText("name"),
+		cmd.UI.TranslateText("service"),
+		cmd.UI.TranslateText("plan"),
+		cmd.UI.TranslateText("bound apps"),
+		cmd.UI.TranslateText("last operation"),
+	}}
 
 	for _, summary := range instanceSummaries {
 		serviceLabel := summary.Service.Label
