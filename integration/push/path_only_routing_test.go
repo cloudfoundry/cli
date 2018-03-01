@@ -28,7 +28,7 @@ var _ = Describe("push with route path", func() {
 
 			BeforeEach(func() {
 				routePath = "some-path"
-				route = fmt.Sprintf("%s.%s/%s", strings.ToLower(appName), defaultSharedDomain(), routePath)
+				route = fmt.Sprintf("%s.%s/%s", strings.ToLower(appName), helpers.DefaultSharedDomain(), routePath)
 			})
 
 			Context("when the default route with path does not exist", func() {
@@ -49,7 +49,7 @@ var _ = Describe("push with route path", func() {
 
 			Context("the default route with path exists and is unmapped", func() {
 				BeforeEach(func() {
-					Eventually(helpers.CF("create-route", space, defaultSharedDomain(), "-n", strings.ToLower(appName), "--path", routePath)).Should(Exit(0))
+					Eventually(helpers.CF("create-route", space, helpers.DefaultSharedDomain(), "-n", strings.ToLower(appName), "--path", routePath)).Should(Exit(0))
 				})
 
 				It("maps the route with the provided path", func() {

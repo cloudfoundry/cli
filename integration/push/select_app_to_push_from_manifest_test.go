@@ -68,7 +68,7 @@ var _ = Describe("pushes specified app from single manifest file", func() {
 				Eventually(session).Should(Say("\\+\\s+name:\\s+%s", firstApp))
 				Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
 				Eventually(session).Should(Say("\\s+routes:"))
-				Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", firstApp, defaultSharedDomain()))
+				Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", firstApp, helpers.DefaultSharedDomain()))
 				Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
 				Eventually(session).Should(Say("Uploading files\\.\\.\\."))
 				Eventually(session).Should(Say("100.00%"))

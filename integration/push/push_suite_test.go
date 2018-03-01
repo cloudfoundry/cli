@@ -3,14 +3,12 @@ package push
 import (
 	"io/ioutil"
 	"os"
-	"regexp"
 	"testing"
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gexec"
 )
 
 const (
@@ -22,10 +20,9 @@ const (
 
 var (
 	// Suite Level
-	organization       string
-	space              string
-	foundDefaultDomain string
-	realDir            string
+	organization string
+	space        string
+	realDir      string
 
 	// Per Test Level
 	homeDir string
@@ -85,24 +82,6 @@ var _ = AfterEach(func() {
 	helpers.QuickDeleteSpace(space)
 	helpers.DestroyHomeDir(homeDir)
 })
-
-func defaultSharedDomain() string {
-	// TODO: Move this into helpers when other packages need it, figure out how
-	// to cache cuz this is a wacky call otherwise
-	if foundDefaultDomain == "" {
-		session := helpers.CF("domains")
-		Eventually(session).Should(Exit(0))
-
-		regex, err := regexp.Compile(`(.+?)\s+shared`)
-		Expect(err).ToNot(HaveOccurred())
-
-		matches := regex.FindStringSubmatch(string(session.Out.Contents()))
-		Expect(matches).To(HaveLen(2))
-
-		foundDefaultDomain = matches[1]
-	}
-	return foundDefaultDomain
-}
 
 func setupCF(org string, space string) {
 	helpers.LoginCF()

@@ -76,7 +76,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						Eventually(session).Should(Say("\\+\\s+key4"))
 						Eventually(session).Should(Say("\\+\\s+key5"))
 						Eventually(session).Should(Say("\\s+routes:"))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
+						Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, helpers.DefaultSharedDomain()))
 						Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
 						Eventually(session).Should(Say("Uploading files\\.\\.\\."))
 						Eventually(session).Should(Say("100.00%"))

@@ -25,7 +25,7 @@ var _ = Describe("push with hostname", func() {
 	Context("when the default domain is a HTTP domain", func() {
 		Context("when no host is provided / host defaults to app name", func() {
 			BeforeEach(func() {
-				route = fmt.Sprintf("%s.%s", strings.ToLower(appName), defaultSharedDomain())
+				route = fmt.Sprintf("%s.%s", strings.ToLower(appName), helpers.DefaultSharedDomain())
 			})
 
 			Context("when the default route does not exist", func() {
@@ -46,7 +46,7 @@ var _ = Describe("push with hostname", func() {
 
 			Context("the default route exists and is unmapped", func() {
 				BeforeEach(func() {
-					Eventually(helpers.CF("create-route", space, defaultSharedDomain(), "-n", strings.ToLower(appName))).Should(Exit(0))
+					Eventually(helpers.CF("create-route", space, helpers.DefaultSharedDomain(), "-n", strings.ToLower(appName))).Should(Exit(0))
 				})
 
 				It("maps the route", func() {
@@ -92,7 +92,7 @@ var _ = Describe("push with hostname", func() {
 
 			BeforeEach(func() {
 				hostname = strings.ToLower(helpers.NewAppName())
-				route = fmt.Sprintf("%s.%s", hostname, defaultSharedDomain())
+				route = fmt.Sprintf("%s.%s", hostname, helpers.DefaultSharedDomain())
 			})
 
 			Context("when the default route does not exist", func() {
@@ -113,7 +113,7 @@ var _ = Describe("push with hostname", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
 						Eventually(session).Should(Say("routes:"))
-						Consistently(session).ShouldNot(Say("(?i)\\+\\s+.*%s.*", defaultSharedDomain()))
+						Consistently(session).ShouldNot(Say("(?i)\\+\\s+.*%s.*", helpers.DefaultSharedDomain()))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -121,7 +121,7 @@ var _ = Describe("push with hostname", func() {
 
 			Context("the default route exists and is unmapped", func() {
 				BeforeEach(func() {
-					Eventually(helpers.CF("create-route", space, defaultSharedDomain(), "-n", strings.ToLower(appName))).Should(Exit(0))
+					Eventually(helpers.CF("create-route", space, helpers.DefaultSharedDomain(), "-n", strings.ToLower(appName))).Should(Exit(0))
 				})
 
 				It("creates and maps the route with the provided hostname", func() {

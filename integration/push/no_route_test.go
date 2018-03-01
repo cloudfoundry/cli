@@ -67,7 +67,7 @@ var _ = Describe("no-route property", func() {
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
 					Eventually(session).Should(Say("\\s+name:\\s+%s", appName))
-					Eventually(session).Should(Say("(?i)\\-\\s+%s.%s", appName, defaultSharedDomain()))
+					Eventually(session).Should(Say("(?i)\\-\\s+%s.%s", appName, helpers.DefaultSharedDomain()))
 					Eventually(session).Should(Say("Unmapping routes\\.\\.\\."))
 					Eventually(session).Should(Exit(0))
 				})
@@ -131,7 +131,7 @@ var _ = Describe("no-route property", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-route", "--no-start")
 					Eventually(session).Should(Say("\\s+name:\\s+%s", appName))
-					Eventually(session).Should(Say("(?i)\\-\\s+%s.%s", appName, defaultSharedDomain()))
+					Eventually(session).Should(Say("(?i)\\-\\s+%s.%s", appName, helpers.DefaultSharedDomain()))
 					Eventually(session).Should(Say("Unmapping routes\\.\\.\\."))
 					Eventually(session).Should(Exit(0))
 				})

@@ -44,13 +44,13 @@ var _ = Describe("pushes multiple apps with a single manifest file", func() {
 					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", firstApp))
 					Eventually(session).Should(Say("\\s+routes:"))
-					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", firstApp, defaultSharedDomain()))
+					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", firstApp, helpers.DefaultSharedDomain()))
 
 					// secondApp
 					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", secondApp))
 					Eventually(session).Should(Say("\\s+routes:"))
-					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", secondApp, defaultSharedDomain()))
+					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", secondApp, helpers.DefaultSharedDomain()))
 
 					Eventually(session).Should(Say("Creating app %s\\.\\.\\.", firstApp))
 					Eventually(session).Should(Say("Mapping routes\\.\\.\\."))

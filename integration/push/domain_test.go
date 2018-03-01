@@ -28,7 +28,7 @@ var _ = Describe("push with different domain values", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
 					PushCommandName, appName, "--no-start",
 				)
-				Eventually(session).Should(Say("\\s+routes:\\s+%s.%s", strings.ToLower(appName), defaultSharedDomain()))
+				Eventually(session).Should(Say("\\s+routes:\\s+%s.%s", strings.ToLower(appName), helpers.DefaultSharedDomain()))
 				Eventually(session).Should(Exit(0))
 			})
 		})
