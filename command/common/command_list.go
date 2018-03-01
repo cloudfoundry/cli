@@ -34,8 +34,6 @@ type commandList struct {
 	V3Start              v3.V3StartCommand              `command:"v3-start" description:"Start an app"`
 	V3Stop               v3.V3StopCommand               `command:"v3-stop" description:"Stop an app"`
 	V3UnsetEnv           v3.V3UnsetEnvCommand           `command:"v3-unset-env" description:"Remove an env variable from an app"`
-	V3ShareService       v3.V3ShareServiceCommand       `command:"v3-share-service" description:"Share a service instance with another space"`
-	V3UnshareService     v3.V3UnshareServiceCommand     `command:"v3-unshare-service" description:"Unshare a shared service instance from a space"`
 	V3SSH                v3.V3SSHCommand                `command:"v3-ssh" description:"SSH to an application container instance"`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
@@ -167,6 +165,7 @@ type commandList struct {
 	SetSpaceRole                       v2.SetSpaceRoleCommand                       `command:"set-space-role" description:"Assign a space role to a user"`
 	SetStagingEnvironmentVariableGroup v2.SetStagingEnvironmentVariableGroupCommand `command:"set-staging-environment-variable-group" alias:"ssevg" description:"Pass parameters as JSON to create a staging environment variable group"`
 	SharePrivateDomain                 v2.SharePrivateDomainCommand                 `command:"share-private-domain" description:"Share a private domain with an org"`
+	ShareService                       v3.ShareServiceCommand                       `command:"share-service" description:"Share a service instance with another space"`
 	SpaceQuotas                        v2.SpaceQuotasCommand                        `command:"space-quotas" description:"List available space resource quotas"`
 	SpaceQuota                         v2.SpaceQuotaCommand                         `command:"space-quota" description:"Show space quota info"`
 	SpaceSSHAllowed                    v2.SpaceSSHAllowedCommand                    `command:"space-ssh-allowed" description:"Reports whether SSH is allowed in a space"`
@@ -197,6 +196,7 @@ type commandList struct {
 	UnsetSpaceQuota                    v2.UnsetSpaceQuotaCommand                    `command:"unset-space-quota" description:"Unassign a quota from a space"`
 	UnsetSpaceRole                     v2.UnsetSpaceRoleCommand                     `command:"unset-space-role" description:"Remove a space role from a user"`
 	UnsharePrivateDomain               v2.UnsharePrivateDomainCommand               `command:"unshare-private-domain" description:"Unshare a private domain with an org"`
+	UnshareService                     v3.UnshareServiceCommand                     `command:"unshare-service" description:"Unshare a shared service instance from a space"`
 	UpdateBuildpack                    v2.UpdateBuildpackCommand                    `command:"update-buildpack" description:"Update a buildpack"`
 	UpdateQuota                        v2.UpdateQuotaCommand                        `command:"update-quota" description:"Update an existing resource quota"`
 	UpdateSecurityGroup                v2.UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`

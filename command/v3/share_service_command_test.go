@@ -19,7 +19,7 @@ import (
 
 var _ = Describe("share-service Command", func() {
 	var (
-		cmd             v3.V3ShareServiceCommand
+		cmd             v3.ShareServiceCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
@@ -34,7 +34,7 @@ var _ = Describe("share-service Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeShareServiceActor)
 
-		cmd = v3.V3ShareServiceCommand{
+		cmd = v3.ShareServiceCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,

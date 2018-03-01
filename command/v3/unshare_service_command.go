@@ -24,13 +24,13 @@ type UnshareServiceActor interface {
 	CloudControllerV3APIVersion() string
 }
 
-type V3UnshareServiceCommand struct {
+type UnshareServiceCommand struct {
 	RequiredArgs      flag.ServiceInstance `positional-args:"yes"`
 	SharedToOrgName   string               `short:"o" required:"false" description:"Org of the other space (Default: targeted org)"`
 	SharedToSpaceName string               `short:"s" required:"true" description:"Space to unshare the service instance from"`
 	Force             bool                 `short:"f" description:"Force unshare without confirmation"`
-	usage             interface{}          `usage:"cf v3-unshare-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG] [-f]"`
-	relatedCommands   interface{}          `related_commands:"delete-service, service, services, unbind-service, v3-share-service"`
+	usage             interface{}          `usage:"cf unshare-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG] [-f]"`
+	relatedCommands   interface{}          `related_commands:"delete-service, service, services, share-service, unbind-service"`
 
 	UI          command.UI
 	Config      command.Config
@@ -38,7 +38,7 @@ type V3UnshareServiceCommand struct {
 	Actor       UnshareServiceActor
 }
 
-func (cmd *V3UnshareServiceCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *UnshareServiceCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 
@@ -66,10 +66,7 @@ func (cmd *V3UnshareServiceCommand) Setup(config command.Config, ui command.UI) 
 	return nil
 }
 
-func (cmd V3UnshareServiceCommand) Execute(args []string) error {
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
-
+func (cmd UnshareServiceCommand) Execute(args []string) error {
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionShareServiceV3)
 	if err != nil {
 		return err

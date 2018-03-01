@@ -25,12 +25,12 @@ type ShareServiceActor interface {
 	CloudControllerV3APIVersion() string
 }
 
-type V3ShareServiceCommand struct {
+type ShareServiceCommand struct {
 	RequiredArgs    flag.ServiceInstance `positional-args:"yes"`
 	OrgName         string               `short:"o" required:"false" description:"Org of the other space (Default: targeted org)"`
 	SpaceName       string               `short:"s" required:"true" description:"Space to share the service instance into"`
-	usage           interface{}          `usage:"cf v3-share-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG]"`
-	relatedCommands interface{}          `related_commands:"bind-service, service, services, v3-unshare-service"`
+	usage           interface{}          `usage:"cf share-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG]"`
+	relatedCommands interface{}          `related_commands:"bind-service, service, services, unshare-service"`
 
 	UI          command.UI
 	Config      command.Config
@@ -38,7 +38,7 @@ type V3ShareServiceCommand struct {
 	Actor       ShareServiceActor
 }
 
-func (cmd *V3ShareServiceCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *ShareServiceCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 
@@ -66,10 +66,7 @@ func (cmd *V3ShareServiceCommand) Setup(config command.Config, ui command.UI) er
 	return nil
 }
 
-func (cmd V3ShareServiceCommand) Execute(args []string) error {
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
-
+func (cmd ShareServiceCommand) Execute(args []string) error {
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionShareServiceV3)
 	if err != nil {
 		return err

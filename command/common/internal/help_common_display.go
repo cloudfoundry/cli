@@ -32,6 +32,7 @@ var CommonHelpCategoryList = []HelpCategory{
 			{"service", "service-key"},
 			{"bind-service", "bind-route-service"},
 			{"unbind-service", "unbind-route-service"},
+			{"share-service", "unshare-service"},
 		},
 	},
 

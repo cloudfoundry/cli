@@ -278,7 +278,7 @@ var _ = Describe("service command", func() {
 				targetSpaceName = helpers.NewSpaceName()
 				helpers.CreateOrgAndSpace(orgName, targetSpaceName)
 				helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
-				Eventually(helpers.CF("v3-share-service", serviceInstanceName, "-s", targetSpaceName)).Should(Exit(0))
+				Eventually(helpers.CF("share-service", serviceInstanceName, "-s", targetSpaceName)).Should(Exit(0))
 			})
 
 			Context("when the user is targeted to the source space", func() {
