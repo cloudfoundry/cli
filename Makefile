@@ -15,6 +15,8 @@ all : test build
 
 build : out/cf
 
+build-osx : out/cf-darwin
+
 check-target-env :
 ifndef CF_API
 	$(error CF_API is undefined)
@@ -87,6 +89,15 @@ out/cf : $(GOSRC)
 							-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)" \
 		.
 
+out/cf-darwin : $(GOSRC)
+	GOARCH=amd64 GOOS=darwin go build -o out/cf-osx \
+	  -ldflags "-w \
+						  -s \
+						  -X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION) \
+						  -X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
+						  -X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)" \
+		.
+
 out/cf-cli-_winx64.exe : $(GOSRC)
 	go get github.com/akavel/rsrc
 	rsrc -ico ci/installers/windows/cf.ico
@@ -119,6 +130,6 @@ vet :
 	@echo  "Vetting packages for potential issues..."
 	go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
 
-.PHONY : all build clean i18n i18n-extract-strings format version vet
+.PHONY : all build build-osx clean i18n i18n-extract-strings format version vet
 .PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
 .PHONY : check-target-env fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
