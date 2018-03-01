@@ -853,7 +853,7 @@ var _ = Describe("Route", func() {
 		})
 	})
 
-	Describe("CheckRoute", func() {
+	Describe("DoesRouteExist", func() {
 		var (
 			route      Route
 			exists     bool
@@ -862,7 +862,7 @@ var _ = Describe("Route", func() {
 		)
 
 		JustBeforeEach(func() {
-			exists, warnings, executeErr = client.CheckRoute(route)
+			exists, warnings, executeErr = client.DoesRouteExist(route)
 		})
 
 		Context("API Version < MinVersionHTTPRoutePath", func() {

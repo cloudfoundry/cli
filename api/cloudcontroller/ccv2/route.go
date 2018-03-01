@@ -233,9 +233,9 @@ func (client *Client) DeleteRoute(routeGUID string) (Warnings, error) {
 	return response.Warnings, err
 }
 
-// CheckRoute returns true if the route exists in the CF instance. DomainGUID
+// DoesRouteExist returns true if the route exists in the CF instance. DomainGUID
 // is required for check. This call will only work for CC API 2.55 or higher.
-func (client *Client) CheckRoute(route Route) (bool, Warnings, error) {
+func (client *Client) DoesRouteExist(route Route) (bool, Warnings, error) {
 	currentVersion := client.APIVersion()
 	switch {
 	case cloudcontroller.MinimumAPIVersionCheck(currentVersion, ccversion.MinVersionNoHostInReservedRouteEndpoint) == nil:

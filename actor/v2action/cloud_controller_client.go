@@ -6,7 +6,6 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 // CloudControllerClient is a Cloud Controller V2 client.
 type CloudControllerClient interface {
-	CheckRoute(route ccv2.Route) (bool, ccv2.Warnings, error)
 	CreateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	CreateRoute(route ccv2.Route, generatePort bool) (ccv2.Route, ccv2.Warnings, error)
 	CreateServiceBinding(appGUID string, serviceBindingGUID string, parameters map[string]interface{}) (ccv2.ServiceBinding, ccv2.Warnings, error)
@@ -18,6 +17,7 @@ type CloudControllerClient interface {
 	DeleteSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	DeleteServiceBinding(serviceBindingGUID string) (ccv2.Warnings, error)
 	DeleteSpaceJob(spaceGUID string) (ccv2.Job, ccv2.Warnings, error)
+	DoesRouteExist(route ccv2.Route) (bool, ccv2.Warnings, error)
 	GetApplication(guid string) (ccv2.Application, ccv2.Warnings, error)
 	GetApplicationApplicationInstanceStatuses(guid string) (map[int]ccv2.ApplicationInstanceStatus, ccv2.Warnings, error)
 	GetApplicationApplicationInstances(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error)

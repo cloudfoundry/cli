@@ -9,21 +9,6 @@ import (
 )
 
 type FakeCloudControllerClient struct {
-	CheckRouteStub        func(route ccv2.Route) (bool, ccv2.Warnings, error)
-	checkRouteMutex       sync.RWMutex
-	checkRouteArgsForCall []struct {
-		route ccv2.Route
-	}
-	checkRouteReturns struct {
-		result1 bool
-		result2 ccv2.Warnings
-		result3 error
-	}
-	checkRouteReturnsOnCall map[int]struct {
-		result1 bool
-		result2 ccv2.Warnings
-		result3 error
-	}
 	CreateApplicationStub        func(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	createApplicationMutex       sync.RWMutex
 	createApplicationArgsForCall []struct {
@@ -182,6 +167,21 @@ type FakeCloudControllerClient struct {
 	}
 	deleteSpaceJobReturnsOnCall map[int]struct {
 		result1 ccv2.Job
+		result2 ccv2.Warnings
+		result3 error
+	}
+	DoesRouteExistStub        func(route ccv2.Route) (bool, ccv2.Warnings, error)
+	doesRouteExistMutex       sync.RWMutex
+	doesRouteExistArgsForCall []struct {
+		route ccv2.Route
+	}
+	doesRouteExistReturns struct {
+		result1 bool
+		result2 ccv2.Warnings
+		result3 error
+	}
+	doesRouteExistReturnsOnCall map[int]struct {
+		result1 bool
 		result2 ccv2.Warnings
 		result3 error
 	}
@@ -931,60 +931,6 @@ type FakeCloudControllerClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCloudControllerClient) CheckRoute(route ccv2.Route) (bool, ccv2.Warnings, error) {
-	fake.checkRouteMutex.Lock()
-	ret, specificReturn := fake.checkRouteReturnsOnCall[len(fake.checkRouteArgsForCall)]
-	fake.checkRouteArgsForCall = append(fake.checkRouteArgsForCall, struct {
-		route ccv2.Route
-	}{route})
-	fake.recordInvocation("CheckRoute", []interface{}{route})
-	fake.checkRouteMutex.Unlock()
-	if fake.CheckRouteStub != nil {
-		return fake.CheckRouteStub(route)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.checkRouteReturns.result1, fake.checkRouteReturns.result2, fake.checkRouteReturns.result3
-}
-
-func (fake *FakeCloudControllerClient) CheckRouteCallCount() int {
-	fake.checkRouteMutex.RLock()
-	defer fake.checkRouteMutex.RUnlock()
-	return len(fake.checkRouteArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) CheckRouteArgsForCall(i int) ccv2.Route {
-	fake.checkRouteMutex.RLock()
-	defer fake.checkRouteMutex.RUnlock()
-	return fake.checkRouteArgsForCall[i].route
-}
-
-func (fake *FakeCloudControllerClient) CheckRouteReturns(result1 bool, result2 ccv2.Warnings, result3 error) {
-	fake.CheckRouteStub = nil
-	fake.checkRouteReturns = struct {
-		result1 bool
-		result2 ccv2.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) CheckRouteReturnsOnCall(i int, result1 bool, result2 ccv2.Warnings, result3 error) {
-	fake.CheckRouteStub = nil
-	if fake.checkRouteReturnsOnCall == nil {
-		fake.checkRouteReturnsOnCall = make(map[int]struct {
-			result1 bool
-			result2 ccv2.Warnings
-			result3 error
-		})
-	}
-	fake.checkRouteReturnsOnCall[i] = struct {
-		result1 bool
-		result2 ccv2.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakeCloudControllerClient) CreateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error) {
 	fake.createApplicationMutex.Lock()
 	ret, specificReturn := fake.createApplicationReturnsOnCall[len(fake.createApplicationArgsForCall)]
@@ -1565,6 +1511,60 @@ func (fake *FakeCloudControllerClient) DeleteSpaceJobReturnsOnCall(i int, result
 	}
 	fake.deleteSpaceJobReturnsOnCall[i] = struct {
 		result1 ccv2.Job
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DoesRouteExist(route ccv2.Route) (bool, ccv2.Warnings, error) {
+	fake.doesRouteExistMutex.Lock()
+	ret, specificReturn := fake.doesRouteExistReturnsOnCall[len(fake.doesRouteExistArgsForCall)]
+	fake.doesRouteExistArgsForCall = append(fake.doesRouteExistArgsForCall, struct {
+		route ccv2.Route
+	}{route})
+	fake.recordInvocation("DoesRouteExist", []interface{}{route})
+	fake.doesRouteExistMutex.Unlock()
+	if fake.DoesRouteExistStub != nil {
+		return fake.DoesRouteExistStub(route)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.doesRouteExistReturns.result1, fake.doesRouteExistReturns.result2, fake.doesRouteExistReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DoesRouteExistCallCount() int {
+	fake.doesRouteExistMutex.RLock()
+	defer fake.doesRouteExistMutex.RUnlock()
+	return len(fake.doesRouteExistArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DoesRouteExistArgsForCall(i int) ccv2.Route {
+	fake.doesRouteExistMutex.RLock()
+	defer fake.doesRouteExistMutex.RUnlock()
+	return fake.doesRouteExistArgsForCall[i].route
+}
+
+func (fake *FakeCloudControllerClient) DoesRouteExistReturns(result1 bool, result2 ccv2.Warnings, result3 error) {
+	fake.DoesRouteExistStub = nil
+	fake.doesRouteExistReturns = struct {
+		result1 bool
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DoesRouteExistReturnsOnCall(i int, result1 bool, result2 ccv2.Warnings, result3 error) {
+	fake.DoesRouteExistStub = nil
+	if fake.doesRouteExistReturnsOnCall == nil {
+		fake.doesRouteExistReturnsOnCall = make(map[int]struct {
+			result1 bool
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.doesRouteExistReturnsOnCall[i] = struct {
+		result1 bool
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -4287,8 +4287,6 @@ func (fake *FakeCloudControllerClient) TokenEndpointReturnsOnCall(i int, result1
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.checkRouteMutex.RLock()
-	defer fake.checkRouteMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
 	defer fake.createApplicationMutex.RUnlock()
 	fake.createRouteMutex.RLock()
@@ -4311,6 +4309,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteServiceBindingMutex.RUnlock()
 	fake.deleteSpaceJobMutex.RLock()
 	defer fake.deleteSpaceJobMutex.RUnlock()
+	fake.doesRouteExistMutex.RLock()
+	defer fake.doesRouteExistMutex.RUnlock()
 	fake.getApplicationMutex.RLock()
 	defer fake.getApplicationMutex.RUnlock()
 	fake.getApplicationApplicationInstanceStatusesMutex.RLock()
