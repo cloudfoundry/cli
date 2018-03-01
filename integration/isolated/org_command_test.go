@@ -120,7 +120,7 @@ var _ = Describe("org command", func() {
 
 					Eventually(session).Should(Say("name:\\s+%s", orgName))
 
-					domainsSorted := []string{defaultSharedDomain(), domainName}
+					domainsSorted := []string{helpers.DefaultSharedDomain(), domainName}
 					sort.Strings(domainsSorted)
 					Eventually(session).Should(Say("domains:.+%s,.+%s", domainsSorted[0], domainsSorted[1]))
 

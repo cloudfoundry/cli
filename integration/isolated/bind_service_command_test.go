@@ -84,7 +84,7 @@ var _ = Describe("bind-service command", func() {
 			username, _ = helpers.GetCredentials()
 
 			setupCF(org, space)
-			domain = defaultSharedDomain()
+			domain = helpers.DefaultSharedDomain()
 		})
 
 		AfterEach(func() {

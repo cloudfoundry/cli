@@ -37,7 +37,7 @@ var _ = Describe("delete-service command", func() {
 			)
 
 			BeforeEach(func() {
-				domain = defaultSharedDomain()
+				domain = helpers.DefaultSharedDomain()
 				service = helpers.PrefixedRandomName("SERVICE")
 				servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 				broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)

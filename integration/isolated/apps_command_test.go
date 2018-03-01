@@ -77,7 +77,7 @@ var _ = XDescribe("apps command", func() {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName2)).Should(Exit(0))
 				})
 
-				domainName = defaultSharedDomain()
+				domainName = helpers.DefaultSharedDomain()
 			})
 
 			It("displays apps in the list", func() {

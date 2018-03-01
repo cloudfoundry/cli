@@ -79,7 +79,7 @@ var _ = Describe("restage command", func() {
 			Context("when the app does *not* stage properly because the app was not detected by any buildpacks", func() {
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("app")
-					domainName = defaultSharedDomain()
+					domainName = helpers.DefaultSharedDomain()
 					helpers.WithHelloWorldApp(func(appDir string) {
 						err := os.Remove(filepath.Join(appDir, "Staticfile"))
 						Expect(err).ToNot(HaveOccurred())
@@ -124,7 +124,7 @@ var _ = Describe("restage command", func() {
 					Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
 					Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
 					appName = helpers.PrefixedRandomName("app")
-					domainName = defaultSharedDomain()
+					domainName = helpers.DefaultSharedDomain()
 					helpers.WithHelloWorldApp(func(appDir string) {
 						manifestContents := []byte(fmt.Sprintf(`
 ---

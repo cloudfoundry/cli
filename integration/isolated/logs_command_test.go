@@ -94,7 +94,7 @@ var _ = Describe("Logs Command", func() {
 					userName, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say("Retrieving logs for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
-					response, err := http.Get(fmt.Sprintf("http://%s.%s", appName, defaultSharedDomain()))
+					response, err := http.Get(fmt.Sprintf("http://%s.%s", appName, helpers.DefaultSharedDomain()))
 					Expect(err).NotTo(HaveOccurred())
 					Expect(response.StatusCode).To(Equal(http.StatusOK))
 					Eventually(session).Should(Say("%s \\[APP/PROC/WEB/0\\]\\s+OUT .*? \"GET / HTTP/1.1\" 200 \\d+", helpers.ISO8601Regex))

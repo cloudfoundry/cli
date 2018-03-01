@@ -30,7 +30,7 @@ var _ = Describe("service-key command", func() {
 		serviceInstance = helpers.PrefixedRandomName("si")
 
 		setupCF(org, space)
-		domain = defaultSharedDomain()
+		domain = helpers.DefaultSharedDomain()
 	})
 
 	AfterEach(func() {

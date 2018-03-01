@@ -111,6 +111,26 @@ func NewDomain(org string, name string) Domain {
 	}
 }
 
+func DefaultSharedDomain() string {
+	// TODO: Move this into helpers when other packages need it, figure out how
+	// to cache cuz this is a wacky call otherwise
+	var foundDefaultDomain string
+
+	if foundDefaultDomain == "" {
+		session := CF("domains")
+		Eventually(session).Should(Exit(0))
+
+		regex, err := regexp.Compile(`(.+?)\s+shared`)
+		Expect(err).ToNot(HaveOccurred())
+
+		matches := regex.FindStringSubmatch(string(session.Out.Contents()))
+		Expect(matches).To(HaveLen(2))
+
+		foundDefaultDomain = matches[1]
+	}
+	return foundDefaultDomain
+}
+
 func (d Domain) Create() {
 	Eventually(CF("create-domain", d.Org, d.Name)).Should(Exit(0))
 	Eventually(CF("domains")).Should(And(Exit(0), Say(d.Name)))

@@ -54,7 +54,7 @@ var _ = Describe("ssh command", func() {
 
 			setupCF(orgName, spaceName)
 			appName = helpers.PrefixedRandomName("app")
-			domainName = defaultSharedDomain()
+			domainName = helpers.DefaultSharedDomain()
 			helpers.WithHelloWorldApp(func(appDir string) {
 				manifestContents := []byte(fmt.Sprintf(`
 ---

@@ -25,7 +25,7 @@ var _ = Describe("service-access command", func() {
 			serviceBroker = helpers.NewServiceBroker(
 				helpers.NewServiceBrokerName(),
 				helpers.NewAssets().ServiceBroker,
-				defaultSharedDomain(),
+				helpers.DefaultSharedDomain(),
 				helpers.PrefixedRandomName("service"),
 				helpers.PrefixedRandomName("plan"),
 			)

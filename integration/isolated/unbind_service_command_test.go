@@ -42,7 +42,7 @@ var _ = Describe("unbind-service command", func() {
 			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
 			setupCF(org, space)
-			domain = defaultSharedDomain()
+			domain = helpers.DefaultSharedDomain()
 		})
 
 		AfterEach(func() {

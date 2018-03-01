@@ -77,7 +77,7 @@ var _ = Describe("services command", func() {
 			Eventually(helpers.CF("cups", userProvidedService1, "-p", `{"username": "admin", "password": "admin"}`)).Should(Exit(0))
 			Eventually(helpers.CF("cups", userProvidedService2, "-p", `{"username": "admin", "password": "admin"}`)).Should(Exit(0))
 
-			domain := defaultSharedDomain()
+			domain := helpers.DefaultSharedDomain()
 			service = helpers.PrefixedRandomName("SERVICE")
 			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 			broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)

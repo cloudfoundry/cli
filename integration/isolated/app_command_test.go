@@ -103,7 +103,7 @@ var _ = Describe("app command", func() {
 					Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
 
 					appName = helpers.PrefixedRandomName("app")
-					domainName = defaultSharedDomain()
+					domainName = helpers.DefaultSharedDomain()
 					tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
 					tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 					helpers.WithHelloWorldApp(func(appDir string) {

@@ -89,7 +89,7 @@ var _ = XDescribe("scale command", func() {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 				})
 
-				domainName = defaultSharedDomain()
+				domainName = helpers.DefaultSharedDomain()
 			})
 
 			AfterEach(func() {

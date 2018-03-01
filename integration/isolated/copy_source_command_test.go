@@ -48,7 +48,7 @@ var _ = Describe("copy-source command", func() {
 		Eventually(session).Should(Say("Showing health and status for app %s", appName2))
 		Eventually(session).Should(Exit(0))
 
-		resp, err := http.Get(fmt.Sprintf("http://%s.%s", appName2, defaultSharedDomain()))
+		resp, err := http.Get(fmt.Sprintf("http://%s.%s", appName2, helpers.DefaultSharedDomain()))
 		Expect(err).ToNot(HaveOccurred())
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)

@@ -106,7 +106,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 			setupCF(orgName, spaceName)
 			userName, _ = helpers.GetCredentials()
-			domainName = defaultSharedDomain()
+			domainName = helpers.DefaultSharedDomain()
 		})
 
 		AfterEach(func() {

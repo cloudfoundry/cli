@@ -78,7 +78,7 @@ var _ = Describe("start command", func() {
 			Context("when the app is started", func() {
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("app")
-					domainName = defaultSharedDomain()
+					domainName = helpers.DefaultSharedDomain()
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 					})
@@ -97,7 +97,7 @@ var _ = Describe("start command", func() {
 				Context("when the app has been staged", func() {
 					BeforeEach(func() {
 						appName = helpers.PrefixedRandomName("app")
-						domainName = defaultSharedDomain()
+						domainName = helpers.DefaultSharedDomain()
 						helpers.WithHelloWorldApp(func(appDir string) {
 							manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -147,7 +147,7 @@ applications:
 					Context("when the app does *not* stage properly because the app was not detected by any buildpacks", func() {
 						BeforeEach(func() {
 							appName = helpers.PrefixedRandomName("app")
-							domainName = defaultSharedDomain()
+							domainName = helpers.DefaultSharedDomain()
 							helpers.WithHelloWorldApp(func(appDir string) {
 								err := os.Remove(filepath.Join(appDir, "Staticfile"))
 								Expect(err).ToNot(HaveOccurred())
@@ -195,7 +195,7 @@ applications:
 								Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
 								Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
 								appName = helpers.PrefixedRandomName("app")
-								domainName = defaultSharedDomain()
+								domainName = helpers.DefaultSharedDomain()
 								helpers.WithHelloWorldApp(func(appDir string) {
 									manifestContents := []byte(fmt.Sprintf(`
 ---
