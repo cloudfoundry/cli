@@ -10,6 +10,7 @@ import (
 
 // User represents a Cloud Controller User.
 type User struct {
+	// GUID is the unique user identifier.
 	GUID string
 }
 
