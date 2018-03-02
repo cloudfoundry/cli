@@ -126,7 +126,7 @@ var _ = Describe("share-service command", func() {
 			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
 			helpers.CreateOrgAndSpace(sharedToOrgName, sharedToSpaceName)
-			setupCF(sourceOrgName, sourceSpaceName)
+			helpers.SetupCF(sourceOrgName, sourceSpaceName)
 
 			domain = helpers.DefaultSharedDomain()
 		})
@@ -246,7 +246,7 @@ var _ = Describe("share-service command", func() {
 				})
 
 				AfterEach(func() {
-					setupCF(sourceOrgName, sourceSpaceName)
+					helpers.SetupCF(sourceOrgName, sourceSpaceName)
 				})
 
 				It("fails with an unauthorized error", func() {

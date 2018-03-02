@@ -48,7 +48,7 @@ var _ = Describe("service command", func() {
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 
 			userName, _ = helpers.GetCredentials()
 		})
@@ -239,7 +239,7 @@ var _ = Describe("service command", func() {
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			sourceSpaceName = helpers.NewSpaceName()
-			setupCF(orgName, sourceSpaceName)
+			helpers.SetupCF(orgName, sourceSpaceName)
 
 			domain := helpers.DefaultSharedDomain()
 			service = helpers.PrefixedRandomName("SERVICE")
