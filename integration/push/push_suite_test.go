@@ -74,7 +74,7 @@ var _ = BeforeEach(func() {
 	homeDir = helpers.SetHomeDir()
 	helpers.SetAPI()
 	space = helpers.NewSpaceName()
-	setupCF(organization, space)
+	helpers.SetupCF(organization, space)
 })
 
 var _ = AfterEach(func() {
@@ -82,10 +82,3 @@ var _ = AfterEach(func() {
 	helpers.QuickDeleteSpace(space)
 	helpers.DestroyHomeDir(homeDir)
 })
-
-func setupCF(org string, space string) {
-	helpers.LoginCF()
-	helpers.TargetOrg(org)
-	helpers.CreateSpace(space)
-	helpers.TargetOrgAndSpace(org, space)
-}
