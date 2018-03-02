@@ -202,8 +202,7 @@ var _ = Describe("v3-push command", func() {
 
 		BeforeEach(func() {
 			setupCF(orgName, spaceName)
-
-			domainName = defaultSharedDomain()
+			domainName = helpers.DefaultSharedDomain()
 		})
 
 		AfterEach(func() {
@@ -589,7 +588,7 @@ var _ = Describe("v3-push command", func() {
 				})
 
 				It("successfully compiles and runs the app", func() {
-					resp, err := http.Get(fmt.Sprintf("http://%s.%s", appName, defaultSharedDomain()))
+					resp, err := http.Get(fmt.Sprintf("http://%s.%s", appName, helpers.DefaultSharedDomain()))
 					Expect(err).ToNot(HaveOccurred())
 					Expect(resp.StatusCode).To(Equal(http.StatusOK))
 				})

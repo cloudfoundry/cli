@@ -171,7 +171,7 @@ var _ = Describe("v3-app command", func() {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
 				})
 
-				domainName = defaultSharedDomain()
+				domainName = helpers.DefaultSharedDomain()
 			})
 
 			It("displays the app summary", func() {
@@ -242,7 +242,7 @@ var _ = Describe("v3-app command", func() {
 
 			BeforeEach(func() {
 				Eventually(helpers.CF("v3-push", appName, "-o", PublicDockerImage)).Should(Exit(0))
-				domainName = defaultSharedDomain()
+				domainName = helpers.DefaultSharedDomain()
 			})
 
 			It("displays the app summary", func() {

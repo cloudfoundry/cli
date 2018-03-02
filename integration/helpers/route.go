@@ -111,10 +111,11 @@ func NewDomain(org string, name string) Domain {
 	}
 }
 
+var foundDefaultDomain string
+
 func DefaultSharedDomain() string {
 	// TODO: Move this into helpers when other packages need it, figure out how
 	// to cache cuz this is a wacky call otherwise
-	var foundDefaultDomain string
 
 	if foundDefaultDomain == "" {
 		session := CF("domains")
