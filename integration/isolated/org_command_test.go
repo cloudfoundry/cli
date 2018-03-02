@@ -62,7 +62,7 @@ var _ = Describe("org command", func() {
 
 		Context("when the org exists", func() {
 			BeforeEach(func() {
-				setupCF(orgName, spaceName)
+				helpers.SetupCF(orgName, spaceName)
 			})
 
 			AfterEach(func() {

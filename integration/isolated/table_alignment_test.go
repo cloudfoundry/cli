@@ -15,7 +15,8 @@ var _ = Describe("table alignment", func() {
 
 	Context("when output is in English", func() {
 		BeforeEach(func() {
-			setupCF(ReadOnlyOrg, ReadOnlySpace)
+			helpers.LoginCF()
+			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 		})
 
 		// Developer note: The spacing in this test is significant and explicit. Do
@@ -34,7 +35,8 @@ var _ = Describe("table alignment", func() {
 
 	Context("when output is in language with multibyte characters", func() {
 		BeforeEach(func() {
-			setupCF(ReadOnlyOrg, ReadOnlySpace)
+			helpers.LoginCF()
+			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 		})
 
 		// Developer note: The spacing in this test is significant and explicit. Do

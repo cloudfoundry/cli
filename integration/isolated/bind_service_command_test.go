@@ -83,7 +83,7 @@ var _ = Describe("bind-service command", func() {
 			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 			username, _ = helpers.GetCredentials()
 
-			setupCF(org, space)
+			helpers.SetupCF(org, space)
 			domain = helpers.DefaultSharedDomain()
 		})
 

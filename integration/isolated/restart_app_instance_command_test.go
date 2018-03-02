@@ -45,7 +45,7 @@ var _ = XDescribe("restart command", func() {
 			spaceName = helpers.NewSpaceName()
 			appName = helpers.NewAppName()
 
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 			userName, _ = helpers.GetCredentials()
 		})
 

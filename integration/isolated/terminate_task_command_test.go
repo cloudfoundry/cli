@@ -49,7 +49,7 @@ var _ = Describe("terminate-task command", func() {
 			spaceName = helpers.NewSpaceName()
 			appName = helpers.PrefixedRandomName("APP")
 
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 		})
 
 		AfterEach(func() {

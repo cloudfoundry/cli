@@ -52,7 +52,7 @@ var _ = Describe("ssh command", func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
 
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 			appName = helpers.PrefixedRandomName("app")
 			domainName = helpers.DefaultSharedDomain()
 			helpers.WithHelloWorldApp(func(appDir string) {

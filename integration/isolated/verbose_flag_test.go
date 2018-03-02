@@ -46,7 +46,8 @@ var _ = Describe("Verbose", func() {
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
-				setupCF(ReadOnlyOrg, ReadOnlySpace)
+				helpers.LoginCF()
+				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 
 				var envMap map[string]string
 				if env != "" {
@@ -114,7 +115,8 @@ var _ = Describe("Verbose", func() {
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
-				setupCF(ReadOnlyOrg, ReadOnlySpace)
+				helpers.LoginCF()
+				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 
 				var envMap map[string]string
 				if env != "" {
@@ -191,7 +193,7 @@ var _ = Describe("Verbose", func() {
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
-				setupCF(ReadOnlyOrg, ReadOnlySpace)
+				helpers.SetupCF(ReadOnlyOrg, ReadOnlySpace)
 
 				// Invalidate the access token to cause a token refresh in order to
 				// test the call to the UAA.
@@ -257,7 +259,7 @@ var _ = Describe("Verbose", func() {
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
 
-				setupCF(ReadOnlyOrg, ReadOnlySpace)
+				helpers.SetupCF(ReadOnlyOrg, ReadOnlySpace)
 
 				// Invalidate the access token to cause a token refresh in order to
 				// test the call to the UAA.
@@ -335,7 +337,7 @@ var _ = Describe("Verbose", func() {
 			orgName = helpers.NewOrgName()
 			spaceName := helpers.NewSpaceName()
 
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 		})
 
 		AfterEach(func() {

@@ -29,7 +29,7 @@ var _ = Describe("service-key command", func() {
 		servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 		serviceInstance = helpers.PrefixedRandomName("si")
 
-		setupCF(org, space)
+		helpers.SetupCF(org, space)
 		domain = helpers.DefaultSharedDomain()
 	})
 

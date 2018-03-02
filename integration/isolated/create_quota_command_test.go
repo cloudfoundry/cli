@@ -10,7 +10,8 @@ import (
 
 var _ = Describe("create-quota command", func() {
 	BeforeEach(func() {
-		setupCF(ReadOnlyOrg, ReadOnlySpace)
+		helpers.LoginCF()
+		helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 	})
 
 	It("creates a quota", func() {

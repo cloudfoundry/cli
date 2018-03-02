@@ -38,7 +38,8 @@ var _ = Describe("services command", func() {
 
 	Context("has no services", func() {
 		BeforeEach(func() {
-			setupCF(ReadOnlyOrg, ReadOnlySpace)
+			helpers.LoginCF()
+			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 		})
 
 		It("tells the user 'no services found'", func() {
@@ -69,7 +70,7 @@ var _ = Describe("services command", func() {
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 
 			userProvidedService1 = helpers.PrefixedRandomName("UPS1")
 			userProvidedService2 = helpers.PrefixedRandomName("UPS2")

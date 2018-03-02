@@ -18,7 +18,7 @@ var _ = Describe("set-space-quota command", func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 
-		setupCF(orgName, spaceName)
+		helpers.SetupCF(orgName, spaceName)
 		quotaName = helpers.QuotaName()
 		session := helpers.CF("create-space-quota", quotaName)
 		Eventually(session).Should(Exit(0))

@@ -51,7 +51,7 @@ var _ = XDescribe("apps command", func() {
 		var userName string
 
 		BeforeEach(func() {
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 			userName, _ = helpers.GetCredentials()
 		})
 

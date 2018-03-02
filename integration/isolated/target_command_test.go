@@ -106,7 +106,8 @@ var _ = Describe("target command", func() {
 
 		Context("when targeted to an org and space", func() {
 			BeforeEach(func() {
-				setupCF(ReadOnlyOrg, ReadOnlySpace)
+				helpers.LoginCF()
+				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 			})
 
 			It("displays current target information", func() {
@@ -127,7 +128,8 @@ var _ = Describe("target command", func() {
 			// We set targets to verify that the target command
 			// preserves existing targets in failure
 			BeforeEach(func() {
-				setupCF(ReadOnlyOrg, ReadOnlySpace)
+				helpers.LoginCF()
+				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 			})
 
 			It("displays org not found, exits 1, and clears existing targets", func() {
@@ -270,7 +272,8 @@ var _ = Describe("target command", func() {
 		// We set the targets to verify that the target command preserves existing targets
 		// in failure
 		BeforeEach(func() {
-			setupCF(ReadOnlyOrg, ReadOnlySpace)
+			helpers.LoginCF()
+			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 		})
 
 		Context("when the org does not exist", func() {

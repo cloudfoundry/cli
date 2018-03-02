@@ -50,7 +50,7 @@ var _ = Describe("space command", func() {
 	Context("when the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 		})
 
 		AfterEach(func() {

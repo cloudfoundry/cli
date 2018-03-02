@@ -37,7 +37,8 @@ var _ = Describe("custom oauth client id", func() {
 
 	Context("when the config file exists", func() {
 		BeforeEach(func() {
-			setupCF(ReadOnlyOrg, ReadOnlySpace)
+			helpers.LoginCF()
+			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 		})
 
 		Context("when the client id and secret keys are set in the config", func() {

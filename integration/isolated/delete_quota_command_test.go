@@ -12,7 +12,8 @@ var _ = Describe("delete-quota command", func() {
 	var quotaName string
 
 	BeforeEach(func() {
-		setupCF(ReadOnlyOrg, ReadOnlySpace)
+		helpers.LoginCF()
+		helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 		quotaName = helpers.QuotaName()
 		session := helpers.CF("create-quota", quotaName)
 		Eventually(session).Should(Exit(0))

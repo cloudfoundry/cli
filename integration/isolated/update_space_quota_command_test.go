@@ -18,7 +18,7 @@ var _ = Describe("update-space-quota command", func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 
-		setupCF(orgName, spaceName)
+		helpers.SetupCF(orgName, spaceName)
 		quotaName = helpers.QuotaName()
 		totalMemory := "24M"
 		instanceMemory := "6M"

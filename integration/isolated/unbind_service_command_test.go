@@ -41,7 +41,7 @@ var _ = Describe("unbind-service command", func() {
 			service = helpers.PrefixedRandomName("SERVICE")
 			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
-			setupCF(org, space)
+			helpers.SetupCF(org, space)
 			domain = helpers.DefaultSharedDomain()
 		})
 

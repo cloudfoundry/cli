@@ -32,7 +32,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			domainName = helpers.DomainName()
 			appName = helpers.PrefixedRandomName("APP")
 
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 			domain = helpers.NewDomain(orgName, domainName)
 			domain.Create()
 		})

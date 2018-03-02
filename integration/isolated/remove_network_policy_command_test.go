@@ -72,7 +72,7 @@ var _ = Describe("remove-network-policy command", func() {
 			spaceName = helpers.NewSpaceName()
 			appName = helpers.PrefixedRandomName("app")
 
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 
 			helpers.WithHelloWorldApp(func(appDir string) {
 				Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))

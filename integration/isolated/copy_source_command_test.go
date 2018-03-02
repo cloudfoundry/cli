@@ -24,7 +24,7 @@ var _ = Describe("copy-source command", func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 
-		setupCF(orgName, spaceName)
+		helpers.SetupCF(orgName, spaceName)
 
 		appName1 = helpers.PrefixedRandomName("hello")
 		appName2 = helpers.PrefixedRandomName("banana")
