@@ -201,7 +201,7 @@ var _ = Describe("v3-push command", func() {
 		var domainName string
 
 		BeforeEach(func() {
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 			domainName = helpers.DefaultSharedDomain()
 		})
 

@@ -148,7 +148,7 @@ var _ = Describe("v3-delete command", func() {
 
 	Context("when the environment is setup correctly", func() {
 		BeforeEach(func() {
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 		})
 
 		AfterEach(func() {

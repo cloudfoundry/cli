@@ -83,3 +83,9 @@ func ClearTarget() {
 	LogoutCF()
 	LoginCF()
 }
+
+func SetupCF(org string, space string) {
+	LoginCF()
+	CreateOrgAndSpace(org, space)
+	TargetOrgAndSpace(org, space)
+}

@@ -69,11 +69,3 @@ var _ = AfterEach(func() {
 	GinkgoWriter.Write([]byte("==============================Global After Each=============================="))
 	helpers.DestroyHomeDir(homeDir)
 })
-
-func setupCF(org string, space string) {
-	helpers.LoginCF()
-	if org != ReadOnlyOrg && space != ReadOnlySpace {
-		helpers.CreateOrgAndSpace(org, space)
-	}
-	helpers.TargetOrgAndSpace(org, space)
-}

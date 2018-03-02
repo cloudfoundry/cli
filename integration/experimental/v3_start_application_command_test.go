@@ -152,7 +152,7 @@ var _ = Describe("v3-start-application command", func() {
 
 	Context("when the environment is set up correctly", func() {
 		BeforeEach(func() {
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 		})
 
 		AfterEach(func() {

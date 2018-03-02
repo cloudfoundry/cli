@@ -22,7 +22,7 @@ var _ = Describe("v3-create-package with .cfignore", func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
-		setupCF(orgName, spaceName)
+		helpers.SetupCF(orgName, spaceName)
 
 	})
 

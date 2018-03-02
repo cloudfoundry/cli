@@ -25,7 +25,7 @@ var _ = Describe("v3-push with --no-start", func() {
 
 	Context("when the environment is set up correctly", func() {
 		BeforeEach(func() {
-			setupCF(orgName, spaceName)
+			helpers.SetupCF(orgName, spaceName)
 		})
 
 		AfterEach(func() {

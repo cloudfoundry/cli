@@ -123,7 +123,7 @@ var _ = Describe("unshare-service command", func() {
 			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
 			helpers.CreateOrgAndSpace(sharedToOrgName, sharedToSpaceName)
-			setupCF(sourceOrgName, sourceSpaceName)
+			helpers.SetupCF(sourceOrgName, sourceSpaceName)
 
 			domain = helpers.DefaultSharedDomain()
 		})
@@ -349,7 +349,7 @@ var _ = Describe("unshare-service command", func() {
 				user = helpers.NewUsername()
 				password = helpers.NewPassword()
 
-				setupCF(sourceOrgName, sourceSpaceName)
+				helpers.SetupCF(sourceOrgName, sourceSpaceName)
 				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 				Eventually(helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)).Should(Exit(0))
@@ -359,7 +359,7 @@ var _ = Describe("unshare-service command", func() {
 			})
 
 			AfterEach(func() {
-				setupCF(sourceOrgName, sourceSpaceName)
+				helpers.SetupCF(sourceOrgName, sourceSpaceName)
 				Eventually(helpers.CF("delete-user", user)).Should(Exit(0))
 				broker.Destroy()
 			})
