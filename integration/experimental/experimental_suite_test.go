@@ -27,7 +27,7 @@ var (
 	homeDir string
 )
 
-func TestIsolated(t *testing.T) {
+func TestExperimental(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Experimental Integration Suite")
 }
