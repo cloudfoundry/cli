@@ -147,7 +147,7 @@ var _ = Describe("plugin API", func() {
 		)
 		BeforeEach(func() {
 			createTargetedOrgAndSpace()
-			domain := defaultSharedDomain()
+			domain := helpers.DefaultSharedDomain()
 			service := helpers.PrefixedRandomName("SERVICE")
 			servicePlan := helpers.PrefixedRandomName("SERVICE-PLAN")
 			serviceInstance1 = helpers.PrefixedRandomName("SI1")

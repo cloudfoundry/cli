@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"regexp"
 	"testing"
 	"time"
 
@@ -87,26 +86,6 @@ func createTargetedOrgAndSpace() (string, string) {
 	helpers.CreateOrgAndSpace(org, space)
 	helpers.TargetOrgAndSpace(org, space)
 	return org, space
-}
-
-var foundDefaultDomain string
-
-func defaultSharedDomain() string {
-	// TODO: Move this into helpers when other packages need it, figure out how
-	// to cache cuz this is a wacky call otherwise
-	if foundDefaultDomain == "" {
-		session := helpers.CF("domains")
-		Eventually(session).Should(Exit(0))
-
-		regex, err := regexp.Compile(`(.+?)\s+shared`)
-		Expect(err).ToNot(HaveOccurred())
-
-		matches := regex.FindStringSubmatch(string(session.Out.Contents()))
-		Expect(matches).To(HaveLen(2))
-
-		foundDefaultDomain = matches[1]
-	}
-	return foundDefaultDomain
 }
 
 func confirmTestPluginOutput(command string, output ...string) {
