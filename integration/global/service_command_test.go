@@ -94,8 +94,9 @@ var _ = Describe("service command", func() {
 					)
 
 					BeforeEach(func() {
-						appName1 = helpers.PrefixedRandomName("a")
-						appName2 = helpers.PrefixedRandomName("b")
+						appName1 = helpers.PrefixedRandomName("1-INTEGRATION-APP")
+						appName2 = helpers.PrefixedRandomName("2-INTEGRATION-APP")
+
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 							Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
@@ -178,8 +179,9 @@ var _ = Describe("service command", func() {
 					)
 
 					BeforeEach(func() {
-						appName1 = helpers.NewAppName()
-						appName2 = helpers.NewAppName()
+						appName1 = helpers.PrefixedRandomName("1-INTEGRATION-APP")
+						appName2 = helpers.PrefixedRandomName("2-INTEGRATION-APP")
+
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 							Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
