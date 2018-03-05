@@ -31,7 +31,6 @@ var HelpCategoryList = []HelpCategory{
 			{"bind-service", "unbind-service"},
 			{"bind-route-service", "unbind-route-service"},
 			{"create-user-provided-service", "update-user-provided-service"},
-			{"share-service", "unshare-service"},
 		},
 	},
 	{
@@ -164,6 +163,12 @@ var ExperimentalHelpCategoryList = []HelpCategory{
 			{"v3-set-env", "v3-unset-env"},
 			{"v3-get-health-check", "v3-set-health-check"},
 			{"v3-packages", "v3-create-package"},
+		},
+	},
+	{
+		CategoryName: "SERVICES (experimental):",
+		CommandList: [][]string{
+			{"share-service", "unshare-service"},
 		},
 	},
 }

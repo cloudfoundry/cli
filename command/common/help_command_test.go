@@ -397,7 +397,6 @@ var _ = Describe("help Command", func() {
 			Expect(testUI.Out).To(Say("Services integration:"))
 			Expect(testUI.Out).To(Say("  marketplace,m\\s+create-user-provided-service,cups"))
 			Expect(testUI.Out).To(Say("  services,s\\s+update-user-provided-service,uups"))
-			Expect(testUI.Out).To(Say("  share-service\\s+unshare-service"))
 
 			Expect(testUI.Out).To(Say("Route and domain management:"))
 			Expect(testUI.Out).To(Say("  routes,r\\s+delete-route\\s+create-domain"))
@@ -516,8 +515,6 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("SERVICES:"))
 				Expect(testUI.Out).To(Say("   marketplace\\s+List available offerings in the marketplace"))
 				Expect(testUI.Out).To(Say("   create-service\\s+Create a service instance"))
-				Expect(testUI.Out).To(Say("   share-service\\s+Share a service instance with another space"))
-				Expect(testUI.Out).To(Say("   unshare-service\\s+Unshare a shared service instance from a space"))
 				Expect(testUI.Out).To(Say(""))
 				Expect(testUI.Out).To(Say("ORGS:"))
 				Expect(testUI.Out).To(Say("   orgs\\s+List all orgs"))
@@ -631,6 +628,10 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("   v3-set-health-check\\s+Change type of health check performed on an app's process"))
 				Expect(testUI.Out).To(Say("   v3-packages\\s+List packages of an app"))
 				Expect(testUI.Out).To(Say("   v3-create-package\\s+Uploads a V3 Package"))
+				Expect(testUI.Out).To(Say("SERVICES \\(experimental\\):"))
+				Expect(testUI.Out).To(Say("   share-service\\s+Share a service instance with another space"))
+				Expect(testUI.Out).To(Say("   unshare-service\\s+Unshare a shared service instance from a space"))
+
 			})
 
 			Context("when there are multiple installed plugins", func() {
