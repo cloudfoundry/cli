@@ -83,13 +83,6 @@ func (a *Application) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DropletRelationship represents the relationship between a V3 Droplet and its
-// V3 Application
-type DropletRelationship struct {
-	Relationship Relationship `json:"data"`
-	Links        APILinks     `json:"links"`
-}
-
 // GetApplications lists applications with optional filters.
 func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -200,32 +193,6 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 	err = client.connection.Make(request, &response)
 
 	return responseApp, response.Warnings, err
-}
-
-// SetApplicationDroplet sets the specified droplet on the given application.
-func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) (Relationship, Warnings, error) {
-	relationship := Relationship{GUID: dropletGUID}
-	bodyBytes, err := json.Marshal(relationship)
-	if err != nil {
-		return Relationship{}, nil, err
-	}
-
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchApplicationCurrentDropletRequest,
-		URIParams:   map[string]string{"app_guid": appGUID},
-		Body:        bytes.NewReader(bodyBytes),
-	})
-	if err != nil {
-		return Relationship{}, nil, err
-	}
-
-	var responseRelationship Relationship
-	response := cloudcontroller.Response{
-		Result: &responseRelationship,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseRelationship, response.Warnings, err
 }
 
 // StopApplication stops the given application.

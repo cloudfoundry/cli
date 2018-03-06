@@ -111,6 +111,32 @@ func (client *Client) RevokeIsolationSegmentFromOrganization(isolationSegmentGUI
 	return response.Warnings, err
 }
 
+// SetApplicationDroplet sets the specified droplet on the given application.
+func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) (Relationship, Warnings, error) {
+	relationship := Relationship{GUID: dropletGUID}
+	bodyBytes, err := json.Marshal(relationship)
+	if err != nil {
+		return Relationship{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchApplicationCurrentDropletRequest,
+		URIParams:   map[string]string{"app_guid": appGUID},
+		Body:        bytes.NewReader(bodyBytes),
+	})
+	if err != nil {
+		return Relationship{}, nil, err
+	}
+
+	var responseRelationship Relationship
+	response := cloudcontroller.Response{
+		Result: &responseRelationship,
+	}
+	err = client.connection.Make(request, &response)
+
+	return responseRelationship, response.Warnings, err
+}
+
 // GetOrganizationDefaultIsolationSegment returns the relationship between an
 // organization and it's default isolation segment.
 func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Relationship, Warnings, error) {
