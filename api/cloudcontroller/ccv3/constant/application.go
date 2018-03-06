@@ -14,9 +14,9 @@ const (
 type AppLifecycleType string
 
 const (
-	// BuildpackAppLifecycleType will use a droplet and a rootfs to run the app.
-	BuildpackAppLifecycleType AppLifecycleType = "buildpack"
-	// DockerAppLifecycleType will pull a docker image from a registry to run an
+	// AppLifecycleTypeBuildpack will use a droplet and a rootfs to run the app.
+	AppLifecycleTypeBuildpack AppLifecycleType = "buildpack"
+	// AppLifecycleTypeDocker will pull a docker image from a registry to run an
 	// app.
-	DockerAppLifecycleType AppLifecycleType = "docker"
+	AppLifecycleTypeDocker AppLifecycleType = "docker"
 )

@@ -130,7 +130,7 @@ var _ = Describe("v3-create-app Command", func() {
 					createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
 					Expect(createApp).To(Equal(v3action.Application{
 						Name:          app,
-						LifecycleType: constant.DockerAppLifecycleType,
+						LifecycleType: constant.AppLifecycleTypeDocker,
 					}))
 					Expect(createSpaceGUID).To(Equal("some-space-guid"))
 				})

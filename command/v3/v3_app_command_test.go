@@ -221,7 +221,7 @@ var _ = Describe("v3-app Command", func() {
 						GUID:          "some-guid",
 						Name:          "some-app",
 						State:         constant.ApplicationStarted,
-						LifecycleType: constant.DockerAppLifecycleType,
+						LifecycleType: constant.AppLifecycleTypeDocker,
 					},
 					CurrentDroplet: v3action.Droplet{
 						Image: "docker/some-image",

@@ -157,7 +157,7 @@ var _ = Describe("Package", func() {
 					pkg, warnings, err := client.CreatePackage(Package{
 						Type: constant.PackageTypeDocker,
 						Relationships: Relationships{
-							constant.ApplicationRelationship: Relationship{GUID: "some-app-guid"},
+							constant.RelationshipTypeApplication: Relationship{GUID: "some-app-guid"},
 						},
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
@@ -218,7 +218,7 @@ var _ = Describe("Package", func() {
 					pkg, warnings, err := client.CreatePackage(Package{
 						Type: constant.PackageTypeBits,
 						Relationships: Relationships{
-							constant.ApplicationRelationship: Relationship{GUID: "some-app-guid"},
+							constant.RelationshipTypeApplication: Relationship{GUID: "some-app-guid"},
 						},
 					})
 

@@ -248,7 +248,7 @@ var _ = Describe("v3-push Command", func() {
 					createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
 					Expect(createApp).To(Equal(v3action.Application{
 						Name:          "some-app",
-						LifecycleType: constant.BuildpackAppLifecycleType,
+						LifecycleType: constant.AppLifecycleTypeBuildpack,
 					}))
 					Expect(createSpaceGUID).To(Equal("some-space-guid"))
 				})
@@ -533,7 +533,7 @@ var _ = Describe("v3-push Command", func() {
 										createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
 										Expect(createApp).To(Equal(v3action.Application{
 											Name:                "some-app",
-											LifecycleType:       constant.BuildpackAppLifecycleType,
+											LifecycleType:       constant.AppLifecycleTypeBuildpack,
 											LifecycleBuildpacks: []string{"some-buildpack"},
 										}))
 										Expect(createSpaceGUID).To(Equal("some-space-guid"))
@@ -550,7 +550,7 @@ var _ = Describe("v3-push Command", func() {
 										createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
 										Expect(createApp).To(Equal(v3action.Application{
 											Name:          "some-app",
-											LifecycleType: constant.DockerAppLifecycleType,
+											LifecycleType: constant.AppLifecycleTypeDocker,
 										}))
 										Expect(createSpaceGUID).To(Equal("some-space-guid"))
 									})
@@ -849,7 +849,7 @@ var _ = Describe("v3-push Command", func() {
 					updateApp := fakeActor.UpdateApplicationArgsForCall(0)
 					Expect(updateApp).To(Equal(v3action.Application{
 						GUID:          "some-app-guid",
-						LifecycleType: constant.DockerAppLifecycleType,
+						LifecycleType: constant.AppLifecycleTypeDocker,
 					}))
 				})
 			})
@@ -864,7 +864,7 @@ var _ = Describe("v3-push Command", func() {
 						appArg := fakeActor.UpdateApplicationArgsForCall(0)
 						Expect(appArg).To(Equal(v3action.Application{
 							GUID:                "some-app-guid",
-							LifecycleType:       constant.BuildpackAppLifecycleType,
+							LifecycleType:       constant.AppLifecycleTypeBuildpack,
 							LifecycleBuildpacks: []string{},
 						}))
 					})
@@ -879,7 +879,7 @@ var _ = Describe("v3-push Command", func() {
 						appArg := fakeActor.UpdateApplicationArgsForCall(0)
 						Expect(appArg).To(Equal(v3action.Application{
 							GUID:                "some-app-guid",
-							LifecycleType:       constant.BuildpackAppLifecycleType,
+							LifecycleType:       constant.AppLifecycleTypeBuildpack,
 							LifecycleBuildpacks: []string{"some-buildpack"},
 						}))
 					})
@@ -894,7 +894,7 @@ var _ = Describe("v3-push Command", func() {
 						appArg := fakeActor.UpdateApplicationArgsForCall(0)
 						Expect(appArg).To(Equal(v3action.Application{
 							GUID:                "some-app-guid",
-							LifecycleType:       constant.BuildpackAppLifecycleType,
+							LifecycleType:       constant.AppLifecycleTypeBuildpack,
 							LifecycleBuildpacks: []string{"some-buildpack-1", "some-buildpack-2"},
 						}))
 					})

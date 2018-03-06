@@ -254,9 +254,9 @@ func (cmd V3PushCommand) createApplication(userName string) (v3action.Applicatio
 	}
 
 	if cmd.DockerImage.Path != "" {
-		appToCreate.LifecycleType = constant.DockerAppLifecycleType
+		appToCreate.LifecycleType = constant.AppLifecycleTypeDocker
 	} else {
-		appToCreate.LifecycleType = constant.BuildpackAppLifecycleType
+		appToCreate.LifecycleType = constant.AppLifecycleTypeBuildpack
 		appToCreate.LifecycleBuildpacks = cmd.Buildpacks
 	}
 
@@ -304,10 +304,10 @@ func (cmd V3PushCommand) updateApplication(userName string, appGUID string) (v3a
 	}
 
 	if cmd.DockerImage.Path != "" {
-		appToUpdate.LifecycleType = constant.DockerAppLifecycleType
+		appToUpdate.LifecycleType = constant.AppLifecycleTypeDocker
 
 	} else {
-		appToUpdate.LifecycleType = constant.BuildpackAppLifecycleType
+		appToUpdate.LifecycleType = constant.AppLifecycleTypeBuildpack
 		appToUpdate.LifecycleBuildpacks = cmd.Buildpacks
 	}
 

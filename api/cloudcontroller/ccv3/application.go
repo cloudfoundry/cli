@@ -31,7 +31,7 @@ func (a Application) MarshalJSON() ([]byte, error) {
 	ccApp.rawApp = (rawApp)(a)
 
 	switch a.LifecycleType {
-	case constant.BuildpackAppLifecycleType:
+	case constant.AppLifecycleTypeBuildpack:
 		if len(a.LifecycleBuildpacks) > 0 {
 			ccApp.Lifecycle = map[string]interface{}{}
 			ccApp.Lifecycle["type"] = a.LifecycleType
@@ -47,7 +47,7 @@ func (a Application) MarshalJSON() ([]byte, error) {
 				}
 			}
 		}
-	case constant.DockerAppLifecycleType:
+	case constant.AppLifecycleTypeDocker:
 		ccApp.Lifecycle = map[string]interface{}{}
 		ccApp.Lifecycle["type"] = a.LifecycleType
 		ccApp.Lifecycle["data"] = map[string]interface{}{}
