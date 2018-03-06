@@ -18,7 +18,7 @@ var _ = Describe("auth command", func() {
 
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say("cf auth USERNAME PASSWORD\n"))
-			// Eventually(session).Should(Say("cf auth CLIENT_ID CLIENT_SECRET --client-credentials\n\n"))
+			Eventually(session).Should(Say("cf auth CLIENT_ID CLIENT_SECRET --client-credentials\n\n"))
 
 			Eventually(session).Should(Say("WARNING:"))
 			Eventually(session).Should(Say("Providing your password as a command line option is highly discouraged"))
