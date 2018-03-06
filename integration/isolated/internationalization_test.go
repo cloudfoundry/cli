@@ -13,10 +13,9 @@ var _ = Describe("internationalization", func() {
 	DescribeTable("outputs help in different languages",
 		func(setup func() *Session) {
 			session := setup()
-			//Eventually(session).Should(Say("push - Envoyer")) // TODO: Uncomment when language files have been updated
-			//Eventually(session).Should(Say("SYNTAXE :"))
-			//Eventually(session).Should(Say("Envoyez par commande push"))
-			//Eventually(session).Should(Say("-i\\s+Nombre d'instances"))
+			Eventually(session).Should(Say("push - Envoyer par commande push"))
+			Eventually(session).Should(Say("SYNTAXE :"))
+			Eventually(session).Should(Say("-i\\s+Nombre d'instances"))
 			Eventually(session).Should(Exit(0))
 		},
 

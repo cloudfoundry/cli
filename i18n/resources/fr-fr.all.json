@@ -1,5 +1,17 @@
 [
    {
+      "id": "Push a new app or sync changes to an existing app",
+      "translation": "Envoyer par commande push une nouvelle application ou synchroniser les modifications dans une application existante"
+   },
+   {
+      "id": "USAGE:",
+      "translation": "SYNTAXE :"
+   },
+   {
+      "id": "Number of instances",
+      "translation": "Nombre d'instances"
+   },
+   {
       "id": "\nApp started\n",
       "translation": "\nApplication démarrée\n",
       "modified": false
