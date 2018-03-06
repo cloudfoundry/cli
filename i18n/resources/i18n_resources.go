@@ -329,14 +329,14 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"resources/de-de.all.json": resourcesDeDeAllJson,
-	"resources/en-us.all.json": resourcesEnUsAllJson,
-	"resources/es-es.all.json": resourcesEsEsAllJson,
-	"resources/fr-fr.all.json": resourcesFrFrAllJson,
-	"resources/it-it.all.json": resourcesItItAllJson,
-	"resources/ja-jp.all.json": resourcesJaJpAllJson,
-	"resources/ko-kr.all.json": resourcesKoKrAllJson,
-	"resources/pt-br.all.json": resourcesPtBrAllJson,
+	"resources/de-de.all.json":   resourcesDeDeAllJson,
+	"resources/en-us.all.json":   resourcesEnUsAllJson,
+	"resources/es-es.all.json":   resourcesEsEsAllJson,
+	"resources/fr-fr.all.json":   resourcesFrFrAllJson,
+	"resources/it-it.all.json":   resourcesItItAllJson,
+	"resources/ja-jp.all.json":   resourcesJaJpAllJson,
+	"resources/ko-kr.all.json":   resourcesKoKrAllJson,
+	"resources/pt-br.all.json":   resourcesPtBrAllJson,
 	"resources/zh-hans.all.json": resourcesZhHansAllJson,
 	"resources/zh-hant.all.json": resourcesZhHantAllJson,
 }
@@ -380,16 +380,17 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
 	"resources": &bintree{nil, map[string]*bintree{
-		"de-de.all.json": &bintree{resourcesDeDeAllJson, map[string]*bintree{}},
-		"en-us.all.json": &bintree{resourcesEnUsAllJson, map[string]*bintree{}},
-		"es-es.all.json": &bintree{resourcesEsEsAllJson, map[string]*bintree{}},
-		"fr-fr.all.json": &bintree{resourcesFrFrAllJson, map[string]*bintree{}},
-		"it-it.all.json": &bintree{resourcesItItAllJson, map[string]*bintree{}},
-		"ja-jp.all.json": &bintree{resourcesJaJpAllJson, map[string]*bintree{}},
-		"ko-kr.all.json": &bintree{resourcesKoKrAllJson, map[string]*bintree{}},
-		"pt-br.all.json": &bintree{resourcesPtBrAllJson, map[string]*bintree{}},
+		"de-de.all.json":   &bintree{resourcesDeDeAllJson, map[string]*bintree{}},
+		"en-us.all.json":   &bintree{resourcesEnUsAllJson, map[string]*bintree{}},
+		"es-es.all.json":   &bintree{resourcesEsEsAllJson, map[string]*bintree{}},
+		"fr-fr.all.json":   &bintree{resourcesFrFrAllJson, map[string]*bintree{}},
+		"it-it.all.json":   &bintree{resourcesItItAllJson, map[string]*bintree{}},
+		"ja-jp.all.json":   &bintree{resourcesJaJpAllJson, map[string]*bintree{}},
+		"ko-kr.all.json":   &bintree{resourcesKoKrAllJson, map[string]*bintree{}},
+		"pt-br.all.json":   &bintree{resourcesPtBrAllJson, map[string]*bintree{}},
 		"zh-hans.all.json": &bintree{resourcesZhHansAllJson, map[string]*bintree{}},
 		"zh-hant.all.json": &bintree{resourcesZhHantAllJson, map[string]*bintree{}},
 	}},
@@ -441,4 +442,3 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-
