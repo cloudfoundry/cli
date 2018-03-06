@@ -1,6 +1,8 @@
 package main_test
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/cli/util/testhelpers/pluginbuilder"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,3 +17,7 @@ func TestTestRpcServerExample(t *testing.T) {
 
 	RunSpecs(t, "Test RPC Server Example Suite")
 }
+
+var _ = BeforeEach(func() {
+	SetDefaultEventuallyTimeout(3 * time.Second)
+})

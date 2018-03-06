@@ -224,12 +224,13 @@ var _ = Describe("App-Lister", func() {
 						It("traverses through all pages and list all the apps", func() {
 							args := []string{ts.Port(), "list-apps"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
-							session.Wait()
 							Expect(err).NotTo(HaveOccurred())
-							Expect(session).To(gbytes.Say("app1"))
-							Expect(session).To(gbytes.Say("app2"))
-							Expect(session).To(gbytes.Say("app3"))
-							Expect(session).To(gbytes.Say("app4"))
+							session.Wait()
+							Eventually(session).Should(gbytes.Say("app1"))
+							Eventually(session).Should(gbytes.Say("app2"))
+							Eventually(session).Should(gbytes.Say("app3"))
+							Eventually(session).Should(gbytes.Say("app4"))
+							Eventually(session).Should(gexec.Exit())
 						})
 					})
 				})
