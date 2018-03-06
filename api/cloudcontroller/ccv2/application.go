@@ -189,8 +189,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 		} `json:"entity"`
 	}
 
-	decoder := json.NewDecoder(bytes.NewBuffer(data))
-	decoder.UseNumber()
+	decoder := cloudcontroller.NewJSONDecoder(data)
 	err := decoder.Decode(&ccApp)
 	if err != nil {
 		return err
