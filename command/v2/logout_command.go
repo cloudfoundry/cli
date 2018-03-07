@@ -18,7 +18,15 @@ func (cmd *LogoutCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd LogoutCommand) Execute(args []string) error {
-	cmd.UI.DisplayText("Logging out...")
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayText("Logging out {{.Username}}...",
+		map[string]interface{}{
+			"Username": user.Name,
+		})
 	cmd.Config.UnsetUserInformation()
 	cmd.UI.DisplayOK()
 

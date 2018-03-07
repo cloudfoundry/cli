@@ -3,6 +3,7 @@ package v2_test
 import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,6 +25,11 @@ var _ = Describe("logout command", func() {
 			UI:     testUI,
 			Config: fakeConfig,
 		}
+		fakeConfig.CurrentUserReturns(
+			configv3.User{
+				Name: "some-user",
+			},
+			nil)
 	})
 
 	JustBeforeEach(func() {
@@ -34,7 +40,7 @@ var _ = Describe("logout command", func() {
 		Expect(executeErr).ToNot(HaveOccurred())
 
 		Expect(fakeConfig.UnsetUserInformationCallCount()).To(Equal(1))
-		Expect(testUI.Out).To(Say("Logging out..."))
+		Expect(testUI.Out).To(Say("Logging out some-user..."))
 		Expect(testUI.Out).To(Say("OK"))
 	})
 })

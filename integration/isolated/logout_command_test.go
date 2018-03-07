@@ -10,18 +10,6 @@ import (
 )
 
 var _ = Describe("logout command", func() {
-	var (
-		orgName   string
-		spaceName string
-	)
-
-	BeforeEach(func() {
-		helpers.LoginCF()
-
-		orgName = helpers.NewOrgName()
-		spaceName = helpers.NewSpaceName()
-	})
-
 	Context("help", func() {
 		It("displays help", func() {
 			session := helpers.CF("logout", "--help")
@@ -37,20 +25,14 @@ var _ = Describe("logout command", func() {
 
 	Context("when there's user information set in the config", func() {
 		BeforeEach(func() {
-			helpers.SetConfig(func(conf *configv3.Config) {
-				conf.SetAccessToken("some-access-token")
-				conf.SetRefreshToken("bb8f7b209ff74409877974bce5752412-r")
-				conf.SetOrganizationInformation("some-org-guid", orgName)
-				conf.SetSpaceInformation("some-space-guid", spaceName, true)
-				conf.SetUAAGrantType("client_credentials")
-				conf.SetUAAClientCredentials("potatoface", "acute")
-			})
+			helpers.SetupCF(ReadOnlyOrg, ReadOnlySpace)
 		})
 
 		It("clears out user information in the config", func() {
+			username, _ := helpers.GetCredentials()
 			session := helpers.CF("logout")
 
-			Eventually(session).Should(Say("Logging out..."))
+			Eventually(session).Should(Say("Logging out %s\\.\\.\\.", username))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 
