@@ -42,7 +42,7 @@ resources:
   type: git
   source:
     uri: git@github.com:cloudfoundry/cli-private
-    private_key: ((cli-private-github-private-key-write))
+    private_key: ((cli-private-github-private-key))
     branch: master
     paths:
     - ci/infrastructure/((stack_name))/bbl-state.json
@@ -50,7 +50,7 @@ resources:
   type: git
   source:
     uri: git@github.com:cloudfoundry/cli-private
-    private_key: ((cli-private-github-private-key-write))
+    private_key: ((cli-private-github-private-key))
     branch: master
     paths:
     - ci/infrastructure/((stack_name))/deployment-vars.yml

@@ -227,7 +227,7 @@ resources:
   type: git
   source:
     uri: git@github.com:cloudfoundry/cli-private
-    private_key: ((cli-private-github-private-key-write))
+    private_key: ((cli-private-github-private-key))
     branch: master
 
 groups:
