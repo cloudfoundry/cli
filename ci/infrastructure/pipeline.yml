@@ -72,8 +72,8 @@ jobs:
       env-repo: state
     params:
       BBL_IAAS: gcp
-      BBL_GCP_SERVICE_ACCOUNT_KEY: ((google_account_creds))
-      BBL_GCP_PROJECT_ID: ((gcp_project))
+      BBL_GCP_SERVICE_ACCOUNT_KEY: ((google-account-creds))
+      BBL_GCP_PROJECT_ID: ((gcp-project))
       BBL_GCP_REGION: us-central1
       BBL_GCP_ZONE: us-central1-f
       BBL_LB_CERT: ((ssl_cert))
