@@ -49,16 +49,16 @@ resources:
   type: s3
   source:
     bucket: ((staging-bucket-name))
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: cf-cli-binaries.tgz
 
 - name: edge-linux-binary-32
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli_edge_linux_i686.tgz
     region_name: us-west-1
 
@@ -66,8 +66,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli_edge_linux_x86-64.tgz
     region_name: us-west-1
 
@@ -75,8 +75,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli_edge_osx.tgz
     region_name: us-west-1
 
@@ -84,8 +84,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli_edge_win32.zip
     region_name: us-west-1
 
@@ -93,8 +93,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli_edge_winx64.zip
     region_name: us-west-1
 
@@ -102,8 +102,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_i686.deb
     region_name: us-west-1
 
@@ -111,8 +111,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_x86-64.deb
     region_name: us-west-1
 
@@ -120,8 +120,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_i686.rpm
     region_name: us-west-1
 
@@ -129,8 +129,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_x86-64.rpm
     region_name: us-west-1
 
@@ -138,8 +138,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_osx.pkg
     region_name: us-west-1
 
@@ -147,8 +147,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_win32.zip
     region_name: us-west-1
 
@@ -156,8 +156,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: ((cli-production-access-key-id))
-    secret_access_key: ((cli-production-secret-access-key))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_winx64.zip
     region_name: us-west-1
 
