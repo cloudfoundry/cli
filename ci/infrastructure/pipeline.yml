@@ -110,7 +110,7 @@ jobs:
   - task: create-vars-file
     file: cli-ci/ci/infrastructure/tasks/create-vars-file.yml
     params:
-      CLIENT_SECRET: ((client_secret))
+      CLIENT_SECRET: ((client-secret))
   - task: copy-ops-files
     file: cli-ci/ci/infrastructure/tasks/combine-inputs.yml
     input_mapping:
