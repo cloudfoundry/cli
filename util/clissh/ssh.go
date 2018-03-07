@@ -152,7 +152,7 @@ func (c *SecureShell) Connect(username string, passcode string, appSSHEndpoint s
 
 func (c *SecureShell) Close() error {
 	for _, listener := range c.localListeners {
-		_ = listener.Close()
+		listener.Close()
 	}
 	return c.secureClient.Close()
 }

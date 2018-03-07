@@ -12,6 +12,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"sync"
 	"syscall"
 	"time"
 
@@ -32,6 +33,22 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
+
+func BlockAcceptOnClose(fake *fake_net.FakeListener) {
+	waitUntilClosed := make(chan bool)
+	fake.AcceptStub = func() (net.Conn, error) {
+		<-waitUntilClosed
+		return nil, errors.New("banana")
+	}
+
+	var once sync.Once
+	fake.CloseStub = func() error {
+		once.Do(func() {
+			close(waitUntilClosed)
+		})
+		return nil
+	}
+}
 
 var _ = Describe("CLI SSH", func() {
 	var (
@@ -831,7 +848,7 @@ var _ = Describe("CLI SSH", func() {
 			localAddress = realLocalListener.Addr().String()
 			fakeListenerFactory.ListenReturns(realLocalListener, nil)
 
-			echoHandler = &fake_server.FakeConnectionHandler{}
+			echoHandler = new(fake_server.FakeConnectionHandler)
 			echoHandler.HandleConnectionStub = func(conn net.Conn) {
 				io.Copy(conn, conn)
 				conn.Close()
@@ -841,12 +858,12 @@ var _ = Describe("CLI SSH", func() {
 			Expect(err).NotTo(HaveOccurred())
 			echoAddress = realListener.Addr().String()
 
-			echoListener = &fake_net.FakeListener{}
+			echoListener = new(fake_net.FakeListener)
 			echoListener.AcceptStub = realListener.Accept
 			echoListener.CloseStub = realListener.Close
 			echoListener.AddrStub = realListener.Addr
 
-			fakeLocalListener = &fake_net.FakeListener{}
+			fakeLocalListener = new(fake_net.FakeListener)
 			fakeLocalListener.AcceptReturns(nil, errors.New("Not Accepting Connections"))
 
 			echoServer = server.NewServer(logger.Session("echo"), "", echoHandler)
@@ -936,77 +953,101 @@ var _ = Describe("CLI SSH", func() {
 		})
 
 		Context("when there are multiple port forward specs", func() {
-			var (
-				realLocalListener2 net.Listener
-				localAddress2      string
-			)
+			Context("when provided a real listener", func() {
+				var (
+					realLocalListener2 net.Listener
+					localAddress2      string
+				)
 
-			BeforeEach(func() {
-				var err error
-				realLocalListener2, err = net.Listen("tcp", "127.0.0.1:0")
-				Expect(err).NotTo(HaveOccurred())
+				BeforeEach(func() {
+					var err error
+					realLocalListener2, err = net.Listen("tcp", "127.0.0.1:0")
+					Expect(err).NotTo(HaveOccurred())
 
-				localAddress2 = realLocalListener2.Addr().String()
+					localAddress2 = realLocalListener2.Addr().String()
 
-				fakeListenerFactory.ListenStub = func(network, addr string) (net.Listener, error) {
-					if addr == localAddress {
-						return realLocalListener, nil
+					fakeListenerFactory.ListenStub = func(network, addr string) (net.Listener, error) {
+						if addr == localAddress {
+							return realLocalListener, nil
+						}
+
+						if addr == localAddress2 {
+							return realLocalListener2, nil
+						}
+
+						return nil, errors.New("unexpected address")
 					}
 
-					if addr == localAddress2 {
-						return realLocalListener2, nil
+					forwardSpecs = []LocalPortForward{
+						{
+							RemoteAddress: echoAddress,
+							LocalAddress:  localAddress,
+						},
+						{
+							RemoteAddress: echoAddress,
+							LocalAddress:  localAddress2,
+						},
 					}
+				})
 
-					return nil, errors.New("unexpected address")
-				}
+				AfterEach(func() {
+					realLocalListener2.Close()
+				})
 
-				forwardSpecs = []LocalPortForward{
-					{
-						RemoteAddress: echoAddress,
-						LocalAddress:  localAddress,
-					},
-					{
-						RemoteAddress: echoAddress,
-						LocalAddress:  localAddress2,
-					},
-				}
-			})
+				It("listens to all the things", func() {
+					Eventually(fakeListenerFactory.ListenCallCount).Should(Equal(2))
 
-			AfterEach(func() {
-				realLocalListener2.Close()
-			})
+					network, addr := fakeListenerFactory.ListenArgsForCall(0)
+					Expect(network).To(Equal("tcp"))
+					Expect(addr).To(Equal(localAddress))
 
-			It("listens to all the things", func() {
-				Eventually(fakeListenerFactory.ListenCallCount).Should(Equal(2))
+					network, addr = fakeListenerFactory.ListenArgsForCall(1)
+					Expect(network).To(Equal("tcp"))
+					Expect(addr).To(Equal(localAddress2))
+				})
 
-				network, addr := fakeListenerFactory.ListenArgsForCall(0)
-				Expect(network).To(Equal("tcp"))
-				Expect(addr).To(Equal(localAddress))
-
-				network, addr = fakeListenerFactory.ListenArgsForCall(1)
-				Expect(network).To(Equal("tcp"))
-				Expect(addr).To(Equal(localAddress2))
-			})
-
-			It("forwards to the correct target", func() {
-				validateConnectivity(localAddress)
-				validateConnectivity(localAddress2)
+				It("forwards to the correct target", func() {
+					validateConnectivity(localAddress)
+					validateConnectivity(localAddress2)
+				})
 			})
 
 			Context("when the secure client is closed", func() {
+				var (
+					fakeLocalListener1 *fake_net.FakeListener
+					fakeLocalListener2 *fake_net.FakeListener
+				)
+
 				BeforeEach(func() {
-					fakeListenerFactory.ListenReturns(fakeLocalListener, nil)
-					fakeLocalListener.AcceptReturns(nil, errors.New("not accepting connections"))
+					forwardSpecs = []LocalPortForward{
+						{
+							RemoteAddress: echoAddress,
+							LocalAddress:  localAddress,
+						},
+						{
+							RemoteAddress: echoAddress,
+							LocalAddress:  localAddress,
+						},
+					}
+
+					fakeLocalListener1 = new(fake_net.FakeListener)
+					BlockAcceptOnClose(fakeLocalListener1)
+					fakeListenerFactory.ListenReturnsOnCall(0, fakeLocalListener1, nil)
+
+					fakeLocalListener2 = new(fake_net.FakeListener)
+					BlockAcceptOnClose(fakeLocalListener2)
+					fakeListenerFactory.ListenReturnsOnCall(1, fakeLocalListener2, nil)
 				})
 
-				It("closes the listeners ", func() {
+				It("closes the listeners", func() {
 					Eventually(fakeListenerFactory.ListenCallCount).Should(Equal(2))
-					Eventually(fakeLocalListener.AcceptCallCount).Should(Equal(2))
+					Eventually(fakeLocalListener1.AcceptCallCount).Should(Equal(1))
+					Eventually(fakeLocalListener2.AcceptCallCount).Should(Equal(1))
 
-					originalCloseCount := fakeLocalListener.CloseCallCount()
 					err := secureShell.Close()
 					Expect(err).NotTo(HaveOccurred())
-					Expect(fakeLocalListener.CloseCallCount()).Should(Equal(originalCloseCount + 2))
+					Eventually(fakeLocalListener1.CloseCallCount).Should(Equal(2))
+					Eventually(fakeLocalListener2.CloseCallCount).Should(Equal(2))
 				})
 			})
 		})
@@ -1023,18 +1064,19 @@ var _ = Describe("CLI SSH", func() {
 
 		Context("when the client it closed", func() {
 			BeforeEach(func() {
+				fakeLocalListener = new(fake_net.FakeListener)
+				BlockAcceptOnClose(fakeLocalListener)
+
 				fakeListenerFactory.ListenReturns(fakeLocalListener, nil)
-				fakeLocalListener.AcceptReturns(nil, errors.New("not accepting and connections"))
 			})
 
 			It("closes the listener when the client is closed", func() {
 				Eventually(fakeListenerFactory.ListenCallCount).Should(Equal(1))
 				Eventually(fakeLocalListener.AcceptCallCount).Should(Equal(1))
 
-				originalCloseCount := fakeLocalListener.CloseCallCount()
 				err := secureShell.Close()
 				Expect(err).NotTo(HaveOccurred())
-				Expect(fakeLocalListener.CloseCallCount()).Should(Equal(originalCloseCount + 1))
+				Eventually(fakeLocalListener.CloseCallCount).Should(Equal(2))
 			})
 		})
 
