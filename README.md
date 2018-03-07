@@ -105,6 +105,7 @@ Follow these download links for [Mac OS X 64 bit](https://packages.cloudfoundry.
 * API tracing to terminal (using `CF_TRACE=true`, `-v` option or `cf config --trace`) doesn't work well with some CLI plugin commands. Trace to file works fine. On Linux, `CF_TRACE=/dev/stdout` works too. See e.g. [this Diego-Enabler plugin issue](https://github.com/cloudfoundry-incubator/Diego-Enabler/issues/6).
 * .cfignore used in `cf push` must be in UTF8 encoding for CLI to interpret correctly.
 * On Linux, when encountering message "bash: .cf: No such file or directory", ensure that you're using the correct binary or installer for your architecture. See https://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists
+* Using non-refactored commands with verbose mode turned on will display the refresh token in the terminal.
 
 ## Filing Issues & Feature Requests
 
