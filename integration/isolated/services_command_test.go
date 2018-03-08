@@ -47,6 +47,7 @@ var _ = Describe("services command", func() {
 
 			Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", ReadOnlyOrg, ReadOnlySpace, userName))
 			Eventually(session).Should(Say("No services found"))
+			Eventually(session).Should(Exit(0))
 		})
 	})
 
