@@ -33,6 +33,11 @@ func TestExperimental(t *testing.T) {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
+	helpers.SetupSynchronizedSuite(func() {
+		helpers.EnableFeatureFlag("diego_docker")
+		helpers.EnableFeatureFlag("service_instance_sharing")
+	})
+
 	return nil
 }, func(_ []byte) {
 	// Ginkgo Globals
@@ -44,11 +49,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	// Enable Experimental Flag
 	helpers.TurnOnExperimental()
-
-	helpers.SetupSynchronizedSuite(func() {
-		helpers.EnableFeatureFlag("diego_docker")
-		helpers.EnableFeatureFlag("service_instance_sharing")
-	})
 
 	ReadOnlyOrg, ReadOnlySpace = helpers.SetupReadOnlyOrgAndSpace()
 })
