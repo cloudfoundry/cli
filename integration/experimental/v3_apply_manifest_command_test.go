@@ -277,7 +277,7 @@ var _ = PDescribe("v3-apply-manifest command", func() {
 
 					It("displays the experimental warning", func() {
 						session := helpers.CF("v3-apply-manifest", "-f", manifestPath)
-						Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+						Eventually(session.Err).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 						Eventually(session).Should(Exit())
 					})
 

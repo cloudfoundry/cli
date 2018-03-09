@@ -57,8 +57,7 @@ func (cmd *V3CreatePackageCommand) Setup(config command.Config, ui command.UI) e
 }
 
 func (cmd V3CreatePackageCommand) Execute(args []string) error {
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
 	if cmd.DockerImage.Path != "" && cmd.AppPath != "" {
 		return translatableerror.ArgumentCombinationError{

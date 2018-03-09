@@ -53,7 +53,7 @@ var _ = Describe("v3-set-droplet command", func() {
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-set-droplet", appName, "--droplet-guid", "some-droplet-guid")
-		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session.Err).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 

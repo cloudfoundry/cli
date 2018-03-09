@@ -61,8 +61,7 @@ func (cmd *V3ApplyManifestCommand) Setup(config command.Config, ui command.UI) e
 func (cmd V3ApplyManifestCommand) Execute(args []string) error {
 	pathToManifest := string(cmd.PathToManifest)
 
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
 	// TODO: Update minimum API version when apply-manifest is complete in V3 API
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)

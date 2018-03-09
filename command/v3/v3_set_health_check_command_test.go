@@ -84,7 +84,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 		})
 
 		It("displays the experimental warning", func() {
-			Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		})
 	})
 
@@ -96,7 +96,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 		It("returns an error", func() {
 			Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: binaryName}))
 
-			Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -129,7 +129,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 		It("returns the error and prints warnings", func() {
 			Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
-			Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 			Expect(testUI.Out).To(Say("Updating health check type for app some-app process some-process-type in org some-org / space some-space as steve\\.\\.\\."))
 
 			Expect(testUI.Err).To(Say("warning-1"))
@@ -150,7 +150,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 		It("displays a message to restart application", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 			Expect(testUI.Out).To(Say("Updating health check type for app some-app process some-process-type in org some-org / space some-space as steve\\.\\.\\."))
 			Expect(testUI.Out).To(Say("TIP: An app restart is required for the change to take effect\\."))
 
@@ -180,7 +180,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 		It("does not display a message to restart application", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 			Expect(testUI.Out).To(Say("Updating health check type for app some-app process some-process-type in org some-org / space some-space as steve\\.\\.\\."))
 			Expect(testUI.Out).NotTo(Say("TIP: An app restart is required for the change to take effect\\."))
 

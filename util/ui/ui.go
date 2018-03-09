@@ -345,13 +345,16 @@ func (ui *UI) DisplayTextWithBold(template string, templateValues ...map[string]
 // DisplayWarning translates the warning, substitutes in templateValues, and
 // outputs to ui.Err. Only the first map in templateValues is used.
 func (ui *UI) DisplayWarning(template string, templateValues ...map[string]interface{}) {
-	fmt.Fprintf(ui.Err, "%s\n", ui.TranslateText(template, templateValues...))
+	fmt.Fprintf(ui.Err, "%s\n\n", ui.TranslateText(template, templateValues...))
 }
 
 // DisplayWarnings translates the warnings and outputs to ui.Err.
 func (ui *UI) DisplayWarnings(warnings []string) {
 	for _, warning := range warnings {
 		fmt.Fprintf(ui.Err, "%s\n", ui.TranslateText(warning))
+	}
+	if len(warnings) > 0 {
+		fmt.Fprintln(ui.Err)
 	}
 }
 

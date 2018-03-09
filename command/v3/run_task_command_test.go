@@ -152,54 +152,16 @@ var _ = Describe("run-task Command", func() {
 						Expect(appGUID).To(Equal("some-app-guid"))
 						Expect(task).To(Equal(v3action.Task{Command: "some command"}))
 
-						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
-OK
+						Expect(testUI.Out).To(Say("Creating task for app some-app-name in org some-org / space some-space as some-user..."))
+						Expect(testUI.Out).To(Say("OK"))
 
-Task has been submitted successfully for execution.
-task name:   31337ddd
-task id:     3
-`))
-						Expect(testUI.Err).To(Say(`get-application-warning-1
-get-application-warning-2
-get-application-warning-3`))
-					})
-				})
+						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
+						Expect(testUI.Out).To(Say("task name:\\s+31337ddd"))
+						Expect(testUI.Out).To(Say("task id:\\s+3"))
 
-				Context("when the task name is provided", func() {
-					BeforeEach(func() {
-						cmd.Name = "some-task-name"
-						fakeActor.RunTaskReturns(
-							v3action.Task{
-								Name:       "some-task-name",
-								SequenceID: 3,
-							},
-							v3action.Warnings{"get-application-warning-3"},
-							nil)
-					})
-
-					It("creates a new task and outputs all warnings", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-						appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-						Expect(appName).To(Equal("some-app-name"))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
-
-						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-						appGUID, task := fakeActor.RunTaskArgsForCall(0)
-						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(task).To(Equal(v3action.Task{Command: "some command", Name: "some-task-name"}))
-
-						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
-OK
-
-Task has been submitted successfully for execution.
-task name:   some-task-name
-task id:     3`,
-						))
-						Expect(testUI.Err).To(Say(`get-application-warning-1
-get-application-warning-2
-get-application-warning-3`))
+						Expect(testUI.Err).To(Say("get-application-warning-1"))
+						Expect(testUI.Err).To(Say("get-application-warning-2"))
+						Expect(testUI.Err).To(Say("get-application-warning-3"))
 					})
 				})
 
@@ -207,48 +169,6 @@ get-application-warning-3`))
 					BeforeEach(func() {
 						cmd.Name = "some-task-name"
 						cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{Value: 321, IsSet: true}}
-						fakeActor.RunTaskReturns(
-							v3action.Task{
-								Name:       "some-task-name",
-								SequenceID: 3,
-							},
-							v3action.Warnings{"get-application-warning-3"},
-							nil)
-					})
-
-					It("creates a new task and outputs all warnings", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-						appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-						Expect(appName).To(Equal("some-app-name"))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
-
-						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-						appGUID, task := fakeActor.RunTaskArgsForCall(0)
-						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(task).To(Equal(v3action.Task{
-							Command:  "some command",
-							Name:     "some-task-name",
-							DiskInMB: 321,
-						}))
-
-						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
-OK
-
-Task has been submitted successfully for execution.
-task name:   some-task-name
-task id:     3`,
-						))
-						Expect(testUI.Err).To(Say(`get-application-warning-1
-get-application-warning-2
-get-application-warning-3`))
-					})
-				})
-
-				Context("when task memory is provided", func() {
-					BeforeEach(func() {
-						cmd.Name = "some-task-name"
 						cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 123, IsSet: true}}
 						fakeActor.RunTaskReturns(
 							v3action.Task{
@@ -273,19 +193,20 @@ get-application-warning-3`))
 						Expect(task).To(Equal(v3action.Task{
 							Command:    "some command",
 							Name:       "some-task-name",
+							DiskInMB:   321,
 							MemoryInMB: 123,
 						}))
 
-						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
-OK
+						Expect(testUI.Out).To(Say("Creating task for app some-app-name in org some-org / space some-space as some-user..."))
+						Expect(testUI.Out).To(Say("OK"))
 
-Task has been submitted successfully for execution.
-task name:   some-task-name
-task id:     3`,
-						))
-						Expect(testUI.Err).To(Say(`get-application-warning-1
-get-application-warning-2
-get-application-warning-3`))
+						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
+						Expect(testUI.Out).To(Say("task name:\\s+some-task-name"))
+						Expect(testUI.Out).To(Say("task id:\\s+3"))
+
+						Expect(testUI.Err).To(Say("get-application-warning-1"))
+						Expect(testUI.Err).To(Say("get-application-warning-2"))
+						Expect(testUI.Err).To(Say("get-application-warning-3"))
 					})
 				})
 			})

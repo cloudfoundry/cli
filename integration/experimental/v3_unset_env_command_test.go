@@ -64,7 +64,7 @@ var _ = Describe("v3-unset-env command", func() {
 
 	It("displays the experimental warning", func() {
 		session := helpers.CF("v3-unset-env", appName, envVarName)
-		Eventually(session).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session.Err).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
 

@@ -107,8 +107,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V3PushCommand) Execute(args []string) error {
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
 	err := cmd.validateArgs()
 	if err != nil {

@@ -67,7 +67,7 @@ var _ = Describe("v3-env Command", func() {
 		})
 
 		It("displays the experimental warning", func() {
-			Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		})
 	})
 

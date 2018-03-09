@@ -67,8 +67,7 @@ func (cmd *UnshareServiceCommand) Setup(config command.Config, ui command.UI) er
 }
 
 func (cmd UnshareServiceCommand) Execute(args []string) error {
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionShareServiceV3)
 	if err != nil {

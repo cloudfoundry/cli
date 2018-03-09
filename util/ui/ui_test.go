@@ -19,6 +19,7 @@ var _ = Describe("UI", func() {
 		ui         *UI
 		fakeConfig *uifakes.FakeConfig
 		out        *Buffer
+		errBuff    *Buffer
 	)
 
 	BeforeEach(func() {
@@ -32,7 +33,8 @@ var _ = Describe("UI", func() {
 		out = NewBuffer()
 		ui.Out = out
 		ui.OutForInteration = out
-		ui.Err = NewBuffer()
+		errBuff = NewBuffer()
+		ui.Err = errBuff
 	})
 
 	It("sets the TimezoneLocation to the local timezone", func() {
@@ -500,7 +502,7 @@ var _ = Describe("UI", func() {
 				map[string]interface{}{
 					"SomeMapValue": "map-value",
 				})
-			Expect(ui.Err).To(Say("template with map-value"))
+			Expect(ui.Err).To(Say("template with map-value\n\n"))
 		})
 
 		Context("when the locale is not set to english", func() {
@@ -532,6 +534,7 @@ var _ = Describe("UI", func() {
 			ui.DisplayWarnings([]string{"warning-1", "warning-2"})
 			Expect(ui.Err).To(Say("warning-1\n"))
 			Expect(ui.Err).To(Say("warning-2\n"))
+			Expect(ui.Err).To(Say("\n"))
 		})
 
 		Context("when the locale is not set to english", func() {
@@ -549,6 +552,14 @@ var _ = Describe("UI", func() {
 				ui.DisplayWarnings([]string{"Also delete any mapped routes", "FEATURE FLAGS"})
 				Expect(ui.Err).To(Say("Supprimer aussi les routes mappées\n"))
 				Expect(ui.Err).To(Say("INDICATEURS DE FONCTION\n"))
+				Expect(ui.Err).To(Say("\n"))
+			})
+		})
+
+		Context("does not display newline when warnings are empty", func() {
+			It("does not print out a new line", func() {
+				ui.DisplayWarnings(nil)
+				Expect(errBuff.Contents()).To(BeEmpty())
 			})
 		})
 	})

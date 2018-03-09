@@ -50,8 +50,7 @@ func (cmd *V3SetEnvCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V3SetEnvCommand) Execute(args []string) error {
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
 	if err != nil {

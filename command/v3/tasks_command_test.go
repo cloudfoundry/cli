@@ -168,17 +168,16 @@ var _ = Describe("tasks Command", func() {
 					Expect(guid).To(Equal("some-app-guid"))
 					Expect(order).To(Equal(v3action.Descending))
 
-					Expect(testUI.Out).To(Say(`Getting tasks for app some-app-name in org some-org / space some-space as some-user...
-OK
+					Expect(testUI.Out).To(Say("Getting tasks for app some-app-name in org some-org / space some-space as some-user..."))
+					Expect(testUI.Out).To(Say("OK"))
 
-id   name     state       start time                      command
-3    task-3   RUNNING     Tue, 08 Nov 2016 22:26:02 UTC   some-command
-2    task-2   FAILED      Tue, 08 Nov 2016 22:26:02 UTC   some-command
-1    task-1   SUCCEEDED   Tue, 08 Nov 2016 22:26:02 UTC   some-command`,
-					))
-					Expect(testUI.Err).To(Say(`get-application-warning-1
-get-application-warning-2
-get-tasks-warning-1`))
+					Expect(testUI.Out).To(Say("id\\s+name\\s+state\\s+start time\\s+command"))
+					Expect(testUI.Out).To(Say("3\\s+task-3\\s+RUNNING\\s+Tue, 08 Nov 2016 22:26:02 UTC\\s+some-command"))
+					Expect(testUI.Out).To(Say("2\\s+task-2\\s+FAILED\\s+Tue, 08 Nov 2016 22:26:02 UTC\\s+some-command"))
+					Expect(testUI.Out).To(Say("1\\s+task-1\\s+SUCCEEDED\\s+Tue, 08 Nov 2016 22:26:02 UTC\\s+some-command"))
+					Expect(testUI.Err).To(Say("get-application-warning-1"))
+					Expect(testUI.Err).To(Say("get-application-warning-2"))
+					Expect(testUI.Err).To(Say("get-tasks-warning-1"))
 				})
 
 				Context("when the tasks' command fields are returned as empty strings", func() {
@@ -209,10 +208,8 @@ get-tasks-warning-1`))
 					It("outputs [hidden] for the tasks' commands", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say(`
-2    task-2   FAILED      Tue, 08 Nov 2016 22:26:02 UTC   \[hidden\]
-1    task-1   SUCCEEDED   Tue, 08 Nov 2016 22:26:02 UTC   \[hidden\]`,
-						))
+						Expect(testUI.Out).To(Say("2\\s+task-2\\s+FAILED\\s+Tue, 08 Nov 2016 22:26:02 UTC\\s+\\[hidden\\]"))
+						Expect(testUI.Out).To(Say("1\\s+task-1\\s+SUCCEEDED\\s+Tue, 08 Nov 2016 22:26:02 UTC\\s+\\[hidden\\]"))
 					})
 				})
 
@@ -224,10 +221,7 @@ get-tasks-warning-1`))
 					It("outputs an empty table", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say(`
-id   name   state   start time   command
-`,
-						))
+						Expect(testUI.Out).To(Say("id\\s+name\\s+state\\s+start time\\s+command"))
 						Expect(testUI.Out).NotTo(Say("1"))
 					})
 				})
