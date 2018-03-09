@@ -262,7 +262,7 @@ jobs:
            channel: '#cli-eng'
            text: |
              Linux unit tests failed :(
-             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+             https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: units-osx
       file: cli-ci/ci/cli/tasks/units-osx.yml
       on_failure:
@@ -271,7 +271,7 @@ jobs:
            channel: '#cli-eng'
            text: |
              OS X unit tests failed :(
-             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+             https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: units-windows
       file: cli-ci/ci/cli/tasks/units-windows.yml
       on_failure:
@@ -280,7 +280,7 @@ jobs:
            channel: '#cli-eng'
            text: |
              Windows unit tests failed :(
-             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+             https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
 
 - name: build-binaries
   serial: true
@@ -299,7 +299,7 @@ jobs:
          channel: '#cli-eng'
          text: |
            i18n generation failed :(
-           https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+           https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
   - aggregate:
     - task: build
       file: cli-ci/ci/cli/tasks/build-binaries.yml
@@ -309,7 +309,7 @@ jobs:
            channel: '#cli-eng'
            text: |
              build binaries failed :(
-             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+             https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: build-osx
       file: cli-ci/ci/cli/tasks/build-osx-binary.yml
       on_failure:
@@ -318,7 +318,7 @@ jobs:
            channel: '#cli-eng'
            text: |
              build OS X binaries failed :(
-             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+             https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
   - task: combine-binaries
     file: cli-ci/ci/cli/tasks/combine-binaries.yml
   - put: cf-cli-binaries
@@ -352,7 +352,7 @@ jobs:
           channel: '#cli-eng'
           text: |
             Linux integration failed :(
-            https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -396,7 +396,7 @@ jobs:
           channel: '#cli-eng'
           text: |
             Windows integration failed :(
-            https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -440,7 +440,7 @@ jobs:
           channel: '#cli-eng'
           text: |
             Windows integration-experimental failed :(
-            https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -458,7 +458,7 @@ jobs:
           channel: '#cli-eng'
           text: |
             Linux integration-experimental failed :(
-            https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -592,7 +592,7 @@ jobs:
           channel: '#cli-eng'
           text: |
             CATs Linux failed :(
-            https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            https://wings.concourse-ci.org/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
   ensure:
     put: gcp-bosh-pool
     params:
