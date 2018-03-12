@@ -55,13 +55,16 @@ func (service *Service) UnmarshalJSON(data []byte) error {
 	// a stringified JSON object ONLY for the 'extra' key (see test stub JSON
 	// response). This unmarshal strips escaped quotes, at which time we can then
 	// unmarshal into the ServiceExtra object.
-	extra := ServiceExtra{}
-	err = json.Unmarshal([]byte(ccService.Entity.Extra), &extra)
-	if err != nil {
-		return err
+	// If 'extra' is null or not provided, this means sharing is NOT enabled
+	if len(ccService.Entity.Extra) != 0 {
+		extra := ServiceExtra{}
+		err = json.Unmarshal([]byte(ccService.Entity.Extra), &extra)
+		if err != nil {
+			return err
+		}
+		service.Extra.Shareable = extra.Shareable
 	}
 
-	service.Extra.Shareable = extra.Shareable
 	return nil
 }
 
