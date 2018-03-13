@@ -25,6 +25,11 @@ const (
 	PathFilter FilterType = "path"
 	// PortFilter is the name of the 'port' filter.
 	PortFilter FilterType = "port"
+
+	// TimestampFilter is the name of the 'timestamp' filter.
+	TimestampFilter FilterType = "timestamp"
+	// Type is the name of the 'type' filter.
+	TypeFilter FilterType = "type"
 )
 
 // FilterOperator is the type of operation a Filter uses.
@@ -33,6 +38,9 @@ type FilterOperator string
 const (
 	// EqualOperator is the Filter's equal operator.
 	EqualOperator FilterOperator = ":"
+
+	// GreaterThanOperator is the query greater than operator.
+	GreaterThanOperator FilterOperator = ">"
 
 	// InOperator is the Filter's "IN" operator.
 	InOperator FilterOperator = " IN "
