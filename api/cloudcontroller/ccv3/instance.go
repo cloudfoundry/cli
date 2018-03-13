@@ -76,7 +76,7 @@ func (client *Client) DeleteApplicationProcessInstance(appGUID string, processTy
 // GetProcessInstances lists instance stats for a given process.
 func (client *Client) GetProcessInstances(processGUID string) ([]ProcessInstance, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetProcessInstancesRequest,
+		RequestName: internal.GetProcessStatsRequest,
 		URIParams:   map[string]string{"process_guid": processGUID},
 	})
 	if err != nil {

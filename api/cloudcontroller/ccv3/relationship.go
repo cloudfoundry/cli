@@ -141,7 +141,7 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 // organization and it's default isolation segment.
 func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Relationship, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetOrganizationDefaultIsolationSegmentRequest,
+		RequestName: internal.GetOrganizationRelationshipDefaultIsolationSegmentRequest,
 		URIParams:   internal.Params{"organization_guid": orgGUID},
 	})
 	if err != nil {
@@ -167,7 +167,7 @@ func (client *Client) PatchOrganizationDefaultIsolationSegment(orgGUID string, i
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchOrganizationDefaultIsolationSegmentRequest,
+		RequestName: internal.PatchOrganizationRelationshipDefaultIsolationSegmentRequest,
 		Body:        bytes.NewReader(body),
 		URIParams:   internal.Params{"organization_guid": orgGUID},
 	})

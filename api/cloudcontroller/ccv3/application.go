@@ -132,7 +132,7 @@ func (client *Client) DeleteApplication(appGUID string) (string, Warnings, error
 // GetApplications lists applications with optional filters.
 func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetAppsRequest,
+		RequestName: internal.GetApplicationsRequest,
 		Query:       query,
 	})
 	if err != nil {
@@ -184,7 +184,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 // application.
 func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (string, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationManifest,
+		RequestName: internal.PostApplicationActionApplyManifest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 		Body:        bytes.NewReader(rawManifest),
 	})
@@ -204,7 +204,7 @@ func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest
 // UpdateApplicationStart starts the given application.
 func (client *Client) UpdateApplicationStart(appGUID string) (Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationStartRequest,
+		RequestName: internal.PostApplicationActionStartRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 	})
 	if err != nil {
@@ -223,7 +223,7 @@ func (client *Client) UpdateApplicationStart(appGUID string) (Application, Warni
 // UpdateApplicationStop stops the given application.
 func (client *Client) UpdateApplicationStop(appGUID string) (Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationStopRequest,
+		RequestName: internal.PostApplicationActionStopRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 	})
 	if err != nil {

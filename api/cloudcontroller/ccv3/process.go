@@ -64,7 +64,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 // GetApplicationProcesses lists processes for a given app
 func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetAppProcessesRequest,
+		RequestName: internal.GetApplicationProcessesRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 	})
 	if err != nil {
@@ -90,7 +90,7 @@ func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnin
 // GetApplicationProcessByType returns application process of specified type
 func (client *Client) GetApplicationProcessByType(appGUID string, processType string) (Process, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetApplicationProcessByTypeRequest,
+		RequestName: internal.GetApplicationProcessRequest,
 		URIParams: map[string]string{
 			"app_guid": appGUID,
 			"type":     processType,
@@ -119,7 +119,7 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchApplicationProcessHealthCheckRequest,
+		RequestName: internal.PatchProcessRequest,
 		Body:        bytes.NewReader(body),
 		URIParams:   internal.Params{"process_guid": processGUID},
 	})
@@ -159,7 +159,7 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, process Proc
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationProcessScaleRequest,
+		RequestName: internal.PostApplicationProcessActionScaleRequest,
 		Body:        bytes.NewReader(body),
 		URIParams:   internal.Params{"app_guid": appGUID, "type": process.Type},
 	})

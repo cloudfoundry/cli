@@ -31,7 +31,7 @@ func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Wa
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostAppTasksRequest,
+		RequestName: internal.PostApplicationTasksRequest,
 		URIParams: internal.Params{
 			"app_guid": appGUID,
 		},
@@ -54,7 +54,7 @@ func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Wa
 // application GUID. Results can be filtered by providing URL queries.
 func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]Task, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetAppTasksRequest,
+		RequestName: internal.GetApplicationTasksRequest,
 		URIParams: internal.Params{
 			"app_guid": appGUID,
 		},

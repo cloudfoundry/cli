@@ -28,7 +28,7 @@ type EnvironmentVariables struct {
 func (client *Client) GetApplicationEnvironmentVariables(appGUID string) (EnvironmentVariableGroups, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		URIParams:   internal.Params{"app_guid": appGUID},
-		RequestName: internal.GetApplicationEnvironmentVariables,
+		RequestName: internal.GetApplicationEnvRequest,
 	})
 	if err != nil {
 		return EnvironmentVariableGroups{}, nil, err
@@ -52,7 +52,7 @@ func (client *Client) PatchApplicationUserProvidedEnvironmentVariables(appGUID s
 
 	request, err := client.newHTTPRequest(requestOptions{
 		URIParams:   internal.Params{"app_guid": appGUID},
-		RequestName: internal.PatchApplicationUserProvidedEnvironmentVariablesRequest,
+		RequestName: internal.PatchApplicationEnvironmentVariablesRequest,
 		Body:        bytes.NewReader(bodyBytes),
 	})
 	if err != nil {
