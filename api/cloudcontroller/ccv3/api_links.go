@@ -3,7 +3,9 @@ package ccv3
 // APILink represents a generic link from a response object.
 type APILink struct {
 	// HREF is the fully qualified URL for the link.
-	HREF   string `json:"href"`
+	HREF string `json:"href"`
+	// Method indicate the desired action to be performed on the identified
+	// resource.
 	Method string `json:"method"`
 
 	// Meta contains additional metadata about the API.

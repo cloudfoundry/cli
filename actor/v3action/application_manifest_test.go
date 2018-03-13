@@ -66,7 +66,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 					Context("when applying the manifest succeeds", func() {
 						BeforeEach(func() {
-							fakeCloudControllerClient.CreateApplicationActionsApplyManifestByApplicationReturns(
+							fakeCloudControllerClient.UpdateApplicationApplyManifestReturns(
 								"some-job-url",
 								ccv3.Warnings{"apply-manifest-1-warning"},
 								nil,
@@ -96,10 +96,10 @@ var _ = Describe("Application Manifest Actions", func() {
 									ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
 								))
 
-								Expect(fakeCloudControllerClient.CreateApplicationActionsApplyManifestByApplicationCallCount()).To(Equal(1))
-								appManifest, guidInCall := fakeCloudControllerClient.CreateApplicationActionsApplyManifestByApplicationArgsForCall(0)
-								Expect(appManifest).To(Equal(manifestContent))
+								Expect(fakeCloudControllerClient.UpdateApplicationApplyManifestCallCount()).To(Equal(1))
+								guidInCall, appManifest := fakeCloudControllerClient.UpdateApplicationApplyManifestArgsForCall(0)
 								Expect(guidInCall).To(Equal("app-1-guid"))
+								Expect(appManifest).To(Equal(manifestContent))
 
 								Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
 								jobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
@@ -147,7 +147,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 						BeforeEach(func() {
 							applyErr = errors.New("some-apply-manifest-error")
-							fakeCloudControllerClient.CreateApplicationActionsApplyManifestByApplicationReturns(
+							fakeCloudControllerClient.UpdateApplicationApplyManifestReturns(
 								"",
 								ccv3.Warnings{"apply-manifest-1-warning"},
 								applyErr,

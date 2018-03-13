@@ -9,13 +9,22 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
+// Build represent the process of staging an application package.
 type Build struct {
-	CreatedAt   string
-	GUID        string
-	Error       string
-	PackageGUID string
-	State       constant.BuildState
+	// CreatedAt is the time with zone when the build was created.
+	CreatedAt string
+	// DropletGUID is the unique identifier for the resulting droplet from the
+	// staging process.
 	DropletGUID string
+	// Error describes errors during the build process.
+	Error string
+	// GUID is the unique build identifier.
+	GUID string
+	// PackageGUID is the unique identifier for package that is the input to the
+	// staging process.
+	PackageGUID string
+	// State is the state of the build.
+	State constant.BuildState
 }
 
 func (b Build) MarshalJSON() ([]byte, error) {

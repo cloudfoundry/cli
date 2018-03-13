@@ -67,22 +67,6 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateApplicationActionsApplyManifestByApplicationStub        func(rawManifest []byte, appGUID string) (string, ccv3.Warnings, error)
-	createApplicationActionsApplyManifestByApplicationMutex       sync.RWMutex
-	createApplicationActionsApplyManifestByApplicationArgsForCall []struct {
-		rawManifest []byte
-		appGUID     string
-	}
-	createApplicationActionsApplyManifestByApplicationReturns struct {
-		result1 string
-		result2 ccv3.Warnings
-		result3 error
-	}
-	createApplicationActionsApplyManifestByApplicationReturnsOnCall map[int]struct {
-		result1 string
-		result2 ccv3.Warnings
-		result3 error
-	}
 	CreateApplicationProcessScaleStub        func(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
 	createApplicationProcessScaleMutex       sync.RWMutex
 	createApplicationProcessScaleArgsForCall []struct {
@@ -643,36 +627,6 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	StartApplicationStub        func(appGUID string) (ccv3.Application, ccv3.Warnings, error)
-	startApplicationMutex       sync.RWMutex
-	startApplicationArgsForCall []struct {
-		appGUID string
-	}
-	startApplicationReturns struct {
-		result1 ccv3.Application
-		result2 ccv3.Warnings
-		result3 error
-	}
-	startApplicationReturnsOnCall map[int]struct {
-		result1 ccv3.Application
-		result2 ccv3.Warnings
-		result3 error
-	}
-	StopApplicationStub        func(appGUID string) (ccv3.Application, ccv3.Warnings, error)
-	stopApplicationMutex       sync.RWMutex
-	stopApplicationArgsForCall []struct {
-		appGUID string
-	}
-	stopApplicationReturns struct {
-		result1 ccv3.Application
-		result2 ccv3.Warnings
-		result3 error
-	}
-	stopApplicationReturnsOnCall map[int]struct {
-		result1 ccv3.Application
-		result2 ccv3.Warnings
-		result3 error
-	}
 	UpdateApplicationStub        func(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
 	updateApplicationMutex       sync.RWMutex
 	updateApplicationArgsForCall []struct {
@@ -684,6 +638,52 @@ type FakeCloudControllerClient struct {
 		result3 error
 	}
 	updateApplicationReturnsOnCall map[int]struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
+	UpdateApplicationApplyManifestStub        func(appGUID string, rawManifest []byte) (string, ccv3.Warnings, error)
+	updateApplicationApplyManifestMutex       sync.RWMutex
+	updateApplicationApplyManifestArgsForCall []struct {
+		appGUID     string
+		rawManifest []byte
+	}
+	updateApplicationApplyManifestReturns struct {
+		result1 string
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateApplicationApplyManifestReturnsOnCall map[int]struct {
+		result1 string
+		result2 ccv3.Warnings
+		result3 error
+	}
+	UpdateApplicationStartStub        func(appGUID string) (ccv3.Application, ccv3.Warnings, error)
+	updateApplicationStartMutex       sync.RWMutex
+	updateApplicationStartArgsForCall []struct {
+		appGUID string
+	}
+	updateApplicationStartReturns struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateApplicationStartReturnsOnCall map[int]struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
+	UpdateApplicationStopStub        func(appGUID string) (ccv3.Application, ccv3.Warnings, error)
+	updateApplicationStopMutex       sync.RWMutex
+	updateApplicationStopArgsForCall []struct {
+		appGUID string
+	}
+	updateApplicationStopReturns struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateApplicationStopReturnsOnCall map[int]struct {
 		result1 ccv3.Application
 		result2 ccv3.Warnings
 		result3 error
@@ -947,66 +947,6 @@ func (fake *FakeCloudControllerClient) CreateApplicationReturnsOnCall(i int, res
 	}
 	fake.createApplicationReturnsOnCall[i] = struct {
 		result1 ccv3.Application
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) CreateApplicationActionsApplyManifestByApplication(rawManifest []byte, appGUID string) (string, ccv3.Warnings, error) {
-	var rawManifestCopy []byte
-	if rawManifest != nil {
-		rawManifestCopy = make([]byte, len(rawManifest))
-		copy(rawManifestCopy, rawManifest)
-	}
-	fake.createApplicationActionsApplyManifestByApplicationMutex.Lock()
-	ret, specificReturn := fake.createApplicationActionsApplyManifestByApplicationReturnsOnCall[len(fake.createApplicationActionsApplyManifestByApplicationArgsForCall)]
-	fake.createApplicationActionsApplyManifestByApplicationArgsForCall = append(fake.createApplicationActionsApplyManifestByApplicationArgsForCall, struct {
-		rawManifest []byte
-		appGUID     string
-	}{rawManifestCopy, appGUID})
-	fake.recordInvocation("CreateApplicationActionsApplyManifestByApplication", []interface{}{rawManifestCopy, appGUID})
-	fake.createApplicationActionsApplyManifestByApplicationMutex.Unlock()
-	if fake.CreateApplicationActionsApplyManifestByApplicationStub != nil {
-		return fake.CreateApplicationActionsApplyManifestByApplicationStub(rawManifest, appGUID)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.createApplicationActionsApplyManifestByApplicationReturns.result1, fake.createApplicationActionsApplyManifestByApplicationReturns.result2, fake.createApplicationActionsApplyManifestByApplicationReturns.result3
-}
-
-func (fake *FakeCloudControllerClient) CreateApplicationActionsApplyManifestByApplicationCallCount() int {
-	fake.createApplicationActionsApplyManifestByApplicationMutex.RLock()
-	defer fake.createApplicationActionsApplyManifestByApplicationMutex.RUnlock()
-	return len(fake.createApplicationActionsApplyManifestByApplicationArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) CreateApplicationActionsApplyManifestByApplicationArgsForCall(i int) ([]byte, string) {
-	fake.createApplicationActionsApplyManifestByApplicationMutex.RLock()
-	defer fake.createApplicationActionsApplyManifestByApplicationMutex.RUnlock()
-	return fake.createApplicationActionsApplyManifestByApplicationArgsForCall[i].rawManifest, fake.createApplicationActionsApplyManifestByApplicationArgsForCall[i].appGUID
-}
-
-func (fake *FakeCloudControllerClient) CreateApplicationActionsApplyManifestByApplicationReturns(result1 string, result2 ccv3.Warnings, result3 error) {
-	fake.CreateApplicationActionsApplyManifestByApplicationStub = nil
-	fake.createApplicationActionsApplyManifestByApplicationReturns = struct {
-		result1 string
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) CreateApplicationActionsApplyManifestByApplicationReturnsOnCall(i int, result1 string, result2 ccv3.Warnings, result3 error) {
-	fake.CreateApplicationActionsApplyManifestByApplicationStub = nil
-	if fake.createApplicationActionsApplyManifestByApplicationReturnsOnCall == nil {
-		fake.createApplicationActionsApplyManifestByApplicationReturnsOnCall = make(map[int]struct {
-			result1 string
-			result2 ccv3.Warnings
-			result3 error
-		})
-	}
-	fake.createApplicationActionsApplyManifestByApplicationReturnsOnCall[i] = struct {
-		result1 string
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -3020,114 +2960,6 @@ func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpacesReturnsOnCall
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) StartApplication(appGUID string) (ccv3.Application, ccv3.Warnings, error) {
-	fake.startApplicationMutex.Lock()
-	ret, specificReturn := fake.startApplicationReturnsOnCall[len(fake.startApplicationArgsForCall)]
-	fake.startApplicationArgsForCall = append(fake.startApplicationArgsForCall, struct {
-		appGUID string
-	}{appGUID})
-	fake.recordInvocation("StartApplication", []interface{}{appGUID})
-	fake.startApplicationMutex.Unlock()
-	if fake.StartApplicationStub != nil {
-		return fake.StartApplicationStub(appGUID)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.startApplicationReturns.result1, fake.startApplicationReturns.result2, fake.startApplicationReturns.result3
-}
-
-func (fake *FakeCloudControllerClient) StartApplicationCallCount() int {
-	fake.startApplicationMutex.RLock()
-	defer fake.startApplicationMutex.RUnlock()
-	return len(fake.startApplicationArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) StartApplicationArgsForCall(i int) string {
-	fake.startApplicationMutex.RLock()
-	defer fake.startApplicationMutex.RUnlock()
-	return fake.startApplicationArgsForCall[i].appGUID
-}
-
-func (fake *FakeCloudControllerClient) StartApplicationReturns(result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
-	fake.StartApplicationStub = nil
-	fake.startApplicationReturns = struct {
-		result1 ccv3.Application
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) StartApplicationReturnsOnCall(i int, result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
-	fake.StartApplicationStub = nil
-	if fake.startApplicationReturnsOnCall == nil {
-		fake.startApplicationReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Application
-			result2 ccv3.Warnings
-			result3 error
-		})
-	}
-	fake.startApplicationReturnsOnCall[i] = struct {
-		result1 ccv3.Application
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) StopApplication(appGUID string) (ccv3.Application, ccv3.Warnings, error) {
-	fake.stopApplicationMutex.Lock()
-	ret, specificReturn := fake.stopApplicationReturnsOnCall[len(fake.stopApplicationArgsForCall)]
-	fake.stopApplicationArgsForCall = append(fake.stopApplicationArgsForCall, struct {
-		appGUID string
-	}{appGUID})
-	fake.recordInvocation("StopApplication", []interface{}{appGUID})
-	fake.stopApplicationMutex.Unlock()
-	if fake.StopApplicationStub != nil {
-		return fake.StopApplicationStub(appGUID)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.stopApplicationReturns.result1, fake.stopApplicationReturns.result2, fake.stopApplicationReturns.result3
-}
-
-func (fake *FakeCloudControllerClient) StopApplicationCallCount() int {
-	fake.stopApplicationMutex.RLock()
-	defer fake.stopApplicationMutex.RUnlock()
-	return len(fake.stopApplicationArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) StopApplicationArgsForCall(i int) string {
-	fake.stopApplicationMutex.RLock()
-	defer fake.stopApplicationMutex.RUnlock()
-	return fake.stopApplicationArgsForCall[i].appGUID
-}
-
-func (fake *FakeCloudControllerClient) StopApplicationReturns(result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
-	fake.StopApplicationStub = nil
-	fake.stopApplicationReturns = struct {
-		result1 ccv3.Application
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeCloudControllerClient) StopApplicationReturnsOnCall(i int, result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
-	fake.StopApplicationStub = nil
-	if fake.stopApplicationReturnsOnCall == nil {
-		fake.stopApplicationReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Application
-			result2 ccv3.Warnings
-			result3 error
-		})
-	}
-	fake.stopApplicationReturnsOnCall[i] = struct {
-		result1 ccv3.Application
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakeCloudControllerClient) UpdateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error) {
 	fake.updateApplicationMutex.Lock()
 	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
@@ -3176,6 +3008,174 @@ func (fake *FakeCloudControllerClient) UpdateApplicationReturnsOnCall(i int, res
 		})
 	}
 	fake.updateApplicationReturnsOnCall[i] = struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (string, ccv3.Warnings, error) {
+	var rawManifestCopy []byte
+	if rawManifest != nil {
+		rawManifestCopy = make([]byte, len(rawManifest))
+		copy(rawManifestCopy, rawManifest)
+	}
+	fake.updateApplicationApplyManifestMutex.Lock()
+	ret, specificReturn := fake.updateApplicationApplyManifestReturnsOnCall[len(fake.updateApplicationApplyManifestArgsForCall)]
+	fake.updateApplicationApplyManifestArgsForCall = append(fake.updateApplicationApplyManifestArgsForCall, struct {
+		appGUID     string
+		rawManifest []byte
+	}{appGUID, rawManifestCopy})
+	fake.recordInvocation("UpdateApplicationApplyManifest", []interface{}{appGUID, rawManifestCopy})
+	fake.updateApplicationApplyManifestMutex.Unlock()
+	if fake.UpdateApplicationApplyManifestStub != nil {
+		return fake.UpdateApplicationApplyManifestStub(appGUID, rawManifest)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.updateApplicationApplyManifestReturns.result1, fake.updateApplicationApplyManifestReturns.result2, fake.updateApplicationApplyManifestReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifestCallCount() int {
+	fake.updateApplicationApplyManifestMutex.RLock()
+	defer fake.updateApplicationApplyManifestMutex.RUnlock()
+	return len(fake.updateApplicationApplyManifestArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifestArgsForCall(i int) (string, []byte) {
+	fake.updateApplicationApplyManifestMutex.RLock()
+	defer fake.updateApplicationApplyManifestMutex.RUnlock()
+	return fake.updateApplicationApplyManifestArgsForCall[i].appGUID, fake.updateApplicationApplyManifestArgsForCall[i].rawManifest
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifestReturns(result1 string, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateApplicationApplyManifestStub = nil
+	fake.updateApplicationApplyManifestReturns = struct {
+		result1 string
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifestReturnsOnCall(i int, result1 string, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateApplicationApplyManifestStub = nil
+	if fake.updateApplicationApplyManifestReturnsOnCall == nil {
+		fake.updateApplicationApplyManifestReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateApplicationApplyManifestReturnsOnCall[i] = struct {
+		result1 string
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationStart(appGUID string) (ccv3.Application, ccv3.Warnings, error) {
+	fake.updateApplicationStartMutex.Lock()
+	ret, specificReturn := fake.updateApplicationStartReturnsOnCall[len(fake.updateApplicationStartArgsForCall)]
+	fake.updateApplicationStartArgsForCall = append(fake.updateApplicationStartArgsForCall, struct {
+		appGUID string
+	}{appGUID})
+	fake.recordInvocation("UpdateApplicationStart", []interface{}{appGUID})
+	fake.updateApplicationStartMutex.Unlock()
+	if fake.UpdateApplicationStartStub != nil {
+		return fake.UpdateApplicationStartStub(appGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.updateApplicationStartReturns.result1, fake.updateApplicationStartReturns.result2, fake.updateApplicationStartReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationStartCallCount() int {
+	fake.updateApplicationStartMutex.RLock()
+	defer fake.updateApplicationStartMutex.RUnlock()
+	return len(fake.updateApplicationStartArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationStartArgsForCall(i int) string {
+	fake.updateApplicationStartMutex.RLock()
+	defer fake.updateApplicationStartMutex.RUnlock()
+	return fake.updateApplicationStartArgsForCall[i].appGUID
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationStartReturns(result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateApplicationStartStub = nil
+	fake.updateApplicationStartReturns = struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationStartReturnsOnCall(i int, result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateApplicationStartStub = nil
+	if fake.updateApplicationStartReturnsOnCall == nil {
+		fake.updateApplicationStartReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Application
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateApplicationStartReturnsOnCall[i] = struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationStop(appGUID string) (ccv3.Application, ccv3.Warnings, error) {
+	fake.updateApplicationStopMutex.Lock()
+	ret, specificReturn := fake.updateApplicationStopReturnsOnCall[len(fake.updateApplicationStopArgsForCall)]
+	fake.updateApplicationStopArgsForCall = append(fake.updateApplicationStopArgsForCall, struct {
+		appGUID string
+	}{appGUID})
+	fake.recordInvocation("UpdateApplicationStop", []interface{}{appGUID})
+	fake.updateApplicationStopMutex.Unlock()
+	if fake.UpdateApplicationStopStub != nil {
+		return fake.UpdateApplicationStopStub(appGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.updateApplicationStopReturns.result1, fake.updateApplicationStopReturns.result2, fake.updateApplicationStopReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationStopCallCount() int {
+	fake.updateApplicationStopMutex.RLock()
+	defer fake.updateApplicationStopMutex.RUnlock()
+	return len(fake.updateApplicationStopArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationStopArgsForCall(i int) string {
+	fake.updateApplicationStopMutex.RLock()
+	defer fake.updateApplicationStopMutex.RUnlock()
+	return fake.updateApplicationStopArgsForCall[i].appGUID
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationStopReturns(result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateApplicationStopStub = nil
+	fake.updateApplicationStopReturns = struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationStopReturnsOnCall(i int, result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateApplicationStopStub = nil
+	if fake.updateApplicationStopReturnsOnCall == nil {
+		fake.updateApplicationStopReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Application
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateApplicationStopReturnsOnCall[i] = struct {
 		result1 ccv3.Application
 		result2 ccv3.Warnings
 		result3 error
@@ -3304,8 +3304,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
 	defer fake.createApplicationMutex.RUnlock()
-	fake.createApplicationActionsApplyManifestByApplicationMutex.RLock()
-	defer fake.createApplicationActionsApplyManifestByApplicationMutex.RUnlock()
 	fake.createApplicationProcessScaleMutex.RLock()
 	defer fake.createApplicationProcessScaleMutex.RUnlock()
 	fake.createApplicationTaskMutex.RLock()
@@ -3380,12 +3378,14 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.setApplicationDropletMutex.RUnlock()
 	fake.shareServiceInstanceToSpacesMutex.RLock()
 	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
-	fake.startApplicationMutex.RLock()
-	defer fake.startApplicationMutex.RUnlock()
-	fake.stopApplicationMutex.RLock()
-	defer fake.stopApplicationMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
+	fake.updateApplicationApplyManifestMutex.RLock()
+	defer fake.updateApplicationApplyManifestMutex.RUnlock()
+	fake.updateApplicationStartMutex.RLock()
+	defer fake.updateApplicationStartMutex.RUnlock()
+	fake.updateApplicationStopMutex.RLock()
+	defer fake.updateApplicationStopMutex.RUnlock()
 	fake.updateTaskMutex.RLock()
 	defer fake.updateTaskMutex.RUnlock()
 	fake.uploadPackageMutex.RLock()

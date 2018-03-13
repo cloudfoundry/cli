@@ -30,7 +30,7 @@ func (actor Actor) ApplyApplicationManifest(parser ManifestParser, spaceGUID str
 			return allWarnings, err
 		}
 
-		jobURL, applyManifestWarnings, err := actor.CloudControllerClient.CreateApplicationActionsApplyManifestByApplication(rawManifest, app.GUID)
+		jobURL, applyManifestWarnings, err := actor.CloudControllerClient.UpdateApplicationApplyManifest(app.GUID, rawManifest)
 		allWarnings = append(allWarnings, applyManifestWarnings...)
 		if err != nil {
 			return allWarnings, err

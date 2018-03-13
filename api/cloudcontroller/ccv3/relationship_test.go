@@ -20,30 +20,32 @@ var _ = Describe("Relationship", func() {
 		client = NewTestClient()
 	})
 
-	Describe("Relationship.MarshalJSON", func() {
-		Context("when the isolation segment is specified by name", func() {
-			It("contains the name in the marshaled JSON", func() {
-				body, err := json.Marshal(Relationship{GUID: "some-iso-guid"})
-				expectedJSON := `{
+	Describe("Relationship", func() {
+		Describe("MarshalJSON", func() {
+			Context("when the isolation segment is specified by name", func() {
+				It("contains the name in the marshaled JSON", func() {
+					body, err := json.Marshal(Relationship{GUID: "some-iso-guid"})
+					expectedJSON := `{
 					"data": {
 						"guid": "some-iso-guid"
 					}
 				}`
 
-				Expect(err).NotTo(HaveOccurred())
-				Expect(body).To(MatchJSON(expectedJSON))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(body).To(MatchJSON(expectedJSON))
+				})
 			})
-		})
 
-		Context("when the isolation segment is the empty string", func() {
-			It("contains null in the marshaled JSON", func() {
-				body, err := json.Marshal(Relationship{GUID: ""})
-				expectedJSON := `{
+			Context("when the isolation segment is the empty string", func() {
+				It("contains null in the marshaled JSON", func() {
+					body, err := json.Marshal(Relationship{GUID: ""})
+					expectedJSON := `{
 					"data": null
 				}`
 
-				Expect(err).NotTo(HaveOccurred())
-				Expect(body).To(MatchJSON(expectedJSON))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(body).To(MatchJSON(expectedJSON))
+				})
 			})
 		})
 	})
@@ -127,11 +129,10 @@ var _ = Describe("Relationship", func() {
 				Expect(server.ReceivedRequests()).To(HaveLen(3))
 			})
 		})
-	})
 
-	Context("when an error occurs", func() {
-		BeforeEach(func() {
-			response := `{
+		Context("when an error occurs", func() {
+			BeforeEach(func() {
+				response := `{
 					"errors": [
 						{
 							"code": 10008,
@@ -141,29 +142,30 @@ var _ = Describe("Relationship", func() {
 					]
 				}`
 
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(http.MethodDelete, "/v3/isolation_segments/segment-guid/relationships/organizations/org-guid"),
-					RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-				),
-			)
-		})
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/isolation_segments/segment-guid/relationships/organizations/org-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
 
-		It("returns the error and warnings", func() {
-			warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
-			Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
-				ResponseCode: http.StatusTeapot,
-				V3ErrorResponse: ccerror.V3ErrorResponse{
-					Errors: []ccerror.V3Error{
-						{
-							Code:   10008,
-							Detail: "The request is semantically invalid: command presence",
-							Title:  "CF-UnprocessableEntity",
+			It("returns the error and warnings", func() {
+				warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
 						},
 					},
-				},
-			}))
-			Expect(warnings).To(ConsistOf("this is a warning"))
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
 		})
 	})
 
@@ -372,6 +374,102 @@ var _ = Describe("Relationship", func() {
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
 								Title:  "CF-UnprocessableEntity",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("SetApplicationDroplet", func() {
+		Context("it sets the droplet", func() {
+			BeforeEach(func() {
+				response := `
+{
+  "data": {
+    "guid": "some-droplet-guid"
+  },
+  "links": {
+    "self": {
+      "href": "https://api.example.org/v3/apps/some-app-guid/relationships/current_droplet"
+    },
+    "related": {
+      "href": "https://api.example.org/v3/apps/some-app-guid/droplets/current"
+    }
+  }
+}`
+				requestBody := map[string]interface{}{
+					"data": map[string]string{
+						"guid": "some-droplet-guid",
+					},
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/apps/some-app-guid/relationships/current_droplet"),
+						VerifyJSONRepresenting(requestBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns warnings and no error", func() {
+				relationship, warnings, err := client.SetApplicationDroplet("some-app-guid", "some-droplet-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(relationship.GUID).To(Equal("some-droplet-guid"))
+			})
+		})
+
+		Context("when the CC returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				requestBody := map[string]interface{}{
+					"data": map[string]string{
+						"guid": "some-droplet-guid",
+					},
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/apps/no-such-app-guid/relationships/current_droplet"),
+						VerifyJSONRepresenting(requestBody),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+
+			})
+
+			It("returns the error and all warnings", func() {
+				_, warnings, err := client.SetApplicationDroplet("no-such-app-guid", "some-droplet-guid")
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "App not found",
+								Title:  "CF-ResourceNotFound",
 							},
 						},
 					},

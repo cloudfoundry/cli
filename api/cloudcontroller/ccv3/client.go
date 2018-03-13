@@ -17,6 +17,9 @@
 // <Top Level Endpoint>, the pluralization is removed from said endpoint in the
 // method name.
 //
+// Additionally, if the endpoint is an "action" endpoint, do not include the
+// word "Action" in the method name.
+//
 // For Example:
 //   Method Name: GetApplication
 //   Endpoint: /v3/applications/:guid
@@ -40,16 +43,19 @@
 //   Endpoint: /v3/apps/:application_guid/task
 //   Action Name: Post
 //   Top Level Endpoint: apps
-//   Return Value: []Task
+//   Return Value: Task
 //
 // Use the following table to determine which HTTP Command equates to which
 // Action Name:
 //   HTTP Command -> Action Name
-//   POST -> Create
+//   POST -> Create OR Update*
 //   GET -> Get
 //   PUT -> Update
 //   DELETE -> Delete
 //   PATCH -> Patch
+//
+// * - In some cases POSTs are updating resources, in these cases the method
+// should be called Update, not Create.
 //
 // Method Locations
 //
@@ -62,7 +68,7 @@
 // from the Cloud Controller should be placed in the errorWrapper. Everything
 // else can be handled in the individual operations. All parsed cloud
 // controller errors should exist in errors.go, all generic HTTP errors should
-// exist in the cloudcontroller's errors.go. Errors related to the individaul
+// exist in the cloudcontroller's errors.go. Errors related to the individual
 // operation should exist at the top of that operation's file.
 package ccv3
 

@@ -13,7 +13,6 @@ type CloudControllerClient interface {
 	AssignSpaceToIsolationSegment(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	CloudControllerAPIVersion() string
 	CreateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
-	CreateApplicationActionsApplyManifestByApplication(rawManifest []byte, appGUID string) (string, ccv3.Warnings, error)
 	CreateApplicationProcessScale(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
 	CreateApplicationTask(appGUID string, task ccv3.Task) (ccv3.Task, ccv3.Warnings, error)
 	CreateBuild(build ccv3.Build) (ccv3.Build, ccv3.Warnings, error)
@@ -51,9 +50,10 @@ type CloudControllerClient interface {
 	RevokeIsolationSegmentFromOrganization(isolationSegmentGUID string, organizationGUID string) (ccv3.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
-	StartApplication(appGUID string) (ccv3.Application, ccv3.Warnings, error)
-	StopApplication(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	UpdateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
+	UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (string, ccv3.Warnings, error)
+	UpdateApplicationStart(appGUID string) (ccv3.Application, ccv3.Warnings, error)
+	UpdateApplicationStop(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	UploadPackage(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error)
 }
