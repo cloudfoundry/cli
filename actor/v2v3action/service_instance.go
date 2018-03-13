@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
 func (actor Actor) ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationName(shareToSpaceName string, serviceInstanceName string, sourceSpaceGUID string, shareToOrgName string) (Warnings, error) {
@@ -84,7 +84,7 @@ func (actor Actor) isServiceInstanceShareableByService(serviceGUID string) (bool
 
 	var featureFlagEnabled bool
 	for _, flag := range featureFlags {
-		if flag.Name == string(ccv2.FeatureFlagServiceInstanceSharing) {
+		if flag.Name == string(constant.FeatureFlagServiceInstanceSharing) {
 			featureFlagEnabled = flag.Enabled
 		}
 	}

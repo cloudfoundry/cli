@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/util/sorting"
 	log "github.com/sirupsen/logrus"
 )
@@ -101,7 +101,7 @@ func (actor Actor) getAndSetSharedInformation(summary *ServiceInstanceSummary, s
 	}
 
 	for _, flag := range featureFlags {
-		if flag.Name == string(ccv2.FeatureFlagServiceInstanceSharing) {
+		if flag.Name == string(constant.FeatureFlagServiceInstanceSharing) {
 			summary.ServiceInstanceSharingFeatureFlag = flag.Enabled
 		}
 	}
