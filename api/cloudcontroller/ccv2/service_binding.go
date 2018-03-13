@@ -86,6 +86,25 @@ func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID s
 	return serviceBinding, response.Warnings, nil
 }
 
+// GetServiceBinding returns back a service binding with the proviced guid
+func (client *Client) GetServiceBinding(guid string) (ServiceBinding, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetServiceBindingRequest,
+		URIParams:   Params{"service_binding_guid": guid},
+	})
+	if err != nil {
+		return ServiceBinding{}, nil, err
+	}
+
+	var serviceBinding ServiceBinding
+	response := cloudcontroller.Response{
+		Result: &serviceBinding,
+	}
+
+	err = client.connection.Make(request, &response)
+	return serviceBinding, response.Warnings, err
+}
+
 // GetServiceBindings returns back a list of Service Bindings based off of the
 // provided filters.
 func (client *Client) GetServiceBindings(filters ...Filter) ([]ServiceBinding, Warnings, error) {

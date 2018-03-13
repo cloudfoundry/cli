@@ -136,6 +136,129 @@ var _ = Describe("Domain", func() {
 		})
 	})
 
+	Describe("GetPrivateDomains", func() {
+		Context("when the cloud controller does not return an error", func() {
+			BeforeEach(func() {
+				response1 := `{
+					"next_url": "/v2/private_domains?q=name%20IN%20domain-name-1,domain-name-2,domain-name-3,domain-name-4&page=2",
+					"resources": [
+						{
+							"metadata": {
+								"guid": "domain-guid-1"
+							},
+							"entity": {
+								"name": "domain-name-1"
+							}
+						},
+						{
+							"metadata": {
+								"guid": "domain-guid-2"
+							},
+							"entity": {
+								"name": "domain-name-2"
+							}
+						}
+					]
+				}`
+				response2 := `{
+					"next_url": null,
+					"resources": [
+						{
+							"metadata": {
+								"guid": "domain-guid-3"
+							},
+							"entity": {
+								"name": "domain-name-3"
+							}
+						},
+						{
+							"metadata": {
+								"guid": "domain-guid-4"
+							},
+							"entity": {
+								"name": "domain-name-4"
+							}
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/private_domains", "q=name%20IN%20domain-name-1,domain-name-2,domain-name-3,domain-name-4"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/private_domains", "q=name%20IN%20domain-name-1,domain-name-2,domain-name-3,domain-name-4&page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns the private domains and warnings", func() {
+				domains, warnings, err := client.GetPrivateDomains(Filter{
+					Type:     constant.NameFilter,
+					Operator: constant.InOperator,
+					Values:   []string{"domain-name-1", "domain-name-2", "domain-name-3", "domain-name-4"},
+				})
+				Expect(err).NotTo(HaveOccurred())
+				Expect(domains).To(Equal([]Domain{
+					{
+						GUID: "domain-guid-1",
+						Name: "domain-name-1",
+						Type: constant.PrivateDomain,
+					},
+					{
+						GUID: "domain-guid-2",
+						Name: "domain-name-2",
+						Type: constant.PrivateDomain,
+					},
+					{
+						GUID: "domain-guid-3",
+						Name: "domain-name-3",
+						Type: constant.PrivateDomain,
+					},
+					{
+						GUID: "domain-guid-4",
+						Name: "domain-name-4",
+						Type: constant.PrivateDomain,
+					},
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
+			})
+		})
+
+		Context("when the cloud controller returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 1,
+					"description": "some error description",
+					"error_code": "CF-SomeError"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/private_domains"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the warnings and error", func() {
+				domains, warnings, err := client.GetPrivateDomains()
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        1,
+						Description: "some error description",
+						ErrorCode:   "CF-SomeError",
+					},
+					ResponseCode: http.StatusTeapot,
+				}))
+				Expect(domains).To(Equal([]Domain{}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+	})
+
 	Describe("GetSharedDomains", func() {
 		Context("when the cloud controller does not return an error", func() {
 			BeforeEach(func() {

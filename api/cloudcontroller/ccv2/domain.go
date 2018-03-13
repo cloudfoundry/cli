@@ -100,6 +100,33 @@ func (client *Client) GetPrivateDomain(domainGUID string) (Domain, Warnings, err
 	return domain, response.Warnings, nil
 }
 
+// GetPrivateDomains returns the private domains this client has access to.
+func (client *Client) GetPrivateDomains(filters ...Filter) ([]Domain, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetPrivateDomainsRequest,
+		Query:       ConvertFilterParameters(filters),
+	})
+	if err != nil {
+		return []Domain{}, nil, err
+	}
+
+	fullDomainsList := []Domain{}
+	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
+		if domain, ok := item.(Domain); ok {
+			domain.Type = constant.PrivateDomain
+			fullDomainsList = append(fullDomainsList, domain)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Domain{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullDomainsList, warnings, err
+}
+
 // GetSharedDomains returns the global shared domains.
 func (client *Client) GetSharedDomains(filters ...Filter) ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{

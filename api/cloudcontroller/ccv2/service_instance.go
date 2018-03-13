@@ -132,6 +132,33 @@ func (client *Client) GetServiceInstance(serviceInstanceGUID string) (ServiceIns
 	return serviceInstance, response.Warnings, err
 }
 
+// GetServiceInstances returns back a list of *user provided* Service Instances based
+// off of the provided queries.
+func (client *Client) GetUserProvidedServiceInstances(filters ...Filter) ([]ServiceInstance, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetUserProvidedServiceInstancesRequest,
+		Query:       ConvertFilterParameters(filters),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullInstancesList []ServiceInstance
+	warnings, err := client.paginate(request, ServiceInstance{}, func(item interface{}) error {
+		if instance, ok := item.(ServiceInstance); ok {
+			fullInstancesList = append(fullInstancesList, instance)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   ServiceInstance{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullInstancesList, warnings, err
+}
+
 // GetServiceInstances returns back a list of *managed* Service Instances based
 // off of the provided filters.
 func (client *Client) GetServiceInstances(filters ...Filter) ([]ServiceInstance, Warnings, error) {

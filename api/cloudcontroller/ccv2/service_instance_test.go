@@ -294,6 +294,115 @@ var _ = Describe("Service Instance", func() {
 		})
 	})
 
+	Describe("GetUserProvidedServiceInstances", func() {
+		BeforeEach(func() {
+			response1 := `{
+				"next_url": "/v2/user_provided_service_instances?q=space_guid:some-space-guid&page=2",
+				"resources": [
+					{
+						"metadata": {
+							"guid": "some-service-guid-1"
+						},
+						"entity": {
+							"name": "some-service-name-1",
+							"space_guid": "some-space-guid",
+							"type": "user_provided_service_instance"
+						}
+					},
+					{
+						"metadata": {
+							"guid": "some-service-guid-2"
+						},
+						"entity": {
+							"name": "some-service-name-2",
+							"space_guid": "some-space-guid",
+							"type": "user_provided_service_instance"
+						}
+					}
+				]
+			}`
+
+			response2 := `{
+				"next_url": null,
+				"resources": [
+					{
+						"metadata": {
+							"guid": "some-service-guid-3"
+						},
+						"entity": {
+							"name": "some-service-name-3",
+							"space_guid": "some-space-guid",
+							"type": "user_provided_service_instance"
+						}
+					},
+					{
+						"metadata": {
+							"guid": "some-service-guid-4"
+						},
+						"entity": {
+							"name": "some-service-name-4",
+							"space_guid": "some-space-guid",
+							"type": "user_provided_service_instance"
+						}
+					}
+				]
+			}`
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/v2/user_provided_service_instances", "q=space_guid:some-space-guid"),
+					RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+				),
+			)
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/v2/user_provided_service_instances", "q=space_guid:some-space-guid&page=2"),
+					RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+				),
+			)
+		})
+
+		Context("when service instances exist", func() {
+			It("returns all the queried service instances", func() {
+				serviceInstances, warnings, err := client.GetUserProvidedServiceInstances(Filter{
+					Type:     constant.SpaceGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-space-guid"},
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
+					{
+						Name:      "some-service-name-1",
+						GUID:      "some-service-guid-1",
+						SpaceGUID: "some-space-guid",
+						Type:      constant.ServiceInstanceTypeUserProvidedService,
+					},
+					{
+						Name:      "some-service-name-2",
+						GUID:      "some-service-guid-2",
+						SpaceGUID: "some-space-guid",
+						Type:      constant.ServiceInstanceTypeUserProvidedService,
+					},
+					{
+						Name:      "some-service-name-3",
+						GUID:      "some-service-guid-3",
+						SpaceGUID: "some-space-guid",
+						Type:      constant.ServiceInstanceTypeUserProvidedService,
+					},
+					{
+						Name:      "some-service-name-4",
+						GUID:      "some-service-guid-4",
+						SpaceGUID: "some-space-guid",
+						Type:      constant.ServiceInstanceTypeUserProvidedService,
+					},
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
+			})
+		})
+	})
+
 	Describe("GetSpaceServiceInstances", func() {
 		Context("including user provided services", func() {
 			BeforeEach(func() {
