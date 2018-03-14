@@ -33,6 +33,9 @@ func TestIsolated(t *testing.T) {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
+	SetDefaultEventuallyTimeout(CFEventuallyTimeout)
+	SetDefaultConsistentlyDuration(CFConsistentlyTimeout)
+
 	helpers.SetupSynchronizedSuite(func() {
 		helpers.EnableFeatureFlag("diego_docker")
 		helpers.EnableFeatureFlag("service_instance_sharing")
