@@ -132,8 +132,8 @@ func (client *Client) GetServiceInstance(serviceInstanceGUID string) (ServiceIns
 	return serviceInstance, response.Warnings, err
 }
 
-// GetServiceInstances returns back a list of *user provided* Service Instances based
-// off of the provided queries.
+// GetUserProvidedServiceInstances returns back a list of *user provided* Service Instances based
+// off the provided queries.
 func (client *Client) GetUserProvidedServiceInstances(filters ...Filter) ([]ServiceInstance, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetUserProvidedServiceInstancesRequest,

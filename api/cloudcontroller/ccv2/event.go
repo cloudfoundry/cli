@@ -1,55 +1,57 @@
 package ccv2
 
 import (
-	"encoding/json"
 	"time"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+// Event represents a Cloud Controller Event
 type Event struct {
 	// GUID is the unique event identifier.
 	GUID string
 
-	// Type is the type of the event.
+	// Type is the type of event.
 	Type constant.EventType
 
-	// The GUID of the actor.
-	Actor string
+	// ActorGUID is the GUID of the actor initiating an event.
+	ActorGUID string
 
-	// The actor type.
+	// ActorType is the type of actor initiating an event.
 	ActorType string
 
-	// The name of the actor.
+	// ActorName is the name of the actor initiating an event.
 	ActorName string
 
-	// The GUID of the actee.
-	Actee string
+	// ActeeGUID is the GUID of the cc object affected by an event.
+	ActeeGUID string
 
-	// The actee type.
+	// ActeeType is the type of the cc object affected by an event.
 	ActeeType string
 
-	// The name of the actee.
+	// ActeeName is the name of the cc object affected by an event.
 	ActeeName string
 
-	// The event creation time.
+	// Timestamp is the event creation time.
 	Timestamp time.Time
 
-	// Metadata about the event
+	// Metadata contains additional information about the event.
 	Metadata map[string]interface{}
 }
 
+// UnmarshalJSON helps unmarshal a Cloud Controller Event response.
 func (event *Event) UnmarshalJSON(data []byte) error {
 	var ccEvent struct {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
 			Type      string                 `json:"type,omitempty"`
-			Actor     string                 `json:"actor,omitempty"`
+			ActorGUID string                 `json:"actor,omitempty"`
 			ActorType string                 `json:"actor_type,omitempty"`
 			ActorName string                 `json:"actor_name,omitempty"`
-			Actee     string                 `json:"actee,omitempty"`
+			ActeeGUID string                 `json:"actee,omitempty"`
 			ActeeType string                 `json:"actee_type,omitempty"`
 			ActeeName string                 `json:"actee_name,omitempty"`
 			Timestamp *time.Time             `json:"timestamp"`
@@ -57,16 +59,18 @@ func (event *Event) UnmarshalJSON(data []byte) error {
 		} `json:"entity"`
 	}
 
-	if err := json.Unmarshal(data, &ccEvent); err != nil {
+	decoder := cloudcontroller.NewJSONDecoder(data)
+	err := decoder.Decode(&ccEvent)
+	if err != nil {
 		return err
 	}
 
 	event.GUID = ccEvent.Metadata.GUID
 	event.Type = constant.EventType(ccEvent.Entity.Type)
-	event.Actor = ccEvent.Entity.Actor
+	event.ActorGUID = ccEvent.Entity.ActorGUID
 	event.ActorType = ccEvent.Entity.ActorType
 	event.ActorName = ccEvent.Entity.ActorName
-	event.Actee = ccEvent.Entity.Actee
+	event.ActeeGUID = ccEvent.Entity.ActeeGUID
 	event.ActeeType = ccEvent.Entity.ActeeType
 	event.ActeeName = ccEvent.Entity.ActeeName
 	if ccEvent.Entity.Timestamp != nil {

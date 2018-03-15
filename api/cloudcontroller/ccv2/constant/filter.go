@@ -28,7 +28,7 @@ const (
 
 	// TimestampFilter is the name of the 'timestamp' filter.
 	TimestampFilter FilterType = "timestamp"
-	// Type is the name of the 'type' filter.
+	// TypeFilter is the name of the 'type' filter.
 	TypeFilter FilterType = "type"
 )
 

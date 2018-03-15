@@ -1,8 +1,6 @@
 package ccv2
 
 import (
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -15,6 +13,7 @@ type RouteMapping struct {
 	RouteGUID string
 }
 
+// UnmarshalJSON helps unmarshal a Cloud Controller Route Mapping
 func (routeMapping *RouteMapping) UnmarshalJSON(data []byte) error {
 	var ccRouteMapping struct {
 		Metadata internal.Metadata `json:"metadata"`
@@ -24,7 +23,9 @@ func (routeMapping *RouteMapping) UnmarshalJSON(data []byte) error {
 		} `json:"entity"`
 	}
 
-	if err := json.Unmarshal(data, &ccRouteMapping); err != nil {
+	decoder := cloudcontroller.NewJSONDecoder(data)
+	err := decoder.Decode(&ccRouteMapping)
+	if err != nil {
 		return err
 	}
 
