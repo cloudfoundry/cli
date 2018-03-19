@@ -80,21 +80,11 @@ integration-tests-full : build integration-cleanup
 
 out/cf : $(GOSRC)
 	go build -o out/cf \
-		-ldflags "-w \
-							-s \
-							-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION) \
-							-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
-							-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)" \
-		.
+	  -ldflags $(LD_FLAGS) .
 
 out/cf-osx : $(GOSRC)
 	GOARCH=amd64 GOOS=darwin go build -o out/cf-osx \
-	  -ldflags "-w \
-						  -s \
-						  -X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION) \
-						  -X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
-						  -X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)" \
-		.
+	  -ldflags $(LD_FLAGS) .
 
 out/cf-cli-_winx64.exe : $(GOSRC)
 	go get github.com/akavel/rsrc
