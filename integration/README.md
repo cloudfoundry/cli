@@ -32,6 +32,8 @@ ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/global integrati
 - `CF_INT_DOCKER_IMAGE` - A private docker image used for the docker authentication tests.
 - `CF_INT_DOCKER_USERNAME` - The username for the private docker registry for `CF_INT_DOCKER_IMAGE`.
 - `CF_INT_DOCKER_PASSWORD` - The password for `CF_INT_DOCKER_USERNAME`.
+- `CF_INT_CLIENT_ID` - the ID for the integration client credentials identity.
+- `CF_INT_CLIENT_SECRET` - the secret for the integration client credentials identity.
 - `CF_CLI_EXPERIMENTAL` - Will enable both experimental functionality of the CF CLI and tests for that functionality. Will default to `false` if not set.
 
 ### The test suite does not cleanup after itself!
