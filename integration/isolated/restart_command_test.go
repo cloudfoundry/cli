@@ -223,10 +223,7 @@ applications:
 							Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 							Consistently(session).ShouldNot(Say("Stopping app\\.\\.\\."))
 
-							// Display Staging Logs
-							Eventually(session).Should(Say("Staging app and tracing logs\\.\\.\\."))
-							Eventually(session).Should(Say("Uploading droplet\\.\\.\\."))
-							Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
+							helpers.ConfirmStagingLogs(session)
 
 							Eventually(session).Should(Say("name:\\s+%s", appName))
 							Eventually(session).Should(Say("requested state:\\s+started"))

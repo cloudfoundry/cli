@@ -213,7 +213,6 @@ applications:
 
 									Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
 								})
-								Eventually(helpers.CF("stop", appName)).Should(Exit(0))
 							})
 
 							It("displays the app logs and information with instances table", func() {
@@ -221,9 +220,7 @@ applications:
 								session := helpers.CF("start", appName)
 								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
-								// Display Staging Logs
-								Eventually(session).Should(Say("Uploading droplet\\.\\.\\."))
-								Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
+								helpers.ConfirmStagingLogs(session)
 
 								Eventually(session).Should(Say("name:\\s+%s", appName))
 								Eventually(session).Should(Say("requested state:\\s+started"))
