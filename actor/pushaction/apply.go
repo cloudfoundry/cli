@@ -91,7 +91,15 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 			}
 		}
 
-		if config.DesiredApplication.DockerImage == "" {
+		if config.DropletPath != "" {
+			eventStream <- UploadingDroplet
+			warnings, err = actor.UploadDroplet(config, progressBar, eventStream)
+			warningsStream <- warnings
+			if err != nil {
+				errorStream <- err
+				return
+			}
+		} else if config.DesiredApplication.DockerImage == "" {
 			eventStream <- ResourceMatching
 			config, warnings = actor.SetMatchedResources(config)
 			warningsStream <- warnings

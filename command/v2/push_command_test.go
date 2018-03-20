@@ -28,7 +28,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("push Command", func() {
+var _ = FDescribe("push Command", func() {
 	var (
 		cmd              V2PushCommand
 		testUI           *ui.UI
@@ -247,6 +247,12 @@ var _ = Describe("push Command", func() {
 							fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 						})
 
+						FContext("when a droplet is provided", func() {
+							It("creates the app based on the droplet", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+							})
+						})
 						Context("when no manifest is provided", func() {
 							It("passes through the command line flags", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
@@ -967,6 +973,20 @@ var _ = Describe("push Command", func() {
 				_, commandLineSettingsErr := cmd.GetCommandLineSettings()
 				Expect(commandLineSettingsErr).To(MatchError(expectedErr))
 			},
+
+			Entry("--droplet and --docker-username",
+				func() {
+					cmd.DropletPath = "some-droplet-path"
+					cmd.DockerUsername = "some-docker-username"
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--droplet", "--docker-username", "-p"}}),
+
+			Entry("--droplet and --docker-image",
+				func() {
+					cmd.DropletPath = "some-droplet-path"
+					cmd.DockerImage.Path = "some-docker-image"
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--droplet", "--docker-image", "-o"}}),
 
 			Entry("-o and -p",
 				func() {

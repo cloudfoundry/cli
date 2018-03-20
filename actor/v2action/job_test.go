@@ -107,6 +107,71 @@ var _ = Describe("Job Actions", func() {
 		})
 	})
 
+	FDescribe("UploadDroplet", func() {
+		var (
+			srcDir string
+
+			appGUID       string
+			droplet       io.Reader
+			dropletLength int64
+
+			job        Job
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			// var err error
+			// srcDir, err = ioutil.TempDir("", "upload-src-dir")
+			// Expect(err).ToNot(HaveOccurred())
+			//
+			// subDir := filepath.Join(srcDir, "level1", "level2")
+			// err = os.MkdirAll(subDir, 0777)
+			// Expect(err).ToNot(HaveOccurred())
+			//
+			// err = ioutil.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0600)
+			// Expect(err).ToNot(HaveOccurred())
+			//
+			// err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0600)
+			// Expect(err).ToNot(HaveOccurred())
+			//
+			// err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0600)
+			// Expect(err).ToNot(HaveOccurred())
+			//
+			appGUID = "some-app-guid"
+			someString := "who reads these days"
+
+			droplet = strings.NewReader(someString)
+			dropletLength = int64(len([]byte(someString)))
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(srcDir)).NotTo(HaveOccurred())
+		})
+
+		JustBeforeEach(func() {
+			job, warnings, executeErr = actor.UploadDroplet(appGUID, droplet, dropletLength)
+		})
+
+		Context("when the upload is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UploadDropletReturns(ccv2.Job{GUID: "some-job-guid"}, ccv2.Warnings{"upload-droplet-warning-1", "upload-droplet-warning-2"}, nil)
+			})
+
+			It("returns all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("upload-droplet-warning-1", "upload-droplet-warning-2"))
+				Expect(job).To(Equal(Job{GUID: "some-job-guid"}))
+
+				Expect(fakeCloudControllerClient.UploadApplicationPackageCallCount()).To(Equal(1))
+				passedAppGUID, passedDroplet, passedDropletLength := fakeCloudControllerClient.UploadDropletArgsForCall(0)
+				Expect(passedAppGUID).To(Equal(appGUID))
+				Expect(passedDroplet).To(Equal(droplet))
+				Expect(passedDropletLength).To(Equal(dropletLength))
+			})
+		})
+
+	})
 	Describe("PollJob", func() {
 		var (
 			job        Job

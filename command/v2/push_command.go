@@ -42,6 +42,7 @@ type V2PushCommand struct {
 	Domain              string                      `short:"d" description:"Domain (e.g. example.com)"`
 	DockerImage         flag.DockerImage            `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
 	DockerUsername      string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
+	DropletPath         flag.PathWithExistenceCheck `long:"droplet" description:"Path to a tgz file with a pre-staged app"`
 	PathToManifest      flag.PathWithExistenceCheck `short:"f" description:"Path to manifest"`
 	HealthCheckType     flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"`
 	Hostname            string                      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
@@ -235,6 +236,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 		DockerImage:          cmd.DockerImage.Path,     // -o
 		DockerPassword:       dockerPassword,           // ENV - CF_DOCKER_PASSWORD
 		DockerUsername:       cmd.DockerUsername,       // --docker-username
+		DropletPath:          string(cmd.DropletPath),  // --droplet
 		HealthCheckTimeout:   cmd.HealthCheckTimeout,   // -t
 		HealthCheckType:      cmd.HealthCheckType.Type, // -u/--health-check-type
 		Instances:            cmd.Instances.NullInt,    // -i
@@ -418,6 +420,16 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 
 func (cmd V2PushCommand) validateArgs() error {
 	switch {
+	case cmd.DropletPath != "" && cmd.DockerImage.Path != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--droplet", "--docker-image", "-o"},
+		}
+	// ArgumentCombinationError trumps RequiredArgsError in this case (when
+	// DockerImage unspecified)
+	case cmd.DropletPath != "" && cmd.DockerUsername != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--droplet", "--docker-username", "-p"},
+		}
 	case cmd.DockerImage.Path != "" && cmd.AppPath != "":
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--docker-image, -o", "-p"},

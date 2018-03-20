@@ -15,6 +15,7 @@ type Application struct {
 	DockerPassword string
 	DockerUsername string
 	Domain         string
+	DropletPath    string
 	// EnvironmentVariables can be any valid json type (ie, strings not
 	// guaranteed, although CLI only ships strings).
 	EnvironmentVariables    map[string]string
@@ -45,7 +46,7 @@ type Application struct {
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Hostname: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-Hostname: %t, No-Route: %t, Path: '%s', RandomRoute: %t, RoutePath: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Droplet Path: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Hostname: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-Hostname: %t, No-Route: %t, Path: '%s', RandomRoute: %t, RoutePath: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
 		app.Name,
 		app.Buildpack.IsSet,
 		app.Buildpack.Value,
@@ -53,6 +54,7 @@ func (app Application) String() string {
 		app.Command.Value,
 		app.DiskQuota,
 		app.DockerImage,
+		app.DropletPath,
 		app.HealthCheckHTTPEndpoint,
 		app.HealthCheckTimeout,
 		app.HealthCheckType,
@@ -76,6 +78,7 @@ func (app Application) MarshalYAML() (interface{}, error) {
 		Buildpack:               app.Buildpack.Value,
 		Command:                 app.Command.Value,
 		Docker:                  rawDockerInfo{Image: app.DockerImage, Username: app.DockerUsername},
+		DropletPath:             app.DropletPath,
 		EnvironmentVariables:    app.EnvironmentVariables,
 		HealthCheckHTTPEndpoint: app.HealthCheckHTTPEndpoint,
 		HealthCheckType:         app.HealthCheckType,
@@ -114,6 +117,7 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	app.DeprecatedNoHostname = m.DeprecatedNoHostname
 	app.DockerImage = m.Docker.Image
 	app.DockerUsername = m.Docker.Username
+	app.DropletPath = m.DropletPath
 	app.HealthCheckHTTPEndpoint = m.HealthCheckHTTPEndpoint
 	app.HealthCheckType = m.HealthCheckType
 	app.Name = m.Name

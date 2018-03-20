@@ -109,3 +109,19 @@ func (actor Actor) UploadPackageWithArchive(config ApplicationConfig, archivePat
 
 	return allWarnings, err
 }
+
+// WIP - is it necessary to pass in something analogous to archivePath here? What to pass into progressBarWrapper?
+func (actor Actor) UploadDroplet(config ApplicationConfig, progressBar ProgressBar, eventStream chan<- Event) (Warnings, error) {
+	log.Info("uploading droplet")
+	// eventStream <- UploadingDroplet
+	// droplet := progressbar.NewProgressBarWrapper(archive, archiveInfo.Size())
+
+	job, warnings, err := actor.V2Actor.UploadDroplet(config.DesiredApplication.GUID, nil, 0)
+	if err != nil {
+		return Warnings(warnings), err
+	}
+
+	// eventStream <- UploadDropletComplete
+	pollWarnings, err := actor.V2Actor.PollJob(job)
+	return append(Warnings(warnings), pollWarnings...), err
+}

@@ -2,6 +2,7 @@
 package v2actionfakes
 
 import (
+	"io"
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -860,6 +861,23 @@ type FakeCloudControllerClient struct {
 		result3 error
 	}
 	uploadApplicationPackageReturnsOnCall map[int]struct {
+		result1 ccv2.Job
+		result2 ccv2.Warnings
+		result3 error
+	}
+	UploadDropletStub        func(appGUID string, droplet io.Reader, dropletLength int64) (ccv2.Job, ccv2.Warnings, error)
+	uploadDropletMutex       sync.RWMutex
+	uploadDropletArgsForCall []struct {
+		appGUID       string
+		droplet       io.Reader
+		dropletLength int64
+	}
+	uploadDropletReturns struct {
+		result1 ccv2.Job
+		result2 ccv2.Warnings
+		result3 error
+	}
+	uploadDropletReturnsOnCall map[int]struct {
 		result1 ccv2.Job
 		result2 ccv2.Warnings
 		result3 error
@@ -4004,6 +4022,62 @@ func (fake *FakeCloudControllerClient) UploadApplicationPackageReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UploadDroplet(appGUID string, droplet io.Reader, dropletLength int64) (ccv2.Job, ccv2.Warnings, error) {
+	fake.uploadDropletMutex.Lock()
+	ret, specificReturn := fake.uploadDropletReturnsOnCall[len(fake.uploadDropletArgsForCall)]
+	fake.uploadDropletArgsForCall = append(fake.uploadDropletArgsForCall, struct {
+		appGUID       string
+		droplet       io.Reader
+		dropletLength int64
+	}{appGUID, droplet, dropletLength})
+	fake.recordInvocation("UploadDroplet", []interface{}{appGUID, droplet, dropletLength})
+	fake.uploadDropletMutex.Unlock()
+	if fake.UploadDropletStub != nil {
+		return fake.UploadDropletStub(appGUID, droplet, dropletLength)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.uploadDropletReturns.result1, fake.uploadDropletReturns.result2, fake.uploadDropletReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UploadDropletCallCount() int {
+	fake.uploadDropletMutex.RLock()
+	defer fake.uploadDropletMutex.RUnlock()
+	return len(fake.uploadDropletArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UploadDropletArgsForCall(i int) (string, io.Reader, int64) {
+	fake.uploadDropletMutex.RLock()
+	defer fake.uploadDropletMutex.RUnlock()
+	return fake.uploadDropletArgsForCall[i].appGUID, fake.uploadDropletArgsForCall[i].droplet, fake.uploadDropletArgsForCall[i].dropletLength
+}
+
+func (fake *FakeCloudControllerClient) UploadDropletReturns(result1 ccv2.Job, result2 ccv2.Warnings, result3 error) {
+	fake.UploadDropletStub = nil
+	fake.uploadDropletReturns = struct {
+		result1 ccv2.Job
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UploadDropletReturnsOnCall(i int, result1 ccv2.Job, result2 ccv2.Warnings, result3 error) {
+	fake.UploadDropletStub = nil
+	if fake.uploadDropletReturnsOnCall == nil {
+		fake.uploadDropletReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Job
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.uploadDropletReturnsOnCall[i] = struct {
+		result1 ccv2.Job
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) API() string {
 	fake.aPIMutex.Lock()
 	ret, specificReturn := fake.aPIReturnsOnCall[len(fake.aPIArgsForCall)]
@@ -4401,6 +4475,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateSecurityGroupStagingSpaceMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()
 	defer fake.uploadApplicationPackageMutex.RUnlock()
+	fake.uploadDropletMutex.RLock()
+	defer fake.uploadDropletMutex.RUnlock()
 	fake.aPIMutex.RLock()
 	defer fake.aPIMutex.RUnlock()
 	fake.aPIVersionMutex.RLock()

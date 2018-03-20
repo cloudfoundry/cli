@@ -16,6 +16,8 @@ const (
 	ResourceMatching                Event = "resource matching"
 	UploadingApplication            Event = "uploading application"
 	UploadingApplicationWithArchive Event = "uploading application with archive"
+	UploadingDroplet                Event = "uploading droplet"
+	UploadingDropletComplete        Event = "uploading droplet complete"
 	UploadWithArchiveComplete       Event = "upload complete"
 	RetryUpload                     Event = "retry upload"
 	Complete                        Event = "complete"

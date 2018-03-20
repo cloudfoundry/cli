@@ -11,6 +11,7 @@ type rawManifestApplication struct {
 	DeprecatedNoHostname    interface{}        `yaml:"no-hostname,omitempty"`
 	DiskQuota               string             `yaml:"disk_quota,omitempty"`
 	Docker                  rawDockerInfo      `yaml:"docker,omitempty"`
+	DropletPath             string             `yaml:"droplet-path,omitempty"`
 	EnvironmentVariables    map[string]string  `yaml:"env,omitempty"`
 	HealthCheckHTTPEndpoint string             `yaml:"health-check-http-endpoint,omitempty"`
 	HealthCheckType         string             `yaml:"health-check-type,omitempty"`

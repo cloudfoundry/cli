@@ -68,7 +68,6 @@ var _ = Describe("Apply", func() {
 					SpaceGUID: "some-space-guid",
 				}},
 			DesiredRoutes: []v2action.Route{{Host: "banana"}},
-			Path:          "some-path",
 		}
 		fakeProgressBar = new(pushactionfakes.FakeProgressBar)
 	})
@@ -141,6 +140,9 @@ var _ = Describe("Apply", func() {
 					})
 
 					Context("when resource matching happens", func() {
+						BeforeEach(func() {
+							config.Path = "some-path"
+						})
 						JustBeforeEach(func() {
 							Eventually(eventStream).Should(Receive(Equal(ResourceMatching)))
 							Eventually(warningsStream).Should(Receive(ConsistOf("resource-warnings-1", "resource-warnings-2")))
@@ -316,6 +318,54 @@ var _ = Describe("Apply", func() {
 							Eventually(eventStream).Should(Receive(Equal(Complete)))
 
 							Expect(fakeSharedActor.ZipDirectoryResourcesCallCount()).To(Equal(0))
+						})
+					})
+
+					Context("when a droplet is provided", func() {
+						BeforeEach(func() {
+							config.DropletPath = "some-droplet-path"
+						})
+						JustBeforeEach(func() {
+							Eventually(eventStream).Should(Receive(Equal(UploadingDroplet)))
+							Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+						})
+						Context("when the upload is successful", func() {
+							BeforeEach(func() {
+								fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, nil)
+							})
+
+							It("skips archiving and sends the updated config and a complete event", func() {
+								Eventually(configStream).Should(Receive(Equal(ApplicationConfig{
+									CurrentApplication: Application{Application: createdApp},
+									CurrentRoutes:      createdRoutes,
+									CurrentServices:    desiredServices,
+									DesiredApplication: Application{Application: createdApp},
+									DesiredRoutes:      createdRoutes,
+									DesiredServices:    desiredServices,
+									DropletPath:        "some-droplet-path",
+								})))
+								Eventually(eventStream).Should(Receive(Equal(Complete)))
+
+								Expect(fakeV2Actor.UploadDropletCallCount()).To(Equal(1))
+								_, droplet, dropletLength := fakeV2Actor.UploadDropletArgsForCall(0)
+								Expect(droplet).To(BeNil())
+								Expect(dropletLength).To(BeNumerically("==", 0))
+								Expect(fakeSharedActor.ZipDirectoryResourcesCallCount()).To(Equal(0))
+							})
+						})
+
+						Context("when the upload errors", func() {
+							var expectedErr error
+
+							BeforeEach(func() {
+								expectedErr = errors.New("dios mio")
+								fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, expectedErr)
+							})
+
+							It("sends warnings and errors, then stops", func() {
+								Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+								Consistently(eventStream).ShouldNot(Receive())
+							})
 						})
 					})
 				})

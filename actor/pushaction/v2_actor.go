@@ -27,4 +27,5 @@ type V2Actor interface {
 	UnmapRouteFromApplication(routeGUID string, appGUID string) (v2action.Warnings, error)
 	UpdateApplication(application v2action.Application) (v2action.Application, v2action.Warnings, error)
 	UploadApplicationPackage(appGUID string, existingResources []v2action.Resource, newResources io.Reader, newResourcesLength int64) (v2action.Job, v2action.Warnings, error)
+	UploadDroplet(appGUID string, droplet io.Reader, dropletLength int64) (v2action.Job, v2action.Warnings, error)
 }

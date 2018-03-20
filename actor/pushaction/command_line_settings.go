@@ -17,6 +17,7 @@ type CommandLineSettings struct {
 	DockerImage          string
 	DockerPassword       string
 	DockerUsername       string
+	DropletPath          string
 	HealthCheckTimeout   int
 	HealthCheckType      string
 	Instances            types.NullInt
@@ -94,6 +95,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 	if settings.ProvidedAppPath != "" {
 		app.Path = settings.ProvidedAppPath
 	}
+
 	if app.Path == "" && app.DockerImage == "" {
 		app.Path = settings.CurrentDirectory
 	}
@@ -115,7 +117,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 
 func (settings CommandLineSettings) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack: (%t, '%s'), Command: (%t, '%s'), CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: (%t, '%d'), Memory: '%d', Provided App Path: '%s', Stack: '%s', RoutePath: '%s', Domain: '%s', Hostname: '%s'",
+		"App Name: '%s', Buildpack: (%t, '%s'), Command: (%t, '%s'), CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Droplet: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: (%t, '%d'), Memory: '%d', Provided App Path: '%s', Stack: '%s', RoutePath: '%s', Domain: '%s', Hostname: '%s'",
 		settings.Name,
 		settings.Buildpack.IsSet,
 		settings.Buildpack.Value,
@@ -124,6 +126,7 @@ func (settings CommandLineSettings) String() string {
 		settings.CurrentDirectory,
 		settings.DiskQuota,
 		settings.DockerImage,
+		settings.DropletPath,
 		settings.HealthCheckTimeout,
 		settings.HealthCheckType,
 		settings.Instances.IsSet,

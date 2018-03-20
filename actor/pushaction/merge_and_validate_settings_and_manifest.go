@@ -100,6 +100,7 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 			settings.DiskQuota != 0,
 			settings.DockerImage != "",
 			settings.DockerUsername != "",
+			settings.DropletPath != "",
 			settings.HealthCheckTimeout != 0,
 			settings.HealthCheckType != "",
 			settings.Instances.IsSet,
@@ -169,7 +170,7 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			}
 		}
 
-		if app.DockerImage == "" {
+		if app.DockerImage == "" && app.DropletPath == "" {
 			_, err := os.Stat(app.Path)
 			if os.IsNotExist(err) {
 				log.WithField("path", app.Path).Error("app path does not exist")

@@ -27,6 +27,7 @@ type ApplicationConfig struct {
 	UnmatchedResources []v2action.Resource
 	Archive            bool
 	Path               string
+	DropletPath        string
 
 	TargetedSpaceGUID string
 }
@@ -45,15 +46,32 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 
 	log.Infof("iterating through %d app configuration(s)", len(apps))
 	for _, app := range apps {
-		absPath, err := filepath.EvalSymlinks(app.Path)
-		if err != nil {
-			return nil, nil, err
-		}
 
-		config := ApplicationConfig{
-			TargetedSpaceGUID: spaceGUID,
-			Path:              absPath,
-			NoRoute:           app.NoRoute,
+		var (
+			config  ApplicationConfig
+			absPath string
+			err     error
+		)
+		if app.DropletPath != "" {
+			absPath, err = filepath.EvalSymlinks(app.DropletPath)
+			if err != nil {
+				return nil, nil, err
+			}
+			config = ApplicationConfig{
+				TargetedSpaceGUID: spaceGUID,
+				DropletPath:       absPath,
+				NoRoute:           app.NoRoute,
+			}
+		} else {
+			absPath, err = filepath.EvalSymlinks(app.Path)
+			if err != nil {
+				return nil, nil, err
+			}
+			config = ApplicationConfig{
+				TargetedSpaceGUID: spaceGUID,
+				Path:              absPath,
+				NoRoute:           app.NoRoute,
+			}
 		}
 
 		log.Infoln("searching for app", app.Name)
@@ -104,7 +122,7 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 			}
 		}
 
-		if app.DockerImage == "" {
+		if app.DockerImage == "" && app.DropletPath == "" {
 			config, err = actor.configureResources(config)
 			if err != nil {
 				log.Errorln("configuring resources", err)

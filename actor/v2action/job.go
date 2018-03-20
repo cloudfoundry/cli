@@ -17,3 +17,8 @@ func (actor Actor) UploadApplicationPackage(appGUID string, existingResources []
 	job, warnings, err := actor.CloudControllerClient.UploadApplicationPackage(appGUID, actor.actorToCCResources(existingResources), newResources, newResourcesLength)
 	return Job(job), Warnings(warnings), err
 }
+
+func (actor Actor) UploadDroplet(appGUID string, droplet io.Reader, dropletLength int64) (Job, Warnings, error) {
+	job, warnings, err := actor.CloudControllerClient.UploadDroplet(appGUID, droplet, dropletLength)
+	return Job(job), Warnings(warnings), err
+}
