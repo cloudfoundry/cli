@@ -45,5 +45,24 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				Path: "/does-not-exist",
 			}},
 			actionerror.NonexistentAppPathError{Path: "/does-not-exist"}),
+
+		Entry("no NonexistentAppPathError if docker image provided via command line",
+			CommandLineSettings{
+				Name:        "some-name",
+				DockerImage: "some-docker-image",
+			}, nil, nil),
+
+		Entry("no NonexistentAppPathError if docker image provided via manifest",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:        "some-name",
+				DockerImage: "some-docker-image",
+			}}, nil),
+
+		Entry("no NonexistentAppPathError if droplet path provided via command line",
+			CommandLineSettings{
+				Name:        "some-name",
+				DropletPath: "some-droplet-path",
+			}, nil, nil),
 	)
 })
