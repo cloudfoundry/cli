@@ -982,6 +982,13 @@ var _ = Describe("push Command", func() {
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"--droplet", "--docker-image", "-o"}}),
 
+			Entry("--droplet and -p",
+				func() {
+					cmd.DropletPath = "some-droplet-path"
+					cmd.AppPath = "some-directory-path"
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--droplet", "-p"}}),
+
 			Entry("-o and -p",
 				func() {
 					cmd.DockerImage.Path = "some-docker-image"

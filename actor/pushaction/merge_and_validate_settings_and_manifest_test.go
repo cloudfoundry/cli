@@ -296,7 +296,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			nil),
 	)
 
-	DescribeTable("validation errors",
+	DescribeTable("command line settings and manifest combination validation errors",
 		func(settings CommandLineSettings, apps []manifest.Application, expectedErr error) {
 			currentDirectory, err := os.Getwd()
 			Expect(err).ToNot(HaveOccurred())
@@ -426,48 +426,18 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			manifestWithMultipleApps,
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 
-		Entry("DockerPasswordNotSetError",
+		Entry("PropertyCombinationError",
 			CommandLineSettings{},
 			[]manifest.Application{{
-				Name:           "some-name-1",
-				DockerImage:    "some-image",
-				DockerUsername: "some-username",
+				Name:    "some-name-1",
+				Routes:  []string{"some-route"},
+				NoRoute: true,
+				Path:    RealPath,
 			}},
-			actionerror.DockerPasswordNotSetError{}),
-
-		Entry("InvalidRoute",
-			CommandLineSettings{},
-			[]manifest.Application{{
-				Name:   "some-name-1",
-				Path:   RealPath,
-				Routes: []string{"http:/www.hardknox.com"},
-			}},
-			actionerror.InvalidRouteError{Route: "http:/www.hardknox.com"}),
-
-		Entry("InvalidRoute",
-			CommandLineSettings{},
-			[]manifest.Application{{
-				Name:   "some-name-1",
-				Path:   RealPath,
-				Routes: []string{"I R ROUTE"},
-			}},
-			actionerror.InvalidRouteError{Route: "I R ROUTE"}),
-
-		Entry("InvalidRoute",
-			CommandLineSettings{},
-			[]manifest.Application{{
-				Name:   "some-name-1",
-				Path:   RealPath,
-				Routes: []string{"potato"},
-			}},
-			actionerror.InvalidRouteError{Route: "potato"}),
-
-		// NonexistentAppPathError found in
-		// merge_and_validate_settings_and_manifest_unix_test.go and
-		// merge_and_validate_settings_and_manifest_windows_test.go
-
-		Entry("MissingNameError", CommandLineSettings{}, nil, actionerror.MissingNameError{}),
-		Entry("MissingNameError", CommandLineSettings{}, []manifest.Application{{}}, actionerror.MissingNameError{}),
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"no-route", "routes"},
+			}),
 
 		Entry("TriggerLegacyPushError",
 			CommandLineSettings{},
@@ -494,20 +464,6 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			[]manifest.Application{{DeprecatedNoHostname: true}},
 			actionerror.TriggerLegacyPushError{DomainHostRelated: []string{"no-hostname"}}),
 
-		// The following are premerge PropertyCombinationErrors
-		Entry("PropertyCombinationError",
-			CommandLineSettings{},
-			[]manifest.Application{{
-				Name:    "some-name-1",
-				Routes:  []string{"some-route"},
-				NoRoute: true,
-				Path:    RealPath,
-			}},
-			actionerror.PropertyCombinationError{
-				AppName:    "some-name-1",
-				Properties: []string{"no-route", "routes"},
-			}),
-		// These represent manifest/commandline conflict errors
 		Entry("CommmandLineOptionsAndManifestConflictError",
 			CommandLineSettings{
 				DefaultRouteDomain: "some-domain",
@@ -556,8 +512,94 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				CommandLineOptions: []string{"-d", "--hostname", "-n", "--no-hostname", "--route-path"},
 			},
 		),
+	)
 
-		// The following are postmerge PropertyCombinationErrors
+	DescribeTable("post merge validation errors",
+		func(settings CommandLineSettings, apps []manifest.Application, expectedErr error) {
+			currentDirectory, err := os.Getwd()
+			Expect(err).ToNot(HaveOccurred())
+
+			if settings.ProvidedAppPath == RealPath {
+				settings.ProvidedAppPath = currentDirectory
+			}
+
+			for i, app := range apps {
+				if app.Path == RealPath {
+					apps[i].Path = currentDirectory
+				}
+			}
+
+			_, err = actor.MergeAndValidateSettingsAndManifests(settings, apps)
+			Expect(err).To(MatchError(expectedErr))
+		},
+
+		Entry("MissingNameError", CommandLineSettings{}, nil, actionerror.MissingNameError{}),
+		Entry("MissingNameError", CommandLineSettings{}, []manifest.Application{{}}, actionerror.MissingNameError{}),
+
+		Entry("InvalidRoute",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:   "some-name-1",
+				Path:   RealPath,
+				Routes: []string{"http:/www.hardknox.com"},
+			}},
+			actionerror.InvalidRouteError{Route: "http:/www.hardknox.com"}),
+
+		Entry("InvalidRoute",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:   "some-name-1",
+				Path:   RealPath,
+				Routes: []string{"I R ROUTE"},
+			}},
+			actionerror.InvalidRouteError{Route: "I R ROUTE"}),
+
+		Entry("InvalidRoute",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:   "some-name-1",
+				Path:   RealPath,
+				Routes: []string{"potato"},
+			}},
+			actionerror.InvalidRouteError{Route: "potato"}),
+
+		Entry("DockerPasswordNotSetError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:           "some-name-1",
+				DockerImage:    "some-image",
+				DockerUsername: "some-username",
+			}},
+			actionerror.DockerPasswordNotSetError{}),
+
+		// NonexistentAppPathError found in
+		// merge_and_validate_settings_and_manifest_unix_test.go and
+		// merge_and_validate_settings_and_manifest_windows_test.go
+
+		Entry("PropertyCombinationError",
+			CommandLineSettings{
+				DropletPath: "some-droplet",
+			},
+			[]manifest.Application{{
+				Name:        "some-name-1",
+				DockerImage: "some-image",
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"docker", "droplet"},
+			}),
+		Entry("PropertyCombinationError",
+			CommandLineSettings{
+				DropletPath: "some-droplet",
+			},
+			[]manifest.Application{{
+				Name: "some-name-1",
+				Path: "some-path",
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"droplet", "path"},
+			}),
 		Entry("PropertyCombinationError",
 			CommandLineSettings{},
 			[]manifest.Application{{

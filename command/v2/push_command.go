@@ -428,6 +428,10 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 
 func (cmd V2PushCommand) validateArgs() error {
 	switch {
+	case cmd.DropletPath != "" && cmd.AppPath != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--droplet", "-p"},
+		}
 	case cmd.DropletPath != "" && cmd.DockerImage.Path != "":
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--droplet", "--docker-image", "-o"},

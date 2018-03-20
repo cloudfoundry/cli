@@ -23,6 +23,26 @@ var _ = Describe("push flag combination errors", func() {
 		Entry("docker image", "Incorrect Usage: The following arguments cannot be used together: --docker-image, -o, -p", "-o", "some-image"),
 	)
 
+	Describe("droplet and", func() {
+		Describe("path", func() {
+			It("displays an error", func() {
+				appName := helpers.NewAppName()
+				session := helpers.CF(PushCommandName, appName, "--no-start", "-p", realDir, "--droplet", realDir)
+				Eventually(session.Err).Should(Say("The following arguments cannot be used together: --droplet, -p"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Describe("docker image", func() {
+			It("displays an error", func() {
+				appName := helpers.NewAppName()
+				session := helpers.CF(PushCommandName, appName, "--no-start", "--droplet", realDir, "--docker-image", "some-image")
+				Eventually(session.Err).Should(Say("The following arguments cannot be used together: --droplet, --docker-image, -o"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+	})
+
 	DescribeTable("everything else",
 		func(expectedError string, flags ...string) {
 			appName := helpers.NewAppName()
@@ -41,6 +61,6 @@ var _ = Describe("push flag combination errors", func() {
 		Entry("random-route and no-route", "The following arguments cannot be used together: --no-route, --random-route", "--no-route", "--random-route"),
 		Entry("random-route and route path", "The following arguments cannot be used together: --random-route, --route-path", "--random-route", "--route-path", "some-route-path"),
 		Entry("docker-username without image", "Incorrect Usage: '--docker-image, -o' and '--docker-username' must be used together.", "--docker-username", "some-user"),
-		Entry("docker-image and buildpack", "Incorrect Usage: The following arguments cannot be used together: -b, --docker-image, -o", "-o", "some-image", "-b", "some-buidpack"),
+		Entry("docker-image and buildpack", "The following arguments cannot be used together: -b, --docker-image, -o", "-o", "some-image", "-b", "some-buidpack"),
 	)
 })

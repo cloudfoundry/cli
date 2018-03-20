@@ -10,28 +10,27 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error) {
+func (actor Actor) MergeAndValidateSettingsAndManifests(cmdLineSettings CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error) {
 	var mergedApps []manifest.Application
 
 	if len(apps) == 0 {
 		log.Info("no manifest, generating one from command line settings")
-		mergedApps = append(mergedApps, settings.OverrideManifestSettings(manifest.Application{}))
+		mergedApps = append(mergedApps, cmdLineSettings.OverrideManifestSettings(manifest.Application{}))
 	} else {
-		if settings.Name != "" && len(apps) > 1 {
+		if cmdLineSettings.Name != "" && len(apps) > 1 {
 			var err error
-			apps, err = actor.selectApp(settings.Name, apps)
+			apps, err = actor.selectApp(cmdLineSettings.Name, apps)
 			if err != nil {
 				return nil, err
 			}
 		}
-
-		err := actor.validatePremergedSettings(settings, apps)
+		err := actor.validateCommandLineSettingsAndManifestCombinations(cmdLineSettings, apps)
 		if err != nil {
 			return nil, err
 		}
 
 		for _, app := range apps {
-			mergedApps = append(mergedApps, settings.OverrideManifestSettings(app))
+			mergedApps = append(mergedApps, cmdLineSettings.OverrideManifestSettings(app))
 		}
 	}
 
@@ -89,28 +88,28 @@ func (Actor) sanitizeAppPath(apps []manifest.Application) ([]manifest.Applicatio
 	return apps, nil
 }
 
-func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []manifest.Application) error {
+func (Actor) validateCommandLineSettingsAndManifestCombinations(cmdLineSettings CommandLineSettings, apps []manifest.Application) error {
 	if len(apps) > 1 {
 		switch {
 		case
-			settings.Buildpack.IsSet,
-			settings.Command.IsSet,
-			settings.DefaultRouteDomain != "",
-			settings.DefaultRouteHostname != "",
-			settings.DiskQuota != 0,
-			settings.DockerImage != "",
-			settings.DockerUsername != "",
-			settings.DropletPath != "",
-			settings.HealthCheckTimeout != 0,
-			settings.HealthCheckType != "",
-			settings.Instances.IsSet,
-			settings.Memory != 0,
-			settings.NoHostname,
-			settings.NoRoute,
-			settings.ProvidedAppPath != "",
-			settings.RandomRoute,
-			settings.RoutePath != "",
-			settings.StackName != "":
+			cmdLineSettings.Buildpack.IsSet,
+			cmdLineSettings.Command.IsSet,
+			cmdLineSettings.DefaultRouteDomain != "",
+			cmdLineSettings.DefaultRouteHostname != "",
+			cmdLineSettings.DiskQuota != 0,
+			cmdLineSettings.DockerImage != "",
+			cmdLineSettings.DockerUsername != "",
+			cmdLineSettings.DropletPath != "",
+			cmdLineSettings.HealthCheckTimeout != 0,
+			cmdLineSettings.HealthCheckType != "",
+			cmdLineSettings.Instances.IsSet,
+			cmdLineSettings.Memory != 0,
+			cmdLineSettings.NoHostname,
+			cmdLineSettings.NoRoute,
+			cmdLineSettings.ProvidedAppPath != "",
+			cmdLineSettings.RandomRoute,
+			cmdLineSettings.RoutePath != "",
+			cmdLineSettings.StackName != "":
 			log.Error("cannot use some parameters with multiple apps")
 			return actionerror.CommandLineOptionsWithMultipleAppsError{}
 		}
@@ -143,10 +142,10 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 				ManifestAttribute:  "route",
 				CommandLineOptions: []string{"-d", "--hostname", "-n", "--no-hostname", "--route-path"},
 			}
-			if settings.DefaultRouteDomain != "" ||
-				settings.DefaultRouteHostname != "" ||
-				settings.NoHostname != false ||
-				settings.RoutePath != "" {
+			if cmdLineSettings.DefaultRouteDomain != "" ||
+				cmdLineSettings.DefaultRouteHostname != "" ||
+				cmdLineSettings.NoHostname != false ||
+				cmdLineSettings.RoutePath != "" {
 				return commandLineOptionsAndManifestConflictErr
 			}
 		}
@@ -170,13 +169,7 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			}
 		}
 
-		if app.DockerImage == "" && app.DropletPath == "" {
-			_, err := os.Stat(app.Path)
-			if os.IsNotExist(err) {
-				log.WithField("path", app.Path).Error("app path does not exist")
-				return actionerror.NonexistentAppPathError{Path: app.Path}
-			}
-		} else {
+		if app.DockerImage != "" {
 			if app.DockerUsername != "" && app.DockerPassword == "" {
 				log.WithField("app", app.Name).Error("no docker password found")
 				return actionerror.DockerPasswordNotSetError{}
@@ -186,6 +179,21 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			}
 			if app.Path != "" {
 				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "path"}}
+			}
+			if app.DropletPath != "" {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "droplet"}}
+			}
+		}
+
+		if app.DropletPath != "" && app.Path != "" {
+			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "path"}}
+		}
+
+		if app.DockerImage == "" && app.DropletPath == "" {
+			_, err := os.Stat(app.Path)
+			if os.IsNotExist(err) {
+				log.WithField("path", app.Path).Error("app path does not exist")
+				return actionerror.NonexistentAppPathError{Path: app.Path}
 			}
 		}
 
