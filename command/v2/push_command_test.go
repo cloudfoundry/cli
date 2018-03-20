@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -113,6 +114,21 @@ var _ = Describe("push Command", func() {
 						},
 					}
 					fakeActor.MergeAndValidateSettingsAndManifestsReturns(appManifests, nil)
+				})
+
+				Context("when the droplet flag is passed and the API version is below the minimum", func() {
+					BeforeEach(func() {
+						fakeActor.CloudControllerAPIVersionReturns("2.6.1")
+						cmd.DropletPath = "some-droplet-path"
+					})
+
+					It("returns a MinimumAPIVersionNotMetError", func() {
+						Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+							Command:        "Option '--droplet'",
+							CurrentVersion: "2.6.1",
+							MinimumVersion: ccversion.MinVersionDropletUploadV2,
+						}))
+					})
 				})
 
 				Context("when the settings can be converted to a valid config", func() {

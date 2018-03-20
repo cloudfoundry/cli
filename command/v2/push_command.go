@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -30,6 +31,7 @@ type ProgressBar interface {
 
 type V2PushActor interface {
 	Apply(config pushaction.ApplicationConfig, progressBar pushaction.ProgressBar) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
+	CloudControllerAPIVersion() string
 	ConvertToApplicationConfigs(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	MergeAndValidateSettingsAndManifests(cmdSettings pushaction.CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error)
 	ReadManifest(pathToManifest string) ([]manifest.Application, error)
@@ -95,7 +97,6 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V2PushCommand) Execute(args []string) error {
-	// cmd.UI.DisplayWarning(command.ExperimentalWarning)
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -110,6 +111,11 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	cliSettings, err := cmd.GetCommandLineSettings()
 	if err != nil {
 		log.Errorln("reading flags:", err)
+		return err
+	}
+
+	ccVersion := cmd.Actor.CloudControllerAPIVersion()
+	if err = command.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionDropletUploadV2, "Option '--droplet'"); cmd.DropletPath != "" && err != nil {
 		return err
 	}
 

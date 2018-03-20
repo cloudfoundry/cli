@@ -1,6 +1,7 @@
 package ccversion
 
 const (
+	MinVersionDropletUploadV2           = "2.63.0"
 	MinVersionLifecyleStagingV2         = "2.68.0"
 	MinVersionHTTPEndpointHealthCheckV2 = "2.68.0"
 	MinVersionProcessHealthCheckV2      = "2.47.0"
