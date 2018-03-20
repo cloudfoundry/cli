@@ -165,6 +165,13 @@ jobs:
   - aggregate:
     - get: cf-deployment-concourse-tasks
     - get: state
+  - task: bosh-cleanup
+    file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
+    input_mapping:
+      bbl-state: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/((stack-name))
+      CLEAN_ALL: true
   - task: destroy-infrastructure
     file: cf-deployment-concourse-tasks/bbl-destroy/task.yml
     input_mapping:
