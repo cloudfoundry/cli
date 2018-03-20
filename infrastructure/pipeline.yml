@@ -21,7 +21,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks
-    tag_filter: v*
+    tag_filter: v6.*
 - name: cli-ci
   type: git
   source:
@@ -32,12 +32,12 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment
-    tag_filter: v*
+    tag_filter: v1.*
 - name: ops-files
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment
-    tag_filter: v*
+    tag_filter: v1.*
 - name: state
   type: git
   source:
@@ -68,8 +68,8 @@ jobs:
   - task: setup-infrastructure
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
     input_mapping:
-      ops-files: state
-      env-repo: state
+      bbl-config: state
+      bbl-state: state
     params:
       BBL_IAAS: gcp
       BBL_GCP_SERVICE_ACCOUNT_KEY: ((google-account-creds))
@@ -84,7 +84,7 @@ jobs:
     ensure:
       put: state
       params:
-        repository: updated-env-repo
+        repository: updated-bbl-state
         rebase: true
 
 - name: deploy-cf
@@ -103,7 +103,7 @@ jobs:
   - task: upload-stemcell
     file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
     input_mapping:
-      env-repo: state
+      bbl-state: state
     params:
       INFRASTRUCTURE: google
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
@@ -121,7 +121,7 @@ jobs:
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
-      env-repo: state
+      bbl-state: state
       vars-store: cf-state
       vars-files: vars_path
       ops-files: combine_inputs_output
@@ -139,7 +139,7 @@ jobs:
   - task: bosh-cleanup
     file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
     input_mapping:
-      env-repo: state
+      bbl-state: state
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
       CLEAN_ALL: true
@@ -154,7 +154,7 @@ jobs:
   - task: delete-cf-deployment
     file: cf-deployment-concourse-tasks/bosh-delete-deployment/task.yml
     input_mapping:
-      env-repo: state
+      bbl-state: state
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
 
@@ -168,11 +168,12 @@ jobs:
   - task: destroy-infrastructure
     file: cf-deployment-concourse-tasks/bbl-destroy/task.yml
     input_mapping:
-      env-repo: state
+      bbl-state: state
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
+      BBL_GCP_SERVICE_ACCOUNT_KEY: ((google-account-creds))
     ensure:
       put: state
       params:
-        repository: updated-env-repo
+        repository: updated-bbl-state
         rebase: true
