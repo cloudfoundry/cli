@@ -5,3 +5,10 @@
 - type: replace
   path: /instance_groups/name=isolated-diego-cell/vm_type
   value: m3.large
+- type: replace
+  path: /instance_groups/name=isolated-diego-cell/jobs/name=rep/properties/loggregator?
+  value:
+    use_v2_api: true
+    ca_cert: "((loggregator_ca.certificate))"
+    cert: "((loggregator_tls_metron.certificate))"
+    key: "((loggregator_tls_metron.private_key))"
