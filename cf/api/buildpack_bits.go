@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	gonet "net"
+	netdialer "net"
 	"net/http"
 	"os"
 	"path"
@@ -22,6 +23,7 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/cf/net/dialcontext"
 	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
@@ -223,11 +225,17 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 			}
 		}
 
+		dialContext := dialcontext.FromEnvironment((&netdialer.Dialer{
+			KeepAlive: 30 * time.Second,
+			Timeout:   30 * time.Second,
+		}).DialContext)
+
 		client := &http.Client{
 			Transport: &http.Transport{
 				Dial:            (&gonet.Dialer{Timeout: 5 * time.Second}).Dial,
 				TLSClientConfig: &tls.Config{RootCAs: certPool},
 				Proxy:           http.ProxyFromEnvironment,
+				DialContext:     dialContext,
 			},
 		}
 

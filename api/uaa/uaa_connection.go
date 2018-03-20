@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"code.cloudfoundry.org/cli/cf/net/dialcontext"
 )
 
 // UAAConnection represents the connection to UAA
@@ -19,15 +21,17 @@ type UAAConnection struct {
 
 // NewConnection returns a pointer to a new UAA Connection
 func NewConnection(skipSSLValidation bool, dialTimeout time.Duration) *UAAConnection {
+	dialContext := dialcontext.FromEnvironment((&net.Dialer{
+		KeepAlive: 30 * time.Second,
+		Timeout:   dialTimeout,
+	}).DialContext)
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: skipSSLValidation,
 		},
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
-			KeepAlive: 30 * time.Second,
-			Timeout:   dialTimeout,
-		}).DialContext,
+		Proxy:       http.ProxyFromEnvironment,
+		DialContext: dialContext,
 	}
 
 	return &UAAConnection{

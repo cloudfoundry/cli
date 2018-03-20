@@ -19,6 +19,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/errors"
 	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/net/dialcontext"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
 	"code.cloudfoundry.org/cli/version"
@@ -446,6 +447,11 @@ func (gateway Gateway) doRequest(request *http.Request) (*http.Response, error) 
 }
 
 func makeHTTPTransport(gateway *Gateway) {
+	dialContext := dialcontext.FromEnvironment((&net.Dialer{
+		KeepAlive: 30 * time.Second,
+		Timeout:   30 * time.Second,
+	}).DialContext)
+
 	gateway.transport = &http.Transport{
 		Dial: (&net.Dialer{
 			KeepAlive: 30 * time.Second,
@@ -453,6 +459,7 @@ func makeHTTPTransport(gateway *Gateway) {
 		}).Dial,
 		TLSClientConfig: NewTLSConfig(gateway.trustedCerts, gateway.config.IsSSLDisabled()),
 		Proxy:           http.ProxyFromEnvironment,
+		DialContext:     dialContext,
 	}
 }
 

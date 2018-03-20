@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
+	"code.cloudfoundry.org/cli/cf/net/dialcontext"
 )
 
 // PluginConnection represents a connection to a plugin repo.
@@ -23,15 +24,17 @@ type PluginConnection struct {
 
 // NewConnection returns a new PluginConnection
 func NewConnection(skipSSLValidation bool, dialTimeout time.Duration) *PluginConnection {
+	dialContext := dialcontext.FromEnvironment((&net.Dialer{
+		KeepAlive: 30 * time.Second,
+		Timeout:   dialTimeout,
+	}).DialContext)
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: skipSSLValidation,
 		},
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
-			KeepAlive: 30 * time.Second,
-			Timeout:   dialTimeout,
-		}).DialContext,
+		Proxy:       http.ProxyFromEnvironment,
+		DialContext: dialContext,
 	}
 
 	return &PluginConnection{
