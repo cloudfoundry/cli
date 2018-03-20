@@ -335,10 +335,6 @@ var _ = Describe("Apply", func() {
 							config.DropletPath = dropletPath
 						})
 
-						JustBeforeEach(func() {
-							Eventually(eventStream).Should(Receive(Equal(UploadingDroplet)))
-						})
-
 						Context("when the upload is successful", func() {
 							BeforeEach(func() {
 								fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, nil)
@@ -366,17 +362,45 @@ var _ = Describe("Apply", func() {
 						})
 
 						Context("when the upload errors", func() {
-							var expectedErr error
+							Context("with a retryable error", func() {
+								BeforeEach(func() {
+									fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{})
+								})
 
-							BeforeEach(func() {
-								expectedErr = errors.New("dios mio")
-								fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, expectedErr)
+								It("retries the download up to three times", func() {
+									Eventually(eventStream).Should(Receive(Equal(UploadingDroplet)))
+									Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(1))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
+
+									Eventually(eventStream).Should(Receive(Equal(UploadingDroplet)))
+									Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(2))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
+
+									Eventually(eventStream).Should(Receive(Equal(UploadingDroplet)))
+									Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(3))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
+
+									Eventually(errorStream).Should(Receive(Equal(actionerror.UploadFailedError{})))
+								})
 							})
 
-							It("sends warnings and errors, then stops", func() {
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-								Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-								Consistently(eventStream).ShouldNot(Receive())
+							Context("with a generic error", func() {
+								var expectedErr error
+
+								BeforeEach(func() {
+									expectedErr = errors.New("dios mio")
+									fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, expectedErr)
+								})
+
+								It("sends warnings and errors, then stops", func() {
+									Eventually(eventStream).Should(Receive(Equal(UploadingDroplet)))
+									Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(1))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+								})
 							})
 						})
 					})

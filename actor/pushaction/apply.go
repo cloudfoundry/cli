@@ -92,10 +92,22 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		}
 
 		if config.DropletPath != "" {
-			warnings, err = actor.UploadDroplet(config, config.DropletPath, progressBar, eventStream)
-			warningsStream <- warnings
+			for count := 0; count < PushRetries; count++ {
+				warnings, err = actor.UploadDroplet(config, config.DropletPath, progressBar, eventStream)
+				warningsStream <- warnings
+				if _, ok := err.(ccerror.PipeSeekError); ok {
+					eventStream <- RetryUpload
+				} else {
+					break
+				}
+			}
+
 			if err != nil {
-				errorStream <- err
+				if _, ok := err.(ccerror.PipeSeekError); ok {
+					errorStream <- actionerror.UploadFailedError{}
+				} else {
+					errorStream <- err
+				}
 				return
 			}
 		} else if config.DesiredApplication.DockerImage == "" {
@@ -116,18 +128,19 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 				for count := 0; count < PushRetries; count++ {
 					warnings, err = actor.UploadPackageWithArchive(config, archivePath, progressBar, eventStream)
 					warningsStream <- warnings
-					if _, ok := err.(ccerror.PipeSeekError); !ok {
+					if _, ok := err.(ccerror.PipeSeekError); ok {
+						eventStream <- RetryUpload
+					} else {
 						break
 					}
-					eventStream <- RetryUpload
 				}
 
 				if err != nil {
 					if _, ok := err.(ccerror.PipeSeekError); ok {
 						errorStream <- actionerror.UploadFailedError{}
-						return
+					} else {
+						errorStream <- err
 					}
-					errorStream <- err
 					return
 				}
 			} else {
