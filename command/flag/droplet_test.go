@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("Droplet", func() {
+var _ = Describe("Droplet", func() {
 	var droplet Droplet
 
 	Describe("UnmarshalFlag", func() {

@@ -28,7 +28,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = FDescribe("push Command", func() {
+var _ = Describe("push Command", func() {
 	var (
 		cmd              V2PushCommand
 		testUI           *ui.UI
@@ -247,12 +247,6 @@ var _ = FDescribe("push Command", func() {
 							fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 						})
 
-						FContext("when a droplet is provided", func() {
-							It("creates the app based on the droplet", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
-
-							})
-						})
 						Context("when no manifest is provided", func() {
 							It("passes through the command line flags", func() {
 								Expect(executeErr).ToNot(HaveOccurred())

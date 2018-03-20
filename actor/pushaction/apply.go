@@ -92,8 +92,7 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		}
 
 		if config.DropletPath != "" {
-			eventStream <- UploadingDroplet
-			warnings, err = actor.UploadDroplet(config, progressBar, eventStream)
+			warnings, err = actor.UploadDroplet(config, config.DropletPath, progressBar, eventStream)
 			warningsStream <- warnings
 			if err != nil {
 				errorStream <- err
@@ -104,16 +103,9 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 			config, warnings = actor.SetMatchedResources(config)
 			warningsStream <- warnings
 
-			if len(config.UnmatchedResources) == 0 {
-				eventStream <- UploadingApplication
-				warnings, err = actor.UploadPackage(config)
-				warningsStream <- warnings
-				if err != nil {
-					errorStream <- err
-					return
-				}
-			} else {
-				archivePath, err := actor.CreateArchive(config)
+			if len(config.UnmatchedResources) > 0 {
+				var archivePath string
+				archivePath, err = actor.CreateArchive(config)
 				if err != nil {
 					errorStream <- err
 					return
@@ -135,6 +127,14 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 						errorStream <- actionerror.UploadFailedError{}
 						return
 					}
+					errorStream <- err
+					return
+				}
+			} else {
+				eventStream <- UploadingApplication
+				warnings, err = actor.UploadPackage(config)
+				warningsStream <- warnings
+				if err != nil {
 					errorStream <- err
 					return
 				}

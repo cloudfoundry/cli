@@ -110,18 +110,40 @@ func (actor Actor) UploadPackageWithArchive(config ApplicationConfig, archivePat
 	return allWarnings, err
 }
 
-// WIP - is it necessary to pass in something analogous to archivePath here? What to pass into progressBarWrapper?
-func (actor Actor) UploadDroplet(config ApplicationConfig, progressBar ProgressBar, eventStream chan<- Event) (Warnings, error) {
+func (actor Actor) UploadDroplet(config ApplicationConfig, dropletPath string, progressbar ProgressBar, eventStream chan<- Event) (Warnings, error) {
 	log.Info("uploading droplet")
-	// eventStream <- UploadingDroplet
-	// droplet := progressbar.NewProgressBarWrapper(archive, archiveInfo.Size())
-
-	job, warnings, err := actor.V2Actor.UploadDroplet(config.DesiredApplication.GUID, nil, 0)
+	droplet, err := os.Open(dropletPath)
 	if err != nil {
-		return Warnings(warnings), err
+		log.WithField("dropletPath", dropletPath).WithError(err).Errorln("opening droplet")
+		return nil, err
+	}
+	defer droplet.Close()
+
+	dropletInfo, err := droplet.Stat()
+	if err != nil {
+		log.WithField("dropletPath", dropletPath).WithError(err).Errorln("stat droplet")
+		return nil, err
 	}
 
-	// eventStream <- UploadDropletComplete
+	log.WithFields(log.Fields{
+		"app_guid":     config.DesiredApplication.GUID,
+		"droplet_size": dropletInfo.Size(),
+	}).Debug("uploading droplet")
+
+	eventStream <- UploadingDroplet
+	reader := progressbar.NewProgressBarWrapper(droplet, dropletInfo.Size())
+
+	var allWarnings Warnings
+	job, warnings, err := actor.V2Actor.UploadDroplet(config.DesiredApplication.GUID, reader, dropletInfo.Size())
+	allWarnings = append(allWarnings, warnings...)
+
+	if err != nil {
+		return allWarnings, err
+	}
+
+	eventStream <- UploadDropletComplete
 	pollWarnings, err := actor.V2Actor.PollJob(job)
-	return append(Warnings(warnings), pollWarnings...), err
+	allWarnings = append(allWarnings, pollWarnings...)
+
+	return allWarnings, err
 }

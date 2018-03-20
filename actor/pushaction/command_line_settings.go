@@ -64,6 +64,10 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 		app.DockerPassword = settings.DockerPassword
 	}
 
+	if settings.DropletPath != "" {
+		app.DropletPath = settings.DropletPath
+	}
+
 	if settings.HealthCheckTimeout != 0 {
 		app.HealthCheckTimeout = settings.HealthCheckTimeout
 	}
@@ -96,7 +100,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 		app.Path = settings.ProvidedAppPath
 	}
 
-	if app.Path == "" && app.DockerImage == "" {
+	if app.Path == "" && app.DockerImage == "" && app.DropletPath == "" {
 		app.Path = settings.CurrentDirectory
 	}
 

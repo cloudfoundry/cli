@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -46,7 +47,7 @@ var _ = Describe("DeleteSpace", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 			Expect(job.GUID).To(Equal("job-guid"))
-			Expect(job.Status).To(Equal(JobStatusQueued))
+			Expect(job.Status).To(Equal(constant.JobStatusQueued))
 		})
 	})
 

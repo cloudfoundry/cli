@@ -424,7 +424,7 @@ var _ = Describe("Resources", func() {
 		})
 	})
 
-	Describe("UploadDropletPackage", func() {
+	Describe("UploadDroplet", func() {
 		var (
 			config          ApplicationConfig
 			dropletPath     string
@@ -454,98 +454,112 @@ var _ = Describe("Resources", func() {
 			warnings, executeErr = actor.UploadDroplet(config, dropletPath, fakeProgressBar, eventStream)
 		})
 
-		Context("when the upload is successful", func() {
-			var (
-				progressBarReader io.Reader
-				uploadJob         v2action.Job
-			)
-
+		Context("when the droplet can be accessed properly", func() {
 			BeforeEach(func() {
-				uploadJob.GUID = "some-job-guid"
-				fakeV2Actor.UploadDropletReturns(uploadJob, v2action.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
+				tmpfile, err := ioutil.TempFile("", "fake-droplet")
+				Expect(err).ToNot(HaveOccurred())
+				_, err = tmpfile.Write([]byte("123456"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(tmpfile.Close()).ToNot(HaveOccurred())
 
-				progressBarReader = strings.NewReader("123456")
-				fakeProgressBar.NewProgressBarWrapperReturns(progressBarReader)
-
-				go func() {
-					defer GinkgoRecover()
-
-					Eventually(eventStream).Should(Receive(Equal(UploadingApplicationWithArchive)))
-					Eventually(eventStream).Should(Receive(Equal(UploadWithArchiveComplete)))
-				}()
-			})
-
-			Context("when the polling is successful", func() {
-				BeforeEach(func() {
-					fakeV2Actor.PollJobReturns(v2action.Warnings{"poll-warning-1", "poll-warning-2"}, nil)
-				})
-
-				It("returns the warnings", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "poll-warning-1", "poll-warning-2"))
-
-					Expect(fakeV2Actor.UploadDropletCallCount()).To(Equal(1))
-					appGUID, _, dropletLength := fakeV2Actor.UploadDropletArgsForCall(0)
-					Expect(appGUID).To(Equal("some-app-guid"))
-					Expect(dropletLength).To(BeNumerically("==", 6))
-
-					Expect(fakeV2Actor.PollJobCallCount()).To(Equal(1))
-					Expect(fakeV2Actor.PollJobArgsForCall(0)).To(Equal(uploadJob))
-				})
-
-				It("passes the file reader to the progress bar", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-
-					Expect(fakeProgressBar.NewProgressBarWrapperCallCount()).To(Equal(1))
-					_, size := fakeProgressBar.NewProgressBarWrapperArgsForCall(0)
-					Expect(size).To(BeNumerically("==", 6))
-				})
-			})
-
-			Context("when the polling fails", func() {
-				var expectedErr error
-
-				BeforeEach(func() {
-					expectedErr = errors.New("I can't let you do that starfox")
-					fakeV2Actor.PollJobReturns(v2action.Warnings{"poll-warning-1", "poll-warning-2"}, expectedErr)
-				})
-
-				It("returns the warnings", func() {
-					Expect(executeErr).To(MatchError(expectedErr))
-					Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "poll-warning-1", "poll-warning-2"))
-				})
-			})
-		})
-
-		Context("when the upload errors", func() {
-			var (
-				expectedErr error
-				done        chan bool
-			)
-
-			BeforeEach(func() {
-				expectedErr = errors.New("I can't let you do that starfox")
-				fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warning-1", "upload-warning-2"}, expectedErr)
-
-				done = make(chan bool)
-
-				go func() {
-					defer GinkgoRecover()
-
-					Eventually(eventStream).Should(Receive(Equal(UploadingDroplet)))
-					Consistently(eventStream).ShouldNot(Receive())
-					done <- true
-				}()
+				dropletPath = tmpfile.Name()
 			})
 
 			AfterEach(func() {
-				close(done)
+				Expect(os.RemoveAll(dropletPath)).ToNot(HaveOccurred())
 			})
 
-			It("returns the error and warnings", func() {
-				Eventually(done).Should(Receive())
-				Expect(executeErr).To(MatchError(expectedErr))
-				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2"))
+			Context("when the upload is successful", func() {
+				var (
+					progressBarReader io.Reader
+					uploadJob         v2action.Job
+				)
+
+				BeforeEach(func() {
+					uploadJob.GUID = "some-job-guid"
+					fakeV2Actor.UploadDropletReturns(uploadJob, v2action.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
+
+					progressBarReader = strings.NewReader("123456")
+					fakeProgressBar.NewProgressBarWrapperReturns(progressBarReader)
+
+					go func() {
+						defer GinkgoRecover()
+
+						Eventually(eventStream).Should(Receive(Equal(UploadDropletComplete)))
+					}()
+				})
+
+				Context("when the polling is successful", func() {
+					BeforeEach(func() {
+						fakeV2Actor.PollJobReturns(v2action.Warnings{"poll-warning-1", "poll-warning-2"}, nil)
+					})
+
+					It("returns the warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "poll-warning-1", "poll-warning-2"))
+
+						Expect(fakeV2Actor.UploadDropletCallCount()).To(Equal(1))
+						appGUID, _, dropletLength := fakeV2Actor.UploadDropletArgsForCall(0)
+						Expect(appGUID).To(Equal("some-app-guid"))
+						Expect(dropletLength).To(BeNumerically("==", 6))
+
+						Expect(fakeV2Actor.PollJobCallCount()).To(Equal(1))
+						Expect(fakeV2Actor.PollJobArgsForCall(0)).To(Equal(uploadJob))
+					})
+
+					It("passes the file reader to the progress bar", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeProgressBar.NewProgressBarWrapperCallCount()).To(Equal(1))
+						_, size := fakeProgressBar.NewProgressBarWrapperArgsForCall(0)
+						Expect(size).To(BeNumerically("==", 6))
+					})
+				})
+
+				Context("when the polling fails", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("I can't let you do that starfox")
+						fakeV2Actor.PollJobReturns(v2action.Warnings{"poll-warning-1", "poll-warning-2"}, expectedErr)
+					})
+
+					It("returns the warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+						Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "poll-warning-1", "poll-warning-2"))
+					})
+				})
+			})
+
+			Context("when the upload errors", func() {
+				var (
+					expectedErr error
+					done        chan bool
+				)
+
+				BeforeEach(func() {
+					expectedErr = errors.New("I can't let you do that starfox")
+					fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warning-1", "upload-warning-2"}, expectedErr)
+
+					done = make(chan bool)
+
+					go func() {
+						defer GinkgoRecover()
+
+						Consistently(eventStream).ShouldNot(Receive(Equal(UploadDropletComplete)))
+						done <- true
+					}()
+				})
+
+				AfterEach(func() {
+					close(done)
+				})
+
+				It("returns the error and warnings", func() {
+					Eventually(done).Should(Receive())
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2"))
+				})
 			})
 		})
 	})

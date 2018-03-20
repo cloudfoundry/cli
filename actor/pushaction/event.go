@@ -17,7 +17,7 @@ const (
 	UploadingApplication            Event = "uploading application"
 	UploadingApplicationWithArchive Event = "uploading application with archive"
 	UploadingDroplet                Event = "uploading droplet"
-	UploadingDropletComplete        Event = "uploading droplet complete"
+	UploadDropletComplete           Event = "upload droplet complete"
 	UploadWithArchiveComplete       Event = "upload complete"
 	RetryUpload                     Event = "retry upload"
 	Complete                        Event = "complete"

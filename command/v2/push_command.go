@@ -62,7 +62,7 @@ type V2PushCommand struct {
 	envCFStartupTimeout interface{}                 `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 	dockerPassword      interface{}                 `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
 
-	usage           interface{} `usage:"cf push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]"`
+	usage           interface{} `usage:"cf push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf push APP_NAME --droplet DROPLET_PATH\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]"`
 	relatedCommands interface{} `related_commands:"apps, create-app-manifest, logs, ssh, start"`
 
 	UI          command.UI
@@ -400,6 +400,10 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	case pushaction.UploadingApplication:
 		cmd.UI.DisplayText("All files found in remote cache; nothing to upload.")
 		cmd.UI.DisplayText("Waiting for API to complete processing files...")
+	case pushaction.UploadingDroplet:
+		cmd.UI.DisplayText("Uploading droplet...")
+		log.Debug("starting progress bar")
+		cmd.ProgressBar.Ready()
 	case pushaction.UploadingApplicationWithArchive:
 		cmd.UI.DisplayText("Uploading files...")
 		log.Debug("starting progress bar")
@@ -410,6 +414,10 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 		cmd.ProgressBar.Complete()
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Waiting for API to complete processing files...")
+	case pushaction.UploadDropletComplete:
+		cmd.ProgressBar.Complete()
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Waiting for API to complete processing droplet...")
 	case pushaction.Complete:
 		return true
 	default:

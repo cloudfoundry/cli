@@ -107,7 +107,7 @@ var _ = Describe("Job Actions", func() {
 		})
 	})
 
-	FDescribe("UploadDroplet", func() {
+	Describe("UploadDroplet", func() {
 		var (
 			srcDir string
 
@@ -163,7 +163,7 @@ var _ = Describe("Job Actions", func() {
 				Expect(warnings).To(ConsistOf("upload-droplet-warning-1", "upload-droplet-warning-2"))
 				Expect(job).To(Equal(Job{GUID: "some-job-guid"}))
 
-				Expect(fakeCloudControllerClient.UploadApplicationPackageCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UploadDropletCallCount()).To(Equal(1))
 				passedAppGUID, passedDroplet, passedDropletLength := fakeCloudControllerClient.UploadDropletArgsForCall(0)
 				Expect(passedAppGUID).To(Equal(appGUID))
 				Expect(passedDroplet).To(Equal(droplet))

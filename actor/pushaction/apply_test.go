@@ -322,19 +322,31 @@ var _ = Describe("Apply", func() {
 					})
 
 					Context("when a droplet is provided", func() {
+						var dropletPath string
+
 						BeforeEach(func() {
-							config.DropletPath = "some-droplet-path"
+							tmpfile, err := ioutil.TempFile("", "fake-droplet")
+							Expect(err).ToNot(HaveOccurred())
+							_, err = tmpfile.Write([]byte("123456"))
+							Expect(err).ToNot(HaveOccurred())
+							Expect(tmpfile.Close()).ToNot(HaveOccurred())
+
+							dropletPath = tmpfile.Name()
+							config.DropletPath = dropletPath
 						})
+
 						JustBeforeEach(func() {
 							Eventually(eventStream).Should(Receive(Equal(UploadingDroplet)))
-							Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
 						})
+
 						Context("when the upload is successful", func() {
 							BeforeEach(func() {
 								fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, nil)
 							})
 
-							It("skips archiving and sends the updated config and a complete event", func() {
+							It("sends an updated config and a complete event", func() {
+								Eventually(eventStream).Should(Receive(Equal(UploadDropletComplete)))
+								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
 								Eventually(configStream).Should(Receive(Equal(ApplicationConfig{
 									CurrentApplication: Application{Application: createdApp},
 									CurrentRoutes:      createdRoutes,
@@ -342,14 +354,13 @@ var _ = Describe("Apply", func() {
 									DesiredApplication: Application{Application: createdApp},
 									DesiredRoutes:      createdRoutes,
 									DesiredServices:    desiredServices,
-									DropletPath:        "some-droplet-path",
+									DropletPath:        dropletPath,
 								})))
-								Eventually(eventStream).Should(Receive(Equal(Complete)))
 
 								Expect(fakeV2Actor.UploadDropletCallCount()).To(Equal(1))
 								_, droplet, dropletLength := fakeV2Actor.UploadDropletArgsForCall(0)
 								Expect(droplet).To(BeNil())
-								Expect(dropletLength).To(BeNumerically("==", 0))
+								Expect(dropletLength).To(BeNumerically("==", 6))
 								Expect(fakeSharedActor.ZipDirectoryResourcesCallCount()).To(Equal(0))
 							})
 						})
@@ -363,6 +374,7 @@ var _ = Describe("Apply", func() {
 							})
 
 							It("sends warnings and errors, then stops", func() {
+								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
 								Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 								Consistently(eventStream).ShouldNot(Receive())
 							})

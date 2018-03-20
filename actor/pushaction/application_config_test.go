@@ -1078,12 +1078,14 @@ var _ = Describe("Application Config", func() {
 
 		Context("when a droplet is provided", func() {
 			BeforeEach(func() {
-				manifestApps[0].DropletPath = "some-droplet-path"
+				manifestApps[0].DropletPath = filesPath
 			})
 
-			It("sets the docker image on DesiredApplication and does not gather resources", func() {
+			It("sets the droplet on DesiredApplication and does not gather resources", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(firstConfig.DropletPath).To(Equal("some-droplet-path"))
+				Expect(firstConfig.DropletPath).To(Equal(filesPath))
+
+				Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(0))
 			})
 		})
 	})
