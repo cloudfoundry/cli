@@ -9,12 +9,13 @@ import (
 )
 
 type FakeBindServiceActor struct {
-	BindServiceBySpaceStub        func(appName string, ServiceInstanceName string, spaceGUID string, parameters map[string]interface{}) (v2action.Warnings, error)
+	BindServiceBySpaceStub        func(appName string, ServiceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (v2action.Warnings, error)
 	bindServiceBySpaceMutex       sync.RWMutex
 	bindServiceBySpaceArgsForCall []struct {
 		appName             string
 		ServiceInstanceName string
 		spaceGUID           string
+		bindingName         string
 		parameters          map[string]interface{}
 	}
 	bindServiceBySpaceReturns struct {
@@ -25,23 +26,33 @@ type FakeBindServiceActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
+	CloudControllerAPIVersionStub        func() string
+	cloudControllerAPIVersionMutex       sync.RWMutex
+	cloudControllerAPIVersionArgsForCall []struct{}
+	cloudControllerAPIVersionReturns     struct {
+		result1 string
+	}
+	cloudControllerAPIVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeBindServiceActor) BindServiceBySpace(appName string, ServiceInstanceName string, spaceGUID string, parameters map[string]interface{}) (v2action.Warnings, error) {
+func (fake *FakeBindServiceActor) BindServiceBySpace(appName string, ServiceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (v2action.Warnings, error) {
 	fake.bindServiceBySpaceMutex.Lock()
 	ret, specificReturn := fake.bindServiceBySpaceReturnsOnCall[len(fake.bindServiceBySpaceArgsForCall)]
 	fake.bindServiceBySpaceArgsForCall = append(fake.bindServiceBySpaceArgsForCall, struct {
 		appName             string
 		ServiceInstanceName string
 		spaceGUID           string
+		bindingName         string
 		parameters          map[string]interface{}
-	}{appName, ServiceInstanceName, spaceGUID, parameters})
-	fake.recordInvocation("BindServiceBySpace", []interface{}{appName, ServiceInstanceName, spaceGUID, parameters})
+	}{appName, ServiceInstanceName, spaceGUID, bindingName, parameters})
+	fake.recordInvocation("BindServiceBySpace", []interface{}{appName, ServiceInstanceName, spaceGUID, bindingName, parameters})
 	fake.bindServiceBySpaceMutex.Unlock()
 	if fake.BindServiceBySpaceStub != nil {
-		return fake.BindServiceBySpaceStub(appName, ServiceInstanceName, spaceGUID, parameters)
+		return fake.BindServiceBySpaceStub(appName, ServiceInstanceName, spaceGUID, bindingName, parameters)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -55,10 +66,10 @@ func (fake *FakeBindServiceActor) BindServiceBySpaceCallCount() int {
 	return len(fake.bindServiceBySpaceArgsForCall)
 }
 
-func (fake *FakeBindServiceActor) BindServiceBySpaceArgsForCall(i int) (string, string, string, map[string]interface{}) {
+func (fake *FakeBindServiceActor) BindServiceBySpaceArgsForCall(i int) (string, string, string, string, map[string]interface{}) {
 	fake.bindServiceBySpaceMutex.RLock()
 	defer fake.bindServiceBySpaceMutex.RUnlock()
-	return fake.bindServiceBySpaceArgsForCall[i].appName, fake.bindServiceBySpaceArgsForCall[i].ServiceInstanceName, fake.bindServiceBySpaceArgsForCall[i].spaceGUID, fake.bindServiceBySpaceArgsForCall[i].parameters
+	return fake.bindServiceBySpaceArgsForCall[i].appName, fake.bindServiceBySpaceArgsForCall[i].ServiceInstanceName, fake.bindServiceBySpaceArgsForCall[i].spaceGUID, fake.bindServiceBySpaceArgsForCall[i].bindingName, fake.bindServiceBySpaceArgsForCall[i].parameters
 }
 
 func (fake *FakeBindServiceActor) BindServiceBySpaceReturns(result1 v2action.Warnings, result2 error) {
@@ -83,11 +94,53 @@ func (fake *FakeBindServiceActor) BindServiceBySpaceReturnsOnCall(i int, result1
 	}{result1, result2}
 }
 
+func (fake *FakeBindServiceActor) CloudControllerAPIVersion() string {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
+	fake.cloudControllerAPIVersionMutex.Unlock()
+	if fake.CloudControllerAPIVersionStub != nil {
+		return fake.CloudControllerAPIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.cloudControllerAPIVersionReturns.result1
+}
+
+func (fake *FakeBindServiceActor) CloudControllerAPIVersionCallCount() int {
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	return len(fake.cloudControllerAPIVersionArgsForCall)
+}
+
+func (fake *FakeBindServiceActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.CloudControllerAPIVersionStub = nil
+	fake.cloudControllerAPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeBindServiceActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.CloudControllerAPIVersionStub = nil
+	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
+		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeBindServiceActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.bindServiceBySpaceMutex.RLock()
 	defer fake.bindServiceBySpaceMutex.RUnlock()
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

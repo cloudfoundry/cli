@@ -42,7 +42,8 @@ var _ = Describe("bind-service command", func() {
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("bs"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("-c      Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."))
+				Eventually(session).Should(Say("--binding-name\\s+Name to expose service instance to app process with \\(Default: service instance name\\)"))
+				Eventually(session).Should(Say("-c\\s+Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("services"))
 				Eventually(session).Should(Exit(0))
@@ -150,6 +151,17 @@ var _ = Describe("bind-service command", func() {
 						Eventually(session).Should(Say("App %s is already bound to %s.", appName, serviceInstance))
 						Eventually(session).Should(Say("OK"))
 
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				Context("when a name is provided for the binding", func() {
+					It("binds the service to the app, displays OK and TIP", func() {
+						session := helpers.CF("bind-service", appName, serviceInstance, "--binding-name", "i-am-a-binding")
+						Eventually(session.Out).Should(Say("Binding service %s to app %s with binding name %s in org %s / space %s as %s...", serviceInstance, appName, "i-am-a-binding", org, space, username))
+
+						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session.Out).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
 						Eventually(session).Should(Exit(0))
 					})
 				})

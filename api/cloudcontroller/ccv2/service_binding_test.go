@@ -20,38 +20,78 @@ var _ = Describe("Service Binding", func() {
 
 	Describe("CreateServiceBinding", func() {
 		Context("when the create is successful", func() {
-			BeforeEach(func() {
-				response := `
+			Context("when a service binding name is provided", func() {
+				BeforeEach(func() {
+					requestBody := map[string]interface{}{
+						"service_instance_guid": "some-service-instance-guid",
+						"app_guid":              "some-app-guid",
+						"name":                  "some-binding-name",
+						"parameters": map[string]interface{}{
+							"the-service-broker": "wants this object",
+						},
+					}
+					response := `
 						{
 							"metadata": {
 								"guid": "some-service-binding-guid"
 							}
 						}`
-				requestBody := map[string]interface{}{
-					"service_instance_guid": "some-service-instance-guid",
-					"app_guid":              "some-app-guid",
-					"parameters": map[string]interface{}{
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v2/service_bindings"),
+							VerifyJSONRepresenting(requestBody),
+							RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the created object and warnings", func() {
+					parameters := map[string]interface{}{
 						"the-service-broker": "wants this object",
-					},
-				}
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v2/service_bindings"),
-						VerifyJSONRepresenting(requestBody),
-						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
+					}
+					serviceBinding, warnings, err := client.CreateServiceBinding("some-app-guid", "some-service-instance-guid", "some-binding-name", parameters)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(serviceBinding).To(Equal(ServiceBinding{GUID: "some-service-binding-guid"}))
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
 			})
 
-			It("returns the created object and warnings", func() {
-				parameters := map[string]interface{}{
-					"the-service-broker": "wants this object",
-				}
-				serviceBinding, warnings, err := client.CreateServiceBinding("some-app-guid", "some-service-instance-guid", parameters)
-				Expect(err).NotTo(HaveOccurred())
+			Context("when a service binding name is not provided", func() {
+				BeforeEach(func() {
+					requestBody := map[string]interface{}{
+						"service_instance_guid": "some-service-instance-guid",
+						"app_guid":              "some-app-guid",
+						"name":                  "",
+						"parameters": map[string]interface{}{
+							"the-service-broker": "wants this object",
+						},
+					}
+					response := `
+						{
+							"metadata": {
+								"guid": "some-service-binding-guid"
+							}
+						}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v2/service_bindings"),
+							VerifyJSONRepresenting(requestBody),
+							RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
 
-				Expect(serviceBinding).To(Equal(ServiceBinding{GUID: "some-service-binding-guid"}))
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				It("returns the created object and warnings", func() {
+					parameters := map[string]interface{}{
+						"the-service-broker": "wants this object",
+					}
+					serviceBinding, warnings, err := client.CreateServiceBinding("some-app-guid", "some-service-instance-guid", "", parameters)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(serviceBinding).To(Equal(ServiceBinding{GUID: "some-service-binding-guid"}))
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
 			})
 		})
 
@@ -76,7 +116,7 @@ var _ = Describe("Service Binding", func() {
 				parameters := map[string]interface{}{
 					"the-service-broker": "wants this object",
 				}
-				_, warnings, err := client.CreateServiceBinding("some-app-guid", "some-service-instance-guid", parameters)
+				_, warnings, err := client.CreateServiceBinding("some-app-guid", "some-service-instance-guid", "", parameters)
 				Expect(err).To(MatchError(ccerror.ServiceBindingTakenError{Message: "The app space binding to service is taken: some-app-guid some-service-instance-guid"}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
