@@ -192,19 +192,20 @@ func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude 
 		return "", err
 	}
 	defer zipFile.Close()
+	zipPath := zipFile.Name()
 
 	writer := zip.NewWriter(zipFile)
 	defer writer.Close()
 
 	source, err := os.Open(sourceArchivePath)
 	if err != nil {
-		return "", err
+		return zipPath, err
 	}
 	defer source.Close()
 
 	reader, err := actor.newArchiveReader(source)
 	if err != nil {
-		return "", err
+		return zipPath, err
 	}
 
 	for _, archiveFile := range reader.File {
@@ -219,7 +220,7 @@ func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude 
 		reader, openErr := archiveFile.Open()
 		if openErr != nil {
 			log.WithField("archiveFile", archiveFile.Name).Errorln("opening path in dir:", openErr)
-			return "", openErr
+			return zipPath, openErr
 		}
 		defer reader.Close()
 
@@ -229,7 +230,7 @@ func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude 
 		)
 		if err != nil {
 			log.WithField("archiveFileName", archiveFile.Name).Errorln("zipping file:", err)
-			return "", err
+			return zipPath, err
 		}
 		reader.Close()
 	}
@@ -238,7 +239,7 @@ func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude 
 		"zip_file_location": zipFile.Name(),
 		"zipped_file_count": len(filesToInclude),
 	}).Info("zip file created")
-	return zipFile.Name(), nil
+	return zipPath, nil
 }
 
 // ZipDirectoryResources zips a directory and a sorted (based on full
@@ -251,6 +252,7 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 		return "", err
 	}
 	defer zipFile.Close()
+	zipPath := zipFile.Name()
 
 	writer := zip.NewWriter(zipFile)
 	defer writer.Close()
@@ -262,7 +264,7 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
 			log.WithField("fullPath", fullPath).Errorln("stat error in dir:", err)
-			return "", err
+			return zipPath, err
 		}
 
 		log.WithField("file-mode", fileInfo.Mode().String()).Debug("resource file info")
@@ -271,14 +273,14 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 			err = actor.addLinkToZipFromFileSystem(fullPath, fileInfo, resource, writer)
 			if err != nil {
 				log.WithField("fullPath", fullPath).Errorln("zipping file:", err)
-				return "", err
+				return zipPath, err
 			}
 		} else {
 			srcFile, err := os.Open(fullPath)
 			defer srcFile.Close()
 			if err != nil {
 				log.WithField("fullPath", fullPath).Errorln("opening path in dir:", err)
-				return "", err
+				return zipPath, err
 			}
 
 			err = actor.addFileToZipFromFileSystem(
@@ -288,7 +290,7 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 			srcFile.Close()
 			if err != nil {
 				log.WithField("fullPath", fullPath).Errorln("zipping file:", err)
-				return "", err
+				return zipPath, err
 			}
 		}
 	}
@@ -297,7 +299,7 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 		"zip_file_location": zipFile.Name(),
 		"zipped_file_count": len(filesToInclude),
 	}).Info("zip file created")
-	return zipFile.Name(), nil
+	return zipPath, nil
 }
 
 func (Actor) addLinkToZipFromFileSystem(srcPath string,

@@ -181,7 +181,7 @@ var _ = Describe("bind-service command", func() {
 						})
 
 						AfterEach(func() {
-							os.Remove(configurationFile.Name())
+							Expect(os.RemoveAll(configurationFile.Name())).ToNot(HaveOccurred())
 						})
 
 						It("displays FAILED and the invalid configuration error", func() {
@@ -207,7 +207,7 @@ var _ = Describe("bind-service command", func() {
 						})
 
 						AfterEach(func() {
-							os.Remove(configurationFile.Name())
+							Expect(os.RemoveAll(configurationFile.Name())).ToNot(HaveOccurred())
 						})
 
 						It("binds the service to the app, displays OK and TIP", func() {
@@ -232,6 +232,10 @@ var _ = Describe("bind-service command", func() {
 
 							err = configurationFile.Close()
 							Expect(err).ToNot(HaveOccurred())
+						})
+
+						AfterEach(func() {
+							Expect(os.RemoveAll(configurationFile.Name())).ToNot(HaveOccurred())
 						})
 
 						It("binds the service to the app, displays OK and TIP", func() {

@@ -3,6 +3,7 @@ package pushaction_test
 import (
 	"errors"
 	"io/ioutil"
+	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
@@ -335,6 +336,10 @@ var _ = Describe("Apply", func() {
 
 							dropletPath = tmpfile.Name()
 							config.DropletPath = dropletPath
+						})
+
+						AfterEach(func() {
+							Expect(os.RemoveAll(dropletPath)).ToNot(HaveOccurred())
 						})
 
 						Context("when the upload is successful", func() {

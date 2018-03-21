@@ -276,6 +276,10 @@ applications:
 				apps, executeErr = ReadAndMergeManifests(pathToManifest)
 			})
 
+			AfterEach(func() {
+				Expect(os.RemoveAll(pathToManifest)).ToNot(HaveOccurred())
+			})
+
 			It("raises an InheritanceFieldError", func() {
 				Expect(executeErr).To(MatchError(InheritanceFieldError{}))
 			})
