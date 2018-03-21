@@ -103,8 +103,8 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 			}
 
 			if err != nil {
-				if _, ok := err.(ccerror.PipeSeekError); ok {
-					errorStream <- actionerror.UploadFailedError{}
+				if e, ok := err.(ccerror.PipeSeekError); ok {
+					errorStream <- actionerror.UploadFailedError{Err: e.Err}
 				} else {
 					errorStream <- err
 				}
@@ -136,8 +136,8 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 				}
 
 				if err != nil {
-					if _, ok := err.(ccerror.PipeSeekError); ok {
-						errorStream <- actionerror.UploadFailedError{}
+					if e, ok := err.(ccerror.PipeSeekError); ok {
+						errorStream <- actionerror.UploadFailedError{Err: e.Err}
 					} else {
 						errorStream <- err
 					}

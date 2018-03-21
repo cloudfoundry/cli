@@ -12,8 +12,10 @@ func (e UploadFailedError) Translate(translate func(string, ...interface{}) stri
 	var message string
 	if err, ok := e.Err.(TranslatableError); ok {
 		message = err.Translate(translate)
-	} else {
+	} else if e.Err != nil {
 		message = e.Err.Error()
+	} else {
+		message = translate("UNKNOWN REASON")
 	}
 
 	return translate(e.Error(), map[string]interface{}{

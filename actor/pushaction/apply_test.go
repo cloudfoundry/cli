@@ -201,8 +201,10 @@ var _ = Describe("Apply", func() {
 
 								Context("when the upload errors", func() {
 									Context("with a retryable error", func() {
+										var internalExpectedErr error
 										BeforeEach(func() {
-											fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{})
+											internalExpectedErr = errors.New("I AM A BANANA")
+											fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{Err: internalExpectedErr})
 										})
 
 										It("retries the download up to three times", func() {
@@ -221,7 +223,7 @@ var _ = Describe("Apply", func() {
 											Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
 											Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
 
-											Eventually(errorStream).Should(Receive(Equal(actionerror.UploadFailedError{})))
+											Eventually(errorStream).Should(Receive(Equal(actionerror.UploadFailedError{Err: internalExpectedErr})))
 										})
 									})
 
@@ -363,8 +365,10 @@ var _ = Describe("Apply", func() {
 
 						Context("when the upload errors", func() {
 							Context("with a retryable error", func() {
+								var internalExpectedErr error
 								BeforeEach(func() {
-									fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{})
+									internalExpectedErr = errors.New("I AM A BANANA")
+									fakeV2Actor.UploadDropletReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{Err: internalExpectedErr})
 								})
 
 								It("retries the download up to three times", func() {
@@ -383,7 +387,7 @@ var _ = Describe("Apply", func() {
 									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
 									Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
 
-									Eventually(errorStream).Should(Receive(Equal(actionerror.UploadFailedError{})))
+									Eventually(errorStream).Should(Receive(Equal(actionerror.UploadFailedError{Err: internalExpectedErr})))
 								})
 							})
 
