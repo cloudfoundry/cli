@@ -24,7 +24,8 @@ func (user *User) UnmarshalJSON(data []byte) error {
 	var ccUser struct {
 		Metadata internal.Metadata `json:"metadata"`
 	}
-	if err := json.Unmarshal(data, &ccUser); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccUser)
+	if err != nil {
 		return err
 	}
 

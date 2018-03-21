@@ -1,7 +1,6 @@
 package ccv2
 
 import (
-	"encoding/json"
 	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -33,7 +32,8 @@ func (instance *ApplicationInstance) UnmarshalJSON(data []byte) error {
 		Since   float64 `json:"since"`
 		State   string  `json:"state"`
 	}
-	if err := json.Unmarshal(data, &ccInstance); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccInstance)
+	if err != nil {
 		return err
 	}
 

@@ -3,6 +3,7 @@ package ccv3_test
 import (
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,7 +23,8 @@ func (t *testItem) UnmarshalJSON(data []byte) error {
 			Name string `json:"name"`
 		} `json:"entity"`
 	}
-	if err := json.Unmarshal(data, &item); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &item)
+	if err != nil {
 		return err
 	}
 

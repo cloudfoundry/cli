@@ -1,10 +1,8 @@
 package cloudcontroller
 
 import (
-	"bytes"
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/json"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -106,9 +104,7 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 
 	// TODO: only unmarshal on 'application/json', skip otherwise
 	if passedResponse.Result != nil {
-		decoder := json.NewDecoder(bytes.NewBuffer(passedResponse.RawResponse))
-		decoder.UseNumber()
-		err = decoder.Decode(passedResponse.Result)
+		err = DecodeJSON(passedResponse.RawResponse, passedResponse.Result)
 		if err != nil {
 			return err
 		}

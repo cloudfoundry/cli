@@ -41,7 +41,7 @@ func (service *Service) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	err := json.Unmarshal(data, &ccService)
+	err := cloudcontroller.DecodeJSON(data, &ccService)
 	if err != nil {
 		return err
 	}

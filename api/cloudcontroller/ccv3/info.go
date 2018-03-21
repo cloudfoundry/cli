@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -72,7 +71,8 @@ func (resources ResourceLinks) UnmarshalJSON(data []byte) error {
 	var ccResourceLinks struct {
 		Links map[string]APILink `json:"links"`
 	}
-	if err := json.Unmarshal(data, &ccResourceLinks); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccResourceLinks)
+	if err != nil {
 		return err
 	}
 

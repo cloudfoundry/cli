@@ -39,7 +39,7 @@ func (r *Relationship) UnmarshalJSON(data []byte) error {
 		} `json:"data"`
 	}
 
-	err := json.Unmarshal(data, &ccRelationship)
+	err := cloudcontroller.DecodeJSON(data, &ccRelationship)
 	if err != nil {
 		return err
 	}

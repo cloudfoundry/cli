@@ -1,8 +1,6 @@
 package ccv2
 
 import (
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
@@ -86,7 +84,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 			} `json:"last_operation"`
 		}
 	}
-	err := json.Unmarshal(data, &ccServiceInstance)
+	err := cloudcontroller.DecodeJSON(data, &ccServiceInstance)
 	if err != nil {
 		return err
 	}

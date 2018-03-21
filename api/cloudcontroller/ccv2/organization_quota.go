@@ -1,8 +1,6 @@
 package ccv2
 
 import (
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
@@ -25,7 +23,8 @@ func (application *OrganizationQuota) UnmarshalJSON(data []byte) error {
 			Name string `json:"name"`
 		} `json:"entity"`
 	}
-	if err := json.Unmarshal(data, &ccOrgQuota); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccOrgQuota)
+	if err != nil {
 		return err
 	}
 

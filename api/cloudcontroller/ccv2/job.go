@@ -53,7 +53,8 @@ func (job *Job) UnmarshalJSON(data []byte) error {
 		} `json:"entity"`
 		Metadata internal.Metadata `json:"metadata"`
 	}
-	if err := json.Unmarshal(data, &ccJob); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccJob)
+	if err != nil {
 		return err
 	}
 

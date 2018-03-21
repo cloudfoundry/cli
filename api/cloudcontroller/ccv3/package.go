@@ -73,7 +73,8 @@ func (p *Package) UnmarshalJSON(data []byte) error {
 			Password string `json:"password"`
 		} `json:"data"`
 	}
-	if err := json.Unmarshal(data, &ccPackage); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccPackage)
+	if err != nil {
 		return err
 	}
 

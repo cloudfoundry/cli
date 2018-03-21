@@ -78,7 +78,7 @@ func (a *Application) UnmarshalJSON(data []byte) error {
 
 	ccApp.rawApp = (*rawApp)(a)
 
-	err := json.Unmarshal(data, &ccApp)
+	err := cloudcontroller.DecodeJSON(data, &ccApp)
 	if err != nil {
 		return err
 	}

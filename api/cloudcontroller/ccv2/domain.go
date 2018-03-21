@@ -1,8 +1,6 @@
 package ccv2
 
 import (
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
@@ -40,7 +38,8 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 			RouterGroupType string `json:"router_group_type"`
 		} `json:"entity"`
 	}
-	if err := json.Unmarshal(data, &ccDomain); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccDomain)
+	if err != nil {
 		return err
 	}
 

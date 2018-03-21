@@ -48,7 +48,8 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 			SpaceGUID  string        `json:"space_guid"`
 		} `json:"entity"`
 	}
-	if err := json.Unmarshal(data, &ccRoute); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccRoute)
+	if err != nil {
 		return err
 	}
 

@@ -188,9 +188,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 			State                    string                 `json:"state"`
 		} `json:"entity"`
 	}
-
-	decoder := cloudcontroller.NewJSONDecoder(data)
-	err := decoder.Decode(&ccApp)
+	err := cloudcontroller.DecodeJSON(data, &ccApp)
 	if err != nil {
 		return err
 	}

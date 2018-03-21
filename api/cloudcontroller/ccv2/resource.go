@@ -28,7 +28,7 @@ type Resource struct {
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Resource response.
-func (r *Resource) UnmarshalJSON(rawJSON []byte) error {
+func (r *Resource) UnmarshalJSON(data []byte) error {
 	var ccResource struct {
 		Filename string `json:"fn,omitempty"`
 		Mode     string `json:"mode,omitempty"`
@@ -36,7 +36,7 @@ func (r *Resource) UnmarshalJSON(rawJSON []byte) error {
 		Size     int64  `json:"size"`
 	}
 
-	err := json.Unmarshal(rawJSON, &ccResource)
+	err := cloudcontroller.DecodeJSON(data, &ccResource)
 	if err != nil {
 		return err
 	}

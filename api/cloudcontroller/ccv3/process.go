@@ -52,7 +52,8 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 	}
 
 	ccProcess.rawProcess = (*rawProcess)(p)
-	if err := json.Unmarshal(data, &ccProcess); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccProcess)
+	if err != nil {
 		return err
 	}
 

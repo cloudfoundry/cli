@@ -1,8 +1,6 @@
 package ccv2
 
 import (
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
@@ -30,7 +28,7 @@ func (servicePlan *ServicePlan) UnmarshalJSON(data []byte) error {
 			ServiceGUID string `json:"service_guid"`
 		}
 	}
-	err := json.Unmarshal(data, &ccServicePlan)
+	err := cloudcontroller.DecodeJSON(data, &ccServicePlan)
 	if err != nil {
 		return err
 	}

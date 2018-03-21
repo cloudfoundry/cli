@@ -53,7 +53,8 @@ func (b *Build) UnmarshalJSON(data []byte) error {
 		} `json:"droplet"`
 	}
 
-	if err := json.Unmarshal(data, &ccBuild); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccBuild)
+	if err != nil {
 		return err
 	}
 

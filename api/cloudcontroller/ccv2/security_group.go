@@ -1,8 +1,6 @@
 package ccv2
 
 import (
-	"encoding/json"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -56,8 +54,8 @@ func (securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 			StagingDefault bool `json:"staging_default"`
 		} `json:"entity"`
 	}
-
-	if err := json.Unmarshal(data, &ccSecurityGroup); err != nil {
+	err := cloudcontroller.DecodeJSON(data, &ccSecurityGroup)
+	if err != nil {
 		return err
 	}
 

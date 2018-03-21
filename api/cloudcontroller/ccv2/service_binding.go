@@ -28,7 +28,7 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 			ServiceInstanceGUID string `json:"service_instance_guid"`
 		} `json:"entity"`
 	}
-	err := json.Unmarshal(data, &ccServiceBinding)
+	err := cloudcontroller.DecodeJSON(data, &ccServiceBinding)
 	if err != nil {
 		return err
 	}
