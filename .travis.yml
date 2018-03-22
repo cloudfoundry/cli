@@ -16,4 +16,3 @@ addons:
     repo_token: 5a9ca60422d07f52c50f36aa2c2c101619a19aa64d94fdafb352746b1db8625e
 os:
   - linux
-  - osx
