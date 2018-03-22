@@ -21,7 +21,7 @@ run:
   - |
     set -ex
 
-    VERSION=$(cat cli/ci/VERSION)
+    VERSION=$(cat cli/VERSION)
     CERT_PASSWORD=$(cat certificates/$CERT_PASSWORD_LOCATION)
 
     security create-keychain -p "" temp-keychain

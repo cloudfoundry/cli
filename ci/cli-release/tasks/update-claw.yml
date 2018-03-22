@@ -26,7 +26,7 @@ run:
 
     tar -zxf edge-linux-binary-64/*.tgz
 
-    LATEST_VERSION=$(cat cli/ci/VERSION)
+    LATEST_VERSION=$(cat cli/VERSION)
 
     ./cf login -a $CF_API -u "$CF_USERNAME" -p "$CF_PASSWORD" -o "$CF_ORGANIZATION" -s "$CF_SPACE"
     CURRENT_VERSIONS=$(./cf env claw | grep AVAILABLE_VERSIONS | awk '{print $2}')

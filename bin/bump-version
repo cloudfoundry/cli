@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 
-ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
-
 set -e
 
 component=$1
 
-old_version=$(cat ci/VERSION)
+old_version=$(cat VERSION)
 major=$(echo $old_version | cut -d'.' -f 1)
 minor=$(echo $old_version | cut -d'.' -f 2)
 patch=$(echo $old_version | cut -d'.' -f 3)
@@ -34,10 +32,10 @@ esac
 version=$major.$minor.$patch
 
 echo "Updating VERSION file to $version"
-echo $version > ci/VERSION
+echo $version > VERSION
 
 echo "Committing change"
 git reset .
-git add ci/VERSION
+git add VERSION
 
 git ci -m "Bump version to $version"

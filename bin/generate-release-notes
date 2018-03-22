@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION=$(cat ci/VERSION)
+VERSION=$(cat VERSION)
 
 cat <<-NOTES
 Package Manager Installation

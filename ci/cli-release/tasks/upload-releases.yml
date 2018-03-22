@@ -27,7 +27,7 @@ run:
   - |
     set -ex
 
-    VERSION=$(cat cli/ci/VERSION)
+    VERSION=$(cat cli/VERSION)
 
     aws s3 cp repackaged-binaries-and-installers/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
     aws s3 cp signed-osx-installer/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive

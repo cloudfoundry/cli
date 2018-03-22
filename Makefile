@@ -2,7 +2,7 @@ CF_DIAL_TIMEOUT ?= 15
 NODES ?= 4
 LC_ALL = "en_US.UTF-8"
 
-CF_BUILD_VERSION ?= $$(cat ci/VERSION)
+CF_BUILD_VERSION ?= $$(cat VERSION)
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 LD_FLAGS = "-w -s \
