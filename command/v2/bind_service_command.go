@@ -21,9 +21,9 @@ type BindServiceActor interface {
 
 type BindServiceCommand struct {
 	RequiredArgs     flag.BindServiceArgs          `positional-args:"yes"`
-	BindingName      string                        `long:"binding-name" description:"Name to expose service instance to app process with (Default: service instance name)"`
+	BindingName      flag.BindingName              `long:"binding-name" description:"Name to expose service instance to app process with (Default: service instance name)"`
 	ParametersAsJSON flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
-	usage            interface{}                   `usage:"CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"permissions\": \"read-only\"\n   }\n\nEXAMPLES:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json"`
+	usage            interface{}                   `usage:"CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [--binding-name BINDING_NAME]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"permissions\": \"read-only\"\n   }\n\n   Optionally provide a binding name for the association between an app and a service instance:\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE --binding-name BINDING_NAME\n\nEXAMPLES:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json --binding-name BINDING_NAME"`
 	relatedCommands  interface{}                   `related_commands:"services"`
 
 	UI          command.UI
@@ -65,20 +65,20 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 	}
 
 	template := "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
-	if cmd.BindingName != "" {
+	if cmd.BindingName.Value != "" {
 		template = "Binding service {{.ServiceName}} to app {{.AppName}} with binding name {{.BindingName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
 	}
 
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
 		"ServiceName": cmd.RequiredArgs.ServiceInstanceName,
 		"AppName":     cmd.RequiredArgs.AppName,
-		"BindingName": cmd.BindingName,
+		"BindingName": cmd.BindingName.Value,
 		"OrgName":     cmd.Config.TargetedOrganization().Name,
 		"SpaceName":   cmd.Config.TargetedSpace().Name,
 		"CurrentUser": user.Name,
 	})
 
-	warnings, err := cmd.Actor.BindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, cmd.Config.TargetedSpace().GUID, cmd.BindingName, cmd.ParametersAsJSON)
+	warnings, err := cmd.Actor.BindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, cmd.Config.TargetedSpace().GUID, cmd.BindingName.Value, cmd.ParametersAsJSON)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, isTakenError := err.(ccerror.ServiceBindingTakenError); isTakenError {

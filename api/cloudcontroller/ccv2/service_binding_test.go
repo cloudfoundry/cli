@@ -22,7 +22,7 @@ var _ = Describe("Service Binding", func() {
 		Context("when the create is successful", func() {
 			Context("when a service binding name is provided", func() {
 				BeforeEach(func() {
-					requestBody := map[string]interface{}{
+					expectedRequestBody := map[string]interface{}{
 						"service_instance_guid": "some-service-instance-guid",
 						"app_guid":              "some-app-guid",
 						"name":                  "some-binding-name",
@@ -39,7 +39,7 @@ var _ = Describe("Service Binding", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPost, "/v2/service_bindings"),
-							VerifyJSONRepresenting(requestBody),
+							VerifyJSONRepresenting(expectedRequestBody),
 							RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 						),
 					)
@@ -59,10 +59,9 @@ var _ = Describe("Service Binding", func() {
 
 			Context("when a service binding name is not provided", func() {
 				BeforeEach(func() {
-					requestBody := map[string]interface{}{
+					expectedRequestBody := map[string]interface{}{
 						"service_instance_guid": "some-service-instance-guid",
 						"app_guid":              "some-app-guid",
-						"name":                  "",
 						"parameters": map[string]interface{}{
 							"the-service-broker": "wants this object",
 						},
@@ -76,7 +75,7 @@ var _ = Describe("Service Binding", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPost, "/v2/service_bindings"),
-							VerifyJSONRepresenting(requestBody),
+							VerifyJSONRepresenting(expectedRequestBody),
 							RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 						),
 					)

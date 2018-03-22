@@ -47,7 +47,7 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 type serviceBindingRequestBody struct {
 	ServiceInstanceGUID string                 `json:"service_instance_guid"`
 	AppGUID             string                 `json:"app_guid"`
-	Name                string                 `json:"name"`
+	Name                string                 `json:"name,omitempty"`
 	Parameters          map[string]interface{} `json:"parameters"`
 }
 

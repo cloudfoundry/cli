@@ -122,13 +122,8 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 		if helpErrored > 0 || flagErr.Type == flags.ErrUnknownFlag || flagErr.Type == flags.ErrExpectedArgument || flagErr.Type == flags.ErrInvalidChoice {
 			return 1
 		}
-	case flags.ErrRequired:
+	case flags.ErrRequired, flags.ErrMarshal:
 		fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
-		parse([]string{"help", originalArgs[0]})
-		return 1
-	case flags.ErrMarshal:
-		errMessage := strings.Split(flagErr.Message, ":")
-		fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", errMessage[0])
 		parse([]string{"help", originalArgs[0]})
 		return 1
 	case flags.ErrUnknownCommand:
