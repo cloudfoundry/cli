@@ -27,7 +27,7 @@ run:
     CF CLI Team <cf-cli-eng@pivotal.io>
     EOF
 
-    VERSION=$(cat cli-ci/ci/VERSION)
+    VERSION=$(cat cli-ci/VERSION)
     RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
 
     echo "Building 32-bit Debian package"

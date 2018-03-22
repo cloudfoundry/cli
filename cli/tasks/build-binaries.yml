@@ -30,13 +30,11 @@ run:
 
     mv i18n-data/i18n_resources.go $GOPATH/src/code.cloudfoundry.org/cli/i18n/resources
 
-    pushd cli-ci
-      BUILD_VERSION=$(cat ci/VERSION)
+    pushd $GOPATH/src/code.cloudfoundry.org/cli
+      BUILD_VERSION=$(cat VERSION)
       BUILD_SHA=$(git rev-parse --short HEAD)
       BUILD_DATE=$(date -u +"%Y-%m-%d")
-    popd
 
-    pushd $GOPATH/src/code.cloudfoundry.org/cli
       VERSION_LDFLAGS="-X code.cloudfoundry.org/cli/version.binaryVersion=${BUILD_VERSION} -X code.cloudfoundry.org/cli/version.binarySHA=${BUILD_SHA} -X code.cloudfoundry.org/cli/version.binaryBuildDate=${BUILD_DATE}"
 
       echo "Building 32-bit Linux"
