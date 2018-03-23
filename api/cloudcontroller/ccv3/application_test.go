@@ -359,11 +359,7 @@ var _ = Describe("Application", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodDelete, "/v3/apps/some-app-guid"),
-						RespondWith(http.StatusBadRequest, `{}`,
-							http.Header{
-								"X-Cf-Warnings": {"some-warning"},
-							},
-						),
+						RespondWith(http.StatusBadRequest, `{}`, http.Header{"X-Cf-Warnings": {"some-warning"}}),
 					),
 				)
 			})

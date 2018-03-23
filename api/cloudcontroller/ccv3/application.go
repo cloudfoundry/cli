@@ -26,6 +26,7 @@ type Application struct {
 	State constant.ApplicationState `json:"state,omitempty"`
 }
 
+// MarshalJSON converts an Application into a Cloud Controller Application.
 func (a Application) MarshalJSON() ([]byte, error) {
 	type rawApp Application
 	var ccApp struct {
@@ -63,6 +64,7 @@ func (a Application) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccApp)
 }
 
+// UnmarshalJSON helps unmarshal a Cloud Controller Application response.
 func (a *Application) UnmarshalJSON(data []byte) error {
 	type rawApp Application
 	var ccApp struct {

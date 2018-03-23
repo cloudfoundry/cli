@@ -7,19 +7,29 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
-// Droplet represents a cloud controller droplet's metadata. A droplet is a set of
+// Droplet represents a Cloud Controller droplet's metadata. A droplet is a set of
 // compiled bits for a given application.
 type Droplet struct {
-	GUID       string                `json:"guid"`
-	State      constant.DropletState `json:"state"`
-	CreatedAt  string                `json:"created_at"`
-	Stack      string                `json:"stack,omitempty"`
-	Buildpacks []DropletBuildpack    `json:"buildpacks,omitempty"`
-	Image      string                `json:"image"`
+	//Buildpacks are the detected buildpacks from the staging process.
+	Buildpacks []DropletBuildpack `json:"buildpacks,omitempty"`
+	// CreatedAt is the timestamp that the Cloud Controller created the droplet.
+	CreatedAt string `json:"created_at"`
+	// GUID is the unique droplet identifier.
+	GUID string `json:"guid"`
+	// Image is the Docker image name.
+	Image string `json:"image"`
+	// Stack is the root filesystem to use with the buildpack.
+	Stack string `json:"stack,omitempty"`
+	// State is the current state of the droplet.
+	State constant.DropletState `json:"state"`
 }
 
+// DropletBuildpack is the name and output of a buildpack used to create a
+// droplet.
 type DropletBuildpack struct {
-	Name         string `json:"name"`
+	// Name is the buildpack name.
+	Name string `json:"name"`
+	//DetectOutput is the output during buildpack detect process.
 	DetectOutput string `json:"detect_output"`
 }
 
@@ -39,6 +49,25 @@ func (client *Client) GetApplicationDropletCurrent(appGUID string) (Droplet, War
 		Result: &responseDroplet,
 	}
 	err = client.connection.Make(request, &response)
+	return responseDroplet, response.Warnings, err
+}
+
+// GetDroplet returns a droplet with the given GUID.
+func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetDropletRequest,
+		URIParams:   map[string]string{"droplet_guid": dropletGUID},
+	})
+	if err != nil {
+		return Droplet{}, nil, err
+	}
+
+	var responseDroplet Droplet
+	response := cloudcontroller.Response{
+		Result: &responseDroplet,
+	}
+	err = client.connection.Make(request, &response)
+
 	return responseDroplet, response.Warnings, err
 }
 
@@ -66,23 +95,4 @@ func (client *Client) GetDroplets(query ...Query) ([]Droplet, Warnings, error) {
 	})
 
 	return responseDroplets, warnings, err
-}
-
-// GetDroplet returns a droplet with the given GUID.
-func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetDropletRequest,
-		URIParams:   map[string]string{"droplet_guid": dropletGUID},
-	})
-	if err != nil {
-		return Droplet{}, nil, err
-	}
-
-	var responseDroplet Droplet
-	response := cloudcontroller.Response{
-		Result: &responseDroplet,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responseDroplet, response.Warnings, err
 }

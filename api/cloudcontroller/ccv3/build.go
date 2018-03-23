@@ -27,6 +27,7 @@ type Build struct {
 	State constant.BuildState
 }
 
+// MarshalJSON converts an Build into a Cloud Controller Application.
 func (b Build) MarshalJSON() ([]byte, error) {
 	var ccBuild struct {
 		Package struct {
@@ -39,6 +40,7 @@ func (b Build) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccBuild)
 }
 
+// UnmarshalJSON helps unmarshal a Cloud Controller Build response.
 func (b *Build) UnmarshalJSON(data []byte) error {
 	var ccBuild struct {
 		CreatedAt string `json:"created_at,omitempty"`
