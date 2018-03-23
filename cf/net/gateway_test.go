@@ -160,6 +160,7 @@ var _ = Describe("Gateway", func() {
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("GET", "/v2/some-endpoint"),
+						ghttp.VerifyHeaderKV("Connection", "close"),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),

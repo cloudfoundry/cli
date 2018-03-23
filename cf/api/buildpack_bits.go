@@ -225,9 +225,10 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 
 		client := &http.Client{
 			Transport: &http.Transport{
-				Dial:            (&gonet.Dialer{Timeout: 5 * time.Second}).Dial,
-				TLSClientConfig: &tls.Config{RootCAs: certPool},
-				Proxy:           http.ProxyFromEnvironment,
+				DisableKeepAlives: true,
+				Dial:              (&gonet.Dialer{Timeout: 5 * time.Second}).Dial,
+				TLSClientConfig:   &tls.Config{RootCAs: certPool},
+				Proxy:             http.ProxyFromEnvironment,
 			},
 		}
 

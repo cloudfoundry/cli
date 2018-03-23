@@ -275,6 +275,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			uaaServer.AppendHandlers(
 				ghttp.CombineHandlers(
 					ghttp.VerifyHeader(http.Header{"authorization": []string{"auth-token"}}),
+					ghttp.VerifyHeaderKV("Connection", "close"),
 					ghttp.VerifyRequest("GET", "/oauth/authorize",
 						"response_type=code&grant_type=authorization_code&client_id=ssh-oauth-client",
 					),

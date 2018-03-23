@@ -198,7 +198,6 @@ func (gateway Gateway) newRequest(request *http.Request, accessToken string, bod
 	}
 
 	request.Header.Set("accept", "application/json")
-	request.Header.Set("Connection", "close")
 	request.Header.Set("content-type", "application/json")
 	request.Header.Set("User-Agent", "go-cli "+version.VersionString()+" / "+runtime.GOOS)
 
@@ -447,6 +446,7 @@ func (gateway Gateway) doRequest(request *http.Request) (*http.Response, error) 
 
 func makeHTTPTransport(gateway *Gateway) {
 	gateway.transport = &http.Transport{
+		DisableKeepAlives: true,
 		Dial: (&net.Dialer{
 			KeepAlive: 30 * time.Second,
 			Timeout:   gateway.DialTimeout,
