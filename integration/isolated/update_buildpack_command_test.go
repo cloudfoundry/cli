@@ -96,8 +96,8 @@ var _ = Describe("update-buildpack command", func() {
 		})
 
 		AfterEach(func() {
-			err := os.RemoveAll(dir)
-			Expect(err).NotTo(HaveOccurred())
+			Eventually(CF("delete-buildpack", "some-buildpack", "-f")).Should(Exit(0))
+			Expect(os.RemoveAll(dir)).To(Succeed())
 		})
 
 		It("outputs an error message to the user, provides help text, and exits 1", func() {

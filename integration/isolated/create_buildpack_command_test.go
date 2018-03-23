@@ -3,6 +3,7 @@ package isolated
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	. "code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -12,6 +13,38 @@ import (
 )
 
 var _ = Describe("create-buildpack command", func() {
+	Context("successful creation", func() {
+		var (
+			dir string
+			err error
+		)
+		BeforeEach(func() {
+			LoginCF()
+
+			dir, err = ioutil.TempDir("", "create-buildpack-test")
+			Expect(err).ToNot(HaveOccurred())
+
+			filename := "some-file"
+			manifestFile := filepath.Join(dir, filename)
+			err = ioutil.WriteFile(manifestFile, []byte(""), 0400)
+			Expect(err).ToNot(HaveOccurred())
+
+			session := CF("create-buildpack", "some-buildpack", dir, "1")
+			Eventually(session).Should(Exit(0))
+		})
+
+		AfterEach(func() {
+			Eventually(CF("delete-buildpack", "some-buildpack", "-f")).Should(Exit(0))
+			Expect(os.RemoveAll(dir)).To(Succeed())
+		})
+
+		It("lists the created buildpack with stack", func() {
+			session := CF("buildpacks")
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say("some-buildpack.*cflinuxfs2.*1"))
+
+		})
+	})
 	Context("when the wrong data type is provided as the position argument", func() {
 		var filename string
 
