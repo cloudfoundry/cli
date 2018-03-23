@@ -16,15 +16,6 @@ type Config interface {
 	// infinite.
 	DialTimeout() time.Duration
 
-	// UAAOAuthClient is the UAA client ID the client will use.
-	UAAOAuthClient() string
-
-	// UAAOAuthClientSecret is the UAA client secret the client will use.
-	UAAOAuthClientSecret() string
-
-	// UAAGrantType returns the grant type of the supplied UAA credentials.
-	UAAGrantType() string
-
 	// SetUAAEndpoint sets the UAA endpoint that is obtained from hitting
 	// <AuthorizationEndpoint>/login.
 	SetUAAEndpoint(uaaEndpoint string)
@@ -37,4 +28,19 @@ type Config interface {
 	// In this mode, TLS is susceptible to man-in-the-middle attacks. This should
 	// be used only for testing.
 	SkipSSLValidation() bool
+
+	// UAADisableKeepAlives controls whether the UAA client will reuse TCP connections
+	// for multiple requests. If true, the client will always use a new TCP request
+	// and set Connection: close in the request header. If false, the client
+	// will reuse the TCP connection.
+	UAADisableKeepAlives() bool
+
+	// UAAGrantType returns the grant type of the supplied UAA credentials.
+	UAAGrantType() string
+
+	// UAAOAuthClient is the UAA client ID the client will use.
+	UAAOAuthClient() string
+
+	// UAAOAuthClientSecret is the UAA client secret the client will use.
+	UAAOAuthClientSecret() string
 }

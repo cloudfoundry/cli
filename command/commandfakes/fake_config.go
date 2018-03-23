@@ -290,15 +290,15 @@ type FakeConfig struct {
 		client       string
 		clientSecret string
 	}
-	SetUAAGrantTypeStub        func(uaaGrantType string)
-	setUAAGrantTypeMutex       sync.RWMutex
-	setUAAGrantTypeArgsForCall []struct {
-		uaaGrantType string
-	}
 	SetUAAEndpointStub        func(uaaEndpoint string)
 	setUAAEndpointMutex       sync.RWMutex
 	setUAAEndpointArgsForCall []struct {
 		uaaEndpoint string
+	}
+	SetUAAGrantTypeStub        func(uaaGrantType string)
+	setUAAGrantTypeMutex       sync.RWMutex
+	setUAAGrantTypeArgsForCall []struct {
+		uaaGrantType string
 	}
 	SkipSSLValidationStub        func() bool
 	skipSSLValidationMutex       sync.RWMutex
@@ -363,6 +363,24 @@ type FakeConfig struct {
 	targetedSpaceReturnsOnCall map[int]struct {
 		result1 configv3.Space
 	}
+	UAADisableKeepAlivesStub        func() bool
+	uAADisableKeepAlivesMutex       sync.RWMutex
+	uAADisableKeepAlivesArgsForCall []struct{}
+	uAADisableKeepAlivesReturns     struct {
+		result1 bool
+	}
+	uAADisableKeepAlivesReturnsOnCall map[int]struct {
+		result1 bool
+	}
+	UAAGrantTypeStub        func() string
+	uAAGrantTypeMutex       sync.RWMutex
+	uAAGrantTypeArgsForCall []struct{}
+	uAAGrantTypeReturns     struct {
+		result1 string
+	}
+	uAAGrantTypeReturnsOnCall map[int]struct {
+		result1 string
+	}
 	UAAOAuthClientStub        func() string
 	uAAOAuthClientMutex       sync.RWMutex
 	uAAOAuthClientArgsForCall []struct{}
@@ -381,24 +399,15 @@ type FakeConfig struct {
 	uAAOAuthClientSecretReturnsOnCall map[int]struct {
 		result1 string
 	}
-	UAAGrantTypeStub        func() string
-	uAAGrantTypeMutex       sync.RWMutex
-	uAAGrantTypeArgsForCall []struct{}
-	uAAGrantTypeReturns     struct {
-		result1 string
-	}
-	uAAGrantTypeReturnsOnCall map[int]struct {
-		result1 string
-	}
-	UnsetUserInformationStub                        func()
-	unsetUserInformationMutex                       sync.RWMutex
-	unsetUserInformationArgsForCall                 []struct{}
 	UnsetOrganizationAndSpaceInformationStub        func()
 	unsetOrganizationAndSpaceInformationMutex       sync.RWMutex
 	unsetOrganizationAndSpaceInformationArgsForCall []struct{}
 	UnsetSpaceInformationStub                       func()
 	unsetSpaceInformationMutex                      sync.RWMutex
 	unsetSpaceInformationArgsForCall                []struct{}
+	UnsetUserInformationStub                        func()
+	unsetUserInformationMutex                       sync.RWMutex
+	unsetUserInformationArgsForCall                 []struct{}
 	VerboseStub                                     func() (bool, []string)
 	verboseMutex                                    sync.RWMutex
 	verboseArgsForCall                              []struct{}
@@ -1621,30 +1630,6 @@ func (fake *FakeConfig) SetUAAClientCredentialsArgsForCall(i int) (string, strin
 	return fake.setUAAClientCredentialsArgsForCall[i].client, fake.setUAAClientCredentialsArgsForCall[i].clientSecret
 }
 
-func (fake *FakeConfig) SetUAAGrantType(uaaGrantType string) {
-	fake.setUAAGrantTypeMutex.Lock()
-	fake.setUAAGrantTypeArgsForCall = append(fake.setUAAGrantTypeArgsForCall, struct {
-		uaaGrantType string
-	}{uaaGrantType})
-	fake.recordInvocation("SetUAAGrantType", []interface{}{uaaGrantType})
-	fake.setUAAGrantTypeMutex.Unlock()
-	if fake.SetUAAGrantTypeStub != nil {
-		fake.SetUAAGrantTypeStub(uaaGrantType)
-	}
-}
-
-func (fake *FakeConfig) SetUAAGrantTypeCallCount() int {
-	fake.setUAAGrantTypeMutex.RLock()
-	defer fake.setUAAGrantTypeMutex.RUnlock()
-	return len(fake.setUAAGrantTypeArgsForCall)
-}
-
-func (fake *FakeConfig) SetUAAGrantTypeArgsForCall(i int) string {
-	fake.setUAAGrantTypeMutex.RLock()
-	defer fake.setUAAGrantTypeMutex.RUnlock()
-	return fake.setUAAGrantTypeArgsForCall[i].uaaGrantType
-}
-
 func (fake *FakeConfig) SetUAAEndpoint(uaaEndpoint string) {
 	fake.setUAAEndpointMutex.Lock()
 	fake.setUAAEndpointArgsForCall = append(fake.setUAAEndpointArgsForCall, struct {
@@ -1667,6 +1652,30 @@ func (fake *FakeConfig) SetUAAEndpointArgsForCall(i int) string {
 	fake.setUAAEndpointMutex.RLock()
 	defer fake.setUAAEndpointMutex.RUnlock()
 	return fake.setUAAEndpointArgsForCall[i].uaaEndpoint
+}
+
+func (fake *FakeConfig) SetUAAGrantType(uaaGrantType string) {
+	fake.setUAAGrantTypeMutex.Lock()
+	fake.setUAAGrantTypeArgsForCall = append(fake.setUAAGrantTypeArgsForCall, struct {
+		uaaGrantType string
+	}{uaaGrantType})
+	fake.recordInvocation("SetUAAGrantType", []interface{}{uaaGrantType})
+	fake.setUAAGrantTypeMutex.Unlock()
+	if fake.SetUAAGrantTypeStub != nil {
+		fake.SetUAAGrantTypeStub(uaaGrantType)
+	}
+}
+
+func (fake *FakeConfig) SetUAAGrantTypeCallCount() int {
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
+	return len(fake.setUAAGrantTypeArgsForCall)
+}
+
+func (fake *FakeConfig) SetUAAGrantTypeArgsForCall(i int) string {
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
+	return fake.setUAAGrantTypeArgsForCall[i].uaaGrantType
 }
 
 func (fake *FakeConfig) SkipSSLValidation() bool {
@@ -1949,6 +1958,86 @@ func (fake *FakeConfig) TargetedSpaceReturnsOnCall(i int, result1 configv3.Space
 	}{result1}
 }
 
+func (fake *FakeConfig) UAADisableKeepAlives() bool {
+	fake.uAADisableKeepAlivesMutex.Lock()
+	ret, specificReturn := fake.uAADisableKeepAlivesReturnsOnCall[len(fake.uAADisableKeepAlivesArgsForCall)]
+	fake.uAADisableKeepAlivesArgsForCall = append(fake.uAADisableKeepAlivesArgsForCall, struct{}{})
+	fake.recordInvocation("UAADisableKeepAlives", []interface{}{})
+	fake.uAADisableKeepAlivesMutex.Unlock()
+	if fake.UAADisableKeepAlivesStub != nil {
+		return fake.UAADisableKeepAlivesStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.uAADisableKeepAlivesReturns.result1
+}
+
+func (fake *FakeConfig) UAADisableKeepAlivesCallCount() int {
+	fake.uAADisableKeepAlivesMutex.RLock()
+	defer fake.uAADisableKeepAlivesMutex.RUnlock()
+	return len(fake.uAADisableKeepAlivesArgsForCall)
+}
+
+func (fake *FakeConfig) UAADisableKeepAlivesReturns(result1 bool) {
+	fake.UAADisableKeepAlivesStub = nil
+	fake.uAADisableKeepAlivesReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) UAADisableKeepAlivesReturnsOnCall(i int, result1 bool) {
+	fake.UAADisableKeepAlivesStub = nil
+	if fake.uAADisableKeepAlivesReturnsOnCall == nil {
+		fake.uAADisableKeepAlivesReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.uAADisableKeepAlivesReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) UAAGrantType() string {
+	fake.uAAGrantTypeMutex.Lock()
+	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
+	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct{}{})
+	fake.recordInvocation("UAAGrantType", []interface{}{})
+	fake.uAAGrantTypeMutex.Unlock()
+	if fake.UAAGrantTypeStub != nil {
+		return fake.UAAGrantTypeStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.uAAGrantTypeReturns.result1
+}
+
+func (fake *FakeConfig) UAAGrantTypeCallCount() int {
+	fake.uAAGrantTypeMutex.RLock()
+	defer fake.uAAGrantTypeMutex.RUnlock()
+	return len(fake.uAAGrantTypeArgsForCall)
+}
+
+func (fake *FakeConfig) UAAGrantTypeReturns(result1 string) {
+	fake.UAAGrantTypeStub = nil
+	fake.uAAGrantTypeReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) UAAGrantTypeReturnsOnCall(i int, result1 string) {
+	fake.UAAGrantTypeStub = nil
+	if fake.uAAGrantTypeReturnsOnCall == nil {
+		fake.uAAGrantTypeReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uAAGrantTypeReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) UAAOAuthClient() string {
 	fake.uAAOAuthClientMutex.Lock()
 	ret, specificReturn := fake.uAAOAuthClientReturnsOnCall[len(fake.uAAOAuthClientArgsForCall)]
@@ -2029,62 +2118,6 @@ func (fake *FakeConfig) UAAOAuthClientSecretReturnsOnCall(i int, result1 string)
 	}{result1}
 }
 
-func (fake *FakeConfig) UAAGrantType() string {
-	fake.uAAGrantTypeMutex.Lock()
-	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
-	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct{}{})
-	fake.recordInvocation("UAAGrantType", []interface{}{})
-	fake.uAAGrantTypeMutex.Unlock()
-	if fake.UAAGrantTypeStub != nil {
-		return fake.UAAGrantTypeStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.uAAGrantTypeReturns.result1
-}
-
-func (fake *FakeConfig) UAAGrantTypeCallCount() int {
-	fake.uAAGrantTypeMutex.RLock()
-	defer fake.uAAGrantTypeMutex.RUnlock()
-	return len(fake.uAAGrantTypeArgsForCall)
-}
-
-func (fake *FakeConfig) UAAGrantTypeReturns(result1 string) {
-	fake.UAAGrantTypeStub = nil
-	fake.uAAGrantTypeReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) UAAGrantTypeReturnsOnCall(i int, result1 string) {
-	fake.UAAGrantTypeStub = nil
-	if fake.uAAGrantTypeReturnsOnCall == nil {
-		fake.uAAGrantTypeReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.uAAGrantTypeReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) UnsetUserInformation() {
-	fake.unsetUserInformationMutex.Lock()
-	fake.unsetUserInformationArgsForCall = append(fake.unsetUserInformationArgsForCall, struct{}{})
-	fake.recordInvocation("UnsetUserInformation", []interface{}{})
-	fake.unsetUserInformationMutex.Unlock()
-	if fake.UnsetUserInformationStub != nil {
-		fake.UnsetUserInformationStub()
-	}
-}
-
-func (fake *FakeConfig) UnsetUserInformationCallCount() int {
-	fake.unsetUserInformationMutex.RLock()
-	defer fake.unsetUserInformationMutex.RUnlock()
-	return len(fake.unsetUserInformationArgsForCall)
-}
-
 func (fake *FakeConfig) UnsetOrganizationAndSpaceInformation() {
 	fake.unsetOrganizationAndSpaceInformationMutex.Lock()
 	fake.unsetOrganizationAndSpaceInformationArgsForCall = append(fake.unsetOrganizationAndSpaceInformationArgsForCall, struct{}{})
@@ -2115,6 +2148,22 @@ func (fake *FakeConfig) UnsetSpaceInformationCallCount() int {
 	fake.unsetSpaceInformationMutex.RLock()
 	defer fake.unsetSpaceInformationMutex.RUnlock()
 	return len(fake.unsetSpaceInformationArgsForCall)
+}
+
+func (fake *FakeConfig) UnsetUserInformation() {
+	fake.unsetUserInformationMutex.Lock()
+	fake.unsetUserInformationArgsForCall = append(fake.unsetUserInformationArgsForCall, struct{}{})
+	fake.recordInvocation("UnsetUserInformation", []interface{}{})
+	fake.unsetUserInformationMutex.Unlock()
+	if fake.UnsetUserInformationStub != nil {
+		fake.UnsetUserInformationStub()
+	}
+}
+
+func (fake *FakeConfig) UnsetUserInformationCallCount() int {
+	fake.unsetUserInformationMutex.RLock()
+	defer fake.unsetUserInformationMutex.RUnlock()
+	return len(fake.unsetUserInformationArgsForCall)
 }
 
 func (fake *FakeConfig) Verbose() (bool, []string) {
@@ -2269,10 +2318,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setTokenInformationMutex.RUnlock()
 	fake.setUAAClientCredentialsMutex.RLock()
 	defer fake.setUAAClientCredentialsMutex.RUnlock()
-	fake.setUAAGrantTypeMutex.RLock()
-	defer fake.setUAAGrantTypeMutex.RUnlock()
 	fake.setUAAEndpointMutex.RLock()
 	defer fake.setUAAEndpointMutex.RUnlock()
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
 	fake.skipSSLValidationMutex.RLock()
 	defer fake.skipSSLValidationMutex.RUnlock()
 	fake.sSHOAuthClientMutex.RLock()
@@ -2287,18 +2336,20 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.targetedOrganizationMutex.RUnlock()
 	fake.targetedSpaceMutex.RLock()
 	defer fake.targetedSpaceMutex.RUnlock()
+	fake.uAADisableKeepAlivesMutex.RLock()
+	defer fake.uAADisableKeepAlivesMutex.RUnlock()
+	fake.uAAGrantTypeMutex.RLock()
+	defer fake.uAAGrantTypeMutex.RUnlock()
 	fake.uAAOAuthClientMutex.RLock()
 	defer fake.uAAOAuthClientMutex.RUnlock()
 	fake.uAAOAuthClientSecretMutex.RLock()
 	defer fake.uAAOAuthClientSecretMutex.RUnlock()
-	fake.uAAGrantTypeMutex.RLock()
-	defer fake.uAAGrantTypeMutex.RUnlock()
-	fake.unsetUserInformationMutex.RLock()
-	defer fake.unsetUserInformationMutex.RUnlock()
 	fake.unsetOrganizationAndSpaceInformationMutex.RLock()
 	defer fake.unsetOrganizationAndSpaceInformationMutex.RUnlock()
 	fake.unsetSpaceInformationMutex.RLock()
 	defer fake.unsetSpaceInformationMutex.RUnlock()
+	fake.unsetUserInformationMutex.RLock()
+	defer fake.unsetUserInformationMutex.RUnlock()
 	fake.verboseMutex.RLock()
 	defer fake.verboseMutex.RUnlock()
 	fake.writePluginConfigMutex.RLock()

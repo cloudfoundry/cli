@@ -32,6 +32,11 @@ const (
 	// application/process container
 	DefaultSSHOAuthClient = "ssh-proxy"
 
+	// DefaultUAADisableKeepAlives is the default value that the UAA client will
+	// use for Transport.DisableKeepAlives. UAA connections should always be
+	// closed after every request because UAA communication is infrequent.
+	DefaultUAADisableKeepAlives = true
+
 	// DefaultUAAOAuthClient is the default client ID for the CLI when
 	// communicating with the UAA.
 	DefaultUAAOAuthClient = "cf"
@@ -57,4 +62,10 @@ func (config *Config) PollingInterval() time.Duration {
 // RequestRetryCount returns the number of request retries.
 func (*Config) RequestRetryCount() int {
 	return DefaultRetryCount
+}
+
+// UAADisableKeepAlives returns true when TCP connections should not be reused
+// for UAA.
+func (*Config) UAADisableKeepAlives() bool {
+	return DefaultUAADisableKeepAlives
 }

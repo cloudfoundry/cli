@@ -17,17 +17,6 @@ type FakeManifestParser struct {
 	appNamesReturnsOnCall map[int]struct {
 		result1 []string
 	}
-	ParseStub        func(manifestPath string) error
-	parseMutex       sync.RWMutex
-	parseArgsForCall []struct {
-		manifestPath string
-	}
-	parseReturns struct {
-		result1 error
-	}
-	parseReturnsOnCall map[int]struct {
-		result1 error
-	}
 	RawManifestStub        func(name string) ([]byte, error)
 	rawManifestMutex       sync.RWMutex
 	rawManifestArgsForCall []struct {
@@ -40,6 +29,17 @@ type FakeManifestParser struct {
 	rawManifestReturnsOnCall map[int]struct {
 		result1 []byte
 		result2 error
+	}
+	ParseStub        func(manifestPath string) error
+	parseMutex       sync.RWMutex
+	parseArgsForCall []struct {
+		manifestPath string
+	}
+	parseReturns struct {
+		result1 error
+	}
+	parseReturnsOnCall map[int]struct {
+		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -82,54 +82,6 @@ func (fake *FakeManifestParser) AppNamesReturnsOnCall(i int, result1 []string) {
 	}
 	fake.appNamesReturnsOnCall[i] = struct {
 		result1 []string
-	}{result1}
-}
-
-func (fake *FakeManifestParser) Parse(manifestPath string) error {
-	fake.parseMutex.Lock()
-	ret, specificReturn := fake.parseReturnsOnCall[len(fake.parseArgsForCall)]
-	fake.parseArgsForCall = append(fake.parseArgsForCall, struct {
-		manifestPath string
-	}{manifestPath})
-	fake.recordInvocation("Parse", []interface{}{manifestPath})
-	fake.parseMutex.Unlock()
-	if fake.ParseStub != nil {
-		return fake.ParseStub(manifestPath)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.parseReturns.result1
-}
-
-func (fake *FakeManifestParser) ParseCallCount() int {
-	fake.parseMutex.RLock()
-	defer fake.parseMutex.RUnlock()
-	return len(fake.parseArgsForCall)
-}
-
-func (fake *FakeManifestParser) ParseArgsForCall(i int) string {
-	fake.parseMutex.RLock()
-	defer fake.parseMutex.RUnlock()
-	return fake.parseArgsForCall[i].manifestPath
-}
-
-func (fake *FakeManifestParser) ParseReturns(result1 error) {
-	fake.ParseStub = nil
-	fake.parseReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeManifestParser) ParseReturnsOnCall(i int, result1 error) {
-	fake.ParseStub = nil
-	if fake.parseReturnsOnCall == nil {
-		fake.parseReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.parseReturnsOnCall[i] = struct {
-		result1 error
 	}{result1}
 }
 
@@ -184,15 +136,63 @@ func (fake *FakeManifestParser) RawManifestReturnsOnCall(i int, result1 []byte, 
 	}{result1, result2}
 }
 
+func (fake *FakeManifestParser) Parse(manifestPath string) error {
+	fake.parseMutex.Lock()
+	ret, specificReturn := fake.parseReturnsOnCall[len(fake.parseArgsForCall)]
+	fake.parseArgsForCall = append(fake.parseArgsForCall, struct {
+		manifestPath string
+	}{manifestPath})
+	fake.recordInvocation("Parse", []interface{}{manifestPath})
+	fake.parseMutex.Unlock()
+	if fake.ParseStub != nil {
+		return fake.ParseStub(manifestPath)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.parseReturns.result1
+}
+
+func (fake *FakeManifestParser) ParseCallCount() int {
+	fake.parseMutex.RLock()
+	defer fake.parseMutex.RUnlock()
+	return len(fake.parseArgsForCall)
+}
+
+func (fake *FakeManifestParser) ParseArgsForCall(i int) string {
+	fake.parseMutex.RLock()
+	defer fake.parseMutex.RUnlock()
+	return fake.parseArgsForCall[i].manifestPath
+}
+
+func (fake *FakeManifestParser) ParseReturns(result1 error) {
+	fake.ParseStub = nil
+	fake.parseReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeManifestParser) ParseReturnsOnCall(i int, result1 error) {
+	fake.ParseStub = nil
+	if fake.parseReturnsOnCall == nil {
+		fake.parseReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.parseReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeManifestParser) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.appNamesMutex.RLock()
 	defer fake.appNamesMutex.RUnlock()
-	fake.parseMutex.RLock()
-	defer fake.parseMutex.RUnlock()
 	fake.rawManifestMutex.RLock()
 	defer fake.rawManifestMutex.RUnlock()
+	fake.parseMutex.RLock()
+	defer fake.parseMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

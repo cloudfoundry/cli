@@ -22,7 +22,7 @@ var _ = Describe("UAA Connection", func() {
 	)
 
 	BeforeEach(func() {
-		connection = NewConnection(true, 0)
+		connection = NewConnection(true, true, 0)
 	})
 
 	Describe("Make", func() {
@@ -77,6 +77,7 @@ var _ = Describe("UAA Connection", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v2/foo", ""),
+						VerifyHeaderKV("Connection", "close"),
 						RespondWith(http.StatusOK, response),
 					),
 				)
@@ -99,7 +100,7 @@ var _ = Describe("UAA Connection", func() {
 		Describe("Errors", func() {
 			Context("when the server does not exist", func() {
 				BeforeEach(func() {
-					connection = NewConnection(false, 0)
+					connection = NewConnection(false, true, 0)
 				})
 
 				It("returns a RequestError", func() {
@@ -125,7 +126,7 @@ var _ = Describe("UAA Connection", func() {
 							),
 						)
 
-						connection = NewConnection(false, 0)
+						connection = NewConnection(false, true, 0)
 					})
 
 					It("returns a UnverifiedServerError", func() {

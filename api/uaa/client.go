@@ -34,7 +34,7 @@ func NewClient(config Config) *Client {
 	client := Client{
 		config: config,
 
-		connection: NewConnection(config.SkipSSLValidation(), config.DialTimeout()),
+		connection: NewConnection(config.SkipSSLValidation(), config.UAADisableKeepAlives(), config.DialTimeout()),
 		userAgent:  userAgent,
 	}
 	client.WrapConnection(NewErrorWrapper())
