@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("when a droplet is provided", func() {
@@ -43,7 +44,27 @@ var _ = Describe("when a droplet is provided", func() {
 		Expect(os.RemoveAll(dropletPath)).ToNot(HaveOccurred())
 	})
 
+	Context("when the v2 api version is lower than the minimum version", func() {
+		var server *Server
+
+		BeforeEach(func() {
+			server = helpers.StartAndTargetServerWithAPIVersions("2.50.0", helpers.DefaultV3Version)
+		})
+
+		AfterEach(func() {
+			server.Close()
+		})
+
+		It("fails with error message that the minimum version is not met", func() {
+			session := helpers.CF(PushCommandName, appName, "--droplet", dropletPath)
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session.Err).Should(Say("Option '--droplet' requires CF API version 2\\.63\\.0 or higher\\. Your target is 2\\.50\\.0"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
 	Context("when the app does not exist", func() {
+
 		It("creates the app", func() {
 			session := helpers.CF(PushCommandName, appName, "--droplet", dropletPath)
 			Eventually(session).Should(Say("Getting app info\\.\\.\\."))

@@ -9,6 +9,11 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
+const (
+	DefaultV2Version string = "2.100.0"
+	DefaultV3Version string = "3.33.3"
+)
+
 func StartAndTargetServerWithoutV3API() *Server {
 	server := NewTLSServer()
 	server.AppendHandlers(
@@ -26,7 +31,7 @@ func StartAndTargetServerWithoutV3API() *Server {
 	return server
 }
 
-func StartAndTargetServerWithV3Version(v3Version string) *Server {
+func StartAndTargetServerWithAPIVersions(v2Version string, v3Version string) *Server {
 	server := NewTLSServer()
 
 	rootResponse := fmt.Sprintf(`{
@@ -37,13 +42,13 @@ func StartAndTargetServerWithV3Version(v3Version string) *Server {
       "cloud_controller_v2": {
          "href": "%[1]s/v2",
          "meta": {
-            "version": "2.94.0"
+            "version": "%[2]s"
          }
       },
       "cloud_controller_v3": {
          "href": "%[1]s/v3",
          "meta": {
-            "version": "%[2]s"
+            "version": "%[3]s"
          }
       },
       "network_policy_v0": {
@@ -66,12 +71,12 @@ func StartAndTargetServerWithV3Version(v3Version string) *Server {
          }
       }
    }
- }`, server.URL(), v3Version)
+ }`, server.URL(), v2Version, v3Version)
 
 	v2InfoResponse := fmt.Sprintf(`{
-		"api_version":"2.34.0",
-		"authorization_endpoint": "%[1]s"
-  }`, server.URL())
+		"api_version":"%[1]s",
+		"authorization_endpoint": "%[2]s"
+  }`, v2Version, server.URL())
 
 	server.RouteToHandler(http.MethodGet, "/v2/info", func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusOK)

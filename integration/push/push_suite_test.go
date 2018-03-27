@@ -96,6 +96,8 @@ var _ = BeforeEach(func() {
 
 var _ = AfterEach(func() {
 	GinkgoWriter.Write([]byte("==============================Global After Each=============================="))
+	helpers.SetAPI()
+	helpers.SetupCF(organization, space)
 	helpers.QuickDeleteSpace(space)
 	helpers.DestroyHomeDir(homeDir)
 })
