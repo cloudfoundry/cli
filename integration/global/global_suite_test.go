@@ -1,6 +1,7 @@
 package global
 
 import (
+	"fmt"
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -29,6 +30,7 @@ func TestGlobal(t *testing.T) {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
+	GinkgoWriter.Write([]byte("==============================Global FIRST Node Synchronized Before Each=============================="))
 	// Ginkgo Globals
 	SetDefaultEventuallyTimeout(CFEventuallyTimeout)
 	SetDefaultConsistentlyDuration(CFConsistentlyTimeout)
@@ -43,19 +45,25 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	ReadOnlyOrg, ReadOnlySpace = helpers.SetupReadOnlyOrgAndSpace()
 
+	GinkgoWriter.Write([]byte("==============================End of Global FIRST Node Synchronized Before Each=============================="))
 	return nil
 }, func(_ []byte) {
+	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================Global Node %d Synchronized Before Each==============================", GinkgoParallelNode())))
 	if GinkgoParallelNode() != 1 {
 		Fail("Test suite cannot run in parallel")
 	}
+	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized Before Each==============================", GinkgoParallelNode())))
 })
 
 var _ = BeforeEach(func() {
+	GinkgoWriter.Write([]byte("==============================Global Before Each=============================="))
 	homeDir = helpers.SetHomeDir()
 	helpers.SetAPI()
+	GinkgoWriter.Write([]byte("==============================End of Global Before Each=============================="))
 })
 
 var _ = AfterEach(func() {
 	GinkgoWriter.Write([]byte("==============================Global After Each=============================="))
 	helpers.DestroyHomeDir(homeDir)
+	GinkgoWriter.Write([]byte("==============================End of Global After Each=============================="))
 })
