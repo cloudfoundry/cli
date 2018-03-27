@@ -79,6 +79,21 @@ var _ = Describe("push Command", func() {
 			executeErr = cmd.Execute(nil)
 		})
 
+		Context("when the droplet flag is passed and the API version is below the minimum", func() {
+			BeforeEach(func() {
+				fakeActor.CloudControllerAPIVersionReturns("2.6.1")
+				cmd.DropletPath = "some-droplet-path"
+			})
+
+			It("returns a MinimumAPIVersionNotMetError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+					Command:        "Option '--droplet'",
+					CurrentVersion: "2.6.1",
+					MinimumVersion: ccversion.MinVersionDropletUploadV2,
+				}))
+			})
+		})
+
 		Context("when checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
@@ -114,21 +129,6 @@ var _ = Describe("push Command", func() {
 						},
 					}
 					fakeActor.MergeAndValidateSettingsAndManifestsReturns(appManifests, nil)
-				})
-
-				Context("when the droplet flag is passed and the API version is below the minimum", func() {
-					BeforeEach(func() {
-						fakeActor.CloudControllerAPIVersionReturns("2.6.1")
-						cmd.DropletPath = "some-droplet-path"
-					})
-
-					It("returns a MinimumAPIVersionNotMetError", func() {
-						Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-							Command:        "Option '--droplet'",
-							CurrentVersion: "2.6.1",
-							MinimumVersion: ccversion.MinVersionDropletUploadV2,
-						}))
-					})
 				})
 
 				Context("when the settings can be converted to a valid config", func() {

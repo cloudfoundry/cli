@@ -97,6 +97,12 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V2PushCommand) Execute(args []string) error {
+	if cmd.DropletPath != "" {
+		if err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionDropletUploadV2, "Option '--droplet'"); err != nil {
+			return err
+		}
+	}
+
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -111,11 +117,6 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	cliSettings, err := cmd.GetCommandLineSettings()
 	if err != nil {
 		log.Errorln("reading flags:", err)
-		return err
-	}
-
-	ccVersion := cmd.Actor.CloudControllerAPIVersion()
-	if err = command.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionDropletUploadV2, "Option '--droplet'"); cmd.DropletPath != "" && err != nil {
 		return err
 	}
 
