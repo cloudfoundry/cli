@@ -33,7 +33,7 @@ run:
     EOF
     chmod 700 sign-rpm
 
-    VERSION=$(cat cli/VERSION)
+    VERSION=$(cat cli/BUILD_VERSION)
 
     cat<< EOF >~/.rpmmacros
     %_gpg_name CF CLI Team <cf-cli-eng@pivotal.io>

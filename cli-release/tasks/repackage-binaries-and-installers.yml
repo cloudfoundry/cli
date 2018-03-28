@@ -24,7 +24,7 @@ run:
   - |
     set -ex
 
-    VERSION=$(cat cli/VERSION)
+    VERSION=$(cat cli/BUILD_VERSION)
 
     mv edge-linux-binary-32/cf-cli_edge_linux_i686.tgz repackaged-binaries-and-installers/cf-cli_${VERSION}_linux_i686.tgz
     mv edge-linux-binary-64/cf-cli_edge_linux_x86-64.tgz repackaged-binaries-and-installers/cf-cli_${VERSION}_linux_x86-64.tgz
