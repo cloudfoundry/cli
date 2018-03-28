@@ -620,10 +620,12 @@ var _ = Describe("Service Instance Summary Actions", func() {
 								returnedServiceBindings = []ccv2.ServiceBinding{
 									{
 										GUID:    "some-service-binding-1-guid",
+										Name:    "some-service-binding-1",
 										AppGUID: "some-app-1-guid",
 									},
 									{
 										GUID:    "some-service-binding-2-guid",
+										Name:    "some-service-binding-2",
 										AppGUID: "some-app-2-guid",
 									},
 								}
@@ -678,7 +680,16 @@ var _ = Describe("Service Instance Summary Actions", func() {
 									Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
 									Expect(summary.ServicePlan).To(Equal(ServicePlan(returnedServicePlan)))
 									Expect(summary.Service).To(Equal(Service(returnedService)))
-									Expect(summary.BoundApplications).To(Equal([]string{"some-app-1", "some-app-2"}))
+									Expect(summary.BoundApplications).To(Equal([]BoundApplication{
+										{
+											AppName:            "some-app-1",
+											ServiceBindingName: "some-service-binding-1",
+										},
+										{
+											AppName:            "some-app-2",
+											ServiceBindingName: "some-service-binding-2",
+										},
+									}))
 									Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-plan-warning", "get-service-warning", "get-service-bindings-warning", "get-application-warning-1", "get-application-warning-2"))
 
 									Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsCallCount()).To(Equal(1))
@@ -731,10 +742,12 @@ var _ = Describe("Service Instance Summary Actions", func() {
 						returnedServiceBindings = []ccv2.ServiceBinding{
 							{
 								GUID:    "some-service-binding-1-guid",
+								Name:    "some-service-binding-1",
 								AppGUID: "some-app-1-guid",
 							},
 							{
 								GUID:    "some-service-binding-2-guid",
+								Name:    "some-service-binding-2",
 								AppGUID: "some-app-2-guid",
 							},
 						}
@@ -767,8 +780,17 @@ var _ = Describe("Service Instance Summary Actions", func() {
 						It("returns a list of applications bound to the service instance and all warnings", func() {
 							Expect(summaryErr).ToNot(HaveOccurred())
 							Expect(summary).To(Equal(ServiceInstanceSummary{
-								ServiceInstance:   ServiceInstance(returnedServiceInstance),
-								BoundApplications: []string{"some-app-1", "some-app-2"},
+								ServiceInstance: ServiceInstance(returnedServiceInstance),
+								BoundApplications: []BoundApplication{
+									{
+										AppName:            "some-app-1",
+										ServiceBindingName: "some-service-binding-1",
+									},
+									{
+										AppName:            "some-app-2",
+										ServiceBindingName: "some-service-binding-2",
+									},
+								},
 							}))
 							Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-service-bindings-warning", "get-application-warning-1", "get-application-warning-2"))
 
@@ -854,7 +876,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 					GUID:            "some-si-GUID-3",
 					Name:            "some-si-name-3",
 					ServiceGUID:     "some-service-GUID-3",
-					ServicePlanGUID: "some-si-sp-GUID-2",
+					ServicePlanGUID: "some-si-sp-GUID-3",
 					Type:            constant.ServiceInstanceTypeUserProvidedService,
 					LastOperation: ccv2.LastOperation{
 						Type:  "some-lo-type",
@@ -869,21 +891,26 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 				bindings1 = []ccv2.ServiceBinding{
 					{
-						AppGUID:             "2-app-GUID",
-						ServiceInstanceGUID: "some-si-GUID-1",
 						GUID:                "some-sb-GUID-1",
+						Name:                "some-service-binding-2",
+						AppGUID:             "2-app-GUID", // we are testing that the app name will be sorted alphanumerically
+						ServiceInstanceGUID: "some-si-GUID-1",
 					},
 					{
-						AppGUID:             "1-app-GUID",
-						ServiceInstanceGUID: "some-si-GUID-3",
 						GUID:                "some-sb-GUID-2",
-					}}
+						Name:                "some-service-binding-1",
+						AppGUID:             "1-app-GUID", // we are testing that the app name will be sorted alphanumerically
+						ServiceInstanceGUID: "some-si-GUID-3",
+					},
+				}
 				bindings2 = []ccv2.ServiceBinding{
 					{
+						GUID:                "some-sb-GUID-1",
+						Name:                "some-service-binding-1",
 						AppGUID:             "1-app-GUID",
 						ServiceInstanceGUID: "some-si-GUID-1",
-						GUID:                "some-sb-GUID-1",
-					}}
+					},
+				}
 				fakeCloudControllerClient.GetServiceInstanceServiceBindingsReturns(
 					bindings1,
 					ccv2.Warnings{"some-bindings-warning"},
@@ -910,17 +937,31 @@ var _ = Describe("Service Instance Summary Actions", func() {
 				}
 			})
 
-			It("returns the service instances summary and all warnings", func() {
+			It("returns the service instances summary with bound apps in alphanumeric sorted order and all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(serviceInstancesSummary).To(Equal(
 					[]ServiceInstanceSummary{
 						{
-							ServiceInstance:   ServiceInstance(serviceInstance1),
-							BoundApplications: []string{"1-app-name", "2-app-name"},
+							ServiceInstance: ServiceInstance(serviceInstance1),
+							BoundApplications: []BoundApplication{
+								{
+									AppName:            "1-app-name",
+									ServiceBindingName: "some-service-binding-1",
+								},
+								{
+									AppName:            "2-app-name",
+									ServiceBindingName: "some-service-binding-2",
+								},
+							},
 						},
 						{
-							ServiceInstance:   ServiceInstance(serviceInstance2),
-							BoundApplications: []string{"1-app-name"},
+							ServiceInstance: ServiceInstance(serviceInstance2),
+							BoundApplications: []BoundApplication{
+								{
+									AppName:            "1-app-name",
+									ServiceBindingName: "some-service-binding-1",
+								},
+							},
 						}}))
 				Expect(warnings).To(ConsistOf("get-by-space-service-instances-warning",
 					"some-get-app-warning", "some-get-app-warning", "some-get-app-warning",

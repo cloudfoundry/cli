@@ -87,6 +87,20 @@ var _ = Describe("service command", func() {
 					})
 				})
 
+				Context("when no apps are bound to the service instance", func() {
+					It("displays service instance info", func() {
+						session := helpers.CF("service", serviceInstanceName)
+						Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(""))
+						Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
+						Eventually(session).Should(Say("service:\\s+user-provided"))
+						Eventually(session).Should(Say(""))
+						Eventually(session).Should(Say("There are no bound apps for this service."))
+						Eventually(session).Should(Say(""))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
 				Context("when apps are bound to the service instance", func() {
 					var (
 						appName1 string
@@ -101,37 +115,72 @@ var _ = Describe("service command", func() {
 							Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 							Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 						})
-						Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
-						Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
 					})
 
 					AfterEach(func() {
-						Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
-						Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
 						Eventually(helpers.CF("delete", appName1, "-f")).Should(Exit(0))
 						Eventually(helpers.CF("delete", appName2, "-f")).Should(Exit(0))
 					})
 
-					It("displays service instance info", func() {
-						session := helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(""))
-						Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
-						Consistently(session).ShouldNot(Say("shared from:"))
-						Eventually(session).Should(Say("service:\\s+user-provided"))
-						Eventually(session).Should(Say("bound apps:\\s+%s, %s", appName1, appName2))
-						Consistently(session).ShouldNot(Say("tags:"))
-						Consistently(session).ShouldNot(Say("plan:"))
-						Consistently(session).ShouldNot(Say("description:"))
-						Consistently(session).ShouldNot(Say("documentation:"))
-						Consistently(session).ShouldNot(Say("dashboard:"))
-						Consistently(session).ShouldNot(Say("shared with spaces:"))
-						Consistently(session).ShouldNot(Say("last operation"))
-						Consistently(session).ShouldNot(Say("status:"))
-						Consistently(session).ShouldNot(Say("message:"))
-						Consistently(session).ShouldNot(Say("started:"))
-						Consistently(session).ShouldNot(Say("updated:"))
-						Eventually(session).Should(Exit(0))
+					Context("when the service bindings do not have binding names", func() {
+						BeforeEach(func() {
+							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
+							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
+						})
+
+						AfterEach(func() {
+							Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
+							Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
+						})
+
+						It("displays service instance info", func() {
+							session := helpers.CF("service", serviceInstanceName)
+							Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
+							Eventually(session).Should(Say(""))
+							Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
+							Eventually(session).Should(Say("service:\\s+user-provided"))
+							Eventually(session).Should(Say(""))
+							Eventually(session).Should(Say("bound apps:"))
+							Eventually(session).Should(Say("name:\\s+binding name"))
+							Eventually(session).Should(Say(appName1))
+							Eventually(session).Should(Say(appName2))
+
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the service bindings have binding names", func() {
+						var (
+							bindingName1 string
+							bindingName2 string
+						)
+
+						BeforeEach(func() {
+							bindingName1 = helpers.PrefixedRandomName("BINDING-NAME")
+							bindingName2 = helpers.PrefixedRandomName("BINDING-NAME")
+							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
+							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
+						})
+
+						AfterEach(func() {
+							Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
+							Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
+						})
+
+						It("displays service instance info", func() {
+							session := helpers.CF("service", serviceInstanceName)
+							Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
+							Eventually(session).Should(Say(""))
+							Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
+							Eventually(session).Should(Say("service:\\s+user-provided"))
+							Eventually(session).Should(Say(""))
+							Eventually(session).Should(Say("bound apps:"))
+							Eventually(session).Should(Say("name:\\s+binding name"))
+							Eventually(session).Should(Say("%s\\s+%s", appName1, bindingName1))
+							Eventually(session).Should(Say("%s\\s+%s", appName2, bindingName2))
+							Eventually(session).Should(Say(""))
+							Eventually(session).Should(Exit(0))
+						})
 					})
 				})
 			})
@@ -186,40 +235,100 @@ var _ = Describe("service command", func() {
 							Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 							Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 						})
-						Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
-						Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
 					})
 
 					AfterEach(func() {
-						Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
-						Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
 						Eventually(helpers.CF("delete", appName1, "-f")).Should(Exit(0))
 						Eventually(helpers.CF("delete", appName2, "-f")).Should(Exit(0))
 					})
 
-					It("displays service instance info", func() {
-						session := helpers.CF("service", serviceInstanceName)
-						Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s\\.\\.\\.", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("\n\n"))
-						Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
-						Consistently(session).ShouldNot(Say("shared from:"))
-						Eventually(session).Should(Say("service:\\s+%s", service))
-						Eventually(session).Should(Say("bound apps:\\s+%s, %s", appName1, appName2))
-						Eventually(session).Should(Say("tags:\\s+database, email"))
-						Eventually(session).Should(Say("plan:\\s+%s", servicePlan))
-						Eventually(session).Should(Say("description:\\s+fake service"))
-						Eventually(session).Should(Say("documentation:"))
-						Eventually(session).Should(Say("dashboard:\\s+http://example\\.com"))
-						Eventually(session).Should(Say("\n\n"))
-						Consistently(session).ShouldNot(Say("shared with spaces:"))
-						Eventually(session).Should(Say("Showing status of last operation from service %s\\.\\.\\.", serviceInstanceName))
-						Eventually(session).Should(Say("\n\n"))
-						Eventually(session).Should(Say("status:\\s+create succeeded"))
-						Eventually(session).Should(Say("message:"))
-						Eventually(session).Should(Say("started:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
-						Eventually(session).Should(Say("updated:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
+					Context("when the service bindings do not have binding names", func() {
+						BeforeEach(func() {
+							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
+							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
+						})
 
-						Eventually(session).Should(Exit(0))
+						AfterEach(func() {
+							Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
+							Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
+						})
+
+						It("displays service instance info", func() {
+							session := helpers.CF("service", serviceInstanceName)
+							Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s\\.\\.\\.", serviceInstanceName, orgName, spaceName, userName))
+							Eventually(session).Should(Say("\n\n"))
+							Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
+							Consistently(session).ShouldNot(Say("shared from:"))
+							Eventually(session).Should(Say("service:\\s+%s", service))
+							Eventually(session).Should(Say("tags:\\s+database, email"))
+							Eventually(session).Should(Say("plan:\\s+%s", servicePlan))
+							Eventually(session).Should(Say("description:\\s+fake service"))
+							Eventually(session).Should(Say("documentation:"))
+							Eventually(session).Should(Say("dashboard:\\s+http://example\\.com"))
+							Eventually(session).Should(Say("\n\n"))
+							Eventually(session).Should(Say("bound apps:"))
+							Eventually(session).Should(Say("name:\\s+binding name"))
+							Eventually(session).Should(Say(appName1))
+							Eventually(session).Should(Say(appName2))
+							Eventually(session).Should(Say("\n\n"))
+							Consistently(session).ShouldNot(Say("shared with spaces:"))
+							Eventually(session).Should(Say("Showing status of last operation from service %s\\.\\.\\.", serviceInstanceName))
+							Eventually(session).Should(Say("\n\n"))
+							Eventually(session).Should(Say("status:\\s+create succeeded"))
+							Eventually(session).Should(Say("message:"))
+							Eventually(session).Should(Say("started:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
+							Eventually(session).Should(Say("updated:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
+
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the service bindings have binding names", func() {
+						var (
+							bindingName1 string
+							bindingName2 string
+						)
+
+						BeforeEach(func() {
+							bindingName1 = helpers.PrefixedRandomName("BINDING-NAME")
+							bindingName2 = helpers.PrefixedRandomName("BINDING-NAME")
+							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
+							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
+						})
+
+						AfterEach(func() {
+							Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
+							Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
+						})
+
+						It("displays service instance info", func() {
+							session := helpers.CF("service", serviceInstanceName)
+							Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s\\.\\.\\.", serviceInstanceName, orgName, spaceName, userName))
+							Eventually(session).Should(Say("\n\n"))
+							Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
+							Consistently(session).ShouldNot(Say("shared from:"))
+							Eventually(session).Should(Say("service:\\s+%s", service))
+							Eventually(session).Should(Say("tags:\\s+database, email"))
+							Eventually(session).Should(Say("plan:\\s+%s", servicePlan))
+							Eventually(session).Should(Say("description:\\s+fake service"))
+							Eventually(session).Should(Say("documentation:"))
+							Eventually(session).Should(Say("dashboard:\\s+http://example\\.com"))
+							Eventually(session).Should(Say("\n\n"))
+							Eventually(session).Should(Say("bound apps:"))
+							Eventually(session).Should(Say("name:\\s+binding name"))
+							Eventually(session).Should(Say("%s\\s+%s", appName1, bindingName1))
+							Eventually(session).Should(Say("%s\\s+%s", appName2, bindingName2))
+							Eventually(session).Should(Say("\n\n"))
+							Consistently(session).ShouldNot(Say("shared with spaces:"))
+							Eventually(session).Should(Say("Showing status of last operation from service %s\\.\\.\\.", serviceInstanceName))
+							Eventually(session).Should(Say("\n\n"))
+							Eventually(session).Should(Say("status:\\s+create succeeded"))
+							Eventually(session).Should(Say("message:"))
+							Eventually(session).Should(Say("started:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
+							Eventually(session).Should(Say("updated:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
+
+							Eventually(session).Should(Exit(0))
+						})
 					})
 				})
 			})

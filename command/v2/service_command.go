@@ -91,11 +91,13 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 
 	if serviceInstanceSummary.IsManaged() {
 		cmd.displayManagedServiceInstanceSummary(serviceInstanceSummary)
+		cmd.displayBoundApplicationsIfExists(serviceInstanceSummary)
 		cmd.displayManagedServiceInstanceLastOperation(serviceInstanceSummary)
 		return nil
 	}
 
 	cmd.displayUserProvidedServiceInstanceSummary(serviceInstanceSummary)
+	cmd.displayBoundApplicationsIfExists(serviceInstanceSummary)
 	return nil
 }
 
@@ -115,7 +117,6 @@ func (cmd ServiceCommand) displayManagedServiceInstanceSummary(serviceInstanceSu
 
 	table = append(table, [][]string{
 		{cmd.UI.TranslateText("service:"), serviceInstanceSummary.Service.Label},
-		{cmd.UI.TranslateText("bound apps:"), strings.Join(serviceInstanceSummary.BoundApplications, ", ")},
 		{cmd.UI.TranslateText("tags:"), strings.Join(serviceInstanceSummary.Tags, ", ")},
 		{cmd.UI.TranslateText("plan:"), serviceInstanceSummary.ServicePlan.Name},
 		{cmd.UI.TranslateText("description:"), serviceInstanceSummary.Service.Description},
@@ -182,7 +183,31 @@ func (cmd ServiceCommand) displayUserProvidedServiceInstanceSummary(serviceInsta
 	table := [][]string{
 		{cmd.UI.TranslateText("name:"), serviceInstanceSummary.Name},
 		{cmd.UI.TranslateText("service:"), cmd.UI.TranslateText("user-provided")},
-		{cmd.UI.TranslateText("bound apps:"), strings.Join(serviceInstanceSummary.BoundApplications, ", ")},
 	}
 	cmd.UI.DisplayKeyValueTable("", table, 3)
+}
+
+func (cmd ServiceCommand) displayBoundApplicationsIfExists(serviceInstanceSummary v2action.ServiceInstanceSummary) {
+
+	cmd.UI.DisplayNewline()
+
+	if len(serviceInstanceSummary.BoundApplications) == 0 {
+		cmd.UI.DisplayText("There are no bound apps for this service.")
+		return
+	}
+
+	cmd.UI.DisplayText("bound apps:")
+	boundAppsTable := [][]string{{
+		cmd.UI.TranslateText("name"),
+		cmd.UI.TranslateText("binding name"),
+	}}
+
+	for _, boundApplication := range serviceInstanceSummary.BoundApplications {
+		boundAppsTable = append(boundAppsTable, []string{
+			boundApplication.AppName,
+			boundApplication.ServiceBindingName,
+		})
+	}
+
+	cmd.UI.DisplayTableWithHeader("", boundAppsTable, 3)
 }

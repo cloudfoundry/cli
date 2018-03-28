@@ -2,7 +2,6 @@ package v2
 
 import (
 	"fmt"
-
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -79,16 +78,24 @@ func (cmd ServicesCommand) Execute(args []string) error {
 		cmd.UI.TranslateText("last operation"),
 	}}
 
+	var boundAppNames []string
+
 	for _, summary := range instanceSummaries {
 		serviceLabel := summary.Service.Label
 		if summary.ServiceInstance.Type == constant.ServiceInstanceTypeUserProvidedService {
 			serviceLabel = "user-provided"
 		}
+
+		boundAppNames = []string{}
+		for _, boundApplication := range summary.BoundApplications {
+			boundAppNames = append(boundAppNames, boundApplication.AppName)
+		}
+
 		table = append(table, []string{
 			summary.Name,
 			serviceLabel,
 			summary.ServicePlan.Name,
-			strings.Join(summary.BoundApplications, ", "),
+			strings.Join(boundAppNames, ", "),
 			fmt.Sprintf("%s %s", summary.LastOperation.Type, summary.LastOperation.State)},
 		)
 	}

@@ -13,11 +13,12 @@ import (
 type ServiceBinding struct {
 	// GUID is the unique Service Binding identifier.
 	GUID string
+	// Name is the name of the service binding
+	Name string
 	// AppGUID is the associated application GUID.
 	AppGUID string
 	// ServiceInstanceGUID is the associated service GUID.
 	ServiceInstanceGUID string
-	Name                string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service Binding response.

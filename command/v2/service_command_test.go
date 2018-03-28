@@ -263,8 +263,8 @@ var _ = Describe("service Command", func() {
 									Description:      "some-description",
 									DocumentationURL: "some-docs-url",
 								},
-								BoundApplications: []string{"app-1", "app-2", "app-3"},
 							}
+
 							fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
 								returnedSummary,
 								v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
@@ -275,13 +275,28 @@ var _ = Describe("service Command", func() {
 							BeforeEach(func() {
 								returnedSummary.ServiceInstanceShareType = v2action.ServiceInstanceIsNotShared
 								returnedSummary.Service.Extra.Shareable = false
+								returnedSummary.BoundApplications = []v2action.BoundApplication{
+									{
+										AppName:            "app-1",
+										ServiceBindingName: "binding-name-1",
+									},
+									{
+										AppName:            "app-2",
+										ServiceBindingName: "binding-name-2",
+									},
+									{
+										AppName:            "app-3",
+										ServiceBindingName: "binding-name-3",
+									},
+								}
 								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
 									returnedSummary,
 									v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
 									nil)
+
 							})
 
-							It("displays the service instance summary and all warnings", func() {
+							It("displays the service instance summary, all warnings and bound applications in the correct position", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
 								Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
@@ -289,7 +304,6 @@ var _ = Describe("service Command", func() {
 								Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
 								Expect(testUI.Out).ToNot(Say("shared from org/space:"))
 								Expect(testUI.Out).To(Say("service:\\s+some-service"))
-								Expect(testUI.Out).To(Say("bound apps:\\s+app-1, app-2, app-3"))
 								Expect(testUI.Out).To(Say("tags:\\s+tag-1, tag-2, tag-3"))
 								Expect(testUI.Out).To(Say("plan:\\s+some-plan"))
 								Expect(testUI.Out).To(Say("description:\\s+some-description"))
@@ -299,6 +313,14 @@ var _ = Describe("service Command", func() {
 								Expect(testUI.Out).ToNot(Say("shared with spaces:"))
 								Expect(testUI.Out).ToNot(Say("org\\s+space\\s+bindings"))
 								Expect(testUI.Out).ToNot(Say("This service is not currently shared."))
+
+								Expect(testUI.Out).To(Say("bound apps:"))
+								Expect(testUI.Out).To(Say("name\\s+binding name"))
+								Expect(testUI.Out).To(Say("app-1\\s+binding-name-1"))
+								Expect(testUI.Out).To(Say("app-2\\s+binding-name-2"))
+								Expect(testUI.Out).To(Say("app-3\\s+binding-name-3"))
+								Expect(testUI.Out).To(Say("\n\n"))
+
 								Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
 								Expect(testUI.Out).To(Say("\n\n"))
 								Expect(testUI.Out).To(Say("status:\\s+some-type some-state"))
@@ -337,7 +359,6 @@ var _ = Describe("service Command", func() {
 								Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
 								Expect(testUI.Out).ToNot(Say("shared from org/space:"))
 								Expect(testUI.Out).To(Say("service:\\s+some-service"))
-								Expect(testUI.Out).To(Say("bound apps:\\s+app-1, app-2, app-3"))
 								Expect(testUI.Out).To(Say("tags:\\s+tag-1, tag-2, tag-3"))
 								Expect(testUI.Out).To(Say("plan:\\s+some-plan"))
 								Expect(testUI.Out).To(Say("description:\\s+some-description"))
@@ -366,6 +387,7 @@ var _ = Describe("service Command", func() {
 								Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
 							})
 						})
+
 						Context("when the service instance is shared from another space", func() {
 							BeforeEach(func() {
 								returnedSummary.ServiceInstanceShareType = v2action.ServiceInstanceIsSharedFrom
@@ -521,6 +543,127 @@ var _ = Describe("service Command", func() {
 								})
 							})
 						})
+
+						Context("when the service instance has bound apps", func() {
+							Context("when the service bindings have binding names", func() {
+								BeforeEach(func() {
+									returnedSummary.BoundApplications = []v2action.BoundApplication{
+										{
+											AppName:            "app-1",
+											ServiceBindingName: "binding-name-1",
+										},
+										{
+											AppName:            "app-2",
+											ServiceBindingName: "binding-name-2",
+										},
+										{
+											AppName:            "app-3",
+											ServiceBindingName: "binding-name-3",
+										},
+									}
+
+									fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+										returnedSummary,
+										v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+										nil)
+								})
+
+								It("displays the bound apps table with service binding names", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+									Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("bound apps:"))
+									Expect(testUI.Out).To(Say("name\\s+binding name"))
+									Expect(testUI.Out).To(Say("app-1\\s+binding-name-1"))
+									Expect(testUI.Out).To(Say("app-2\\s+binding-name-2"))
+									Expect(testUI.Out).To(Say("app-3\\s+binding-name-3"))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+
+									Expect(fakeActor.GetServiceInstanceSummaryByNameAndSpaceCallCount()).To(Equal(1))
+									serviceInstanceNameArg, spaceGUIDArg := fakeActor.GetServiceInstanceSummaryByNameAndSpaceArgsForCall(0)
+									Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
+									Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+									Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
+								})
+							})
+
+							Context("when the service bindings do not have binding names", func() {
+								BeforeEach(func() {
+									returnedSummary.BoundApplications = []v2action.BoundApplication{
+										{AppName: "app-1"},
+										{AppName: "app-2"},
+										{AppName: "app-3"},
+									}
+
+									fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+										returnedSummary,
+										v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+										nil)
+								})
+
+								It("displays the bound apps table with NO service binding names", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+									Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("bound apps:"))
+									Expect(testUI.Out).To(Say("name\\s+binding name"))
+									Expect(testUI.Out).To(Say("app-1"))
+									Expect(testUI.Out).To(Say("app-2"))
+									Expect(testUI.Out).To(Say("app-3"))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+
+									Expect(fakeActor.GetServiceInstanceSummaryByNameAndSpaceCallCount()).To(Equal(1))
+									serviceInstanceNameArg, spaceGUIDArg := fakeActor.GetServiceInstanceSummaryByNameAndSpaceArgsForCall(0)
+									Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
+									Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+									Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
+								})
+							})
+						})
+
+						Context("when the service instance does not have bound apps", func() {
+							It("displays a message indicating that there are no bound apps", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+								Expect(testUI.Out).To(Say("\n\n"))
+								Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+								Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+								Expect(testUI.Out).To(Say("\n\n"))
+								Expect(testUI.Out).To(Say("There are no bound apps for this service."))
+								Expect(testUI.Out).To(Say("\n\n"))
+								Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+
+								Expect(fakeActor.GetServiceInstanceSummaryByNameAndSpaceCallCount()).To(Equal(1))
+								serviceInstanceNameArg, spaceGUIDArg := fakeActor.GetServiceInstanceSummaryByNameAndSpaceArgsForCall(0)
+								Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
+								Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+								Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
+							})
+
+						})
 					})
 
 					Context("when the service instance is a user provided service instance", func() {
@@ -531,14 +674,13 @@ var _ = Describe("service Command", func() {
 										Name: "some-service-instance",
 										Type: constant.ServiceInstanceTypeUserProvidedService,
 									},
-									BoundApplications: []string{"app-1", "app-2", "app-3"},
 								},
 								v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
 								nil,
 							)
 						})
 
-						It("displays the service instance summary", func() {
+						It("displays a smaller service instance summary than for managed service instances", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
 							Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
@@ -546,7 +688,6 @@ var _ = Describe("service Command", func() {
 							Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
 							Expect(testUI.Out).ToNot(Say("shared from"))
 							Expect(testUI.Out).To(Say("service:\\s+user-provided"))
-							Expect(testUI.Out).To(Say("bound apps:\\s+app-1, app-2, app-3"))
 							Expect(testUI.Out).ToNot(Say("tags:"))
 							Expect(testUI.Out).ToNot(Say("plan:"))
 							Expect(testUI.Out).ToNot(Say("description:"))
@@ -568,6 +709,121 @@ var _ = Describe("service Command", func() {
 							Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 							Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
+						})
+
+						Context("when the service instance has bound apps", func() {
+							Context("when the service bindings have binding names", func() {
+								BeforeEach(func() {
+									fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+										v2action.ServiceInstanceSummary{
+											ServiceInstance: v2action.ServiceInstance{
+												Name: "some-service-instance",
+												Type: constant.ServiceInstanceTypeUserProvidedService,
+											},
+											BoundApplications: []v2action.BoundApplication{
+												{
+													AppName:            "app-1",
+													ServiceBindingName: "binding-name-1",
+												},
+												{
+													AppName:            "app-2",
+													ServiceBindingName: "binding-name-2",
+												},
+												{
+													AppName:            "app-3",
+													ServiceBindingName: "binding-name-3",
+												},
+											},
+										},
+										v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+										nil,
+									)
+								})
+
+								It("displays the bound apps table with service binding names", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+									Expect(testUI.Out).To(Say("service:\\s+user-provided"))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("bound apps:"))
+									Expect(testUI.Out).To(Say("name\\s+binding name"))
+									Expect(testUI.Out).To(Say("app-1\\s+binding-name-1"))
+									Expect(testUI.Out).To(Say("app-2\\s+binding-name-2"))
+									Expect(testUI.Out).To(Say("app-3\\s+binding-name-3"))
+
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+
+									Expect(fakeActor.GetServiceInstanceSummaryByNameAndSpaceCallCount()).To(Equal(1))
+									serviceInstanceNameArg, spaceGUIDArg := fakeActor.GetServiceInstanceSummaryByNameAndSpaceArgsForCall(0)
+									Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
+									Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+									Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
+								})
+							})
+
+							Context("when the service bindings do not have binding names", func() {
+								BeforeEach(func() {
+									fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+										v2action.ServiceInstanceSummary{
+											ServiceInstance: v2action.ServiceInstance{
+												Name: "some-service-instance",
+												Type: constant.ServiceInstanceTypeUserProvidedService,
+											},
+											BoundApplications: []v2action.BoundApplication{
+												{AppName: "app-1"},
+												{AppName: "app-2"},
+												{AppName: "app-3"},
+											},
+										},
+										v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+										nil,
+									)
+								})
+
+								It("displays the bound apps table with NO service binding names", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+									Expect(testUI.Out).To(Say("service:\\s+user-provided"))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("bound apps:"))
+									Expect(testUI.Out).To(Say("name\\s+binding name"))
+									Expect(testUI.Out).To(Say("app-1"))
+									Expect(testUI.Out).To(Say("app-2"))
+									Expect(testUI.Out).To(Say("app-3"))
+
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+
+									Expect(fakeActor.GetServiceInstanceSummaryByNameAndSpaceCallCount()).To(Equal(1))
+									serviceInstanceNameArg, spaceGUIDArg := fakeActor.GetServiceInstanceSummaryByNameAndSpaceArgsForCall(0)
+									Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
+									Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+									Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
+								})
+
+							})
+						})
+
+						Context("when the service instance does not have bound apps", func() {
+							It("displays a message indicating that there are no bound apps", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+								Expect(testUI.Out).To(Say("\n\n"))
+								Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+								Expect(testUI.Out).To(Say("service:\\s+user-provided"))
+								Expect(testUI.Out).To(Say("\n\n"))
+								Expect(testUI.Out).To(Say("There are no bound apps for this service."))
+							})
 						})
 					})
 				})

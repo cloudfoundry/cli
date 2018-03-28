@@ -139,9 +139,12 @@ var _ = Describe("services Command", func() {
 									},
 									Type: constant.ServiceInstanceTypeManagedService,
 								},
-								ServicePlan:       v2action.ServicePlan{Name: "some-plan"},
-								Service:           v2action.Service{Label: "some-service-1"},
-								BoundApplications: []string{"app-1", "app-2"},
+								ServicePlan: v2action.ServicePlan{Name: "some-plan"},
+								Service:     v2action.Service{Label: "some-service-1"},
+								BoundApplications: []v2action.BoundApplication{
+									{AppName: "app-1"},
+									{AppName: "app-2"},
+								},
 							},
 							{
 								ServiceInstance: v2action.ServiceInstance{

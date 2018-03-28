@@ -27,7 +27,7 @@ type ServiceInstanceSummary struct {
 	ServiceInstanceShareType          ServiceInstanceShareType
 	ServiceInstanceSharedFrom         ServiceInstanceSharedFrom
 	ServiceInstanceSharedTos          []ServiceInstanceSharedTo
-	BoundApplications                 []string
+	BoundApplications                 []BoundApplication
 }
 
 func (s ServiceInstanceSummary) IsShareable() bool {
@@ -44,6 +44,11 @@ func (s ServiceInstanceSummary) IsSharedFrom() bool {
 
 func (s ServiceInstanceSummary) IsSharedTo() bool {
 	return s.ServiceInstanceShareType == ServiceInstanceIsSharedTo
+}
+
+type BoundApplication struct {
+	AppName            string
+	ServiceBindingName string
 }
 
 func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUID string) (ServiceInstanceSummary, Warnings, error) {
@@ -218,6 +223,7 @@ func (actor Actor) getSummaryInfoCompositeForInstance(spaceGUID string, serviceI
 			"app_guid":             serviceBinding.AppGUID,
 			"service_binding_guid": serviceBinding.GUID,
 		}).Debug("application lookup")
+
 		app, appWarnings, err := actor.GetApplication(serviceBinding.AppGUID)
 		allWarnings = append(allWarnings, appWarnings...)
 		if err != nil {
@@ -227,11 +233,15 @@ func (actor Actor) getSummaryInfoCompositeForInstance(spaceGUID string, serviceI
 			}).Errorln("looking up application:", err)
 			return serviceInstanceSummary, allWarnings, err
 		}
-		serviceInstanceSummary.BoundApplications = append(serviceInstanceSummary.BoundApplications, app.Name)
+
+		serviceInstanceSummary.BoundApplications = append(serviceInstanceSummary.BoundApplications, BoundApplication{AppName: app.Name, ServiceBindingName: serviceBinding.Name})
 	}
 
-	sort.Slice(serviceInstanceSummary.BoundApplications,
-		sorting.SortAlphabeticFunc(serviceInstanceSummary.BoundApplications))
+	sort.Slice(
+		serviceInstanceSummary.BoundApplications,
+		func(i, j int) bool {
+			return sorting.LessIgnoreCase(serviceInstanceSummary.BoundApplications[i].AppName, serviceInstanceSummary.BoundApplications[j].AppName)
+		})
 
 	return serviceInstanceSummary, allWarnings, nil
 }
