@@ -4,7 +4,7 @@ set -e
 
 component=$1
 
-old_version=$(cat VERSION)
+old_version=$(cat BUILD_VERSION)
 major=$(echo $old_version | cut -d'.' -f 1)
 minor=$(echo $old_version | cut -d'.' -f 2)
 patch=$(echo $old_version | cut -d'.' -f 3)
@@ -31,11 +31,11 @@ esac
 
 version=$major.$minor.$patch
 
-echo "Updating VERSION file to $version"
-echo $version > VERSION
+echo "Updating BUILD_VERSION file to $version"
+echo $version > BUILD_VERSION
 
 echo "Committing change"
 git reset .
-git add VERSION
+git add BUILD_VERSION
 
 git ci -m "Bump version to $version"

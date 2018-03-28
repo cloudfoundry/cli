@@ -32,7 +32,7 @@ run:
 
     export DEBIAN_FRONTEND=noninteractive
 
-    VERSION=$(cat cli/VERSION)
+    VERSION=$(cat cli/BUILD_VERSION)
 
     mkdir installers
     curl -L "https://cli.run.pivotal.io/stable?release=debian32&version=${VERSION}&source=github-rel" > installers/cf-cli-installer_${VERSION}_i686.deb

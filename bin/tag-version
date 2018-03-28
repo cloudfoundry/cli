@@ -2,7 +2,7 @@
 
 set -e
 
-version=$(cat VERSION)
+version=$(cat BUILD_VERSION)
 
 echo "Creating v$version tag at current version"
 git tag v$version
