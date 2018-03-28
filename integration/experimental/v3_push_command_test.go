@@ -139,7 +139,7 @@ var _ = Describe("v3-push command", func() {
 			var server *Server
 
 			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version,"3.0.0")
+				server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, "3.0.0")
 			})
 
 			AfterEach(func() {
