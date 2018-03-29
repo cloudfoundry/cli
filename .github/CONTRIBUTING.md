@@ -24,7 +24,7 @@ Documentation on installing GoLang and setting the `GOROOT`, `GOPATH` and `PATH`
 
 > To check what Golang version a particular Linux `cf` binary was built with, use `strings cf | grep 'go1\....'` and look for the `go1.x.y` version number in the output.
 
-## Obtain the Source
+## Obtain the source
 
 ```sh
 go get code.cloudfoundry.org/cli
@@ -35,7 +35,7 @@ go get code.cloudfoundry.org/cli
 Build the binary and add it to the PATH:
 ```
 cd $GOPATH/src/code.cloudfoundry.org/cli
-bin/build
+make build
 export PATH=$GOPATH/src/code.cloudfoundry.org/cli/out:$PATH
 ```
 
@@ -48,7 +48,19 @@ instructions:
 
 https://github.com/cloudfoundry/bosh-lite#deploy-cloud-foundry
 
-## Run the Tests
+
+## Updating tests
+
+The CLI uses [`counterfeiter`](https://github.com/maxbrunsfeld/counterfeiter) to generate unit test fakes from interfaces. If you make any changes to an interface you should regenerate the fakes by running:
+```
+go get -u github.com/maxbrunsfeld/counterfeiter # install counterfeiter
+
+go generate ./<directory>/...
+```
+where `<directory>` contains the package with the changed interface. Don't run `go generate` from the root directory.
+
+
+## Running tests
 
 First install `ginkgo`.
 ```
@@ -59,7 +71,7 @@ Run the tests:
 ```
 cd $GOPATH/src/code.cloudfoundry.org/cli
 
-ginkgo -r
+make test
 ```
 
 # Architecture Overview
@@ -81,8 +93,8 @@ The API package handles the HTTP requests to the API. The functions in this pack
 
 # Vendoring Dependencies
 
-The CLI uses [GVT](https://github.com/FiloSottile/gvt) to manage vendored
-dependencies. Refer to the GVT documentation for managing dependencies.
+The CLI uses [dep](https://github.com/golang/dep) to manage vendored
+dependencies. Refer to the [`dep` documentation](https://golang.github.io/dep/docs/daily-dep.html) for managing dependencies.
 
 If you are vendoring a new dependency, please read [License and Notice Files](https://github.com/cloudfoundry/cli/wiki/License-and-Notice-Files) to abide by third party licenses.
 
