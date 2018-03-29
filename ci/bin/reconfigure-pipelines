@@ -50,3 +50,4 @@ configure_infrastructure_pipeline inf-beque beque-pipeline
 configure_infrastructure_pipeline inf-hardknox hardknox-pipeline
 configure_infrastructure_pipeline inf-lovingcup lovingcup-pipeline
 configure_infrastructure_pipeline inf-tartine tartine-pipeline
+configure_infrastructure_pipeline inf-arsicault arsicault-pipeline
