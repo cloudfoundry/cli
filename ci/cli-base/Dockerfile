@@ -1,5 +1,7 @@
 FROM golang:latest
 
+RUN go version
+
 # used by coverage utilities
 RUN go get golang.org/x/tools/cmd/cover
 
