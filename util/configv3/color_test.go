@@ -49,6 +49,6 @@ var _ = Describe("Config", func() {
 		Entry("config=false env=unset disabled", "false", "", ColorDisabled),
 		Entry("config=true  env=unset disabled", "true", "", ColorEnabled),
 
-		Entry("config=unset env=unset falls back to default", "", "", ColorEnabled),
+		Entry("config=unset env=unset falls back to default", "", "", ColorAuto),
 	)
 })
