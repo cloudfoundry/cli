@@ -11,8 +11,7 @@ SET /p CF_PASSWORD=<%CD%\cf-credentials\cf-password
 SET CF_API=https://api.%DOMAIN%
 
 pushd %CD%\cf-cli-binaries
-	gzip -d cf-cli-binaries.tgz
-	tar -xvf cf-cli-binaries.tar
+	7z x cf-cli-binaries.tgz
 	MOVE %CD%\cf-cli_winx64.exe ..\cf.exe
 popd
 

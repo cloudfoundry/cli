@@ -23,7 +23,7 @@ ISCC %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
 
 MOVE %ROOT_DIR%\cli-ci\ci\installers\windows\Output\mysetup.exe cf_installer.exe
 
-zip %ROOT_DIR%\winstallers\cf-cli-installer_winx64.zip cf_installer.exe
+7z x %ROOT_DIR%\winstallers\cf-cli-installer_winx64.zip cf_installer.exe
 
 sed -i -e "s/VERSION/%VERSION%/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 sed -i -e "s/CF_LICENSE/%ESCAPED_ROOT_DIR%\\LICENSE/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
@@ -37,4 +37,4 @@ ISCC %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 
 MOVE %ROOT_DIR%\cli-ci\ci\installers\windows\Output\mysetup.exe cf_installer.exe
 
-zip %ROOT_DIR%\winstallers\cf-cli-installer_win32.zip cf_installer.exe
+7z x %ROOT_DIR%\winstallers\cf-cli-installer_win32.zip cf_installer.exe
