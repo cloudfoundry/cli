@@ -2,7 +2,7 @@ package experimental
 
 import (
 	"fmt"
-	"os/exec"
+	"net/http"
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -353,15 +353,11 @@ var _ = Describe("v3-ssh command", func() {
 					session := helpers.CF("v3-ssh", appName, "-N", "-L", fmt.Sprintf("%d:localhost:8080", port))
 
 					time.Sleep(5 * time.Second) // Need to wait a few seconds for pipes to connect.
-					curl, err := Start(
-						exec.Command("curl", fmt.Sprintf("localhost:%d/", port)),
-						GinkgoWriter,
-						GinkgoWriter,
-					)
+					response, err := http.Get(fmt.Sprintf("http://localhost:%d/", port))
 					Expect(err).ToNot(HaveOccurred())
+					defer response.Body.Close()
 
-					Eventually(curl).Should(Say("WEBrick"))
-					Eventually(curl).Should(Exit(0))
+					Eventually(BufferReader(response.Body)).Should(Say("WEBrick"))
 
 					session.Kill()
 					Eventually(session).Should(Exit())
