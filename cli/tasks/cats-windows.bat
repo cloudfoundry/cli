@@ -13,6 +13,7 @@ SET PATH=%CD%;%PATH%
 SET CONFIG=%CD%\cats-config\integration_config.json
 
 pushd %CD%\cf-cli-binaries
+	7z e cf-cli-binaries.tgz
 	7z x cf-cli-binaries.tar
 	MOVE %CD%\cf-cli_winx64.exe ..\cf.exe
 popd
