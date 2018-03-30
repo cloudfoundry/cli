@@ -25,7 +25,7 @@ _testmain.go
 
 # Built binaries
 *.exe
-cli
+/cli
 
 out/
 release/*
@@ -47,7 +47,7 @@ tmp/
 .hg/
 
 *.test
-tags
+/tags
 
 *.coverprofile
 
