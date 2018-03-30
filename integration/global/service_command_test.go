@@ -141,7 +141,7 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("service:\\s+user-provided"))
 							Eventually(session).Should(Say(""))
 							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say("name:\\s+binding name"))
+							Eventually(session).Should(Say("name\\s+binding name"))
 							Eventually(session).Should(Say(appName1))
 							Eventually(session).Should(Say(appName2))
 
@@ -175,7 +175,7 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("service:\\s+user-provided"))
 							Eventually(session).Should(Say(""))
 							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say("name:\\s+binding name"))
+							Eventually(session).Should(Say("name\\s+binding name"))
 							Eventually(session).Should(Say("%s\\s+%s", appName1, bindingName1))
 							Eventually(session).Should(Say("%s\\s+%s", appName2, bindingName2))
 							Eventually(session).Should(Say(""))
@@ -267,7 +267,7 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("dashboard:\\s+http://example\\.com"))
 							Eventually(session).Should(Say("\n\n"))
 							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say("name:\\s+binding name"))
+							Eventually(session).Should(Say("name\\s+binding name"))
 							Eventually(session).Should(Say(appName1))
 							Eventually(session).Should(Say(appName2))
 							Eventually(session).Should(Say("\n\n"))
@@ -315,7 +315,7 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("dashboard:\\s+http://example\\.com"))
 							Eventually(session).Should(Say("\n\n"))
 							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say("name:\\s+binding name"))
+							Eventually(session).Should(Say("name\\s+binding name"))
 							Eventually(session).Should(Say("%s\\s+%s", appName1, bindingName1))
 							Eventually(session).Should(Say("%s\\s+%s", appName2, bindingName2))
 							Eventually(session).Should(Say("\n\n"))
@@ -480,23 +480,28 @@ var _ = Describe("service command", func() {
 				var appName1, appName2 string
 
 				BeforeEach(func() {
+					// We test that the app names are listed in alphanumeric sort order
+					appName1 = helpers.PrefixedRandomName("2-INTEGRATION-APP")
+					appName2 = helpers.PrefixedRandomName("1-INTEGRATION-APP")
 					helpers.TargetOrgAndSpace(orgName, targetSpaceName)
 					helpers.WithHelloWorldApp(func(appDir string) {
-						appName1 = helpers.NewAppName()
 						Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 						Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
 
-						appName2 = helpers.NewAppName()
 						Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 						Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
 					})
 				})
 
-				Context("when there are bound apps to the service", func() {
-					It("should display the bound apps", func() {
+				Context("when there are bound apps to the service with no binding names", func() {
+					It("should display the bound apps in alphanumeric sort order", func() {
 						session := helpers.CF("service", serviceInstanceName)
 						Eventually(session).Should(Say("shared from org/space:\\s+%s / %s", orgName, sourceSpaceName))
-						Eventually(session).Should(Say("bound apps:\\s+(%s, %s|%s, %s)", appName1, appName2, appName2, appName1))
+						Eventually(session).Should(Say("\n\n"))
+						Eventually(session).Should(Say("bound apps:"))
+						Eventually(session).Should(Say("name\\s+binding name"))
+						Eventually(session).Should(Say(appName2))
+						Eventually(session).Should(Say(appName1))
 						Eventually(session).Should(Exit(0))
 					})
 				})
