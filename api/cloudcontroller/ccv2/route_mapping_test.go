@@ -215,14 +215,11 @@ var _ = Describe("RouteMappings", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/route_mappings"),
-						RespondWith(http.StatusTeapot, response),
-					),
-				)
+						VerifyRequest(http.MethodGet, "/v2/route_mappings"), RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning, this is another warning"}})))
 			})
 
 			It("returns an error", func() {
-				_, _, err := client.GetRouteMappings()
+				_, warnings, err := client.GetRouteMappings()
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V2ErrorResponse: ccerror.V2ErrorResponse{
@@ -231,6 +228,8 @@ var _ = Describe("RouteMappings", func() {
 						ErrorCode:   "CF-SomeError",
 					},
 				}))
+
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 			})
 		})
 	})

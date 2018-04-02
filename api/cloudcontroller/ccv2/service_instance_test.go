@@ -295,8 +295,52 @@ var _ = Describe("Service Instance", func() {
 	})
 
 	Describe("GetUserProvidedServiceInstances", func() {
-		BeforeEach(func() {
-			response1 := `{
+		var (
+			serviceInstances []ServiceInstance
+			warnings         Warnings
+			executeErr       error
+		)
+
+		JustBeforeEach(func() {
+			serviceInstances, warnings, executeErr = client.GetUserProvidedServiceInstances(Filter{
+				Type:     constant.SpaceGUIDFilter,
+				Operator: constant.EqualOperator,
+				Values:   []string{"some-space-guid"},
+			})
+		})
+
+		Context("when getting user provided service instances errors", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 1,
+					"description": "some error description",
+					"error_code": "CF-SomeError"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/user_provided_service_instances", "q=space_guid:some-space-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V2UnexpectedResponseError{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        1,
+						Description: "some error description",
+						ErrorCode:   "CF-SomeError",
+					},
+					ResponseCode: http.StatusTeapot,
+				}))
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		Context("when getting user provided service instances succeeds", func() {
+			BeforeEach(func() {
+				response1 := `{
 				"next_url": "/v2/user_provided_service_instances?q=space_guid:some-space-guid&page=2",
 				"resources": [
 					{
@@ -322,7 +366,7 @@ var _ = Describe("Service Instance", func() {
 				]
 			}`
 
-			response2 := `{
+				response2 := `{
 				"next_url": null,
 				"resources": [
 					{
@@ -348,29 +392,23 @@ var _ = Describe("Service Instance", func() {
 				]
 			}`
 
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/v2/user_provided_service_instances", "q=space_guid:some-space-guid"),
-					RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-				),
-			)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/user_provided_service_instances", "q=space_guid:some-space-guid"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
 
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/v2/user_provided_service_instances", "q=space_guid:some-space-guid&page=2"),
-					RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
-				),
-			)
-		})
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/user_provided_service_instances", "q=space_guid:some-space-guid&page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
 
-		Context("when service instances exist", func() {
 			It("returns all the queried service instances", func() {
-				serviceInstances, warnings, err := client.GetUserProvidedServiceInstances(Filter{
-					Type:     constant.SpaceGUIDFilter,
-					Operator: constant.EqualOperator,
-					Values:   []string{"some-space-guid"},
-				})
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
 					{
@@ -398,6 +436,7 @@ var _ = Describe("Service Instance", func() {
 						Type:      constant.ServiceInstanceTypeUserProvidedService,
 					},
 				}))
+
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 			})
 		})

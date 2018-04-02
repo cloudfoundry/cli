@@ -8,8 +8,13 @@ import (
 
 // RouteMapping represents a Cloud Controller map between an application and route.
 type RouteMapping struct {
-	GUID      string
-	AppGUID   string
+	// GUID is the unique route mapping identifier.
+	GUID string
+
+	// AppGUID is the unique application identifier.
+	AppGUID string
+
+	// RouteGUID is the unique route identifier.
 	RouteGUID string
 }
 
@@ -23,8 +28,7 @@ func (routeMapping *RouteMapping) UnmarshalJSON(data []byte) error {
 		} `json:"entity"`
 	}
 
-	decoder := cloudcontroller.NewJSONDecoder(data)
-	err := decoder.Decode(&ccRouteMapping)
+	err := cloudcontroller.DecodeJSON(data, &ccRouteMapping)
 	if err != nil {
 		return err
 	}

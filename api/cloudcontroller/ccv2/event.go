@@ -59,8 +59,7 @@ func (event *Event) UnmarshalJSON(data []byte) error {
 		} `json:"entity"`
 	}
 
-	decoder := cloudcontroller.NewJSONDecoder(data)
-	err := decoder.Decode(&ccEvent)
+	err := cloudcontroller.DecodeJSON(data, &ccEvent)
 	if err != nil {
 		return err
 	}
