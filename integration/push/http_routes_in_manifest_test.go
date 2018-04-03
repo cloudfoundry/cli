@@ -171,7 +171,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
 							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-							Eventually(session.Err).Should(Say("The app cannot be mapped to route %s because the route is not in this space. Apps must be mapped to routes in the same space.", route2))
+							Eventually(session.Err).Should(Say("The app cannot be mapped to route %s because the route exists in a different space.", route2))
 							Eventually(session).Should(Exit(1))
 						})
 					})
@@ -337,7 +337,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
 							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-							Eventually(session.Err).Should(Say("The app cannot be mapped to route %s because the route is not in this space. Apps must be mapped to routes in the same space.", routeWithPath))
+							Eventually(session.Err).Should(Say("The app cannot be mapped to route %s because the route exists in a different space.", routeWithPath))
 							Eventually(session).Should(Exit(1))
 						})
 					})
