@@ -55,7 +55,7 @@ func ReadAndInterpolateManifest(pathToManifest string, pathToVarsFile string) ([
 
 		err = yaml.Unmarshal(rawVarsFile, &staticVars)
 		if err != nil {
-			return nil, err
+			return nil, InvalidYAMLError{Err: err}
 		}
 
 		rawManifest, err = tpl.Evaluate(staticVars, nil, template.EvaluateOpts{})

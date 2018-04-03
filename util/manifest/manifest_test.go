@@ -1,6 +1,7 @@
 package manifest_test
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -319,7 +320,9 @@ applications:
 
 				It("returns an error", func() {
 					Expect(executeErr).To(HaveOccurred())
-					Expect(executeErr.Error()).To(ContainSubstring("yaml: did not find expected key"))
+					Expect(executeErr).To(MatchError(InvalidYAMLError{
+						Err: errors.New("yaml: did not find expected key"),
+					}))
 				})
 			})
 		})
