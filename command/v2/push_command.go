@@ -34,7 +34,7 @@ type V2PushActor interface {
 	CloudControllerAPIVersion() string
 	ConvertToApplicationConfigs(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	MergeAndValidateSettingsAndManifests(cmdSettings pushaction.CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error)
-	ReadManifest(pathToManifest string) ([]manifest.Application, error)
+	ReadManifest(pathToManifest string, pathToVarsFile string) ([]manifest.Application, error)
 }
 
 type V2PushCommand struct {
@@ -59,6 +59,7 @@ type V2PushCommand struct {
 	RandomRoute         bool                        `long:"random-route" description:"Create a random route for this app"`
 	RoutePath           flag.RoutePath              `long:"route-path" description:"Path for the route"`
 	StackName           string                      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
+	VarsFilePath        flag.PathWithExistenceCheck `long:"vars-file" description:"Path to vars file"`
 	HealthCheckTimeout  int                         `short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
 	envCFStagingTimeout interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}                 `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
@@ -262,8 +263,10 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 }
 
 func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.CommandLineSettings) ([]manifest.Application, error) {
-	var pathToManifest string
-
+	var (
+		pathToManifest string
+		pathToVarsFile string
+	)
 	switch {
 	case cmd.NoManifest:
 		log.Debug("skipping reading of manifest")
@@ -325,6 +328,10 @@ func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.C
 		return nil, nil
 	}
 
+	if cmd.VarsFilePath != "" {
+		pathToVarsFile = string(cmd.VarsFilePath)
+	}
+
 	cmd.UI.DisplayTextWithFlavor("Pushing from manifest to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
@@ -334,7 +341,7 @@ func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.C
 	cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{
 		"Path": pathToManifest,
 	})
-	return cmd.Actor.ReadManifest(pathToManifest)
+	return cmd.Actor.ReadManifest(pathToManifest, pathToVarsFile)
 }
 
 func (cmd V2PushCommand) processApplyStreams(

@@ -18,20 +18,19 @@ import (
 var _ = Describe("Manifest", func() {
 	var manifest string
 
-	Describe("ReadAndMergeManifests", func() {
-		// There are additional tests for this function in manifest_*OS*_test.go
+	Describe("ReadAndInterpolateManifest", func() {
+		var (
+			pathToManifest string
+			pathToVarsFile string
+			apps           []Application
+			executeErr     error
+		)
 
-		Context("when the manifest does not contain deprecated fields", func() {
-			var (
-				pathToManifest string
-				apps           []Application
-				executeErr     error
-			)
-
-			BeforeEach(func() {
-				manifest = `---
+		BeforeEach(func() {
+			pathToVarsFile = ""
+			manifest = `---
 applications:
-- name: "app-1"
+- name: app-1
   buildpack: "some-buildpack"
   command: "some-command"
   health-check-http-endpoint: "\\some-endpoint"
@@ -84,24 +83,28 @@ applications:
   - route: bleep.blah.com
   random-route: true
 `
-				tempFile, err := ioutil.TempFile("", "manifest-test-")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(tempFile.Close()).ToNot(HaveOccurred())
-				pathToManifest = tempFile.Name()
 
-				err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
-				Expect(err).ToNot(HaveOccurred())
-			})
+			tempFile, err := ioutil.TempFile("", "manifest-test-")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(tempFile.Close()).ToNot(HaveOccurred())
+			pathToManifest = tempFile.Name()
 
-			JustBeforeEach(func() {
-				apps, executeErr = ReadAndMergeManifests(pathToManifest)
-			})
+			err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+			Expect(err).ToNot(HaveOccurred())
 
-			AfterEach(func() {
-				Expect(os.RemoveAll(pathToManifest)).ToNot(HaveOccurred())
-			})
+		})
 
-			It("reads the manifest file", func() {
+		AfterEach(func() {
+			Expect(os.RemoveAll(pathToManifest)).ToNot(HaveOccurred())
+			Expect(os.RemoveAll(pathToVarsFile)).ToNot(HaveOccurred())
+		})
+
+		JustBeforeEach(func() {
+			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, pathToVarsFile)
+		})
+
+		Context("when the manifest does not contain deprecated fields", func() {
+			It("returns a merged set of applications", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(apps).To(HaveLen(7))
 
@@ -207,7 +210,7 @@ applications:
 						Expect(err).ToNot(HaveOccurred())
 						defer os.Remove(tempFile.Name())
 						Expect(tempFile.Close()).ToNot(HaveOccurred())
-						pathToManifest := tempFile.Name()
+						pathToManifest = tempFile.Name()
 
 						if numberOfValues == 1 {
 							manifest = fmt.Sprintf("---\n%s: value", manifestProperty)
@@ -218,7 +221,7 @@ applications:
 						err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
 						Expect(err).ToNot(HaveOccurred())
 
-						_, err = ReadAndMergeManifests(pathToManifest)
+						_, err = ReadAndInterpolateManifest(pathToManifest, pathToVarsFile)
 						Expect(err).To(MatchError(GlobalFieldsError{Fields: []string{manifestProperty}}))
 					},
 
@@ -250,13 +253,6 @@ applications:
 		})
 
 		Context("when inheritance is provided", func() {
-			var (
-				pathToManifest string
-
-				apps       []Application
-				executeErr error
-			)
-
 			BeforeEach(func() {
 				manifest = `---
 inherit: "./some-inheritance-file"
@@ -272,16 +268,75 @@ applications:
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			JustBeforeEach(func() {
-				apps, executeErr = ReadAndMergeManifests(pathToManifest)
-			})
-
-			AfterEach(func() {
-				Expect(os.RemoveAll(pathToManifest)).ToNot(HaveOccurred())
-			})
-
 			It("raises an InheritanceFieldError", func() {
 				Expect(executeErr).To(MatchError(InheritanceFieldError{}))
+			})
+		})
+
+		Context("when a vars file is provided", func() {
+			BeforeEach(func() {
+				manifest = `---
+applications:
+- name: ((var1))
+`
+				err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				vars := `var1: app-1`
+				varFile, err := ioutil.TempFile("", "vars-test-")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(varFile.Close()).ToNot(HaveOccurred())
+				pathToVarsFile = varFile.Name()
+
+				err = ioutil.WriteFile(pathToVarsFile, []byte(vars), 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			Context("when the provided file exists and contains valid yaml", func() {
+				It("interpolates the placeholder values", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(apps[0].Name).To(Equal("app-1"))
+				})
+			})
+
+			Context("when the provided file path does not exist", func() {
+				BeforeEach(func() {
+					pathToVarsFile = "garbage/path"
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(executeErr.Error()).To(ContainSubstring("no such file or directory"))
+				})
+			})
+
+			Context("when the provided file is not a valid yaml file", func() {
+				BeforeEach(func() {
+					vars := `: bad`
+					err := ioutil.WriteFile(pathToVarsFile, []byte(vars), 0666)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(executeErr.Error()).To(ContainSubstring("yaml: did not find expected key"))
+				})
+			})
+		})
+
+		Context("when no vars file is provided", func() {
+			BeforeEach(func() {
+				manifest = `---
+applications:
+- name: ((var1))
+`
+				err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns the merged, uninterpolated applications", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(apps[0].Name).To(Equal("((var1))"))
 			})
 		})
 	})

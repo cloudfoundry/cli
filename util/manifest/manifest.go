@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"github.com/cloudfoundry/bosh-cli/director/template"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -30,21 +31,46 @@ func (manifest *Manifest) UnmarshalYAML(unmarshal func(interface{}) error) error
 	return nil
 }
 
-// ReadAndMergeManifests reads the manifest at provided path and returns a
-// fully merged set of applications.
-func ReadAndMergeManifests(pathToManifest string) ([]Application, error) {
-	raw, err := ioutil.ReadFile(pathToManifest)
+// ReadAndInterpolateManifest reads the manifest at the provided paths,
+// interpolates variables if a vars file is provided, and retunrs a fully
+// merged set of applications.
+func ReadAndInterpolateManifest(pathToManifest string, pathToVarsFile string) ([]Application, error) {
+	rawManifest, err := ioutil.ReadFile(pathToManifest)
 	if err != nil {
 		return nil, err
+	}
+
+	tpl := template.NewTemplate(rawManifest)
+
+	if pathToVarsFile != "" {
+		var (
+			rawVarsFile []byte
+			staticVars  template.StaticVariables
+		)
+
+		rawVarsFile, err = ioutil.ReadFile(pathToVarsFile)
+		if err != nil {
+			return nil, err
+		}
+
+		err = yaml.Unmarshal(rawVarsFile, &staticVars)
+		if err != nil {
+			return nil, err
+		}
+
+		rawManifest, err = tpl.Evaluate(staticVars, nil, template.EvaluateOpts{})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var manifest Manifest
-	err = yaml.Unmarshal(raw, &manifest)
+
+	err = yaml.Unmarshal(rawManifest, &manifest)
 	if err != nil {
 		return nil, err
 	}
 
-	// turns the relative path into an absolute path
 	for i, app := range manifest.Applications {
 		if app.Path != "" && !filepath.IsAbs(app.Path) {
 			manifest.Applications[i].Path = filepath.Join(filepath.Dir(pathToManifest), app.Path)

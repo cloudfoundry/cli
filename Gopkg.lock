@@ -80,10 +80,38 @@
   version = "v3.5.1"
 
 [[projects]]
+  name = "github.com/bmatcuk/doublestar"
+  packages = ["."]
+  revision = "b3608229437ba4dc33dae64d56a79a2a73f1f6b2"
+  version = "v1.0.9"
+
+[[projects]]
   branch = "master"
   name = "github.com/bmizerany/pat"
   packages = ["."]
   revision = "6226ea591a40176dd3ff9cd8eff81ed6ca721a00"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/charlievieth/fs"
+  packages = ["."]
+  revision = "7dc373669fa10ddf827c37c595dee30a2f001be9"
+
+[[projects]]
+  name = "github.com/cloudfoundry/bosh-cli"
+  packages = ["director/template"]
+  revision = "712bfd7271b478ba03c3f604339e2eefbec4647c"
+  version = "v3.0.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/cloudfoundry/bosh-utils"
+  packages = [
+    "errors",
+    "logger",
+    "system"
+  ]
+  revision = "c6a922e299b8eb5eaadad8a2842e3ab7e043dc5d"
 
 [[projects]]
   branch = "master"
@@ -107,6 +135,12 @@
   name = "github.com/cloudfoundry/sonde-go"
   packages = ["events"]
   revision = "c48c4f0332609a0e402af4ae31595204c9f7b363"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/cppforlife/go-patch"
+  packages = ["patch"]
+  revision = "250da0e0e68ce3367b4302f34218f6c064eb9559"
 
 [[projects]]
   branch = "master"
@@ -380,6 +414,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9f05711ab6131f5e0af88c22ffe6dbb94064b5ae3e2072c53508f383a2605079"
+  inputs-digest = "f4a37f635e6550c42a580a0e86a72e6774e2f87b75fd2b40c8751de1a0b5230d"
   solver-name = "gps-cdcl"
   solver-version = 1

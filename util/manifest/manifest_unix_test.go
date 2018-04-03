@@ -33,14 +33,14 @@ var _ = Describe("Manifest with paths", func() {
 		Expect(os.RemoveAll(pathToManifest)).ToNot(HaveOccurred())
 	})
 
-	Describe("ReadAndMergeManifests", func() {
+	Describe("ReadAndInterpolateManifest", func() {
 		var (
 			apps       []Application
 			executeErr error
 		)
 
 		JustBeforeEach(func() {
-			apps, executeErr = ReadAndMergeManifests(pathToManifest)
+			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, "")
 		})
 
 		BeforeEach(func() {

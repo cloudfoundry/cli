@@ -430,6 +430,28 @@ var _ = Describe("push Command", func() {
 											Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
 											Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(providedPath))
 										})
+
+										Context("when a vars file is also provided", func() {
+											var providedVarsFilePath string
+
+											BeforeEach(func() {
+												providedVarsFilePath = filepath.Join(tmpDir, "vars-file.yml")
+												cmd.VarsFilePath = flag.PathWithExistenceCheck(providedVarsFilePath)
+											})
+
+											It("should read the vars-file.yml file and replace the variables in the manifest.yml file", func() {
+												Expect(executeErr).ToNot(HaveOccurred())
+
+												Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+												Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(providedPath)))
+
+												Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+												manifest, varsfile := fakeActor.ReadManifestArgsForCall(0)
+												Expect(manifest).To(Equal(providedPath))
+												Expect(varsfile).To(Equal(providedVarsFilePath))
+											})
+
+										})
 									})
 								})
 
@@ -514,6 +536,7 @@ var _ = Describe("push Command", func() {
 									})
 								})
 							})
+
 						})
 
 						Context("when an app name and manifest are provided", func() {
