@@ -300,6 +300,17 @@ applications:
 				})
 			})
 
+			Context("when the provided file path does not exist", func() {
+				BeforeEach(func() {
+					pathToVarsFile = "garbagepath"
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(os.IsNotExist(executeErr)).To(BeTrue())
+				})
+			})
+
 			Context("when the provided file is not a valid yaml file", func() {
 				BeforeEach(func() {
 					vars := `: bad`

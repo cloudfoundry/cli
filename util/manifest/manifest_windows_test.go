@@ -16,7 +16,6 @@ import (
 var _ = Describe("Manifest with paths", func() {
 	var (
 		pathToManifest string
-		pathToVarsFile string
 		manifest       string
 	)
 
@@ -41,7 +40,7 @@ var _ = Describe("Manifest with paths", func() {
 		)
 
 		JustBeforeEach(func() {
-			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, pathToVarsFile)
+			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, "")
 		})
 
 		BeforeEach(func() {
@@ -56,31 +55,15 @@ applications:
 `
 		})
 
-		Context("when the provided file exists and contains valid yaml", func() {
-			BeforeEach(func() {
-				pathToVarsFile = ""
-			})
-			It("reads the manifest file", func() {
-				tempDir := filepath.Dir(pathToManifest)
-				parentTempDir := filepath.Dir(tempDir)
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(apps).To(ConsistOf(
-					Application{Name: "app-1", Path: "C:\\foo"},
-					Application{Name: "app-2", Path: filepath.Join(tempDir, "bar")},
-					Application{Name: "app-3", Path: filepath.Join(parentTempDir, "baz")},
-				))
-			})
-		})
-
-		Context("when the provided file path does not exist", func() {
-			BeforeEach(func() {
-				pathToVarsFile = "garbagepath"
-			})
-
-			It("returns an error", func() {
-				Expect(executeErr).To(HaveOccurred())
-				Expect(executeErr.Error()).To(ContainSubstring("The system cannot find the path specified."))
-			})
+		It("reads the manifest file", func() {
+			tempDir := filepath.Dir(pathToManifest)
+			parentTempDir := filepath.Dir(tempDir)
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(apps).To(ConsistOf(
+				Application{Name: "app-1", Path: "C:\\foo"},
+				Application{Name: "app-2", Path: filepath.Join(tempDir, "bar")},
+				Application{Name: "app-3", Path: filepath.Join(parentTempDir, "baz")},
+			))
 		})
 	})
 })
