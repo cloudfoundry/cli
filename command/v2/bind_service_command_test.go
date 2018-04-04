@@ -44,7 +44,6 @@ var _ = Describe("bind-service Command", func() {
 
 		cmd.RequiredArgs.AppName = "some-app"
 		cmd.RequiredArgs.ServiceInstanceName = "some-service"
-		cmd.BindingName.Value = "some-binding-name"
 		cmd.ParametersAsJSON = map[string]interface{}{
 			"some-parameter": "some-value",
 		}
@@ -79,6 +78,9 @@ var _ = Describe("bind-service Command", func() {
 
 		Context("when the user is logged in, and an org and space are targeted", func() {
 			BeforeEach(func() {
+				fakeConfig.CurrentUserReturns(
+					configv3.User{Name: "some-user"},
+					nil)
 				fakeConfig.HasTargetedOrganizationReturns(true)
 				fakeConfig.HasTargetedSpaceReturns(true)
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -91,108 +93,131 @@ var _ = Describe("bind-service Command", func() {
 				})
 			})
 
-			Context("when the version check fails", func() {
-				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns("2.34.0")
+			Context("when a binding name is not passed", func() {
+				It("displays flavor text", func() {
+					Expect(testUI.Out).To(Say("Binding service some-service to app some-app in org some-org / space some-space as some-user..."))
+
+					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 				})
 
-				It("returns a MinimumAPIVersionNotMetError", func() {
-					Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-						Command:        "Option '--name'",
-						CurrentVersion: "2.34.0",
-						MinimumVersion: ccversion.MinVersionProvideNameForServiceBinding,
-					}))
-					Expect(fakeActor.CloudControllerAPIVersionCallCount()).To(Equal(1))
+				It("displays OK and the TIP", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeActor.BindServiceBySpaceCallCount()).To(Equal(1))
+					appName, serviceInstanceName, spaceGUID, bindingName, parameters := fakeActor.BindServiceBySpaceArgsForCall(0)
+					Expect(appName).To(Equal("some-app"))
+					Expect(serviceInstanceName).To(Equal("some-service"))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(bindingName).To(BeEmpty())
+					Expect(parameters).To(Equal(map[string]interface{}{"some-parameter": "some-value"}))
 				})
 			})
 
-			Context("when the version check succeeds", func() {
+			Context("when passed a binding name", func() {
 				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionProvideNameForServiceBinding)
+					cmd.BindingName.Value = "some-binding-name"
 				})
 
-				Context("when getting the current user returns an error", func() {
-					var expectedErr error
-
+				Context("when the version check fails", func() {
 					BeforeEach(func() {
-						expectedErr = errors.New("got bananapants??")
-						fakeConfig.CurrentUserReturns(
-							configv3.User{},
-							expectedErr)
+						fakeActor.CloudControllerAPIVersionReturns("2.34.0")
 					})
 
-					It("returns the error", func() {
-						Expect(executeErr).To(MatchError(expectedErr))
+					It("returns a MinimumAPIVersionNotMetError", func() {
+						Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+							Command:        "Option '--name'",
+							CurrentVersion: "2.34.0",
+							MinimumVersion: ccversion.MinVersionProvideNameForServiceBinding,
+						}))
+						Expect(fakeActor.CloudControllerAPIVersionCallCount()).To(Equal(1))
 					})
 				})
 
-				Context("when getting the current user does not return an error", func() {
+				Context("when the version check succeeds", func() {
 					BeforeEach(func() {
-						fakeConfig.CurrentUserReturns(
-							configv3.User{Name: "some-user"},
-							nil)
+						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionProvideNameForServiceBinding)
 					})
 
-					It("displays flavor text", func() {
-						Expect(testUI.Out).To(Say("Binding service some-service to app some-app with binding name some-binding-name in org some-org / space some-space as some-user..."))
+					Context("when getting the current user returns an error", func() {
+						var expectedErr error
 
-						Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
-					})
-
-					Context("when the service was already bound", func() {
 						BeforeEach(func() {
-							fakeActor.BindServiceBySpaceReturns(
-								[]string{"foo", "bar"},
-								ccerror.ServiceBindingTakenError{})
+							expectedErr = errors.New("got bananapants??")
+							fakeConfig.CurrentUserReturns(
+								configv3.User{},
+								expectedErr)
 						})
 
-						It("displays warnings and 'OK'", func() {
-							Expect(executeErr).NotTo(HaveOccurred())
-
-							Expect(testUI.Err).To(Say("foo"))
-							Expect(testUI.Err).To(Say("bar"))
-							Expect(testUI.Out).To(Say("App some-app is already bound to some-service."))
-							Expect(testUI.Out).To(Say("OK"))
+						It("returns the error", func() {
+							Expect(executeErr).To(MatchError(expectedErr))
 						})
 					})
 
-					Context("when binding the service instance results in an error other than ServiceBindingTakenError", func() {
+					Context("when getting the current user does not return an error", func() {
 						BeforeEach(func() {
-							fakeActor.BindServiceBySpaceReturns(
-								nil,
-								actionerror.ApplicationNotFoundError{Name: "some-app"})
 						})
 
-						It("should return the error", func() {
-							Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{
-								Name: "some-app",
-							}))
-						})
-					})
+						It("displays flavor text", func() {
+							Expect(testUI.Out).To(Say("Binding service some-service to app some-app with binding name some-binding-name in org some-org / space some-space as some-user..."))
 
-					Context("when the service binding is successful", func() {
-						BeforeEach(func() {
-							fakeActor.BindServiceBySpaceReturns(
-								v2action.Warnings{"some-warning", "another-warning"},
-								nil,
-							)
+							Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 						})
 
-						It("displays OK and the TIP", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
+						Context("when the service was already bound", func() {
+							BeforeEach(func() {
+								fakeActor.BindServiceBySpaceReturns(
+									[]string{"foo", "bar"},
+									ccerror.ServiceBindingTakenError{})
+							})
 
-							Expect(testUI.Out).To(Say("OK"))
-							Expect(testUI.Out).To(Say("TIP: Use 'faceman restage some-app' to ensure your env variable changes take effect"))
-							Expect(testUI.Err).To(Say("some-warning"))
-							Expect(testUI.Err).To(Say("another-warning"))
+							It("displays warnings and 'OK'", func() {
+								Expect(executeErr).NotTo(HaveOccurred())
 
-							Expect(fakeActor.BindServiceBySpaceCallCount()).To(Equal(1))
-							appName, serviceInstanceName, spaceGUID, bindingName, parameters := fakeActor.BindServiceBySpaceArgsForCall(0)
-							Expect(appName).To(Equal("some-app"))
-							Expect(serviceInstanceName).To(Equal("some-service"))
-							Expect(spaceGUID).To(Equal("some-space-guid"))
-							Expect(bindingName).To(Equal("some-binding-name"))
-							Expect(parameters).To(Equal(map[string]interface{}{"some-parameter": "some-value"}))
+								Expect(testUI.Err).To(Say("foo"))
+								Expect(testUI.Err).To(Say("bar"))
+								Expect(testUI.Out).To(Say("App some-app is already bound to some-service."))
+								Expect(testUI.Out).To(Say("OK"))
+							})
+						})
+
+						Context("when binding the service instance results in an error other than ServiceBindingTakenError", func() {
+							BeforeEach(func() {
+								fakeActor.BindServiceBySpaceReturns(
+									nil,
+									actionerror.ApplicationNotFoundError{Name: "some-app"})
+							})
+
+							It("should return the error", func() {
+								Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{
+									Name: "some-app",
+								}))
+							})
+						})
+
+						Context("when the service binding is successful", func() {
+							BeforeEach(func() {
+								fakeActor.BindServiceBySpaceReturns(
+									v2action.Warnings{"some-warning", "another-warning"},
+									nil,
+								)
+							})
+
+							It("displays OK and the TIP", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say("OK"))
+								Expect(testUI.Out).To(Say("TIP: Use 'faceman restage some-app' to ensure your env variable changes take effect"))
+								Expect(testUI.Err).To(Say("some-warning"))
+								Expect(testUI.Err).To(Say("another-warning"))
+
+								Expect(fakeActor.BindServiceBySpaceCallCount()).To(Equal(1))
+								appName, serviceInstanceName, spaceGUID, bindingName, parameters := fakeActor.BindServiceBySpaceArgsForCall(0)
+								Expect(appName).To(Equal("some-app"))
+								Expect(serviceInstanceName).To(Equal("some-service"))
+								Expect(spaceGUID).To(Equal("some-space-guid"))
+								Expect(bindingName).To(Equal("some-binding-name"))
+								Expect(parameters).To(Equal(map[string]interface{}{"some-parameter": "some-value"}))
+							})
 						})
 					})
 				})

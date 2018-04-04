@@ -47,14 +47,20 @@ func (cmd *BindServiceCommand) Setup(config command.Config, ui command.UI) error
 }
 
 func (cmd BindServiceCommand) Execute(args []string) error {
-	var err error
+	template := "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+	if cmd.BindingName.Value != "" {
+		err := command.MinimumAPIVersionCheck(
+			cmd.Actor.CloudControllerAPIVersion(),
+			ccversion.MinVersionProvideNameForServiceBinding,
+			"Option '--name'")
+		if err != nil {
+			return err
+		}
 
-	err = cmd.SharedActor.CheckTarget(true, true)
-	if err != nil {
-		return err
+		template = "Binding service {{.ServiceName}} to app {{.AppName}} with binding name {{.BindingName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
 	}
 
-	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionProvideNameForServiceBinding, "Option '--name'")
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}
@@ -62,11 +68,6 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
-	}
-
-	template := "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
-	if cmd.BindingName.Value != "" {
-		template = "Binding service {{.ServiceName}} to app {{.AppName}} with binding name {{.BindingName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
 	}
 
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
