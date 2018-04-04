@@ -300,17 +300,6 @@ applications:
 				})
 			})
 
-			Context("when the provided file path does not exist", func() {
-				BeforeEach(func() {
-					pathToVarsFile = "garbage/path"
-				})
-
-				It("returns an error", func() {
-					Expect(executeErr).To(HaveOccurred())
-					Expect(executeErr.Error()).To(ContainSubstring("no such file or directory"))
-				})
-			})
-
 			Context("when the provided file is not a valid yaml file", func() {
 				BeforeEach(func() {
 					vars := `: bad`
