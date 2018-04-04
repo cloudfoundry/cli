@@ -26,7 +26,7 @@ run:
 
     go version
 
-    go install ./vendor/github.com/onsi/ginkgo/ginkgo
+    go get -u github.com/onsi/ginkgo/ginkgo
     ginkgo version
 
     echo -e "\n Vetting packages for potential issues..."
