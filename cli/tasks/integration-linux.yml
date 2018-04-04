@@ -50,12 +50,7 @@ run:
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
 
-    if [ ! $(which ginkgo) ];then
-      echo -e "\n Building ginkgo..."
-      pushd vendor/github.com/onsi/ginkgo/ginkgo
-      go install
-      popd
-    fi
+    go get -u github.com/onsi/ginkgo/ginkgo
 
     ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/isolated integration/plugin integration/push
     ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/global
