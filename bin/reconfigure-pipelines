@@ -25,6 +25,7 @@ configure_pipeline() {
 configure_infrastructure_pipeline() {
   local name=$1
   local creds=$2
+  local potato=$3
 
   printf "configuring the $name pipeline...\n"
 
@@ -32,7 +33,8 @@ configure_infrastructure_pipeline() {
     -p $name \
     -c $pipelines_path/infrastructure/pipeline.yml \
     -l <(lpass show "Concourse Credentials" --notes) \
-    -l <(lpass show "$creds" --notes)
+    -l <(lpass show "$creds" --notes) \
+    -v pool-name=$potato
 }
 
 check_installed lpass
@@ -43,11 +45,10 @@ lpass sync
 
 pipelines_path=$(cd $(dirname $0)/.. && pwd)
 
-configure_pipeline cli \
-  $pipelines_path/cli/pipeline.yml
+configure_pipeline cli $pipelines_path/cli/pipeline.yml
 
-configure_infrastructure_pipeline inf-beque beque-pipeline
-configure_infrastructure_pipeline inf-hardknox hardknox-pipeline
-configure_infrastructure_pipeline inf-lovingcup lovingcup-pipeline
-configure_infrastructure_pipeline inf-tartine tartine-pipeline
-configure_infrastructure_pipeline inf-arsicault arsicault-pipeline
+configure_infrastructure_pipeline inf-beque beque-pipeline baked-potato
+configure_infrastructure_pipeline inf-hardknox hardknox-pipeline baked-potato
+configure_infrastructure_pipeline inf-lovingcup lovingcup-pipeline baked-potato
+configure_infrastructure_pipeline inf-tartine tartine-pipeline baked-potato
+configure_infrastructure_pipeline inf-arsicault arsicault-pipeline deep-fried-potato
