@@ -59,7 +59,7 @@ type V2PushCommand struct {
 	RandomRoute         bool                        `long:"random-route" description:"Create a random route for this app"`
 	RoutePath           flag.RoutePath              `long:"route-path" description:"Path for the route"`
 	StackName           string                      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
-	VarsFilePath        flag.PathWithExistenceCheck `hidden:"true" long:"vars-file" description:"Path to vars file"`
+	VarsFilePath        flag.PathWithExistenceCheck `long:"vars-file" description:"Path to vars file"`
 	HealthCheckTimeout  int                         `short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
 	envCFStagingTimeout interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}                 `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
