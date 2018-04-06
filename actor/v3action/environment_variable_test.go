@@ -7,7 +7,6 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -152,12 +151,13 @@ var _ = Describe("Environment Variable Actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(
 						ccv3.EnvironmentVariables{
-							Variables: map[string]types.FilteredString{"my-var": {Value: "my-val", IsSet: true}},
+							"my-var": {Value: "my-val", IsSet: true},
 						},
 						ccv3.Warnings{"some-env-var-warnings"},
 						nil,
 					)
 				})
+
 				It("makes the API call to update the app environment variables and returns all warnings", func() {
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
@@ -169,7 +169,7 @@ var _ = Describe("Environment Variable Actions", func() {
 					appGUIDArg, envVarsArg := fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
 					Expect(envVarsArg).To(Equal(ccv3.EnvironmentVariables{
-						Variables: map[string]types.FilteredString{"my-var": {Value: "my-val", IsSet: true}},
+						"my-var": {Value: "my-val", IsSet: true},
 					}))
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("get-application-warning", "some-env-var-warnings"))
@@ -265,7 +265,7 @@ var _ = Describe("Environment Variable Actions", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(
 							ccv3.EnvironmentVariables{
-								Variables: map[string]types.FilteredString{"my-var": {Value: "my-val", IsSet: true}},
+								"my-var": {Value: "my-val", IsSet: true},
 							},
 							ccv3.Warnings{"some-patch-env-var-warnings"},
 							nil,
@@ -282,7 +282,7 @@ var _ = Describe("Environment Variable Actions", func() {
 						appGUIDArg, envVarsArg := fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesArgsForCall(0)
 						Expect(appGUIDArg).To(Equal("some-app-guid"))
 						Expect(envVarsArg).To(Equal(ccv3.EnvironmentVariables{
-							Variables: map[string]types.FilteredString{"my-var": {Value: "", IsSet: false}},
+							"my-var": {Value: "", IsSet: false},
 						}))
 
 						Expect(executeErr).ToNot(HaveOccurred())
