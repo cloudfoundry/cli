@@ -110,11 +110,11 @@ var _ = Describe("v3-env Command", func() {
 			Context("when getting the environment returns env vars for all groups", func() {
 				BeforeEach(func() {
 					envGroups := v3action.EnvironmentVariableGroups{
-						SystemProvided:      map[string]interface{}{"system-name": map[string]interface{}{"mysql": []string{"system-value"}}},
-						ApplicationProvided: map[string]interface{}{"application-name": "application-value"},
-						UserProvided:        map[string]interface{}{"user-name": "user-value"},
-						RunningGroup:        map[string]interface{}{"running-name": "running-value"},
-						StagingGroup:        map[string]interface{}{"staging-name": "staging-value"},
+						System:               map[string]interface{}{"system-name": map[string]interface{}{"mysql": []string{"system-value"}}},
+						Application:          map[string]interface{}{"application-name": "application-value"},
+						EnvironmentVariables: map[string]interface{}{"user-name": "user-value"},
+						Running:              map[string]interface{}{"running-name": "running-value"},
+						Staging:              map[string]interface{}{"staging-name": "staging-value"},
 					}
 					fakeActor.GetEnvironmentVariablesByApplicationNameAndSpaceReturns(envGroups, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 				})
@@ -153,11 +153,11 @@ var _ = Describe("v3-env Command", func() {
 			Context("when getting the environment returns empty env vars for all groups", func() {
 				BeforeEach(func() {
 					envGroups := v3action.EnvironmentVariableGroups{
-						SystemProvided:      map[string]interface{}{},
-						ApplicationProvided: map[string]interface{}{},
-						UserProvided:        map[string]interface{}{},
-						RunningGroup:        map[string]interface{}{},
-						StagingGroup:        map[string]interface{}{},
+						System:               map[string]interface{}{},
+						Application:          map[string]interface{}{},
+						EnvironmentVariables: map[string]interface{}{},
+						Running:              map[string]interface{}{},
+						Staging:              map[string]interface{}{},
 					}
 					fakeActor.GetEnvironmentVariablesByApplicationNameAndSpaceReturns(envGroups, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 				})

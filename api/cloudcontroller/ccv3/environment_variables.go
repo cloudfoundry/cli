@@ -9,13 +9,24 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-// EnvironmentVariableGroups represents all environment variables on an application
-type EnvironmentVariableGroups struct {
-	SystemProvided      map[string]interface{} `json:"system_env_json"`
-	ApplicationProvided map[string]interface{} `json:"application_env_json"`
-	UserProvided        map[string]interface{} `json:"environment_variables"`
-	RunningGroup        map[string]interface{} `json:"running_env_json"`
-	StagingGroup        map[string]interface{} `json:"staging_env_json"`
+// Environment variables that will be provided to an app at runtime. It will
+// include environment variables for Environment Variable Groups and Service
+// Bindings.
+type Environment struct {
+	// Application contains basic application settings set by the user and CF
+	// instance.
+	Application map[string]interface{} `json:"application_env_json"`
+	// EnvironmentVariables are user provided environment variables.
+	EnvironmentVariables map[string]interface{} `json:"environment_variables"`
+	//Running is the set of default environment variables available to running
+	//apps.
+	Running map[string]interface{} `json:"running_env_json"`
+	//Staging is the set of default environment variables available during
+	//staging.
+	Staging map[string]interface{} `json:"staging_env_json"`
+	// System contains information about bound services for the application. AKA
+	// VCAP_SERVICES.
+	System map[string]interface{} `json:"system_env_json"`
 }
 
 // EnvironmentVariables represents the environment variables that can be set on application by user
@@ -23,18 +34,18 @@ type EnvironmentVariables struct {
 	Variables map[string]types.FilteredString `json:"var"`
 }
 
-// GetApplicationEnvironmentVariables fetches all the environment variables on
+// GetApplicationEnvironment fetches all the environment variables on
 // an application by groups.
-func (client *Client) GetApplicationEnvironmentVariables(appGUID string) (EnvironmentVariableGroups, Warnings, error) {
+func (client *Client) GetApplicationEnvironment(appGUID string) (Environment, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		URIParams:   internal.Params{"app_guid": appGUID},
 		RequestName: internal.GetApplicationEnvRequest,
 	})
 	if err != nil {
-		return EnvironmentVariableGroups{}, nil, err
+		return Environment{}, nil, err
 	}
 
-	var responseEnvVars EnvironmentVariableGroups
+	var responseEnvVars Environment
 	response := cloudcontroller.Response{
 		Result: &responseEnvVars,
 	}
@@ -42,9 +53,10 @@ func (client *Client) GetApplicationEnvironmentVariables(appGUID string) (Enviro
 	return responseEnvVars, response.Warnings, err
 }
 
-// PatchApplicationUserProvidedEnvironmentVariables updates the user provided environment
-// variables on an applicaiton. A restart is required for changes to take effect.
-func (client *Client) PatchApplicationUserProvidedEnvironmentVariables(appGUID string, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
+// UpdateApplicationEnvironmentVariables updates the user provided environment
+// variables on an applicaiton. A restart is required for changes to take
+// effect.
+func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
 	bodyBytes, err := json.Marshal(envVars)
 	if err != nil {
 		return EnvironmentVariables{}, nil, err

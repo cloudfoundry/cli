@@ -87,37 +87,37 @@ func (cmd V3EnvCommand) Execute(args []string) error {
 		return err
 	}
 
-	if len(envGroups.SystemProvided) > 0 || len(envGroups.ApplicationProvided) > 0 {
+	if len(envGroups.System) > 0 || len(envGroups.Application) > 0 {
 		cmd.UI.DisplayHeader("System-Provided:")
-		cmd.displayEnvGroup(envGroups.SystemProvided)
-		if len(envGroups.ApplicationProvided) > 0 {
+		cmd.displayEnvGroup(envGroups.System)
+		if len(envGroups.Application) > 0 {
 			cmd.UI.DisplayNewline()
-			cmd.displayEnvGroup(envGroups.ApplicationProvided)
+			cmd.displayEnvGroup(envGroups.Application)
 		}
 	} else {
 		cmd.UI.DisplayText("No system-provided env variables have been set")
 	}
 	cmd.UI.DisplayNewline()
 
-	if len(envGroups.UserProvided) > 0 {
+	if len(envGroups.EnvironmentVariables) > 0 {
 		cmd.UI.DisplayHeader("User-Provided:")
-		cmd.displayEnvGroup(envGroups.UserProvided)
+		cmd.displayEnvGroup(envGroups.EnvironmentVariables)
 	} else {
 		cmd.UI.DisplayText("No user-provided env variables have been set")
 	}
 	cmd.UI.DisplayNewline()
 
-	if len(envGroups.RunningGroup) > 0 {
+	if len(envGroups.Running) > 0 {
 		cmd.UI.DisplayHeader("Running Environment Variable Groups:")
-		cmd.displayEnvGroup(envGroups.RunningGroup)
+		cmd.displayEnvGroup(envGroups.Running)
 	} else {
 		cmd.UI.DisplayText("No running env variables have been set")
 	}
 	cmd.UI.DisplayNewline()
 
-	if len(envGroups.StagingGroup) > 0 {
+	if len(envGroups.Staging) > 0 {
 		cmd.UI.DisplayHeader("Staging Environment Variable Groups:")
-		cmd.displayEnvGroup(envGroups.StagingGroup)
+		cmd.displayEnvGroup(envGroups.Staging)
 	} else {
 		cmd.UI.DisplayText("No staging env variables have been set")
 	}

@@ -52,7 +52,7 @@
 //   GET -> Get
 //   PUT -> Update
 //   DELETE -> Delete
-//   PATCH -> Patch
+//   PATCH -> Update
 //
 // * - In some cases POSTs are updating resources, in these cases the method
 // should be called Update, not Create.

@@ -4,12 +4,10 @@ import "net/http"
 
 // Naming convention:
 //
-// Method + non-parameter parts of the path
+// HTTP method + non-parameter parts of the path + "Request"
 //
 // If the request returns a single entity by GUID, use the singular (for example
 // /v2/organizations/:organization_guid is GetOrganization).
-//
-// The const name should always be the const value + Request.
 const (
 	DeleteApplicationProcessInstanceRequest                     = "DeleteApplicationProcessInstance"
 	DeleteApplicationRequest                                    = "DeleteApplication"
