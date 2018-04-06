@@ -103,7 +103,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 								Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
 								jobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
-								Expect(jobURL).To(Equal("some-job-url"))
+								Expect(jobURL).To(Equal(ccv3.JobURL("some-job-url")))
 							})
 						})
 

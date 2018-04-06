@@ -39,8 +39,8 @@ func (job Job) Failed() bool {
 }
 
 // GetJob returns a job for the provided GUID.
-func (client *Client) GetJob(jobURL string) (Job, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{URL: jobURL})
+func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{URL: string(jobURL)})
 	if err != nil {
 		return Job{}, nil, err
 	}
@@ -57,7 +57,7 @@ func (client *Client) GetJob(jobURL string) (Job, Warnings, error) {
 // PollJob will keep polling the given job until the job has terminated, an
 // error is encountered, or config.OverallPollingTimeout is reached. In the
 // last case, a JobTimeoutError is returned.
-func (client *Client) PollJob(jobURL string) (Warnings, error) {
+func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 	var (
 		err         error
 		warnings    Warnings

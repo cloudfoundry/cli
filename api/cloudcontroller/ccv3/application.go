@@ -115,23 +115,6 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 	return responseApp, response.Warnings, err
 }
 
-// DeleteApplication deletes the app with the given app GUID. Returns back a
-// resulting job URL to poll.
-func (client *Client) DeleteApplication(appGUID string) (string, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteApplicationRequest,
-		URIParams:   internal.Params{"app_guid": appGUID},
-	})
-	if err != nil {
-		return "", nil, err
-	}
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return response.ResourceLocationURL, response.Warnings, err
-}
-
 // GetApplications lists applications with optional queries.
 func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -181,27 +164,6 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 	err = client.connection.Make(request, &response)
 
 	return responseApp, response.Warnings, err
-}
-
-// UpdateApplicationApplyManifest applies the manifest to the given
-// application. Returns back a resulting job URL to poll.
-func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (string, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostApplicationActionApplyManifest,
-		URIParams:   map[string]string{"app_guid": appGUID},
-		Body:        bytes.NewReader(rawManifest),
-	})
-
-	if err != nil {
-		return "", nil, err
-	}
-
-	request.Header.Set("Content-Type", "application/x-yaml")
-
-	response := cloudcontroller.Response{}
-	err = client.connection.Make(request, &response)
-
-	return response.ResourceLocationURL, response.Warnings, err
 }
 
 // UpdateApplicationStart starts the given application.

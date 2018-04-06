@@ -144,18 +144,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	DeleteApplicationStub        func(guid string) (string, ccv3.Warnings, error)
+	DeleteApplicationStub        func(guid string) (ccv3.JobURL, ccv3.Warnings, error)
 	deleteApplicationMutex       sync.RWMutex
 	deleteApplicationArgsForCall []struct {
 		guid string
 	}
 	deleteApplicationReturns struct {
-		result1 string
+		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}
 	deleteApplicationReturnsOnCall map[int]struct {
-		result1 string
+		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -552,10 +552,10 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	PollJobStub        func(jobURL string) (ccv3.Warnings, error)
+	PollJobStub        func(jobURL ccv3.JobURL) (ccv3.Warnings, error)
 	pollJobMutex       sync.RWMutex
 	pollJobArgsForCall []struct {
-		jobURL string
+		jobURL ccv3.JobURL
 	}
 	pollJobReturns struct {
 		result1 ccv3.Warnings
@@ -626,19 +626,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateApplicationApplyManifestStub        func(appGUID string, rawManifest []byte) (string, ccv3.Warnings, error)
+	UpdateApplicationApplyManifestStub        func(appGUID string, rawManifest []byte) (ccv3.JobURL, ccv3.Warnings, error)
 	updateApplicationApplyManifestMutex       sync.RWMutex
 	updateApplicationApplyManifestArgsForCall []struct {
 		appGUID     string
 		rawManifest []byte
 	}
 	updateApplicationApplyManifestReturns struct {
-		result1 string
+		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}
 	updateApplicationApplyManifestReturnsOnCall map[int]struct {
-		result1 string
+		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -1224,7 +1224,7 @@ func (fake *FakeCloudControllerClient) CreatePackageReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) DeleteApplication(guid string) (string, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) DeleteApplication(guid string) (ccv3.JobURL, ccv3.Warnings, error) {
 	fake.deleteApplicationMutex.Lock()
 	ret, specificReturn := fake.deleteApplicationReturnsOnCall[len(fake.deleteApplicationArgsForCall)]
 	fake.deleteApplicationArgsForCall = append(fake.deleteApplicationArgsForCall, struct {
@@ -1253,26 +1253,26 @@ func (fake *FakeCloudControllerClient) DeleteApplicationArgsForCall(i int) strin
 	return fake.deleteApplicationArgsForCall[i].guid
 }
 
-func (fake *FakeCloudControllerClient) DeleteApplicationReturns(result1 string, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) DeleteApplicationReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.DeleteApplicationStub = nil
 	fake.deleteApplicationReturns = struct {
-		result1 string
+		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) DeleteApplicationReturnsOnCall(i int, result1 string, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) DeleteApplicationReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.DeleteApplicationStub = nil
 	if fake.deleteApplicationReturnsOnCall == nil {
 		fake.deleteApplicationReturnsOnCall = make(map[int]struct {
-			result1 string
+			result1 ccv3.JobURL
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.deleteApplicationReturnsOnCall[i] = struct {
-		result1 string
+		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -2687,11 +2687,11 @@ func (fake *FakeCloudControllerClient) PatchOrganizationDefaultIsolationSegmentR
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) PollJob(jobURL string) (ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error) {
 	fake.pollJobMutex.Lock()
 	ret, specificReturn := fake.pollJobReturnsOnCall[len(fake.pollJobArgsForCall)]
 	fake.pollJobArgsForCall = append(fake.pollJobArgsForCall, struct {
-		jobURL string
+		jobURL ccv3.JobURL
 	}{jobURL})
 	fake.recordInvocation("PollJob", []interface{}{jobURL})
 	fake.pollJobMutex.Unlock()
@@ -2710,7 +2710,7 @@ func (fake *FakeCloudControllerClient) PollJobCallCount() int {
 	return len(fake.pollJobArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) PollJobArgsForCall(i int) string {
+func (fake *FakeCloudControllerClient) PollJobArgsForCall(i int) ccv3.JobURL {
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
 	return fake.pollJobArgsForCall[i].jobURL
@@ -2959,7 +2959,7 @@ func (fake *FakeCloudControllerClient) UpdateApplicationReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (string, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (ccv3.JobURL, ccv3.Warnings, error) {
 	var rawManifestCopy []byte
 	if rawManifest != nil {
 		rawManifestCopy = make([]byte, len(rawManifest))
@@ -2994,26 +2994,26 @@ func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifestArgsForCall
 	return fake.updateApplicationApplyManifestArgsForCall[i].appGUID, fake.updateApplicationApplyManifestArgsForCall[i].rawManifest
 }
 
-func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifestReturns(result1 string, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifestReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.UpdateApplicationApplyManifestStub = nil
 	fake.updateApplicationApplyManifestReturns = struct {
-		result1 string
+		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifestReturnsOnCall(i int, result1 string, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) UpdateApplicationApplyManifestReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
 	fake.UpdateApplicationApplyManifestStub = nil
 	if fake.updateApplicationApplyManifestReturnsOnCall == nil {
 		fake.updateApplicationApplyManifestReturnsOnCall = make(map[int]struct {
-			result1 string
+			result1 ccv3.JobURL
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.updateApplicationApplyManifestReturnsOnCall[i] = struct {
-		result1 string
+		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

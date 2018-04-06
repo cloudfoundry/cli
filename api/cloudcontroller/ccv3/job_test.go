@@ -43,7 +43,7 @@ var _ = Describe("Job", func() {
 
 	Describe("GetJob", func() {
 		var (
-			jobLocation string
+			jobLocation JobURL
 
 			job        Job
 			warnings   Warnings
@@ -52,7 +52,7 @@ var _ = Describe("Job", func() {
 
 		BeforeEach(func() {
 			client = NewTestClient()
-			jobLocation = fmt.Sprintf("%s/some-job-location", server.URL())
+			jobLocation = JobURL(fmt.Sprintf("%s/some-job-location", server.URL()))
 		})
 
 		JustBeforeEach(func() {
@@ -134,7 +134,7 @@ var _ = Describe("Job", func() {
 
 	Describe("PollJob", func() {
 		var (
-			jobLocation string
+			jobLocation JobURL
 
 			warnings   Warnings
 			executeErr error
@@ -143,8 +143,8 @@ var _ = Describe("Job", func() {
 		)
 
 		BeforeEach(func() {
-			jobLocation = fmt.Sprintf("%s/some-job-location", server.URL())
 			client = NewTestClient(Config{JobPollingTimeout: time.Minute})
+			jobLocation = JobURL(fmt.Sprintf("%s/some-job-location", server.URL()))
 		})
 
 		JustBeforeEach(func() {
