@@ -115,7 +115,8 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 	return responseApp, response.Warnings, err
 }
 
-// DeleteApplication deletes the app with the given app GUID.
+// DeleteApplication deletes the app with the given app GUID. Returns back a
+// resulting job URL to poll.
 func (client *Client) DeleteApplication(appGUID string) (string, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteApplicationRequest,
@@ -131,7 +132,7 @@ func (client *Client) DeleteApplication(appGUID string) (string, Warnings, error
 	return response.ResourceLocationURL, response.Warnings, err
 }
 
-// GetApplications lists applications with optional filters.
+// GetApplications lists applications with optional queries.
 func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetApplicationsRequest,
@@ -183,7 +184,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 }
 
 // UpdateApplicationApplyManifest applies the manifest to the given
-// application.
+// application. Returns back a resulting job URL to poll.
 func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest []byte) (string, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationActionApplyManifest,

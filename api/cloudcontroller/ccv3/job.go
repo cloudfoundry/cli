@@ -8,17 +8,24 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
+// ErrorDetails provides information regarding a job's error.
 type ErrorDetails struct {
+	// Code is a numeric code for this error.
+	Code int `json:"code"`
+	// Detail is a verbose description of the error.
 	Detail string `json:"detail"`
-	Title  string `json:"title"`
-	Code   int    `json:"code"`
+	// Title is a short description of the error.
+	Title string `json:"title"`
 }
 
 // Job represents a Cloud Controller Job.
 type Job struct {
-	Errors []ErrorDetails    `json:"errors"`
-	GUID   string            `json:"guid"`
-	State  constant.JobState `json:"state"`
+	// Errors is a list of errors that occurred while processing the job.
+	Errors []ErrorDetails `json:"errors"`
+	// GUID is a unique identifier for the job.
+	GUID string `json:"guid"`
+	// State is the state of the job.
+	State constant.JobState `json:"state"`
 }
 
 // Complete returns true when the job has completed successfully.

@@ -42,11 +42,21 @@ var _ = Describe("Job", func() {
 	})
 
 	Describe("GetJob", func() {
-		var jobLocation string
+		var (
+			jobLocation string
+
+			job        Job
+			warnings   Warnings
+			executeErr error
+		)
 
 		BeforeEach(func() {
 			client = NewTestClient()
 			jobLocation = fmt.Sprintf("%s/some-job-location", server.URL())
+		})
+
+		JustBeforeEach(func() {
+			job, warnings, executeErr = client.GetJob(jobLocation)
 		})
 
 		Context("when no errors are encountered", func() {
@@ -73,9 +83,7 @@ var _ = Describe("Job", func() {
 			})
 
 			It("returns job with all warnings", func() {
-				job, warnings, err := client.GetJob(jobLocation)
-
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
 				Expect(job.State).To(Equal(constant.JobProcessing))
@@ -113,9 +121,7 @@ var _ = Describe("Job", func() {
 			})
 
 			It("returns job with all warnings", func() {
-				job, warnings, err := client.GetJob(jobLocation)
-
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
 				Expect(job.State).To(Equal(constant.JobFailed))
@@ -127,11 +133,23 @@ var _ = Describe("Job", func() {
 	})
 
 	Describe("PollJob", func() {
-		var jobLocation string
+		var (
+			jobLocation string
+
+			warnings   Warnings
+			executeErr error
+
+			startTime time.Time
+		)
 
 		BeforeEach(func() {
 			jobLocation = fmt.Sprintf("%s/some-job-location", server.URL())
 			client = NewTestClient(Config{JobPollingTimeout: time.Minute})
+		})
+
+		JustBeforeEach(func() {
+			startTime = time.Now()
+			warnings, executeErr = client.PollJob(jobLocation)
 		})
 
 		Context("when the job starts queued and then finishes successfully", func() {
@@ -189,14 +207,14 @@ var _ = Describe("Job", func() {
 			})
 
 			It("should poll until completion", func() {
-				warnings, err := client.PollJob(jobLocation)
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
 			})
 		})
 
 		Context("when the job starts queued and then fails", func() {
 			var jobFailureMessage string
+
 			BeforeEach(func() {
 				jobFailureMessage = "I am a banana!!!"
 
@@ -258,30 +276,11 @@ var _ = Describe("Job", func() {
 			})
 
 			It("returns a JobFailedError", func() {
-				warnings, err := client.PollJob(jobLocation)
-				Expect(err).To(MatchError(ccerror.JobFailedError{
+				Expect(executeErr).To(MatchError(ccerror.JobFailedError{
 					JobGUID: "job-guid",
 					Message: jobFailureMessage,
 				}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
-			})
-		})
-
-		Context("when retrieving the job errors", func() {
-			BeforeEach(func() {
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/some-job-location"),
-						RespondWith(http.StatusAccepted, `{
-							INVALID YAML
-						}`, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
-					))
-			})
-
-			It("returns the CC error", func() {
-				warnings, err := client.PollJob(jobLocation)
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-				Expect(err.Error()).To(MatchRegexp("invalid character"))
 			})
 		})
 
@@ -349,12 +348,11 @@ var _ = Describe("Job", func() {
 				})
 
 				It("raises a JobTimeoutError", func() {
-					_, err := client.PollJob(jobLocation)
-
-					Expect(err).To(MatchError(ccerror.JobTimeoutError{
+					Expect(executeErr).To(MatchError(ccerror.JobTimeoutError{
 						Timeout: jobPollingTimeout,
 						JobGUID: "job-guid",
 					}))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3"))
 				})
 
 				// Fuzzy test to ensure that the overall function time isn't [far]
@@ -362,10 +360,8 @@ var _ = Describe("Job", func() {
 				// dependent on the speed of the system, the expectation is that the
 				// function *should* never exceed three times the timeout.
 				It("does not run [too much] longer than the timeout", func() {
-					startTime := time.Now()
-					_, err := client.PollJob(jobLocation)
 					endTime := time.Now()
-					Expect(err).To(HaveOccurred())
+					Expect(executeErr).To(HaveOccurred())
 
 					// If the jobPollingTimeout is less than the PollingInterval,
 					// then the margin may be too small, we should not allow the
