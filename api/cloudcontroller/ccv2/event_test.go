@@ -185,7 +185,7 @@ var _ = Describe("Event", func() {
 					},
 					{
 						GUID:      "some-event-guid-2",
-						Type:      constant.EventTypeAuditApplicationDelete,
+						Type:      constant.EventTypeAuditApplicationDeleteRequest,
 						ActorGUID: "some-actor-guid",
 						ActorType: "some-actor-type",
 						ActorName: "some-actor-name",
@@ -209,7 +209,7 @@ var _ = Describe("Event", func() {
 					},
 					{
 						GUID:      "some-event-guid-4",
-						Type:      constant.EventTypeAuditApplicationDelete,
+						Type:      constant.EventTypeAuditApplicationDeleteRequest,
 						ActorGUID: "some-actor-guid",
 						ActorType: "some-actor-type",
 						ActorName: "some-actor-name",
