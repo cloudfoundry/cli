@@ -405,11 +405,9 @@
   version = "v1.0.18"
 
 [[projects]]
-  branch = "off_by_one_scanner_error_line"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "fd70c8694ac38cc10ed519e30c6309aa9cb7bbd9"
-  source = "github.com/vitreuz/yaml"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
