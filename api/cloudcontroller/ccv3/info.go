@@ -12,32 +12,37 @@ import (
 type APIInfo struct {
 	// Links is a list of top level Cloud Controller APIs.
 	Links struct {
-		// AppSSH is the link for application ssh info
+		// AppSSH is the link for application ssh info.
 		AppSSH APILink `json:"app_ssh"`
 
-		// CCV3 is the link to the Cloud Controller V3 API
+		// CCV3 is the link to the Cloud Controller V3 API.
 		CCV3 APILink `json:"cloud_controller_v3"`
 
-		// Logging is the link to the Logging API
+		// Logging is the link to the Logging API.
 		Logging APILink `json:"logging"`
 
+		// NetworkPolicyV1 is the link to the Container to Container Networking
+		// API.
 		NetworkPolicyV1 APILink `json:"network_policy_v1"`
 
-		// UAA is the link to the UAA API
+		// UAA is the link to the UAA API.
 		UAA APILink `json:"uaa"`
 	} `json:"links"`
 }
 
-func (info APIInfo) AppSSHHostKeyFingerprint() string {
-	return info.Links.AppSSH.Meta.HostKeyFingerprint
-}
-
+// AppSSHEndpoint is the root URL for SSHing into an app container.
 func (info APIInfo) AppSSHEndpoint() string {
 	return info.Links.AppSSH.HREF
 }
 
-func (info APIInfo) OAuthClient() string {
-	return info.Links.AppSSH.Meta.OAuthClient
+// AppSSHHostKeyFingerprint
+func (info APIInfo) AppSSHHostKeyFingerprint() string {
+	return info.Links.AppSSH.Meta.HostKeyFingerprint
+}
+
+// CloudControllerAPIVersion returns the version for the CloudController.
+func (info APIInfo) CloudControllerAPIVersion() string {
+	return info.Links.CCV3.Meta.Version
 }
 
 // Logging returns the HREF for Logging.
@@ -49,14 +54,13 @@ func (info APIInfo) NetworkPolicyV1() string {
 	return info.Links.NetworkPolicyV1.HREF
 }
 
+func (info APIInfo) OAuthClient() string {
+	return info.Links.AppSSH.Meta.OAuthClient
+}
+
 // UAA returns the HREF for the UAA.
 func (info APIInfo) UAA() string {
 	return info.Links.UAA.HREF
-}
-
-// CloudControllerAPIVersion returns the version for the CloudController.
-func (info APIInfo) CloudControllerAPIVersion() string {
-	return info.Links.CCV3.Meta.Version
 }
 
 func (info APIInfo) ccV3Link() string {
