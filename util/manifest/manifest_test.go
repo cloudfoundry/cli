@@ -21,15 +21,35 @@ var _ = Describe("Manifest", func() {
 
 	Describe("ReadAndInterpolateManifest", func() {
 		var (
-			pathToManifest string
-			pathToVarsFile string
-			apps           []Application
-			executeErr     error
+			pathToManifest   string
+			pathsToVarsFiles []string
+			apps             []Application
+			executeErr       error
 		)
 
 		BeforeEach(func() {
-			pathToVarsFile = ""
-			manifest = `---
+			tempFile, err := ioutil.TempFile("", "manifest-test-")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(tempFile.Close()).ToNot(HaveOccurred())
+			pathToManifest = tempFile.Name()
+
+			pathsToVarsFiles = nil
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(pathToManifest)).ToNot(HaveOccurred())
+			for _, path := range pathsToVarsFiles {
+				Expect(os.RemoveAll(path)).ToNot(HaveOccurred())
+			}
+		})
+
+		JustBeforeEach(func() {
+			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, pathsToVarsFiles)
+		})
+
+		Context("when the manifest contains no variables", func() {
+			BeforeEach(func() {
+				manifest = `---
 applications:
 - name: app-1
   buildpack: "some-buildpack"
@@ -85,172 +105,156 @@ applications:
   random-route: true
 `
 
-			tempFile, err := ioutil.TempFile("", "manifest-test-")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(tempFile.Close()).ToNot(HaveOccurred())
-			pathToManifest = tempFile.Name()
-
-			err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
-			Expect(err).ToNot(HaveOccurred())
-
-		})
-
-		AfterEach(func() {
-			Expect(os.RemoveAll(pathToManifest)).ToNot(HaveOccurred())
-			Expect(os.RemoveAll(pathToVarsFile)).ToNot(HaveOccurred())
-		})
-
-		JustBeforeEach(func() {
-			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, pathToVarsFile)
-		})
-
-		Context("when the manifest does not contain deprecated fields", func() {
-			It("returns a merged set of applications", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(apps).To(HaveLen(7))
-
-				Expect(apps[0]).To(Equal(Application{
-					Name: "app-1",
-					Buildpack: types.FilteredString{
-						IsSet: true,
-						Value: "some-buildpack",
-					},
-					Command: types.FilteredString{
-						IsSet: true,
-						Value: "some-command",
-					},
-					HealthCheckHTTPEndpoint: "\\some-endpoint",
-					HealthCheckType:         "http",
-					Instances: types.NullInt{
-						Value: 10,
-						IsSet: true,
-					},
-					DiskQuota: types.NullByteSizeInMb{
-						Value: 100,
-						IsSet: true,
-					},
-					DockerImage:    "some-docker-image",
-					DockerUsername: "some-docker-username",
-					Memory: types.NullByteSizeInMb{
-						Value: 200,
-						IsSet: true,
-					},
-					RandomRoute:        true,
-					StackName:          "some-stack",
-					HealthCheckTimeout: 120,
-				}))
-
-				Expect(apps[1]).To(Equal(Application{
-					Name: "app-2",
-					Buildpack: types.FilteredString{
-						IsSet: true,
-						Value: "",
-					},
-					DiskQuota: types.NullByteSizeInMb{
-						Value: 1024,
-						IsSet: true,
-					},
-					Instances: types.NullInt{
-						IsSet: true,
-						Value: 0,
-					},
-					Memory: types.NullByteSizeInMb{
-						Value: 2048,
-						IsSet: true,
-					},
-					Routes:   []string{"foo.bar.com", "baz.qux.com", "blep.blah.com/boop"},
-					Services: []string{"service_1", "service_2"},
-				}))
-
-				Expect(apps[2]).To(Equal(Application{
-					Name: "app-3",
-					EnvironmentVariables: map[string]string{
-						"env_1": "foo",
-						"env_2": "182837403930483038",
-						"env_3": "true",
-						"env_4": "1.00001",
-					},
-					NoRoute: true,
-				}))
-
-				Expect(apps[3]).To(Equal(Application{
-					Name: "app-4",
-					Buildpack: types.FilteredString{
-						IsSet: true,
-						Value: "",
-					},
-					Command: types.FilteredString{
-						IsSet: true,
-						Value: "",
-					},
-				}))
-
-				Expect(apps[4].Name).To(Equal("app-5"))
-				Expect(apps[4].DeprecatedDomain).ToNot(BeNil())
-				Expect(apps[4].DeprecatedDomains).ToNot(BeNil())
-
-				Expect(apps[5].Name).To(Equal("app-6"))
-				Expect(apps[5].DeprecatedHost).ToNot(BeNil())
-				Expect(apps[5].DeprecatedHosts).ToNot(BeNil())
-				Expect(apps[5].DeprecatedNoHostname).ToNot(BeNil())
-
-				Expect(apps[6]).To(Equal(Application{
-					Name:        "app-7",
-					Routes:      []string{"hello.com", "bleep.blah.com"},
-					RandomRoute: true,
-				}))
-			})
-		})
-
-		Context("when provided deprecated fields", func() {
-
-			Context("when global fields are provided", func() {
-				DescribeTable("raises a GlobalFieldsError",
-					func(manifestProperty string, numberOfValues int) {
-						tempFile, err := ioutil.TempFile("", "manifest-test-")
-						Expect(err).ToNot(HaveOccurred())
-						defer os.Remove(tempFile.Name())
-						Expect(tempFile.Close()).ToNot(HaveOccurred())
-						pathToManifest = tempFile.Name()
-
-						if numberOfValues == 1 {
-							manifest = fmt.Sprintf("---\n%s: value", manifestProperty)
-						} else {
-							values := []string{"A", "B"}
-							manifest = fmt.Sprintf("---\n%s: [%s]", manifestProperty, strings.Join(values, ","))
-						}
-						err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
-						Expect(err).ToNot(HaveOccurred())
-
-						_, err = ReadAndInterpolateManifest(pathToManifest, pathToVarsFile)
-						Expect(err).To(MatchError(GlobalFieldsError{Fields: []string{manifestProperty}}))
-					},
-
-					Entry("global buildpack", "buildpack", 1),
-					Entry("global command", "command", 1),
-					Entry("global disk quota", "disk_quota", 1),
-					Entry("global docker", "docker", 1),
-					Entry("global domain", "domain", 1),
-					Entry("global domains", "domains", 2),
-					Entry("global environment variables", "env", 2),
-					Entry("global health check HTTP endpoint", "health-check-http-endpoint", 1),
-					Entry("global health check timeout", "timeout", 1),
-					Entry("global health check type", "health-check-type", 1),
-					Entry("global host", "host", 1),
-					Entry("global hosts", "hosts", 2),
-					Entry("global instances", "instances", 1),
-					Entry("global memory", "memory", 1),
-					Entry("global name", "name", 1),
-					Entry("global no hostname", "no-hostname", 1),
-					Entry("global no route", "no-route", 1),
-					Entry("global path", "path", 1),
-					Entry("global random-route", "random-route", 1),
-					Entry("global routes", "routes", 2),
-					Entry("global services", "services", 2),
-					Entry("global stack", "stack", 1),
-				)
+				err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+				Expect(err).ToNot(HaveOccurred())
 			})
 
+			Context("when the manifest does not contain deprecated fields", func() {
+				It("returns a merged set of applications", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(apps).To(HaveLen(7))
+
+					Expect(apps[0]).To(Equal(Application{
+						Name: "app-1",
+						Buildpack: types.FilteredString{
+							IsSet: true,
+							Value: "some-buildpack",
+						},
+						Command: types.FilteredString{
+							IsSet: true,
+							Value: "some-command",
+						},
+						HealthCheckHTTPEndpoint: "\\some-endpoint",
+						HealthCheckType:         "http",
+						Instances: types.NullInt{
+							Value: 10,
+							IsSet: true,
+						},
+						DiskQuota: types.NullByteSizeInMb{
+							Value: 100,
+							IsSet: true,
+						},
+						DockerImage:    "some-docker-image",
+						DockerUsername: "some-docker-username",
+						Memory: types.NullByteSizeInMb{
+							Value: 200,
+							IsSet: true,
+						},
+						RandomRoute:        true,
+						StackName:          "some-stack",
+						HealthCheckTimeout: 120,
+					}))
+
+					Expect(apps[1]).To(Equal(Application{
+						Name: "app-2",
+						Buildpack: types.FilteredString{
+							IsSet: true,
+							Value: "",
+						},
+						DiskQuota: types.NullByteSizeInMb{
+							Value: 1024,
+							IsSet: true,
+						},
+						Instances: types.NullInt{
+							IsSet: true,
+							Value: 0,
+						},
+						Memory: types.NullByteSizeInMb{
+							Value: 2048,
+							IsSet: true,
+						},
+						Routes:   []string{"foo.bar.com", "baz.qux.com", "blep.blah.com/boop"},
+						Services: []string{"service_1", "service_2"},
+					}))
+
+					Expect(apps[2]).To(Equal(Application{
+						Name: "app-3",
+						EnvironmentVariables: map[string]string{
+							"env_1": "foo",
+							"env_2": "182837403930483038",
+							"env_3": "true",
+							"env_4": "1.00001",
+						},
+						NoRoute: true,
+					}))
+
+					Expect(apps[3]).To(Equal(Application{
+						Name: "app-4",
+						Buildpack: types.FilteredString{
+							IsSet: true,
+							Value: "",
+						},
+						Command: types.FilteredString{
+							IsSet: true,
+							Value: "",
+						},
+					}))
+
+					Expect(apps[4].Name).To(Equal("app-5"))
+					Expect(apps[4].DeprecatedDomain).ToNot(BeNil())
+					Expect(apps[4].DeprecatedDomains).ToNot(BeNil())
+
+					Expect(apps[5].Name).To(Equal("app-6"))
+					Expect(apps[5].DeprecatedHost).ToNot(BeNil())
+					Expect(apps[5].DeprecatedHosts).ToNot(BeNil())
+					Expect(apps[5].DeprecatedNoHostname).ToNot(BeNil())
+
+					Expect(apps[6]).To(Equal(Application{
+						Name:        "app-7",
+						Routes:      []string{"hello.com", "bleep.blah.com"},
+						RandomRoute: true,
+					}))
+				})
+			})
+
+			Context("when provided deprecated fields", func() {
+				Context("when global fields are provided", func() {
+					DescribeTable("raises a GlobalFieldsError",
+						func(manifestProperty string, numberOfValues int) {
+							tempFile, err := ioutil.TempFile("", "manifest-test-")
+							Expect(err).ToNot(HaveOccurred())
+							defer os.Remove(tempFile.Name())
+							Expect(tempFile.Close()).ToNot(HaveOccurred())
+							pathToManifest = tempFile.Name()
+
+							if numberOfValues == 1 {
+								manifest = fmt.Sprintf("---\n%s: value", manifestProperty)
+							} else {
+								values := []string{"A", "B"}
+								manifest = fmt.Sprintf("---\n%s: [%s]", manifestProperty, strings.Join(values, ","))
+							}
+							err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+							Expect(err).ToNot(HaveOccurred())
+
+							_, err = ReadAndInterpolateManifest(pathToManifest, pathsToVarsFiles)
+							Expect(err).To(MatchError(GlobalFieldsError{Fields: []string{manifestProperty}}))
+						},
+
+						Entry("global buildpack", "buildpack", 1),
+						Entry("global command", "command", 1),
+						Entry("global disk quota", "disk_quota", 1),
+						Entry("global docker", "docker", 1),
+						Entry("global domain", "domain", 1),
+						Entry("global domains", "domains", 2),
+						Entry("global environment variables", "env", 2),
+						Entry("global health check HTTP endpoint", "health-check-http-endpoint", 1),
+						Entry("global health check timeout", "timeout", 1),
+						Entry("global health check type", "health-check-type", 1),
+						Entry("global host", "host", 1),
+						Entry("global hosts", "hosts", 2),
+						Entry("global instances", "instances", 1),
+						Entry("global memory", "memory", 1),
+						Entry("global name", "name", 1),
+						Entry("global no hostname", "no-hostname", 1),
+						Entry("global no route", "no-route", 1),
+						Entry("global path", "path", 1),
+						Entry("global random-route", "random-route", 1),
+						Entry("global routes", "routes", 2),
+						Entry("global services", "services", 2),
+						Entry("global stack", "stack", 1),
+					)
+				})
+			})
 		})
 
 		Context("when inheritance is provided", func() {
@@ -260,12 +264,8 @@ inherit: "./some-inheritance-file"
 applications:
 - name: "app-1"
 `
-				tempFile, err := ioutil.TempFile("", "manifest-test-")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(tempFile.Close()).ToNot(HaveOccurred())
-				pathToManifest = tempFile.Name()
 
-				err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+				err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -274,72 +274,104 @@ applications:
 			})
 		})
 
-		Context("when a vars file is provided", func() {
+		Context("when the manifest contains variables", func() {
 			BeforeEach(func() {
 				manifest = `---
 applications:
 - name: ((var1))
+  instances: ((var2))
 `
 				err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
 				Expect(err).ToNot(HaveOccurred())
-
-				vars := `var1: app-1`
-				varFile, err := ioutil.TempFile("", "vars-test-")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(varFile.Close()).ToNot(HaveOccurred())
-				pathToVarsFile = varFile.Name()
-
-				err = ioutil.WriteFile(pathToVarsFile, []byte(vars), 0666)
-				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when the provided file exists and contains valid yaml", func() {
-				It("interpolates the placeholder values", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(apps[0].Name).To(Equal("app-1"))
-				})
-			})
+			Context("when vars file are provided", func() {
+				var (
+					varsDir string
+				)
 
-			Context("when the provided file path does not exist", func() {
 				BeforeEach(func() {
-					pathToVarsFile = "garbagepath"
-				})
-
-				It("returns an error", func() {
-					Expect(executeErr).To(HaveOccurred())
-					Expect(os.IsNotExist(executeErr)).To(BeTrue())
-				})
-			})
-
-			Context("when the provided file is not a valid yaml file", func() {
-				BeforeEach(func() {
-					vars := `: bad`
-					err := ioutil.WriteFile(pathToVarsFile, []byte(vars), 0666)
+					var err error
+					varsDir, err = ioutil.TempDir("", "vars-test")
 					Expect(err).ToNot(HaveOccurred())
+
+					varsFilePath1 := filepath.Join(varsDir, "vars-1")
+					err = ioutil.WriteFile(varsFilePath1, []byte("var1: app-1"), 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					varsFilePath2 := filepath.Join(varsDir, "vars-2")
+					err = ioutil.WriteFile(varsFilePath2, []byte("var2: 4"), 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					pathsToVarsFiles = append(pathsToVarsFiles, varsFilePath1, varsFilePath2)
 				})
 
-				It("returns an error", func() {
+				AfterEach(func() {
+					Expect(os.RemoveAll(varsDir)).ToNot(HaveOccurred())
+				})
+
+				Context("when multiple values for the same variable(s) are provided", func() {
+					BeforeEach(func() {
+						varsFilePath1 := filepath.Join(varsDir, "vars-1")
+						err := ioutil.WriteFile(varsFilePath1, []byte("var1: garbageapp\nvar1: app-1\nvar2: 0"), 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						varsFilePath2 := filepath.Join(varsDir, "vars-2")
+						err = ioutil.WriteFile(varsFilePath2, []byte("var2: 4"), 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						pathsToVarsFiles = append(pathsToVarsFiles, varsFilePath1, varsFilePath2)
+					})
+
+					It("interpolates the placeholder values", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(apps[0].Name).To(Equal("app-1"))
+						Expect(apps[0].Instances).To(Equal(types.NullInt{Value: 4, IsSet: true}))
+					})
+				})
+
+				Context("when the provided files exists and contain valid yaml", func() {
+					It("interpolates the placeholder values", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(apps[0].Name).To(Equal("app-1"))
+						Expect(apps[0].Instances).To(Equal(types.NullInt{Value: 4, IsSet: true}))
+					})
+				})
+
+				Context("when the provided file path does not exist", func() {
+					BeforeEach(func() {
+						pathsToVarsFiles = []string{"garbagepath"}
+					})
+
+					It("returns an error", func() {
+						Expect(executeErr).To(HaveOccurred())
+						Expect(os.IsNotExist(executeErr)).To(BeTrue())
+					})
+				})
+
+				Context("when the provided file is not a valid yaml file", func() {
+					BeforeEach(func() {
+						varsFilePath := filepath.Join(varsDir, "vars-1")
+						err := ioutil.WriteFile(varsFilePath, []byte(": bad"), 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						pathsToVarsFiles = []string{varsFilePath}
+					})
+
+					It("returns an error", func() {
+						Expect(executeErr).To(HaveOccurred())
+						Expect(executeErr).To(MatchError(InvalidYAMLError{
+							Err: errors.New("yaml: did not find expected key"),
+						}))
+					})
+				})
+			})
+
+			Context("when no vars file is provided", func() {
+				It("raises an error", func() {
 					Expect(executeErr).To(HaveOccurred())
-					Expect(executeErr).To(MatchError(InvalidYAMLError{
-						Err: errors.New("yaml: did not find expected key"),
-					}))
+					// TODO: look back at this with #155960593
 				})
-			})
-		})
-
-		Context("when no vars file is provided", func() {
-			BeforeEach(func() {
-				manifest = `---
-applications:
-- name: ((var1))
-`
-				err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("returns the merged, uninterpolated applications", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(apps[0].Name).To(Equal("((var1))"))
 			})
 		})
 	})

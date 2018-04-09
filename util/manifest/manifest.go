@@ -34,34 +34,36 @@ func (manifest *Manifest) UnmarshalYAML(unmarshal func(interface{}) error) error
 // ReadAndInterpolateManifest reads the manifest at the provided paths,
 // interpolates variables if a vars file is provided, and retunrs a fully
 // merged set of applications.
-func ReadAndInterpolateManifest(pathToManifest string, pathToVarsFile string) ([]Application, error) {
+func ReadAndInterpolateManifest(pathToManifest string, pathsToVarsFiles []string) ([]Application, error) {
 	rawManifest, err := ioutil.ReadFile(pathToManifest)
 	if err != nil {
 		return nil, err
 	}
 
 	tpl := template.NewTemplate(rawManifest)
+	fileVars := template.StaticVariables{}
 
-	if pathToVarsFile != "" {
-		var (
-			rawVarsFile []byte
-			staticVars  template.StaticVariables
-		)
-
-		rawVarsFile, err = ioutil.ReadFile(pathToVarsFile)
-		if err != nil {
-			return nil, err
+	for _, path := range pathsToVarsFiles {
+		rawVarsFile, ioerr := ioutil.ReadFile(path)
+		if ioerr != nil {
+			return nil, ioerr
 		}
 
-		err = yaml.Unmarshal(rawVarsFile, &staticVars)
+		var sv template.StaticVariables
+
+		err = yaml.Unmarshal(rawVarsFile, &sv)
 		if err != nil {
 			return nil, InvalidYAMLError{Err: err}
 		}
 
-		rawManifest, err = tpl.Evaluate(staticVars, nil, template.EvaluateOpts{})
-		if err != nil {
-			return nil, err
+		for k, v := range sv {
+			fileVars[k] = v
 		}
+	}
+
+	rawManifest, err = tpl.Evaluate(fileVars, nil, template.EvaluateOpts{ExpectAllKeys: true})
+	if err != nil {
+		return nil, err
 	}
 
 	var manifest Manifest

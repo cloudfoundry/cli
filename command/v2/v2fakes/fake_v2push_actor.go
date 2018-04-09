@@ -69,11 +69,11 @@ type FakeV2PushActor struct {
 		result1 []manifest.Application
 		result2 error
 	}
-	ReadManifestStub        func(pathToManifest string, pathToVarsFile string) ([]manifest.Application, error)
+	ReadManifestStub        func(pathToManifest string, pathsToVarsFiles []string) ([]manifest.Application, error)
 	readManifestMutex       sync.RWMutex
 	readManifestArgsForCall []struct {
-		pathToManifest string
-		pathToVarsFile string
+		pathToManifest   string
+		pathsToVarsFiles []string
 	}
 	readManifestReturns struct {
 		result1 []manifest.Application
@@ -304,17 +304,22 @@ func (fake *FakeV2PushActor) MergeAndValidateSettingsAndManifestsReturnsOnCall(i
 	}{result1, result2}
 }
 
-func (fake *FakeV2PushActor) ReadManifest(pathToManifest string, pathToVarsFile string) ([]manifest.Application, error) {
+func (fake *FakeV2PushActor) ReadManifest(pathToManifest string, pathsToVarsFiles []string) ([]manifest.Application, error) {
+	var pathsToVarsFilesCopy []string
+	if pathsToVarsFiles != nil {
+		pathsToVarsFilesCopy = make([]string, len(pathsToVarsFiles))
+		copy(pathsToVarsFilesCopy, pathsToVarsFiles)
+	}
 	fake.readManifestMutex.Lock()
 	ret, specificReturn := fake.readManifestReturnsOnCall[len(fake.readManifestArgsForCall)]
 	fake.readManifestArgsForCall = append(fake.readManifestArgsForCall, struct {
-		pathToManifest string
-		pathToVarsFile string
-	}{pathToManifest, pathToVarsFile})
-	fake.recordInvocation("ReadManifest", []interface{}{pathToManifest, pathToVarsFile})
+		pathToManifest   string
+		pathsToVarsFiles []string
+	}{pathToManifest, pathsToVarsFilesCopy})
+	fake.recordInvocation("ReadManifest", []interface{}{pathToManifest, pathsToVarsFilesCopy})
 	fake.readManifestMutex.Unlock()
 	if fake.ReadManifestStub != nil {
-		return fake.ReadManifestStub(pathToManifest, pathToVarsFile)
+		return fake.ReadManifestStub(pathToManifest, pathsToVarsFiles)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -328,10 +333,10 @@ func (fake *FakeV2PushActor) ReadManifestCallCount() int {
 	return len(fake.readManifestArgsForCall)
 }
 
-func (fake *FakeV2PushActor) ReadManifestArgsForCall(i int) (string, string) {
+func (fake *FakeV2PushActor) ReadManifestArgsForCall(i int) (string, []string) {
 	fake.readManifestMutex.RLock()
 	defer fake.readManifestMutex.RUnlock()
-	return fake.readManifestArgsForCall[i].pathToManifest, fake.readManifestArgsForCall[i].pathToVarsFile
+	return fake.readManifestArgsForCall[i].pathToManifest, fake.readManifestArgsForCall[i].pathsToVarsFiles
 }
 
 func (fake *FakeV2PushActor) ReadManifestReturns(result1 []manifest.Application, result2 error) {

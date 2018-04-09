@@ -436,7 +436,7 @@ var _ = Describe("push Command", func() {
 
 											BeforeEach(func() {
 												providedVarsFilePath = filepath.Join(tmpDir, "vars-file.yml")
-												cmd.VarsFilePath = flag.PathWithExistenceCheck(providedVarsFilePath)
+												cmd.VarsFilePaths = []flag.PathWithExistenceCheck{flag.PathWithExistenceCheck(providedVarsFilePath)}
 											})
 
 											It("should read the vars-file.yml file and replace the variables in the manifest.yml file", func() {
@@ -446,11 +446,38 @@ var _ = Describe("push Command", func() {
 												Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(providedPath)))
 
 												Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
-												manifest, varsfile := fakeActor.ReadManifestArgsForCall(0)
+												manifest, varsFiles := fakeActor.ReadManifestArgsForCall(0)
 												Expect(manifest).To(Equal(providedPath))
-												Expect(varsfile).To(Equal(providedVarsFilePath))
+												Expect(varsFiles).To(Equal([]string{providedVarsFilePath}))
+											})
+										})
+
+										Context("when multiple vars files are provided", func() {
+											var (
+												firstProvidedVarsFilePath  string
+												secondProvidedVarsFilePath string
+											)
+
+											BeforeEach(func() {
+												firstProvidedVarsFilePath = filepath.Join(tmpDir, "vars-file-1.yml")
+												firstVarsFile := flag.PathWithExistenceCheck(firstProvidedVarsFilePath)
+
+												secondProvidedVarsFilePath = filepath.Join(tmpDir, "vars-file-2.yml")
+												secondVarsFile := flag.PathWithExistenceCheck(secondProvidedVarsFilePath)
+												cmd.VarsFilePaths = []flag.PathWithExistenceCheck{firstVarsFile, secondVarsFile}
 											})
 
+											It("should read the vars-file.yml file and replace the variables in the manifest.yml file", func() {
+												Expect(executeErr).ToNot(HaveOccurred())
+
+												Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+												Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(providedPath)))
+
+												Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+												manifest, varsFiles := fakeActor.ReadManifestArgsForCall(0)
+												Expect(manifest).To(Equal(providedPath))
+												Expect(varsFiles).To(Equal([]string{firstProvidedVarsFilePath, secondProvidedVarsFilePath}))
+											})
 										})
 									})
 								})
