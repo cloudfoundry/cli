@@ -28,6 +28,7 @@ const (
 	GetAppsRequest                                       = "GetApps"
 	GetAppStatsRequest                                   = "GetAppStats"
 	GetConfigFeatureFlagsRequest                         = "GetConfigFeatureFlags"
+	GetEventsRequest                                     = "GetEvents"
 	GetInfoRequest                                       = "GetInfo"
 	GetJobRequest                                        = "GetJob"
 	GetOrganizationPrivateDomainsRequest                 = "GetOrganizationPrivateDomains"
@@ -35,14 +36,19 @@ const (
 	GetOrganizationRequest                               = "GetOrganization"
 	GetOrganizationsRequest                              = "GetOrganizations"
 	GetPrivateDomainRequest                              = "GetPrivateDomain"
+	GetPrivateDomainsRequest                             = "GetPrivateDomains"
 	GetRouteAppsRequest                                  = "GetRouteApps"
+	GetRouteMappingRequest                               = "GetRouteMapping"
+	GetRouteMappingsRequest                              = "GetRouteMappings"
 	GetRouteReservedDeprecatedRequest                    = "GetRouteReservedDeprecated"
 	GetRouteReservedRequest                              = "GetRouteReserved"
 	GetRouteRouteMappingsRequest                         = "GetRouteRouteMappings"
+	GetRouteRequest                                      = "GetRoute"
 	GetRoutesRequest                                     = "GetRoutes"
 	GetSecurityGroupSpacesRequest                        = "GetSecurityGroupSpaces"
 	GetSecurityGroupsRequest                             = "GetSecurityGroups"
 	GetSecurityGroupStagingSpacesRequest                 = "GetSecurityGroupStagingSpaces"
+	GetServiceBindingRequest                             = "GetServiceBinding"
 	GetServiceBindingsRequest                            = "GetServiceBindings"
 	GetServiceInstanceRequest                            = "GetServiceInstance"
 	GetServiceInstanceServiceBindingsRequest             = "GetServiceInstanceServiceBindings"
@@ -61,6 +67,7 @@ const (
 	GetSpaceStagingSecurityGroupsRequest                 = "GetSpaceStagingSecurityGroups"
 	GetStackRequest                                      = "GetStack"
 	GetStacksRequest                                     = "GetStacks"
+	GetUserProvidedServiceInstancesRequest               = "GetUserProvidedServiceInstances"
 	GetUserProvidedServiceInstanceServiceBindingsRequest = "GetUserProvidedServiceInstanceServiceBindings"
 	GetUsersRequest                                      = "GetUsers"
 	PostAppRequest                                       = "PostApp"
@@ -91,18 +98,23 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: GetAppRoutesRequest},
 	{Path: "/v2/apps/:app_guid/stats", Method: http.MethodGet, Name: GetAppStatsRequest},
 	{Path: "/v2/config/feature_flags", Method: http.MethodGet, Name: GetConfigFeatureFlagsRequest},
+	{Path: "/v2/events", Method: http.MethodGet, Name: GetEventsRequest},
 	{Path: "/v2/info", Method: http.MethodGet, Name: GetInfoRequest},
 	{Path: "/v2/jobs/:job_guid", Method: http.MethodGet, Name: GetJobRequest},
 	{Path: "/v2/organizations", Method: http.MethodGet, Name: GetOrganizationsRequest},
 	{Path: "/v2/organizations/:organization_guid", Method: http.MethodDelete, Name: DeleteOrganizationRequest},
 	{Path: "/v2/organizations/:organization_guid", Method: http.MethodGet, Name: GetOrganizationRequest},
 	{Path: "/v2/organizations/:organization_guid/private_domains", Method: http.MethodGet, Name: GetOrganizationPrivateDomainsRequest},
+	{Path: "/v2/private_domains", Method: http.MethodGet, Name: GetPrivateDomainsRequest},
 	{Path: "/v2/private_domains/:private_domain_guid", Method: http.MethodGet, Name: GetPrivateDomainRequest},
 	{Path: "/v2/quota_definitions/:organization_quota_guid", Method: http.MethodGet, Name: GetOrganizationQuotaDefinitionRequest},
 	{Path: "/v2/resource_match", Method: http.MethodPut, Name: PutResourceMatchRequest},
+	{Path: "/v2/route_mappings", Method: http.MethodGet, Name: GetRouteMappingsRequest},
+	{Path: "/v2/route_mappings/:route_mapping_guid", Method: http.MethodGet, Name: GetRouteMappingRequest},
 	{Path: "/v2/routes", Method: http.MethodGet, Name: GetRoutesRequest},
 	{Path: "/v2/routes", Method: http.MethodPost, Name: PostRouteRequest},
 	{Path: "/v2/routes/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
+	{Path: "/v2/routes/:route_guid", Method: http.MethodGet, Name: GetRouteRequest},
 	{Path: "/v2/routes/:route_guid/apps", Method: http.MethodGet, Name: GetRouteAppsRequest},
 	{Path: "/v2/routes/:route_guid/apps/:app_guid", Method: http.MethodDelete, Name: DeleteRouteAppRequest},
 	{Path: "/v2/routes/:route_guid/apps/:app_guid", Method: http.MethodPut, Name: PutRouteAppRequest},
@@ -117,6 +129,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/security_groups/:security_group_guid/staging_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupStagingSpaceRequest},
 	{Path: "/v2/security_groups/:security_group_guid/staging_spaces/:space_guid", Method: http.MethodPut, Name: PutSecurityGroupStagingSpaceRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodGet, Name: GetServiceBindingsRequest},
+	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodGet, Name: GetServiceBindingRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodPost, Name: PostServiceBindingRequest},
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodDelete, Name: DeleteServiceBindingRequest},
 	{Path: "/v2/service_instances", Method: http.MethodGet, Name: GetServiceInstancesRequest},
@@ -137,6 +150,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/spaces/:space_guid/staging_security_groups", Method: http.MethodGet, Name: GetSpaceStagingSecurityGroupsRequest},
 	{Path: "/v2/stacks", Method: http.MethodGet, Name: GetStacksRequest},
 	{Path: "/v2/stacks/:stack_guid", Method: http.MethodGet, Name: GetStackRequest},
+	{Path: "/v2/user_provided_service_instances", Method: http.MethodGet, Name: GetUserProvidedServiceInstancesRequest},
 	{Path: "/v2/user_provided_service_instances/:user_provided_service_instance_guid/service_bindings", Method: http.MethodGet, Name: GetUserProvidedServiceInstanceServiceBindingsRequest},
 	{Path: "/v2/users", Method: http.MethodPost, Name: PostUserRequest},
 }

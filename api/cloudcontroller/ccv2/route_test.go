@@ -318,6 +318,85 @@ var _ = Describe("Route", func() {
 		})
 	})
 
+	Describe("GetRoute", func() {
+		var (
+			route      Route
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			route, warnings, executeErr = client.GetRoute("some-route-guid")
+		})
+
+		Context("when the cc returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 1,
+					"description": "some error description",
+					"error_code": "CF-SomeError"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(ccerror.V2UnexpectedResponseError{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        1,
+						Description: "some error description",
+						ErrorCode:   "CF-SomeError",
+					},
+					ResponseCode: http.StatusTeapot,
+				}))
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		Context("when there are no errors", func() {
+			BeforeEach(func() {
+				response := `{
+						"metadata": {
+							"guid": "route-guid-1",
+							"updated_at": null
+						},
+						"entity": {
+							"host": "host-1",
+							"path": "path",
+							"port": null,
+							"domain_guid": "some-http-domain",
+							"space_guid": "some-space-guid-1"
+						}
+					}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					),
+				)
+			})
+
+			It("returns the route", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(route).To(Equal(Route{
+					GUID:       "route-guid-1",
+					Host:       "host-1",
+					Path:       "path",
+					Port:       types.NullInt{IsSet: false},
+					DomainGUID: "some-http-domain",
+					SpaceGUID:  "some-space-guid-1",
+				}))
+			})
+		})
+	})
+
 	Describe("GetRoutes", func() {
 		Context("when there are routes", func() {
 			BeforeEach(func() {

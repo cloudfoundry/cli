@@ -122,6 +122,78 @@ var _ = Describe("Service Binding", func() {
 		})
 	})
 
+	Describe("GetServiceBinding", func() {
+		var (
+			serviceBinding ServiceBinding
+			warnings       Warnings
+			executeErr     error
+		)
+
+		JustBeforeEach(func() {
+			serviceBinding, warnings, executeErr = client.GetServiceBinding("some-service-binding-guid")
+		})
+
+		Context("when the cc returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 1,
+					"description": "some error description",
+					"error_code": "CF-SomeError"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/service_bindings/some-service-binding-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(ccerror.V2UnexpectedResponseError{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        1,
+						Description: "some error description",
+						ErrorCode:   "CF-SomeError",
+					},
+					ResponseCode: http.StatusTeapot,
+				}))
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		Context("when there are no errors", func() {
+			BeforeEach(func() {
+				response := `{
+						"metadata": {
+							"guid": "service-binding-guid-1"
+						},
+						"entity": {
+							"app_guid":"app-guid-1",
+							"service_instance_guid": "service-instance-guid-1"
+						}
+					}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/service_bindings/some-service-binding-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					),
+				)
+			})
+
+			It("returns the service binding", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(serviceBinding).To(Equal(ServiceBinding{
+					GUID:                "service-binding-guid-1",
+					AppGUID:             "app-guid-1",
+					ServiceInstanceGUID: "service-instance-guid-1",
+				}))
+			})
+		})
+	})
+
 	Describe("GetServiceBindings", func() {
 		BeforeEach(func() {
 			response1 := `{

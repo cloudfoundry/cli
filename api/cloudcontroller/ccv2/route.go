@@ -193,6 +193,25 @@ func (client *Client) GetSpaceRoutes(spaceGUID string, filters ...Filter) ([]Rou
 	return fullRoutesList, warnings, err
 }
 
+// GetRoute returns a route with the provided guid.
+func (client *Client) GetRoute(guid string) (Route, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRouteRequest,
+		URIParams:   Params{"route_guid": guid},
+	})
+	if err != nil {
+		return Route{}, nil, err
+	}
+
+	var route Route
+	response := cloudcontroller.Response{
+		Result: &route,
+	}
+
+	err = client.connection.Make(request, &response)
+	return route, response.Warnings, err
+}
+
 // GetRoutes returns a list of Routes based off of the provided filters.
 func (client *Client) GetRoutes(filters ...Filter) ([]Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
