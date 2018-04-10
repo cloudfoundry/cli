@@ -83,26 +83,24 @@ func (*CloudControllerConnection) processRequestErrors(request *http.Request, er
 func (connection *CloudControllerConnection) populateResponse(response *http.Response, passedResponse *Response) error {
 	passedResponse.HTTPResponse = response
 
-	// The cloud controller returns warnings with key "X-Cf-Warnings", and the
-	// value is a comma seperated string.
-	if rawWarnings := response.Header.Get("X-Cf-Warnings"); rawWarnings != "" {
-		passedResponse.Warnings = []string{}
-		for _, warning := range strings.Split(rawWarnings, ",") {
-			warningTrimmed := strings.Trim(warning, " ")
-			passedResponse.Warnings = append(passedResponse.Warnings, warningTrimmed)
-		}
+	warnings, err := connection.handleWarnings(response)
+	if err != nil {
+		return err
 	}
+	passedResponse.Warnings = warnings
 
 	if resourceLocationURL := response.Header.Get("Location"); resourceLocationURL != "" {
 		passedResponse.ResourceLocationURL = resourceLocationURL
 	}
 
-	err := connection.handleStatusCodes(response, passedResponse)
+	err = connection.handleStatusCodes(response, passedResponse)
 	if err != nil {
 		return err
 	}
 
-	// TODO: only unmarshal on 'application/json', skip otherwise
+	// TODO: only unmarshal on 'application/json', skip otherwise - Fixing this
+	// todo will require changing ALL the API tests to include the content-type
+	// in their tests.
 	if passedResponse.Result != nil {
 		err = DecodeJSON(passedResponse.RawResponse, passedResponse.Result)
 		if err != nil {
@@ -111,6 +109,27 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 	}
 
 	return nil
+}
+
+// handleWarnings looks for the "X-Cf-Warnings" header in the cloud controller
+// response and URI decodes them. The value can contain multiple warnings that
+// are comma separated.
+func (*CloudControllerConnection) handleWarnings(response *http.Response) ([]string, error) {
+	rawWarnings := response.Header.Get("X-Cf-Warnings")
+	rawWarnings, err := url.QueryUnescape(rawWarnings)
+	if err != nil {
+		return nil, err
+	}
+
+	var warnings []string
+	if rawWarnings != "" {
+		for _, warning := range strings.Split(rawWarnings, ",") {
+			warningTrimmed := strings.Trim(warning, " ")
+			warnings = append(warnings, warningTrimmed)
+		}
+	}
+
+	return warnings, nil
 }
 
 func (*CloudControllerConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {

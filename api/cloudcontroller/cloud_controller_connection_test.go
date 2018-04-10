@@ -137,32 +137,58 @@ var _ = Describe("Cloud Controller Connection", func() {
 			})
 
 			Describe("X-Cf-Warnings", func() {
-				BeforeEach(func() {
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v2/foo"),
-							RespondWith(http.StatusOK, "{}", http.Header{"X-Cf-Warnings": {"42, Ed McMann, the 1942 doggers"}}),
-						),
-					)
+				Context("when there are warnings", func() {
+					BeforeEach(func() {
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodGet, "/v2/foo"),
+								RespondWith(http.StatusOK, "{}", http.Header{"X-Cf-Warnings": {"42,+Ed+McMann,+the+1942+doggers"}}),
+							),
+						)
+					})
+
+					It("returns them in Response", func() {
+						req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
+						Expect(err).ToNot(HaveOccurred())
+						request := &Request{Request: req}
+
+						var response Response
+						err = connection.Make(request, &response)
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+						warnings := response.Warnings
+						Expect(warnings).ToNot(BeNil())
+						Expect(warnings).To(HaveLen(3))
+						Expect(warnings).To(ContainElement("42"))
+						Expect(warnings).To(ContainElement("Ed McMann"))
+						Expect(warnings).To(ContainElement("the 1942 doggers"))
+					})
 				})
 
-				It("returns them in Response", func() {
-					req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
-					Expect(err).ToNot(HaveOccurred())
-					request := &Request{Request: req}
+				Context("when there are no warnings", func() {
+					BeforeEach(func() {
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodGet, "/v2/foo"),
+								RespondWith(http.StatusOK, "{}"),
+							),
+						)
+					})
 
-					var response Response
-					err = connection.Make(request, &response)
-					Expect(err).NotTo(HaveOccurred())
+					It("returns them in Response", func() {
+						req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
+						Expect(err).ToNot(HaveOccurred())
+						request := &Request{Request: req}
 
-					Expect(server.ReceivedRequests()).To(HaveLen(1))
+						var response Response
+						err = connection.Make(request, &response)
+						Expect(err).NotTo(HaveOccurred())
 
-					warnings := response.Warnings
-					Expect(warnings).ToNot(BeNil())
-					Expect(warnings).To(HaveLen(3))
-					Expect(warnings).To(ContainElement("42"))
-					Expect(warnings).To(ContainElement("Ed McMann"))
-					Expect(warnings).To(ContainElement("the 1942 doggers"))
+						Expect(response.Warnings).To(BeEmpty())
+						Expect(server.ReceivedRequests()).To(HaveLen(1))
+					})
 				})
 			})
 		})
