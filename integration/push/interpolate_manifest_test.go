@@ -83,6 +83,32 @@ var _ = Describe("push with a manifest and vars files", func() {
 			})
 		})
 
+		Context("when a variable in manifest is not found in var_file", func() {
+			BeforeEach(func() {
+				firstVarsFilePath = filepath.Join(tmpDir, "vars1")
+				vars1 := fmt.Sprintf("vars1: %s", appName)
+				err := ioutil.WriteFile(firstVarsFilePath, []byte(vars1), 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("fails with error saying that variable is missing", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name": "((not_vars))",
+								"path": dir,
+							},
+						},
+					})
+
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--vars-file", firstVarsFilePath)
+					Eventually(session.Err).Should(Say("Expected to find variables: not_vars"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
 		Context("when there are duplicate variables", func() {
 			BeforeEach(func() {
 				firstVarsFilePath = filepath.Join(tmpDir, "vars1")

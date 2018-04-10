@@ -338,6 +338,20 @@ applications:
 					})
 				})
 
+				Context("when a variable in the manifest is not provided in the vars file", func() {
+					BeforeEach(func() {
+						varsFilePath := filepath.Join(varsDir, "vars-1")
+						err := ioutil.WriteFile(varsFilePath, []byte("notvar: foo"), 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						pathsToVarsFiles = []string{varsFilePath}
+					})
+
+					It("returns an error", func() {
+						Expect(executeErr.Error()).To(Equal("Expected to find variables: var1\nvar2"))
+					})
+				})
+
 				Context("when the provided file path does not exist", func() {
 					BeforeEach(func() {
 						pathsToVarsFiles = []string{"garbagepath"}
@@ -364,13 +378,6 @@ applications:
 							Err: errors.New("yaml: did not find expected key"),
 						}))
 					})
-				})
-			})
-
-			Context("when no vars file is provided", func() {
-				It("raises an error", func() {
-					Expect(executeErr).To(HaveOccurred())
-					// TODO: look back at this with #155960593
 				})
 			})
 		})
