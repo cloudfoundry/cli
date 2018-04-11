@@ -47,7 +47,7 @@ var _ = Describe("Manifest", func() {
 			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, pathsToVarsFiles)
 		})
 
-		Context("when the manifest contains NO variables that need interpolation", func() {
+		Context("when the manifest contains no variables", func() {
 			BeforeEach(func() {
 				manifest = `---
 applications:
@@ -110,168 +110,100 @@ applications:
 			})
 
 			Context("when the manifest does not contain deprecated fields", func() {
-				Context("when the manifest specified a single buildpack", func() {
-					It("returns a merged set of applications", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(apps).To(HaveLen(7))
+				It("returns a merged set of applications", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(apps).To(HaveLen(7))
 
-						Expect(apps[0]).To(Equal(Application{
-							Name: "app-1",
-							Buildpack: types.FilteredString{
-								IsSet: true,
-								Value: "some-buildpack",
-							},
-							Command: types.FilteredString{
-								IsSet: true,
-								Value: "some-command",
-							},
-							HealthCheckHTTPEndpoint: "\\some-endpoint",
-							HealthCheckType:         "http",
-							Instances: types.NullInt{
-								Value: 10,
-								IsSet: true,
-							},
-							DiskQuota: types.NullByteSizeInMb{
-								Value: 100,
-								IsSet: true,
-							},
-							DockerImage:    "some-docker-image",
-							DockerUsername: "some-docker-username",
-							Memory: types.NullByteSizeInMb{
-								Value: 200,
-								IsSet: true,
-							},
-							RandomRoute:        true,
-							StackName:          "some-stack",
-							HealthCheckTimeout: 120,
-						}))
+					Expect(apps[0]).To(Equal(Application{
+						Name: "app-1",
+						Buildpack: types.FilteredString{
+							IsSet: true,
+							Value: "some-buildpack",
+						},
+						Command: types.FilteredString{
+							IsSet: true,
+							Value: "some-command",
+						},
+						HealthCheckHTTPEndpoint: "\\some-endpoint",
+						HealthCheckType:         "http",
+						Instances: types.NullInt{
+							Value: 10,
+							IsSet: true,
+						},
+						DiskQuota: types.NullByteSizeInMb{
+							Value: 100,
+							IsSet: true,
+						},
+						DockerImage:    "some-docker-image",
+						DockerUsername: "some-docker-username",
+						Memory: types.NullByteSizeInMb{
+							Value: 200,
+							IsSet: true,
+						},
+						RandomRoute:        true,
+						StackName:          "some-stack",
+						HealthCheckTimeout: 120,
+					}))
 
-						Expect(apps[1]).To(Equal(Application{
-							Name: "app-2",
-							Buildpack: types.FilteredString{
-								IsSet: true,
-								Value: "",
-							},
-							DiskQuota: types.NullByteSizeInMb{
-								Value: 1024,
-								IsSet: true,
-							},
-							Instances: types.NullInt{
-								IsSet: true,
-								Value: 0,
-							},
-							Memory: types.NullByteSizeInMb{
-								Value: 2048,
-								IsSet: true,
-							},
-							Routes:   []string{"foo.bar.com", "baz.qux.com", "blep.blah.com/boop"},
-							Services: []string{"service_1", "service_2"},
-						}))
+					Expect(apps[1]).To(Equal(Application{
+						Name: "app-2",
+						Buildpack: types.FilteredString{
+							IsSet: true,
+							Value: "",
+						},
+						DiskQuota: types.NullByteSizeInMb{
+							Value: 1024,
+							IsSet: true,
+						},
+						Instances: types.NullInt{
+							IsSet: true,
+							Value: 0,
+						},
+						Memory: types.NullByteSizeInMb{
+							Value: 2048,
+							IsSet: true,
+						},
+						Routes:   []string{"foo.bar.com", "baz.qux.com", "blep.blah.com/boop"},
+						Services: []string{"service_1", "service_2"},
+					}))
 
-						Expect(apps[2]).To(Equal(Application{
-							Name: "app-3",
-							EnvironmentVariables: map[string]string{
-								"env_1": "foo",
-								"env_2": "182837403930483038",
-								"env_3": "true",
-								"env_4": "1.00001",
-							},
-							NoRoute: true,
-						}))
+					Expect(apps[2]).To(Equal(Application{
+						Name: "app-3",
+						EnvironmentVariables: map[string]string{
+							"env_1": "foo",
+							"env_2": "182837403930483038",
+							"env_3": "true",
+							"env_4": "1.00001",
+						},
+						NoRoute: true,
+					}))
 
-						Expect(apps[3]).To(Equal(Application{
-							Name: "app-4",
-							Buildpack: types.FilteredString{
-								IsSet: true,
-								Value: "",
-							},
-							Command: types.FilteredString{
-								IsSet: true,
-								Value: "",
-							},
-						}))
+					Expect(apps[3]).To(Equal(Application{
+						Name: "app-4",
+						Buildpack: types.FilteredString{
+							IsSet: true,
+							Value: "",
+						},
+						Command: types.FilteredString{
+							IsSet: true,
+							Value: "",
+						},
+					}))
 
-						Expect(apps[4].Name).To(Equal("app-5"))
-						Expect(apps[4].DeprecatedDomain).ToNot(BeNil())
-						Expect(apps[4].DeprecatedDomains).ToNot(BeNil())
+					Expect(apps[4].Name).To(Equal("app-5"))
+					Expect(apps[4].DeprecatedDomain).ToNot(BeNil())
+					Expect(apps[4].DeprecatedDomains).ToNot(BeNil())
 
-						Expect(apps[5].Name).To(Equal("app-6"))
-						Expect(apps[5].DeprecatedHost).ToNot(BeNil())
-						Expect(apps[5].DeprecatedHosts).ToNot(BeNil())
-						Expect(apps[5].DeprecatedNoHostname).ToNot(BeNil())
+					Expect(apps[5].Name).To(Equal("app-6"))
+					Expect(apps[5].DeprecatedHost).ToNot(BeNil())
+					Expect(apps[5].DeprecatedHosts).ToNot(BeNil())
+					Expect(apps[5].DeprecatedNoHostname).ToNot(BeNil())
 
-						Expect(apps[6]).To(Equal(Application{
-							Name:        "app-7",
-							Routes:      []string{"hello.com", "bleep.blah.com"},
-							RandomRoute: true,
-						}))
-					})
-				})
-
-				Context("when the manifest contains buildpacks (plural)", func() {
-					BeforeEach(func() {
-						manifest = `---
-applications:
-- name: app-1
-  buildpacks:
-  - "some-buildpack-1"
-  - "some-buildpack-2"
-  memory: 200M
-  instances: 10
-- name: app-2
-  buildpacks:
-  - "some-other-buildpack-1"
-  - "some-other-buildpack-2"
-  memory: 2048M
-  instances: 0`
-						err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
-						Expect(err).ToNot(HaveOccurred())
-					})
-
-					It("returns a merged set of applications", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(apps).To(HaveLen(2))
-
-						Expect(apps[0]).To(Equal(Application{
-							Name: "app-1",
-							Buildpacks: []types.FilteredString{
-								types.FilteredString{
-									IsSet: true,
-									Value: "some-buildpack-1",
-								}, types.FilteredString{
-									IsSet: true,
-									Value: "some-buildpack-2",
-								}},
-							Instances: types.NullInt{
-								Value: 10,
-								IsSet: true,
-							},
-							Memory: types.NullByteSizeInMb{
-								Value: 200,
-								IsSet: true,
-							},
-						}))
-
-						Expect(apps[1]).To(Equal(Application{
-							Name: "app-2",
-							Buildpacks: []types.FilteredString{
-								types.FilteredString{
-									IsSet: true,
-									Value: "some-other-buildpack-1",
-								}, types.FilteredString{
-									IsSet: true,
-									Value: "some-other-buildpack-2",
-								}},
-							Instances: types.NullInt{
-								IsSet: true,
-								Value: 0,
-							},
-							Memory: types.NullByteSizeInMb{
-								Value: 2048,
-								IsSet: true,
-							},
-						}))
-					})
+					Expect(apps[6]).To(Equal(Application{
+						Name:        "app-7",
+						Routes:      []string{"hello.com", "bleep.blah.com"},
+						RandomRoute: true,
+					}))
 				})
 			})
 
@@ -342,7 +274,7 @@ applications:
 			})
 		})
 
-		Context("when the manifest contains variables that need interpolation", func() {
+		Context("when the manifest contains variables", func() {
 			BeforeEach(func() {
 				manifest = `---
 applications:

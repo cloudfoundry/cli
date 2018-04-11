@@ -98,7 +98,6 @@ var _ = Describe("Application", func() {
 						},
 						"entity": {
 							"buildpack": "ruby 1.6.29",
-							"buildpacks": null,
 							"command": "some-command",
 							"detected_start_command": "echo 'I am a banana'",
 							"disk_quota": 586,
@@ -192,7 +191,6 @@ var _ = Describe("Application", func() {
 						},
 						"entity": {
 							"buildpack": "ruby 1.6.29",
-							"buildpacks": null,
 							"detected_start_command": "echo 'I am a banana'",
 							"disk_quota": 586,
 							"detected_buildpack": null,

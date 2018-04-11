@@ -18,9 +18,6 @@ type Application struct {
 	// Buildpack is the buildpack set by the user.
 	Buildpack types.FilteredString
 
-	// Buildpacks is the array of buildpacks set by the user.
-	Buildpacks []types.FilteredString
-
 	// Command is the user specified start command.
 	Command types.FilteredString
 
@@ -103,7 +100,6 @@ type DockerCredentials struct {
 func (application Application) MarshalJSON() ([]byte, error) {
 	ccApp := struct {
 		Buildpack               *string                             `json:"buildpack,omitempty"`
-		Buildpacks              *[]string                           `json:"buildpacks,omitempty"`
 		Command                 *string                             `json:"command,omitempty"`
 		DiskQuota               *uint64                             `json:"disk_quota,omitempty"`
 		DockerCredentials       *DockerCredentials                  `json:"docker_credentials,omitempty"`
@@ -131,18 +127,6 @@ func (application Application) MarshalJSON() ([]byte, error) {
 
 	if application.Buildpack.IsSet {
 		ccApp.Buildpack = &application.Buildpack.Value
-	}
-
-	for _, buildpack := range application.Buildpacks {
-		if buildpack.IsSet {
-			bp := types.FilteredString{}
-			bp.Value = buildpack.Value
-
-			if ccApp.Buildpacks == nil {
-				ccApp.Buildpacks = &[]string{}
-			}
-			*ccApp.Buildpacks = append(*ccApp.Buildpacks, bp.Value)
-		}
 	}
 
 	if application.Command.IsSet {
