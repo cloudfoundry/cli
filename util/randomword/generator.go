@@ -179,6 +179,7 @@ sitatunga
 springhare
 squirrel
 swan
+tasmaniandevil
 tiger
 topi
 toucan
