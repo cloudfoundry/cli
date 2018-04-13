@@ -3,7 +3,7 @@
 // These sets of packages are still under development/pre-pre-pre...alpha. Use
 // at your own risk! Functionality and design may change without warning.
 //
-// It is currently designed to support Cloud Controller API 2.23.0. However, it
+// It is currently designed to support Cloud Controller API 2.58.0. However, it
 // may include features and endpoints of later API versions.
 //
 // For more information on the Cloud Controller API see
