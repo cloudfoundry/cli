@@ -14,6 +14,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("Manifest", func() {
@@ -47,7 +48,7 @@ var _ = Describe("Manifest", func() {
 			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, pathsToVarsFiles)
 		})
 
-		Context("when the manifest contains no variables", func() {
+		Context("when the manifest contains NO variables that need interpolation", func() {
 			BeforeEach(func() {
 				manifest = `---
 applications:
@@ -255,26 +256,111 @@ applications:
 					)
 				})
 			})
-		})
 
-		Context("when inheritance is provided", func() {
-			BeforeEach(func() {
-				manifest = `---
+			Context("when inheritance is provided", func() {
+				BeforeEach(func() {
+					manifest = `---
 inherit: "./some-inheritance-file"
 applications:
 - name: "app-1"
 `
 
-				err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
-				Expect(err).ToNot(HaveOccurred())
+					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("raises an InheritanceFieldError", func() {
+					Expect(executeErr).To(MatchError(InheritanceFieldError{}))
+				})
 			})
 
-			It("raises an InheritanceFieldError", func() {
-				Expect(executeErr).To(MatchError(InheritanceFieldError{}))
+			Context("when the manifest specified a single buildpack", func() {
+				BeforeEach(func() {
+					manifest = `---
+applications:
+- name: app-1
+  buildpack: "some-buildpack"
+  memory: 200M
+  instances: 10
+`
+					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("returns a merged set of applications", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(apps).To(HaveLen(1))
+
+					Expect(apps[0]).To(MatchFields(IgnoreExtras, Fields{
+						"Buildpack": Equal(types.FilteredString{
+							IsSet: true,
+							Value: "some-buildpack",
+						}),
+						"Buildpacks": BeEmpty(),
+					}))
+				})
+			})
+
+			Context("when the manifest contains buildpacks (plural)", func() {
+				BeforeEach(func() {
+					manifest = `---
+applications:
+- name: app-1
+  buildpacks:
+  - "some-buildpack-1"
+  - "some-buildpack-2"
+  memory: 200M
+  instances: 10
+- name: app-2
+  buildpacks:
+  - "some-other-buildpack-1"
+  - "some-other-buildpack-2"
+  memory: 2048M
+  instances: 0`
+					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("returns a merged set of applications", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(apps).To(HaveLen(2))
+
+					Expect(apps[0]).To(MatchFields(IgnoreExtras, Fields{
+						"Buildpack": Equal(types.FilteredString{
+							IsSet: false,
+							Value: "",
+						}),
+						"Buildpacks": ConsistOf(
+							types.FilteredString{
+								IsSet: true,
+								Value: "some-buildpack-1",
+							}, types.FilteredString{
+								IsSet: true,
+								Value: "some-buildpack-2",
+							},
+						),
+					}))
+
+					Expect(apps[1]).To(MatchFields(IgnoreExtras, Fields{
+						"Buildpack": Equal(types.FilteredString{
+							IsSet: false,
+							Value: "",
+						}),
+						"Buildpacks": ConsistOf(
+							types.FilteredString{
+								IsSet: true,
+								Value: "some-other-buildpack-1",
+							}, types.FilteredString{
+								IsSet: true,
+								Value: "some-other-buildpack-2",
+							},
+						),
+					}))
+				})
 			})
 		})
 
-		Context("when the manifest contains variables", func() {
+		Context("when the manifest contains variables that need interpolation", func() {
 			BeforeEach(func() {
 				manifest = `---
 applications:

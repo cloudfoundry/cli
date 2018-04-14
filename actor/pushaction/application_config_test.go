@@ -1088,5 +1088,27 @@ var _ = Describe("Application Config", func() {
 				Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(0))
 			})
 		})
+
+		Context("when buildpacks (plural) are provided", func() {
+			BeforeEach(func() {
+				manifestApps[0].Buildpacks = []types.FilteredString{
+					types.FilteredString{
+						IsSet: true,
+						Value: "some-buildpack-1",
+					},
+					types.FilteredString{
+						IsSet: true,
+						Value: "some-buildpack-2",
+					},
+				}
+			})
+
+			It("sets the buildpacks on DesiredApplication", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(len(firstConfig.DesiredApplication.Buildpacks)).To(Equal(2))
+				Expect(firstConfig.DesiredApplication.Buildpacks[0].Value).To(Equal("some-buildpack-1"))
+				Expect(firstConfig.DesiredApplication.Buildpacks[1].Value).To(Equal("some-buildpack-2"))
+			})
+		})
 	})
 })

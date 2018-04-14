@@ -29,7 +29,13 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		var err error
 
 		eventStream <- SettingUpApplication
-		config, event, warnings, err = actor.CreateOrUpdateApp(config)
+		if config.UpdatingApplication() {
+			config, event, warnings, err = actor.UpdateApplication(config)
+		} else {
+			config, event, warnings, err = actor.CreateApplication(config)
+		}
+		// config, event, warnings, err = FinalizeApplication(config)
+
 		warningsStream <- warnings
 		if err != nil {
 			errorStream <- err

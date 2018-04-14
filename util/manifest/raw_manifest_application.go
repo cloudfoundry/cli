@@ -3,6 +3,7 @@ package manifest
 type rawManifestApplication struct {
 	Name                    string             `yaml:"name,omitempty"`
 	Buildpack               string             `yaml:"buildpack,omitempty"`
+	Buildpacks              []string           `yaml:"buildpacks,omitempty"`
 	Command                 string             `yaml:"command,omitempty"`
 	DeprecatedDomain        interface{}        `yaml:"domain,omitempty"`
 	DeprecatedDomains       interface{}        `yaml:"domains,omitempty"`

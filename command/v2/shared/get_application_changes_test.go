@@ -103,7 +103,7 @@ var _ = Describe("GetApplicationChanges", func() {
 	})
 
 	Describe("buildpack", func() {
-		Context("new app with no specified buildpack", func() {
+		Context("new app with no specified buildpack AND no specified buildpacks(plural)", func() {
 			It("does not provide a buildpack change", func() {
 				for i, change := range changes {
 					Expect(change.Header).ToNot(Equal("buildpack:"), fmt.Sprintf("entry %d should not be a buildpack", i))
