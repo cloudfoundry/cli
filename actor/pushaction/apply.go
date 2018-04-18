@@ -34,7 +34,6 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		} else {
 			config, event, warnings, err = actor.CreateApplication(config)
 		}
-		// config, event, warnings, err = FinalizeApplication(config)
 
 		warningsStream <- warnings
 		if err != nil {
@@ -84,17 +83,15 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 
 		if len(config.CurrentServices) != len(config.DesiredServices) {
 			eventStream <- ConfiguringServices
-			var boundServices bool
-			config, boundServices, warnings, err = actor.BindServices(config)
+			config, _, warnings, err = actor.BindServices(config)
 			warningsStream <- warnings
 			if err != nil {
 				errorStream <- err
 				return
 			}
-			if boundServices {
-				log.Debugf("bound desired services: %#v", config.DesiredServices)
-				eventStream <- BoundServices
-			}
+
+			log.Debugf("bound desired services: %#v", config.DesiredServices)
+			eventStream <- BoundServices
 		}
 
 		if config.DropletPath != "" {
