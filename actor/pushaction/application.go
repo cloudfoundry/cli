@@ -49,6 +49,7 @@ func (actor Actor) CreateApplication(config ApplicationConfig) (ApplicationConfi
 			Name:                newApp.Name,
 			GUID:                newApp.GUID,
 			LifecycleBuildpacks: buildpacks,
+			LifecycleType:       constant.AppLifecycleTypeBuildpack,
 		}
 
 		_, v3warnings, err := actor.V3Actor.UpdateApplication(v3App)
@@ -157,6 +158,8 @@ func (actor Actor) ignoreSameStackGUID(config ApplicationConfig, v2App v2action.
 	return v2App
 }
 
+// If 'buildpacks' is set with only one buildpack, set `buildpack` (singular)
+// on the application.
 func (actor Actor) setBuildpack(config ApplicationConfig) types.FilteredString {
 	if len(config.DesiredApplication.Buildpacks) == 1 {
 		return config.DesiredApplication.Buildpacks[0]

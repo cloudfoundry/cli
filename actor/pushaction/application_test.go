@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
@@ -233,6 +234,7 @@ var _ = Describe("Applications", func() {
 							Name:                updatedApplication.Name,
 							GUID:                updatedApplication.GUID,
 							LifecycleBuildpacks: []string{"ruby", "java"},
+							LifecycleType:       constant.AppLifecycleTypeBuildpack,
 						}
 
 						fakeV2Actor.UpdateApplicationReturns(updatedApplication, v2action.Warnings{"v2-create-application-warnings"}, nil)
@@ -419,6 +421,7 @@ var _ = Describe("Applications", func() {
 							Name:                createdApplication.Name,
 							GUID:                createdApplication.GUID,
 							LifecycleBuildpacks: []string{"ruby", "java"},
+							LifecycleType:       constant.AppLifecycleTypeBuildpack,
 						}
 
 						fakeV2Actor.CreateApplicationReturns(createdApplication, v2action.Warnings{"v2-create-application-warnings"}, nil)

@@ -7,11 +7,13 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
+	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifest"
 	"code.cloudfoundry.org/cli/util/progressbar"
@@ -87,9 +89,15 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
+
+	ccClientV3, uaaClient, err := sharedV3.NewClients(config, ui, true)
+	if err != nil {
+		return err
+	}
 	v2Actor := v2action.NewActor(ccClient, uaaClient, config)
+	v3Actor := v3action.NewActor(ccClientV3, config, sharedActor, nil)
 	cmd.RestartActor = v2Actor
-	cmd.Actor = pushaction.NewActor(v2Actor, sharedActor)
+	cmd.Actor = pushaction.NewActor(v2Actor, v3Actor, sharedActor)
 	cmd.SharedActor = sharedActor
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
 
