@@ -5,6 +5,8 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
 	log "github.com/sirupsen/logrus"
 )
@@ -16,7 +18,7 @@ type Application struct {
 }
 
 func (app Application) String() string {
-	return fmt.Sprintf("%s, Stack Name: '%s'", app.Application, app.Stack.Name)
+	return fmt.Sprintf("%s, Stack Name: '%s', Buildpacks: %s", app.Application, app.Stack.Name, app.Buildpacks)
 }
 
 func (app *Application) SetStack(stack v2action.Stack) {
@@ -25,14 +27,36 @@ func (app *Application) SetStack(stack v2action.Stack) {
 }
 
 func (actor Actor) CreateApplication(config ApplicationConfig) (ApplicationConfig, Event, Warnings, error) {
+	var warnings Warnings
 	log.Debugf("creating application")
 	v2App := config.DesiredApplication.Application
 	v2App.Buildpack = actor.setBuildpack(config)
 
-	newApp, warnings, err := actor.V2Actor.CreateApplication(v2App)
+	newApp, v2warnings, err := actor.V2Actor.CreateApplication(v2App)
+	warnings = append(warnings, v2warnings...)
 	if err != nil {
 		log.Errorln("creating application:", err)
-		return config, CreatedApplication, Warnings(warnings), err
+		return ApplicationConfig{}, "", Warnings(warnings), err
+	}
+
+	if config.HasV3Buildpacks() {
+		var buildpacks []string
+		for _, buildpack := range config.DesiredApplication.Buildpacks {
+			buildpacks = append(buildpacks, buildpack.Value)
+		}
+
+		v3App := v3action.Application{
+			Name:                newApp.Name,
+			GUID:                newApp.GUID,
+			LifecycleBuildpacks: buildpacks,
+		}
+
+		_, v3warnings, err := actor.V3Actor.UpdateApplication(v3App)
+		warnings = append(warnings, v3warnings...)
+
+		if err != nil {
+			return ApplicationConfig{}, "", Warnings(warnings), err
+		}
 	}
 
 	config.DesiredApplication.Application = newApp
@@ -53,6 +77,27 @@ func (actor Actor) UpdateApplication(config ApplicationConfig) (ApplicationConfi
 	if err != nil {
 		log.Errorln("updating application:", err)
 		return ApplicationConfig{}, "", Warnings(warnings), err
+	}
+
+	if config.HasV3Buildpacks() {
+		var buildpacks []string
+		for _, buildpack := range config.DesiredApplication.Buildpacks {
+			buildpacks = append(buildpacks, buildpack.Value)
+		}
+
+		v3App := v3action.Application{
+			Name:                v2App.Name,
+			GUID:                v2App.GUID,
+			LifecycleBuildpacks: buildpacks,
+			LifecycleType:       constant.AppLifecycleTypeBuildpack,
+		}
+
+		_, v3warnings, v3err := actor.V3Actor.UpdateApplication(v3App)
+		warnings = append(warnings, v3warnings...)
+
+		if v3err != nil {
+			return ApplicationConfig{}, "", Warnings(warnings), v3err
+		}
 	}
 
 	config.DesiredApplication.Application = v2App

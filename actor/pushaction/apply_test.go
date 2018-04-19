@@ -102,7 +102,7 @@ var _ = Describe("Apply", func() {
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
 		fakeSharedActor = new(pushactionfakes.FakeSharedActor)
-		actor = NewActor(fakeV2Actor, fakeSharedActor)
+		actor = NewActor(fakeV2Actor, nil, fakeSharedActor)
 		config = ApplicationConfig{
 			DesiredApplication: Application{
 				Application: v2action.Application{

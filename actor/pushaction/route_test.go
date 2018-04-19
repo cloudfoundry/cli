@@ -24,7 +24,7 @@ var _ = Describe("Routes", func() {
 
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		actor = NewActor(fakeV2Actor, nil)
+		actor = NewActor(fakeV2Actor, nil, nil)
 
 		fakeRandomWordGenerator = new(pushactionfakes.FakeRandomWordGenerator)
 		actor.WordGenerator = fakeRandomWordGenerator

@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
@@ -18,11 +19,13 @@ var _ = Describe("Applications", func() {
 	var (
 		actor       *Actor
 		fakeV2Actor *pushactionfakes.FakeV2Actor
+		fakeV3Actor *pushactionfakes.FakeV3Actor
 	)
 
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		actor = NewActor(fakeV2Actor, nil)
+		fakeV3Actor = new(pushactionfakes.FakeV3Actor)
+		actor = NewActor(fakeV2Actor, fakeV3Actor, nil)
 	})
 
 	Describe("UpdateApplication", func() {
@@ -170,6 +173,7 @@ var _ = Describe("Applications", func() {
 						"Buildpack": Equal(buildpack),
 					}))
 
+					Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(0))
 					Expect(returnedConfig.DesiredApplication.Application).To(Equal(updatedApplication))
 				})
 			})
@@ -192,6 +196,7 @@ var _ = Describe("Applications", func() {
 						"Buildpack": Equal(buildpacks[0]),
 					}))
 
+					Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(0))
 					Expect(returnedConfig.DesiredApplication.Application).To(Equal(updatedApplication))
 				})
 			})
@@ -208,7 +213,7 @@ var _ = Describe("Applications", func() {
 					fakeV2Actor.UpdateApplicationReturns(updatedApplication, v2action.Warnings{"update-warning"}, nil)
 				})
 
-				It("does not set buidpack", func() {
+				It("does not set buildpack", func() {
 					Expect(fakeV2Actor.UpdateApplicationCallCount()).To(Equal(1))
 					submitApp := fakeV2Actor.UpdateApplicationArgsForCall(0)
 					Expect(submitApp).To(MatchFields(IgnoreExtras, Fields{
@@ -216,6 +221,47 @@ var _ = Describe("Applications", func() {
 					}))
 
 					Expect(returnedConfig.DesiredApplication.Application).To(Equal(updatedApplication))
+				})
+
+				Context("when the v3 update is successful", func() {
+					var submitApp v3action.Application
+
+					BeforeEach(func() {
+						updatedApplication = config.DesiredApplication.Application
+						updatedApplication.GUID = "yay-im-a-guid"
+						submitApp = v3action.Application{
+							Name:                updatedApplication.Name,
+							GUID:                updatedApplication.GUID,
+							LifecycleBuildpacks: []string{"ruby", "java"},
+						}
+
+						fakeV2Actor.UpdateApplicationReturns(updatedApplication, v2action.Warnings{"v2-create-application-warnings"}, nil)
+						fakeV3Actor.UpdateApplicationReturns(v3action.Application{}, v3action.Warnings{"v3-update-application-warnings"}, nil)
+					})
+
+					It("updates only the buildpacks in ccv3", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("v2-create-application-warnings", "v3-update-application-warnings"))
+
+						Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(1))
+						Expect(fakeV3Actor.UpdateApplicationArgsForCall(0)).To(Equal(submitApp))
+
+						Expect(returnedConfig.DesiredApplication.Application).To(Equal(updatedApplication))
+					})
+				})
+
+				Context("when the v3 update fails", func() {
+					BeforeEach(func() {
+						fakeV2Actor.UpdateApplicationReturns(v2action.Application{}, v2action.Warnings{"v2-create-application-warnings"}, nil)
+						fakeV3Actor.UpdateApplicationReturns(v3action.Application{}, v3action.Warnings{"v3-update-application-warnings"}, errors.New("boom"))
+					})
+
+					It("raises an error", func() {
+						Expect(executeErr).To(MatchError("boom"))
+						Expect(warnings).To(ConsistOf("v2-create-application-warnings", "v3-update-application-warnings"))
+
+						Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(1))
+					})
 				})
 			})
 		})
@@ -313,6 +359,7 @@ var _ = Describe("Applications", func() {
 						"Buildpack": Equal(buildpack),
 					}))
 
+					Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(0))
 					Expect(returnedConfig.DesiredApplication.Application).To(Equal(createdApplication))
 				})
 			})
@@ -335,6 +382,7 @@ var _ = Describe("Applications", func() {
 						"Buildpack": Equal(buildpacks[0]),
 					}))
 
+					Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(0))
 					Expect(returnedConfig.DesiredApplication.Application).To(Equal(createdApplication))
 				})
 			})
@@ -351,7 +399,7 @@ var _ = Describe("Applications", func() {
 					fakeV2Actor.CreateApplicationReturns(createdApplication, v2action.Warnings{"create-warning"}, nil)
 				})
 
-				It("does not set buidpack", func() {
+				It("does not set buildpack", func() {
 					Expect(fakeV2Actor.CreateApplicationCallCount()).To(Equal(1))
 					submitApp := fakeV2Actor.CreateApplicationArgsForCall(0)
 					Expect(submitApp).To(MatchFields(IgnoreExtras, Fields{
@@ -359,6 +407,47 @@ var _ = Describe("Applications", func() {
 					}))
 
 					Expect(returnedConfig.DesiredApplication.Application).To(Equal(createdApplication))
+				})
+
+				Context("when the v3 update is successful", func() {
+					var submitApp v3action.Application
+
+					BeforeEach(func() {
+						createdApplication = config.DesiredApplication.Application
+						createdApplication.GUID = "yay-im-a-guid"
+						submitApp = v3action.Application{
+							Name:                createdApplication.Name,
+							GUID:                createdApplication.GUID,
+							LifecycleBuildpacks: []string{"ruby", "java"},
+						}
+
+						fakeV2Actor.CreateApplicationReturns(createdApplication, v2action.Warnings{"v2-create-application-warnings"}, nil)
+						fakeV3Actor.UpdateApplicationReturns(v3action.Application{}, v3action.Warnings{"v3-update-application-warnings"}, nil)
+					})
+
+					It("updates only the buildpacks in ccv3", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("v2-create-application-warnings", "v3-update-application-warnings"))
+
+						Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(1))
+						Expect(fakeV3Actor.UpdateApplicationArgsForCall(0)).To(Equal(submitApp))
+
+						Expect(returnedConfig.DesiredApplication.Application).To(Equal(createdApplication))
+					})
+				})
+
+				Context("when the v3 update fails", func() {
+					BeforeEach(func() {
+						fakeV2Actor.CreateApplicationReturns(v2action.Application{}, v2action.Warnings{"v2-create-application-warnings"}, nil)
+						fakeV3Actor.UpdateApplicationReturns(v3action.Application{}, v3action.Warnings{"v3-update-application-warnings"}, errors.New("boom"))
+					})
+
+					It("raises an error", func() {
+						Expect(executeErr).To(MatchError("boom"))
+						Expect(warnings).To(ConsistOf("v2-create-application-warnings", "v3-update-application-warnings"))
+
+						Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(1))
+					})
 				})
 			})
 		})

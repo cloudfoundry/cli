@@ -41,6 +41,10 @@ func (config ApplicationConfig) UpdatingApplication() bool {
 	return !config.CreatingApplication()
 }
 
+func (config ApplicationConfig) HasV3Buildpacks() bool {
+	return len(config.DesiredApplication.Buildpacks) > 1
+}
+
 func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]ApplicationConfig, Warnings, error) {
 	var configs []ApplicationConfig
 	var warnings Warnings

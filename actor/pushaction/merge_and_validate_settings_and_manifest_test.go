@@ -23,7 +23,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 	)
 
 	BeforeEach(func() {
-		actor = NewActor(nil, nil)
+		actor = NewActor(nil, nil, nil)
 		currentDirectory = getCurrentDir()
 	})
 

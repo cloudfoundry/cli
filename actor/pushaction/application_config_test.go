@@ -31,7 +31,7 @@ var _ = Describe("Application Config", func() {
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
 		fakeSharedActor = new(pushactionfakes.FakeSharedActor)
-		actor = NewActor(fakeV2Actor, fakeSharedActor)
+		actor = NewActor(fakeV2Actor, nil, fakeSharedActor)
 
 		fakeRandomWordGenerator = new(pushactionfakes.FakeRandomWordGenerator)
 		actor.WordGenerator = fakeRandomWordGenerator
