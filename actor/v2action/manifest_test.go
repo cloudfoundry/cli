@@ -171,7 +171,7 @@ var _ = Describe("Manifest Actions", func() {
 					})
 
 					AfterEach(func() {
-						Expect(os.Remove(manifestFilePath)).To(Succeed())
+						Expect(os.RemoveAll(manifestFilePath)).To(Succeed())
 					})
 
 					It("writes the manifest to the specified path", func() {

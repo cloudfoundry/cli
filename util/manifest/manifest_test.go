@@ -211,11 +211,11 @@ applications:
 				Context("when global fields are provided", func() {
 					DescribeTable("raises a GlobalFieldsError",
 						func(manifestProperty string, numberOfValues int) {
-							tempFile, err := ioutil.TempFile("", "manifest-test-")
+							tempManifest, err := ioutil.TempFile("", "manifest-test-")
 							Expect(err).ToNot(HaveOccurred())
-							defer os.Remove(tempFile.Name())
-							Expect(tempFile.Close()).ToNot(HaveOccurred())
-							pathToManifest = tempFile.Name()
+							Expect(tempManifest.Close()).ToNot(HaveOccurred())
+							manifestPath := tempManifest.Name()
+							defer os.RemoveAll(manifestPath)
 
 							if numberOfValues == 1 {
 								manifest = fmt.Sprintf("---\n%s: value", manifestProperty)
@@ -223,10 +223,10 @@ applications:
 								values := []string{"A", "B"}
 								manifest = fmt.Sprintf("---\n%s: [%s]", manifestProperty, strings.Join(values, ","))
 							}
-							err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+							err = ioutil.WriteFile(manifestPath, []byte(manifest), 0666)
 							Expect(err).ToNot(HaveOccurred())
 
-							_, err = ReadAndInterpolateManifest(pathToManifest, pathsToVarsFiles)
+							_, err = ReadAndInterpolateManifest(manifestPath, pathsToVarsFiles)
 							Expect(err).To(MatchError(GlobalFieldsError{Fields: []string{manifestProperty}}))
 						},
 
