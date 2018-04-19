@@ -39,7 +39,7 @@ run:
       make out/cf-cli_linux_i686
 
       echo "Building 64-bit Linux"
-      make -o out/cf-cli_linux_x86-64
+      make out/cf-cli_linux_x86-64
 
       echo "Building 64-bit Darwin"
       make out/cf-cli_osx
