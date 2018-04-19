@@ -16,7 +16,7 @@ GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path 
 all : test build
 
 build : out/cf-cli_linux_x86-64
-	mv out/cf-cli_linux_x86-64 out/cf
+	cp out/cf-cli_linux_x86-64 out/cf
 
 check-target-env :
 ifndef CF_API
@@ -46,12 +46,6 @@ fly-windows-push : check-target-env
 
 fly-windows-units :
 	fly -t ci execute -c ci/cli/tasks/units-windows.yml -i cli=./ -i cli-ci=./
-
-i18n :
-	$(PWD)/bin/i18n-checkup
-
-i18n-extract-strings :
-	$(PWD)/bin/i18n-extract-strings
 
 integration-cleanup :
 	$(PWD)/bin/cleanup-integration
