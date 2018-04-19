@@ -31,9 +31,9 @@ run:
     mv i18n-data/i18n_resources.go $GOPATH/src/code.cloudfoundry.org/cli/i18n/resources
 
     pushd $GOPATH/src/code.cloudfoundry.org/cli
-      CF_BUILD_VERSION=$(cat BUILD_VERSION)
-      CF_BUILD_SHA=$(git rev-parse --short HEAD)
-      CF_BUILD_DATE=$(date -u +"%Y-%m-%d")
+      export CF_BUILD_VERSION=$(cat BUILD_VERSION)
+      export CF_BUILD_SHA=$(git rev-parse --short HEAD)
+      export CF_BUILD_DATE=$(date -u +"%Y-%m-%d")
 
       echo "Building 32-bit Linux"
       make out/cf-cli_linux_i686
