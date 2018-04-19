@@ -12,7 +12,7 @@ inputs:
 - name: i18n-data
 
 outputs:
-- name: cross-compiled
+- name: compiled
 
 run:
   path: bash
@@ -31,28 +31,25 @@ run:
     mv i18n-data/i18n_resources.go $GOPATH/src/code.cloudfoundry.org/cli/i18n/resources
 
     pushd $GOPATH/src/code.cloudfoundry.org/cli
-      BUILD_VERSION=$(cat BUILD_VERSION)
-      BUILD_SHA=$(git rev-parse --short HEAD)
-      BUILD_DATE=$(date -u +"%Y-%m-%d")
-
-      VERSION_LDFLAGS="-X code.cloudfoundry.org/cli/version.binaryVersion=${BUILD_VERSION} -X code.cloudfoundry.org/cli/version.binarySHA=${BUILD_SHA} -X code.cloudfoundry.org/cli/version.binaryBuildDate=${BUILD_DATE}"
+      CF_BUILD_VERSION=$(cat BUILD_VERSION)
+      CF_BUILD_SHA=$(git rev-parse --short HEAD)
+      CF_BUILD_DATE=$(date -u +"%Y-%m-%d")
 
       echo "Building 32-bit Linux"
-      CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags "-w -s -extldflags \"-static\" ${VERSION_LDFLAGS}" -o out/cf-cli_linux_i686 .
+      make out/cf-cli_linux_i686
 
       echo "Building 64-bit Linux"
-      CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags "-w -s -extldflags \"-static\" ${VERSION_LDFLAGS}" -o out/cf-cli_linux_x86-64 .
+      make -o out/cf-cli_linux_x86-64
 
-      # This to to add the CF Icon into the windows executable
-      go get github.com/akavel/rsrc
-      rsrc -ico ci/installers/windows/cf.ico
+      echo "Building 64-bit Darwin"
+      make out/cf-cli_osx
 
       echo "Building 32-bit Windows"
-      GOARCH=386 GOOS=windows go build -tags="forceposix" -ldflags "-w -s ${VERSION_LDFLAGS}" -o out/cf-cli_win32.exe .
+      make out/cf-cli_win32.exe
 
       echo "Building 64-bit Windows"
-      GOARCH=amd64 GOOS=windows go build -tags="forceposix" -ldflags "-w -s ${VERSION_LDFLAGS}" -o out/cf-cli_winx64.exe .
+      make out/cf-cli_winx64.exe
 
       echo "Creating tarball"
-      tar -cvzf $cwd/cross-compiled/cf-cli-binaries.tgz -C out .
+      tar -cvzf $cwd/compiled/cf-cli-binaries.tgz -C out .
     popd
