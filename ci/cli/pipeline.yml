@@ -300,27 +300,15 @@ jobs:
          text: |
            i18n generation failed :(
            https://wings.pivotal.io/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - aggregate:
-    - task: build
-      file: cli-ci/ci/cli/tasks/build-binaries.yml
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-eng'
-           text: |
-             build binaries failed :(
-             https://wings.pivotal.io/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-    - task: build-osx
-      file: cli-ci/ci/cli/tasks/build-osx-binary.yml
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-eng'
-           text: |
-             build OS X binaries failed :(
-             https://wings.pivotal.io/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - task: combine-binaries
-    file: cli-ci/ci/cli/tasks/combine-binaries.yml
+  - task: build
+    file: cli-ci/ci/cli/tasks/build-binaries.yml
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-eng'
+         text: |
+           build binaries failed :(
+           https://wings.pivotal.io/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
   - put: cf-cli-binaries
     params:
       file: compiled/cf-cli-binaries.tgz
