@@ -85,7 +85,7 @@ integration-tests-full : build integration-cleanup
 out/cf-cli_linux_i686: $(GOSRC)
 	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
 							$(REQUIRED_FOR_STATIC_BINARY) \
-							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_x86-64 .
+							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_i686 .
 
 out/cf-cli_linux_x86-64: $(GOSRC)
 	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build \
