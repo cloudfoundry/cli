@@ -128,13 +128,13 @@
     "consumer/internal",
     "errors"
   ]
-  revision = "9d59e2b25abb53ee8907660061e12ef68bbb4503"
+  revision = "5beab4261046115d89e363902e75155f7370849c"
 
 [[projects]]
   branch = "master"
   name = "github.com/cloudfoundry/sonde-go"
   packages = ["events"]
-  revision = "c48c4f0332609a0e402af4ae31595204c9f7b363"
+  revision = "b33733203bb48d7c56de7cb639d77f78b0449d19"
 
 [[projects]]
   branch = "master"
@@ -219,7 +219,7 @@
     "jlexer",
     "jwriter"
   ]
-  revision = "32fa128f234d041f196a9f3e0fea5ac9772c08e1"
+  revision = "8b799c424f57fa123fc63a99d6383bc6e4c02578"
 
 [[projects]]
   branch = "master"

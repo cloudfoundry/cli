@@ -489,7 +489,7 @@ func (c *connection) close() error {
 	if c.ws == nil {
 		return nil
 	}
-	err := c.ws.WriteControl(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""), time.Time{})
+	err := c.ws.WriteControl(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""), time.Now().Add(10*time.Second))
 	if err != nil {
 		return err
 	}
