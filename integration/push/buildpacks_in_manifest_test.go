@@ -22,28 +22,55 @@ var _ = Describe("push with buildpacks in manifest", func() {
 	})
 
 	Context("when buildpacks (plural) is provided", func() {
-		It("sets all buildpacks correctly for the pushed app", func() {
-			helpers.WithHelloWorldApp(func(dir string) {
-				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
-					"applications": []map[string]interface{}{
-						{
-							"name": appName,
-							"buildpacks": []string{
-								"https://github.com/cloudfoundry/ruby-buildpack",
-								"https://github.com/cloudfoundry/staticfile-buildpack",
+		Context("when mutiple buildpacks are specified", func() {
+			It("sets all buildpacks correctly for the pushed app", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name": appName,
+								"buildpacks": []string{
+									"https://github.com/cloudfoundry/ruby-buildpack",
+									"https://github.com/cloudfoundry/staticfile-buildpack",
+								},
 							},
 						},
-					},
+					})
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+					Eventually(session).Should(Exit(0))
 				})
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+
+				session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
+
+				Eventually(session).Should(Say(`https://github.com/cloudfoundry/ruby-buildpack"`))
+				Eventually(session).Should(Say(`https://github.com/cloudfoundry/staticfile-buildpack"`))
 				Eventually(session).Should(Exit(0))
 			})
+		})
 
-			session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
+		Context("when only one buildpack is specified", func() {
+			It("sets only one buildpack for the pushed app", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name": appName,
+								"buildpacks": []string{
+									"https://github.com/cloudfoundry/staticfile-buildpack",
+								},
+							},
+						},
+					})
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+					Eventually(session).Should(Exit(0))
+				})
 
-			Eventually(session).Should(Say(`https://github.com/cloudfoundry/ruby-buildpack"`))
-			Eventually(session).Should(Say(`https://github.com/cloudfoundry/staticfile-buildpack"`))
-			Eventually(session).Should(Exit(0))
+				session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
+
+				// TODO: fix during app command rework to actually test that the second buildpack does not exist
+				Eventually(session).Should(Say(`https://github.com/cloudfoundry/staticfile-buildpack"`))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 })
