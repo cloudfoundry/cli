@@ -22,7 +22,7 @@ var _ = Describe("Version Check Actions", func() {
 		It("returns the V2 CC API version", func() {
 			expectedVersion := "2.75.0"
 			fakeV2Actor.CloudControllerAPIVersionReturns(expectedVersion)
-			Expect(actor.CloudControllerAPIVersion()).To(Equal(expectedVersion))
+			Expect(actor.CloudControllerV2APIVersion()).To(Equal(expectedVersion))
 		})
 	})
 })

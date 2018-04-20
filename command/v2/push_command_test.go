@@ -81,7 +81,7 @@ var _ = Describe("push Command", func() {
 
 		Context("when the droplet flag is passed and the API version is below the minimum", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns("2.6.1")
+				fakeActor.CloudControllerV2APIVersionReturns("2.6.1")
 				cmd.DropletPath = "some-droplet-path"
 			})
 
@@ -129,6 +129,40 @@ var _ = Describe("push Command", func() {
 						},
 					}
 					fakeActor.MergeAndValidateSettingsAndManifestsReturns(appManifests, nil)
+				})
+
+				Context("when buildpacks (plural) is provided in the manifest and the API version is below the minimum", func() {
+
+					BeforeEach(func() {
+						appManifests = []manifest.Application{
+							{
+								Name: appName,
+								Path: pwd,
+								Buildpacks: []types.FilteredString{
+									types.FilteredString{
+										IsSet: true,
+										Value: "ruby-buildpack",
+									},
+									types.FilteredString{
+										IsSet: true,
+										Value: "java-buildpack",
+									},
+								},
+							},
+						}
+
+						fakeActor.MergeAndValidateSettingsAndManifestsReturns(appManifests, nil)
+						fakeActor.CloudControllerV3APIVersionReturns("3.13.0")
+					})
+
+					It("returns a MinimumAPIVersionNotMetError", func() {
+						Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+							Command:        "'buildpacks' in manifest",
+							CurrentVersion: "3.13.0",
+							MinimumVersion: ccversion.MinVersionManifestBuildpacksV3,
+						}))
+					})
+
 				})
 
 				Context("when the settings can be converted to a valid config", func() {
@@ -372,6 +406,7 @@ var _ = Describe("push Command", func() {
 										Expect(manifestApps).To(BeNil())
 									})
 								})
+
 							})
 
 							Context("via a manifest.yaml in the current directory", func() {

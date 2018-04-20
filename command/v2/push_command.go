@@ -33,7 +33,8 @@ type ProgressBar interface {
 
 type V2PushActor interface {
 	Apply(config pushaction.ApplicationConfig, progressBar pushaction.ProgressBar) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
-	CloudControllerAPIVersion() string
+	CloudControllerV2APIVersion() string
+	CloudControllerV3APIVersion() string
 	ConvertToApplicationConfigs(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	MergeAndValidateSettingsAndManifests(cmdSettings pushaction.CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error)
 	ReadManifest(pathToManifest string, pathsToVarsFiles []string) ([]manifest.Application, error)
@@ -90,14 +91,17 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	ccClientV3, uaaClient, err := sharedV3.NewClients(config, ui, true)
+	ccClientV3, _, err := sharedV3.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
+
 	v2Actor := v2action.NewActor(ccClient, uaaClient, config)
 	v3Actor := v3action.NewActor(ccClientV3, config, sharedActor, nil)
+
 	cmd.RestartActor = v2Actor
 	cmd.Actor = pushaction.NewActor(v2Actor, v3Actor, sharedActor)
+
 	cmd.SharedActor = sharedActor
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
 
@@ -107,7 +111,7 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 
 func (cmd V2PushCommand) Execute(args []string) error {
 	if cmd.DropletPath != "" {
-		if err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionDropletUploadV2, "Option '--droplet'"); err != nil {
+		if err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV2APIVersion(), ccversion.MinVersionDropletUploadV2, "Option '--droplet'"); err != nil {
 			return err
 		}
 	}
@@ -141,6 +145,15 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	if err != nil {
 		log.Errorln("merging manifest:", err)
 		return err
+	}
+
+	for _, manifestApplication := range manifestApplications {
+		if len(manifestApplication.Buildpacks) > 0 {
+
+			if err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "'buildpacks' in manifest"); err != nil {
+				return err
+			}
+		}
 	}
 
 	cmd.UI.DisplayText("Getting app info...")

@@ -16,4 +16,6 @@ const (
 	MinVersionRunTaskV3          = "3.0.0"
 	MinVersionIsolationSegmentV3 = "3.11.0"
 	MinVersionShareServiceV3     = "3.36.0"
+
+	MinVersionManifestBuildpacksV3 = "3.25.0"
 )

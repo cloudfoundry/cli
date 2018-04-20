@@ -28,13 +28,22 @@ type FakeV2PushActor struct {
 		result3 <-chan pushaction.Warnings
 		result4 <-chan error
 	}
-	CloudControllerAPIVersionStub        func() string
-	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	CloudControllerV2APIVersionStub        func() string
+	cloudControllerV2APIVersionMutex       sync.RWMutex
+	cloudControllerV2APIVersionArgsForCall []struct{}
+	cloudControllerV2APIVersionReturns     struct {
 		result1 string
 	}
-	cloudControllerAPIVersionReturnsOnCall map[int]struct {
+	cloudControllerV2APIVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
+	CloudControllerV3APIVersionStub        func() string
+	cloudControllerV3APIVersionMutex       sync.RWMutex
+	cloudControllerV3APIVersionArgsForCall []struct{}
+	cloudControllerV3APIVersionReturns     struct {
+		result1 string
+	}
+	cloudControllerV3APIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
 	ConvertToApplicationConfigsStub        func(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
@@ -145,42 +154,82 @@ func (fake *FakeV2PushActor) ApplyReturnsOnCall(i int, result1 <-chan pushaction
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeV2PushActor) CloudControllerAPIVersion() string {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
-	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
-	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
+func (fake *FakeV2PushActor) CloudControllerV2APIVersion() string {
+	fake.cloudControllerV2APIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerV2APIVersionReturnsOnCall[len(fake.cloudControllerV2APIVersionArgsForCall)]
+	fake.cloudControllerV2APIVersionArgsForCall = append(fake.cloudControllerV2APIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("CloudControllerV2APIVersion", []interface{}{})
+	fake.cloudControllerV2APIVersionMutex.Unlock()
+	if fake.CloudControllerV2APIVersionStub != nil {
+		return fake.CloudControllerV2APIVersionStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	return fake.cloudControllerV2APIVersionReturns.result1
 }
 
-func (fake *FakeV2PushActor) CloudControllerAPIVersionCallCount() int {
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	return len(fake.cloudControllerAPIVersionArgsForCall)
+func (fake *FakeV2PushActor) CloudControllerV2APIVersionCallCount() int {
+	fake.cloudControllerV2APIVersionMutex.RLock()
+	defer fake.cloudControllerV2APIVersionMutex.RUnlock()
+	return len(fake.cloudControllerV2APIVersionArgsForCall)
 }
 
-func (fake *FakeV2PushActor) CloudControllerAPIVersionReturns(result1 string) {
-	fake.CloudControllerAPIVersionStub = nil
-	fake.cloudControllerAPIVersionReturns = struct {
+func (fake *FakeV2PushActor) CloudControllerV2APIVersionReturns(result1 string) {
+	fake.CloudControllerV2APIVersionStub = nil
+	fake.cloudControllerV2APIVersionReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeV2PushActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
-	fake.CloudControllerAPIVersionStub = nil
-	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
-		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+func (fake *FakeV2PushActor) CloudControllerV2APIVersionReturnsOnCall(i int, result1 string) {
+	fake.CloudControllerV2APIVersionStub = nil
+	if fake.cloudControllerV2APIVersionReturnsOnCall == nil {
+		fake.cloudControllerV2APIVersionReturnsOnCall = make(map[int]struct {
 			result1 string
 		})
 	}
-	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
+	fake.cloudControllerV2APIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeV2PushActor) CloudControllerV3APIVersion() string {
+	fake.cloudControllerV3APIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerV3APIVersionReturnsOnCall[len(fake.cloudControllerV3APIVersionArgsForCall)]
+	fake.cloudControllerV3APIVersionArgsForCall = append(fake.cloudControllerV3APIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("CloudControllerV3APIVersion", []interface{}{})
+	fake.cloudControllerV3APIVersionMutex.Unlock()
+	if fake.CloudControllerV3APIVersionStub != nil {
+		return fake.CloudControllerV3APIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.cloudControllerV3APIVersionReturns.result1
+}
+
+func (fake *FakeV2PushActor) CloudControllerV3APIVersionCallCount() int {
+	fake.cloudControllerV3APIVersionMutex.RLock()
+	defer fake.cloudControllerV3APIVersionMutex.RUnlock()
+	return len(fake.cloudControllerV3APIVersionArgsForCall)
+}
+
+func (fake *FakeV2PushActor) CloudControllerV3APIVersionReturns(result1 string) {
+	fake.CloudControllerV3APIVersionStub = nil
+	fake.cloudControllerV3APIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeV2PushActor) CloudControllerV3APIVersionReturnsOnCall(i int, result1 string) {
+	fake.CloudControllerV3APIVersionStub = nil
+	if fake.cloudControllerV3APIVersionReturnsOnCall == nil {
+		fake.cloudControllerV3APIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cloudControllerV3APIVersionReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -366,8 +415,10 @@ func (fake *FakeV2PushActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.applyMutex.RLock()
 	defer fake.applyMutex.RUnlock()
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	fake.cloudControllerV2APIVersionMutex.RLock()
+	defer fake.cloudControllerV2APIVersionMutex.RUnlock()
+	fake.cloudControllerV3APIVersionMutex.RLock()
+	defer fake.cloudControllerV3APIVersionMutex.RUnlock()
 	fake.convertToApplicationConfigsMutex.RLock()
 	defer fake.convertToApplicationConfigsMutex.RUnlock()
 	fake.mergeAndValidateSettingsAndManifestsMutex.RLock()

@@ -251,18 +251,16 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 	}
 
 	for _, buildpack := range manifest.Buildpacks {
-		if buildpack.IsSet {
-			bp := types.FilteredString{
-				IsSet: true,
-				Value: buildpack.Value,
-			}
-
-			if application.Buildpacks == nil {
-				application.Buildpacks = []types.FilteredString{}
-			}
-
-			application.Buildpacks = append(application.Buildpacks, bp)
+		bp := types.FilteredString{
+			IsSet: true,
+			Value: buildpack.Value,
 		}
+
+		if application.Buildpacks == nil {
+			application.Buildpacks = []types.FilteredString{}
+		}
+
+		application.Buildpacks = append(application.Buildpacks, bp)
 	}
 
 	if manifest.Command.IsSet {
