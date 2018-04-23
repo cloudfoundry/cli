@@ -18,7 +18,7 @@ var _ = Describe("ProcessInstance", func() {
 		client = NewTestClient()
 	})
 
-	Describe("DeleteInstanceByApplicationProcessTypeAndIndex", func() {
+	Describe("DeleteApplicationProcessInstance", func() {
 		var (
 			warnings   Warnings
 			executeErr error
@@ -48,7 +48,7 @@ var _ = Describe("ProcessInstance", func() {
 				)
 			})
 
-			It("returns the error", func() {
+			It("returns the error and all warnings", func() {
 				Expect(executeErr).To(MatchError(ccerror.ProcessNotFoundError{}))
 				Expect(warnings).To(ConsistOf("warning-1"))
 			})
@@ -72,6 +72,16 @@ var _ = Describe("ProcessInstance", func() {
 	})
 
 	Describe("GetProcessInstances", func() {
+		var (
+			processes  []ProcessInstance
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			processes, warnings, executeErr = client.GetProcessInstances("some-process-guid")
+		})
+
 		Context("when the process exists", func() {
 			BeforeEach(func() {
 				response := `{
@@ -111,8 +121,7 @@ var _ = Describe("ProcessInstance", func() {
 			})
 
 			It("returns a list of instances for the given process and all warnings", func() {
-				processes, warnings, err := client.GetProcessInstances("some-process-guid")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(processes).To(ConsistOf(
 					ProcessInstance{
@@ -154,14 +163,14 @@ var _ = Describe("ProcessInstance", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/processes/some-process-guid/stats"),
-						RespondWith(http.StatusNotFound, response),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 				)
 			})
 
-			It("returns the error", func() {
-				_, _, err := client.GetProcessInstances("some-process-guid")
-				Expect(err).To(MatchError(ccerror.ProcessNotFoundError{}))
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.ProcessNotFoundError{}))
+				Expect(warnings).To(ConsistOf("warning-1"))
 			})
 		})
 	})

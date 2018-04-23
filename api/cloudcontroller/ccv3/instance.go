@@ -10,14 +10,22 @@ import (
 )
 
 type ProcessInstance struct {
-	Index       int
-	State       constant.ProcessInstanceState
-	Uptime      int
-	CPU         float64
-	MemoryUsage uint64
+	//CPU is the current CPU usage of the instance
+	CPU float64
+	//DiskQuota is the maximum disk the instance is allowed to use.
+	DiskQuota uint64
+	//DiskUsage is the current disk usage of the instance
+	DiskUsage uint64
+	//Index is the index of the instance
+	Index int
+	//MemoryQuota is the maximum memory the instance is allowed to use.
 	MemoryQuota uint64
-	DiskUsage   uint64
-	DiskQuota   uint64
+	//DiskUsage is the current memory usage of the instance
+	MemoryUsage uint64
+	//State is the state of the instance.
+	State constant.ProcessInstanceState
+	//Uptime is the uptime in seconds for the instance
+	Uptime int
 }
 
 // UnmarshalJSON helps unmarshal a V3 Cloud Controller Instance response.
