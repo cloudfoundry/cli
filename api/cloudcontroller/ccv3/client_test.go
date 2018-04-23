@@ -71,7 +71,7 @@ var _ = Describe("Cloud Controller Client", func() {
 		})
 
 		It("adds a user agent header", func() {
-			_, _, _, err := client.Info()
+			_, _, _, err := client.GetInfo()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(server.ReceivedRequests()).To(HaveLen(4))
 		})

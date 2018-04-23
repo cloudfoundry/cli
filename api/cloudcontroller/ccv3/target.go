@@ -41,12 +41,12 @@ func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 		client.connection = wrapper.Wrap(client.connection)
 	}
 
-	apiInfo, resourceLinks, warnings, err := client.Info()
+	apiInfo, resourceLinks, warnings, err := client.GetInfo()
 	if err != nil {
 		return warnings, err
 	}
 
-	client.APIInfo = apiInfo
+	client.Info = apiInfo
 
 	resources := map[string]string{}
 	for resource, link := range resourceLinks {

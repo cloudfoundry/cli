@@ -51,7 +51,7 @@ func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
 	}
 
 	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
-	cmd.NOAAClient = shared.NewNOAAClient(ccClient.APIInfo.Logging(), config, uaaClient, ui)
+	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
 	return nil
 }

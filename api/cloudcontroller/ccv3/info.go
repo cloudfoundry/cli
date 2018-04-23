@@ -7,9 +7,9 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
-// APIInfo represents a GET response from the '/' endpoint of the cloud
+// Info represents a GET response from the '/' endpoint of the cloud
 // controller API.
-type APIInfo struct {
+type Info struct {
 	// Links is a list of top level Cloud Controller APIs.
 	Links struct {
 		// AppSSH is the link for application ssh info.
@@ -30,40 +30,45 @@ type APIInfo struct {
 	} `json:"links"`
 }
 
-// AppSSHEndpoint is the root URL for SSHing into an app container.
-func (info APIInfo) AppSSHEndpoint() string {
+// AppSSHEndpoint returns the HREF for SSHing into an app container.
+func (info Info) AppSSHEndpoint() string {
 	return info.Links.AppSSH.HREF
 }
 
-// AppSSHHostKeyFingerprint
-func (info APIInfo) AppSSHHostKeyFingerprint() string {
+// AppSSHHostKeyFingerprint returns the SSH key fingerprint of the SSH proxy
+// that brokers connections to application instances.
+func (info Info) AppSSHHostKeyFingerprint() string {
 	return info.Links.AppSSH.Meta.HostKeyFingerprint
 }
 
-// CloudControllerAPIVersion returns the version for the CloudController.
-func (info APIInfo) CloudControllerAPIVersion() string {
+// CloudControllerAPIVersion returns the version of the CloudController.
+func (info Info) CloudControllerAPIVersion() string {
 	return info.Links.CCV3.Meta.Version
 }
 
-// Logging returns the HREF for Logging.
-func (info APIInfo) Logging() string {
+// Logging returns the HREF of the Loggregator Traffic Controller.
+func (info Info) Logging() string {
 	return info.Links.Logging.HREF
 }
 
-func (info APIInfo) NetworkPolicyV1() string {
+// NetworkPolicyV1 returns the HREF of the Container Networking v1 Policy API
+func (info Info) NetworkPolicyV1() string {
 	return info.Links.NetworkPolicyV1.HREF
 }
 
-func (info APIInfo) OAuthClient() string {
+// OAuthClient returns the oauth client ID of the SSH proxy that brokers
+// connections to application instances.
+func (info Info) OAuthClient() string {
 	return info.Links.AppSSH.Meta.OAuthClient
 }
 
-// UAA returns the HREF for the UAA.
-func (info APIInfo) UAA() string {
+// UAA returns the HREF of the UAA server.
+func (info Info) UAA() string {
 	return info.Links.UAA.HREF
 }
 
-func (info APIInfo) ccV3Link() string {
+// ccv3Link returns the HREF of the CloudController v3 API.
+func (info Info) ccV3Link() string {
 	return info.Links.CCV3.HREF
 }
 
@@ -87,11 +92,11 @@ func (resources ResourceLinks) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Info returns endpoint and API information from /v3.
-func (client *Client) Info() (APIInfo, ResourceLinks, Warnings, error) {
+// GetInfo returns endpoint and API information from /v3.
+func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
 	rootResponse, warnings, err := client.rootResponse()
 	if err != nil {
-		return APIInfo{}, ResourceLinks{}, warnings, err
+		return Info{}, ResourceLinks{}, warnings, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -99,7 +104,7 @@ func (client *Client) Info() (APIInfo, ResourceLinks, Warnings, error) {
 		URL:    rootResponse.ccV3Link(),
 	})
 	if err != nil {
-		return APIInfo{}, ResourceLinks{}, warnings, err
+		return Info{}, ResourceLinks{}, warnings, err
 	}
 
 	info := ResourceLinks{} // Explicitly initializing
@@ -111,30 +116,30 @@ func (client *Client) Info() (APIInfo, ResourceLinks, Warnings, error) {
 	warnings = append(warnings, response.Warnings...)
 
 	if err != nil {
-		return APIInfo{}, ResourceLinks{}, warnings, err
+		return Info{}, ResourceLinks{}, warnings, err
 	}
 
 	return rootResponse, info, warnings, nil
 }
 
 // rootResponse returns the CC API root document.
-func (client *Client) rootResponse() (APIInfo, Warnings, error) {
+func (client *Client) rootResponse() (Info, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		Method: http.MethodGet,
 		URL:    client.cloudControllerURL,
 	})
 	if err != nil {
-		return APIInfo{}, nil, err
+		return Info{}, nil, err
 	}
 
-	var rootResponse APIInfo
+	var rootResponse Info
 	response := cloudcontroller.Response{
 		Result: &rootResponse,
 	}
 
 	err = client.connection.Make(request, &response)
 	if unknownSourceErr, ok := err.(ccerror.UnknownHTTPSourceError); ok && unknownSourceErr.StatusCode == http.StatusNotFound {
-		return APIInfo{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
+		return Info{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
 	}
 
 	return rootResponse, response.Warnings, err

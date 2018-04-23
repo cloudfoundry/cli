@@ -19,6 +19,11 @@ var _ = Describe("Info", func() {
 		client          *Client
 		rootRespondWith http.HandlerFunc
 		v3RespondWith   http.HandlerFunc
+
+		apis       Info
+		resources  ResourceLinks
+		warnings   Warnings
+		executeErr error
 	)
 
 	JustBeforeEach(func() {
@@ -33,6 +38,8 @@ var _ = Describe("Info", func() {
 				VerifyRequest(http.MethodGet, "/v3"),
 				v3RespondWith,
 			))
+
+		apis, resources, warnings, executeErr = client.GetInfo()
 	})
 
 	Describe("when all requests are successful", func() {
@@ -99,8 +106,7 @@ var _ = Describe("Info", func() {
 		})
 
 		It("returns the CC Information", func() {
-			apis, _, _, err := client.Info()
-			Expect(err).NotTo(HaveOccurred())
+			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(apis.UAA()).To(Equal("https://uaa.bosh-lite.com"))
 			Expect(apis.Logging()).To(Equal("wss://doppler.bosh-lite.com:443"))
 			Expect(apis.NetworkPolicyV1()).To(Equal(fmt.Sprintf("%s/networking/v1/external", server.URL())))
@@ -110,15 +116,13 @@ var _ = Describe("Info", func() {
 		})
 
 		It("returns back the resource links", func() {
-			_, resources, _, err := client.Info()
-			Expect(err).NotTo(HaveOccurred())
+			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(resources[internal.AppsResource].HREF).To(Equal(server.URL() + "/v3/apps"))
 			Expect(resources[internal.TasksResource].HREF).To(Equal(server.URL() + "/v3/tasks"))
 		})
 
 		It("returns all warnings", func() {
-			_, _, warnings, err := client.Info()
-			Expect(err).NotTo(HaveOccurred())
+			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(warnings).To(ConsistOf("warning 1", "warning 2"))
 		})
 	})
@@ -129,12 +133,13 @@ var _ = Describe("Info", func() {
 				rootRespondWith = RespondWith(
 					http.StatusNotFound,
 					`i am google, bow down`,
+					http.Header{"X-Cf-Warnings": {"warning 2"}},
 				)
 			})
 
-			It("returns an APINotFoundError", func() {
-				_, _, _, err := client.Info()
-				Expect(err).To(MatchError(ccerror.APINotFoundError{URL: server.URL()}))
+			It("returns an APINotFoundError and no warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.APINotFoundError{URL: server.URL()}))
+				Expect(warnings).To(BeNil())
 			})
 		})
 
@@ -146,9 +151,8 @@ var _ = Describe("Info", func() {
 					http.Header{"X-Cf-Warnings": {"this is a warning"}})
 			})
 
-			It("returns the same error", func() {
-				_, _, warnings, err := client.Info()
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{}))
+			It("returns the same error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
@@ -197,9 +201,8 @@ var _ = Describe("Info", func() {
 					http.Header{"X-Cf-Warnings": {"this is a warning"}})
 			})
 
-			It("returns the same error", func() {
-				_, _, warnings, err := client.Info()
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Not found, lol"}))
+			It("returns the same error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{Message: "Not found, lol"}))
 				Expect(warnings).To(ConsistOf("warning 1", "this is a warning"))
 			})
 		})

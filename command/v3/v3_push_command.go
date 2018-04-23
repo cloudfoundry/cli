@@ -92,7 +92,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.V2PushActor = pushaction.NewActor(v2Actor, sharedActor)
 
 	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2, config)
-	cmd.NOAAClient = shared.NewNOAAClient(ccClient.APIInfo.Logging(), config, uaaClient, ui)
+	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
 	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
 		UI:              cmd.UI,
