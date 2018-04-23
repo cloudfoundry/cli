@@ -9,6 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
+//ProcessInstance represents a single process instance for a
+//particular application
 type ProcessInstance struct {
 	//CPU is the current CPU usage of the instance
 	CPU float64
