@@ -433,7 +433,7 @@ applications:
 					})
 
 					It("returns an error", func() {
-						Expect(executeErr.Error()).To(Equal("Expected to find variables: var1\nvar2"))
+						Expect(executeErr.Error()).To(Equal("Expected to find variables: var1, var2"))
 					})
 				})
 

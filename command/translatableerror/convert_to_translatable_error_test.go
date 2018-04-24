@@ -318,6 +318,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			manifest.GlobalFieldsError{Fields: []string{"some-field"}},
 			TriggerLegacyPushError{GlobalRelated: []string{"some-field"}}),
 
+		Entry("manifest.InterpolationError -> InterpolationError",
+			manifest.InterpolationError{Err: errors.New("an-error")},
+			InterpolationError{Err: errors.New("an-error")}),
+
 		// Plugin Errors
 		Entry("pluginerror.RawHTTPStatusError -> DownloadPluginHTTPError",
 			pluginerror.RawHTTPStatusError{Status: "some status"},

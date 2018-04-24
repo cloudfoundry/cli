@@ -161,6 +161,8 @@ func ConvertToTranslatableError(err error) error {
 		return TriggerLegacyPushError{InheritanceRelated: true}
 	case manifest.GlobalFieldsError:
 		return TriggerLegacyPushError{GlobalRelated: e.Fields}
+	case manifest.InterpolationError:
+		return InterpolationError(e)
 
 	// Plugin Execution Errors
 	case pluginerror.RawHTTPStatusError:

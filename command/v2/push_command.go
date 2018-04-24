@@ -149,7 +149,6 @@ func (cmd V2PushCommand) Execute(args []string) error {
 
 	for _, manifestApplication := range manifestApplications {
 		if len(manifestApplication.Buildpacks) > 0 {
-
 			if err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "'buildpacks' in manifest"); err != nil {
 				return err
 			}

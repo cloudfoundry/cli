@@ -63,7 +63,7 @@ func ReadAndInterpolateManifest(pathToManifest string, pathsToVarsFiles []string
 
 	rawManifest, err = tpl.Evaluate(fileVars, nil, template.EvaluateOpts{ExpectAllKeys: true})
 	if err != nil {
-		return nil, err
+		return nil, InterpolationError{Err: err}
 	}
 
 	var manifest Manifest
