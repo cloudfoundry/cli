@@ -13,7 +13,7 @@ import (
 
 type Application struct {
 	v2action.Application
-	Buildpacks []types.FilteredString
+	Buildpacks types.FilteredStrings
 	Stack      v2action.Stack
 }
 
