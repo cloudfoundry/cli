@@ -40,7 +40,7 @@ var _ = Describe("Manifest with paths", func() {
 		)
 
 		JustBeforeEach(func() {
-			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, nil)
+			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, nil, nil)
 		})
 
 		BeforeEach(func() {

@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	. "code.cloudfoundry.org/cli/util/manifest"
 
+	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -24,6 +25,7 @@ var _ = Describe("Manifest", func() {
 		var (
 			pathToManifest   string
 			pathsToVarsFiles []string
+			vars             []template.VarKV
 			apps             []Application
 			executeErr       error
 		)
@@ -33,6 +35,7 @@ var _ = Describe("Manifest", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(tempFile.Close()).ToNot(HaveOccurred())
 			pathToManifest = tempFile.Name()
+			vars = nil
 
 			pathsToVarsFiles = nil
 		})
@@ -45,7 +48,7 @@ var _ = Describe("Manifest", func() {
 		})
 
 		JustBeforeEach(func() {
-			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, pathsToVarsFiles)
+			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, pathsToVarsFiles, vars)
 		})
 
 		Context("when the manifest contains NO variables that need interpolation", func() {
@@ -227,7 +230,7 @@ applications:
 							err = ioutil.WriteFile(manifestPath, []byte(manifest), 0666)
 							Expect(err).ToNot(HaveOccurred())
 
-							_, err = ReadAndInterpolateManifest(manifestPath, pathsToVarsFiles)
+							_, err = ReadAndInterpolateManifest(manifestPath, pathsToVarsFiles, vars)
 							Expect(err).To(MatchError(GlobalFieldsError{Fields: []string{manifestProperty}}))
 						},
 
@@ -370,7 +373,7 @@ applications:
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when vars file are provided", func() {
+			Context("when only vars files are provided", func() {
 				var (
 					varsDir string
 				)
@@ -463,6 +466,54 @@ applications:
 							Err: errors.New("yaml: did not find expected key"),
 						}))
 					})
+				})
+			})
+
+			Context("when only vars are provided", func() {
+				BeforeEach(func() {
+					vars = []template.VarKV{
+						{Name: "var1", Value: "app-1"},
+						{Name: "var2", Value: 4},
+					}
+					manifest = `---
+applications:
+- name: ((var1))
+  instances: ((var2))
+`
+				})
+
+				It("interpolates the placeholder values", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(apps[0].Name).To(Equal("app-1"))
+					Expect(apps[0].Instances).To(Equal(types.NullInt{Value: 4, IsSet: true}))
+				})
+			})
+
+			Context("when vars and vars files are provided", func() {
+				var varsFilePath string
+				BeforeEach(func() {
+					tmp, err := ioutil.TempFile("", "util-manifest-varsilfe")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(tmp.Close()).NotTo(HaveOccurred())
+
+					varsFilePath = tmp.Name()
+					err = ioutil.WriteFile(varsFilePath, []byte("var1: app-1\nvar2: 12345"), 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					pathsToVarsFiles = []string{varsFilePath}
+					vars = []template.VarKV{
+						{Name: "var2", Value: 4},
+					}
+				})
+
+				AfterEach(func() {
+					Expect(os.RemoveAll(varsFilePath)).ToNot(HaveOccurred())
+				})
+
+				It("interpolates the placeholder values, prioritizing the vars flag", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(apps[0].Name).To(Equal("app-1"))
+					Expect(apps[0].Instances).To(Equal(types.NullInt{Value: 4, IsSet: true}))
 				})
 			})
 		})

@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/util/manifest"
+	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
 type FakeV2PushActor struct {
@@ -78,11 +79,12 @@ type FakeV2PushActor struct {
 		result1 []manifest.Application
 		result2 error
 	}
-	ReadManifestStub        func(pathToManifest string, pathsToVarsFiles []string) ([]manifest.Application, error)
+	ReadManifestStub        func(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]manifest.Application, error)
 	readManifestMutex       sync.RWMutex
 	readManifestArgsForCall []struct {
 		pathToManifest   string
 		pathsToVarsFiles []string
+		vars             []template.VarKV
 	}
 	readManifestReturns struct {
 		result1 []manifest.Application
@@ -353,22 +355,28 @@ func (fake *FakeV2PushActor) MergeAndValidateSettingsAndManifestsReturnsOnCall(i
 	}{result1, result2}
 }
 
-func (fake *FakeV2PushActor) ReadManifest(pathToManifest string, pathsToVarsFiles []string) ([]manifest.Application, error) {
+func (fake *FakeV2PushActor) ReadManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]manifest.Application, error) {
 	var pathsToVarsFilesCopy []string
 	if pathsToVarsFiles != nil {
 		pathsToVarsFilesCopy = make([]string, len(pathsToVarsFiles))
 		copy(pathsToVarsFilesCopy, pathsToVarsFiles)
+	}
+	var varsCopy []template.VarKV
+	if vars != nil {
+		varsCopy = make([]template.VarKV, len(vars))
+		copy(varsCopy, vars)
 	}
 	fake.readManifestMutex.Lock()
 	ret, specificReturn := fake.readManifestReturnsOnCall[len(fake.readManifestArgsForCall)]
 	fake.readManifestArgsForCall = append(fake.readManifestArgsForCall, struct {
 		pathToManifest   string
 		pathsToVarsFiles []string
-	}{pathToManifest, pathsToVarsFilesCopy})
-	fake.recordInvocation("ReadManifest", []interface{}{pathToManifest, pathsToVarsFilesCopy})
+		vars             []template.VarKV
+	}{pathToManifest, pathsToVarsFilesCopy, varsCopy})
+	fake.recordInvocation("ReadManifest", []interface{}{pathToManifest, pathsToVarsFilesCopy, varsCopy})
 	fake.readManifestMutex.Unlock()
 	if fake.ReadManifestStub != nil {
-		return fake.ReadManifestStub(pathToManifest, pathsToVarsFiles)
+		return fake.ReadManifestStub(pathToManifest, pathsToVarsFiles, vars)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -382,10 +390,10 @@ func (fake *FakeV2PushActor) ReadManifestCallCount() int {
 	return len(fake.readManifestArgsForCall)
 }
 
-func (fake *FakeV2PushActor) ReadManifestArgsForCall(i int) (string, []string) {
+func (fake *FakeV2PushActor) ReadManifestArgsForCall(i int) (string, []string, []template.VarKV) {
 	fake.readManifestMutex.RLock()
 	defer fake.readManifestMutex.RUnlock()
-	return fake.readManifestArgsForCall[i].pathToManifest, fake.readManifestArgsForCall[i].pathsToVarsFiles
+	return fake.readManifestArgsForCall[i].pathToManifest, fake.readManifestArgsForCall[i].pathsToVarsFiles, fake.readManifestArgsForCall[i].vars
 }
 
 func (fake *FakeV2PushActor) ReadManifestReturns(result1 []manifest.Application, result2 error) {

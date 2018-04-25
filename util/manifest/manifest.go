@@ -34,7 +34,7 @@ func (manifest *Manifest) UnmarshalYAML(unmarshal func(interface{}) error) error
 // ReadAndInterpolateManifest reads the manifest at the provided paths,
 // interpolates variables if a vars file is provided, and retunrs a fully
 // merged set of applications.
-func ReadAndInterpolateManifest(pathToManifest string, pathsToVarsFiles []string) ([]Application, error) {
+func ReadAndInterpolateManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]Application, error) {
 	rawManifest, err := ioutil.ReadFile(pathToManifest)
 	if err != nil {
 		return nil, err
@@ -59,6 +59,10 @@ func ReadAndInterpolateManifest(pathToManifest string, pathsToVarsFiles []string
 		for k, v := range sv {
 			fileVars[k] = v
 		}
+	}
+
+	for _, kv := range vars {
+		fileVars[kv.Name] = kv.Value
 	}
 
 	rawManifest, err = tpl.Evaluate(fileVars, nil, template.EvaluateOpts{ExpectAllKeys: true})

@@ -17,6 +17,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifest"
 	"code.cloudfoundry.org/cli/util/progressbar"
+	"github.com/cloudfoundry/bosh-cli/director/template"
 	"github.com/cloudfoundry/noaa/consumer"
 	log "github.com/sirupsen/logrus"
 )
@@ -37,7 +38,7 @@ type V2PushActor interface {
 	CloudControllerV3APIVersion() string
 	ConvertToApplicationConfigs(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	MergeAndValidateSettingsAndManifests(cmdSettings pushaction.CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error)
-	ReadManifest(pathToManifest string, pathsToVarsFiles []string) ([]manifest.Application, error)
+	ReadManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]manifest.Application, error)
 }
 
 type V2PushCommand struct {
@@ -63,12 +64,13 @@ type V2PushCommand struct {
 	RoutePath           flag.RoutePath                `long:"route-path" description:"Path for the route"`
 	StackName           string                        `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	VarsFilePaths       []flag.PathWithExistenceCheck `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
+	Vars                []template.VarKV              `long:"vars" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
 	HealthCheckTimeout  int                           `short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
 	envCFStagingTimeout interface{}                   `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}                   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 	dockerPassword      interface{}                   `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
 
-	usage           interface{} `usage:"cf push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--vars-file VARS_FILE_PATH]...\n\n   cf push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--vars-file VARS_FILE_PATH]...\n\n   cf push APP_NAME --droplet DROPLET_PATH\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--vars-file VARS_FILE_PATH]...\n\n   cf push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]"`
+	usage           interface{} `usage:"cf push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--vars KEY=VALUE] [--vars-file VARS_FILE_PATH]...\n\n   cf push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--vars KEY=VALUE] [--vars-file VARS_FILE_PATH]...\n\n   cf push APP_NAME --droplet DROPLET_PATH\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--vars KEY=VALUE] [--vars-file VARS_FILE_PATH]...\n\n   cf push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]"`
 	relatedCommands interface{} `related_commands:"apps, create-app-manifest, logs, ssh, start"`
 
 	UI          command.UI
@@ -361,7 +363,7 @@ func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.C
 	cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{
 		"Path": pathToManifest,
 	})
-	return cmd.Actor.ReadManifest(pathToManifest, pathsToVarsFiles)
+	return cmd.Actor.ReadManifest(pathToManifest, pathsToVarsFiles, cmd.Vars)
 }
 
 func (cmd V2PushCommand) processApplyStreams(
