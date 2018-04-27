@@ -131,7 +131,7 @@ func (actor Actor) GetIsolationSegmentSummaries() ([]IsolationSegmentSummary, Wa
 			EntitledOrgs: []string{},
 		}
 
-		orgs, warnings, err := actor.CloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegment(isolationSegment.GUID)
+		orgs, warnings, err := actor.CloudControllerClient.GetIsolationSegmentOrganizations(isolationSegment.GUID)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
 			return nil, allWarnings, err

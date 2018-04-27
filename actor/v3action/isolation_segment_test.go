@@ -534,8 +534,8 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 			Context("when getting entitled organizations succeeds", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentReturnsOnCall(0, []ccv3.Organization{}, ccv3.Warnings{"get-entitled-orgs-warning-1"}, nil)
-					fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentReturnsOnCall(1, []ccv3.Organization{
+					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturnsOnCall(0, []ccv3.Organization{}, ccv3.Warnings{"get-entitled-orgs-warning-1"}, nil)
+					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturnsOnCall(1, []ccv3.Organization{
 						{
 							Name: "iso-2-org-1",
 							GUID: "iso-2-org-guid-1",
@@ -564,9 +564,9 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(BeEmpty())
-					Expect(fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentCallCount()).To(Equal(2))
-					Expect(fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentArgsForCall(0)).To(Equal("iso-guid-1"))
-					Expect(fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentArgsForCall(1)).To(Equal("iso-guid-2"))
+					Expect(fakeCloudControllerClient.GetIsolationSegmentOrganizationsCallCount()).To(Equal(2))
+					Expect(fakeCloudControllerClient.GetIsolationSegmentOrganizationsArgsForCall(0)).To(Equal("iso-guid-1"))
+					Expect(fakeCloudControllerClient.GetIsolationSegmentOrganizationsArgsForCall(1)).To(Equal("iso-guid-2"))
 				})
 			})
 
@@ -575,7 +575,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
-					fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentReturns(nil, ccv3.Warnings{"get-entitled-orgs-warning"}, expectedErr)
+					fakeCloudControllerClient.GetIsolationSegmentOrganizationsReturns(nil, ccv3.Warnings{"get-entitled-orgs-warning"}, expectedErr)
 				})
 
 				It("returns the error and warnings", func() {
