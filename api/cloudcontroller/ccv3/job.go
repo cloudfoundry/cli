@@ -28,14 +28,14 @@ type Job struct {
 	State constant.JobState `json:"state"`
 }
 
-// Complete returns true when the job has completed successfully.
-func (job Job) Complete() bool {
-	return job.State == constant.JobComplete
+// HasFailed returns true when the job has completed with an error/failure.
+func (job Job) HasFailed() bool {
+	return job.State == constant.JobFailed
 }
 
-// Failed returns true when the job has completed with an error/failure.
-func (job Job) Failed() bool {
-	return job.State == constant.JobFailed
+// IsComplete returns true when the job has completed successfully.
+func (job Job) IsComplete() bool {
+	return job.State == constant.JobComplete
 }
 
 // GetJob returns a job for the provided GUID.
@@ -73,14 +73,14 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 			return allWarnings, err
 		}
 
-		if job.Failed() {
+		if job.HasFailed() {
 			return allWarnings, ccerror.JobFailedError{
 				JobGUID: job.GUID,
 				Message: job.Errors[0].Detail,
 			}
 		}
 
-		if job.Complete() {
+		if job.IsComplete() {
 			return allWarnings, nil
 		}
 

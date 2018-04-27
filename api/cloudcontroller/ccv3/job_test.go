@@ -18,10 +18,10 @@ var _ = Describe("Job", func() {
 	var client *Client
 
 	Describe("Job", func() {
-		DescribeTable("Complete",
+		DescribeTable("IsComplete",
 			func(status constant.JobState, expected bool) {
 				job := Job{State: status}
-				Expect(job.Complete()).To(Equal(expected))
+				Expect(job.IsComplete()).To(Equal(expected))
 			},
 
 			Entry("when failed, it returns false", constant.JobFailed, false),
@@ -29,10 +29,10 @@ var _ = Describe("Job", func() {
 			Entry("when processing, it returns false", constant.JobProcessing, false),
 		)
 
-		DescribeTable("Failed",
+		DescribeTable("HasFailed",
 			func(status constant.JobState, expected bool) {
 				job := Job{State: status}
-				Expect(job.Failed()).To(Equal(expected))
+				Expect(job.HasFailed()).To(Equal(expected))
 			},
 
 			Entry("when failed, it returns true", constant.JobFailed, true),
@@ -284,7 +284,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Describe("JobPollingTimeout", func() {
+		Context("polling timeouts", func() {
 			Context("when the job runs longer than the OverallPollingTimeout", func() {
 				var jobPollingTimeout time.Duration
 
