@@ -11,8 +11,10 @@ import (
 
 // IsolationSegment represents a Cloud Controller Isolation Segment.
 type IsolationSegment struct {
-	Name string `json:"name"`
+	//GUID is the unique ID of the isolation segment
 	GUID string `json:"guid,omitempty"`
+	//Name is the name of the isolation segment
+	Name string `json:"name"`
 }
 
 // CreateIsolationSegment will create an Isolation Segment on the Cloud
@@ -41,30 +43,21 @@ func (client *Client) CreateIsolationSegment(isolationSegment IsolationSegment) 
 	return responseIsolationSegment, response.Warnings, err
 }
 
-// GetIsolationSegments lists isolation segments with optional filters.
-func (client *Client) GetIsolationSegments(query ...Query) ([]IsolationSegment, Warnings, error) {
+// DeleteIsolationSegment removes an isolation segment from the cloud
+// controller. Note: This will only remove it from the cloud controller
+// database. It will not remove it from diego.
+func (client *Client) DeleteIsolationSegment(guid string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetIsolationSegmentsRequest,
-		Query:       query,
+		RequestName: internal.DeleteIsolationSegmentRequest,
+		URIParams:   map[string]string{"isolation_segment_guid": guid},
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	var fullIsolationSegmentsList []IsolationSegment
-	warnings, err := client.paginate(request, IsolationSegment{}, func(item interface{}) error {
-		if isolationSegment, ok := item.(IsolationSegment); ok {
-			fullIsolationSegmentsList = append(fullIsolationSegmentsList, isolationSegment)
-		} else {
-			return ccerror.UnknownObjectInListError{
-				Expected:   IsolationSegment{},
-				Unexpected: item,
-			}
-		}
-		return nil
-	})
-
-	return fullIsolationSegmentsList, warnings, err
+	var response cloudcontroller.Response
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
 }
 
 // GetIsolationSegment returns back the requested isolation segment that
@@ -90,19 +83,28 @@ func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnin
 	return isolationSegment, response.Warnings, nil
 }
 
-// DeleteIsolationSegment removes an isolation segment from the cloud
-// controller. Note: This will only remove it from the cloud controller
-// database. It will not remove it from diego.
-func (client *Client) DeleteIsolationSegment(guid string) (Warnings, error) {
+// GetIsolationSegments lists isolation segments with optional filters.
+func (client *Client) GetIsolationSegments(query ...Query) ([]IsolationSegment, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteIsolationSegmentRequest,
-		URIParams:   map[string]string{"isolation_segment_guid": guid},
+		RequestName: internal.GetIsolationSegmentsRequest,
+		Query:       query,
 	})
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var response cloudcontroller.Response
-	err = client.connection.Make(request, &response)
-	return response.Warnings, err
+	var fullIsolationSegmentsList []IsolationSegment
+	warnings, err := client.paginate(request, IsolationSegment{}, func(item interface{}) error {
+		if isolationSegment, ok := item.(IsolationSegment); ok {
+			fullIsolationSegmentsList = append(fullIsolationSegmentsList, isolationSegment)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   IsolationSegment{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullIsolationSegmentsList, warnings, err
 }

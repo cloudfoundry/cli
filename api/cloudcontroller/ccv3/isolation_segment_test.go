@@ -14,15 +14,26 @@ import (
 var _ = Describe("Isolation Segments", func() {
 	var (
 		client *Client
-		name   string
 	)
 
 	BeforeEach(func() {
 		client = NewTestClient()
-		name = "an_isolation_segment"
 	})
 
 	Describe("CreateIsolationSegment", func() {
+		var (
+			name string
+
+			isolationSegment IsolationSegment
+			warnings         Warnings
+			executeErr       error
+		)
+
+		JustBeforeEach(func() {
+			isolationSegment, warnings, executeErr = client.CreateIsolationSegment(IsolationSegment{Name: name})
+			name = "an_isolation_segment"
+		})
+
 		Context("when the segment does not exist", func() {
 			BeforeEach(func() {
 				response := `{
@@ -43,9 +54,8 @@ var _ = Describe("Isolation Segments", func() {
 				)
 			})
 
-			It("returns the queried applications and all warnings", func() {
-				isolationSegment, warnings, err := client.CreateIsolationSegment(IsolationSegment{Name: name})
-				Expect(err).NotTo(HaveOccurred())
+			It("returns the created segment and all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(isolationSegment).To(Equal(IsolationSegment{
 					Name: name,
@@ -75,8 +85,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.CreateIsolationSegment(IsolationSegment{Name: name})
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
 						Errors: []ccerror.V3Error{
@@ -94,6 +103,22 @@ var _ = Describe("Isolation Segments", func() {
 	})
 
 	Describe("GetIsolationSegments", func() {
+		var (
+			queries []Query
+
+			segments   []IsolationSegment
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			queries = []Query{
+				{Key: OrganizationGUIDFilter, Values: []string{"some-org-guid"}},
+				{Key: NameFilter, Values: []string{"iso1,iso2,iso3"}},
+			}
+			segments, warnings, executeErr = client.GetIsolationSegments(queries...)
+		})
+
 		Context("when the isolation segments exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
@@ -139,11 +164,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the queried applications and all warnings", func() {
-				segments, warnings, err := client.GetIsolationSegments(
-					Query{Key: OrganizationGUIDFilter, Values: []string{"some-org-guid"}},
-					Query{Key: NameFilter, Values: []string{"iso1,iso2,iso3"}},
-				)
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(segments).To(ConsistOf(
 					IsolationSegment{Name: "iso-name-1", GUID: "iso-guid-1"},
@@ -179,8 +200,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetIsolationSegments()
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
 						Errors: []ccerror.V3Error{
@@ -203,6 +223,16 @@ var _ = Describe("Isolation Segments", func() {
 	})
 
 	Describe("GetIsolationSegment", func() {
+		var (
+			warnings         Warnings
+			executeErr       error
+			isolationSegment IsolationSegment
+		)
+
+		JustBeforeEach(func() {
+			isolationSegment, warnings, executeErr = client.GetIsolationSegment("some-iso-guid")
+		})
+
 		Context("when the isolation segment exists", func() {
 			BeforeEach(func() {
 				response := `{
@@ -218,8 +248,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the isolation segment and all warnings", func() {
-				isolationSegment, warnings, err := client.GetIsolationSegment("some-iso-guid")
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(isolationSegment).To(Equal(IsolationSegment{
 					Name: "an_isolation_segment",
@@ -249,9 +278,8 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns a ResourceNotFoundError", func() {
-				_, warnings, err := client.GetIsolationSegment("some-iso-guid")
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Isolation segment not found"}))
+				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{Message: "Isolation segment not found"}))
 			})
 		})
 
@@ -280,8 +308,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetIsolationSegment("some-iso-guid")
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
 						Errors: []ccerror.V3Error{
@@ -304,6 +331,15 @@ var _ = Describe("Isolation Segments", func() {
 	})
 
 	Describe("DeleteIsolationSegment", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.DeleteIsolationSegment("some-iso-guid")
+		})
+
 		Context("when the delete is successful", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
@@ -315,8 +351,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the queried applications and all warnings", func() {
-				warnings, err := client.DeleteIsolationSegment("some-iso-guid")
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
@@ -346,8 +381,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				warnings, err := client.DeleteIsolationSegment("some-iso-guid")
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
 						Errors: []ccerror.V3Error{
