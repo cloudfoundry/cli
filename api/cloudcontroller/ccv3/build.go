@@ -27,7 +27,7 @@ type Build struct {
 	State constant.BuildState
 }
 
-// MarshalJSON converts an Build into a Cloud Controller Application.
+// MarshalJSON converts a Build into a Cloud Controller Application.
 func (b Build) MarshalJSON() ([]byte, error) {
 	var ccBuild struct {
 		Package struct {

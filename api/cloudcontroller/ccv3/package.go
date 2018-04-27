@@ -14,18 +14,37 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
+// Package represents a Cloud Controller V3 Package.
 type Package struct {
-	GUID           string
-	CreatedAt      string
-	Links          APILinks
-	Relationships  Relationships
-	State          constant.PackageState
-	Type           constant.PackageType
-	DockerImage    string
-	DockerUsername string
+	// CreatedAt is the time with zone when the object was created.
+	CreatedAt string
+
+	// DockerImage is the registry address of the docker image.
+	DockerImage string
+
+	// DockerPassword is the password for the docker image's registry.
 	DockerPassword string
+
+	// DockerUsername is the username for the docker image's registry.
+	DockerUsername string
+
+	// GUID is the unique identifier of the package.
+	GUID string
+
+	// Links are links to related resources.
+	Links APILinks
+
+	// Relationships are a list of relationships to other resources.
+	Relationships Relationships
+
+	// State is the state of the package.
+	State constant.PackageState
+
+	// Type is the package type.
+	Type constant.PackageType
 }
 
+// MarshalJSON converts a Package into a Cloud Controller Package.
 func (p Package) MarshalJSON() ([]byte, error) {
 	type ccPackageData struct {
 		Image    string `json:"image,omitempty"`
@@ -59,6 +78,7 @@ func (p Package) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccPackage)
 }
 
+// UnmarshalJSON helps unmarshal a Cloud Controller Package response.
 func (p *Package) UnmarshalJSON(data []byte) error {
 	var ccPackage struct {
 		GUID          string                `json:"guid,omitempty"`
@@ -91,25 +111,6 @@ func (p *Package) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// GetPackage returns the package with the given GUID.
-func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetPackageRequest,
-		URIParams:   internal.Params{"package_guid": packageGUID},
-	})
-	if err != nil {
-		return Package{}, nil, err
-	}
-
-	var responsePackage Package
-	response := cloudcontroller.Response{
-		Result: &responsePackage,
-	}
-	err = client.connection.Make(request, &response)
-
-	return responsePackage, response.Warnings, err
-}
-
 // CreatePackage creates a package with the given settings, Type and the
 // ApplicationRelationship must be set.
 func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
@@ -135,29 +136,15 @@ func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 	return responsePackage, response.Warnings, err
 }
 
-// UploadPackage uploads a file to a given package's Upload resource. Note:
-// fileToUpload is read entirely into memory prior to sending data to CC.
-func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, Warnings, error) {
-	link, ok := pkg.Links["upload"]
-	if !ok {
-		return Package{}, nil, ccerror.UploadLinkNotFoundError{PackageGUID: pkg.GUID}
-	}
-
-	body, contentType, err := client.createUploadStream(fileToUpload, "bits")
-	if err != nil {
-		return Package{}, nil, err
-	}
-
+// GetPackage returns the package with the given GUID.
+func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		URL:    link.HREF,
-		Method: link.Method,
-		Body:   body,
+		RequestName: internal.GetPackageRequest,
+		URIParams:   internal.Params{"package_guid": packageGUID},
 	})
 	if err != nil {
 		return Package{}, nil, err
 	}
-
-	request.Header.Set("Content-Type", contentType)
 
 	var responsePackage Package
 	response := cloudcontroller.Response{
@@ -192,6 +179,39 @@ func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
 	})
 
 	return fullPackagesList, warnings, err
+}
+
+// UploadPackage uploads a file to a given package's Upload resource. Note:
+// fileToUpload is read entirely into memory prior to sending data to CC.
+func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, Warnings, error) {
+	link, ok := pkg.Links["upload"]
+	if !ok {
+		return Package{}, nil, ccerror.UploadLinkNotFoundError{PackageGUID: pkg.GUID}
+	}
+
+	body, contentType, err := client.createUploadStream(fileToUpload, "bits")
+	if err != nil {
+		return Package{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		URL:    link.HREF,
+		Method: link.Method,
+		Body:   body,
+	})
+	if err != nil {
+		return Package{}, nil, err
+	}
+
+	request.Header.Set("Content-Type", contentType)
+
+	var responsePackage Package
+	response := cloudcontroller.Response{
+		Result: &responsePackage,
+	}
+	err = client.connection.Make(request, &response)
+
+	return responsePackage, response.Warnings, err
 }
 
 func (*Client) createUploadStream(path string, paramName string) (io.ReadSeeker, string, error) {

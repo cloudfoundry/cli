@@ -23,95 +23,32 @@ var _ = Describe("Package", func() {
 		client = NewTestClient()
 	})
 
-	Describe("GetPackage", func() {
-		Context("when the package exist", func() {
-			BeforeEach(func() {
-				response := `{
-  "guid": "some-pkg-guid",
-  "state": "PROCESSING_UPLOAD",
-	"links": {
-    "upload": {
-      "href": "some-package-upload-url",
-      "method": "POST"
-    }
-	}
-}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/packages/some-pkg-guid"),
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns the queried packages and all warnings", func() {
-				pkg, warnings, err := client.GetPackage("some-pkg-guid")
-				Expect(err).NotTo(HaveOccurred())
-
-				expectedPackage := Package{
-					GUID:  "some-pkg-guid",
-					State: constant.PackageProcessingUpload,
-					Links: map[string]APILink{
-						"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
-					},
-				}
-				Expect(pkg).To(Equal(expectedPackage))
-				Expect(warnings).To(ConsistOf("this is a warning"))
-			})
-		})
-
-		Context("when the cloud controller returns errors and warnings", func() {
-			BeforeEach(func() {
-				response := `{
-  "errors": [
-    {
-      "code": 10008,
-      "detail": "The request is semantically invalid: command presence",
-      "title": "CF-UnprocessableEntity"
-    },
-    {
-      "code": 10010,
-      "detail": "Package not found",
-      "title": "CF-ResourceNotFound"
-    }
-  ]
-}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/packages/some-pkg-guid"),
-						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetPackage("some-pkg-guid")
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
-					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10010,
-								Detail: "Package not found",
-								Title:  "CF-ResourceNotFound",
-							},
-						},
-					},
-				}))
-				Expect(warnings).To(ConsistOf("this is a warning"))
-			})
-		})
-	})
-
 	Describe("CreatePackage", func() {
+		var (
+			inputPackage Package
+
+			pkg        Package
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			pkg, warnings, executeErr = client.CreatePackage(inputPackage)
+		})
+
 		Context("when the package successfully is created", func() {
 			Context("when creating a docker package", func() {
 				BeforeEach(func() {
+					inputPackage = Package{
+						Type: constant.PackageTypeDocker,
+						Relationships: Relationships{
+							constant.RelationshipTypeApplication: Relationship{GUID: "some-app-guid"},
+						},
+						DockerImage:    "some-docker-image",
+						DockerUsername: "some-username",
+						DockerPassword: "some-password",
+					}
+
 					response := `{
 					"data": {
 						"image": "some-docker-image",
@@ -154,17 +91,7 @@ var _ = Describe("Package", func() {
 				})
 
 				It("returns the created package and warnings", func() {
-					pkg, warnings, err := client.CreatePackage(Package{
-						Type: constant.PackageTypeDocker,
-						Relationships: Relationships{
-							constant.RelationshipTypeApplication: Relationship{GUID: "some-app-guid"},
-						},
-						DockerImage:    "some-docker-image",
-						DockerUsername: "some-username",
-						DockerPassword: "some-password",
-					})
-
-					Expect(err).NotTo(HaveOccurred())
+					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 
 					expectedPackage := Package{
@@ -181,8 +108,15 @@ var _ = Describe("Package", func() {
 					Expect(pkg).To(Equal(expectedPackage))
 				})
 			})
+
 			Context("when creating a bits package", func() {
 				BeforeEach(func() {
+					inputPackage = Package{
+						Type: constant.PackageTypeBits,
+						Relationships: Relationships{
+							constant.RelationshipTypeApplication: Relationship{GUID: "some-app-guid"},
+						},
+					}
 					response := `{
 					"guid": "some-pkg-guid",
 					"type": "bits",
@@ -215,14 +149,7 @@ var _ = Describe("Package", func() {
 				})
 
 				It("omits data, and returns the created package and warnings", func() {
-					pkg, warnings, err := client.CreatePackage(Package{
-						Type: constant.PackageTypeBits,
-						Relationships: Relationships{
-							constant.RelationshipTypeApplication: Relationship{GUID: "some-app-guid"},
-						},
-					})
-
-					Expect(err).NotTo(HaveOccurred())
+					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 
 					expectedPackage := Package{
@@ -240,6 +167,7 @@ var _ = Describe("Package", func() {
 
 		Context("when cc returns back an error or warnings", func() {
 			BeforeEach(func() {
+				inputPackage = Package{}
 				response := ` {
   "errors": [
     {
@@ -263,8 +191,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.CreatePackage(Package{})
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
 						Errors: []ccerror.V3Error{
@@ -286,75 +213,39 @@ var _ = Describe("Package", func() {
 		})
 	})
 
-	Describe("UploadPackage", func() {
-		Context("when the package successfully is created", func() {
-			var tempFile *os.File
+	Describe("GetPackage", func() {
+		var (
+			pkg        Package
+			warnings   Warnings
+			executeErr error
+		)
 
+		JustBeforeEach(func() {
+			pkg, warnings, executeErr = client.GetPackage("some-pkg-guid")
+		})
+
+		Context("when the package exist", func() {
 			BeforeEach(func() {
-				var err error
-				tempFile, err = ioutil.TempFile("", "package-upload")
-				Expect(err).ToNot(HaveOccurred())
-				defer tempFile.Close()
-
-				fileSize := 1024
-				contents := strings.Repeat("A", fileSize)
-				err = ioutil.WriteFile(tempFile.Name(), []byte(contents), 0666)
-				Expect(err).NotTo(HaveOccurred())
-
-				verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
-					contentType := req.Header.Get("Content-Type")
-					Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
-
-					boundary := contentType[30:]
-
-					defer req.Body.Close()
-					rawBody, err := ioutil.ReadAll(req.Body)
-					Expect(err).NotTo(HaveOccurred())
-					body := BufferWithBytes(rawBody)
-					Expect(body).To(Say("--%s", boundary))
-					Expect(body).To(Say(`name="bits"`))
-					Expect(body).To(Say(contents))
-					Expect(body).To(Say("--%s--", boundary))
-				}
-
 				response := `{
-					"guid": "some-pkg-guid",
-					"state": "PROCESSING_UPLOAD",
-					"links": {
-						"upload": {
-							"href": "some-package-upload-url",
-							"method": "POST"
-						}
-					}
-				}`
-
+  "guid": "some-pkg-guid",
+  "state": "PROCESSING_UPLOAD",
+	"links": {
+    "upload": {
+      "href": "some-package-upload-url",
+      "method": "POST"
+    }
+	}
+}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
-						verifyHeaderAndBody,
+						VerifyRequest(http.MethodGet, "/v3/packages/some-pkg-guid"),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
 
-			AfterEach(func() {
-				if tempFile != nil {
-					Expect(os.Remove(tempFile.Name())).ToNot(HaveOccurred())
-				}
-			})
-
-			It("returns the created package and warnings", func() {
-				pkg, warnings, err := client.UploadPackage(Package{
-					State: constant.PackageAwaitingUpload,
-					Links: map[string]APILink{
-						"upload": APILink{
-							HREF:   fmt.Sprintf("%s/v3/my-special-endpoint/some-pkg-guid/upload", server.URL()),
-							Method: http.MethodPost,
-						},
-					},
-				}, tempFile.Name())
-
-				Expect(err).NotTo(HaveOccurred())
+			It("returns the queried packages and all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
 
 				expectedPackage := Package{
 					GUID:  "some-pkg-guid",
@@ -368,15 +259,64 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when the package does not have an upload link", func() {
-			It("returns an UploadLinkNotFoundError", func() {
-				_, _, err := client.UploadPackage(Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload}, "/path/to/foo")
-				Expect(err).To(MatchError(ccerror.UploadLinkNotFoundError{PackageGUID: "some-pkg-guid"}))
+		Context("when the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "Package not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/packages/some-pkg-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "Package not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
 	})
 
 	Describe("GetPackages", func() {
+		var (
+			pkgs       []Package
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			pkgs, warnings, executeErr = client.GetPackages(Query{Key: AppGUIDFilter, Values: []string{"some-app-guid"}})
+		})
+
 		Context("when cloud controller returns list of packages", func() {
 			BeforeEach(func() {
 				response := `{
@@ -416,10 +356,9 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the queried packages and all warnings", func() {
-				packages, warnings, err := client.GetPackages(Query{Key: AppGUIDFilter, Values: []string{"some-app-guid"}})
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 
-				Expect(packages).To(Equal([]Package{
+				Expect(pkgs).To(Equal([]Package{
 					{
 						GUID:      "some-pkg-guid-1",
 						Type:      constant.PackageTypeBits,
@@ -468,8 +407,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetPackages(Query{Key: AppGUIDFilter, Values: []string{"some-app-guid"}})
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
 						Errors: []ccerror.V3Error{
@@ -489,6 +427,184 @@ var _ = Describe("Package", func() {
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
+	})
 
+	Describe("UploadPackage", func() {
+		var (
+			inputPackage Package
+			fileToUpload string
+
+			pkg        Package
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			pkg, warnings, executeErr = client.UploadPackage(inputPackage, fileToUpload)
+		})
+
+		Context("when the package successfully is created", func() {
+			var tempFile *os.File
+
+			BeforeEach(func() {
+				var err error
+
+				inputPackage = Package{
+					State: constant.PackageAwaitingUpload,
+					Links: map[string]APILink{
+						"upload": APILink{
+							HREF:   fmt.Sprintf("%s/v3/my-special-endpoint/some-pkg-guid/upload", server.URL()),
+							Method: http.MethodPost,
+						},
+					},
+				}
+
+				tempFile, err = ioutil.TempFile("", "package-upload")
+				Expect(err).ToNot(HaveOccurred())
+				defer tempFile.Close()
+
+				fileToUpload = tempFile.Name()
+
+				fileSize := 1024
+				contents := strings.Repeat("A", fileSize)
+				err = ioutil.WriteFile(tempFile.Name(), []byte(contents), 0666)
+				Expect(err).NotTo(HaveOccurred())
+
+				verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
+					contentType := req.Header.Get("Content-Type")
+					Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
+
+					boundary := contentType[30:]
+
+					defer req.Body.Close()
+					rawBody, err := ioutil.ReadAll(req.Body)
+					Expect(err).NotTo(HaveOccurred())
+					body := BufferWithBytes(rawBody)
+					Expect(body).To(Say("--%s", boundary))
+					Expect(body).To(Say(`name="bits"`))
+					Expect(body).To(Say(contents))
+					Expect(body).To(Say("--%s--", boundary))
+				}
+
+				response := `{
+					"guid": "some-pkg-guid",
+					"state": "PROCESSING_UPLOAD",
+					"links": {
+						"upload": {
+							"href": "some-package-upload-url",
+							"method": "POST"
+						}
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
+						verifyHeaderAndBody,
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			AfterEach(func() {
+				if tempFile != nil {
+					Expect(os.RemoveAll(tempFile.Name())).ToNot(HaveOccurred())
+				}
+			})
+
+			It("returns the created package and warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				expectedPackage := Package{
+					GUID:  "some-pkg-guid",
+					State: constant.PackageProcessingUpload,
+					Links: map[string]APILink{
+						"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
+					},
+				}
+				Expect(pkg).To(Equal(expectedPackage))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when the package does not have an upload link", func() {
+			BeforeEach(func() {
+				inputPackage = Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload}
+				fileToUpload = "/path/to/foo"
+			})
+
+			It("returns an UploadLinkNotFoundError", func() {
+				Expect(executeErr).To(MatchError(ccerror.UploadLinkNotFoundError{PackageGUID: "some-pkg-guid"}))
+			})
+		})
+
+		Context("when cc returns back an error or warnings", func() {
+			var tempFile *os.File
+
+			BeforeEach(func() {
+				var err error
+
+				inputPackage = Package{
+					State: constant.PackageAwaitingUpload,
+					Links: map[string]APILink{
+						"upload": APILink{
+							HREF:   fmt.Sprintf("%s/v3/my-special-endpoint/some-pkg-guid/upload", server.URL()),
+							Method: http.MethodPost,
+						},
+					},
+				}
+
+				tempFile, err = ioutil.TempFile("", "package-upload")
+				Expect(err).ToNot(HaveOccurred())
+				defer tempFile.Close()
+
+				fileToUpload = tempFile.Name()
+
+				fileSize := 1024
+				contents := strings.Repeat("A", fileSize)
+				err = ioutil.WriteFile(tempFile.Name(), []byte(contents), 0666)
+				Expect(err).NotTo(HaveOccurred())
+
+				response := ` {
+					"errors": [
+					{
+						"code": 10008,
+						"detail": "The request is semantically invalid: command presence",
+						"title": "CF-UnprocessableEntity"
+					}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			AfterEach(func() {
+				if tempFile != nil {
+					Expect(os.RemoveAll(tempFile.Name())).ToNot(HaveOccurred())
+				}
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+
+		})
 	})
 })
