@@ -16,11 +16,15 @@ func NewPaginatedResources(exampleResource interface{}) *PaginatedResources {
 // PaginatedResources represents a page of resources returned by the Cloud
 // Controller.
 type PaginatedResources struct {
+	// Pagination represents information about the paginated resource.
 	Pagination struct {
+		// Next represents a link to the next page.
 		Next struct {
+			// HREF is the HREF of the next page.
 			HREF string `json:"href"`
 		} `json:"next"`
 	} `json:"pagination"`
+	// ResourceBytes is the list of resources for the current page.
 	ResourcesBytes json.RawMessage `json:"resources"`
 	resourceType   reflect.Type
 }
