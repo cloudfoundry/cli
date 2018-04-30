@@ -1,5 +1,8 @@
 If you have any questions about developing a CLI plugin, ask away on the [cf-dev mailing list](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/) (many plugin developers there!) or the #cli channel in our Slack community.
 
+# Future updates to the architecture
+Our current plugin architecture currently requires a review and possible large overhaul. Until then, there are no current plans to update our existing architecture. Feel free to provide input [here](https://www.pivotaltracker.com/story/show/157201049) where you can provide feedback.
+
 # Changes in v6.25.0
 - `GetApp` now returns `Path` and `Port` information.
 
