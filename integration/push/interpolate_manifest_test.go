@@ -150,10 +150,10 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 		})
 	})
 
-	Context("when only `--vars` flag vars are provided", func() {
+	Context("when only `--var` flag vars are provided", func() {
 		It("replaces the variables with the provided values", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", manifestPath, "--vars", fmt.Sprintf("vars1=%s", appName), "--vars", fmt.Sprintf("vars2=%d", instances))
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", manifestPath, "--var", fmt.Sprintf("vars1=%s", appName), "--var", fmt.Sprintf("vars2=%d", instances))
 				Eventually(session).Should(Say("Getting app info\\.\\.\\."))
 				Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 				Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
@@ -168,7 +168,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 		})
 	})
 
-	Context("when `--vars-file` and `--vars` flag vars are provided", func() {
+	Context("when `--vars-file` and `--var` flag vars are provided", func() {
 		var varsFilePath string
 		BeforeEach(func() {
 			tmp, err := ioutil.TempFile("", "varsfile-interpolation")
@@ -184,9 +184,9 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 			Expect(os.RemoveAll(varsFilePath)).ToNot(HaveOccurred())
 		})
 
-		It("overwrites the vars-file with the provided vars key value pair", func() {
+		It("overwrites the vars-file with the provided var key value pair", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", manifestPath, "--vars", fmt.Sprintf("vars1=%s", appName), "--vars-file", varsFilePath)
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", manifestPath, "--var", fmt.Sprintf("vars1=%s", appName), "--vars-file", varsFilePath)
 				Eventually(session).Should(Say("Getting app info\\.\\.\\."))
 				Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 				Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
