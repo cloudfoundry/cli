@@ -2,9 +2,12 @@ package plugin
 
 import (
 	"os"
+	"syscall"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
@@ -69,5 +72,25 @@ var _ = Describe("running plugins", func() {
 				})
 			})
 		})
+	})
+
+	Describe("signal handling", func() {
+		BeforeEach(func() {
+			installTestPlugin()
+		})
+
+		DescribeTable("will wait for the plugin to terminate",
+			func(signal syscall.Signal) {
+				session := helpers.CF("Sleep", "3000")
+				// Give time for the plugin to be called
+				time.Sleep(500 * time.Millisecond)
+				session = session.Signal(signal)
+				Eventually(session).Should(Say("Slept for 3000 ms"))
+				Eventually(session).Should(Exit(0))
+			},
+			Entry("when SIGINT", syscall.SIGINT),
+			Entry("when SIGQUIT", syscall.SIGQUIT),
+			Entry("when SIGTERM", syscall.SIGTERM),
+		)
 	})
 })
