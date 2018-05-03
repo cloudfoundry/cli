@@ -79,7 +79,7 @@ type FakeV2PushActor struct {
 		result1 []manifest.Application
 		result2 error
 	}
-	ReadManifestStub        func(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]manifest.Application, error)
+	ReadManifestStub        func(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]manifest.Application, pushaction.Warnings, error)
 	readManifestMutex       sync.RWMutex
 	readManifestArgsForCall []struct {
 		pathToManifest   string
@@ -88,11 +88,13 @@ type FakeV2PushActor struct {
 	}
 	readManifestReturns struct {
 		result1 []manifest.Application
-		result2 error
+		result2 pushaction.Warnings
+		result3 error
 	}
 	readManifestReturnsOnCall map[int]struct {
 		result1 []manifest.Application
-		result2 error
+		result2 pushaction.Warnings
+		result3 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -355,7 +357,7 @@ func (fake *FakeV2PushActor) MergeAndValidateSettingsAndManifestsReturnsOnCall(i
 	}{result1, result2}
 }
 
-func (fake *FakeV2PushActor) ReadManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]manifest.Application, error) {
+func (fake *FakeV2PushActor) ReadManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]manifest.Application, pushaction.Warnings, error) {
 	var pathsToVarsFilesCopy []string
 	if pathsToVarsFiles != nil {
 		pathsToVarsFilesCopy = make([]string, len(pathsToVarsFiles))
@@ -379,9 +381,9 @@ func (fake *FakeV2PushActor) ReadManifest(pathToManifest string, pathsToVarsFile
 		return fake.ReadManifestStub(pathToManifest, pathsToVarsFiles, vars)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.readManifestReturns.result1, fake.readManifestReturns.result2
+	return fake.readManifestReturns.result1, fake.readManifestReturns.result2, fake.readManifestReturns.result3
 }
 
 func (fake *FakeV2PushActor) ReadManifestCallCount() int {
@@ -396,26 +398,29 @@ func (fake *FakeV2PushActor) ReadManifestArgsForCall(i int) (string, []string, [
 	return fake.readManifestArgsForCall[i].pathToManifest, fake.readManifestArgsForCall[i].pathsToVarsFiles, fake.readManifestArgsForCall[i].vars
 }
 
-func (fake *FakeV2PushActor) ReadManifestReturns(result1 []manifest.Application, result2 error) {
+func (fake *FakeV2PushActor) ReadManifestReturns(result1 []manifest.Application, result2 pushaction.Warnings, result3 error) {
 	fake.ReadManifestStub = nil
 	fake.readManifestReturns = struct {
 		result1 []manifest.Application
-		result2 error
-	}{result1, result2}
+		result2 pushaction.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeV2PushActor) ReadManifestReturnsOnCall(i int, result1 []manifest.Application, result2 error) {
+func (fake *FakeV2PushActor) ReadManifestReturnsOnCall(i int, result1 []manifest.Application, result2 pushaction.Warnings, result3 error) {
 	fake.ReadManifestStub = nil
 	if fake.readManifestReturnsOnCall == nil {
 		fake.readManifestReturnsOnCall = make(map[int]struct {
 			result1 []manifest.Application
-			result2 error
+			result2 pushaction.Warnings
+			result3 error
 		})
 	}
 	fake.readManifestReturnsOnCall[i] = struct {
 		result1 []manifest.Application
-		result2 error
-	}{result1, result2}
+		result2 pushaction.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeV2PushActor) Invocations() map[string][][]interface{} {

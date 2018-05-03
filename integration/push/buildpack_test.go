@@ -24,7 +24,7 @@ var _ = Describe("push with different buildpack values", func() {
 	})
 
 	Context("when the buildpack flag is provided", func() {
-		Context("when only one instance of buildpack is provided", func() {
+		Context("when only one buildpack is provided", func() {
 			It("sets that buildpack correctly for the pushed app", func() {
 				helpers.WithProcfileApp(func(dir string) {
 					tempfile := filepath.Join(dir, "index.html")
@@ -168,6 +168,78 @@ var _ = Describe("push with different buildpack values", func() {
 					Eventually(session).Should(Say(`go_buildpack`))
 					Eventually(session).Should(Exit(0))
 				})
+			})
+		})
+	})
+
+	Context("when buildpack is provided via manifest", func() {
+		It("sets buildpack and returns a warning", func() {
+			helpers.WithHelloWorldApp(func(dir string) {
+				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"name":      appName,
+							"buildpack": "staticfile_buildpack",
+						},
+					},
+				})
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "no-start")
+				Eventually(session).Should(Say(`\s+buildpack:\s+staticfile_buildpack`))
+				Eventually(session.Err).Should(Say(`Deprecation warning: Use of buildpack`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	Context("when buildpacks (plural) is provided via manifest", func() {
+		Context("when mutiple buildpacks are specified", func() {
+			It("sets all buildpacks correctly for the pushed app", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name": appName,
+								"buildpacks": []string{
+									"https://github.com/cloudfoundry/ruby-buildpack",
+									"https://github.com/cloudfoundry/staticfile-buildpack",
+								},
+							},
+						},
+					})
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+					Eventually(session).Should(Exit(0))
+				})
+
+				session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
+
+				Eventually(session).Should(Say(`https://github.com/cloudfoundry/ruby-buildpack"`))
+				Eventually(session).Should(Say(`https://github.com/cloudfoundry/staticfile-buildpack"`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("when only one buildpack is specified", func() {
+			It("sets only one buildpack for the pushed app", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name": appName,
+								"buildpacks": []string{
+									"https://github.com/cloudfoundry/staticfile-buildpack",
+								},
+							},
+						},
+					})
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+					Eventually(session).Should(Exit(0))
+				})
+
+				session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
+
+				// TODO: fix during app command rework to actually test that the second buildpack does not exist
+				Eventually(session).Should(Say(`https://github.com/cloudfoundry/staticfile-buildpack"`))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})

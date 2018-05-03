@@ -259,6 +259,7 @@ applications:
 					)
 				})
 			})
+
 			Context("when inheritance is provided", func() {
 				BeforeEach(func() {
 					manifest = `---

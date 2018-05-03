@@ -119,7 +119,12 @@ func (Actor) validateCommandLineSettingsAndManifestCombinations(cmdLineSettings 
 		switch {
 		case app.NoRoute && len(app.Routes) > 0:
 			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"no-route", "routes"}}
-		case app.DeprecatedDomain != nil || app.DeprecatedDomains != nil || app.DeprecatedHost != nil || app.DeprecatedHosts != nil || app.DeprecatedNoHostname != nil:
+		case app.DeprecatedDomain != nil ||
+			app.DeprecatedDomains != nil ||
+			app.DeprecatedHost != nil ||
+			app.DeprecatedHosts != nil ||
+			app.DeprecatedNoHostname != nil:
+
 			deprecatedFields := []string{}
 			if app.DeprecatedDomain != nil {
 				deprecatedFields = append(deprecatedFields, "domain")

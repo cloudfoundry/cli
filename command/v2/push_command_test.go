@@ -341,7 +341,7 @@ var _ = Describe("push Command", func() {
 									Expect(err).ToNot(HaveOccurred())
 
 									expectedApps = []manifest.Application{{Name: "some-app"}, {Name: "some-other-app"}}
-									fakeActor.ReadManifestReturns(expectedApps, nil)
+									fakeActor.ReadManifestReturns(expectedApps, nil, nil)
 								})
 
 								Context("when reading the manifest file is successful", func() {
@@ -373,7 +373,7 @@ var _ = Describe("push Command", func() {
 									BeforeEach(func() {
 										expectedErr = errors.New("I am an error!!!")
 
-										fakeActor.ReadManifestReturns(nil, expectedErr)
+										fakeActor.ReadManifestReturns(nil, nil, expectedErr)
 									})
 
 									It("returns the error", func() {

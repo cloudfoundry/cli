@@ -38,7 +38,7 @@ type V2PushActor interface {
 	CloudControllerV3APIVersion() string
 	ConvertToApplicationConfigs(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	MergeAndValidateSettingsAndManifests(cmdSettings pushaction.CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error)
-	ReadManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]manifest.Application, error)
+	ReadManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]manifest.Application, pushaction.Warnings, error)
 }
 
 type V2PushCommand struct {
@@ -363,7 +363,11 @@ func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.C
 	cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{
 		"Path": pathToManifest,
 	})
-	return cmd.Actor.ReadManifest(pathToManifest, pathsToVarsFiles, cmd.Vars)
+
+	apps, warnings, err := cmd.Actor.ReadManifest(pathToManifest, pathsToVarsFiles, cmd.Vars)
+	cmd.UI.DisplayWarnings(warnings)
+
+	return apps, err
 }
 
 func (cmd V2PushCommand) processApplyStreams(
