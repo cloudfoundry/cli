@@ -16,7 +16,9 @@
 
 ## CC API Endpoint Version  
 
-<!-- see `cf api` output -->
+<!-- see `cf api` output
+Note: As of January 2018, we no longer support API versions older than 2.69.0/3.4.0 (CF Release: 251 / CAPI Release: 1.15.0)
+-->
 
 ## CF Trace
 
