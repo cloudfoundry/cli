@@ -92,7 +92,7 @@ func (Actor) validateCommandLineSettingsAndManifestCombinations(cmdLineSettings 
 	if len(apps) > 1 {
 		switch {
 		case
-			cmdLineSettings.Buildpack.IsSet,
+			cmdLineSettings.Buildpacks != nil,
 			cmdLineSettings.Command.IsSet,
 			cmdLineSettings.DefaultRouteDomain != "",
 			cmdLineSettings.DefaultRouteHostname != "",

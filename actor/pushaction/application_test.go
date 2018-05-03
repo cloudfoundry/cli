@@ -150,7 +150,7 @@ var _ = Describe("Applications", func() {
 		Context("Buildpack(s)", func() {
 			var (
 				buildpack  types.FilteredString
-				buildpacks []types.FilteredString
+				buildpacks []string
 			)
 
 			BeforeEach(func() {
@@ -181,33 +181,52 @@ var _ = Describe("Applications", func() {
 
 			Context("when buildpacks is set with one buildpack", func() {
 				BeforeEach(func() {
-					buildpacks = []types.FilteredString{
-						{Value: "ruby", IsSet: true},
-					}
+					buildpacks = []string{"ruby"}
 					config.DesiredApplication.Buildpacks = buildpacks
 
-					updatedApplication = v2action.Application{Buildpack: buildpacks[0]}
+					updatedApplication = v2action.Application{Buildpack: types.FilteredString{
+						Value: buildpacks[0],
+						IsSet: true,
+					}}
 					fakeV2Actor.UpdateApplicationReturns(updatedApplication, v2action.Warnings{"update-warning"}, nil)
 				})
 
-				It("sets buildpack to the set buildpack in buildpacks", func() {
+				It("sets buildpack to the only provided buildpack in buildpacks", func() {
 					Expect(fakeV2Actor.UpdateApplicationCallCount()).To(Equal(1))
 					submitApp := fakeV2Actor.UpdateApplicationArgsForCall(0)
 					Expect(submitApp).To(MatchFields(IgnoreExtras, Fields{
-						"Buildpack": Equal(buildpacks[0]),
+						"Buildpack": Equal(types.FilteredString{Value: buildpacks[0], IsSet: true}),
 					}))
 
 					Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(0))
 					Expect(returnedConfig.DesiredApplication.Application).To(Equal(updatedApplication))
 				})
+
+				Context("when that buildpack is default/null", func() {
+					BeforeEach(func() {
+						buildpacks = []string{"default"}
+						config.DesiredApplication.Buildpacks = buildpacks
+
+						updatedApplication = v2action.Application{Buildpack: types.FilteredString{
+							Value: buildpacks[0],
+							IsSet: true,
+						}}
+						fakeV2Actor.UpdateApplicationReturns(updatedApplication, v2action.Warnings{"update-warning"}, nil)
+					})
+
+					It("sets buildpack with the empty string", func() {
+						Expect(fakeV2Actor.UpdateApplicationCallCount()).To(Equal(1))
+						submitApp := fakeV2Actor.UpdateApplicationArgsForCall(0)
+						Expect(submitApp).To(MatchFields(IgnoreExtras, Fields{
+							"Buildpack": Equal(types.FilteredString{IsSet: true}),
+						}))
+					})
+				})
 			})
 
 			Context("when buildpacks is set with more than one buildpack", func() {
 				BeforeEach(func() {
-					buildpacks = []types.FilteredString{
-						{Value: "ruby", IsSet: true},
-						{Value: "java", IsSet: true},
-					}
+					buildpacks = []string{"ruby", "java"}
 					config.DesiredApplication.Buildpacks = buildpacks
 
 					updatedApplication = v2action.Application{}
@@ -342,7 +361,7 @@ var _ = Describe("Applications", func() {
 		Context("Buildpack(s)", func() {
 			var (
 				buildpack  types.FilteredString
-				buildpacks []types.FilteredString
+				buildpacks []string
 			)
 
 			Context("when buildpack is set", func() {
@@ -368,12 +387,13 @@ var _ = Describe("Applications", func() {
 
 			Context("when buildpacks is set with one buildpack", func() {
 				BeforeEach(func() {
-					buildpacks = []types.FilteredString{
-						{Value: "ruby", IsSet: true},
-					}
+					buildpacks = []string{"ruby"}
 					config.DesiredApplication.Buildpacks = buildpacks
 
-					createdApplication = v2action.Application{Buildpack: buildpacks[0]}
+					createdApplication = v2action.Application{Buildpack: types.FilteredString{
+						Value: buildpacks[0],
+						IsSet: true,
+					}}
 					fakeV2Actor.CreateApplicationReturns(createdApplication, v2action.Warnings{"create-warning"}, nil)
 				})
 
@@ -381,7 +401,7 @@ var _ = Describe("Applications", func() {
 					Expect(fakeV2Actor.CreateApplicationCallCount()).To(Equal(1))
 					submitApp := fakeV2Actor.CreateApplicationArgsForCall(0)
 					Expect(submitApp).To(MatchFields(IgnoreExtras, Fields{
-						"Buildpack": Equal(buildpacks[0]),
+						"Buildpack": Equal(types.FilteredString{Value: buildpacks[0], IsSet: true}),
 					}))
 
 					Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(0))
@@ -391,10 +411,7 @@ var _ = Describe("Applications", func() {
 
 			Context("when buildpacks is set with more than one buildpack", func() {
 				BeforeEach(func() {
-					buildpacks = []types.FilteredString{
-						{Value: "ruby", IsSet: true},
-						{Value: "java", IsSet: true},
-					}
+					buildpacks = []string{"ruby", "java"}
 					config.DesiredApplication.Buildpacks = buildpacks
 
 					createdApplication = v2action.Application{}

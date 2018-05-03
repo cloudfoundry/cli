@@ -332,15 +332,7 @@ applications:
 							IsSet: false,
 							Value: "",
 						}),
-						"Buildpacks": ConsistOf(
-							types.FilteredString{
-								IsSet: true,
-								Value: "some-buildpack-1",
-							}, types.FilteredString{
-								IsSet: true,
-								Value: "some-buildpack-2",
-							},
-						),
+						"Buildpacks": ConsistOf("some-buildpack-1", "some-buildpack-2"),
 					}))
 
 					Expect(apps[1]).To(MatchFields(IgnoreExtras, Fields{
@@ -349,13 +341,8 @@ applications:
 							Value: "",
 						}),
 						"Buildpacks": ConsistOf(
-							types.FilteredString{
-								IsSet: true,
-								Value: "some-other-buildpack-1",
-							}, types.FilteredString{
-								IsSet: true,
-								Value: "some-other-buildpack-2",
-							},
+							"some-other-buildpack-1",
+							"some-other-buildpack-2",
 						),
 					}))
 				})

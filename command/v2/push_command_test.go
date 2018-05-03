@@ -133,22 +133,12 @@ var _ = Describe("push Command", func() {
 				})
 
 				Context("when buildpacks (plural) is provided in the manifest and the API version is below the minimum", func() {
-
 					BeforeEach(func() {
 						appManifests = []manifest.Application{
 							{
-								Name: appName,
-								Path: pwd,
-								Buildpacks: []types.FilteredString{
-									types.FilteredString{
-										IsSet: true,
-										Value: "ruby-buildpack",
-									},
-									types.FilteredString{
-										IsSet: true,
-										Value: "java-buildpack",
-									},
-								},
+								Name:       appName,
+								Path:       pwd,
+								Buildpacks: []string{"ruby-buildpack", "java-buildpack"},
 							},
 						}
 
@@ -950,7 +940,7 @@ var _ = Describe("push Command", func() {
 
 			Context("when general app settings are given", func() {
 				BeforeEach(func() {
-					cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
+					cmd.Buildpacks = []string{"some-buildpack"}
 					cmd.Command = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "echo foo bar baz"}}
 					cmd.DiskQuota = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
 					cmd.HealthCheckTimeout = 14
@@ -962,7 +952,7 @@ var _ = Describe("push Command", func() {
 
 				It("sets them on the command line settings", func() {
 					Expect(commandLineSettingsErr).ToNot(HaveOccurred())
-					Expect(settings.Buildpack).To(Equal(types.FilteredString{Value: "some-buildpack", IsSet: true}))
+					Expect(settings.Buildpacks).To(ConsistOf("some-buildpack"))
 					Expect(settings.Command).To(Equal(types.FilteredString{IsSet: true, Value: "echo foo bar baz"}))
 					Expect(settings.DiskQuota).To(Equal(uint64(1024)))
 					Expect(settings.HealthCheckTimeout).To(Equal(14))
@@ -1135,7 +1125,7 @@ var _ = Describe("push Command", func() {
 			Entry("-b and --docker-image",
 				func() {
 					cmd.DockerImage.Path = "some-docker-image"
-					cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
+					cmd.Buildpacks = []string{"some-buildpack"}
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"-b", "--docker-image, -o"}}),
 

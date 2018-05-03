@@ -13,7 +13,7 @@ import (
 
 type Application struct {
 	v2action.Application
-	Buildpacks types.FilteredStrings
+	Buildpacks []string
 	Stack      v2action.Stack
 }
 
@@ -42,7 +42,7 @@ func (actor Actor) CreateApplication(config ApplicationConfig) (ApplicationConfi
 	if config.HasV3Buildpacks() {
 		var buildpacks []string
 		for _, buildpack := range config.DesiredApplication.Buildpacks {
-			buildpacks = append(buildpacks, buildpack.Value)
+			buildpacks = append(buildpacks, buildpack)
 		}
 
 		v3App := v3action.Application{
@@ -83,7 +83,7 @@ func (actor Actor) UpdateApplication(config ApplicationConfig) (ApplicationConfi
 	if config.HasV3Buildpacks() {
 		var buildpacks []string
 		for _, buildpack := range config.DesiredApplication.Buildpacks {
-			buildpacks = append(buildpacks, buildpack.Value)
+			buildpacks = append(buildpacks, buildpack)
 		}
 
 		v3App := v3action.Application{
@@ -162,7 +162,9 @@ func (actor Actor) ignoreSameStackGUID(config ApplicationConfig, v2App v2action.
 // on the application.
 func (actor Actor) setBuildpack(config ApplicationConfig) types.FilteredString {
 	if len(config.DesiredApplication.Buildpacks) == 1 {
-		return config.DesiredApplication.Buildpacks[0]
+		filtered := new(types.FilteredString)
+		filtered.ParseValue(config.DesiredApplication.Buildpacks[0])
+		return *filtered
 	}
 
 	return config.DesiredApplication.Buildpack

@@ -2,13 +2,14 @@ package pushaction
 
 import (
 	"fmt"
+	"strings"
 
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
 )
 
 type CommandLineSettings struct {
-	Buildpack            types.FilteredString
+	Buildpacks           []string
 	Command              types.FilteredString
 	CurrentDirectory     string
 	DefaultRouteDomain   string
@@ -32,8 +33,8 @@ type CommandLineSettings struct {
 }
 
 func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Application) manifest.Application {
-	if settings.Buildpack.IsSet {
-		app.Buildpack = settings.Buildpack
+	if len(settings.Buildpacks) > 0 {
+		app = settings.setBuildpacks(app)
 	}
 
 	if settings.Command.IsSet {
@@ -119,12 +120,27 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 	return app
 }
 
+func (settings CommandLineSettings) setBuildpacks(app manifest.Application) manifest.Application {
+	app.Buildpack = types.FilteredString{}
+	app.Buildpacks = nil
+
+	if len(settings.Buildpacks) == 1 {
+		app.Buildpack.ParseValue(settings.Buildpacks[0])
+		return app
+	}
+
+	for _, bp := range settings.Buildpacks {
+		app.Buildpacks = append(app.Buildpacks, bp)
+	}
+
+	return app
+}
+
 func (settings CommandLineSettings) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack: (%t, '%s'), Command: (%t, '%s'), CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Droplet: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: (%t, '%d'), Memory: '%d', Provided App Path: '%s', Stack: '%s', RoutePath: '%s', Domain: '%s', Hostname: '%s'",
+		"App Name: '%s', Buildpacks: %s, Command: (%t, '%s'), CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Droplet: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: (%t, '%d'), Memory: '%d', Provided App Path: '%s', Stack: '%s', RoutePath: '%s', Domain: '%s', Hostname: '%s'",
 		settings.Name,
-		settings.Buildpack.IsSet,
-		settings.Buildpack.Value,
+		strings.Join(settings.Buildpacks, ", "),
 		settings.Command.IsSet,
 		settings.Command.Value,
 		settings.CurrentDirectory,

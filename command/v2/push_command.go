@@ -43,7 +43,7 @@ type V2PushActor interface {
 
 type V2PushCommand struct {
 	OptionalArgs        flag.OptionalAppName          `positional-args:"yes"`
-	Buildpack           flag.Buildpack                `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	Buildpacks          []string                      `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	Command             flag.Command                  `short:"c" description:"Startup command, set to null to reset to default start command"`
 	Domain              string                        `short:"d" description:"Domain (e.g. example.com)"`
 	DockerImage         flag.DockerImage              `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
@@ -257,8 +257,8 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 	}
 
 	config := pushaction.CommandLineSettings{
-		Buildpack:            cmd.Buildpack.FilteredString, // -b
-		Command:              cmd.Command.FilteredString,   // -c
+		Buildpacks:           cmd.Buildpacks,             // -b
+		Command:              cmd.Command.FilteredString, // -c
 		CurrentDirectory:     pwd,
 		DefaultRouteDomain:   cmd.Domain,               // -d
 		DefaultRouteHostname: cmd.Hostname,             // -n/--hostname
@@ -482,7 +482,7 @@ func (cmd V2PushCommand) validateArgs() error {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--docker-image, -o", "-p"},
 		}
-	case cmd.DockerImage.Path != "" && cmd.Buildpack.IsSet:
+	case cmd.DockerImage.Path != "" && cmd.Buildpacks != nil:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"-b", "--docker-image, -o"},
 		}

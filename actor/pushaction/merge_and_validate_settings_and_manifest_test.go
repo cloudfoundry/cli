@@ -317,7 +317,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
-				Buildpack: types.FilteredString{IsSet: true},
+				Buildpacks: []string{"some-buildpack"},
 			},
 			manifestWithMultipleApps,
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),

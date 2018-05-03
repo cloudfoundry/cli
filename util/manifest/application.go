@@ -9,7 +9,7 @@ import (
 
 type Application struct {
 	Buildpack      types.FilteredString
-	Buildpacks     types.FilteredStrings
+	Buildpacks     []string
 	Command        types.FilteredString
 	DiskQuota      types.NullByteSizeInMb
 	DockerImage    string
@@ -51,7 +51,7 @@ func (app Application) String() string {
 		app.Name,
 		app.Buildpack.IsSet,
 		app.Buildpack.Value,
-		app.Buildpacks,
+		strings.Join(app.Buildpacks, ", "),
 		app.Command.IsSet,
 		app.Command.Value,
 		app.DiskQuota,
@@ -161,10 +161,7 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 
 	if _, ok := exists["buildpacks"]; ok {
 		for _, buildpack := range m.Buildpacks {
-			bp := types.FilteredString{}
-			bp.ParseValue(buildpack)
-			bp.IsSet = true
-			app.Buildpacks = append(app.Buildpacks, bp)
+			app.Buildpacks = append(app.Buildpacks, buildpack)
 		}
 	}
 

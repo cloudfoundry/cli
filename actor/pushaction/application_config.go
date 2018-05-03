@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
@@ -251,16 +250,11 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 	}
 
 	for _, buildpack := range manifest.Buildpacks {
-		bp := types.FilteredString{
-			IsSet: true,
-			Value: buildpack.Value,
-		}
-
 		if application.Buildpacks == nil {
-			application.Buildpacks = []types.FilteredString{}
+			application.Buildpacks = []string{}
 		}
 
-		application.Buildpacks = append(application.Buildpacks, bp)
+		application.Buildpacks = append(application.Buildpacks, buildpack)
 	}
 
 	if manifest.Command.IsSet {

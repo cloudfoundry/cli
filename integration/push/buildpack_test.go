@@ -24,64 +24,150 @@ var _ = Describe("push with different buildpack values", func() {
 	})
 
 	Context("when the buildpack flag is provided", func() {
-		It("sets that buildpack correctly for the pushed app", func() {
-			helpers.WithProcfileApp(func(dir string) {
-				tempfile := filepath.Join(dir, "index.html")
-				err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
-				Expect(err).ToNot(HaveOccurred())
+		Context("when only one instance of buildpack is provided", func() {
+			It("sets that buildpack correctly for the pushed app", func() {
+				helpers.WithProcfileApp(func(dir string) {
+					tempfile := filepath.Join(dir, "index.html")
+					err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+					Expect(err).ToNot(HaveOccurred())
 
-				By("pushing a ruby app with a static buildpack sets buildpack to static")
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-					PushCommandName, appName,
-					"-b", "staticfile_buildpack",
-				)
-				Eventually(session).Should(Say("Staticfile Buildpack"))
-				Eventually(session).Should(Exit(0))
+					By("pushing a ruby app with a static buildpack sets buildpack to static")
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+						PushCommandName, appName,
+						"-b", "staticfile_buildpack",
+					)
+					Eventually(session).Should(Say("Staticfile Buildpack"))
+					Eventually(session).Should(Exit(0))
 
-				session = helpers.CF("app", appName)
-				Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
-				Eventually(session).Should(Exit(0))
+					session = helpers.CF("app", appName)
+					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+					Eventually(session).Should(Exit(0))
 
-				By("pushing a ruby app with a null buildpack sets buildpack to auto-detected (ruby)")
-				session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-					PushCommandName, appName,
-					"-b", "null",
-				)
-				Eventually(session).Should(Say(`\-\s+buildpack:\s+staticfile_buildpack`))
-				Consistently(session).ShouldNot(Say(`\+\s+buildpack:`))
-				Eventually(session).Should(Say("Ruby Buildpack"))
-				Eventually(session).Should(Exit(0))
+					By("pushing a ruby app with a null buildpack sets buildpack to auto-detected (ruby)")
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+						PushCommandName, appName,
+						"-b", "null",
+					)
+					Eventually(session).Should(Say(`\-\s+buildpack:\s+staticfile_buildpack`))
+					Consistently(session).ShouldNot(Say(`\+\s+buildpack:`))
+					Eventually(session).Should(Say("Ruby Buildpack"))
+					Eventually(session).Should(Exit(0))
 
-				session = helpers.CF("app", appName)
-				Eventually(session).Should(Say(`buildpack:\s+ruby`))
-				Eventually(session).Should(Exit(0))
+					session = helpers.CF("app", appName)
+					Eventually(session).Should(Say(`buildpack:\s+ruby`))
+					Eventually(session).Should(Exit(0))
 
-				By("pushing a ruby app with a static buildpack sets buildpack to static")
-				session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-					PushCommandName, appName,
-					"-b", "staticfile_buildpack",
-				)
-				Eventually(session).Should(Say("Staticfile Buildpack"))
-				Eventually(session).Should(Exit(0))
+					By("pushing a ruby app with a static buildpack sets buildpack to static")
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+						PushCommandName, appName,
+						"-b", "staticfile_buildpack",
+					)
+					Eventually(session).Should(Say("Staticfile Buildpack"))
+					Eventually(session).Should(Exit(0))
 
-				session = helpers.CF("app", appName)
-				Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
-				Eventually(session).Should(Exit(0))
+					session = helpers.CF("app", appName)
+					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+					Eventually(session).Should(Exit(0))
 
-				By("pushing a ruby app with a default buildpack sets buildpack to auto-detected (ruby)")
-				session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-					PushCommandName, appName,
-					"-b", "default",
-				)
-				Eventually(session).Should(Say(`\-\s+buildpack:\s+staticfile_buildpack`))
-				Consistently(session).ShouldNot(Say(`\+\s+buildpack:`))
-				Eventually(session).Should(Say("Ruby Buildpack"))
-				Eventually(session).Should(Exit(0))
+					By("pushing a ruby app with a default buildpack sets buildpack to auto-detected (ruby)")
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+						PushCommandName, appName,
+						"-b", "default",
+					)
+					Eventually(session).Should(Say(`\-\s+buildpack:\s+staticfile_buildpack`))
+					Consistently(session).ShouldNot(Say(`\+\s+buildpack:`))
+					Eventually(session).Should(Say("Ruby Buildpack"))
+					Eventually(session).Should(Exit(0))
 
-				session = helpers.CF("app", appName)
-				Eventually(session).Should(Say(`buildpack:\s+ruby`))
-				Eventually(session).Should(Exit(0))
+					session = helpers.CF("app", appName)
+					Eventually(session).Should(Say(`buildpack:\s+ruby`))
+					Eventually(session).Should(Exit(0))
 
+				})
+			})
+		})
+
+		Context("when multiple instances of buildpack are provided", func() {
+			Context("when the app does NOT have existing buildpack configurations", func() {
+				It("pushes the app successfully with multiple buildpacks", func() {
+					helpers.WithProcfileApp(func(dir string) {
+						tempfile := filepath.Join(dir, "index.html")
+						err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+							PushCommandName, appName,
+							"-b", "staticfile_buildpack", "-b", "ruby_buildpack", "--no-start",
+						)
+						Eventually(session).Should(Exit(0))
+					})
+
+					session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
+
+					Eventually(session).Should(Say(`\s+"buildpacks":\s+`))
+					Eventually(session).Should(Say(`\s+"staticfile_buildpack"`))
+					Eventually(session).Should(Say(`\s+"ruby_buildpack"`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when the app has existing buildpacks", func() {
+				It("pushes the app successfully and overrides the existing buildpacks", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+							"applications": []map[string]interface{}{
+								{
+									"name": appName,
+									"buildpacks": []string{
+										"ruby_buildpack",
+										"staticfile_buildpack",
+									},
+								},
+							},
+						})
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+							PushCommandName, appName,
+							"-b", "php_buildpack", "-b", "go_buildpack", "--no-start",
+						)
+						Eventually(session).Should(Exit(0))
+					})
+
+					session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
+
+					Eventually(session).Should(Say(`\s+"buildpacks":\s+`))
+					Eventually(session).Should(Say(`php_buildpack`))
+					Eventually(session).Should(Say(`go_buildpack`))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when the app has existing `buildpack`", func() {
+				It("pushes the app successfully and overrides the existing buildpacks", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+							"applications": []map[string]interface{}{
+								{
+									"name": appName,
+									"buildpacks": []string{
+										"staticfile_buildpack",
+									},
+								},
+							},
+						})
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+							PushCommandName, appName,
+							"-b", "php_buildpack", "-b", "go_buildpack", "--no-start",
+						)
+						Eventually(session).Should(Exit(0))
+					})
+
+					session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
+
+					Eventually(session).Should(Say(`\s+"buildpacks":\s+`))
+					Eventually(session).Should(Say(`php_buildpack`))
+					Eventually(session).Should(Say(`go_buildpack`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 	})
