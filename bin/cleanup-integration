@@ -29,18 +29,25 @@ cf auth $CF_USERNAME $CF_PASSWORD
 # failure when running commands in parallel
 set +e
 
+cf create-org temp-org
+cf target -o temp-org
+
+cf domains | egrep -i ^\(sub.\)?integration- | cut -d " " -f1 | xargs_func cf delete-shared-domain -f
+
+if [[ $1 == "unbind-first" ]]; then
+  cf security-groups | grep -i "integration-sec-group" | grep -v \<all\>| grep -i staging | awk '{print $2 " " $3 " " $4}' | uniq - | xargs -n 3 -P 15 -r cf unbind-security-group --lifecycle staging
+  cf security-groups | grep -i "integration-sec-group" | grep -v \<all\>| grep -i staging | awk '{print $1 " " $2 " " $3}' | uniq - | xargs -n 3 -P 15 -r cf unbind-security-group --lifecycle staging
+  cf security-groups | grep -i "integration-sec-group" | grep -v \<all\>| grep -i running | awk '{print $2 " " $3 " " $4}' | uniq - | xargs -n 3 -P 15 -r cf unbind-security-group --lifecycle running
+  cf security-groups | grep -i "integration-sec-group" | grep -v \<all\>| grep -i running | awk '{print $1 " " $2 " " $3}' | uniq - | xargs -n 3 -P 15 -r cf unbind-security-group --lifecycle running
+fi
+cf security-groups | grep -i "integration-sec-group" | awk '{print $2}' | xargs_func cf delete-security-group -f
+
 cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 cf isolation-segments | grep -i ^integration-isolation-segment | xargs_func cf delete-isolation-segment -f
 cf service-brokers | grep -i -e ^integration-service-broker- -e CATS- | awk '{print $1}' | xargs_func cf delete-service-broker -f
 
 cf quotas | grep -i -e ^integration-quota -e CATS- | cut -d " " -f1 | xargs_func cf delete-quota -f
-
-cf create-org temp-org
-cf target -o temp-org
-cf domains | egrep -i ^\(sub.\)?integration- | cut -d " " -f1 | xargs_func cf delete-shared-domain -f
-
-cf security-groups | grep -i "^#.* integration-sec-group" | awk '{print $2}' | xargs_func cf delete-security-group -f
 
 cf delete-org -f temp-org
 
