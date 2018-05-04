@@ -27,6 +27,8 @@ Latest help of each command is [here](https://cli.cloudfoundry.org) (or run `cf 
 Further documentation is at the [docs page for the
 CLI](https://docs.cloudfoundry.org/cf-cli).
 
+**Note**: CF CLI supports as far back as CF Release v251 (CAPI Release: 1.15.0 (APIs 2.69.0 and 3.4.0). See our [wiki](https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version) for more information. If you are on an older version of CF Release, we recommend you upgrade to a supported version. 
+
 If you have any questions, ask away on the #cli channel in [our Slack
 community](https://slack.cloudfoundry.org/) and the
 [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/)
