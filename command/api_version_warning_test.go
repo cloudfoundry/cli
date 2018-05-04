@@ -78,7 +78,7 @@ var _ = Describe("WarnAPIVersionCheck", func() {
 			fakeConfig.BinaryVersionReturns(binaryVersion)
 		})
 
-		It("does not return an error", func() {
+		It("parses the versions successfully and recommends to update the CLI version", func() {
 			err := WarnAPIVersionCheck(fakeConfig, testUI)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testUI.Err).To(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))

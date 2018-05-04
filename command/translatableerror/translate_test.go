@@ -69,6 +69,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("ManifestCreationError", ManifestCreationError{}),
 		Entry("ManifestFileNotFoundInDirectoryError", ManifestFileNotFoundInDirectoryError{}),
 		Entry("MinimumAPIVersionNotMetError", MinimumAPIVersionNotMetError{}),
+		Entry("MinimumCLIVersionNotMetError", MinimumCLIVersionNotMetError{}),
 		Entry("NetworkPolicyProtocolOrPortNotProvidedError", NetworkPolicyProtocolOrPortNotProvidedError{}),
 		Entry("NoAPISetError", NoAPISetError{}),
 		Entry("NoCompatibleBinaryError", NoCompatibleBinaryError{}),
