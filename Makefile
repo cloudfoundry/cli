@@ -76,6 +76,9 @@ integration-tests-full : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
 	make integration-cleanup
 
+lint:
+	go run bin/style/main.go api/cloudcontroller/ccv2 # this list will grow as we cleanup all the code
+
 out/cf-cli_linux_i686: $(GOSRC)
 	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
 							$(REQUIRED_FOR_STATIC_BINARY) \
@@ -126,6 +129,6 @@ vet :
 	@echo  "Vetting packages for potential issues..."
 	go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
 
-.PHONY : all build clean i18n i18n-extract-strings format version vet
+.PHONY : all build clean format version vet lint
 .PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
 .PHONY : check-target-env fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
