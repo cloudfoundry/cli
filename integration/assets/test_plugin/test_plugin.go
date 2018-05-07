@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
-	"time"
 
 	"code.cloudfoundry.org/cli/plugin"
 )
@@ -15,13 +13,6 @@ type Test1 struct {
 
 func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 	switch args[0] {
-	case "Sleep":
-		sleepDurationInMs, err := strconv.ParseInt(args[1], 10, 64)
-		if err != nil {
-			panic(err)
-		}
-		time.Sleep(time.Duration(sleepDurationInMs) * time.Millisecond)
-		fmt.Println("Slept for", sleepDurationInMs, "ms")
 	case "CliCommandWithoutTerminalOutput":
 		result, _ := cliConnection.CliCommandWithoutTerminalOutput("target")
 		fmt.Println("Done CliCommandWithoutTerminalOutput:", result)
@@ -128,7 +119,6 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			Build: 0,
 		},
 		Commands: []plugin.Command{
-			{Name: "Sleep"},
 			{Name: "CliCommandWithoutTerminalOutput"},
 			{Name: "CliCommand"},
 			{Name: "GetCurrentSpace"},

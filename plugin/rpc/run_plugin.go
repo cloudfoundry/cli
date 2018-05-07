@@ -3,8 +3,6 @@ package rpc
 import (
 	"os"
 	"os/exec"
-	"os/signal"
-	"syscall"
 
 	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
 )
@@ -19,14 +17,6 @@ func RunMethodIfExists(rpcService *CliRpcService, args []string, pluginList map[
 				defer rpcService.Stop()
 
 				pluginArgs := append([]string{rpcService.Port()}, args...)
-
-				go func() {
-					sig := make(chan os.Signal, 3)
-					signal.Notify(sig, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM)
-					for {
-						<-sig
-					}
-				}()
 
 				cmd := exec.Command(metadata.Location, pluginArgs...)
 				cmd.Stdout = os.Stdout
