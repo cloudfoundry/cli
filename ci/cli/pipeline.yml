@@ -12,9 +12,11 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
-    ignore_paths:
+    ignore_paths: &ciPaths
+    - bin
     - ci
     - integration
+    - Makefile
 
 - name: cli-i18n
   type: git
@@ -27,9 +29,7 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
-    paths:
-    - bin
-    - ci
+    paths: *ciPaths
 
 - name: cli-integration
   type: git
