@@ -1,6 +1,8 @@
 package ccv2
 
 import (
+	"net/url"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -50,16 +52,37 @@ func (space *Space) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-//go:generate go run $GOPATH/src/code.cloudfoundry.org/cli/util/codegen/generate.go Space codetemplates/delete_async_by_guid.go.template delete_space.go
-//go:generate go run $GOPATH/src/code.cloudfoundry.org/cli/util/codegen/generate.go Space codetemplates/delete_async_by_guid_test.go.template delete_space_test.go
-
-// GetSpaces returns a list of Spaces based off of the provided filters.
-func (client *Client) GetSpaces(filters ...Filter) ([]Space, Warnings, error) {
-	params := ConvertFilterParameters(filters)
-	params.Add("order-by", "name")
+// DeleteSpace deletes the Space associated with the provided
+// GUID. It will return the Cloud Controller job that is assigned to the
+// Space deletion.
+func (client *Client) DeleteSpace(guid string) (Job, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetSpacesRequest,
-		Query:       params,
+		RequestName: internal.DeleteSpaceRequest,
+		URIParams:   Params{"space_guid": guid},
+		Query: url.Values{
+			"recursive": {"true"},
+			"async":     {"true"},
+		},
+	})
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	var job Job
+	response := cloudcontroller.Response{
+		Result: &job,
+	}
+
+	err = client.connection.Make(request, &response)
+	return job, response.Warnings, err
+}
+
+// GetSecurityGroupSpaces returns a list of Spaces based on the provided
+// SecurityGroup GUID.
+func (client *Client) GetSecurityGroupSpaces(securityGroupGUID string) ([]Space, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetSecurityGroupSpacesRequest,
+		URIParams:   map[string]string{"security_group_guid": securityGroupGUID},
 	})
 	if err != nil {
 		return nil, nil, err
@@ -108,12 +131,13 @@ func (client *Client) GetSecurityGroupStagingSpaces(securityGroupGUID string) ([
 	return fullSpacesList, warnings, err
 }
 
-// GetSecurityGroupSpaces returns a list of Spaces based on the provided
-// SecurityGroup GUID.
-func (client *Client) GetSecurityGroupSpaces(securityGroupGUID string) ([]Space, Warnings, error) {
+// GetSpaces returns a list of Spaces based off of the provided filters.
+func (client *Client) GetSpaces(filters ...Filter) ([]Space, Warnings, error) {
+	params := ConvertFilterParameters(filters)
+	params.Add("order-by", "name")
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetSecurityGroupSpacesRequest,
-		URIParams:   map[string]string{"security_group_guid": securityGroupGUID},
+		RequestName: internal.GetSpacesRequest,
+		Query:       params,
 	})
 	if err != nil {
 		return nil, nil, err
