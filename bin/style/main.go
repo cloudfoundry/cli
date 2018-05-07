@@ -110,20 +110,22 @@ func (v *visitor) addWarning(pos token.Pos, format string, vars ...interface{}) 
 }
 
 func (v *visitor) checkConst(node *ast.GenDecl) {
-	constName := node.Specs[0].(*ast.ValueSpec).Names[0].Name
+	currentConstantNode := node.Specs[0].(*ast.ValueSpec)
+	constName := currentConstantNode.Names[0].Name
+	constType := fmt.Sprint(currentConstantNode.Type)
 
 	if v.lastFuncDecl != "" {
-		v.addWarning(node.Pos(), "constant %s defined after a function declaration", constName)
+		v.addWarning(node.Pos(), "File Positioning: constant %s defined after a function declarations", constName)
 	}
-	if len(v.typeSpecs) != 0 {
-		v.addWarning(node.Pos(), "constant %s defined after a type declaration", constName)
+	if len(v.typeSpecs) != 0 && !isIn(constType, v.typeSpecs) {
+		v.addWarning(node.Pos(), "File Positioning: constant %s defined after a type declarations", constName)
 	}
 	if v.lastVarSpec != "" {
-		v.addWarning(node.Pos(), "constant %s defined after a variable declaration", constName)
+		v.addWarning(node.Pos(), "File Positioning: constant %s defined after a variable declarations", constName)
 	}
 
 	if strings.Compare(constName, v.lastConstSpec) == -1 {
-		v.addWarning(node.Pos(), "constant %s defined after constant %s", constName, v.lastConstSpec)
+		v.addWarning(node.Pos(), "Alphabetical Ordering: constant %s defined after constant %s", constName, v.lastConstSpec)
 	}
 
 	v.lastConstSpec = constName
@@ -139,7 +141,7 @@ func (v *visitor) checkFunc(node *ast.FuncDecl) {
 		}
 
 		if strings.Compare(funcName, v.lastFuncDecl) == -1 {
-			v.addWarning(node.Pos(), "function %s defined after function %s", funcName, v.lastFuncDecl)
+			v.addWarning(node.Pos(), "Alphabetical Ordering: function %s defined after function %s", funcName, v.lastFuncDecl)
 		}
 
 		v.lastFuncDecl = funcName
@@ -296,6 +298,15 @@ func main() {
 	if len(allWarnings) > 0 {
 		os.Exit(1)
 	}
+}
+
+func isIn(s string, ary []string) bool {
+	for _, item := range ary {
+		if s == item {
+			return true
+		}
+	}
+	return false
 }
 
 func shouldParseFile(info os.FileInfo) bool {
