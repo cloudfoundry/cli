@@ -41,7 +41,7 @@ func (cmd *AuthCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd AuthCommand) Execute(args []string) error {
-	err := command.WarnAPIVersionCheck(cmd.Config, cmd.UI)
+	err := command.WarnCLIVersionCheck(cmd.Config, cmd.UI)
 	if err != nil {
 		return err
 	}

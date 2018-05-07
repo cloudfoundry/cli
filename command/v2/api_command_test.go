@@ -53,7 +53,7 @@ var _ = Describe("api Command", func() {
 		Context("when the API is set, the user is logged in and an org and space are targeted", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetReturns("some-api-target")
-				fakeConfig.APIVersionReturns("some-version")
+				fakeConfig.APIVersionReturns("100.200.300")
 				fakeConfig.CurrentUserReturns(configv3.User{
 					Name: "admin",
 				}, nil)
@@ -68,7 +68,7 @@ var _ = Describe("api Command", func() {
 			It("outputs target information", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(testUI.Out).To(Say("api endpoint:\\s+some-api-target"))
-				Expect(testUI.Out).To(Say("api version:\\s+some-version"))
+				Expect(testUI.Out).To(Say("api version:\\s+100.200.300"))
 			})
 		})
 
@@ -98,7 +98,7 @@ var _ = Describe("api Command", func() {
 					cmd.OptionalArgs.URL = CCAPI
 
 					fakeConfig.TargetReturns("some-api-target")
-					fakeConfig.APIVersionReturns("some-version")
+					fakeConfig.APIVersionReturns("100.200.300")
 				})
 
 				Context("when the url has verified SSL", func() {
@@ -114,7 +114,7 @@ var _ = Describe("api Command", func() {
 						Expect(testUI.Out).To(Say(`OK
 
 api endpoint:   some-api-target
-api version:    some-version`,
+api version:    100.200.300`,
 						))
 					})
 				})
@@ -137,7 +137,7 @@ api version:    some-version`,
 							Expect(testUI.Out).To(Say(`OK
 
 api endpoint:   some-api-target
-api version:    some-version`,
+api version:    100.200.300`,
 							))
 						})
 					})
@@ -202,6 +202,20 @@ api version:    some-version`,
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(testUI.Out).ToNot(Say("Not logged in. Use 'faceman login' to log in."))
+			})
+		})
+
+		Context("when the API has an older version", func() {
+			BeforeEach(func() {
+				cmd.OptionalArgs.URL = "https://api.foo.com"
+				fakeConfig.TargetReturns("something")
+				fakeConfig.APIVersionReturns("1.2.3")
+			})
+
+			It("outputs a warning", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(testUI.Err).To(Say("Your API version is no longer supported. Upgrade to a newer version of the API"))
 			})
 		})
 

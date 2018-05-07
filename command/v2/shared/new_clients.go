@@ -55,6 +55,10 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv2.Clie
 		return nil, nil, err
 	}
 
+	if err = command.WarnAPIVersionCheck(ccClient.APIVersion(), ui); err != nil {
+		return nil, nil, err
+	}
+
 	if ccClient.AuthorizationEndpoint() == "" {
 		return nil, nil, translatableerror.AuthorizationEndpointNotFoundError{}
 	}

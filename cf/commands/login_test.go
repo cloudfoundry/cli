@@ -35,6 +35,7 @@ var _ = Describe("Login Command", func() {
 
 		minCLIVersion            string
 		minRecommendedCLIVersion string
+		apiVersion               string
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -73,6 +74,7 @@ var _ = Describe("Login Command", func() {
 		endpointRepo = new(coreconfigfakes.FakeEndpointRepository)
 		minCLIVersion = "1.0.0"
 		minRecommendedCLIVersion = "1.0.0"
+		apiVersion = "100.200.300"
 
 		org = models.Organization{}
 		org.Name = "my-new-org"
@@ -104,7 +106,7 @@ var _ = Describe("Login Command", func() {
 		JustBeforeEach(func() {
 			endpointRepo.GetCCInfoStub = func(endpoint string) (*coreconfig.CCInfo, string, error) {
 				return &coreconfig.CCInfo{
-					APIVersion:               "some-version",
+					APIVersion:               apiVersion,
 					AuthorizationEndpoint:    "auth/endpoint",
 					DopplerEndpoint:          "doppler/endpoint",
 					MinCLIVersion:            minCLIVersion,
@@ -169,7 +171,7 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 				Expect(Config.APIEndpoint()).To(Equal("api.example.com"))
-				Expect(Config.APIVersion()).To(Equal("some-version"))
+				Expect(Config.APIVersion()).To(Equal("100.200.300"))
 				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))
 				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
 				Expect(Config.MinCLIVersion()).To(Equal("1.0.0"))
@@ -552,7 +554,7 @@ var _ = Describe("Login Command", func() {
 			Config.SetRefreshToken("the-old-refresh-token")
 			endpointRepo.GetCCInfoStub = func(endpoint string) (*coreconfig.CCInfo, string, error) {
 				return &coreconfig.CCInfo{
-					APIVersion:               "some-version",
+					APIVersion:               apiVersion,
 					AuthorizationEndpoint:    "auth/endpoint",
 					DopplerEndpoint:          "doppler/endpoint",
 					MinCLIVersion:            minCLIVersion,
@@ -689,6 +691,16 @@ var _ = Describe("Login Command", func() {
 				})
 
 				ItDoesntShowTheTarget()
+			})
+
+			Describe("when the api version is older than the minimum version", func() {
+				BeforeEach(func() {
+					apiVersion = "2.68.0"
+				})
+
+				It("prints a warning", func() {
+					Expect(ui.WarnOutputs[0]).To(ContainSubstring("Your API version is no longer supported. Upgrade to a newer version of the API."))
+				})
 			})
 		})
 
@@ -833,7 +845,7 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.OrganizationFields().GUID).To(Equal("new-org-guid"))
 				Expect(Config.SpaceFields().GUID).To(Equal("new-space-guid"))
 
-				Expect(Config.APIVersion()).To(Equal("some-version"))
+				Expect(Config.APIVersion()).To(Equal("100.200.300"))
 				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))
 				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
 				Expect(Config.MinCLIVersion()).To(Equal("1.0.0"))
