@@ -76,15 +76,17 @@ integration-tests-full : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
 	make integration-cleanup
 
-lint:
-	go run bin/style/main.go api/cloudcontroller/ccv2 # this list will grow as we cleanup all the code
+lint :
+	@echo "linting files:" # this list will grow as we cleanup all the code
+	go run bin/style/main.go api/cloudcontroller/ccv2
+	@echo
 
-out/cf-cli_linux_i686: $(GOSRC)
+out/cf-cli_linux_i686 : $(GOSRC)
 	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
 							$(REQUIRED_FOR_STATIC_BINARY) \
 							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_i686 .
 
-out/cf-cli_linux_x86-64: $(GOSRC)
+out/cf-cli_linux_x86-64 : $(GOSRC)
 	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build \
 							$(REQUIRED_FOR_STATIC_BINARY) \
 							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_x86-64 .
@@ -102,7 +104,7 @@ out/cf-cli_winx64.exe : $(GOSRC) rsrc.syso
 	GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe -ldflags "$(LD_FLAGS)" .
 	rm rsrc.syso
 
-rsrc.syso:
+rsrc.syso :
 	@# Software for windows icon
 	go get github.com/akavel/rsrc
 	@# Generates icon file
@@ -110,12 +112,12 @@ rsrc.syso:
 
 test : units
 
-units : format vet build
+units : format vet lint build
 	ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites \
 		api actor command types util version
 	@echo "\nSWEET SUITE SUCCESS"
 
-units-full : format vet build
+units-full : format vet lint build
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
 	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites -skipPackage integration,cf/ssh
@@ -128,6 +130,7 @@ version :
 vet :
 	@echo  "Vetting packages for potential issues..."
 	go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
+	@echo
 
 .PHONY : all build clean format version vet lint
 .PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
