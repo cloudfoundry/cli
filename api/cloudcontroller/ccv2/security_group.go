@@ -6,21 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
-// SecurityGroupRule represents a Cloud Controller Security Group Role.
-type SecurityGroupRule struct {
-	// Description is a short message discribing the rule.
-	Description string
-
-	// Destination is the destination CIDR or range of IPs.
-	Destination string
-
-	// Ports is the port or port range.
-	Ports string
-
-	// Protocol can be tcp, icmp, udp, all.
-	Protocol string
-}
-
 // SecurityGroup represents a Cloud Controller Security Group.
 type SecurityGroup struct {
 	// GUID is the unique Security Group identifier.
@@ -73,12 +58,12 @@ func (securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// UpdateSecurityGroupSpace associates a security group in the running phase
+// DeleteSecurityGroupSpace disassociates a security group in the running phase
 // for the lifecycle, specified by its GUID, from a space, which is also
 // specified by its GUID.
-func (client *Client) UpdateSecurityGroupSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+func (client *Client) DeleteSecurityGroupSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutSecurityGroupSpaceRequest,
+		RequestName: internal.DeleteSecurityGroupSpaceRequest,
 		URIParams: Params{
 			"security_group_guid": securityGroupGUID,
 			"space_guid":          spaceGUID,
@@ -95,12 +80,12 @@ func (client *Client) UpdateSecurityGroupSpace(securityGroupGUID string, spaceGU
 	return response.Warnings, err
 }
 
-// UpdateSecurityGroupStagingSpace associates a security group in the staging
-// phase for the lifecycle, specified by its GUID, from a space, which is also
-// specified by its GUID.
-func (client *Client) UpdateSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+// DeleteSecurityGroupStagingSpace disassociates a security group in the
+// staging phase fo the lifecycle, specified by its GUID, from a space, which
+// is also specified by its GUID.
+func (client *Client) DeleteSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutSecurityGroupStagingSpaceRequest,
+		RequestName: internal.DeleteSecurityGroupStagingSpaceRequest,
 		URIParams: Params{
 			"security_group_guid": securityGroupGUID,
 			"space_guid":          spaceGUID,
@@ -157,6 +142,50 @@ func (client *Client) GetSpaceStagingSecurityGroups(spaceGUID string, filters ..
 	return client.getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID, internal.GetSpaceStagingSecurityGroupsRequest, filters)
 }
 
+// UpdateSecurityGroupSpace associates a security group in the running phase
+// for the lifecycle, specified by its GUID, from a space, which is also
+// specified by its GUID.
+func (client *Client) UpdateSecurityGroupSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutSecurityGroupSpaceRequest,
+		URIParams: Params{
+			"security_group_guid": securityGroupGUID,
+			"space_guid":          spaceGUID,
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}
+
+// UpdateSecurityGroupStagingSpace associates a security group in the staging
+// phase for the lifecycle, specified by its GUID, from a space, which is also
+// specified by its GUID.
+func (client *Client) UpdateSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutSecurityGroupStagingSpaceRequest,
+		URIParams: Params{
+			"security_group_guid": securityGroupGUID,
+			"space_guid":          spaceGUID,
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}
+
 func (client *Client) getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID string, lifecycle string, filters []Filter) ([]SecurityGroup, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: lifecycle,
@@ -181,48 +210,4 @@ func (client *Client) getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID string
 	})
 
 	return securityGroupsList, warnings, err
-}
-
-// DeleteSecurityGroupSpace disassociates a security group in the running phase
-// for the lifecycle, specified by its GUID, from a space, which is also
-// specified by its GUID.
-func (client *Client) DeleteSecurityGroupSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteSecurityGroupSpaceRequest,
-		URIParams: Params{
-			"security_group_guid": securityGroupGUID,
-			"space_guid":          spaceGUID,
-		},
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	response := cloudcontroller.Response{}
-
-	err = client.connection.Make(request, &response)
-	return response.Warnings, err
-}
-
-// DeleteSecurityGroupStagingSpace disassociates a security group in the
-// staging phase fo the lifecycle, specified by its GUID, from a space, which
-// is also specified by its GUID.
-func (client *Client) DeleteSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteSecurityGroupStagingSpaceRequest,
-		URIParams: Params{
-			"security_group_guid": securityGroupGUID,
-			"space_guid":          spaceGUID,
-		},
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	response := cloudcontroller.Response{}
-
-	err = client.connection.Make(request, &response)
-	return response.Warnings, err
 }

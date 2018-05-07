@@ -42,25 +42,9 @@ type ServiceInstance struct {
 	LastOperation LastOperation
 }
 
-type LastOperation struct {
-	// Type is the type of operation that was last performed or currently being
-	// performed on the service instance.
-	Type string
-
-	// State is the status of the last operation or current operation being
-	// performed on the service instance.
-	State string
-
-	// Description is the service broker-provided description of the operation.
-	Description string
-
-	// UpdatedAt is the timestamp that the Cloud Controller last checked the
-	// service instance state from the broker.
-	UpdatedAt string
-
-	// CreatedAt is the timestamp that the Cloud Controller created the service
-	// instance from the broker.
-	CreatedAt string
+// Managed returns true if the Service Instance is a managed service.
+func (serviceInstance ServiceInstance) Managed() bool {
+	return serviceInstance.Type == constant.ServiceInstanceTypeManagedService
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service Instance response.
@@ -105,11 +89,6 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 // service.
 func (serviceInstance ServiceInstance) UserProvided() bool {
 	return serviceInstance.Type == constant.ServiceInstanceTypeUserProvidedService
-}
-
-// Managed returns true if the Service Instance is a managed service.
-func (serviceInstance ServiceInstance) Managed() bool {
-	return serviceInstance.Type == constant.ServiceInstanceTypeManagedService
 }
 
 // GetServiceInstance returns the service instance with the given GUID. This

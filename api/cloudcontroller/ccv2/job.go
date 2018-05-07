@@ -40,6 +40,16 @@ type Job struct {
 	Status constant.JobStatus
 }
 
+// Failed returns true when the job has completed with an error/failure.
+func (job Job) Failed() bool {
+	return job.Status == constant.JobStatusFailed
+}
+
+// Finished returns true when the job has completed successfully.
+func (job Job) Finished() bool {
+	return job.Status == constant.JobStatusFinished
+}
+
 // UnmarshalJSON helps unmarshal a Cloud Controller Job response.
 func (job *Job) UnmarshalJSON(data []byte) error {
 	var ccJob struct {
@@ -63,16 +73,6 @@ func (job *Job) UnmarshalJSON(data []byte) error {
 	job.GUID = ccJob.Entity.GUID
 	job.Status = constant.JobStatus(ccJob.Entity.Status)
 	return nil
-}
-
-// Finished returns true when the job has completed successfully.
-func (job Job) Finished() bool {
-	return job.Status == constant.JobStatusFinished
-}
-
-// Failed returns true when the job has completed with an error/failure.
-func (job Job) Failed() bool {
-	return job.Status == constant.JobStatusFailed
 }
 
 // DeleteOrganizationJob deletes the Organization associated with the provided
@@ -229,6 +229,47 @@ func (client *Client) UploadDroplet(appGUID string, droplet io.Reader, dropletLe
 	return client.uploadAsynchronously(request, writeErrors)
 }
 
+func (*Client) calculateAppBitsRequestSize(existingResources []Resource, newResourcesLength int64) (int64, error) {
+	body := &bytes.Buffer{}
+	form := multipart.NewWriter(body)
+
+	jsonResources, err := json.Marshal(existingResources)
+	if err != nil {
+		return 0, err
+	}
+	err = form.WriteField("resources", string(jsonResources))
+	if err != nil {
+		return 0, err
+	}
+	_, err = form.CreateFormFile("application", "application.zip")
+	if err != nil {
+		return 0, err
+	}
+	err = form.Close()
+	if err != nil {
+		return 0, err
+	}
+
+	return int64(body.Len()) + newResourcesLength, nil
+}
+
+func (*Client) calculateDropletRequestSize(dropletSize int64) (int64, error) {
+	body := &bytes.Buffer{}
+	form := multipart.NewWriter(body)
+
+	_, err := form.CreateFormFile("droplet", "droplet.tgz")
+	if err != nil {
+		return 0, err
+	}
+
+	err = form.Close()
+	if err != nil {
+		return 0, err
+	}
+
+	return int64(body.Len()) + dropletSize, nil
+}
+
 func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
 	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
 	form := multipart.NewWriter(writerInput)
@@ -305,88 +346,6 @@ func (*Client) createMultipartBodyAndHeaderForDroplet(droplet io.Reader) (string
 	return form.FormDataContentType(), writerOutput, writeErrors
 }
 
-func (*Client) calculateAppBitsRequestSize(existingResources []Resource, newResourcesLength int64) (int64, error) {
-	body := &bytes.Buffer{}
-	form := multipart.NewWriter(body)
-
-	jsonResources, err := json.Marshal(existingResources)
-	if err != nil {
-		return 0, err
-	}
-	err = form.WriteField("resources", string(jsonResources))
-	if err != nil {
-		return 0, err
-	}
-	_, err = form.CreateFormFile("application", "application.zip")
-	if err != nil {
-		return 0, err
-	}
-	err = form.Close()
-	if err != nil {
-		return 0, err
-	}
-
-	return int64(body.Len()) + newResourcesLength, nil
-}
-
-func (*Client) calculateDropletRequestSize(dropletSize int64) (int64, error) {
-	body := &bytes.Buffer{}
-	form := multipart.NewWriter(body)
-
-	_, err := form.CreateFormFile("droplet", "droplet.tgz")
-	if err != nil {
-		return 0, err
-	}
-
-	err = form.Close()
-	if err != nil {
-		return 0, err
-	}
-
-	return int64(body.Len()) + dropletSize, nil
-}
-
-func (client *Client) uploadExistingResourcesOnly(appGUID string, existingResources []Resource) (Job, Warnings, error) {
-	jsonResources, err := json.Marshal(existingResources)
-	if err != nil {
-		return Job{}, nil, err
-	}
-
-	body := bytes.NewBuffer(nil)
-	form := multipart.NewWriter(body)
-	err = form.WriteField("resources", string(jsonResources))
-	if err != nil {
-		return Job{}, nil, err
-	}
-
-	err = form.Close()
-	if err != nil {
-		return Job{}, nil, err
-	}
-
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutAppBitsRequest,
-		URIParams:   Params{"app_guid": appGUID},
-		Query: url.Values{
-			"async": {"true"},
-		},
-		Body: bytes.NewReader(body.Bytes()),
-	})
-	if err != nil {
-		return Job{}, nil, err
-	}
-
-	request.Header.Set("Content-Type", form.FormDataContentType())
-
-	var job Job
-	response := cloudcontroller.Response{
-		Result: &job,
-	}
-
-	err = client.connection.Make(request, &response)
-	return job, response.Warnings, err
-}
-
 func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Job, Warnings, error) {
 	var job Job
 	response := cloudcontroller.Response{
@@ -438,6 +397,47 @@ func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, wri
 	}
 
 	return job, response.Warnings, firstError
+}
+
+func (client *Client) uploadExistingResourcesOnly(appGUID string, existingResources []Resource) (Job, Warnings, error) {
+	jsonResources, err := json.Marshal(existingResources)
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	body := bytes.NewBuffer(nil)
+	form := multipart.NewWriter(body)
+	err = form.WriteField("resources", string(jsonResources))
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	err = form.Close()
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutAppBitsRequest,
+		URIParams:   Params{"app_guid": appGUID},
+		Query: url.Values{
+			"async": {"true"},
+		},
+		Body: bytes.NewReader(body.Bytes()),
+	})
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	request.Header.Set("Content-Type", form.FormDataContentType())
+
+	var job Job
+	response := cloudcontroller.Response{
+		Result: &job,
+	}
+
+	err = client.connection.Make(request, &response)
+	return job, response.Warnings, err
 }
 
 func (client *Client) uploadNewAndExistingResources(appGUID string, existingResources []Resource, newResources Reader, newResourcesLength int64) (Job, Warnings, error) {

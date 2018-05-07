@@ -122,6 +122,44 @@ var _ = Describe("Service Binding", func() {
 		})
 	})
 
+	Describe("DeleteServiceBinding", func() {
+		Context("when the service binding exist", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(CombineHandlers(VerifyRequest(http.MethodDelete, "/v2/service_bindings/some-service-binding-guid"), RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}})))
+			})
+
+			It("deletes the service binding", func() {
+				warnings, err := client.DeleteServiceBinding("some-service-binding-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+
+		Context("when the service binding does not exist", func() {
+			BeforeEach(func() {
+				response := `{
+				"code": 90004,
+				"description": "The service binding could not be found: some-service-binding-guid",
+				"error_code": "CF-ServiceBindingNotFound"
+			}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v2/service_bindings/some-service-binding-guid"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns a not found error", func() {
+				warnings, err := client.DeleteServiceBinding("some-service-binding-guid")
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
+					Message: "The service binding could not be found: some-service-binding-guid",
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+	})
+
 	Describe("GetServiceBinding", func() {
 		var (
 			serviceBinding ServiceBinding
@@ -271,44 +309,6 @@ var _ = Describe("Service Binding", func() {
 					{GUID: "service-binding-guid-4", AppGUID: "app-guid-4", ServiceInstanceGUID: "service-instance-guid-4"},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
-			})
-		})
-	})
-
-	Describe("DeleteServiceBinding", func() {
-		Context("when the service binding exist", func() {
-			BeforeEach(func() {
-				server.AppendHandlers(CombineHandlers(VerifyRequest(http.MethodDelete, "/v2/service_bindings/some-service-binding-guid"), RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}})))
-			})
-
-			It("deletes the service binding", func() {
-				warnings, err := client.DeleteServiceBinding("some-service-binding-guid")
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-			})
-		})
-
-		Context("when the service binding does not exist", func() {
-			BeforeEach(func() {
-				response := `{
-				"code": 90004,
-				"description": "The service binding could not be found: some-service-binding-guid",
-				"error_code": "CF-ServiceBindingNotFound"
-			}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v2/service_bindings/some-service-binding-guid"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns a not found error", func() {
-				warnings, err := client.DeleteServiceBinding("some-service-binding-guid")
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
-					Message: "The service binding could not be found: some-service-binding-guid",
-				}))
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
 		})
 	})

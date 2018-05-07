@@ -14,16 +14,6 @@ type errorWrapper struct {
 	connection cloudcontroller.Connection
 }
 
-func newErrorWrapper() *errorWrapper {
-	return new(errorWrapper)
-}
-
-// Wrap wraps a Cloud Controller connection in this error handling wrapper.
-func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
-	e.connection = innerconnection
-	return e
-}
-
 // Make converts RawHTTPStatusError, which represents responses with 4xx and
 // 5xx status codes, to specific errors.
 func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
@@ -37,6 +27,12 @@ func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cl
 		return convert400(rawHTTPStatusErr)
 	}
 	return err
+}
+
+// Wrap wraps a Cloud Controller connection in this error handling wrapper.
+func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
+	e.connection = innerconnection
+	return e
 }
 
 func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
@@ -102,4 +98,8 @@ func handleUnauthorized(errorResponse ccerror.V2ErrorResponse) error {
 	}
 
 	return ccerror.UnauthorizedError{Message: errorResponse.Description}
+}
+
+func newErrorWrapper() *errorWrapper {
+	return new(errorWrapper)
 }

@@ -63,23 +63,6 @@ func (client *Client) DopplerEndpoint() string {
 	return client.dopplerEndpoint
 }
 
-// MinCLIVersion returns the minimum CLI version required for the targeted
-// Cloud Controller
-func (client *Client) MinCLIVersion() string {
-	return client.minCLIVersion
-}
-
-// RoutingEndpoint returns the Routing endpoint for the targeted Cloud
-// Controller.
-func (client *Client) RoutingEndpoint() string {
-	return client.routingEndpoint
-}
-
-// TokenEndpoint returns the Token endpoint for the targeted Cloud Controller.
-func (client *Client) TokenEndpoint() string {
-	return client.tokenEndpoint
-}
-
 // Info returns back endpoint and API information from /v2/info.
 func (client *Client) Info() (APIInformation, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -99,4 +82,21 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 		return APIInformation{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
 	}
 	return info, response.Warnings, err
+}
+
+// MinCLIVersion returns the minimum CLI version required for the targeted
+// Cloud Controller
+func (client *Client) MinCLIVersion() string {
+	return client.minCLIVersion
+}
+
+// RoutingEndpoint returns the Routing endpoint for the targeted Cloud
+// Controller.
+func (client *Client) RoutingEndpoint() string {
+	return client.routingEndpoint
+}
+
+// TokenEndpoint returns the Token endpoint for the targeted Cloud Controller.
+func (client *Client) TokenEndpoint() string {
+	return client.tokenEndpoint
 }

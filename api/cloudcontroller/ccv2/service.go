@@ -22,13 +22,6 @@ type Service struct {
 	Extra ServiceExtra
 }
 
-// ServiceExtra contains extra service related properties.
-type ServiceExtra struct {
-	// Shareable is true if the service is shareable across organizations and
-	// spaces.
-	Shareable bool
-}
-
 // UnmarshalJSON helps unmarshal a Cloud Controller Service response.
 func (service *Service) UnmarshalJSON(data []byte) error {
 	var ccService struct {

@@ -86,6 +86,21 @@ func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID s
 	return serviceBinding, response.Warnings, nil
 }
 
+// DeleteServiceBinding will destroy the requested Service Binding.
+func (client *Client) DeleteServiceBinding(serviceBindingGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteServiceBindingRequest,
+		URIParams:   map[string]string{"service_binding_guid": serviceBindingGUID},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var response cloudcontroller.Response
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}
+
 // GetServiceBinding returns back a service binding with the proviced guid
 func (client *Client) GetServiceBinding(guid string) (ServiceBinding, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -130,21 +145,6 @@ func (client *Client) GetServiceBindings(filters ...Filter) ([]ServiceBinding, W
 	})
 
 	return fullBindingsList, warnings, err
-}
-
-// DeleteServiceBinding will destroy the requested Service Binding.
-func (client *Client) DeleteServiceBinding(serviceBindingGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteServiceBindingRequest,
-		URIParams:   map[string]string{"service_binding_guid": serviceBindingGUID},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var response cloudcontroller.Response
-	err = client.connection.Make(request, &response)
-	return response.Warnings, err
 }
 
 // GetServiceInstanceServiceBindings returns back a list of Service Bindings for the provided service instance GUID.

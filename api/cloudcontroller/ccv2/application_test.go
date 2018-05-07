@@ -301,6 +301,227 @@ var _ = Describe("Application", func() {
 		})
 	})
 
+	Describe("GetRouteApplications", func() {
+		Context("when the route guid is not found", func() {
+			BeforeEach(func() {
+				response := `
+{
+  "code": 210002,
+  "description": "The route could not be found: some-route-guid",
+  "error_code": "CF-RouteNotFound"
+}
+			`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps"),
+						RespondWith(http.StatusNotFound, response),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				_, _, err := client.GetRouteApplications("some-route-guid")
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
+					Message: "The route could not be found: some-route-guid",
+				}))
+			})
+		})
+
+		Context("when there are applications associated with this route", func() {
+			BeforeEach(func() {
+				response1 := `{
+				"next_url": "/v2/routes/some-route-guid/apps?q=space_guid:some-space-guid&page=2",
+				"resources": [
+					{
+						"metadata": {
+							"guid": "app-guid-1",
+							"updated_at": null
+						},
+						"entity": {
+							"name": "app-name-1"
+						}
+					},
+					{
+						"metadata": {
+							"guid": "app-guid-2",
+							"updated_at": null
+						},
+						"entity": {
+							"name": "app-name-2"
+						}
+					}
+				]
+			}`
+				response2 := `{
+				"next_url": null,
+				"resources": [
+					{
+						"metadata": {
+							"guid": "app-guid-3",
+							"updated_at": null
+						},
+						"entity": {
+							"name": "app-name-3"
+						}
+					},
+					{
+						"metadata": {
+							"guid": "app-guid-4",
+							"updated_at": null
+						},
+						"entity": {
+							"name": "app-name-4"
+						}
+					}
+				]
+			}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps", "q=space_guid:some-space-guid"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps", "q=space_guid:some-space-guid&page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns all the applications and all warnings", func() {
+				apps, warnings, err := client.GetRouteApplications("some-route-guid", Filter{
+					Type:     constant.SpaceGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-space-guid"},
+				})
+				Expect(err).NotTo(HaveOccurred())
+				Expect(apps).To(ConsistOf([]Application{
+					{Name: "app-name-1", GUID: "app-guid-1"},
+					{Name: "app-name-2", GUID: "app-guid-2"},
+					{Name: "app-name-3", GUID: "app-guid-3"},
+					{Name: "app-name-4", GUID: "app-guid-4"},
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
+			})
+		})
+
+		Context("when there are no applications associated with this route", func() {
+			BeforeEach(func() {
+				response := `{
+				"next_url": "",
+				"resources": []
+			}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps"),
+						RespondWith(http.StatusOK, response),
+					),
+				)
+			})
+
+			It("returns an empty list of applications", func() {
+				apps, _, err := client.GetRouteApplications("some-route-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(apps).To(BeEmpty())
+			})
+		})
+	})
+
+	Describe("RestageApplication", func() {
+		Context("when the restage is successful", func() {
+			BeforeEach(func() {
+				response := `{
+					"metadata": {
+						"guid": "some-app-guid",
+						"url": "/v2/apps/some-app-guid"
+					},
+					"entity": {
+						"buildpack": "ruby 1.6.29",
+						"detected_start_command": "echo 'I am a banana'",
+						"disk_quota": 586,
+						"detected_buildpack": null,
+						"docker_image": "some-docker-path",
+						"health_check_type": "some-health-check-type",
+						"health_check_http_endpoint": "/anything",
+						"instances": 13,
+						"memory": 1024,
+						"name": "app-name-1",
+						"package_updated_at": "2015-03-10T23:11:54Z",
+						"stack_guid": "some-stack-guid",
+						"state": "STARTED"
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/apps/some-app-guid/restage"),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the updated object and warnings and sends all updated field", func() {
+				app, warnings, err := client.RestageApplication(Application{
+					DockerImage:             "some-docker-path",
+					GUID:                    "some-app-guid",
+					HealthCheckType:         "some-health-check-type",
+					HealthCheckHTTPEndpoint: "/anything",
+					State: constant.ApplicationStarted,
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				updatedAt, err := time.Parse(time.RFC3339, "2015-03-10T23:11:54Z")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(app).To(Equal(Application{
+					Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
+					DetectedBuildpack:       types.FilteredString{},
+					DetectedStartCommand:    types.FilteredString{IsSet: true, Value: "echo 'I am a banana'"},
+					DiskQuota:               types.NullByteSizeInMb{IsSet: true, Value: 586},
+					DockerImage:             "some-docker-path",
+					GUID:                    "some-app-guid",
+					HealthCheckType:         "some-health-check-type",
+					HealthCheckHTTPEndpoint: "/anything",
+					Instances:               types.NullInt{Value: 13, IsSet: true},
+					Memory:                  types.NullByteSizeInMb{IsSet: true, Value: 1024},
+					Name:                    "app-name-1",
+					PackageUpdatedAt:        updatedAt,
+					StackGUID:               "some-stack-guid",
+					State:                   constant.ApplicationStarted,
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+
+		Context("when the restage returns an error", func() {
+			BeforeEach(func() {
+				response := `
+{
+  "code": 210002,
+  "description": "The app could not be found: some-app-guid",
+  "error_code": "CF-AppNotFound"
+}
+			`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/apps/some-app-guid/restage"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := client.RestageApplication(Application{
+					GUID:            "some-app-guid",
+					HealthCheckType: "some-health-check-type",
+				})
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "The app could not be found: some-app-guid"}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+	})
+
 	Describe("UpdateApplication", func() {
 		Context("when the update is successful", func() {
 			Context("when updating all fields", func() { //are we encoding everything correctly?
@@ -513,227 +734,6 @@ var _ = Describe("Application", func() {
 				})
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "The app could not be found: some-app-guid"}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-			})
-		})
-	})
-
-	Describe("RestageApplication", func() {
-		Context("when the restage is successful", func() {
-			BeforeEach(func() {
-				response := `{
-					"metadata": {
-						"guid": "some-app-guid",
-						"url": "/v2/apps/some-app-guid"
-					},
-					"entity": {
-						"buildpack": "ruby 1.6.29",
-						"detected_start_command": "echo 'I am a banana'",
-						"disk_quota": 586,
-						"detected_buildpack": null,
-						"docker_image": "some-docker-path",
-						"health_check_type": "some-health-check-type",
-						"health_check_http_endpoint": "/anything",
-						"instances": 13,
-						"memory": 1024,
-						"name": "app-name-1",
-						"package_updated_at": "2015-03-10T23:11:54Z",
-						"stack_guid": "some-stack-guid",
-						"state": "STARTED"
-					}
-				}`
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v2/apps/some-app-guid/restage"),
-						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns the updated object and warnings and sends all updated field", func() {
-				app, warnings, err := client.RestageApplication(Application{
-					DockerImage:             "some-docker-path",
-					GUID:                    "some-app-guid",
-					HealthCheckType:         "some-health-check-type",
-					HealthCheckHTTPEndpoint: "/anything",
-					State: constant.ApplicationStarted,
-				})
-				Expect(err).NotTo(HaveOccurred())
-
-				updatedAt, err := time.Parse(time.RFC3339, "2015-03-10T23:11:54Z")
-				Expect(err).NotTo(HaveOccurred())
-
-				Expect(app).To(Equal(Application{
-					Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
-					DetectedBuildpack:       types.FilteredString{},
-					DetectedStartCommand:    types.FilteredString{IsSet: true, Value: "echo 'I am a banana'"},
-					DiskQuota:               types.NullByteSizeInMb{IsSet: true, Value: 586},
-					DockerImage:             "some-docker-path",
-					GUID:                    "some-app-guid",
-					HealthCheckType:         "some-health-check-type",
-					HealthCheckHTTPEndpoint: "/anything",
-					Instances:               types.NullInt{Value: 13, IsSet: true},
-					Memory:                  types.NullByteSizeInMb{IsSet: true, Value: 1024},
-					Name:                    "app-name-1",
-					PackageUpdatedAt:        updatedAt,
-					StackGUID:               "some-stack-guid",
-					State:                   constant.ApplicationStarted,
-				}))
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-			})
-		})
-
-		Context("when the restage returns an error", func() {
-			BeforeEach(func() {
-				response := `
-{
-  "code": 210002,
-  "description": "The app could not be found: some-app-guid",
-  "error_code": "CF-AppNotFound"
-}
-			`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v2/apps/some-app-guid/restage"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns the error and warnings", func() {
-				_, warnings, err := client.RestageApplication(Application{
-					GUID:            "some-app-guid",
-					HealthCheckType: "some-health-check-type",
-				})
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "The app could not be found: some-app-guid"}))
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-			})
-		})
-	})
-
-	Describe("GetRouteApplications", func() {
-		Context("when the route guid is not found", func() {
-			BeforeEach(func() {
-				response := `
-{
-  "code": 210002,
-  "description": "The route could not be found: some-route-guid",
-  "error_code": "CF-RouteNotFound"
-}
-			`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps"),
-						RespondWith(http.StatusNotFound, response),
-					),
-				)
-			})
-
-			It("returns an error", func() {
-				_, _, err := client.GetRouteApplications("some-route-guid")
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
-					Message: "The route could not be found: some-route-guid",
-				}))
-			})
-		})
-
-		Context("when there are applications associated with this route", func() {
-			BeforeEach(func() {
-				response1 := `{
-				"next_url": "/v2/routes/some-route-guid/apps?q=space_guid:some-space-guid&page=2",
-				"resources": [
-					{
-						"metadata": {
-							"guid": "app-guid-1",
-							"updated_at": null
-						},
-						"entity": {
-							"name": "app-name-1"
-						}
-					},
-					{
-						"metadata": {
-							"guid": "app-guid-2",
-							"updated_at": null
-						},
-						"entity": {
-							"name": "app-name-2"
-						}
-					}
-				]
-			}`
-				response2 := `{
-				"next_url": null,
-				"resources": [
-					{
-						"metadata": {
-							"guid": "app-guid-3",
-							"updated_at": null
-						},
-						"entity": {
-							"name": "app-name-3"
-						}
-					},
-					{
-						"metadata": {
-							"guid": "app-guid-4",
-							"updated_at": null
-						},
-						"entity": {
-							"name": "app-name-4"
-						}
-					}
-				]
-			}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps", "q=space_guid:some-space-guid"),
-						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps", "q=space_guid:some-space-guid&page=2"),
-						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
-					),
-				)
-			})
-
-			It("returns all the applications and all warnings", func() {
-				apps, warnings, err := client.GetRouteApplications("some-route-guid", Filter{
-					Type:     constant.SpaceGUIDFilter,
-					Operator: constant.EqualOperator,
-					Values:   []string{"some-space-guid"},
-				})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(apps).To(ConsistOf([]Application{
-					{Name: "app-name-1", GUID: "app-guid-1"},
-					{Name: "app-name-2", GUID: "app-guid-2"},
-					{Name: "app-name-3", GUID: "app-guid-3"},
-					{Name: "app-name-4", GUID: "app-guid-4"},
-				}))
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
-			})
-		})
-
-		Context("when there are no applications associated with this route", func() {
-			BeforeEach(func() {
-				response := `{
-				"next_url": "",
-				"resources": []
-			}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps"),
-						RespondWith(http.StatusOK, response),
-					),
-				)
-			})
-
-			It("returns an empty list of applications", func() {
-				apps, _, err := client.GetRouteApplications("some-route-guid")
-				Expect(err).NotTo(HaveOccurred())
-				Expect(apps).To(BeEmpty())
 			})
 		})
 	})
