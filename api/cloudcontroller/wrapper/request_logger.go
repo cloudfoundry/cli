@@ -41,12 +41,6 @@ func NewRequestLogger(output RequestLoggerOutput) *RequestLogger {
 	}
 }
 
-// Wrap sets the connection on the RequestLogger and returns itself
-func (logger *RequestLogger) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
-	logger.connection = innerconnection
-	return logger
-}
-
 // Make records the request and the response to UI
 func (logger *RequestLogger) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
 	err := logger.displayRequest(request)
@@ -64,6 +58,12 @@ func (logger *RequestLogger) Make(request *cloudcontroller.Request, passedRespon
 	}
 
 	return err
+}
+
+// Wrap sets the connection on the RequestLogger and returns itself
+func (logger *RequestLogger) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
+	logger.connection = innerconnection
+	return logger
 }
 
 func (logger *RequestLogger) displayRequest(request *cloudcontroller.Request) error {

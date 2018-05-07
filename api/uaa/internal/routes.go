@@ -10,11 +10,6 @@ const (
 	PostUserRequest       = "PostUser"
 )
 
-const (
-	AuthorizationResource = "authorization_endpoint"
-	UAAResource           = "uaa"
-)
-
 // APIRoutes is a list of routes used by the router to construct request URLs.
 var APIRoutes = []Route{
 	{Path: "/Users", Method: http.MethodPost, Name: PostUserRequest, Resource: UAAResource},

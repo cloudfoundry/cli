@@ -61,25 +61,15 @@ func (connection *PluginConnection) Make(request *http.Request, passedResponse *
 	return connection.populateResponse(response, passedResponse, body)
 }
 
-// processRequestError handles errors that occur while making the request.
-func (connection *PluginConnection) processRequestErrors(request *http.Request, err error) error {
-	switch e := err.(type) {
-	case *url.Error:
-		switch urlErr := e.Err.(type) {
-		case x509.UnknownAuthorityError:
-			return pluginerror.UnverifiedServerError{
-				URL: request.URL.String(),
-			}
-		case x509.HostnameError:
-			return pluginerror.SSLValidationHostnameError{
-				Message: urlErr.Error(),
-			}
-		default:
-			return pluginerror.RequestError{Err: e}
+func (*PluginConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
+	if response.StatusCode >= 400 {
+		return pluginerror.RawHTTPStatusError{
+			Status:      response.Status,
+			RawResponse: passedResponse.RawResponse,
 		}
-	default:
-		return err
 	}
+
+	return nil
 }
 
 func (connection *PluginConnection) populateResponse(response *http.Response, passedResponse *Response, body io.ReadCloser) error {
@@ -109,13 +99,23 @@ func (connection *PluginConnection) populateResponse(response *http.Response, pa
 	return nil
 }
 
-func (*PluginConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
-	if response.StatusCode >= 400 {
-		return pluginerror.RawHTTPStatusError{
-			Status:      response.Status,
-			RawResponse: passedResponse.RawResponse,
+// processRequestError handles errors that occur while making the request.
+func (connection *PluginConnection) processRequestErrors(request *http.Request, err error) error {
+	switch e := err.(type) {
+	case *url.Error:
+		switch urlErr := e.Err.(type) {
+		case x509.UnknownAuthorityError:
+			return pluginerror.UnverifiedServerError{
+				URL: request.URL.String(),
+			}
+		case x509.HostnameError:
+			return pluginerror.SSLValidationHostnameError{
+				Message: urlErr.Error(),
+			}
+		default:
+			return pluginerror.RequestError{Err: e}
 		}
+	default:
+		return err
 	}
-
-	return nil
 }

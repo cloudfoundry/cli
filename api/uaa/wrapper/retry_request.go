@@ -22,12 +22,6 @@ func NewRetryRequest(maxRetries int) *RetryRequest {
 	}
 }
 
-// Wrap sets the connection in the RetryRequest and returns itself.
-func (retry *RetryRequest) Wrap(innerconnection uaa.Connection) uaa.Connection {
-	retry.connection = innerconnection
-	return retry
-}
-
 // Make retries the request if it comes back with a 5XX status code.
 func (retry *RetryRequest) Make(request *http.Request, passedResponse *uaa.Response) error {
 	var err error
@@ -55,6 +49,12 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *uaa.Respo
 		}
 	}
 	return err
+}
+
+// Wrap sets the connection in the RetryRequest and returns itself.
+func (retry *RetryRequest) Wrap(innerconnection uaa.Connection) uaa.Connection {
+	retry.connection = innerconnection
+	return retry
 }
 
 // skipRetry will skip retry if the request method is POST or contains a status

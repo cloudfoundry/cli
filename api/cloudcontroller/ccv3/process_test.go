@@ -20,108 +20,375 @@ var _ = Describe("Process", func() {
 	BeforeEach(func() {
 		client = NewTestClient()
 	})
-	Describe("MarshalJSON", func() {
-		var (
-			process      Process
-			processBytes []byte
-			err          error
-		)
 
-		BeforeEach(func() {
-			process = Process{}
-		})
+	Describe("Process", func() {
+		Describe("MarshalJSON", func() {
+			var (
+				process      Process
+				processBytes []byte
+				err          error
+			)
 
-		JustBeforeEach(func() {
-			processBytes, err = process.MarshalJSON()
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		Context("when health check type http is provided", func() {
 			BeforeEach(func() {
-				process = Process{
-					HealthCheckType:     "http",
-					HealthCheckEndpoint: "some-endpoint",
-				}
+				process = Process{}
 			})
 
-			It("sets the health check type to http and has an endpoint", func() {
-				Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"http", "data": {"endpoint": "some-endpoint"}}}`))
+			JustBeforeEach(func() {
+				processBytes, err = process.MarshalJSON()
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			Context("when health check type http is provided", func() {
+				BeforeEach(func() {
+					process = Process{
+						HealthCheckType:     "http",
+						HealthCheckEndpoint: "some-endpoint",
+					}
+				})
+
+				It("sets the health check type to http and has an endpoint", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"http", "data": {"endpoint": "some-endpoint"}}}`))
+				})
+			})
+
+			Context("when health check type port is provided", func() {
+				BeforeEach(func() {
+					process = Process{
+						HealthCheckType: "port",
+					}
+				})
+
+				It("sets the health check type to port", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"port", "data": {"endpoint": null}}}`))
+				})
+			})
+
+			Context("when health check type process is provided", func() {
+				BeforeEach(func() {
+					process = Process{
+						HealthCheckType: "process",
+					}
+				})
+
+				It("sets the health check type to process", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"process", "data": {"endpoint": null}}}`))
+				})
 			})
 		})
 
-		Context("when health check type port is provided", func() {
+		Describe("UnmarshalJSON", func() {
+			var (
+				process      Process
+				processBytes []byte
+				err          error
+			)
 			BeforeEach(func() {
-				process = Process{
-					HealthCheckType: "port",
-				}
+				processBytes = []byte("{}")
 			})
 
-			It("sets the health check type to port", func() {
-				Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"port", "data": {"endpoint": null}}}`))
+			JustBeforeEach(func() {
+				err = json.Unmarshal(processBytes, &process)
+				Expect(err).ToNot(HaveOccurred())
 			})
-		})
+			Context("when health check type http is provided", func() {
+				BeforeEach(func() {
+					processBytes = []byte(`{"health_check":{"type":"http", "data": {"endpoint": "some-endpoint"}}}`)
+				})
 
-		Context("when health check type process is provided", func() {
-			BeforeEach(func() {
-				process = Process{
-					HealthCheckType: "process",
-				}
+				It("sets the health check type to http and has an endpoint", func() {
+					Expect(process).To(Equal(Process{
+						HealthCheckType:     "http",
+						HealthCheckEndpoint: "some-endpoint",
+					}))
+				})
 			})
 
-			It("sets the health check type to process", func() {
-				Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"process", "data": {"endpoint": null}}}`))
+			Context("when health check type port is provided", func() {
+				BeforeEach(func() {
+					processBytes = []byte(`{"health_check":{"type":"port", "data": {"endpoint": null}}}`)
+				})
+
+				It("sets the health check type to port", func() {
+					Expect(process).To(Equal(Process{
+						HealthCheckType: "port",
+					}))
+				})
+			})
+
+			Context("when health check type process is provided", func() {
+				BeforeEach(func() {
+					processBytes = []byte(`{"health_check":{"type":"process", "data": {"endpoint": null}}}`)
+				})
+
+				It("sets the health check type to process", func() {
+					Expect(process).To(Equal(Process{
+						HealthCheckType: "process",
+					}))
+				})
 			})
 		})
 	})
 
-	Describe("UnmarshalJSON", func() {
-		var (
-			process      Process
-			processBytes []byte
-			err          error
-		)
-		BeforeEach(func() {
-			processBytes = []byte("{}")
+	Describe("CreateApplicationProcessScale", func() {
+		var passedProcess Process
+
+		Context("when providing all scale options", func() {
+			BeforeEach(func() {
+				passedProcess = Process{
+					Type:       constant.ProcessTypeWeb,
+					Instances:  types.NullInt{Value: 2, IsSet: true},
+					MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
+					DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
+				}
+				expectedBody := `{
+					"instances": 2,
+					"memory_in_mb": 100,
+					"disk_in_mb": 200
+				}`
+				response := `{
+					"guid": "some-process-guid"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("scales the application process; returns the scaled process and all warnings", func() {
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				Expect(process).To(Equal(Process{GUID: "some-process-guid"}))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
 		})
+
+		Context("when providing all scale options with 0 values", func() {
+			BeforeEach(func() {
+				passedProcess = Process{
+					Type:       constant.ProcessTypeWeb,
+					Instances:  types.NullInt{Value: 0, IsSet: true},
+					MemoryInMB: types.NullUint64{Value: 0, IsSet: true},
+					DiskInMB:   types.NullUint64{Value: 0, IsSet: true},
+				}
+				expectedBody := `{
+					"instances": 0,
+					"memory_in_mb": 0,
+					"disk_in_mb": 0
+				}`
+				response := `{
+					"guid": "some-process-guid"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("scales the application process to 0 values; returns the scaled process and all warnings", func() {
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				Expect(process).To(Equal(Process{GUID: "some-process-guid"}))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when providing only one scale option", func() {
+			BeforeEach(func() {
+				passedProcess = Process{Type: constant.ProcessTypeWeb, Instances: types.NullInt{Value: 2, IsSet: true}}
+				expectedBody := `{
+					"instances": 2
+				}`
+				response := `{
+					"guid": "some-process-guid",
+					"instances": 2
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("scales the application process; returns the process object and all warnings", func() {
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				Expect(process).To(Equal(Process{GUID: "some-process-guid", Instances: types.NullInt{Value: 2, IsSet: true}}))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when an error is encountered", func() {
+			BeforeEach(func() {
+				passedProcess = Process{Type: constant.ProcessTypeWeb, Instances: types.NullInt{Value: 2, IsSet: true}}
+				response := `{
+						"errors": [
+							{
+								"code": 10008,
+								"detail": "The request is semantically invalid: command presence",
+								"title": "CF-UnprocessableEntity"
+							},
+							{
+								"code": 10009,
+								"detail": "Some CC Error",
+								"title": "CF-SomeNewError"
+							}
+						]
+					}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an empty process, the error and all warnings", func() {
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				Expect(process).To(BeZero())
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10009,
+								Detail: "Some CC Error",
+								Title:  "CF-SomeNewError",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("GetApplicationProcessByType", func() {
+		var (
+			process  Process
+			warnings []string
+			err      error
+		)
 
 		JustBeforeEach(func() {
-			err = json.Unmarshal(processBytes, &process)
-			Expect(err).ToNot(HaveOccurred())
+			process, warnings, err = client.GetApplicationProcessByType("some-app-guid", "some-type")
 		})
-		Context("when health check type http is provided", func() {
+
+		Context("when the process exists", func() {
 			BeforeEach(func() {
-				processBytes = []byte(`{"health_check":{"type":"http", "data": {"endpoint": "some-endpoint"}}}`)
+				response := `{
+					"guid": "process-1-guid",
+					"type": "some-type",
+					"memory_in_mb": 32,
+					"health_check": {
+						"type": "http",
+						"data": {
+							"timeout": 90,
+							"endpoint": "/health"
+						}
+					}
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes/some-type"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
 			})
 
-			It("sets the health check type to http and has an endpoint", func() {
+			It("returns the process and all warnings", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(process).To(Equal(Process{
+					GUID:                "process-1-guid",
+					Type:                "some-type",
+					MemoryInMB:          types.NullUint64{Value: 32, IsSet: true},
 					HealthCheckType:     "http",
-					HealthCheckEndpoint: "some-endpoint",
+					HealthCheckEndpoint: "/health",
 				}))
 			})
 		})
 
-		Context("when health check type port is provided", func() {
+		Context("when the application does not exist", func() {
 			BeforeEach(func() {
-				processBytes = []byte(`{"health_check":{"type":"port", "data": {"endpoint": null}}}`)
+				response := `{
+					"errors": [
+						{
+							"detail": "Application not found",
+							"title": "CF-ResourceNotFound",
+							"code": 10010
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes/some-type"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
 			})
 
-			It("sets the health check type to port", func() {
-				Expect(process).To(Equal(Process{
-					HealthCheckType: "port",
-				}))
+			It("returns a ResourceNotFoundError", func() {
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Application not found"}))
 			})
 		})
 
-		Context("when health check type process is provided", func() {
+		Context("when the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
-				processBytes = []byte(`{"health_check":{"type":"process", "data": {"endpoint": null}}}`)
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10009,
+							"detail": "Some CC Error",
+							"title": "CF-SomeNewError"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes/some-type"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
 			})
 
-			It("sets the health check type to process", func() {
-				Expect(process).To(Equal(Process{
-					HealthCheckType: "process",
+			It("returns the error and all warnings", func() {
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10009,
+								Detail: "Some CC Error",
+								Title:  "CF-SomeNewError",
+							},
+						},
+					},
 				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
 	})
@@ -248,124 +515,6 @@ var _ = Describe("Process", func() {
 			It("returns the error", func() {
 				_, _, err := client.GetApplicationProcesses("some-app-guid")
 				Expect(err).To(MatchError(ccerror.ApplicationNotFoundError{}))
-			})
-		})
-	})
-
-	Describe("GetApplicationProcessByType", func() {
-		var (
-			process  Process
-			warnings []string
-			err      error
-		)
-
-		JustBeforeEach(func() {
-			process, warnings, err = client.GetApplicationProcessByType("some-app-guid", "some-type")
-		})
-
-		Context("when the process exists", func() {
-			BeforeEach(func() {
-				response := `{
-					"guid": "process-1-guid",
-					"type": "some-type",
-					"memory_in_mb": 32,
-					"health_check": {
-						"type": "http",
-						"data": {
-							"timeout": 90,
-							"endpoint": "/health"
-						}
-					}
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes/some-type"),
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns the process and all warnings", func() {
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(process).To(Equal(Process{
-					GUID:                "process-1-guid",
-					Type:                "some-type",
-					MemoryInMB:          types.NullUint64{Value: 32, IsSet: true},
-					HealthCheckType:     "http",
-					HealthCheckEndpoint: "/health",
-				}))
-			})
-		})
-
-		Context("when the application does not exist", func() {
-			BeforeEach(func() {
-				response := `{
-					"errors": [
-						{
-							"detail": "Application not found",
-							"title": "CF-ResourceNotFound",
-							"code": 10010
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes/some-type"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns a ResourceNotFoundError", func() {
-				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Application not found"}))
-			})
-		})
-
-		Context("when the cloud controller returns errors and warnings", func() {
-			BeforeEach(func() {
-				response := `{
-					"errors": [
-						{
-							"code": 10008,
-							"detail": "The request is semantically invalid: command presence",
-							"title": "CF-UnprocessableEntity"
-						},
-						{
-							"code": 10009,
-							"detail": "Some CC Error",
-							"title": "CF-SomeNewError"
-						}
-					]
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes/some-type"),
-						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns the error and all warnings", func() {
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
-					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10009,
-								Detail: "Some CC Error",
-								Title:  "CF-SomeNewError",
-							},
-						},
-					},
-				}))
-				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
 	})
@@ -512,152 +661,6 @@ var _ = Describe("Process", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
-					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10009,
-								Detail: "Some CC Error",
-								Title:  "CF-SomeNewError",
-							},
-						},
-					},
-				}))
-				Expect(warnings).To(ConsistOf("this is a warning"))
-			})
-		})
-	})
-
-	Describe("CreateApplicationProcessScale", func() {
-		var passedProcess Process
-
-		Context("when providing all scale options", func() {
-			BeforeEach(func() {
-				passedProcess = Process{
-					Type:       constant.ProcessTypeWeb,
-					Instances:  types.NullInt{Value: 2, IsSet: true},
-					MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
-					DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
-				}
-				expectedBody := `{
-					"instances": 2,
-					"memory_in_mb": 100,
-					"disk_in_mb": 200
-				}`
-				response := `{
-					"guid": "some-process-guid"
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
-						VerifyJSON(expectedBody),
-						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("scales the application process; returns the scaled process and all warnings", func() {
-				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
-				Expect(process).To(Equal(Process{GUID: "some-process-guid"}))
-				Expect(err).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("this is a warning"))
-			})
-		})
-
-		Context("when providing all scale options with 0 values", func() {
-			BeforeEach(func() {
-				passedProcess = Process{
-					Type:       constant.ProcessTypeWeb,
-					Instances:  types.NullInt{Value: 0, IsSet: true},
-					MemoryInMB: types.NullUint64{Value: 0, IsSet: true},
-					DiskInMB:   types.NullUint64{Value: 0, IsSet: true},
-				}
-				expectedBody := `{
-					"instances": 0,
-					"memory_in_mb": 0,
-					"disk_in_mb": 0
-				}`
-				response := `{
-					"guid": "some-process-guid"
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
-						VerifyJSON(expectedBody),
-						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("scales the application process to 0 values; returns the scaled process and all warnings", func() {
-				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
-				Expect(process).To(Equal(Process{GUID: "some-process-guid"}))
-				Expect(err).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("this is a warning"))
-			})
-		})
-
-		Context("when providing only one scale option", func() {
-			BeforeEach(func() {
-				passedProcess = Process{Type: constant.ProcessTypeWeb, Instances: types.NullInt{Value: 2, IsSet: true}}
-				expectedBody := `{
-					"instances": 2
-				}`
-				response := `{
-					"guid": "some-process-guid",
-					"instances": 2
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
-						VerifyJSON(expectedBody),
-						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("scales the application process; returns the process object and all warnings", func() {
-				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
-				Expect(process).To(Equal(Process{GUID: "some-process-guid", Instances: types.NullInt{Value: 2, IsSet: true}}))
-				Expect(err).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("this is a warning"))
-			})
-		})
-
-		Context("when an error is encountered", func() {
-			BeforeEach(func() {
-				passedProcess = Process{Type: constant.ProcessTypeWeb, Instances: types.NullInt{Value: 2, IsSet: true}}
-				response := `{
-						"errors": [
-							{
-								"code": 10008,
-								"detail": "The request is semantically invalid: command presence",
-								"title": "CF-UnprocessableEntity"
-							},
-							{
-								"code": 10009,
-								"detail": "Some CC Error",
-								"title": "CF-SomeNewError"
-							}
-						]
-					}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
-						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns an empty process, the error and all warnings", func() {
-				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
-				Expect(process).To(BeZero())
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

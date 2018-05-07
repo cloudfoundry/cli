@@ -78,7 +78,7 @@ integration-tests-full : build integration-cleanup
 
 lint :
 	@echo "linting files:" # this list will grow as we cleanup all the code
-	go run bin/style/main.go api/cloudcontroller/ccv2
+	go run bin/style/main.go api/cloudcontroller
 	@echo
 
 out/cf-cli_linux_i686 : $(GOSRC)

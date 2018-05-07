@@ -22,12 +22,6 @@ func NewRetryRequest(maxRetries int) *RetryRequest {
 	}
 }
 
-// Wrap sets the connection in the RetryRequest and returns itself.
-func (retry *RetryRequest) Wrap(innerconnection plugin.Connection) plugin.Connection {
-	retry.connection = innerconnection
-	return retry
-}
-
 // Make retries the request if it comes back with a 5XX status code.
 func (retry *RetryRequest) Make(request *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error {
 	var err error
@@ -55,6 +49,12 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *plugin.Re
 		}
 	}
 	return err
+}
+
+// Wrap sets the connection in the RetryRequest and returns itself.
+func (retry *RetryRequest) Wrap(innerconnection plugin.Connection) plugin.Connection {
+	retry.connection = innerconnection
+	return retry
 }
 
 // skipRetry if the request method is POST, or not one of the following http

@@ -16,12 +16,6 @@ func NewErrorWrapper() *errorWrapper {
 	return new(errorWrapper)
 }
 
-// Wrap wraps a UAA connection in this error handling wrapper.
-func (e *errorWrapper) Wrap(innerconnection Connection) Connection {
-	e.connection = innerconnection
-	return e
-}
-
 // Make converts RawHTTPStatusError, which represents responses with 4xx and
 // 5xx status codes, to specific errors.
 func (e *errorWrapper) Make(request *http.Request, passedResponse *Response) error {
@@ -32,6 +26,12 @@ func (e *errorWrapper) Make(request *http.Request, passedResponse *Response) err
 	}
 
 	return err
+}
+
+// Wrap wraps a UAA connection in this error handling wrapper.
+func (e *errorWrapper) Wrap(innerconnection Connection) Connection {
+	e.connection = innerconnection
+	return e
 }
 
 func convert(rawHTTPStatusErr RawHTTPStatusError) error {

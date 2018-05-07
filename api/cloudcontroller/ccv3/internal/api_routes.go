@@ -54,19 +54,6 @@ const (
 	PutTaskCancelRequest                                        = "PutTaskCancel"
 )
 
-const (
-	AppsResource              = "apps"
-	BuildsResource            = "builds"
-	DropletsResource          = "droplets"
-	IsolationSegmentsResource = "isolation_segments"
-	OrgsResource              = "organizations"
-	PackagesResource          = "packages"
-	ProcessesResource         = "processes"
-	ServiceInstancesResource  = "service_instances"
-	SpacesResource            = "spaces"
-	TasksResource             = "tasks"
-)
-
 // APIRoutes is a list of routes used by the router to construct request URLs.
 var APIRoutes = []Route{
 	{Resource: AppsResource, Path: "/", Method: http.MethodGet, Name: GetApplicationsRequest},

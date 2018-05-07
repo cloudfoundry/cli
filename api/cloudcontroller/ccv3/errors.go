@@ -18,12 +18,6 @@ func newErrorWrapper() *errorWrapper {
 	return new(errorWrapper)
 }
 
-// Wrap wraps a Cloud Controller connection in this error handling wrapper.
-func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
-	e.connection = innerconnection
-	return e
-}
-
 // Make creates a connection in the wrapped connection and handles errors
 // that it returns.
 func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
@@ -36,6 +30,12 @@ func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cl
 		return convert400(rawHTTPStatusErr)
 	}
 	return err
+}
+
+// Wrap wraps a Cloud Controller connection in this error handling wrapper.
+func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
+	e.connection = innerconnection
+	return e
 }
 
 func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
@@ -94,32 +94,6 @@ func convert500(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	}
 }
 
-func unmarshalFirstV3Error(rawHTTPStatusErr ccerror.RawHTTPStatusError) (ccerror.V3Error, ccerror.V3ErrorResponse, error) {
-	// Try to unmarshal the raw error into a CC error. If unmarshaling fails,
-	// return the raw error.
-	var errorResponse ccerror.V3ErrorResponse
-	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
-	// error parsing json
-	if err != nil {
-		return ccerror.V3Error{}, errorResponse, ccerror.UnknownHTTPSourceError{
-			StatusCode:  rawHTTPStatusErr.StatusCode,
-			RawResponse: rawHTTPStatusErr.RawResponse,
-		}
-	}
-
-	errors := errorResponse.Errors
-	if len(errors) == 0 {
-		return ccerror.V3Error{}, errorResponse, ccerror.V3UnexpectedResponseError{
-			ResponseCode:    rawHTTPStatusErr.StatusCode,
-			V3ErrorResponse: errorResponse,
-		}
-	}
-	// There could be multiple errors in the future but for now we only convert
-	// the first error.
-	firstErr := errors[0]
-	return firstErr, errorResponse, nil
-}
-
 func handleNotFound(errorResponse ccerror.V3Error) error {
 	switch errorResponse.Detail {
 	case "App not found":
@@ -144,4 +118,30 @@ func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
 	default:
 		return ccerror.UnprocessableEntityError{Message: errorResponse.Detail}
 	}
+}
+
+func unmarshalFirstV3Error(rawHTTPStatusErr ccerror.RawHTTPStatusError) (ccerror.V3Error, ccerror.V3ErrorResponse, error) {
+	// Try to unmarshal the raw error into a CC error. If unmarshaling fails,
+	// return the raw error.
+	var errorResponse ccerror.V3ErrorResponse
+	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
+	// error parsing json
+	if err != nil {
+		return ccerror.V3Error{}, errorResponse, ccerror.UnknownHTTPSourceError{
+			StatusCode:  rawHTTPStatusErr.StatusCode,
+			RawResponse: rawHTTPStatusErr.RawResponse,
+		}
+	}
+
+	errors := errorResponse.Errors
+	if len(errors) == 0 {
+		return ccerror.V3Error{}, errorResponse, ccerror.V3UnexpectedResponseError{
+			ResponseCode:    rawHTTPStatusErr.StatusCode,
+			V3ErrorResponse: errorResponse,
+		}
+	}
+	// There could be multiple errors in the future but for now we only convert
+	// the first error.
+	firstErr := errors[0]
+	return firstErr, errorResponse, nil
 }

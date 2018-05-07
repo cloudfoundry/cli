@@ -14,6 +14,10 @@ type errorWrapper struct {
 	connection cloudcontroller.Connection
 }
 
+func newErrorWrapper() *errorWrapper {
+	return new(errorWrapper)
+}
+
 // Make converts RawHTTPStatusError, which represents responses with 4xx and
 // 5xx status codes, to specific errors.
 func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
@@ -98,8 +102,4 @@ func handleUnauthorized(errorResponse ccerror.V2ErrorResponse) error {
 	}
 
 	return ccerror.UnauthorizedError{Message: errorResponse.Description}
-}
-
-func newErrorWrapper() *errorWrapper {
-	return new(errorWrapper)
 }

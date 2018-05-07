@@ -13,6 +13,3 @@ const (
 	// ProcessInstanceDown is when the process has gone down.
 	ProcessInstanceDown ProcessInstanceState = "DOWN"
 )
-
-// ProcessTypeWeb represents the "web" process type.
-const ProcessTypeWeb = "web"

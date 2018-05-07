@@ -9,11 +9,11 @@ type CustomWrapper struct {
 	CustomMake func(connection cloudcontroller.Connection, request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error
 }
 
+func (e *CustomWrapper) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
+	return e.CustomMake(e.connection, request, passedResponse)
+}
+
 func (e *CustomWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
 	e.connection = innerconnection
 	return e
-}
-
-func (e *CustomWrapper) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
-	return e.CustomMake(e.connection, request, passedResponse)
 }

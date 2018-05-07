@@ -40,12 +40,6 @@ func NewRequestLogger(output RequestLoggerOutput) *RequestLogger {
 	}
 }
 
-// Wrap sets the connection on the RequestLogger and returns itself
-func (logger *RequestLogger) Wrap(innerconnection plugin.Connection) plugin.Connection {
-	logger.connection = innerconnection
-	return logger
-}
-
 // Make records the request and the response to UI
 func (logger *RequestLogger) Make(request *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error {
 	err := logger.displayRequest(request)
@@ -63,6 +57,12 @@ func (logger *RequestLogger) Make(request *http.Request, passedResponse *plugin.
 	}
 
 	return err
+}
+
+// Wrap sets the connection on the RequestLogger and returns itself
+func (logger *RequestLogger) Wrap(innerconnection plugin.Connection) plugin.Connection {
+	logger.connection = innerconnection
+	return logger
 }
 
 func (logger *RequestLogger) displayRequest(request *http.Request) error {

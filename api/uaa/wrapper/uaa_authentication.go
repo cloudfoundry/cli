@@ -43,17 +43,6 @@ func NewUAAAuthentication(client UAAClient, cache TokenCache) *UAAAuthentication
 	}
 }
 
-// Wrap sets the connection on the UAAAuthentication and returns itself
-func (t *UAAAuthentication) Wrap(innerconnection uaa.Connection) uaa.Connection {
-	t.connection = innerconnection
-	return t
-}
-
-// SetClient sets the UAA client that the wrapper will use.
-func (t *UAAAuthentication) SetClient(client UAAClient) {
-	t.client = client
-}
-
 // Make adds authentication headers to the passed in request and then calls the
 // wrapped connection's Make
 func (t *UAAAuthentication) Make(request *http.Request, passedResponse *uaa.Response) error {
@@ -98,6 +87,17 @@ func (t *UAAAuthentication) Make(request *http.Request, passedResponse *uaa.Resp
 	}
 
 	return err
+}
+
+// SetClient sets the UAA client that the wrapper will use.
+func (t *UAAAuthentication) SetClient(client UAAClient) {
+	t.client = client
+}
+
+// Wrap sets the connection on the UAAAuthentication and returns itself
+func (t *UAAAuthentication) Wrap(innerconnection uaa.Connection) uaa.Connection {
+	t.connection = innerconnection
+	return t
 }
 
 // The authentication header is not added to token refresh requests or login

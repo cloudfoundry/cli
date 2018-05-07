@@ -21,12 +21,6 @@ func NewRetryRequest(maxRetries int) *RetryRequest {
 	}
 }
 
-// Wrap sets the connection in the RetryRequest and returns itself.
-func (retry *RetryRequest) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
-	retry.connection = innerconnection
-	return retry
-}
-
 // Make retries the request if it comes back with a 5XX status code.
 func (retry *RetryRequest) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
 	var err error
@@ -51,6 +45,12 @@ func (retry *RetryRequest) Make(request *cloudcontroller.Request, passedResponse
 		}
 	}
 	return err
+}
+
+// Wrap sets the connection in the RetryRequest and returns itself.
+func (retry *RetryRequest) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
+	retry.connection = innerconnection
+	return retry
 }
 
 // skipRetry will skip retry if the request method is POST or contains a status

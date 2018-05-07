@@ -82,77 +82,61 @@ var _ = Describe("Relationship", func() {
 		})
 	})
 
-	Describe("GetSpaceIsolationSegment", func() {
-		Context("when getting the isolation segment is successful", func() {
-			BeforeEach(func() {
-				response := `{
-					"data": {
-						"guid": "some-isolation-segment-guid"
-					}
-				}`
+	Describe("DeleteServiceInstanceRelationshipsSharedSpace", func() {
+		var (
+			serviceInstanceGUID string
+			spaceGUID           string
 
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			serviceInstanceGUID = "some-service-instance-guid"
+			spaceGUID = "some-space-guid"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID, spaceGUID)
+		})
+
+		Context("when no errors occur deleting the shared space relationship", func() {
+			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/spaces/some-space-guid/relationships/isolation_segment"),
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						VerifyRequest(http.MethodDelete, "/v3/service_instances/some-service-instance-guid/relationships/shared_spaces/some-space-guid"),
+						RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
 
-			It("returns the relationship and warnings", func() {
-				relationship, warnings, err := client.GetSpaceIsolationSegment("some-space-guid")
-				Expect(err).NotTo(HaveOccurred())
+			It("does not return any errors and returns all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(relationship).To(Equal(Relationship{
-					GUID: "some-isolation-segment-guid",
-				}))
-			})
-		})
-	})
-
-	Describe("RevokeIsolationSegmentFromOrganization", func() {
-		Context("when relationship exists", func() {
-			BeforeEach(func() {
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v3/isolation_segments/segment-guid/relationships/organizations/org-guid"),
-						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("revoke the relationship", func() {
-				warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("this is a warning"))
-
-				Expect(server.ReceivedRequests()).To(HaveLen(3))
 			})
 		})
 
-		Context("when an error occurs", func() {
+		Context("when an error occurs deleting the shared space relationship", func() {
 			BeforeEach(func() {
 				response := `{
-					"errors": [
-						{
-							"code": 10008,
-							"detail": "The request is semantically invalid: command presence",
-							"title": "CF-UnprocessableEntity"
-						}
-					]
-				}`
-
+						"errors": [
+							{
+								"code": 10008,
+								"detail": "The request is semantically invalid: command presence",
+								"title": "CF-UnprocessableEntity"
+							}
+						]
+					}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v3/isolation_segments/segment-guid/relationships/organizations/org-guid"),
+						VerifyRequest(http.MethodDelete, "/v3/service_instances/some-service-instance-guid/relationships/shared_spaces/some-space-guid"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
 
-			It("returns the error and warnings", func() {
-				warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+			It("returns the errors and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
 						Errors: []ccerror.V3Error{
@@ -221,6 +205,34 @@ var _ = Describe("Relationship", func() {
 					Message: "Organization not found",
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("GetSpaceIsolationSegment", func() {
+		Context("when getting the isolation segment is successful", func() {
+			BeforeEach(func() {
+				response := `{
+					"data": {
+						"guid": "some-isolation-segment-guid"
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/spaces/some-space-guid/relationships/isolation_segment"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the relationship and warnings", func() {
+				relationship, warnings, err := client.GetSpaceIsolationSegment("some-space-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(relationship).To(Equal(Relationship{
+					GUID: "some-isolation-segment-guid",
+				}))
 			})
 		})
 	})
@@ -312,61 +324,49 @@ var _ = Describe("Relationship", func() {
 		})
 	})
 
-	Describe("DeleteServiceInstanceRelationshipsSharedSpace", func() {
-		var (
-			serviceInstanceGUID string
-			spaceGUID           string
-
-			warnings   Warnings
-			executeErr error
-		)
-
-		BeforeEach(func() {
-			serviceInstanceGUID = "some-service-instance-guid"
-			spaceGUID = "some-space-guid"
-		})
-
-		JustBeforeEach(func() {
-			warnings, executeErr = client.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID, spaceGUID)
-		})
-
-		Context("when no errors occur deleting the shared space relationship", func() {
+	Describe("RevokeIsolationSegmentFromOrganization", func() {
+		Context("when relationship exists", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v3/service_instances/some-service-instance-guid/relationships/shared_spaces/some-space-guid"),
-						RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						VerifyRequest(http.MethodDelete, "/v3/isolation_segments/segment-guid/relationships/organizations/org-guid"),
+						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
 
-			It("does not return any errors and returns all warnings", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
+			It("revoke the relationship", func() {
+				warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
+				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(server.ReceivedRequests()).To(HaveLen(3))
 			})
 		})
 
-		Context("when an error occurs deleting the shared space relationship", func() {
+		Context("when an error occurs", func() {
 			BeforeEach(func() {
 				response := `{
-						"errors": [
-							{
-								"code": 10008,
-								"detail": "The request is semantically invalid: command presence",
-								"title": "CF-UnprocessableEntity"
-							}
-						]
-					}`
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						}
+					]
+				}`
+
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v3/service_instances/some-service-instance-guid/relationships/shared_spaces/some-space-guid"),
+						VerifyRequest(http.MethodDelete, "/v3/isolation_segments/segment-guid/relationships/organizations/org-guid"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
 
-			It("returns the errors and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+			It("returns the error and warnings", func() {
+				warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
 						Errors: []ccerror.V3Error{

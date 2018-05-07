@@ -60,18 +60,15 @@ func (connection *UAAConnection) Make(request *http.Request, passedResponse *Res
 	return connection.populateResponse(response, passedResponse)
 }
 
-func (connection *UAAConnection) processRequestErrors(request *http.Request, err error) error {
-	switch e := err.(type) {
-	case *url.Error:
-		if _, ok := e.Err.(x509.UnknownAuthorityError); ok {
-			return UnverifiedServerError{
-				URL: request.URL.String(),
-			}
+func (*UAAConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
+	if response.StatusCode >= 400 {
+		return RawHTTPStatusError{
+			StatusCode:  response.StatusCode,
+			RawResponse: passedResponse.RawResponse,
 		}
-		return RequestError{Err: e}
-	default:
-		return err
 	}
+
+	return nil
 }
 
 func (connection *UAAConnection) populateResponse(response *http.Response, passedResponse *Response) error {
@@ -101,13 +98,16 @@ func (connection *UAAConnection) populateResponse(response *http.Response, passe
 	return nil
 }
 
-func (*UAAConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
-	if response.StatusCode >= 400 {
-		return RawHTTPStatusError{
-			StatusCode:  response.StatusCode,
-			RawResponse: passedResponse.RawResponse,
+func (connection *UAAConnection) processRequestErrors(request *http.Request, err error) error {
+	switch e := err.(type) {
+	case *url.Error:
+		if _, ok := e.Err.(x509.UnknownAuthorityError); ok {
+			return UnverifiedServerError{
+				URL: request.URL.String(),
+			}
 		}
+		return RequestError{Err: e}
+	default:
+		return err
 	}
-
-	return nil
 }
