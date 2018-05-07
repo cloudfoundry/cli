@@ -136,7 +136,7 @@ func (v *visitor) checkFunc(node *ast.FuncDecl) {
 		v.checkFuncWithReceiver(node)
 	} else {
 		funcName := node.Name.Name
-		if funcName == "Execute" || strings.HasPrefix(funcName, "New") {
+		if funcName == "Execute" || strings.HasPrefix(funcName, "New") || strings.HasPrefix(funcName, "new") {
 			return
 		}
 
