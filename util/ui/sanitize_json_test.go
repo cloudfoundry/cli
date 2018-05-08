@@ -1,6 +1,8 @@
 package ui_test
 
 import (
+	"fmt"
+
 	. "code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"
@@ -16,7 +18,9 @@ var _ = Describe("SanitizeJSON", func() {
 				"again": {
 					"real password ": "Don't tell nobody, it's banana",
 					"token_endpoint": "some url",
-					"testtokentest": "banana pants"
+					"testtokentest": "banana pants",
+					"some url":"jdbc:mysql://hostname/db-name?user=username&password=very-secret-password",
+					"some other url":"jdbc:mysql://hostname/db-name?password=very-secret-password&user=username"
 				}
 			}
 		}`)
@@ -29,6 +33,8 @@ var _ = Describe("SanitizeJSON", func() {
 					"real password ": RedactedValue,
 					"token_endpoint": "some url",
 					"testtokentest":  RedactedValue,
+					"some url":       fmt.Sprintf("jdbc:mysql://hostname/db-name?user=username&password=%s", RedactedValue),
+					"some other url": fmt.Sprintf("jdbc:mysql://hostname/db-name?password=%s&user=username", RedactedValue),
 				},
 			},
 		}
