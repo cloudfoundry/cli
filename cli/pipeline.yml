@@ -564,7 +564,7 @@ jobs:
     - task: config
       file: cli-ci/ci/cli/tasks/cats-config.yml
       params:
-        INCLUDE_V3: false
+        INCLUDE_V3: true
         BROKER_START_TIMEOUT: 330
         CF_PUSH_TIMEOUT: 210
         DEFAULT_TIMEOUT: 60
