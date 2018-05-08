@@ -60,7 +60,11 @@ var _ = Describe("custom oauth client id", func() {
 			Context("auth", func() {
 				It("uses the custom client id and secret", func() {
 					username, password := helpers.GetCredentials()
-					session := helpers.CF("auth", username, password)
+					env := map[string]string{
+						"CF_USERNAME": username,
+						"CF_PASSWORD": password,
+					}
+					session := helpers.CFWithEnv(env, "auth")
 					Eventually(session).Should(Exit(1))
 					Expect(session.Err).To(Say(
 						"Credentials were rejected, please try again."))

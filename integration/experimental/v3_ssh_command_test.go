@@ -420,7 +420,11 @@ var _ = Describe("v3-ssh command", func() {
 
 					Eventually(helpers.CF("create-user", newUser, newPass)).Should(Exit(0))
 					Eventually(helpers.CF("set-space-role", newUser, orgName, spaceName, "SpaceAuditor")).Should(Exit(0))
-					Eventually(helpers.CF("auth", newUser, newPass)).Should(Exit(0))
+					env := map[string]string{
+						"CF_USERNAME": newUser,
+						"CF_PASSWORD": newPass,
+					}
+					Eventually(helpers.CFWithEnv(env, "auth")).Should(Exit(0))
 					helpers.TargetOrgAndSpace(orgName, spaceName)
 				})
 

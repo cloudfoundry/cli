@@ -231,7 +231,11 @@ var _ = Describe("unshare-service command", func() {
 							password = helpers.NewPassword()
 							Eventually(helpers.CF("create-user", username, password)).Should(Exit(0))
 							Eventually(helpers.CF("set-space-role", username, sourceOrgName, sourceSpaceName, "SpaceDeveloper")).Should(Exit(0))
-							Eventually(helpers.CF("auth", username, password)).Should(Exit(0))
+							env := map[string]string{
+								"CF_USERNAME": username,
+								"CF_PASSWORD": password,
+							}
+							Eventually(helpers.CFWithEnv(env, "auth")).Should(Exit(0))
 							helpers.TargetOrgAndSpace(sourceOrgName, sourceSpaceName)
 						})
 
@@ -366,7 +370,11 @@ var _ = Describe("unshare-service command", func() {
 
 			Context("and I have no access to the source space", func() {
 				BeforeEach(func() {
-					Eventually(helpers.CF("auth", user, password)).Should(Exit(0))
+					env := map[string]string{
+						"CF_USERNAME": user,
+						"CF_PASSWORD": password,
+					}
+					Eventually(helpers.CFWithEnv(env, "auth")).Should(Exit(0))
 					Eventually(helpers.CF("target", "-o", sharedToOrgName, "-s", sharedToSpaceName)).Should(Exit(0))
 				})
 
@@ -380,8 +388,12 @@ var _ = Describe("unshare-service command", func() {
 
 			Context("and I have SpaceAuditor access to the source space", func() {
 				BeforeEach(func() {
+					env := map[string]string{
+						"CF_USERNAME": user,
+						"CF_PASSWORD": password,
+					}
 					Eventually(helpers.CF("set-space-role", user, sourceOrgName, sourceSpaceName, "SpaceAuditor")).Should(Exit(0))
-					Eventually(helpers.CF("auth", user, password)).Should(Exit(0))
+					Eventually(helpers.CFWithEnv(env, "auth")).Should(Exit(0))
 					Eventually(helpers.CF("target", "-o", sharedToOrgName, "-s", sharedToSpaceName)).Should(Exit(0))
 				})
 

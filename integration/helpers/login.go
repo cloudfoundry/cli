@@ -42,14 +42,22 @@ func GetAPI() string {
 
 func LoginCF() string {
 	username, password := GetCredentials()
-	Eventually(CF("auth", username, password)).Should(Exit(0))
+	env := map[string]string{
+		"CF_USERNAME": username,
+		"CF_PASSWORD": password,
+	}
+	Eventually(CFWithEnv(env, "auth")).Should(Exit(0))
 
 	return username
 }
 
 func LoginCFWithClientCredentials() string {
 	username, password := SkipIfClientCredentialsNotSet()
-	Eventually(CF("auth", username, password, "--client-credentials")).Should(Exit(0))
+	env := map[string]string{
+		"CF_USERNAME": username,
+		"CF_PASSWORD": password,
+	}
+	Eventually(CFWithEnv(env, "auth", "--client-credentials")).Should(Exit(0))
 
 	return username
 }
