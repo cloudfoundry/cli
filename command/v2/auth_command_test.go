@@ -2,10 +2,12 @@ package v2_test
 
 import (
 	"errors"
+	"os"
 
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -100,6 +102,101 @@ var _ = Describe("auth Command", func() {
 				Expect(password).To(Equal(testSecret))
 				Expect(grantType).To(Equal(constant.GrantTypePassword))
 			})
+
+			Context("when the username and password are provided in env variables", func() {
+				BeforeEach(func() {
+					os.Setenv("CF_USERNAME", testID)
+					os.Setenv("CF_PASSWORD", testSecret)
+				})
+
+				AfterEach(func() {
+					os.Unsetenv("CF_USERNAME")
+					os.Unsetenv("CF_PASSWORD")
+				})
+
+				Context("when username and password are not also provided as arguments", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs.Username = ""
+						cmd.RequiredArgs.Password = ""
+					})
+
+					It("authenticates with the values in the env variables", func() {
+						Expect(err).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
+						Expect(testUI.Out).To(Say("Authenticating\\.\\.\\."))
+						Expect(testUI.Out).To(Say("OK"))
+
+						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+						username, password, _ := fakeActor.AuthenticateArgsForCall(0)
+						Expect(username).To(Equal(testID))
+						Expect(password).To(Equal(testSecret))
+					})
+				})
+
+				Context("when username and password are also provided as arguments", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs.Username = "hello"
+						cmd.RequiredArgs.Password = "goodbye"
+					})
+
+					It("authenticates with the values from the command line args", func() {
+						Expect(err).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
+						Expect(testUI.Out).To(Say("Authenticating\\.\\.\\."))
+						Expect(testUI.Out).To(Say("OK"))
+
+						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+						username, password, _ := fakeActor.AuthenticateArgsForCall(0)
+						Expect(username).To(Equal("hello"))
+						Expect(password).To(Equal("goodbye"))
+					})
+				})
+			})
+
+		})
+	})
+
+	Context("when credentials are missing", func() {
+		Context("when username and password are both missing", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.Username = ""
+				cmd.RequiredArgs.Password = ""
+			})
+
+			It("raises an error", func() {
+				Expect(err).To(MatchError(translatableerror.MissingCredentialsError{
+					MissingUsername: true,
+					MissingPassword: true,
+				}))
+			})
+		})
+
+		Context("when username is missing", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.Username = ""
+				cmd.RequiredArgs.Password = "mypassword"
+			})
+
+			It("raises an error", func() {
+				Expect(err).To(MatchError(translatableerror.MissingCredentialsError{
+					MissingUsername: true,
+				}))
+			})
+		})
+
+		Context("when password is missing", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.Username = "myuser"
+				cmd.RequiredArgs.Password = ""
+			})
+
+			It("raises an error", func() {
+				Expect(err).To(MatchError(translatableerror.MissingCredentialsError{
+					MissingPassword: true,
+				}))
+			})
 		})
 	})
 
@@ -109,7 +206,6 @@ var _ = Describe("auth Command", func() {
 			cmd.RequiredArgs.Password = "bar"
 
 			fakeConfig.TargetReturns("some-api-target")
-
 			fakeActor.AuthenticateReturns(uaa.BadCredentialsError{Message: "some message"})
 		})
 
@@ -148,6 +244,9 @@ var _ = Describe("auth Command", func() {
 			fakeConfig.APIVersionReturns(apiVersion)
 			minCLIVersion = "1.0.0"
 			fakeConfig.MinCLIVersionReturns(minCLIVersion)
+
+			cmd.RequiredArgs.Username = "user"
+			cmd.RequiredArgs.Password = "password"
 		})
 
 		Context("the CLI version is older than the minimum version required by the API", func() {
@@ -166,6 +265,7 @@ var _ = Describe("auth Command", func() {
 			BeforeEach(func() {
 				binaryVersion = "1.0.0"
 				fakeConfig.BinaryVersionReturns(binaryVersion)
+
 			})
 
 			It("does not display a recommendation to update the CLI version", func() {

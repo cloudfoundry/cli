@@ -85,8 +85,8 @@ type APITarget struct {
 }
 
 type Authentication struct {
-	Username string `positional-arg-name:"USERNAME" required:"true" description:"The username"`
-	Password string `positional-arg-name:"PASSWORD" required:"true" description:"The password"`
+	Username string `positional-arg-name:"USERNAME" description:"The username"`
+	Password string `positional-arg-name:"PASSWORD" description:"The password"`
 }
 
 type CreateUser struct {

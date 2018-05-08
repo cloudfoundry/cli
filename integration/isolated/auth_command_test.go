@@ -20,9 +20,14 @@ var _ = Describe("auth command", func() {
 			Eventually(session).Should(Say("cf auth USERNAME PASSWORD\n"))
 			Eventually(session).Should(Say("cf auth CLIENT_ID CLIENT_SECRET --client-credentials\n\n"))
 
+			Eventually(session).Should(Say("ENVIRONMENT VARIABLES:"))
+			Eventually(session).Should(Say("CF_USERNAME=user\\s+Authenticating user. Overridden if USERNAME argument is provided."))
+			Eventually(session).Should(Say("CF_PASSWORD=password\\s+Password associated with user. Overriden if PASSWORD argument is provided."))
+
 			Eventually(session).Should(Say("WARNING:"))
 			Eventually(session).Should(Say("Providing your password as a command line option is highly discouraged"))
-			Eventually(session).Should(Say("Your password may be visible to others and may be recorded in your shell history\n\n"))
+			Eventually(session).Should(Say("Your password may be visible to others and may be recorded in your shell history\n"))
+			Eventually(session).Should(Say("Consider using the CF_PASSWORD environment variable instead\n\n"))
 
 			Eventually(session).Should(Say("EXAMPLES:"))
 			Eventually(session).Should(Say("cf auth name@example\\.com \"my password\" \\(use quotes for passwords with a space\\)"))
@@ -38,20 +43,53 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when no arguments are provided", func() {
-		It("errors-out with the help information", func() {
-			session := helpers.CF("auth")
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `USERNAME` and `PASSWORD` were not provided\n\n"))
-			Eventually(session).Should(Say("NAME:"))
+	Context("when no positional arguments are provided", func() {
+		Context("and no env variables are provided", func() {
+			It("errors-out with the help information", func() {
+				session := helpers.CF("auth")
+				Eventually(session.Err).Should(Say("Username and password not provided."))
+				Eventually(session).Should(Say("NAME:"))
 
-			Eventually(session).Should(Exit(1))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when env variables are provided", func() {
+			It("authenticates the user", func() {
+				username, password := helpers.GetCredentials()
+				env := map[string]string{
+					"CF_USERNAME": username,
+					"CF_PASSWORD": password,
+				}
+				session := helpers.CFWithEnv(env, "auth")
+
+				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
+
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 
 	Context("when only a username is provided", func() {
 		It("errors-out with a password required error and the help information", func() {
 			session := helpers.CF("auth", "some-user")
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PASSWORD` was not provided\n\n"))
+			Eventually(session.Err).Should(Say("Password not provided."))
+			Eventually(session).Should(Say("NAME:"))
+
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	Context("when only a password is provided", func() {
+		It("errors-out with a username required error and the help information", func() {
+			env := map[string]string{
+				"CF_PASSWORD": "some-pass",
+			}
+			session := helpers.CFWithEnv(env, "auth")
+			Eventually(session.Err).Should(Say("Username not provided."))
 			Eventually(session).Should(Say("NAME:"))
 
 			Eventually(session).Should(Exit(1))
