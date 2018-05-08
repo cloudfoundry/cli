@@ -225,7 +225,7 @@
   branch = "master"
   name = "github.com/mattn/go-colorable"
   packages = ["."]
-  revision = "6fcc0c1fd9b620311d821b106a400b35dc95c497"
+  revision = "efa589957cd060542a26d2dd7832fd6a6c6c3ade"
 
 [[projects]]
   name = "github.com/mattn/go-isatty"
@@ -275,7 +275,7 @@
     "reporters/stenographer/support/go-isatty",
     "types"
   ]
-  revision = "6c46eb8334b30dc55b42f1a1c725d5ce97375390"
+  revision = "a3b6351eb1ff8e1bfa30b2f55d7e282186ed8fee"
 
 [[projects]]
   branch = "master"
@@ -299,7 +299,7 @@
     "matchers/support/goraph/util",
     "types"
   ]
-  revision = "a9c79f175573664afefe4fe0f3827c66263abcbb"
+  revision = "b7d1a52235cc433a76c556aa3f4229e63b95e7da"
 
 [[projects]]
   name = "github.com/opencontainers/go-digest"
@@ -322,8 +322,8 @@
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
-  version = "v1.0.3"
+  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
+  version = "v1.0.5"
 
 [[projects]]
   branch = "master"

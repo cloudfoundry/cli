@@ -47,7 +47,7 @@ A more comprehensive example is available at https://onsi.github.io/gomega/#_tes
 					})
 
 					It("should return the returned sprockets", func() {
-						Ω(client.Sprockets()).Should(Equal(sprockets))
+						Expect(client.Sprockets()).Should(Equal(sprockets))
 					})
 				})
 
@@ -57,7 +57,7 @@ A more comprehensive example is available at https://onsi.github.io/gomega/#_tes
 					})
 
 					It("should return an empty list of sprockets", func() {
-						Ω(client.Sprockets()).Should(BeEmpty())
+						Expect(client.Sprockets()).Should(BeEmpty())
 					})
 				})
 
@@ -68,8 +68,8 @@ A more comprehensive example is available at https://onsi.github.io/gomega/#_tes
 
 					It("should return an AuthenticationError error", func() {
 						sprockets, err := client.Sprockets()
-						Ω(sprockets).Should(BeEmpty())
-						Ω(err).Should(MatchError(AuthenticationError))
+						Expect(sprockets).Should(BeEmpty())
+						Expect(err).Should(MatchError(AuthenticationError))
 					})
 				})
 
@@ -80,8 +80,8 @@ A more comprehensive example is available at https://onsi.github.io/gomega/#_tes
 
 					It("should return an InternalError error", func() {
 						sprockets, err := client.Sprockets()
-						Ω(sprockets).Should(BeEmpty())
-						Ω(err).Should(MatchError(InternalError))
+						Expect(sprockets).Should(BeEmpty())
+						Expect(err).Should(MatchError(InternalError))
 					})
 				})
 			})
@@ -97,7 +97,7 @@ A more comprehensive example is available at https://onsi.github.io/gomega/#_tes
 				})
 
 				It("should make the request with a filter", func() {
-					Ω(client.Sprockets("food")).Should(Equal(sprockets))
+					Expect(client.Sprockets("food")).Should(Equal(sprockets))
 				})
 			})
 		})
@@ -111,6 +111,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/http/httputil"
 	"reflect"
 	"regexp"
 	"strings"
@@ -242,7 +243,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		defer func() {
 			recover()
 		}()
-		Ω(e).Should(BeNil(), "Handler Panicked")
+		Expect(e).Should(BeNil(), "Handler Panicked")
 	}()
 
 	if s.Writer != nil {
@@ -265,7 +266,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			req.Body.Close()
 			w.WriteHeader(s.GetUnhandledRequestStatusCode())
 		} else {
-			Ω(req).Should(BeNil(), "Received Unhandled Request")
+			formatted, err := httputil.DumpRequest(req, true)
+			Expect(err).NotTo(HaveOccurred(), "Encountered error while dumping HTTP request")
+			Expect(string(formatted)).Should(BeNil(), "Received Unhandled Request")
 		}
 	}
 }
