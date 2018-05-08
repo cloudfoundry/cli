@@ -54,6 +54,56 @@ grant_type=password&password=[PRIVATE DATA HIDDEN]&scope=&username=mgehard%2Bcli
 				Expect(Sanitize(request)).To(Equal(expected))
 			})
 
+			It("hides passwords in the first and last query parameters", func() {
+				response := `
+HTTP/1.1 200 BORK
+
+{
+  "resources": [
+    {
+      "entity": {
+        "credentials": {
+          "jdbcUrl": "jdbc:mysql://hostname/db-name?user=username&password=very-secret-password"
+        }
+      }
+    },
+	{
+      "entity": {
+        "credentials": {
+          "jdbcUrl": "jdbc:mysql://hostname/db-name?password=very-secret-password&user=username"
+        }
+      }
+    }
+  ]
+}
+`
+
+				expected := `
+HTTP/1.1 200 BORK
+
+{
+  "resources": [
+    {
+      "entity": {
+        "credentials": {
+          "jdbcUrl": "jdbc:mysql://hostname/db-name?user=username&password=[PRIVATE DATA HIDDEN]"
+        }
+      }
+    },
+	{
+      "entity": {
+        "credentials": {
+          "jdbcUrl": "jdbc:mysql://hostname/db-name?password=[PRIVATE DATA HIDDEN]&user=username"
+        }
+      }
+    }
+  ]
+}
+`
+
+				Expect(Sanitize(response)).To(Equal(expected))
+			})
+
 			It("hides passwords in the JSON-formatted request body", func() {
 				request := `
 REQUEST: [2014-03-07T10:53:36-08:00]
