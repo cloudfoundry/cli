@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
 
 	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
+	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

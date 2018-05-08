@@ -4,9 +4,9 @@ package rpcserverfakes
 import (
 	"sync"
 
+	"code.cloudfoundry.org/cli/cf/util/testhelpers/rpcserver"
 	"code.cloudfoundry.org/cli/plugin"
 	"code.cloudfoundry.org/cli/plugin/models"
-	"code.cloudfoundry.org/cli/util/testhelpers/rpcserver"
 )
 
 type FakeHandlers struct {

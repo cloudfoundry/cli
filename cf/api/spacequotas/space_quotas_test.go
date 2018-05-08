@@ -13,7 +13,7 @@ import (
 	"github.com/onsi/gomega/ghttp"
 
 	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
+	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 
 	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
 	. "github.com/onsi/ginkgo"

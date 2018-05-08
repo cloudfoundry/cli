@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/util/json"
+	"code.cloudfoundry.org/cli/cf/util/json"
 )
 
 //go:generate counterfeiter . Binder

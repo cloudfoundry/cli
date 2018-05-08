@@ -5,7 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/cf/terminal"
 
-	io_helpers "code.cloudfoundry.org/cli/util/testhelpers/io"
+	io_helpers "code.cloudfoundry.org/cli/cf/util/testhelpers/io"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"

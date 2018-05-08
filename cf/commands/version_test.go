@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/commands"
 	"code.cloudfoundry.org/cli/cf/flags"
 
-	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
+	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
 
 	"code.cloudfoundry.org/cli/cf"
 	. "github.com/onsi/ginkgo"

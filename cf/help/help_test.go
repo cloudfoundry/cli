@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
 	"code.cloudfoundry.org/cli/cf/help"
 
-	"code.cloudfoundry.org/cli/util/testhelpers/io"
+	"code.cloudfoundry.org/cli/cf/util/testhelpers/io"
 
 	"os"
 

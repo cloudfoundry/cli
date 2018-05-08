@@ -7,10 +7,10 @@ import (
 	cmdsQuota "code.cloudfoundry.org/cli/cf/commands/quota"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/errors"
-	testcmd "code.cloudfoundry.org/cli/util/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
-	. "code.cloudfoundry.org/cli/util/testhelpers/matchers"
-	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
+	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
+	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
 
 	"encoding/json"
 

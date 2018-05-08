@@ -1,7 +1,7 @@
 package spellcheck_test
 
 import (
-	. "code.cloudfoundry.org/cli/util/spellcheck"
+	. "code.cloudfoundry.org/cli/cf/util/spellcheck"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -4,8 +4,8 @@ import (
 	"code.cloudfoundry.org/cli/cf/actors/pluginrepo"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf/util/downloader"
 	"code.cloudfoundry.org/cli/util"
-	"code.cloudfoundry.org/cli/util/downloader"
 )
 
 //go:generate counterfeiter . PluginInstaller

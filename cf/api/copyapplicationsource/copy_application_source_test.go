@@ -10,8 +10,8 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
-	testnet "code.cloudfoundry.org/cli/util/testhelpers/net"
+	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
+	testnet "code.cloudfoundry.org/cli/cf/util/testhelpers/net"
 
 	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
 	. "github.com/onsi/ginkgo"

@@ -7,8 +7,8 @@ import (
 
 	. "code.cloudfoundry.org/cli/plugin/plugin_examples/test_rpc_server_example"
 
-	"code.cloudfoundry.org/cli/util/testhelpers/rpcserver"
-	"code.cloudfoundry.org/cli/util/testhelpers/rpcserver/rpcserverfakes"
+	"code.cloudfoundry.org/cli/cf/util/testhelpers/rpcserver"
+	"code.cloudfoundry.org/cli/cf/util/testhelpers/rpcserver/rpcserverfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

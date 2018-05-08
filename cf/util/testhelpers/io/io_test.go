@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/util/testhelpers/io"
+	. "code.cloudfoundry.org/cli/cf/util/testhelpers/io"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

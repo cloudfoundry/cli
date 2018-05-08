@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/util/json"
+	"code.cloudfoundry.org/cli/cf/util/json"
 )
 
 type CreateSecurityGroup struct {

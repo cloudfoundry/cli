@@ -17,9 +17,9 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf/util/downloader"
 	"code.cloudfoundry.org/cli/plugin"
 	"code.cloudfoundry.org/cli/util"
-	"code.cloudfoundry.org/cli/util/downloader"
 	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	pluginRPCService "code.cloudfoundry.org/cli/plugin/rpc"

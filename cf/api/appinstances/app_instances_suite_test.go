@@ -2,7 +2,7 @@ package appinstances_test
 
 import (
 	"code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/util/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 

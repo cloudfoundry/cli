@@ -8,7 +8,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/util/downloader"
+	"code.cloudfoundry.org/cli/cf/util/downloader"
 	clipr "github.com/cloudfoundry/cli-plugin-repo/web"
 )
 

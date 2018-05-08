@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/util/json"
+	"code.cloudfoundry.org/cli/cf/util/json"
 )
 
 type UpdateSecurityGroup struct {
