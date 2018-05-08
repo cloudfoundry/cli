@@ -1,9 +1,11 @@
 package helpers
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	. "github.com/onsi/ginkgo"
@@ -18,7 +20,7 @@ const (
 )
 
 func CF(args ...string) *Session {
-	WriteCommand(args)
+	WriteCommand(nil, args)
 	session, err := Start(
 		exec.Command("cf", args...),
 		NewPrefixedWriter(DebugOutPrefix, GinkgoWriter),
@@ -50,7 +52,7 @@ func CustomCF(cfEnv CFEnv, args ...string) *Session {
 		command.Env = env
 	}
 
-	WriteCommand(args)
+	WriteCommand(cfEnv.EnvVars, args)
 	session, err := Start(
 		command,
 		NewPrefixedWriter(DebugOutPrefix, GinkgoWriter),
@@ -69,7 +71,7 @@ func DebugCustomCF(cfEnv CFEnv, args ...string) *Session {
 }
 
 func CFWithStdin(stdin io.Reader, args ...string) *Session {
-	WriteCommand(args)
+	WriteCommand(nil, args)
 	command := exec.Command("cf", args...)
 	command.Stdin = stdin
 	session, err := Start(
@@ -84,7 +86,20 @@ func CFWithEnv(envVars map[string]string, args ...string) *Session {
 	return CustomCF(CFEnv{EnvVars: envVars}, args...)
 }
 
-func WriteCommand(args []string) {
-	display := append([]string{DebugCommandPrefix, "cf"}, args...)
+func WriteCommand(env map[string]string, args []string) {
+	display := []string{
+		DebugCommandPrefix,
+	}
+
+	isPass := regexp.MustCompile("(?i)password|token")
+	for key, val := range env {
+		if isPass.MatchString(key) {
+			val = "*****"
+		}
+		display = append(display, fmt.Sprintf("%s=%s", key, val))
+	}
+
+	display = append(display, "cf")
+	display = append(display, args...)
 	GinkgoWriter.Write([]byte(strings.Join(append(display, "\n"), " ")))
 }
