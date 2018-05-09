@@ -6,7 +6,7 @@ install:
 - go get -u github.com/onsi/ginkgo/ginkgo
 script:
 - go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
-- CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites -race -skipPackage integration,cf/ssh
+- NODES=1 make units-full
 branches:
   only:
   - master
