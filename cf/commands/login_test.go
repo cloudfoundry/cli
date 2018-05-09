@@ -473,6 +473,36 @@ var _ = Describe("Login Command", func() {
 				})
 			})
 
+			Context("when multiple prompts of password type are given", func() {
+				BeforeEach(func() {
+					authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]coreconfig.AuthPrompt{
+						"username": {
+							DisplayName: "Username",
+							Type:        coreconfig.AuthPromptTypeText,
+						},
+						"otherpass1": {
+							DisplayName: "some secure thing like mfa",
+							Type:        coreconfig.AuthPromptTypePassword,
+						},
+						"password": {
+							DisplayName: "Your Password",
+							Type:        coreconfig.AuthPromptTypePassword,
+						},
+					}, nil)
+				})
+
+				It("prompts for the password first", func() {
+					ui.Inputs = []string{"api.example.com", "the-username", "the-password", "other-secret"}
+
+					testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
+
+					Expect(ui.PasswordPrompts).To(Equal([]string{
+						"Your Password",
+						"some secure thing like mfa",
+					}))
+				})
+			})
+
 			It("takes the password from the -p flag", func() {
 				Flags = []string{"-p", "the-password"}
 				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number", "the-pin"}

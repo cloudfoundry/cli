@@ -226,7 +226,7 @@ func (cmd Login) authenticate(c flags.FlagContext) error {
 
 	for key, prompt := range prompts {
 		if prompt.Type == coreconfig.AuthPromptTypePassword {
-			if key == "passcode" {
+			if key == "passcode" || key == "password" {
 				continue
 			}
 
@@ -239,13 +239,19 @@ func (cmd Login) authenticate(c flags.FlagContext) error {
 	}
 
 	for i := 0; i < maxLoginTries; i++ {
-		for _, key := range passwordKeys {
-			if key == "password" && passwordFlagValue != "" {
-				credentials[key] = passwordFlagValue
+
+		// ensure that password gets prompted before other codes (eg. mfa code)
+		if passPrompt, ok := prompts["password"]; ok {
+			if passwordFlagValue != "" {
+				credentials["password"] = passwordFlagValue
 				passwordFlagValue = ""
 			} else {
-				credentials[key] = cmd.ui.AskForPassword(prompts[key].DisplayName)
+				credentials["password"] = cmd.ui.AskForPassword(passPrompt.DisplayName)
 			}
+		}
+
+		for _, key := range passwordKeys {
+			credentials[key] = cmd.ui.AskForPassword(prompts[key].DisplayName)
 		}
 
 		credentialsCopy := make(map[string]string, len(credentials))
