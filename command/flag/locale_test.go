@@ -53,6 +53,15 @@ var _ = Describe("Locale", func() {
 			Expect(locale.Locale).To(Equal("ja-JP"))
 		})
 
+		Context("when the value provided to the locale flag starts with a '-'", func() {
+			It("returns a ErrExpectedArgument error that an argument for locale was expected", func() {
+				Expect(locale.UnmarshalFlag("-some-val")).To(MatchError(&flags.Error{
+					Type:    flags.ErrExpectedArgument,
+					Message: "expected argument for flag --locale, but got option -some-val",
+				}))
+			})
+		})
+
 		It("errors on anything else", func() {
 			err := locale.UnmarshalFlag("I AM A BANANANANANANANANAE")
 			Expect(err).To(MatchError(&flags.Error{

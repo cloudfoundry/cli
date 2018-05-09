@@ -45,20 +45,15 @@ var _ = Describe("NetworkPort", func() {
 					Type:    flags.ErrRequired,
 					Message: `PORT must be a positive integer`,
 				}),
-			Entry("when provided '-1' it returns back a flag error", "-1",
-				&flags.Error{
-					Type:    flags.ErrRequired,
-					Message: `PORT must be a positive integer`,
-				}),
-			Entry("when provided '-1-1' it returns back a flag error", "-1-1",
-				&flags.Error{
-					Type:    flags.ErrRequired,
-					Message: `PORT must be a positive integer`,
-				}),
 			Entry("when provided '1-2-3' it returns back a flag error", "1-2-3",
 				&flags.Error{
 					Type:    flags.ErrRequired,
 					Message: `PORT syntax must match integer[-integer]`,
+				}),
+			Entry("when provided '-someval' it returns back a flag error", "-someval",
+				&flags.Error{
+					Type:    flags.ErrExpectedArgument,
+					Message: "expected argument for flag --port, but got option -someval",
 				}),
 		)
 	})

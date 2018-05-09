@@ -41,5 +41,14 @@ var _ = Describe("Docker", func() {
 				Expect(docker.Path).To(BeEmpty())
 			})
 		})
+
+		Context("when the value provided to the docker image flag starts with a '-'", func() {
+			It("returns a ErrExpectedArgument error that an argument for docker was expected", func() {
+				Expect(docker.UnmarshalFlag("-some-val")).To(MatchError(&flags.Error{
+					Type:    flags.ErrExpectedArgument,
+					Message: "expected argument for flag --docker-image, but got option -some-val",
+				}))
+			})
+		})
 	})
 })

@@ -28,6 +28,13 @@ func (PathWithExistenceCheck) Complete(prefix string) []flags.Completion {
 }
 
 func (p *PathWithExistenceCheck) UnmarshalFlag(path string) error {
+	if strings.HasPrefix(path, "-") {
+		return &flags.Error{
+			Type:    flags.ErrExpectedArgument,
+			Message: fmt.Sprintf("expected argument, but got option %s", path),
+		}
+	}
+
 	_, err := os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -51,6 +58,13 @@ func (JSONOrFileWithValidation) Complete(prefix string) []flags.Completion {
 
 func (p *JSONOrFileWithValidation) UnmarshalFlag(pathOrJSON string) error {
 	var jsonBytes []byte
+
+	if strings.HasPrefix(pathOrJSON, "-") {
+		return &flags.Error{
+			Type:    flags.ErrExpectedArgument,
+			Message: fmt.Sprintf("expected argument, but got option %s", pathOrJSON),
+		}
+	}
 
 	errorToReturn := &flags.Error{
 		Type:    flags.ErrRequired,
@@ -84,6 +98,13 @@ func (PathWithExistenceCheckOrURL) Complete(prefix string) []flags.Completion {
 }
 
 func (p *PathWithExistenceCheckOrURL) UnmarshalFlag(path string) error {
+	if strings.HasPrefix(path, "-") {
+		return &flags.Error{
+			Type:    flags.ErrExpectedArgument,
+			Message: fmt.Sprintf("expected argument, but got option %s", path),
+		}
+	}
+
 	if !strings.HasPrefix(path, "http://") && !strings.HasPrefix(path, "https://") {
 		_, err := os.Stat(path)
 		if err != nil {

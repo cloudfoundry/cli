@@ -1,6 +1,7 @@
 package flag
 
 import (
+	"fmt"
 	"strings"
 
 	flags "github.com/jessevdk/go-flags"
@@ -15,6 +16,12 @@ func (NetworkProtocol) Complete(prefix string) []flags.Completion {
 }
 
 func (h *NetworkProtocol) UnmarshalFlag(val string) error {
+	if strings.HasPrefix(val, "-") {
+		return &flags.Error{
+			Type:    flags.ErrExpectedArgument,
+			Message: fmt.Sprintf("expected argument for flag --protocol, but got option %s", val),
+		}
+	}
 	valLower := strings.ToLower(val)
 	switch valLower {
 	case "tcp", "udp":

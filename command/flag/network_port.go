@@ -1,6 +1,7 @@
 package flag
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -13,6 +14,13 @@ type NetworkPort struct {
 }
 
 func (np *NetworkPort) UnmarshalFlag(val string) error {
+	if strings.HasPrefix(val, "-") {
+		return &flags.Error{
+			Type:    flags.ErrExpectedArgument,
+			Message: fmt.Sprintf("expected argument for flag --port, but got option %s", val),
+		}
+	}
+
 	ports := strings.Split(val, "-")
 
 	var err error

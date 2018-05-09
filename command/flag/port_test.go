@@ -34,14 +34,12 @@ var _ = Describe("Port", func() {
 			})
 		})
 
-		Context("when a negative integer is provided", func() {
-			It("returns an error", func() {
-				err := port.UnmarshalFlag("-10")
-				Expect(err).To(MatchError(&flags.Error{
-					Type:    flags.ErrRequired,
-					Message: "invalid argument for flag '--port' (expected int > 0)",
+		Context("when the value provided to the port flag starts with a '-'", func() {
+			It("returns a ErrExpectedArgument error that an argument for port was expected", func() {
+				Expect(port.UnmarshalFlag("-some-val")).To(MatchError(&flags.Error{
+					Type:    flags.ErrExpectedArgument,
+					Message: "expected argument for flag --port, but got option -some-val",
 				}))
-				Expect(port).To(Equal(Port{NullInt: types.NullInt{Value: -10, IsSet: true}}))
 			})
 		})
 

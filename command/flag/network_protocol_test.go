@@ -47,6 +47,15 @@ var _ = Describe("NetworkProtocol", func() {
 			Entry("sets 'udp' when passed 'uDp'", "uDp", "udp"),
 		)
 
+		Context("when passed a value starting with '-'", func() {
+			It("returns a ErrExpectedArgument error that an argument for protocol was expected", func() {
+				Expect(proto.UnmarshalFlag("-some-val")).To(MatchError(&flags.Error{
+					Type:    flags.ErrExpectedArgument,
+					Message: "expected argument for flag --protocol, but got option -some-val",
+				}))
+			})
+		})
+
 		Context("when passed anything else", func() {
 			It("returns an error", func() {
 				err := proto.UnmarshalFlag("banana")

@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("SpaceRole", func() {
+var _ = Describe("SSHPortForwarding", func() {
 	var forward SSHPortForwarding
 
 	Describe("UnmarshalFlag", func() {
@@ -40,7 +40,16 @@ var _ = Describe("SpaceRole", func() {
 			})
 		})
 
-		DescribeTable("error cases",
+		Context("when passed a value starting with a '-'", func() {
+			It("returns a ErrExpectedArgument error that an argument for ssh port forwarding was expected", func() {
+				Expect(forward.UnmarshalFlag("-some-val")).To(MatchError(&flags.Error{
+					Type:    flags.ErrExpectedArgument,
+					Message: "expected argument for flag -L, but got option -some-val",
+				}))
+			})
+		})
+
+		DescribeTable("other error cases",
 			func(input string) {
 				err := forward.UnmarshalFlag(input)
 				Expect(err).To(MatchError(&flags.Error{

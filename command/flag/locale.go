@@ -18,6 +18,13 @@ func (l Locale) Complete(prefix string) []flags.Completion {
 }
 
 func (l *Locale) UnmarshalFlag(val string) error {
+	if strings.HasPrefix(val, "-") {
+		return &flags.Error{
+			Type:    flags.ErrExpectedArgument,
+			Message: fmt.Sprintf("expected argument for flag --locale, but got option %s", val),
+		}
+	}
+
 	sanitized := strings.ToLower(l.sanitize(val))
 	for _, locale := range l.listLocales() {
 		if sanitized == strings.ToLower(locale) {
