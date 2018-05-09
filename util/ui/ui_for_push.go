@@ -21,31 +21,6 @@ type Change struct {
 	HiddenValue  bool
 }
 
-// DisplayChangesForPush will display the set of changes via
-// DisplayChangeForPush in the order given.
-func (ui *UI) DisplayChangesForPush(changeSet []Change) error {
-	if len(changeSet) == 0 {
-		return nil
-	}
-
-	var columnWidth int
-	for _, change := range changeSet {
-		if width := wordSize(ui.TranslateText(change.Header)); width > columnWidth {
-			columnWidth = width
-		}
-	}
-
-	for _, change := range changeSet {
-		padding := columnWidth - wordSize(ui.TranslateText(change.Header)) + 3
-		err := ui.DisplayChangeForPush(change.Header, padding, change.HiddenValue, change.CurrentValue, change.NewValue)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 // DisplayChangeForPush will display the header and old/new value with the
 // appropriately red/green minuses and pluses.
 func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, hiddenValue bool, originalValue interface{}, newValue interface{}) error {
@@ -87,6 +62,31 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, hiddenV
 	default:
 		panic(fmt.Sprintf("diff display does not have case for '%s'", header))
 	}
+	return nil
+}
+
+// DisplayChangesForPush will display the set of changes via
+// DisplayChangeForPush in the order given.
+func (ui *UI) DisplayChangesForPush(changeSet []Change) error {
+	if len(changeSet) == 0 {
+		return nil
+	}
+
+	var columnWidth int
+	for _, change := range changeSet {
+		if width := wordSize(ui.TranslateText(change.Header)); width > columnWidth {
+			columnWidth = width
+		}
+	}
+
+	for _, change := range changeSet {
+		padding := columnWidth - wordSize(ui.TranslateText(change.Header)) + 3
+		err := ui.DisplayChangeForPush(change.Header, padding, change.HiddenValue, change.CurrentValue, change.NewValue)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

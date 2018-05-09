@@ -273,16 +273,16 @@ var _ = Describe("JSONConfig", func() {
 	Describe("SetUAAEndpoint", func() {
 		It("sets the UAA endpoint", func() {
 			config = new(Config)
-			config.SetUAAGrantType("some-uaa-grant-type")
-			Expect(config.ConfigFile.UAAGrantType).To(Equal("some-uaa-grant-type"))
+			config.SetUAAEndpoint("some-uaa-endpoint.com")
+			Expect(config.ConfigFile.UAAEndpoint).To(Equal("some-uaa-endpoint.com"))
 		})
 	})
 
-	Describe("SetUAAEndpoint", func() {
+	Describe("SetUAAGrantType", func() {
 		It("sets the UAA endpoint", func() {
 			config = new(Config)
-			config.SetUAAEndpoint("some-uaa-endpoint.com")
-			Expect(config.ConfigFile.UAAEndpoint).To(Equal("some-uaa-endpoint.com"))
+			config.SetUAAGrantType("some-uaa-grant-type")
+			Expect(config.ConfigFile.UAAGrantType).To(Equal("some-uaa-grant-type"))
 		})
 	})
 
@@ -366,6 +366,22 @@ var _ = Describe("JSONConfig", func() {
 		})
 	})
 
+	Describe("UAAGrantType", func() {
+		BeforeEach(func() {
+			rawConfig := ` { "UAAGrantType": "some-grant-type" }`
+			setConfig(homeDir, rawConfig)
+
+			var err error
+			config, err = LoadConfig()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config).ToNot(BeNil())
+		})
+
+		It("returns the client secret", func() {
+			Expect(config.UAAGrantType()).To(Equal("some-grant-type"))
+		})
+	})
+
 	Describe("UAAOAuthClient", func() {
 		BeforeEach(func() {
 			rawConfig := `{ "UAAOAuthClient":"some-client" }`
@@ -402,49 +418,6 @@ var _ = Describe("JSONConfig", func() {
 		})
 	})
 
-	Describe("UAAGrantType", func() {
-		BeforeEach(func() {
-			rawConfig := ` { "UAAGrantType": "some-grant-type" }`
-			setConfig(homeDir, rawConfig)
-
-			var err error
-			config, err = LoadConfig()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(config).ToNot(BeNil())
-		})
-
-		It("returns the client secret", func() {
-			Expect(config.UAAGrantType()).To(Equal("some-grant-type"))
-		})
-	})
-
-	Describe("UnsetUserInformation", func() {
-		BeforeEach(func() {
-			config = new(Config)
-			config.SetAccessToken("some-access-token")
-			config.SetRefreshToken("some-refresh-token")
-			config.SetUAAGrantType("client-credentials")
-			config.SetUAAClientCredentials("some-client", "some-client-secret")
-			config.SetOrganizationInformation("some-org-guid", "some-org")
-			config.SetSpaceInformation("guid-value-1", "my-org-name", true)
-		})
-
-		It("resets all user information", func() {
-			config.UnsetUserInformation()
-
-			Expect(config.ConfigFile.AccessToken).To(BeEmpty())
-			Expect(config.ConfigFile.RefreshToken).To(BeEmpty())
-			Expect(config.ConfigFile.TargetedOrganization.GUID).To(BeEmpty())
-			Expect(config.ConfigFile.TargetedOrganization.Name).To(BeEmpty())
-			Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
-			Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
-			Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
-			Expect(config.ConfigFile.UAAGrantType).To(BeEmpty())
-			Expect(config.ConfigFile.UAAOAuthClient).To(Equal(DefaultUAAOAuthClient))
-			Expect(config.ConfigFile.UAAOAuthClientSecret).To(Equal(DefaultUAAOAuthClientSecret))
-		})
-	})
-
 	Describe("UnsetOrganizationAndSpaceInformation", func() {
 		BeforeEach(func() {
 			config = new(Config)
@@ -475,6 +448,33 @@ var _ = Describe("JSONConfig", func() {
 			Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
 			Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
 			Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
+		})
+	})
+
+	Describe("UnsetUserInformation", func() {
+		BeforeEach(func() {
+			config = new(Config)
+			config.SetAccessToken("some-access-token")
+			config.SetRefreshToken("some-refresh-token")
+			config.SetUAAGrantType("client-credentials")
+			config.SetUAAClientCredentials("some-client", "some-client-secret")
+			config.SetOrganizationInformation("some-org-guid", "some-org")
+			config.SetSpaceInformation("guid-value-1", "my-org-name", true)
+		})
+
+		It("resets all user information", func() {
+			config.UnsetUserInformation()
+
+			Expect(config.ConfigFile.AccessToken).To(BeEmpty())
+			Expect(config.ConfigFile.RefreshToken).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedOrganization.GUID).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedOrganization.Name).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
+			Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
+			Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
+			Expect(config.ConfigFile.UAAGrantType).To(BeEmpty())
+			Expect(config.ConfigFile.UAAOAuthClient).To(Equal(DefaultUAAOAuthClient))
+			Expect(config.ConfigFile.UAAOAuthClientSecret).To(Equal(DefaultUAAOAuthClientSecret))
 		})
 	})
 })

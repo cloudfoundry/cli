@@ -34,6 +34,40 @@ var _ = Describe("UI", func() {
 		ui.Err = NewBuffer()
 	})
 
+	Describe("DisplayChangesForPush", func() {
+		It("alings all the string types", func() {
+			changeSet := []Change{
+				{
+					Header:       "h1",
+					CurrentValue: "old",
+					NewValue:     "new",
+				},
+				{
+					Header:       "header2",
+					CurrentValue: "old",
+					NewValue:     "old",
+				},
+				{
+					Header:       "header3",
+					CurrentValue: []string{"route2", "route1", "route4"},
+					NewValue:     []string{"route4", "route2", "route3"},
+				},
+			}
+
+			err := ui.DisplayChangesForPush(changeSet)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(out).To(Say("\x1b\\[31m\\-\\s+h1        old\x1b\\[0m"))
+			Expect(out).To(Say("\x1b\\[32m\\+\\s+h1        new\x1b\\[0m"))
+			Expect(out).To(Say("(?m)^\\s+header2   old"))
+			Expect(out).To(Say("(?m)^\\s+header3$"))
+			Expect(out).To(Say("\x1b\\[31m\\-\\s+route1\x1b\\[0m"))
+			Expect(out).To(Say("(?m)^\\s+route2$"))
+			Expect(out).To(Say("\x1b\\[32m\\+\\s+route3\x1b\\[0m"))
+			Expect(out).To(Say("(?m)^\\s+route4$"))
+		})
+	})
+
 	Describe("DisplayChangeForPush", func() {
 		Context("in english", func() {
 			Context("when passed strings for values", func() {
@@ -318,40 +352,6 @@ var _ = Describe("UI", func() {
 					Expect(out).To(Say("(?m)^\\s+route4$"))
 				})
 			})
-		})
-	})
-
-	Describe("DisplayChangesForPush", func() {
-		It("alings all the string types", func() {
-			changeSet := []Change{
-				{
-					Header:       "h1",
-					CurrentValue: "old",
-					NewValue:     "new",
-				},
-				{
-					Header:       "header2",
-					CurrentValue: "old",
-					NewValue:     "old",
-				},
-				{
-					Header:       "header3",
-					CurrentValue: []string{"route2", "route1", "route4"},
-					NewValue:     []string{"route4", "route2", "route3"},
-				},
-			}
-
-			err := ui.DisplayChangesForPush(changeSet)
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(out).To(Say("\x1b\\[31m\\-\\s+h1        old\x1b\\[0m"))
-			Expect(out).To(Say("\x1b\\[32m\\+\\s+h1        new\x1b\\[0m"))
-			Expect(out).To(Say("(?m)^\\s+header2   old"))
-			Expect(out).To(Say("(?m)^\\s+header3$"))
-			Expect(out).To(Say("\x1b\\[31m\\-\\s+route1\x1b\\[0m"))
-			Expect(out).To(Say("(?m)^\\s+route2$"))
-			Expect(out).To(Say("\x1b\\[32m\\+\\s+route3\x1b\\[0m"))
-			Expect(out).To(Say("(?m)^\\s+route4$"))
 		})
 	})
 })

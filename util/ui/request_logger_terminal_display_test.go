@@ -215,4 +215,28 @@ Origin: wss://doppler.bosh-lite.com:443`
 			Expect(display.Stop()).NotTo(HaveOccurred())
 		})
 	})
+
+	Describe("UI", func() {
+		Describe("RequestLoggerTerminalDisplay", func() {
+			BeforeEach(func() {
+				Expect(display.Stop()).ToNot(HaveOccurred())
+			})
+
+			It("returns a RequestLoggerTerminalDisplay with the consistent display mutex", func() {
+				logger1 := testUI.RequestLoggerTerminalDisplay()
+				logger2 := testUI.RequestLoggerTerminalDisplay()
+
+				c := make(chan bool)
+				err := logger1.Start()
+				Expect(err).ToNot(HaveOccurred())
+				go func() {
+					Expect(logger2.Start()).ToNot(HaveOccurred())
+					c <- true
+				}()
+				Consistently(c).ShouldNot(Receive())
+				Expect(logger1.Stop()).ToNot(HaveOccurred())
+				Eventually(c).Should(Receive())
+			})
+		})
+	})
 })

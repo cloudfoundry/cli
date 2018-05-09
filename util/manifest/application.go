@@ -45,36 +45,6 @@ type Application struct {
 	DeprecatedNoHostname interface{}
 }
 
-func (app Application) String() string {
-	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s',  Buildpacks: [%s], Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Droplet Path: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Hostname: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-Hostname: %t, No-Route: %t, Path: '%s', RandomRoute: %t, RoutePath: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
-		app.Name,
-		app.Buildpack.IsSet,
-		app.Buildpack.Value,
-		strings.Join(app.Buildpacks, ", "),
-		app.Command.IsSet,
-		app.Command.Value,
-		app.DiskQuota,
-		app.DockerImage,
-		app.DropletPath,
-		app.HealthCheckHTTPEndpoint,
-		app.HealthCheckTimeout,
-		app.HealthCheckType,
-		app.Hostname,
-		app.Instances.IsSet,
-		app.Instances.Value,
-		app.Memory,
-		app.NoHostname,
-		app.NoRoute,
-		app.Path,
-		app.RandomRoute,
-		app.RoutePath,
-		strings.Join(app.Routes, ", "),
-		strings.Join(app.Services, ", "),
-		app.StackName,
-	)
-}
-
 func (app Application) MarshalYAML() (interface{}, error) {
 	var m = rawManifestApplication{
 		Buildpack:               app.Buildpack.Value,
@@ -104,6 +74,36 @@ func (app Application) MarshalYAML() (interface{}, error) {
 	}
 
 	return m, nil
+}
+
+func (app Application) String() string {
+	return fmt.Sprintf(
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s',  Buildpacks: [%s], Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Droplet Path: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Hostname: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-Hostname: %t, No-Route: %t, Path: '%s', RandomRoute: %t, RoutePath: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
+		app.Name,
+		app.Buildpack.IsSet,
+		app.Buildpack.Value,
+		strings.Join(app.Buildpacks, ", "),
+		app.Command.IsSet,
+		app.Command.Value,
+		app.DiskQuota,
+		app.DockerImage,
+		app.DropletPath,
+		app.HealthCheckHTTPEndpoint,
+		app.HealthCheckTimeout,
+		app.HealthCheckType,
+		app.Hostname,
+		app.Instances.IsSet,
+		app.Instances.Value,
+		app.Memory,
+		app.NoHostname,
+		app.NoRoute,
+		app.Path,
+		app.RandomRoute,
+		app.RoutePath,
+		strings.Join(app.Routes, ", "),
+		strings.Join(app.Services, ", "),
+		app.StackName,
+	)
 }
 
 func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) error {

@@ -18,7 +18,7 @@ import (
 
 var _ = Describe("Request Logger File Writer", func() {
 	var (
-		testUI   *UI
+		ui       *UI
 		display  *RequestLoggerFileWriter
 		tmpdir   string
 		logFile1 string
@@ -26,7 +26,7 @@ var _ = Describe("Request Logger File Writer", func() {
 	)
 
 	BeforeEach(func() {
-		testUI = NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
+		ui = NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 	})
 
 	Describe("Valid file paths", func() {
@@ -37,7 +37,7 @@ var _ = Describe("Request Logger File Writer", func() {
 
 			logFile1 = filepath.Join(tmpdir, "tmp_sub_dir", "tmpfile1")
 			logFile2 = filepath.Join(tmpdir, "tmp", "sub", "dir", ".", "tmpfile2")
-			display = testUI.RequestLoggerFileWriter([]string{logFile1, logFile2})
+			display = ui.RequestLoggerFileWriter([]string{logFile1, logFile2})
 			Expect(display.Start()).ToNot(HaveOccurred())
 		})
 
@@ -292,7 +292,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 			It("sends error to standard error", func() {
 				err := errors.New("foobar")
 				display.HandleInternalError(err)
-				Expect(testUI.Err).To(Say("foobar"))
+				Expect(ui.Err).To(Say("foobar"))
 				Expect(display.Stop()).NotTo(HaveOccurred())
 			})
 		})
@@ -303,7 +303,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 				Expect(display.Stop()).NotTo(HaveOccurred())
 				logFile1 = filepath.Join(tmpdir, "tmp_sub_dir", "tmpfile3")
 				logFile2 = filepath.Join(tmpdir, "tmp", "sub", "dir", ".", "tmpfile4")
-				display = testUI.RequestLoggerFileWriter([]string{logFile1, logFile2})
+				display = ui.RequestLoggerFileWriter([]string{logFile1, logFile2})
 			})
 
 			It("locks and then unlocks the mutex properly", func() { // and creates the intermediate dirs
@@ -336,7 +336,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 
 		It("returns the os error when we unsuccessfully try to write to a file", func() {
 			Expect(os.Mkdir(pathName, os.ModeDir|os.ModePerm)).NotTo(HaveOccurred())
-			display = testUI.RequestLoggerFileWriter([]string{pathName})
+			display = ui.RequestLoggerFileWriter([]string{pathName})
 			err := display.Start()
 
 			Expect(err).To(MatchError(fmt.Sprintf("open %s: is a directory", pathName)))
@@ -350,11 +350,31 @@ Origin: wss://doppler.bosh-lite.com:443`
 			err = file.Close()
 			Expect(err).ToNot(HaveOccurred())
 
-			display = testUI.RequestLoggerFileWriter([]string{filepath.Join(pathName, "bar")})
+			display = ui.RequestLoggerFileWriter([]string{filepath.Join(pathName, "bar")})
 			err = display.Start()
 
 			pathName = strings.Replace(pathName, `\`, `\\`, -1)
 			Expect(err).To(MatchError(MatchRegexp(fmt.Sprintf("mkdir %s", pathName))))
+		})
+	})
+
+	Describe("UI", func() {
+		Describe("RequestLoggerFileWriter", func() {
+			It("returns a RequestLoggerFileWriter with the consistent filewriting mutex", func() {
+				logger1 := ui.RequestLoggerFileWriter(nil)
+				logger2 := ui.RequestLoggerFileWriter(nil)
+
+				c := make(chan bool)
+				err := logger1.Start()
+				Expect(err).ToNot(HaveOccurred())
+				go func() {
+					Expect(logger2.Start()).ToNot(HaveOccurred())
+					c <- true
+				}()
+				Consistently(c).ShouldNot(Receive())
+				Expect(logger1.Stop()).ToNot(HaveOccurred())
+				Eventually(c).Should(Receive())
+			})
 		})
 	})
 })

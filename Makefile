@@ -77,8 +77,9 @@ integration-tests-full : build integration-cleanup
 	make integration-cleanup
 
 lint :
-	@echo "linting files:" # this list will grow as we cleanup all the code
-	go run bin/style/main.go api
+	@echo "style linting files:" # this list will grow as we cleanup all the code
+	@bash -c "go run bin/style/main.go api util/{configv3,manifest,randomword,sorting,ui}"
+	@echo "No lint errors!"
 	@echo
 
 out/cf-cli_linux_i686 : $(GOSRC)

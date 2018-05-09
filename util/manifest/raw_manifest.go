@@ -28,10 +28,6 @@ type rawManifest struct {
 	Inherit                       interface{} `yaml:"inherit"`
 }
 
-func (raw rawManifest) containsInheritanceField() bool {
-	return raw.Inherit != nil
-}
-
 func (raw rawManifest) containsGlobalFields() []string {
 	globalFields := []string{}
 
@@ -102,4 +98,8 @@ func (raw rawManifest) containsGlobalFields() []string {
 		globalFields = append(globalFields, "stack")
 	}
 	return globalFields
+}
+
+func (raw rawManifest) containsInheritanceField() bool {
+	return raw.Inherit != nil
 }

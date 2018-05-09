@@ -117,12 +117,6 @@ func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken
 }
 
-// SetUAAClientCredentials sets the client credentials.
-func (config *Config) SetUAAClientCredentials(client string, clientSecret string) {
-	config.ConfigFile.UAAOAuthClient = client
-	config.ConfigFile.UAAOAuthClientSecret = clientSecret
-}
-
 // SetOrganizationInformation sets the currently targeted organization.
 func (config *Config) SetOrganizationInformation(guid string, name string) {
 	config.ConfigFile.TargetedOrganization.GUID = guid
@@ -163,16 +157,22 @@ func (config *Config) SetTokenInformation(accessToken string, refreshToken strin
 	config.ConfigFile.SSHOAuthClient = sshOAuthClient
 }
 
-// SetUAAGrantType sets the UAA grant type for logging in and refreshing the
-// token.
-func (config *Config) SetUAAGrantType(uaaGrantType string) {
-	config.ConfigFile.UAAGrantType = uaaGrantType
+// SetUAAClientCredentials sets the client credentials.
+func (config *Config) SetUAAClientCredentials(client string, clientSecret string) {
+	config.ConfigFile.UAAOAuthClient = client
+	config.ConfigFile.UAAOAuthClientSecret = clientSecret
 }
 
 // SetUAAEndpoint sets the UAA endpoint that is obtained from hitting
 // <AuthorizationEndpoint>/login.
 func (config *Config) SetUAAEndpoint(uaaEndpoint string) {
 	config.ConfigFile.UAAEndpoint = uaaEndpoint
+}
+
+// SetUAAGrantType sets the UAA grant type for logging in and refreshing the
+// token.
+func (config *Config) SetUAAGrantType(uaaGrantType string) {
+	config.ConfigFile.UAAGrantType = uaaGrantType
 }
 
 // SkipSSLValidation returns whether or not to skip SSL validation when
@@ -202,6 +202,11 @@ func (config *Config) TargetedSpace() Space {
 	return config.ConfigFile.TargetedSpace
 }
 
+// UAAGrantType returns the grant type of the supplied UAA credentials.
+func (config *Config) UAAGrantType() string {
+	return config.ConfigFile.UAAGrantType
+}
+
 // UAAOAuthClient returns the CLI's UAA client ID.
 func (config *Config) UAAOAuthClient() string {
 	return config.ConfigFile.UAAOAuthClient
@@ -210,23 +215,6 @@ func (config *Config) UAAOAuthClient() string {
 // UAAOAuthClientSecret returns the CLI's UAA client secret.
 func (config *Config) UAAOAuthClientSecret() string {
 	return config.ConfigFile.UAAOAuthClientSecret
-}
-
-// UAAGrantType returns the grant type of the supplied UAA credentials.
-func (config *Config) UAAGrantType() string {
-	return config.ConfigFile.UAAGrantType
-}
-
-// UnsetUserInformation resets the access token, refresh token, UAA grant type,
-// UAA client credentials, and targeted org/space information.
-func (config *Config) UnsetUserInformation() {
-	config.SetAccessToken("")
-	config.SetRefreshToken("")
-	config.SetUAAGrantType("")
-	config.SetUAAClientCredentials(DefaultUAAOAuthClient, DefaultUAAOAuthClientSecret)
-
-	config.UnsetOrganizationAndSpaceInformation()
-
 }
 
 // UnsetOrganizationAndSpaceInformation resets the organization and space
@@ -239,6 +227,18 @@ func (config *Config) UnsetOrganizationAndSpaceInformation() {
 // UnsetSpaceInformation resets the space values to default.
 func (config *Config) UnsetSpaceInformation() {
 	config.SetSpaceInformation("", "", false)
+}
+
+// UnsetUserInformation resets the access token, refresh token, UAA grant type,
+// UAA client credentials, and targeted org/space information.
+func (config *Config) UnsetUserInformation() {
+	config.SetAccessToken("")
+	config.SetRefreshToken("")
+	config.SetUAAGrantType("")
+	config.SetUAAClientCredentials(DefaultUAAOAuthClient, DefaultUAAOAuthClientSecret)
+
+	config.UnsetOrganizationAndSpaceInformation()
+
 }
 
 func decodeUserFromJWT(accessToken string) (User, error) {

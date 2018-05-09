@@ -6,14 +6,6 @@ import (
 
 type AlphabetSorter func([]string) func(i, j int) bool
 
-// SortAlphabeticFunc returns a `less()` comparator for sorting strings while
-// respecting case.
-func SortAlphabeticFunc(list []string) func(i, j int) bool {
-	return func(i, j int) bool {
-		return LessIgnoreCase(list[i], list[j])
-	}
-}
-
 // LessIgnoreCase returns true if first
 func LessIgnoreCase(first string, second string) bool {
 	iRunes := []rune(first)
@@ -42,4 +34,12 @@ func LessIgnoreCase(first string, second string) bool {
 	}
 
 	return false
+}
+
+// SortAlphabeticFunc returns a `less()` comparator for sorting strings while
+// respecting case.
+func SortAlphabeticFunc(list []string) func(i, j int) bool {
+	return func(i, j int) bool {
+		return LessIgnoreCase(list[i], list[j])
+	}
 }

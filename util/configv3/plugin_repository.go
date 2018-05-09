@@ -19,18 +19,19 @@ type PluginRepository struct {
 	URL  string `json:"URL"`
 }
 
+// AddPluginRepository adds an new repository to the plugin config. It does not
+// add duplicates to the config.
+func (config *Config) AddPluginRepository(name string, url string) {
+	config.ConfigFile.PluginRepositories = append(config.ConfigFile.PluginRepositories,
+		PluginRepository{Name: name, URL: url})
+}
+
 // PluginRepositories returns the currently configured plugin repositories from the
-// .cf/config.json
+// .cf/config.json.
 func (config *Config) PluginRepositories() []PluginRepository {
 	repos := config.ConfigFile.PluginRepositories
 	sort.Slice(repos, func(i, j int) bool {
 		return strings.ToLower(repos[i].Name) < strings.ToLower(repos[j].Name)
 	})
 	return repos
-}
-
-// does not add duplicates to the config
-func (config *Config) AddPluginRepository(name string, url string) {
-	config.ConfigFile.PluginRepositories = append(config.ConfigFile.PluginRepositories,
-		PluginRepository{Name: name, URL: url})
 }

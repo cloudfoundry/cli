@@ -105,3 +105,10 @@ func (display *RequestLoggerTerminalDisplay) Stop() error {
 	display.lock.Unlock()
 	return nil
 }
+
+// RequestLoggerTerminalDisplay returns a RequestLoggerTerminalDisplay that
+// cannot overwrite another RequestLoggerTerminalDisplay or the current
+// display.
+func (ui *UI) RequestLoggerTerminalDisplay() *RequestLoggerTerminalDisplay {
+	return newRequestLoggerTerminalDisplay(ui, ui.terminalLock)
+}

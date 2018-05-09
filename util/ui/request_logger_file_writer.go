@@ -147,3 +147,9 @@ func (display *RequestLoggerFileWriter) Stop() error {
 	display.lock.Unlock()
 	return err
 }
+
+// RequestLoggerFileWriter returns a RequestLoggerFileWriter that cannot
+// overwrite another RequestLoggerFileWriter.
+func (ui *UI) RequestLoggerFileWriter(filePaths []string) *RequestLoggerFileWriter {
+	return newRequestLoggerFileWriter(ui, ui.fileLock, filePaths)
+}

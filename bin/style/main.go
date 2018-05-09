@@ -136,7 +136,11 @@ func (v *visitor) checkFunc(node *ast.FuncDecl) {
 		v.checkFuncWithReceiver(node)
 	} else {
 		funcName := node.Name.Name
-		if funcName == "Execute" || strings.HasPrefix(funcName, "New") || strings.HasPrefix(funcName, "new") {
+		if funcName == "Execute" ||
+			strings.HasPrefix(funcName, "New") ||
+			strings.HasPrefix(funcName, "new") ||
+			strings.HasPrefix(funcName, "Default") ||
+			strings.HasPrefix(funcName, "default") {
 			return
 		}
 
@@ -168,8 +172,8 @@ func (v *visitor) checkFuncWithReceiver(node *ast.FuncDecl) {
 		}
 	}
 	if receiver == v.lastReceiver {
-		if strings.Compare(funcName, v.lastReceiverFunc) == -1 {
-			v.addWarning(node.Pos(), "method %s.%s defined after method %s.%s", receiver, funcName, receiver, v.lastReceiverFunc)
+		if strings.Compare(lowerSansFirst(funcName), lowerSansFirst(v.lastReceiverFunc)) == -1 {
+			v.addWarning(node.Pos(), "Alphabetical Ordering: method %s.%s defined after method %s.%s", receiver, funcName, receiver, v.lastReceiverFunc)
 		}
 	}
 
@@ -331,4 +335,10 @@ func walkFile(fileSet *token.FileSet, file *ast.File) []warning {
 	ast.Walk(&v, file)
 
 	return v.warnings
+}
+
+// lowerSansFirst is used to keep the precedence order of public (uppercased)
+// methods over private (lowercased) methods.
+func lowerSansFirst(str string) string {
+	return str[0:1] + strings.ToLower(str[1:])
 }

@@ -16,42 +16,8 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/fatih/color"
-	"github.com/lunixbochs/vtclean"
 	runewidth "github.com/mattn/go-runewidth"
-	"github.com/vito/go-interact/interact"
 )
-
-// LogTimestampFormat is the timestamp formatting for log lines.
-const LogTimestampFormat = "2006-01-02T15:04:05.00-0700"
-
-// DefaultTableSpacePadding is the default space padding in tables.
-const DefaultTableSpacePadding = 3
-
-//go:generate counterfeiter . Config
-
-// Config is the UI configuration.
-type Config interface {
-	// ColorEnabled enables or disabled color
-	ColorEnabled() configv3.ColorSetting
-	// Locale is the language to translate the output to
-	Locale() string
-	// IsTTY returns true when the ui has a TTY
-	IsTTY() bool
-	// TerminalWidth returns the width of the terminal
-	TerminalWidth() int
-}
-
-//go:generate counterfeiter . LogMessage
-
-// LogMessage is a log response representing one to many joined lines of a log
-// message.
-type LogMessage interface {
-	Message() string
-	Type() string
-	Timestamp() time.Time
-	SourceType() string
-	SourceInstance() string
-}
 
 // UI is interface to interact with the user
 type UI struct {
@@ -124,47 +90,6 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 	}
 }
 
-func (ui *UI) GetIn() io.Reader {
-	return ui.In
-}
-
-func (ui *UI) GetOut() io.Writer {
-	return ui.Out
-}
-
-func (ui *UI) GetErr() io.Writer {
-	return ui.Err
-}
-
-// DisplayBoolPrompt outputs the prompt and waits for user input. It only
-// allows for a boolean response. A default boolean response can be set with
-// defaultResponse.
-func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateValues ...map[string]interface{}) (bool, error) {
-	ui.terminalLock.Lock()
-	defer ui.terminalLock.Unlock()
-
-	response := defaultResponse
-	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...))
-	interactivePrompt.Input = ui.In
-	interactivePrompt.Output = ui.OutForInteration
-	err := interactivePrompt.Resolve(&response)
-	return response, err
-}
-
-// DisplayPasswordPrompt outputs the prompt and waits for user input. Hides
-// user's response from the screen.
-func (ui *UI) DisplayPasswordPrompt(template string, templateValues ...map[string]interface{}) (string, error) {
-	ui.terminalLock.Lock()
-	defer ui.terminalLock.Unlock()
-
-	var password interact.Password
-	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...))
-	interactivePrompt.Input = ui.In
-	interactivePrompt.Output = ui.OutForInteration
-	err := interactivePrompt.Resolve(interact.Required(&password))
-	return string(password), err
-}
-
 // DisplayError outputs the translated error message to ui.Err if the error
 // satisfies TranslatableError, otherwise it outputs the original error message
 // to ui.Err. It also outputs "FAILED" in bold red to ui.Out.
@@ -192,98 +117,12 @@ func (ui *UI) DisplayHeader(text string) {
 	fmt.Fprintf(ui.Out, "%s\n", ui.modifyColor(ui.TranslateText(text), color.New(color.Bold)))
 }
 
-// DisplayKeyValueTable outputs a matrix of strings as a table to UI.Out.
-// Prefix will be prepended to each row and padding adds the specified number
-// of spaces between columns. The final columns may wrap to multiple lines but
-// will still be confined to the last column. Wrapping will occur on word
-// boundaries.
-func (ui *UI) DisplayKeyValueTable(prefix string, table [][]string, padding int) {
-	rows := len(table)
-	if rows == 0 {
-		return
-	}
-
-	columns := len(table[0])
-
-	if columns < 2 || !ui.IsTTY {
-		ui.DisplayNonWrappingTable(prefix, table, padding)
-		return
-	}
-
-	ui.displayWrappingTableWithWidth(prefix, table, padding)
-}
-
-// DisplayLogMessage formats and outputs a given log message.
-func (ui *UI) DisplayLogMessage(message LogMessage, displayHeader bool) {
-	ui.terminalLock.Lock()
-	defer ui.terminalLock.Unlock()
-
-	var header string
-	if displayHeader {
-		time := message.Timestamp().In(ui.TimezoneLocation).Format(LogTimestampFormat)
-
-		header = fmt.Sprintf("%s [%s/%s] %s ",
-			time,
-			message.SourceType(),
-			message.SourceInstance(),
-			message.Type(),
-		)
-	}
-
-	for _, line := range strings.Split(message.Message(), "\n") {
-		logLine := fmt.Sprintf("%s%s", header, strings.TrimRight(line, "\r\n"))
-		if message.Type() == "ERR" {
-			logLine = ui.modifyColor(logLine, color.New(color.FgRed))
-		}
-		fmt.Fprintf(ui.Out, "   %s\n", logLine)
-	}
-}
-
 // DisplayNewline outputs a newline to UI.Out.
 func (ui *UI) DisplayNewline() {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
 	fmt.Fprintf(ui.Out, "\n")
-}
-
-// DisplayNonWrappingTable outputs a matrix of strings as a table to UI.Out. Prefix will
-// be prepended to each row and padding adds the specified number of spaces
-// between columns.
-func (ui *UI) DisplayNonWrappingTable(prefix string, table [][]string, padding int) {
-	ui.terminalLock.Lock()
-	defer ui.terminalLock.Unlock()
-
-	if len(table) == 0 {
-		return
-	}
-
-	var columnPadding []int
-
-	rows := len(table)
-	columns := len(table[0])
-	for col := 0; col < columns; col++ {
-		var max int
-		for row := 0; row < rows; row++ {
-			if strLen := wordSize(table[row][col]); max < strLen {
-				max = strLen
-			}
-		}
-		columnPadding = append(columnPadding, max+padding)
-	}
-
-	for row := 0; row < rows; row++ {
-		fmt.Fprintf(ui.Out, prefix)
-		for col := 0; col < columns; col++ {
-			data := table[row][col]
-			var addedPadding int
-			if col+1 != columns {
-				addedPadding = columnPadding[col] - wordSize(data)
-			}
-			fmt.Fprintf(ui.Out, "%s%s", data, strings.Repeat(" ", addedPadding))
-		}
-		fmt.Fprintf(ui.Out, "\n")
-	}
 }
 
 // DisplayOK outputs a bold green translated "OK" to UI.Out.
@@ -294,17 +133,6 @@ func (ui *UI) DisplayOK() {
 	fmt.Fprintf(ui.Out, "%s\n", ui.modifyColor(ui.TranslateText("OK"), color.New(color.FgGreen, color.Bold)))
 }
 
-func (ui *UI) DisplayTableWithHeader(prefix string, table [][]string, padding int) {
-	if len(table) == 0 {
-		return
-	}
-	for i, str := range table[0] {
-		table[0][i] = ui.modifyColor(str, color.New(color.Bold))
-	}
-
-	ui.DisplayNonWrappingTable(prefix, table, padding)
-}
-
 // DisplayText translates the template, substitutes in templateValues, and
 // outputs the result to ui.Out. Only the first map in templateValues is used.
 func (ui *UI) DisplayText(template string, templateValues ...map[string]interface{}) {
@@ -312,20 +140,6 @@ func (ui *UI) DisplayText(template string, templateValues ...map[string]interfac
 	defer ui.terminalLock.Unlock()
 
 	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, templateValues...))
-}
-
-// DisplayTextWithFlavor translates the template, bolds and adds cyan color to
-// templateValues, substitutes templateValues into the template, and outputs
-// the result to ui.Out. Only the first map in templateValues is used.
-func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[string]interface{}) {
-	ui.terminalLock.Lock()
-	defer ui.terminalLock.Unlock()
-
-	firstTemplateValues := getFirstSet(templateValues)
-	for key, value := range firstTemplateValues {
-		firstTemplateValues[key] = ui.modifyColor(fmt.Sprint(value), color.New(color.FgCyan, color.Bold))
-	}
-	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
 }
 
 // DisplayTextWithBold translates the template, bolds the templateValues,
@@ -338,6 +152,20 @@ func (ui *UI) DisplayTextWithBold(template string, templateValues ...map[string]
 	firstTemplateValues := getFirstSet(templateValues)
 	for key, value := range firstTemplateValues {
 		firstTemplateValues[key] = ui.modifyColor(fmt.Sprint(value), color.New(color.Bold))
+	}
+	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
+}
+
+// DisplayTextWithFlavor translates the template, bolds and adds cyan color to
+// templateValues, substitutes templateValues into the template, and outputs
+// the result to ui.Out. Only the first map in templateValues is used.
+func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[string]interface{}) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	firstTemplateValues := getFirstSet(templateValues)
+	for key, value := range firstTemplateValues {
+		firstTemplateValues[key] = ui.modifyColor(fmt.Sprint(value), color.New(color.FgCyan, color.Bold))
 	}
 	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
 }
@@ -358,17 +186,19 @@ func (ui *UI) DisplayWarnings(warnings []string) {
 	}
 }
 
-// RequestLoggerFileWriter returns a RequestLoggerFileWriter that cannot
-// overwrite another RequestLoggerFileWriter.
-func (ui *UI) RequestLoggerFileWriter(filePaths []string) *RequestLoggerFileWriter {
-	return newRequestLoggerFileWriter(ui, ui.fileLock, filePaths)
+// GetErr returns the error writer.
+func (ui *UI) GetErr() io.Writer {
+	return ui.Err
 }
 
-// RequestLoggerTerminalDisplay returns a RequestLoggerTerminalDisplay that
-// cannot overwrite another RequestLoggerTerminalDisplay or the current
-// display.
-func (ui *UI) RequestLoggerTerminalDisplay() *RequestLoggerTerminalDisplay {
-	return newRequestLoggerTerminalDisplay(ui, ui.terminalLock)
+// GetIn returns the input reader.
+func (ui *UI) GetIn() io.Reader {
+	return ui.In
+}
+
+// GetOut returns the output writer. Same as `Writer`.
+func (ui *UI) GetOut() io.Writer {
+	return ui.Out
 }
 
 // TranslateText passes the template through an internationalization function
@@ -383,6 +213,7 @@ func (ui *UI) UserFriendlyDate(input time.Time) string {
 	return input.Local().Format("Mon 02 Jan 15:04:05 MST 2006")
 }
 
+// Writer returns the output writer. Same as `GetOut`.
 func (ui *UI) Writer() io.Writer {
 	return ui.Out
 }
@@ -443,15 +274,6 @@ func (ui *UI) displayWrappingTableWithWidth(prefix string, table [][]string, pad
 	}
 }
 
-// getFirstSet returns the first map if 1 or more maps are provided. Otherwise
-// it returns the empty map.
-func getFirstSet(list []map[string]interface{}) map[string]interface{} {
-	if list == nil || len(list) == 0 {
-		return map[string]interface{}{}
-	}
-	return list[0]
-}
-
 func (ui *UI) modifyColor(text string, colorPrinter *color.Color) string {
 	if len(text) == 0 {
 		return text
@@ -467,6 +289,15 @@ func (ui *UI) modifyColor(text string, colorPrinter *color.Color) string {
 	return colorPrinter.SprintFunc()(text)
 }
 
+// getFirstSet returns the first map if 1 or more maps are provided. Otherwise
+// it returns the empty map.
+func getFirstSet(list []map[string]interface{}) map[string]interface{} {
+	if list == nil || len(list) == 0 {
+		return map[string]interface{}{}
+	}
+	return list[0]
+}
+
 func sum(intSlice []int) int {
 	sum := 0
 
@@ -475,9 +306,4 @@ func sum(intSlice []int) int {
 	}
 
 	return sum
-}
-
-func wordSize(str string) int {
-	cleanStr := vtclean.Clean(str, false)
-	return runewidth.StringWidth(cleanStr)
 }

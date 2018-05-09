@@ -25,6 +25,18 @@ func NewSha1Checksum(filepath string) Sha1Checksum {
 	}
 }
 
+func (c *sha1Checksum) CheckSha1(targetSha1 string) bool {
+	sha1, err := c.ComputeFileSha1()
+	if err != nil {
+		return false
+	}
+
+	if fmt.Sprintf("%x", sha1) == targetSha1 {
+		return true
+	}
+	return false
+}
+
 func (c *sha1Checksum) ComputeFileSha1() ([]byte, error) {
 	hash := sha1.New()
 
@@ -39,18 +51,6 @@ func (c *sha1Checksum) ComputeFileSha1() ([]byte, error) {
 	}
 
 	return hash.Sum(nil), nil
-}
-
-func (c *sha1Checksum) CheckSha1(targetSha1 string) bool {
-	sha1, err := c.ComputeFileSha1()
-	if err != nil {
-		return false
-	}
-
-	if fmt.Sprintf("%x", sha1) == targetSha1 {
-		return true
-	}
-	return false
 }
 
 func (c *sha1Checksum) SetFilePath(filepath string) {

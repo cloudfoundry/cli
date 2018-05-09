@@ -97,126 +97,6 @@ var _ = Describe("PluginsConfig", func() {
 		}),
 	)
 
-	Describe("Plugin", func() {
-		Describe("CalculateSHA1", func() {
-			var plugin Plugin
-
-			Context("when no errors are encountered calculating the sha1 value", func() {
-				var file *os.File
-
-				BeforeEach(func() {
-					var err error
-					file, err = ioutil.TempFile("", "")
-					defer file.Close()
-					Expect(err).NotTo(HaveOccurred())
-
-					err = ioutil.WriteFile(file.Name(), []byte("foo"), 0600)
-					Expect(err).NotTo(HaveOccurred())
-
-					plugin.Location = file.Name()
-				})
-
-				AfterEach(func() {
-					err := os.Remove(file.Name())
-					Expect(err).NotTo(HaveOccurred())
-				})
-
-				It("returns the sha1 value", func() {
-					Expect(plugin.CalculateSHA1()).To(Equal("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"))
-				})
-			})
-
-			Context("when an error is encountered calculating the sha1 value", func() {
-				var dirPath string
-
-				BeforeEach(func() {
-					var err error
-					dirPath, err = ioutil.TempDir("", "")
-					Expect(err).NotTo(HaveOccurred())
-
-					plugin.Location = dirPath
-				})
-
-				AfterEach(func() {
-					err := os.RemoveAll(dirPath)
-					Expect(err).NotTo(HaveOccurred())
-				})
-
-				It("returns 'N/A'", func() {
-					Expect(plugin.CalculateSHA1()).To(Equal("N/A"))
-				})
-			})
-		})
-
-		Describe("PluginCommands", func() {
-			It("returns the plugin's commands sorted by command name", func() {
-				plugin := Plugin{
-					Commands: []PluginCommand{
-						{Name: "T-sort"},
-						{Name: "sort-2"},
-						{Name: "sort-1"},
-					},
-				}
-
-				Expect(plugin.PluginCommands()).To(Equal([]PluginCommand{
-					PluginCommand{Name: "sort-1"},
-					PluginCommand{Name: "sort-2"},
-					PluginCommand{Name: "T-sort"},
-				}))
-			})
-		})
-	})
-
-	Describe("PluginVersion", func() {
-		var version PluginVersion
-
-		Describe("String", func() {
-			It("returns the version in the format x.y.z", func() {
-				version = PluginVersion{
-					Major: 1,
-					Minor: 2,
-					Build: 3,
-				}
-				Expect(version.String()).To(Equal("1.2.3"))
-			})
-
-			Context("when the major, minor, and build are all 0", func() {
-				BeforeEach(func() {
-					version = PluginVersion{
-						Major: 0,
-						Minor: 0,
-						Build: 0,
-					}
-				})
-
-				It("returns 'N/A'", func() {
-					Expect(version.String()).To(Equal("N/A"))
-				})
-			})
-		})
-	})
-
-	Describe("PluginCommand", func() {
-		var cmd PluginCommand
-
-		Describe("CommandName", func() {
-			It("returns the name of the command", func() {
-				cmd = PluginCommand{Name: "some-command"}
-				Expect(cmd.CommandName()).To(Equal("some-command"))
-			})
-
-			Context("when the command name and command alias are not empty", func() {
-				BeforeEach(func() {
-					cmd = PluginCommand{Name: "some-command", Alias: "sp"}
-				})
-
-				It("returns the command name concatenated with the command alias", func() {
-					Expect(cmd.CommandName()).To(Equal("some-command, sp"))
-				})
-			})
-		})
-	})
-
 	Describe("Config", func() {
 		Describe("RemovePlugin", func() {
 			var (
@@ -291,97 +171,6 @@ var _ = Describe("PluginsConfig", func() {
 				It("doesn't blow up", func() {
 					config.RemovePlugin("does-not-exist")
 				})
-			})
-		})
-
-		Describe("WritePluginConfig", func() {
-			var config *Config
-
-			BeforeEach(func() {
-				rawConfig := `
-{
-	"Plugins": {
-		"Diego-Enabler": {
-			"Location": "~/.cf/plugins/diego-enabler_darwin_amd64",
-			"Version": {
-				"Major": 1,
-				"Minor": 0,
-				"Build": 1
-			},
-			"Commands": [
-				{
-					"Name": "enable-diego",
-					"Alias": "",
-					"HelpText": "enable Diego support for an app",
-					"UsageDetails": {
-						"Usage": "cf enable-diego APP_NAME",
-						"Options": null
-					}
-				}
-			]
-		}
-	}
-}`
-				setPluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
-
-				var err error
-				config, err = LoadConfig()
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			Context("when no errors are encountered", func() {
-				It("writes the plugin config to pluginHome/.cf/plugin/config.json", func() {
-					config.RemovePlugin("Diego-Enabler")
-
-					err := config.WritePluginConfig()
-					Expect(err).ToNot(HaveOccurred())
-
-					newConfig, err := LoadConfig()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(newConfig.Plugins()).To(HaveLen(0))
-				})
-			})
-
-			Context("when an error is encountered", func() {
-				BeforeEach(func() {
-					pluginConfigPath := filepath.Join(homeDir, ".cf", "plugins", "config.json")
-					err := os.Remove(pluginConfigPath)
-					Expect(err).ToNot(HaveOccurred())
-					err = os.Mkdir(pluginConfigPath, 0700)
-					Expect(err).ToNot(HaveOccurred())
-				})
-
-				It("returns the error", func() {
-					err := config.WritePluginConfig()
-					_, ok := err.(*os.PathError)
-					Expect(ok).To(BeTrue())
-				})
-			})
-		})
-
-		Describe("Plugins", func() {
-			BeforeEach(func() {
-				rawConfig := `
-				{
-					"Plugins": {
-						"Q-plugin": {},
-						"plugin-2": {},
-						"plugin-1": {}
-					}
-				}`
-
-				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
-				setPluginConfig(pluginsPath, rawConfig)
-			})
-
-			It("returns the pluging sorted by name", func() {
-				config, err := LoadConfig()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(config.Plugins()).To(Equal([]Plugin{
-					{Name: "plugin-1"},
-					{Name: "plugin-2"},
-					{Name: "Q-plugin"},
-				}))
 			})
 		})
 
@@ -499,6 +288,217 @@ var _ = Describe("PluginsConfig", func() {
 					// do not test the plugin because the plugins are in a map and the
 					// order is undefined
 					Expect(exist).To(BeTrue())
+				})
+			})
+		})
+
+		Describe("Plugins", func() {
+			BeforeEach(func() {
+				rawConfig := `
+				{
+					"Plugins": {
+						"Q-plugin": {},
+						"plugin-2": {},
+						"plugin-1": {}
+					}
+				}`
+
+				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
+				setPluginConfig(pluginsPath, rawConfig)
+			})
+
+			It("returns the pluging sorted by name", func() {
+				config, err := LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config.Plugins()).To(Equal([]Plugin{
+					{Name: "plugin-1"},
+					{Name: "plugin-2"},
+					{Name: "Q-plugin"},
+				}))
+			})
+		})
+
+		Describe("WritePluginConfig", func() {
+			var config *Config
+
+			BeforeEach(func() {
+				rawConfig := `
+{
+	"Plugins": {
+		"Diego-Enabler": {
+			"Location": "~/.cf/plugins/diego-enabler_darwin_amd64",
+			"Version": {
+				"Major": 1,
+				"Minor": 0,
+				"Build": 1
+			},
+			"Commands": [
+				{
+					"Name": "enable-diego",
+					"Alias": "",
+					"HelpText": "enable Diego support for an app",
+					"UsageDetails": {
+						"Usage": "cf enable-diego APP_NAME",
+						"Options": null
+					}
+				}
+			]
+		}
+	}
+}`
+				setPluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
+
+				var err error
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			Context("when no errors are encountered", func() {
+				It("writes the plugin config to pluginHome/.cf/plugin/config.json", func() {
+					config.RemovePlugin("Diego-Enabler")
+
+					err := config.WritePluginConfig()
+					Expect(err).ToNot(HaveOccurred())
+
+					newConfig, err := LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(newConfig.Plugins()).To(HaveLen(0))
+				})
+			})
+
+			Context("when an error is encountered", func() {
+				BeforeEach(func() {
+					pluginConfigPath := filepath.Join(homeDir, ".cf", "plugins", "config.json")
+					err := os.Remove(pluginConfigPath)
+					Expect(err).ToNot(HaveOccurred())
+					err = os.Mkdir(pluginConfigPath, 0700)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("returns the error", func() {
+					err := config.WritePluginConfig()
+					_, ok := err.(*os.PathError)
+					Expect(ok).To(BeTrue())
+				})
+			})
+		})
+	})
+
+	Describe("Plugin", func() {
+		Describe("CalculateSHA1", func() {
+			var plugin Plugin
+
+			Context("when no errors are encountered calculating the sha1 value", func() {
+				var file *os.File
+
+				BeforeEach(func() {
+					var err error
+					file, err = ioutil.TempFile("", "")
+					defer file.Close()
+					Expect(err).NotTo(HaveOccurred())
+
+					err = ioutil.WriteFile(file.Name(), []byte("foo"), 0600)
+					Expect(err).NotTo(HaveOccurred())
+
+					plugin.Location = file.Name()
+				})
+
+				AfterEach(func() {
+					err := os.Remove(file.Name())
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("returns the sha1 value", func() {
+					Expect(plugin.CalculateSHA1()).To(Equal("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"))
+				})
+			})
+
+			Context("when an error is encountered calculating the sha1 value", func() {
+				var dirPath string
+
+				BeforeEach(func() {
+					var err error
+					dirPath, err = ioutil.TempDir("", "")
+					Expect(err).NotTo(HaveOccurred())
+
+					plugin.Location = dirPath
+				})
+
+				AfterEach(func() {
+					err := os.RemoveAll(dirPath)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("returns 'N/A'", func() {
+					Expect(plugin.CalculateSHA1()).To(Equal("N/A"))
+				})
+			})
+		})
+
+		Describe("PluginCommands", func() {
+			It("returns the plugin's commands sorted by command name", func() {
+				plugin := Plugin{
+					Commands: []PluginCommand{
+						{Name: "T-sort"},
+						{Name: "sort-2"},
+						{Name: "sort-1"},
+					},
+				}
+
+				Expect(plugin.PluginCommands()).To(Equal([]PluginCommand{
+					PluginCommand{Name: "sort-1"},
+					PluginCommand{Name: "sort-2"},
+					PluginCommand{Name: "T-sort"},
+				}))
+			})
+		})
+	})
+
+	Describe("PluginVersion", func() {
+		var version PluginVersion
+
+		Describe("String", func() {
+			It("returns the version in the format x.y.z", func() {
+				version = PluginVersion{
+					Major: 1,
+					Minor: 2,
+					Build: 3,
+				}
+				Expect(version.String()).To(Equal("1.2.3"))
+			})
+
+			Context("when the major, minor, and build are all 0", func() {
+				BeforeEach(func() {
+					version = PluginVersion{
+						Major: 0,
+						Minor: 0,
+						Build: 0,
+					}
+				})
+
+				It("returns 'N/A'", func() {
+					Expect(version.String()).To(Equal("N/A"))
+				})
+			})
+		})
+	})
+
+	Describe("PluginCommand", func() {
+		var cmd PluginCommand
+
+		Describe("CommandName", func() {
+			It("returns the name of the command", func() {
+				cmd = PluginCommand{Name: "some-command"}
+				Expect(cmd.CommandName()).To(Equal("some-command"))
+			})
+
+			Context("when the command name and command alias are not empty", func() {
+				BeforeEach(func() {
+					cmd = PluginCommand{Name: "some-command", Alias: "sp"}
+				})
+
+				It("returns the command name concatenated with the command alias", func() {
+					Expect(cmd.CommandName()).To(Equal("some-command, sp"))
 				})
 			})
 		})
