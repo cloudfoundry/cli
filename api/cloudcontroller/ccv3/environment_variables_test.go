@@ -59,12 +59,14 @@ var _ = Describe("EnvironmentVariables", func() {
 			Context("when env variable is being set", func() {
 				BeforeEach(func() {
 					envVars = EnvironmentVariables{
-						"my-var": {Value: "my-val", IsSet: true},
+						"my-var":    {Value: "my-val", IsSet: true},
+						"delete-me": {},
 					}
 
 					expectedBody := map[string]interface{}{
-						"var": map[string]string{
-							"my-var": "my-val",
+						"var": map[string]interface{}{
+							"my-var":    "my-val",
+							"delete-me": nil,
 						},
 					}
 

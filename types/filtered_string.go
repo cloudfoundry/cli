@@ -51,6 +51,8 @@ func (n *FilteredString) UnmarshalJSON(rawJSON []byte) error {
 	return nil
 }
 
+// MarshalJSON marshals the value field if IsSet is true, otherwise returns an
+// null.
 func (n FilteredString) MarshalJSON() ([]byte, error) {
 	if n.IsSet {
 		return json.Marshal(n.Value)

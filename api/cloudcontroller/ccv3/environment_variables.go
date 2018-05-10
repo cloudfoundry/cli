@@ -9,7 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-// EnvironmentVariables represents the environment variables that can be set on application by user
+// EnvironmentVariables represents the environment variables that can be set on
+// an application by the user.
 type EnvironmentVariables map[string]types.FilteredString
 
 func (variables EnvironmentVariables) MarshalJSON() ([]byte, error) {
@@ -33,9 +34,9 @@ func (variables *EnvironmentVariables) UnmarshalJSON(data []byte) error {
 	return err
 }
 
-// UpdateApplicationEnvironmentVariables updates the user provided environment
-// variables on an applicaiton. A restart is required for changes to take
-// effect.
+// UpdateApplicationEnvironmentVariables adds/updates the user provided
+// environment variables on an applicaiton. A restart is required for changes
+// to take effect.
 func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
 	bodyBytes, err := json.Marshal(envVars)
 	if err != nil {
