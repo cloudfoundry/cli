@@ -37,15 +37,6 @@ var _ = Describe("HealthCheckType", func() {
 			healthCheck = HealthCheckType{}
 		})
 
-		Context("when the value provided to the health check type flag starts with a '-'", func() {
-			It("returns a ErrExpectedArgument error that an argument for health-check-type was expected", func() {
-				Expect(healthCheck.UnmarshalFlag("-some-val")).To(MatchError(&flags.Error{
-					Type:    flags.ErrExpectedArgument,
-					Message: "expected argument for flag --health-check-type, but got option -some-val",
-				}))
-			})
-		})
-
 		DescribeTable("downcases and sets type",
 			func(settingType string, expectedType string) {
 				err := healthCheck.UnmarshalFlag(settingType)

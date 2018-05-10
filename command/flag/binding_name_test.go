@@ -23,15 +23,6 @@ var _ = Describe("BindingName", func() {
 		})
 	})
 
-	Context("when the value provided to the --binding-name flag starts with a '-'", func() {
-		It("returns a ErrExpectedArgument error that an argument for binding name was expected", func() {
-			Expect(bindingName.UnmarshalFlag("-some-val")).To(MatchError(&flags.Error{
-				Type:    flags.ErrExpectedArgument,
-				Message: "expected argument for flag --binding-name, but got option -some-val",
-			}))
-		})
-	})
-
 	Context("when the value provided to the --binding-name flag is greater than 0 characters long", func() {
 		It("stores the binding name and does not return an error", func() {
 			bindingName.UnmarshalFlag("some-name")

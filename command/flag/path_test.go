@@ -230,15 +230,6 @@ var _ = Describe("path types", func() {
 					Expect(pathWithExistenceCheck).To(BeEquivalentTo("abc"))
 				})
 			})
-
-			Context("when the path starts with a '-'", func() {
-				It("returns a ErrExpectedArgument error that an argument was expected", func() {
-					Expect(pathWithExistenceCheck.UnmarshalFlag("-some-val")).To(MatchError(&flags.Error{
-						Type:    flags.ErrExpectedArgument,
-						Message: "expected argument, but got option -some-val",
-					}))
-				})
-			})
 		})
 	})
 
@@ -282,15 +273,6 @@ var _ = Describe("path types", func() {
 							Message: "Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.",
 						}))
 					})
-				})
-			})
-
-			Context("when the JSON starts with a '-'", func() {
-				It("returns a ErrExpectedArgument error that an argument was expected", func() {
-					Expect(jsonOrFile.UnmarshalFlag("-some-val")).To(MatchError(&flags.Error{
-						Type:    flags.ErrExpectedArgument,
-						Message: "expected argument, but got option -some-val",
-					}))
 				})
 			})
 
@@ -356,15 +338,6 @@ var _ = Describe("path types", func() {
 					err := pathWithExistenceCheckOrURL.UnmarshalFlag("abc")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(pathWithExistenceCheckOrURL).To(BeEquivalentTo("abc"))
-				})
-			})
-
-			Context("when the path starts with a '-'", func() {
-				It("returns a ErrExpectedArgument error that an argument was expected", func() {
-					Expect(pathWithExistenceCheckOrURL.UnmarshalFlag("-some-val")).To(MatchError(&flags.Error{
-						Type:    flags.ErrExpectedArgument,
-						Message: "expected argument, but got option -some-val",
-					}))
 				})
 			})
 		})

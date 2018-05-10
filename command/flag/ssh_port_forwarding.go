@@ -16,13 +16,6 @@ type SSHPortForwarding struct {
 }
 
 func (s *SSHPortForwarding) UnmarshalFlag(val string) error {
-	if strings.HasPrefix(val, "-") {
-		return &flags.Error{
-			Type:    flags.ErrExpectedArgument,
-			Message: fmt.Sprintf("expected argument for flag -L, but got option %s", val),
-		}
-	}
-
 	splitHosts := strings.Split(val, ":")
 	for _, piece := range splitHosts {
 		if len(piece) == 0 {
