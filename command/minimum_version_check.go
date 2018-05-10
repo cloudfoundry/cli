@@ -10,12 +10,12 @@ func MinimumAPIVersionCheck(current string, minimum string, customCommand ...str
 		command = customCommand[0]
 	}
 
-	comparison, err := compareSemVer(current, minimum)
+	isOutdated, err := checkVersionOutdated(current, minimum)
 	if err != nil {
 		return err
 	}
 
-	if comparison == -1 {
+	if isOutdated {
 		return translatableerror.MinimumAPIVersionNotMetError{
 			Command:        command,
 			CurrentVersion: current,

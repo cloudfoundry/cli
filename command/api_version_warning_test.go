@@ -19,10 +19,12 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		apiVersion    string
 		minCLIVersion string
 		binaryVersion string
+		errBuff       *strings.Builder
 	)
 
 	BeforeEach(func() {
-		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+		errBuff = new(strings.Builder)
+		testUI = ui.NewTestUI(nil, NewBuffer(), errBuff)
 		fakeConfig = new(commandfakes.FakeConfig)
 
 		apiVersion = "100.200.3"
@@ -42,7 +44,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 
 			It("displays a recommendation to update the CLI version", func() {
 				err := WarnCLIVersionCheck(fakeConfig, testUI)
-				Expect(testUI.Err).To(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
+				Expect(errBuff.String()).To(ContainSubstring("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
@@ -57,7 +59,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		It("does not display a recommendation to update the CLI version", func() {
 			err := WarnCLIVersionCheck(fakeConfig, testUI)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
+			Expect(errBuff.String()).To(BeEmpty())
 		})
 	})
 
@@ -70,7 +72,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 			err := WarnCLIVersionCheck(fakeConfig, testUI)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("No Major.Minor.Patch elements found"))
-			Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s.", apiVersion, minCLIVersion))
+			Expect(errBuff.String()).To(BeEmpty())
 		})
 	})
 
@@ -85,7 +87,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		It("parses the versions successfully and recommends to update the CLI version", func() {
 			err := WarnCLIVersionCheck(fakeConfig, testUI)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Err).To(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
+			Expect(errBuff.String()).To(ContainSubstring("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
 		})
 	})
 
@@ -97,10 +99,10 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 			fakeConfig.BinaryVersionReturns(binaryVersion)
 		})
 
-		It("does not return an error", func() {
+		It("does not return an error or print a warning", func() {
 			err := WarnCLIVersionCheck(fakeConfig, testUI)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
+			Expect(errBuff.String()).To(BeEmpty())
 		})
 	})
 
@@ -112,10 +114,10 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 			fakeConfig.BinaryVersionReturns(binaryVersion)
 		})
 
-		It("does not return an error", func() {
+		It("does not return an error or print a warning", func() {
 			err := WarnCLIVersionCheck(fakeConfig, testUI)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
+			Expect(errBuff.String()).To(BeEmpty())
 		})
 	})
 })

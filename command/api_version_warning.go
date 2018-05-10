@@ -1,70 +1,64 @@
 package command
 
 import (
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/constant"
 	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
 )
 
 func WarnCLIVersionCheck(config Config, ui UI) error {
-	err := minimumCLIVersionCheck(config.BinaryVersion(), config.MinCLIVersion(), config.APIVersion())
-	if err != nil {
-		if e, ok := err.(translatableerror.MinimumCLIVersionNotMetError); ok {
-			ui.DisplayWarning(e.Error(), map[string]interface{}{
-				"APIVersion":    e.APIVersion,
-				"MinCLIVersion": e.MinCLIVersion,
-				"BinaryVersion": e.BinaryVersion,
-			})
-			ui.DisplayNewline()
-			return nil
-		}
-	}
+	minVer := config.MinCLIVersion()
+	currentVer := config.BinaryVersion()
 
-	return err
-}
-
-func WarnAPIVersionCheck(apiVersion string, ui UI) error {
-	err := MinimumAPIVersionCheck(apiVersion, constant.MinimumAPIVersion)
-	if _, ok := err.(translatableerror.MinimumAPIVersionNotMetError); ok {
-		ui.DisplayWarning("Your API version is no longer supported. Upgrade to a newer version of the API.")
-		return nil
-	}
-
-	return err
-}
-
-func minimumCLIVersionCheck(current string, minimum string, apiVersion string) error {
-	comparison, err := compareSemVer(current, minimum)
+	isOutdated, err := checkVersionOutdated(currentVer, minVer)
 	if err != nil {
 		return err
 	}
 
-	if comparison == -1 {
-		return translatableerror.MinimumCLIVersionNotMetError{
-			APIVersion:    apiVersion,
-			BinaryVersion: current,
-			MinCLIVersion: minimum,
-		}
+	if isOutdated {
+		ui.DisplayWarning("Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+			map[string]interface{}{
+				"APIVersion":    config.APIVersion(),
+				"MinCLIVersion": minVer,
+				"BinaryVersion": currentVer,
+			})
+		ui.DisplayNewline()
 	}
 
 	return nil
 }
 
-func compareSemVer(current string, minimum string) (int, error) {
+func WarnAPIVersionCheck(apiVersion string, ui UI) error {
+	isOutdated, err := checkVersionOutdated(apiVersion, constant.MinimumAPIVersion)
+	if err != nil {
+		return err
+	}
+
+	if isOutdated {
+		ui.DisplayWarning("Your API version is no longer supported. Upgrade to a newer version of the API.")
+	}
+
+	return nil
+}
+
+func checkVersionOutdated(current string, minimum string) (bool, error) {
 	if current == version.DefaultVersion || minimum == "" {
-		return 2, nil
+		return false, nil
 	}
 
 	currentSemvar, err := semver.Make(current)
 	if err != nil {
-		return 2, err
+		return false, err
 	}
 
 	minimumSemvar, err := semver.Make(minimum)
 	if err != nil {
-		return 2, err
+		return false, err
 	}
 
-	return currentSemvar.Compare(minimumSemvar), nil
+	if currentSemvar.Compare(minimumSemvar) == -1 {
+		return true, nil
+	}
+
+	return false, nil
 }
