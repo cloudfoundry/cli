@@ -3,10 +3,15 @@
 The Cloud Foundry team uses GitHub and accepts code contributions via
 [pull requests](https://help.github.com/articles/using-pull-requests).
 
-Before working on a PR to the CLI code base, please reach out to us first via a GitHub issue or on our Slack #cli channel at cloudfoundry.slack.com. (If you're not a member of Cloud Foundry's slack team yet, you'll need to [request an invite](https://slack.cloudfoundry.org/).) There are areas of the code base that contain a lot of complexity, and something which seems like a simple change may be more involved. In addition, the code base is undergoing re-architecturing/refactoring, and there may be work already planned that would accomplish the goals of the intended PR. The CLI team can work with you at the start of this process to determine the best path forward.
+Before working on a PR to the CLI code base, please:
+  - reach out to us first via a GitHub issue or on our Slack #cli channel at cloudfoundry.slack.com. There are areas of the code base that contain a lot of complexity, and something which seems like a simple change may be more involved. In addition, the code base is undergoing re-architecturing/refactoring, and there may be work already planned that would accomplish the goals of the intended PR. The CLI team can work with you at the start of this process to determine the best path forward.
+  - or, look for the `contributions welcome` label on GitHub for issues we are actively looking for help on. 
+
+If you're not a member of Cloud Foundry's slack team yet, you'll need to [request an invite](https://slack.cloudfoundry.org/). 
 
 After reaching out to the CLI team and the conclusion is to make a PR, please follow these steps:
 1. Ensure that you have either completed our CLA Agreement for [individuals](https://www.cloudfoundry.org/pdfs/CFF_Individual_CLA.pdf) or are a [public member](https://help.github.com/articles/publicizing-or-hiding-organization-membership/) of an organization that has signed the [corporate](https://www.cloudfoundry.org/pdfs/CFF_Corporate_CLA.pdf) CLA.
+1. Review the CF CLI's [Style Guide](https://github.com/cloudfoundry/cli/wiki/CF-CLI-Style-Guide)
 1. Fork the project’s repository
 1. Create a feature branch (e.g. `git checkout -b better_cli`) and make changes on this branch
   * Follow the previous sections on this page to set up your development environment, build `cf` and run the tests.
