@@ -922,23 +922,49 @@ var _ = Describe("Application Config", func() {
 					var existingRoute v2action.Route
 
 					BeforeEach(func() {
+						domain = v2action.Domain{
+							Name: "some-domain.com",
+							GUID: "some-domain-guid",
+						}
 						existingRoute = v2action.Route{
-							Domain: v2action.Domain{
-								Name: "some-domain.com",
-								GUID: "some-domain-guid",
-							},
-							Host:      app.Name,
+							Domain:    domain,
+							Host:      "some-hostname",
 							GUID:      "route-guid",
 							SpaceGUID: spaceGUID,
 						}
 						fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{existingRoute}, v2action.Warnings{"app-route-warnings"}, nil)
 					})
 
-					It("does not bind any addition routes", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(warnings).To(ConsistOf("app-route-warnings"))
-						Expect(firstConfig.DesiredRoutes).To(ConsistOf(existingRoute))
-						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(0))
+					Context("when hostname is not defined", func() {
+						It("does not bind any addition routes", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(warnings).To(ConsistOf("app-route-warnings"))
+							Expect(firstConfig.DesiredRoutes).To(ConsistOf(existingRoute))
+							Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(0))
+						})
+					})
+
+					Context("when hostname is defined", func() {
+						var newRoute v2action.Route
+
+						BeforeEach(func() {
+							manifestApps[0].Hostname = "another-manifest"
+							newRoute = v2action.Route{
+								Domain:    domain,
+								Host:      "another-hostname",
+								GUID:      "route-guid",
+								SpaceGUID: spaceGUID,
+							}
+							fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{existingRoute}, v2action.Warnings{"app-route-warnings"}, nil)
+							fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(newRoute, v2action.Warnings{"find-route-warnings"}, nil)
+						})
+
+						It("binds a route with the provided hostname", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(warnings).To(ConsistOf("app-route-warnings", "private-domain-warnings", "shared-domain-warnings", "find-route-warnings"))
+
+							Expect(firstConfig.DesiredRoutes).To(ConsistOf(existingRoute, newRoute))
+						})
 					})
 				})
 

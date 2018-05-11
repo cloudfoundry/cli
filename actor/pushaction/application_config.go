@@ -146,6 +146,14 @@ func (actor Actor) configureRoutes(manifestApp manifest.Application, orgGUID str
 		routes, warnings, err := actor.CalculateRoutes(manifestApp.Routes, orgGUID, spaceGUID, config.CurrentRoutes)
 		config.DesiredRoutes = routes
 		return config, warnings, err
+	case len(config.CurrentRoutes) > 0 && manifestApp.Hostname != "":
+		desiredRoute, warnings, err := actor.GetGeneratedRoute(manifestApp, orgGUID, spaceGUID, config.CurrentRoutes)
+		if err != nil {
+			log.Errorln("getting generated route:", err)
+			return config, warnings, err
+		}
+		config.DesiredRoutes = append(config.CurrentRoutes, desiredRoute)
+		return config, warnings, nil
 	case len(config.CurrentRoutes) > 0 && (manifestApp.RandomRoute || manifestApp.Domain == ""):
 		config.DesiredRoutes = config.CurrentRoutes
 		return config, nil, nil
@@ -157,7 +165,7 @@ func (actor Actor) configureRoutes(manifestApp manifest.Application, orgGUID str
 	default:
 		desiredRoute, warnings, err := actor.GetGeneratedRoute(manifestApp, orgGUID, spaceGUID, config.CurrentRoutes)
 		if err != nil {
-			log.Errorln("getting default route:", err)
+			log.Errorln("getting generated route:", err)
 			return config, warnings, err
 		}
 		config.DesiredRoutes = append(config.CurrentRoutes, desiredRoute)
