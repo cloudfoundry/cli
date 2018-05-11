@@ -123,10 +123,11 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 				archivePath, err = actor.CreateArchive(config)
 				if err != nil {
 					errorStream <- err
+					os.RemoveAll(archivePath)
 					return
 				}
 				eventStream <- CreatingArchive
-				defer os.Remove(archivePath)
+				defer os.RemoveAll(archivePath)
 
 				for count := 0; count < PushRetries; count++ {
 					warnings, err = actor.UploadPackageWithArchive(config, archivePath, progressBar, eventStream)

@@ -82,8 +82,10 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 		archivePath, err = actor.SharedActor.ZipArchiveResources(bitsPath, resources)
 	}
 	if err != nil {
+		os.RemoveAll(archivePath)
 		return Package{}, allWarnings, err
 	}
+	defer os.RemoveAll(archivePath)
 
 	inputPackage := ccv3.Package{
 		Type: constant.PackageTypeBits,

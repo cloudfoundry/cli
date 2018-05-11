@@ -23,7 +23,7 @@ func (actor Actor) CreateArchive(config ApplicationConfig) (string, error) {
 	}
 	if err != nil {
 		log.WithField("path", config.Path).Errorln("archiving resources:", err)
-		return "", err
+		return archivePath, err
 	}
 	log.WithField("archivePath", archivePath).Debug("archive created")
 	return archivePath, nil
