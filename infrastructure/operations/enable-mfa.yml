@@ -6,7 +6,7 @@
     providerName: potato
     providers:
       potato:
-	type: google-authenticator
-	config:
-	  providerDescription: test google authenticator
-	  issuer: google
+        type: google-authenticator
+        config:
+          providerDescription: test google authenticator
+          issuer: google
