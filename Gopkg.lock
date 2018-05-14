@@ -252,7 +252,6 @@
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
-  branch = "master"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -275,10 +274,10 @@
     "reporters/stenographer/support/go-isatty",
     "types"
   ]
-  revision = "a3b6351eb1ff8e1bfa30b2f55d7e282186ed8fee"
+  revision = "fa5fabab2a1bfbd924faf4c067d07ae414e2aedf"
+  version = "v1.5.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -299,7 +298,8 @@
     "matchers/support/goraph/util",
     "types"
   ]
-  revision = "b7d1a52235cc433a76c556aa3f4229e63b95e7da"
+  revision = "62bff4df71bdbc266561a0caee19f0594b17c240"
+  version = "v1.4.0"
 
 [[projects]]
   name = "github.com/opencontainers/go-digest"
