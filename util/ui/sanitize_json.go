@@ -11,10 +11,11 @@ import (
 const tokenEndpoint = "token_endpoint"
 
 var keysToSanitize = regexp.MustCompile("(?i)token|password")
-var sanitizeValues = regexp.MustCompile(`([&?]password)=[A-Za-z0-9\-._~!$'()*+,;=:@/?]*`)
+var sanitizeURIParams = regexp.MustCompile(`([&?]password)=[A-Za-z0-9\-._~!$'()*+,;=:@/?]*`)
+var sanitizeURLPassword = regexp.MustCompile(`([\d\w]+):\/\/([^:]+):(?:[^@]+)@`)
 
-func SanitizeJSON(raw []byte) (map[string]interface{}, error) {
-	var result map[string]interface{}
+func SanitizeJSON(raw []byte) ([]byte, error) {
+	var result interface{}
 	decoder := json.NewDecoder(bytes.NewBuffer(raw))
 	decoder.UseNumber()
 	err := decoder.Decode(&result)
@@ -22,22 +23,46 @@ func SanitizeJSON(raw []byte) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	return iterateAndRedact(result), nil
-}
+	sanitized := iterateAndRedact(result)
 
-func iterateAndRedact(blob map[string]interface{}) map[string]interface{} {
-	for key, value := range blob {
-		switch v := value.(type) {
-		case string:
-			if keysToSanitize.MatchString(key) && key != tokenEndpoint {
-				blob[key] = RedactedValue
-			} else {
-				blob[key] = sanitizeValues.ReplaceAllString(value.(string), fmt.Sprintf("$1=%s", RedactedValue))
-			}
-		case map[string]interface{}:
-			blob[key] = iterateAndRedact(v)
-		}
+	buff := new(bytes.Buffer)
+	encoder := json.NewEncoder(buff)
+	encoder.SetEscapeHTML(false)
+	encoder.SetIndent("", "  ")
+	err = encoder.Encode(sanitized)
+	if err != nil {
+		return nil, err
 	}
 
+	return buff.Bytes(), nil
+}
+
+func iterateAndRedact(blob interface{}) interface{} {
+	switch v := blob.(type) {
+	case string:
+		return sanitizeURL(v)
+	case []interface{}:
+		var list []interface{}
+		for _, val := range v {
+			list = append(list, iterateAndRedact(val))
+		}
+
+		return list
+	case map[string]interface{}:
+		for key, value := range v {
+			if keysToSanitize.MatchString(key) && key != tokenEndpoint {
+				v[key] = RedactedValue
+			} else {
+				v[key] = iterateAndRedact(value)
+			}
+		}
+		return v
+	}
 	return blob
+}
+
+func sanitizeURL(rawURL string) string {
+	sanitized := sanitizeURLPassword.ReplaceAllString(rawURL, fmt.Sprintf("$1://$2:%s@", RedactedValue))
+	sanitized = sanitizeURIParams.ReplaceAllString(sanitized, fmt.Sprintf("$1=%s", RedactedValue))
+	return sanitized
 }

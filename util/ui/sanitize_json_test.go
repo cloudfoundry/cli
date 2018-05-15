@@ -1,46 +1,86 @@
 package ui_test
 
 import (
-	"fmt"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("SanitizeJSON", func() {
-	It("sanitizes json", func() {
-		raw := []byte(`{
-			"mytoken": "foo",
-			"next_level": {
-				"next_pAssword_all": "bar",
-				"again": {
-					"real password ": "Don't tell nobody, it's banana",
-					"token_endpoint": "some url",
-					"testtokentest": "banana pants",
-					"some url":"jdbc:mysql://hostname/db-name?user=username&password=very-secret-password",
-					"some other url":"jdbc:mysql://hostname/db-name?password=very-secret-password&user=username"
-				}
-			}
-		}`)
+	DescribeTable("sanitizes the json input",
+		func(original string) {
+			expected := strings.Replace(original, "CrAzY_PaSSw0rd", RedactedValue, -1)
 
-		expected := map[string]interface{}{
-			"mytoken": RedactedValue,
-			"next_level": map[string]interface{}{
-				"next_pAssword_all": RedactedValue,
-				"again": map[string]interface{}{
-					"real password ": RedactedValue,
-					"token_endpoint": "some url",
-					"testtokentest":  RedactedValue,
-					"some url":       fmt.Sprintf("jdbc:mysql://hostname/db-name?user=username&password=%s", RedactedValue),
-					"some other url": fmt.Sprintf("jdbc:mysql://hostname/db-name?password=%s&user=username", RedactedValue),
-				},
+			redacted, err := SanitizeJSON([]byte(original))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(redacted).To(MatchJSON(expected))
+		},
+
+		Entry("when the top level is an array", `[
+			{
+				"some url":"jdbc:mysql://hostname/db-name?user=username&password=CrAzY_PaSSw0rd",
+				"some other url":"jdbc:mysql://hostname/db-name?password=CrAzY_PaSSw0rd&user=username",
+				"uri":"postgres://some-user-name:CrAzY_PaSSw0rd@10.0.0.1:5432/some-other-data"
 			},
-		}
+			{
+			"real password ": "CrAzY_PaSSw0rd",
+			"token_endpoint": "some url",
+			"testtokentest": "CrAzY_PaSSw0rd",
+			"simple": "https://www.google.com/search?q=i+am+a+potato&oq=I+am+a+potato&aqs=chrome.0.0l6.2383j0j8&client=ubuntu&sourceid=chrome&ie=UTF-8"
+			}
+		]`),
 
-		redacted, err := SanitizeJSON(raw)
+		Entry("when the top level is an array", `{
+			"mytoken": "CrAzY_PaSSw0rd",
+			"next_level": {
+				"again": {
+					"real password ": "CrAzY_PaSSw0rd",
+					"simple": "https://www.google.com/search?q=i+am+a+potato&oq=I+am+a+potato&aqs=chrome.0.0l6.2383j0j8&client=ubuntu&sourceid=chrome&ie=UTF-8",
+					"some other url":"jdbc:mysql://hostname/db-name?password=CrAzY_PaSSw0rd&user=username",
+					"some url":"jdbc:mysql://hostname/db-name?user=username&password=CrAzY_PaSSw0rd",
+					"testtokentest": "CrAzY_PaSSw0rd",
+					"token_endpoint": "some url",
+					"uri":"postgres://some-user-name:CrAzY_PaSSw0rd@10.0.0.1:5432/some-other-data"
+				},
+				"ary": [
+					"jdbc:mysql://hostname/db-name?user=username&password=CrAzY_PaSSw0rd",
+					"postgres://some-user-name:CrAzY_PaSSw0rd@10.0.0.1:5432/some-other-data"
+				],
+				"ary2": [
+					{
+						"some other url":"jdbc:mysql://hostname/db-name?password=CrAzY_PaSSw0rd&user=username",
+						"some url":"jdbc:mysql://hostname/db-name?user=username&password=CrAzY_PaSSw0rd",
+						"uri":"postgres://some-user-name:CrAzY_PaSSw0rd@10.0.0.1:5432/some-other-data"
+					}
+				],
+				"next_pAssword_all": "CrAzY_PaSSw0rd"
+			}
+		}`),
+	)
+
+	It("formats spacing", func() {
+		original := `{"a":"b"}`
+		expected := `{
+  "a": "b"
+}
+` // Extra new line is required due to encoder
+		redacted, err := SanitizeJSON([]byte(original))
 		Expect(err).ToNot(HaveOccurred())
-		Expect(redacted).To(Equal(expected))
+		Expect(redacted).To(Equal([]byte(expected)))
+	})
+
+	It("does not escape characters", func() {
+		original := `{"a":"&<foo#>"}`
+		expected := `{
+  "a": "&<foo#>"
+}
+` // Extra new line is required due to encoder
+		redacted, err := SanitizeJSON([]byte(original))
+		Expect(err).ToNot(HaveOccurred())
+		Expect(redacted).To(Equal([]byte(expected)))
 	})
 })

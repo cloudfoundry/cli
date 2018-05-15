@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -68,17 +66,8 @@ func (display *RequestLoggerFileWriter) DisplayJSONBody(body []byte) error {
 		return display.DisplayMessage(string(body))
 	}
 
-	buff := new(bytes.Buffer)
-	encoder := json.NewEncoder(buff)
-	encoder.SetEscapeHTML(false)
-	encoder.SetIndent("", "  ")
-	err = encoder.Encode(sanitized)
-	if err != nil {
-		return err
-	}
-
 	for _, logFile := range display.logFiles {
-		_, err = logFile.Write(buff.Bytes())
+		_, err = logFile.Write(sanitized)
 		if err != nil {
 			return err
 		}
