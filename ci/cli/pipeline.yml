@@ -192,7 +192,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
-    branch: master
+    branch: 6.36.2
     paths: [ci/cli-base/Dockerfile]
 
 - name: cli-ci-package-dockerfile
