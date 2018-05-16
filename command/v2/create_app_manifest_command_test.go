@@ -2,6 +2,7 @@ package v2_test
 
 import (
 	"errors"
+	"path/filepath"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
@@ -134,7 +135,7 @@ var _ = Describe("create-app-manifest Command", func() {
 
 					Expect(fakeActor.WriteApplicationManifestCallCount()).To(Equal(1))
 					manifestArg, pathArg := fakeActor.WriteApplicationManifestArgsForCall(0)
-					Expect(pathArg).To(ContainSubstring("some-app_manifest.yml"))
+					Expect(pathArg).To(Equal(filepath.FromSlash("./some-app_manifest.yml")))
 					Expect(manifestArg).To(Equal(manifest.Application{}))
 				})
 			})
