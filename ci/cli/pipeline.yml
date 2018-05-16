@@ -11,7 +11,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
-    branch: master
+    branch: 2.36.2
     ignore_paths: &ciPaths
     - bin
     - ci
@@ -28,14 +28,14 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
-    branch: master
+    branch: 2.36.2
     paths: *ciPaths
 
 - name: cli-integration
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
-    branch: master
+    branch: 2.36.2
     paths:
     - integration
 
