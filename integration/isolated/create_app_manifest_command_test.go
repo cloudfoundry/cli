@@ -340,7 +340,7 @@ var _ = Describe("create-app-manifest command", func() {
 				})
 			})
 
-			FIt("returns a manifest with multiple buildpacks", func() {
+			It("returns a manifest with multiple buildpacks", func() {
 				appManifest, err := createManifest(appName)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -356,7 +356,7 @@ var _ = Describe("create-app-manifest command", func() {
 				})
 			})
 
-			FIt("returns a manifest with multiple buildpacks", func() {
+			It("returns a manifest with multiple buildpacks", func() {
 				appManifest, err := createManifest(appName)
 				Expect(err).ToNot(HaveOccurred())
 
