@@ -43,11 +43,5 @@ lpass sync
 
 pipelines_path=$(cd $(dirname $0)/.. && pwd)
 
-configure_pipeline cli \
+configure_pipeline cli-6-36-2 \
   $pipelines_path/cli/pipeline.yml
-
-configure_infrastructure_pipeline inf-beque beque-pipeline
-configure_infrastructure_pipeline inf-hardknox hardknox-pipeline
-configure_infrastructure_pipeline inf-lovingcup lovingcup-pipeline
-configure_infrastructure_pipeline inf-tartine tartine-pipeline
-configure_infrastructure_pipeline inf-arsicault arsicault-pipeline
