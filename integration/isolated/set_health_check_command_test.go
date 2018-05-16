@@ -158,7 +158,7 @@ var _ = Describe("set-health-check command", func() {
 
 				It("displays tip to restart the app", func() {
 					session := helpers.CF("set-health-check", appName, "port")
-					Eventually(session).Should(Say("TIP: An app restart is required for the change to take affect\\."))
+					Eventually(session).Should(Say("TIP: An app restart is required for the change to take effect\\."))
 					Eventually(session).Should(Exit(0))
 				})
 			})

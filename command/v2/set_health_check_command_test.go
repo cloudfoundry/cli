@@ -198,7 +198,7 @@ var _ = Describe("set-health-check Command", func() {
 		})
 
 		It("displays a tip to restart the app", func() {
-			Expect(testUI.Out).To(Say("TIP: An app restart is required for the change to take affect."))
+			Expect(testUI.Out).To(Say("TIP: An app restart is required for the change to take effect."))
 		})
 	})
 
