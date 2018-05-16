@@ -134,7 +134,7 @@ var _ = Describe("create-app-manifest Command", func() {
 
 					Expect(fakeActor.WriteApplicationManifestCallCount()).To(Equal(1))
 					manifestArg, pathArg := fakeActor.WriteApplicationManifestArgsForCall(0)
-					Expect(pathArg).To(Equal("./some-app_manifest.yml"))
+					Expect(pathArg).To(ContainSubstring("some-app_manifest.yml"))
 					Expect(manifestArg).To(Equal(manifest.Application{}))
 				})
 			})
