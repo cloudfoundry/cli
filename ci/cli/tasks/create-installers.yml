@@ -7,6 +7,7 @@ image_resource:
     repository: cfcli/cli-package
 
 inputs:
+- name: cli
 - name: cli-ci
 - name: extracted-binaries
 
@@ -27,7 +28,7 @@ run:
     CF CLI Team <cf-cli-eng@pivotal.io>
     EOF
 
-    VERSION=$(cat cli-ci/BUILD_VERSION)
+    VERSION=$(cat cli/BUILD_VERSION)
     RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
 
     echo "Building 32-bit Debian package"

@@ -12,9 +12,11 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
-    ignore_paths:
+    ignore_paths: &ciPaths
+    - bin
     - ci
     - integration
+    - Makefile
 
 - name: cli-i18n
   type: git
@@ -27,9 +29,7 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
-    paths:
-    - bin
-    - ci
+    paths: *ciPaths
 
 - name: cli-integration
   type: git
@@ -180,7 +180,7 @@ resources:
   type: docker-image
   source:
     repository: golang
-    tag: latest
+    tag: 1.9
 
 - name: baseimage
   type: docker-image
@@ -300,27 +300,15 @@ jobs:
          text: |
            i18n generation failed :(
            https://wings.pivotal.io/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - aggregate:
-    - task: build
-      file: cli-ci/ci/cli/tasks/build-binaries.yml
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-eng'
-           text: |
-             build binaries failed :(
-             https://wings.pivotal.io/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-    - task: build-osx
-      file: cli-ci/ci/cli/tasks/build-osx-binary.yml
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-eng'
-           text: |
-             build OS X binaries failed :(
-             https://wings.pivotal.io/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - task: combine-binaries
-    file: cli-ci/ci/cli/tasks/combine-binaries.yml
+  - task: build
+    file: cli-ci/ci/cli/tasks/build-binaries.yml
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-eng'
+         text: |
+           build binaries failed :(
+           https://wings.pivotal.io/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
   - put: cf-cli-binaries
     params:
       file: compiled/cf-cli-binaries.tgz
@@ -576,7 +564,7 @@ jobs:
     - task: config
       file: cli-ci/ci/cli/tasks/cats-config.yml
       params:
-        INCLUDE_V3: false
+        INCLUDE_V3: true
         BROKER_START_TIMEOUT: 330
         CF_PUSH_TIMEOUT: 210
         DEFAULT_TIMEOUT: 60

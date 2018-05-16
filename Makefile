@@ -5,15 +5,18 @@ LC_ALL = "en_US.UTF-8"
 CF_BUILD_VERSION ?= $$(cat BUILD_VERSION)
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
-LD_FLAGS = "-w -s \
+LD_FLAGS =-w -s \
 	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION) \
 	-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
-	-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)"
+	-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)
+LD_FLAGS_LINUX = -extldflags \"-static\" $(LD_FLAGS)
+REQUIRED_FOR_STATIC_BINARY =-a -tags netgo -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 
 all : test build
 
-build : out/cf
+build : out/cf-cli_linux_x86-64
+	cp out/cf-cli_linux_x86-64 out/cf
 
 check-target-env :
 ifndef CF_API
@@ -24,7 +27,7 @@ ifndef CF_PASSWORD
 endif
 
 clean :
-	rm -r $(wildcard out/*)
+	rm -f $(wildcard out/cf*)
 
 format :
 	go fmt ./...
@@ -43,12 +46,6 @@ fly-windows-push : check-target-env
 
 fly-windows-units :
 	fly -t ci execute -c ci/cli/tasks/units-windows.yml -i cli=./ -i cli-ci=./
-
-i18n :
-	$(PWD)/bin/i18n-checkup
-
-i18n-extract-strings :
-	$(PWD)/bin/i18n-extract-strings
 
 integration-cleanup :
 	$(PWD)/bin/cleanup-integration
@@ -74,29 +71,39 @@ integration-tests : build integration-cleanup
 	make integration-cleanup
 
 integration-tests-full : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/isolated integration/push integration/plugin integration/experimental
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) \
+		integration/isolated integration/push integration/plugin integration/experimental
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
 	make integration-cleanup
 
-out/cf : $(GOSRC)
-	go build -o out/cf \
-	  -ldflags $(LD_FLAGS) .
+out/cf-cli_linux_i686 : $(GOSRC)
+	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
+							$(REQUIRED_FOR_STATIC_BINARY) \
+							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_i686 .
 
-out/cf-osx : $(GOSRC)
-	GOARCH=amd64 GOOS=darwin go build -o out/cf-osx \
-	  -ldflags $(LD_FLAGS) .
+out/cf-cli_linux_x86-64 : $(GOSRC)
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build \
+							$(REQUIRED_FOR_STATIC_BINARY) \
+							-ldflags "$(LD_FLAGS_LINUX)" -o out/cf-cli_linux_x86-64 .
 
-out/cf-cli-_winx64.exe : $(GOSRC)
-	go get github.com/akavel/rsrc
-	rsrc -ico ci/installers/windows/cf.ico
-	GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe -ldflags $(LD_FLAGS) .
+out/cf-cli_osx : $(GOSRC)
+	GOARCH=amd64 GOOS=darwin go build \
+				 $(REQUIRED_FOR_STATIC_BINARY) \
+				 -ldflags "$(LD_FLAGS)" -o out/cf-cli_osx .
+
+out/cf-cli_win32.exe : $(GOSRC) rsrc.syso
+	GOARCH=386 GOOS=windows go build -tags="forceposix" -o out/cf-cli_win32.exe -ldflags "$(LD_FLAGS)" .
 	rm rsrc.syso
 
-out/cf-cli-_win32.exe : $(GOSRC)
-	go get github.com/akavel/rsrc
-	rsrc -ico ci/installers/windows/cf.ico
-	GOARCH=386 GOOS=windows go build -tags="forceposix" -o out/cf-cli_win32.exe -ldflags $(LD_FLAGS) .
+out/cf-cli_winx64.exe : $(GOSRC) rsrc.syso
+	GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe -ldflags "$(LD_FLAGS)" .
 	rm rsrc.syso
+
+rsrc.syso :
+	@# Software for windows icon
+	go get github.com/akavel/rsrc
+	@# Generates icon file
+	rsrc -ico ci/installers/windows/cf.ico
 
 test : units
 
@@ -118,7 +125,8 @@ version :
 vet :
 	@echo  "Vetting packages for potential issues..."
 	go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
+	@echo
 
-.PHONY : all buildg clean i18n i18n-extract-strings format version vet
+.PHONY : all build clean format version vet
 .PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
 .PHONY : check-target-env fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
