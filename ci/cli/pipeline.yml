@@ -180,7 +180,7 @@ resources:
   type: docker-image
   source:
     repository: golang
-    tag: latest
+    tag: 1.9
 
 - name: baseimage
   type: docker-image
