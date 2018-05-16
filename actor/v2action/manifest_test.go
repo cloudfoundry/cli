@@ -2,23 +2,22 @@ package v2action_test
 
 import (
 	"errors"
-	"io/ioutil"
-	"os"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("Manifest Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
-		manifestFilePath          string
 	)
 
 	BeforeEach(func() {
@@ -28,12 +27,13 @@ var _ = Describe("Manifest Actions", func() {
 
 	Describe("CreateApplicationManifestByNameAndSpace", func() {
 		var (
+			manifestApp    manifest.Application
 			createWarnings Warnings
 			createErr      error
 		)
 
 		JustBeforeEach(func() {
-			createWarnings, createErr = actor.CreateApplicationManifestByNameAndSpace("some-app", "some-space-guid", manifestFilePath)
+			manifestApp, createWarnings, createErr = actor.CreateApplicationManifestByNameAndSpace("some-app", "some-space-guid")
 		})
 
 		Context("when getting the application summary errors", func() {
@@ -162,268 +162,138 @@ var _ = Describe("Manifest Actions", func() {
 					}
 				})
 
-				Context("when writing manifest succeeds", func() {
+				Context("when creating the simple app", func() {
+					It("creates the corresponding manifest application", func() {
+						Expect(manifestApp).To(Equal(manifest.Application{
+							Name: "some-app",
+							Buildpack: types.FilteredString{
+								IsSet: true,
+								Value: "some-buildpack",
+							},
+							DiskQuota:      types.NullByteSizeInMb{IsSet: true, Value: 1024},
+							DockerImage:    "some-docker-image",
+							DockerUsername: "some-docker-username",
+							DockerPassword: "",
+							Command: types.FilteredString{
+								IsSet: true,
+								Value: "some-command",
+							},
+							EnvironmentVariables: map[string]string{
+								"env_1": "foo",
+								"env_2": "182837403930483038",
+								"env_3": "true",
+								"env_4": "1.00001",
+							},
+							HealthCheckTimeout:      120,
+							HealthCheckHTTPEndpoint: "\\some-endpoint",
+							HealthCheckType:         "http",
+							Instances: types.NullInt{
+								Value: 10,
+								IsSet: true,
+							},
+							Memory:    types.NullByteSizeInMb{IsSet: true, Value: 200},
+							Routes:    []string{"host-1.some-domain", "host-2.some-domain"},
+							Services:  []string{"service-1", "service-2"},
+							StackName: "some-stack",
+						}))
+					})
+				})
+
+				Context("when there are no routes", func() {
 					BeforeEach(func() {
-						manifestFile, err := ioutil.TempFile("", "manifest-test-")
-						Expect(err).NotTo(HaveOccurred())
-						Expect(manifestFile.Close()).To(Succeed())
-						manifestFilePath = manifestFile.Name()
+						fakeCloudControllerClient.GetApplicationRoutesReturns(nil, nil, nil)
 					})
 
-					AfterEach(func() {
-						Expect(os.RemoveAll(manifestFilePath)).To(Succeed())
+					It("returns the app with no-route set to true", func() {
+						Expect(createErr).NotTo(HaveOccurred())
+						Expect(createWarnings).To(ConsistOf("some-app-warning", "some-stack-warning", "some-service-warning", "some-service-1-warning", "some-service-2-warning"))
+						Expect(manifestApp).To(MatchFields(IgnoreExtras, Fields{
+							"Routes":  BeEmpty(),
+							"NoRoute": Equal(true),
+						}))
+					})
+				})
+
+				Context("when docker image and username are not provided", func() {
+					BeforeEach(func() {
+						app.DockerImage = ""
+						app.DockerCredentials = ccv2.DockerCredentials{}
+						fakeCloudControllerClient.GetApplicationsReturns(
+							[]ccv2.Application{app},
+							ccv2.Warnings{"some-app-warning"},
+							nil)
 					})
 
-					It("writes the manifest to the specified path", func() {
-						manifestBytes, err := ioutil.ReadFile(manifestFilePath)
-						Expect(err).NotTo(HaveOccurred())
-						Expect(createWarnings).To(ConsistOf("some-app-warning", "some-routes-warning", "some-domain-warning", "some-stack-warning", "some-service-warning", "some-service-1-warning", "some-service-2-warning"))
-						Expect(string(manifestBytes)).To(Equal(`applications:
-- name: some-app
-  buildpack: some-buildpack
-  command: some-command
-  disk_quota: 1G
-  docker:
-    image: some-docker-image
-    username: some-docker-username
-  env:
-    env_1: foo
-    env_2: "182837403930483038"
-    env_3: "true"
-    env_4: "1.00001"
-  health-check-http-endpoint: \some-endpoint
-  health-check-type: http
-  instances: 10
-  memory: 200M
-  routes:
-  - route: host-1.some-domain
-  - route: host-2.some-domain
-  services:
-  - service-1
-  - service-2
-  stack: some-stack
-  timeout: 120
-`))
+					It("does not include it in manifest", func() {
+						Expect(createErr).NotTo(HaveOccurred())
+						Expect(createWarnings).To(ConsistOf("some-app-warning", "some-stack-warning", "some-routes-warning", "some-domain-warning", "some-service-warning", "some-service-1-warning", "some-service-2-warning"))
+						Expect(manifestApp).To(MatchFields(IgnoreExtras, Fields{
+							"DockerImage":    BeEmpty(),
+							"DockerUsername": BeEmpty(),
+						}))
 					})
+				})
 
-					Context("when there are no routes", func() {
+				Describe("default CC values", func() {
+					// We ommitting default CC values from manifest
+					// so that it won't get too big
+
+					Context("when the health check type is port", func() {
 						BeforeEach(func() {
-							fakeCloudControllerClient.GetApplicationRoutesReturns(nil, nil, nil)
-						})
-
-						It("writes the manifest with no-route set to true", func() {
-							manifestBytes, err := ioutil.ReadFile(manifestFilePath)
-							Expect(err).NotTo(HaveOccurred())
-							Expect(createWarnings).To(ConsistOf("some-app-warning", "some-stack-warning", "some-service-warning", "some-service-1-warning", "some-service-2-warning"))
-							Expect(string(manifestBytes)).To(Equal(`applications:
-- name: some-app
-  buildpack: some-buildpack
-  command: some-command
-  disk_quota: 1G
-  docker:
-    image: some-docker-image
-    username: some-docker-username
-  env:
-    env_1: foo
-    env_2: "182837403930483038"
-    env_3: "true"
-    env_4: "1.00001"
-  health-check-http-endpoint: \some-endpoint
-  health-check-type: http
-  instances: 10
-  memory: 200M
-  no-route: true
-  services:
-  - service-1
-  - service-2
-  stack: some-stack
-  timeout: 120
-`))
-						})
-					})
-
-					Context("when docker image and username are not provided", func() {
-						BeforeEach(func() {
-							app.DockerImage = ""
-							app.DockerCredentials = ccv2.DockerCredentials{}
+							app.HealthCheckType = constant.ApplicationHealthCheckPort
 							fakeCloudControllerClient.GetApplicationsReturns(
 								[]ccv2.Application{app},
 								ccv2.Warnings{"some-app-warning"},
 								nil)
 						})
 
-						It("does not include it in manifest", func() {
-							manifestBytes, err := ioutil.ReadFile(manifestFilePath)
-							Expect(err).NotTo(HaveOccurred())
-							Expect(string(manifestBytes)).To(Equal(`applications:
-- name: some-app
-  buildpack: some-buildpack
-  command: some-command
-  disk_quota: 1G
-  env:
-    env_1: foo
-    env_2: "182837403930483038"
-    env_3: "true"
-    env_4: "1.00001"
-  health-check-http-endpoint: \some-endpoint
-  health-check-type: http
-  instances: 10
-  memory: 200M
-  routes:
-  - route: host-1.some-domain
-  - route: host-2.some-domain
-  services:
-  - service-1
-  - service-2
-  stack: some-stack
-  timeout: 120
-`))
+						It("does not include health check type and endpoint", func() {
+							Expect(createErr).NotTo(HaveOccurred())
+							Expect(createWarnings).To(ConsistOf("some-app-warning", "some-stack-warning", "some-routes-warning", "some-domain-warning", "some-service-warning", "some-service-1-warning", "some-service-2-warning"))
+							Expect(manifestApp).To(MatchFields(IgnoreExtras, Fields{
+								"HealthCheckType":         BeEmpty(),
+								"HealthCheckHTTPEndpoint": BeEmpty(),
+							}))
 						})
 					})
 
-					Describe("default CC values", func() {
-						// We ommitting default CC values from manifest
-						// so that it won't get too big
-
-						Context("when the health check type is port", func() {
+					Context("when the health check type is http", func() {
+						Context("when the health check endpoint path is '/'", func() {
 							BeforeEach(func() {
-								app.HealthCheckType = constant.ApplicationHealthCheckPort
+								app.HealthCheckType = constant.ApplicationHealthCheckHTTP
+								app.HealthCheckHTTPEndpoint = "/"
 								fakeCloudControllerClient.GetApplicationsReturns(
 									[]ccv2.Application{app},
 									ccv2.Warnings{"some-app-warning"},
 									nil)
 							})
 
-							It("does not include health check type and endpoint", func() {
-								manifestBytes, err := ioutil.ReadFile(manifestFilePath)
-								Expect(err).NotTo(HaveOccurred())
-								Expect(string(manifestBytes)).To(Equal(`applications:
-- name: some-app
-  buildpack: some-buildpack
-  command: some-command
-  disk_quota: 1G
-  docker:
-    image: some-docker-image
-    username: some-docker-username
-  env:
-    env_1: foo
-    env_2: "182837403930483038"
-    env_3: "true"
-    env_4: "1.00001"
-  instances: 10
-  memory: 200M
-  routes:
-  - route: host-1.some-domain
-  - route: host-2.some-domain
-  services:
-  - service-1
-  - service-2
-  stack: some-stack
-  timeout: 120
-`))
+							It("does not include health check endpoint in manifest", func() {
+								Expect(createErr).NotTo(HaveOccurred())
+								Expect(createWarnings).To(ConsistOf("some-app-warning", "some-stack-warning", "some-routes-warning", "some-domain-warning", "some-service-warning", "some-service-1-warning", "some-service-2-warning"))
+								Expect(manifestApp).To(MatchFields(IgnoreExtras, Fields{
+									"HealthCheckHTTPEndpoint": BeEmpty(),
+								}))
 							})
 						})
 
-						Context("when the health check type is http", func() {
-							Context("when the health check endpoint path is '/'", func() {
-								BeforeEach(func() {
-									app.HealthCheckType = constant.ApplicationHealthCheckHTTP
-									app.HealthCheckHTTPEndpoint = "/"
-									fakeCloudControllerClient.GetApplicationsReturns(
-										[]ccv2.Application{app},
-										ccv2.Warnings{"some-app-warning"},
-										nil)
-								})
-
-								It("does not include health check endpoint in manifest", func() {
-									manifestBytes, err := ioutil.ReadFile(manifestFilePath)
-									Expect(err).NotTo(HaveOccurred())
-									Expect(string(manifestBytes)).To(Equal(`applications:
-- name: some-app
-  buildpack: some-buildpack
-  command: some-command
-  disk_quota: 1G
-  docker:
-    image: some-docker-image
-    username: some-docker-username
-  env:
-    env_1: foo
-    env_2: "182837403930483038"
-    env_3: "true"
-    env_4: "1.00001"
-  health-check-type: http
-  instances: 10
-  memory: 200M
-  routes:
-  - route: host-1.some-domain
-  - route: host-2.some-domain
-  services:
-  - service-1
-  - service-2
-  stack: some-stack
-  timeout: 120
-`))
-								})
+						Context("when the health check type is process", func() {
+							BeforeEach(func() {
+								app.HealthCheckType = constant.ApplicationHealthCheckProcess
+								fakeCloudControllerClient.GetApplicationsReturns(
+									[]ccv2.Application{app},
+									ccv2.Warnings{"some-app-warning"},
+									nil)
 							})
 
-							Context("when the health check type is process", func() {
-								BeforeEach(func() {
-									app.HealthCheckType = constant.ApplicationHealthCheckProcess
-									fakeCloudControllerClient.GetApplicationsReturns(
-										[]ccv2.Application{app},
-										ccv2.Warnings{"some-app-warning"},
-										nil)
-								})
-
-								It("does not include health check endpoint in manifest", func() {
-									manifestBytes, err := ioutil.ReadFile(manifestFilePath)
-									Expect(err).NotTo(HaveOccurred())
-									Expect(string(manifestBytes)).To(Equal(`applications:
-- name: some-app
-  buildpack: some-buildpack
-  command: some-command
-  disk_quota: 1G
-  docker:
-    image: some-docker-image
-    username: some-docker-username
-  env:
-    env_1: foo
-    env_2: "182837403930483038"
-    env_3: "true"
-    env_4: "1.00001"
-  health-check-type: process
-  instances: 10
-  memory: 200M
-  routes:
-  - route: host-1.some-domain
-  - route: host-2.some-domain
-  services:
-  - service-1
-  - service-2
-  stack: some-stack
-  timeout: 120
-`))
-								})
+							It("does not include health check endpoint in manifest", func() {
+								Expect(createErr).NotTo(HaveOccurred())
+								Expect(createWarnings).To(ConsistOf("some-app-warning", "some-stack-warning", "some-routes-warning", "some-domain-warning", "some-service-warning", "some-service-1-warning", "some-service-2-warning"))
+								Expect(manifestApp).To(MatchFields(IgnoreExtras, Fields{
+									"HealthCheckHTTPEndpoint": BeEmpty(),
+								}))
 							})
 						})
-					})
-				})
-
-				Context("when writing the manifest fails", func() {
-					BeforeEach(func() {
-						var err error
-						manifestFilePath, err = ioutil.TempDir("", "manifest-test-")
-						Expect(err).NotTo(HaveOccurred())
-					})
-
-					AfterEach(func() {
-						Expect(os.RemoveAll(manifestFilePath)).To(Succeed())
-					})
-
-					It("returns an ManifestCreationError", func() {
-						Expect(createErr).To(HaveOccurred())
-						Expect(createErr.Error()).To(ContainSubstring("Error creating manifest file:"))
-						Expect(createWarnings).To(ConsistOf("some-app-warning", "some-routes-warning", "some-domain-warning", "some-stack-warning", "some-service-warning", "some-service-1-warning", "some-service-2-warning"))
 					})
 				})
 			})

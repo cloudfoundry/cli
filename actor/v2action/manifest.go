@@ -5,19 +5,19 @@ import (
 	"code.cloudfoundry.org/cli/util/manifest"
 )
 
-func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, spaceGUID string, pathToFile string) (Warnings, error) {
+func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, spaceGUID string) (manifest.Application, Warnings, error) {
 
 	var allWarnings Warnings
 	applicationSummary, appSummaryWarnings, err := actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID)
 	allWarnings = append(allWarnings, appSummaryWarnings...)
 	if err != nil {
-		return allWarnings, err
+		return manifest.Application{}, allWarnings, err
 	}
 
 	serviceInstances, serviceWarnings, err := actor.GetServiceInstancesByApplication(applicationSummary.GUID)
 	allWarnings = append(allWarnings, serviceWarnings...)
 	if err != nil {
-		return allWarnings, err
+		return manifest.Application{}, allWarnings, err
 	}
 
 	var routes []string
@@ -58,6 +58,9 @@ func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, space
 		}
 	}
 
-	err = manifest.WriteApplicationManifest(manifestApp, pathToFile)
-	return allWarnings, err
+	return manifestApp, allWarnings, err
+}
+
+func (Actor) WriteApplicationManifest(manifestApp manifest.Application, manifestFilePath string) error {
+	return manifest.WriteApplicationManifest(manifestApp, manifestFilePath)
 }

@@ -48,6 +48,7 @@ type Application struct {
 func (app Application) MarshalYAML() (interface{}, error) {
 	var m = rawManifestApplication{
 		Buildpack:               app.Buildpack.Value,
+		Buildpacks:              app.Buildpacks,
 		Command:                 app.Command.Value,
 		Docker:                  rawDockerInfo{Image: app.DockerImage, Username: app.DockerUsername},
 		DropletPath:             app.DropletPath,

@@ -2,16 +2,15 @@ package v2_test
 
 import (
 	"errors"
-	"fmt"
-	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/manifest"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -83,7 +82,7 @@ var _ = Describe("create-app-manifest Command", func() {
 
 		Context("when creating the manifest errors", func() {
 			BeforeEach(func() {
-				fakeActor.CreateApplicationManifestByNameAndSpaceReturns(v2action.Warnings{"some-warning"}, errors.New("some-error"))
+				fakeActor.CreateApplicationManifestByNameAndSpaceReturns(manifest.Application{}, v2v3action.Warnings{"some-warning"}, errors.New("some-error"))
 			})
 
 			It("returns the error, prints warnings", func() {
@@ -95,7 +94,7 @@ var _ = Describe("create-app-manifest Command", func() {
 
 		Context("when creating the manifest succeeds", func() {
 			BeforeEach(func() {
-				fakeActor.CreateApplicationManifestByNameAndSpaceReturns(v2action.Warnings{"some-warning"}, nil)
+				fakeActor.CreateApplicationManifestByNameAndSpaceReturns(manifest.Application{}, v2v3action.Warnings{"some-warning"}, nil)
 			})
 
 			It("displays the file it created and returns no errors", func() {
@@ -106,10 +105,14 @@ var _ = Describe("create-app-manifest Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeActor.CreateApplicationManifestByNameAndSpaceCallCount()).To(Equal(1))
-				appArg, spaceArg, pathArg := fakeActor.CreateApplicationManifestByNameAndSpaceArgsForCall(0)
+				appArg, spaceArg := fakeActor.CreateApplicationManifestByNameAndSpaceArgsForCall(0)
 				Expect(appArg).To(Equal("some-app"))
 				Expect(spaceArg).To(Equal("some-space-guid"))
+
+				Expect(fakeActor.WriteApplicationManifestCallCount()).To(Equal(1))
+				manifestArg, pathArg := fakeActor.WriteApplicationManifestArgsForCall(0)
 				Expect(pathArg).To(Equal("some-file-path"))
+				Expect(manifestArg).To(Equal(manifest.Application{}))
 			})
 
 			Context("when no filepath is provided", func() {
@@ -125,10 +128,14 @@ var _ = Describe("create-app-manifest Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(fakeActor.CreateApplicationManifestByNameAndSpaceCallCount()).To(Equal(1))
-					appArg, spaceArg, pathArg := fakeActor.CreateApplicationManifestByNameAndSpaceArgsForCall(0)
+					appArg, spaceArg := fakeActor.CreateApplicationManifestByNameAndSpaceArgsForCall(0)
 					Expect(appArg).To(Equal("some-app"))
 					Expect(spaceArg).To(Equal("some-space-guid"))
-					Expect(pathArg).To(Equal(fmt.Sprintf(".%ssome-app_manifest.yml", string(os.PathSeparator))))
+
+					Expect(fakeActor.WriteApplicationManifestCallCount()).To(Equal(1))
+					manifestArg, pathArg := fakeActor.WriteApplicationManifestArgsForCall(0)
+					Expect(pathArg).To(Equal("./some-app_manifest.yml"))
+					Expect(manifestArg).To(Equal(manifest.Application{}))
 				})
 			})
 		})

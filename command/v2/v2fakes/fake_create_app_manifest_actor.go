@@ -4,47 +4,60 @@ package v2fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/command/v2"
+	"code.cloudfoundry.org/cli/util/manifest"
 )
 
 type FakeCreateAppManifestActor struct {
-	CreateApplicationManifestByNameAndSpaceStub        func(appName string, spaceGUID string, filePath string) (v2action.Warnings, error)
+	CreateApplicationManifestByNameAndSpaceStub        func(appName string, spaceGUID string) (manifest.Application, v2v3action.Warnings, error)
 	createApplicationManifestByNameAndSpaceMutex       sync.RWMutex
 	createApplicationManifestByNameAndSpaceArgsForCall []struct {
 		appName   string
 		spaceGUID string
-		filePath  string
 	}
 	createApplicationManifestByNameAndSpaceReturns struct {
-		result1 v2action.Warnings
-		result2 error
+		result1 manifest.Application
+		result2 v2v3action.Warnings
+		result3 error
 	}
 	createApplicationManifestByNameAndSpaceReturnsOnCall map[int]struct {
-		result1 v2action.Warnings
-		result2 error
+		result1 manifest.Application
+		result2 v2v3action.Warnings
+		result3 error
+	}
+	WriteApplicationManifestStub        func(manifestApp manifest.Application, manifestPath string) error
+	writeApplicationManifestMutex       sync.RWMutex
+	writeApplicationManifestArgsForCall []struct {
+		manifestApp  manifest.Application
+		manifestPath string
+	}
+	writeApplicationManifestReturns struct {
+		result1 error
+	}
+	writeApplicationManifestReturnsOnCall map[int]struct {
+		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateAppManifestActor) CreateApplicationManifestByNameAndSpace(appName string, spaceGUID string, filePath string) (v2action.Warnings, error) {
+func (fake *FakeCreateAppManifestActor) CreateApplicationManifestByNameAndSpace(appName string, spaceGUID string) (manifest.Application, v2v3action.Warnings, error) {
 	fake.createApplicationManifestByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.createApplicationManifestByNameAndSpaceReturnsOnCall[len(fake.createApplicationManifestByNameAndSpaceArgsForCall)]
 	fake.createApplicationManifestByNameAndSpaceArgsForCall = append(fake.createApplicationManifestByNameAndSpaceArgsForCall, struct {
 		appName   string
 		spaceGUID string
-		filePath  string
-	}{appName, spaceGUID, filePath})
-	fake.recordInvocation("CreateApplicationManifestByNameAndSpace", []interface{}{appName, spaceGUID, filePath})
+	}{appName, spaceGUID})
+	fake.recordInvocation("CreateApplicationManifestByNameAndSpace", []interface{}{appName, spaceGUID})
 	fake.createApplicationManifestByNameAndSpaceMutex.Unlock()
 	if fake.CreateApplicationManifestByNameAndSpaceStub != nil {
-		return fake.CreateApplicationManifestByNameAndSpaceStub(appName, spaceGUID, filePath)
+		return fake.CreateApplicationManifestByNameAndSpaceStub(appName, spaceGUID)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createApplicationManifestByNameAndSpaceReturns.result1, fake.createApplicationManifestByNameAndSpaceReturns.result2
+	return fake.createApplicationManifestByNameAndSpaceReturns.result1, fake.createApplicationManifestByNameAndSpaceReturns.result2, fake.createApplicationManifestByNameAndSpaceReturns.result3
 }
 
 func (fake *FakeCreateAppManifestActor) CreateApplicationManifestByNameAndSpaceCallCount() int {
@@ -53,32 +66,84 @@ func (fake *FakeCreateAppManifestActor) CreateApplicationManifestByNameAndSpaceC
 	return len(fake.createApplicationManifestByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeCreateAppManifestActor) CreateApplicationManifestByNameAndSpaceArgsForCall(i int) (string, string, string) {
+func (fake *FakeCreateAppManifestActor) CreateApplicationManifestByNameAndSpaceArgsForCall(i int) (string, string) {
 	fake.createApplicationManifestByNameAndSpaceMutex.RLock()
 	defer fake.createApplicationManifestByNameAndSpaceMutex.RUnlock()
-	return fake.createApplicationManifestByNameAndSpaceArgsForCall[i].appName, fake.createApplicationManifestByNameAndSpaceArgsForCall[i].spaceGUID, fake.createApplicationManifestByNameAndSpaceArgsForCall[i].filePath
+	return fake.createApplicationManifestByNameAndSpaceArgsForCall[i].appName, fake.createApplicationManifestByNameAndSpaceArgsForCall[i].spaceGUID
 }
 
-func (fake *FakeCreateAppManifestActor) CreateApplicationManifestByNameAndSpaceReturns(result1 v2action.Warnings, result2 error) {
+func (fake *FakeCreateAppManifestActor) CreateApplicationManifestByNameAndSpaceReturns(result1 manifest.Application, result2 v2v3action.Warnings, result3 error) {
 	fake.CreateApplicationManifestByNameAndSpaceStub = nil
 	fake.createApplicationManifestByNameAndSpaceReturns = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 manifest.Application
+		result2 v2v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeCreateAppManifestActor) CreateApplicationManifestByNameAndSpaceReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+func (fake *FakeCreateAppManifestActor) CreateApplicationManifestByNameAndSpaceReturnsOnCall(i int, result1 manifest.Application, result2 v2v3action.Warnings, result3 error) {
 	fake.CreateApplicationManifestByNameAndSpaceStub = nil
 	if fake.createApplicationManifestByNameAndSpaceReturnsOnCall == nil {
 		fake.createApplicationManifestByNameAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 v2action.Warnings
-			result2 error
+			result1 manifest.Application
+			result2 v2v3action.Warnings
+			result3 error
 		})
 	}
 	fake.createApplicationManifestByNameAndSpaceReturnsOnCall[i] = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 manifest.Application
+		result2 v2v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCreateAppManifestActor) WriteApplicationManifest(manifestApp manifest.Application, manifestPath string) error {
+	fake.writeApplicationManifestMutex.Lock()
+	ret, specificReturn := fake.writeApplicationManifestReturnsOnCall[len(fake.writeApplicationManifestArgsForCall)]
+	fake.writeApplicationManifestArgsForCall = append(fake.writeApplicationManifestArgsForCall, struct {
+		manifestApp  manifest.Application
+		manifestPath string
+	}{manifestApp, manifestPath})
+	fake.recordInvocation("WriteApplicationManifest", []interface{}{manifestApp, manifestPath})
+	fake.writeApplicationManifestMutex.Unlock()
+	if fake.WriteApplicationManifestStub != nil {
+		return fake.WriteApplicationManifestStub(manifestApp, manifestPath)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.writeApplicationManifestReturns.result1
+}
+
+func (fake *FakeCreateAppManifestActor) WriteApplicationManifestCallCount() int {
+	fake.writeApplicationManifestMutex.RLock()
+	defer fake.writeApplicationManifestMutex.RUnlock()
+	return len(fake.writeApplicationManifestArgsForCall)
+}
+
+func (fake *FakeCreateAppManifestActor) WriteApplicationManifestArgsForCall(i int) (manifest.Application, string) {
+	fake.writeApplicationManifestMutex.RLock()
+	defer fake.writeApplicationManifestMutex.RUnlock()
+	return fake.writeApplicationManifestArgsForCall[i].manifestApp, fake.writeApplicationManifestArgsForCall[i].manifestPath
+}
+
+func (fake *FakeCreateAppManifestActor) WriteApplicationManifestReturns(result1 error) {
+	fake.WriteApplicationManifestStub = nil
+	fake.writeApplicationManifestReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeCreateAppManifestActor) WriteApplicationManifestReturnsOnCall(i int, result1 error) {
+	fake.WriteApplicationManifestStub = nil
+	if fake.writeApplicationManifestReturnsOnCall == nil {
+		fake.writeApplicationManifestReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.writeApplicationManifestReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeCreateAppManifestActor) Invocations() map[string][][]interface{} {
@@ -86,6 +151,8 @@ func (fake *FakeCreateAppManifestActor) Invocations() map[string][][]interface{}
 	defer fake.invocationsMutex.RUnlock()
 	fake.createApplicationManifestByNameAndSpaceMutex.RLock()
 	defer fake.createApplicationManifestByNameAndSpaceMutex.RUnlock()
+	fake.writeApplicationManifestMutex.RLock()
+	defer fake.writeApplicationManifestMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

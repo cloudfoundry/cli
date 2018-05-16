@@ -539,6 +539,7 @@ applications:
 						IsSet: true,
 						Value: "some-buildpack",
 					},
+					Buildpacks: []string{"buildpack1", "buildpack2"},
 					Command: types.FilteredString{
 						IsSet: true,
 						Value: "some-command",
@@ -581,6 +582,9 @@ applications:
 				Expect(string(manifestBytes)).To(Equal(`applications:
 - name: app-1
   buildpack: some-buildpack
+  buildpacks:
+  - buildpack1
+  - buildpack2
   command: some-command
   disk_quota: 1G
   docker:

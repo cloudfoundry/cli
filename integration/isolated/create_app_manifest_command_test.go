@@ -332,5 +332,37 @@ var _ = Describe("create-app-manifest command", func() {
 				Expect(appManifest.Applications[0].Routes[0]).To(Equal(domain.Name))
 			})
 		})
+
+		Context("when the app has a buildpack", func() {
+			BeforeEach(func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start", "-b", "staticfile_buildpack")).Should(Exit(0))
+				})
+			})
+
+			FIt("returns a manifest with multiple buildpacks", func() {
+				appManifest, err := createManifest(appName)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(appManifest.Applications).To(HaveLen(1))
+				Expect(appManifest.Applications[0].Buildpacks).To(Equal([]string{"staticfile_buildpack"}))
+			})
+		})
+
+		Context("when the app has multiple buildpacks", func() {
+			BeforeEach(func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start", "-b", "ruby_buildpack", "-b", "staticfile_buildpack")).Should(Exit(0))
+				})
+			})
+
+			FIt("returns a manifest with multiple buildpacks", func() {
+				appManifest, err := createManifest(appName)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(appManifest.Applications).To(HaveLen(1))
+				Expect(appManifest.Applications[0].Buildpacks).To(Equal([]string{"ruby_buildpack", "staticfile_buildpack"}))
+			})
+		})
 	})
 })
