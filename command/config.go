@@ -16,6 +16,8 @@ type Config interface {
 	APIVersion() string
 	BinaryName() string
 	BinaryVersion() string
+	CFPassword() string
+	CFUsername() string
 	ColorEnabled() configv3.ColorSetting
 	CurrentUser() (configv3.User, error)
 	DialTimeout() time.Duration

@@ -2,7 +2,6 @@ package v2
 
 import (
 	"fmt"
-	"os"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
@@ -88,7 +87,7 @@ func (cmd AuthCommand) checkEnvVariables() (string, string, error) {
 
 	username := cmd.RequiredArgs.Username
 	if username == "" {
-		if envUser := os.Getenv("CF_USERNAME"); envUser != "" {
+		if envUser := cmd.Config.CFUsername(); envUser != "" {
 			username = envUser
 		} else {
 			userMissing = true
@@ -97,7 +96,7 @@ func (cmd AuthCommand) checkEnvVariables() (string, string, error) {
 
 	password := cmd.RequiredArgs.Password
 	if password == "" {
-		if envPassword := os.Getenv("CF_PASSWORD"); envPassword != "" {
+		if envPassword := cmd.Config.CFPassword(); envPassword != "" {
 			password = envPassword
 		} else {
 			passwordMissing = true

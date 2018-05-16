@@ -29,8 +29,10 @@ var _ = Describe("Config", func() {
 		BeforeEach(func() {
 			Expect(os.Setenv("CF_DIAL_TIMEOUT", "1234")).ToNot(HaveOccurred())
 			Expect(os.Setenv("CF_DOCKER_PASSWORD", "banana")).ToNot(HaveOccurred())
+			Expect(os.Setenv("CF_PASSWORD", "I am password.")).ToNot(HaveOccurred())
 			Expect(os.Setenv("CF_STAGING_TIMEOUT", "8675")).ToNot(HaveOccurred())
 			Expect(os.Setenv("CF_STARTUP_TIMEOUT", "309")).ToNot(HaveOccurred())
+			Expect(os.Setenv("CF_USERNAME", "i-R-user")).ToNot(HaveOccurred())
 			Expect(os.Setenv("https_proxy", "proxy.com")).ToNot(HaveOccurred())
 
 			var err error
@@ -42,12 +44,16 @@ var _ = Describe("Config", func() {
 		AfterEach(func() {
 			Expect(os.Unsetenv("CF_DIAL_TIMEOUT")).ToNot(HaveOccurred())
 			Expect(os.Unsetenv("CF_DOCKER_PASSWORD")).ToNot(HaveOccurred())
+			Expect(os.Unsetenv("CF_PASSWORD")).ToNot(HaveOccurred())
 			Expect(os.Unsetenv("CF_STAGING_TIMEOUT")).ToNot(HaveOccurred())
 			Expect(os.Unsetenv("CF_STARTUP_TIMEOUT")).ToNot(HaveOccurred())
+			Expect(os.Unsetenv("CF_USERNAME")).ToNot(HaveOccurred())
 			Expect(os.Unsetenv("https_proxy")).ToNot(HaveOccurred())
 		})
 
 		It("overrides specific config values", func() {
+			Expect(config.CFUsername()).To(Equal("i-R-user"))
+			Expect(config.CFPassword()).To(Equal("I am password."))
 			Expect(config.DialTimeout()).To(Equal(1234 * time.Second))
 			Expect(config.DockerPassword()).To(Equal("banana"))
 			Expect(config.HTTPSProxy()).To(Equal("proxy.com"))

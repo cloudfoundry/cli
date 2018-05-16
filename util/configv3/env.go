@@ -13,10 +13,12 @@ type EnvOverride struct {
 	CFDialTimeout    string
 	CFHome           string
 	CFLogLevel       string
+	CFPassword       string
 	CFPluginHome     string
 	CFStagingTimeout string
 	CFStartupTimeout string
 	CFTrace          string
+	CFUsername       string
 	DockerPassword   string
 	Experimental     string
 	ForceTTY         string
@@ -28,6 +30,16 @@ type EnvOverride struct {
 // BinaryName returns the running name of the CF CLI
 func (config *Config) BinaryName() string {
 	return config.ENV.BinaryName
+}
+
+// CFPassword returns the value of the "CF_PASSWORD" environment variable.
+func (config *Config) CFPassword() string {
+	return config.ENV.CFPassword
+}
+
+// CFUsername returns the value of the "CF_USERNAME" environment variable.
+func (config *Config) CFUsername() string {
+	return config.ENV.CFUsername
 }
 
 // DialTimeout returns the timeout to use when dialing. This is based off of:

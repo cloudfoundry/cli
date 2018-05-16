@@ -2,7 +2,6 @@ package v2_test
 
 import (
 	"errors"
-	"os"
 
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
@@ -10,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
-	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -53,20 +51,19 @@ var _ = Describe("auth Command", func() {
 		)
 
 		BeforeEach(func() {
-			testID = helpers.NewUsername()
-			testSecret = helpers.NewPassword()
-			cmd.RequiredArgs.Username = testID
-			cmd.RequiredArgs.Password = testSecret
+			testID = "hello"
+			testSecret = "goodbye"
 
 			fakeConfig.TargetReturns("some-api-target")
-
-			fakeActor.AuthenticateReturns(nil)
 		})
 
-		Context("when client credentials is set", func() {
+		Context("when --client-credentials is set", func() {
 			BeforeEach(func() {
 				cmd.ClientCredentials = true
+				cmd.RequiredArgs.Username = testID
+				cmd.RequiredArgs.Password = testSecret
 			})
+
 			It("outputs API target information and clears the targeted org and space", func() {
 				Expect(err).ToNot(HaveOccurred())
 
@@ -83,49 +80,61 @@ var _ = Describe("auth Command", func() {
 			})
 		})
 
-		Context("when client credentials is not set", func() {
-			BeforeEach(func() {
-				cmd.ClientCredentials = false
-			})
+		Context("when --client-credentials is not set", func() {
+			Context("when username and password are only provided as arguments", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs.Username = testID
+					cmd.RequiredArgs.Password = testSecret
+				})
 
-			It("outputs API target information and clears the targeted org and space", func() {
-				Expect(err).ToNot(HaveOccurred())
+				It("outputs API target information and clears the targeted org and space", func() {
+					Expect(err).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
-				Expect(testUI.Out).To(Say("Authenticating\\.\\.\\."))
-				Expect(testUI.Out).To(Say("OK"))
-				Expect(testUI.Out).To(Say("Use '%s target' to view or set your target org and space", binaryName))
+					Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
+					Expect(testUI.Out).To(Say("Authenticating\\.\\.\\."))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("Use '%s target' to view or set your target org and space", binaryName))
 
-				Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-				username, password, grantType := fakeActor.AuthenticateArgsForCall(0)
-				Expect(username).To(Equal(testID))
-				Expect(password).To(Equal(testSecret))
-				Expect(grantType).To(Equal(constant.GrantTypePassword))
+					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+					username, password, grantType := fakeActor.AuthenticateArgsForCall(0)
+					Expect(username).To(Equal(testID))
+					Expect(password).To(Equal(testSecret))
+					Expect(grantType).To(Equal(constant.GrantTypePassword))
+				})
 			})
 
 			Context("when the username and password are provided in env variables", func() {
-				BeforeEach(func() {
-					os.Setenv("CF_USERNAME", testID)
-					os.Setenv("CF_PASSWORD", testSecret)
-				})
+				var (
+					envUsername string
+					envPassword string
+				)
 
-				AfterEach(func() {
-					os.Unsetenv("CF_USERNAME")
-					os.Unsetenv("CF_PASSWORD")
+				BeforeEach(func() {
+					envUsername = "banana"
+					envPassword = "potato"
+					fakeConfig.CFUsernameReturns(envUsername)
+					fakeConfig.CFPasswordReturns(envPassword)
 				})
 
 				Context("when username and password are not also provided as arguments", func() {
-					BeforeEach(func() {
-						cmd.RequiredArgs.Username = ""
-						cmd.RequiredArgs.Password = ""
-					})
-
 					It("authenticates with the values in the env variables", func() {
 						Expect(err).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
-						Expect(testUI.Out).To(Say("Authenticating\\.\\.\\."))
-						Expect(testUI.Out).To(Say("OK"))
+						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+						username, password, _ := fakeActor.AuthenticateArgsForCall(0)
+						Expect(username).To(Equal(envUsername))
+						Expect(password).To(Equal(envPassword))
+					})
+				})
+
+				Context("when username and password are also provided as arguments", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs.Username = testID
+						cmd.RequiredArgs.Password = testSecret
+					})
+
+					It("authenticates with the values from the command line args", func() {
+						Expect(err).ToNot(HaveOccurred())
 
 						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
 						username, password, _ := fakeActor.AuthenticateArgsForCall(0)
@@ -133,38 +142,12 @@ var _ = Describe("auth Command", func() {
 						Expect(password).To(Equal(testSecret))
 					})
 				})
-
-				Context("when username and password are also provided as arguments", func() {
-					BeforeEach(func() {
-						cmd.RequiredArgs.Username = "hello"
-						cmd.RequiredArgs.Password = "goodbye"
-					})
-
-					It("authenticates with the values from the command line args", func() {
-						Expect(err).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
-						Expect(testUI.Out).To(Say("Authenticating\\.\\.\\."))
-						Expect(testUI.Out).To(Say("OK"))
-
-						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-						username, password, _ := fakeActor.AuthenticateArgsForCall(0)
-						Expect(username).To(Equal("hello"))
-						Expect(password).To(Equal("goodbye"))
-					})
-				})
 			})
-
 		})
 	})
 
 	Context("when credentials are missing", func() {
 		Context("when username and password are both missing", func() {
-			BeforeEach(func() {
-				cmd.RequiredArgs.Username = ""
-				cmd.RequiredArgs.Password = ""
-			})
-
 			It("raises an error", func() {
 				Expect(err).To(MatchError(translatableerror.MissingCredentialsError{
 					MissingUsername: true,
@@ -175,7 +158,6 @@ var _ = Describe("auth Command", func() {
 
 		Context("when username is missing", func() {
 			BeforeEach(func() {
-				cmd.RequiredArgs.Username = ""
 				cmd.RequiredArgs.Password = "mypassword"
 			})
 
@@ -189,7 +171,6 @@ var _ = Describe("auth Command", func() {
 		Context("when password is missing", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs.Username = "myuser"
-				cmd.RequiredArgs.Password = ""
 			})
 
 			It("raises an error", func() {
@@ -265,7 +246,6 @@ var _ = Describe("auth Command", func() {
 			BeforeEach(func() {
 				binaryVersion = "1.0.0"
 				fakeConfig.BinaryVersionReturns(binaryVersion)
-
 			})
 
 			It("does not display a recommendation to update the CLI version", func() {

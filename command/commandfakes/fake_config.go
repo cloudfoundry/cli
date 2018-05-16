@@ -57,6 +57,24 @@ type FakeConfig struct {
 	binaryVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
+	CFPasswordStub        func() string
+	cFPasswordMutex       sync.RWMutex
+	cFPasswordArgsForCall []struct{}
+	cFPasswordReturns     struct {
+		result1 string
+	}
+	cFPasswordReturnsOnCall map[int]struct {
+		result1 string
+	}
+	CFUsernameStub        func() string
+	cFUsernameMutex       sync.RWMutex
+	cFUsernameArgsForCall []struct{}
+	cFUsernameReturns     struct {
+		result1 string
+	}
+	cFUsernameReturnsOnCall map[int]struct {
+		result1 string
+	}
 	ColorEnabledStub        func() configv3.ColorSetting
 	colorEnabledMutex       sync.RWMutex
 	colorEnabledArgsForCall []struct{}
@@ -637,6 +655,86 @@ func (fake *FakeConfig) BinaryVersionReturnsOnCall(i int, result1 string) {
 		})
 	}
 	fake.binaryVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) CFPassword() string {
+	fake.cFPasswordMutex.Lock()
+	ret, specificReturn := fake.cFPasswordReturnsOnCall[len(fake.cFPasswordArgsForCall)]
+	fake.cFPasswordArgsForCall = append(fake.cFPasswordArgsForCall, struct{}{})
+	fake.recordInvocation("CFPassword", []interface{}{})
+	fake.cFPasswordMutex.Unlock()
+	if fake.CFPasswordStub != nil {
+		return fake.CFPasswordStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.cFPasswordReturns.result1
+}
+
+func (fake *FakeConfig) CFPasswordCallCount() int {
+	fake.cFPasswordMutex.RLock()
+	defer fake.cFPasswordMutex.RUnlock()
+	return len(fake.cFPasswordArgsForCall)
+}
+
+func (fake *FakeConfig) CFPasswordReturns(result1 string) {
+	fake.CFPasswordStub = nil
+	fake.cFPasswordReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) CFPasswordReturnsOnCall(i int, result1 string) {
+	fake.CFPasswordStub = nil
+	if fake.cFPasswordReturnsOnCall == nil {
+		fake.cFPasswordReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cFPasswordReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) CFUsername() string {
+	fake.cFUsernameMutex.Lock()
+	ret, specificReturn := fake.cFUsernameReturnsOnCall[len(fake.cFUsernameArgsForCall)]
+	fake.cFUsernameArgsForCall = append(fake.cFUsernameArgsForCall, struct{}{})
+	fake.recordInvocation("CFUsername", []interface{}{})
+	fake.cFUsernameMutex.Unlock()
+	if fake.CFUsernameStub != nil {
+		return fake.CFUsernameStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.cFUsernameReturns.result1
+}
+
+func (fake *FakeConfig) CFUsernameCallCount() int {
+	fake.cFUsernameMutex.RLock()
+	defer fake.cFUsernameMutex.RUnlock()
+	return len(fake.cFUsernameArgsForCall)
+}
+
+func (fake *FakeConfig) CFUsernameReturns(result1 string) {
+	fake.CFUsernameStub = nil
+	fake.cFUsernameReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) CFUsernameReturnsOnCall(i int, result1 string) {
+	fake.CFUsernameStub = nil
+	if fake.cFUsernameReturnsOnCall == nil {
+		fake.cFUsernameReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cFUsernameReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -2264,6 +2362,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.binaryNameMutex.RUnlock()
 	fake.binaryVersionMutex.RLock()
 	defer fake.binaryVersionMutex.RUnlock()
+	fake.cFPasswordMutex.RLock()
+	defer fake.cFPasswordMutex.RUnlock()
+	fake.cFUsernameMutex.RLock()
+	defer fake.cFUsernameMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
 	fake.currentUserMutex.RLock()
