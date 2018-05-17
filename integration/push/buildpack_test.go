@@ -169,6 +169,23 @@ var _ = Describe("push with different buildpack values", func() {
 					Eventually(session).Should(Exit(0))
 				})
 			})
+
+			Context("when one of the buildpacks provided is null or default", func() {
+				It("fails and prints an error", func() {
+					helpers.WithProcfileApp(func(dir string) {
+						tempfile := filepath.Join(dir, "index.html")
+						err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+							PushCommandName, appName,
+							"-b", "staticfile_buildpack", "-b", "null", "--no-start",
+						)
+						Eventually(session).Should(Exit(1))
+						Eventually(session.Err).Should(Say("Multiple buildpacks flags cannot have null/default option."))
+					})
+				})
+			})
 		})
 	})
 

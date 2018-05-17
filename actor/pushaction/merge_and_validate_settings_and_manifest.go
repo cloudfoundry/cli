@@ -217,6 +217,14 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 		if app.HealthCheckHTTPEndpoint != "" && app.HealthCheckType != "http" {
 			return actionerror.HTTPHealthCheckInvalidError{}
 		}
+
+		if len(app.Buildpacks) > 1 {
+			for _, b := range app.Buildpacks {
+				if b == "null" || b == "default" {
+					return actionerror.InvalidBuildpacksError{}
+				}
+			}
+		}
 	}
 	return nil
 }

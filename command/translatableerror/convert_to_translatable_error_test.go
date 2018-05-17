@@ -86,6 +86,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.HTTPHealthCheckInvalidError{},
 			HTTPHealthCheckInvalidError{}),
 
+		Entry("actionerror.InvalidBuildpacksError -> InvalidBuildpacksError",
+			actionerror.InvalidBuildpacksError{},
+			InvalidBuildpacksError{}),
+
 		Entry("actionerror.InvalidHTTPRouteSettings -> PortNotAllowedWithHTTPDomainError",
 			actionerror.InvalidHTTPRouteSettings{Domain: "some-domain"},
 			PortNotAllowedWithHTTPDomainError{Domain: "some-domain"}),

@@ -707,5 +707,23 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				Path: RealPath,
 			}},
 			actionerror.HTTPHealthCheckInvalidError{}),
+		Entry("InvalidBuildpacksError",
+			CommandLineSettings{
+				Buildpacks: []string{"null", "some-buildpack"},
+			},
+			[]manifest.Application{{
+				Name: "some-name-1",
+				Path: RealPath,
+			}},
+			actionerror.InvalidBuildpacksError{}),
+		Entry("InvalidBuildpacksError",
+			CommandLineSettings{
+				Buildpacks: []string{"default", "some-buildpack"},
+			},
+			[]manifest.Application{{
+				Name: "some-name-1",
+				Path: RealPath,
+			}},
+			actionerror.InvalidBuildpacksError{}),
 	)
 })

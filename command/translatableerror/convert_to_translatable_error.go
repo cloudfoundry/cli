@@ -45,6 +45,8 @@ func ConvertToTranslatableError(err error) error {
 		return HostnameWithTCPDomainError(e)
 	case actionerror.HTTPHealthCheckInvalidError:
 		return HTTPHealthCheckInvalidError{}
+	case actionerror.InvalidBuildpacksError:
+		return InvalidBuildpacksError{}
 	case actionerror.InvalidHTTPRouteSettings:
 		return PortNotAllowedWithHTTPDomainError(e)
 	case actionerror.InvalidRouteError:
