@@ -1103,6 +1103,17 @@ var _ = Describe("Application Config", func() {
 				Expect(firstConfig.DesiredApplication.Buildpacks[0]).To(Equal("some-buildpack-1"))
 				Expect(firstConfig.DesiredApplication.Buildpacks[1]).To(Equal("some-buildpack-2"))
 			})
+
+			Context("when the buildpacks are an empty array", func() {
+				BeforeEach(func() {
+					manifestApps[0].Buildpacks = []string{}
+				})
+
+				It("set the buildpacks on DesiredApplication to empty array", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(firstConfig.DesiredApplication.Buildpacks).To(Equal([]string{}))
+				})
+			})
 		})
 	})
 })

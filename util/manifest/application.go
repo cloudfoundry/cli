@@ -161,6 +161,7 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	}
 
 	if _, ok := exists["buildpacks"]; ok {
+		app.Buildpacks = []string{}
 		for _, buildpack := range m.Buildpacks {
 			app.Buildpacks = append(app.Buildpacks, buildpack)
 		}

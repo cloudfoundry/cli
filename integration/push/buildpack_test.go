@@ -242,5 +242,31 @@ var _ = Describe("push with different buildpack values", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
+
+		Context("when empty list of buildpacks is specified", func() {
+			It("autodetects the buildpack", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-b", "staticfile_buildpack", "--no-start")
+					Eventually(session).Should(Exit(0))
+
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name":       appName,
+								"buildpacks": []string{},
+							},
+						},
+					})
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+					Eventually(session).Should(Exit(0))
+				})
+
+				By("displaying an empty buildpacks field")
+				session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
+
+				Eventually(session).Should(Say(`"buildpacks": \[\]`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
 	})
 })
