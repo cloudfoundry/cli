@@ -118,6 +118,12 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		}
 	}
 
+	if len(cmd.Buildpacks) > 1 {
+		if err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "Multiple option '-b'"); err != nil {
+			return err
+		}
+	}
+
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err

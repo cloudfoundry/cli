@@ -80,6 +80,21 @@ var _ = Describe("push Command", func() {
 			executeErr = cmd.Execute(nil)
 		})
 
+		Context("when the mutiple buildpacks are provided, and the API version is below the mutiple buildpacks minimum", func() {
+			BeforeEach(func() {
+				fakeActor.CloudControllerV3APIVersionReturns("3.1.0")
+				cmd.Buildpacks = []string{"some-buildpack", "some-other-buildpack"}
+			})
+
+			It("returns a MinimumAPIVersionNotMetError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+					Command:        "Multiple option '-b'",
+					CurrentVersion: "3.1.0",
+					MinimumVersion: ccversion.MinVersionManifestBuildpacksV3,
+				}))
+			})
+		})
+
 		Context("when the droplet flag is passed and the API version is below the minimum", func() {
 			BeforeEach(func() {
 				fakeActor.CloudControllerV2APIVersionReturns("2.6.1")
