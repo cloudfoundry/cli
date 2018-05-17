@@ -661,6 +661,19 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				AppName:    "some-name-1",
 				Properties: []string{"route-path", "no-route"},
 			}),
+		Entry("PropertyCombinationError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:       "some-name-1",
+				Path:       RealPath,
+				Buildpack:  types.FilteredString{Value: "some-buildpack", IsSet: true},
+				Buildpacks: []string{},
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"buildpack", "buildpacks"},
+			},
+		),
 		Entry("HTTPHealthCheckInvalidError",
 			CommandLineSettings{
 				HealthCheckType: "port",

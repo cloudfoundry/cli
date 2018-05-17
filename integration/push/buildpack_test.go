@@ -286,4 +286,26 @@ var _ = Describe("push with different buildpack values", func() {
 			})
 		})
 	})
+
+	Context("when both buildpack and buildpakcs are provided via manifest", func() {
+		It("returns an error", func() {
+			helpers.WithHelloWorldApp(func(dir string) {
+				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"name":      appName,
+							"buildpack": "ruby_buildpack",
+							"buildpacks": []string{
+								"https://github.com/cloudfoundry/staticfile-buildpack",
+							},
+						},
+					},
+				})
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Application %s cannot use the combination of properties: buildpack, buildpacks", appName))
+			})
+		})
+	})
 })

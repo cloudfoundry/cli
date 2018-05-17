@@ -218,6 +218,10 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			return actionerror.HTTPHealthCheckInvalidError{}
 		}
 
+		if app.Buildpacks != nil && app.Buildpack.IsSet {
+			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"buildpack", "buildpacks"}}
+		}
+
 		if len(app.Buildpacks) > 1 {
 			for _, b := range app.Buildpacks {
 				if b == "null" || b == "default" {
