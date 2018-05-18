@@ -414,4 +414,58 @@ var _ = Describe("push with different buildpack values", func() {
 			})
 		})
 	})
+
+	Context("when both buildpack and droplet are provided via flags", func() {
+		var tempDroplet string
+
+		BeforeEach(func() {
+			f, err := ioutil.TempFile("", "INT-push-buildpack-droplet-")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(f.Close()).ToNot(HaveOccurred())
+
+			tempDroplet = f.Name()
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(tempDroplet)).ToNot(HaveOccurred())
+		})
+
+		It("returns an error", func() {
+			helpers.WithHelloWorldApp(func(dir string) {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+					PushCommandName, appName, "--droplet", tempDroplet, "-b", "staticfile_buildpack",
+				)
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Application %s cannot use the combination of properties: droplet, buildpack", appName))
+			})
+		})
+	})
+
+	Context("when both buildpacks and droplet are provided via flags", func() {
+		var tempDroplet string
+
+		BeforeEach(func() {
+			f, err := ioutil.TempFile("", "INT-push-buildpack-droplet-")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(f.Close()).ToNot(HaveOccurred())
+
+			tempDroplet = f.Name()
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(tempDroplet)).ToNot(HaveOccurred())
+		})
+
+		It("returns an error", func() {
+			helpers.WithHelloWorldApp(func(dir string) {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+					PushCommandName, appName, "--droplet", tempDroplet, "-b", "ruby_buildpack", "-b", "staticfile_buildpack",
+				)
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Application %s cannot use the combination of properties: droplet, buildpacks", appName))
+			})
+		})
+	})
 })
