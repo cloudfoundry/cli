@@ -287,7 +287,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	Context("when both buildpack and buildpakcs are provided via manifest", func() {
+	Context("when both buildpack and buildpacks are provided via manifest", func() {
 		It("returns an error", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -329,6 +329,19 @@ var _ = Describe("push with different buildpack values", func() {
 
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("Application %s cannot use the combination of properties: docker, buildpacks", appName))
+			})
+		})
+	})
+
+	Context("when both buildpacks and docker are provided via flags", func() {
+		It("returns an error", func() {
+			helpers.WithHelloWorldApp(func(dir string) {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+					PushCommandName, appName, "-o", PublicDockerImage, "-b", "ruby_buildpack", "-b", "staticfile_buildpack",
+				)
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -b, --docker-image, -o"))
 			})
 		})
 	})
