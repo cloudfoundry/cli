@@ -7,8 +7,8 @@ inputs:
 
 params:
   # these will be pulled from the environment where the task is executed
-  CF_API:
-  CF_PASSWORD:
+  CF_INT_API:
+  CF_INT_PASSWORD:
   CF_TEST_SUITE:
   CF_CLI_EXPERIMENTAL:
   CF_INT_CLIENT_ID:
