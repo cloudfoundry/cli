@@ -37,7 +37,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 				"host":     "example.com",
 				"user":     "me",
 				"password": "secret",
-			})
+			}, nil)
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
@@ -57,7 +57,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 				"host":     "example.com",
 				"user":     "me",
 				"password": "secret",
-			})
+			}, nil)
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
@@ -77,7 +77,23 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 				"host":     "example.com",
 				"user":     "me",
 				"password": "secret",
+			}, nil)
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+
+		It("creates user provided service instances with tags", func() {
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "POST",
+				Path:     "/v2/user_provided_service_instances",
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{},"space_guid":"my-space-guid","syslog_drain_url":"","route_service_url":"","tags": ["tag1", "tag2"]}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
+
+			ts, handler, repo := createUserProvidedServiceInstanceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
+
+			apiErr := repo.Create("my-custom-service", "", "", map[string]interface{}{}, []string{"tag1", "tag2"})
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})

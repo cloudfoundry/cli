@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/flagcontext"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/uihelpers"
 
 	"fmt"
 
@@ -33,13 +34,14 @@ func (cmd *CreateUserProvidedService) MetaData() commandregistry.CommandMetadata
 	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications")}
 	fs["l"] = &flags.StringFlag{ShortName: "l", Usage: T("URL to which logs for bound applications will be streamed")}
 	fs["r"] = &flags.StringFlag{ShortName: "r", Usage: T("URL to which requests for bound routes will be forwarded. Scheme for this URL must be https")}
+	fs["t"] = &flags.StringFlag{ShortName: "t", Usage: T("User provided tags")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "create-user-provided-service",
 		ShortName:   "cups",
 		Description: T("Make a user-provided service instance available to CF apps"),
 		Usage: []string{
-			T(`CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]
+			T(`CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL] [-t TAGS]
 
    Pass comma separated credential parameter names to enable interactive mode:
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
@@ -53,6 +55,7 @@ func (cmd *CreateUserProvidedService) MetaData() commandregistry.CommandMetadata
 		Examples: []string{
 			`CF_NAME create-user-provided-service my-db-mine -p "username, password"`,
 			`CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json`,
+			`CF_NAME create-user-provided-service my-db-mine -t "list, of, tags"`,
 			`CF_NAME create-user-provided-service my-drain-service -l syslog://example.com`,
 			`CF_NAME create-user-provided-service my-route-service -r https://example.com`,
 			``,
@@ -100,6 +103,8 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) error {
 	routeServiceURL := c.String("r")
 	credentials := strings.Trim(c.String("p"), `"'`)
 	credentialsMap := make(map[string]interface{})
+	tags := c.String("t")
+	tagsList := uihelpers.ParseTags(tags)
 
 	if c.IsSet("p") {
 		jsonBytes, err := flagcontext.GetContentsFromFlagValue(credentials)
@@ -124,7 +129,7 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) error {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err := cmd.userProvidedServiceInstanceRepo.Create(name, drainURL, routeServiceURL, credentialsMap)
+	err := cmd.userProvidedServiceInstanceRepo.Create(name, drainURL, routeServiceURL, credentialsMap, tagsList)
 	if err != nil {
 		return err
 	}
