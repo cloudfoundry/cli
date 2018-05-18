@@ -674,6 +674,18 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				Properties: []string{"buildpack", "buildpacks"},
 			},
 		),
+		Entry("PropertyCombinationError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:        "some-name-1",
+				DockerImage: "some-docker-image",
+				Buildpacks:  []string{},
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"docker", "buildpacks"},
+			},
+		),
 		Entry("HTTPHealthCheckInvalidError",
 			CommandLineSettings{
 				HealthCheckType: "port",
