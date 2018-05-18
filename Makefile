@@ -19,11 +19,11 @@ build : out/cf-cli_linux_x86-64
 	cp out/cf-cli_linux_x86-64 out/cf
 
 check-target-env :
-ifndef CF_API
-	$(error CF_API is undefined)
+ifndef CF_INT_API
+	$(error CF_INT_API is undefined)
 endif
-ifndef CF_PASSWORD
-	$(error CF_PASSWORD is undefined)
+ifndef CF_INT_PASSWORD
+	$(error CF_INT_PASSWORD is undefined)
 endif
 
 clean :

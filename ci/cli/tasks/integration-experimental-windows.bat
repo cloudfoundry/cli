@@ -7,8 +7,8 @@ SET PATH=C:\Program Files\GnuWin32\bin;%PATH%
 SET PATH=%CD%;%PATH%
 
 SET /p DOMAIN=<%CD%\bosh-lite-lock\name
-SET /p CF_PASSWORD=<%CD%\cf-credentials\cf-password
-SET CF_API=https://api.%DOMAIN%
+SET /p CF_INT_PASSWORD=<%CD%\cf-credentials\cf-password
+SET CF_INT_API=https://api.%DOMAIN%
 
 pushd %CD%\cf-cli-binaries
 	7z e cf-cli-binaries.tgz

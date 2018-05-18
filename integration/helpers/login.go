@@ -29,7 +29,7 @@ func skipSSLValidation() string {
 }
 
 func GetAPI() string {
-	apiURL := os.Getenv("CF_API")
+	apiURL := os.Getenv("CF_INT_API")
 	if apiURL == "" {
 		return "https://api.bosh-lite.com"
 	}
@@ -64,11 +64,11 @@ func LoginCFWithClientCredentials() string {
 
 // GetCredentials returns back the username and the password.
 func GetCredentials() (string, string) {
-	username := os.Getenv("CF_USERNAME")
+	username := os.Getenv("CF_INT_USERNAME")
 	if username == "" {
 		username = "admin"
 	}
-	password := os.Getenv("CF_PASSWORD")
+	password := os.Getenv("CF_INT_PASSWORD")
 	if password == "" {
 		password = "admin"
 	}

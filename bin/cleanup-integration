@@ -10,9 +10,9 @@ xargs_func () {
   fi
 }
 
-CF_API=${CF_API:-"api.bosh-lite.com"}
-CF_USERNAME=${CF_USERNAME:-"admin"}
-CF_PASSWORD=${CF_PASSWORD:-"admin"}
+CF_API=${CF_INT_API:-"api.bosh-lite.com"}
+export CF_USERNAME=${CF_INT_USERNAME:-"admin"}
+export CF_PASSWORD=${CF_INT_PASSWORD:-"admin"}
 
 export CF_CLI_EXPERIMENTAL=true
 export CF_DIAL_TIMEOUT=15
@@ -23,7 +23,7 @@ else
   cf api $CF_API
 fi
 
-cf auth $CF_USERNAME $CF_PASSWORD
+cf auth
 
 # we don't want the pipeline job to fail because there's a high chance of
 # failure when running commands in parallel

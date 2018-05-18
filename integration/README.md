@@ -25,10 +25,10 @@ ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/global integrati
 
 ### Customizations (based on environment variables)
 
-- `CF_API` - Sets the CF API URL these tests will be using. Will default to `api.bosh-lite.com` if not set.
+- `CF_INT_API` - Sets the CF API URL these tests will be using. Will default to `api.bosh-lite.com` if not set.
 - `SKIP_SSL_VALIDATION` - If true, will skip SSL Validation. Will default `--skip-ssl-validation` if not set.
-- `CF_USERNAME` - The CF Administrator username. Will default to `admin` if not set.
-- `CF_PASSWORD` - The CF Administrator password. Will default to `admin` if not set.
+- `CF_INT_USERNAME` - The CF Administrator username. Will default to `admin` if not set.
+- `CF_INT_PASSWORD` - The CF Administrator password. Will default to `admin` if not set.
 - `CF_INT_DOCKER_IMAGE` - A private docker image used for the docker authentication tests.
 - `CF_INT_DOCKER_USERNAME` - The username for the private docker registry for `CF_INT_DOCKER_IMAGE`.
 - `CF_INT_DOCKER_PASSWORD` - The password for `CF_INT_DOCKER_USERNAME`.
