@@ -193,8 +193,13 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			}
 		}
 
-		if app.DropletPath != "" && app.Path != "" {
-			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "path"}}
+		if app.DropletPath != "" {
+			if app.Path != "" {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "path"}}
+			}
+			if app.Buildpacks != nil {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "buildpacks"}}
+			}
 		}
 
 		if app.DockerImage == "" && app.DropletPath == "" {

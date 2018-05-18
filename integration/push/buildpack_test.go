@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"os"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -342,6 +343,41 @@ var _ = Describe("push with different buildpack values", func() {
 
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -b, --docker-image, -o"))
+			})
+		})
+	})
+
+	Context("when buildpacks is provided via manifest and droplet is provided via flag", func() {
+		var tempDroplet string
+
+		BeforeEach(func() {
+			f, err := ioutil.TempFile("", "INT-push-buildpack-droplet-")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(f.Close()).ToNot(HaveOccurred())
+
+			tempDroplet = f.Name()
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(tempDroplet)).ToNot(HaveOccurred())
+		})
+
+		It("returns an error", func() {
+			helpers.WithHelloWorldApp(func(dir string) {
+				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"name": appName,
+							"buildpacks": []string{
+								"https://github.com/cloudfoundry/staticfile-buildpack",
+							},
+						},
+					},
+				})
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--droplet", tempDroplet)
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Application %s cannot use the combination of properties: droplet, buildpacks", appName))
 			})
 		})
 	})
