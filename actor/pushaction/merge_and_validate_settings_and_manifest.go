@@ -197,6 +197,9 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			if app.Path != "" {
 				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "path"}}
 			}
+			if app.Buildpack.IsSet {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "buildpack"}}
+			}
 			if app.Buildpacks != nil {
 				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "buildpacks"}}
 			}

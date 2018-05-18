@@ -699,6 +699,19 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				Properties: []string{"droplet", "buildpacks"},
 			},
 		),
+		Entry("PropertyCombinationError",
+			CommandLineSettings{
+				DropletPath: "some-droplet",
+			},
+			[]manifest.Application{{
+				Name:      "some-name-1",
+				Buildpack: types.FilteredString{Value: "some-buildpack", IsSet: true},
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"droplet", "buildpack"},
+			},
+		),
 		Entry("HTTPHealthCheckInvalidError",
 			CommandLineSettings{
 				HealthCheckType: "port",
