@@ -50,6 +50,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("DockerPasswordNotSetError", DockerPasswordNotSetError{}),
 		Entry("DownloadPluginHTTPError", DownloadPluginHTTPError{}),
 		Entry("EmptyDirectoryError", EmptyDirectoryError{}),
+		Entry("EmptyBuildpacksError", EmptyBuildpacksError{}),
 		Entry("FetchingPluginInfoFromRepositoriesError", FetchingPluginInfoFromRepositoriesError{}),
 		Entry("FileChangedError", FileChangedError{}),
 		Entry("FileNotFoundError", FileNotFoundError{}),

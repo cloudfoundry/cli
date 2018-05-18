@@ -35,6 +35,8 @@ func ConvertToTranslatableError(err error) error {
 		return DockerPasswordNotSetError{}
 	case actionerror.DomainNotFoundError:
 		return DomainNotFoundError(e)
+	case manifest.EmptyBuildpacksError:
+		return EmptyBuildpacksError(e)
 	case actionerror.EmptyDirectoryError:
 		return EmptyDirectoryError(e)
 	case actionerror.FileChangedError:

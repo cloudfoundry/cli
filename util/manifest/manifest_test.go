@@ -349,7 +349,7 @@ applications:
 				})
 			})
 
-			Context("when the manifest contains an empty buildpacks attribute", func() {
+			Context("when the manifest sets buildpacks to an empty array", func() {
 				BeforeEach(func() {
 					manifest = `---
 applications:
@@ -373,6 +373,22 @@ applications:
 						}),
 						"Buildpacks": Equal([]string{}),
 					}))
+				})
+			})
+
+			Context("when the manifest contains an empty buildpacks attribute", func() {
+				BeforeEach(func() {
+					manifest = `---
+applications:
+- name: app-1
+  buildpacks:
+`
+					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("raises an error", func() {
+					Expect(executeErr).ToNot(MatchError(new(EmptyBuildpacksError)))
 				})
 			})
 		})

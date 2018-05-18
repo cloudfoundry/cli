@@ -286,6 +286,24 @@ var _ = Describe("push with different buildpack values", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
+
+		Context("when an empty string is specified", func() {
+			It("rasises an error", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name":       appName,
+								"buildpacks": nil,
+							},
+						},
+					})
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+					Eventually(session).Should(Exit(1))
+					Eventually(session.Err).Should(Say("Buildpacks property cannot be an empty string."))
+				})
+			})
+		})
 	})
 
 	Context("when both buildpack and buildpacks are provided via manifest", func() {

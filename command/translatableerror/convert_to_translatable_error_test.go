@@ -62,6 +62,11 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"},
 			DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"}),
 
+		Entry("actionerror.EmptyBuildpacksError -> EmptyBuildpacksError",
+			manifest.EmptyBuildpacksError{},
+			EmptyBuildpacksError{},
+		),
+
 		Entry("actionerror.EmptyDirectoryError -> EmptyDirectoryError",
 			actionerror.EmptyDirectoryError{Path: "some-filename"},
 			EmptyDirectoryError{Path: "some-filename"}),
