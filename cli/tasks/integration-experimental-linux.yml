@@ -34,7 +34,7 @@ run:
     set -x
 
     domain=$(cat bosh-lite-lock/name)
-    export CF_API="https://api.${domain}"
+    export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
 
     export GOPATH=$PWD/go
