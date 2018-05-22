@@ -82,8 +82,8 @@ run:
       ln -s ${PWD}/cf-cli_linux_x86-64 ${bindir}/cf
     popd
 
-    export CF_USERNAME=$(CF_INT_USERNAME)
-    export CF_PASSWORD=$(CF_INT_PASSWORD)
+    export CF_USERNAME=${CF_INT_USERNAME}
+    export CF_PASSWORD=${CF_INT_PASSWORD}
     cf api ${API} --skip-ssl-validation
     cf auth
     cf enable-feature-flag diego_docker
