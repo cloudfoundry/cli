@@ -143,6 +143,12 @@
   revision = "250da0e0e68ce3367b4302f34218f6c064eb9559"
 
 [[projects]]
+  name = "github.com/cyphar/filepath-securejoin"
+  packages = ["."]
+  revision = "06bda8370f45268db985f7af15732444d94ed51c"
+  version = "v0.2.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/docker/distribution"
   packages = [
@@ -252,6 +258,7 @@
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
+  branch = "master"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -274,10 +281,10 @@
     "reporters/stenographer/support/go-isatty",
     "types"
   ]
-  revision = "fa5fabab2a1bfbd924faf4c067d07ae414e2aedf"
-  version = "v1.5.0"
+  revision = "26d21430af911e84459ee38099f0a07e57a7f9b0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -298,14 +305,19 @@
     "matchers/support/goraph/util",
     "types"
   ]
-  revision = "62bff4df71bdbc266561a0caee19f0594b17c240"
-  version = "v1.4.0"
+  revision = "cc102abc031d83b2c8294f7a0532a459abd63b1a"
 
 [[projects]]
   name = "github.com/opencontainers/go-digest"
   packages = ["."]
   revision = "279bed98673dd5bef374d3b6e4b09e2af76183bf"
   version = "v1.0.0-rc1"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   branch = "master"
@@ -415,6 +427,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "88eff211f618e240e2b6ee6bf8b0c99af3c4d6b265be413d99a24ecdf165781f"
+  inputs-digest = "d6c2bdc8333921020f8d9866712896219e783b1507723b2b0e81d6a6e84a503e"
   solver-name = "gps-cdcl"
   solver-version = 1

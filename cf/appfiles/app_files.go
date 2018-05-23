@@ -11,6 +11,7 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/gofileutils/fileutils"
+	securejoin "github.com/cyphar/filepath-securejoin"
 )
 
 const windowsPathPrefix = `\\?\`
@@ -83,7 +84,12 @@ func (appfiles ApplicationFiles) shaFile(fullPath string) (string, error) {
 func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) error {
 	for _, file := range appFiles {
 		err := func() error {
-			fromPath, err := filepath.Abs(filepath.Join(fromDir, file.Path))
+			path, err := securejoin.SecureJoin(fromDir, file.Path)
+			if err != nil {
+				return err
+			}
+
+			fromPath, err := filepath.Abs(path)
 			if err != nil {
 				return err
 			}
@@ -97,7 +103,11 @@ func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, from
 				return err
 			}
 
-			toPath, err := filepath.Abs(filepath.Join(toDir, file.Path))
+			path, err = securejoin.SecureJoin(toDir, file.Path)
+			if err != nil {
+				return err
+			}
+			toPath, err := filepath.Abs(path)
 			if err != nil {
 				return err
 			}
