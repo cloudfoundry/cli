@@ -88,6 +88,10 @@ func (config *Config) AddPlugin(plugin Plugin) {
 	config.pluginsConfig.Plugins[plugin.Name] = plugin
 }
 
+func (config *Config) CreatePluginHome() error {
+	return os.MkdirAll(config.PluginHome(), 0700)
+}
+
 // GetPlugin returns the requested plugin and true if it exists.
 func (config *Config) GetPlugin(pluginName string) (Plugin, bool) {
 	plugin, exists := config.pluginsConfig.Plugins[pluginName]

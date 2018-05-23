@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"runtime"
-	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pluginaction"
@@ -55,8 +55,9 @@ var _ = Describe("install-plugin command", func() {
 			ProgressBar: fakeProgressBar,
 		}
 
-		tmpDirectorySeed := strconv.Itoa(int(rand.Int63()))
-		pluginHome = fmt.Sprintf("some-pluginhome-%s", tmpDirectorySeed)
+		var err error
+		pluginHome, err = ioutil.TempDir("", "some-pluginhome")
+		Expect(err).ToNot(HaveOccurred())
 		fakeConfig.PluginHomeReturns(pluginHome)
 		binaryName = helpers.PrefixedRandomName("bin")
 		fakeConfig.BinaryNameReturns(binaryName)

@@ -169,6 +169,11 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 		return err
 	}
 
+	err = cfConfig.CreatePluginHome()
+	if err != nil {
+		return err
+	}
+
 	// TODO: when the line in the old code under `cf` which calls
 	// configv3.LoadConfig() is finally removed, then we should replace the code
 	// path above with the following:

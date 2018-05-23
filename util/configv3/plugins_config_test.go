@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"syscall"
 
 	. "code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
@@ -379,6 +380,67 @@ var _ = Describe("PluginsConfig", func() {
 					err := config.WritePluginConfig()
 					_, ok := err.(*os.PathError)
 					Expect(ok).To(BeTrue())
+				})
+			})
+		})
+
+		Describe("CreatePluginHome", func() {
+			var (
+				config *Config
+
+				pluginHome string
+
+				executeErr error
+			)
+
+			BeforeEach(func() {
+				config = new(Config)
+
+				var err error
+				pluginHome, err = ioutil.TempDir("", "my-plugin-home")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(os.RemoveAll(pluginHome)).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(pluginHome)).ToNot(HaveOccurred())
+			})
+
+			JustBeforeEach(func() {
+				executeErr = config.CreatePluginHome()
+			})
+
+			Context("when it correctly writes a directory", func() {
+				BeforeEach(func() {
+					config.ENV.CFPluginHome = pluginHome
+				})
+
+				It("returns no error", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					_, statErr := os.Stat(pluginHome)
+					Expect(os.IsNotExist(statErr)).To(BeFalse())
+				})
+			})
+
+			Context("when it fails to write a directory", func() {
+				var tempFile string
+
+				BeforeEach(func() {
+					f, err := ioutil.TempFile("", "fail-plugin-home")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(f.Close()).ToNot(HaveOccurred())
+					tempFile = f.Name()
+
+					config.ENV.CFPluginHome = tempFile + "/some-path"
+				})
+
+				AfterEach(func() {
+					Expect(os.RemoveAll(tempFile)).ToNot(HaveOccurred())
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError(&os.PathError{Op: "mkdir", Path: tempFile, Err: syscall.ENOTDIR}))
 				})
 			})
 		})
