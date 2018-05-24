@@ -40,6 +40,10 @@ func NewUsername() string {
 	return PrefixedRandomName("INTEGRATION-USER")
 }
 
+func NewBuildpack() string {
+	return PrefixedRandomName("INTEGRATION-BUILDPACK")
+}
+
 func PrefixedRandomName(namePrefix string) string {
 	return namePrefix + "-" + RandomName()
 }

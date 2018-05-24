@@ -42,12 +42,12 @@ if [[ $1 == "unbind-first" ]]; then
 fi
 cf security-groups | grep -i "integration-sec-group" | awk '{print $2}' | xargs_func cf delete-security-group -f
 
-cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
-cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 cf isolation-segments | grep -i ^integration-isolation-segment | xargs_func cf delete-isolation-segment -f
-cf service-brokers | grep -i -e ^integration-service-broker- -e CATS- | awk '{print $1}' | xargs_func cf delete-service-broker -f
+cf buildpacks | grep -i ^integration-buildpack | awk '{print $1}' | xargs_func cf delete-buildpack -f
 
-cf quotas | grep -i -e ^integration-quota -e CATS- | cut -d " " -f1 | xargs_func cf delete-quota -f
+cf service-brokers | grep -i -e ^integration-service-broker- -e CATS- | awk '{print $1}' | xargs_func cf delete-service-broker -f
+cf quotas | grep -i -e ^integration-quota -e CATS- | awk '{print $1}' | xargs_func cf delete-quota -f
+cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 
 cf delete-org -f temp-org
 

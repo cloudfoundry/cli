@@ -55,7 +55,7 @@ var _ = Describe("update-buildpack command", func() {
 			err = ioutil.WriteFile(tempfile, []byte{}, 0400)
 			Expect(err).ToNot(HaveOccurred())
 
-			session := CF("create-buildpack", "some-buildpack", dir, "1")
+			session := CF("create-buildpack", NewBuildpack(), dir, "1")
 			Eventually(session).Should(Exit(0))
 		})
 
