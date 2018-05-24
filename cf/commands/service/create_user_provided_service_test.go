@@ -145,11 +145,12 @@ var _ = Describe("CreateUserProvidedService", func() {
 		It("tries to create the user provided service instance", func() {
 			Expect(runCLIErr).NotTo(HaveOccurred())
 			Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
-			name, drainURL, routeServiceURL, credentialsMap, _ := serviceInstanceRepo.CreateArgsForCall(0)
+			name, drainURL, routeServiceURL, credentialsMap, tags := serviceInstanceRepo.CreateArgsForCall(0)
 			Expect(name).To(Equal("service-instance"))
 			Expect(drainURL).To(Equal(""))
 			Expect(routeServiceURL).To(Equal(""))
 			Expect(credentialsMap).To(Equal(map[string]interface{}{}))
+			Expect(tags).To(Equal([]string{}))
 		})
 
 		Context("when creating the user provided service instance succeeds", func() {
@@ -276,7 +277,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 				flagContext.Parse("service-instance", "-t", "tag1, tag2, tag3, tag4")
 			})
 
-			It("sucessfully creates a service and passes the tags as json", func() {
+			It("sucessfully creates a service instance and passes the tags as json", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
 				_, _, _, _, tags := serviceInstanceRepo.CreateArgsForCall(0)

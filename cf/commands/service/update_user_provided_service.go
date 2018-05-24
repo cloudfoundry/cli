@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/flagcontext"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/uihelpers"
 
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
@@ -34,13 +35,14 @@ func (cmd *UpdateUserProvidedService) MetaData() commandregistry.CommandMetadata
 	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications")}
 	fs["l"] = &flags.StringFlag{ShortName: "l", Usage: T("URL to which logs for bound applications will be streamed")}
 	fs["r"] = &flags.StringFlag{ShortName: "r", Usage: T("URL to which requests for bound routes will be forwarded. Scheme for this URL must be https")}
+	fs["t"] = &flags.StringFlag{ShortName: "t", Usage: T("User provided tags")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "update-user-provided-service",
 		ShortName:   "uups",
 		Description: T("Update user-provided service instance"),
 		Usage: []string{
-			T(`CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]
+			T(`CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL] [-t TAGS]
 
    Pass comma separated credential parameter names to enable interactive mode:
    CF_NAME update-user-provided-service SERVICE_INSTANCE -p "comma, separated, parameter, names"
@@ -54,6 +56,7 @@ func (cmd *UpdateUserProvidedService) MetaData() commandregistry.CommandMetadata
 		Examples: []string{
 			`CF_NAME update-user-provided-service my-db-mine -p '{"username":"admin", "password":"pa55woRD"}'`,
 			"CF_NAME update-user-provided-service my-db-mine -p /path/to/credentials.json",
+			`CF_NAME update-user-provided-service my-db-mine -t "list, of, tags"`,
 			"CF_NAME update-user-provided-service my-drain-service -l syslog://example.com",
 			"CF_NAME update-user-provided-service my-route-service -r https://example.com",
 		},
@@ -97,6 +100,8 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) error {
 	drainURL := c.String("l")
 	credentials := strings.Trim(c.String("p"), `'"`)
 	routeServiceURL := c.String("r")
+	tags := c.String("t")
+	tagsList := uihelpers.ParseTags(tags)
 
 	credentialsMap := make(map[string]interface{})
 
@@ -126,6 +131,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) error {
 	serviceInstance.Params = credentialsMap
 	serviceInstance.SysLogDrainURL = drainURL
 	serviceInstance.RouteServiceURL = routeServiceURL
+	serviceInstance.Tags = tagsList
 
 	err := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance.ServiceInstanceFields)
 	if err != nil {
@@ -138,7 +144,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) error {
 			"CFRestageCommand": terminal.CommandColor(cf.Name + " restage"),
 		}))
 
-	if routeServiceURL == "" && credentials == "" && drainURL == "" {
+	if routeServiceURL == "" && credentials == "" && drainURL == "" && tags == "" {
 		cmd.ui.Warn(T("No flags specified. No changes were made."))
 	}
 	return nil

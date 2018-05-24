@@ -56,6 +56,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 		Credentials:     serviceInstanceFields.Params,
 		SysLogDrainURL:  serviceInstanceFields.SysLogDrainURL,
 		RouteServiceURL: serviceInstanceFields.RouteServiceURL,
+		Tags:            serviceInstanceFields.Tags,
 	}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {

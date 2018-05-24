@@ -104,7 +104,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/user_provided_service_instances/my-instance-guid",
-				Matcher:  testnet.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"},"syslog_drain_url":"syslog://example.com","route_service_url":""}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"},"syslog_drain_url":"syslog://example.com","route_service_url":"","tags": ["tag3", "tag4"]}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
@@ -121,6 +121,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 			serviceInstance.Params = params
 			serviceInstance.SysLogDrainURL = "syslog://example.com"
 			serviceInstance.RouteServiceURL = ""
+			serviceInstance.Tags = []string{"tag3", "tag4"}
 
 			apiErr := repo.Update(serviceInstance)
 			Expect(handler).To(HaveAllRequestsCalled())
