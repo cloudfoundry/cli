@@ -2,14 +2,13 @@ package pushaction
 
 import (
 	"fmt"
-	"strings"
 
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
 )
 
 type CommandLineSettings struct {
-	Buildpacks           []string
+	Buildpack            string
 	Command              types.FilteredString
 	CurrentDirectory     string
 	DefaultRouteDomain   string
@@ -33,7 +32,7 @@ type CommandLineSettings struct {
 }
 
 func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Application) manifest.Application {
-	if len(settings.Buildpacks) > 0 {
+	if settings.Buildpack != "" {
 		app = settings.setBuildpacks(app)
 	}
 
@@ -122,25 +121,26 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 
 func (settings CommandLineSettings) setBuildpacks(app manifest.Application) manifest.Application {
 	app.Buildpack = types.FilteredString{}
-	app.Buildpacks = nil
+	// app.Buildpacks = nil
 
-	if len(settings.Buildpacks) == 1 {
-		app.Buildpack.ParseValue(settings.Buildpacks[0])
+	if settings.Buildpack != "" {
+		app.Buildpack.ParseValue(settings.Buildpack)
 		return app
 	}
 
-	for _, bp := range settings.Buildpacks {
-		app.Buildpacks = append(app.Buildpacks, bp)
-	}
+	// for _, bp := range settings.Buildpacks {
+	// 	app.Buildpacks = append(app.Buildpacks, bp)
+	// }
 
 	return app
 }
 
 func (settings CommandLineSettings) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpacks: %s, Command: (%t, '%s'), CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Droplet: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: (%t, '%d'), Memory: '%d', Provided App Path: '%s', Stack: '%s', RoutePath: '%s', Domain: '%s', Hostname: '%s'",
+		"App Name: '%s', Buildpack: %s, Command: (%t, '%s'), CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Droplet: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: (%t, '%d'), Memory: '%d', Provided App Path: '%s', Stack: '%s', RoutePath: '%s', Domain: '%s', Hostname: '%s'",
 		settings.Name,
-		strings.Join(settings.Buildpacks, ", "),
+		// strings.Join(settings.Buildpacks, ", "),
+		settings.Buildpack,
 		settings.Command.IsSet,
 		settings.Command.Value,
 		settings.CurrentDirectory,

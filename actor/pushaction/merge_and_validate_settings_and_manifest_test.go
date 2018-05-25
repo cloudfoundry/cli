@@ -315,12 +315,12 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			Expect(err).To(MatchError(expectedErr))
 		},
 
-		Entry("CommandLineOptionsWithMultipleAppsError",
-			CommandLineSettings{
-				Buildpacks: []string{"some-buildpack"},
-			},
-			manifestWithMultipleApps,
-			actionerror.CommandLineOptionsWithMultipleAppsError{}),
+		// Entry("CommandLineOptionsWithMultipleAppsError",
+		// 	CommandLineSettings{
+		// 		Buildpacks: []string{"some-buildpack"},
+		// 	},
+		// 	manifestWithMultipleApps,
+		// 	actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
 				Command: types.FilteredString{IsSet: true},
@@ -661,44 +661,44 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				AppName:    "some-name-1",
 				Properties: []string{"route-path", "no-route"},
 			}),
-		Entry("PropertyCombinationError",
-			CommandLineSettings{},
-			[]manifest.Application{{
-				Name:       "some-name-1",
-				Path:       RealPath,
-				Buildpack:  types.FilteredString{Value: "some-buildpack", IsSet: true},
-				Buildpacks: []string{},
-			}},
-			actionerror.PropertyCombinationError{
-				AppName:    "some-name-1",
-				Properties: []string{"buildpack", "buildpacks"},
-			},
-		),
-		Entry("PropertyCombinationError",
-			CommandLineSettings{},
-			[]manifest.Application{{
-				Name:        "some-name-1",
-				DockerImage: "some-docker-image",
-				Buildpacks:  []string{},
-			}},
-			actionerror.PropertyCombinationError{
-				AppName:    "some-name-1",
-				Properties: []string{"docker", "buildpacks"},
-			},
-		),
-		Entry("PropertyCombinationError",
-			CommandLineSettings{
-				DropletPath: "some-droplet",
-			},
-			[]manifest.Application{{
-				Name:       "some-name-1",
-				Buildpacks: []string{},
-			}},
-			actionerror.PropertyCombinationError{
-				AppName:    "some-name-1",
-				Properties: []string{"droplet", "buildpacks"},
-			},
-		),
+		// Entry("PropertyCombinationError",
+		// 	CommandLineSettings{},
+		// 	[]manifest.Application{{
+		// 		Name:       "some-name-1",
+		// 		Path:       RealPath,
+		// 		Buildpack:  types.FilteredString{Value: "some-buildpack", IsSet: true},
+		// 		Buildpacks: []string{},
+		// 	}},
+		// 	actionerror.PropertyCombinationError{
+		// 		AppName:    "some-name-1",
+		// 		Properties: []string{"buildpack", "buildpacks"},
+		// 	},
+		// ),
+		// Entry("PropertyCombinationError",
+		// 	CommandLineSettings{},
+		// 	[]manifest.Application{{
+		// 		Name:        "some-name-1",
+		// 		DockerImage: "some-docker-image",
+		// 		Buildpacks:  []string{},
+		// 	}},
+		// 	actionerror.PropertyCombinationError{
+		// 		AppName:    "some-name-1",
+		// 		Properties: []string{"docker", "buildpacks"},
+		// 	},
+		// ),
+		// Entry("PropertyCombinationError",
+		// 	CommandLineSettings{
+		// 		DropletPath: "some-droplet",
+		// 	},
+		// 	[]manifest.Application{{
+		// 		Name:       "some-name-1",
+		// 		Buildpacks: []string{},
+		// 	}},
+		// 	actionerror.PropertyCombinationError{
+		// 		AppName:    "some-name-1",
+		// 		Properties: []string{"droplet", "buildpacks"},
+		// 	},
+		// ),
 		Entry("PropertyCombinationError",
 			CommandLineSettings{
 				DropletPath: "some-droplet",
@@ -758,23 +758,23 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				Path: RealPath,
 			}},
 			actionerror.HTTPHealthCheckInvalidError{}),
-		Entry("InvalidBuildpacksError",
-			CommandLineSettings{
-				Buildpacks: []string{"null", "some-buildpack"},
-			},
-			[]manifest.Application{{
-				Name: "some-name-1",
-				Path: RealPath,
-			}},
-			actionerror.InvalidBuildpacksError{}),
-		Entry("InvalidBuildpacksError",
-			CommandLineSettings{
-				Buildpacks: []string{"default", "some-buildpack"},
-			},
-			[]manifest.Application{{
-				Name: "some-name-1",
-				Path: RealPath,
-			}},
-			actionerror.InvalidBuildpacksError{}),
+		// Entry("InvalidBuildpacksError",
+		// 	CommandLineSettings{
+		// 		Buildpacks: []string{"null", "some-buildpack"},
+		// 	},
+		// 	[]manifest.Application{{
+		// 		Name: "some-name-1",
+		// 		Path: RealPath,
+		// 	}},
+		// 	actionerror.InvalidBuildpacksError{}),
+		// Entry("InvalidBuildpacksError",
+		// 	CommandLineSettings{
+		// 		Buildpacks: []string{"default", "some-buildpack"},
+		// 	},
+		// 	[]manifest.Application{{
+		// 		Name: "some-name-1",
+		// 		Path: RealPath,
+		// 	}},
+		// 	actionerror.InvalidBuildpacksError{}),
 	)
 })

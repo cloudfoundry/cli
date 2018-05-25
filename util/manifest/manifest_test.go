@@ -299,12 +299,12 @@ applications:
 							IsSet: true,
 							Value: "some-buildpack",
 						}),
-						"Buildpacks": BeEmpty(),
+						// "Buildpacks": BeEmpty(),
 					}))
 				})
 			})
 
-			Context("when the manifest contains buildpacks (plural)", func() {
+			PContext("when the manifest contains buildpacks (plural)", func() {
 				BeforeEach(func() {
 					manifest = `---
 applications:
@@ -349,7 +349,7 @@ applications:
 				})
 			})
 
-			Context("when the manifest sets buildpacks to an empty array", func() {
+			PContext("when the manifest sets buildpacks to an empty array", func() {
 				BeforeEach(func() {
 					manifest = `---
 applications:
@@ -376,7 +376,7 @@ applications:
 				})
 			})
 
-			Context("when the manifest contains an empty buildpacks attribute", func() {
+			PContext("when the manifest contains an empty buildpacks attribute", func() {
 				BeforeEach(func() {
 					manifest = `---
 applications:
@@ -582,7 +582,7 @@ applications:
 						IsSet: true,
 						Value: "some-buildpack",
 					},
-					Buildpacks: []string{"buildpack1", "buildpack2"},
+					// Buildpacks: []string{"buildpack1", "buildpack2"},
 					Command: types.FilteredString{
 						IsSet: true,
 						Value: "some-command",
@@ -625,9 +625,6 @@ applications:
 				Expect(string(manifestBytes)).To(Equal(`applications:
 - name: app-1
   buildpack: some-buildpack
-  buildpacks:
-  - buildpack1
-  - buildpack2
   command: some-command
   disk_quota: 1G
   docker:

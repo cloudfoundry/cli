@@ -249,13 +249,13 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 		application.Buildpack = manifest.Buildpack
 	}
 
-	if manifest.Buildpacks != nil {
-		application.Buildpacks = []string{}
-	}
+	// if manifest.Buildpacks != nil {
+	// 	application.Buildpacks = []string{}
+	// }
 
-	for _, buildpack := range manifest.Buildpacks {
-		application.Buildpacks = append(application.Buildpacks, buildpack)
-	}
+	// for _, buildpack := range manifest.Buildpacks {
+	// 	application.Buildpacks = append(application.Buildpacks, buildpack)
+	// }
 
 	if manifest.Command.IsSet {
 		application.Command = manifest.Command

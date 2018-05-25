@@ -92,7 +92,7 @@ func (Actor) validateCommandLineSettingsAndManifestCombinations(cmdLineSettings 
 	if len(apps) > 1 {
 		switch {
 		case
-			cmdLineSettings.Buildpacks != nil,
+			cmdLineSettings.Buildpack != "",
 			cmdLineSettings.Command.IsSet,
 			cmdLineSettings.DefaultRouteDomain != "",
 			cmdLineSettings.DefaultRouteHostname != "",
@@ -182,9 +182,9 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			if app.Buildpack.IsSet {
 				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "buildpack"}}
 			}
-			if app.Buildpacks != nil {
-				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "buildpacks"}}
-			}
+			// if app.Buildpacks != nil {
+			// 	return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "buildpacks"}}
+			// }
 			if app.Path != "" {
 				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "path"}}
 			}
@@ -200,9 +200,9 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			if app.Buildpack.IsSet {
 				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "buildpack"}}
 			}
-			if app.Buildpacks != nil {
-				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "buildpacks"}}
-			}
+			// if app.Buildpacks != nil {
+			// 	return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "buildpacks"}}
+			// }
 		}
 
 		if app.DockerImage == "" && app.DropletPath == "" {
@@ -229,17 +229,17 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			return actionerror.HTTPHealthCheckInvalidError{}
 		}
 
-		if app.Buildpacks != nil && app.Buildpack.IsSet {
-			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"buildpack", "buildpacks"}}
-		}
+		// if app.Buildpacks != nil && app.Buildpack.IsSet {
+		// 	return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"buildpack", "buildpacks"}}
+		// }
 
-		if len(app.Buildpacks) > 1 {
-			for _, b := range app.Buildpacks {
-				if b == "null" || b == "default" {
-					return actionerror.InvalidBuildpacksError{}
-				}
-			}
-		}
+		// if len(app.Buildpacks) > 1 {
+		// 	for _, b := range app.Buildpacks {
+		// 		if b == "null" || b == "default" {
+		// 			return actionerror.InvalidBuildpacksError{}
+		// 		}
+		// 	}
+		// }
 	}
 	return nil
 }
