@@ -60,7 +60,7 @@ var _ = Describe("Manifest", func() {
 			fakeV2Actor.CreateApplicationManifestByNameAndSpaceReturns(v2Application, v2action.Warnings{"v2-action-warnings"}, nil)
 		})
 
-		Context("when the cc returns an invalid semver", func() {
+		PContext("when the cc returns an invalid semver", func() {
 			BeforeEach(func() {
 				fakeV3Actor.CloudControllerAPIVersionReturns("i am invalid")
 			})
@@ -72,7 +72,7 @@ var _ = Describe("Manifest", func() {
 
 		})
 
-		Context("when the cc has a v3 buildpacks endpoint ( >= v3.25)", func() {
+		PContext("when the cc has a v3 buildpacks endpoint ( >= v3.25)", func() {
 			BeforeEach(func() {
 				fakeV3Actor.CloudControllerAPIVersionReturns("3.25.0")
 			})
