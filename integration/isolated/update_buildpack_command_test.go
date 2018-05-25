@@ -41,7 +41,10 @@ var _ = Describe("update-buildpack command", func() {
 	})
 
 	Context("when a URL is provided as the buildpack", func() {
-		var dir string
+		var (
+			dir           string
+			buildpackName string
+		)
 
 		BeforeEach(func() {
 			LoginCF()
@@ -55,7 +58,8 @@ var _ = Describe("update-buildpack command", func() {
 			err = ioutil.WriteFile(tempfile, []byte{}, 0400)
 			Expect(err).ToNot(HaveOccurred())
 
-			session := CF("create-buildpack", NewBuildpack(), dir, "1")
+			buildpackName = NewBuildpack()
+			session := CF("create-buildpack", buildpackName, dir, "1")
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -65,7 +69,7 @@ var _ = Describe("update-buildpack command", func() {
 		})
 
 		It("outputs an error message to the user, provides help text, and exits 1", func() {
-			session := CF("update-buildpack", "some-buildpack", "-p", "https://example.com/bogus.tgz")
+			session := CF("update-buildpack", buildpackName, "-p", "https://example.com/bogus.tgz")
 			Eventually(session).Should(Say("Failed to create a local temporary zip file for the buildpack"))
 			Eventually(session).Should(Say("FAILED"))
 			Eventually(session).Should(Say("Couldn't write zip file: zip: not a valid zip file"))
