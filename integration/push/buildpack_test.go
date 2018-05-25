@@ -191,7 +191,7 @@ var _ = Describe("push with different buildpack values", func() {
 	})
 
 	Context("when buildpack is provided via manifest", func() {
-		It("sets buildpack and returns a warning", func() {
+		It("sets buildpack", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
 					"applications": []map[string]interface{}{
@@ -203,7 +203,7 @@ var _ = Describe("push with different buildpack values", func() {
 				})
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "no-start")
 				Eventually(session).Should(Say(`\s+buildpack:\s+staticfile_buildpack`))
-				Eventually(session.Err).Should(Say(`Deprecation warning: Use of buildpack`))
+				// Eventually(session.Err).Should(Say(`Deprecation warning: Use of buildpack`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
