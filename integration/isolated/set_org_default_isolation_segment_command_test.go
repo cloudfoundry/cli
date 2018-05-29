@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,6 +17,8 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
+
 		orgName = helpers.NewOrgName()
 		isolationSegmentName = helpers.NewIsolationSegmentName()
 	})

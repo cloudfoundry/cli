@@ -3,6 +3,7 @@ package global
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,6 +22,8 @@ var _ = Describe("share-service command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfVersionLessThan(ccversion.MinVersionShareServiceV3)
+
 		sourceOrgName = helpers.NewOrgName()
 		sourceSpaceName = helpers.NewSpaceName()
 		sharedToOrgName = helpers.NewOrgName()

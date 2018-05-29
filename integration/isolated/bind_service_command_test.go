@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -170,6 +171,10 @@ var _ = Describe("bind-service command", func() {
 				})
 
 				Context("when the --binding-name flag is provided and the value is a non-empty string", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionProvideNameForServiceBinding)
+					})
+
 					It("binds the service to the app, displays OK and TIP", func() {
 						session := helpers.CF("bind-service", appName, serviceInstance, "--binding-name", "i-am-a-binding")
 						Eventually(session.Out).Should(Say("Binding service %s to app %s with binding name %s in org %s / space %s as %s...", serviceInstance, appName, "i-am-a-binding", org, space, username))

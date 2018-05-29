@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
@@ -269,11 +270,44 @@ var _ = Describe("create-app-manifest command", func() {
 		})
 
 		Context("when app was created with docker image", func() {
-			var (
-				oldDockerPassword string
-			)
 
 			BeforeEach(func() {
+				Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
+			})
+
+			It("creates the manifest", func() {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-v")
+				Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("OK"))
+				expectedFilePath := helpers.ConvertPathToRegularExpression(fmt.Sprintf(".%s%s_manifest.yml", string(os.PathSeparator), appName))
+				Eventually(session).Should(Say("Manifest file created successfully at %s", expectedFilePath))
+
+				expectedFile := fmt.Sprintf(`applications:
+- name: %s
+  disk_quota: 1G
+  docker:
+    image: %s
+  instances: 1
+  memory: 32M
+  routes:
+  - route: %s.%s
+  stack: cflinuxfs2
+`, appName, DockerImage, strings.ToLower(appName), domainName)
+
+				createdFile, err := ioutil.ReadFile(manifestFilePath)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(createdFile)).To(Equal(expectedFile))
+
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("when the API supports docker credentials", func() {
+			var oldDockerPassword string
+
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionDockerCredentialsV2)
+
 				oldDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
 				Expect(os.Setenv("CF_DOCKER_PASSWORD", "my-docker-password")).To(Succeed())
 
@@ -310,6 +344,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 				Eventually(session).Should(Exit(0))
 			})
+
 		})
 
 		Context("when app has no hostname", func() {
@@ -355,6 +390,8 @@ var _ = Describe("create-app-manifest command", func() {
 
 		PContext("when the app has multiple buildpacks", func() {
 			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
+
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start", "-b", "ruby_buildpack", "-b", "staticfile_buildpack")).Should(Exit(0))
 				})

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -93,19 +94,12 @@ var _ = Describe("app command", func() {
 			Context("when the app is a buildpack app", func() {
 				var (
 					domainName string
-					tcpDomain  helpers.Domain
 					appName    string
 				)
 
 				BeforeEach(func() {
-					Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
-					Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
-					Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
-
 					appName = helpers.PrefixedRandomName("app")
 					domainName = helpers.DefaultSharedDomain()
-					tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
-					tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 					helpers.WithHelloWorldApp(func(appDir string) {
 						manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -116,8 +110,7 @@ applications:
   disk_quota: 128M
   routes:
   - route: %s.%s
-  - route: %s:1024
-`, appName, appName, domainName, tcpDomain.Name))
+`, appName, appName, domainName))
 						manifestPath := filepath.Join(appDir, "manifest.yml")
 						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
 						Expect(err).ToNot(HaveOccurred())
@@ -133,9 +126,8 @@ applications:
 						Eventually(session).Should(Say("name:\\s+%s", appName))
 						Eventually(session).Should(Say("requested state:\\s+started"))
 						Eventually(session).Should(Say("instances:\\s+2/2"))
-						Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
 						Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s, %s:1024", domainName, tcpDomain.Name))
+						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s", domainName))
 						Eventually(session).Should(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
 						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 						Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
@@ -145,6 +137,23 @@ applications:
 						Eventually(session).Should(Say("#1\\s+(running|starting)\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
 						Eventually(session).Should(Exit(0))
 					})
+				})
+
+				Context("when isolation segments are available", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
+
+						Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
+						Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
+						Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
+					})
+
+					It("displays the app isolation segment information", func() {
+						session := helpers.CF("app", appName)
+
+						Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
+					})
+
 				})
 
 				Context("when the app is stopped", func() {
@@ -158,7 +167,7 @@ applications:
 						Eventually(session).Should(Say("requested state:\\s+stopped"))
 						Eventually(session).Should(Say("instances:\\s+0/2"))
 						Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+.%s, %s:1024", domainName, tcpDomain.Name))
+						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+.%s", domainName))
 						Eventually(session).Should(Say("last uploaded:"))
 						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 						Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
@@ -179,7 +188,7 @@ applications:
 						Eventually(session).Should(Say("requested state:\\s+started"))
 						Eventually(session).Should(Say("instances:\\s+0/0"))
 						Eventually(session).Should(Say("usage:\\s+128M x 0 instances"))
-						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s, %s:1024", domainName, tcpDomain.Name))
+						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s", domainName))
 						Eventually(session).Should(Say("last uploaded:"))
 						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 						Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
@@ -220,15 +229,13 @@ applications:
 
 			Context("when the app is a Docker app", func() {
 				var (
-					tcpDomain helpers.Domain
-					appName   string
+					appName string
 				)
 
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("app")
-					tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
-					tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
-					Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
+					domainName := helpers.DefaultSharedDomain()
+					Eventually(helpers.CF("push", appName, "-o", DockerImage, "-d", domainName)).Should(Exit())
 				})
 
 				It("displays the docker image and does not display buildpack", func() {
@@ -238,6 +245,41 @@ applications:
 					Eventually(session).Should(Say("docker image:\\s+%s", DockerImage))
 					Consistently(session).ShouldNot(Say("buildpack:"))
 					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when the app has tcp routes", func() {
+				var (
+					appName   string
+					tcpDomain helpers.Domain
+				)
+
+				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
+
+					appName = helpers.PrefixedRandomName("app")
+					tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
+					tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
+					helpers.WithHelloWorldApp(func(appDir string) {
+						manifestContents := []byte(fmt.Sprintf(`
+---
+applications:
+- name: %s
+  routes:
+  - route: %s:1024
+`, appName, tcpDomain.Name))
+						manifestPath := filepath.Join(appDir, "manifest.yml")
+						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						// Create manifest
+						Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
+					})
+
+					It("displays the app information", func() {
+						session := helpers.CF("app", appName)
+						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s", tcpDomain))
+					})
 				})
 			})
 		})

@@ -3,6 +3,7 @@ package isolated
 import (
 	"sort"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -79,10 +80,9 @@ var _ = Describe("org command", func() {
 
 			Context("when no flags are used", func() {
 				var (
-					domainName              string
-					quotaName               string
-					spaceName2              string
-					isolationSegmentsSorted []string
+					domainName string
+					quotaName  string
+					spaceName2 string
 				)
 
 				BeforeEach(func() {
@@ -99,18 +99,6 @@ var _ = Describe("org command", func() {
 					spaceName2 = helpers.NewSpaceName()
 					helpers.CreateSpace(spaceName2)
 
-					isolationSegmentName1 := helpers.NewIsolationSegmentName()
-					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName1)).Should(Exit(0))
-					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName1)).Should(Exit(0))
-
-					isolationSegmentName2 := helpers.NewIsolationSegmentName()
-					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName2)).Should(Exit(0))
-					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName2)).Should(Exit(0))
-
-					isolationSegmentsSorted = []string{isolationSegmentName1, isolationSegmentName2}
-					sort.Strings(isolationSegmentsSorted)
-
-					Eventually(helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentsSorted[0])).Should(Exit(0))
 				})
 
 				It("displays a table with org domains, quotas, spaces, space quotas and isolation segments, and exits 0", func() {
@@ -130,9 +118,34 @@ var _ = Describe("org command", func() {
 					sort.Strings(spacesSorted)
 					Eventually(session).Should(Say("spaces:\\s+%s,.* %s", spacesSorted[0], spacesSorted[1]))
 
-					Eventually(session).Should(Say("isolation segments:\\s+.*%s \\(default\\),.* %s", isolationSegmentsSorted[0], isolationSegmentsSorted[1]))
-
 					Eventually(session).Should(Exit(0))
+				})
+
+				Context("when isolation segments are available", func() {
+					var isolationSegmentsSorted []string
+
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
+
+						isolationSegmentName1 := helpers.NewIsolationSegmentName()
+						Eventually(helpers.CF("create-isolation-segment", isolationSegmentName1)).Should(Exit(0))
+						Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName1)).Should(Exit(0))
+
+						isolationSegmentName2 := helpers.NewIsolationSegmentName()
+						Eventually(helpers.CF("create-isolation-segment", isolationSegmentName2)).Should(Exit(0))
+						Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName2)).Should(Exit(0))
+
+						isolationSegmentsSorted = []string{isolationSegmentName1, isolationSegmentName2}
+						sort.Strings(isolationSegmentsSorted)
+
+						Eventually(helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentsSorted[0])).Should(Exit(0))
+					})
+
+					It("displays isolation segment information in the org table", func() {
+						session := helpers.CF("org", orgName)
+
+						Eventually(session).Should(Say("isolation segments:\\s+.*%s \\(default\\),.* %s", isolationSegmentsSorted[0], isolationSegmentsSorted[1]))
+					})
 				})
 			})
 		})

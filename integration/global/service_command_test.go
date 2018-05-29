@@ -1,6 +1,7 @@
 package global
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -156,6 +157,7 @@ var _ = Describe("service command", func() {
 						)
 
 						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBindingNameV2)
 							bindingName1 = helpers.PrefixedRandomName("BINDING-NAME")
 							bindingName2 = helpers.PrefixedRandomName("BINDING-NAME")
 							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
@@ -290,6 +292,7 @@ var _ = Describe("service command", func() {
 						)
 
 						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBindingNameV2)
 							bindingName1 = helpers.PrefixedRandomName("BINDING-NAME")
 							bindingName2 = helpers.PrefixedRandomName("BINDING-NAME")
 							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
@@ -346,6 +349,7 @@ var _ = Describe("service command", func() {
 		)
 
 		BeforeEach(func() {
+			helpers.SkipIfVersionLessThan(ccversion.MinVersionShareServiceV3)
 			orgName = helpers.NewOrgName()
 			sourceSpaceName = helpers.NewSpaceName()
 			helpers.SetupCF(orgName, sourceSpaceName)

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -144,15 +145,11 @@ var _ = Describe("space command", func() {
 						spaceQuotaName = helpers.PrefixedRandomName("space-quota")
 						Eventually(helpers.CF("create-space-quota", spaceQuotaName)).Should(Exit(0))
 						Eventually(helpers.CF("set-space-quota", spaceName, spaceQuotaName)).Should(Exit(0))
-						isolationSegmentName = helpers.NewIsolationSegmentName()
-						Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
-						Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName)).Should(Exit(0))
-						Eventually(helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)).Should(Exit(0))
 
 						Eventually(helpers.CF("bind-security-group", securityGroup1.Name, orgName, spaceName)).Should(Exit(0))
 					})
 
-					It("displays a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
+					It("displays a table with space name, org, apps, services, space quota and security groups", func() {
 						session := helpers.CF("space", spaceName)
 						userName, _ := helpers.GetCredentials()
 						Eventually(session).Should(Say("Getting info for space %s in org %s as %s\\.\\.\\.", spaceName, orgName, userName))
@@ -161,11 +158,29 @@ var _ = Describe("space command", func() {
 						Eventually(session).Should(Say("org:\\s+%s", orgName))
 						Eventually(session).Should(Say("apps:\\s+%s", appName))
 						Eventually(session).Should(Say("services:\\s+%s", serviceInstance))
-						Eventually(session).Should(Say("isolation segment:\\s+%s", isolationSegmentName))
 						Eventually(session).Should(Say("space quota:\\s+%s", spaceQuotaName))
 						Eventually(session).Should(Say("running security groups:\\s+.*%s,.* %s", securityGroup1.Name, securityGroupName2))
 						Eventually(session).Should(Say("staging security groups:\\s+.*%s,.* %s", securityGroup0.Name, securityGroupName2))
 						Eventually(session).Should(Exit(0))
+					})
+
+					Context("when isolations segments are enabled", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
+
+							isolationSegmentName = helpers.NewIsolationSegmentName()
+							Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
+							Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName)).Should(Exit(0))
+							Eventually(helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)).Should(Exit(0))
+						})
+
+						It("displays the isolation segment in the table", func() {
+							session := helpers.CF("space", spaceName)
+							userName, _ := helpers.GetCredentials()
+							Eventually(session).Should(Say("Getting info for space %s in org %s as %s\\.\\.\\.", spaceName, orgName, userName))
+
+							Eventually(session).Should(Say("isolation segment:\\s+%s", isolationSegmentName))
+						})
 					})
 				})
 
@@ -173,6 +188,7 @@ var _ = Describe("space command", func() {
 					var orgIsolationSegmentName string
 
 					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
 						orgIsolationSegmentName = helpers.NewIsolationSegmentName()
 						Eventually(helpers.CF("create-isolation-segment", orgIsolationSegmentName)).Should(Exit(0))
 						Eventually(helpers.CF("enable-org-isolation", orgName, orgIsolationSegmentName)).Should(Exit(0))
@@ -196,7 +212,6 @@ var _ = Describe("space command", func() {
 						Eventually(session).Should(Say("org:"))
 						Eventually(session).Should(Say("apps:"))
 						Eventually(session).Should(Say("services:"))
-						Eventually(session).Should(Say("isolation segment:"))
 						Eventually(session).Should(Say("space quota:"))
 						Eventually(session).Should(Say("running security groups:"))
 						Eventually(session).Should(Say("staging security groups:"))
