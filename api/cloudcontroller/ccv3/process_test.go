@@ -38,6 +38,42 @@ var _ = Describe("Process", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
+			Context("when instances is provided", func() {
+				BeforeEach(func() {
+					process = Process{
+						Instances: types.NullInt{Value: 0, IsSet: true},
+					}
+				})
+
+				It("sets the instances to be set", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{"instances": 0}`))
+				})
+			})
+
+			Context("when memory is provided", func() {
+				BeforeEach(func() {
+					process = Process{
+						MemoryInMB: types.NullUint64{Value: 0, IsSet: true},
+					}
+				})
+
+				It("sets the memory to be set", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{"memory_in_mb": 0}`))
+				})
+			})
+
+			Context("when disk is provided", func() {
+				BeforeEach(func() {
+					process = Process{
+						DiskInMB: types.NullUint64{Value: 0, IsSet: true},
+					}
+				})
+
+				It("sets the disk to be set", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{"disk_in_mb": 0}`))
+				})
+			})
+
 			Context("when health check type http is provided", func() {
 				BeforeEach(func() {
 					process = Process{
@@ -72,6 +108,16 @@ var _ = Describe("Process", func() {
 
 				It("sets the health check type to process", func() {
 					Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"process", "data": {"endpoint": null}}}`))
+				})
+			})
+
+			Context("when process has no fields provided", func() {
+				BeforeEach(func() {
+					process = Process{}
+				})
+
+				It("sets the health check type to process", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{}`))
 				})
 			})
 		})

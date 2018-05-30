@@ -16,25 +16,45 @@ type Process struct {
 	Type                string           `json:"type"`
 	HealthCheckType     string           `json:"-"`
 	HealthCheckEndpoint string           `json:"-"`
-	Instances           types.NullInt    `json:"instances"`
-	MemoryInMB          types.NullUint64 `json:"memory_in_mb"`
-	DiskInMB            types.NullUint64 `json:"disk_in_mb"`
+	Instances           types.NullInt    `json:"instances,omitempty"`
+	MemoryInMB          types.NullUint64 `json:"memory_in_mb,omitempty"`
+	DiskInMB            types.NullUint64 `json:"disk_in_mb,omitempty"`
 }
 
 func (p Process) MarshalJSON() ([]byte, error) {
-	var ccProcess struct {
-		HealthCheck struct {
-			Type string `json:"type"`
-			Data struct {
-				Endpoint interface{} `json:"endpoint"`
-			} `json:"data"`
-		} `json:"health_check"`
+	type healthCheck struct {
+		Type string `json:"type"`
+		Data struct {
+			Endpoint interface{} `json:"endpoint"`
+		} `json:"data"`
 	}
 
-	ccProcess.HealthCheck.Type = p.HealthCheckType
-	if p.HealthCheckEndpoint != "" {
-		ccProcess.HealthCheck.Data.Endpoint = p.HealthCheckEndpoint
+	var ccProcess struct {
+		Instances  json.Number `json:"instances,omitempty"`
+		MemoryInMB json.Number `json:"memory_in_mb,omitempty"`
+		DiskInMB   json.Number `json:"disk_in_mb,omitempty"`
+
+		HealthCheck *healthCheck `json:"health_check,omitempty"`
 	}
+
+	if p.Instances.IsSet {
+		ccProcess.Instances = json.Number(fmt.Sprint(p.Instances.Value))
+	}
+	if p.MemoryInMB.IsSet {
+		ccProcess.MemoryInMB = json.Number(fmt.Sprint(p.MemoryInMB.Value))
+	}
+	if p.DiskInMB.IsSet {
+		ccProcess.DiskInMB = json.Number(fmt.Sprint(p.DiskInMB.Value))
+	}
+
+	if p.HealthCheckType != "" || p.HealthCheckEndpoint != "" {
+		ccProcess.HealthCheck = new(healthCheck)
+		ccProcess.HealthCheck.Type = p.HealthCheckType
+		if p.HealthCheckEndpoint != "" {
+			ccProcess.HealthCheck.Data.Endpoint = p.HealthCheckEndpoint
+		}
+	}
+
 	return json.Marshal(ccProcess)
 }
 
@@ -64,23 +84,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 
 // CreateApplicationProcessScale updates process instances count, memory or disk
 func (client *Client) CreateApplicationProcessScale(appGUID string, process Process) (Process, Warnings, error) {
-	ccProcessScale := struct {
-		Instances  json.Number `json:"instances,omitempty"`
-		MemoryInMB json.Number `json:"memory_in_mb,omitempty"`
-		DiskInMB   json.Number `json:"disk_in_mb,omitempty"`
-	}{}
-
-	if process.Instances.IsSet {
-		ccProcessScale.Instances = json.Number(fmt.Sprint(process.Instances.Value))
-	}
-	if process.MemoryInMB.IsSet {
-		ccProcessScale.MemoryInMB = json.Number(fmt.Sprint(process.MemoryInMB.Value))
-	}
-	if process.DiskInMB.IsSet {
-		ccProcessScale.DiskInMB = json.Number(fmt.Sprint(process.DiskInMB.Value))
-	}
-
-	body, err := json.Marshal(ccProcessScale)
+	body, err := json.Marshal(process)
 	if err != nil {
 		return Process{}, nil, err
 	}
@@ -94,12 +98,12 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, process Proc
 		return Process{}, nil, err
 	}
 
-	var responceProcess Process
+	var responseProcess Process
 	response := cloudcontroller.Response{
-		Result: &responceProcess,
+		Result: &responseProcess,
 	}
 	err = client.connection.Make(request, &response)
-	return responceProcess, response.Warnings, err
+	return responseProcess, response.Warnings, err
 }
 
 // GetApplicationProcessByType returns application process of specified type
