@@ -77,10 +77,13 @@ var _ = Describe("restart command", func() {
 				appName    string
 			)
 
+			BeforeEach(func() {
+				appName = helpers.PrefixedRandomName("app")
+				domainName = helpers.DefaultSharedDomain()
+			})
+
 			Context("when the app is started", func() {
 				BeforeEach(func() {
-					appName = helpers.PrefixedRandomName("app")
-					domainName = helpers.DefaultSharedDomain()
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 					})
@@ -100,8 +103,6 @@ var _ = Describe("restart command", func() {
 			Context("when the app is stopped", func() {
 				Context("when the app has been staged", func() {
 					BeforeEach(func() {
-						appName = helpers.PrefixedRandomName("app")
-						domainName = helpers.DefaultSharedDomain()
 						helpers.WithHelloWorldApp(func(appDir string) {
 							manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -149,8 +150,6 @@ applications:
 
 				Context("when the app does *not* stage properly because the app was not detected by any buildpacks", func() {
 					BeforeEach(func() {
-						appName = helpers.PrefixedRandomName("app")
-						domainName = helpers.DefaultSharedDomain()
 						helpers.WithHelloWorldApp(func(appDir string) {
 							err := os.Remove(filepath.Join(appDir, "Staticfile"))
 							Expect(err).ToNot(HaveOccurred())
@@ -193,8 +192,6 @@ applications:
 
 					Context("when the app starts properly", func() {
 						BeforeEach(func() {
-							appName = helpers.PrefixedRandomName("app")
-							domainName = helpers.DefaultSharedDomain()
 							helpers.WithHelloWorldApp(func(appDir string) {
 								manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -248,12 +245,17 @@ applications:
 							Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
 							Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
 							Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
+
+							helpers.WithHelloWorldApp(func(appDir string) {
+								Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
+							})
 						})
 
 						It("displays the isolation segment information", func() {
 							session := helpers.CF("restart", appName)
 
 							Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 				})

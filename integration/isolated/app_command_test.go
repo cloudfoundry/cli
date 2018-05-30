@@ -100,8 +100,12 @@ var _ = Describe("app command", func() {
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("app")
 					domainName = helpers.DefaultSharedDomain()
-					helpers.WithHelloWorldApp(func(appDir string) {
-						manifestContents := []byte(fmt.Sprintf(`
+				})
+
+				Context("when the app is started and has 2 instances", func() {
+					BeforeEach(func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							manifestContents := []byte(fmt.Sprintf(`
 ---
 applications:
 - name: %s
@@ -111,16 +115,15 @@ applications:
   routes:
   - route: %s.%s
 `, appName, appName, domainName))
-						manifestPath := filepath.Join(appDir, "manifest.yml")
-						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
-						Expect(err).ToNot(HaveOccurred())
+							manifestPath := filepath.Join(appDir, "manifest.yml")
+							err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+							Expect(err).ToNot(HaveOccurred())
 
-						// Create manifest
-						Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
+							// Create manifest
+							Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
+						})
 					})
-				})
 
-				Context("when the app is started and has 2 instances", func() {
 					It("displays the app information with instances table", func() {
 						session := helpers.CF("app", appName)
 						Eventually(session).Should(Say("name:\\s+%s", appName))
@@ -146,31 +149,33 @@ applications:
 						Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
 						Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
 						Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
+
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
+						})
 					})
 
 					It("displays the app isolation segment information", func() {
 						session := helpers.CF("app", appName)
 
 						Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
+						Eventually(session).Should(Exit(0))
 					})
-
 				})
 
 				Context("when the app is stopped", func() {
 					BeforeEach(func() {
-						Eventually(helpers.CF("stop", appName)).Should(Exit(0))
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+						})
 					})
 
 					It("displays the app information", func() {
 						session := helpers.CF("app", appName)
 						Eventually(session).Should(Say("name:\\s+%s", appName))
 						Eventually(session).Should(Say("requested state:\\s+stopped"))
-						Eventually(session).Should(Say("instances:\\s+0/2"))
-						Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+.%s", domainName))
-						Eventually(session).Should(Say("last uploaded:"))
-						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-						Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+						Eventually(session).Should(Say("instances:\\s+0/1"))
+						Eventually(session).Should(Say("usage:\\s+\\d+M x 1 instances"))
 
 						Eventually(session).Should(Say("There are no running instances of this app."))
 						Eventually(session).Should(Exit(0))
@@ -179,7 +184,9 @@ applications:
 
 				Context("when the app has 0 instances", func() {
 					BeforeEach(func() {
-						Eventually(helpers.CF("scale", appName, "-i", "0")).Should(Exit(0))
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "-i", "0")).Should(Exit(0))
+						})
 					})
 
 					It("displays the app information", func() {
@@ -187,11 +194,7 @@ applications:
 						Eventually(session).Should(Say("name:\\s+%s", appName))
 						Eventually(session).Should(Say("requested state:\\s+started"))
 						Eventually(session).Should(Say("instances:\\s+0/0"))
-						Eventually(session).Should(Say("usage:\\s+128M x 0 instances"))
-						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s", domainName))
-						Eventually(session).Should(Say("last uploaded:"))
-						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-						Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+						Eventually(session).Should(Say("usage:\\s+\\d+M x 0 instances"))
 
 						Eventually(session).Should(Say("There are no running instances of this app."))
 						Eventually(session).Should(Exit(0))
@@ -202,6 +205,10 @@ applications:
 					var appGUID string
 
 					BeforeEach(func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+						})
+
 						session := helpers.CF("curl", fmt.Sprintf("/v2/apps?q=name:%s", appName))
 						Eventually(session).Should(Exit(0))
 						rawJSON := strings.TrimSpace(string(session.Out.Contents()))
