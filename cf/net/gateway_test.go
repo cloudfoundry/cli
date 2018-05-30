@@ -116,6 +116,10 @@ var _ = Describe("Gateway", func() {
 				Expect(reflect.TypeOf(request.SeekableBody)).To(BeNil())
 			})
 
+			It("does not set the content-type header", func() {
+				Expect(request.HTTPReq.Header.Get("Content-Type")).To(Equal(""))
+			})
+
 			It("sets the Authorization header", func() {
 				Expect(request.HTTPReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
 			})

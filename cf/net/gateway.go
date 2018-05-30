@@ -198,7 +198,9 @@ func (gateway Gateway) newRequest(request *http.Request, accessToken string, bod
 	}
 
 	request.Header.Set("accept", "application/json")
-	request.Header.Set("content-type", "application/json")
+	if request.Body != nil {
+		request.Header.Set("content-type", "application/json")
+	}
 	request.Header.Set("User-Agent", "go-cli "+version.VersionString()+" / "+runtime.GOOS)
 
 	return &Request{HTTPReq: request, SeekableBody: body}

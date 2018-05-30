@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/net"
@@ -52,7 +51,7 @@ func (repo CloudControllerRouteServiceBindingRepository) Bind(
 
 		rs = bytes.NewReader(jsonBytes)
 	} else {
-		rs = strings.NewReader("")
+		rs = nil
 	}
 
 	return repo.gateway.UpdateResourceSync(
