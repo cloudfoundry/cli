@@ -66,6 +66,6 @@ func (actor Actor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID str
 }
 
 func (actor Actor) TerminateTask(taskGUID string) (Task, Warnings, error) {
-	task, warnings, err := actor.CloudControllerClient.UpdateTask(taskGUID)
+	task, warnings, err := actor.CloudControllerClient.UpdateTaskCancel(taskGUID)
 	return Task(task), Warnings(warnings), err
 }

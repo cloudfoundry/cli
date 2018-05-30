@@ -272,7 +272,7 @@ var _ = Describe("Task Actions", func() {
 					GUID:       "some-task-guid",
 					SequenceID: 1,
 				}
-				fakeCloudControllerClient.UpdateTaskReturns(
+				fakeCloudControllerClient.UpdateTaskCancelReturns(
 					returnedTask,
 					ccv3.Warnings{"update-task-warning"},
 					nil)
@@ -291,7 +291,7 @@ var _ = Describe("Task Actions", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("cc-error")
-				fakeCloudControllerClient.UpdateTaskReturns(
+				fakeCloudControllerClient.UpdateTaskCancelReturns(
 					ccv3.Task{},
 					ccv3.Warnings{"update-task-warning"},
 					expectedErr)

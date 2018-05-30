@@ -688,17 +688,17 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateTaskStub        func(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
-	updateTaskMutex       sync.RWMutex
-	updateTaskArgsForCall []struct {
+	UpdateTaskCancelStub        func(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
+	updateTaskCancelMutex       sync.RWMutex
+	updateTaskCancelArgsForCall []struct {
 		taskGUID string
 	}
-	updateTaskReturns struct {
+	updateTaskCancelReturns struct {
 		result1 ccv3.Task
 		result2 ccv3.Warnings
 		result3 error
 	}
-	updateTaskReturnsOnCall map[int]struct {
+	updateTaskCancelReturnsOnCall map[int]struct {
 		result1 ccv3.Task
 		result2 ccv3.Warnings
 		result3 error
@@ -3182,54 +3182,54 @@ func (fake *FakeCloudControllerClient) UpdateApplicationStopReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error) {
-	fake.updateTaskMutex.Lock()
-	ret, specificReturn := fake.updateTaskReturnsOnCall[len(fake.updateTaskArgsForCall)]
-	fake.updateTaskArgsForCall = append(fake.updateTaskArgsForCall, struct {
+func (fake *FakeCloudControllerClient) UpdateTaskCancel(taskGUID string) (ccv3.Task, ccv3.Warnings, error) {
+	fake.updateTaskCancelMutex.Lock()
+	ret, specificReturn := fake.updateTaskCancelReturnsOnCall[len(fake.updateTaskCancelArgsForCall)]
+	fake.updateTaskCancelArgsForCall = append(fake.updateTaskCancelArgsForCall, struct {
 		taskGUID string
 	}{taskGUID})
-	fake.recordInvocation("UpdateTask", []interface{}{taskGUID})
-	fake.updateTaskMutex.Unlock()
-	if fake.UpdateTaskStub != nil {
-		return fake.UpdateTaskStub(taskGUID)
+	fake.recordInvocation("UpdateTaskCancel", []interface{}{taskGUID})
+	fake.updateTaskCancelMutex.Unlock()
+	if fake.UpdateTaskCancelStub != nil {
+		return fake.UpdateTaskCancelStub(taskGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.updateTaskReturns.result1, fake.updateTaskReturns.result2, fake.updateTaskReturns.result3
+	return fake.updateTaskCancelReturns.result1, fake.updateTaskCancelReturns.result2, fake.updateTaskCancelReturns.result3
 }
 
-func (fake *FakeCloudControllerClient) UpdateTaskCallCount() int {
-	fake.updateTaskMutex.RLock()
-	defer fake.updateTaskMutex.RUnlock()
-	return len(fake.updateTaskArgsForCall)
+func (fake *FakeCloudControllerClient) UpdateTaskCancelCallCount() int {
+	fake.updateTaskCancelMutex.RLock()
+	defer fake.updateTaskCancelMutex.RUnlock()
+	return len(fake.updateTaskCancelArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateTaskArgsForCall(i int) string {
-	fake.updateTaskMutex.RLock()
-	defer fake.updateTaskMutex.RUnlock()
-	return fake.updateTaskArgsForCall[i].taskGUID
+func (fake *FakeCloudControllerClient) UpdateTaskCancelArgsForCall(i int) string {
+	fake.updateTaskCancelMutex.RLock()
+	defer fake.updateTaskCancelMutex.RUnlock()
+	return fake.updateTaskCancelArgsForCall[i].taskGUID
 }
 
-func (fake *FakeCloudControllerClient) UpdateTaskReturns(result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {
-	fake.UpdateTaskStub = nil
-	fake.updateTaskReturns = struct {
+func (fake *FakeCloudControllerClient) UpdateTaskCancelReturns(result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateTaskCancelStub = nil
+	fake.updateTaskCancelReturns = struct {
 		result1 ccv3.Task
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateTaskReturnsOnCall(i int, result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {
-	fake.UpdateTaskStub = nil
-	if fake.updateTaskReturnsOnCall == nil {
-		fake.updateTaskReturnsOnCall = make(map[int]struct {
+func (fake *FakeCloudControllerClient) UpdateTaskCancelReturnsOnCall(i int, result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateTaskCancelStub = nil
+	if fake.updateTaskCancelReturnsOnCall == nil {
+		fake.updateTaskCancelReturnsOnCall = make(map[int]struct {
 			result1 ccv3.Task
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
-	fake.updateTaskReturnsOnCall[i] = struct {
+	fake.updateTaskCancelReturnsOnCall[i] = struct {
 		result1 ccv3.Task
 		result2 ccv3.Warnings
 		result3 error
@@ -3386,8 +3386,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateApplicationStartMutex.RUnlock()
 	fake.updateApplicationStopMutex.RLock()
 	defer fake.updateApplicationStopMutex.RUnlock()
-	fake.updateTaskMutex.RLock()
-	defer fake.updateTaskMutex.RUnlock()
+	fake.updateTaskCancelMutex.RLock()
+	defer fake.updateTaskCancelMutex.RUnlock()
 	fake.uploadPackageMutex.RLock()
 	defer fake.uploadPackageMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
