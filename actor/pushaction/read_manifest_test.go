@@ -27,6 +27,7 @@ var _ = Describe("ReadManifest", func() {
 		varsKV         []template.VarKV
 
 		apps       []manifest.Application
+		warnings   Warnings
 		executeErr error
 	)
 
@@ -49,7 +50,7 @@ var _ = Describe("ReadManifest", func() {
 	})
 
 	JustBeforeEach(func() {
-		apps, _, executeErr = actor.ReadManifest(manifestPath, varsFilesPaths, varsKV)
+		apps, warnings, executeErr = actor.ReadManifest(manifestPath, varsFilesPaths, varsKV)
 	})
 
 	Context("when provided `buildpack`", func() {
@@ -62,10 +63,11 @@ applications:
   - name: some-other-app
     buildpack: some-other-buildpack
 `)
+
 			Expect(ioutil.WriteFile(manifestPath, manifest, 0666)).To(Succeed())
 		})
 
-		It("sets the buildpack on the app", func() {
+		It("sets the buildpack on the app and returns a deprecated field warning", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(apps).To(ConsistOf(manifest.Application{
@@ -75,7 +77,8 @@ applications:
 				Name:      "some-other-app",
 				Buildpack: types.FilteredString{Value: "some-other-buildpack", IsSet: true},
 			}))
-			// Expect(warnings).To(ConsistOf(`Deprecation warning: Use of buildpack attribute in manifest is deprecated in favor of 'buildpacks'. Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated for alternatives and other app manifest deprecations. This feature will be removed in the future.`))
+
+			Expect(warnings).To(ConsistOf(`Deprecation warning: Use of buildpack attribute in manifest is deprecated in favor of 'buildpacks'. Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated for alternatives and other app manifest deprecations. This feature will be removed in the future.`))
 		})
 	})
 })
