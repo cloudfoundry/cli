@@ -78,7 +78,7 @@ var _ = Describe("v3-create-package with .cfignore", func() {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-package", appName)
 
 					Eventually(session).Should(Exit(0))
-					helpers.VerifyAppPackageContents(appName, "file1", "file2", "Staticfile", "index.html")
+					helpers.VerifyAppPackageContentsV3(appName, "file1", "file2", "Staticfile", "index.html")
 				})
 			})
 		})
@@ -103,7 +103,7 @@ var _ = Describe("v3-create-package with .cfignore", func() {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-package", appName)
 
 						Eventually(session).Should(Exit(0))
-						helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
+						helpers.VerifyAppPackageContentsV3(appName, "Staticfile", "index.html")
 					})
 				})
 			})
@@ -127,7 +127,7 @@ var _ = Describe("v3-create-package with .cfignore", func() {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-package", appName, "-p", appDir)
 
 						Eventually(session).Should(Exit(0))
-						helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
+						helpers.VerifyAppPackageContentsV3(appName, "Staticfile", "index.html")
 					})
 				})
 			})
@@ -167,7 +167,7 @@ var _ = Describe("v3-create-package with .cfignore", func() {
 					session := helpers.CF("v3-create-package", appName, "-p", archive)
 
 					Eventually(session).Should(Exit(0))
-					helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
+					helpers.VerifyAppPackageContentsV3(appName, "Staticfile", "index.html")
 				})
 			})
 		})
@@ -193,7 +193,7 @@ var _ = Describe("v3-create-package with .cfignore", func() {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-app", appName)).Should(Exit(0))
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-package", appName)
 					Eventually(session).Should(Exit(0))
-					helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
+					helpers.VerifyAppPackageContentsV3(appName, "Staticfile", "index.html")
 				})
 			})
 		})
@@ -242,7 +242,7 @@ var _ = Describe("v3-create-package with .cfignore", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-package", appName)
 
 				Eventually(session).Should(Exit(0))
-				helpers.VerifyAppPackageContents(appName, "file1", "file2", "Staticfile", "index.html")
+				helpers.VerifyAppPackageContentsV3(appName, "file1", "file2", "Staticfile", "index.html")
 			})
 		})
 	})

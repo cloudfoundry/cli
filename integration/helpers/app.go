@@ -12,7 +12,7 @@ import (
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	"github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/gexec"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -150,7 +150,7 @@ func WithBananaPantsApp(f func(dir string)) {
 // AppGUID returns the GUID for an app in the currently targeted space.
 func AppGUID(appName string) string {
 	session := CF("app", appName, "--guid")
-	Eventually(session).Should(gexec.Exit(0))
+	Eventually(session).Should(Exit(0))
 	return strings.TrimSpace(string(session.Out.Contents()))
 }
 
@@ -161,7 +161,7 @@ func WriteManifest(path string, manifest map[string]interface{}) {
 	Expect(err).ToNot(HaveOccurred())
 }
 
-func ConfirmStagingLogs(session *gexec.Session) {
+func ConfirmStagingLogs(session *Session) {
 	Eventually(session).Should(Say("(?i)Creating container|Successfully created container|Staging\\.\\.\\.|Staging process started \\.\\.\\.|Staging Complete"))
 }
 

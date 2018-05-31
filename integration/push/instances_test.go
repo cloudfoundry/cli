@@ -1,6 +1,7 @@
 package push
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -51,6 +52,10 @@ var _ = Describe("push with different instances values", func() {
 		})
 
 		Context("when instances flag is set to 0", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionZeroAppInstancesV2)
+			})
+
 			It("pushes an app with 0 instances", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					By("pushing an app with 0 instances")

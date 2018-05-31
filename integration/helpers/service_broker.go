@@ -153,15 +153,6 @@ func (b ServiceBroker) ToJSON(shareable bool) string {
 	return replacer.Replace(string(bytes))
 }
 
-func GetAppGuid(appName string) string {
-	session := CF("app", appName, "--guid")
-	Eventually(session).Should(Exit(0))
-
-	appGuid := strings.TrimSpace(string(session.Out.Contents()))
-	Expect(appGuid).NotTo(Equal(""))
-	return appGuid
-}
-
 type Assets struct {
 	ServiceBroker string
 }

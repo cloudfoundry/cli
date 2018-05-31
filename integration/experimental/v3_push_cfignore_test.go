@@ -77,7 +77,7 @@ var _ = Describe("v3-push with .cfignore", func() {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)
 
 					Eventually(session).Should(Exit(0))
-					helpers.VerifyAppPackageContents(appName, "file1", "file2", "Staticfile", "index.html")
+					helpers.VerifyAppPackageContentsV3(appName, "file1", "file2", "Staticfile", "index.html")
 				})
 			})
 		})
@@ -101,7 +101,7 @@ var _ = Describe("v3-push with .cfignore", func() {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)
 
 						Eventually(session).Should(Exit(0))
-						helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
+						helpers.VerifyAppPackageContentsV3(appName, "Staticfile", "index.html")
 					})
 				})
 			})
@@ -124,7 +124,7 @@ var _ = Describe("v3-push with .cfignore", func() {
 						session := helpers.CF("v3-push", appName, "-p", appDir)
 
 						Eventually(session).Should(Exit(0))
-						helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
+						helpers.VerifyAppPackageContentsV3(appName, "Staticfile", "index.html")
 					})
 				})
 			})
@@ -163,7 +163,7 @@ var _ = Describe("v3-push with .cfignore", func() {
 					session := helpers.CF("v3-push", appName, "-p", archive)
 
 					Eventually(session).Should(Exit(0))
-					helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
+					helpers.VerifyAppPackageContentsV3(appName, "Staticfile", "index.html")
 				})
 			})
 		})
@@ -188,7 +188,7 @@ var _ = Describe("v3-push with .cfignore", func() {
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)
 					Eventually(session).Should(Exit(0))
-					helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
+					helpers.VerifyAppPackageContentsV3(appName, "Staticfile", "index.html")
 				})
 			})
 		})
@@ -236,7 +236,7 @@ var _ = Describe("v3-push with .cfignore", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)
 
 				Eventually(session).Should(Exit(0))
-				helpers.VerifyAppPackageContents(appName, "file1", "file2", "Staticfile", "index.html")
+				helpers.VerifyAppPackageContentsV3(appName, "file1", "file2", "Staticfile", "index.html")
 			})
 		})
 	})

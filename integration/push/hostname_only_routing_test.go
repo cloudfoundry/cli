@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -170,6 +171,8 @@ var _ = Describe("push with hostname", func() {
 		)
 
 		BeforeEach(func() {
+			helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
+
 			domainName = helpers.DomainName()
 			domain = helpers.NewDomain(organization, domainName)
 			domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))

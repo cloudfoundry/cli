@@ -1,6 +1,7 @@
 package push
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -63,6 +64,8 @@ var _ = Describe("pushing with no-hostname", func() {
 				var domain helpers.Domain
 
 				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
+
 					domain = helpers.NewDomain(organization, domainName)
 					domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 				})

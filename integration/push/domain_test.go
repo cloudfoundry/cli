@@ -3,6 +3,7 @@ package push
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -76,6 +77,8 @@ var _ = Describe("push with different domain values", func() {
 			var domain helpers.Domain
 
 			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
+
 				domainName = helpers.DomainName("tcp-domain")
 				domain = helpers.NewDomain(organization, domainName)
 				domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
