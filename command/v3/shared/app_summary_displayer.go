@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/bytefmt"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 )
@@ -45,7 +46,7 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 		var routeWarnings v2action.Warnings
 		routes, routeWarnings, err = display.V2AppRouteActor.GetApplicationRoutes(summary.Application.GUID)
 		display.UI.DisplayWarnings(routeWarnings)
-		if err != nil {
+		if _, ok := err.(ccerror.ResourceNotFoundError); err != nil && !ok {
 			return err
 		}
 	}
