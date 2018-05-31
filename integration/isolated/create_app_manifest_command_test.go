@@ -9,7 +9,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -376,19 +375,16 @@ var _ = Describe("create-app-manifest command", func() {
 				})
 			})
 
-			It("returns a manifest with single buildpack", func() {
+			It("returns a manifest with multiple buildpacks", func() {
 				appManifest, err := createManifest(appName)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(appManifest.Applications).To(HaveLen(1))
-				Expect(appManifest.Applications[0].Buildpack).To(Equal(types.FilteredString{
-					IsSet: true,
-					Value: "staticfile_buildpack",
-				}))
+				Expect(appManifest.Applications[0].Buildpacks).To(Equal([]string{"staticfile_buildpack"}))
 			})
 		})
 
-		PContext("when the app has multiple buildpacks", func() {
+		Context("when the app has multiple buildpacks", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 
@@ -402,7 +398,7 @@ var _ = Describe("create-app-manifest command", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(appManifest.Applications).To(HaveLen(1))
-				Expect(appManifest.Applications[0].Buildpack).To(Equal("ruby-bp"))
+				Expect(appManifest.Applications[0].Buildpacks).To(Equal([]string{"ruby_buildpack", "staticfile_buildpack"}))
 			})
 		})
 	})

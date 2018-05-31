@@ -88,7 +88,7 @@ var _ = Describe("push with different buildpack values", func() {
 			})
 		})
 
-		PContext("when multiple instances of buildpack are provided", func() {
+		Context("when multiple instances of buildpack are provided", func() {
 			Context("when the app does NOT have existing buildpack configurations", func() {
 				It("pushes the app successfully with multiple buildpacks", func() {
 					helpers.WithProcfileApp(func(dir string) {
@@ -209,7 +209,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	PContext("when buildpacks (plural) is provided via manifest", func() {
+	Context("when buildpacks (plural) is provided via manifest", func() {
 		Context("when mutiple buildpacks are specified", func() {
 			It("sets all buildpacks correctly for the pushed app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
@@ -306,7 +306,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	PContext("when both buildpack and buildpacks are provided via manifest", func() {
+	Context("when both buildpack and buildpacks are provided via manifest", func() {
 		It("returns an error", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -328,7 +328,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	PContext("when both buildpacks and docker are provided via manfest", func() {
+	Context("when both buildpacks and docker are provided via manfest", func() {
 		It("returns an error", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -352,7 +352,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	PContext("when both buildpacks and docker are provided via flags", func() {
+	Context("when both buildpacks and docker are provided via flags", func() {
 		It("returns an error", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
@@ -398,7 +398,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	PContext("when buildpacks is provided via manifest and droplet is provided via flags", func() {
+	Context("when buildpacks is provided via manifest and droplet is provided via flags", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {
@@ -460,7 +460,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	PContext("when both buildpacks and droplet are provided via flags", func() {
+	Context("when both buildpacks and droplet are provided via flags", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {

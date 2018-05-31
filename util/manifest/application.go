@@ -8,8 +8,8 @@ import (
 )
 
 type Application struct {
-	Buildpack types.FilteredString
-	// Buildpacks     []string
+	Buildpack      types.FilteredString
+	Buildpacks     []string
 	Command        types.FilteredString
 	DiskQuota      types.NullByteSizeInMb
 	DockerImage    string
@@ -47,8 +47,8 @@ type Application struct {
 
 func (app Application) MarshalYAML() (interface{}, error) {
 	var m = rawManifestApplication{
-		Buildpack: app.Buildpack.Value,
-		// Buildpacks:              app.Buildpacks,
+		Buildpack:               app.Buildpack.Value,
+		Buildpacks:              app.Buildpacks,
 		Command:                 app.Command.Value,
 		Docker:                  rawDockerInfo{Image: app.DockerImage, Username: app.DockerUsername},
 		DropletPath:             app.DropletPath,
@@ -79,11 +79,11 @@ func (app Application) MarshalYAML() (interface{}, error) {
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Droplet Path: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Hostname: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-Hostname: %t, No-Route: %t, Path: '%s', RandomRoute: %t, RoutePath: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s',  Buildpacks: [%s], Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Droplet Path: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Hostname: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-Hostname: %t, No-Route: %t, Path: '%s', RandomRoute: %t, RoutePath: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
 		app.Name,
 		app.Buildpack.IsSet,
 		app.Buildpack.Value,
-		// strings.Join(app.Buildpacks, ", "),
+		strings.Join(app.Buildpacks, ", "),
 		app.Command.IsSet,
 		app.Command.Value,
 		app.DiskQuota,
@@ -165,10 +165,10 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 			return EmptyBuildpacksError{}
 		}
 
-		// app.Buildpacks = []string{}
-		// for _, buildpack := range m.Buildpacks {
-		// 	app.Buildpacks = append(app.Buildpacks, buildpack)
-		// }
+		app.Buildpacks = []string{}
+		for _, buildpack := range m.Buildpacks {
+			app.Buildpacks = append(app.Buildpacks, buildpack)
+		}
 	}
 
 	if _, ok := exists["command"]; ok {

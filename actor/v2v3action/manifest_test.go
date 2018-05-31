@@ -94,8 +94,8 @@ var _ = Describe("Manifest", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("v2-action-warnings", "v3-action-warnings"))
 					Expect(manifestApp).To(MatchFields(IgnoreExtras, Fields{
-						"Buildpack": Equal(types.FilteredString{}),
-						// "Buildpacks": ConsistOf("some-buildpack"),
+						"Buildpack":  Equal(types.FilteredString{}),
+						"Buildpacks": ConsistOf("some-buildpack"),
 					}))
 				})
 			})
@@ -125,8 +125,8 @@ var _ = Describe("Manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("v2-action-warnings"))
 				Expect(manifestApp).To(MatchFields(IgnoreExtras, Fields{
-					"Buildpack": Equal(types.FilteredString{IsSet: true, Value: "some-buildpack"}),
-					// "Buildpacks": BeNil(),
+					"Buildpack":  Equal(types.FilteredString{IsSet: true, Value: "some-buildpack"}),
+					"Buildpacks": BeNil(),
 				}))
 			})
 		})

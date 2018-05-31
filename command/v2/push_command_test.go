@@ -80,10 +80,10 @@ var _ = Describe("push Command", func() {
 			executeErr = cmd.Execute(nil)
 		})
 
-		PContext("when the mutiple buildpacks are provided, and the API version is below the mutiple buildpacks minimum", func() {
+		Context("when the mutiple buildpacks are provided, and the API version is below the mutiple buildpacks minimum", func() {
 			BeforeEach(func() {
 				fakeActor.CloudControllerV3APIVersionReturns("3.1.0")
-				// cmd.Buildpacks = []string{"some-buildpack", "some-other-buildpack"}
+				cmd.Buildpacks = []string{"some-buildpack", "some-other-buildpack"}
 			})
 
 			It("returns a MinimumAPIVersionNotMetError", func() {
@@ -147,13 +147,13 @@ var _ = Describe("push Command", func() {
 					fakeActor.MergeAndValidateSettingsAndManifestsReturns(appManifests, nil)
 				})
 
-				PContext("when buildpacks (plural) is provided in the manifest and the API version is below the minimum", func() {
+				Context("when buildpacks (plural) is provided in the manifest and the API version is below the minimum", func() {
 					BeforeEach(func() {
 						appManifests = []manifest.Application{
 							{
-								Name: appName,
-								Path: pwd,
-								// Buildpacks: []string{"ruby-buildpack", "java-buildpack"},
+								Name:       appName,
+								Path:       pwd,
+								Buildpacks: []string{"ruby-buildpack", "java-buildpack"},
 							},
 						}
 
@@ -955,8 +955,7 @@ var _ = Describe("push Command", func() {
 
 			Context("when general app settings are given", func() {
 				BeforeEach(func() {
-					// cmd.Buildpacks = []string{"some-buildpack"}
-					cmd.Buildpack = "some-buildpack"
+					cmd.Buildpacks = []string{"some-buildpack"}
 					cmd.Command = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "echo foo bar baz"}}
 					cmd.DiskQuota = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
 					cmd.HealthCheckTimeout = 14
@@ -968,8 +967,7 @@ var _ = Describe("push Command", func() {
 
 				It("sets them on the command line settings", func() {
 					Expect(commandLineSettingsErr).ToNot(HaveOccurred())
-					// Expect(settings.Buildpacks).To(ConsistOf("some-buildpack"))
-					Expect(settings.Buildpack).To(Equal("some-buildpack"))
+					Expect(settings.Buildpacks).To(ConsistOf("some-buildpack"))
 					Expect(settings.Command).To(Equal(types.FilteredString{IsSet: true, Value: "echo foo bar baz"}))
 					Expect(settings.DiskQuota).To(Equal(uint64(1024)))
 					Expect(settings.HealthCheckTimeout).To(Equal(14))
@@ -1142,8 +1140,7 @@ var _ = Describe("push Command", func() {
 			Entry("-b and --docker-image",
 				func() {
 					cmd.DockerImage.Path = "some-docker-image"
-					// cmd.Buildpacks = []string{"some-buildpack"}
-					cmd.Buildpack = "some-buildpack"
+					cmd.Buildpacks = []string{"some-buildpack"}
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"-b", "--docker-image, -o"}}),
 
