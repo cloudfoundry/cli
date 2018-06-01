@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/versioncheck"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
-	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
 )
 
@@ -40,7 +39,6 @@ func (actor *Actor) CreateApplicationManifestByNameAndSpace(appName string, appS
 			return manifest.Application{}, allWarnings, v3Err
 		}
 
-		manifestApp.Buildpack = types.FilteredString{}
 		manifestApp.Buildpacks = v3App.LifecycleBuildpacks
 	}
 

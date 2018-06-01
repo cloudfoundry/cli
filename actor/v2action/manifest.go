@@ -31,7 +31,6 @@ func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, space
 	}
 
 	manifestApp := manifest.Application{
-		Buildpack:            applicationSummary.Buildpack,
 		Command:              applicationSummary.Command,
 		DiskQuota:            applicationSummary.DiskQuota,
 		DockerImage:          applicationSummary.DockerImage,
@@ -45,6 +44,11 @@ func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, space
 		Services:             services,
 		StackName:            applicationSummary.Stack.Name,
 	}
+
+	if applicationSummary.Buildpack.IsSet {
+		manifestApp.Buildpacks = append(manifestApp.Buildpacks, applicationSummary.Buildpack.Value)
+	}
+
 	if len(routes) < 1 {
 		manifestApp.NoRoute = true
 	}

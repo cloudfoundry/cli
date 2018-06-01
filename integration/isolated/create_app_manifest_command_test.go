@@ -17,11 +17,11 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func createManifest(appName string) (manifest.Manifest, error) {
+func createManifest(appName string) (manifest.Manifest, string, error) {
 	tmpDir, err := ioutil.TempDir("", "")
 	defer os.RemoveAll(tmpDir)
 	if err != nil {
-		return manifest.Manifest{}, err
+		return manifest.Manifest{}, "", err
 	}
 
 	manifestPath := filepath.Join(tmpDir, "manifest.yml")
@@ -29,16 +29,16 @@ func createManifest(appName string) (manifest.Manifest, error) {
 
 	manifestContents, err := ioutil.ReadFile(manifestPath)
 	if err != nil {
-		return manifest.Manifest{}, err
+		return manifest.Manifest{}, "", err
 	}
 
 	var appsManifest manifest.Manifest
 	err = yaml.Unmarshal(manifestContents, &appsManifest)
 	if err != nil {
-		return manifest.Manifest{}, err
+		return manifest.Manifest{}, "", err
 	}
 
-	return appsManifest, nil
+	return appsManifest, string(manifestContents), nil
 }
 
 var _ = Describe("create-app-manifest command", func() {
@@ -359,7 +359,7 @@ var _ = Describe("create-app-manifest command", func() {
 			})
 
 			It("contains routes without hostnames", func() {
-				appManifest, err := createManifest(appName)
+				appManifest, _, err := createManifest(appName)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(appManifest.Applications).To(HaveLen(1))
@@ -375,12 +375,12 @@ var _ = Describe("create-app-manifest command", func() {
 				})
 			})
 
-			It("returns a manifest with multiple buildpacks", func() {
-				appManifest, err := createManifest(appName)
+			It("returns a manifest with one buildpack under buildpacks", func() {
+				appManifest, rawManifest, err := createManifest(appName)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(appManifest.Applications).To(HaveLen(1))
-				Expect(appManifest.Applications[0].Buildpacks).To(Equal([]string{"staticfile_buildpack"}))
+				Expect(appManifest.Applications[0].Buildpacks).To(ConsistOf("staticfile_buildpack"), fmt.Sprintf("Manifest should have a staticfile_buildpack:\n%s\n", rawManifest))
 			})
 		})
 
@@ -394,11 +394,11 @@ var _ = Describe("create-app-manifest command", func() {
 			})
 
 			It("returns a manifest with multiple buildpacks", func() {
-				appManifest, err := createManifest(appName)
+				appManifest, rawManifest, err := createManifest(appName)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(appManifest.Applications).To(HaveLen(1))
-				Expect(appManifest.Applications[0].Buildpacks).To(Equal([]string{"ruby_buildpack", "staticfile_buildpack"}))
+				Expect(appManifest.Applications[0].Buildpacks).To(ConsistOf("ruby_buildpack", "staticfile_buildpack"), fmt.Sprintf("Manifest should have ruby and staticfile:\n%s\n", rawManifest))
 			})
 		})
 	})
