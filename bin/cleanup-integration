@@ -51,6 +51,11 @@ cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 
 cf delete-org -f temp-org
 
+for stack in $(cf stacks | tail -n +5 | cut -d ' ' -f1); do
+  cf buildpacks | grep -i -e ^integration-buildpack | cut -d ' ' -f1 | uniq | xargs_func -I{} cf delete-buildpack {} -f -s $stack
+done
+cf buildpacks | grep -i -e ^integration-buildpack | cut -d ' ' -f1 | uniq | xargs_func -I{} cf delete-buildpack {} -f
+
 CF_USERS=$(cf curl /v2/users | grep total_results | grep -o '[0-9]\+')
 USER_PAGES=$(( $CF_USERS / 50 + 1))
 

@@ -15,7 +15,9 @@ const (
 	NotStaged                              = "170002"
 	InstancesError                         = "220001"
 	QuotaDefinitionNameTaken               = "240002"
+	BuildpackNameStackTaken                = "290000"
 	BuildpackNameTaken                     = "290001"
+	StackUnique                            = "290003"
 	SecurityGroupNameTaken                 = "300005"
 	ServiceKeyNameTaken                    = "360001"
 )

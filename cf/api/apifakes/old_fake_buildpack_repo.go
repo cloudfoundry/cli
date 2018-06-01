@@ -1,8 +1,6 @@
 package apifakes
 
 import (
-	"fmt"
-
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/cf/models"
 )
@@ -21,9 +19,10 @@ type OldFakeBuildpackRepository struct {
 	FindByNameAndStackStack     string
 	FindByNameAndStackBuildpack models.Buildpack
 
-	CreateBuildpackExists bool
-	CreateBuildpack       models.Buildpack
-	CreateAPIResponse     error
+	CreateBuildpackExists             bool
+	CreateBuildpackWithNilStackExists bool
+	CreateBuildpack                   models.Buildpack
+	CreateAPIResponse                 error
 
 	DeleteBuildpackGUID string
 	DeleteAPIResponse   error
@@ -69,15 +68,14 @@ func (repo *OldFakeBuildpackRepository) FindByNameAndStack(name, stack string) (
 	return
 }
 
-var buildpackCreateCount int
-
 func (repo *OldFakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error) {
 	if repo.CreateBuildpackExists {
 		return repo.CreateBuildpack, errors.NewHTTPError(400, errors.BuildpackNameTaken, "Buildpack already exists")
+	} else if repo.CreateBuildpackWithNilStackExists {
+		return repo.CreateBuildpack, errors.NewHTTPError(400, errors.StackUnique, "stack unique")
 	}
 
-	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked, GUID: fmt.Sprintf("BUILDPACK-GUID-%d", buildpackCreateCount)}
-	buildpackCreateCount++
+	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked, GUID: "BUILDPACK-GUID-X"}
 	return repo.CreateBuildpack, repo.CreateAPIResponse
 }
 

@@ -188,7 +188,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 			_, apiErr := repo.FindByName("Buildpack1")
 			Expect(handler).To(HaveAllRequestsCalled())
-			Expect(apiErr.(*errors.AmbiguousModelError)).NotTo(BeNil())
+			Expect(apiErr).To(BeAssignableToTypeOf(&errors.AmbiguousModelError{}))
 		})
 	})
 

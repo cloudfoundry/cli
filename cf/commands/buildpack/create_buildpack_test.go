@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api/apifakes"
+	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
@@ -101,14 +102,30 @@ var _ = Describe("create-buildpack command", func() {
 		})
 	})
 
-	It("warns the user when the buildpack already exists", func() {
-		repo.CreateBuildpackExists = true
+	It("warns the user when the buildpack with nil stack already exists", func() {
+		repo.CreateBuildpackWithNilStackExists = true
 		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
 		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating buildpack", "my-buildpack"},
 			[]string{"OK"},
-			[]string{"my-buildpack", "already exists"},
+			[]string{"my-buildpack", "already exists without a stack"},
+			[]string{"TIP", "use", cf.Name, "delete-buildpack"},
+		))
+		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
+	})
+
+	It("warns the user when the buildpack with actual stack already exists", func() {
+		bitsRepo.UploadBuildpackReturns(errors.NewHTTPError(433, errors.BuildpackNameStackTaken, "test error"))
+		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
+
+		By("printing server error in UI because that's the only way to include the stack in the error message")
+		Expect(ui.Outputs()).To(ContainSubstrings(
+			[]string{"Creating buildpack", "my-buildpack"},
+			[]string{"OK"},
+			[]string{"Uploading buildpack", "my-buildpack"},
+			[]string{"OK"},
+			[]string{"test error"},
 			[]string{"TIP", "use", cf.Name, "update-buildpack"},
 		))
 		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
@@ -126,12 +143,10 @@ var _ = Describe("create-buildpack command", func() {
 		Expect(*repo.CreateBuildpack.Enabled).To(Equal(false))
 	})
 
-	It("alerts the user when uploading the buildpack bits fails and rolls back the creation", func() {
+	It("alerts the user when uploading the buildpack bits fails", func() {
 		bitsRepo.UploadBuildpackReturns(fmt.Errorf("upload error"))
 
 		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "bogus/path", "5"}, requirementsFactory, updateCommandDependency, false, ui)
-
-		Expect(repo.DeleteBuildpackGUID).To(Equal(repo.CreateBuildpack.GUID))
 
 		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating buildpack", "my-buildpack"},

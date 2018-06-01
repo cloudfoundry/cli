@@ -93,7 +93,11 @@ func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) error {
 		cmd.ui.Warn(T("Buildpack {{.BuildpackName}} does not exist.", map[string]interface{}{"BuildpackName": buildpackName}))
 		return nil
 	case *errors.AmbiguousModelError:
-		return fmt.Errorf("%s Specify the stack (using -s) to disambiguate.", err.Error())
+		var err2 error
+		buildpack, err2 = cmd.buildpackRepo.FindByNameWithNilStack(buildpackName)
+		if err2 != nil {
+			return fmt.Errorf("%s Specify the stack (using -s) to disambiguate.", err.Error())
+		}
 	default:
 		return err
 
