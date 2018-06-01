@@ -90,7 +90,8 @@ var _ = Describe("push with symlinked resources", func() {
 			})
 		})
 
-		Context("when the directory contains a symlink to a file outside the directory", func() {
+		// See #153499645
+		PContext("when the directory contains a symlink to a file outside the directory", func() {
 			var targetPath string
 
 			BeforeEach(func() {
