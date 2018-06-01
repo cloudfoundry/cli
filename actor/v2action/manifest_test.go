@@ -79,29 +79,6 @@ var _ = Describe("Manifest Actions", func() {
 					})
 				})
 
-				Context("when detected buildpack is set", func() {
-					BeforeEach(func() {
-						app = ccv2.Application{
-							GUID: "some-app-guid",
-							Name: "some-app",
-							DetectedBuildpack: types.FilteredString{
-								IsSet: true,
-								Value: "some-detected-buildpack",
-							},
-						}
-
-						fakeCloudControllerClient.GetApplicationsReturns(
-							[]ccv2.Application{app},
-							ccv2.Warnings{"some-app-warning"},
-							nil)
-					})
-
-					It("populates buildpacks field with the detected buildpack", func() {
-						Expect(createErr).NotTo(HaveOccurred())
-						Expect(manifestApp.Buildpacks).To(ConsistOf("some-detected-buildpack"))
-					})
-				})
-
 				Context("when buildpack and detected buildpack are set", func() {
 					BeforeEach(func() {
 						app = ccv2.Application{
