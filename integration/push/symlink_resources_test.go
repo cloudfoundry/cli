@@ -89,35 +89,6 @@ var _ = Describe("push with symlinked resources", func() {
 				helpers.VerifyAppPackageContentsV2(appName, "symlinkFile", "Staticfile", "index.html")
 			})
 		})
-
-		// See #153499645
-		PContext("when the directory contains a symlink to a file outside the directory", func() {
-			var targetPath string
-
-			BeforeEach(func() {
-				tmpFile, err := ioutil.TempFile("", "push-symlink-integration-")
-				Expect(err).ToNot(HaveOccurred())
-				tmpFile.Close()
-
-				targetPath = tmpFile.Name()
-			})
-
-			AfterEach(func() {
-				Expect(os.Remove(targetPath))
-			})
-
-			It("it should fail with an upload invalid error", func() {
-				helpers.WithHelloWorldApp(func(dir string) {
-					err := os.Symlink(targetPath, filepath.Join(dir, "symlinkFile"))
-					Expect(err).ToNot(HaveOccurred())
-
-					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
-
-					Eventually(session.Err).Should(Say("The app upload is invalid: Symlink\\(s\\) point outside of root folder"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-		})
 	})
 
 	Context("when pushing an archive", func() {
