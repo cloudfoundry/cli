@@ -179,10 +179,10 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 		return Process{}, nil, err
 	}
 
-	var responceProcess Process
+	var responseProcess Process
 	response := cloudcontroller.Response{
-		Result: &responceProcess,
+		Result: &responseProcess,
 	}
 	err = client.connection.Make(request, &response)
-	return responceProcess, response.Warnings, err
+	return responseProcess, response.Warnings, err
 }

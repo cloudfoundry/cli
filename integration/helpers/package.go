@@ -60,7 +60,6 @@ func getFirstAppPackageGuid(appName string) string {
 	session := CF("v3-packages", appName)
 	Eventually(session).Should(Exit(0))
 
-	// myRegexp, err := regexp.Compile("([a-f0-9-])\\s+ready")
 	myRegexp, err := regexp.Compile(GUIDRegex)
 	Expect(err).NotTo(HaveOccurred())
 	matches := myRegexp.FindAll(session.Out.Contents(), -1)

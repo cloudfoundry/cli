@@ -105,7 +105,7 @@ var _ = Describe("Build", func() {
 	})
 
 	Describe("GetBuild", func() {
-		Context("when the build exist", func() {
+		Context("when the build exists", func() {
 			BeforeEach(func() {
 				response := `{
 					"created_at": "some-time",

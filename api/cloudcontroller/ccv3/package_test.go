@@ -224,7 +224,7 @@ var _ = Describe("Package", func() {
 			pkg, warnings, executeErr = client.GetPackage("some-pkg-guid")
 		})
 
-		Context("when the package exist", func() {
+		Context("when the package exists", func() {
 			BeforeEach(func() {
 				response := `{
   "guid": "some-pkg-guid",
@@ -244,7 +244,7 @@ var _ = Describe("Package", func() {
 				)
 			})
 
-			It("returns the queried packages and all warnings", func() {
+			It("returns the queried package and all warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				expectedPackage := Package{

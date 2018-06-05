@@ -50,7 +50,7 @@ var _ = Describe("Relationship", func() {
 		})
 	})
 
-	Describe("AssignSpaceToIsolationSegment", func() {
+	Describe("UpdateSpaceIsolationSegmentRelationship", func() {
 		Context("when the assignment is successful", func() {
 			BeforeEach(func() {
 				response := `{
@@ -72,7 +72,7 @@ var _ = Describe("Relationship", func() {
 			})
 
 			It("returns all relationships and warnings", func() {
-				relationship, warnings, err := client.AssignSpaceToIsolationSegment("some-space-guid", "some-iso-guid")
+				relationship, warnings, err := client.UpdateSpaceIsolationSegmentRelationship("some-space-guid", "some-iso-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(relationship).To(Equal(Relationship{
@@ -237,7 +237,7 @@ var _ = Describe("Relationship", func() {
 		})
 	})
 
-	Describe("PatchOrganizationDefaultIsolationSegment", func() {
+	Describe("UpdateOrganizationDefaultIsolationSegmentRelationship", func() {
 		Context("when patching the default organization isolation segment with non-empty isolation segment guid", func() {
 			BeforeEach(func() {
 				expectedBody := `{
@@ -261,7 +261,7 @@ var _ = Describe("Relationship", func() {
 			})
 
 			It("patches the organization's default isolation segment", func() {
-				relationship, warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "some-isolation-segment-guid")
+				relationship, warnings, err := client.UpdateOrganizationDefaultIsolationSegmentRelationship("some-org-guid", "some-isolation-segment-guid")
 				Expect(relationship).To(Equal(Relationship{GUID: "some-isolation-segment-guid"}))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
@@ -286,7 +286,7 @@ var _ = Describe("Relationship", func() {
 			})
 
 			It("patches the organization's default isolation segment with nil guid", func() {
-				relationship, warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "")
+				relationship, warnings, err := client.UpdateOrganizationDefaultIsolationSegmentRelationship("some-org-guid", "")
 				Expect(relationship).To(BeZero())
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
@@ -314,7 +314,7 @@ var _ = Describe("Relationship", func() {
 			})
 
 			It("returns the empty relationship, an error and warnings", func() {
-				relationship, warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "some-isolation-segment-guid")
+				relationship, warnings, err := client.UpdateOrganizationDefaultIsolationSegmentRelationship("some-org-guid", "some-isolation-segment-guid")
 				Expect(relationship).To(BeZero())
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "Organization not found",
@@ -324,7 +324,7 @@ var _ = Describe("Relationship", func() {
 		})
 	})
 
-	Describe("RevokeIsolationSegmentFromOrganization", func() {
+	Describe("DeleteIsolationSegmentOrganization", func() {
 		Context("when relationship exists", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
@@ -336,7 +336,7 @@ var _ = Describe("Relationship", func() {
 			})
 
 			It("revoke the relationship", func() {
-				warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
+				warnings, err := client.DeleteIsolationSegmentOrganization("segment-guid", "org-guid")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
@@ -365,7 +365,7 @@ var _ = Describe("Relationship", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
+				warnings, err := client.DeleteIsolationSegmentOrganization("segment-guid", "org-guid")
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

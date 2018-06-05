@@ -17,7 +17,7 @@ import (
 
 type DisableOrgIsolationActor interface {
 	CloudControllerAPIVersion() string
-	RevokeIsolationSegmentFromOrganizationByName(isolationSegmentName string, orgName string) (v3action.Warnings, error)
+	DeleteIsolationSegmentOrganizationByName(isolationSegmentName string, orgName string) (v3action.Warnings, error)
 }
 type DisableOrgIsolationCommand struct {
 	RequiredArgs    flag.OrgIsolationArgs `positional-args:"yes"`
@@ -69,7 +69,7 @@ func (cmd DisableOrgIsolationCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	warnings, err := cmd.Actor.RevokeIsolationSegmentFromOrganizationByName(cmd.RequiredArgs.IsolationSegmentName, cmd.RequiredArgs.OrganizationName)
+	warnings, err := cmd.Actor.DeleteIsolationSegmentOrganizationByName(cmd.RequiredArgs.IsolationSegmentName, cmd.RequiredArgs.OrganizationName)
 
 	cmd.UI.DisplayWarnings(warnings)
 

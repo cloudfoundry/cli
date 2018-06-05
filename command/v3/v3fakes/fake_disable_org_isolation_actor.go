@@ -18,17 +18,17 @@ type FakeDisableOrgIsolationActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	RevokeIsolationSegmentFromOrganizationByNameStub        func(isolationSegmentName string, orgName string) (v3action.Warnings, error)
-	revokeIsolationSegmentFromOrganizationByNameMutex       sync.RWMutex
-	revokeIsolationSegmentFromOrganizationByNameArgsForCall []struct {
+	DeleteIsolationSegmentOrganizationByNameStub        func(isolationSegmentName string, orgName string) (v3action.Warnings, error)
+	deleteIsolationSegmentOrganizationByNameMutex       sync.RWMutex
+	deleteIsolationSegmentOrganizationByNameArgsForCall []struct {
 		isolationSegmentName string
 		orgName              string
 	}
-	revokeIsolationSegmentFromOrganizationByNameReturns struct {
+	deleteIsolationSegmentOrganizationByNameReturns struct {
 		result1 v3action.Warnings
 		result2 error
 	}
-	revokeIsolationSegmentFromOrganizationByNameReturnsOnCall map[int]struct {
+	deleteIsolationSegmentOrganizationByNameReturnsOnCall map[int]struct {
 		result1 v3action.Warnings
 		result2 error
 	}
@@ -76,53 +76,53 @@ func (fake *FakeDisableOrgIsolationActor) CloudControllerAPIVersionReturnsOnCall
 	}{result1}
 }
 
-func (fake *FakeDisableOrgIsolationActor) RevokeIsolationSegmentFromOrganizationByName(isolationSegmentName string, orgName string) (v3action.Warnings, error) {
-	fake.revokeIsolationSegmentFromOrganizationByNameMutex.Lock()
-	ret, specificReturn := fake.revokeIsolationSegmentFromOrganizationByNameReturnsOnCall[len(fake.revokeIsolationSegmentFromOrganizationByNameArgsForCall)]
-	fake.revokeIsolationSegmentFromOrganizationByNameArgsForCall = append(fake.revokeIsolationSegmentFromOrganizationByNameArgsForCall, struct {
+func (fake *FakeDisableOrgIsolationActor) DeleteIsolationSegmentOrganizationByName(isolationSegmentName string, orgName string) (v3action.Warnings, error) {
+	fake.deleteIsolationSegmentOrganizationByNameMutex.Lock()
+	ret, specificReturn := fake.deleteIsolationSegmentOrganizationByNameReturnsOnCall[len(fake.deleteIsolationSegmentOrganizationByNameArgsForCall)]
+	fake.deleteIsolationSegmentOrganizationByNameArgsForCall = append(fake.deleteIsolationSegmentOrganizationByNameArgsForCall, struct {
 		isolationSegmentName string
 		orgName              string
 	}{isolationSegmentName, orgName})
-	fake.recordInvocation("RevokeIsolationSegmentFromOrganizationByName", []interface{}{isolationSegmentName, orgName})
-	fake.revokeIsolationSegmentFromOrganizationByNameMutex.Unlock()
-	if fake.RevokeIsolationSegmentFromOrganizationByNameStub != nil {
-		return fake.RevokeIsolationSegmentFromOrganizationByNameStub(isolationSegmentName, orgName)
+	fake.recordInvocation("DeleteIsolationSegmentOrganizationByName", []interface{}{isolationSegmentName, orgName})
+	fake.deleteIsolationSegmentOrganizationByNameMutex.Unlock()
+	if fake.DeleteIsolationSegmentOrganizationByNameStub != nil {
+		return fake.DeleteIsolationSegmentOrganizationByNameStub(isolationSegmentName, orgName)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.revokeIsolationSegmentFromOrganizationByNameReturns.result1, fake.revokeIsolationSegmentFromOrganizationByNameReturns.result2
+	return fake.deleteIsolationSegmentOrganizationByNameReturns.result1, fake.deleteIsolationSegmentOrganizationByNameReturns.result2
 }
 
-func (fake *FakeDisableOrgIsolationActor) RevokeIsolationSegmentFromOrganizationByNameCallCount() int {
-	fake.revokeIsolationSegmentFromOrganizationByNameMutex.RLock()
-	defer fake.revokeIsolationSegmentFromOrganizationByNameMutex.RUnlock()
-	return len(fake.revokeIsolationSegmentFromOrganizationByNameArgsForCall)
+func (fake *FakeDisableOrgIsolationActor) DeleteIsolationSegmentOrganizationByNameCallCount() int {
+	fake.deleteIsolationSegmentOrganizationByNameMutex.RLock()
+	defer fake.deleteIsolationSegmentOrganizationByNameMutex.RUnlock()
+	return len(fake.deleteIsolationSegmentOrganizationByNameArgsForCall)
 }
 
-func (fake *FakeDisableOrgIsolationActor) RevokeIsolationSegmentFromOrganizationByNameArgsForCall(i int) (string, string) {
-	fake.revokeIsolationSegmentFromOrganizationByNameMutex.RLock()
-	defer fake.revokeIsolationSegmentFromOrganizationByNameMutex.RUnlock()
-	return fake.revokeIsolationSegmentFromOrganizationByNameArgsForCall[i].isolationSegmentName, fake.revokeIsolationSegmentFromOrganizationByNameArgsForCall[i].orgName
+func (fake *FakeDisableOrgIsolationActor) DeleteIsolationSegmentOrganizationByNameArgsForCall(i int) (string, string) {
+	fake.deleteIsolationSegmentOrganizationByNameMutex.RLock()
+	defer fake.deleteIsolationSegmentOrganizationByNameMutex.RUnlock()
+	return fake.deleteIsolationSegmentOrganizationByNameArgsForCall[i].isolationSegmentName, fake.deleteIsolationSegmentOrganizationByNameArgsForCall[i].orgName
 }
 
-func (fake *FakeDisableOrgIsolationActor) RevokeIsolationSegmentFromOrganizationByNameReturns(result1 v3action.Warnings, result2 error) {
-	fake.RevokeIsolationSegmentFromOrganizationByNameStub = nil
-	fake.revokeIsolationSegmentFromOrganizationByNameReturns = struct {
+func (fake *FakeDisableOrgIsolationActor) DeleteIsolationSegmentOrganizationByNameReturns(result1 v3action.Warnings, result2 error) {
+	fake.DeleteIsolationSegmentOrganizationByNameStub = nil
+	fake.deleteIsolationSegmentOrganizationByNameReturns = struct {
 		result1 v3action.Warnings
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeDisableOrgIsolationActor) RevokeIsolationSegmentFromOrganizationByNameReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
-	fake.RevokeIsolationSegmentFromOrganizationByNameStub = nil
-	if fake.revokeIsolationSegmentFromOrganizationByNameReturnsOnCall == nil {
-		fake.revokeIsolationSegmentFromOrganizationByNameReturnsOnCall = make(map[int]struct {
+func (fake *FakeDisableOrgIsolationActor) DeleteIsolationSegmentOrganizationByNameReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
+	fake.DeleteIsolationSegmentOrganizationByNameStub = nil
+	if fake.deleteIsolationSegmentOrganizationByNameReturnsOnCall == nil {
+		fake.deleteIsolationSegmentOrganizationByNameReturnsOnCall = make(map[int]struct {
 			result1 v3action.Warnings
 			result2 error
 		})
 	}
-	fake.revokeIsolationSegmentFromOrganizationByNameReturnsOnCall[i] = struct {
+	fake.deleteIsolationSegmentOrganizationByNameReturnsOnCall[i] = struct {
 		result1 v3action.Warnings
 		result2 error
 	}{result1, result2}
@@ -133,8 +133,8 @@ func (fake *FakeDisableOrgIsolationActor) Invocations() map[string][][]interface
 	defer fake.invocationsMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	fake.revokeIsolationSegmentFromOrganizationByNameMutex.RLock()
-	defer fake.revokeIsolationSegmentFromOrganizationByNameMutex.RUnlock()
+	fake.deleteIsolationSegmentOrganizationByNameMutex.RLock()
+	defer fake.deleteIsolationSegmentOrganizationByNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

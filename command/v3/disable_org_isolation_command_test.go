@@ -95,7 +95,7 @@ var _ = Describe("disable-org-isolation Command", func() {
 
 		Context("when revoking is successful", func() {
 			BeforeEach(func() {
-				fakeActor.RevokeIsolationSegmentFromOrganizationByNameReturns(v3action.Warnings{"warning 1", "warning 2"}, nil)
+				fakeActor.DeleteIsolationSegmentOrganizationByNameReturns(v3action.Warnings{"warning 1", "warning 2"}, nil)
 			})
 
 			It("Isolation segnment is revoked from org", func() {
@@ -105,8 +105,8 @@ var _ = Describe("disable-org-isolation Command", func() {
 				Expect(testUI.Err).To(Say("warning 1"))
 				Expect(testUI.Err).To(Say("warning 2"))
 
-				Expect(fakeActor.RevokeIsolationSegmentFromOrganizationByNameCallCount()).To(Equal(1))
-				actualIsolationSegmentName, actualOrgName := fakeActor.RevokeIsolationSegmentFromOrganizationByNameArgsForCall(0)
+				Expect(fakeActor.DeleteIsolationSegmentOrganizationByNameCallCount()).To(Equal(1))
+				actualIsolationSegmentName, actualOrgName := fakeActor.DeleteIsolationSegmentOrganizationByNameArgsForCall(0)
 				Expect(actualIsolationSegmentName).To(Equal(isolationSegment))
 				Expect(actualOrgName).To(Equal(org))
 			})
@@ -117,7 +117,7 @@ var _ = Describe("disable-org-isolation Command", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("ZOMG")
-				fakeActor.RevokeIsolationSegmentFromOrganizationByNameReturns(v3action.Warnings{"warning 1", "warning 2"}, expectedErr)
+				fakeActor.DeleteIsolationSegmentOrganizationByNameReturns(v3action.Warnings{"warning 1", "warning 2"}, expectedErr)
 			})
 
 			It("returns the error", func() {

@@ -48,30 +48,21 @@ func (r *Relationship) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// AssignSpaceToIsolationSegment assigns an isolation segment to a space and
-// returns the relationship.
-func (client *Client) AssignSpaceToIsolationSegment(spaceGUID string, isolationSegmentGUID string) (Relationship, Warnings, error) {
-	body, err := json.Marshal(Relationship{GUID: isolationSegmentGUID})
-	if err != nil {
-		return Relationship{}, nil, err
-	}
-
+// DeleteIsolationSegmentOrganization will delete the relationship between
+// the isolation segment and the organization provided.
+func (client *Client) DeleteIsolationSegmentOrganization(isolationSegmentGUID string, orgGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchSpaceRelationshipIsolationSegmentRequest,
-		URIParams:   internal.Params{"space_guid": spaceGUID},
-		Body:        bytes.NewReader(body),
+		RequestName: internal.DeleteIsolationSegmentRelationshipOrganizationRequest,
+		URIParams:   internal.Params{"isolation_segment_guid": isolationSegmentGUID, "organization_guid": orgGUID},
 	})
 	if err != nil {
-		return Relationship{}, nil, err
+		return nil, err
 	}
 
-	var relationship Relationship
-	response := cloudcontroller.Response{
-		Result: &relationship,
-	}
-
+	var response cloudcontroller.Response
 	err = client.connection.Make(request, &response)
-	return relationship, response.Warnings, err
+
+	return response.Warnings, err
 }
 
 // DeleteServiceInstanceRelationshipsSharedSpace will delete the sharing relationship
@@ -130,49 +121,6 @@ func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, 
 	return relationship, response.Warnings, err
 }
 
-// PatchOrganizationDefaultIsolationSegment sets the default isolation segment
-// for an organization on the controller.
-// If isoSegGuid is empty it will reset the default isolation segment.
-func (client *Client) PatchOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (Relationship, Warnings, error) {
-	body, err := json.Marshal(Relationship{GUID: isoSegGUID})
-	if err != nil {
-		return Relationship{}, nil, err
-	}
-
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PatchOrganizationRelationshipDefaultIsolationSegmentRequest,
-		Body:        bytes.NewReader(body),
-		URIParams:   internal.Params{"organization_guid": orgGUID},
-	})
-	if err != nil {
-		return Relationship{}, nil, err
-	}
-
-	var relationship Relationship
-	response := cloudcontroller.Response{
-		Result: &relationship,
-	}
-	err = client.connection.Make(request, &response)
-	return relationship, response.Warnings, err
-}
-
-// RevokeIsolationSegmentFromOrganization will delete the relationship between
-// the isolation segment and the organization provided.
-func (client *Client) RevokeIsolationSegmentFromOrganization(isolationSegmentGUID string, orgGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteIsolationSegmentRelationshipOrganizationRequest,
-		URIParams:   internal.Params{"isolation_segment_guid": isolationSegmentGUID, "organization_guid": orgGUID},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var response cloudcontroller.Response
-	err = client.connection.Make(request, &response)
-
-	return response.Warnings, err
-}
-
 // SetApplicationDroplet sets the specified droplet on the given application.
 func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) (Relationship, Warnings, error) {
 	relationship := Relationship{GUID: dropletGUID}
@@ -197,4 +145,56 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 	err = client.connection.Make(request, &response)
 
 	return responseRelationship, response.Warnings, err
+}
+
+// UpdateOrganizationDefaultIsolationSegmentRelationship sets the default isolation segment
+// for an organization on the controller.
+// If isoSegGuid is empty it will reset the default isolation segment.
+func (client *Client) UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isoSegGUID string) (Relationship, Warnings, error) {
+	body, err := json.Marshal(Relationship{GUID: isoSegGUID})
+	if err != nil {
+		return Relationship{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchOrganizationRelationshipDefaultIsolationSegmentRequest,
+		Body:        bytes.NewReader(body),
+		URIParams:   internal.Params{"organization_guid": orgGUID},
+	})
+	if err != nil {
+		return Relationship{}, nil, err
+	}
+
+	var relationship Relationship
+	response := cloudcontroller.Response{
+		Result: &relationship,
+	}
+	err = client.connection.Make(request, &response)
+	return relationship, response.Warnings, err
+}
+
+// UpdateSpaceIsolationSegmentRelationship assigns an isolation segment to a space and
+// returns the relationship.
+func (client *Client) UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (Relationship, Warnings, error) {
+	body, err := json.Marshal(Relationship{GUID: isolationSegmentGUID})
+	if err != nil {
+		return Relationship{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchSpaceRelationshipIsolationSegmentRequest,
+		URIParams:   internal.Params{"space_guid": spaceGUID},
+		Body:        bytes.NewReader(body),
+	})
+	if err != nil {
+		return Relationship{}, nil, err
+	}
+
+	var relationship Relationship
+	response := cloudcontroller.Response{
+		Result: &relationship,
+	}
+
+	err = client.connection.Make(request, &response)
+	return relationship, response.Warnings, err
 }

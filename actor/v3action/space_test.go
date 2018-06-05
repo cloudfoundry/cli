@@ -26,7 +26,7 @@ var _ = Describe("Space", func() {
 	Describe("ResetSpaceIsolationSegment", func() {
 		Context("when the organization does not have a default isolation segment", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.AssignSpaceToIsolationSegmentReturns(
+				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
 					ccv3.Relationship{GUID: ""},
 					ccv3.Warnings{"warning-1", "warning-2"}, nil)
 			})
@@ -38,8 +38,8 @@ var _ = Describe("Space", func() {
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				Expect(newIsolationSegmentName).To(BeEmpty())
 
-				Expect(fakeCloudControllerClient.AssignSpaceToIsolationSegmentCallCount()).To(Equal(1))
-				spaceGUID, isolationSegmentGUID := fakeCloudControllerClient.AssignSpaceToIsolationSegmentArgsForCall(0)
+				Expect(fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipCallCount()).To(Equal(1))
+				spaceGUID, isolationSegmentGUID := fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(isolationSegmentGUID).To(BeEmpty())
 
@@ -53,7 +53,7 @@ var _ = Describe("Space", func() {
 
 		Context("when the organization has a default isolation segment", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.AssignSpaceToIsolationSegmentReturns(
+				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
 					ccv3.Relationship{GUID: ""},
 					ccv3.Warnings{"warning-1", "warning-2"}, nil)
 				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
@@ -67,8 +67,8 @@ var _ = Describe("Space", func() {
 			It("returns the org's isolation segment GUID", func() {
 				newIsolationSegmentName, warnings, err := actor.ResetSpaceIsolationSegment("some-org-guid", "some-space-guid")
 
-				Expect(fakeCloudControllerClient.AssignSpaceToIsolationSegmentCallCount()).To(Equal(1))
-				spaceGUID, isolationSegmentGUID := fakeCloudControllerClient.AssignSpaceToIsolationSegmentArgsForCall(0)
+				Expect(fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipCallCount()).To(Equal(1))
+				spaceGUID, isolationSegmentGUID := fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(isolationSegmentGUID).To(BeEmpty())
 
@@ -91,7 +91,7 @@ var _ = Describe("Space", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("some error")
-				fakeCloudControllerClient.AssignSpaceToIsolationSegmentReturns(
+				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
 					ccv3.Relationship{GUID: ""},
 					ccv3.Warnings{"warning-1", "warning-2"}, expectedErr)
 			})
@@ -108,7 +108,7 @@ var _ = Describe("Space", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("some error")
-				fakeCloudControllerClient.AssignSpaceToIsolationSegmentReturns(
+				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
 					ccv3.Relationship{GUID: ""},
 					ccv3.Warnings{"warning-1", "warning-2"}, nil)
 				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
@@ -128,7 +128,7 @@ var _ = Describe("Space", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("some error")
-				fakeCloudControllerClient.AssignSpaceToIsolationSegmentReturns(
+				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
 					ccv3.Relationship{GUID: ""},
 					ccv3.Warnings{"warning-1", "warning-2"}, nil)
 				fakeCloudControllerClient.GetOrganizationDefaultIsolationSegmentReturns(
