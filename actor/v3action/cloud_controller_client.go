@@ -43,7 +43,7 @@ type CloudControllerClient interface {
 	GetServiceInstances(query ...ccv3.Query) ([]ccv3.ServiceInstance, ccv3.Warnings, error)
 	GetSpaceIsolationSegment(spaceGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	GetSpaces(query ...ccv3.Query) ([]ccv3.Space, ccv3.Warnings, error)
-	PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string) (ccv3.Process, ccv3.Warnings, error)
+	PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, ProcessHealthCheckInvocationTimeout int) (ccv3.Process, ccv3.Warnings, error)
 	PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
