@@ -9,9 +9,10 @@ import (
 )
 
 type ProcessHealthCheck struct {
-	ProcessType     string
-	HealthCheckType string
-	Endpoint        string
+	ProcessType       string
+	HealthCheckType   string
+	Endpoint          string
+	InvocationTimeout int
 }
 
 type ProcessHealthChecks []ProcessHealthCheck
@@ -57,9 +58,10 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 	var processHealthChecks ProcessHealthChecks
 	for _, ccv3Process := range ccv3Processes {
 		processHealthCheck := ProcessHealthCheck{
-			ProcessType:     ccv3Process.Type,
-			HealthCheckType: ccv3Process.HealthCheckType,
-			Endpoint:        ccv3Process.HealthCheckEndpoint,
+			ProcessType:       ccv3Process.Type,
+			HealthCheckType:   ccv3Process.HealthCheckType,
+			Endpoint:          ccv3Process.HealthCheckEndpoint,
+			InvocationTimeout: ccv3Process.HealthCheckInvocationTimeout,
 		}
 		processHealthChecks = append(processHealthChecks, processHealthCheck)
 	}

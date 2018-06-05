@@ -158,9 +158,9 @@ var _ = Describe("v3-get-health-check Command", func() {
 	Context("when app has processes", func() {
 		BeforeEach(func() {
 			appProcessHealthChecks := []v3action.ProcessHealthCheck{
-				{ProcessType: constant.ProcessTypeWeb, HealthCheckType: "http", Endpoint: "/foo"},
-				{ProcessType: "queue", HealthCheckType: "port", Endpoint: ""},
-				{ProcessType: "timer", HealthCheckType: "process", Endpoint: ""},
+				{ProcessType: constant.ProcessTypeWeb, HealthCheckType: "http", Endpoint: "/foo", InvocationTimeout: 10},
+				{ProcessType: "queue", HealthCheckType: "port", Endpoint: "", InvocationTimeout: 0},
+				{ProcessType: "timer", HealthCheckType: "process", Endpoint: "", InvocationTimeout: 5},
 			}
 			fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceReturns(appProcessHealthChecks, v3action.Warnings{"warning-1", "warning-2"}, nil)
 		})
@@ -170,10 +170,10 @@ var _ = Describe("v3-get-health-check Command", func() {
 
 			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 			Expect(testUI.Out).To(Say("Getting process health check types for app some-app in org some-org / space some-space as steve\\.\\.\\."))
-			Expect(testUI.Out).To(Say(`process\s+health check\s+endpoint\s+\(for http\)\n`))
-			Expect(testUI.Out).To(Say(`web\s+http\s+/foo\n`))
-			Expect(testUI.Out).To(Say(`queue\s+port\s+\n`))
-			Expect(testUI.Out).To(Say(`timer\s+process\s+\n`))
+			Expect(testUI.Out).To(Say(`process\s+health check\s+endpoint\s+\(for http\)\s+invocation timeout\n`))
+			Expect(testUI.Out).To(Say(`web\s+http\s+/foo\s+10\n`))
+			Expect(testUI.Out).To(Say(`queue\s+port\s+1\n`))
+			Expect(testUI.Out).To(Say(`timer\s+process\s+5\n`))
 
 			Expect(fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceCallCount()).To(Equal(1))
 			appName, spaceGUID := fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceArgsForCall(0)

@@ -1,6 +1,7 @@
 package v3
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -92,14 +93,21 @@ func (cmd V3GetHealthCheckCommand) Execute(args []string) error {
 			cmd.UI.TranslateText("process"),
 			cmd.UI.TranslateText("health check"),
 			cmd.UI.TranslateText("endpoint (for http)"),
+			cmd.UI.TranslateText("invocation timeout"),
 		},
 	}
 
 	for _, healthCheck := range processHealthChecks {
+		invocationTimeout := healthCheck.InvocationTimeout
+		if invocationTimeout == 0 {
+			invocationTimeout = 1
+		}
+
 		table = append(table, []string{
 			healthCheck.ProcessType,
 			healthCheck.HealthCheckType,
 			healthCheck.Endpoint,
+			fmt.Sprint(invocationTimeout),
 		})
 	}
 

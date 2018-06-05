@@ -135,15 +135,17 @@ var _ = Describe("Process Health Check Actions", func() {
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
 						[]ccv3.Process{
 							{
-								GUID:                "process-guid-1",
-								Type:                "process-type-1",
-								HealthCheckType:     "health-check-type-1",
-								HealthCheckEndpoint: "health-check-endpoint-1",
+								GUID:                         "process-guid-1",
+								Type:                         "process-type-1",
+								HealthCheckType:              "health-check-type-1",
+								HealthCheckEndpoint:          "health-check-endpoint-1",
+								HealthCheckInvocationTimeout: 42,
 							},
 							{
-								GUID:            "process-guid-2",
-								Type:            "process-type-2",
-								HealthCheckType: "health-check-type-2",
+								GUID:                         "process-guid-2",
+								Type:                         "process-type-2",
+								HealthCheckType:              "health-check-type-2",
+								HealthCheckInvocationTimeout: 0,
 							},
 						},
 						ccv3.Warnings{"some-process-warning"},
@@ -156,13 +158,15 @@ var _ = Describe("Process Health Check Actions", func() {
 					Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
 					Expect(processHealthChecks).To(Equal([]ProcessHealthCheck{
 						{
-							ProcessType:     "process-type-1",
-							HealthCheckType: "health-check-type-1",
-							Endpoint:        "health-check-endpoint-1",
+							ProcessType:       "process-type-1",
+							HealthCheckType:   "health-check-type-1",
+							Endpoint:          "health-check-endpoint-1",
+							InvocationTimeout: 42,
 						},
 						{
-							ProcessType:     "process-type-2",
-							HealthCheckType: "health-check-type-2",
+							ProcessType:       "process-type-2",
+							HealthCheckType:   "health-check-type-2",
+							InvocationTimeout: 0,
 						},
 					}))
 				})
