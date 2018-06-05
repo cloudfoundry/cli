@@ -9,24 +9,24 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
-//ProcessInstance represents a single process instance for a
-//particular application
+// ProcessInstance represents a single process instance for a particular
+// application.
 type ProcessInstance struct {
-	//CPU is the current CPU usage of the instance
+	//CPU is the current CPU usage of the instance.
 	CPU float64
 	//DiskQuota is the maximum disk the instance is allowed to use.
 	DiskQuota uint64
-	//DiskUsage is the current disk usage of the instance
+	//DiskUsage is the current disk usage of the instance.
 	DiskUsage uint64
-	//Index is the index of the instance
+	//Index is the index of the instance.
 	Index int
 	//MemoryQuota is the maximum memory the instance is allowed to use.
 	MemoryQuota uint64
-	//DiskUsage is the current memory usage of the instance
+	//DiskUsage is the current memory usage of the instance.
 	MemoryUsage uint64
 	//State is the state of the instance.
 	State constant.ProcessInstanceState
-	//Uptime is the uptime in seconds for the instance
+	//Uptime is the uptime in seconds for the instance.
 	Uptime int
 }
 

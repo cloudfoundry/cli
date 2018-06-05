@@ -12,20 +12,22 @@ import (
 )
 
 type Process struct {
-	GUID                string           `json:"guid"`
-	Type                string           `json:"type"`
-	HealthCheckType     string           `json:"-"`
-	HealthCheckEndpoint string           `json:"-"`
-	Instances           types.NullInt    `json:"instances,omitempty"`
-	MemoryInMB          types.NullUint64 `json:"memory_in_mb,omitempty"`
-	DiskInMB            types.NullUint64 `json:"disk_in_mb,omitempty"`
+	GUID                         string           `json:"guid"`
+	Type                         string           `json:"type"`
+	HealthCheckType              string           `json:"-"`
+	HealthCheckEndpoint          string           `json:"-"`
+	HealthCheckInvocationTimeout int              `json:"-"`
+	Instances                    types.NullInt    `json:"instances,omitempty"`
+	MemoryInMB                   types.NullUint64 `json:"memory_in_mb,omitempty"`
+	DiskInMB                     types.NullUint64 `json:"disk_in_mb,omitempty"`
 }
 
 func (p Process) MarshalJSON() ([]byte, error) {
 	type healthCheck struct {
 		Type string `json:"type"`
 		Data struct {
-			Endpoint interface{} `json:"endpoint"`
+			Endpoint          interface{} `json:"endpoint"`
+			InvocationTimeout int         `json:"invocation_timeout,omitempty"`
 		} `json:"data"`
 	}
 
@@ -47,9 +49,10 @@ func (p Process) MarshalJSON() ([]byte, error) {
 		ccProcess.DiskInMB = json.Number(fmt.Sprint(p.DiskInMB.Value))
 	}
 
-	if p.HealthCheckType != "" || p.HealthCheckEndpoint != "" {
+	if p.HealthCheckType != "" || p.HealthCheckEndpoint != "" || p.HealthCheckInvocationTimeout != 0 {
 		ccProcess.HealthCheck = new(healthCheck)
 		ccProcess.HealthCheck.Type = p.HealthCheckType
+		ccProcess.HealthCheck.Data.InvocationTimeout = p.HealthCheckInvocationTimeout
 		if p.HealthCheckEndpoint != "" {
 			ccProcess.HealthCheck.Data.Endpoint = p.HealthCheckEndpoint
 		}
@@ -66,7 +69,8 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 		HealthCheck struct {
 			Type string `json:"type"`
 			Data struct {
-				Endpoint string `json:"endpoint"`
+				Endpoint          string `json:"endpoint"`
+				InvocationTimeout int    `json:"invocation_timeout"`
 			} `json:"data"`
 		} `json:"health_check"`
 	}
@@ -79,6 +83,8 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 
 	p.HealthCheckEndpoint = ccProcess.HealthCheck.Data.Endpoint
 	p.HealthCheckType = ccProcess.HealthCheck.Type
+	p.HealthCheckInvocationTimeout = ccProcess.HealthCheck.Data.InvocationTimeout
+
 	return nil
 }
 
@@ -154,10 +160,11 @@ func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnin
 }
 
 // PatchApplicationProcessHealthCheck updates application health check type
-func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string) (Process, Warnings, error) {
+func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, processHealthCheckInvocationTimeout int) (Process, Warnings, error) {
 	body, err := json.Marshal(Process{
-		HealthCheckType:     processHealthCheckType,
-		HealthCheckEndpoint: processHealthCheckEndpoint,
+		HealthCheckType:              processHealthCheckType,
+		HealthCheckEndpoint:          processHealthCheckEndpoint,
+		HealthCheckInvocationTimeout: processHealthCheckInvocationTimeout,
 	})
 	if err != nil {
 		return Process{}, nil, err

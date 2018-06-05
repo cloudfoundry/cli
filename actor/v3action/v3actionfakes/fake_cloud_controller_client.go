@@ -519,12 +519,13 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	PatchApplicationProcessHealthCheckStub        func(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string) (ccv3.Process, ccv3.Warnings, error)
+	PatchApplicationProcessHealthCheckStub        func(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, processInvocationTimeout int) (ccv3.Process, ccv3.Warnings, error)
 	patchApplicationProcessHealthCheckMutex       sync.RWMutex
 	patchApplicationProcessHealthCheckArgsForCall []struct {
 		processGUID                string
 		processHealthCheckType     string
 		processHealthCheckEndpoint string
+		processInvocationTimeout   int
 	}
 	patchApplicationProcessHealthCheckReturns struct {
 		result1 ccv3.Process
@@ -2576,18 +2577,19 @@ func (fake *FakeCloudControllerClient) GetSpacesReturnsOnCall(i int, result1 []c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string) (ccv3.Process, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, processInvocationTimeout int) (ccv3.Process, ccv3.Warnings, error) {
 	fake.patchApplicationProcessHealthCheckMutex.Lock()
 	ret, specificReturn := fake.patchApplicationProcessHealthCheckReturnsOnCall[len(fake.patchApplicationProcessHealthCheckArgsForCall)]
 	fake.patchApplicationProcessHealthCheckArgsForCall = append(fake.patchApplicationProcessHealthCheckArgsForCall, struct {
 		processGUID                string
 		processHealthCheckType     string
 		processHealthCheckEndpoint string
-	}{processGUID, processHealthCheckType, processHealthCheckEndpoint})
-	fake.recordInvocation("PatchApplicationProcessHealthCheck", []interface{}{processGUID, processHealthCheckType, processHealthCheckEndpoint})
+		processInvocationTimeout   int
+	}{processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout})
+	fake.recordInvocation("PatchApplicationProcessHealthCheck", []interface{}{processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout})
 	fake.patchApplicationProcessHealthCheckMutex.Unlock()
 	if fake.PatchApplicationProcessHealthCheckStub != nil {
-		return fake.PatchApplicationProcessHealthCheckStub(processGUID, processHealthCheckType, processHealthCheckEndpoint)
+		return fake.PatchApplicationProcessHealthCheckStub(processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2601,10 +2603,10 @@ func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckCallCou
 	return len(fake.patchApplicationProcessHealthCheckArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckArgsForCall(i int) (string, string, string) {
+func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckArgsForCall(i int) (string, string, string, int) {
 	fake.patchApplicationProcessHealthCheckMutex.RLock()
 	defer fake.patchApplicationProcessHealthCheckMutex.RUnlock()
-	return fake.patchApplicationProcessHealthCheckArgsForCall[i].processGUID, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckType, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckEndpoint
+	return fake.patchApplicationProcessHealthCheckArgsForCall[i].processGUID, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckType, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckEndpoint, fake.patchApplicationProcessHealthCheckArgsForCall[i].processInvocationTimeout
 }
 
 func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckReturns(result1 ccv3.Process, result2 ccv3.Warnings, result3 error) {

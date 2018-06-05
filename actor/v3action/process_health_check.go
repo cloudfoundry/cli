@@ -69,7 +69,15 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 	return processHealthChecks, allWarnings, nil
 }
 
-func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType string, httpEndpoint string, processType string) (Application, Warnings, error) {
+func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
+	appName string,
+	spaceGUID string,
+	healthCheckType string,
+	httpEndpoint string,
+	processType string,
+	invocationTimeout int,
+) (Application, Warnings, error) {
+
 	if healthCheckType != "http" {
 		if httpEndpoint == "/" {
 			httpEndpoint = ""
@@ -96,6 +104,7 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(appName st
 		process.GUID,
 		healthCheckType,
 		httpEndpoint,
+		invocationTimeout,
 	)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
