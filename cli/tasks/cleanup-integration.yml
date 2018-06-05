@@ -15,6 +15,9 @@ inputs:
 outputs:
 - name: cleanup-integration-outputs
 
+params:
+  ARGS:
+
 run:
   path: bash
   args:
@@ -42,4 +45,4 @@ run:
     popd
 
     cd cli-ci
-    bin/cleanup-integration
+    bin/cleanup-integration "${ARGS}"

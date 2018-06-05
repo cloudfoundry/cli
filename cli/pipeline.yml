@@ -169,6 +169,14 @@ resources:
     branch: master
     pool: baked-potato
 
+- name: legacy-gcp-bosh-pool
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/cli-pools
+    private_key: ((cli-pools-github-private-key))
+    branch: master
+    pool: moldy-gnocchi
+
 - name: cf-cli-tracker
   type: tracker
   source:
@@ -237,6 +245,7 @@ groups:
   - build-binaries
   - integration-linux
   - integration-windows
+  - integration-legacy
   - cats
   - integration-experimental
   - create-installers
@@ -344,12 +353,13 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-      params:
+      params: &integration_params
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ((client-secret))
         CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
         CF_INT_DOCKER_USERNAME: ((dockerhub-username))
         CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
+        CF_INT_IGNORE_API_VERSION_CHECK: true
   ensure:
     put: gcp-bosh-pool
     params:
@@ -389,11 +399,7 @@ jobs:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
       params:
-        CF_INT_CLIENT_ID: 'potato-face'
-        CF_INT_CLIENT_SECRET: ((client-secret))
-        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
-        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
-        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
+        <<: *integration_params
   ensure:
     put: gcp-bosh-pool
     params:
@@ -433,11 +439,7 @@ jobs:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
       params:
-        CF_INT_CLIENT_ID: 'potato-face'
-        CF_INT_CLIENT_SECRET: ((client-secret))
-        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
-        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
-        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
+        <<: *integration_params
     - task: integration-linux
       file: cli-ci/ci/cli/tasks/integration-experimental-linux.yml
       on_failure:
@@ -451,13 +453,52 @@ jobs:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
       params:
-        CF_INT_CLIENT_ID: 'potato-face'
-        CF_INT_CLIENT_SECRET: ((client-secret))
-        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
-        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
-        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
+        <<: *integration_params
   ensure:
     put: gcp-bosh-pool
+    params:
+      release: bosh-lite-lock
+
+- name: integration-legacy
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [build-binaries]
+    - get: cf-cli-binaries
+      passed: [build-binaries]
+      trigger: true
+    - get: cli-ci
+    - get: cli-integration
+    - get: vars-store
+    - put: bosh-lite-lock
+      resource: legacy-gcp-bosh-pool
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+      params:
+        ARGS: unbind-first
+    - task: integration
+      file: cli-ci/ci/cli/tasks/integration-linux.yml
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-eng'
+          text: |
+            Legacy integration failed :(
+            https://wings.pivotal.io/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+        params:
+          ARGS: unbind-first
+      params:
+        <<: *integration_params
+        CF_INT_IGNORE_API_VERSION_CHECK: false
+  ensure:
+    put: legacy-gcp-bosh-pool
     params:
       release: bosh-lite-lock
 
@@ -466,9 +507,9 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      passed: [integration-linux, integration-windows, integration-experimental]
+      passed: [integration-linux, integration-windows, integration-experimental, integration-legacy]
     - get: cf-cli-binaries
-      passed: [integration-linux, integration-windows, integration-experimental]
+      passed: [integration-linux, integration-windows, integration-experimental, integration-legacy]
       trigger: true
     - get: cli-ci
   - task: extract-binaries
@@ -547,10 +588,10 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      passed: [integration-linux, integration-windows, integration-experimental]
+      passed: [integration-linux, integration-windows, integration-experimental, integration-legacy]
     - get: cf-acceptance-tests
     - get: cf-cli-binaries
-      passed: [integration-linux, integration-windows, integration-experimental]
+      passed: [integration-linux, integration-windows, integration-experimental, integration-legacy]
       trigger: true
     - get: cli-ci
     - get: vars-store
