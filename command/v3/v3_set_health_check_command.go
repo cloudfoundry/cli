@@ -25,7 +25,7 @@ type V3SetHealthCheckCommand struct {
 	HTTPEndpoint      string                  `long:"endpoint" default:"/" description:"Path on the app"`
 	InvocationTimeout flag.PositiveInteger    `long:"invocation-timeout" description:"Time (in seconds) that controls individual health check invocations"`
 	ProcessType       string                  `long:"process" default:"web" description:"App process to update"`
-	usage             interface{}             `usage:"CF_NAME v3-set-health-check APP_NAME (process | port | http [--endpoint PATH]) [--process PROCESS]\n\nEXAMPLES:\n   cf v3-set-health-check worker-app process --process worker\n   cf v3-set-health-check my-web-app http --endpoint /foo"`
+	usage             interface{}             `usage:"CF_NAME v3-set-health-check APP_NAME (process | port | http [--endpoint PATH]) [--process PROCESS] [--invocation-timeout INVOCATION_TIMEOUT]\n\nEXAMPLES:\n   cf v3-set-health-check worker-app process --process worker\n   cf v3-set-health-check my-web-app http --endpoint /foo\n   cf v3-set-health-check my-web-app http --invocation-timeout 10"`
 
 	UI          command.UI
 	Config      command.Config

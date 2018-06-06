@@ -30,7 +30,7 @@ var _ = Describe("v3-set-health-check command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("v3-set-health-check - Change type of health check performed on an app's process"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(`cf v3-set-health-check APP_NAME \(process \| port \| http \[--endpoint PATH\]\) \[--process PROCESS\] [--invocation-timeout INVOCATION_TIMEOUT]`))
+				Eventually(session).Should(Say(`cf v3-set-health-check APP_NAME \(process \| port \| http \[--endpoint PATH\]\) \[--process PROCESS\] \[--invocation-timeout INVOCATION_TIMEOUT\]`))
 
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say("cf v3-set-health-check worker-app process --process worker"))
@@ -39,8 +39,8 @@ var _ = Describe("v3-set-health-check command", func() {
 
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say(`--endpoint\s+Path on the app \(Default: /\)`))
+				Eventually(session).Should(Say(`--invocation-timeout\s+Time \(in seconds\) that controls individual health check invocations`))
 				Eventually(session).Should(Say(`--process\s+App process to update \(Default: web\)`))
-				Eventually(session).Should(Say(`--invocation-timeout\s+Time (in seconds) that controls individual health check invocations`))
 
 				Eventually(session).Should(Exit(0))
 			})
