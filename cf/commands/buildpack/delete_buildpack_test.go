@@ -99,16 +99,31 @@ var _ = Describe("delete-buildpack command", func() {
 					ui = &testterm.FakeUI{Inputs: []string{"y"}}
 					buildpackRepo.FindByNameAmbiguous = true
 				})
-				It("warns the user to specify the stack if unspecified", func() {
+				It("deletes the buildpack with the nil stack", func() {
 					runCommand("my-buildpack")
 
 					Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
 
 					Expect(ui.Outputs()).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"Multiple buildpacks named my-buildpack found"},
-						[]string{"Specify the stack (using -s) to disambiguate"},
+						[]string{"Deleting buildpack", "my-buildpack"},
+						[]string{"OK"},
 					))
+				})
+				Context("none of those buildpacks has a nil stack", func() {
+					BeforeEach(func() {
+						buildpackRepo.FindByNameWithNilStackNotFound = true
+					})
+					It("warns the user to specify the stack if unspecified", func() {
+						runCommand("my-buildpack")
+
+						Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
+
+						Expect(ui.Outputs()).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"Multiple buildpacks named my-buildpack found"},
+							[]string{"Specify the stack (using -s) to disambiguate"},
+						))
+					})
 				})
 			})
 

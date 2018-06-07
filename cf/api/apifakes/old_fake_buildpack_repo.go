@@ -19,6 +19,10 @@ type OldFakeBuildpackRepository struct {
 	FindByNameAndStackStack     string
 	FindByNameAndStackBuildpack models.Buildpack
 
+	FindByNameWithNilStackNotFound  bool
+	FindByNameWithNilStackName      string
+	FindByNameWithNilStackBuildpack models.Buildpack
+
 	CreateBuildpackExists             bool
 	CreateBuildpackWithNilStackExists bool
 	CreateBuildpack                   models.Buildpack
@@ -62,6 +66,17 @@ func (repo *OldFakeBuildpackRepository) FindByNameAndStack(name, stack string) (
 	buildpack = repo.FindByNameAndStackBuildpack
 
 	if repo.FindByNameAndStackNotFound {
+		apiErr = errors.NewModelNotFoundError("Buildpack", name)
+	}
+
+	return
+}
+
+func (repo *OldFakeBuildpackRepository) FindByNameWithNilStack(name string) (buildpack models.Buildpack, apiErr error) {
+	repo.FindByNameWithNilStackName = name
+	buildpack = repo.FindByNameWithNilStackBuildpack
+
+	if repo.FindByNameWithNilStackNotFound {
 		apiErr = errors.NewModelNotFoundError("Buildpack", name)
 	}
 

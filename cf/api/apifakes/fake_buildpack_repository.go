@@ -36,6 +36,19 @@ type FakeBuildpackRepository struct {
 		result1 models.Buildpack
 		result2 error
 	}
+	FindByNameWithNilStackStub        func(name string) (buildpack models.Buildpack, apiErr error)
+	findByNameWithNilStackMutex       sync.RWMutex
+	findByNameWithNilStackArgsForCall []struct {
+		name string
+	}
+	findByNameWithNilStackReturns struct {
+		result1 models.Buildpack
+		result2 error
+	}
+	findByNameWithNilStackReturnsOnCall map[int]struct {
+		result1 models.Buildpack
+		result2 error
+	}
 	ListBuildpacksStub        func(func(models.Buildpack) bool) error
 	listBuildpacksMutex       sync.RWMutex
 	listBuildpacksArgsForCall []struct {
@@ -189,6 +202,57 @@ func (fake *FakeBuildpackRepository) FindByNameAndStackReturnsOnCall(i int, resu
 		})
 	}
 	fake.findByNameAndStackReturnsOnCall[i] = struct {
+		result1 models.Buildpack
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeBuildpackRepository) FindByNameWithNilStack(name string) (buildpack models.Buildpack, apiErr error) {
+	fake.findByNameWithNilStackMutex.Lock()
+	ret, specificReturn := fake.findByNameWithNilStackReturnsOnCall[len(fake.findByNameWithNilStackArgsForCall)]
+	fake.findByNameWithNilStackArgsForCall = append(fake.findByNameWithNilStackArgsForCall, struct {
+		name string
+	}{name})
+	fake.recordInvocation("FindByNameWithNilStack", []interface{}{name})
+	fake.findByNameWithNilStackMutex.Unlock()
+	if fake.FindByNameWithNilStackStub != nil {
+		return fake.FindByNameWithNilStackStub(name)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.findByNameWithNilStackReturns.result1, fake.findByNameWithNilStackReturns.result2
+}
+
+func (fake *FakeBuildpackRepository) FindByNameWithNilStackCallCount() int {
+	fake.findByNameWithNilStackMutex.RLock()
+	defer fake.findByNameWithNilStackMutex.RUnlock()
+	return len(fake.findByNameWithNilStackArgsForCall)
+}
+
+func (fake *FakeBuildpackRepository) FindByNameWithNilStackArgsForCall(i int) string {
+	fake.findByNameWithNilStackMutex.RLock()
+	defer fake.findByNameWithNilStackMutex.RUnlock()
+	return fake.findByNameWithNilStackArgsForCall[i].name
+}
+
+func (fake *FakeBuildpackRepository) FindByNameWithNilStackReturns(result1 models.Buildpack, result2 error) {
+	fake.FindByNameWithNilStackStub = nil
+	fake.findByNameWithNilStackReturns = struct {
+		result1 models.Buildpack
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeBuildpackRepository) FindByNameWithNilStackReturnsOnCall(i int, result1 models.Buildpack, result2 error) {
+	fake.FindByNameWithNilStackStub = nil
+	if fake.findByNameWithNilStackReturnsOnCall == nil {
+		fake.findByNameWithNilStackReturnsOnCall = make(map[int]struct {
+			result1 models.Buildpack
+			result2 error
+		})
+	}
+	fake.findByNameWithNilStackReturnsOnCall[i] = struct {
 		result1 models.Buildpack
 		result2 error
 	}{result1, result2}
@@ -402,6 +466,8 @@ func (fake *FakeBuildpackRepository) Invocations() map[string][][]interface{} {
 	defer fake.findByNameMutex.RUnlock()
 	fake.findByNameAndStackMutex.RLock()
 	defer fake.findByNameAndStackMutex.RUnlock()
+	fake.findByNameWithNilStackMutex.RLock()
+	defer fake.findByNameWithNilStackMutex.RUnlock()
 	fake.listBuildpacksMutex.RLock()
 	defer fake.listBuildpacksMutex.RUnlock()
 	fake.createMutex.RLock()
