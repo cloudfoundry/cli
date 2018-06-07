@@ -69,7 +69,6 @@ jobs:
         claim: ((stack-name)).cli.fun
     - get: ops-files
     - get: cli-ci
-    - get: gcp-bosh-pool
     - get: cf-state
   - task: setup-infrastructure
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
