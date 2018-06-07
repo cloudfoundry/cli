@@ -184,6 +184,7 @@ applications:
 
 				Context("when the app has 0 instances", func() {
 					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionZeroAppInstancesV2)
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "-i", "0")).Should(Exit(0))
 						})
