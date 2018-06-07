@@ -688,7 +688,7 @@ var _ = Describe("service Command", func() {
 							Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
 							Expect(testUI.Out).ToNot(Say("shared from"))
 							Expect(testUI.Out).To(Say("service:\\s+user-provided"))
-							Expect(testUI.Out).ToNot(Say("tags:"))
+							Expect(testUI.Out).To(Say("tags:"))
 							Expect(testUI.Out).ToNot(Say("plan:"))
 							Expect(testUI.Out).ToNot(Say("description:"))
 							Expect(testUI.Out).ToNot(Say("documentation:"))
@@ -823,6 +823,28 @@ var _ = Describe("service Command", func() {
 								Expect(testUI.Out).To(Say("service:\\s+user-provided"))
 								Expect(testUI.Out).To(Say("\n\n"))
 								Expect(testUI.Out).To(Say("There are no bound apps for this service."))
+							})
+						})
+
+						Context("when the service instance have tags", func() {
+							BeforeEach(func() {
+								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+									v2action.ServiceInstanceSummary{
+										ServiceInstance: v2action.ServiceInstance{
+											Name: "some-service-instance",
+											Type: constant.ServiceInstanceTypeUserProvidedService,
+											Tags: []string{"tag-1", "tag-2", "tag-3"},
+										},
+									},
+									v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+									nil,
+								)
+							})
+
+							It("displays the tags", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say("tags:\\s+tag-1, tag-2, tag-3"))
 							})
 						})
 					})

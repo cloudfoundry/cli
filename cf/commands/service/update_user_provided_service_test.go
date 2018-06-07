@@ -170,7 +170,9 @@ var _ = Describe("UpdateUserProvidedService", func() {
 			It("tries to update the service instance", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceInstanceRepo.UpdateCallCount()).To(Equal(1))
-				Expect(serviceInstanceRepo.UpdateArgsForCall(0)).To(Equal(serviceInstance.ServiceInstanceFields))
+				expectedFields := serviceInstance.ServiceInstanceFields
+				expectedFields.Tags = []string{}
+				Expect(serviceInstanceRepo.UpdateArgsForCall(0)).To(Equal(expectedFields))
 			})
 
 			It("tells the user no changes were made", func() {
@@ -192,6 +194,12 @@ var _ = Describe("UpdateUserProvidedService", func() {
 					Expect(serviceInstanceFields.Params).To(Equal(map[string]interface{}{
 						"some": "json",
 					}))
+				})
+
+				It("does not tell the user that no changes were made", func() {
+					Expect(ui.Outputs()).NotTo(ContainSubstrings(
+						[]string{"No flags specified. No changes were made."},
+					))
 				})
 			})
 
@@ -221,6 +229,12 @@ var _ = Describe("UpdateUserProvidedService", func() {
 						"some": "json",
 					}))
 				})
+
+				It("does not tell the user that no changes were made", func() {
+					Expect(ui.Outputs()).NotTo(ContainSubstrings(
+						[]string{"No flags specified. No changes were made."},
+					))
+				})
 			})
 
 			Context("when the -p flag is passed with inline JSON", func() {
@@ -246,6 +260,31 @@ var _ = Describe("UpdateUserProvidedService", func() {
 						"key1": "value1",
 						"key2": "value2",
 					}))
+				})
+
+				It("does not tell the user that no changes were made", func() {
+					Expect(ui.Outputs()).NotTo(ContainSubstrings(
+						[]string{"No flags specified. No changes were made."},
+					))
+				})
+			})
+
+			Context("when passing in tags", func() {
+				BeforeEach(func() {
+					flagContext.Parse("service-instance", "-t", "tag1, tag2, tag3, tag4")
+				})
+
+				It("sucessfully updates the service instance and passes the tags as json", func() {
+					Expect(runCLIErr).NotTo(HaveOccurred())
+					Expect(serviceInstanceRepo.UpdateCallCount()).To(Equal(1))
+					serviceInstanceFields := serviceInstanceRepo.UpdateArgsForCall(0)
+					Expect(serviceInstanceFields.Tags).To(ConsistOf("tag1", "tag2", "tag3", "tag4"))
+				})
+
+				It("does not tell the user that no changes were made", func() {
+					Expect(ui.Outputs()).NotTo(ContainSubstrings(
+						[]string{"No flags specified. No changes were made."},
+					))
 				})
 			})
 

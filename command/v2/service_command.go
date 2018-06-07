@@ -183,6 +183,7 @@ func (cmd ServiceCommand) displayUserProvidedServiceInstanceSummary(serviceInsta
 	table := [][]string{
 		{cmd.UI.TranslateText("name:"), serviceInstanceSummary.Name},
 		{cmd.UI.TranslateText("service:"), cmd.UI.TranslateText("user-provided")},
+		{cmd.UI.TranslateText("tags:"), strings.Join(serviceInstanceSummary.Tags, ", ")},
 	}
 	cmd.UI.DisplayKeyValueTable("", table, 3)
 }

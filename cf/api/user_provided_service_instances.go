@@ -13,7 +13,7 @@ import (
 //go:generate counterfeiter . UserProvidedServiceInstanceRepository
 
 type UserProvidedServiceInstanceRepository interface {
-	Create(name, drainURL string, routeServiceURL string, params map[string]interface{}) (apiErr error)
+	Create(name, drainURL string, routeServiceURL string, params map[string]interface{}, tags []string) (apiErr error)
 	Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error)
 	GetSummaries() (models.UserProvidedServiceSummary, error)
 }
@@ -29,7 +29,7 @@ func NewCCUserProvidedServiceInstanceRepository(config coreconfig.Reader, gatewa
 	return
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainURL string, routeServiceURL string, params map[string]interface{}) (apiErr error) {
+func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainURL string, routeServiceURL string, params map[string]interface{}, tags []string) (apiErr error) {
 	path := "/v2/user_provided_service_instances"
 
 	jsonBytes, err := json.Marshal(models.UserProvidedService{
@@ -38,6 +38,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainURL string
 		SpaceGUID:       repo.config.SpaceFields().GUID,
 		SysLogDrainURL:  drainURL,
 		RouteServiceURL: routeServiceURL,
+		Tags:            tags,
 	})
 
 	if err != nil {
@@ -55,6 +56,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 		Credentials:     serviceInstanceFields.Params,
 		SysLogDrainURL:  serviceInstanceFields.SysLogDrainURL,
 		RouteServiceURL: serviceInstanceFields.RouteServiceURL,
+		Tags:            serviceInstanceFields.Tags,
 	}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {

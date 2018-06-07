@@ -37,7 +37,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 				"host":     "example.com",
 				"user":     "me",
 				"password": "secret",
-			})
+			}, nil)
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
@@ -57,7 +57,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 				"host":     "example.com",
 				"user":     "me",
 				"password": "secret",
-			})
+			}, nil)
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
@@ -77,7 +77,23 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 				"host":     "example.com",
 				"user":     "me",
 				"password": "secret",
+			}, nil)
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+
+		It("creates user provided service instances with tags", func() {
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "POST",
+				Path:     "/v2/user_provided_service_instances",
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{},"space_guid":"my-space-guid","syslog_drain_url":"","route_service_url":"","tags": ["tag1", "tag2"]}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
+
+			ts, handler, repo := createUserProvidedServiceInstanceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
+
+			apiErr := repo.Create("my-custom-service", "", "", map[string]interface{}{}, []string{"tag1", "tag2"})
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
@@ -88,7 +104,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/user_provided_service_instances/my-instance-guid",
-				Matcher:  testnet.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"},"syslog_drain_url":"syslog://example.com","route_service_url":""}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"},"syslog_drain_url":"syslog://example.com","route_service_url":"","tags": ["tag3", "tag4"]}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
@@ -105,6 +121,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 			serviceInstance.Params = params
 			serviceInstance.SysLogDrainURL = "syslog://example.com"
 			serviceInstance.RouteServiceURL = ""
+			serviceInstance.Tags = []string{"tag3", "tag4"}
 
 			apiErr := repo.Update(serviceInstance)
 			Expect(handler).To(HaveAllRequestsCalled())
