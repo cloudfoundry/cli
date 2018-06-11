@@ -72,8 +72,7 @@ var _ = Describe("service command", func() {
 		Context("when the service instance belongs to this space", func() {
 			Context("when the service instance is a user provided service instance", func() {
 				BeforeEach(func() {
-					Eventually(helpers.CF("create-user-provided-service", serviceInstanceName,
-						"-t", "database, email")).Should(Exit(0))
+					Eventually(helpers.CF("create-user-provided-service", serviceInstanceName)).Should(Exit(0))
 				})
 
 				AfterEach(func() {
@@ -96,7 +95,6 @@ var _ = Describe("service command", func() {
 						Eventually(session).Should(Say(""))
 						Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
 						Eventually(session).Should(Say("service:\\s+user-provided"))
-						Eventually(session).Should(Say("tags:\\s+database, email"))
 						Eventually(session).Should(Say(""))
 						Eventually(session).Should(Say("There are no bound apps for this service."))
 						Eventually(session).Should(Say(""))
@@ -142,7 +140,6 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say(""))
 							Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
 							Eventually(session).Should(Say("service:\\s+user-provided"))
-							Eventually(session).Should(Say("tags:\\s+database, email"))
 							Eventually(session).Should(Say(""))
 							Eventually(session).Should(Say("bound apps:"))
 							Eventually(session).Should(Say("name\\s+binding name"))
@@ -178,7 +175,6 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say(""))
 							Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
 							Eventually(session).Should(Say("service:\\s+user-provided"))
-							Eventually(session).Should(Say("tags:\\s+database, email"))
 							Eventually(session).Should(Say(""))
 							Eventually(session).Should(Say("bound apps:"))
 							Eventually(session).Should(Say("name\\s+binding name"))
@@ -190,8 +186,9 @@ var _ = Describe("service command", func() {
 					})
 				})
 
-				Context("when we update the user provided service instance", func() {
+				Context("when we update the user provided service instance with tags", func() {
 					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionUserProvidedServiceTagsV2)
 						Eventually(helpers.CF("update-user-provided-service", serviceInstanceName,
 							"-t", "foo, bar")).Should(Exit(0))
 					})
@@ -199,15 +196,24 @@ var _ = Describe("service command", func() {
 					It("displays service instance info", func() {
 						session := helpers.CF("service", serviceInstanceName)
 						Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session).Should(Say(""))
-						Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
-						Eventually(session).Should(Say("service:\\s+user-provided"))
 						Eventually(session).Should(Say("tags:\\s+foo, bar"))
-						Eventually(session).Should(Say(""))
-						Eventually(session).Should(Say("There are no bound apps for this service."))
-						Eventually(session).Should(Say(""))
 						Eventually(session).Should(Exit(0))
 					})
+				})
+
+			})
+
+			Context("when a user-provided service instance is created with tags", func() {
+				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionUserProvidedServiceTagsV2)
+					Eventually(helpers.CF("create-user-provided-service", serviceInstanceName, "-t", "database, email")).Should(Exit(0))
+				})
+
+				It("displays tag info", func() {
+					session := helpers.CF("service", serviceInstanceName)
+					Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("tags:\\s+database, email"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 

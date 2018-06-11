@@ -3,8 +3,9 @@ package cf
 import "github.com/blang/semver"
 
 var (
-	ReservedRoutePortsMinimumAPIVersion, _              = semver.Make("2.55.0") // #112023051
-	TCPRoutingMinimumAPIVersion, _                      = semver.Make("2.53.0") // #111475922
+	UserProvidedServiceTagsMinimumAPIVersion, _         = semver.Make("2.104.0") // #158233239,#157770881
+	ReservedRoutePortsMinimumAPIVersion, _              = semver.Make("2.55.0")  // #112023051
+	TCPRoutingMinimumAPIVersion, _                      = semver.Make("2.53.0")  // #111475922
 	MultipleAppPortsMinimumAPIVersion, _                = semver.Make("2.51.0")
 	SpaceAppInstanceLimitMinimumAPIVersion, _           = semver.Make("2.40.0")
 	SetRolesByUsernameMinimumAPIVersion, _              = semver.Make("2.37.0")

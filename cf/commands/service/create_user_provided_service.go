@@ -87,6 +87,10 @@ func (cmd *CreateUserProvidedService) Requirements(requirementsFactory requireme
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-r'", cf.MultipleAppPortsMinimumAPIVersion))
 	}
 
+	if fc.IsSet("t") {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-t'", cf.UserProvidedServiceTagsMinimumAPIVersion))
+	}
+
 	return reqs, nil
 }
 

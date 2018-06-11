@@ -9,6 +9,7 @@ const (
 	MinVersionProcessHealthCheckV2      = "2.47.0"
 	MinVersionSymlinkedFilesV2          = "2.107.0"
 	MinVersionZeroAppInstancesV2        = "2.70.0"
+	MinVersionUserProvidedServiceTagsV2 = "2.104.0"
 
 	MinVersionHTTPRoutePath                 = "2.36.0"
 	MinVersionTCPRouting                    = "2.53.0"
