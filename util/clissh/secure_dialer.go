@@ -2,7 +2,10 @@ package clissh
 
 import (
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/net/proxy"
 )
+
+type fakeConn struct{}
 
 type secureDialer struct{}
 
@@ -11,10 +14,16 @@ func DefaultSecureDialer() secureDialer {
 }
 
 func (secureDialer) Dial(network string, address string, config *ssh.ClientConfig) (SecureClient, error) {
-	client, err := ssh.Dial(network, address, config)
+	conn, err := proxy.FromEnvironment().Dial(network, address)
 	if err != nil {
 		return secureClient{}, err
 	}
+
+	c, chans, reqs, err := ssh.NewClientConn(conn, address, config)
+	if err != nil {
+		return secureClient{}, err
+	}
+	client := ssh.NewClient(c, chans, reqs)
 
 	return secureClient{client: client}, nil
 }
