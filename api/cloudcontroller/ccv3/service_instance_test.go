@@ -120,20 +120,18 @@ var _ = Describe("Service Instance", func() {
 
 		It("returns the error and all warnings", func() {
 			_, warnings, err := client.GetServiceInstances()
-			Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+			Expect(err).To(MatchError(ccerror.MultiError{
 				ResponseCode: http.StatusTeapot,
-				V3ErrorResponse: ccerror.V3ErrorResponse{
-					Errors: []ccerror.V3Error{
-						{
-							Code:   42424,
-							Detail: "Some detailed error message",
-							Title:  "CF-SomeErrorTitle",
-						},
-						{
-							Code:   11111,
-							Detail: "Some other detailed error message",
-							Title:  "CF-SomeOtherErrorTitle",
-						},
+				Errors: []ccerror.V3Error{
+					{
+						Code:   42424,
+						Detail: "Some detailed error message",
+						Title:  "CF-SomeErrorTitle",
+					},
+					{
+						Code:   11111,
+						Detail: "Some other detailed error message",
+						Title:  "CF-SomeOtherErrorTitle",
 					},
 				},
 			}))

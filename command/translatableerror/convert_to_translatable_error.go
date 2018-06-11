@@ -149,6 +149,8 @@ func ConvertToTranslatableError(err error) error {
 		return JobFailedError(e)
 	case ccerror.JobTimeoutError:
 		return JobTimeoutError{JobGUID: e.JobGUID}
+	case ccerror.MultiError:
+		return MultiError{Messages: e.Details()}
 	case ccerror.UnprocessableEntityError:
 		if strings.Contains(e.Message, "Task must have a droplet. Specify droplet or assign current droplet to app.") {
 			return RunTaskError{Message: "App is not staged."}

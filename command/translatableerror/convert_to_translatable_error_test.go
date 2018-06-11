@@ -284,6 +284,22 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			ccerror.JobTimeoutError{JobGUID: "some-job-guid"},
 			JobTimeoutError{JobGUID: "some-job-guid"}),
 
+		Entry("ccerror.MultiError -> MultiError",
+			ccerror.MultiError{ResponseCode: 418, Errors: []ccerror.V3Error{
+				{
+					Code:   282010,
+					Detail: "detail 1",
+					Title:  "title-1",
+				},
+				{
+					Code:   10242013,
+					Detail: "detail 2",
+					Title:  "title-2",
+				},
+			}},
+			MultiError{Messages: []string{"detail 1", "detail 2"}},
+		),
+
 		Entry("ccerror.RequestError -> APIRequestError",
 			ccerror.RequestError{Err: err},
 			APIRequestError{Err: err}),

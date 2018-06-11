@@ -72,6 +72,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("MinimumAPIVersionNotMetError", MinimumAPIVersionNotMetError{}),
 		Entry("MinimumCLIVersionNotMetError", MinimumCLIVersionNotMetError{}),
 		Entry("MissingCredentialsError", MissingCredentialsError{}),
+		Entry("MultiError", MultiError{}),
 		Entry("NetworkPolicyProtocolOrPortNotProvidedError", NetworkPolicyProtocolOrPortNotProvidedError{}),
 		Entry("NoAPISetError", NoAPISetError{}),
 		Entry("NoCompatibleBinaryError", NoCompatibleBinaryError{}),

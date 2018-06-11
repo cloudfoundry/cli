@@ -124,6 +124,11 @@ var _ = Describe("Relationship", func() {
 								"code": 10008,
 								"detail": "The request is semantically invalid: command presence",
 								"title": "CF-UnprocessableEntity"
+							},
+							{
+								"code": 10008,
+								"detail": "The request is semantically invalid: command presence",
+								"title": "CF-UnprocessableEntity"
 							}
 						]
 					}`
@@ -136,15 +141,18 @@ var _ = Describe("Relationship", func() {
 			})
 
 			It("returns the errors and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
 						},
 					},
 				}))
@@ -352,6 +360,11 @@ var _ = Describe("Relationship", func() {
 							"code": 10008,
 							"detail": "The request is semantically invalid: command presence",
 							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
 						}
 					]
 				}`
@@ -366,15 +379,18 @@ var _ = Describe("Relationship", func() {
 
 			It("returns the error and warnings", func() {
 				warnings, err := client.DeleteIsolationSegmentOrganization("segment-guid", "org-guid")
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
 						},
 					},
 				}))
@@ -457,20 +473,18 @@ var _ = Describe("Relationship", func() {
 
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.SetApplicationDroplet("no-such-app-guid", "some-droplet-guid")
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10010,
-								Detail: "App not found",
-								Title:  "CF-ResourceNotFound",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
 						},
 					},
 				}))

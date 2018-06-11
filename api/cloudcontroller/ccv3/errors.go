@@ -44,6 +44,10 @@ func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 		return err
 	}
 
+	if len(errorResponse.Errors) > 1 {
+		return ccerror.MultiError{Errors: errorResponse.Errors, ResponseCode: rawHTTPStatusErr.StatusCode}
+	}
+
 	switch rawHTTPStatusErr.StatusCode {
 	case http.StatusUnauthorized: // 401
 		if firstErr.Title == "CF-InvalidAuthToken" {
@@ -125,7 +129,6 @@ func unmarshalFirstV3Error(rawHTTPStatusErr ccerror.RawHTTPStatusError) (ccerror
 	// return the raw error.
 	var errorResponse ccerror.V3ErrorResponse
 	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
-	// error parsing json
 	if err != nil {
 		return ccerror.V3Error{}, errorResponse, ccerror.UnknownHTTPSourceError{
 			StatusCode:  rawHTTPStatusErr.StatusCode,
@@ -140,8 +143,6 @@ func unmarshalFirstV3Error(rawHTTPStatusErr ccerror.RawHTTPStatusError) (ccerror
 			V3ErrorResponse: errorResponse,
 		}
 	}
-	// There could be multiple errors in the future but for now we only convert
-	// the first error.
-	firstErr := errors[0]
-	return firstErr, errorResponse, nil
+
+	return errors[0], errorResponse, nil
 }

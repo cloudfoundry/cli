@@ -106,20 +106,18 @@ var _ = Describe("Spaces", func() {
 
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.GetSpaces()
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10010,
-								Detail: "Space not found",
-								Title:  "CF-SpaceNotFound",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Space not found",
+							Title:  "CF-SpaceNotFound",
 						},
 					},
 				}))

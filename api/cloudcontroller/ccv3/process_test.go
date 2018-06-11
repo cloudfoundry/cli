@@ -303,20 +303,18 @@ var _ = Describe("Process", func() {
 			It("returns an empty process, the error and all warnings", func() {
 				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
 				Expect(process).To(BeZero())
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10009,
-								Detail: "Some CC Error",
-								Title:  "CF-SomeNewError",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10009,
+							Detail: "Some CC Error",
+							Title:  "CF-SomeNewError",
 						},
 					},
 				}))
@@ -427,20 +425,18 @@ var _ = Describe("Process", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10009,
-								Detail: "Some CC Error",
-								Title:  "CF-SomeNewError",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10009,
+							Detail: "Some CC Error",
+							Title:  "CF-SomeNewError",
 						},
 					},
 				}))
@@ -768,20 +764,18 @@ var _ = Describe("Process", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10009,
-								Detail: "Some CC Error",
-								Title:  "CF-SomeNewError",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10009,
+							Detail: "Some CC Error",
+							Title:  "CF-SomeNewError",
 						},
 					},
 				}))

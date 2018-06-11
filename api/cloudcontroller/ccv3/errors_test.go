@@ -215,16 +215,6 @@ var _ = Describe("Error Wrapper", func() {
 				Context("(422) Unprocessable Entity", func() {
 					BeforeEach(func() {
 						serverResponseCode = http.StatusUnprocessableEntity
-						serverResponse = `
-{
-  "errors": [
-    {
-      "code": 10008,
-      "detail": "SomeCC Error Message",
-      "title": "CF-UnprocessableEntity"
-    }
-  ]
-}`
 					})
 
 					Context("when the name isn't unique to space", func() {
@@ -266,6 +256,19 @@ var _ = Describe("Error Wrapper", func() {
 					})
 
 					Context("when the detail describes something else", func() {
+						BeforeEach(func() {
+							serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "SomeCC Error Message",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+						})
+
 						It("returns a UnprocessableEntityError", func() {
 							Expect(makeError).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
 						})
@@ -345,6 +348,44 @@ var _ = Describe("Error Wrapper", func() {
 						RequestIDs: []string{
 							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
 							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
+						},
+					}))
+				})
+			})
+
+			Context("multiple errors", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusTeapot
+					serverResponse = `{
+							"errors": [
+								{
+									"code": 1000,
+									"detail": "Some CC Error Message",
+									"title": "CF-UnprocessableEntity"
+								},
+								{
+									"code": 1001,
+									"detail": "Some CC Error Message",
+									"title": "CF-UnprocessableEntity"
+								}
+							]
+						}`
+				})
+
+				It("returns a MultiError", func() {
+					Expect(makeError).To(MatchError(ccerror.MultiError{
+						ResponseCode: http.StatusTeapot,
+						Errors: []ccerror.V3Error{
+							{
+								Code:   1000,
+								Detail: "Some CC Error Message",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   1001,
+								Detail: "Some CC Error Message",
+								Title:  "CF-UnprocessableEntity",
+							},
 						},
 					}))
 				})

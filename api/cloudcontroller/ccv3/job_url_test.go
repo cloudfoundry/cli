@@ -52,16 +52,44 @@ var _ = Describe("Job URL", func() {
 
 		Context("when deleting the application returns an error", func() {
 			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 1001,
+      "detail": "Request invalid due to parse error: invalid request body",
+      "title": "CF-MessageParseError"
+    },
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodDelete, "/v3/apps/some-app-guid"),
-						RespondWith(http.StatusBadRequest, `{}`, http.Header{"X-Cf-Warnings": {"some-warning"}}),
+						RespondWith(http.StatusBadRequest, response, http.Header{"X-Cf-Warnings": {"some-warning"}}),
 					),
 				)
 			})
 
 			It("returns all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{ResponseCode: 400}))
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusBadRequest,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   1001,
+							Detail: "Request invalid due to parse error: invalid request body",
+							Title:  "CF-MessageParseError",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 			})
 		})
@@ -137,20 +165,18 @@ var _ = Describe("Job URL", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   1001,
-								Detail: "Request invalid due to parse error: invalid request body",
-								Title:  "CF-MessageParseError",
-							},
-							{
-								Code:   10010,
-								Detail: "App not found",
-								Title:  "CF-ResourceNotFound",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   1001,
+							Detail: "Request invalid due to parse error: invalid request body",
+							Title:  "CF-MessageParseError",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
 						},
 					},
 				}))
