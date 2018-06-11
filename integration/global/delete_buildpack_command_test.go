@@ -1,4 +1,4 @@
-package isolated
+package global
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -11,6 +11,13 @@ import (
 )
 
 var _ = Describe("delete-buildpack command", func() {
+	var buildpackName string
+
+	BeforeEach(func() {
+		helpers.LoginCF()
+		buildpackName = NewBuildpack()
+	})
+
 	Context("when the environment is not setup correctly", func() {
 		XIt("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "delete-buildpack", "nonexistent-buildpack")
@@ -27,10 +34,6 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	Context("when the buildpack doesn't exist", func() {
-		BeforeEach(func() {
-			helpers.LoginCF()
-		})
-
 		It("displays a warning and exits 0", func() {
 			session := helpers.CF("delete-buildpack", "-f", "nonexistent-buildpack")
 			Eventually(session).Should(Say("Deleting buildpack nonexistent-buildpack"))
@@ -41,39 +44,29 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	Context("there is exactly one buildpack with the specified name", func() {
-		var buildpackName string
-
 		BeforeEach(func() {
-			buildpackName = helpers.PrefixedRandomName("integration-buildpack-delete")
-
-			helpers.LoginCF()
 			session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
 			Eventually(session).Should(Exit(0))
 		})
 
-		It("deletes the specified buildpack", func() {
-			By("passing the associated stack")
-			session := CF("delete-buildpack", buildpackName, "-s", "cflinuxfs2", "-f")
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("OK"))
+		Context("when the stack is specified", func() {
+			It("deletes the specified buildpack", func() {
+				session := CF("delete-buildpack", buildpackName, "-s", "cflinuxfs2", "-f")
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("OK"))
+			})
+		})
 
-			session = CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
-			Eventually(session).Should(Exit(0))
-
-			By("passing no stack")
-			session = CF("delete-buildpack", buildpackName, "-f")
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("OK"))
+		Context("when the stack is not specified", func() {
+			It("deletes the specified buildpack", func() {
+				session := CF("delete-buildpack", buildpackName, "-f")
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("OK"))
+			})
 		})
 	})
 
 	Context("there are two buildpacks with same name", func() {
-		var buildpackName string
-		BeforeEach(func() {
-			buildpackName = helpers.PrefixedRandomName("integration-buildpack-delete")
-			helpers.LoginCF()
-		})
-
 		Context("neither buildpack has a nil stack", func() {
 			BeforeEach(func() {
 				session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
@@ -81,6 +74,7 @@ var _ = Describe("delete-buildpack command", func() {
 				session = CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-windows2012R2-v1.0.0.zip", "1")
 				Eventually(session).Should(Exit(0))
 			})
+
 			It("properly handles ambiguity", func() {
 				By("failing when no stack specified")
 				session := CF("delete-buildpack", buildpackName, "-f")
@@ -97,13 +91,16 @@ var _ = Describe("delete-buildpack command", func() {
 				Eventually(session.Out).Should(Say("OK"))
 			})
 		})
+
 		Context("one buildpack has a nil stack", func() {
 			BeforeEach(func() {
 				session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-windows2012R2-v1.0.0.zip", "1")
 				Eventually(session).Should(Exit(0))
+
 				session = CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-v1.0.0.zip", "1")
 				Eventually(session).Should(Exit(0))
 			})
+
 			It("properly handles ambiguity", func() {
 				By("deleting nil buildpack when no stack specified")
 				session := CF("delete-buildpack", buildpackName, "-f")
@@ -119,15 +116,11 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	Context("when the -f flag not is provided", func() {
-		var (
-			buffer        *Buffer
-			buildpackName string
-		)
+		var buffer *Buffer
 
 		BeforeEach(func() {
-			helpers.LoginCF()
 			buffer = NewBuffer()
-			buildpackName = helpers.PrefixedRandomName("integration-buildpack-delete")
+
 			session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-v1.0.0.zip", "1")
 			Eventually(session).Should(Exit(0))
 		})
@@ -180,8 +173,6 @@ var _ = Describe("delete-buildpack command", func() {
 
 	Context("when the -f flag is provided", func() {
 		It("deletes the org", func() {
-			helpers.LoginCF()
-			buildpackName := helpers.PrefixedRandomName("integration-buildpack-delete")
 			session := helpers.CF("delete-buildpack", buildpackName, "-f")
 			Eventually(session).Should(Say("Deleting buildpack %s", buildpackName))
 			Eventually(session).Should(Say("OK"))

@@ -1,4 +1,4 @@
-package isolated
+package global
 
 import (
 	"io/ioutil"
@@ -13,6 +13,13 @@ import (
 )
 
 var _ = Describe("update-buildpack command", func() {
+	var buildpackName string
+
+	BeforeEach(func() {
+		LoginCF()
+		buildpackName = NewBuildpack()
+	})
+
 	Context("when the buildpack is not provided", func() {
 		It("returns a buildpack argument not provided error", func() {
 			session := CF("update-buildpack", "-p", ".")
@@ -41,11 +48,8 @@ var _ = Describe("update-buildpack command", func() {
 	})
 
 	Context("when multiple buildpacks have the same name", func() {
-		var buildpackName string
 		BeforeEach(func() {
-			LoginCF()
 
-			buildpackName = "integration-buildpack-multiple"
 			session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
 			Eventually(session).Should(Exit(0))
 
@@ -73,13 +77,9 @@ var _ = Describe("update-buildpack command", func() {
 	})
 
 	Context("when a URL is provided as the buildpack", func() {
-		var (
-			dir           string
-			buildpackName string
-		)
+		var dir string
 
 		BeforeEach(func() {
-			LoginCF()
 
 			var err error
 			dir, err = ioutil.TempDir("", "update-buildpack-test")
