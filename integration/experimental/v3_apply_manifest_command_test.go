@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = PDescribe("v3-apply-manifest command", func() {
+var _ = Describe("v3-apply-manifest command", func() {
 	var (
 		orgName      string
 		spaceName    string
@@ -98,7 +98,7 @@ var _ = PDescribe("v3-apply-manifest command", func() {
 			})
 		})
 
-		PContext("when the v3 api version is lower than the minimum version", func() {
+		Context("when the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
