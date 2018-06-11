@@ -27,6 +27,7 @@ func init() {
 func (cmd *UpdateBuildpack) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["i"] = &flags.IntFlag{ShortName: "i", Usage: T("The order in which the buildpacks are checked during buildpack auto-detection")}
+	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Specify stack to disambiguate buildpacks with the same name")}
 	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Path to directory or zip file")}
 	fs["enable"] = &flags.BoolFlag{Name: "enable", Usage: T("Enable the buildpack to be used for staging")}
 	fs["disable"] = &flags.BoolFlag{Name: "disable", Usage: T("Disable the buildpack from being used for staging")}
@@ -37,7 +38,7 @@ func (cmd *UpdateBuildpack) MetaData() commandregistry.CommandMetadata {
 		Name:        "update-buildpack",
 		Description: T("Update a buildpack"),
 		Usage: []string{
-			T("CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]"),
+			T("CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [-s STACK] [--enable|--disable] [--lock|--unlock]"),
 			T("\n\nTIP:\n"),
 			T("   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."),
 		},
@@ -52,7 +53,7 @@ func (cmd *UpdateBuildpack) Requirements(requirementsFactory requirements.Factor
 	}
 
 	loginReq := requirementsFactory.NewLoginRequirement()
-	cmd.buildpackReq = requirementsFactory.NewBuildpackRequirement(fc.Args()[0])
+	cmd.buildpackReq = requirementsFactory.NewBuildpackRequirement(fc.Args()[0], fc.String("s"))
 
 	reqs := []requirements.Requirement{
 		loginReq,
@@ -72,7 +73,7 @@ func (cmd *UpdateBuildpack) SetDependency(deps commandregistry.Dependency, plugi
 func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) error {
 	buildpack := cmd.buildpackReq.GetBuildpack()
 
-	cmd.ui.Say(T("Updating buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpack.Name)}))
+	cmd.ui.Say(T("Updating buildpack {{.BuildpackName}} with stack {{.BuildpackStack}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpack.Name), "BuildpackStack": terminal.EntityNameColor(buildpack.Stack)}))
 
 	updateBuildpack := false
 

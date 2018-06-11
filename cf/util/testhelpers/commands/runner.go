@@ -32,8 +32,10 @@ func RunCLICommand(cmdName string, args []string, requirementsFactory requiremen
 	if err != nil {
 		return false
 	}
+
 	for _, requirement := range requirements {
 		if err = requirement.Execute(); err != nil {
+			ui.Failed(err.Error())
 			return false
 		}
 	}
