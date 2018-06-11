@@ -373,6 +373,8 @@
     "html",
     "html/atom",
     "html/charset",
+    "internal/socks",
+    "proxy",
     "websocket"
   ]
   revision = "d11bb6cd8e3c4e60239c9cb20ef68586d74500d0"
@@ -427,6 +429,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d6c2bdc8333921020f8d9866712896219e783b1507723b2b0e81d6a6e84a503e"
+  inputs-digest = "985f4cf17fececbd2b8dce0108dcae9e68c3065eee35d1c11564fbbfd5fa4c4e"
   solver-name = "gps-cdcl"
   solver-version = 1
