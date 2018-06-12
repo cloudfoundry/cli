@@ -36,19 +36,19 @@ run:
     wget https://github.com/cloudfoundry/bosh-bootloader/releases/download/v6.7.0/bbl-v6.7.0_linux_x86-64 -O /usr/bin/bbl
     chmod +x /usr/bin/bbl
 
-    bbl_state_path="bbl-state/${BBL_STATE_DIR}"
+    root_dir="${PWD}"
+    bbl_state_path="${root_dir}/bbl-state/${BBL_STATE_DIR}"
+    cli_operations_dir="${root_dir}/cli-ci/ci/infrastructure/operations"
 
     cd $bbl_state_path
       eval "$(bbl print-env)"
-    cd ../
+    cd $root_dir
 
     bosh upload-stemcell -n "https://s3.amazonaws.com/bosh-gce-light-stemcells/light-bosh-stemcell-3312.51-google-kvm-ubuntu-trusty-go_agent.tgz"
 
     cat << EOF > vars.yml
     client-secret: $CLIENT_SECRET
     EOF
-
-    cli_operations_dir="cli-ci/ci/infrastructure/operations"
 
     bosh -d cf deploy cli-ci/ci/infrastructure/assets/legacy-cf-deployment.yml -n \
       -o $cli_operations_dir/legacy/gcp.yml \
@@ -59,7 +59,7 @@ run:
       -o $cli_operations_dir/diego-cell-instances.yml \
       -o $cli_operations_dir/add-uaa-client-credentials.yml \
       -v system_domain=$SYSTEM_DOMAIN \
-      --vars-store=$VARS_STORE_FILE \
+      --vars-store="vars-store/${VARS_STORE_FILE} \
       --vars-file=./vars.yml
 
     cd $bbl_state_path
@@ -70,7 +70,7 @@ run:
         git add "${VARS_STORE_FILE}"
         git commit -m "Update vars-store after legacy deploy"
       fi
-    cd ../
+    cd $root_dir
 
     shopt -s dotglob
     cp -R "${bbl_state_path}"/vars-store/* "${bbl_state_path}"/updated-vars-store/
