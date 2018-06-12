@@ -10,6 +10,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// MergeAndValidateSettingsAndManifests merges command line settings and
+// manifest settings. It does this by:
+// - Validating command line setting and their effect on the provided manifests
+// - Override manifest settings with command line settings (when applicable)
+// - Sanitizing the inputs
+// - Validate merged manifest
 func (actor Actor) MergeAndValidateSettingsAndManifests(cmdLineSettings CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error) {
 	var mergedApps []manifest.Application
 

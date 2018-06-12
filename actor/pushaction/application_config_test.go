@@ -215,7 +215,6 @@ var _ = Describe("Application Config", func() {
 
 					It("sets the current application to the existing application", func() {
 						Expect(firstConfig.CurrentApplication).To(Equal(app))
-						Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
 
 						Expect(fakeV2Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 						passedName, passedSpaceGUID := fakeV2Actor.GetApplicationByNameAndSpaceArgsForCall(0)
@@ -329,7 +328,6 @@ var _ = Describe("Application Config", func() {
 						Name:      appName,
 						SpaceGUID: spaceGUID,
 					}}))
-				Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
 			})
 
 			Context("when the --random-route flag is provided", func() {

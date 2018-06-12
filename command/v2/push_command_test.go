@@ -187,8 +187,7 @@ var _ = Describe("push Command", func() {
 									{Host: "route3", Domain: v2action.Domain{Name: "example.com"}},
 									{Host: "route4", Domain: v2action.Domain{Name: "example.com"}},
 								},
-								TargetedSpaceGUID: "some-space-guid",
-								Path:              pwd,
+								Path: pwd,
 							},
 						}
 						fakeActor.ConvertToApplicationConfigsReturns(appConfigs, pushaction.Warnings{"some-config-warnings"}, nil)
@@ -207,7 +206,6 @@ var _ = Describe("push Command", func() {
 								updatedConfig = pushaction.ApplicationConfig{
 									CurrentApplication: pushaction.Application{Application: v2action.Application{Name: appName, GUID: "some-app-guid"}},
 									DesiredApplication: pushaction.Application{Application: v2action.Application{Name: appName, GUID: "some-app-guid"}},
-									TargetedSpaceGUID:  "some-space-guid",
 									Path:               pwd,
 								}
 

@@ -28,8 +28,6 @@ type ApplicationConfig struct {
 	Archive            bool
 	Path               string
 	DropletPath        string
-
-	TargetedSpaceGUID string
 }
 
 func (config ApplicationConfig) CreatingApplication() bool {
@@ -44,6 +42,14 @@ func (config ApplicationConfig) HasV3Buildpacks() bool {
 	return len(config.DesiredApplication.Buildpacks) > 1
 }
 
+// ConvertToApplicationConfigs converts a set of application manifests into an
+// application configs. These configs reflect the current and desired states of
+// the application - providing details required by the Apply function to
+// proceed.
+//
+// The V2 Actor is primarily used to determine all but multiple buildpack
+// information. Only then is the V3 Actor used to gather the multiple
+// buildpacks.
 func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]ApplicationConfig, Warnings, error) {
 	var configs []ApplicationConfig
 	var warnings Warnings
@@ -62,9 +68,8 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 				return nil, nil, err
 			}
 			config = ApplicationConfig{
-				TargetedSpaceGUID: spaceGUID,
-				DropletPath:       absPath,
-				NoRoute:           app.NoRoute,
+				DropletPath: absPath,
+				NoRoute:     app.NoRoute,
 			}
 		} else {
 			absPath, err = filepath.EvalSymlinks(app.Path)
@@ -72,9 +77,8 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 				return nil, nil, err
 			}
 			config = ApplicationConfig{
-				TargetedSpaceGUID: spaceGUID,
-				Path:              absPath,
-				NoRoute:           app.NoRoute,
+				Path:    absPath,
+				NoRoute: app.NoRoute,
 			}
 		}
 
