@@ -19,6 +19,18 @@ var _ = Describe("Spaces", func() {
 	})
 
 	Describe("GetSpaces", func() {
+		var (
+			query Query
+
+			spaces     []Space
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			spaces, warnings, executeErr = client.GetSpaces(query)
+		})
+
 		Context("when spaces exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
@@ -62,14 +74,15 @@ var _ = Describe("Spaces", func() {
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)
+
+				query = Query{
+					Key:    NameFilter,
+					Values: []string{"some-space-name"},
+				}
 			})
 
 			It("returns the queried spaces and all warnings", func() {
-				spaces, warnings, err := client.GetSpaces(Query{
-					Key:    NameFilter,
-					Values: []string{"some-space-name"},
-				})
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(spaces).To(ConsistOf(
 					Space{Name: "space-name-1", GUID: "space-guid-1"},
@@ -105,8 +118,7 @@ var _ = Describe("Spaces", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetSpaces()
-				Expect(err).To(MatchError(ccerror.MultiError{
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
 					Errors: []ccerror.V3Error{
 						{

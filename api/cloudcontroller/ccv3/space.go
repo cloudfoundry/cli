@@ -7,8 +7,10 @@ import (
 
 // Space represents a Cloud Controller V3 Space.
 type Space struct {
-	Name string `json:"name"`
+	// GUID is a unique space identifier.
 	GUID string `json:"guid"`
+	// Name is the name of the space.
+	Name string `json:"name"`
 }
 
 // GetSpaces lists spaces with optional filters.
