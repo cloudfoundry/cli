@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3"
 )
 
-type FakeV2PushActor struct {
+type FakeOriginalV2PushActor struct {
 	CreateAndMapDefaultApplicationRouteStub        func(orgGUID string, spaceGUID string, app v2action.Application) (pushaction.Warnings, error)
 	createAndMapDefaultApplicationRouteMutex       sync.RWMutex
 	createAndMapDefaultApplicationRouteArgsForCall []struct {
@@ -29,7 +29,7 @@ type FakeV2PushActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV2PushActor) CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID string, app v2action.Application) (pushaction.Warnings, error) {
+func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID string, app v2action.Application) (pushaction.Warnings, error) {
 	fake.createAndMapDefaultApplicationRouteMutex.Lock()
 	ret, specificReturn := fake.createAndMapDefaultApplicationRouteReturnsOnCall[len(fake.createAndMapDefaultApplicationRouteArgsForCall)]
 	fake.createAndMapDefaultApplicationRouteArgsForCall = append(fake.createAndMapDefaultApplicationRouteArgsForCall, struct {
@@ -48,19 +48,19 @@ func (fake *FakeV2PushActor) CreateAndMapDefaultApplicationRoute(orgGUID string,
 	return fake.createAndMapDefaultApplicationRouteReturns.result1, fake.createAndMapDefaultApplicationRouteReturns.result2
 }
 
-func (fake *FakeV2PushActor) CreateAndMapDefaultApplicationRouteCallCount() int {
+func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteCallCount() int {
 	fake.createAndMapDefaultApplicationRouteMutex.RLock()
 	defer fake.createAndMapDefaultApplicationRouteMutex.RUnlock()
 	return len(fake.createAndMapDefaultApplicationRouteArgsForCall)
 }
 
-func (fake *FakeV2PushActor) CreateAndMapDefaultApplicationRouteArgsForCall(i int) (string, string, v2action.Application) {
+func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteArgsForCall(i int) (string, string, v2action.Application) {
 	fake.createAndMapDefaultApplicationRouteMutex.RLock()
 	defer fake.createAndMapDefaultApplicationRouteMutex.RUnlock()
 	return fake.createAndMapDefaultApplicationRouteArgsForCall[i].orgGUID, fake.createAndMapDefaultApplicationRouteArgsForCall[i].spaceGUID, fake.createAndMapDefaultApplicationRouteArgsForCall[i].app
 }
 
-func (fake *FakeV2PushActor) CreateAndMapDefaultApplicationRouteReturns(result1 pushaction.Warnings, result2 error) {
+func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteReturns(result1 pushaction.Warnings, result2 error) {
 	fake.CreateAndMapDefaultApplicationRouteStub = nil
 	fake.createAndMapDefaultApplicationRouteReturns = struct {
 		result1 pushaction.Warnings
@@ -68,7 +68,7 @@ func (fake *FakeV2PushActor) CreateAndMapDefaultApplicationRouteReturns(result1 
 	}{result1, result2}
 }
 
-func (fake *FakeV2PushActor) CreateAndMapDefaultApplicationRouteReturnsOnCall(i int, result1 pushaction.Warnings, result2 error) {
+func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteReturnsOnCall(i int, result1 pushaction.Warnings, result2 error) {
 	fake.CreateAndMapDefaultApplicationRouteStub = nil
 	if fake.createAndMapDefaultApplicationRouteReturnsOnCall == nil {
 		fake.createAndMapDefaultApplicationRouteReturnsOnCall = make(map[int]struct {
@@ -82,7 +82,7 @@ func (fake *FakeV2PushActor) CreateAndMapDefaultApplicationRouteReturnsOnCall(i 
 	}{result1, result2}
 }
 
-func (fake *FakeV2PushActor) Invocations() map[string][][]interface{} {
+func (fake *FakeOriginalV2PushActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.createAndMapDefaultApplicationRouteMutex.RLock()
@@ -94,7 +94,7 @@ func (fake *FakeV2PushActor) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeV2PushActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeOriginalV2PushActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -106,4 +106,4 @@ func (fake *FakeV2PushActor) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v3.V2PushActor = new(FakeV2PushActor)
+var _ v3.OriginalV2PushActor = new(FakeOriginalV2PushActor)

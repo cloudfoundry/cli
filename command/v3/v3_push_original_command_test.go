@@ -34,8 +34,8 @@ var _ = Describe("v3-push Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
-		fakeActor       *v3fakes.FakeV3PushActor
-		fakeV2PushActor *v3fakes.FakeV2PushActor
+		fakeActor       *v3fakes.FakeOriginalV3PushActor
+		fakeV2PushActor *v3fakes.FakeOriginalV2PushActor
 		fakeV2AppActor  *sharedfakes.FakeV2AppRouteActor
 		binaryName      string
 		executeErr      error
@@ -49,8 +49,8 @@ var _ = Describe("v3-push Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v3fakes.FakeV3PushActor)
-		fakeV2PushActor = new(v3fakes.FakeV2PushActor)
+		fakeActor = new(v3fakes.FakeOriginalV3PushActor)
+		fakeV2PushActor = new(v3fakes.FakeOriginalV2PushActor)
 		fakeV2AppActor = new(sharedfakes.FakeV2AppRouteActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
 
@@ -78,11 +78,11 @@ var _ = Describe("v3-push Command", func() {
 		cmd = v3.V3PushCommand{
 			RequiredArgs: flag.AppName{AppName: app},
 
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-			V2PushActor: fakeV2PushActor,
+			UI:                  testUI,
+			Config:              fakeConfig,
+			SharedActor:         fakeSharedActor,
+			OriginalActor:       fakeActor,
+			OriginalV2PushActor: fakeV2PushActor,
 
 			NOAAClient:          fakeNOAAClient,
 			AppSummaryDisplayer: appSummaryDisplayer,
