@@ -34,7 +34,10 @@ run:
       eval "$(bbl print-env)"
     cd ../
 
-    bosh upload-stemcell -n "https://s3.amazonaws.com/bosh-gce-light-stemcells/light-bosh-stemcell-3312.51-google-kvm-ubuntu-trusty-go_agent.tgz"
+    wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-3.0.1-linux-amd64 -O ./bosh
+		chmod +x ./bosh
+
+    ./bosh upload-stemcell -n "https://s3.amazonaws.com/bosh-gce-light-stemcells/light-bosh-stemcell-3312.51-google-kvm-ubuntu-trusty-go_agent.tgz"
 
     cat << EOF > vars.yml
     client-secret: $CLIENT_SECRET
@@ -42,7 +45,7 @@ run:
 
     cli_operations_dir="cli-ci/ci/infrastructure/operations"
 
-    bosh -d cf deploy cli-ci/ci/infrastructure/assets/legacy-cf-deployment.yml -n \
+    ./bosh -d cf deploy cli-ci/ci/infrastructure/assets/legacy-cf-deployment.yml -n \
       -o $cli_operations_dir/legacy/gcp.yml \
       -o $cli_operations_dir/legacy/scale-to-one-az.yml \
       -o $cli_operations_dir/legacy/add-reserved-routes.yml \
