@@ -1,6 +1,7 @@
 package global
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "code.cloudfoundry.org/cli/integration/helpers"
@@ -67,6 +68,11 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	Context("there are two buildpacks with same name", func() {
+		BeforeEach(func() {
+			SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+			SkipIfOneStack()
+		})
+
 		Context("neither buildpack has a nil stack", func() {
 			BeforeEach(func() {
 				session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")

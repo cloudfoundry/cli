@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -47,8 +48,23 @@ var _ = Describe("update-buildpack command", func() {
 		})
 	})
 
+	PContext("when not using stack association", func() {
+		BeforeEach(func() {
+			session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("updates buildpack properly", func() {
+			session := CF("update-buildpack", buildpackName, "-i", "999")
+			Eventually(session).Should(Exit(0))
+			Eventually(session).Should(Say("Updating buildpack %s\\.\\.\\.", buildpackName))
+		})
+	})
+
 	Context("when multiple buildpacks have the same name", func() {
 		BeforeEach(func() {
+			SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+			SkipIfOneStack()
 
 			session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
 			Eventually(session).Should(Exit(0))

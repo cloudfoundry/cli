@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	. "code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,20 +22,51 @@ var _ = Describe("create-buildpack command", func() {
 		bpname = NewBuildpack()
 	})
 
-	Context("when creating a new buildpack with a stack", func() {
-		It("creates the new buildpack and assigns its stack", func() {
-			session := CF("create-buildpack", bpname, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
-			Eventually(session).Should(Exit(0))
+	Context("when creating a new buildpack", func() {
+		Context("without stack association", func() {
+			It("creates the new buildpack", func() {
+				session := CF("create-buildpack", bpname, "../assets/test_buildpacks/simple_buildpack-v1.0.0.zip", "1")
+				Eventually(session).Should(Exit(0))
 
-			session = CF("buildpacks")
-			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(bpname + ".*cflinuxfs2.*1"))
+				session = CF("buildpacks")
+				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(Say(bpname))
+			})
+		})
 
+		Context("with stack association", func() {
+			BeforeEach(func() {
+				SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+			})
+
+			It("creates the new buildpack and assigns its stack", func() {
+				session := CF("create-buildpack", bpname, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
+				Eventually(session).Should(Exit(0))
+
+				session = CF("buildpacks")
+				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(Say(bpname + ".*cflinuxfs2.*1"))
+			})
+		})
+	})
+
+	Context("when creating a buildpack with no stack that already exists", func() {
+		BeforeEach(func() {
+			session := CF("create-buildpack", bpname, "../assets/test_buildpacks/simple_buildpack-v1.0.0.zip", "1")
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("issues a warning and exits 0", func() {
+			session := CF("create-buildpack", bpname, "../assets/test_buildpacks/simple_buildpack-v1.0.0.zip", "1")
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say("Buildpack %s already exists", bpname))
 		})
 	})
 
 	Context("when creating a buildpack/stack that already exists", func() {
 		BeforeEach(func() {
+			SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+
 			session := CF("create-buildpack", bpname, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
 			Eventually(session).Should(Exit(0))
 		})
