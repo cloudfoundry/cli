@@ -35,7 +35,7 @@ run:
     cd ../
 
     wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-3.0.1-linux-amd64 -O ./bosh
-		chmod +x ./bosh
+    chmod +x ./bosh
 
     ./bosh upload-stemcell -n "https://s3.amazonaws.com/bosh-gce-light-stemcells/light-bosh-stemcell-3312.51-google-kvm-ubuntu-trusty-go_agent.tgz"
 
