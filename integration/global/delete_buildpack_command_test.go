@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
-	. "code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -12,11 +11,14 @@ import (
 )
 
 var _ = Describe("delete-buildpack command", func() {
-	var buildpackName string
+	var (
+		buildpackName string
+		stacks        []string
+	)
 
 	BeforeEach(func() {
 		helpers.LoginCF()
-		buildpackName = NewBuildpack()
+		buildpackName = helpers.NewBuildpack()
 	})
 
 	Context("when the environment is not setup correctly", func() {
@@ -45,14 +47,18 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	Context("there is exactly one buildpack with the specified name", func() {
+
 		BeforeEach(func() {
-			session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
-			Eventually(session).Should(Exit(0))
+			stacks = helpers.FetchStacks()
+			helpers.BuildpackWithStack(func(buildpackPath string) {
+				session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+				Eventually(session).Should(Exit(0))
+			}, stacks[0])
 		})
 
 		Context("when the stack is specified", func() {
 			It("deletes the specified buildpack", func() {
-				session := CF("delete-buildpack", buildpackName, "-s", "cflinuxfs2", "-f")
+				session := helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("OK"))
 			})
@@ -60,7 +66,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 		Context("when the stack is not specified", func() {
 			It("deletes the specified buildpack", func() {
-				session := CF("delete-buildpack", buildpackName, "-f")
+				session := helpers.CF("delete-buildpack", buildpackName, "-f")
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("OK"))
 			})
@@ -68,53 +74,70 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	Context("there are two buildpacks with same name", func() {
+
 		BeforeEach(func() {
-			SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
-			SkipIfOneStack()
+			helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+			helpers.SkipIfOneStack()
 		})
 
 		Context("neither buildpack has a nil stack", func() {
 			BeforeEach(func() {
-				session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-cflinuxfs2-v1.0.0.zip", "1")
-				Eventually(session).Should(Exit(0))
-				session = CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-windows2012R2-v1.0.0.zip", "1")
-				Eventually(session).Should(Exit(0))
+				stacks = helpers.FetchStacks()
+
+				helpers.BuildpackWithStack(func(buildpackPath string) {
+					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+					Eventually(session).Should(Exit(0))
+				}, stacks[0])
+
+				helpers.BuildpackWithStack(func(buildpackPath string) {
+					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+					Eventually(session).Should(Exit(0))
+				}, stacks[1])
 			})
 
 			It("properly handles ambiguity", func() {
 				By("failing when no stack specified")
-				session := CF("delete-buildpack", buildpackName, "-f")
+
+				session := helpers.CF("delete-buildpack", buildpackName, "-f")
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Out).Should(Say("FAILED"))
 
 				By("deleting the buildpack when the associated stack is specified")
-				session = CF("delete-buildpack", buildpackName, "-s", "cflinuxfs2", "-f")
+
+				session = helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("OK"))
 
-				session = CF("delete-buildpack", buildpackName, "-s", "windows2012R2", "-f")
+				session = helpers.CF("delete-buildpack", buildpackName, "-s", stacks[1], "-f")
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("OK"))
 			})
 		})
 
 		Context("one buildpack has a nil stack", func() {
-			BeforeEach(func() {
-				session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-windows2012R2-v1.0.0.zip", "1")
-				Eventually(session).Should(Exit(0))
 
-				session = CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-v1.0.0.zip", "1")
-				Eventually(session).Should(Exit(0))
+			BeforeEach(func() {
+				stacks = helpers.FetchStacks()
+
+				helpers.BuildpackWithStack(func(buildpackPath string) {
+					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+					Eventually(session).Should(Exit(0))
+				}, stacks[0])
+
+				helpers.BuildpackWithStack(func(buildpackPath string) {
+					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+					Eventually(session).Should(Exit(0))
+				}, "")
 			})
 
 			It("properly handles ambiguity", func() {
 				By("deleting nil buildpack when no stack specified")
-				session := CF("delete-buildpack", buildpackName, "-f")
+				session := helpers.CF("delete-buildpack", buildpackName, "-f")
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("OK"))
 
 				By("deleting the remaining buildpack when no stack is specified")
-				session = CF("delete-buildpack", buildpackName, "-f")
+				session = helpers.CF("delete-buildpack", buildpackName, "-f")
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("OK"))
 			})
@@ -127,8 +150,10 @@ var _ = Describe("delete-buildpack command", func() {
 		BeforeEach(func() {
 			buffer = NewBuffer()
 
-			session := CF("create-buildpack", buildpackName, "../assets/test_buildpacks/simple_buildpack-v1.0.0.zip", "1")
-			Eventually(session).Should(Exit(0))
+			helpers.BuildpackWithStack(func(buildpackPath string) {
+				session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+				Eventually(session).Should(Exit(0))
+			}, "")
 		})
 
 		Context("when the user enters 'y'", func() {

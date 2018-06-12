@@ -17,12 +17,12 @@ type ccStacks struct {
 }
 
 func SkipIfOneStack() {
-	if len(fetchStacks()) < 2 {
+	if len(FetchStacks()) < 2 {
 		Skip("test requires at least two stacks")
 	}
 }
 
-func fetchStacks() []string {
+func FetchStacks() []string {
 	session := CF("curl", "/v2/stacks")
 
 	Eventually(session).Should(Exit(0))
