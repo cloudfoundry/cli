@@ -20,6 +20,18 @@ var _ = Describe("Service Instance", func() {
 	})
 
 	Describe("GetServiceInstances", func() {
+		var (
+			query Query
+
+			instances  []ServiceInstance
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			instances, warnings, executeErr = client.GetServiceInstances(query)
+		})
+
 		Context("when service instances exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`
@@ -66,14 +78,15 @@ var _ = Describe("Service Instance", func() {
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
 					),
 				)
+
+				query = Query{
+					Key:    NameFilter,
+					Values: []string{"some-service-instance-name"},
+				}
 			})
 
 			It("returns a list of service instances with their associated warnings", func() {
-				instances, warnings, err := client.GetServiceInstances(Query{
-					Key:    NameFilter,
-					Values: []string{"some-service-instance-name"},
-				})
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(instances).To(ConsistOf(
 					ServiceInstance{
@@ -92,11 +105,10 @@ var _ = Describe("Service Instance", func() {
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})
 		})
-	})
 
-	Context("when the cloud controller returns errors and warnings", func() {
-		BeforeEach(func() {
-			response := `{
+		Context("when the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
 				"errors": [
 					{
 						"code": 42424,
@@ -110,32 +122,32 @@ var _ = Describe("Service Instance", func() {
 					}
 				]
 			}`
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/v3/service_instances"),
-					RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-				),
-			)
-		})
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/service_instances"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
 
-		It("returns the error and all warnings", func() {
-			_, warnings, err := client.GetServiceInstances()
-			Expect(err).To(MatchError(ccerror.MultiError{
-				ResponseCode: http.StatusTeapot,
-				Errors: []ccerror.V3Error{
-					{
-						Code:   42424,
-						Detail: "Some detailed error message",
-						Title:  "CF-SomeErrorTitle",
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   42424,
+							Detail: "Some detailed error message",
+							Title:  "CF-SomeErrorTitle",
+						},
+						{
+							Code:   11111,
+							Detail: "Some other detailed error message",
+							Title:  "CF-SomeOtherErrorTitle",
+						},
 					},
-					{
-						Code:   11111,
-						Detail: "Some other detailed error message",
-						Title:  "CF-SomeOtherErrorTitle",
-					},
-				},
-			}))
-			Expect(warnings).To(ConsistOf("this is a warning"))
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
 		})
 	})
 })
