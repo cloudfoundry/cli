@@ -3,6 +3,7 @@ package experimental
 import (
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -288,7 +289,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 						Eventually(session).Should(Exit())
 
 						session = helpers.CF("v3-apply-manifest", "-f", manifestPath)
-						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", manifestPath, orgName, spaceName, userName))
+						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
 						Eventually(session).Should(Exit())
 
 						session = helpers.CF("app", appName)
