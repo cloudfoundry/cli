@@ -22,7 +22,7 @@ func (e MultiError) Details() []string {
 
 func (e MultiError) Error() string {
 	errorMsg := []string{
-		"Multiple errors returned:",
+		"Multiple errors occurred:",
 		fmt.Sprintf("Response Code: %d", e.ResponseCode),
 	}
 

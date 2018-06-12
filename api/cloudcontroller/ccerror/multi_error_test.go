@@ -28,7 +28,7 @@ var _ = Describe("MultiError", func() {
 				},
 			}
 
-			Expect(err).To(MatchError(`Multiple errors returned:
+			Expect(err).To(MatchError(`Multiple errors occurred:
 Response Code: 418
 Code: 282010, Title: title-1, Detail: detail 1
 Code: 10242013, Title: title-2, Detail: detail 2`))
