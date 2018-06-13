@@ -35,7 +35,7 @@ func WarnAPIVersionCheck(apiVersion string, ui UI) error {
 	}
 
 	if isOutdated {
-		ui.DisplayWarning("Your API version is no longer supported. Upgrade to a newer version of the API.")
+		ui.DisplayWarning("Your API version is no longer supported. Upgrade to a newer version of the API. Please refer to https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version")
 	}
 
 	return nil
