@@ -74,7 +74,6 @@ func (cmd *UpdateUserProvidedService) Requirements(requirementsFactory requireme
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
-		cmd.serviceInstanceReq,
 	}
 
 	if fc.IsSet("r") {
@@ -85,6 +84,7 @@ func (cmd *UpdateUserProvidedService) Requirements(requirementsFactory requireme
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-t'", cf.UserProvidedServiceTagsMinimumAPIVersion))
 	}
 
+	reqs = append(reqs, cmd.serviceInstanceReq)
 	return reqs, nil
 }
 
