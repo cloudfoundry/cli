@@ -52,7 +52,7 @@ var _ = Describe("create-buildpack command", func() {
 
 				session := helpers.CF("buildpacks")
 				Eventually(session).Should(Exit(0))
-				Expect(session.Out).To(Say(buildpackName + ".*cflinuxfs2.*1"))
+				Expect(session.Out).To(Say(buildpackName+".*%s.*1", stacks[0]))
 			})
 		})
 	})
