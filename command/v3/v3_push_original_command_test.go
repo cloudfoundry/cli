@@ -197,7 +197,6 @@ var _ = Describe("v3-push Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: spaceName, GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: orgName, GUID: "some-org-guid"})
-
 		})
 
 		Context("when looking up the application returns some api error", func() {

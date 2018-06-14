@@ -14,7 +14,6 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/types"
 )
 
 func streamsDrainedAndClosed(configStream <-chan ApplicationConfig, eventStream <-chan Event, warningsStream <-chan Warnings, errorStream <-chan error) bool {
@@ -73,15 +72,6 @@ func setUpNextEvent(c <-chan ApplicationConfig, e <-chan Event, w <-chan Warning
 	}
 }
 
-func EqualEither(events ...Event) GomegaMatcher {
-	var equals []GomegaMatcher
-	for _, event := range events {
-		equals = append(equals, Equal(event))
-	}
-
-	return Or(equals...)
-}
-
 var _ = Describe("Apply", func() {
 	var (
 		actor           *Actor
@@ -112,7 +102,6 @@ var _ = Describe("Apply", func() {
 			DesiredRoutes: []v2action.Route{{Host: "banana"}},
 		}
 		fakeProgressBar = new(pushactionfakes.FakeProgressBar)
-
 	})
 
 	JustBeforeEach(func() {

@@ -4,6 +4,7 @@ type Event string
 
 const (
 	SettingUpApplication            Event = "setting up application"
+	SkipingApplicationCreation      Event = "skipping creation"
 	CreatedApplication              Event = "created application"
 	UpdatedApplication              Event = "updated application"
 	CreatingAndMappingRoutes        Event = "creating and mapping routes"
