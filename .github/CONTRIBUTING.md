@@ -64,6 +64,11 @@ go generate ./<directory>/...
 ```
 where `<directory>` contains the package with the changed interface. Don't run `go generate` from the root directory.
 
+The CLI has a minimum required version. Refer to the following:
+
+https://github.com/cloudfoundry/cli/wiki/Versioning-Policy#cf-cli-minimum-supported-version
+
+If your pull request requires a CAPI version higher than the minimum, integration tests you implement must be versioned tests. To do so please add your minimum version to `api/cloudcontroller/ccversion/minimum_version.go`, and a corresponding `helpers.SkipIfVersionLessThan` or `helpers.SkipIfVersionGreaterThan`. See this [example](https://github.com/cloudfoundry/cli/blob/87aaed8215fad3b2077c6829d1812ead3902d5cf/integration/isolated/create_isolation_segment_command_test.go#L17).
 
 ## Running tests
 
