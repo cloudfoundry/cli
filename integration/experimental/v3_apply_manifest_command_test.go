@@ -2,6 +2,7 @@ package experimental
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 
@@ -19,16 +20,21 @@ var _ = Describe("v3-apply-manifest command", func() {
 		spaceName    string
 		appName      string
 		manifestPath string
+		appDir       string
 	)
 
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
-		appDir, _ := ioutil.TempDir("", "simple-app")
+		appDir, _ = ioutil.TempDir("", "simple-app")
 		manifestPath = filepath.Join(appDir, "manifest.yml")
 		// Ensure the file exists at the minimum
 		helpers.WriteManifest(manifestPath, map[string]interface{}{})
+	})
+
+	AfterEach(func() {
+		Expect(os.RemoveAll(appDir)).ToNot(HaveOccurred())
 	})
 
 	Describe("help", func() {
@@ -243,8 +249,8 @@ var _ = Describe("v3-apply-manifest command", func() {
 
 				Context("when the instances value is more than the space quota limit", func() {
 					BeforeEach(func() {
-						helpers.CF("create-space-quota", "some-space-quota-name", "-a", "4")
-						helpers.CF("set-space-quota", spaceName, "some-space-quota-name")
+						Eventually(helpers.CF("create-space-quota", "some-space-quota-name", "-a", "4")).Should(Exit(0))
+						Eventually(helpers.CF("set-space-quota", spaceName, "some-space-quota-name")).Should(Exit(0))
 						helpers.WriteManifest(manifestPath, map[string]interface{}{
 							"applications": []map[string]interface{}{
 								{

@@ -199,11 +199,15 @@ func Zipit(source, target, prefix string) error {
 		if err != nil {
 			return err
 		}
+		header.Name, err = filepath.Rel(source, path)
+		if err != nil {
+			return err
+		}
 
-		header.Name = strings.TrimPrefix(path, source+string(filepath.Separator))
+		header.Name = filepath.ToSlash(header.Name)
 
 		if info.IsDir() {
-			header.Name += string(os.PathSeparator)
+			header.Name += "/"
 			header.SetMode(0755)
 		} else {
 			header.Method = zip.Deflate

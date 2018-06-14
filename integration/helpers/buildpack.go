@@ -13,6 +13,8 @@ func BuildpackWithStack(f func(buildpackArchive string), stackName string) {
 
 	archiveFile, err := ioutil.TempFile("", "buildpack-archive-file-")
 	Expect(err).ToNot(HaveOccurred())
+	Expect(archiveFile.Close()).ToNot(HaveOccurred())
+	Expect(os.RemoveAll(archiveFile.Name())).ToNot(HaveOccurred())
 
 	buildpackZip := archiveFile.Name() + ".zip"
 

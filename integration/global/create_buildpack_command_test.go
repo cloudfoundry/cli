@@ -59,8 +59,6 @@ var _ = Describe("create-buildpack command", func() {
 
 	Context("when creating a buildpack with no stack that already exists", func() {
 		BeforeEach(func() {
-			stacks = helpers.FetchStacks()
-
 			helpers.BuildpackWithStack(func(buildpackPath string) {
 				session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 				Eventually(session).Should(Exit(0))
@@ -78,8 +76,9 @@ var _ = Describe("create-buildpack command", func() {
 
 	Context("when creating a buildpack/stack that already exists", func() {
 		BeforeEach(func() {
-			helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+			stacks = helpers.FetchStacks()
 
+			helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
 			helpers.BuildpackWithStack(func(buildpackPath string) {
 				session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 				Eventually(session).Should(Exit(0))
