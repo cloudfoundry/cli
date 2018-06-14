@@ -12,13 +12,13 @@ If your contribution falls under a company CLA but your membership is not public
 
 <!-- What benefits will be realized by the code change? Explain its value to users. What is their current solution to the problem, and why is it insufficient? -->
 
-##Who Is The Functionality For?
+## Who Is The Functionality For?
 
 <!--
 Explain who specifically the change would benefit. What users would want this change? Is there broad demand for the change, or is there a single customer who benefits?
 -->
 
-##How Often Will This Functionality Be Used?
+## How Often Will This Functionality Be Used?
 
 <!-- How often will the change be used? -->
 
@@ -46,10 +46,10 @@ have worked with the code here recently, so please walk us through the concepts.
 
 <!-- List any applicable Issues here -->
 
-##How Urgent Is The Change?
+## How Urgent Is The Change?
 
 <!-- Is the change urgent? If so, explain why it is time-sensitive.-->
 
-##Other Relevant Parties
+## Other Relevant Parties
 
 <!-- Who else is affected by the change? -->
