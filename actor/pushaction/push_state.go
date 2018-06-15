@@ -16,7 +16,7 @@ type PushState struct {
 	// Archive bool
 }
 
-func (actor Actor) GeneratePushState(settings CommandLineSettings, spaceGUID string) ([]PushState, Warnings, error) {
+func (actor Actor) Conceptualize(settings CommandLineSettings, spaceGUID string) ([]PushState, Warnings, error) {
 	var (
 		application v3action.Application
 		warnings    v3action.Warnings

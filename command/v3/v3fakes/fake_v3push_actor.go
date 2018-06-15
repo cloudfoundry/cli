@@ -27,18 +27,18 @@ type FakeV3PushActor struct {
 		result3 <-chan pushaction.Warnings
 		result4 <-chan error
 	}
-	GeneratePushStateStub        func(setting pushaction.CommandLineSettings, spaceGUID string) ([]pushaction.PushState, pushaction.Warnings, error)
-	generatePushStateMutex       sync.RWMutex
-	generatePushStateArgsForCall []struct {
+	ConceptualizeStub        func(setting pushaction.CommandLineSettings, spaceGUID string) ([]pushaction.PushState, pushaction.Warnings, error)
+	conceptualizeMutex       sync.RWMutex
+	conceptualizeArgsForCall []struct {
 		setting   pushaction.CommandLineSettings
 		spaceGUID string
 	}
-	generatePushStateReturns struct {
+	conceptualizeReturns struct {
 		result1 []pushaction.PushState
 		result2 pushaction.Warnings
 		result3 error
 	}
-	generatePushStateReturnsOnCall map[int]struct {
+	conceptualizeReturnsOnCall map[int]struct {
 		result1 []pushaction.PushState
 		result2 pushaction.Warnings
 		result3 error
@@ -105,55 +105,55 @@ func (fake *FakeV3PushActor) ActualizeReturnsOnCall(i int, result1 <-chan pushac
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeV3PushActor) GeneratePushState(setting pushaction.CommandLineSettings, spaceGUID string) ([]pushaction.PushState, pushaction.Warnings, error) {
-	fake.generatePushStateMutex.Lock()
-	ret, specificReturn := fake.generatePushStateReturnsOnCall[len(fake.generatePushStateArgsForCall)]
-	fake.generatePushStateArgsForCall = append(fake.generatePushStateArgsForCall, struct {
+func (fake *FakeV3PushActor) Conceptualize(setting pushaction.CommandLineSettings, spaceGUID string) ([]pushaction.PushState, pushaction.Warnings, error) {
+	fake.conceptualizeMutex.Lock()
+	ret, specificReturn := fake.conceptualizeReturnsOnCall[len(fake.conceptualizeArgsForCall)]
+	fake.conceptualizeArgsForCall = append(fake.conceptualizeArgsForCall, struct {
 		setting   pushaction.CommandLineSettings
 		spaceGUID string
 	}{setting, spaceGUID})
-	fake.recordInvocation("GeneratePushState", []interface{}{setting, spaceGUID})
-	fake.generatePushStateMutex.Unlock()
-	if fake.GeneratePushStateStub != nil {
-		return fake.GeneratePushStateStub(setting, spaceGUID)
+	fake.recordInvocation("Conceptualize", []interface{}{setting, spaceGUID})
+	fake.conceptualizeMutex.Unlock()
+	if fake.ConceptualizeStub != nil {
+		return fake.ConceptualizeStub(setting, spaceGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.generatePushStateReturns.result1, fake.generatePushStateReturns.result2, fake.generatePushStateReturns.result3
+	return fake.conceptualizeReturns.result1, fake.conceptualizeReturns.result2, fake.conceptualizeReturns.result3
 }
 
-func (fake *FakeV3PushActor) GeneratePushStateCallCount() int {
-	fake.generatePushStateMutex.RLock()
-	defer fake.generatePushStateMutex.RUnlock()
-	return len(fake.generatePushStateArgsForCall)
+func (fake *FakeV3PushActor) ConceptualizeCallCount() int {
+	fake.conceptualizeMutex.RLock()
+	defer fake.conceptualizeMutex.RUnlock()
+	return len(fake.conceptualizeArgsForCall)
 }
 
-func (fake *FakeV3PushActor) GeneratePushStateArgsForCall(i int) (pushaction.CommandLineSettings, string) {
-	fake.generatePushStateMutex.RLock()
-	defer fake.generatePushStateMutex.RUnlock()
-	return fake.generatePushStateArgsForCall[i].setting, fake.generatePushStateArgsForCall[i].spaceGUID
+func (fake *FakeV3PushActor) ConceptualizeArgsForCall(i int) (pushaction.CommandLineSettings, string) {
+	fake.conceptualizeMutex.RLock()
+	defer fake.conceptualizeMutex.RUnlock()
+	return fake.conceptualizeArgsForCall[i].setting, fake.conceptualizeArgsForCall[i].spaceGUID
 }
 
-func (fake *FakeV3PushActor) GeneratePushStateReturns(result1 []pushaction.PushState, result2 pushaction.Warnings, result3 error) {
-	fake.GeneratePushStateStub = nil
-	fake.generatePushStateReturns = struct {
+func (fake *FakeV3PushActor) ConceptualizeReturns(result1 []pushaction.PushState, result2 pushaction.Warnings, result3 error) {
+	fake.ConceptualizeStub = nil
+	fake.conceptualizeReturns = struct {
 		result1 []pushaction.PushState
 		result2 pushaction.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3PushActor) GeneratePushStateReturnsOnCall(i int, result1 []pushaction.PushState, result2 pushaction.Warnings, result3 error) {
-	fake.GeneratePushStateStub = nil
-	if fake.generatePushStateReturnsOnCall == nil {
-		fake.generatePushStateReturnsOnCall = make(map[int]struct {
+func (fake *FakeV3PushActor) ConceptualizeReturnsOnCall(i int, result1 []pushaction.PushState, result2 pushaction.Warnings, result3 error) {
+	fake.ConceptualizeStub = nil
+	if fake.conceptualizeReturnsOnCall == nil {
+		fake.conceptualizeReturnsOnCall = make(map[int]struct {
 			result1 []pushaction.PushState
 			result2 pushaction.Warnings
 			result3 error
 		})
 	}
-	fake.generatePushStateReturnsOnCall[i] = struct {
+	fake.conceptualizeReturnsOnCall[i] = struct {
 		result1 []pushaction.PushState
 		result2 pushaction.Warnings
 		result3 error
@@ -165,8 +165,8 @@ func (fake *FakeV3PushActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.actualizeMutex.RLock()
 	defer fake.actualizeMutex.RUnlock()
-	fake.generatePushStateMutex.RLock()
-	defer fake.generatePushStateMutex.RUnlock()
+	fake.conceptualizeMutex.RLock()
+	defer fake.conceptualizeMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

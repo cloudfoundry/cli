@@ -27,7 +27,7 @@ type ProgressBar interface {
 
 type V3PushActor interface {
 	Actualize(state pushaction.PushState, progressBar pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
-	GeneratePushState(setting pushaction.CommandLineSettings, spaceGUID string) ([]pushaction.PushState, pushaction.Warnings, error)
+	Conceptualize(setting pushaction.CommandLineSettings, spaceGUID string) ([]pushaction.PushState, pushaction.Warnings, error)
 }
 
 //go:generate counterfeiter . V3PushVersionActor
@@ -130,7 +130,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("Getting app info...")
 
 	log.Info("generating the app state")
-	pushState, warnings, err := cmd.Actor.GeneratePushState(pushaction.CommandLineSettings{
+	pushState, warnings, err := cmd.Actor.Conceptualize(pushaction.CommandLineSettings{
 		Buildpacks:      cmd.Buildpacks,
 		Name:            cmd.RequiredArgs.AppName,
 		ProvidedAppPath: string(cmd.AppPath),

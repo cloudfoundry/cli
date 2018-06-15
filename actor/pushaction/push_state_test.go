@@ -28,7 +28,7 @@ var _ = Describe("Push State", func() {
 		actor = NewActor(fakeV2Actor, fakeV3Actor, fakeSharedActor)
 	})
 
-	Describe("GeneratePushState", func() {
+	Describe("Conceptualize", func() {
 		var (
 			settings  CommandLineSettings
 			spaceGUID string
@@ -47,7 +47,7 @@ var _ = Describe("Push State", func() {
 		})
 
 		JustBeforeEach(func() {
-			states, warnings, executeErr = actor.GeneratePushState(settings, spaceGUID)
+			states, warnings, executeErr = actor.Conceptualize(settings, spaceGUID)
 		})
 
 		Context("when the application exists", func() {

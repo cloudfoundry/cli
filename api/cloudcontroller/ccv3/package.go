@@ -14,6 +14,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
+//go:generate counterfeiter io.Reader
+
 // Package represents a Cloud Controller V3 Package.
 type Package struct {
 	// CreatedAt is the time with zone when the object was created.
@@ -181,6 +183,32 @@ func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
 	return fullPackagesList, warnings, err
 }
 
+// UploadApplicationPackage uploads the newResources and a list of existing
+// resources to the cloud controller. An updated package is returned. The
+// function will act differently given the following Readers:
+//   - io.ReadSeeker: Will function properly on retry.
+//   - io.Reader: Will return a ccerror.PipeSeekError on retry.
+//   - nil: Will not add the "application" section to the request. The newResourcesLength is ignored in this case.
+//
+// Note: In order to determine if package creation is successful, poll the
+// Package's state field for more information.
+func (client *Client) UploadApplicationPackage(pkg Package, existingResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+	link, ok := pkg.Links["upload"]
+	if !ok {
+		return Package{}, nil, ccerror.UploadLinkNotFoundError{PackageGUID: pkg.GUID}
+	}
+
+	if existingResources == nil {
+		return Package{}, nil, ccerror.NilObjectError{Object: "existingResources"}
+	}
+
+	if newResources == nil {
+		return client.uploadExistingResourcesOnly(link, existingResources)
+	}
+
+	return client.uploadNewAndExistingResources(link, existingResources, newResources, newResourcesLength)
+}
+
 // UploadPackage uploads a file to a given package's Upload resource. Note:
 // fileToUpload is read entirely into memory prior to sending data to CC.
 func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, Warnings, error) {
@@ -214,6 +242,75 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 	return responsePackage, response.Warnings, err
 }
 
+func (*Client) calculateAppBitsRequestSize(existingResources []Resource, newResourcesLength int64) (int64, error) {
+	body := &bytes.Buffer{}
+	form := multipart.NewWriter(body)
+
+	jsonResources, err := json.Marshal(existingResources)
+	if err != nil {
+		return 0, err
+	}
+	err = form.WriteField("resources", string(jsonResources))
+	if err != nil {
+		return 0, err
+	}
+	_, err = form.CreateFormFile("bits", "package.zip")
+	if err != nil {
+		return 0, err
+	}
+	err = form.Close()
+	if err != nil {
+		return 0, err
+	}
+
+	return int64(body.Len()) + newResourcesLength, nil
+}
+
+func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
+	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
+	form := multipart.NewWriter(writerInput)
+
+	writeErrors := make(chan error)
+
+	go func() {
+		defer close(writeErrors)
+		defer writerInput.Close()
+
+		jsonResources, err := json.Marshal(existingResources)
+		if err != nil {
+			writeErrors <- err
+			return
+		}
+
+		err = form.WriteField("resources", string(jsonResources))
+		if err != nil {
+			writeErrors <- err
+			return
+		}
+
+		writer, err := form.CreateFormFile("bits", "package.zip")
+		if err != nil {
+			writeErrors <- err
+			return
+		}
+
+		if newResourcesLength != 0 {
+			_, err = io.Copy(writer, newResources)
+			if err != nil {
+				writeErrors <- err
+				return
+			}
+		}
+
+		err = form.Close()
+		if err != nil {
+			writeErrors <- err
+		}
+	}()
+
+	return form.FormDataContentType(), writerOutput, writeErrors
+}
+
 func (*Client) createUploadStream(path string, paramName string) (io.ReadSeeker, string, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -235,4 +332,118 @@ func (*Client) createUploadStream(path string, paramName string) (io.ReadSeeker,
 	err = writer.Close()
 
 	return bytes.NewReader(body.Bytes()), writer.FormDataContentType(), err
+}
+
+func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Package, Warnings, error) {
+	var pkg Package
+	response := cloudcontroller.Response{
+		Result: &pkg,
+	}
+
+	httpErrors := make(chan error)
+
+	go func() {
+		defer close(httpErrors)
+
+		err := client.connection.Make(request, &response)
+		if err != nil {
+			httpErrors <- err
+		}
+	}()
+
+	// The following section makes the following assumptions:
+	// 1) If an error occurs during file reading, an EOF is sent to the request
+	// object. Thus ending the request transfer.
+	// 2) If an error occurs during request transfer, an EOF is sent to the pipe.
+	// Thus ending the writing routine.
+	var firstError error
+	var writeClosed, httpClosed bool
+
+	for {
+		select {
+		case writeErr, ok := <-writeErrors:
+			if !ok {
+				writeClosed = true
+				break // for select
+			}
+			if firstError == nil {
+				firstError = writeErr
+			}
+		case httpErr, ok := <-httpErrors:
+			if !ok {
+				httpClosed = true
+				break // for select
+			}
+			if firstError == nil {
+				firstError = httpErr
+			}
+		}
+
+		if writeClosed && httpClosed {
+			break // for for
+		}
+	}
+
+	return pkg, response.Warnings, firstError
+}
+
+func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, existingResources []Resource) (Package, Warnings, error) {
+	jsonResources, err := json.Marshal(existingResources)
+	if err != nil {
+		return Package{}, nil, err
+	}
+
+	body := bytes.NewBuffer(nil)
+	form := multipart.NewWriter(body)
+	err = form.WriteField("resources", string(jsonResources))
+	if err != nil {
+		return Package{}, nil, err
+	}
+
+	err = form.Close()
+	if err != nil {
+		return Package{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		URL:    uploadLink.HREF,
+		Method: uploadLink.Method,
+		Body:   bytes.NewReader(body.Bytes()),
+	})
+	if err != nil {
+		return Package{}, nil, err
+	}
+
+	request.Header.Set("Content-Type", form.FormDataContentType())
+
+	var pkg Package
+	response := cloudcontroller.Response{
+		Result: &pkg,
+	}
+
+	err = client.connection.Make(request, &response)
+	return pkg, response.Warnings, err
+}
+
+func (client *Client) uploadNewAndExistingResources(uploadLink APILink, existingResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+	contentLength, err := client.calculateAppBitsRequestSize(existingResources, newResourcesLength)
+	if err != nil {
+		return Package{}, nil, err
+	}
+
+	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(existingResources, newResources, newResourcesLength)
+
+	request, err := client.newHTTPRequest(requestOptions{
+		URL:    uploadLink.HREF,
+		Method: uploadLink.Method,
+		Body:   body,
+	})
+	if err != nil {
+		return Package{}, nil, err
+	}
+
+	request.Header.Set("Content-Type", contentType)
+	request.ContentLength = contentLength
+
+	return client.uploadAsynchronously(request, writeErrors)
 }

@@ -170,7 +170,7 @@ var _ = Describe("v3-push Command", func() {
 
 			Context("when getting app settings is successful", func() {
 				BeforeEach(func() {
-					fakeActor.GeneratePushStateReturns(
+					fakeActor.ConceptualizeReturns(
 						[]pushaction.PushState{
 							{
 								Application: v3action.Application{Name: "some-app"},
@@ -198,8 +198,8 @@ var _ = Describe("v3-push Command", func() {
 						Expect(testUI.Out).To(Say("Getting app info..."))
 						Expect(testUI.Err).To(Say("some-warning-1"))
 
-						Expect(fakeActor.GeneratePushStateCallCount()).To(Equal(1))
-						settings, spaceGUID := fakeActor.GeneratePushStateArgsForCall(0)
+						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+						settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
 						Expect(settings).To(MatchFields(IgnoreExtras, Fields{
 							"Name": Equal("some-app"),
 						}))
@@ -223,7 +223,7 @@ var _ = Describe("v3-push Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("fasdflkjdkjinenwnnondsokekm foo")
-					fakeActor.GeneratePushStateReturns(nil, pushaction.Warnings{"some-warning-1"}, expectedErr)
+					fakeActor.ConceptualizeReturns(nil, pushaction.Warnings{"some-warning-1"}, expectedErr)
 				})
 
 				It("generates a push state with the specified app path", func() {
@@ -238,8 +238,8 @@ var _ = Describe("v3-push Command", func() {
 				})
 
 				It("generates a push state with the specified app path", func() {
-					Expect(fakeActor.GeneratePushStateCallCount()).To(Equal(1))
-					settings, spaceGUID := fakeActor.GeneratePushStateArgsForCall(0)
+					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+					settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
 					Expect(settings).To(MatchFields(IgnoreExtras, Fields{
 						"Name":            Equal("some-app"),
 						"ProvidedAppPath": Equal("some/app/path"),
@@ -254,8 +254,8 @@ var _ = Describe("v3-push Command", func() {
 				})
 
 				It("generates a push state with the specified buildpacks", func() {
-					Expect(fakeActor.GeneratePushStateCallCount()).To(Equal(1))
-					settings, spaceGUID := fakeActor.GeneratePushStateArgsForCall(0)
+					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+					settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
 					Expect(settings).To(MatchFields(IgnoreExtras, Fields{
 						"Name":       Equal("some-app"),
 						"Buildpacks": Equal([]string{"some-buildpack-1", "some-buildpack-2"}),
