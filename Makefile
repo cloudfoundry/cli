@@ -33,7 +33,7 @@ format :
 	go fmt ./...
 
 fly-windows-experimental : check-target-env
-	CF_CLI_EXPERIMENTAL=true CF_TEST_SUITE=./integration/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
+	CF_TEST_SUITE=./integration/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
 
 fly-windows-isolated : check-target-env
 	CF_TEST_SUITE=./integration/isolated fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
@@ -54,7 +54,7 @@ integration-cleanup :
 	$(PWD)/bin/cleanup-integration
 
 integration-experimental : build integration-cleanup
-	CF_CLI_EXPERIMENTAL=true ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/experimental
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/experimental
 
 integration-global : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
