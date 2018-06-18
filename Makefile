@@ -18,6 +18,9 @@ all : test build
 build : out/cf-cli_linux_x86-64
 	cp out/cf-cli_linux_x86-64 out/cf
 
+osx: out/cf-cli_osx
+	cp out/cf-cli_osx out/cf
+
 check-target-env :
 ifndef CF_INT_API
 	$(error CF_INT_API is undefined)
