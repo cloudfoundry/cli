@@ -78,7 +78,7 @@ applications:
 				Buildpack: types.FilteredString{Value: "some-other-buildpack", IsSet: true},
 			}))
 
-			Expect(warnings).To(ConsistOf(`Deprecation warning: Use of buildpack attribute in manifest is deprecated in favor of 'buildpacks'. Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated for alternatives and other app manifest deprecations. This feature will be removed in the future.`))
+			Expect(warnings).To(ConsistOf(`Deprecation warning: Use of 'buildpack' attribute in manifest is deprecated in favor of 'buildpacks'. Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated for alternatives and other app manifest deprecations. This feature will be removed in the future.`))
 		})
 	})
 })
