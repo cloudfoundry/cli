@@ -27,6 +27,7 @@ type Factory interface {
 	NewAPIEndpointRequirement() Requirement
 	NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement
 	NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) Requirement
+	NewUnsupportedLegacyFlagRequirement(flags ...string) Requirement
 	NewUsageRequirement(Usable, string, func() bool) Requirement
 	NewNumberArguments([]string, ...string) Requirement
 }
@@ -163,6 +164,10 @@ func (f apiRequirementFactory) NewMaxAPIVersionRequirement(commandName string, m
 		commandName,
 		maximumVersion,
 	)
+}
+
+func (f apiRequirementFactory) NewUnsupportedLegacyFlagRequirement(flags ...string) Requirement {
+	return NewUnsupportedLegacyFlagRequirement(flags)
 }
 
 func (f apiRequirementFactory) NewUsageRequirement(cmd Usable, errorMessage string, pred func() bool) Requirement {

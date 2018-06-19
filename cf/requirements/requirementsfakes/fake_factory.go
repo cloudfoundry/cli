@@ -179,6 +179,17 @@ type FakeFactory struct {
 	newMaxAPIVersionRequirementReturnsOnCall map[int]struct {
 		result1 requirements.Requirement
 	}
+	NewUnsupportedLegacyFlagRequirementStub        func(flags ...string) requirements.Requirement
+	newUnsupportedLegacyFlagRequirementMutex       sync.RWMutex
+	newUnsupportedLegacyFlagRequirementArgsForCall []struct {
+		flags []string
+	}
+	newUnsupportedLegacyFlagRequirementReturns struct {
+		result1 requirements.Requirement
+	}
+	newUnsupportedLegacyFlagRequirementReturnsOnCall map[int]struct {
+		result1 requirements.Requirement
+	}
 	NewUsageRequirementStub        func(requirements.Usable, string, func() bool) requirements.Requirement
 	newUsageRequirementMutex       sync.RWMutex
 	newUsageRequirementArgsForCall []struct {
@@ -940,6 +951,54 @@ func (fake *FakeFactory) NewMaxAPIVersionRequirementReturnsOnCall(i int, result1
 	}{result1}
 }
 
+func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirement(flags ...string) requirements.Requirement {
+	fake.newUnsupportedLegacyFlagRequirementMutex.Lock()
+	ret, specificReturn := fake.newUnsupportedLegacyFlagRequirementReturnsOnCall[len(fake.newUnsupportedLegacyFlagRequirementArgsForCall)]
+	fake.newUnsupportedLegacyFlagRequirementArgsForCall = append(fake.newUnsupportedLegacyFlagRequirementArgsForCall, struct {
+		flags []string
+	}{flags})
+	fake.recordInvocation("NewUnsupportedLegacyFlagRequirement", []interface{}{flags})
+	fake.newUnsupportedLegacyFlagRequirementMutex.Unlock()
+	if fake.NewUnsupportedLegacyFlagRequirementStub != nil {
+		return fake.NewUnsupportedLegacyFlagRequirementStub(flags...)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.newUnsupportedLegacyFlagRequirementReturns.result1
+}
+
+func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementCallCount() int {
+	fake.newUnsupportedLegacyFlagRequirementMutex.RLock()
+	defer fake.newUnsupportedLegacyFlagRequirementMutex.RUnlock()
+	return len(fake.newUnsupportedLegacyFlagRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementArgsForCall(i int) []string {
+	fake.newUnsupportedLegacyFlagRequirementMutex.RLock()
+	defer fake.newUnsupportedLegacyFlagRequirementMutex.RUnlock()
+	return fake.newUnsupportedLegacyFlagRequirementArgsForCall[i].flags
+}
+
+func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementReturns(result1 requirements.Requirement) {
+	fake.NewUnsupportedLegacyFlagRequirementStub = nil
+	fake.newUnsupportedLegacyFlagRequirementReturns = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
+	fake.NewUnsupportedLegacyFlagRequirementStub = nil
+	if fake.newUnsupportedLegacyFlagRequirementReturnsOnCall == nil {
+		fake.newUnsupportedLegacyFlagRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.Requirement
+		})
+	}
+	fake.newUnsupportedLegacyFlagRequirementReturnsOnCall[i] = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
 func (fake *FakeFactory) NewUsageRequirement(arg1 requirements.Usable, arg2 string, arg3 func() bool) requirements.Requirement {
 	fake.newUsageRequirementMutex.Lock()
 	ret, specificReturn := fake.newUsageRequirementReturnsOnCall[len(fake.newUsageRequirementArgsForCall)]
@@ -1079,6 +1138,8 @@ func (fake *FakeFactory) Invocations() map[string][][]interface{} {
 	defer fake.newMinAPIVersionRequirementMutex.RUnlock()
 	fake.newMaxAPIVersionRequirementMutex.RLock()
 	defer fake.newMaxAPIVersionRequirementMutex.RUnlock()
+	fake.newUnsupportedLegacyFlagRequirementMutex.RLock()
+	defer fake.newUnsupportedLegacyFlagRequirementMutex.RUnlock()
 	fake.newUsageRequirementMutex.RLock()
 	defer fake.newUsageRequirementMutex.RUnlock()
 	fake.newNumberArgumentsMutex.RLock()
