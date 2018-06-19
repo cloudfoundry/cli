@@ -8,7 +8,7 @@ type StagingTimeoutError struct {
 }
 
 func (StagingTimeoutError) Error() string {
-	return `Error staging application {{.AppName}}: timed out after {{.Timeout}} {{if eq .Timeout 1.0}}minute{{else}}minutes{{end}}`
+	return `Error staging application {{.AppName}}: timed out after {{.Timeout}} minute(s)`
 }
 
 func (e StagingTimeoutError) Translate(translate func(string, ...interface{}) string) string {
