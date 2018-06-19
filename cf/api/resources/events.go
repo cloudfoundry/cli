@@ -69,6 +69,7 @@ func (resource EventResourceOldV2) ToFields() models.EventFields {
 var knownMetadataKeys = []string{
 	"index",
 	"reason",
+	"cell_id",
 	"exit_description",
 	"exit_status",
 	"recursive",
