@@ -41,6 +41,7 @@ type V3SSHCommand struct {
 
 	usage           interface{} `usage:"cf v3-ssh APP_NAME [--process PROCESS] [-i INDEX] [-c COMMAND]\n   [-L [BIND_ADDRESS:]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT]... [--skip-remote-execution]\n   [--disable-pseudo-tty | --force-pseudo-tty | --request-pseudo-tty] [--skip-host-validation]"`
 	relatedCommands interface{} `related_commands:"allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled"`
+	allproxy        interface{} `environmentName:"all_proxy" environmentDescription:"Specify a proxy server to enable proxying for all requests"`
 
 	UI          command.UI
 	Config      command.Config
