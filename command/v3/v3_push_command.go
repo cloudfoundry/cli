@@ -1,6 +1,8 @@
 package v3
 
 import (
+	"os"
+
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -128,13 +130,13 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayText("Getting app info...")
+	cls, err := cmd.GetCommandLineSettings()
+	if err != nil {
+		return err
+	}
 
 	log.Info("generating the app state")
-	pushState, warnings, err := cmd.Actor.Conceptualize(pushaction.CommandLineSettings{
-		Buildpacks:      cmd.Buildpacks,
-		Name:            cmd.RequiredArgs.AppName,
-		ProvidedAppPath: string(cmd.AppPath),
-	}, cmd.Config.TargetedSpace().GUID)
+	pushState, warnings, err := cmd.Actor.Conceptualize(cls, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -209,18 +211,43 @@ func (cmd V3PushCommand) processEvent(appName string, event pushaction.Event) bo
 	log.Infoln("received apply event:", event)
 
 	switch event {
+	case pushaction.SkippingApplicationCreation:
+		cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}}...", map[string]interface{}{
+			"AppName": appName,
+		})
 	case pushaction.CreatedApplication:
 		cmd.UI.DisplayTextWithFlavor("Creating app {{.AppName}}...", map[string]interface{}{
 			"AppName": appName,
 		})
-	case pushaction.SkipingApplicationCreation:
-		cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}}...", map[string]interface{}{
-			"AppName": appName,
-		})
+	case pushaction.CreatingArchive:
+		cmd.UI.DisplayTextWithFlavor("Packaging files to upload...")
+	case pushaction.UploadingApplicationWithArchive:
+		cmd.UI.DisplayTextWithFlavor("Uploading files...")
+		log.Debug("starting progress bar")
+		cmd.ProgressBar.Ready()
+	case pushaction.RetryUpload:
+		cmd.UI.DisplayText("Retrying upload due to an error...")
+	case pushaction.UploadWithArchiveComplete:
+		cmd.ProgressBar.Complete()
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Waiting for API to complete processing files...")
 	case pushaction.Complete:
 		return true
 	default:
 		log.WithField("event", event).Debug("ignoring event")
 	}
 	return false
+}
+
+func (cmd V3PushCommand) GetCommandLineSettings() (pushaction.CommandLineSettings, error) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return pushaction.CommandLineSettings{}, err
+	}
+	return pushaction.CommandLineSettings{
+		Buildpacks:       cmd.Buildpacks,
+		CurrentDirectory: pwd,
+		Name:             cmd.RequiredArgs.AppName,
+		ProvidedAppPath:  string(cmd.AppPath),
+	}, nil
 }

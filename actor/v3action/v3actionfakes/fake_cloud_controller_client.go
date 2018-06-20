@@ -2,6 +2,7 @@
 package v3actionfakes
 
 import (
+	"io"
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -517,13 +518,13 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	PatchApplicationProcessHealthCheckStub        func(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, processInvocationTimeout int) (ccv3.Process, ccv3.Warnings, error)
+	PatchApplicationProcessHealthCheckStub        func(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, processHealthCheckInvocationTimeout int) (ccv3.Process, ccv3.Warnings, error)
 	patchApplicationProcessHealthCheckMutex       sync.RWMutex
 	patchApplicationProcessHealthCheckArgsForCall []struct {
-		processGUID                string
-		processHealthCheckType     string
-		processHealthCheckEndpoint string
-		processInvocationTimeout   int
+		processGUID                         string
+		processHealthCheckType              string
+		processHealthCheckEndpoint          string
+		processHealthCheckInvocationTimeout int
 	}
 	patchApplicationProcessHealthCheckReturns struct {
 		result1 ccv3.Process
@@ -701,6 +702,24 @@ type FakeCloudControllerClient struct {
 	}
 	updateTaskCancelReturnsOnCall map[int]struct {
 		result1 ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}
+	UploadBitsPackageStub        func(pkg ccv3.Package, existingResources []ccv3.Resource, newResources io.Reader, newResourcesLength int64) (ccv3.Package, ccv3.Warnings, error)
+	uploadBitsPackageMutex       sync.RWMutex
+	uploadBitsPackageArgsForCall []struct {
+		pkg                ccv3.Package
+		existingResources  []ccv3.Resource
+		newResources       io.Reader
+		newResourcesLength int64
+	}
+	uploadBitsPackageReturns struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}
+	uploadBitsPackageReturnsOnCall map[int]struct {
+		result1 ccv3.Package
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -2574,19 +2593,19 @@ func (fake *FakeCloudControllerClient) GetSpacesReturnsOnCall(i int, result1 []c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, processInvocationTimeout int) (ccv3.Process, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, processHealthCheckInvocationTimeout int) (ccv3.Process, ccv3.Warnings, error) {
 	fake.patchApplicationProcessHealthCheckMutex.Lock()
 	ret, specificReturn := fake.patchApplicationProcessHealthCheckReturnsOnCall[len(fake.patchApplicationProcessHealthCheckArgsForCall)]
 	fake.patchApplicationProcessHealthCheckArgsForCall = append(fake.patchApplicationProcessHealthCheckArgsForCall, struct {
-		processGUID                string
-		processHealthCheckType     string
-		processHealthCheckEndpoint string
-		processInvocationTimeout   int
-	}{processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout})
-	fake.recordInvocation("PatchApplicationProcessHealthCheck", []interface{}{processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout})
+		processGUID                         string
+		processHealthCheckType              string
+		processHealthCheckEndpoint          string
+		processHealthCheckInvocationTimeout int
+	}{processGUID, processHealthCheckType, processHealthCheckEndpoint, processHealthCheckInvocationTimeout})
+	fake.recordInvocation("PatchApplicationProcessHealthCheck", []interface{}{processGUID, processHealthCheckType, processHealthCheckEndpoint, processHealthCheckInvocationTimeout})
 	fake.patchApplicationProcessHealthCheckMutex.Unlock()
 	if fake.PatchApplicationProcessHealthCheckStub != nil {
-		return fake.PatchApplicationProcessHealthCheckStub(processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout)
+		return fake.PatchApplicationProcessHealthCheckStub(processGUID, processHealthCheckType, processHealthCheckEndpoint, processHealthCheckInvocationTimeout)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2603,7 +2622,7 @@ func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckCallCou
 func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckArgsForCall(i int) (string, string, string, int) {
 	fake.patchApplicationProcessHealthCheckMutex.RLock()
 	defer fake.patchApplicationProcessHealthCheckMutex.RUnlock()
-	return fake.patchApplicationProcessHealthCheckArgsForCall[i].processGUID, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckType, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckEndpoint, fake.patchApplicationProcessHealthCheckArgsForCall[i].processInvocationTimeout
+	return fake.patchApplicationProcessHealthCheckArgsForCall[i].processGUID, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckType, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckEndpoint, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckInvocationTimeout
 }
 
 func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckReturns(result1 ccv3.Process, result2 ccv3.Warnings, result3 error) {
@@ -3238,6 +3257,68 @@ func (fake *FakeCloudControllerClient) UpdateTaskCancelReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UploadBitsPackage(pkg ccv3.Package, existingResources []ccv3.Resource, newResources io.Reader, newResourcesLength int64) (ccv3.Package, ccv3.Warnings, error) {
+	var existingResourcesCopy []ccv3.Resource
+	if existingResources != nil {
+		existingResourcesCopy = make([]ccv3.Resource, len(existingResources))
+		copy(existingResourcesCopy, existingResources)
+	}
+	fake.uploadBitsPackageMutex.Lock()
+	ret, specificReturn := fake.uploadBitsPackageReturnsOnCall[len(fake.uploadBitsPackageArgsForCall)]
+	fake.uploadBitsPackageArgsForCall = append(fake.uploadBitsPackageArgsForCall, struct {
+		pkg                ccv3.Package
+		existingResources  []ccv3.Resource
+		newResources       io.Reader
+		newResourcesLength int64
+	}{pkg, existingResourcesCopy, newResources, newResourcesLength})
+	fake.recordInvocation("UploadBitsPackage", []interface{}{pkg, existingResourcesCopy, newResources, newResourcesLength})
+	fake.uploadBitsPackageMutex.Unlock()
+	if fake.UploadBitsPackageStub != nil {
+		return fake.UploadBitsPackageStub(pkg, existingResources, newResources, newResourcesLength)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.uploadBitsPackageReturns.result1, fake.uploadBitsPackageReturns.result2, fake.uploadBitsPackageReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UploadBitsPackageCallCount() int {
+	fake.uploadBitsPackageMutex.RLock()
+	defer fake.uploadBitsPackageMutex.RUnlock()
+	return len(fake.uploadBitsPackageArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UploadBitsPackageArgsForCall(i int) (ccv3.Package, []ccv3.Resource, io.Reader, int64) {
+	fake.uploadBitsPackageMutex.RLock()
+	defer fake.uploadBitsPackageMutex.RUnlock()
+	return fake.uploadBitsPackageArgsForCall[i].pkg, fake.uploadBitsPackageArgsForCall[i].existingResources, fake.uploadBitsPackageArgsForCall[i].newResources, fake.uploadBitsPackageArgsForCall[i].newResourcesLength
+}
+
+func (fake *FakeCloudControllerClient) UploadBitsPackageReturns(result1 ccv3.Package, result2 ccv3.Warnings, result3 error) {
+	fake.UploadBitsPackageStub = nil
+	fake.uploadBitsPackageReturns = struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UploadBitsPackageReturnsOnCall(i int, result1 ccv3.Package, result2 ccv3.Warnings, result3 error) {
+	fake.UploadBitsPackageStub = nil
+	if fake.uploadBitsPackageReturnsOnCall == nil {
+		fake.uploadBitsPackageReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Package
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.uploadBitsPackageReturnsOnCall[i] = struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UploadPackage(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error) {
 	fake.uploadPackageMutex.Lock()
 	ret, specificReturn := fake.uploadPackageReturnsOnCall[len(fake.uploadPackageArgsForCall)]
@@ -3390,6 +3471,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateSpaceIsolationSegmentRelationshipMutex.RUnlock()
 	fake.updateTaskCancelMutex.RLock()
 	defer fake.updateTaskCancelMutex.RUnlock()
+	fake.uploadBitsPackageMutex.RLock()
+	defer fake.uploadBitsPackageMutex.RUnlock()
 	fake.uploadPackageMutex.RLock()
 	defer fake.uploadPackageMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

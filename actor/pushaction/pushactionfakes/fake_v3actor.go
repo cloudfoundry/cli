@@ -2,9 +2,11 @@
 package pushactionfakes
 
 import (
+	"io"
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/pushaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 )
 
@@ -34,6 +36,21 @@ type FakeV3Actor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
+	CreateBitsPackageByApplicationStub        func(appGUID string) (v3action.Package, v3action.Warnings, error)
+	createBitsPackageByApplicationMutex       sync.RWMutex
+	createBitsPackageByApplicationArgsForCall []struct {
+		appGUID string
+	}
+	createBitsPackageByApplicationReturns struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}
+	createBitsPackageByApplicationReturnsOnCall map[int]struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}
 	GetApplicationByNameAndSpaceStub        func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
@@ -50,6 +67,21 @@ type FakeV3Actor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
+	PollPackageStub        func(pkg v3action.Package) (v3action.Package, v3action.Warnings, error)
+	pollPackageMutex       sync.RWMutex
+	pollPackageArgsForCall []struct {
+		pkg v3action.Package
+	}
+	pollPackageReturns struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}
+	pollPackageReturnsOnCall map[int]struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}
 	UpdateApplicationStub        func(v3action.Application) (v3action.Application, v3action.Warnings, error)
 	updateApplicationMutex       sync.RWMutex
 	updateApplicationArgsForCall []struct {
@@ -62,6 +94,24 @@ type FakeV3Actor struct {
 	}
 	updateApplicationReturnsOnCall map[int]struct {
 		result1 v3action.Application
+		result2 v3action.Warnings
+		result3 error
+	}
+	UploadBitsPackageStub        func(v3action.Package, []sharedaction.Resource, io.Reader, int64) (v3action.Package, v3action.Warnings, error)
+	uploadBitsPackageMutex       sync.RWMutex
+	uploadBitsPackageArgsForCall []struct {
+		arg1 v3action.Package
+		arg2 []sharedaction.Resource
+		arg3 io.Reader
+		arg4 int64
+	}
+	uploadBitsPackageReturns struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}
+	uploadBitsPackageReturnsOnCall map[int]struct {
+		result1 v3action.Package
 		result2 v3action.Warnings
 		result3 error
 	}
@@ -164,6 +214,60 @@ func (fake *FakeV3Actor) CreateApplicationInSpaceReturnsOnCall(i int, result1 v3
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV3Actor) CreateBitsPackageByApplication(appGUID string) (v3action.Package, v3action.Warnings, error) {
+	fake.createBitsPackageByApplicationMutex.Lock()
+	ret, specificReturn := fake.createBitsPackageByApplicationReturnsOnCall[len(fake.createBitsPackageByApplicationArgsForCall)]
+	fake.createBitsPackageByApplicationArgsForCall = append(fake.createBitsPackageByApplicationArgsForCall, struct {
+		appGUID string
+	}{appGUID})
+	fake.recordInvocation("CreateBitsPackageByApplication", []interface{}{appGUID})
+	fake.createBitsPackageByApplicationMutex.Unlock()
+	if fake.CreateBitsPackageByApplicationStub != nil {
+		return fake.CreateBitsPackageByApplicationStub(appGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createBitsPackageByApplicationReturns.result1, fake.createBitsPackageByApplicationReturns.result2, fake.createBitsPackageByApplicationReturns.result3
+}
+
+func (fake *FakeV3Actor) CreateBitsPackageByApplicationCallCount() int {
+	fake.createBitsPackageByApplicationMutex.RLock()
+	defer fake.createBitsPackageByApplicationMutex.RUnlock()
+	return len(fake.createBitsPackageByApplicationArgsForCall)
+}
+
+func (fake *FakeV3Actor) CreateBitsPackageByApplicationArgsForCall(i int) string {
+	fake.createBitsPackageByApplicationMutex.RLock()
+	defer fake.createBitsPackageByApplicationMutex.RUnlock()
+	return fake.createBitsPackageByApplicationArgsForCall[i].appGUID
+}
+
+func (fake *FakeV3Actor) CreateBitsPackageByApplicationReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.CreateBitsPackageByApplicationStub = nil
+	fake.createBitsPackageByApplicationReturns = struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3Actor) CreateBitsPackageByApplicationReturnsOnCall(i int, result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.CreateBitsPackageByApplicationStub = nil
+	if fake.createBitsPackageByApplicationReturnsOnCall == nil {
+		fake.createBitsPackageByApplicationReturnsOnCall = make(map[int]struct {
+			result1 v3action.Package
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.createBitsPackageByApplicationReturnsOnCall[i] = struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV3Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
@@ -214,6 +318,60 @@ func (fake *FakeV3Actor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result
 	}
 	fake.getApplicationByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v3action.Application
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3Actor) PollPackage(pkg v3action.Package) (v3action.Package, v3action.Warnings, error) {
+	fake.pollPackageMutex.Lock()
+	ret, specificReturn := fake.pollPackageReturnsOnCall[len(fake.pollPackageArgsForCall)]
+	fake.pollPackageArgsForCall = append(fake.pollPackageArgsForCall, struct {
+		pkg v3action.Package
+	}{pkg})
+	fake.recordInvocation("PollPackage", []interface{}{pkg})
+	fake.pollPackageMutex.Unlock()
+	if fake.PollPackageStub != nil {
+		return fake.PollPackageStub(pkg)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.pollPackageReturns.result1, fake.pollPackageReturns.result2, fake.pollPackageReturns.result3
+}
+
+func (fake *FakeV3Actor) PollPackageCallCount() int {
+	fake.pollPackageMutex.RLock()
+	defer fake.pollPackageMutex.RUnlock()
+	return len(fake.pollPackageArgsForCall)
+}
+
+func (fake *FakeV3Actor) PollPackageArgsForCall(i int) v3action.Package {
+	fake.pollPackageMutex.RLock()
+	defer fake.pollPackageMutex.RUnlock()
+	return fake.pollPackageArgsForCall[i].pkg
+}
+
+func (fake *FakeV3Actor) PollPackageReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.PollPackageStub = nil
+	fake.pollPackageReturns = struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3Actor) PollPackageReturnsOnCall(i int, result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.PollPackageStub = nil
+	if fake.pollPackageReturnsOnCall == nil {
+		fake.pollPackageReturnsOnCall = make(map[int]struct {
+			result1 v3action.Package
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.pollPackageReturnsOnCall[i] = struct {
+		result1 v3action.Package
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -273,6 +431,68 @@ func (fake *FakeV3Actor) UpdateApplicationReturnsOnCall(i int, result1 v3action.
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV3Actor) UploadBitsPackage(arg1 v3action.Package, arg2 []sharedaction.Resource, arg3 io.Reader, arg4 int64) (v3action.Package, v3action.Warnings, error) {
+	var arg2Copy []sharedaction.Resource
+	if arg2 != nil {
+		arg2Copy = make([]sharedaction.Resource, len(arg2))
+		copy(arg2Copy, arg2)
+	}
+	fake.uploadBitsPackageMutex.Lock()
+	ret, specificReturn := fake.uploadBitsPackageReturnsOnCall[len(fake.uploadBitsPackageArgsForCall)]
+	fake.uploadBitsPackageArgsForCall = append(fake.uploadBitsPackageArgsForCall, struct {
+		arg1 v3action.Package
+		arg2 []sharedaction.Resource
+		arg3 io.Reader
+		arg4 int64
+	}{arg1, arg2Copy, arg3, arg4})
+	fake.recordInvocation("UploadBitsPackage", []interface{}{arg1, arg2Copy, arg3, arg4})
+	fake.uploadBitsPackageMutex.Unlock()
+	if fake.UploadBitsPackageStub != nil {
+		return fake.UploadBitsPackageStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.uploadBitsPackageReturns.result1, fake.uploadBitsPackageReturns.result2, fake.uploadBitsPackageReturns.result3
+}
+
+func (fake *FakeV3Actor) UploadBitsPackageCallCount() int {
+	fake.uploadBitsPackageMutex.RLock()
+	defer fake.uploadBitsPackageMutex.RUnlock()
+	return len(fake.uploadBitsPackageArgsForCall)
+}
+
+func (fake *FakeV3Actor) UploadBitsPackageArgsForCall(i int) (v3action.Package, []sharedaction.Resource, io.Reader, int64) {
+	fake.uploadBitsPackageMutex.RLock()
+	defer fake.uploadBitsPackageMutex.RUnlock()
+	return fake.uploadBitsPackageArgsForCall[i].arg1, fake.uploadBitsPackageArgsForCall[i].arg2, fake.uploadBitsPackageArgsForCall[i].arg3, fake.uploadBitsPackageArgsForCall[i].arg4
+}
+
+func (fake *FakeV3Actor) UploadBitsPackageReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.UploadBitsPackageStub = nil
+	fake.uploadBitsPackageReturns = struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3Actor) UploadBitsPackageReturnsOnCall(i int, result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.UploadBitsPackageStub = nil
+	if fake.uploadBitsPackageReturnsOnCall == nil {
+		fake.uploadBitsPackageReturnsOnCall = make(map[int]struct {
+			result1 v3action.Package
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.uploadBitsPackageReturnsOnCall[i] = struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV3Actor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -280,10 +500,16 @@ func (fake *FakeV3Actor) Invocations() map[string][][]interface{} {
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.createApplicationInSpaceMutex.RLock()
 	defer fake.createApplicationInSpaceMutex.RUnlock()
+	fake.createBitsPackageByApplicationMutex.RLock()
+	defer fake.createBitsPackageByApplicationMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	fake.pollPackageMutex.RLock()
+	defer fake.pollPackageMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
+	fake.uploadBitsPackageMutex.RLock()
+	defer fake.uploadBitsPackageMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

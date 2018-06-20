@@ -431,7 +431,7 @@ var _ = Describe("Package", func() {
 		})
 	})
 
-	Describe("UploadApplicationPackage", func() {
+	Describe("UploadBitsPackage", func() {
 		var (
 			inputPackage Package
 		)
@@ -511,7 +511,7 @@ var _ = Describe("Package", func() {
 				})
 
 				It("returns the created job and warnings", func() {
-					pkg, warnings, err := client.UploadApplicationPackage(inputPackage, resources, reader, int64(len(readerBody)))
+					pkg, warnings, err := client.UploadBitsPackage(inputPackage, resources, reader, int64(len(readerBody)))
 					Expect(err).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 					Expect(pkg).To(Equal(Package{
@@ -568,7 +568,7 @@ var _ = Describe("Package", func() {
 				})
 
 				It("does not send the application bits", func() {
-					pkg, warnings, err := client.UploadApplicationPackage(inputPackage, resources, nil, 33513531353)
+					pkg, warnings, err := client.UploadBitsPackage(inputPackage, resources, nil, 33513531353)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 					Expect(pkg).To(Equal(Package{
@@ -601,7 +601,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the error", func() {
-				_, warnings, err := client.UploadApplicationPackage(inputPackage, []Resource{}, bytes.NewReader(nil), 0)
+				_, warnings, err := client.UploadBitsPackage(inputPackage, []Resource{}, bytes.NewReader(nil), 0)
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Banana"}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -609,7 +609,7 @@ var _ = Describe("Package", func() {
 
 		Context("when passed a nil resources", func() {
 			It("returns a NilObjectError", func() {
-				_, _, err := client.UploadApplicationPackage(inputPackage, nil, bytes.NewReader(nil), 0)
+				_, _, err := client.UploadBitsPackage(inputPackage, nil, bytes.NewReader(nil), 0)
 				Expect(err).To(MatchError(ccerror.NilObjectError{Object: "existingResources"}))
 			})
 		})
@@ -631,7 +631,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the error", func() {
-				_, _, err := client.UploadApplicationPackage(inputPackage, []Resource{}, fakeReader, 3)
+				_, _, err := client.UploadBitsPackage(inputPackage, []Resource{}, fakeReader, 3)
 				Expect(err).To(MatchError(expectedErr))
 			})
 		})
@@ -656,7 +656,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the PipeSeekError", func() {
-				_, _, err := client.UploadApplicationPackage(inputPackage, []Resource{}, strings.NewReader("hello world"), 3)
+				_, _, err := client.UploadBitsPackage(inputPackage, []Resource{}, strings.NewReader("hello world"), 3)
 				Expect(err).To(MatchError(ccerror.PipeSeekError{}))
 			})
 		})
@@ -687,14 +687,14 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the http error", func() {
-				_, _, err := client.UploadApplicationPackage(inputPackage, []Resource{}, strings.NewReader(strings.Repeat("a", UploadSize)), 3)
+				_, _, err := client.UploadBitsPackage(inputPackage, []Resource{}, strings.NewReader(strings.Repeat("a", UploadSize)), 3)
 				Expect(err).To(MatchError(expectedErr))
 			})
 		})
 
 		Context("when the input package does not have an upload link", func() {
 			It("returns an UploadLinkNotFoundError", func() {
-				_, _, err := client.UploadApplicationPackage(Package{GUID: "some-pkg-guid"}, nil, nil, 0)
+				_, _, err := client.UploadBitsPackage(Package{GUID: "some-pkg-guid"}, nil, nil, 0)
 				Expect(err).To(MatchError(ccerror.UploadLinkNotFoundError{PackageGUID: "some-pkg-guid"}))
 			})
 		})

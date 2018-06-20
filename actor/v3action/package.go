@@ -1,6 +1,7 @@
 package v3action
 
 import (
+	"io"
 	"os"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -123,7 +125,36 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 		return Package{}, allWarnings, actionerror.PackageProcessingExpiredError{}
 	}
 
-	return Package(pkg), allWarnings, err
+	updatedPackage, updatedWarnings, err := actor.PollPackage(Package(pkg))
+	return updatedPackage, append(allWarnings, updatedWarnings...), err
+}
+
+func (actor Actor) PollPackage(pkg Package) (Package, Warnings, error) {
+	var allWarnings Warnings
+
+	for pkg.State != constant.PackageReady && pkg.State != constant.PackageFailed && pkg.State != constant.PackageExpired {
+		time.Sleep(actor.Config.PollingInterval())
+		ccPkg, warnings, err := actor.CloudControllerClient.GetPackage(pkg.GUID)
+		log.WithFields(log.Fields{
+			"package_guid": pkg.GUID,
+			"state":        pkg.State,
+		}).Debug("polling package state")
+
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return Package{}, allWarnings, err
+		}
+
+		pkg = Package(ccPkg)
+	}
+
+	if pkg.State == constant.PackageFailed {
+		return Package{}, allWarnings, actionerror.PackageProcessingFailedError{}
+	} else if pkg.State == constant.PackageExpired {
+		return Package{}, allWarnings, actionerror.PackageProcessingExpiredError{}
+	}
+
+	return pkg, allWarnings, nil
 }
 
 // GetApplicationPackages returns a list of package of an app.
@@ -147,4 +178,31 @@ func (actor *Actor) GetApplicationPackages(appName string, spaceGUID string) ([]
 	}
 
 	return packages, allWarnings, nil
+}
+
+func (actor Actor) CreateBitsPackageByApplication(appGUID string) (Package, Warnings, error) {
+	inputPackage := ccv3.Package{
+		Type: constant.PackageTypeBits,
+		Relationships: ccv3.Relationships{
+			constant.RelationshipTypeApplication: ccv3.Relationship{GUID: appGUID},
+		},
+	}
+
+	pkg, warnings, err := actor.CloudControllerClient.CreatePackage(inputPackage)
+	if err != nil {
+		return Package{}, Warnings(warnings), err
+	}
+
+	return Package(pkg), Warnings(warnings), err
+}
+
+func (actor Actor) UploadBitsPackage(pkg Package, existingResources []sharedaction.Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+	apiResources := make([]ccv3.Resource, 0, len(existingResources)) // Explicitly done to prevent nils
+
+	for _, resource := range existingResources {
+		apiResources = append(apiResources, ccv3.Resource(resource))
+	}
+
+	appPkg, warnings, err := actor.CloudControllerClient.UploadBitsPackage(ccv3.Package(pkg), apiResources, newResources, newResourcesLength)
+	return Package(appPkg), Warnings(warnings), err
 }

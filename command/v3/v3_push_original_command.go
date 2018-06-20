@@ -54,7 +54,8 @@ func (cmd *V3PushCommand) OriginalSetup(config command.Config, ui command.UI) er
 
 		return err
 	}
-	cmd.OriginalActor = v3action.NewActor(ccClient, config, sharedActor, nil)
+	v3actor := v3action.NewActor(ccClient, config, sharedActor, nil)
+	cmd.OriginalActor = v3actor
 
 	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {
@@ -64,7 +65,7 @@ func (cmd *V3PushCommand) OriginalSetup(config command.Config, ui command.UI) er
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 
 	cmd.SharedActor = sharedActor
-	cmd.OriginalV2PushActor = pushaction.NewActor(v2Actor, cmd.OriginalActor, sharedActor)
+	cmd.OriginalV2PushActor = pushaction.NewActor(v2Actor, v3actor, sharedActor)
 
 	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)

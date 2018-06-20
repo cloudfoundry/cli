@@ -2,8 +2,10 @@ package v3action_test
 
 import (
 	"errors"
+	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -15,6 +17,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("Package Actions", func() {
@@ -701,6 +704,124 @@ var _ = Describe("Package Actions", func() {
 					Expect(fakeSharedActor.GatherArchiveResourcesArgsForCall(0)).To(Equal(bitsPath))
 					Expect(executeErr).ToNot(HaveOccurred())
 				})
+			})
+		})
+	})
+
+	Describe("CreateBitsPackageByApplication", func() {
+		var (
+			appGUID string
+
+			pkg        Package
+			executeErr error
+			warnings   Warnings
+		)
+
+		JustBeforeEach(func() {
+			pkg, warnings, executeErr = actor.CreateBitsPackageByApplication(appGUID)
+		})
+
+		Context("when creating the package fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreatePackageReturns(
+					ccv3.Package{},
+					ccv3.Warnings{"create-package-warning"},
+					errors.New("some-create-error"),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("some-create-error"))
+				Expect(warnings).To(ConsistOf("create-package-warning"))
+			})
+		})
+
+		Context("when creating the package succeeds", func() {
+			var createdPackage ccv3.Package
+
+			BeforeEach(func() {
+				createdPackage = ccv3.Package{GUID: "some-pkg-guid"}
+				fakeCloudControllerClient.CreatePackageReturns(
+					createdPackage,
+					ccv3.Warnings{"create-package-warning"},
+					nil,
+				)
+			})
+
+			It("returns all warnings and the package", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.CreatePackageArgsForCall(0)).To(Equal(ccv3.Package{
+					Type: constant.PackageTypeBits,
+					Relationships: ccv3.Relationships{
+						constant.RelationshipTypeApplication: ccv3.Relationship{GUID: appGUID},
+					},
+				}))
+
+				Expect(warnings).To(ConsistOf("create-package-warning"))
+				Expect(pkg).To(MatchFields(IgnoreExtras, Fields{
+					"GUID": Equal("some-pkg-guid"),
+				}))
+			})
+		})
+	})
+
+	Describe("UploadBitsPackage", func() {
+		var (
+			pkg               Package
+			existingResources []sharedaction.Resource
+			reader            io.Reader
+			readerLength      int64
+
+			appPkg     Package
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			pkg = Package{GUID: "some-package-guid"}
+
+			existingResources = []sharedaction.Resource{{Filename: "some-resource"}, {Filename: "another-resource"}}
+			someString := "who reads these days"
+			reader = strings.NewReader(someString)
+			readerLength = int64(len([]byte(someString)))
+		})
+
+		JustBeforeEach(func() {
+			appPkg, warnings, executeErr = actor.UploadBitsPackage(pkg, existingResources, reader, readerLength)
+		})
+
+		Context("when the upload is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UploadBitsPackageReturns(ccv3.Package{GUID: "some-package-guid"}, ccv3.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
+			})
+
+			It("returns all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2"))
+				Expect(appPkg).To(Equal(Package{GUID: "some-package-guid"}))
+
+				Expect(fakeCloudControllerClient.UploadBitsPackageCallCount()).To(Equal(1))
+				passedPackage, passedExistingResources, passedReader, passedReaderLength := fakeCloudControllerClient.UploadBitsPackageArgsForCall(0)
+				Expect(passedPackage).To(Equal(ccv3.Package(appPkg)))
+				Expect(passedExistingResources).To(ConsistOf(ccv3.Resource{Filename: "some-resource"}, ccv3.Resource{Filename: "another-resource"}))
+				Expect(passedReader).To(Equal(reader))
+				Expect(passedReaderLength).To(Equal(readerLength))
+			})
+		})
+
+		Context("when the upload returns an error", func() {
+			var err error
+
+			BeforeEach(func() {
+				err = errors.New("some-error")
+				fakeCloudControllerClient.UploadBitsPackageReturns(ccv3.Package{}, ccv3.Warnings{"upload-warning-1", "upload-warning-2"}, err)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(err))
+				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2"))
 			})
 		})
 	})

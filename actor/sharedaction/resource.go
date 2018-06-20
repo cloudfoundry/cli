@@ -455,3 +455,26 @@ func (Actor) newArchiveReader(archive *os.File) (*zip.Reader, error) {
 
 	return ykk.NewReader(archive, info.Size())
 }
+
+func (actor Actor) CreateArchive(bitsPath string, resources []Resource) (io.ReadCloser, int64, error) {
+	archivePath, err := actor.ZipDirectoryResources(bitsPath, resources)
+	_ = err
+
+	return actor.ReadArchive(archivePath)
+}
+
+func (Actor) ReadArchive(archivePath string) (io.ReadCloser, int64, error) {
+	archive, err := os.Open(archivePath)
+	if err != nil {
+		log.WithField("archivePath", archivePath).Errorln("opening temp archive:", err)
+		return nil, -1, err
+	}
+
+	archiveInfo, err := archive.Stat()
+	if err != nil {
+		log.WithField("archivePath", archivePath).Errorln("stat temp archive:", err)
+		return nil, -1, err
+	}
+
+	return archive, archiveInfo.Size(), nil
+}

@@ -2,18 +2,18 @@ package pushaction
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 )
 
 type PushState struct {
-	Application v3action.Application
-	SpaceGUID   string
-	// Path        string //TODO: more descriptive name - feels ambiguous - is this a manifest path or app dir path?
-
-	// AllResources       []v2action.Resource
-	// MatchedResources   []v2action.Resource
-	// UnmatchedResources []v2action.Resource
-	// Archive bool
+	Application        v3action.Application
+	SpaceGUID          string
+	BitsPath           string
+	AllResources       []sharedaction.Resource
+	MatchedResources   []sharedaction.Resource
+	UnmatchedResources []sharedaction.Resource
+	Archive            bool
 }
 
 func (actor Actor) Conceptualize(settings CommandLineSettings, spaceGUID string) ([]PushState, Warnings, error) {
@@ -32,12 +32,20 @@ func (actor Actor) Conceptualize(settings CommandLineSettings, spaceGUID string)
 		return nil, Warnings(warnings), err
 	}
 
+	bitsPath := settings.CurrentDirectory
+	if settings.ProvidedAppPath != "" {
+		bitsPath = settings.ProvidedAppPath
+	}
+
+	resources, err := actor.SharedActor.GatherDirectoryResources(bitsPath)
+
 	desiredState := []PushState{
 		{
-			Application: application,
-			SpaceGUID:   spaceGUID,
-			// Path:        settings.ProvidedAppPath,
+			Application:  application,
+			SpaceGUID:    spaceGUID,
+			BitsPath:     bitsPath,
+			AllResources: resources,
 		},
 	}
-	return desiredState, Warnings(warnings), nil
+	return desiredState, Warnings(warnings), err
 }

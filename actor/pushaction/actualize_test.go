@@ -4,9 +4,12 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -94,6 +97,7 @@ var _ = Describe("Actualize", func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
 		fakeV3Actor = new(pushactionfakes.FakeV3Actor)
 		fakeSharedActor = new(pushactionfakes.FakeSharedActor)
+		fakeSharedActor.ReadArchiveReturns(new(pushactionfakes.FakeReadCloser), 0, nil)
 		actor = NewActor(fakeV2Actor, fakeV3Actor, fakeSharedActor)
 
 		fakeProgressBar = new(pushactionfakes.FakeProgressBar)
@@ -120,7 +124,7 @@ var _ = Describe("Actualize", func() {
 			})
 
 			It("returns a skipped app creation event", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SkipingApplicationCreation))
+				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SkippingApplicationCreation))
 
 				Eventually(stateStream).Should(Receive(MatchFields(IgnoreExtras,
 					Fields{
@@ -176,6 +180,202 @@ var _ = Describe("Actualize", func() {
 				It("returns warnings and error", func() {
 					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-warnings")))
 					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+				})
+			})
+		})
+	})
+
+	Describe("package upload", func() {
+		Context("when app bits are provided", func() {
+			BeforeEach(func() {
+				state = PushState{
+					Application: v3action.Application{
+						Name: "some-app",
+						GUID: "some-app-guid",
+					},
+					BitsPath: "/some-bits-path",
+					AllResources: []sharedaction.Resource{
+						{Filename: "some-filename", Size: 6},
+					},
+					MatchedResources: []sharedaction.Resource{
+						{Filename: "some-matched-filename", Size: 6},
+					},
+				}
+			})
+
+			It("creates the archive", func() {
+				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+
+				Eventually(fakeSharedActor.ZipDirectoryResourcesCallCount).Should(Equal(1))
+				bitsPath, resources := fakeSharedActor.ZipDirectoryResourcesArgsForCall(0)
+				Expect(bitsPath).To(Equal("/some-bits-path"))
+				Expect(resources).To(ConsistOf(sharedaction.Resource{
+					Filename: "some-filename",
+					Size:     6,
+				}))
+			})
+
+			Context("when the archive creation is successful", func() {
+				BeforeEach(func() {
+					fakeSharedActor.ZipDirectoryResourcesReturns("/some/archive/path", nil)
+				})
+
+				It("creates the package", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
+
+					Eventually(fakeV3Actor.CreateBitsPackageByApplicationCallCount).Should(Equal(1))
+					Expect(fakeV3Actor.CreateBitsPackageByApplicationArgsForCall(0)).To(Equal("some-app-guid"))
+				})
+
+				Context("when the package creation is successful", func() {
+					BeforeEach(func() {
+						fakeV3Actor.CreateBitsPackageByApplicationReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"some-create-package-warning"}, nil)
+					})
+
+					It("reads the archive", func() {
+						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
+						Eventually(fakeSharedActor.ReadArchiveCallCount).Should(Equal(1))
+						Expect(fakeSharedActor.ReadArchiveArgsForCall(0)).To(Equal("/some/archive/path"))
+					})
+
+					Context("when reading the archive is successful", func() {
+						BeforeEach(func() {
+							fakeReadCloser := new(pushactionfakes.FakeReadCloser)
+							fakeSharedActor.ReadArchiveReturns(fakeReadCloser, 6, nil)
+						})
+
+						It("uploads the bits package", func() {
+							Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+							Eventually(fakeV3Actor.UploadBitsPackageCallCount).Should(Equal(1))
+							pkg, resource, _, size := fakeV3Actor.UploadBitsPackageArgsForCall(0)
+
+							Expect(pkg).To(Equal(v3action.Package{GUID: "some-guid"}))
+							Expect(resource).To(ConsistOf(sharedaction.Resource{
+								Filename: "some-matched-filename",
+								Size:     6,
+							}))
+							Expect(size).To(BeNumerically("==", 6))
+						})
+
+						Context("when the upload is successful", func() {
+							BeforeEach(func() {
+								fakeV3Actor.UploadBitsPackageReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"some-upload-package-warning"}, nil)
+							})
+
+							It("returns an upload complete event and warnings", func() {
+								Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+								Eventually(warningsStream).Should(Receive(ConsistOf("some-upload-package-warning")))
+								Eventually(eventStream).Should(Receive(Equal(UploadWithArchiveComplete)))
+							})
+
+							Describe("polling", func() {
+								Context("when the the polling is succesful", func() {
+									BeforeEach(func() {
+										fakeV3Actor.PollPackageReturns(v3action.Package{}, v3action.Warnings{"some-poll-package-warning"}, nil)
+									})
+
+									It("returns warnings", func() {
+										Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadWithArchiveComplete))
+										Eventually(warningsStream).Should(Receive(ConsistOf("some-poll-package-warning")))
+									})
+								})
+
+								Context("when the the polling returns an error", func() {
+									var someErr error
+
+									BeforeEach(func() {
+										someErr = errors.New("I AM A BANANA")
+										fakeV3Actor.PollPackageReturns(v3action.Package{}, v3action.Warnings{"some-poll-package-warning"}, someErr)
+									})
+
+									It("returns errors and warnings", func() {
+										Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadWithArchiveComplete))
+										Eventually(warningsStream).Should(Receive(ConsistOf("some-poll-package-warning")))
+										Eventually(errorStream).Should(Receive(MatchError(someErr)))
+									})
+								})
+							})
+						})
+
+						Context("when the upload errors", func() {
+							Context("when the upload error is a retryable error", func() {
+								var someErr error
+
+								BeforeEach(func() {
+									someErr = errors.New("I AM A BANANA")
+									fakeV3Actor.UploadBitsPackageReturns(v3action.Package{}, v3action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{Err: someErr})
+								})
+
+								It("should send a RetryUpload event and retry uploading", func() {
+									Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
+
+									Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
+
+									Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
+
+									Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
+									Eventually(fakeV3Actor.UploadBitsPackageCallCount()).Should(Equal(3))
+									Expect(errorStream).To(Receive(MatchError(actionerror.UploadFailedError{Err: someErr})))
+								})
+
+							})
+
+							Context("when the upload error is not a retryable error", func() {
+								BeforeEach(func() {
+									fakeV3Actor.UploadBitsPackageReturns(v3action.Package{}, v3action.Warnings{"upload-warnings-1", "upload-warnings-2"}, errors.New("dios mio"))
+								})
+
+								It("sends warnings and errors, then stops", func() {
+									Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
+									Eventually(errorStream).Should(Receive(MatchError("dios mio")))
+								})
+							})
+						})
+					})
+
+					Context("when reading the archive fails", func() {
+						BeforeEach(func() {
+							fakeSharedActor.ReadArchiveReturns(nil, 0, errors.New("the bits!"))
+						})
+
+						It("returns an error", func() {
+							Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
+							Eventually(errorStream).Should(Receive(MatchError("the bits!")))
+						})
+					})
+				})
+
+				Context("when the package creation errors", func() {
+					BeforeEach(func() {
+						fakeV3Actor.CreateBitsPackageByApplicationReturns(v3action.Package{}, v3action.Warnings{"package-creation-warning"}, errors.New("the bits!"))
+					})
+
+					It("it returns errors and warnings", func() {
+						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
+
+						Eventually(warningsStream).Should(Receive(ConsistOf("package-creation-warning")))
+						Eventually(errorStream).Should(Receive(MatchError("the bits!")))
+					})
+				})
+			})
+
+			Context("when the archive creation errors", func() {
+				BeforeEach(func() {
+					fakeSharedActor.ZipDirectoryResourcesReturns("", errors.New("oh no"))
+				})
+
+				It("returns an error and exits", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+
+					Eventually(errorStream).Should(Receive(MatchError("oh no")))
 				})
 			})
 		})

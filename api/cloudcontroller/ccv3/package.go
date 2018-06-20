@@ -192,7 +192,7 @@ func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
 //
 // Note: In order to determine if package creation is successful, poll the
 // Package's state field for more information.
-func (client *Client) UploadApplicationPackage(pkg Package, existingResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+func (client *Client) UploadBitsPackage(pkg Package, existingResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
 	link, ok := pkg.Links["upload"]
 	if !ok {
 		return Package{}, nil, ccerror.UploadLinkNotFoundError{PackageGUID: pkg.GUID}
@@ -433,6 +433,8 @@ func (client *Client) uploadNewAndExistingResources(uploadLink APILink, existing
 
 	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(existingResources, newResources, newResourcesLength)
 
+	// This request uses URL/Method instead of an internal RequestName to support
+	// the possibility of external bit services.
 	request, err := client.newHTTPRequest(requestOptions{
 		URL:    uploadLink.HREF,
 		Method: uploadLink.Method,

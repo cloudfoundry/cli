@@ -2,6 +2,7 @@
 package pushactionfakes
 
 import (
+	"io"
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/pushaction"
@@ -34,6 +35,21 @@ type FakeSharedActor struct {
 	gatherDirectoryResourcesReturnsOnCall map[int]struct {
 		result1 []sharedaction.Resource
 		result2 error
+	}
+	ReadArchiveStub        func(archivePath string) (io.ReadCloser, int64, error)
+	readArchiveMutex       sync.RWMutex
+	readArchiveArgsForCall []struct {
+		archivePath string
+	}
+	readArchiveReturns struct {
+		result1 io.ReadCloser
+		result2 int64
+		result3 error
+	}
+	readArchiveReturnsOnCall map[int]struct {
+		result1 io.ReadCloser
+		result2 int64
+		result3 error
 	}
 	ZipArchiveResourcesStub        func(sourceArchivePath string, filesToInclude []sharedaction.Resource) (string, error)
 	zipArchiveResourcesMutex       sync.RWMutex
@@ -169,6 +185,60 @@ func (fake *FakeSharedActor) GatherDirectoryResourcesReturnsOnCall(i int, result
 	}{result1, result2}
 }
 
+func (fake *FakeSharedActor) ReadArchive(archivePath string) (io.ReadCloser, int64, error) {
+	fake.readArchiveMutex.Lock()
+	ret, specificReturn := fake.readArchiveReturnsOnCall[len(fake.readArchiveArgsForCall)]
+	fake.readArchiveArgsForCall = append(fake.readArchiveArgsForCall, struct {
+		archivePath string
+	}{archivePath})
+	fake.recordInvocation("ReadArchive", []interface{}{archivePath})
+	fake.readArchiveMutex.Unlock()
+	if fake.ReadArchiveStub != nil {
+		return fake.ReadArchiveStub(archivePath)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.readArchiveReturns.result1, fake.readArchiveReturns.result2, fake.readArchiveReturns.result3
+}
+
+func (fake *FakeSharedActor) ReadArchiveCallCount() int {
+	fake.readArchiveMutex.RLock()
+	defer fake.readArchiveMutex.RUnlock()
+	return len(fake.readArchiveArgsForCall)
+}
+
+func (fake *FakeSharedActor) ReadArchiveArgsForCall(i int) string {
+	fake.readArchiveMutex.RLock()
+	defer fake.readArchiveMutex.RUnlock()
+	return fake.readArchiveArgsForCall[i].archivePath
+}
+
+func (fake *FakeSharedActor) ReadArchiveReturns(result1 io.ReadCloser, result2 int64, result3 error) {
+	fake.ReadArchiveStub = nil
+	fake.readArchiveReturns = struct {
+		result1 io.ReadCloser
+		result2 int64
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeSharedActor) ReadArchiveReturnsOnCall(i int, result1 io.ReadCloser, result2 int64, result3 error) {
+	fake.ReadArchiveStub = nil
+	if fake.readArchiveReturnsOnCall == nil {
+		fake.readArchiveReturnsOnCall = make(map[int]struct {
+			result1 io.ReadCloser
+			result2 int64
+			result3 error
+		})
+	}
+	fake.readArchiveReturnsOnCall[i] = struct {
+		result1 io.ReadCloser
+		result2 int64
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeSharedActor) ZipArchiveResources(sourceArchivePath string, filesToInclude []sharedaction.Resource) (string, error) {
 	var filesToIncludeCopy []sharedaction.Resource
 	if filesToInclude != nil {
@@ -290,6 +360,8 @@ func (fake *FakeSharedActor) Invocations() map[string][][]interface{} {
 	defer fake.gatherArchiveResourcesMutex.RUnlock()
 	fake.gatherDirectoryResourcesMutex.RLock()
 	defer fake.gatherDirectoryResourcesMutex.RUnlock()
+	fake.readArchiveMutex.RLock()
+	defer fake.readArchiveMutex.RUnlock()
 	fake.zipArchiveResourcesMutex.RLock()
 	defer fake.zipArchiveResourcesMutex.RUnlock()
 	fake.zipDirectoryResourcesMutex.RLock()
