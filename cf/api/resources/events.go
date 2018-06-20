@@ -70,6 +70,7 @@ var knownMetadataKeys = []string{
 	"index",
 	"reason",
 	"cell_id",
+	"instance",
 	"exit_description",
 	"exit_status",
 	"recursive",
