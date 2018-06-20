@@ -183,7 +183,7 @@ var _ = Describe("push with different buildpack values", func() {
 				})
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "no-start")
 				Eventually(session).Should(Say(`\s+buildpack:\s+staticfile_buildpack`))
-				Eventually(session.Err).Should(Say(`Deprecation warning: Use of buildpack`))
+				Eventually(session.Err).Should(Say(`Deprecation warning: Use of 'buildpack'`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
