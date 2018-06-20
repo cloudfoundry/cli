@@ -3,9 +3,6 @@ package v2action_test
 import (
 	"errors"
 	"io"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"strings"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
@@ -86,8 +83,6 @@ var _ = Describe("Job Actions", func() {
 
 	Describe("UploadDroplet", func() {
 		var (
-			srcDir string
-
 			appGUID       string
 			droplet       io.Reader
 			dropletLength int64
@@ -98,32 +93,11 @@ var _ = Describe("Job Actions", func() {
 		)
 
 		BeforeEach(func() {
-			// var err error
-			// srcDir, err = ioutil.TempDir("", "upload-src-dir")
-			// Expect(err).ToNot(HaveOccurred())
-			//
-			// subDir := filepath.Join(srcDir, "level1", "level2")
-			// err = os.MkdirAll(subDir, 0777)
-			// Expect(err).ToNot(HaveOccurred())
-			//
-			// err = ioutil.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0600)
-			// Expect(err).ToNot(HaveOccurred())
-			//
-			// err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0600)
-			// Expect(err).ToNot(HaveOccurred())
-			//
-			// err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0600)
-			// Expect(err).ToNot(HaveOccurred())
-			//
 			appGUID = "some-app-guid"
 			someString := "who reads these days"
 
 			droplet = strings.NewReader(someString)
 			dropletLength = int64(len([]byte(someString)))
-		})
-
-		AfterEach(func() {
-			Expect(os.RemoveAll(srcDir)).NotTo(HaveOccurred())
 		})
 
 		JustBeforeEach(func() {
@@ -149,6 +123,7 @@ var _ = Describe("Job Actions", func() {
 		})
 
 	})
+
 	Describe("PollJob", func() {
 		var (
 			job        Job
