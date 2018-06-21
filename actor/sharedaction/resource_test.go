@@ -86,9 +86,7 @@ var _ = Describe("Resource Actions", func() {
 		})
 
 		AfterEach(func() {
-			if executeErr == nil {
-				Expect(readCloser.Close()).ToNot(HaveOccurred())
-			}
+			Expect(os.RemoveAll(archivePath)).ToNot(HaveOccurred())
 		})
 
 		Context("when the archive can be accessed properly", func() {
@@ -102,11 +100,9 @@ var _ = Describe("Resource Actions", func() {
 				archivePath = tmpfile.Name()
 			})
 
-			AfterEach(func() {
-				Expect(os.Remove(archivePath)).ToNot(HaveOccurred())
-			})
-
 			It("returns zero errors", func() {
+				defer readCloser.Close()
+
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fileSize).To(BeNumerically("==", 6))
 
