@@ -24,7 +24,7 @@ var _ = Describe("UnsupportedLegacyFlagRequirement", func() {
 
 	Context("Execute", func() {
 		It("always returns an error", func() {
-			Expect(requirement.Execute()).To(MatchError("The following flags cannot used with deprecated usage: --flag-1, --flag-2, --flag-3"))
+			Expect(requirement.Execute()).To(MatchError("The following flags cannot be used with deprecated usage: --flag-1, --flag-2, --flag-3"))
 		})
 	})
 })

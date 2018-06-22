@@ -19,7 +19,7 @@ func NewUnsupportedLegacyFlagRequirement(flags []string) UnsupportedLegacyFlagRe
 
 func (r UnsupportedLegacyFlagRequirement) Execute() error {
 	return errors.New(T(
-		"The following flags cannot used with deprecated usage: {{.flags}}",
+		"The following flags cannot be used with deprecated usage: {{.flags}}",
 		map[string]interface{}{
 			"flags": strings.Join(r.flags, ", "),
 		}))
