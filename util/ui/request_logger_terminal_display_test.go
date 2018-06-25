@@ -2,6 +2,7 @@ package ui_test
 
 import (
 	"errors"
+	"regexp"
 	"time"
 
 	. "code.cloudfoundry.org/cli/util/ui"
@@ -186,7 +187,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 			err = display.Stop()
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("banana: \\[%s\\]", passedTime.Format(time.RFC3339)))
+			Expect(testUI.Out).To(Say("banana: \\[%s\\]", regexp.QuoteMeta(passedTime.Format(time.RFC3339))))
 		})
 	})
 
