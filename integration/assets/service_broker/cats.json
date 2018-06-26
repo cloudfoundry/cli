@@ -15,6 +15,8 @@
             ],
             "max_db_per_node": 5,
             "bindable": true,
+            "instances_retrievable": true,
+            "bindings_retrievable": true,
             "metadata": {
               "provider": {
                 "name": "The name"
@@ -102,6 +104,20 @@
                     }
                   ]
                 }
+              },
+              {
+                "name": "<fake-async-plan-3>",
+                "id": "<fake-async-plan-3-guid>",
+                "description": "Shared fake Server, 5tb persistent disk, 40 max concurrent connections. 100 async",
+                "max_storage_tb": 5,
+                "metadata": {
+                  "cost": 0,
+                  "bullets": [
+                    {
+                      "content": "40 concurrent connections"
+                    }
+                  ]
+                }
               }
             ]
           }
@@ -118,6 +134,12 @@
       "<fake-async-plan-2-guid>": {
         "sleep_seconds": 0,
         "status": 202,
+        "body": {
+        }
+      },
+      "<fake-async-plan-3-guid>": {
+        "sleep_seconds": 0,
+        "status": 200,
         "body": {
         }
       },
@@ -189,6 +211,12 @@
       }
     },
     "bind": {
+      "<fake-async-plan-3-guid>": {
+        "sleep_seconds": 0,
+        "async_only": true,
+        "status": 202,
+        "body": {}
+      },
       "default": {
         "sleep_seconds": 0,
         "status": 201,
@@ -209,6 +237,22 @@
         "sleep_seconds": 0,
         "status": 200,
         "body": {}
+      }
+    },
+    "fetch_service_binding": {
+      "default": {
+        "sleep_seconds": 0,
+        "status": 200,
+        "body": {
+          "credentials": {
+            "uri": "fake-service://fake-user:fake-password@fake-host:3306/fake-dbname",
+            "username": "fake-user",
+            "password": "fake-password",
+            "host": "fake-host",
+            "port": 3306,
+            "database": "fake-dbname"
+          }
+        }
       }
     }
   },

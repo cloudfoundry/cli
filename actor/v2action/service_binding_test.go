@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -24,11 +25,28 @@ var _ = Describe("Service Binding Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
 
+	Describe("ServiceBinding", func() {
+		DescribeTable("IsInProgress",
+			func(state constant.LastOperationState, expected bool) {
+				serviceBinding := ServiceBinding{
+					LastOperation: ccv2.LastOperation{
+						State: state,
+					},
+				}
+				Expect(serviceBinding.IsInProgress()).To(Equal(expected))
+			},
+
+			Entry("returns true for 'in progress'", constant.LastOperationInProgress, true),
+			Entry("returns false for 'succeeded'", constant.LastOperationSucceeded, false),
+			Entry("returns false for 'failed'", constant.LastOperationFailed, false),
+			Entry("returns false for empty", constant.LastOperationState(""), false),
+		)
+	})
+
 	Describe("BindServiceByApplicationAndServiceInstance", func() {
 		var (
 			applicationGUID     string
 			serviceInstanceGUID string
-			bindingName         string
 
 			executeErr error
 			warnings   Warnings
@@ -36,7 +54,6 @@ var _ = Describe("Service Binding Actions", func() {
 		BeforeEach(func() {
 			applicationGUID = "some-app-guid"
 			serviceInstanceGUID = "some-service-instance-guid"
-			bindingName = "some-binding-name"
 		})
 
 		JustBeforeEach(func() {
@@ -53,10 +70,11 @@ var _ = Describe("Service Binding Actions", func() {
 				Expect(warnings).To(ConsistOf("some-warnings"))
 
 				Expect(fakeCloudControllerClient.CreateServiceBindingCallCount()).To(Equal(1))
-				inputAppGUID, inputServiceInstanceGUID, inputBindingName, inputParameters := fakeCloudControllerClient.CreateServiceBindingArgsForCall(0)
+				inputAppGUID, inputServiceInstanceGUID, inputBindingName, inputAcceptsIncomplete, inputParameters := fakeCloudControllerClient.CreateServiceBindingArgsForCall(0)
 				Expect(inputAppGUID).To(Equal(applicationGUID))
 				Expect(inputServiceInstanceGUID).To(Equal(serviceInstanceGUID))
 				Expect(inputBindingName).To(Equal(""))
+				Expect(inputAcceptsIncomplete).To(BeFalse())
 				Expect(inputParameters).To(BeNil())
 			})
 		})
@@ -75,12 +93,13 @@ var _ = Describe("Service Binding Actions", func() {
 
 	Describe("BindServiceBySpace", func() {
 		var (
-			executeErr error
-			warnings   Warnings
+			executeErr     error
+			warnings       Warnings
+			serviceBinding ServiceBinding
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.BindServiceBySpace("some-app-name", "some-service-instance-name", "some-space-guid", "some-binding-name", map[string]interface{}{"some-parameter": "some-value"})
+			serviceBinding, warnings, executeErr = actor.BindServiceBySpace("some-app-name", "some-service-instance-name", "some-space-guid", "some-binding-name", map[string]interface{}{"some-parameter": "some-value"})
 		})
 
 		Context("when getting the application errors", func() {
@@ -145,6 +164,7 @@ var _ = Describe("Service Binding Actions", func() {
 						Expect(warnings).To(ConsistOf("foo-1", "foo-2", "foo-3"))
 					})
 				})
+
 				Context("when getting binding the service instance to the application succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.CreateServiceBindingReturns(
@@ -157,16 +177,18 @@ var _ = Describe("Service Binding Actions", func() {
 					It("returns all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("foo-1", "foo-2", "foo-3"))
+						Expect(serviceBinding).To(Equal(ServiceBinding{GUID: "some-service-binding-guid"}))
 
 						Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 
 						Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
 
 						Expect(fakeCloudControllerClient.CreateServiceBindingCallCount()).To(Equal(1))
-						appGUID, serviceInstanceGUID, bindingName, parameters := fakeCloudControllerClient.CreateServiceBindingArgsForCall(0)
+						appGUID, serviceInstanceGUID, bindingName, acceptsIncomplete, parameters := fakeCloudControllerClient.CreateServiceBindingArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(bindingName).To(Equal("some-binding-name"))
 						Expect(serviceInstanceGUID).To(Equal("some-service-instance-guid"))
+						Expect(bindingName).To(Equal("some-binding-name"))
+						Expect(acceptsIncomplete).To(BeTrue())
 						Expect(parameters).To(Equal(map[string]interface{}{"some-parameter": "some-value"}))
 					})
 				})

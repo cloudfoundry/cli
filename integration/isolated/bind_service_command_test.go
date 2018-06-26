@@ -308,32 +308,61 @@ var _ = Describe("bind-service command", func() {
 			Context("when the service is provided by a broker", func() {
 				var broker helpers.ServiceBroker
 
-				BeforeEach(func() {
-					broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-					broker.Push()
-					broker.Configure(true)
-					broker.Create()
-
-					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
-
-					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
-				})
-
 				AfterEach(func() {
 					broker.Destroy()
 				})
 
-				It("binds the service to the app, displays OK and TIP", func() {
-					session := helpers.CF("bind-service", appName, serviceInstance, "-c", `{"wheres":"waldo"}`)
-					Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
+				Context("when the service binding is blocking", func() {
+					BeforeEach(func() {
+						broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+						broker.Push()
+						broker.Configure(true)
+						broker.Create()
 
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
-					Eventually(session).Should(Exit(0))
+						Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+					})
 
-					session = helpers.CF("service", serviceInstance)
-					Eventually(session).Should(Say(appName))
-					Eventually(session).Should(Exit(0))
+					It("binds the service to the app, displays OK and TIP", func() {
+						session := helpers.CF("bind-service", appName, serviceInstance, "-c", `{"wheres":"waldo"}`)
+						Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
+
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("service", serviceInstance)
+						Eventually(session).Should(Say(appName))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				Context("when the service binding is asynchronous", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
+
+						broker = helpers.NewAsynchServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+						broker.Push()
+						broker.Configure(true)
+						broker.Create()
+
+						Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+					})
+
+					It("binds the service to the app, displays OK and TIP", func() {
+						session := helpers.CF("bind-service", appName, serviceInstance, "-c", `{"wheres":"waldo"}`)
+						Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
+
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Say("Binding in progress. Use 'cf service %s' to check operation status.", serviceInstance))
+						Eventually(session).Should(Say("TIP: Once this operation succeeds, use 'cf restage %s' to ensure your env variable changes take effect", appName))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("service", serviceInstance)
+						Eventually(session).Should(Say(appName))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 		})

@@ -10,32 +10,36 @@ import (
 // application.
 type ServiceBinding ccv2.ServiceBinding
 
+func (serviceBinding ServiceBinding) IsInProgress() bool {
+	return serviceBinding.LastOperation.State == constant.LastOperationInProgress
+}
+
 // BindServiceByApplicationAndServiceInstance binds the service instance to an application.
 func (actor Actor) BindServiceByApplicationAndServiceInstance(appGUID string, serviceInstanceGUID string) (Warnings, error) {
-	_, warnings, err := actor.CloudControllerClient.CreateServiceBinding(appGUID, serviceInstanceGUID, "", nil)
+	_, warnings, err := actor.CloudControllerClient.CreateServiceBinding(appGUID, serviceInstanceGUID, "", false, nil)
 
 	return Warnings(warnings), err
 }
 
 // BindServiceBySpace binds the service instance to an application for a given space.
-func (actor Actor) BindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (Warnings, error) {
+func (actor Actor) BindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (ServiceBinding, Warnings, error) {
 	var allWarnings Warnings
 	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return allWarnings, err
+		return ServiceBinding{}, allWarnings, err
 	}
 
 	serviceInstance, warnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return allWarnings, err
+		return ServiceBinding{}, allWarnings, err
 	}
 
-	_, ccv2Warnings, err := actor.CloudControllerClient.CreateServiceBinding(app.GUID, serviceInstance.GUID, bindingName, parameters)
+	serviceBinding, ccv2Warnings, err := actor.CloudControllerClient.CreateServiceBinding(app.GUID, serviceInstance.GUID, bindingName, true, parameters)
 	allWarnings = append(allWarnings, ccv2Warnings...)
 
-	return allWarnings, err
+	return ServiceBinding(serviceBinding), allWarnings, err
 }
 
 // GetServiceBindingByApplicationAndServiceInstance returns a service binding

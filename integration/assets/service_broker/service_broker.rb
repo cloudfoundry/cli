@@ -233,6 +233,15 @@ class ServiceBroker < Sinatra::Base
     end
   end
 
+  # fetch service binding
+  get '/v2/service_instances/:instance_id/service_bindings/:binding_id/last_operation/?' do |instance_id, binding_id|
+    status 200
+    log_response(status, {
+      state: 'succeeded',
+      description: '100%',
+    }.to_json)
+  end
+
   # update service instance
   patch '/v2/service_instances/:id/?' do |id|
     json_body = JSON.parse(request.body.read)
@@ -264,7 +273,7 @@ class ServiceBroker < Sinatra::Base
     json_body = JSON.parse(request.body.read)
 
     service_binding = $datasource.create_service_binding(instance_id, binding_id, json_body)
-    respond_with_behavior($datasource.behavior_for_type(:bind, service_binding['binding_data']['plan_id']))
+    respond_with_behavior($datasource.behavior_for_type(:bind, service_binding['binding_data']['plan_id']), params[:accepts_incomplete])
   end
 
   # delete service binding
@@ -273,10 +282,22 @@ class ServiceBroker < Sinatra::Base
 
     service_binding = $datasource.delete_service_binding(binding_id)
     if service_binding
-      respond_with_behavior($datasource.behavior_for_type(:unbind, service_binding['binding_data']['plan_id']))
+      respond_with_behavior($datasource.behavior_for_type(:unbind, service_binding['binding_data']['plan_id']), params[:accepts_incomplete])
     else
-      respond_with_behavior($datasource.behavior_for_type(:unbind, nil))
+      respond_with_behavior($datasource.behavior_for_type(:unbind, nil), params[:accepts_incomplete])
     end
+  end
+
+  get '/v2/service_instances/:instance_id' do |instance_id|
+    status 200
+    log_response(status, JSON.pretty_generate($datasource.data['service_instances'][instance_id].provision_data))
+  end
+
+  get '/v2/service_instances/:instance_id/service_bindings/:id' do |instance_id, binding_id|
+    binding_data = $datasource.data['service_instances'][binding_id]['binding_data']
+    response_body = $datasource.behavior_for_type(:fetch_service_binding, binding_data['plan_id'])
+    response_body['body'].merge!(binding_data)
+    respond_with_behavior(response_body)
   end
 
   get '/config/all/?' do
