@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -120,82 +121,116 @@ var _ = Describe("unbind-service command", func() {
 		})
 
 		Context("when the service is provided by a broker", func() {
-			BeforeEach(func() {
-				broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-				broker.Push()
-				broker.Configure(true)
-				broker.Create()
-
-				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
-			})
-
-			AfterEach(func() {
-				broker.Destroy()
-			})
-
-			Context("when the service is bound to an app", func() {
+			Context("when the unbinding is asynchronous", func() {
 				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
+					broker = helpers.NewAsynchServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+					broker.Push()
+					broker.Configure(true)
+					broker.Create()
+
+					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+
 					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
 					Eventually(helpers.CF("bind-service", appName, serviceInstance)).Should(Exit(0))
+					client, err := helpers.CreateCCV2Client()
+					Expect(err).ToNot(HaveOccurred())
+					helpers.PollLastOperationUntilSuccess(client, appName, serviceInstance)
 				})
 
-				It("unbinds the service", func() {
-					Eventually(helpers.CF("services")).Should(SatisfyAll(
-						Exit(0),
-						Say("%s.*%s", serviceInstance, appName)),
-					)
-					Eventually(helpers.CF("unbind-service", appName, serviceInstance)).Should(Exit(0))
-					Eventually(helpers.CF("services")).Should(SatisfyAll(
-						Exit(0),
-						Not(Say("%s.*%s", serviceInstance, appName)),
-					))
-				})
-			})
-
-			Context("when the service is not bound to an app", func() {
-				BeforeEach(func() {
-					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
-					helpers.WithHelloWorldApp(func(appDir string) {
-						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "--no-route")).Should(Exit(0))
-					})
+				AfterEach(func() {
+					broker.Destroy()
 				})
 
-				It("returns a warning and continues", func() {
-					session := helpers.CF("unbind-service", appName, serviceInstance)
-					Eventually(session).Should(Say("OK"))
-					Eventually(session.Err).Should(Say("Binding between %s and %s did not exist", serviceInstance, appName))
+				It("returns that the unbind is in progress", func() {
+					session := helpers.CF("unbind-service", "-v", appName, serviceInstance)
 					Eventually(session).Should(Exit(0))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("Unbinding in progress. Use 'cf service %s' to check operation status.", serviceInstance))
 				})
 			})
 
-			Context("when the service does not exist", func() {
+			Context("when the unbinding is blocking", func() {
 				BeforeEach(func() {
-					helpers.WithHelloWorldApp(func(appDir string) {
-						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+					broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+					broker.Push()
+					broker.Configure(true)
+					broker.Create()
+
+					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					broker.Destroy()
+				})
+
+				Context("when the service is bound to an app", func() {
+					BeforeEach(func() {
+						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+						})
+						Eventually(helpers.CF("bind-service", appName, serviceInstance)).Should(Exit(0))
+					})
+
+					It("unbinds the service", func() {
+						Eventually(helpers.CF("services")).Should(SatisfyAll(
+							Exit(0),
+							Say("%s.*%s", serviceInstance, appName)),
+						)
+						Eventually(helpers.CF("unbind-service", appName, serviceInstance)).Should(Exit(0))
+						Eventually(helpers.CF("services")).Should(SatisfyAll(
+							Exit(0),
+							Not(Say("%s.*%s", serviceInstance, appName)),
+						))
 					})
 				})
 
-				It("fails to unbind the service", func() {
-					session := helpers.CF("unbind-service", appName, serviceInstance)
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Service instance %s not found", serviceInstance))
-					Eventually(session).Should(Exit(1))
-				})
-			})
+				Context("when the service is not bound to an app", func() {
+					BeforeEach(func() {
+						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "--no-route")).Should(Exit(0))
+						})
+					})
 
-			Context("when the app does not exist", func() {
-				BeforeEach(func() {
-					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+					It("returns a warning and continues", func() {
+						session := helpers.CF("unbind-service", appName, serviceInstance)
+						Eventually(session).Should(Say("OK"))
+						Eventually(session.Err).Should(Say("Binding between %s and %s did not exist", serviceInstance, appName))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 
-				It("fails to unbind the service", func() {
-					session := helpers.CF("unbind-service", appName, serviceInstance)
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("App %s not found", appName))
-					Eventually(session).Should(Exit(1))
+				Context("when the service does not exist", func() {
+					BeforeEach(func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+						})
+					})
+
+					It("fails to unbind the service", func() {
+						session := helpers.CF("unbind-service", appName, serviceInstance)
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Service instance %s not found", serviceInstance))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				Context("when the app does not exist", func() {
+					BeforeEach(func() {
+						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+					})
+
+					It("fails to unbind the service", func() {
+						session := helpers.CF("unbind-service", appName, serviceInstance)
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("App %s not found", appName))
+						Eventually(session).Should(Exit(1))
+					})
 				})
 			})
 		})

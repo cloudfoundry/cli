@@ -145,18 +145,21 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
-	DeleteServiceBindingStub        func(serviceBindingGUID string) (ccv2.Warnings, error)
+	DeleteServiceBindingStub        func(serviceBindingGUID string, acceptsIncomplete bool) (ccv2.ServiceBinding, ccv2.Warnings, error)
 	deleteServiceBindingMutex       sync.RWMutex
 	deleteServiceBindingArgsForCall []struct {
 		serviceBindingGUID string
+		acceptsIncomplete  bool
 	}
 	deleteServiceBindingReturns struct {
-		result1 ccv2.Warnings
-		result2 error
+		result1 ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
 	}
 	deleteServiceBindingReturnsOnCall map[int]struct {
-		result1 ccv2.Warnings
-		result2 error
+		result1 ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
 	}
 	DeleteSpaceJobStub        func(spaceGUID string) (ccv2.Job, ccv2.Warnings, error)
 	deleteSpaceJobMutex       sync.RWMutex
@@ -1433,21 +1436,22 @@ func (fake *FakeCloudControllerClient) DeleteSecurityGroupStagingSpaceReturnsOnC
 	}{result1, result2}
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceBinding(serviceBindingGUID string) (ccv2.Warnings, error) {
+func (fake *FakeCloudControllerClient) DeleteServiceBinding(serviceBindingGUID string, acceptsIncomplete bool) (ccv2.ServiceBinding, ccv2.Warnings, error) {
 	fake.deleteServiceBindingMutex.Lock()
 	ret, specificReturn := fake.deleteServiceBindingReturnsOnCall[len(fake.deleteServiceBindingArgsForCall)]
 	fake.deleteServiceBindingArgsForCall = append(fake.deleteServiceBindingArgsForCall, struct {
 		serviceBindingGUID string
-	}{serviceBindingGUID})
-	fake.recordInvocation("DeleteServiceBinding", []interface{}{serviceBindingGUID})
+		acceptsIncomplete  bool
+	}{serviceBindingGUID, acceptsIncomplete})
+	fake.recordInvocation("DeleteServiceBinding", []interface{}{serviceBindingGUID, acceptsIncomplete})
 	fake.deleteServiceBindingMutex.Unlock()
 	if fake.DeleteServiceBindingStub != nil {
-		return fake.DeleteServiceBindingStub(serviceBindingGUID)
+		return fake.DeleteServiceBindingStub(serviceBindingGUID, acceptsIncomplete)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.deleteServiceBindingReturns.result1, fake.deleteServiceBindingReturns.result2
+	return fake.deleteServiceBindingReturns.result1, fake.deleteServiceBindingReturns.result2, fake.deleteServiceBindingReturns.result3
 }
 
 func (fake *FakeCloudControllerClient) DeleteServiceBindingCallCount() int {
@@ -1456,32 +1460,35 @@ func (fake *FakeCloudControllerClient) DeleteServiceBindingCallCount() int {
 	return len(fake.deleteServiceBindingArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceBindingArgsForCall(i int) string {
+func (fake *FakeCloudControllerClient) DeleteServiceBindingArgsForCall(i int) (string, bool) {
 	fake.deleteServiceBindingMutex.RLock()
 	defer fake.deleteServiceBindingMutex.RUnlock()
-	return fake.deleteServiceBindingArgsForCall[i].serviceBindingGUID
+	return fake.deleteServiceBindingArgsForCall[i].serviceBindingGUID, fake.deleteServiceBindingArgsForCall[i].acceptsIncomplete
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceBindingReturns(result1 ccv2.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) DeleteServiceBindingReturns(result1 ccv2.ServiceBinding, result2 ccv2.Warnings, result3 error) {
 	fake.DeleteServiceBindingStub = nil
 	fake.deleteServiceBindingReturns = struct {
-		result1 ccv2.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) DeleteServiceBindingReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) DeleteServiceBindingReturnsOnCall(i int, result1 ccv2.ServiceBinding, result2 ccv2.Warnings, result3 error) {
 	fake.DeleteServiceBindingStub = nil
 	if fake.deleteServiceBindingReturnsOnCall == nil {
 		fake.deleteServiceBindingReturnsOnCall = make(map[int]struct {
-			result1 ccv2.Warnings
-			result2 error
+			result1 ccv2.ServiceBinding
+			result2 ccv2.Warnings
+			result3 error
 		})
 	}
 	fake.deleteServiceBindingReturnsOnCall[i] = struct {
-		result1 ccv2.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) DeleteSpaceJob(spaceGUID string) (ccv2.Job, ccv2.Warnings, error) {

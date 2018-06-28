@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -12,7 +14,7 @@ import (
 //go:generate counterfeiter . UnbindServiceActor
 
 type UnbindServiceActor interface {
-	UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2action.Warnings, error)
+	UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2action.ServiceBinding, v2action.Warnings, error)
 }
 
 type UnbindServiceCommand struct {
@@ -60,7 +62,7 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	warnings, err := cmd.Actor.UnbindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, space.GUID)
+	serviceBinding, warnings, err := cmd.Actor.UnbindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, space.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.ServiceBindingNotFoundError); ok {
@@ -74,6 +76,14 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
+
+	if serviceBinding.IsInProgress() {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Unbinding in progress. Use '{{.CFCommand}} {{.ServiceName}}' to check operation status.", map[string]interface{}{
+			"CFCommand":   fmt.Sprintf("%s service", cmd.Config.BinaryName()),
+			"ServiceName": cmd.RequiredArgs.ServiceInstanceName,
+		})
+	}
 
 	return nil
 }

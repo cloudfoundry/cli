@@ -233,6 +233,12 @@
       }
     },
     "unbind": {
+      "<fake-async-plan-3-guid>": {
+        "sleep_seconds": 0,
+        "async_only": true,
+        "status": 202,
+        "body": {}
+      },
       "default": {
         "sleep_seconds": 0,
         "status": 200,

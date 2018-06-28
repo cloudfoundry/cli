@@ -93,22 +93,31 @@ func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID s
 	return serviceBinding, response.Warnings, nil
 }
 
-// DeleteServiceBinding will destroy the requested Service Binding.
-func (client *Client) DeleteServiceBinding(serviceBindingGUID string) (Warnings, error) {
+// DeleteServiceBinding deletes the specified Service Binding. An updated
+// service binding is returned only if acceptsIncomplete is true.
+func (client *Client) DeleteServiceBinding(serviceBindingGUID string, acceptsIncomplete bool) (ServiceBinding, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteServiceBindingRequest,
 		URIParams:   map[string]string{"service_binding_guid": serviceBindingGUID},
+		Query:       url.Values{"accepts_incomplete": {fmt.Sprint(acceptsIncomplete)}},
 	})
 	if err != nil {
-		return nil, err
+		return ServiceBinding{}, nil, err
 	}
 
 	var response cloudcontroller.Response
+	var serviceBinding ServiceBinding
+	if acceptsIncomplete {
+		response = cloudcontroller.Response{
+			Result: &serviceBinding,
+		}
+	}
+
 	err = client.connection.Make(request, &response)
-	return response.Warnings, err
+	return serviceBinding, response.Warnings, err
 }
 
-// GetServiceBinding returns back a service binding with the proviced guid
+// GetServiceBinding returns back a service binding with the provided GUID.
 func (client *Client) GetServiceBinding(guid string) (ServiceBinding, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetServiceBindingRequest,

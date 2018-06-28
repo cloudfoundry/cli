@@ -9,7 +9,7 @@ import (
 )
 
 type FakeUnbindServiceActor struct {
-	UnbindServiceBySpaceStub        func(appName string, serviceInstanceName string, spaceGUID string) (v2action.Warnings, error)
+	UnbindServiceBySpaceStub        func(appName string, serviceInstanceName string, spaceGUID string) (v2action.ServiceBinding, v2action.Warnings, error)
 	unbindServiceBySpaceMutex       sync.RWMutex
 	unbindServiceBySpaceArgsForCall []struct {
 		appName             string
@@ -17,18 +17,20 @@ type FakeUnbindServiceActor struct {
 		spaceGUID           string
 	}
 	unbindServiceBySpaceReturns struct {
-		result1 v2action.Warnings
-		result2 error
+		result1 v2action.ServiceBinding
+		result2 v2action.Warnings
+		result3 error
 	}
 	unbindServiceBySpaceReturnsOnCall map[int]struct {
-		result1 v2action.Warnings
-		result2 error
+		result1 v2action.ServiceBinding
+		result2 v2action.Warnings
+		result3 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUnbindServiceActor) UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2action.Warnings, error) {
+func (fake *FakeUnbindServiceActor) UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2action.ServiceBinding, v2action.Warnings, error) {
 	fake.unbindServiceBySpaceMutex.Lock()
 	ret, specificReturn := fake.unbindServiceBySpaceReturnsOnCall[len(fake.unbindServiceBySpaceArgsForCall)]
 	fake.unbindServiceBySpaceArgsForCall = append(fake.unbindServiceBySpaceArgsForCall, struct {
@@ -42,9 +44,9 @@ func (fake *FakeUnbindServiceActor) UnbindServiceBySpace(appName string, service
 		return fake.UnbindServiceBySpaceStub(appName, serviceInstanceName, spaceGUID)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.unbindServiceBySpaceReturns.result1, fake.unbindServiceBySpaceReturns.result2
+	return fake.unbindServiceBySpaceReturns.result1, fake.unbindServiceBySpaceReturns.result2, fake.unbindServiceBySpaceReturns.result3
 }
 
 func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceCallCount() int {
@@ -59,26 +61,29 @@ func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceArgsForCall(i int) (stri
 	return fake.unbindServiceBySpaceArgsForCall[i].appName, fake.unbindServiceBySpaceArgsForCall[i].serviceInstanceName, fake.unbindServiceBySpaceArgsForCall[i].spaceGUID
 }
 
-func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturns(result1 v2action.Warnings, result2 error) {
+func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturns(result1 v2action.ServiceBinding, result2 v2action.Warnings, result3 error) {
 	fake.UnbindServiceBySpaceStub = nil
 	fake.unbindServiceBySpaceReturns = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 v2action.ServiceBinding
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturnsOnCall(i int, result1 v2action.ServiceBinding, result2 v2action.Warnings, result3 error) {
 	fake.UnbindServiceBySpaceStub = nil
 	if fake.unbindServiceBySpaceReturnsOnCall == nil {
 		fake.unbindServiceBySpaceReturnsOnCall = make(map[int]struct {
-			result1 v2action.Warnings
-			result2 error
+			result1 v2action.ServiceBinding
+			result2 v2action.Warnings
+			result3 error
 		})
 	}
 	fake.unbindServiceBySpaceReturnsOnCall[i] = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 v2action.ServiceBinding
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeUnbindServiceActor) Invocations() map[string][][]interface{} {

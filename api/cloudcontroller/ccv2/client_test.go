@@ -34,7 +34,7 @@ var _ = Describe("Cloud Controller Client", func() {
 			client.WrapConnection(fakeConnectionWrapper)
 			Expect(fakeConnectionWrapper.WrapCallCount()).To(Equal(1))
 
-			client.DeleteServiceBinding("does-not-matter")
+			client.DeleteServiceBinding("does-not-matter", true)
 			Expect(fakeConnectionWrapper.MakeCallCount()).To(Equal(1))
 		})
 	})
