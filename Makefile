@@ -15,11 +15,7 @@ GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path 
 
 all : test build
 
-build : out/cf-cli_linux_x86-64
-	cp out/cf-cli_linux_x86-64 out/cf
-
-osx: out/cf-cli_osx
-	cp out/cf-cli_osx out/cf
+build : out/cf
 
 check-target-env :
 ifndef CF_INT_API
@@ -87,6 +83,11 @@ lint :
 	@bash -c "go run bin/style/main.go api util/{configv3,manifest,randomword,sorting,ui}"
 	@echo "No lint errors!"
 	@echo
+
+out/cf: $(GOSRC)
+	CGO_ENABLED=0 go build \
+		$(REQUIRED_FOR_STATIC_BINARY) \
+		-ldflags "$(LD_FLAGS_LINUX)" -o out/cf .
 
 out/cf-cli_linux_i686 : $(GOSRC)
 	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
