@@ -24,12 +24,12 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment
-    tag_filter: v1.*
+    tag_filter: v2.*
 - name: ops-files
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment
-    tag_filter: v1.*
+    tag_filter: v2.*
 - name: state
   type: git
   source:
