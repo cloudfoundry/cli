@@ -3,7 +3,8 @@
 // Constant Naming Conventions:
 //
 // The standard naming for a constant is <Constant Type><Enum Name>. The only
-// exception is 'state' types, where the word 'state' is omitted.
+// exception is 'state' types, where the word 'state' is omitted from the enum
+// values.
 //
 // For Example:
 //   Constant Type: PackageType

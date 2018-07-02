@@ -28,6 +28,8 @@
               "route_forwarding"
             ],
             "max_db_per_node": 5,
+            "instances_retrievable": true,
+            "bindings_retrievable": true,
             "bindable": true,
             "metadata": {
               "provider": {
