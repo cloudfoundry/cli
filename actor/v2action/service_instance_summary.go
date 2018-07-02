@@ -48,6 +48,8 @@ func (s ServiceInstanceSummary) IsSharedTo() bool {
 
 type BoundApplication struct {
 	AppName            string
+	LastOperationState constant.LastOperationState
+	Message            string
 	ServiceBindingName string
 }
 
@@ -234,7 +236,14 @@ func (actor Actor) getSummaryInfoCompositeForInstance(spaceGUID string, serviceI
 			return serviceInstanceSummary, allWarnings, err
 		}
 
-		serviceInstanceSummary.BoundApplications = append(serviceInstanceSummary.BoundApplications, BoundApplication{AppName: app.Name, ServiceBindingName: serviceBinding.Name})
+		serviceInstanceSummary.BoundApplications = append(
+			serviceInstanceSummary.BoundApplications,
+			BoundApplication{
+				AppName:            app.Name,
+				ServiceBindingName: serviceBinding.Name,
+				LastOperationState: serviceBinding.LastOperation.State,
+				Message:            serviceBinding.LastOperation.Description,
+			})
 	}
 
 	sort.Slice(

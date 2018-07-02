@@ -619,14 +619,16 @@ var _ = Describe("Service Instance Summary Actions", func() {
 							BeforeEach(func() {
 								returnedServiceBindings = []ccv2.ServiceBinding{
 									{
-										GUID:    "some-service-binding-1-guid",
-										Name:    "some-service-binding-1",
-										AppGUID: "some-app-1-guid",
+										GUID:          "some-service-binding-1-guid",
+										Name:          "some-service-binding-1",
+										AppGUID:       "some-app-1-guid",
+										LastOperation: ccv2.LastOperation{State: constant.LastOperationInProgress, Description: "10% complete"},
 									},
 									{
-										GUID:    "some-service-binding-2-guid",
-										Name:    "some-service-binding-2",
-										AppGUID: "some-app-2-guid",
+										GUID:          "some-service-binding-2-guid",
+										Name:          "some-service-binding-2",
+										AppGUID:       "some-app-2-guid",
+										LastOperation: ccv2.LastOperation{State: constant.LastOperationSucceeded, Description: "100% complete"},
 									},
 								}
 								fakeCloudControllerClient.GetServiceInstanceServiceBindingsReturns(
@@ -684,10 +686,14 @@ var _ = Describe("Service Instance Summary Actions", func() {
 										{
 											AppName:            "some-app-1",
 											ServiceBindingName: "some-service-binding-1",
+											LastOperationState: constant.LastOperationInProgress,
+											Message:            "10% complete",
 										},
 										{
 											AppName:            "some-app-2",
 											ServiceBindingName: "some-service-binding-2",
+											LastOperationState: constant.LastOperationSucceeded,
+											Message:            "100% complete",
 										},
 									}))
 									Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-plan-warning", "get-service-warning", "get-service-bindings-warning", "get-application-warning-1", "get-application-warning-2"))
