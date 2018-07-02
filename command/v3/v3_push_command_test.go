@@ -317,9 +317,9 @@ var _ = Describe("v3-push Command", func() {
 								Expect(testUI.Err).To(Say("log-warning-1"))
 								Expect(testUI.Err).To(Say("log-warning-2"))
 
-								Expect(testUI.Out).To(Say("log-message-1"))
-								Expect(testUI.Out).To(Say("log-message-2"))
-								Expect(testUI.Out).ToNot(Say("log-message-3"))
+								Eventually(testUI.Out).Should(Say("log-message-1"))
+								Eventually(testUI.Out).Should(Say("log-message-2"))
+								Eventually(testUI.Out).ShouldNot(Say("log-message-3"))
 
 								Expect(fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
 								passedAppName, spaceGUID, _ := fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
@@ -346,7 +346,7 @@ var _ = Describe("v3-push Command", func() {
 
 								Expect(testUI.Err).To(Say("log-warning-1"))
 								Expect(testUI.Err).To(Say("log-warning-2"))
-								Expect(testUI.Err).To(Say("some-random-err"))
+								Eventually(testUI.Err).Should(Say("some-random-err"))
 								Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
 
 								Eventually(testUI.Out).Should(Say("log-message-1"))
