@@ -19,8 +19,8 @@ type Droplet struct {
 
 type Buildpack ccv3.DropletBuildpack
 
-// SetApplicationDroplet sets the droplet for an application.
-func (actor Actor) SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (Warnings, error) {
+// SetApplicationDropletByApplicationNameAndSpace sets the droplet for an application.
+func (actor Actor) SetApplicationDropletByApplicationNameAndSpace(appName string, spaceGUID string, dropletGUID string) (Warnings, error) {
 	allWarnings := Warnings{}
 	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
@@ -36,6 +36,16 @@ func (actor Actor) SetApplicationDroplet(appName string, spaceGUID string, dropl
 	}
 
 	return allWarnings, err
+}
+
+func (actor Actor) SetApplicationDroplet(appGUID string, dropletGUID string) (Warnings, error) {
+	_, warnings, err := actor.CloudControllerClient.SetApplicationDroplet(appGUID, dropletGUID)
+
+	if newErr, ok := err.(ccerror.UnprocessableEntityError); ok {
+		return Warnings(warnings), actionerror.AssignDropletError{Message: newErr.Message}
+	}
+
+	return Warnings(warnings), err
 }
 
 // GetApplicationDroplets returns the list of droplets that belong to applicaiton.

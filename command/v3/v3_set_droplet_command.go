@@ -17,7 +17,7 @@ import (
 
 type V3SetDropletActor interface {
 	CloudControllerAPIVersion() string
-	SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
+	SetApplicationDropletByApplicationNameAndSpace(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
 }
 
 type V3SetDropletCommand struct {
@@ -75,7 +75,7 @@ func (cmd V3SetDropletCommand) Execute(args []string) error {
 		"Username":    user.Name,
 	})
 
-	warnings, err := cmd.Actor.SetApplicationDroplet(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.DropletGUID)
+	warnings, err := cmd.Actor.SetApplicationDropletByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.DropletGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

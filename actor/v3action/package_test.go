@@ -825,4 +825,108 @@ var _ = Describe("Package Actions", func() {
 			})
 		})
 	})
+
+	Describe("PollPackage", func() {
+		Context("Polling Behavior", func() {
+			var (
+				pkg Package
+
+				appPkg     Package
+				warnings   Warnings
+				executeErr error
+			)
+
+			BeforeEach(func() {
+				pkg = Package{
+					GUID: "some-pkg-guid",
+				}
+
+				warnings = nil
+				executeErr = nil
+
+				// putting this here so the tests don't hang on polling
+				fakeCloudControllerClient.GetPackageReturns(
+					ccv3.Package{
+						GUID:  "some-pkg-guid",
+						State: constant.PackageReady,
+					},
+					ccv3.Warnings{},
+					nil,
+				)
+			})
+
+			JustBeforeEach(func() {
+				appPkg, warnings, executeErr = actor.PollPackage(pkg)
+			})
+
+			Context("when the polling errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("Fake error during polling")
+					fakeCloudControllerClient.GetPackageReturns(
+						ccv3.Package{},
+						ccv3.Warnings{"some-get-pkg-warning"},
+						expectedErr,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("some-get-pkg-warning"))
+				})
+			})
+
+			Context("when the polling is successful", func() {
+				It("returns the package", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					expectedPackage := ccv3.Package{
+						GUID:  "some-pkg-guid",
+						State: constant.PackageReady,
+					}
+
+					Expect(appPkg).To(Equal(Package(expectedPackage)))
+					Expect(fakeCloudControllerClient.GetPackageCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetPackageArgsForCall(0)).To(Equal("some-pkg-guid"))
+				})
+			})
+		})
+
+		DescribeTable("Polling states",
+			func(finalState constant.PackageState, expectedErr error) {
+				fakeCloudControllerClient.GetPackageReturns(
+					ccv3.Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload},
+					ccv3.Warnings{"poll-package-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetPackageReturnsOnCall(
+					1,
+					ccv3.Package{State: finalState},
+					ccv3.Warnings{"poll-package-warning"},
+					nil,
+				)
+
+				_, tableWarnings, err := actor.PollPackage(Package{
+					GUID: "some-pkg-guid",
+				})
+
+				if expectedErr == nil {
+					Expect(err).ToNot(HaveOccurred())
+				} else {
+					Expect(err).To(MatchError(expectedErr))
+				}
+
+				Expect(tableWarnings).To(ConsistOf("poll-package-warning", "poll-package-warning"))
+
+				Expect(fakeCloudControllerClient.GetPackageCallCount()).To(Equal(2))
+				Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
+			},
+
+			Entry("READY", constant.PackageReady, nil),
+			Entry("FAILED", constant.PackageFailed, actionerror.PackageProcessingFailedError{}),
+			Entry("EXPIRED", constant.PackageExpired, actionerror.PackageProcessingExpiredError{}),
+		)
+	})
 })

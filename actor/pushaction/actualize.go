@@ -93,12 +93,42 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 
 		eventStream <- UploadWithArchiveComplete
 
-		_, warnings, err = actor.V3Actor.PollPackage(pkg)
+		polledPackage, warnings, err := actor.V3Actor.PollPackage(pkg)
 		warningsStream <- Warnings(warnings)
 		if err != nil {
 			errorStream <- err
 			return
 		}
+
+		eventStream <- StartingStaging
+
+		build, warnings, err := actor.V3Actor.StageApplicationPackage(polledPackage.GUID)
+		warningsStream <- Warnings(warnings)
+		if err != nil {
+			errorStream <- err
+			return
+		}
+
+		eventStream <- PollingBuild
+
+		droplet, warnings, err := actor.V3Actor.PollBuild(build.GUID, state.Application.Name)
+		warningsStream <- Warnings(warnings)
+		if err != nil {
+			errorStream <- err
+			return
+		}
+
+		eventStream <- StagingComplete
+		eventStream <- SettingDroplet
+
+		warnings, err = actor.V3Actor.SetApplicationDroplet(state.Application.GUID, droplet.GUID)
+		warningsStream <- Warnings(warnings)
+		if err != nil {
+			errorStream <- err
+			return
+		}
+
+		eventStream <- SetDropletComplete
 
 		log.Debug("completed apply")
 		eventStream <- Complete

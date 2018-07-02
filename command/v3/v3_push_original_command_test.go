@@ -471,7 +471,7 @@ var _ = Describe("v3-push Command", func() {
 
 							Context("when setting the droplet fails", func() {
 								BeforeEach(func() {
-									fakeActor.SetApplicationDropletReturns(v3action.Warnings{"droplet-warning-1", "droplet-warning-2"}, errors.New("some-error"))
+									fakeActor.SetApplicationDropletByApplicationNameAndSpaceReturns(v3action.Warnings{"droplet-warning-1", "droplet-warning-2"}, errors.New("some-error"))
 								})
 
 								It("returns the error", func() {
@@ -488,7 +488,7 @@ var _ = Describe("v3-push Command", func() {
 
 							Context("when setting the application droplet is successful", func() {
 								BeforeEach(func() {
-									fakeActor.SetApplicationDropletReturns(v3action.Warnings{"droplet-warning-1", "droplet-warning-2"}, nil)
+									fakeActor.SetApplicationDropletByApplicationNameAndSpaceReturns(v3action.Warnings{"droplet-warning-1", "droplet-warning-2"}, nil)
 								})
 
 								It("displays that the droplet was assigned", func() {
@@ -503,8 +503,8 @@ var _ = Describe("v3-push Command", func() {
 									Expect(testUI.Err).To(Say("droplet-warning-2"))
 									Expect(testUI.Out).To(Say("OK"))
 
-									Expect(fakeActor.SetApplicationDropletCallCount()).To(Equal(1))
-									appName, spaceGUID, dropletGUID := fakeActor.SetApplicationDropletArgsForCall(0)
+									Expect(fakeActor.SetApplicationDropletByApplicationNameAndSpaceCallCount()).To(Equal(1))
+									appName, spaceGUID, dropletGUID := fakeActor.SetApplicationDropletByApplicationNameAndSpaceArgsForCall(0)
 									Expect(appName).To(Equal("some-app"))
 									Expect(spaceGUID).To(Equal("some-space-guid"))
 									Expect(dropletGUID).To(Equal("some-droplet-guid"))

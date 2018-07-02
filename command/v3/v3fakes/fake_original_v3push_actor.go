@@ -2,10 +2,8 @@
 package v3fakes
 
 import (
-	"io"
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command/v3"
 )
@@ -19,21 +17,6 @@ type FakeOriginalV3PushActor struct {
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
-	}
-	CreateBitsPackageByApplicationStub        func(appGUID string) (v3action.Package, v3action.Warnings, error)
-	createBitsPackageByApplicationMutex       sync.RWMutex
-	createBitsPackageByApplicationArgsForCall []struct {
-		appGUID string
-	}
-	createBitsPackageByApplicationReturns struct {
-		result1 v3action.Package
-		result2 v3action.Warnings
-		result3 error
-	}
-	createBitsPackageByApplicationReturnsOnCall map[int]struct {
-		result1 v3action.Package
-		result2 v3action.Warnings
-		result3 error
 	}
 	CreateAndUploadBitsPackageByApplicationNameAndSpaceStub        func(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
 	createAndUploadBitsPackageByApplicationNameAndSpaceMutex       sync.RWMutex
@@ -148,18 +131,18 @@ type FakeOriginalV3PushActor struct {
 	pollStartReturnsOnCall map[int]struct {
 		result1 error
 	}
-	SetApplicationDropletStub        func(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
-	setApplicationDropletMutex       sync.RWMutex
-	setApplicationDropletArgsForCall []struct {
+	SetApplicationDropletByApplicationNameAndSpaceStub        func(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
+	setApplicationDropletByApplicationNameAndSpaceMutex       sync.RWMutex
+	setApplicationDropletByApplicationNameAndSpaceArgsForCall []struct {
 		appName     string
 		spaceGUID   string
 		dropletGUID string
 	}
-	setApplicationDropletReturns struct {
+	setApplicationDropletByApplicationNameAndSpaceReturns struct {
 		result1 v3action.Warnings
 		result2 error
 	}
-	setApplicationDropletReturnsOnCall map[int]struct {
+	setApplicationDropletByApplicationNameAndSpaceReturnsOnCall map[int]struct {
 		result1 v3action.Warnings
 		result2 error
 	}
@@ -222,24 +205,6 @@ type FakeOriginalV3PushActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	UploadBitsPackageStub        func(v3action.Package, []sharedaction.Resource, io.Reader, int64) (v3action.Package, v3action.Warnings, error)
-	uploadBitsPackageMutex       sync.RWMutex
-	uploadBitsPackageArgsForCall []struct {
-		arg1 v3action.Package
-		arg2 []sharedaction.Resource
-		arg3 io.Reader
-		arg4 int64
-	}
-	uploadBitsPackageReturns struct {
-		result1 v3action.Package
-		result2 v3action.Warnings
-		result3 error
-	}
-	uploadBitsPackageReturnsOnCall map[int]struct {
-		result1 v3action.Package
-		result2 v3action.Warnings
-		result3 error
-	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -282,60 +247,6 @@ func (fake *FakeOriginalV3PushActor) CloudControllerAPIVersionReturnsOnCall(i in
 	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
-}
-
-func (fake *FakeOriginalV3PushActor) CreateBitsPackageByApplication(appGUID string) (v3action.Package, v3action.Warnings, error) {
-	fake.createBitsPackageByApplicationMutex.Lock()
-	ret, specificReturn := fake.createBitsPackageByApplicationReturnsOnCall[len(fake.createBitsPackageByApplicationArgsForCall)]
-	fake.createBitsPackageByApplicationArgsForCall = append(fake.createBitsPackageByApplicationArgsForCall, struct {
-		appGUID string
-	}{appGUID})
-	fake.recordInvocation("CreateBitsPackageByApplication", []interface{}{appGUID})
-	fake.createBitsPackageByApplicationMutex.Unlock()
-	if fake.CreateBitsPackageByApplicationStub != nil {
-		return fake.CreateBitsPackageByApplicationStub(appGUID)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.createBitsPackageByApplicationReturns.result1, fake.createBitsPackageByApplicationReturns.result2, fake.createBitsPackageByApplicationReturns.result3
-}
-
-func (fake *FakeOriginalV3PushActor) CreateBitsPackageByApplicationCallCount() int {
-	fake.createBitsPackageByApplicationMutex.RLock()
-	defer fake.createBitsPackageByApplicationMutex.RUnlock()
-	return len(fake.createBitsPackageByApplicationArgsForCall)
-}
-
-func (fake *FakeOriginalV3PushActor) CreateBitsPackageByApplicationArgsForCall(i int) string {
-	fake.createBitsPackageByApplicationMutex.RLock()
-	defer fake.createBitsPackageByApplicationMutex.RUnlock()
-	return fake.createBitsPackageByApplicationArgsForCall[i].appGUID
-}
-
-func (fake *FakeOriginalV3PushActor) CreateBitsPackageByApplicationReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
-	fake.CreateBitsPackageByApplicationStub = nil
-	fake.createBitsPackageByApplicationReturns = struct {
-		result1 v3action.Package
-		result2 v3action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeOriginalV3PushActor) CreateBitsPackageByApplicationReturnsOnCall(i int, result1 v3action.Package, result2 v3action.Warnings, result3 error) {
-	fake.CreateBitsPackageByApplicationStub = nil
-	if fake.createBitsPackageByApplicationReturnsOnCall == nil {
-		fake.createBitsPackageByApplicationReturnsOnCall = make(map[int]struct {
-			result1 v3action.Package
-			result2 v3action.Warnings
-			result3 error
-		})
-	}
-	fake.createBitsPackageByApplicationReturnsOnCall[i] = struct {
-		result1 v3action.Package
-		result2 v3action.Warnings
-		result3 error
-	}{result1, result2, result3}
 }
 
 func (fake *FakeOriginalV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error) {
@@ -723,54 +634,54 @@ func (fake *FakeOriginalV3PushActor) PollStartReturnsOnCall(i int, result1 error
 	}{result1}
 }
 
-func (fake *FakeOriginalV3PushActor) SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error) {
-	fake.setApplicationDropletMutex.Lock()
-	ret, specificReturn := fake.setApplicationDropletReturnsOnCall[len(fake.setApplicationDropletArgsForCall)]
-	fake.setApplicationDropletArgsForCall = append(fake.setApplicationDropletArgsForCall, struct {
+func (fake *FakeOriginalV3PushActor) SetApplicationDropletByApplicationNameAndSpace(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error) {
+	fake.setApplicationDropletByApplicationNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.setApplicationDropletByApplicationNameAndSpaceReturnsOnCall[len(fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall)]
+	fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall = append(fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall, struct {
 		appName     string
 		spaceGUID   string
 		dropletGUID string
 	}{appName, spaceGUID, dropletGUID})
-	fake.recordInvocation("SetApplicationDroplet", []interface{}{appName, spaceGUID, dropletGUID})
-	fake.setApplicationDropletMutex.Unlock()
-	if fake.SetApplicationDropletStub != nil {
-		return fake.SetApplicationDropletStub(appName, spaceGUID, dropletGUID)
+	fake.recordInvocation("SetApplicationDropletByApplicationNameAndSpace", []interface{}{appName, spaceGUID, dropletGUID})
+	fake.setApplicationDropletByApplicationNameAndSpaceMutex.Unlock()
+	if fake.SetApplicationDropletByApplicationNameAndSpaceStub != nil {
+		return fake.SetApplicationDropletByApplicationNameAndSpaceStub(appName, spaceGUID, dropletGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.setApplicationDropletReturns.result1, fake.setApplicationDropletReturns.result2
+	return fake.setApplicationDropletByApplicationNameAndSpaceReturns.result1, fake.setApplicationDropletByApplicationNameAndSpaceReturns.result2
 }
 
-func (fake *FakeOriginalV3PushActor) SetApplicationDropletCallCount() int {
-	fake.setApplicationDropletMutex.RLock()
-	defer fake.setApplicationDropletMutex.RUnlock()
-	return len(fake.setApplicationDropletArgsForCall)
+func (fake *FakeOriginalV3PushActor) SetApplicationDropletByApplicationNameAndSpaceCallCount() int {
+	fake.setApplicationDropletByApplicationNameAndSpaceMutex.RLock()
+	defer fake.setApplicationDropletByApplicationNameAndSpaceMutex.RUnlock()
+	return len(fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeOriginalV3PushActor) SetApplicationDropletArgsForCall(i int) (string, string, string) {
-	fake.setApplicationDropletMutex.RLock()
-	defer fake.setApplicationDropletMutex.RUnlock()
-	return fake.setApplicationDropletArgsForCall[i].appName, fake.setApplicationDropletArgsForCall[i].spaceGUID, fake.setApplicationDropletArgsForCall[i].dropletGUID
+func (fake *FakeOriginalV3PushActor) SetApplicationDropletByApplicationNameAndSpaceArgsForCall(i int) (string, string, string) {
+	fake.setApplicationDropletByApplicationNameAndSpaceMutex.RLock()
+	defer fake.setApplicationDropletByApplicationNameAndSpaceMutex.RUnlock()
+	return fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall[i].appName, fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall[i].spaceGUID, fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall[i].dropletGUID
 }
 
-func (fake *FakeOriginalV3PushActor) SetApplicationDropletReturns(result1 v3action.Warnings, result2 error) {
-	fake.SetApplicationDropletStub = nil
-	fake.setApplicationDropletReturns = struct {
+func (fake *FakeOriginalV3PushActor) SetApplicationDropletByApplicationNameAndSpaceReturns(result1 v3action.Warnings, result2 error) {
+	fake.SetApplicationDropletByApplicationNameAndSpaceStub = nil
+	fake.setApplicationDropletByApplicationNameAndSpaceReturns = struct {
 		result1 v3action.Warnings
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeOriginalV3PushActor) SetApplicationDropletReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
-	fake.SetApplicationDropletStub = nil
-	if fake.setApplicationDropletReturnsOnCall == nil {
-		fake.setApplicationDropletReturnsOnCall = make(map[int]struct {
+func (fake *FakeOriginalV3PushActor) SetApplicationDropletByApplicationNameAndSpaceReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
+	fake.SetApplicationDropletByApplicationNameAndSpaceStub = nil
+	if fake.setApplicationDropletByApplicationNameAndSpaceReturnsOnCall == nil {
+		fake.setApplicationDropletByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
 			result1 v3action.Warnings
 			result2 error
 		})
 	}
-	fake.setApplicationDropletReturnsOnCall[i] = struct {
+	fake.setApplicationDropletByApplicationNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v3action.Warnings
 		result2 error
 	}{result1, result2}
@@ -990,75 +901,11 @@ func (fake *FakeOriginalV3PushActor) UpdateApplicationReturnsOnCall(i int, resul
 	}{result1, result2, result3}
 }
 
-func (fake *FakeOriginalV3PushActor) UploadBitsPackage(arg1 v3action.Package, arg2 []sharedaction.Resource, arg3 io.Reader, arg4 int64) (v3action.Package, v3action.Warnings, error) {
-	var arg2Copy []sharedaction.Resource
-	if arg2 != nil {
-		arg2Copy = make([]sharedaction.Resource, len(arg2))
-		copy(arg2Copy, arg2)
-	}
-	fake.uploadBitsPackageMutex.Lock()
-	ret, specificReturn := fake.uploadBitsPackageReturnsOnCall[len(fake.uploadBitsPackageArgsForCall)]
-	fake.uploadBitsPackageArgsForCall = append(fake.uploadBitsPackageArgsForCall, struct {
-		arg1 v3action.Package
-		arg2 []sharedaction.Resource
-		arg3 io.Reader
-		arg4 int64
-	}{arg1, arg2Copy, arg3, arg4})
-	fake.recordInvocation("UploadBitsPackage", []interface{}{arg1, arg2Copy, arg3, arg4})
-	fake.uploadBitsPackageMutex.Unlock()
-	if fake.UploadBitsPackageStub != nil {
-		return fake.UploadBitsPackageStub(arg1, arg2, arg3, arg4)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.uploadBitsPackageReturns.result1, fake.uploadBitsPackageReturns.result2, fake.uploadBitsPackageReturns.result3
-}
-
-func (fake *FakeOriginalV3PushActor) UploadBitsPackageCallCount() int {
-	fake.uploadBitsPackageMutex.RLock()
-	defer fake.uploadBitsPackageMutex.RUnlock()
-	return len(fake.uploadBitsPackageArgsForCall)
-}
-
-func (fake *FakeOriginalV3PushActor) UploadBitsPackageArgsForCall(i int) (v3action.Package, []sharedaction.Resource, io.Reader, int64) {
-	fake.uploadBitsPackageMutex.RLock()
-	defer fake.uploadBitsPackageMutex.RUnlock()
-	return fake.uploadBitsPackageArgsForCall[i].arg1, fake.uploadBitsPackageArgsForCall[i].arg2, fake.uploadBitsPackageArgsForCall[i].arg3, fake.uploadBitsPackageArgsForCall[i].arg4
-}
-
-func (fake *FakeOriginalV3PushActor) UploadBitsPackageReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
-	fake.UploadBitsPackageStub = nil
-	fake.uploadBitsPackageReturns = struct {
-		result1 v3action.Package
-		result2 v3action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeOriginalV3PushActor) UploadBitsPackageReturnsOnCall(i int, result1 v3action.Package, result2 v3action.Warnings, result3 error) {
-	fake.UploadBitsPackageStub = nil
-	if fake.uploadBitsPackageReturnsOnCall == nil {
-		fake.uploadBitsPackageReturnsOnCall = make(map[int]struct {
-			result1 v3action.Package
-			result2 v3action.Warnings
-			result3 error
-		})
-	}
-	fake.uploadBitsPackageReturnsOnCall[i] = struct {
-		result1 v3action.Package
-		result2 v3action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakeOriginalV3PushActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	fake.createBitsPackageByApplicationMutex.RLock()
-	defer fake.createBitsPackageByApplicationMutex.RUnlock()
 	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()
 	defer fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RUnlock()
 	fake.createDockerPackageByApplicationNameAndSpaceMutex.RLock()
@@ -1073,8 +920,8 @@ func (fake *FakeOriginalV3PushActor) Invocations() map[string][][]interface{} {
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
-	fake.setApplicationDropletMutex.RLock()
-	defer fake.setApplicationDropletMutex.RUnlock()
+	fake.setApplicationDropletByApplicationNameAndSpaceMutex.RLock()
+	defer fake.setApplicationDropletByApplicationNameAndSpaceMutex.RUnlock()
 	fake.stagePackageMutex.RLock()
 	defer fake.stagePackageMutex.RUnlock()
 	fake.startApplicationMutex.RLock()
@@ -1083,8 +930,6 @@ func (fake *FakeOriginalV3PushActor) Invocations() map[string][][]interface{} {
 	defer fake.stopApplicationMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
-	fake.uploadBitsPackageMutex.RLock()
-	defer fake.uploadBitsPackageMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

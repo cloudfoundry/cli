@@ -34,7 +34,7 @@ type OriginalV3PushActor interface {
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
-	SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
+	SetApplicationDropletByApplicationNameAndSpace(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
 	StagePackage(packageGUID string, appName string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error)
 	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
@@ -372,7 +372,7 @@ func (cmd V3PushCommand) setApplicationDroplet(dropletGUID string, userName stri
 		"Username":    userName,
 	})
 
-	warnings, err := cmd.OriginalActor.SetApplicationDroplet(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, dropletGUID)
+	warnings, err := cmd.OriginalActor.SetApplicationDropletByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, dropletGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

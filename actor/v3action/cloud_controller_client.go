@@ -54,6 +54,7 @@ type CloudControllerClient interface {
 	UpdateApplicationEnvironmentVariables(appGUID string, envVars ccv3.EnvironmentVariables) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
 	UpdateApplicationStart(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	UpdateApplicationStop(appGUID string) (ccv3.Application, ccv3.Warnings, error)
+	UpdateApplicationRestart(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	UpdateTaskCancel(taskGUID string) (ccv3.Task, ccv3.Warnings, error)

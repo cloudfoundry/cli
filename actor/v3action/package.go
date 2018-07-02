@@ -129,34 +129,6 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 	return updatedPackage, append(allWarnings, updatedWarnings...), err
 }
 
-func (actor Actor) PollPackage(pkg Package) (Package, Warnings, error) {
-	var allWarnings Warnings
-
-	for pkg.State != constant.PackageReady && pkg.State != constant.PackageFailed && pkg.State != constant.PackageExpired {
-		time.Sleep(actor.Config.PollingInterval())
-		ccPkg, warnings, err := actor.CloudControllerClient.GetPackage(pkg.GUID)
-		log.WithFields(log.Fields{
-			"package_guid": pkg.GUID,
-			"state":        pkg.State,
-		}).Debug("polling package state")
-
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return Package{}, allWarnings, err
-		}
-
-		pkg = Package(ccPkg)
-	}
-
-	if pkg.State == constant.PackageFailed {
-		return Package{}, allWarnings, actionerror.PackageProcessingFailedError{}
-	} else if pkg.State == constant.PackageExpired {
-		return Package{}, allWarnings, actionerror.PackageProcessingExpiredError{}
-	}
-
-	return pkg, allWarnings, nil
-}
-
 // GetApplicationPackages returns a list of package of an app.
 func (actor *Actor) GetApplicationPackages(appName string, spaceGUID string) ([]Package, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
@@ -205,4 +177,33 @@ func (actor Actor) UploadBitsPackage(pkg Package, existingResources []sharedacti
 
 	appPkg, warnings, err := actor.CloudControllerClient.UploadBitsPackage(ccv3.Package(pkg), apiResources, newResources, newResourcesLength)
 	return Package(appPkg), Warnings(warnings), err
+}
+
+// PollPackage returns a package of an app.
+func (actor Actor) PollPackage(pkg Package) (Package, Warnings, error) {
+	var allWarnings Warnings
+
+	for pkg.State != constant.PackageReady && pkg.State != constant.PackageFailed && pkg.State != constant.PackageExpired {
+		time.Sleep(actor.Config.PollingInterval())
+		ccPkg, warnings, err := actor.CloudControllerClient.GetPackage(pkg.GUID)
+		log.WithFields(log.Fields{
+			"package_guid": pkg.GUID,
+			"state":        pkg.State,
+		}).Debug("polling package state")
+
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return Package{}, allWarnings, err
+		}
+
+		pkg = Package(ccPkg)
+	}
+
+	if pkg.State == constant.PackageFailed {
+		return Package{}, allWarnings, actionerror.PackageProcessingFailedError{}
+	} else if pkg.State == constant.PackageExpired {
+		return Package{}, allWarnings, actionerror.PackageProcessingExpiredError{}
+	}
+
+	return pkg, allWarnings, nil
 }

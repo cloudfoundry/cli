@@ -3,10 +3,12 @@ package v3_test
 import (
 	"errors"
 	"os"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -27,9 +29,10 @@ type Step struct {
 	Warnings pushaction.Warnings
 }
 
-func FillInValues(tuples []Step, state pushaction.PushState) func(state pushaction.PushState, progressBar pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
-	return func(state pushaction.PushState, progressBar pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+func FillInValues(tuples []Step, state pushaction.PushState) func(pushaction.PushState, pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+	return func(pushaction.PushState, pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
 		stateStream := make(chan pushaction.PushState)
+
 		eventStream := make(chan pushaction.Event)
 		warningsStream := make(chan pushaction.Warnings)
 		errorStream := make(chan error)
@@ -50,11 +53,38 @@ func FillInValues(tuples []Step, state pushaction.PushState) func(state pushacti
 				}
 			}
 
-			eventStream <- pushaction.Complete
 			stateStream <- state
+			eventStream <- pushaction.Complete
 		}()
 
 		return stateStream, eventStream, warningsStream, errorStream
+	}
+}
+
+type LogEvent struct {
+	Log   *v3action.LogMessage
+	Error error
+}
+
+func ReturnLogs(logevents []LogEvent, passedWarnings v3action.Warnings, passedError error) func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
+	return func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
+		logStream := make(chan *v3action.LogMessage)
+		errStream := make(chan error)
+		go func() {
+			defer close(logStream)
+			defer close(errStream)
+
+			for _, log := range logevents {
+				if log.Log != nil {
+					logStream <- log.Log
+				}
+				if log.Error != nil {
+					errStream <- log.Error
+				}
+			}
+		}()
+
+		return logStream, errStream, passedWarnings, passedError
 	}
 }
 
@@ -67,9 +97,11 @@ var _ = Describe("v3-push Command", func() {
 		fakeActor        *v3fakes.FakeV3PushActor
 		fakeVersionActor *v3fakes.FakeV3PushVersionActor
 		fakeProgressBar  *v3fakes.FakeProgressBar
+		fakeNOAAClient   *v3actionfakes.FakeNOAAClient
 		binaryName       string
 		executeErr       error
 
+		appName   string
 		userName  string
 		spaceName string
 		orgName   string
@@ -82,6 +114,7 @@ var _ = Describe("v3-push Command", func() {
 		fakeActor = new(v3fakes.FakeV3PushActor)
 		fakeVersionActor = new(v3fakes.FakeV3PushVersionActor)
 		fakeProgressBar = new(v3fakes.FakeProgressBar)
+		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -95,9 +128,11 @@ var _ = Describe("v3-push Command", func() {
 			VersionActor: fakeVersionActor,
 			SharedActor:  fakeSharedActor,
 			ProgressBar:  fakeProgressBar,
+			NOAAClient:   fakeNOAAClient,
 		}
 
-		userName = "banana"
+		appName = "some-app"
+		userName = "some-user"
 		spaceName = "some-space"
 		orgName = "some-org"
 	})
@@ -155,7 +190,7 @@ var _ = Describe("v3-push Command", func() {
 				})
 			})
 
-			Context("when the user is logged in", func() {
+			Context("when the user is logged in, and org and space are targeted", func() {
 				BeforeEach(func() {
 					fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
 
@@ -178,13 +213,13 @@ var _ = Describe("v3-push Command", func() {
 						fakeActor.ConceptualizeReturns(
 							[]pushaction.PushState{
 								{
-									Application: v3action.Application{Name: "some-app"},
+									Application: v3action.Application{Name: appName},
 								},
 							},
 							pushaction.Warnings{"some-warning-1"}, nil)
 					})
 
-					Context("when the app is successfully actualized", func() {
+					Describe("actualizing non-logging events", func() {
 						BeforeEach(func() {
 							fakeActor.ActualizeStub = FillInValues([]Step{
 								{
@@ -209,12 +244,16 @@ var _ = Describe("v3-push Command", func() {
 								{
 									Event: pushaction.UploadWithArchiveComplete,
 								},
+								{
+									Event: pushaction.StagingComplete,
+								},
 							}, pushaction.PushState{})
 						})
 
 						It("generates a push state with the specified app path", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).To(Say("Getting app info..."))
+							Expect(testUI.Out).To(Say("Pushing app %s to org some-org / space some-space as some-user", appName))
+							Expect(testUI.Out).To(Say("Getting app info\\.\\.\\."))
 							Expect(testUI.Err).To(Say("some-warning-1"))
 
 							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
@@ -244,7 +283,154 @@ var _ = Describe("v3-push Command", func() {
 							Expect(testUI.Err).To(Say("retry upload warning"))
 
 							Expect(testUI.Out).To(Say("Waiting for API to complete processing files..."))
+
+							Expect(testUI.Out).To(Say("Waiting for app to start..."))
 							Expect(fakeProgressBar.CompleteCallCount()).Should(Equal(1))
+						})
+					})
+
+					Describe("actualizing logging events", func() {
+						BeforeEach(func() {
+							fakeActor.ActualizeStub = FillInValues([]Step{
+								{
+									Event: pushaction.StartingStaging,
+								},
+							}, pushaction.PushState{})
+						})
+
+						Context("when there are no logging errors", func() {
+							BeforeEach(func() {
+								fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
+									[]LogEvent{
+										{Log: v3action.NewLogMessage("log-message-1", 1, time.Now(), v3action.StagingLog, "source-instance")},
+										{Log: v3action.NewLogMessage("log-message-2", 1, time.Now(), v3action.StagingLog, "source-instance")},
+										{Log: v3action.NewLogMessage("log-message-3", 1, time.Now(), "potato", "source-instance")},
+									},
+									v3action.Warnings{"log-warning-1", "log-warning-2"},
+									nil,
+								)
+							})
+
+							It("displays the staging logs and warnings", func() {
+								Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
+
+								Expect(testUI.Err).To(Say("log-warning-1"))
+								Expect(testUI.Err).To(Say("log-warning-2"))
+
+								Expect(testUI.Out).To(Say("log-message-1"))
+								Expect(testUI.Out).To(Say("log-message-2"))
+								Expect(testUI.Out).ToNot(Say("log-message-3"))
+
+								Expect(fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
+								passedAppName, spaceGUID, _ := fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
+								Expect(passedAppName).To(Equal(appName))
+								Expect(spaceGUID).To(Equal("some-space-guid"))
+							})
+						})
+
+						Context("when there are logging errors", func() {
+							BeforeEach(func() {
+								fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
+									[]LogEvent{
+										{Error: errors.New("some-random-err")},
+										{Error: actionerror.NOAATimeoutError{}},
+										{Log: v3action.NewLogMessage("log-message-1", 1, time.Now(), v3action.StagingLog, "source-instance")},
+									},
+									v3action.Warnings{"log-warning-1", "log-warning-2"},
+									nil,
+								)
+							})
+
+							It("displays the errors as warnings", func() {
+								Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
+
+								Expect(testUI.Err).To(Say("log-warning-1"))
+								Expect(testUI.Err).To(Say("log-warning-2"))
+								Expect(testUI.Err).To(Say("some-random-err"))
+								Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
+
+								Eventually(testUI.Out).Should(Say("log-message-1"))
+							})
+						})
+					})
+
+					Context("when the app is successfully actualized", func() {
+						BeforeEach(func() {
+							fakeActor.ActualizeStub = FillInValues([]Step{
+								{},
+							}, pushaction.PushState{Application: v3action.Application{GUID: "potato"}})
+						})
+
+						// It("outputs flavor text prior to generating app configuration", func() {
+						// })
+
+						Context("when restarting the app succeeds", func() {
+							BeforeEach(func() {
+								fakeVersionActor.RestartApplicationReturns(v3action.Warnings{"some-restart-warning"}, nil)
+							})
+
+							It("restarts the app and displays warnings", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(fakeVersionActor.RestartApplicationCallCount()).To(Equal(1))
+								Expect(fakeVersionActor.RestartApplicationArgsForCall(0)).To(Equal("potato"))
+								Expect(testUI.Err).To(Say("some-restart-warning"))
+							})
+
+							Context("when polling the restart succeeds", func() {
+								BeforeEach(func() {
+									fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
+										warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+										return nil
+									}
+								})
+
+								It("displays all warnings", func() {
+									Expect(testUI.Err).To(Say("some-poll-warning-1"))
+									Expect(testUI.Err).To(Say("some-poll-warning-2"))
+
+									Expect(executeErr).ToNot(HaveOccurred())
+								})
+							})
+
+							Context("when polling the start fails", func() {
+								BeforeEach(func() {
+									fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
+										warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+										return errors.New("some-error")
+									}
+								})
+
+								It("displays all warnings and fails", func() {
+									Expect(testUI.Err).To(Say("some-poll-warning-1"))
+									Expect(testUI.Err).To(Say("some-poll-warning-2"))
+
+									Expect(executeErr).To(MatchError("some-error"))
+								})
+							})
+
+							Context("when polling times out", func() {
+								BeforeEach(func() {
+									fakeVersionActor.PollStartReturns(actionerror.StartupTimeoutError{})
+								})
+
+								It("returns the StartupTimeoutError", func() {
+									Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{
+										AppName:    "some-app",
+										BinaryName: binaryName,
+									}))
+								})
+							})
+						})
+
+						Context("when restarting the app fails", func() {
+							BeforeEach(func() {
+								fakeVersionActor.RestartApplicationReturns(v3action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
+							})
+
+							It("returns an error and any warnings", func() {
+								Expect(executeErr).To(MatchError("restart failure"))
+								Expect(testUI.Err).To(Say("some-restart-warning"))
+							})
 						})
 					})
 

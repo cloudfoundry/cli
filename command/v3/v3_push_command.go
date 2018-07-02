@@ -3,6 +3,7 @@ package v3
 import (
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -10,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/util/progressbar"
@@ -36,6 +38,9 @@ type V3PushActor interface {
 
 type V3PushVersionActor interface {
 	CloudControllerAPIVersion() string
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
+	PollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error
+	RestartApplication(appGUID string) (v3action.Warnings, error)
 }
 
 type V3PushCommand struct {
@@ -109,6 +114,8 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 	cmd.Actor = pushaction.NewActor(v2Actor, v3Actor, sharedActor)
 
+	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
+
 	return nil
 }
 
@@ -129,14 +136,27 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayText("Getting app info...")
-	cls, err := cmd.GetCommandLineSettings()
+	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
 	}
 
+	cliSettings, err := cmd.GetCommandLineSettings()
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Pushing app {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		"AppName":   cliSettings.Name,
+		"OrgName":   cmd.Config.TargetedOrganization().Name,
+		"SpaceName": cmd.Config.TargetedSpace().Name,
+		"Username":  user.Name,
+	})
+
+	cmd.UI.DisplayText("Getting app info...")
+
 	log.Info("generating the app state")
-	pushState, warnings, err := cmd.Actor.Conceptualize(cls, cmd.Config.TargetedSpace().GUID)
+	pushState, warnings, err := cmd.Actor.Conceptualize(cliSettings, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -146,8 +166,43 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	for _, state := range pushState {
 		log.WithField("app_name", state.Application.Name).Info("actualizing")
 		stateStream, eventStream, warningsStream, errorStream := cmd.Actor.Actualize(state, cmd.ProgressBar)
-		_, err = cmd.processApplyStreams(state.Application.Name, stateStream, eventStream, warningsStream, errorStream)
+		updatedState, err := cmd.processApplyStreams(state.Application.Name, stateStream, eventStream, warningsStream, errorStream)
 		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Waiting for app to start...")
+		warnings, err := cmd.VersionActor.RestartApplication(updatedState.Application.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+
+		pollWarnings := make(chan v3action.Warnings)
+		done := make(chan bool)
+		go func() {
+			for {
+				select {
+				case message := <-pollWarnings:
+					cmd.UI.DisplayWarnings(message)
+				case <-done:
+					return
+				}
+			}
+		}()
+
+		err = cmd.VersionActor.PollStart(updatedState.Application.GUID, pollWarnings)
+		done <- true
+
+		if err != nil {
+			if _, ok := err.(actionerror.StartupTimeoutError); ok {
+				return translatableerror.StartupTimeoutError{
+					AppName:    cmd.RequiredArgs.AppName,
+					BinaryName: cmd.Config.BinaryName(),
+				}
+			}
+
 			return err
 		}
 	}
@@ -174,7 +229,6 @@ func (cmd V3PushCommand) processApplyStreams(
 				break
 			}
 			updateState = state
-			log.Debugf("updated config received: %#v", updateState)
 		case event, ok := <-eventStream:
 			if !ok {
 				log.Debug("processing event stream closed")
@@ -199,7 +253,6 @@ func (cmd V3PushCommand) processApplyStreams(
 		}
 
 		if stateClosed && eventClosed && warningsClosed && complete {
-			log.Debug("breaking apply display loop")
 			break
 		}
 	}
@@ -231,12 +284,43 @@ func (cmd V3PushCommand) processEvent(appName string, event pushaction.Event) bo
 		cmd.ProgressBar.Complete()
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Waiting for API to complete processing files...")
+	case pushaction.StartingStaging:
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Staging app and tracing logs...")
+		logStream, errStream, warnings, _ := cmd.VersionActor.GetStreamingLogsForApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+		cmd.UI.DisplayWarnings(warnings)
+		go cmd.getLogs(logStream, errStream)
+	case pushaction.StagingComplete:
+		cmd.NOAAClient.Close()
 	case pushaction.Complete:
 		return true
 	default:
 		log.WithField("event", event).Debug("ignoring event")
 	}
 	return false
+}
+
+func (cmd V3PushCommand) getLogs(logStream <-chan *v3action.LogMessage, errStream <-chan error) {
+	for {
+		select {
+		case logMessage, open := <-logStream:
+			if !open {
+				return
+			}
+			if logMessage.Staging() {
+				cmd.UI.DisplayLogMessage(logMessage, false)
+			}
+		case err, open := <-errStream:
+			if !open {
+				return
+			}
+			_, ok := err.(actionerror.NOAATimeoutError)
+			if ok {
+				cmd.UI.DisplayWarning("timeout connecting to log server, no log will be shown")
+			}
+			cmd.UI.DisplayWarning(err.Error())
+		}
+	}
 }
 
 func (cmd V3PushCommand) GetCommandLineSettings() (pushaction.CommandLineSettings, error) {

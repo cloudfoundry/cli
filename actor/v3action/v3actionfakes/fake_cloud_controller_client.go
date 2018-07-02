@@ -658,6 +658,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateApplicationRestartStub        func(appGUID string) (ccv3.Application, ccv3.Warnings, error)
+	updateApplicationRestartMutex       sync.RWMutex
+	updateApplicationRestartArgsForCall []struct {
+		appGUID string
+	}
+	updateApplicationRestartReturns struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateApplicationRestartReturnsOnCall map[int]struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateOrganizationDefaultIsolationSegmentRelationshipStub        func(orgGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	updateOrganizationDefaultIsolationSegmentRelationshipMutex       sync.RWMutex
 	updateOrganizationDefaultIsolationSegmentRelationshipArgsForCall []struct {
@@ -3093,6 +3108,60 @@ func (fake *FakeCloudControllerClient) UpdateApplicationStopReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateApplicationRestart(appGUID string) (ccv3.Application, ccv3.Warnings, error) {
+	fake.updateApplicationRestartMutex.Lock()
+	ret, specificReturn := fake.updateApplicationRestartReturnsOnCall[len(fake.updateApplicationRestartArgsForCall)]
+	fake.updateApplicationRestartArgsForCall = append(fake.updateApplicationRestartArgsForCall, struct {
+		appGUID string
+	}{appGUID})
+	fake.recordInvocation("UpdateApplicationRestart", []interface{}{appGUID})
+	fake.updateApplicationRestartMutex.Unlock()
+	if fake.UpdateApplicationRestartStub != nil {
+		return fake.UpdateApplicationRestartStub(appGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.updateApplicationRestartReturns.result1, fake.updateApplicationRestartReturns.result2, fake.updateApplicationRestartReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationRestartCallCount() int {
+	fake.updateApplicationRestartMutex.RLock()
+	defer fake.updateApplicationRestartMutex.RUnlock()
+	return len(fake.updateApplicationRestartArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationRestartArgsForCall(i int) string {
+	fake.updateApplicationRestartMutex.RLock()
+	defer fake.updateApplicationRestartMutex.RUnlock()
+	return fake.updateApplicationRestartArgsForCall[i].appGUID
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationRestartReturns(result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateApplicationRestartStub = nil
+	fake.updateApplicationRestartReturns = struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationRestartReturnsOnCall(i int, result1 ccv3.Application, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateApplicationRestartStub = nil
+	if fake.updateApplicationRestartReturnsOnCall == nil {
+		fake.updateApplicationRestartReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Application
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateApplicationRestartReturnsOnCall[i] = struct {
+		result1 ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error) {
 	fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.Lock()
 	ret, specificReturn := fake.updateOrganizationDefaultIsolationSegmentRelationshipReturnsOnCall[len(fake.updateOrganizationDefaultIsolationSegmentRelationshipArgsForCall)]
@@ -3465,6 +3534,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateApplicationStartMutex.RUnlock()
 	fake.updateApplicationStopMutex.RLock()
 	defer fake.updateApplicationStopMutex.RUnlock()
+	fake.updateApplicationRestartMutex.RLock()
+	defer fake.updateApplicationRestartMutex.RUnlock()
 	fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RLock()
 	defer fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RUnlock()
 	fake.updateSpaceIsolationSegmentRelationshipMutex.RLock()

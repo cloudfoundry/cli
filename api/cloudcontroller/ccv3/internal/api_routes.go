@@ -41,6 +41,7 @@ const (
 	PatchProcessRequest                                         = "PatchProcess"
 	PatchSpaceRelationshipIsolationSegmentRequest               = "PatchSpaceRelationshipIsolationSegment"
 	PostApplicationActionApplyManifest                          = "PostApplicationActionApplyM"
+	PostApplicationActionRestartRequest                         = "PostApplicationActionRestart"
 	PostApplicationActionStartRequest                           = "PostApplicationActionStart"
 	PostApplicationActionStopRequest                            = "PostApplicationActionStop"
 	PostApplicationProcessActionScaleRequest                    = "PostApplicationProcessActionScale"
@@ -61,6 +62,7 @@ var APIRoutes = []Route{
 	{Resource: AppsResource, Path: "/:app_guid", Method: http.MethodDelete, Name: DeleteApplicationRequest},
 	{Resource: AppsResource, Path: "/:app_guid", Method: http.MethodPatch, Name: PatchApplicationRequest},
 	{Resource: AppsResource, Path: "/:app_guid/actions/apply_manifest", Method: http.MethodPost, Name: PostApplicationActionApplyManifest},
+	{Resource: AppsResource, Path: "/:app_guid/actions/restart", Method: http.MethodPost, Name: PostApplicationActionRestartRequest},
 	{Resource: AppsResource, Path: "/:app_guid/actions/start", Method: http.MethodPost, Name: PostApplicationActionStartRequest},
 	{Resource: AppsResource, Path: "/:app_guid/actions/stop", Method: http.MethodPost, Name: PostApplicationActionStopRequest},
 	{Resource: AppsResource, Path: "/:app_guid/droplets/current", Method: http.MethodGet, Name: GetApplicationDropletCurrentRequest},
