@@ -91,8 +91,8 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 
 	if serviceInstanceSummary.IsManaged() {
 		cmd.displayManagedServiceInstanceSummary(serviceInstanceSummary)
-		cmd.displayBoundApplicationsIfExists(serviceInstanceSummary)
 		cmd.displayManagedServiceInstanceLastOperation(serviceInstanceSummary)
+		cmd.displayBoundApplicationsIfExists(serviceInstanceSummary)
 		return nil
 	}
 
@@ -189,7 +189,6 @@ func (cmd ServiceCommand) displayUserProvidedServiceInstanceSummary(serviceInsta
 }
 
 func (cmd ServiceCommand) displayBoundApplicationsIfExists(serviceInstanceSummary v2action.ServiceInstanceSummary) {
-
 	cmd.UI.DisplayNewline()
 
 	if len(serviceInstanceSummary.BoundApplications) == 0 {
@@ -201,12 +200,16 @@ func (cmd ServiceCommand) displayBoundApplicationsIfExists(serviceInstanceSummar
 	boundAppsTable := [][]string{{
 		cmd.UI.TranslateText("name"),
 		cmd.UI.TranslateText("binding name"),
+		cmd.UI.TranslateText("status"),
+		cmd.UI.TranslateText("message"),
 	}}
 
 	for _, boundApplication := range serviceInstanceSummary.BoundApplications {
 		boundAppsTable = append(boundAppsTable, []string{
 			boundApplication.AppName,
 			boundApplication.ServiceBindingName,
+			string(boundApplication.LastOperationState),
+			boundApplication.Message,
 		})
 	}
 

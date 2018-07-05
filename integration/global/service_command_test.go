@@ -142,7 +142,7 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("service:\\s+user-provided"))
 							Eventually(session).Should(Say(""))
 							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say("name\\s+binding name"))
+							Eventually(session).Should(Say("name\\s+binding name\\s+status\\s+message"))
 							Eventually(session).Should(Say(appName1))
 							Eventually(session).Should(Say(appName2))
 
@@ -177,7 +177,7 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("service:\\s+user-provided"))
 							Eventually(session).Should(Say(""))
 							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say("name\\s+binding name"))
+							Eventually(session).Should(Say("name\\s+binding name\\s+status\\s+message"))
 							Eventually(session).Should(Say("%s\\s+%s", appName1, bindingName1))
 							Eventually(session).Should(Say("%s\\s+%s", appName2, bindingName2))
 							Eventually(session).Should(Say(""))
@@ -200,7 +200,6 @@ var _ = Describe("service command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 				})
-
 			})
 
 			Context("when a user-provided service instance is created with tags", func() {
@@ -298,11 +297,6 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("documentation:"))
 							Eventually(session).Should(Say("dashboard:\\s+http://example\\.com"))
 							Eventually(session).Should(Say("\n\n"))
-							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say("name\\s+binding name"))
-							Eventually(session).Should(Say(appName1))
-							Eventually(session).Should(Say(appName2))
-							Eventually(session).Should(Say("\n\n"))
 							Consistently(session).ShouldNot(Say("shared with spaces:"))
 							Eventually(session).Should(Say("Showing status of last operation from service %s\\.\\.\\.", serviceInstanceName))
 							Eventually(session).Should(Say("\n\n"))
@@ -310,6 +304,11 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("message:"))
 							Eventually(session).Should(Say("started:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
 							Eventually(session).Should(Say("updated:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
+							Eventually(session).Should(Say("\n\n"))
+							Eventually(session).Should(Say("bound apps:"))
+							Eventually(session).Should(Say("name\\s+binding name\\s+status\\s+message"))
+							Eventually(session).Should(Say(appName1))
+							Eventually(session).Should(Say(appName2))
 
 							Eventually(session).Should(Exit(0))
 						})
@@ -347,11 +346,6 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("documentation:"))
 							Eventually(session).Should(Say("dashboard:\\s+http://example\\.com"))
 							Eventually(session).Should(Say("\n\n"))
-							Eventually(session).Should(Say("bound apps:"))
-							Eventually(session).Should(Say("name\\s+binding name"))
-							Eventually(session).Should(Say("%s\\s+%s", appName1, bindingName1))
-							Eventually(session).Should(Say("%s\\s+%s", appName2, bindingName2))
-							Eventually(session).Should(Say("\n\n"))
 							Consistently(session).ShouldNot(Say("shared with spaces:"))
 							Eventually(session).Should(Say("Showing status of last operation from service %s\\.\\.\\.", serviceInstanceName))
 							Eventually(session).Should(Say("\n\n"))
@@ -359,6 +353,42 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("message:"))
 							Eventually(session).Should(Say("started:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
 							Eventually(session).Should(Say("updated:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
+							Eventually(session).Should(Say("\n\n"))
+							Eventually(session).Should(Say("bound apps:"))
+							Eventually(session).Should(Say("name\\s+binding name\\s+status\\s+message"))
+							Eventually(session).Should(Say("%s\\s+%s", appName1, bindingName1))
+							Eventually(session).Should(Say("%s\\s+%s", appName2, bindingName2))
+
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the binding has a state", func() {
+						var (
+							bindingName1 string
+							bindingName2 string
+						)
+
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
+							bindingName1 = helpers.PrefixedRandomName("BINDING-NAME")
+							bindingName2 = helpers.PrefixedRandomName("BINDING-NAME")
+							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
+							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName, "--binding-name", bindingName2)).Should(Exit(0))
+						})
+
+						AfterEach(func() {
+							Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
+							Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
+						})
+
+						It("displays it in the status field", func() {
+							session := helpers.CF("service", serviceInstanceName)
+							Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
+							Eventually(session).Should(Say("bound apps:"))
+							Eventually(session).Should(Say("name\\s+binding name\\s+status\\s+message"))
+							Eventually(session).Should(Say("%s\\s+%s\\s+succeeded", appName1, bindingName1))
+							Eventually(session).Should(Say("%s\\s+%s\\s+succeeded", appName2, bindingName2))
 
 							Eventually(session).Should(Exit(0))
 						})
@@ -533,7 +563,7 @@ var _ = Describe("service command", func() {
 						Eventually(session).Should(Say("shared from org/space:\\s+%s / %s", orgName, sourceSpaceName))
 						Eventually(session).Should(Say("\n\n"))
 						Eventually(session).Should(Say("bound apps:"))
-						Eventually(session).Should(Say("name\\s+binding name"))
+						Eventually(session).Should(Say("name\\s+binding name\\s+status\\s+message"))
 						Eventually(session).Should(Say(appName2))
 						Eventually(session).Should(Say(appName1))
 						Eventually(session).Should(Exit(0))
