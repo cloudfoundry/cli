@@ -4,6 +4,9 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
@@ -113,7 +116,7 @@ var _ = Describe("unbind-service Command", func() {
 
 				Context("when unbinding the service instance results in an error not related to service binding", func() {
 					BeforeEach(func() {
-						fakeActor.UnbindServiceBySpaceReturns(nil, actionerror.ApplicationNotFoundError{Name: "some-app"})
+						fakeActor.UnbindServiceBySpaceReturns(v2action.ServiceBinding{}, nil, actionerror.ApplicationNotFoundError{Name: "some-app"})
 					})
 
 					It("should return the error", func() {
@@ -126,6 +129,7 @@ var _ = Describe("unbind-service Command", func() {
 				Context("when the service binding does not exist", func() {
 					BeforeEach(func() {
 						fakeActor.UnbindServiceBySpaceReturns(
+							v2action.ServiceBinding{},
 							[]string{"foo", "bar"},
 							actionerror.ServiceBindingNotFoundError{})
 					})
@@ -152,6 +156,29 @@ var _ = Describe("unbind-service Command", func() {
 						Expect(appName).To(Equal("some-app"))
 						Expect(serviceInstanceName).To(Equal("some-service"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
+					})
+
+					Context("when the service unbind is async", func() {
+						BeforeEach(func() {
+							fakeActor.UnbindServiceBySpaceReturns(
+								v2action.ServiceBinding{LastOperation: ccv2.LastOperation{State: constant.LastOperationInProgress}},
+								nil,
+								nil)
+						})
+
+						It("displays usefull message", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("OK"))
+							Expect(testUI.Out).To(Say("Unbinding in progress. Use 'faceman service some-service' to check operation status."))
+							Expect(testUI.Err).NotTo(Say("Binding between some-service and some-app did not exist"))
+
+							Expect(fakeActor.UnbindServiceBySpaceCallCount()).To(Equal(1))
+							appName, serviceInstanceName, spaceGUID := fakeActor.UnbindServiceBySpaceArgsForCall(0)
+							Expect(appName).To(Equal("some-app"))
+							Expect(serviceInstanceName).To(Equal("some-service"))
+							Expect(spaceGUID).To(Equal("some-space-guid"))
+						})
 					})
 				})
 			})

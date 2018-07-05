@@ -1,6 +1,7 @@
 package ccv2_test
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -177,20 +178,81 @@ var _ = Describe("Service Binding", func() {
 	})
 
 	Describe("DeleteServiceBinding", func() {
+		var (
+			serviceBindingGUID string
+			acceptsIncomplete  bool
+
+			serviceBinding ServiceBinding
+			warnings       Warnings
+			executeErr     error
+		)
+
+		BeforeEach(func() {
+			serviceBindingGUID = "some-service-binding-guid"
+		})
+
+		JustBeforeEach(func() {
+			serviceBinding, warnings, executeErr = client.DeleteServiceBinding(serviceBindingGUID, acceptsIncomplete)
+		})
+
 		Context("when the service binding exist", func() {
-			BeforeEach(func() {
-				server.AppendHandlers(CombineHandlers(VerifyRequest(http.MethodDelete, "/v2/service_bindings/some-service-binding-guid"), RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}})))
+			Context("when accepts_incomplete is true", func() {
+				BeforeEach(func() {
+					acceptsIncomplete = true
+					response := fmt.Sprintf(`{
+						 "metadata": {
+								"guid": "%s"
+						 },
+						 "entity": {
+								"app_guid": "63af8eb4-6ac6-4baa-b97d-da32d473131c",
+								"service_instance_guid": "637a1734-3eec-408e-aeaa-bfc577d893b7",
+								"last_operation": {
+									 "state": "in progress"
+								}
+						 }
+					 }`, serviceBindingGUID)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodDelete, "/v2/service_bindings/some-service-binding-guid", "accepts_incomplete=true"),
+							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the service binding and warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+					Expect(serviceBinding).To(Equal(ServiceBinding{
+						GUID:                serviceBindingGUID,
+						AppGUID:             "63af8eb4-6ac6-4baa-b97d-da32d473131c",
+						ServiceInstanceGUID: "637a1734-3eec-408e-aeaa-bfc577d893b7",
+						LastOperation: LastOperation{
+							State: constant.LastOperationInProgress,
+						},
+					}))
+				})
 			})
 
-			It("deletes the service binding", func() {
-				warnings, err := client.DeleteServiceBinding("some-service-binding-guid")
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			Context("when accepts_incomplete is false", func() {
+				BeforeEach(func() {
+					acceptsIncomplete = false
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodDelete, "/v2/service_bindings/some-service-binding-guid"),
+							RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						))
+				})
+
+				It("deletes the service binding", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
 			})
 		})
 
 		Context("when the service binding does not exist", func() {
 			BeforeEach(func() {
+				acceptsIncomplete = false
 				response := `{
 				"code": 90004,
 				"description": "The service binding could not be found: some-service-binding-guid",
@@ -205,8 +267,7 @@ var _ = Describe("Service Binding", func() {
 			})
 
 			It("returns a not found error", func() {
-				warnings, err := client.DeleteServiceBinding("some-service-binding-guid")
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
+				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The service binding could not be found: some-service-binding-guid",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))

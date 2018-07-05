@@ -74,31 +74,31 @@ func (actor Actor) GetServiceBindingByApplicationAndServiceInstance(appGUID stri
 
 // UnbindServiceBySpace deletes the service binding between an application and
 // service instance for a given space.
-func (actor Actor) UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (Warnings, error) {
+func (actor Actor) UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (ServiceBinding, Warnings, error) {
 	var allWarnings Warnings
 
 	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return allWarnings, err
+		return ServiceBinding{}, allWarnings, err
 	}
 
 	serviceInstance, warnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return allWarnings, err
+		return ServiceBinding{}, allWarnings, err
 	}
 
 	serviceBinding, warnings, err := actor.GetServiceBindingByApplicationAndServiceInstance(app.GUID, serviceInstance.GUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return allWarnings, err
+		return ServiceBinding{}, allWarnings, err
 	}
 
-	ccWarnings, err := actor.CloudControllerClient.DeleteServiceBinding(serviceBinding.GUID)
+	deletedBinding, ccWarnings, err := actor.CloudControllerClient.DeleteServiceBinding(serviceBinding.GUID, true)
 	allWarnings = append(allWarnings, ccWarnings...)
 
-	return allWarnings, err
+	return ServiceBinding(deletedBinding), allWarnings, err
 }
 
 func (actor Actor) GetServiceBindingsByServiceInstance(serviceInstanceGUID string) ([]ServiceBinding, Warnings, error) {

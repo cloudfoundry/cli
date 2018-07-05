@@ -51,6 +51,7 @@ var _ = Describe("Service Binding Actions", func() {
 			executeErr error
 			warnings   Warnings
 		)
+
 		BeforeEach(func() {
 			applicationGUID = "some-app-guid"
 			serviceInstanceGUID = "some-service-instance-guid"
@@ -264,6 +265,16 @@ var _ = Describe("Service Binding Actions", func() {
 	})
 
 	Describe("UnbindServiceBySpace", func() {
+		var (
+			executeErr     error
+			warnings       Warnings
+			serviceBinding ServiceBinding
+		)
+
+		JustBeforeEach(func() {
+			serviceBinding, warnings, executeErr = actor.UnbindServiceBySpace("some-app", "some-service-instance", "some-space-guid")
+		})
+
 		Context("when the service binding exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
@@ -297,18 +308,21 @@ var _ = Describe("Service Binding Actions", func() {
 				)
 
 				fakeCloudControllerClient.DeleteServiceBindingReturns(
+					ccv2.ServiceBinding{GUID: "deleted-service-binding-guid"},
 					ccv2.Warnings{"foo-4", "foo-5"},
 					nil,
 				)
 			})
 
 			It("deletes the service binding", func() {
-				warnings, err := actor.UnbindServiceBySpace("some-app", "some-service-instance", "some-space-guid")
-				Expect(err).NotTo(HaveOccurred())
+				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"foo-1", "foo-2", "foo-3", "foo-4", "foo-5"}))
+				Expect(serviceBinding).To(Equal(ServiceBinding{GUID: "deleted-service-binding-guid"}))
 
 				Expect(fakeCloudControllerClient.DeleteServiceBindingCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.DeleteServiceBindingArgsForCall(0)).To(Equal("some-service-binding-guid"))
+				passedGUID, acceptsIncomplete := fakeCloudControllerClient.DeleteServiceBindingArgsForCall(0)
+				Expect(passedGUID).To(Equal("some-service-binding-guid"))
+				Expect(acceptsIncomplete).To(BeTrue())
 			})
 
 			Context("when the cloud controller API returns warnings and an error", func() {
@@ -316,12 +330,11 @@ var _ = Describe("Service Binding Actions", func() {
 
 				BeforeEach(func() {
 					expectedError = errors.New("I am a CC error")
-					fakeCloudControllerClient.DeleteServiceBindingReturns(ccv2.Warnings{"foo-4", "foo-5"}, expectedError)
+					fakeCloudControllerClient.DeleteServiceBindingReturns(ccv2.ServiceBinding{}, ccv2.Warnings{"foo-4", "foo-5"}, expectedError)
 				})
 
 				It("returns the warnings and the error", func() {
-					warnings, err := actor.UnbindServiceBySpace("some-app", "some-service-instance", "some-space-guid")
-					Expect(err).To(MatchError(expectedError))
+					Expect(executeErr).To(MatchError(expectedError))
 					Expect(warnings).To(ConsistOf(Warnings{"foo-1", "foo-2", "foo-3", "foo-4", "foo-5"}))
 				})
 			})
