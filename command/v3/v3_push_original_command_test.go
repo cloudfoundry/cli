@@ -765,13 +765,13 @@ var _ = Describe("v3-push Command", func() {
 													Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
 													Expect(testUI.Out).To(Say("name:\\s+some-app"))
 													Expect(testUI.Out).To(Say("requested state:\\s+started"))
-													Expect(testUI.Out).To(Say("processes:\\s+worker:1/1"))
-													Expect(testUI.Out).To(Say("memory usage:\\s+64M x 1"))
 													Expect(testUI.Out).To(Say("routes:\\s+some-other-domain, some-domain"))
 													Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
 													Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output\n\n"))
 
-													Expect(testUI.Out).To(Say("worker:1/1"))
+													Expect(testUI.Out).To(Say("type:\\s+worker"))
+													Expect(testUI.Out).To(Say("instances:\\s+1/1"))
+													Expect(testUI.Out).To(Say("memory usage:\\s+64M"))
 													Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
 													Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
 

@@ -122,7 +122,7 @@ test : units
 
 units : format vet lint build
 	ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites \
-		api actor command types util version
+		api actor command types util version integration/helpers
 	@echo "\nSWEET SUITE SUCCESS"
 
 units-full : format vet lint build

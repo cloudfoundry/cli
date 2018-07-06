@@ -1,7 +1,7 @@
 package experimental
 
 import (
-	"strings"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -206,11 +206,11 @@ var _ = Describe("v3-restart-app-instance command", func() {
 							restartedAppTable = helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
 							if len(restartedAppTable.Processes) > 0 {
-								return restartedAppTable.Processes[0].Title
+								return restartedAppTable.Processes[0].Type
 							}
 
 							return ""
-						}).Should(MatchRegexp(`web:\d/1`))
+						}).Should(Equal(`web`))
 						Expect(restartedAppTable.Processes[0].Instances).ToNot(BeEmpty())
 						return restartedAppTable.Processes[0].Instances[0].Since
 					}).ShouldNot(Equal(firstAppTable.Processes[0].Instances[0].Since))
@@ -231,7 +231,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 					Context("when instance index exists", func() {
 						findConsoleProcess := func(appTable helpers.AppTable) (helpers.AppProcessTable, bool) {
 							for _, process := range appTable.Processes {
-								if strings.HasPrefix(process.Title, "console") {
+								if process.Type == "console" {
 									return process, true
 								}
 							}
@@ -253,8 +253,8 @@ var _ = Describe("v3-restart-app-instance command", func() {
 								var found bool
 								firstAppTableConsoleProcess, found = findConsoleProcess(firstAppTable)
 								Expect(found).To(BeTrue())
-								return firstAppTableConsoleProcess.Title
-							}).Should(MatchRegexp(`console:1/1`))
+								return fmt.Sprintf("%s, %s", firstAppTableConsoleProcess.Type, firstAppTableConsoleProcess.InstanceCount)
+							}).Should(MatchRegexp(`console, 1/1`))
 
 							By("restarting worker process instance")
 							session = helpers.CF("v3-restart-app-instance", appName, "0", "--process", "console")
@@ -275,8 +275,8 @@ var _ = Describe("v3-restart-app-instance command", func() {
 									restartedAppTableConsoleProcess, found = findConsoleProcess(restartedAppTable)
 									Expect(found).To(BeTrue())
 
-									return restartedAppTableConsoleProcess.Title
-								}).Should(MatchRegexp(`console:1/1`))
+									return fmt.Sprintf("%s, %s", firstAppTableConsoleProcess.Type, firstAppTableConsoleProcess.InstanceCount)
+								}).Should(MatchRegexp(`console, 1/1`))
 
 								return restartedAppTableConsoleProcess.Instances[0].Since
 							}).ShouldNot(Equal(firstAppTableConsoleProcess.Instances[0].Since))

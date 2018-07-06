@@ -206,14 +206,18 @@ var _ = Describe("v3-scale command", func() {
 					Expect(len(appTable.Processes)).To(Equal(3))
 
 					processSummary := appTable.Processes[0]
-					Expect(processSummary.Title).To(Equal("web:1/1"))
+					Expect(processSummary.Type).To(Equal("web"))
+					Expect(processSummary.InstanceCount).To(Equal("1/1"))
 
 					instanceSummary := processSummary.Instances[0]
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 
-					Expect(appTable.Processes[1].Title).To(Equal("console:0/0"))
-					Expect(appTable.Processes[2].Title).To(Equal("rake:0/0"))
+					Expect(appTable.Processes[1].Type).To(Equal("console"))
+					Expect(appTable.Processes[1].InstanceCount).To(Equal("0/0"))
+
+					Expect(appTable.Processes[2].Type).To(Equal("rake"))
+					Expect(appTable.Processes[2].InstanceCount).To(Equal("0/0"))
 				})
 			})
 
@@ -238,10 +242,11 @@ var _ = Describe("v3-scale command", func() {
 
 					processSummary := updatedAppTable.Processes[0]
 					instanceSummary := processSummary.Instances[0]
-					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
-					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
+					Expect(processSummary.Type).To(Equal("web"))
+					Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/3`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 					By("scaling memory to 64M")
 					buffer := NewBuffer()
 					buffer.Write([]byte("y\n"))
@@ -257,7 +262,8 @@ var _ = Describe("v3-scale command", func() {
 
 					processSummary = updatedAppTable.Processes[0]
 					instanceSummary = processSummary.Instances[0]
-					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
+					Expect(processSummary.Type).To(Equal("web"))
+					Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/3`))
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 
@@ -276,7 +282,8 @@ var _ = Describe("v3-scale command", func() {
 
 					processSummary = updatedAppTable.Processes[0]
 					instanceSummary = processSummary.Instances[0]
-					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
+					Expect(processSummary.Type).To(Equal("web"))
+					Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/3`))
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 92M`))
 
@@ -327,7 +334,8 @@ var _ = Describe("v3-scale command", func() {
 
 						processSummary := appTable.Processes[0]
 						instanceSummary := processSummary.Instances[0]
-						Expect(processSummary.Title).To(MatchRegexp(`web:\d/2`))
+						Expect(processSummary.Type).To(Equal("web"))
+						Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/2`))
 						Expect(instanceSummary.State).To(MatchRegexp(`running|starting`))
 						Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 60M`))
 						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 120M`))
@@ -350,7 +358,8 @@ var _ = Describe("v3-scale command", func() {
 
 						processSummary := appTable.Processes[0]
 						instanceSummary := processSummary.Instances[0]
-						Expect(processSummary.Title).To(MatchRegexp(`web:\d/2`))
+						Expect(processSummary.Type).To(Equal("web"))
+						Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/2`))
 						Expect(instanceSummary.State).To(MatchRegexp(`crashed`))
 						Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 6M`))
 						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 120M`))
@@ -391,7 +400,8 @@ var _ = Describe("v3-scale command", func() {
 
 					newProcessSummary := appTable.Processes[0]
 					newInstanceSummary := newProcessSummary.Instances[0]
-					Expect(newProcessSummary.Title).To(MatchRegexp(fmt.Sprintf(`web:\d/%s`, currentInstances)))
+					Expect(newProcessSummary.Type).To(Equal("web"))
+					Expect(newProcessSummary.InstanceCount).To(MatchRegexp(fmt.Sprintf(`\d/%s`, currentInstances)))
 					Expect(newInstanceSummary.Memory).To(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]? of %s`, maxMemory)))
 					Expect(newInstanceSummary.Disk).To(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]? of %s`, maxDiskSize)))
 				})
@@ -409,7 +419,8 @@ var _ = Describe("v3-scale command", func() {
 					processSummary := appTable.Processes[1]
 					instanceSummary := processSummary.Instances[0]
 					Expect(processSummary.Instances).To(HaveLen(2))
-					Expect(processSummary.Title).To(MatchRegexp(`console:\d/2`))
+					Expect(processSummary.Type).To(Equal("console"))
+					Expect(processSummary.InstanceCount).To(MatchRegexp(`\d/2`))
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 				})

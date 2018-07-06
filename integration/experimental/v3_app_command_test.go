@@ -182,12 +182,16 @@ var _ = Describe("v3-app command", func() {
 
 				Eventually(session).Should(Say("name:\\s+%s", appName))
 				Eventually(session).Should(Say("requested state:\\s+started"))
-				Eventually(session).Should(Say("processes:\\s+web:1/1"))
-				Eventually(session).Should(Say("memory usage:\\s+\\d+[KMG] x 1"))
 				Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+				// TODO: remove or implement based on decision re: last uploaded/PackageUpdatedAt
+				// Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
 				Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 				Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
-				Eventually(session).Should(Say("web:1/1"))
+
+				Eventually(session).Should(Say("type:\\s+web"))
+				Eventually(session).Should(Say("instances:\\s+1/1"))
+				Eventually(session).Should(Say("memory usage:\\s+\\d+[KMG]"))
+				Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
 				Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
 
 				Eventually(session).Should(Exit(0))
@@ -237,6 +241,20 @@ var _ = Describe("v3-app command", func() {
 			})
 		})
 
+		Context("when the app uses multiple buildpacks", func() {
+			BeforeEach(func() {
+				helpers.WithMultiBuildpackApp(func(appDir string) {
+					Eventually(helpers.CF("v3-push", appName, "-p", appDir, "-b", "ruby_buildpack", "-b", "go_buildpack")).Should(Exit(0))
+				})
+			})
+
+			It("displays the app buildpacks", func() {
+				session := helpers.CF("v3-app", appName)
+				Eventually(session).Should(Say("buildpacks:\\s+ruby_buildpack,\\s+go"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
 		Context("when the app is a docker app", func() {
 			var domainName string
 
@@ -253,12 +271,15 @@ var _ = Describe("v3-app command", func() {
 
 				Eventually(session).Should(Say("name:\\s+%s", appName))
 				Eventually(session).Should(Say("requested state:\\s+started"))
-				Eventually(session).Should(Say("processes:\\s+web:1/1"))
-				Eventually(session).Should(Say("memory usage:\\s+\\d+[KMG] x 1"))
 				Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+				Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
 				Eventually(session).Should(Say("stack:\\s+"))
 				Eventually(session).Should(Say("docker image:\\s+cloudfoundry/diego-docker-app-custom"))
-				Eventually(session).Should(Say("web:1/1"))
+
+				Eventually(session).Should(Say("type:\\s+web"))
+				Eventually(session).Should(Say("instances:\\s+1/1"))
+				Eventually(session).Should(Say("memory usage:\\s+\\d+[KMG]"))
+				Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
 				Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
 
 				Eventually(session).Should(Exit(0))

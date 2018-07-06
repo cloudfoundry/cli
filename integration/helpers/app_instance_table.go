@@ -15,8 +15,10 @@ type AppInstanceRow struct {
 }
 
 type AppProcessTable struct {
-	Title     string
-	Instances []AppInstanceRow
+	Type          string
+	InstanceCount string
+	MemUsage      string
+	Instances     []AppInstanceRow
 }
 
 type AppTable struct {
@@ -30,7 +32,7 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 	foundFirstProcess := false
 	for _, row := range rows {
 		if !foundFirstProcess {
-			ok, err := regexp.MatchString(`\A([^:]+):\d/\d\z`, row)
+			ok, err := regexp.MatchString(`\Atype:([^:]+)\z`, row)
 			if err != nil {
 				panic(err)
 			}
@@ -62,11 +64,18 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 				instanceRow,
 			)
 
-		} else if !strings.HasPrefix(row, " ") {
-			// process title
+		} else if strings.HasPrefix(row, "type:") {
 			appTable.Processes = append(appTable.Processes, AppProcessTable{
-				Title: row,
+				Type: strings.TrimSpace(strings.TrimPrefix(row, "type:")),
 			})
+		} else if strings.HasPrefix(row, "instances:") {
+			lpi := len(appTable.Processes) - 1
+			iVal := strings.TrimSpace(strings.TrimPrefix(row, "instances:"))
+			appTable.Processes[lpi].InstanceCount = iVal
+		} else if strings.HasPrefix(row, "memory usage:") {
+			lpi := len(appTable.Processes) - 1
+			mVal := strings.TrimSpace(strings.TrimPrefix(row, "memory usage:"))
+			appTable.Processes[lpi].MemUsage = mVal
 		} else {
 			// column headers
 			continue
