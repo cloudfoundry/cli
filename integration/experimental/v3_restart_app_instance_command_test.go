@@ -275,7 +275,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 									restartedAppTableConsoleProcess, found = findConsoleProcess(restartedAppTable)
 									Expect(found).To(BeTrue())
 
-									return fmt.Sprintf("%s, %s", firstAppTableConsoleProcess.Type, firstAppTableConsoleProcess.InstanceCount)
+									return fmt.Sprintf("%s, %s", restartedAppTableConsoleProcess.Type, restartedAppTableConsoleProcess.InstanceCount)
 								}).Should(MatchRegexp(`console, 1/1`))
 
 								return restartedAppTableConsoleProcess.Instances[0].Since
