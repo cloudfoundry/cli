@@ -359,7 +359,7 @@ jobs:
         CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
         CF_INT_DOCKER_USERNAME: ((dockerhub-username))
         CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
-        CF_INT_IGNORE_API_VERSION_CHECK: true
+        CF_INT_IGNORE_API_VERSION_CHECK: false
   ensure:
     put: gcp-bosh-pool
     params:
