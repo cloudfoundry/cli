@@ -272,7 +272,8 @@ var _ = Describe("v3-app command", func() {
 				Eventually(session).Should(Say("name:\\s+%s", appName))
 				Eventually(session).Should(Say("requested state:\\s+started"))
 				Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
-				Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
+				// TODO: remove or implement based on decision re: last uploaded/PackageUpdatedAt
+				// Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
 				Eventually(session).Should(Say("stack:\\s+"))
 				Eventually(session).Should(Say("docker image:\\s+cloudfoundry/diego-docker-app-custom"))
 
