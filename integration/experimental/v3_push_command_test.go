@@ -29,6 +29,11 @@ var _ = Describe("v3-push command", func() {
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
 		userName, _ = helpers.GetCredentials()
+		helpers.TurnOffExperimental()
+	})
+
+	AfterEach(func() {
+		helpers.TurnOnExperimental()
 	})
 
 	Describe("help", func() {

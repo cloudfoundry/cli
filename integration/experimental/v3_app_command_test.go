@@ -24,6 +24,11 @@ var _ = Describe("v3-app command", func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
+		helpers.TurnOffExperimental()
+	})
+
+	AfterEach(func() {
+		helpers.TurnOnExperimental()
 	})
 
 	Describe("help", func() {

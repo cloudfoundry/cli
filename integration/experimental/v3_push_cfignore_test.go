@@ -23,10 +23,11 @@ var _ = Describe("v3-push with .cfignore", func() {
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
 		helpers.SetupCF(orgName, spaceName)
-
+		helpers.TurnOffExperimental()
 	})
 
 	AfterEach(func() {
+		helpers.TurnOnExperimental()
 		helpers.QuickDeleteOrg(orgName)
 	})
 
