@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -161,6 +162,121 @@ var _ = Describe("Service", func() {
 				_, warnings, err := client.GetService("non-existant-service-guid")
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "The service could not be found: non-existant-service-guid"}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+	})
+	Describe("GetServices", func() {
+		var (
+			services   []Service
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			services, warnings, executeErr = client.GetServices(Filter{
+				Type:     constant.LabelFilter,
+				Operator: constant.EqualOperator,
+				Values:   []string{"some-label"},
+			})
+		})
+
+		Context("when the cc returns back services", func() {
+			BeforeEach(func() {
+				response1 := `{
+					"next_url": "/v2/services?q=label:some-label&page=2",
+					"resources": [
+						{
+							"metadata": {
+								"guid": "some-service-guid-1"
+							},
+							"entity": {
+								"label": "some-service"
+							}
+						},
+						{
+							"metadata": {
+								"guid": "some-service-guid-2"
+							},
+							"entity": {
+								"label": "other-service"
+							}
+						}
+					]
+				}`
+
+				response2 := `{
+					"next_url": null,
+					"resources": [
+						{
+							"metadata": {
+								"guid": "some-service-guid-3"
+							},
+							"entity": {
+								"label": "some-service"
+							}
+						},
+						{
+							"metadata": {
+								"guid": "some-service-guid-4"
+							},
+							"entity": {
+								"label": "other-service"
+							}
+						}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/services", "q=label:some-label"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/services", "q=label:some-label&page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns all the queried services", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(services).To(ConsistOf([]Service{
+					{GUID: "some-service-guid-1", Label: "some-service"},
+					{GUID: "some-service-guid-2", Label: "other-service"},
+					{GUID: "some-service-guid-3", Label: "some-service"},
+					{GUID: "some-service-guid-4", Label: "other-service"},
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
+			})
+		})
+
+		Context("when the cc returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"description": "Some description.",
+					"error_code": "CF-Error",
+					"code": 90003
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/services"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V2UnexpectedResponseError{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        90003,
+						Description: "Some description.",
+						ErrorCode:   "CF-Error",
+					},
+					ResponseCode: http.StatusTeapot,
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
 	})

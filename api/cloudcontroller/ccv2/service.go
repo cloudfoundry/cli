@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -78,4 +79,30 @@ func (client *Client) GetService(serviceGUID string) (Service, Warnings, error) 
 
 	err = client.connection.Make(request, &response)
 	return service, response.Warnings, err
+}
+
+// GetServices returns a list of Services given the provided filters.
+func (client *Client) GetServices(filters ...Filter) ([]Service, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetServicesRequest,
+		Query:       ConvertFilterParameters(filters),
+	})
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullServicesList []Service
+	warnings, err := client.paginate(request, Service{}, func(item interface{}) error {
+		if service, ok := item.(Service); ok {
+			fullServicesList = append(fullServicesList, service)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Service{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+	return fullServicesList, warnings, err
 }
