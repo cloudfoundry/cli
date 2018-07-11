@@ -16,6 +16,18 @@ import (
 )
 
 var _ = Describe("app command", func() {
+	var (
+		orgName   string
+		spaceName string
+		appName   string
+	)
+
+	BeforeEach(func() {
+		orgName = helpers.NewOrgName()
+		spaceName = helpers.NewSpaceName()
+		appName = helpers.PrefixedRandomName("app")
+	})
+
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
@@ -37,18 +49,65 @@ var _ = Describe("app command", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "app", "some-app")
 		})
+
+		Context("when no API endpoint is set", func() {
+			BeforeEach(func() {
+				helpers.UnsetAPI()
+			})
+
+			It("fails with no API endpoint set message", func() {
+				session := helpers.CF("app", appName)
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+		Context("when not logged in", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+			})
+
+			It("fails with not logged in message", func() {
+				session := helpers.CF("app", appName)
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when there is no org set", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+				helpers.LoginCF()
+			})
+
+			It("fails with no org targeted error message", func() {
+				session := helpers.CF("app", appName)
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when there is no space set", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+				helpers.LoginCF()
+				helpers.TargetOrg(ReadOnlyOrg)
+			})
+
+			It("fails with no space targeted error message", func() {
+				session := helpers.CF("app", appName)
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
 	})
 
 	Context("when the environment is set up correctly", func() {
-		var (
-			orgName   string
-			spaceName string
-		)
 
 		BeforeEach(func() {
-			orgName = helpers.NewOrgName()
-			spaceName = helpers.NewSpaceName()
-
 			helpers.SetupCF(orgName, spaceName)
 		})
 
@@ -69,7 +128,6 @@ var _ = Describe("app command", func() {
 		Context("when the app does not exist", func() {
 			Context("when no flags are given", func() {
 				It("tells the user that the app is not found and exits 1", func() {
-					appName := helpers.PrefixedRandomName("app")
 					session := helpers.CF("app", appName)
 
 					Eventually(session).Should(Say("FAILED"))
@@ -80,7 +138,6 @@ var _ = Describe("app command", func() {
 
 			Context("when the --guid flag is given", func() {
 				It("tells the user that the app is not found and exits 1", func() {
-					appName := helpers.PrefixedRandomName("app")
 					session := helpers.CF("app", "--guid", appName)
 
 					Eventually(session).Should(Say("FAILED"))
@@ -92,13 +149,9 @@ var _ = Describe("app command", func() {
 
 		Context("when the app does exist", func() {
 			Context("when the app is a buildpack app", func() {
-				var (
-					domainName string
-					appName    string
-				)
+				var domainName string
 
 				BeforeEach(func() {
-					appName = helpers.PrefixedRandomName("app")
 					domainName = helpers.DefaultSharedDomain()
 				})
 
@@ -124,25 +177,61 @@ applications:
 						})
 					})
 
-					It("displays the app information with instances table", func() {
-						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+started"))
-						Eventually(session).Should(Say("instances:\\s+2/2"))
-						Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s", domainName))
-						Eventually(session).Should(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-						Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
-						Eventually(session).Should(Say(""))
-						Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
-						Eventually(session).Should(Say("#0\\s+(running|starting)\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
-						Eventually(session).Should(Say("#1\\s+(running|starting)\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
-						Eventually(session).Should(Exit(0))
+					Context("when the API version is below 3.27.0", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+						})
+
+						It("runs the v2 command", func() {
+							session := helpers.CF("app", appName)
+							Eventually(session).Should(Say("name:\\s+%s", appName))
+							Eventually(session).Should(Say("requested state:\\s+started"))
+							Eventually(session).Should(Say("instances:\\s+2/2"))
+							Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
+							Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s", domainName))
+							Eventually(session).Should(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+							Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+							Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+							Eventually(session).Should(Say(""))
+							Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
+							Eventually(session).Should(Say("#0\\s+(running|starting)\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
+							Eventually(session).Should(Say("#1\\s+(running|starting)\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the API version is above 3.27.0", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+						})
+
+						It("runs the v3 command", func() {
+							userName, _ := helpers.GetCredentials()
+
+							session := helpers.CF("app", appName)
+
+							Eventually(session).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+
+							Eventually(session).Should(Say("name:\\s+%s", appName))
+							Eventually(session).Should(Say("requested state:\\s+started"))
+							Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+							// TODO: remove or implement based on decision re: last uploaded/PackageUpdatedAt
+							// Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
+							Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+							Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
+
+							Eventually(session).Should(Say("type:\\s+web"))
+							Eventually(session).Should(Say("instances:\\s+2/2"))
+							Eventually(session).Should(Say("memory usage:\\s+128M"))
+							Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
+							Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+
+							Eventually(session).Should(Exit(0))
+						})
 					})
 				})
 
-				Context("when isolation segments are available", func() {
+				PContext("when isolation segments are available", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
 
@@ -170,15 +259,38 @@ applications:
 						})
 					})
 
-					It("displays the app information", func() {
-						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+stopped"))
-						Eventually(session).Should(Say("instances:\\s+0/1"))
-						Eventually(session).Should(Say("usage:\\s+\\d+M x 1 instances"))
+					Context("when the API version is below 3.27.0", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+						})
+						It("displays the app information", func() {
+							session := helpers.CF("app", appName)
+							Eventually(session).Should(Say("name:\\s+%s", appName))
+							Eventually(session).Should(Say("requested state:\\s+stopped"))
 
-						Eventually(session).Should(Say("There are no running instances of this app."))
-						Eventually(session).Should(Exit(0))
+							Eventually(session).Should(Say("usage:\\s+\\d+M x 1 instances"))
+
+							Eventually(session).Should(Say("There are no running instances of this app."))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the API version is above 3.27.0", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+						})
+
+						It("displays that there are no running instances of the app", func() {
+							userName, _ := helpers.GetCredentials()
+
+							session := helpers.CF("app", appName)
+
+							Eventually(session).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say("requested state:\\s+stopped"))
+							Consistently(session).ShouldNot(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+							Eventually(session).Should(Say("There are no running instances of this app"))
+							Eventually(session).Should(Exit(0))
+						})
 					})
 				})
 
@@ -190,103 +302,163 @@ applications:
 						})
 					})
 
-					It("displays the app information", func() {
-						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+started"))
-						Eventually(session).Should(Say("instances:\\s+0/0"))
-						Eventually(session).Should(Say("usage:\\s+\\d+M x 0 instances"))
+					Context("when the API version is below 3.27.0", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+						})
 
-						Eventually(session).Should(Say("There are no running instances of this app."))
-						Eventually(session).Should(Exit(0))
+						It("displays the app information", func() {
+							session := helpers.CF("app", appName)
+							Eventually(session).Should(Say("name:\\s+%s", appName))
+							Eventually(session).Should(Say("requested state:\\s+started"))
+							Eventually(session).Should(Say("usage:\\s+\\d+M x 0 instances"))
+
+							Eventually(session).Should(Say("There are no running instances of this app."))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+					Context("when the API version is above 3.27.0", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+						})
+
+						It("displays the app information", func() {
+							userName, _ := helpers.GetCredentials()
+
+							session := helpers.CF("app", appName)
+
+							Eventually(session).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say("requested state:\\s+started"))
+							Consistently(session).ShouldNot(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+							Eventually(session).Should(Say("There are no running instances of this app"))
+							Eventually(session).Should(Exit(0))
+						})
 					})
 				})
 
 				Context("when the --guid flag is given", func() {
 					var appGUID string
 
-					BeforeEach(func() {
-						helpers.WithHelloWorldApp(func(appDir string) {
-							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+					Context("when the API version is below 3.27.0", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+							helpers.WithHelloWorldApp(func(appDir string) {
+								Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+							})
+
+							session := helpers.CF("curl", fmt.Sprintf("/v2/apps?q=name:%s", appName))
+							Eventually(session).Should(Exit(0))
+							rawJSON := strings.TrimSpace(string(session.Out.Contents()))
+
+							var AppInfo struct {
+								Resources []struct {
+									Metadata struct {
+										GUID string `json:"guid"`
+									} `json:"metadata"`
+								} `json:"resources"`
+							}
+
+							err := json.Unmarshal([]byte(rawJSON), &AppInfo)
+							Expect(err).NotTo(HaveOccurred())
+
+							appGUID = AppInfo.Resources[0].Metadata.GUID
 						})
 
-						session := helpers.CF("curl", fmt.Sprintf("/v2/apps?q=name:%s", appName))
-						Eventually(session).Should(Exit(0))
-						rawJSON := strings.TrimSpace(string(session.Out.Contents()))
-						var AppInfo struct {
-							Resources []struct {
-								Metadata struct {
+						It("displays the app guid", func() {
+							session := helpers.CF("app", "--guid", appName)
+							Eventually(session).Should(Say(appGUID))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+					Context("when the API version is above 3.27.0", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+							helpers.WithHelloWorldApp(func(appDir string) {
+								Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+							})
+
+							session := helpers.CF("curl", fmt.Sprintf("/v3/apps?names=%s", appName))
+							Eventually(session).Should(Exit(0))
+							rawJSON := strings.TrimSpace(string(session.Out.Contents()))
+							var AppInfo struct {
+								Resources []struct {
 									GUID string `json:"guid"`
-								} `json:"metadata"`
-							} `json:"resources"`
-						}
+								} `json:"resources"`
+							}
 
-						err := json.Unmarshal([]byte(rawJSON), &AppInfo)
-						Expect(err).NotTo(HaveOccurred())
+							err := json.Unmarshal([]byte(rawJSON), &AppInfo)
+							Expect(err).NotTo(HaveOccurred())
 
-						appGUID = AppInfo.Resources[0].Metadata.GUID
+							appGUID = AppInfo.Resources[0].GUID
+						})
+
+						It("displays the app guid", func() {
+							session := helpers.CF("app", "--guid", appName)
+							Eventually(session).Should(Say(appGUID))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+
+				Context("when the app is a Docker app", func() {
+					BeforeEach(func() {
+						domainName := helpers.DefaultSharedDomain()
+						Eventually(helpers.CF("push", appName, "-o", DockerImage, "-d", domainName)).Should(Exit())
 					})
 
-					It("displays the app guid", func() {
-						session := helpers.CF("app", "--guid", appName)
-						Eventually(session).Should(Say(appGUID))
+					It("displays the docker image and does not display buildpack", func() {
+						session := helpers.CF("app", appName)
+						Eventually(session).Should(Say("name:\\s+%s", appName))
+						Consistently(session).ShouldNot(Say("buildpacks?:"))
+						Eventually(session).Should(Say("docker image:\\s+%s", DockerImage))
+						Consistently(session).ShouldNot(Say("buildpacks?:"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
-			})
 
-			Context("when the app is a Docker app", func() {
-				var (
-					appName string
-				)
+				Context("when the app has tcp routes", func() {
+					var tcpDomain helpers.Domain
 
-				BeforeEach(func() {
-					appName = helpers.PrefixedRandomName("app")
-					domainName := helpers.DefaultSharedDomain()
-					Eventually(helpers.CF("push", appName, "-o", DockerImage, "-d", domainName)).Should(Exit())
-				})
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
 
-				It("displays the docker image and does not display buildpack", func() {
-					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Consistently(session).ShouldNot(Say("buildpack:"))
-					Eventually(session).Should(Say("docker image:\\s+%s", DockerImage))
-					Consistently(session).ShouldNot(Say("buildpack:"))
-					Eventually(session).Should(Exit(0))
-				})
-			})
-
-			Context("when the app has tcp routes", func() {
-				var (
-					appName   string
-					tcpDomain helpers.Domain
-				)
-
-				BeforeEach(func() {
-					helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
-
-					appName = helpers.PrefixedRandomName("app")
-					tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
-					tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
-					helpers.WithHelloWorldApp(func(appDir string) {
-						manifestContents := []byte(fmt.Sprintf(`
+						tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
+						tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
+						helpers.WithHelloWorldApp(func(appDir string) {
+							manifestContents := []byte(fmt.Sprintf(`
 ---
 applications:
 - name: %s
   routes:
   - route: %s:1024
 `, appName, tcpDomain.Name))
-						manifestPath := filepath.Join(appDir, "manifest.yml")
-						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
-						Expect(err).ToNot(HaveOccurred())
+							manifestPath := filepath.Join(appDir, "manifest.yml")
+							err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+							Expect(err).ToNot(HaveOccurred())
 
-						// Create manifest
-						Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
+							// Create manifest
+							Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
+						})
+
+						It("displays the app information", func() {
+							session := helpers.CF("app", appName)
+							Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s", tcpDomain))
+						})
+					})
+				})
+
+				Context("when the app uses multiple buildpacks", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+						helpers.WithMultiBuildpackApp(func(appDir string) {
+							Eventually(helpers.CF("v3-push", appName, "-p", appDir, "-b", "ruby_buildpack", "-b", "go_buildpack")).Should(Exit(0))
+						})
 					})
 
-					It("displays the app information", func() {
+					It("displays the app buildpacks", func() {
 						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s", tcpDomain))
+						Eventually(session).Should(Say("buildpacks:\\s+ruby_buildpack,\\s+go"))
+						Eventually(session).Should(Exit(0))
 					})
 				})
 			})

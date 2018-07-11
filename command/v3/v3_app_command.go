@@ -1,16 +1,12 @@
 package v3
 
 import (
-	"net/http"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
@@ -24,9 +20,10 @@ type V3AppActor interface {
 }
 
 type V3AppCommand struct {
-	RequiredArgs flag.AppName `positional-args:"yes"`
-	GUID         bool         `long:"guid" description:"Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."`
-	usage        interface{}  `usage:"CF_NAME v3-app APP_NAME [--guid]"`
+	RequiredArgs    flag.AppName `positional-args:"yes"`
+	GUID            bool         `long:"guid" description:"Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."`
+	usage           interface{}  `usage:"CF_NAME app APP_NAME [--guid]"`
+	relatedCommands interface{}  `related_commands:"apps, events, logs, map-route, unmap-route, push"`
 
 	UI                  command.UI
 	Config              command.Config
@@ -40,12 +37,8 @@ func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.NewClients(config, ui, true)
+	ccClient, _, err := shared.NewClients(config, ui, true, ccversion.MinVersionV3)
 	if err != nil {
-		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionV3}
-		}
-
 		return err
 	}
 
