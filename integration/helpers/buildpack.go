@@ -10,7 +10,6 @@ import (
 )
 
 func BuildpackWithStack(f func(buildpackArchive string), stackName string) {
-
 	archiveFile, err := ioutil.TempFile("", "buildpack-archive-file-")
 	Expect(err).ToNot(HaveOccurred())
 	Expect(archiveFile.Close()).ToNot(HaveOccurred())

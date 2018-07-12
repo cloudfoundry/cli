@@ -15,7 +15,7 @@ type Buildpack struct {
 	GUID string
 	// Name     string
 	// Position int
-	// Enabled  bool
+	// Enabled bool
 }
 
 //go:generate counterfeiter . SimpleProgressBar
@@ -58,7 +58,6 @@ func (p *ProgressBar) Terminate() {
 }
 
 func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Buildpack, Warnings, error) {
-
 	buildpack := ccv2.Buildpack{
 		Name:     name,
 		Position: position,
@@ -66,8 +65,12 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 	}
 
 	ccBuildpack, warnings, err := actor.CloudControllerClient.CreateBuildpack(buildpack)
-	if _, ok := err.(ccerror.BuildpackAlreadyExistsError); ok {
-		return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsError(name)
+	if _, ok := err.(ccerror.BuildpackAlreadyExistsWithoutStackError); ok {
+		return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError(name)
+	}
+
+	if _, ok := err.(ccerror.BuildpackNameTakenError); ok {
+		return Buildpack{}, Warnings(warnings), actionerror.BuildpackNameTakenError(name)
 	}
 
 	return Buildpack{GUID: ccBuildpack.GUID}, Warnings(warnings), err
@@ -76,11 +79,14 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 func (actor *Actor) UploadBuildpack(GUID string, path string, progBar SimpleProgressBar) (Warnings, error) {
 	progressBarReader, size, err := progBar.Initialize(path)
 	if err != nil {
-		return nil, err
+		return Warnings{}, err
 	}
 
 	warnings, err := actor.CloudControllerClient.UploadBuildpack(GUID, path, progressBarReader, size)
 	if err != nil {
+		if _, ok := err.(ccerror.BuildpackAlreadyExistsForStackError); ok {
+			return Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: err.Error()}
+		}
 		return Warnings(warnings), err
 	}
 

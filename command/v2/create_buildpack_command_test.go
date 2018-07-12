@@ -10,6 +10,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -51,6 +53,50 @@ var _ = Describe("CreateBuildpackCommand", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
+	Context("when both --enable and --disable are provided", func() {
+		BeforeEach(func() {
+			cmd.Enable = true
+			cmd.Disable = true
+		})
+
+		It("returns an argument combination error", func() {
+			argumentCombinationError := translatableerror.ArgumentCombinationError{
+				Args: []string{"--enable", "--disable"},
+			}
+			Expect(executeErr).To(MatchError(argumentCombinationError))
+		})
+	})
+
+	Context("when --enable is provided", func() {
+		BeforeEach(func() {
+			cmd.Enable = true
+			fakeActor.CreateBuildpackReturns(v2action.Buildpack{GUID: "some-guid"}, v2action.Warnings{"some-create-bp-warning"}, nil)
+		})
+
+		It("successfully creates a buildpack with enabled set to true", func() {
+			Expect(testUI.Out).To(Say("OK"))
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(fakeActor.CreateBuildpackCallCount()).To(Equal(1))
+			_, _, enabled := fakeActor.CreateBuildpackArgsForCall(0)
+			Expect(enabled).To(BeTrue())
+		})
+	})
+
+	Context("when --disable is provided", func() {
+		BeforeEach(func() {
+			cmd.Disable = true
+			fakeActor.CreateBuildpackReturns(v2action.Buildpack{GUID: "some-guid"}, v2action.Warnings{"some-create-bp-warning"}, nil)
+		})
+
+		It("successfully creates a buildpack with enabled set to false", func() {
+			Expect(testUI.Out).To(Say("OK"))
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(fakeActor.CreateBuildpackCallCount()).To(Equal(1))
+			_, _, enabled := fakeActor.CreateBuildpackArgsForCall(0)
+			Expect(enabled).To(BeFalse())
+		})
+	})
+
 	Context("when an error is encountered checking if the environment is setup correctly", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
@@ -90,7 +136,35 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				fakeConfig.CurrentUserReturns(fakeUser, nil)
 			})
 
-			Context("when creating the buildpack fails", func() {
+			Context("when creating the buildpack fails because a buildpack already exists", func() {
+				BeforeEach(func() {
+					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackNameTakenError("bp-name"))
+					cmd.RequiredArgs.Buildpack = "bp-name"
+				})
+
+				It("prints the error message as a warning but does not return it", func() {
+					Expect(testUI.Err).To(Say("some-create-bp-warning"))
+					Expect(testUI.Err).To(Say("Buildpack bp-name already exists"))
+					Expect(testUI.Out).To(Say("TIP: use 'faceman update-buildpack' to update this buildpack"))
+					Expect(executeErr).ToNot(HaveOccurred())
+				})
+			})
+
+			Context("when creating the buildpack fails because a buildpack with the nil stack already exists", func() {
+				BeforeEach(func() {
+					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackAlreadyExistsWithoutStackError("bp-name"))
+					cmd.RequiredArgs.Buildpack = "bp-name"
+				})
+
+				It("prints the error message as a warning but does not return it", func() {
+					Expect(testUI.Err).To(Say("some-create-bp-warning"))
+					Expect(testUI.Err).To(Say("Buildpack bp-name already exists without a stack"))
+					Expect(testUI.Out).To(Say("TIP: use 'faceman buildpacks' and 'faceman delete-buildpack' to delete buildpack bp-name without a stack"))
+					Expect(executeErr).ToNot(HaveOccurred())
+				})
+			})
+
+			Context("when creating the buildpack fails with a generic error", func() {
 				BeforeEach(func() {
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, errors.New("some-create-bp-error"))
 				})
@@ -104,9 +178,6 @@ var _ = Describe("CreateBuildpackCommand", func() {
 			Context("when creating the buildpack succeeds", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs.Buildpack = "bp-name"
-					cmd.RequiredArgs.Position.Value = 3
-					cmd.RequiredArgs.Path = "some/path"
-					cmd.Disable = true
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{GUID: "some-guid"}, v2action.Warnings{"some-create-bp-warning"}, nil)
 				})
 
@@ -115,7 +186,20 @@ var _ = Describe("CreateBuildpackCommand", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 				})
 
-				Context("when uploading the buildpack fails", func() {
+				Context("when uploading the buildpack fails because a buildpack with that stack already exists", func() {
+					BeforeEach(func() {
+						fakeActor.UploadBuildpackReturns(v2action.Warnings{"some-upload-bp-warning"}, actionerror.BuildpackAlreadyExistsForStackError{Message: "bp error"})
+					})
+
+					It("prints the error message as a warning but does not return it", func() {
+						Expect(testUI.Err).To(Say("some-upload-bp-warning"))
+						Expect(testUI.Err).To(Say("bp error"))
+						Expect(testUI.Out).To(Say("TIP: use 'faceman update-buildpack' to update this buildpack"))
+						Expect(executeErr).ToNot(HaveOccurred())
+					})
+				})
+
+				Context("when uploading the buildpack fails with a generic error", func() {
 					BeforeEach(func() {
 						fakeActor.UploadBuildpackReturns(v2action.Warnings{"some-upload-bp-warning"}, errors.New("some-upload-bp-error"))
 					})
@@ -129,13 +213,18 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				})
 
 				Context("when uploading the buildpack succeeds", func() {
+					BeforeEach(func() {
+						cmd.RequiredArgs.Position = flag.PositiveInteger{Value: 3}
+						cmd.RequiredArgs.Path = "some/path"
+					})
+
 					It("displays that the buildpack was uploaded successfully", func() {
 						Expect(fakeActor.CreateBuildpackCallCount()).To(Equal(1))
 
 						name, position, enabled := fakeActor.CreateBuildpackArgsForCall(0)
 						Expect(name).To(Equal("bp-name"))
 						Expect(position).To(Equal(3))
-						Expect(enabled).To(BeFalse())
+						Expect(enabled).To(BeTrue())
 
 						guid, path, _ := fakeActor.UploadBuildpackArgsForCall(0)
 						Expect(guid).To(Equal("some-guid"))

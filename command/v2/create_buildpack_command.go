@@ -1,10 +1,12 @@
 package v2
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
@@ -45,6 +47,12 @@ func (cmd *CreateBuildpackCommand) Setup(config command.Config, ui command.UI) e
 }
 
 func (cmd *CreateBuildpackCommand) Execute(args []string) error {
+	if cmd.Enable && cmd.Disable {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--enable", "--disable"},
+		}
+	}
+
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
@@ -59,11 +67,33 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 		"Buildpack": cmd.RequiredArgs.Buildpack,
 		"Username":  user.Name,
 	})
+
 	buildpack, warnings, err := cmd.Actor.CreateBuildpack(cmd.RequiredArgs.Buildpack, cmd.RequiredArgs.Position.Value, !cmd.Disable)
 	cmd.UI.DisplayWarnings(warnings)
+
 	if err != nil {
+		if _, ok := err.(actionerror.BuildpackAlreadyExistsWithoutStackError); ok {
+			cmd.UI.DisplayNewline()
+			cmd.UI.DisplayWarning(err.Error())
+			cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfBuildpacksCommand}}' and '{{.CfDeleteBuildpackCommand}}' to delete buildpack {{.BuildpackName}} without a stack",
+				map[string]interface{}{
+					"CfBuildpacksCommand":      cmd.Config.BinaryName() + " buildpacks",
+					"CfDeleteBuildpackCommand": cmd.Config.BinaryName() + " delete-buildpack",
+					"BuildpackName":            cmd.RequiredArgs.Buildpack,
+				})
+			return nil
+		} else if _, ok := err.(actionerror.BuildpackNameTakenError); ok {
+			cmd.UI.DisplayNewline()
+			cmd.UI.DisplayWarning(err.Error())
+			cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
+				map[string]interface{}{
+					"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
+				})
+			return nil
+		}
 		return err
 	}
+
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 
@@ -75,8 +105,19 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	uploadWarnings, err := cmd.Actor.UploadBuildpack(buildpack.GUID, string(cmd.RequiredArgs.Path), cmd.ProgressBar)
 	cmd.UI.DisplayWarnings(uploadWarnings)
 	if err != nil {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayNewline()
+		if _, ok := err.(actionerror.BuildpackAlreadyExistsForStackError); ok {
+			cmd.UI.DisplayWarning(err.Error())
+			cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
+				map[string]interface{}{
+					"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
+				})
+			return nil
+		}
 		return err
 	}
+
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayText("Done uploading")

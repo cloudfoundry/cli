@@ -13,7 +13,7 @@ import (
 
 // Buildpack represents a Cloud Controller Buildpack.
 type Buildpack struct {
-	Enabled  bool   `json:"enabled,omitempty"`
+	Enabled  bool   `json:"enabled"`
 	GUID     string `json:"guid,omitempty"`
 	Name     string `json:"name"`
 	Position int    `json:"position,omitempty"`

@@ -155,10 +155,27 @@ var _ = Describe("Error Wrapper", func() {
 						}`
 						})
 
-						It("returns an BuildpackAlreadyExistsError", func() {
+						It("returns an BuildpackAlreadyExistsWithoutStackError", func() {
 							_, _, err := client.GetApplications()
-							Expect(err).To(MatchError(ccerror.BuildpackAlreadyExistsError{
+							Expect(err).To(MatchError(ccerror.BuildpackAlreadyExistsWithoutStackError{
 								Message: "Buildpack is invalid: stack unique",
+							}))
+						})
+					})
+
+					Context("when creating a buildpack causes a name collision", func() {
+						BeforeEach(func() {
+							serverResponse = `{
+							 "code": 290001,
+							 "description": "The buildpack name is already in use: foo",
+							 "error_code": "CF-BuildpackNameTaken"
+						}`
+						})
+
+						It("returns an BuildpackNameTakenError", func() {
+							_, _, err := client.GetApplications()
+							Expect(err).To(MatchError(ccerror.BuildpackNameTakenError{
+								Message: "The buildpack name is already in use: foo",
 							}))
 						})
 					})
@@ -221,10 +238,30 @@ var _ = Describe("Error Wrapper", func() {
 						serverResponseCode = http.StatusUnprocessableEntity
 					})
 
-					It("returns a UnprocessableEntityError", func() {
-						_, _, err := client.GetApplications()
-						Expect(err).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
+					Context("generic Unprocessable entity", func() {
+						It("returns a UnprocessableEntityError", func() {
+							_, _, err := client.GetApplications()
+							Expect(err).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
+						})
 					})
+
+					Context("when creating a buildpack causes a name and stack collision", func() {
+						BeforeEach(func() {
+							serverResponse = `{
+							 "code": 290000,
+							 "description": "The buildpack name foo is already in use for the stack bar",
+							 "error_code": "CF-BuildpackNameStackTaken"
+						}`
+						})
+
+						It("returns an BuildpackAlreadyExistsForStackError", func() {
+							_, _, err := client.GetApplications()
+							Expect(err).To(MatchError(ccerror.BuildpackAlreadyExistsForStackError{
+								Message: "The buildpack name foo is already in use for the stack bar",
+							}))
+						})
+					})
+
 				})
 
 				Context("unhandled Error Codes", func() {

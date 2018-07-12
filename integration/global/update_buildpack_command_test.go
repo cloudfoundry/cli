@@ -1,9 +1,7 @@
 package global
 
 import (
-	"io/ioutil"
 	"os"
-	"path/filepath"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -107,19 +105,10 @@ var _ = Describe("update-buildpack command", func() {
 		var dir string
 
 		BeforeEach(func() {
-
-			var err error
-			dir, err = ioutil.TempDir("", "update-buildpack-test")
-			Expect(err).ToNot(HaveOccurred())
-
-			filename := "some-file"
-			tempfile := filepath.Join(dir, filename)
-			err = ioutil.WriteFile(tempfile, []byte{}, 0400)
-			Expect(err).ToNot(HaveOccurred())
-
-			buildpackName = helpers.NewBuildpack()
-			session := helpers.CF("create-buildpack", buildpackName, dir, "1")
-			Eventually(session).Should(Exit(0))
+			helpers.BuildpackWithStack(func(buildpackPath string) {
+				session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+				Eventually(session).Should(Exit(0))
+			}, stacks[1])
 		})
 
 		AfterEach(func() {

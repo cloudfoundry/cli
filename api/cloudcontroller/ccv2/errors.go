@@ -59,7 +59,7 @@ func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	case http.StatusNotFound: // 404
 		return ccerror.ResourceNotFoundError{Message: errorResponse.Description}
 	case http.StatusUnprocessableEntity: // 422
-		return ccerror.UnprocessableEntityError{Message: errorResponse.Description}
+		return handleUnprocessableEntity(errorResponse)
 	default:
 		return ccerror.V2UnexpectedResponseError{
 			RequestIDs:      rawHTTPStatusErr.RequestIDs,
@@ -84,7 +84,9 @@ func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
 	case "CF-AppStoppedStatsError":
 		return ccerror.ApplicationStoppedStatsError{Message: errorResponse.Description}
 	case "CF-BuildpackInvalid":
-		return ccerror.BuildpackAlreadyExistsError{Message: errorResponse.Description}
+		return ccerror.BuildpackAlreadyExistsWithoutStackError{Message: errorResponse.Description}
+	case "CF-BuildpackNameTaken":
+		return ccerror.BuildpackNameTakenError{Message: errorResponse.Description}
 	case "CF-InstancesError":
 		return ccerror.InstancesError{Message: errorResponse.Description}
 	case "CF-InvalidRelation":
@@ -104,4 +106,11 @@ func handleUnauthorized(errorResponse ccerror.V2ErrorResponse) error {
 	}
 
 	return ccerror.UnauthorizedError{Message: errorResponse.Description}
+}
+
+func handleUnprocessableEntity(errorResponse ccerror.V2ErrorResponse) error {
+	if errorResponse.ErrorCode == "CF-BuildpackNameStackTaken" {
+		return ccerror.BuildpackAlreadyExistsForStackError{Message: errorResponse.Description}
+	}
+	return ccerror.UnprocessableEntityError{Message: errorResponse.Description}
 }
