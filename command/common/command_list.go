@@ -9,11 +9,16 @@ import (
 )
 
 var Commands commandList
+var V2Commands V2CommandList
+
+type V2CommandList struct {
+	V2App v2.AppCommand `command:"app" description:"Display health and status for an app"`
+}
 
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	V3App                v3.V3AppCommand                `command:"v3-app" description:"Display health and status for an app"`
+	V3App                v3.V3AppCommand                `command:"app" description:"Display health and status for an app"`
 	V3Apps               v3.V3AppsCommand               `command:"v3-apps" description:"List all apps in the target space"`
 	V3ApplyManifest      v3.V3ApplyManifestCommand      `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
 	V3CreateApp          v3.V3CreateAppCommand          `command:"v3-create-app" description:"Create a V3 App"`
