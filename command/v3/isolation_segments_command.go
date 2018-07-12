@@ -37,7 +37,7 @@ func (cmd *IsolationSegmentsCommand) Setup(config command.Config, ui command.UI)
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	client, _, err := shared.NewClients(config, ui, true, "")
+	client, _, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionIsolationSegmentV3}

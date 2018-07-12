@@ -38,7 +38,7 @@ func (cmd *TerminateTaskCommand) Setup(config command.Config, ui command.UI) err
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	client, _, err := shared.NewClients(config, ui, true, "")
+	client, _, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionRunTaskV3}

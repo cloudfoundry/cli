@@ -45,7 +45,7 @@ func (cmd *ResetSpaceIsolationSegmentCommand) Setup(config command.Config, ui co
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.NewClients(config, ui, true, "")
+	ccClient, _, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionIsolationSegmentV3}

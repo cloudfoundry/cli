@@ -35,37 +35,32 @@ type TriggerLegacyMain interface {
 	error
 }
 
-const switchToV2 = -3
-
 var ErrFailed = errors.New("command failed")
 var ParseErr = errors.New("incorrect type for arg")
 
 func main() {
 	defer panichandler.HandlePanic()
-	exitStatus := parse(os.Args[1:], &common.Commands)
-	if exitStatus == switchToV2 {
-		exitStatus = parse(os.Args[1:], &common.V2Commands)
-	}
+	exitStatus := parse(os.Args[1:])
 	if exitStatus != 0 {
 		os.Exit(exitStatus)
 	}
 }
 
-func parse(args []string, commandList interface{}) int {
-	parser := flags.NewParser(commandList, flags.HelpFlag)
+func parse(args []string) int {
+	parser := flags.NewParser(&common.Commands, flags.HelpFlag)
 	parser.CommandHandler = executionWrapper
 	extraArgs, err := parser.ParseArgs(args)
 	if err == nil {
 		return 0
-	} else if _, ok := err.(translatableerror.V3V2SwitchError); ok {
-		return switchToV2
-	} else if flagErr, ok := err.(*flags.Error); ok {
-		return handleFlagErrorAndCommandHelp(flagErr, parser, extraArgs, args, commandList)
+	}
+
+	if flagErr, ok := err.(*flags.Error); ok {
+		return handleFlagErrorAndCommandHelp(flagErr, parser, extraArgs, args)
 	} else if err == ErrFailed {
 		return 1
 	} else if err == ParseErr {
 		fmt.Println()
-		parse([]string{"help", args[0]}, commandList)
+		parse([]string{"help", args[0]})
 		return 1
 	} else if exitError, ok := err.(*ssh.ExitError); ok {
 		return exitError.ExitStatus()
@@ -75,7 +70,7 @@ func parse(args []string, commandList interface{}) int {
 	return 1
 }
 
-func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, extraArgs []string, originalArgs []string, commandList interface{}) int {
+func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, extraArgs []string, originalArgs []string) int {
 	switch flagErr.Type {
 	case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrExpectedArgument, flags.ErrInvalidChoice:
 		_, found := reflect.TypeOf(common.Commands).FieldByNameFunc(
@@ -94,7 +89,7 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 					newArgs = append(newArgs, arg)
 				}
 			}
-			parse(newArgs, commandList)
+			parse(newArgs)
 			return 0
 		}
 
@@ -104,22 +99,22 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 
 		var helpErrored int
 		if found {
-			helpErrored = parse([]string{"help", parser.Active.Name}, commandList)
+			helpErrored = parse([]string{"help", parser.Active.Name})
 		} else {
 			switch len(extraArgs) {
 			case 0:
-				helpErrored = parse([]string{"help"}, commandList)
+				helpErrored = parse([]string{"help"})
 			case 1:
 				if !isOption(extraArgs[0]) || (len(originalArgs) > 1 && extraArgs[0] == "-a") {
-					helpErrored = parse([]string{"help", extraArgs[0]}, commandList)
+					helpErrored = parse([]string{"help", extraArgs[0]})
 				} else {
-					helpErrored = parse([]string{"help"}, commandList)
+					helpErrored = parse([]string{"help"})
 				}
 			default:
 				if isCommand(extraArgs[0]) {
-					helpErrored = parse([]string{"help", extraArgs[0]}, commandList)
+					helpErrored = parse([]string{"help", extraArgs[0]})
 				} else {
-					helpErrored = parse(extraArgs[1:], commandList)
+					helpErrored = parse(extraArgs[1:])
 				}
 			}
 		}
@@ -129,15 +124,15 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 		}
 	case flags.ErrRequired, flags.ErrMarshal:
 		fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
-		parse([]string{"help", originalArgs[0]}, commandList)
+		parse([]string{"help", originalArgs[0]})
 		return 1
 	case flags.ErrUnknownCommand:
 		cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	case flags.ErrCommandRequired:
 		if common.Commands.VerboseOrVersion {
-			parse([]string{"version"}, commandList)
+			parse([]string{"version"})
 		} else {
-			parse([]string{"help"}, commandList)
+			parse([]string{"help"})
 		}
 	default:
 		fmt.Fprintf(os.Stderr, "Unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
@@ -232,15 +227,21 @@ func handleError(passedErr error, commandUI UI) error {
 	translatedErr := translatableerror.ConvertToTranslatableError(passedErr)
 
 	switch typedErr := translatedErr.(type) {
-	case translatableerror.V3V2SwitchError:
-		log.Info("Received a V3V2SwitchError - switch to the V2 version of the command")
-		return passedErr
 	case TriggerLegacyMain:
 		if typedErr.Error() != "" {
 			commandUI.DisplayWarning("")
 			commandUI.DisplayWarning(typedErr.Error())
 		}
 
+		// TODO: Replace this section with os.Args when v2-push has been replaced
+		// var args []string
+		// for _, arg := range os.Args {
+		// 	if arg == "v2-push" {
+		// 		args = append(args, "push")
+		// 	} else {
+		// 		args = append(args, arg)
+		// 	}
+		// }
 		cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	case *ssh.ExitError:
 		exitStatus := typedErr.ExitStatus()

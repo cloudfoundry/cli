@@ -57,7 +57,7 @@ func (cmd *SpaceCommand) Setup(config command.Config, ui command.UI) error {
 	}
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
-	ccClientV3, _, err := sharedV3.NewClients(config, ui, true, "")
+	ccClientV3, _, err := sharedV3.NewClients(config, ui, true)
 	if err != nil {
 		if _, ok := err.(translatableerror.V3APIDoesNotExistError); !ok {
 			return err

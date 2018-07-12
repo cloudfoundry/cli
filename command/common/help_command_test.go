@@ -611,6 +611,7 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say(""))
 				Expect(testUI.Out).To(Say("APPS \\(experimental\\):"))
 				Expect(testUI.Out).To(Say("   v3-apps\\s+List all apps in the target space"))
+				Expect(testUI.Out).To(Say("   v3-app\\s+Display health and status for an app"))
 				Expect(testUI.Out).To(Say("   v3-create-app\\s+Create a V3 App"))
 				Expect(testUI.Out).To(Say("   v3-push\\s+Push a new app or sync changes to an existing app"))
 				Expect(testUI.Out).To(Say("   v3-scale\\s+Change or view the instance count, disk space limit, and memory limit for an app"))
