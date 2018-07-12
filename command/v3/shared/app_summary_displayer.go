@@ -68,20 +68,11 @@ func (display AppSummaryDisplayer) DisplayAppProcessInfo() error {
 	return nil
 }
 
-func GetCreatedTime(summary v3action.ApplicationSummary) time.Time {
-	// *Time t := &time.Time.New()
-	// *time.Time timestamp := &[]byte(summary.CurrentDroplet.CreatedAt)
-	// timestamp := &[]byte(summary.CurrentDroplet.CreatedAt)
-	timestamp, _ := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
-	return timestamp
-}
-
 func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes) {
 	keyValueTable := [][]string{
 		{display.UI.TranslateText("name:"), summary.Application.Name},
 		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
 		{display.UI.TranslateText("routes:"), routes.Summary()},
-		{display.UI.TranslateText("last uploaded:"), display.UI.UserFriendlyDate(GetCreatedTime(summary))},
 		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
 	}
 
