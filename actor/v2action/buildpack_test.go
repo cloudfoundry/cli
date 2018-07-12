@@ -2,8 +2,8 @@ package v2action_test
 
 import (
 	"errors"
-	"io/ioutil"
-	"os"
+	"io"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
-var _ = FDescribe("Buildpack", func() {
+var _ = Describe("Buildpack", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
@@ -80,38 +80,29 @@ var _ = FDescribe("Buildpack", func() {
 
 	Describe("UploadBuildpack", func() {
 		var (
-			buildpackFile *os.File
-			fakePb        *v2actionfakes.FakeSimpleProgressBar
+			bpFile     io.Reader
+			bpFilePath string
+			fakePb     *v2actionfakes.FakeSimpleProgressBar
 
 			warnings   Warnings
 			executeErr error
 		)
 
 		BeforeEach(func() {
-			var err error
-			buildpackFile, err = ioutil.TempFile("", "test-buildpack")
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(buildpackFile.Close()).ToNot(HaveOccurred())
-
-			err = ioutil.WriteFile(buildpackFile.Name(), []byte("123456"), 0655)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			Expect(os.RemoveAll(buildpackFile.Name()))
+			bpFile = strings.NewReader("")
+			bpFilePath = "some/fake-buildpack.zip"
 		})
 
 		JustBeforeEach(func() {
 			fakePb = new(v2actionfakes.FakeSimpleProgressBar)
-			fakePb.InitializeReturns(buildpackFile, 6, nil)
-			warnings, executeErr = actor.UploadBuildpack("some-bp-guid", buildpackFile.Name(), fakePb)
+			fakePb.InitializeReturns(bpFile, 0, nil)
+			warnings, executeErr = actor.UploadBuildpack("some-bp-guid", bpFilePath, fakePb)
 		})
 
 		It("tracks the progress of the upload", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(fakePb.InitializeCallCount()).To(Equal(1))
-			Expect(fakePb.InitializeArgsForCall(0)).To(Equal(buildpackFile.Name()))
+			Expect(fakePb.InitializeArgsForCall(0)).To(Equal(bpFilePath))
 			Expect(fakePb.TerminateCallCount()).To(Equal(1))
 		})
 
@@ -123,9 +114,11 @@ var _ = FDescribe("Buildpack", func() {
 			It("uploads the buildpack and returns any warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeCloudControllerClient.UploadBuildpackCallCount()).To(Equal(1))
-				guid, _, size := fakeCloudControllerClient.UploadBuildpackArgsForCall(0)
+				guid, path, pbReader, size := fakeCloudControllerClient.UploadBuildpackArgsForCall(0)
 				Expect(guid).To(Equal("some-bp-guid"))
-				Expect(size).To(Equal(int64(6)))
+				Expect(size).To(Equal(int64(0)))
+				Expect(path).To(Equal(bpFilePath))
+				Expect(pbReader).To(Equal(bpFile))
 				Expect(warnings).To(ConsistOf("some-create-warning"))
 			})
 		})

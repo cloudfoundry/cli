@@ -1,7 +1,6 @@
 package v2action
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"time"
@@ -39,14 +38,11 @@ func (p *ProgressBar) Initialize(path string) (io.Reader, int64, error) {
 	if err != nil {
 		return nil, 0, err
 	}
-	fmt.Printf("file %v", file)
 
 	fileInfo, err := file.Stat()
 	if err != nil {
 		return nil, 0, err
 	}
-	fmt.Printf("fileinfo %v", fileInfo)
-	fmt.Printf("fileinfosize %v", fileInfo.Size())
 
 	p.bar = pb.New(int(fileInfo.Size())).SetUnits(pb.U_BYTES)
 	p.bar.ShowTimeLeft = false
@@ -78,9 +74,12 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 }
 
 func (actor *Actor) UploadBuildpack(GUID string, path string, progBar SimpleProgressBar) (Warnings, error) {
-	progressBarReader, size, _ := progBar.Initialize(path)
-	warnings, err := actor.CloudControllerClient.UploadBuildpack(GUID, progressBarReader, size)
+	progressBarReader, size, err := progBar.Initialize(path)
+	if err != nil {
+		return nil, err
+	}
 
+	warnings, err := actor.CloudControllerClient.UploadBuildpack(GUID, path, progressBarReader, size)
 	if err != nil {
 		return Warnings(warnings), err
 	}

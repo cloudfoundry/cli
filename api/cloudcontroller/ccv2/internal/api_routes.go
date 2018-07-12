@@ -82,6 +82,7 @@ const (
 	PostUserRequest                                      = "PostUser"
 	PutAppBitsRequest                                    = "PutAppBits"
 	PutAppRequest                                        = "PutApp"
+	PutBuildpackRequest                                  = "PutBuildpack"
 	PutDropletRequest                                    = "PutDroplet"
 	PutResourceMatchRequest                              = "PutResourceMatch"
 	PutRouteAppRequest                                   = "PutRouteApp"
@@ -103,6 +104,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: GetAppRoutesRequest},
 	{Path: "/v2/apps/:app_guid/stats", Method: http.MethodGet, Name: GetAppStatsRequest},
 	{Path: "/v2/buildpacks", Method: http.MethodPost, Name: PostBuildpackRequest},
+	{Path: "/v2/buildpacks/:buildpack_guid/bits", Method: http.MethodPut, Name: PutBuildpackRequest},
 	{Path: "/v2/config/feature_flags", Method: http.MethodGet, Name: GetConfigFeatureFlagsRequest},
 	{Path: "/v2/events", Method: http.MethodGet, Name: GetEventsRequest},
 	{Path: "/v2/info", Method: http.MethodGet, Name: GetInfoRequest},

@@ -945,10 +945,11 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	UploadBuildpackStub        func(buildpackGUID string, buildpack io.Reader, buildpackLength int64) (ccv2.Warnings, error)
+	UploadBuildpackStub        func(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (ccv2.Warnings, error)
 	uploadBuildpackMutex       sync.RWMutex
 	uploadBuildpackArgsForCall []struct {
 		buildpackGUID   string
+		buildpackPath   string
 		buildpack       io.Reader
 		buildpackLength int64
 	}
@@ -4393,18 +4394,19 @@ func (fake *FakeCloudControllerClient) UploadApplicationPackageReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UploadBuildpack(buildpackGUID string, buildpack io.Reader, buildpackLength int64) (ccv2.Warnings, error) {
+func (fake *FakeCloudControllerClient) UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (ccv2.Warnings, error) {
 	fake.uploadBuildpackMutex.Lock()
 	ret, specificReturn := fake.uploadBuildpackReturnsOnCall[len(fake.uploadBuildpackArgsForCall)]
 	fake.uploadBuildpackArgsForCall = append(fake.uploadBuildpackArgsForCall, struct {
 		buildpackGUID   string
+		buildpackPath   string
 		buildpack       io.Reader
 		buildpackLength int64
-	}{buildpackGUID, buildpack, buildpackLength})
-	fake.recordInvocation("UploadBuildpack", []interface{}{buildpackGUID, buildpack, buildpackLength})
+	}{buildpackGUID, buildpackPath, buildpack, buildpackLength})
+	fake.recordInvocation("UploadBuildpack", []interface{}{buildpackGUID, buildpackPath, buildpack, buildpackLength})
 	fake.uploadBuildpackMutex.Unlock()
 	if fake.UploadBuildpackStub != nil {
-		return fake.UploadBuildpackStub(buildpackGUID, buildpack, buildpackLength)
+		return fake.UploadBuildpackStub(buildpackGUID, buildpackPath, buildpack, buildpackLength)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -4418,10 +4420,10 @@ func (fake *FakeCloudControllerClient) UploadBuildpackCallCount() int {
 	return len(fake.uploadBuildpackArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UploadBuildpackArgsForCall(i int) (string, io.Reader, int64) {
+func (fake *FakeCloudControllerClient) UploadBuildpackArgsForCall(i int) (string, string, io.Reader, int64) {
 	fake.uploadBuildpackMutex.RLock()
 	defer fake.uploadBuildpackMutex.RUnlock()
-	return fake.uploadBuildpackArgsForCall[i].buildpackGUID, fake.uploadBuildpackArgsForCall[i].buildpack, fake.uploadBuildpackArgsForCall[i].buildpackLength
+	return fake.uploadBuildpackArgsForCall[i].buildpackGUID, fake.uploadBuildpackArgsForCall[i].buildpackPath, fake.uploadBuildpackArgsForCall[i].buildpack, fake.uploadBuildpackArgsForCall[i].buildpackLength
 }
 
 func (fake *FakeCloudControllerClient) UploadBuildpackReturns(result1 ccv2.Warnings, result2 error) {

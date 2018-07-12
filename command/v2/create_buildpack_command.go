@@ -65,6 +65,7 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 		return err
 	}
 	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{
 		"Buildpack": cmd.RequiredArgs.Buildpack,
@@ -76,6 +77,7 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayText("Done uploading")
 	cmd.UI.DisplayOK()
