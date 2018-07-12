@@ -25,6 +25,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	CreateBuildpackStub        func(buildpack ccv2.Buildpack) (ccv2.Buildpack, ccv2.Warnings, error)
+	createBuildpackMutex       sync.RWMutex
+	createBuildpackArgsForCall []struct {
+		buildpack ccv2.Buildpack
+	}
+	createBuildpackReturns struct {
+		result1 ccv2.Buildpack
+		result2 ccv2.Warnings
+		result3 error
+	}
+	createBuildpackReturnsOnCall map[int]struct {
+		result1 ccv2.Buildpack
+		result2 ccv2.Warnings
+		result3 error
+	}
 	CreateRouteStub        func(route ccv2.Route, generatePort bool) (ccv2.Route, ccv2.Warnings, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
@@ -930,6 +945,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	UploadBuildpackStub        func(buildpackGUID string, buildpack io.Reader, buildpackLength int64) (ccv2.Warnings, error)
+	uploadBuildpackMutex       sync.RWMutex
+	uploadBuildpackArgsForCall []struct {
+		buildpackGUID   string
+		buildpack       io.Reader
+		buildpackLength int64
+	}
+	uploadBuildpackReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	uploadBuildpackReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	UploadDropletStub        func(appGUID string, droplet io.Reader, dropletLength int64) (ccv2.Job, ccv2.Warnings, error)
 	uploadDropletMutex       sync.RWMutex
 	uploadDropletArgsForCall []struct {
@@ -1063,6 +1093,60 @@ func (fake *FakeCloudControllerClient) CreateApplicationReturnsOnCall(i int, res
 	}
 	fake.createApplicationReturnsOnCall[i] = struct {
 		result1 ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpack(buildpack ccv2.Buildpack) (ccv2.Buildpack, ccv2.Warnings, error) {
+	fake.createBuildpackMutex.Lock()
+	ret, specificReturn := fake.createBuildpackReturnsOnCall[len(fake.createBuildpackArgsForCall)]
+	fake.createBuildpackArgsForCall = append(fake.createBuildpackArgsForCall, struct {
+		buildpack ccv2.Buildpack
+	}{buildpack})
+	fake.recordInvocation("CreateBuildpack", []interface{}{buildpack})
+	fake.createBuildpackMutex.Unlock()
+	if fake.CreateBuildpackStub != nil {
+		return fake.CreateBuildpackStub(buildpack)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createBuildpackReturns.result1, fake.createBuildpackReturns.result2, fake.createBuildpackReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpackCallCount() int {
+	fake.createBuildpackMutex.RLock()
+	defer fake.createBuildpackMutex.RUnlock()
+	return len(fake.createBuildpackArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpackArgsForCall(i int) ccv2.Buildpack {
+	fake.createBuildpackMutex.RLock()
+	defer fake.createBuildpackMutex.RUnlock()
+	return fake.createBuildpackArgsForCall[i].buildpack
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpackReturns(result1 ccv2.Buildpack, result2 ccv2.Warnings, result3 error) {
+	fake.CreateBuildpackStub = nil
+	fake.createBuildpackReturns = struct {
+		result1 ccv2.Buildpack
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpackReturnsOnCall(i int, result1 ccv2.Buildpack, result2 ccv2.Warnings, result3 error) {
+	fake.CreateBuildpackStub = nil
+	if fake.createBuildpackReturnsOnCall == nil {
+		fake.createBuildpackReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Buildpack
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.createBuildpackReturnsOnCall[i] = struct {
+		result1 ccv2.Buildpack
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -4309,6 +4393,59 @@ func (fake *FakeCloudControllerClient) UploadApplicationPackageReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UploadBuildpack(buildpackGUID string, buildpack io.Reader, buildpackLength int64) (ccv2.Warnings, error) {
+	fake.uploadBuildpackMutex.Lock()
+	ret, specificReturn := fake.uploadBuildpackReturnsOnCall[len(fake.uploadBuildpackArgsForCall)]
+	fake.uploadBuildpackArgsForCall = append(fake.uploadBuildpackArgsForCall, struct {
+		buildpackGUID   string
+		buildpack       io.Reader
+		buildpackLength int64
+	}{buildpackGUID, buildpack, buildpackLength})
+	fake.recordInvocation("UploadBuildpack", []interface{}{buildpackGUID, buildpack, buildpackLength})
+	fake.uploadBuildpackMutex.Unlock()
+	if fake.UploadBuildpackStub != nil {
+		return fake.UploadBuildpackStub(buildpackGUID, buildpack, buildpackLength)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.uploadBuildpackReturns.result1, fake.uploadBuildpackReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UploadBuildpackCallCount() int {
+	fake.uploadBuildpackMutex.RLock()
+	defer fake.uploadBuildpackMutex.RUnlock()
+	return len(fake.uploadBuildpackArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UploadBuildpackArgsForCall(i int) (string, io.Reader, int64) {
+	fake.uploadBuildpackMutex.RLock()
+	defer fake.uploadBuildpackMutex.RUnlock()
+	return fake.uploadBuildpackArgsForCall[i].buildpackGUID, fake.uploadBuildpackArgsForCall[i].buildpack, fake.uploadBuildpackArgsForCall[i].buildpackLength
+}
+
+func (fake *FakeCloudControllerClient) UploadBuildpackReturns(result1 ccv2.Warnings, result2 error) {
+	fake.UploadBuildpackStub = nil
+	fake.uploadBuildpackReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UploadBuildpackReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.UploadBuildpackStub = nil
+	if fake.uploadBuildpackReturnsOnCall == nil {
+		fake.uploadBuildpackReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.uploadBuildpackReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UploadDroplet(appGUID string, droplet io.Reader, dropletLength int64) (ccv2.Job, ccv2.Warnings, error) {
 	fake.uploadDropletMutex.Lock()
 	ret, specificReturn := fake.uploadDropletReturnsOnCall[len(fake.uploadDropletArgsForCall)]
@@ -4650,6 +4787,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.invocationsMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
 	defer fake.createApplicationMutex.RUnlock()
+	fake.createBuildpackMutex.RLock()
+	defer fake.createBuildpackMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	fake.createServiceBindingMutex.RLock()
@@ -4770,6 +4909,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateSecurityGroupStagingSpaceMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()
 	defer fake.uploadApplicationPackageMutex.RUnlock()
+	fake.uploadBuildpackMutex.RLock()
+	defer fake.uploadBuildpackMutex.RUnlock()
 	fake.uploadDropletMutex.RLock()
 	defer fake.uploadDropletMutex.RUnlock()
 	fake.aPIMutex.RLock()

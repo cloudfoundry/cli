@@ -20,8 +20,6 @@ func BuildpackWithStack(f func(buildpackArchive string), stackName string) {
 
 	dir, err := ioutil.TempDir("", "buildpack-dir-")
 	Expect(err).ToNot(HaveOccurred())
-
-	defer os.Remove(buildpackZip)
 	defer os.RemoveAll(dir)
 
 	path := filepath.Join(dir, "bin")
@@ -38,6 +36,7 @@ func BuildpackWithStack(f func(buildpackArchive string), stackName string) {
 
 	err = Zipit(dir, buildpackZip, "")
 	Expect(err).ToNot(HaveOccurred())
+	defer os.Remove(buildpackZip)
 
 	f(buildpackZip)
 }

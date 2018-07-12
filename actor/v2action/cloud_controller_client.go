@@ -11,6 +11,7 @@ import (
 // CloudControllerClient is a Cloud Controller V2 client.
 type CloudControllerClient interface {
 	CreateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
+	CreateBuildpack(buildpack ccv2.Buildpack) (ccv2.Buildpack, ccv2.Warnings, error)
 	CreateRoute(route ccv2.Route, generatePort bool) (ccv2.Route, ccv2.Warnings, error)
 	CreateServiceBinding(appGUID string, serviceBindingGUID string, bindingName string, acceptsIncomplete bool, parameters map[string]interface{}) (ccv2.ServiceBinding, ccv2.Warnings, error)
 	CreateUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
@@ -71,6 +72,7 @@ type CloudControllerClient interface {
 	UpdateSecurityGroupSpace(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	UpdateSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	UploadApplicationPackage(appGUID string, existingResources []ccv2.Resource, newResources ccv2.Reader, newResourcesLength int64) (ccv2.Job, ccv2.Warnings, error)
+	UploadBuildpack(buildpackGUID string, buildpack io.Reader, buildpackLength int64) (ccv2.Warnings, error)
 	UploadDroplet(appGUID string, droplet io.Reader, dropletLength int64) (ccv2.Job, ccv2.Warnings, error)
 
 	API() string

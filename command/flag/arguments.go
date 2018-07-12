@@ -220,7 +220,7 @@ type SetHealthCheckArgs struct {
 type CreateBuildpackArgs struct {
 	Buildpack string                      `positional-arg-name:"BUILDPACK" required:"true" description:"The buildpack"`
 	Path      PathWithExistenceCheckOrURL `positional-arg-name:"PATH" required:"true" description:"The path to the buildpack file"`
-	Position  string                      `positional-arg-name:"POSITION" required:"true" description:"The position that sets priority"`
+	Position  PositiveInteger             `positional-arg-name:"POSITION" required:"true" description:"The position that sets priority"`
 }
 
 type RenameBuildpackArgs struct {

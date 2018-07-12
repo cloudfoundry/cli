@@ -83,6 +83,8 @@ func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
 	switch errorResponse.ErrorCode {
 	case "CF-AppStoppedStatsError":
 		return ccerror.ApplicationStoppedStatsError{Message: errorResponse.Description}
+	case "CF-BuildpackInvalid":
+		return ccerror.BuildpackAlreadyExistsError{Message: errorResponse.Description}
 	case "CF-InstancesError":
 		return ccerror.InstancesError{Message: errorResponse.Description}
 	case "CF-InvalidRelation":

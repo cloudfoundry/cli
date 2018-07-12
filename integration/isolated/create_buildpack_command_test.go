@@ -1,4 +1,4 @@
-package global
+package isolated
 
 import (
 	"os"
@@ -275,7 +275,7 @@ var _ = FDescribe("create buildpack command", func() {
 					helpers.BuildpackWithStack(func(buildpackPath string) {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "-1")
 						Eventually(session).Should(Exit(1))
-						Eventually(session.Err).Should(Say("position must be a positive integer"))
+						Eventually(session.Err).Should(Say("Position must be a positive integer"))
 					}, "")
 				})
 			})

@@ -145,6 +145,23 @@ var _ = Describe("Error Wrapper", func() {
 							}))
 						})
 					})
+
+					Context("when creating a buildpack with nil stack that already exists", func() {
+						BeforeEach(func() {
+							serverResponse = `{
+							 "description": "Buildpack is invalid: stack unique",
+							 "error_code": "CF-BuildpackInvalid",
+							 "code": 290003
+						}`
+						})
+
+						It("returns an BuildpackAlreadyExistsError", func() {
+							_, _, err := client.GetApplications()
+							Expect(err).To(MatchError(ccerror.BuildpackAlreadyExistsError{
+								Message: "Buildpack is invalid: stack unique",
+							}))
+						})
+					})
 				})
 
 				Context("(401) Unauthorized", func() {
