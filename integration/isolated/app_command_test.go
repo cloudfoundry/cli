@@ -212,14 +212,13 @@ applications:
 
 							Eventually(session).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
+							Eventually(session).ShouldNot(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 							Eventually(session).Should(Say("name:\\s+%s", appName))
 							Eventually(session).Should(Say("requested state:\\s+started"))
 							Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
-							// TODO: remove or implement based on decision re: last uploaded/PackageUpdatedAt
-							// Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
+							Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
 							Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 							Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
-
 							Eventually(session).Should(Say("type:\\s+web"))
 							Eventually(session).Should(Say("instances:\\s+2/2"))
 							Eventually(session).Should(Say("memory usage:\\s+128M"))
@@ -263,7 +262,7 @@ applications:
 						BeforeEach(func() {
 							helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
 						})
-						It("displays the app information", func() {
+						It("displays that there are no running instances of the app", func() {
 							session := helpers.CF("app", appName)
 							Eventually(session).Should(Say("name:\\s+%s", appName))
 							Eventually(session).Should(Say("requested state:\\s+stopped"))
