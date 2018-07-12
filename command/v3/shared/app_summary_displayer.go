@@ -56,6 +56,51 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 	return nil
 }
 
+<<<<<<< Updated upstream
+=======
+func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v3action.ProcessSummary) {
+	display.UI.DisplayNewline()
+
+	display.UI.DisplayTextWithBold("{{.ProcessType}}:{{.HealthyInstanceCount}}/{{.TotalInstanceCount}}", map[string]interface{}{
+		"ProcessType":          processSummary.Type,
+		"HealthyInstanceCount": processSummary.HealthyInstanceCount(),
+		"TotalInstanceCount":   processSummary.TotalInstanceCount(),
+	})
+
+	if !display.processHasAnInstance(&processSummary) {
+		return
+	}
+
+	table := [][]string{
+		{
+			display.UI.TranslateText("type"),
+			display.UI.TranslateText("instances"),
+			display.UI.TranslateText("memory"),
+			display.UI.TranslateText("disk"),
+		},
+	}
+
+	for _, instance := range processSummary.InstanceDetails {
+		table = append(table, []string{})
+		table = append(table, []string{
+			fmt.Sprintf("#%d", instance.Index),
+			display.UI.TranslateText(strings.ToLower(string(instance.State))),
+			display.appInstanceDate(instance.StartTime()),
+			fmt.Sprintf("%.1f%%", instance.CPU*100),
+			display.UI.TranslateText("{{.MemUsage}} of {{.MemQuota}}", map[string]interface{}{
+				"MemUsage": bytefmt.ByteSize(instance.MemoryUsage),
+				"MemQuota": bytefmt.ByteSize(instance.MemoryQuota),
+			}),
+			display.UI.TranslateText("{{.DiskUsage}} of {{.DiskQuota}}", map[string]interface{}{
+				"DiskUsage": bytefmt.ByteSize(instance.DiskUsage),
+				"DiskQuota": bytefmt.ByteSize(instance.DiskQuota),
+			}),
+		})
+	}
+
+	display.UI.DisplayInstancesTableForApp(table)
+}
+
 func (display AppSummaryDisplayer) DisplayAppProcessInfo() error {
 	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID)
 	display.UI.DisplayWarnings(warnings)
@@ -68,10 +113,7 @@ func (display AppSummaryDisplayer) DisplayAppProcessInfo() error {
 	return nil
 }
 
-func GetCreatedTime(summary v3action.ApplicationSummary) time.Time {
-	// *Time t := &time.Time.New()
-	// *time.Time timestamp := &[]byte(summary.CurrentDroplet.CreatedAt)
-	// timestamp := &[]byte(summary.CurrentDroplet.CreatedAt)
+func getCreatedTime(summary v3action.ApplicationSummary) time.Time {
 	timestamp, _ := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
 	return timestamp
 }
@@ -80,6 +122,8 @@ func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationS
 	keyValueTable := [][]string{
 		{display.UI.TranslateText("name:"), summary.Application.Name},
 		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
+		// {display.UI.TranslateText("processes:"), summary.ProcessSummaries.String()},
+		// {display.UI.TranslateText("memory usage:"), display.usageSummary(summary.ProcessSummaries)},
 		{display.UI.TranslateText("routes:"), routes.Summary()},
 		{display.UI.TranslateText("last uploaded:"), display.UI.UserFriendlyDate(GetCreatedTime(summary))},
 		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
@@ -155,24 +199,27 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v3act
 }
 
 func (display AppSummaryDisplayer) displayProcessTable(summary v3action.ApplicationSummary) {
-	appHasARunningInstance := false
+	display.UI.DisplayNewline()
 
-	for processIdx := range summary.ProcessSummaries {
-		if display.processHasAnInstance(&summary.ProcessSummaries[processIdx]) {
-			appHasARunningInstance = true
-			break
-		}
-	}
-
-	if !appHasARunningInstance {
-		display.UI.DisplayNewline()
-		display.UI.DisplayText("There are no running instances of this app.")
-		return
+	table := [][]string{
+		{
+			display.UI.TranslateText("type"),
+			display.UI.TranslateText("instances"),
+			display.UI.TranslateText("memory"),
+			display.UI.TranslateText("disk"),
+		},
 	}
 
 	for _, process := range summary.ProcessSummaries {
-		display.displayAppInstancesTable(process)
+		table = append(table, []string{
+			process.Type,
+			fmt.Sprint(process.TotalInstanceCount()),
+			fmt.Sprintf("%dM", process.MemoryInMB.Value),
+			fmt.Sprintf("%dM", process.DiskInMB.Value),
+		})
+
 	}
+	display.UI.DisplayInstancesTableForApp(table)
 }
 
 func (AppSummaryDisplayer) usageSummary(processSummaries v3action.ProcessSummaries) string {
