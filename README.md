@@ -55,6 +55,8 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 brew install cloudfoundry/tap/cf-cli
 ```
 
+**Note:** `cf` tab completion requires `bash-completion` to be installed properly in order to work.
+
 **Debian** and **Ubuntu** based Linux distributions:
 
 ```sh
