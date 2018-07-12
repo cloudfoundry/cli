@@ -3,6 +3,7 @@ package ccv2
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -61,4 +62,8 @@ func (client *Client) CreateBuildpack(buildpack Buildpack) (Buildpack, Warnings,
 
 	err = client.connection.Make(request, &response)
 	return createdBuildpack, response.Warnings, err
+}
+
+func (client *Client) UploadBuildpack(buildpackGUID string, buildpack io.Reader, buildpackLength int64) (Warnings, error) {
+	return nil, nil
 }

@@ -6,14 +6,13 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
-	"code.cloudfoundry.org/cli/util/progressbar"
 )
 
 //go:generate counterfeiter . CreateBuildpackActor
 
 type CreateBuildpackActor interface {
 	CreateBuildpack(name string, position int, enabled bool) (v2action.Buildpack, v2action.Warnings, error)
-	UploadBuildpack(GUID string, path string, pb progressbar.ProgressBar) (v2action.Warnings, error)
+	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
 }
 
 type CreateBuildpackCommand struct {
@@ -25,6 +24,7 @@ type CreateBuildpackCommand struct {
 
 	UI          command.UI
 	Actor       CreateBuildpackActor
+	ProgressBar v2action.SimpleProgressBar
 	SharedActor command.SharedActor
 	Config      command.Config
 }
@@ -39,6 +39,7 @@ func (cmd *CreateBuildpackCommand) Setup(config command.Config, ui command.UI) e
 		return err
 	}
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
+	cmd.ProgressBar = v2action.NewProgressBar()
 
 	return nil
 }
@@ -70,7 +71,7 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
-	uploadWarnings, err := cmd.Actor.UploadBuildpack(buildpack.GUID, string(cmd.RequiredArgs.Path), progressbar.ProgressBar{})
+	uploadWarnings, err := cmd.Actor.UploadBuildpack(buildpack.GUID, string(cmd.RequiredArgs.Path), cmd.ProgressBar)
 	cmd.UI.DisplayWarnings(uploadWarnings)
 	if err != nil {
 		return err

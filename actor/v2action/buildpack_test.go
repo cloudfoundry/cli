@@ -36,7 +36,7 @@ var _ = FDescribe("Buildpack", func() {
 			buildpack, warnings, executeErr = actor.CreateBuildpack("some-bp-name", 42, true)
 		})
 
-		Context("when the cloud controller client is successful", func() {
+		Context("when creating the buildpack is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateBuildpackReturns(ccv2.Buildpack{GUID: "some-guid"}, ccv2.Warnings{"some-create-warning"}, nil)
 			})
@@ -66,7 +66,7 @@ var _ = FDescribe("Buildpack", func() {
 			})
 		})
 
-		Context("when a cc error occurs", func() {
+		Context("when a cc create error occurs", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-create-warning"}, errors.New("some error oh no"))
 			})
@@ -80,39 +80,44 @@ var _ = FDescribe("Buildpack", func() {
 
 	Describe("UploadBuildpack", func() {
 		var (
-			fakePb *v2actionfakes.FakeProgressBar
+			buildpackFile *os.File
+			fakePb        *v2actionfakes.FakeSimpleProgressBar
 
 			warnings   Warnings
 			executeErr error
 		)
 
+		BeforeEach(func() {
+			var err error
+			buildpackFile, err = ioutil.TempFile("", "test-buildpack")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(buildpackFile.Close()).ToNot(HaveOccurred())
+
+			err = ioutil.WriteFile(buildpackFile.Name(), []byte("123456"), 0655)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(buildpackFile.Name()))
+		})
+
 		JustBeforeEach(func() {
-			fakePb = new(v2actionfakes.FakeProgressBar)
-			warnings, executeErr = actor.UploadBuildpack("some-bp-guid", "some-path", fakePb)
+			fakePb = new(v2actionfakes.FakeSimpleProgressBar)
+			fakePb.InitializeReturns(buildpackFile, 6, nil)
+			warnings, executeErr = actor.UploadBuildpack("some-bp-guid", buildpackFile.Name(), fakePb)
 		})
 
 		It("tracks the progress of the upload", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(fakePb.InitializeCallCount()).To(Equal(1))
-			Expect(fakePb.InitializeArgsForCall(0)).To(Equal("some-path"))
+			Expect(fakePb.InitializeArgsForCall(0)).To(Equal(buildpackFile.Name()))
 			Expect(fakePb.TerminateCallCount()).To(Equal(1))
 		})
 
 		Context("when the upload is successful", func() {
-			var buildpackFile *os.File
-
 			BeforeEach(func() {
-				var err error
-				buildpackFile, err = ioutil.TempFile("", "test-buildpack")
-				Expect(err).ToNot(HaveOccurred())
-				buildpackFile.Close()
-				err = ioutil.WriteFile(buildpackFile.Name(), []byte("123456"), 0655)
-				Expect(err).ToNot(HaveOccurred())
 				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-create-warning"}, nil)
-			})
-
-			AfterEach(func() {
-				Expect(os.RemoveAll(buildpackFile.Name()))
 			})
 
 			It("uploads the buildpack and returns any warnings", func() {
@@ -120,8 +125,19 @@ var _ = FDescribe("Buildpack", func() {
 				Expect(fakeCloudControllerClient.UploadBuildpackCallCount()).To(Equal(1))
 				guid, _, size := fakeCloudControllerClient.UploadBuildpackArgsForCall(0)
 				Expect(guid).To(Equal("some-bp-guid"))
-				Expect(size).To(Equal(6))
+				Expect(size).To(Equal(int64(6)))
 				Expect(warnings).To(ConsistOf("some-create-warning"))
+			})
+		})
+
+		Context("when a cc upload error occurs", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-upload-warning"}, errors.New("some-upload-error"))
+			})
+
+			It("returns warnings and errors", func() {
+				Expect(warnings).To(ConsistOf("some-upload-warning"))
+				Expect(executeErr).To(MatchError("some-upload-error"))
 			})
 		})
 	})

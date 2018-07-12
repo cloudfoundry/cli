@@ -6,7 +6,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/util/progressbar"
 )
 
 type FakeCreateBuildpackActor struct {
@@ -27,12 +26,12 @@ type FakeCreateBuildpackActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	UploadBuildpackStub        func(GUID string, path string, pb progressbar.ProgressBar) (v2action.Warnings, error)
+	UploadBuildpackStub        func(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
 	uploadBuildpackMutex       sync.RWMutex
 	uploadBuildpackArgsForCall []struct {
-		GUID string
-		path string
-		pb   progressbar.ProgressBar
+		GUID    string
+		path    string
+		progBar v2action.SimpleProgressBar
 	}
 	uploadBuildpackReturns struct {
 		result1 v2action.Warnings
@@ -102,18 +101,18 @@ func (fake *FakeCreateBuildpackActor) CreateBuildpackReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCreateBuildpackActor) UploadBuildpack(GUID string, path string, pb progressbar.ProgressBar) (v2action.Warnings, error) {
+func (fake *FakeCreateBuildpackActor) UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error) {
 	fake.uploadBuildpackMutex.Lock()
 	ret, specificReturn := fake.uploadBuildpackReturnsOnCall[len(fake.uploadBuildpackArgsForCall)]
 	fake.uploadBuildpackArgsForCall = append(fake.uploadBuildpackArgsForCall, struct {
-		GUID string
-		path string
-		pb   progressbar.ProgressBar
-	}{GUID, path, pb})
-	fake.recordInvocation("UploadBuildpack", []interface{}{GUID, path, pb})
+		GUID    string
+		path    string
+		progBar v2action.SimpleProgressBar
+	}{GUID, path, progBar})
+	fake.recordInvocation("UploadBuildpack", []interface{}{GUID, path, progBar})
 	fake.uploadBuildpackMutex.Unlock()
 	if fake.UploadBuildpackStub != nil {
-		return fake.UploadBuildpackStub(GUID, path, pb)
+		return fake.UploadBuildpackStub(GUID, path, progBar)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -127,10 +126,10 @@ func (fake *FakeCreateBuildpackActor) UploadBuildpackCallCount() int {
 	return len(fake.uploadBuildpackArgsForCall)
 }
 
-func (fake *FakeCreateBuildpackActor) UploadBuildpackArgsForCall(i int) (string, string, progressbar.ProgressBar) {
+func (fake *FakeCreateBuildpackActor) UploadBuildpackArgsForCall(i int) (string, string, v2action.SimpleProgressBar) {
 	fake.uploadBuildpackMutex.RLock()
 	defer fake.uploadBuildpackMutex.RUnlock()
-	return fake.uploadBuildpackArgsForCall[i].GUID, fake.uploadBuildpackArgsForCall[i].path, fake.uploadBuildpackArgsForCall[i].pb
+	return fake.uploadBuildpackArgsForCall[i].GUID, fake.uploadBuildpackArgsForCall[i].path, fake.uploadBuildpackArgsForCall[i].progBar
 }
 
 func (fake *FakeCreateBuildpackActor) UploadBuildpackReturns(result1 v2action.Warnings, result2 error) {
