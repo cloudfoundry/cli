@@ -29,7 +29,7 @@ type ShareServiceCommand struct {
 	RequiredArgs    flag.ServiceInstance `positional-args:"yes"`
 	OrgName         string               `short:"o" required:"false" description:"Org of the other space (Default: targeted org)"`
 	SpaceName       string               `short:"s" required:"true" description:"Space to share the service instance into"`
-	usage           interface{}          `usage:"cf share-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG]"`
+	usage           interface{}          `usage:"CF_NAME share-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG]"`
 	relatedCommands interface{}          `related_commands:"bind-service, service, services, unshare-service"`
 
 	UI          command.UI
