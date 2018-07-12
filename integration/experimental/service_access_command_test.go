@@ -158,6 +158,20 @@ var _ = Describe("service-access command", func() {
 					serviceBroker1.SyncPlans[1].Name,
 				))
 				Eventually(session).Should(Exit(0))
+
+				By("by showing the specified broker and it's plans in alphabetical order when the -b flag is provided")
+				session = helpers.CF("service-access", "-b", serviceBroker2.Name)
+				Eventually(session).Should(Say("broker:\\s+%s", serviceBroker2.Name))
+				Eventually(session).Should(Say("%s\\s+%s\\s+all",
+					serviceBroker2.Service.Name,
+					serviceBroker2.SyncPlans[1].Name,
+				))
+				Eventually(session).Should(Say("%s\\s+%s\\s+all",
+					serviceBroker2.Service.Name,
+					serviceBroker2.SyncPlans[0].Name,
+				))
+				Consistently(session).ShouldNot(Say("broker:\\s+%s", serviceBroker1.Name))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})

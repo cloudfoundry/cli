@@ -11,7 +11,15 @@ type ServiceBrokerSummary struct {
 }
 
 func (actor Actor) GetServiceBrokerSummaries(broker string, service string, organization string) ([]ServiceBrokerSummary, Warnings, error) {
-	brokers, ccWarnings, brokersErr := actor.CloudControllerClient.GetServiceBrokers()
+	var filters []ccv2.Filter
+	if broker != "" {
+		filters = append(filters, ccv2.Filter{
+			Type:     constant.NameFilter,
+			Operator: constant.EqualOperator,
+			Values:   []string{broker},
+		})
+	}
+	brokers, ccWarnings, brokersErr := actor.CloudControllerClient.GetServiceBrokers(filters...)
 
 	warnings := Warnings(ccWarnings)
 	var brokerSummaries []ServiceBrokerSummary
@@ -70,27 +78,29 @@ func (actor Actor) fetchServiceSummary(service ccv2.Service) (ServiceSummary, Wa
 
 	var servicePlanSummaries []ServicePlanSummary
 	for _, plan := range ccServicePlans {
-		serviceVisibilities, visibilityWarnings, visErr := actor.CloudControllerClient.GetServicePlanVisibilities(ccv2.Filter{
-			Type:     constant.ServicePlanGUIDFilter,
-			Operator: constant.EqualOperator,
-			Values:   []string{plan.GUID},
-		})
-		warnings = append(warnings, visibilityWarnings...)
-
-		if visErr != nil {
-			return ServiceSummary{}, Warnings(warnings), visErr
-		}
-
 		var visibleTo []string
-		for _, serviceVisibility := range serviceVisibilities {
-			org, orgWarnings, orgsErr := actor.GetOrganization(serviceVisibility.OrganizationGUID)
-			warnings = append(warnings, orgWarnings...)
+		if !plan.Public {
+			serviceVisibilities, visibilityWarnings, visErr := actor.CloudControllerClient.GetServicePlanVisibilities(ccv2.Filter{
+				Type:     constant.ServicePlanGUIDFilter,
+				Operator: constant.EqualOperator,
+				Values:   []string{plan.GUID},
+			})
+			warnings = append(warnings, visibilityWarnings...)
 
-			if orgsErr != nil {
-				return ServiceSummary{}, Warnings(warnings), orgsErr
+			if visErr != nil {
+				return ServiceSummary{}, Warnings(warnings), visErr
 			}
 
-			visibleTo = append(visibleTo, org.Name)
+			for _, serviceVisibility := range serviceVisibilities {
+				org, orgWarnings, orgsErr := actor.GetOrganization(serviceVisibility.OrganizationGUID)
+				warnings = append(warnings, orgWarnings...)
+
+				if orgsErr != nil {
+					return ServiceSummary{}, Warnings(warnings), orgsErr
+				}
+
+				visibleTo = append(visibleTo, org.Name)
+			}
 		}
 
 		servicePlanSummaries = append(servicePlanSummaries,

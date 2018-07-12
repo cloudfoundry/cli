@@ -74,6 +74,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 						))
 
 						Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)).To(BeEmpty())
 					})
 				})
 
@@ -153,7 +154,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 											nil)
 									})
 
-									It("returns the expected Service Plans", func() {
+									It("returns the expected Service Plans without visibilities", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 										Expect(warnings).To(ConsistOf(
 											"get-brokers-warning", "service-warning-1",
@@ -191,6 +192,8 @@ var _ = Describe("Service Broker Summary Actions", func() {
 											Operator: constant.EqualOperator,
 											Values:   []string{"service-guid-2"},
 										}))
+
+										Expect(fakeCloudControllerClient.GetServicePlanVisibilitiesCallCount()).To(Equal(0))
 									})
 								})
 
@@ -373,6 +376,40 @@ var _ = Describe("Service Broker Summary Actions", func() {
 					Expect(warnings).To(ConsistOf("test-warning"))
 					Expect(executeErr).To(MatchError("explode"))
 				})
+			})
+		})
+
+		Context("when only a service broker is specified", func() {
+			BeforeEach(func() {
+				broker = "broker-1"
+				service = ""
+				organization = ""
+
+				fakeCloudControllerClient.GetServiceBrokersReturns(
+					[]ccv2.ServiceBroker{
+						{Name: "broker-1", GUID: "broker-guid-1"},
+					},
+					ccv2.Warnings{"get-brokers-warning"},
+					nil)
+			})
+
+			It("returns expected Service Brokers", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-brokers-warning"))
+				Expect(summaries).To(ConsistOf(
+					ServiceBrokerSummary{
+						ServiceBroker: ServiceBroker{
+							Name: "broker-1",
+							GUID: "broker-guid-1",
+						},
+					}))
+
+				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)).To(ConsistOf(ccv2.Filter{
+					Type:     constant.NameFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{broker},
+				}))
 			})
 		})
 	})
