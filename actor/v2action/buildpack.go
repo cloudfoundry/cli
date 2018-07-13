@@ -11,12 +11,7 @@ import (
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
-type Buildpack struct {
-	GUID string
-	// Name     string
-	// Position int
-	// Enabled bool
-}
+type Buildpack ccv2.Buildpack
 
 //go:generate counterfeiter . SimpleProgressBar
 

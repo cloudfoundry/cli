@@ -73,22 +73,10 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 
 	if err != nil {
 		if _, ok := err.(actionerror.BuildpackAlreadyExistsWithoutStackError); ok {
-			cmd.UI.DisplayNewline()
-			cmd.UI.DisplayWarning(err.Error())
-			cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfBuildpacksCommand}}' and '{{.CfDeleteBuildpackCommand}}' to delete buildpack {{.BuildpackName}} without a stack",
-				map[string]interface{}{
-					"CfBuildpacksCommand":      cmd.Config.BinaryName() + " buildpacks",
-					"CfDeleteBuildpackCommand": cmd.Config.BinaryName() + " delete-buildpack",
-					"BuildpackName":            cmd.RequiredArgs.Buildpack,
-				})
+			cmd.displayAlreadyExistingBuildpackWithoutStack(err)
 			return nil
 		} else if _, ok := err.(actionerror.BuildpackNameTakenError); ok {
-			cmd.UI.DisplayNewline()
-			cmd.UI.DisplayWarning(err.Error())
-			cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
-				map[string]interface{}{
-					"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
-				})
+			cmd.displayAlreadyExistingBuildpackWithStack(err)
 			return nil
 		}
 		return err
@@ -123,4 +111,23 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("Done uploading")
 	cmd.UI.DisplayOK()
 	return nil
+}
+func (cmd CreateBuildpackCommand) displayAlreadyExistingBuildpackWithoutStack(err error) {
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayWarning(err.Error())
+	cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfBuildpacksCommand}}' and '{{.CfDeleteBuildpackCommand}}' to delete buildpack {{.BuildpackName}} without a stack",
+		map[string]interface{}{
+			"CfBuildpacksCommand":      cmd.Config.BinaryName() + " buildpacks",
+			"CfDeleteBuildpackCommand": cmd.Config.BinaryName() + " delete-buildpack",
+			"BuildpackName":            cmd.RequiredArgs.Buildpack,
+		})
+}
+
+func (cmd CreateBuildpackCommand) displayAlreadyExistingBuildpackWithStack(err error) {
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayWarning(err.Error())
+	cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
+		map[string]interface{}{
+			"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
+		})
 }
