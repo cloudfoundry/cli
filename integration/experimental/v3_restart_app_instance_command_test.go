@@ -189,7 +189,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 
 			Context("when process type is not provided", func() {
 				It("defaults to web process", func() {
-					appOutputSession := helpers.CF("v3-app", appName)
+					appOutputSession := helpers.CF("app", appName)
 					Eventually(appOutputSession).Should(Exit(0))
 					firstAppTable := helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
@@ -201,7 +201,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 					Eventually(func() string {
 						var restartedAppTable helpers.AppTable
 						Eventually(func() string {
-							appOutputSession := helpers.CF("v3-app", appName)
+							appOutputSession := helpers.CF("app", appName)
 							Eventually(appOutputSession).Should(Exit(0))
 							restartedAppTable = helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
@@ -246,7 +246,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 							By("waiting for worker process to come up")
 							var firstAppTableConsoleProcess helpers.AppProcessTable
 							Eventually(func() string {
-								appOutputSession := helpers.CF("v3-app", appName)
+								appOutputSession := helpers.CF("app", appName)
 								Eventually(appOutputSession).Should(Exit(0))
 								firstAppTable := helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
@@ -267,7 +267,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 								var restartedAppTableConsoleProcess helpers.AppProcessTable
 
 								Eventually(func() string {
-									appOutputSession := helpers.CF("v3-app", appName)
+									appOutputSession := helpers.CF("app", appName)
 									Eventually(appOutputSession).Should(Exit(0))
 
 									restartedAppTable := helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())

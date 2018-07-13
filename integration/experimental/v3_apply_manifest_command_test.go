@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -298,6 +299,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
 						Eventually(session).Should(Exit())
 
+						time.Sleep(5 * time.Second) // Need to wait for all instances to run
 						session = helpers.CF("app", appName)
 						Eventually(session).Should(Say("instances:\\s+%s", "3/3"))
 						Eventually(session).Should(Exit())
