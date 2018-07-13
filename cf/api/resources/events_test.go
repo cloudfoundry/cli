@@ -30,6 +30,7 @@ var _ = Describe("Event resources", func() {
 				"metadata": {
 				  "instance": "50dd66d3f8874b35988d23a25d19bfa0",
 				  "index": 3,
+					"cell_id": "some-cell",
 				  "exit_status": -1,
 				  "exit_description": "unknown",
 				  "reason": "CRASHED"
@@ -45,7 +46,7 @@ var _ = Describe("Event resources", func() {
 			Expect(eventFields.GUID).To(Equal("event-1-guid"))
 			Expect(eventFields.Name).To(Equal("app.crash"))
 			Expect(eventFields.Timestamp).To(Equal(timestamp))
-			Expect(eventFields.Description).To(Equal(`index: 3, reason: CRASHED, exit_description: unknown, exit_status: -1`))
+			Expect(eventFields.Description).To(Equal(`index: 3, reason: CRASHED, cell_id: some-cell, instance: 50dd66d3f8874b35988d23a25d19bfa0, exit_description: unknown, exit_status: -1`))
 		})
 
 		It("unmarshals app update events", func() {
