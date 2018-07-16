@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -27,83 +28,179 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 	Context("when the app is new", func() {
 		Context("when the manifest is in the current directory", func() {
 			Context("with no global properties", func() {
-				It("uses the manifest for app settings", func() {
-					helpers.WithHelloWorldApp(func(dir string) {
-						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
-							"applications": []map[string]interface{}{
-								{
-									"name":       appName,
-									"path":       dir,
-									"command":    fmt.Sprintf("echo 'hi' && %s", helpers.StaticfileBuildpackStartCommand),
-									"buildpack":  "staticfile_buildpack",
-									"disk_quota": "300M",
-									"env": map[string]interface{}{
-										"key1": "val1",
-										"key2": 2,
-										"key3": true,
-										"key4": 123412341234,
-										"key5": 12345.123,
+				Context("when the API version is below 3.27.0", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+					})
+
+					It("uses the manifest for app settings", func() {
+						helpers.WithHelloWorldApp(func(dir string) {
+							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+								"applications": []map[string]interface{}{
+									{
+										"name":       appName,
+										"path":       dir,
+										"command":    fmt.Sprintf("echo 'hi' && %s", helpers.StaticfileBuildpackStartCommand),
+										"buildpack":  "staticfile_buildpack",
+										"disk_quota": "300M",
+										"env": map[string]interface{}{
+											"key1": "val1",
+											"key2": 2,
+											"key3": true,
+											"key4": 123412341234,
+											"key5": 12345.123,
+										},
+										"instances":                  2,
+										"memory":                     "70M",
+										"stack":                      "cflinuxfs2",
+										"health-check-type":          "http",
+										"health-check-http-endpoint": "/",
+										"timeout":                    180,
 									},
-									"instances":                  2,
-									"memory":                     "70M",
-									"stack":                      "cflinuxfs2",
-									"health-check-type":          "http",
-									"health-check-http-endpoint": "/",
-									"timeout":                    180,
 								},
-							},
+							})
+
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
+							Eventually(session).Should(Say("Pushing from manifest to org %s / space %s as %s\\.\\.\\.", organization, space, username))
+							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+							Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
+							Eventually(session).Should(Say("\\s+buildpack:\\s+staticfile_buildpack"))
+							Eventually(session).Should(Say("\\s+command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
+							Eventually(session).Should(Say("\\s+disk quota:\\s+300M"))
+							Eventually(session).Should(Say("\\s+health check http endpoint:\\s+/"))
+							Eventually(session).Should(Say("\\s+health check timeout:\\s+180"))
+							Eventually(session).Should(Say("\\s+health check type:\\s+http"))
+							Eventually(session).Should(Say("\\s+instances:\\s+2"))
+							Eventually(session).Should(Say("\\s+memory:\\s+70M"))
+							Eventually(session).Should(Say("\\s+stack:\\s+cflinuxfs2"))
+							Eventually(session).Should(Say("\\s+env:"))
+							Eventually(session).Should(Say("\\+\\s+key1"))
+							Eventually(session).Should(Say("\\+\\s+key2"))
+							Eventually(session).Should(Say("\\+\\s+key3"))
+							Eventually(session).Should(Say("\\+\\s+key4"))
+							Eventually(session).Should(Say("\\+\\s+key5"))
+							Eventually(session).Should(Say("\\s+routes:"))
+							Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, helpers.DefaultSharedDomain()))
+							Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
+							Eventually(session).Should(Say("Uploading files\\.\\.\\."))
+							Eventually(session).Should(Say("100.00%"))
+							Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
+							helpers.ConfirmStagingLogs(session)
+							Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
+							Eventually(session).Should(Say("requested state:\\s+started"))
+							Eventually(session).Should(Say("start command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
+							Eventually(session).Should(Exit(0))
 						})
 
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
-						Eventually(session).Should(Say("Pushing from manifest to org %s / space %s as %s\\.\\.\\.", organization, space, username))
-						Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-						Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-						Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-						Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
-						Eventually(session).Should(Say("\\s+buildpack:\\s+staticfile_buildpack"))
-						Eventually(session).Should(Say("\\s+command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
-						Eventually(session).Should(Say("\\s+disk quota:\\s+300M"))
-						Eventually(session).Should(Say("\\s+health check http endpoint:\\s+/"))
-						Eventually(session).Should(Say("\\s+health check timeout:\\s+180"))
-						Eventually(session).Should(Say("\\s+health check type:\\s+http"))
-						Eventually(session).Should(Say("\\s+instances:\\s+2"))
-						Eventually(session).Should(Say("\\s+memory:\\s+70M"))
-						Eventually(session).Should(Say("\\s+stack:\\s+cflinuxfs2"))
-						Eventually(session).Should(Say("\\s+env:"))
-						Eventually(session).Should(Say("\\+\\s+key1"))
-						Eventually(session).Should(Say("\\+\\s+key2"))
-						Eventually(session).Should(Say("\\+\\s+key3"))
-						Eventually(session).Should(Say("\\+\\s+key4"))
-						Eventually(session).Should(Say("\\+\\s+key5"))
-						Eventually(session).Should(Say("\\s+routes:"))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, helpers.DefaultSharedDomain()))
-						Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
-						Eventually(session).Should(Say("Uploading files\\.\\.\\."))
-						Eventually(session).Should(Say("100.00%"))
-						Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
-						helpers.ConfirmStagingLogs(session)
-						Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
-						Eventually(session).Should(Say("requested state:\\s+started"))
-						Eventually(session).Should(Say("start command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
+						session := helpers.CF("app", appName)
+						Eventually(session).Should(Say("name:\\s+%s", appName))
+						Eventually(session).Should(Say("instances:\\s+\\d/2"))
+						Eventually(session).Should(Say("usage:\\s+70M x 2"))
+						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+						Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+						Eventually(session).Should(Say("#0.* of 70M"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("env", appName)
+						Eventually(session).Should(Say("key1:\\s+val1"))
+						Eventually(session).Should(Say("key2:\\s+2"))
+						Eventually(session).Should(Say("key3:\\s+true"))
+						Eventually(session).Should(Say("key4:\\s+123412341234"))
+						Eventually(session).Should(Say("key5:\\s+12345.123"))
 						Eventually(session).Should(Exit(0))
 					})
 
-					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Eventually(session).Should(Say("instances:\\s+\\d/2"))
-					Eventually(session).Should(Say("usage:\\s+70M x 2"))
-					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
-					Eventually(session).Should(Say("#0.* of 70M"))
-					Eventually(session).Should(Exit(0))
+				})
 
-					session = helpers.CF("env", appName)
-					Eventually(session).Should(Say("key1:\\s+val1"))
-					Eventually(session).Should(Say("key2:\\s+2"))
-					Eventually(session).Should(Say("key3:\\s+true"))
-					Eventually(session).Should(Say("key4:\\s+123412341234"))
-					Eventually(session).Should(Say("key5:\\s+12345.123"))
-					Eventually(session).Should(Exit(0))
+				Context("when the API version is above 3.27.0", func() {
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+					})
+
+					It("uses the manifest for app settings", func() {
+						helpers.WithHelloWorldApp(func(dir string) {
+							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+								"applications": []map[string]interface{}{
+									{
+										"name":       appName,
+										"path":       dir,
+										"command":    fmt.Sprintf("echo 'hi' && %s", helpers.StaticfileBuildpackStartCommand),
+										"buildpack":  "staticfile_buildpack",
+										"disk_quota": "300M",
+										"env": map[string]interface{}{
+											"key1": "val1",
+											"key2": 2,
+											"key3": true,
+											"key4": 123412341234,
+											"key5": 12345.123,
+										},
+										"instances":                  2,
+										"memory":                     "70M",
+										"stack":                      "cflinuxfs2",
+										"health-check-type":          "http",
+										"health-check-http-endpoint": "/",
+										"timeout":                    180,
+									},
+								},
+							})
+
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
+							Eventually(session).Should(Say("Pushing from manifest to org %s / space %s as %s\\.\\.\\.", organization, space, username))
+							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+							Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
+							Eventually(session).Should(Say("\\s+buildpack:\\s+staticfile_buildpack"))
+							Eventually(session).Should(Say("\\s+command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
+							Eventually(session).Should(Say("\\s+disk quota:\\s+300M"))
+							Eventually(session).Should(Say("\\s+health check http endpoint:\\s+/"))
+							Eventually(session).Should(Say("\\s+health check timeout:\\s+180"))
+							Eventually(session).Should(Say("\\s+health check type:\\s+http"))
+							Eventually(session).Should(Say("\\s+instances:\\s+2"))
+							Eventually(session).Should(Say("\\s+memory:\\s+70M"))
+							Eventually(session).Should(Say("\\s+stack:\\s+cflinuxfs2"))
+							Eventually(session).Should(Say("\\s+env:"))
+							Eventually(session).Should(Say("\\+\\s+key1"))
+							Eventually(session).Should(Say("\\+\\s+key2"))
+							Eventually(session).Should(Say("\\+\\s+key3"))
+							Eventually(session).Should(Say("\\+\\s+key4"))
+							Eventually(session).Should(Say("\\+\\s+key5"))
+							Eventually(session).Should(Say("\\s+routes:"))
+							Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, helpers.DefaultSharedDomain()))
+							Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
+							Eventually(session).Should(Say("Uploading files\\.\\.\\."))
+							Eventually(session).Should(Say("100.00%"))
+							Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
+							helpers.ConfirmStagingLogs(session)
+							Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
+							Eventually(session).Should(Say("requested state:\\s+started"))
+							Eventually(session).Should(Say("start command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
+							Eventually(session).Should(Exit(0))
+						})
+
+						session := helpers.CF("app", appName)
+						Eventually(session).Should(Say("name:\\s+%s", appName))
+						Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
+						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+						Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
+						Eventually(session).Should(Say("type:\\s+web"))
+						Eventually(session).Should(Say("instances:\\s+2/2"))
+						Eventually(session).Should(Say("memory usage:\\s+70M"))
+						Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
+						Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("env", appName)
+						Eventually(session).Should(Say("key1:\\s+val1"))
+						Eventually(session).Should(Say("key2:\\s+2"))
+						Eventually(session).Should(Say("key3:\\s+true"))
+						Eventually(session).Should(Say("key4:\\s+123412341234"))
+						Eventually(session).Should(Say("key5:\\s+12345.123"))
+						Eventually(session).Should(Exit(0))
+					})
+
 				})
 
 				Context("when health-check-type is http and no endpoint is provided", func() {

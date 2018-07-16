@@ -370,6 +370,7 @@ applications:
 							Eventually(session).Should(Exit(0))
 						})
 					})
+
 					Context("when the API version is above 3.27.0", func() {
 						BeforeEach(func() {
 							helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
