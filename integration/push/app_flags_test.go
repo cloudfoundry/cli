@@ -3,6 +3,7 @@ package push
 import (
 	"fmt"
 	"regexp"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -119,6 +120,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 			})
 
 			// output is different from when API version is below 3.27.0
+			time.Sleep(5 * time.Second)
 			session := helpers.CF("app", appName)
 			Eventually(session).Should(Say("name:\\s+%s", appName))
 			Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
@@ -234,6 +236,8 @@ var _ = Describe("push with various flags and no manifest", func() {
 			})
 
 			// output is different from when API version is below 3.27.0
+
+			time.Sleep(5 * time.Second)
 			session := helpers.CF("app", appName)
 			Eventually(session).Should(Say("name:\\s+%s", appName))
 			Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
