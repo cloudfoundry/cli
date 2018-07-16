@@ -1,8 +1,6 @@
 package global
 
 import (
-	"os"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -102,17 +100,11 @@ var _ = Describe("update-buildpack command", func() {
 	})
 
 	Context("when a URL is provided as the buildpack", func() {
-		var dir string
-
 		BeforeEach(func() {
 			helpers.BuildpackWithStack(func(buildpackPath string) {
 				session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 				Eventually(session).Should(Exit(0))
-			}, stacks[1])
-		})
-
-		AfterEach(func() {
-			Expect(os.RemoveAll(dir)).To(Succeed())
+			}, "")
 		})
 
 		It("outputs an error message to the user, provides help text, and exits 1", func() {
