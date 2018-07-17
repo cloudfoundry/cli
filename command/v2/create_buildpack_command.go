@@ -68,7 +68,7 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
-	buildpack, warnings, err := cmd.Actor.CreateBuildpack(cmd.RequiredArgs.Buildpack, cmd.RequiredArgs.Position.Value, !cmd.Disable)
+	buildpack, warnings, err := cmd.Actor.CreateBuildpack(cmd.RequiredArgs.Buildpack, cmd.RequiredArgs.Position, !cmd.Disable)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {

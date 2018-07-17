@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
@@ -214,7 +213,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 
 				Context("when uploading the buildpack succeeds", func() {
 					BeforeEach(func() {
-						cmd.RequiredArgs.Position = flag.PositiveInteger{Value: 3}
+						cmd.RequiredArgs.Position = 3
 						cmd.RequiredArgs.Path = "some/path"
 					})
 
