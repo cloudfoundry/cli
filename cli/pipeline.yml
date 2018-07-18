@@ -386,6 +386,8 @@ jobs:
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
     - task: integration
       file: cli-ci/ci/cli/tasks/integration-windows.yml
+      params:
+        <<: *integration_params
       input_mapping:
         cf-credentials: cleanup-integration-outputs
       on_failure:
@@ -398,8 +400,6 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-      params:
-        <<: *integration_params
   ensure:
     put: gcp-bosh-pool
     params:
@@ -426,6 +426,8 @@ jobs:
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
     - task: integration-windows
       file: cli-ci/ci/cli/tasks/integration-experimental-windows.yml
+      params:
+        <<: *integration_params
       input_mapping:
         cf-credentials: cleanup-integration-outputs
       on_failure:
@@ -438,8 +440,6 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-      params:
-        <<: *integration_params
     - task: integration-linux
       file: cli-ci/ci/cli/tasks/integration-experimental-linux.yml
       on_failure:
