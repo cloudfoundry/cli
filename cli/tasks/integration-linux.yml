@@ -22,6 +22,7 @@ params:
   CF_INT_DOCKER_USERNAME:
   CF_INT_DOCKER_PASSWORD:
   CF_INT_IGNORE_API_VERSION_CHECK:
+  NODES: 16
 
 run:
   path: bash
@@ -53,5 +54,5 @@ run:
 
     go get -u github.com/onsi/ginkgo/ginkgo
 
-    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/isolated integration/plugin integration/push
+    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/isolated integration/plugin integration/push
     ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/global

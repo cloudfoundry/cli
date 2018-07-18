@@ -482,6 +482,10 @@ jobs:
         ARGS: unbind-first
     - task: integration
       file: cli-ci/ci/cli/tasks/integration-linux.yml
+      params:
+        <<: *integration_params
+        CF_INT_IGNORE_API_VERSION_CHECK: false
+        NODES: 12
       on_failure:
         put: slack-alert
         params:
@@ -494,9 +498,6 @@ jobs:
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
         params:
           ARGS: unbind-first
-      params:
-        <<: *integration_params
-        CF_INT_IGNORE_API_VERSION_CHECK: false
   ensure:
     put: legacy-gcp-bosh-pool
     params:
