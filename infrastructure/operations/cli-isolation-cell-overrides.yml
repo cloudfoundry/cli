@@ -10,5 +10,5 @@
   value:
     use_v2_api: true
     ca_cert: "((loggregator_ca.certificate))"
-    cert: "((loggregator_tls_metron.certificate))"
-    key: "((loggregator_tls_metron.private_key))"
+    cert: "((loggregator_tls_agent.certificate))"
+    key: "((loggregator_tls_agent.private_key))"
