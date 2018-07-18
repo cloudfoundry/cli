@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
+	"code.cloudfoundry.org/cli/util/download"
 	"code.cloudfoundry.org/cli/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
@@ -189,6 +190,10 @@ func ConvertToTranslatableError(err error) error {
 		return UnauthorizedToPerformActionError{}
 	case uaa.InvalidAuthTokenError:
 		return InvalidRefreshTokenError{}
+
+	// Other Errors
+	case download.RawHTTPStatusError:
+		return HTTPStatusError{Status: e.Status}
 	}
 
 	return err

@@ -59,6 +59,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("HostAndPathNotAllowedWithTCPDomainError", HostAndPathNotAllowedWithTCPDomainError{}),
 		Entry("HostnameWithTCPDomainError", HostnameWithTCPDomainError{}),
 		Entry("HTTPHealthCheckInvalidError", HTTPHealthCheckInvalidError{}),
+		Entry("HTTPStatusError", HTTPStatusError{Status: "some status"}),
 		Entry("InvalidChecksumError", InvalidChecksumError{}),
 		Entry("InvalidRouteError", InvalidRouteError{}),
 		Entry("InvalidSSLCertError", InvalidSSLCertError{}),

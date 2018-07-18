@@ -1,6 +1,9 @@
 package global
 
 import (
+	"bytes"
+	"log"
+	"net/http"
 	"os"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -10,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("create buildpack command", func() {
@@ -263,18 +267,60 @@ var _ = Describe("create buildpack command", func() {
 		})
 
 		Context("when uploading from a URL", func() {
-			var (
-			// buildpackName string
-			)
-			BeforeEach(func() {
-				// buildpackName = helpers.NewBuildpack()
-			})
-			Context("when specifying a valid path", func() {
+			var buildpackURL string
+
+			Context("when specifying a valid URL", func() {
+				BeforeEach(func() {
+					buildpackURL = "https://github.com/cloudfoundry/binary-buildpack/releases/download/v1.0.21/binary-buildpack-v1.0.21.zip"
+				})
+
 				It("successfully uploads a buildpack", func() {
+					username, _ := helpers.GetCredentials()
+					session := helpers.CF("create-buildpack", buildpackName, buildpackURL, "1")
+					Eventually(session).Should(Say("Creating buildpack %s as %s...", buildpackName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("Uploading buildpack %s as %s...", buildpackName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
-			Context("when specifying an invalid path", func() {
+
+			Context("when a 4xx or 5xx HTTP response status is encountered", func() {
+				var server *Server
+
+				BeforeEach(func() {
+					server = NewServer()
+					// Suppresses ginkgo server logs
+					server.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/"),
+							RespondWith(http.StatusNotFound, nil),
+						),
+					)
+				})
+
+				AfterEach(func() {
+					server.Close()
+				})
+
+				It("displays an appropriate error", func() {
+					session := helpers.CF("create-buildpack", buildpackName, server.URL(), "10")
+					Eventually(session.Err).Should(Say("Download attempt failed; server returned 404 Not Found"))
+					Eventually(session.Err).Should(Say("Unable to install; buildpack is not available from the given URL\\."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			Context("when specifying an invalid URL", func() {
+				BeforeEach(func() {
+					buildpackURL = "http://not-a-real-url"
+				})
+
 				It("returns the appropriate error", func() {
+					session := helpers.CF("create-buildpack", buildpackName, buildpackURL, "1")
+					Eventually(session.Err).Should(Say("Get %s: dial tcp: lookup", buildpackURL))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

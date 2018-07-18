@@ -3,11 +3,14 @@ package v2action
 import (
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/util/download"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -18,6 +21,12 @@ type Buildpack ccv2.Buildpack
 type SimpleProgressBar interface {
 	Initialize(path string) (io.Reader, int64, error)
 	Terminate()
+}
+
+//go:generate counterfeiter . Downloader
+
+type Downloader interface {
+	Download(string) (string, error)
 }
 
 type ProgressBar struct {
@@ -72,12 +81,19 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 }
 
 func (actor *Actor) UploadBuildpack(GUID string, path string, progBar SimpleProgressBar) (Warnings, error) {
-	progressBarReader, size, err := progBar.Initialize(path)
+	downloader := download.NewDownloader(time.Second * 30)
+
+	pathToBuildpackBits, err := actor.PrepareBuildpackBits(path, downloader)
 	if err != nil {
 		return Warnings{}, err
 	}
 
-	warnings, err := actor.CloudControllerClient.UploadBuildpack(GUID, path, progressBarReader, size)
+	progressBarReader, size, err := progBar.Initialize(pathToBuildpackBits)
+	if err != nil {
+		return Warnings{}, err
+	}
+
+	warnings, err := actor.CloudControllerClient.UploadBuildpack(GUID, pathToBuildpackBits, progressBarReader, size)
 	if err != nil {
 		if _, ok := err.(ccerror.BuildpackAlreadyExistsForStackError); ok {
 			return Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: err.Error()}
@@ -86,5 +102,32 @@ func (actor *Actor) UploadBuildpack(GUID string, path string, progBar SimpleProg
 	}
 
 	progBar.Terminate()
+
+	if actor.isURL(path) {
+		parentDir, _ := filepath.Split(pathToBuildpackBits)
+		os.RemoveAll(parentDir)
+	}
 	return Warnings(warnings), nil
+}
+
+func (actor *Actor) PrepareBuildpackBits(path string, downloader Downloader) (string, error) {
+
+	if actor.isURL(path) {
+		tempPath, err := downloader.Download(path)
+		if err != nil {
+			parentDir, _ := filepath.Split(path)
+			os.RemoveAll(parentDir)
+
+			return "", err
+		}
+		return tempPath, nil
+	}
+	return path, nil
+}
+
+func (actor *Actor) isURL(path string) bool {
+	if strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://") {
+		return true
+	}
+	return false
 }

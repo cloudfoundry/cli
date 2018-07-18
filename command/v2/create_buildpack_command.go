@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/util/download"
 )
 
 //go:generate counterfeiter . CreateBuildpackActor
@@ -15,6 +16,12 @@ import (
 type CreateBuildpackActor interface {
 	CreateBuildpack(name string, position int, enabled bool) (v2action.Buildpack, v2action.Warnings, error)
 	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
+}
+
+//go:generate counterfeiter . Downloader
+
+type Downloader interface {
+	Download(string) (string, error)
 }
 
 type CreateBuildpackCommand struct {
@@ -102,6 +109,8 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 					"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
 				})
 			return nil
+		} else if httpErr, ok := err.(download.RawHTTPStatusError); ok {
+			return translatableerror.HTTPStatusError{Status: httpErr.Status}
 		}
 		return err
 	}
