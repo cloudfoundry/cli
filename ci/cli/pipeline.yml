@@ -611,7 +611,7 @@ jobs:
         CF_PUSH_TIMEOUT: 210
         DEFAULT_TIMEOUT: 60
         LONG_CURL_TIMEOUT: 210
-    - task: linux
+    - task: run-tests
       file: cli-ci/ci/cli/tasks/cats-linux.yml
       params:
         BACKEND: diego
