@@ -177,6 +177,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	}
 	appParams.Hosts = removeDuplicatedValue(hostsArr)
 
+	appParams.Buildpacks = sliceOrNil(yamlMap, "buildpacks", &errs)
 	appParams.Name = stringVal(yamlMap, "name", &errs)
 	appParams.Path = stringVal(yamlMap, "path", &errs)
 	appParams.StackName = stringVal(yamlMap, "stack", &errs)
@@ -211,6 +212,13 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 			path = filepath.Join(basePath, path)
 		}
 		appParams.Path = &path
+	}
+
+	if len(appParams.Buildpacks) > 0 {
+		errs = append(errs, fmt.Errorf(T("The following manifest fields cannot be used with legacy push: {{.fields}}",
+			map[string]interface{}{
+				"fields": "buildpacks",
+			})))
 	}
 
 	if len(errs) > 0 {
