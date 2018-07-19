@@ -53,8 +53,11 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 		}
 
 		var instanceWarnings v2action.Warnings
-		appStats, instanceWarnings, _ = display.V2AppActor.GetApplicationInstancesWithStatsByApplication(summary.Application.GUID)
+		appStats, instanceWarnings, err = display.V2AppActor.GetApplicationInstancesWithStatsByApplication(summary.Application.GUID)
 		display.UI.DisplayWarnings(instanceWarnings)
+		if _, ok := err.(ccerror.ResourceNotFoundError); err != nil && !ok {
+			return err
+		}
 	}
 
 	display.displayAppTable(summary, routes, appStats)

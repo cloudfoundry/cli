@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v3/shared"
@@ -164,6 +165,38 @@ var _ = Describe("app summary displayer", func() {
 
 						Expect(testUI.Err).To(Say("get-app-summary-warning"))
 						Expect(testUI.Err).To(Say("some-instance-stats-warning"))
+					})
+				})
+
+				Context("when getting the isloation segment information errors", func() {
+					Context("when a random error is returned", func() {
+						var expectedErr error
+
+						BeforeEach(func() {
+							expectedErr = errors.New("knaslfnasldfnasdfnasdkj")
+							fakeV2Actor.GetApplicationInstancesWithStatsByApplicationReturns(nil, v2action.Warnings{"some-instance-stats-warning"}, expectedErr)
+						})
+
+						It("displays the warnings and returns an error", func() {
+							Expect(executeErr).To(MatchError(expectedErr))
+
+							Expect(testUI.Err).To(Say("get-app-summary-warning"))
+							Expect(testUI.Err).To(Say("some-instance-stats-warning"))
+						})
+					})
+
+					Context("when a random error is returned", func() {
+						BeforeEach(func() {
+							fakeV2Actor.GetApplicationInstancesWithStatsByApplicationReturns(nil, v2action.Warnings{"some-instance-stats-warning"}, ccerror.ResourceNotFoundError{})
+						})
+
+						It("displays the warnings and continues", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).ToNot(Say("isolation segment:"))
+
+							Expect(testUI.Err).To(Say("get-app-summary-warning"))
+							Expect(testUI.Err).To(Say("some-instance-stats-warning"))
+						})
 					})
 				})
 
