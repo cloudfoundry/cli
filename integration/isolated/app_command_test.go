@@ -428,6 +428,21 @@ applications:
 					})
 				})
 
+				Context("when isolation segment is not set for the application", func() {
+					BeforeEach(func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
+						})
+					})
+
+					It("displays the app isolation segment information", func() {
+						session := helpers.CF("app", appName)
+
+						Consistently(session).ShouldNot(Say("isolation segment:"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
 				Context("when the app is a Docker app", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
