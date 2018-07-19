@@ -32,7 +32,7 @@ import (
 
 var _ = Describe("push Command", func() {
 	var (
-		cmd              V2PushCommand
+		cmd              PushCommand
 		testUI           *ui.UI
 		fakeConfig       *commandfakes.FakeConfig
 		fakeSharedActor  *commandfakes.FakeSharedActor
@@ -56,7 +56,7 @@ var _ = Describe("push Command", func() {
 		fakeRestartActor = new(v2fakes.FakeRestartActor)
 		fakeProgressBar = new(v2fakes.FakeProgressBar)
 
-		cmd = V2PushCommand{
+		cmd = PushCommand{
 			UI:           testUI,
 			Config:       fakeConfig,
 			SharedActor:  fakeSharedActor,
