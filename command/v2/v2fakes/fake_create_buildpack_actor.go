@@ -41,6 +41,20 @@ type FakeCreateBuildpackActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
+	PrepareBuildpackBitsStub        func(path string, downloader v2action.Downloader) (string, error)
+	prepareBuildpackBitsMutex       sync.RWMutex
+	prepareBuildpackBitsArgsForCall []struct {
+		path       string
+		downloader v2action.Downloader
+	}
+	prepareBuildpackBitsReturns struct {
+		result1 string
+		result2 error
+	}
+	prepareBuildpackBitsReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -154,6 +168,58 @@ func (fake *FakeCreateBuildpackActor) UploadBuildpackReturnsOnCall(i int, result
 	}{result1, result2}
 }
 
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBits(path string, downloader v2action.Downloader) (string, error) {
+	fake.prepareBuildpackBitsMutex.Lock()
+	ret, specificReturn := fake.prepareBuildpackBitsReturnsOnCall[len(fake.prepareBuildpackBitsArgsForCall)]
+	fake.prepareBuildpackBitsArgsForCall = append(fake.prepareBuildpackBitsArgsForCall, struct {
+		path       string
+		downloader v2action.Downloader
+	}{path, downloader})
+	fake.recordInvocation("PrepareBuildpackBits", []interface{}{path, downloader})
+	fake.prepareBuildpackBitsMutex.Unlock()
+	if fake.PrepareBuildpackBitsStub != nil {
+		return fake.PrepareBuildpackBitsStub(path, downloader)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.prepareBuildpackBitsReturns.result1, fake.prepareBuildpackBitsReturns.result2
+}
+
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsCallCount() int {
+	fake.prepareBuildpackBitsMutex.RLock()
+	defer fake.prepareBuildpackBitsMutex.RUnlock()
+	return len(fake.prepareBuildpackBitsArgsForCall)
+}
+
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsArgsForCall(i int) (string, v2action.Downloader) {
+	fake.prepareBuildpackBitsMutex.RLock()
+	defer fake.prepareBuildpackBitsMutex.RUnlock()
+	return fake.prepareBuildpackBitsArgsForCall[i].path, fake.prepareBuildpackBitsArgsForCall[i].downloader
+}
+
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsReturns(result1 string, result2 error) {
+	fake.PrepareBuildpackBitsStub = nil
+	fake.prepareBuildpackBitsReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsReturnsOnCall(i int, result1 string, result2 error) {
+	fake.PrepareBuildpackBitsStub = nil
+	if fake.prepareBuildpackBitsReturnsOnCall == nil {
+		fake.prepareBuildpackBitsReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.prepareBuildpackBitsReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCreateBuildpackActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -161,6 +227,8 @@ func (fake *FakeCreateBuildpackActor) Invocations() map[string][][]interface{} {
 	defer fake.createBuildpackMutex.RUnlock()
 	fake.uploadBuildpackMutex.RLock()
 	defer fake.uploadBuildpackMutex.RUnlock()
+	fake.prepareBuildpackBitsMutex.RLock()
+	defer fake.prepareBuildpackBitsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

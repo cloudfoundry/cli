@@ -1,6 +1,10 @@
 package v2
 
 import (
+	"os"
+	"path/filepath"
+	"time"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -8,20 +12,22 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/util"
 	"code.cloudfoundry.org/cli/util/download"
 )
+
+//go:generate counterfeiter . Downloader
+
+type Downloader interface {
+	Download(string) (string, error)
+}
 
 //go:generate counterfeiter . CreateBuildpackActor
 
 type CreateBuildpackActor interface {
 	CreateBuildpack(name string, position int, enabled bool) (v2action.Buildpack, v2action.Warnings, error)
 	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
-}
-
-//go:generate counterfeiter . Downloader
-
-type Downloader interface {
-	Download(string) (string, error)
+	PrepareBuildpackBits(path string, downloader v2action.Downloader) (string, error)
 }
 
 type CreateBuildpackCommand struct {
@@ -92,12 +98,23 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 
+	downloader := download.NewDownloader(time.Second * 30)
+	pathToBuildpackBits, err := cmd.Actor.PrepareBuildpackBits(string(cmd.RequiredArgs.Path), downloader)
+	if err != nil {
+		return err
+	}
+
+	if util.IsHTTPScheme(string(cmd.RequiredArgs.Path)) {
+		parentTempDir := filepath.Dir(pathToBuildpackBits)
+		defer os.RemoveAll(parentTempDir)
+	}
+
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{
 		"Buildpack": cmd.RequiredArgs.Buildpack,
 		"Username":  user.Name,
 	})
 
-	uploadWarnings, err := cmd.Actor.UploadBuildpack(buildpack.GUID, string(cmd.RequiredArgs.Path), cmd.ProgressBar)
+	uploadWarnings, err := cmd.Actor.UploadBuildpack(buildpack.GUID, pathToBuildpackBits, cmd.ProgressBar)
 	cmd.UI.DisplayWarnings(uploadWarnings)
 	if err != nil {
 		cmd.UI.DisplayNewline()
@@ -116,9 +133,9 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayNewline()
-
 	cmd.UI.DisplayText("Done uploading")
 	cmd.UI.DisplayOK()
+
 	return nil
 }
 func (cmd CreateBuildpackCommand) displayAlreadyExistingBuildpackWithoutStack(err error) {

@@ -12,7 +12,6 @@ import (
 
 type Downloader struct {
 	HTTPClient HTTPClient
-	// ProgressBar ProgressBar
 }
 
 func NewDownloader(dialTimeout time.Duration) *Downloader {
@@ -25,7 +24,6 @@ func NewDownloader(dialTimeout time.Duration) *Downloader {
 	}
 
 	return &Downloader{
-		// ProgressBar: pb.New(0),
 		HTTPClient: &http.Client{
 			Transport: tr,
 		},
@@ -42,16 +40,15 @@ func (downloader Downloader) Download(url string) (string, error) {
 
 	resp, err := downloader.HTTPClient.Get(url)
 	if err != nil {
-		return "", err
+		return bpFileName, err
 	}
 
 	if resp.StatusCode >= 400 {
 		rawBytes, readErr := ioutil.ReadAll(resp.Body)
 		if readErr != nil {
-			return "", readErr
+			return bpFileName, readErr
 		}
-
-		return "", RawHTTPStatusError{
+		return bpFileName, RawHTTPStatusError{
 			Status:      resp.Status,
 			RawResponse: rawBytes,
 		}
@@ -59,13 +56,13 @@ func (downloader Downloader) Download(url string) (string, error) {
 
 	file, err := os.Create(bpFileName)
 	if err != nil {
-		return "", err
+		return bpFileName, err
 	}
 	defer file.Close()
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
-		return "", err
+		return bpFileName, err
 	}
 
 	return bpFileName, nil

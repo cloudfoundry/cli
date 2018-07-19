@@ -43,6 +43,7 @@ var _ = Describe("Buildpack", func() {
 			})
 
 			It("returns the buildpack and all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeCloudControllerClient.CreateBuildpackCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.CreateBuildpackArgsForCall(0)).To(Equal(ccv2.Buildpack{
 					Name:     "some-bp-name",
@@ -52,7 +53,6 @@ var _ = Describe("Buildpack", func() {
 
 				Expect(buildpack).To(Equal(Buildpack{GUID: "some-guid"}))
 				Expect(warnings).To(ConsistOf("some-create-warning"))
-				Expect(executeErr).ToNot(HaveOccurred())
 			})
 		})
 
@@ -118,24 +118,7 @@ var _ = Describe("Buildpack", func() {
 			Expect(fakePb.TerminateCallCount()).To(Equal(1))
 		})
 
-		Context("when the upload is successful", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-create-warning"}, nil)
-			})
-
-			It("uploads the buildpack and returns any warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeCloudControllerClient.UploadBuildpackCallCount()).To(Equal(1))
-				guid, path, pbReader, size := fakeCloudControllerClient.UploadBuildpackArgsForCall(0)
-				Expect(guid).To(Equal("some-bp-guid"))
-				Expect(size).To(Equal(int64(0)))
-				Expect(path).To(Equal(bpFilePath))
-				Expect(pbReader).To(Equal(bpFile))
-				Expect(warnings).To(ConsistOf("some-create-warning"))
-			})
-		})
-
-		Context("when a cc upload error occurs", func() {
+		Context("when the upload errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-upload-warning"}, errors.New("some-upload-error"))
 			})
@@ -154,6 +137,23 @@ var _ = Describe("Buildpack", func() {
 			It("returns warnings and a BuildpackAlreadyExistsForStackError", func() {
 				Expect(warnings).To(ConsistOf("some-upload-warning"))
 				Expect(executeErr).To(MatchError(actionerror.BuildpackAlreadyExistsForStackError{Message: "buildpack stack error"}))
+			})
+		})
+
+		Context("when the upload is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-create-warning"}, nil)
+			})
+
+			It("uploads the buildpack and returns any warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.UploadBuildpackCallCount()).To(Equal(1))
+				guid, path, pbReader, size := fakeCloudControllerClient.UploadBuildpackArgsForCall(0)
+				Expect(guid).To(Equal("some-bp-guid"))
+				Expect(size).To(Equal(int64(0)))
+				Expect(path).To(Equal(bpFilePath))
+				Expect(pbReader).To(Equal(bpFile))
+				Expect(warnings).To(ConsistOf("some-create-warning"))
 			})
 		})
 	})
@@ -211,9 +211,9 @@ var _ = Describe("Buildpack", func() {
 			})
 
 			It("returns the local filepath", func() {
-				Expect(outPath).To(Equal("/foo/buildpacks/a.zip"))
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeDownloader.DownloadCallCount()).To(Equal(0))
+				Expect(outPath).To(Equal("/foo/buildpacks/a.zip"))
 			})
 		})
 	})

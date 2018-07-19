@@ -4,29 +4,28 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/util/download"
+	"code.cloudfoundry.org/cli/util"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
 type Buildpack ccv2.Buildpack
+
+//go:generate counterfeiter . Downloader
+
+type Downloader interface {
+	Download(string) (string, error)
+}
 
 //go:generate counterfeiter . SimpleProgressBar
 
 type SimpleProgressBar interface {
 	Initialize(path string) (io.Reader, int64, error)
 	Terminate()
-}
-
-//go:generate counterfeiter . Downloader
-
-type Downloader interface {
-	Download(string) (string, error)
 }
 
 type ProgressBar struct {
@@ -80,14 +79,7 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 	return Buildpack{GUID: ccBuildpack.GUID}, Warnings(warnings), err
 }
 
-func (actor *Actor) UploadBuildpack(GUID string, path string, progBar SimpleProgressBar) (Warnings, error) {
-	downloader := download.NewDownloader(time.Second * 30)
-
-	pathToBuildpackBits, err := actor.PrepareBuildpackBits(path, downloader)
-	if err != nil {
-		return Warnings{}, err
-	}
-
+func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, progBar SimpleProgressBar) (Warnings, error) {
 	progressBarReader, size, err := progBar.Initialize(pathToBuildpackBits)
 	if err != nil {
 		return Warnings{}, err
@@ -102,20 +94,14 @@ func (actor *Actor) UploadBuildpack(GUID string, path string, progBar SimpleProg
 	}
 
 	progBar.Terminate()
-
-	if actor.isURL(path) {
-		parentDir, _ := filepath.Split(pathToBuildpackBits)
-		os.RemoveAll(parentDir)
-	}
 	return Warnings(warnings), nil
 }
 
 func (actor *Actor) PrepareBuildpackBits(path string, downloader Downloader) (string, error) {
-
-	if actor.isURL(path) {
+	if util.IsHTTPScheme(path) {
 		tempPath, err := downloader.Download(path)
 		if err != nil {
-			parentDir, _ := filepath.Split(path)
+			parentDir, _ := filepath.Split(tempPath)
 			os.RemoveAll(parentDir)
 
 			return "", err
@@ -123,11 +109,4 @@ func (actor *Actor) PrepareBuildpackBits(path string, downloader Downloader) (st
 		return tempPath, nil
 	}
 	return path, nil
-}
-
-func (actor *Actor) isURL(path string) bool {
-	if strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://") {
-		return true
-	}
-	return false
 }
