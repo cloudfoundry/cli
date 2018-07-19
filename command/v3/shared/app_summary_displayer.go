@@ -88,6 +88,13 @@ func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationS
 		isoRow = append(isoRow, display.UI.TranslateText("isolation segment:"), appStats[0].IsolationSegment)
 	}
 
+	var lifecycleInfo []string
+	if summary.LifecycleType == constant.AppLifecycleTypeDocker {
+		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
+	} else {
+		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)}
+	}
+
 	keyValueTable := [][]string{
 		{display.UI.TranslateText("name:"), summary.Application.Name},
 		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
@@ -95,26 +102,10 @@ func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationS
 		{display.UI.TranslateText("routes:"), routes.Summary()},
 		{display.UI.TranslateText("last uploaded:"), display.UI.UserFriendlyDate(GetCreatedTime(summary))},
 		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
+		lifecycleInfo,
 	}
 
-	var lifecycleInfo []string
-
-	if summary.LifecycleType == constant.AppLifecycleTypeDocker {
-		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
-	} else {
-		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)}
-	}
-
-	keyValueTable = append(keyValueTable, lifecycleInfo)
-
-	crashedProcesses := []string{}
-	for i := range summary.ProcessSummaries {
-		if display.processInstancesAreAllCrashed(&summary.ProcessSummaries[i]) {
-			crashedProcesses = append(crashedProcesses, summary.ProcessSummaries[i].Type)
-		}
-	}
-
-	display.UI.DisplayKeyValueTableForV3App(keyValueTable, crashedProcesses)
+	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
 
 	display.displayProcessTable(summary)
 }
