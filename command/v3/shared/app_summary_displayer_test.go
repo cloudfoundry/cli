@@ -63,7 +63,8 @@ var _ = Describe("app summary displayer", func() {
 				BeforeEach(func() {
 					appSummary := v3action.ApplicationSummary{
 						Application: v3action.Application{
-							GUID: "some-app-guid",
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStarted,
 						},
 						ProcessSummaries: v3action.ProcessSummaries{
 							{
@@ -168,7 +169,7 @@ var _ = Describe("app summary displayer", func() {
 					})
 				})
 
-				Context("when getting the isloation segment information errors", func() {
+				Context("when getting the isolation segment information errors", func() {
 					Context("when a random error is returned", func() {
 						var expectedErr error
 
@@ -247,6 +248,31 @@ var _ = Describe("app summary displayer", func() {
 						Application: v3action.Application{
 							GUID: "some-app-guid",
 						},
+					}
+
+					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+						appSummary,
+						v3action.Warnings{"get-app-summary-warning"},
+						nil)
+					fakeV2Actor.GetApplicationInstancesWithStatsByApplicationReturns(nil, v2action.Warnings{"some-instance-stats-warning"}, nil)
+				})
+
+				It("should not output isolation segment header", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Out).ToNot(Say("isolation segment:"))
+
+					Expect(fakeV2Actor.GetApplicationInstancesWithStatsByApplicationCallCount()).To(Equal(0))
+				})
+			})
+
+			Context("when the app is stopped", func() {
+				BeforeEach(func() {
+					appSummary := v3action.ApplicationSummary{
+						Application: v3action.Application{
+							GUID:  "some-app-guid",
+							State: constant.ApplicationStopped,
+						},
+						ProcessSummaries: v3action.ProcessSummaries{{}},
 					}
 
 					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(

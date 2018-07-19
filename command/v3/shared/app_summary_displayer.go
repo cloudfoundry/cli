@@ -52,11 +52,13 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 			return err
 		}
 
-		var instanceWarnings v2action.Warnings
-		appStats, instanceWarnings, err = display.V2AppActor.GetApplicationInstancesWithStatsByApplication(summary.Application.GUID)
-		display.UI.DisplayWarnings(instanceWarnings)
-		if _, ok := err.(ccerror.ResourceNotFoundError); err != nil && !ok {
-			return err
+		if summary.State == constant.ApplicationStarted {
+			var instanceWarnings v2action.Warnings
+			appStats, instanceWarnings, err = display.V2AppActor.GetApplicationInstancesWithStatsByApplication(summary.Application.GUID)
+			display.UI.DisplayWarnings(instanceWarnings)
+			if _, ok := err.(ccerror.ResourceNotFoundError); err != nil && !ok {
+				return err
+			}
 		}
 	}
 
