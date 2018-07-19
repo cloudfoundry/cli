@@ -26,11 +26,11 @@ type V3AppsActor interface {
 type V3AppsCommand struct {
 	usage interface{} `usage:"CF_NAME v3-apps"`
 
-	UI              command.UI
-	Config          command.Config
-	Actor           V3AppsActor
-	V2AppRouteActor shared.V2AppRouteActor
-	SharedActor     command.SharedActor
+	UI          command.UI
+	Config      command.Config
+	Actor       V3AppsActor
+	V2AppActor  shared.V2AppActor
+	SharedActor command.SharedActor
 }
 
 func (cmd *V3AppsCommand) Setup(config command.Config, ui command.UI) error {
@@ -53,7 +53,7 @@ func (cmd *V3AppsCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	cmd.V2AppRouteActor = v2action.NewActor(ccClientV2, uaaClientV2, config)
+	cmd.V2AppActor = v2action.NewActor(ccClientV2, uaaClientV2, config)
 
 	return nil
 }
@@ -106,7 +106,7 @@ func (cmd V3AppsCommand) Execute(args []string) error {
 	for _, summary := range summaries {
 		var routesList string
 		if len(summary.ProcessSummaries) > 0 {
-			routes, warnings, err := cmd.V2AppRouteActor.GetApplicationRoutes(summary.GUID)
+			routes, warnings, err := cmd.V2AppActor.GetApplicationRoutes(summary.GUID)
 			cmd.UI.DisplayWarnings(warnings)
 			if err != nil {
 				return err

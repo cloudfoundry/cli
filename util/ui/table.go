@@ -23,14 +23,20 @@ func (ui *UI) DisplayKeyValueTable(prefix string, table [][]string, padding int)
 		return
 	}
 
-	columns := len(table[0])
+	var displayTable [][]string
+	for _, row := range table {
+		if len(row) > 0 {
+			displayTable = append(displayTable, row)
+		}
+	}
+	columns := len(displayTable[0])
 
 	if columns < 2 || !ui.IsTTY {
-		ui.DisplayNonWrappingTable(prefix, table, padding)
+		ui.DisplayNonWrappingTable(prefix, displayTable, padding)
 		return
 	}
 
-	ui.displayWrappingTableWithWidth(prefix, table, padding)
+	ui.displayWrappingTableWithWidth(prefix, displayTable, padding)
 }
 
 // DisplayNonWrappingTable outputs a matrix of strings as a table to UI.Out.

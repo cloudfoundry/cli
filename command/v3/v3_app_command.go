@@ -52,11 +52,11 @@ func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 
 	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
-		UI:              cmd.UI,
-		Config:          cmd.Config,
-		Actor:           cmd.Actor,
-		V2AppRouteActor: v2Actor,
-		AppName:         cmd.RequiredArgs.AppName,
+		UI:         cmd.UI,
+		Config:     cmd.Config,
+		Actor:      cmd.Actor,
+		V2AppActor: v2Actor,
+		AppName:    cmd.RequiredArgs.AppName,
 	}
 	return nil
 }

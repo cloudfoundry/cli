@@ -14,17 +14,18 @@ import (
 )
 
 type AppSummaryDisplayer struct {
-	UI              command.UI
-	Config          command.Config
-	Actor           V3AppSummaryActor
-	V2AppRouteActor V2AppRouteActor
-	AppName         string
+	UI         command.UI
+	Config     command.Config
+	Actor      V3AppSummaryActor
+	V2AppActor V2AppActor
+	AppName    string
 }
 
-//go:generate counterfeiter . V2AppRouteActor
+//go:generate counterfeiter . V2AppActor
 
-type V2AppRouteActor interface {
+type V2AppActor interface {
 	GetApplicationRoutes(appGUID string) (v2action.Routes, v2action.Warnings, error)
+	GetApplicationInstancesWithStatsByApplication(guid string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)
 }
 
 //go:generate counterfeiter . V3AppSummaryActor
@@ -42,16 +43,21 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 	summary.ProcessSummaries.Sort()
 
 	var routes v2action.Routes
+	var appStats []v2action.ApplicationInstanceWithStats
 	if len(summary.ProcessSummaries) > 0 {
 		var routeWarnings v2action.Warnings
-		routes, routeWarnings, err = display.V2AppRouteActor.GetApplicationRoutes(summary.Application.GUID)
+		routes, routeWarnings, err = display.V2AppActor.GetApplicationRoutes(summary.Application.GUID)
 		display.UI.DisplayWarnings(routeWarnings)
 		if _, ok := err.(ccerror.ResourceNotFoundError); err != nil && !ok {
 			return err
 		}
+
+		var instanceWarnings v2action.Warnings
+		appStats, instanceWarnings, _ = display.V2AppActor.GetApplicationInstancesWithStatsByApplication(summary.Application.GUID)
+		display.UI.DisplayWarnings(instanceWarnings)
 	}
 
-	display.displayAppTable(summary, routes)
+	display.displayAppTable(summary, routes, appStats)
 
 	return nil
 }
@@ -69,17 +75,20 @@ func (display AppSummaryDisplayer) DisplayAppProcessInfo() error {
 }
 
 func GetCreatedTime(summary v3action.ApplicationSummary) time.Time {
-	// *Time t := &time.Time.New()
-	// *time.Time timestamp := &[]byte(summary.CurrentDroplet.CreatedAt)
-	// timestamp := &[]byte(summary.CurrentDroplet.CreatedAt)
 	timestamp, _ := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
 	return timestamp
 }
 
-func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes) {
+func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes, appStats []v2action.ApplicationInstanceWithStats) {
+	var isoRow []string
+	if len(appStats) > 0 && len(appStats[0].IsolationSegment) > 0 {
+		isoRow = append(isoRow, display.UI.TranslateText("isolation segment:"), appStats[0].IsolationSegment)
+	}
+
 	keyValueTable := [][]string{
 		{display.UI.TranslateText("name:"), summary.Application.Name},
 		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
+		isoRow,
 		{display.UI.TranslateText("routes:"), routes.Summary()},
 		{display.UI.TranslateText("last uploaded:"), display.UI.UserFriendlyDate(GetCreatedTime(summary))},
 		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},

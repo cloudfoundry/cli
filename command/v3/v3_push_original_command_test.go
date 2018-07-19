@@ -36,7 +36,7 @@ var _ = Describe("v3-push Command", func() {
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
 		fakeActor       *v3fakes.FakeOriginalV3PushActor
 		fakeV2PushActor *v3fakes.FakeOriginalV2PushActor
-		fakeV2AppActor  *sharedfakes.FakeV2AppRouteActor
+		fakeV2AppActor  *sharedfakes.FakeV2AppActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -51,7 +51,7 @@ var _ = Describe("v3-push Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeOriginalV3PushActor)
 		fakeV2PushActor = new(v3fakes.FakeOriginalV2PushActor)
-		fakeV2AppActor = new(sharedfakes.FakeV2AppRouteActor)
+		fakeV2AppActor = new(sharedfakes.FakeV2AppActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
 
 		fakeConfig.StagingTimeoutReturns(10 * time.Minute)
@@ -64,11 +64,11 @@ var _ = Describe("v3-push Command", func() {
 		orgName = "some-org"
 
 		appSummaryDisplayer := shared.AppSummaryDisplayer{
-			UI:              testUI,
-			Config:          fakeConfig,
-			Actor:           fakeActor,
-			V2AppRouteActor: fakeV2AppActor,
-			AppName:         app,
+			UI:         testUI,
+			Config:     fakeConfig,
+			Actor:      fakeActor,
+			V2AppActor: fakeV2AppActor,
+			AppName:    app,
 		}
 		packageDisplayer := shared.NewPackageDisplayer(
 			testUI,

@@ -71,11 +71,11 @@ func (cmd *V3PushCommand) OriginalSetup(config command.Config, ui command.UI) er
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
 	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
-		UI:              cmd.UI,
-		Config:          cmd.Config,
-		Actor:           cmd.OriginalActor,
-		V2AppRouteActor: v2AppActor,
-		AppName:         cmd.RequiredArgs.AppName,
+		UI:         cmd.UI,
+		Config:     cmd.Config,
+		Actor:      cmd.OriginalActor,
+		V2AppActor: v2AppActor,
+		AppName:    cmd.RequiredArgs.AppName,
 	}
 	cmd.PackageDisplayer = shared.NewPackageDisplayer(cmd.UI, cmd.Config)
 

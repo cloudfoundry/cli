@@ -40,6 +40,8 @@ var _ = Describe("Table", func() {
 				[][]string{
 					{"wut0:", ""},
 					{"wut1:", "hi hi"},
+					nil,
+					[]string{},
 					{"wut2:", strings.Repeat("a", 9)},
 					{"wut3:", "hi hi " + strings.Repeat("a", 9)},
 					{"wut4:", strings.Repeat("a", 15) + " " + strings.Repeat("b", 15)},
@@ -54,13 +56,13 @@ var _ = Describe("Table", func() {
 			})
 
 			It("displays a table with the last column wrapping according to width", func() {
-				Expect(out).To(Say(" wut0:  " + "\n"))
-				Expect(out).To(Say(" wut1:  " + "hi hi\n"))
-				Expect(out).To(Say(" wut2:  " + strings.Repeat("a", 9) + "\n"))
+				Expect(out).To(Say(" wut0:  \n"))
+				Expect(out).To(Say(" wut1:  hi hi\n"))
+				Expect(out).To(Say(" wut2:  %s\n", strings.Repeat("a", 9)))
 				Expect(out).To(Say(" wut3:  hi hi\n"))
-				Expect(out).To(Say("        " + strings.Repeat("a", 9) + "\n"))
-				Expect(out).To(Say(" wut4:  " + strings.Repeat("a", 15) + "\n"))
-				Expect(out).To(Say("        " + strings.Repeat("b", 15) + "\n"))
+				Expect(out).To(Say("        %s\n", strings.Repeat("a", 9)))
+				Expect(out).To(Say(" wut4:  %s\n", strings.Repeat("a", 15)))
+				Expect(out).To(Say("        %s\n", strings.Repeat("b", 15)))
 			})
 		})
 	})

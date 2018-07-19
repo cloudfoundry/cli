@@ -230,7 +230,7 @@ applications:
 					})
 				})
 
-				PContext("when isolation segments are available", func() {
+				Context("when isolation segments are available", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
 
