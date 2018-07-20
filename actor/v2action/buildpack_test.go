@@ -3,6 +3,9 @@ package v2action_test
 import (
 	"errors"
 	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 
 	. "github.com/onsi/ginkgo"
@@ -90,6 +93,84 @@ var _ = Describe("Buildpack", func() {
 		})
 	})
 
+	Describe("PrepareBuildpackBits", func() {
+		var (
+			inPath         string
+			outPath        string
+			fakeDownloader *v2actionfakes.FakeDownloader
+
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			fakeDownloader = new(v2actionfakes.FakeDownloader)
+		})
+
+		JustBeforeEach(func() {
+			outPath, executeErr = actor.PrepareBuildpackBits(inPath, fakeDownloader)
+		})
+
+		Context("when the buildpack path is a url", func() {
+			BeforeEach(func() {
+				inPath = "http://buildpacks.com/a.zip"
+				fakeDownloader = new(v2actionfakes.FakeDownloader)
+			})
+
+			Context("when downloading the file succeeds", func() {
+				BeforeEach(func() {
+					fakeDownloader.DownloadReturns("/tmp/a.zip", nil)
+				})
+
+				It("downloads the buildpack to a local file", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeDownloader.DownloadCallCount()).To(Equal(1))
+					Expect(fakeDownloader.DownloadArgsForCall(0)).To(Equal("http://buildpacks.com/a.zip"))
+					Expect(outPath).To(Equal("/tmp/a.zip"))
+				})
+			})
+
+			Context("when downloading the file fails", func() {
+				BeforeEach(func() {
+					fakeDownloader.DownloadReturns("", errors.New("bad"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("bad"))
+				})
+			})
+		})
+
+		Context("when the buildpack path points to a directory", func() {
+			BeforeEach(func() {
+				var err error
+				inPath, err = ioutil.TempDir("", "buildpackdir-")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				os.RemoveAll(inPath)
+			})
+
+			It("returns a path to the zipped directory", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeDownloader.DownloadCallCount()).To(Equal(0))
+				Expect(filepath.Base(outPath)).To(Equal(filepath.Base(inPath) + ".zip"))
+			})
+		})
+
+		Context("when the buildpack path points to a zip file", func() {
+			BeforeEach(func() {
+				inPath = "/foo/buildpacks/a.zip"
+			})
+
+			It("returns the local filepath", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeDownloader.DownloadCallCount()).To(Equal(0))
+				Expect(outPath).To(Equal("/foo/buildpacks/a.zip"))
+			})
+		})
+	})
+
 	Describe("UploadBuildpack", func() {
 		var (
 			bpFile     io.Reader
@@ -154,66 +235,6 @@ var _ = Describe("Buildpack", func() {
 				Expect(path).To(Equal(bpFilePath))
 				Expect(pbReader).To(Equal(bpFile))
 				Expect(warnings).To(ConsistOf("some-create-warning"))
-			})
-		})
-	})
-
-	Describe("PrepareBuildpackBits", func() {
-		var (
-			inPath         string
-			outPath        string
-			fakeDownloader *v2actionfakes.FakeDownloader
-
-			executeErr error
-		)
-
-		BeforeEach(func() {
-			fakeDownloader = new(v2actionfakes.FakeDownloader)
-		})
-
-		JustBeforeEach(func() {
-			outPath, executeErr = actor.PrepareBuildpackBits(inPath, fakeDownloader)
-		})
-
-		Context("when the buildpack path is a url", func() {
-			BeforeEach(func() {
-				inPath = "http://buildpacks.com/a.zip"
-				fakeDownloader = new(v2actionfakes.FakeDownloader)
-			})
-
-			Context("when downloading the file succeeds", func() {
-				BeforeEach(func() {
-					fakeDownloader.DownloadReturns("/tmp/a.zip", nil)
-				})
-
-				It("downloads the buildpack to a local file", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(fakeDownloader.DownloadCallCount()).To(Equal(1))
-					Expect(fakeDownloader.DownloadArgsForCall(0)).To(Equal("http://buildpacks.com/a.zip"))
-					Expect(outPath).To(Equal("/tmp/a.zip"))
-				})
-			})
-
-			Context("when downloading the file fails", func() {
-				BeforeEach(func() {
-					fakeDownloader.DownloadReturns("", errors.New("bad"))
-				})
-
-				It("returns the error", func() {
-					Expect(executeErr).To(MatchError("bad"))
-				})
-			})
-		})
-
-		Context("when the buildpack path points to a file", func() {
-			BeforeEach(func() {
-				inPath = "/foo/buildpacks/a.zip"
-			})
-
-			It("returns the local filepath", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeDownloader.DownloadCallCount()).To(Equal(0))
-				Expect(outPath).To(Equal("/foo/buildpacks/a.zip"))
 			})
 		})
 	})

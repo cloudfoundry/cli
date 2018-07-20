@@ -2,6 +2,7 @@ package global
 
 import (
 	"bytes"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -56,6 +57,40 @@ var _ = Describe("create buildpack command", func() {
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
+		})
+
+		Context("when uploading from a directory", func() {
+			var buildpackDir string
+
+			Context("when zipping the directory errors", func() {
+				BeforeEach(func() {
+					buildpackDir = "some/nonexistent/dir"
+				})
+
+				It("returns an error", func() {
+					session := helpers.CF("create-buildpack", buildpackName, buildpackDir, "1")
+					Eventually(session).Should(Exit(1))
+					Expect(session.Err).To(Say("Incorrect Usage: The specified path 'some/nonexistent/dir' does not exist."))
+				})
+			})
+
+			Context("when zipping the directory succeeds", func() {
+				BeforeEach(func() {
+					var err error
+					buildpackDir, err = ioutil.TempDir("", "buildpackdir-")
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("successfully uploads a buildpack", func() {
+					username, _ := helpers.GetCredentials()
+					session := helpers.CF("create-buildpack", buildpackName, buildpackDir, "1")
+					Eventually(session).Should(Say("Creating buildpack %s as %s...", buildpackName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("Uploading buildpack %s as %s...", buildpackName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
 		})
 
 		Context("when uploading from a zip", func() {

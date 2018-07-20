@@ -1,7 +1,9 @@
 package v2action
 
 import (
+	"archive/zip"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -108,5 +110,101 @@ func (actor *Actor) PrepareBuildpackBits(path string, downloader Downloader) (st
 		}
 		return tempPath, nil
 	}
+
+	if filepath.Ext(path) == ".zip" {
+		return path, nil
+	}
+
+	info, err := os.Stat(path)
+	if err != nil {
+		return "", err
+	}
+
+	if info.IsDir() {
+		tmpDir, err := ioutil.TempDir("", "")
+		if err != nil {
+			return "", nil
+		}
+
+		archive := filepath.Join(tmpDir, filepath.Base(path)) + ".zip"
+
+		err = Zipit(path, archive, "")
+		if err != nil {
+			return "", err
+		}
+		return archive, nil
+	}
+
 	return path, nil
+}
+
+// Zipit zips the source into a .zip file in the target dir
+func Zipit(source, target, prefix string) error {
+	// Thanks to Svett Ralchev
+	// http://blog.ralch.com/tutorial/golang-working-with-zip/
+
+	zipfile, err := os.Create(target)
+	if err != nil {
+		return err
+	}
+	defer zipfile.Close()
+
+	if prefix != "" {
+		_, err = io.WriteString(zipfile, prefix)
+		if err != nil {
+			return err
+		}
+	}
+
+	archive := zip.NewWriter(zipfile)
+	defer archive.Close()
+
+	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if path == source {
+			return nil
+		}
+
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+		header.Name, err = filepath.Rel(source, path)
+		if err != nil {
+			return err
+		}
+
+		header.Name = filepath.ToSlash(header.Name)
+
+		if info.IsDir() {
+			header.Name += "/"
+			header.SetMode(0755)
+		} else {
+			header.Method = zip.Deflate
+			header.SetMode(0744)
+		}
+
+		writer, err := archive.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		_, err = io.Copy(writer, file)
+		return err
+	})
+
+	return err
 }
