@@ -162,7 +162,7 @@ func WriteManifest(path string, manifest map[string]interface{}) {
 }
 
 func ConfirmStagingLogs(session *Session) {
-	Eventually(session).Should(Say("(?i)Creating container|Successfully created container|Staging\\.\\.\\.|Staging process started \\.\\.\\.|Staging Complete"))
+	Eventually(session).Should(Say(`(?i)Creating container|Successfully created container|Staging\.\.\.|Staging process started \.\.\.|Staging Complete|Exit status 0|Uploading droplet\.\.\.|Uploading complete`))
 }
 
 // Zipit zips the source into a .zip file in the target dir
