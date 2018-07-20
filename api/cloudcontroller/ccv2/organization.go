@@ -1,6 +1,8 @@
 package ccv2
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -46,6 +48,40 @@ func (org *Organization) UnmarshalJSON(data []byte) error {
 	org.QuotaDefinitionGUID = ccOrg.Entity.QuotaDefinitionGUID
 	org.DefaultIsolationSegmentGUID = ccOrg.Entity.DefaultIsolationSegmentGUID
 	return nil
+}
+
+type createOrganizationRequestBody struct {
+	Name string `json:"name"`
+}
+
+func (client *Client) CreateOrganization(orgName string) (Organization, Warnings, error) {
+
+	requestBody := createOrganizationRequestBody{
+		Name: orgName,
+	}
+
+	bodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return Organization{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostOrganizationRequest,
+		Body:        bytes.NewReader(bodyBytes),
+	})
+	/*
+		if err != nil {
+			return Organization{}, nil, err
+		}
+	*/
+
+	var org Organization
+	response := cloudcontroller.Response{
+		Result: &org,
+	}
+
+	err = client.connection.Make(request, &response)
+	return org, response.Warnings, err
 }
 
 // DeleteOrganization deletes the Organization associated with the provided

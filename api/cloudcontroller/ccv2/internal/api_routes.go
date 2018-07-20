@@ -77,6 +77,7 @@ const (
 	PostAppRequest                                       = "PostApp"
 	PostAppRestageRequest                                = "PostAppRestage"
 	PostBuildpackRequest                                 = "PostBuildpack"
+	PostOrganizationRequest                              = "PostOrganization"
 	PostRouteRequest                                     = "PostRoute"
 	PostServiceBindingRequest                            = "PostServiceBinding"
 	PostUserRequest                                      = "PostUser"
@@ -110,6 +111,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/info", Method: http.MethodGet, Name: GetInfoRequest},
 	{Path: "/v2/jobs/:job_guid", Method: http.MethodGet, Name: GetJobRequest},
 	{Path: "/v2/organizations", Method: http.MethodGet, Name: GetOrganizationsRequest},
+	{Path: "/v2/organizations", Method: http.MethodPost, Name: PostOrganizationRequest},
 	{Path: "/v2/organizations/:organization_guid", Method: http.MethodDelete, Name: DeleteOrganizationRequest},
 	{Path: "/v2/organizations/:organization_guid", Method: http.MethodGet, Name: GetOrganizationRequest},
 	{Path: "/v2/organizations/:organization_guid/private_domains", Method: http.MethodGet, Name: GetOrganizationPrivateDomainsRequest},

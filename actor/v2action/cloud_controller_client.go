@@ -12,6 +12,7 @@ import (
 type CloudControllerClient interface {
 	CreateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	CreateBuildpack(buildpack ccv2.Buildpack) (ccv2.Buildpack, ccv2.Warnings, error)
+	CreateOrganization(orgName string) (ccv2.Organization, ccv2.Warnings, error)
 	CreateRoute(route ccv2.Route, generatePort bool) (ccv2.Route, ccv2.Warnings, error)
 	CreateServiceBinding(appGUID string, serviceBindingGUID string, bindingName string, acceptsIncomplete bool, parameters map[string]interface{}) (ccv2.ServiceBinding, ccv2.Warnings, error)
 	CreateUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)

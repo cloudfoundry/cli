@@ -40,6 +40,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	CreateOrganizationStub        func(orgName string) (ccv2.Organization, ccv2.Warnings, error)
+	createOrganizationMutex       sync.RWMutex
+	createOrganizationArgsForCall []struct {
+		orgName string
+	}
+	createOrganizationReturns struct {
+		result1 ccv2.Organization
+		result2 ccv2.Warnings
+		result3 error
+	}
+	createOrganizationReturnsOnCall map[int]struct {
+		result1 ccv2.Organization
+		result2 ccv2.Warnings
+		result3 error
+	}
 	CreateRouteStub        func(route ccv2.Route, generatePort bool) (ccv2.Route, ccv2.Warnings, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
@@ -1148,6 +1163,60 @@ func (fake *FakeCloudControllerClient) CreateBuildpackReturnsOnCall(i int, resul
 	}
 	fake.createBuildpackReturnsOnCall[i] = struct {
 		result1 ccv2.Buildpack
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganization(orgName string) (ccv2.Organization, ccv2.Warnings, error) {
+	fake.createOrganizationMutex.Lock()
+	ret, specificReturn := fake.createOrganizationReturnsOnCall[len(fake.createOrganizationArgsForCall)]
+	fake.createOrganizationArgsForCall = append(fake.createOrganizationArgsForCall, struct {
+		orgName string
+	}{orgName})
+	fake.recordInvocation("CreateOrganization", []interface{}{orgName})
+	fake.createOrganizationMutex.Unlock()
+	if fake.CreateOrganizationStub != nil {
+		return fake.CreateOrganizationStub(orgName)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createOrganizationReturns.result1, fake.createOrganizationReturns.result2, fake.createOrganizationReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganizationCallCount() int {
+	fake.createOrganizationMutex.RLock()
+	defer fake.createOrganizationMutex.RUnlock()
+	return len(fake.createOrganizationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganizationArgsForCall(i int) string {
+	fake.createOrganizationMutex.RLock()
+	defer fake.createOrganizationMutex.RUnlock()
+	return fake.createOrganizationArgsForCall[i].orgName
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganizationReturns(result1 ccv2.Organization, result2 ccv2.Warnings, result3 error) {
+	fake.CreateOrganizationStub = nil
+	fake.createOrganizationReturns = struct {
+		result1 ccv2.Organization
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateOrganizationReturnsOnCall(i int, result1 ccv2.Organization, result2 ccv2.Warnings, result3 error) {
+	fake.CreateOrganizationStub = nil
+	if fake.createOrganizationReturnsOnCall == nil {
+		fake.createOrganizationReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Organization
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.createOrganizationReturnsOnCall[i] = struct {
+		result1 ccv2.Organization
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -4791,6 +4860,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createApplicationMutex.RUnlock()
 	fake.createBuildpackMutex.RLock()
 	defer fake.createBuildpackMutex.RUnlock()
+	fake.createOrganizationMutex.RLock()
+	defer fake.createOrganizationMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	fake.createServiceBindingMutex.RLock()

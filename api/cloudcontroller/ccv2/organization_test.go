@@ -18,6 +18,55 @@ var _ = Describe("Organization", func() {
 		client = NewTestClient()
 	})
 
+	Describe("CreateOrganization", func() {
+		var (
+			org        Organization
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			org, warnings, executeErr = client.CreateOrganization("some-org")
+		})
+
+		Context("when the organization exists", func() {
+			BeforeEach(func() {
+				response := `{
+					"metadata": {
+						"guid": "some-org-guid"
+					},
+					"entity": {
+						"name": "some-org",
+						"quota_definition_guid": "some-quota-guid"
+					}
+				}`
+				requestBody := map[string]interface{}{
+					"name": "some-org",
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/organizations"),
+						VerifyJSONRepresenting(requestBody),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					))
+			})
+
+			It("returns the org and all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(org).To(Equal(
+					Organization{
+						GUID:                "some-org-guid",
+						Name:                "some-org",
+						QuotaDefinitionGUID: "some-quota-guid",
+					},
+				))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+	})
+
 	Describe("DeleteOrganization", func() {
 		Context("when no errors are encountered", func() {
 			BeforeEach(func() {
