@@ -89,17 +89,17 @@ func (*CloudControllerConnection) handleStatusCodes(response *http.Response, pas
 // are comma separated.
 func (*CloudControllerConnection) handleWarnings(response *http.Response) ([]string, error) {
 	rawWarnings := response.Header.Get("X-Cf-Warnings")
-	rawWarnings, err := url.QueryUnescape(rawWarnings)
-	if err != nil {
-		return nil, err
+	if len(rawWarnings) == 0 {
+		return nil, nil
 	}
 
 	var warnings []string
-	if rawWarnings != "" {
-		for _, warning := range strings.Split(rawWarnings, ",") {
-			warningTrimmed := strings.Trim(warning, " ")
-			warnings = append(warnings, warningTrimmed)
+	for _, rawWarning := range strings.Split(rawWarnings, ",") {
+		warning, err := url.QueryUnescape(rawWarning)
+		if err != nil {
+			return nil, err
 		}
+		warnings = append(warnings, strings.Trim(warning, " "))
 	}
 
 	return warnings, nil

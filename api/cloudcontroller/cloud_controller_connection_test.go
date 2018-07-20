@@ -142,7 +142,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 						server.AppendHandlers(
 							CombineHandlers(
 								VerifyRequest(http.MethodGet, "/v2/foo"),
-								RespondWith(http.StatusOK, "{}", http.Header{"X-Cf-Warnings": {"42,+Ed+McMann,+the+1942+doggers"}}),
+								RespondWith(http.StatusOK, "{}", http.Header{"X-Cf-Warnings": {"42,+Ed+McMann,+the+1942+doggers,a%2Cb"}}),
 							),
 						)
 					})
@@ -160,10 +160,11 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 						warnings := response.Warnings
 						Expect(warnings).ToNot(BeNil())
-						Expect(warnings).To(HaveLen(3))
+						Expect(warnings).To(HaveLen(4))
 						Expect(warnings).To(ContainElement("42"))
 						Expect(warnings).To(ContainElement("Ed McMann"))
 						Expect(warnings).To(ContainElement("the 1942 doggers"))
+						Expect(warnings).To(ContainElement("a,b"))
 					})
 				})
 
