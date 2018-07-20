@@ -17,6 +17,21 @@ func NewManifest(path string, data generic.Map) (m *manifest.Manifest) {
 }
 
 var _ = Describe("Manifests", func() {
+	It("errors when provided multiple buildpacks", func() {
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				map[interface{}]interface{}{
+					"name":       "bitcoin-miner",
+					"buildpacks": []interface{}{"a", "b"},
+				},
+			},
+		}))
+
+		_, err := m.Applications()
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(MatchRegexp("The following manifest fields cannot be used with legacy push: buildpacks"))
+	})
+
 	It("merges global properties into each app's properties", func() {
 		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"instances": "3",

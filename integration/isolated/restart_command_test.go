@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -76,10 +77,13 @@ var _ = Describe("restart command", func() {
 				appName    string
 			)
 
+			BeforeEach(func() {
+				appName = helpers.PrefixedRandomName("app")
+				domainName = helpers.DefaultSharedDomain()
+			})
+
 			Context("when the app is started", func() {
 				BeforeEach(func() {
-					appName = helpers.PrefixedRandomName("app")
-					domainName = helpers.DefaultSharedDomain()
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 					})
@@ -99,8 +103,6 @@ var _ = Describe("restart command", func() {
 			Context("when the app is stopped", func() {
 				Context("when the app has been staged", func() {
 					BeforeEach(func() {
-						appName = helpers.PrefixedRandomName("app")
-						domainName = helpers.DefaultSharedDomain()
 						helpers.WithHelloWorldApp(func(appDir string) {
 							manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -148,8 +150,6 @@ applications:
 
 				Context("when the app does *not* stage properly because the app was not detected by any buildpacks", func() {
 					BeforeEach(func() {
-						appName = helpers.PrefixedRandomName("app")
-						domainName = helpers.DefaultSharedDomain()
 						helpers.WithHelloWorldApp(func(appDir string) {
 							err := os.Remove(filepath.Join(appDir, "Staticfile"))
 							Expect(err).ToNot(HaveOccurred())
@@ -192,11 +192,6 @@ applications:
 
 					Context("when the app starts properly", func() {
 						BeforeEach(func() {
-							Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
-							Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
-							Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
-							appName = helpers.PrefixedRandomName("app")
-							domainName = helpers.DefaultSharedDomain()
 							helpers.WithHelloWorldApp(func(appDir string) {
 								manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -228,7 +223,6 @@ applications:
 							Eventually(session).Should(Say("name:\\s+%s", appName))
 							Eventually(session).Should(Say("requested state:\\s+started"))
 							Eventually(session).Should(Say("instances:\\s+2/2"))
-							Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
 							Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
 							Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
 							Eventually(session).Should(Say("last uploaded:"))
@@ -240,6 +234,27 @@ applications:
 
 							Eventually(session).Should(Say("#0\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 							Eventually(session).Should(Say("#1\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when isolation segments are available", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
+
+							Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
+							Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
+							Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
+
+							helpers.WithHelloWorldApp(func(appDir string) {
+								Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
+							})
+						})
+
+						It("displays the isolation segment information", func() {
+							session := helpers.CF("restart", appName)
+
+							Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
 							Eventually(session).Should(Exit(0))
 						})
 					})

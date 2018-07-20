@@ -29,7 +29,7 @@ type UnshareServiceCommand struct {
 	SharedToOrgName   string               `short:"o" required:"false" description:"Org of the other space (Default: targeted org)"`
 	SharedToSpaceName string               `short:"s" required:"true" description:"Space to unshare the service instance from"`
 	Force             bool                 `short:"f" description:"Force unshare without confirmation"`
-	usage             interface{}          `usage:"cf unshare-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG] [-f]"`
+	usage             interface{}          `usage:"CF_NAME unshare-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG] [-f]"`
 	relatedCommands   interface{}          `related_commands:"delete-service, service, services, share-service, unbind-service"`
 
 	UI          command.UI
@@ -45,7 +45,7 @@ func (cmd *UnshareServiceCommand) Setup(config command.Config, ui command.UI) er
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	ccClientV3, uaaClientV3, err := sharedV3.NewClients(config, ui, true)
+	ccClientV3, uaaClientV3, err := sharedV3.NewClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionShareServiceV3}

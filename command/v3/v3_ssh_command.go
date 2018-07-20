@@ -29,18 +29,19 @@ type V3SSHActor interface {
 
 type V3SSHCommand struct {
 	RequiredArgs          flag.AppName             `positional-args:"yes"`
-	ProcessIndex          uint                     `long:"app-instance-index" short:"i" description:"App process instance index (Default: 0)"`
+	ProcessIndex          uint                     `long:"app-instance-index" short:"i" default:"0" description:"App process instance index"`
 	Commands              []string                 `long:"command" short:"c" description:"Command to run"`
 	DisablePseudoTTY      bool                     `long:"disable-pseudo-tty" short:"T" description:"Disable pseudo-tty allocation"`
 	ForcePseudoTTY        bool                     `long:"force-pseudo-tty" description:"Force pseudo-tty allocation"`
 	LocalPortForwardSpecs []flag.SSHPortForwarding `short:"L" description:"Local port forward specification"`
-	ProcessType           string                   `long:"process" description:"App process name (Default: web)"`
+	ProcessType           string                   `long:"process" default:"web" description:"App process name"`
 	RequestPseudoTTY      bool                     `long:"request-pseudo-tty" short:"t" description:"Request pseudo-tty allocation"`
 	SkipHostValidation    bool                     `long:"skip-host-validation" short:"k" description:"Skip host key validation. Not recommended!"`
 	SkipRemoteExecution   bool                     `long:"skip-remote-execution" short:"N" description:"Do not execute a remote command"`
 
-	usage           interface{} `usage:"cf v3-ssh APP_NAME [--process PROCESS] [-i INDEX] [-c COMMAND]\n   [-L [BIND_ADDRESS:]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT]... [--skip-remote-execution]\n   [--disable-pseudo-tty | --force-pseudo-tty | --request-pseudo-tty] [--skip-host-validation]"`
+	usage           interface{} `usage:"CF_NAME v3-ssh APP_NAME [--process PROCESS] [-i INDEX] [-c COMMAND]\n   [-L [BIND_ADDRESS:]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT]... [--skip-remote-execution]\n   [--disable-pseudo-tty | --force-pseudo-tty | --request-pseudo-tty] [--skip-host-validation]"`
 	relatedCommands interface{} `related_commands:"allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled"`
+	allproxy        interface{} `environmentName:"all_proxy" environmentDescription:"Specify a proxy server to enable proxying for all requests"`
 
 	UI          command.UI
 	Config      command.Config
@@ -57,7 +58,7 @@ func (cmd *V3SSHCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.SharedActor = sharedActor
 	cmd.SSHActor = sharedActor
 
-	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionV3}
@@ -89,10 +90,6 @@ func (cmd V3SSHCommand) Execute(args []string) error {
 	ttyOption, err := cmd.EvaluateTTYOption()
 	if err != nil {
 		return err
-	}
-
-	if cmd.ProcessType == "" {
-		cmd.ProcessType = "web"
 	}
 
 	var forwardSpecs []sharedaction.LocalPortForward

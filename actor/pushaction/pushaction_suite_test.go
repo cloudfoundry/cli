@@ -4,8 +4,10 @@ import (
 	"os"
 	"time"
 
+	. "code.cloudfoundry.org/cli/actor/pushaction"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/types"
 
 	"testing"
 
@@ -21,6 +23,15 @@ var _ = BeforeEach(func() {
 	SetDefaultEventuallyTimeout(3 * time.Second)
 	log.SetLevel(log.PanicLevel)
 })
+
+func EqualEither(events ...Event) GomegaMatcher {
+	var equals []GomegaMatcher
+	for _, event := range events {
+		equals = append(equals, Equal(event))
+	}
+
+	return Or(equals...)
+}
 
 func getCurrentDir() string {
 	pwd, err := os.Getwd()

@@ -11,6 +11,7 @@ type UserProvidedService struct {
 	SpaceGUID       string                 `json:"space_guid,omitempty"`
 	SysLogDrainURL  string                 `json:"syslog_drain_url"`
 	RouteServiceURL string                 `json:"route_service_url"`
+	Tags            []string               `json:"tags,omitempty"`
 }
 
 type UserProvidedServiceEntity struct {

@@ -77,6 +77,45 @@ var _ = Describe("install-plugin command", func() {
 		})
 	})
 
+	Context("when the plugin dir does not exist", func() {
+		var (
+			newPluginHome string
+
+			cfPluginHome string
+		)
+
+		BeforeEach(func() {
+			cfPluginHome = os.Getenv("CF_PLUGIN_HOME")
+
+			var err error
+			newPluginHome, err = ioutil.TempDir("", "plugin-temp-dir")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(os.RemoveAll(newPluginHome))
+
+			Expect(os.Setenv("CF_PLUGIN_HOME", newPluginHome)).ToNot(HaveOccurred())
+
+			pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+				[]helpers.PluginCommand{
+					{Name: "some-command", Help: "some-command-help"},
+				},
+			)
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(newPluginHome)).ToNot(HaveOccurred())
+			Expect(os.Setenv("CF_PLUGIN_HOME", cfPluginHome)).ToNot(HaveOccurred())
+		})
+
+		It("creates the new directory, and continues as normal", func() {
+			session := helpers.CF("install-plugin", pluginPath, "-f")
+			Eventually(session).Should(Exit(0))
+
+			log.Println(newPluginHome)
+			_, err := os.Stat(newPluginHome)
+			Expect(os.IsNotExist(err)).To(Equal(false))
+		})
+	})
+
 	Describe("installing a plugin from a local file", func() {
 		Context("when the file is compiled for a different os and architecture", func() {
 			BeforeEach(func() {

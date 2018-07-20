@@ -1,6 +1,7 @@
 package push
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -51,47 +52,59 @@ var _ = Describe("push with different instances values", func() {
 		})
 
 		Context("when instances flag is set to 0", func() {
-			It("pushes an app with 0 instances", func() {
-				helpers.WithHelloWorldApp(func(dir string) {
-					By("pushing an app with 0 instances")
-					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-						PushCommandName, appName,
-						"-i", "0",
-					)
-					Eventually(session).Should(Say("\\s+instances:\\s+0"))
-					Eventually(session).Should(Exit(0))
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionZeroAppInstancesV2)
+			})
 
-					session = helpers.CF("app", appName)
-					Eventually(session).Should(Say("instances:\\s+\\d/0"))
-					Eventually(session).Should(Exit(0))
+			Context("when the API version is above 3.27.0", func() {
+				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+				})
 
-					By("updating an app to 1 instance")
-					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-						PushCommandName, appName,
-						"-i", "1",
-					)
-					Eventually(session).Should(Say("\\-\\s+instances:\\s+0"))
-					Eventually(session).Should(Say("\\+\\s+instances:\\s+1"))
-					Eventually(session).Should(Exit(0))
+				It("pushes an app with 0 instances", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						By("pushing an app with 0 instances")
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+							PushCommandName, appName,
+							"-i", "0",
+						)
 
-					session = helpers.CF("app", appName)
-					Eventually(session).Should(Say("instances:\\s+\\d/1"))
-					Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Say("\\s+instances:\\s+0"))
+						Eventually(session).Should(Exit(0))
 
-					By("updating an app back to 0 instances")
-					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-						PushCommandName, appName,
-						"-i", "0",
-					)
-					Eventually(session).Should(Say("\\-\\s+instances:\\s+1"))
-					Eventually(session).Should(Say("\\+\\s+instances:\\s+0"))
-					Eventually(session).Should(Exit(0))
+						session = helpers.CF("app", appName)
+						Eventually(session).Should(Say("There are no running instances of this app."))
+						Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("app", appName)
-					Eventually(session).Should(Say("instances:\\s+\\d/0"))
-					Eventually(session).Should(Exit(0))
+						By("updating an app to 1 instance")
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+							PushCommandName, appName,
+							"-i", "1",
+						)
+						Eventually(session).Should(Say("\\-\\s+instances:\\s+0"))
+						Eventually(session).Should(Say("\\+\\s+instances:\\s+1"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("app", appName)
+						Eventually(session).Should(Say("instances:\\s+\\d/1"))
+						Eventually(session).Should(Exit(0))
+
+						By("updating an app back to 0 instances")
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+							PushCommandName, appName,
+							"-i", "0",
+						)
+						Eventually(session).Should(Say("\\-\\s+instances:\\s+1"))
+						Eventually(session).Should(Say("\\+\\s+instances:\\s+0"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("app", appName)
+						Eventually(session).Should(Say("There are no running instances of this app."))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
+
 		})
 	})
 

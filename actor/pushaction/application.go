@@ -40,23 +40,10 @@ func (actor Actor) CreateApplication(config ApplicationConfig) (ApplicationConfi
 	}
 
 	if config.HasV3Buildpacks() {
-		var buildpacks []string
-		for _, buildpack := range config.DesiredApplication.Buildpacks {
-			buildpacks = append(buildpacks, buildpack)
-		}
-
-		v3App := v3action.Application{
-			Name:                newApp.Name,
-			GUID:                newApp.GUID,
-			LifecycleBuildpacks: buildpacks,
-			LifecycleType:       constant.AppLifecycleTypeBuildpack,
-		}
-
-		_, v3warnings, err := actor.V3Actor.UpdateApplication(v3App)
-		warnings = append(warnings, v3warnings...)
-
-		if err != nil {
-			return ApplicationConfig{}, "", Warnings(warnings), err
+		v3Warnings, v3Err := actor.updateBuildpacks(config, newApp)
+		warnings = append(warnings, v3Warnings...)
+		if v3Err != nil {
+			return ApplicationConfig{}, "", warnings, v3Err
 		}
 	}
 
@@ -67,6 +54,7 @@ func (actor Actor) CreateApplication(config ApplicationConfig) (ApplicationConfi
 }
 
 func (actor Actor) UpdateApplication(config ApplicationConfig) (ApplicationConfig, Event, Warnings, error) {
+	var warnings Warnings
 	log.Debugf("updating application")
 	v2App := config.DesiredApplication.Application
 	v2App.Buildpack = actor.setBuildpack(config)
@@ -74,34 +62,22 @@ func (actor Actor) UpdateApplication(config ApplicationConfig) (ApplicationConfi
 	v2App = actor.ignoreSameState(config, v2App)
 	v2App = actor.ignoreSameStackGUID(config, v2App)
 
-	v2App, warnings, err := actor.V2Actor.UpdateApplication(v2App)
+	updatedApp, v2Warnings, err := actor.V2Actor.UpdateApplication(v2App)
+	warnings = append(warnings, v2Warnings...)
 	if err != nil {
 		log.Errorln("updating application:", err)
 		return ApplicationConfig{}, "", Warnings(warnings), err
 	}
 
 	if config.HasV3Buildpacks() {
-		var buildpacks []string
-		for _, buildpack := range config.DesiredApplication.Buildpacks {
-			buildpacks = append(buildpacks, buildpack)
-		}
-
-		v3App := v3action.Application{
-			Name:                v2App.Name,
-			GUID:                v2App.GUID,
-			LifecycleBuildpacks: buildpacks,
-			LifecycleType:       constant.AppLifecycleTypeBuildpack,
-		}
-
-		_, v3warnings, v3err := actor.V3Actor.UpdateApplication(v3App)
-		warnings = append(warnings, v3warnings...)
-
-		if v3err != nil {
-			return ApplicationConfig{}, "", Warnings(warnings), v3err
+		v3Warnings, v3Err := actor.updateBuildpacks(config, updatedApp)
+		warnings = append(warnings, v3Warnings...)
+		if v3Err != nil {
+			return ApplicationConfig{}, "", warnings, v3Err
 		}
 	}
 
-	config.DesiredApplication.Application = v2App
+	config.DesiredApplication.Application = updatedApp
 	config.CurrentApplication = config.DesiredApplication
 
 	return config, UpdatedApplication, Warnings(warnings), err
@@ -160,12 +136,36 @@ func (actor Actor) ignoreSameStackGUID(config ApplicationConfig, v2App v2action.
 
 // If 'buildpacks' is set with only one buildpack, set `buildpack` (singular)
 // on the application.
-func (actor Actor) setBuildpack(config ApplicationConfig) types.FilteredString {
-	if len(config.DesiredApplication.Buildpacks) == 1 {
+func (Actor) setBuildpack(config ApplicationConfig) types.FilteredString {
+	buildpacks := config.DesiredApplication.Buildpacks
+
+	if len(buildpacks) == 1 {
 		filtered := new(types.FilteredString)
-		filtered.ParseValue(config.DesiredApplication.Buildpacks[0])
+		filtered.ParseValue(buildpacks[0])
 		return *filtered
 	}
 
+	if buildpacks != nil && len(buildpacks) == 0 {
+		filtered := types.FilteredString{IsSet: true}
+		return filtered
+	}
+
 	return config.DesiredApplication.Buildpack
+}
+
+func (actor Actor) updateBuildpacks(config ApplicationConfig, v2App v2action.Application) (Warnings, error) {
+	var buildpacks []string
+	for _, buildpack := range config.DesiredApplication.Buildpacks {
+		buildpacks = append(buildpacks, buildpack)
+	}
+
+	v3App := v3action.Application{
+		Name:                v2App.Name,
+		GUID:                v2App.GUID,
+		LifecycleBuildpacks: buildpacks,
+		LifecycleType:       constant.AppLifecycleTypeBuildpack,
+	}
+
+	_, warnings, err := actor.V3Actor.UpdateApplication(v3App)
+	return Warnings(warnings), err
 }

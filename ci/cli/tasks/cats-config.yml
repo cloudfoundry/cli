@@ -30,15 +30,15 @@ run:
 
     DOMAIN=`cat bosh-lite-lock/name`
     API="api.${DOMAIN}"
-    CF_USER="admin"
+    CF_INT_USERNAME="admin"
 
     ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
-    CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
+    CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
 
     cat << EOF | jq -S . > cats-config/integration_config.json
     {
-      "admin_password": "${CF_PASSWORD}",
-      "admin_user": "${CF_USER}",
+      "admin_password": "${CF_INT_PASSWORD}",
+      "admin_user": "${CF_INT_USERNAME}",
       "api": "${API}",
       "apps_domain": "${DOMAIN}",
       "backend" : "diego",
@@ -82,6 +82,8 @@ run:
       ln -s ${PWD}/cf-cli_linux_x86-64 ${bindir}/cf
     popd
 
+    export CF_USERNAME=${CF_INT_USERNAME}
+    export CF_PASSWORD=${CF_INT_PASSWORD}
     cf api ${API} --skip-ssl-validation
-    cf auth ${CF_USER} ${CF_PASSWORD}
+    cf auth
     cf enable-feature-flag diego_docker

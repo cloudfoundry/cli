@@ -25,7 +25,7 @@ var _ = Describe("Droplet Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil)
 	})
 
-	Describe("SetApplicationDroplet", func() {
+	Describe("SetApplicationDropletByApplicationNameAndSpace", func() {
 		Context("when there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
@@ -44,7 +44,7 @@ var _ = Describe("Droplet Actions", func() {
 			})
 
 			It("sets the app's droplet", func() {
-				warnings, err := actor.SetApplicationDroplet("some-app-name", "some-space-guid", "some-droplet-guid")
+				warnings, err := actor.SetApplicationDropletByApplicationNameAndSpace("some-app-name", "some-space-guid", "some-droplet-guid")
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("get-applications-warning", "set-application-droplet-warning"))
@@ -76,7 +76,7 @@ var _ = Describe("Droplet Actions", func() {
 			})
 
 			It("returns the error", func() {
-				warnings, err := actor.SetApplicationDroplet("some-app-name", "some-space-guid", "some-droplet-guid")
+				warnings, err := actor.SetApplicationDropletByApplicationNameAndSpace("some-app-name", "some-space-guid", "some-droplet-guid")
 
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("get-applications-warning"))
@@ -103,7 +103,7 @@ var _ = Describe("Droplet Actions", func() {
 			})
 
 			It("returns the error", func() {
-				warnings, err := actor.SetApplicationDroplet("some-app-name", "some-space-guid", "some-droplet-guid")
+				warnings, err := actor.SetApplicationDropletByApplicationNameAndSpace("some-app-name", "some-space-guid", "some-droplet-guid")
 
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("get-applications-warning", "set-application-droplet-warning"))
@@ -119,13 +119,75 @@ var _ = Describe("Droplet Actions", func() {
 				})
 
 				It("raises the error as AssignDropletError and returns warnings", func() {
-					warnings, err := actor.SetApplicationDroplet("some-app-name", "some-space-guid", "some-droplet-guid")
+					warnings, err := actor.SetApplicationDropletByApplicationNameAndSpace("some-app-name", "some-space-guid", "some-droplet-guid")
 
 					Expect(err).To(MatchError("some-message"))
 					Expect(warnings).To(ConsistOf("get-applications-warning", "set-application-droplet-warning"))
 				})
 			})
 
+		})
+	})
+
+	Describe("SetApplicationDroplet", func() {
+		Context("when there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.SetApplicationDropletReturns(
+					ccv3.Relationship{GUID: "some-droplet-guid"},
+					ccv3.Warnings{"set-application-droplet-warning"},
+					nil,
+				)
+			})
+
+			It("sets the app's droplet", func() {
+				warnings, err := actor.SetApplicationDroplet("some-app-guid", "some-droplet-guid")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("set-application-droplet-warning"))
+
+				Expect(fakeCloudControllerClient.SetApplicationDropletCallCount()).To(Equal(1))
+				appGUID, dropletGUID := fakeCloudControllerClient.SetApplicationDropletArgsForCall(0)
+				Expect(appGUID).To(Equal("some-app-guid"))
+				Expect(dropletGUID).To(Equal("some-droplet-guid"))
+			})
+		})
+
+		Context("when setting the droplet fails", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some set application-droplet error")
+
+				fakeCloudControllerClient.SetApplicationDropletReturns(
+					ccv3.Relationship{},
+					ccv3.Warnings{"set-application-droplet-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error", func() {
+				warnings, err := actor.SetApplicationDroplet("some-app-guid", "some-droplet-guid")
+
+				Expect(err).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("set-application-droplet-warning"))
+			})
+
+			Context("when the cc client response contains an UnprocessableEntityError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.SetApplicationDropletReturns(
+						ccv3.Relationship{},
+						ccv3.Warnings{"set-application-droplet-warning"},
+						ccerror.UnprocessableEntityError{Message: "some-message"},
+					)
+				})
+
+				It("raises the error as AssignDropletError and returns warnings", func() {
+					warnings, err := actor.SetApplicationDroplet("some-app-guid", "some-droplet-guid")
+
+					Expect(err).To(MatchError("some-message"))
+					Expect(warnings).To(ConsistOf("set-application-droplet-warning"))
+				})
+			})
 		})
 	})
 

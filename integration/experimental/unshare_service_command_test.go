@@ -1,6 +1,7 @@
 package experimental
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,6 +20,8 @@ var _ = Describe("unshare-service command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.SkipIfVersionLessThan(ccversion.MinVersionShareServiceV3)
+
 		sourceOrgName = helpers.NewOrgName()
 		sourceSpaceName = helpers.NewSpaceName()
 		sharedToOrgName = helpers.NewOrgName()

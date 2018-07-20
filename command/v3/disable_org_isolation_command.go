@@ -17,7 +17,7 @@ import (
 
 type DisableOrgIsolationActor interface {
 	CloudControllerAPIVersion() string
-	RevokeIsolationSegmentFromOrganizationByName(isolationSegmentName string, orgName string) (v3action.Warnings, error)
+	DeleteIsolationSegmentOrganizationByName(isolationSegmentName string, orgName string) (v3action.Warnings, error)
 }
 type DisableOrgIsolationCommand struct {
 	RequiredArgs    flag.OrgIsolationArgs `positional-args:"yes"`
@@ -35,7 +35,7 @@ func (cmd *DisableOrgIsolationCommand) Setup(config command.Config, ui command.U
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	client, _, err := shared.NewClients(config, ui, true)
+	client, _, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionIsolationSegmentV3}
@@ -69,7 +69,7 @@ func (cmd DisableOrgIsolationCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	warnings, err := cmd.Actor.RevokeIsolationSegmentFromOrganizationByName(cmd.RequiredArgs.IsolationSegmentName, cmd.RequiredArgs.OrganizationName)
+	warnings, err := cmd.Actor.DeleteIsolationSegmentOrganizationByName(cmd.RequiredArgs.IsolationSegmentName, cmd.RequiredArgs.OrganizationName)
 
 	cmd.UI.DisplayWarnings(warnings)
 

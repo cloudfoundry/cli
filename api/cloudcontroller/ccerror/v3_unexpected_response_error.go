@@ -10,13 +10,6 @@ type V3ErrorResponse struct {
 	Errors []V3Error `json:"errors"`
 }
 
-// V3Error represents a cloud controller error.
-type V3Error struct {
-	Code   int    `json:"code"`
-	Detail string `json:"detail"`
-	Title  string `json:"title"`
-}
-
 // V3UnexpectedResponseError is returned when the client gets an error that has
 // not been accounted for.
 type V3UnexpectedResponseError struct {

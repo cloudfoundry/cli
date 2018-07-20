@@ -19,7 +19,7 @@ import (
 
 func successfulUpdate(ui *testterm.FakeUI, buildpackName string) {
 	Expect(ui.Outputs()).To(ContainSubstrings(
-		[]string{"Updating buildpack", buildpackName},
+		[]string{"Updating buildpack", buildpackName, " with stack cflinuxfs99"},
 		[]string{"OK"},
 	))
 }
@@ -55,7 +55,7 @@ var _ = Describe("Updating buildpack command", func() {
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		buildpackReq := new(requirementsfakes.FakeBuildpackRequirement)
-		buildpackReq.GetBuildpackReturns(models.Buildpack{Name: buildpackName})
+		buildpackReq.GetBuildpackReturns(models.Buildpack{Name: buildpackName, GUID: "buildpack-guid", Stack: "cflinuxfs99"})
 		requirementsFactory.NewBuildpackRequirementReturns(buildpackReq)
 		ui = new(testterm.FakeUI)
 		repo = new(apifakes.OldFakeBuildpackRepository)
@@ -66,17 +66,27 @@ var _ = Describe("Updating buildpack command", func() {
 		return testcmd.RunCLICommand("update-buildpack", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
-	Context("is only successful on login and buildpack success", func() {
+	Context("is only successful on login with valid arguments and buildpack success", func() {
 		It("returns success when both are true", func() {
 			Expect(runCommand(buildpackName)).To(BeTrue())
 		})
 
-		It("returns failure when at requirements error", func() {
+		It("returns failure when invalid arguments are passed", func() {
+			buildpackReq := new(requirementsfakes.FakeBuildpackRequirement)
+			requirementsFactory.NewBuildpackRequirementReturns(buildpackReq)
+
+			Expect(runCommand(buildpackName, "-p", "buildpack.zip", "extraArg")).To(BeFalse())
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"Incorrect Usage"}))
+		})
+
+		It("returns error messages from requirements errors", func() {
 			buildpackReq := new(requirementsfakes.FakeBuildpackRequirement)
 			buildpackReq.ExecuteReturns(errors.New("no build pack"))
 			requirementsFactory.NewBuildpackRequirementReturns(buildpackReq)
 
-			Expect(runCommand(buildpackName, "-p", "buildpack.zip", "extraArg")).To(BeFalse())
+			Expect(runCommand(buildpackName, "-p", "buildpack.zip")).To(BeFalse())
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"no build pack"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 		})
 	})
 
@@ -112,7 +122,22 @@ var _ = Describe("Updating buildpack command", func() {
 		})
 	})
 
-	Context("updates buildpack when passed the proper flags", func() {
+	Describe("flags", func() {
+		Context("stack flag", func() {
+			It("updates the specific buildpack by name and stack, when stack is provided", func() {
+				runCommand("-i", "999", buildpackName, "-s", "cflinuxfs99")
+
+				Expect(requirementsFactory.NewBuildpackRequirementCallCount()).To(Equal(1))
+				buildpack, stack := requirementsFactory.NewBuildpackRequirementArgsForCall(0)
+				Expect(buildpack).To(Equal(buildpackName))
+				Expect(stack).To(Equal("cflinuxfs99"))
+
+				Expect(*repo.UpdateBuildpackArgs.Buildpack.Position).To(Equal(999))
+				Expect(repo.UpdateBuildpackArgs.Buildpack.GUID).To(Equal("buildpack-guid"))
+				successfulUpdate(ui, buildpackName)
+			})
+		})
+
 		Context("position flag", func() {
 			It("sets the position when passed a value", func() {
 				runCommand("-i", "999", buildpackName)

@@ -14,20 +14,26 @@ type BuildpackRequirement interface {
 
 type buildpackAPIRequirement struct {
 	name          string
+	stack         string
 	buildpackRepo api.BuildpackRepository
 	buildpack     models.Buildpack
 }
 
-func NewBuildpackRequirement(name string, bR api.BuildpackRepository) (req *buildpackAPIRequirement) {
+func NewBuildpackRequirement(name, stack string, bR api.BuildpackRepository) (req *buildpackAPIRequirement) {
 	req = new(buildpackAPIRequirement)
 	req.name = name
+	req.stack = stack
 	req.buildpackRepo = bR
 	return
 }
 
 func (req *buildpackAPIRequirement) Execute() error {
 	var apiErr error
-	req.buildpack, apiErr = req.buildpackRepo.FindByName(req.name)
+	if req.stack == "" {
+		req.buildpack, apiErr = req.buildpackRepo.FindByName(req.name)
+	} else {
+		req.buildpack, apiErr = req.buildpackRepo.FindByNameAndStack(req.name, req.stack)
+	}
 
 	if apiErr != nil {
 		return apiErr

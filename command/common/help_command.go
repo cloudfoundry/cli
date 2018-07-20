@@ -314,7 +314,8 @@ func (cmd HelpCommand) environmentalVariablesTableData() [][]string {
 		{"CF_PLUGIN_HOME=path/to/dir/", cmd.UI.TranslateText("Override path to default plugin config directory")},
 		{"CF_TRACE=true", cmd.UI.TranslateText("Print API request diagnostics to stdout")},
 		{"CF_TRACE=path/to/trace.log", cmd.UI.TranslateText("Append API request diagnostics to a log file")},
-		{"https_proxy=proxy.example.com:8080", cmd.UI.TranslateText("Enable HTTP proxying for API requests")},
+		{"all_proxy=proxy.example.com:8080", cmd.UI.TranslateText("Specify a proxy server to enable proxying for all requests")},
+		{"https_proxy=proxy.example.com:8080", cmd.UI.TranslateText("Enable proxying for HTTP requests")},
 	}
 }
 

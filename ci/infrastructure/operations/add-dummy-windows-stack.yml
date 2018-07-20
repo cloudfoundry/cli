@@ -1,0 +1,4 @@
+---
+- type: replace
+  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/stacks/name=windows2012R2?/description
+  value: windows

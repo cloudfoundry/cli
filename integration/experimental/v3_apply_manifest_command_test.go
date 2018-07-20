@@ -2,7 +2,10 @@ package experimental
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"regexp"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -12,22 +15,27 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = PDescribe("v3-apply-manifest command", func() {
+var _ = Describe("v3-apply-manifest command", func() {
 	var (
 		orgName      string
 		spaceName    string
 		appName      string
 		manifestPath string
+		appDir       string
 	)
 
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
-		appDir, _ := ioutil.TempDir("", "simple-app")
+		appDir, _ = ioutil.TempDir("", "simple-app")
 		manifestPath = filepath.Join(appDir, "manifest.yml")
 		// Ensure the file exists at the minimum
 		helpers.WriteManifest(manifestPath, map[string]interface{}{})
+	})
+
+	AfterEach(func() {
+		Expect(os.RemoveAll(appDir)).ToNot(HaveOccurred())
 	})
 
 	Describe("help", func() {
@@ -98,7 +106,7 @@ var _ = PDescribe("v3-apply-manifest command", func() {
 			})
 		})
 
-		PContext("when the v3 api version is lower than the minimum version", func() {
+		Context("when the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -242,8 +250,8 @@ var _ = PDescribe("v3-apply-manifest command", func() {
 
 				Context("when the instances value is more than the space quota limit", func() {
 					BeforeEach(func() {
-						helpers.CF("create-space-quota", "some-space-quota-name", "-a", "4")
-						helpers.CF("set-space-quota", spaceName, "some-space-quota-name")
+						Eventually(helpers.CF("create-space-quota", "some-space-quota-name", "-a", "4")).Should(Exit(0))
+						Eventually(helpers.CF("set-space-quota", spaceName, "some-space-quota-name")).Should(Exit(0))
 						helpers.WriteManifest(manifestPath, map[string]interface{}{
 							"applications": []map[string]interface{}{
 								{
@@ -288,9 +296,10 @@ var _ = PDescribe("v3-apply-manifest command", func() {
 						Eventually(session).Should(Exit())
 
 						session = helpers.CF("v3-apply-manifest", "-f", manifestPath)
-						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", manifestPath, orgName, spaceName, userName))
+						Eventually(session).Should(Say("Applying manifest %s in org %s / space %s as %s...", regexp.QuoteMeta(manifestPath), orgName, spaceName, userName))
 						Eventually(session).Should(Exit())
 
+						time.Sleep(5 * time.Second) // Need to wait for all instances to run
 						session = helpers.CF("app", appName)
 						Eventually(session).Should(Say("instances:\\s+%s", "3/3"))
 						Eventually(session).Should(Exit())

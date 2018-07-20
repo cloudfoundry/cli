@@ -71,6 +71,29 @@ func NewServiceBroker(name string, path string, appsDomain string, serviceName s
 	b.AsyncPlans = []Plan{
 		{Name: RandomName(), ID: RandomName()},
 		{Name: RandomName(), ID: RandomName()},
+		{Name: RandomName(), ID: RandomName()}, // accepts_incomplete = true
+	}
+	b.Service.DashboardClient.ID = RandomName()
+	b.Service.DashboardClient.Secret = RandomName()
+	b.Service.DashboardClient.RedirectUri = RandomName()
+	return b
+}
+
+func NewAsynchServiceBroker(name string, path string, appsDomain string, serviceName string, planName string) ServiceBroker {
+	b := ServiceBroker{}
+	b.Path = path
+	b.Name = name
+	b.AppsDomain = appsDomain
+	b.Service.Name = serviceName
+	b.Service.ID = RandomName()
+	b.SyncPlans = []Plan{
+		{Name: RandomName(), ID: RandomName()},
+		{Name: RandomName(), ID: RandomName()},
+	}
+	b.AsyncPlans = []Plan{
+		{Name: RandomName(), ID: RandomName()},
+		{Name: RandomName(), ID: RandomName()},
+		{Name: planName, ID: RandomName()}, // accepts_incomplete = true
 	}
 	b.Service.DashboardClient.ID = RandomName()
 	b.Service.DashboardClient.Secret = RandomName()
@@ -146,20 +169,13 @@ func (b ServiceBroker) ToJSON(shareable bool) string {
 		"<fake-async-plan-guid>", b.AsyncPlans[0].ID,
 		"<fake-async-plan-2>", b.AsyncPlans[1].Name,
 		"<fake-async-plan-2-guid>", b.AsyncPlans[1].ID,
+		"<fake-async-plan-3>", b.AsyncPlans[2].Name,
+		"<fake-async-plan-3-guid>", b.AsyncPlans[2].ID,
 		"\"<fake-plan-schema>\"", string(planSchema),
 		"\"<shareable-service>\"", fmt.Sprintf("%t", shareable),
 	)
 
 	return replacer.Replace(string(bytes))
-}
-
-func GetAppGuid(appName string) string {
-	session := CF("app", appName, "--guid")
-	Eventually(session).Should(Exit(0))
-
-	appGuid := strings.TrimSpace(string(session.Out.Contents()))
-	Expect(appGuid).NotTo(Equal(""))
-	return appGuid
 }
 
 type Assets struct {

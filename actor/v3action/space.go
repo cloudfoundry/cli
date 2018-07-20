@@ -14,7 +14,7 @@ type Space ccv3.Space
 func (actor Actor) ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) (string, Warnings, error) {
 	var allWarnings Warnings
 
-	_, apiWarnings, err := actor.CloudControllerClient.AssignSpaceToIsolationSegment(spaceGUID, "")
+	_, apiWarnings, err := actor.CloudControllerClient.UpdateSpaceIsolationSegmentRelationship(spaceGUID, "")
 	allWarnings = append(allWarnings, apiWarnings...)
 	if err != nil {
 		return "", allWarnings, err

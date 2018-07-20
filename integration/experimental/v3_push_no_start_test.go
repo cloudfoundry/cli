@@ -21,6 +21,11 @@ var _ = Describe("v3-push with --no-start", func() {
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
 		userName, _ = helpers.GetCredentials()
+		helpers.TurnOffExperimental()
+	})
+
+	AfterEach(func() {
+		helpers.TurnOnExperimental()
 	})
 
 	Context("when the environment is set up correctly", func() {

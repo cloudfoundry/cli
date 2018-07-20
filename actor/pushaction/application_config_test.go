@@ -215,7 +215,6 @@ var _ = Describe("Application Config", func() {
 
 					It("sets the current application to the existing application", func() {
 						Expect(firstConfig.CurrentApplication).To(Equal(app))
-						Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
 
 						Expect(fakeV2Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 						passedName, passedSpaceGUID := fakeV2Actor.GetApplicationByNameAndSpaceArgsForCall(0)
@@ -329,7 +328,6 @@ var _ = Describe("Application Config", func() {
 						Name:      appName,
 						SpaceGUID: spaceGUID,
 					}}))
-				Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
 			})
 
 			Context("when the --random-route flag is provided", func() {
@@ -1102,6 +1100,17 @@ var _ = Describe("Application Config", func() {
 				Expect(len(firstConfig.DesiredApplication.Buildpacks)).To(Equal(2))
 				Expect(firstConfig.DesiredApplication.Buildpacks[0]).To(Equal("some-buildpack-1"))
 				Expect(firstConfig.DesiredApplication.Buildpacks[1]).To(Equal("some-buildpack-2"))
+			})
+
+			Context("when the buildpacks are an empty array", func() {
+				BeforeEach(func() {
+					manifestApps[0].Buildpacks = []string{}
+				})
+
+				It("set the buildpacks on DesiredApplication to empty array", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(firstConfig.DesiredApplication.Buildpacks).To(Equal([]string{}))
+				})
 			})
 		})
 	})

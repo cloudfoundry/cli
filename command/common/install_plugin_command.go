@@ -76,10 +76,6 @@ func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) err
 
 func (cmd InstallPluginCommand) Execute([]string) error {
 	log.WithField("PluginHome", cmd.Config.PluginHome()).Info("making plugin dir")
-	err := os.MkdirAll(cmd.Config.PluginHome(), 0700)
-	if err != nil {
-		return err
-	}
 
 	tempPluginDir, err := ioutil.TempDir(cmd.Config.PluginHome(), "temp")
 	log.WithField("tempPluginDir", tempPluginDir).Debug("making tempPluginDir dir")

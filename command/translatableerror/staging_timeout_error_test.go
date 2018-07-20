@@ -37,7 +37,7 @@ var _ = Describe("StagingTimeoutError", func() {
 					Timeout: 150 * time.Second,
 				}
 
-				Expect(err.Translate(translateFunc)).To(Equal("Error staging application sliders: timed out after 2.5 minutes"))
+				Expect(err.Translate(translateFunc)).To(Equal("Error staging application sliders: timed out after 2.5 minute(s)"))
 			})
 		})
 
@@ -48,7 +48,7 @@ var _ = Describe("StagingTimeoutError", func() {
 					Timeout: 120 * time.Second,
 				}
 
-				Expect(err.Translate(translateFunc)).To(Equal("Error staging application sliders: timed out after 2 minutes"))
+				Expect(err.Translate(translateFunc)).To(Equal("Error staging application sliders: timed out after 2 minute(s)"))
 			})
 		})
 
@@ -59,7 +59,7 @@ var _ = Describe("StagingTimeoutError", func() {
 					Timeout: 30 * time.Second,
 				}
 
-				Expect(err.Translate(translateFunc)).To(Equal("Error staging application sliders: timed out after 0.5 minutes"))
+				Expect(err.Translate(translateFunc)).To(Equal("Error staging application sliders: timed out after 0.5 minute(s)"))
 			})
 		})
 
@@ -70,7 +70,7 @@ var _ = Describe("StagingTimeoutError", func() {
 					Timeout: 60 * time.Second,
 				}
 
-				Expect(err.Translate(translateFunc)).To(Equal("Error staging application sliders: timed out after 1 minute"))
+				Expect(err.Translate(translateFunc)).To(Equal("Error staging application sliders: timed out after 1 minute(s)"))
 			})
 		})
 
@@ -81,7 +81,7 @@ var _ = Describe("StagingTimeoutError", func() {
 					Timeout: 120 * time.Second,
 				}
 
-				Expect(err.Translate(translateFunc)).To(Equal("Error staging application sliders: timed out after 2 minutes"))
+				Expect(err.Translate(translateFunc)).To(Equal("Error staging application sliders: timed out after 2 minute(s)"))
 			})
 		})
 	})

@@ -9,9 +9,10 @@ import (
 )
 
 type ProcessHealthCheck struct {
-	ProcessType     string
-	HealthCheckType string
-	Endpoint        string
+	ProcessType       string
+	HealthCheckType   string
+	Endpoint          string
+	InvocationTimeout int
 }
 
 type ProcessHealthChecks []ProcessHealthCheck
@@ -57,9 +58,10 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 	var processHealthChecks ProcessHealthChecks
 	for _, ccv3Process := range ccv3Processes {
 		processHealthCheck := ProcessHealthCheck{
-			ProcessType:     ccv3Process.Type,
-			HealthCheckType: ccv3Process.HealthCheckType,
-			Endpoint:        ccv3Process.HealthCheckEndpoint,
+			ProcessType:       ccv3Process.Type,
+			HealthCheckType:   ccv3Process.HealthCheckType,
+			Endpoint:          ccv3Process.HealthCheckEndpoint,
+			InvocationTimeout: ccv3Process.HealthCheckInvocationTimeout,
 		}
 		processHealthChecks = append(processHealthChecks, processHealthCheck)
 	}
@@ -69,7 +71,15 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 	return processHealthChecks, allWarnings, nil
 }
 
-func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType string, httpEndpoint string, processType string) (Application, Warnings, error) {
+func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
+	appName string,
+	spaceGUID string,
+	healthCheckType string,
+	httpEndpoint string,
+	processType string,
+	invocationTimeout int,
+) (Application, Warnings, error) {
+
 	if healthCheckType != "http" {
 		if httpEndpoint == "/" {
 			httpEndpoint = ""
@@ -96,6 +106,7 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(appName st
 		process.GUID,
 		healthCheckType,
 		httpEndpoint,
+		invocationTimeout,
 	)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {

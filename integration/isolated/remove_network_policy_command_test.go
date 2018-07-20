@@ -3,6 +3,7 @@ package isolated
 import (
 	"regexp"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -13,6 +14,10 @@ import (
 )
 
 var _ = Describe("remove-network-policy command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfVersionLessThan(ccversion.MinVersionNetworkingV3)
+	})
+
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {

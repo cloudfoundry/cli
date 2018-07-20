@@ -2,6 +2,7 @@ package sharedaction_test
 
 import (
 	"archive/zip"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -69,6 +70,55 @@ var _ = Describe("Resource Actions", func() {
 
 	Describe("GatherDirectoryResources", func() {
 		// tests are under resource_unix_test.go and resource_windows_test.go
+	})
+
+	Describe("ReadArchive", func() {
+		var (
+			archivePath string
+			executeErr  error
+
+			readCloser io.ReadCloser
+			fileSize   int64
+		)
+
+		JustBeforeEach(func() {
+			readCloser, fileSize, executeErr = actor.ReadArchive(archivePath)
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(archivePath)).ToNot(HaveOccurred())
+		})
+
+		Context("when the archive can be accessed properly", func() {
+			BeforeEach(func() {
+				tmpfile, err := ioutil.TempFile("", "fake-archive")
+				Expect(err).ToNot(HaveOccurred())
+				_, err = tmpfile.Write([]byte("123456"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(tmpfile.Close()).ToNot(HaveOccurred())
+
+				archivePath = tmpfile.Name()
+			})
+
+			It("returns zero errors", func() {
+				defer readCloser.Close()
+
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fileSize).To(BeNumerically("==", 6))
+
+				b := make([]byte, 100)
+				size, err := readCloser.Read(b)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(b[:size]).To(Equal([]byte("123456")))
+			})
+		})
+
+		Context("when the archive returns any access errors", func() {
+			It("returns the error", func() {
+				_, ok := executeErr.(*os.PathError)
+				Expect(ok).To(BeTrue())
+			})
+		})
 	})
 
 	Describe("ZipArchiveResources", func() {

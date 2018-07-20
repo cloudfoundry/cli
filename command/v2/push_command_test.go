@@ -32,7 +32,7 @@ import (
 
 var _ = Describe("push Command", func() {
 	var (
-		cmd              V2PushCommand
+		cmd              PushCommand
 		testUI           *ui.UI
 		fakeConfig       *commandfakes.FakeConfig
 		fakeSharedActor  *commandfakes.FakeSharedActor
@@ -56,7 +56,7 @@ var _ = Describe("push Command", func() {
 		fakeRestartActor = new(v2fakes.FakeRestartActor)
 		fakeProgressBar = new(v2fakes.FakeProgressBar)
 
-		cmd = V2PushCommand{
+		cmd = PushCommand{
 			UI:           testUI,
 			Config:       fakeConfig,
 			SharedActor:  fakeSharedActor,
@@ -78,6 +78,21 @@ var _ = Describe("push Command", func() {
 	Context("Execute", func() {
 		JustBeforeEach(func() {
 			executeErr = cmd.Execute(nil)
+		})
+
+		Context("when the mutiple buildpacks are provided, and the API version is below the mutiple buildpacks minimum", func() {
+			BeforeEach(func() {
+				fakeActor.CloudControllerV3APIVersionReturns("3.1.0")
+				cmd.Buildpacks = []string{"some-buildpack", "some-other-buildpack"}
+			})
+
+			It("returns a MinimumAPIVersionNotMetError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+					Command:        "Multiple option '-b'",
+					CurrentVersion: "3.1.0",
+					MinimumVersion: ccversion.MinVersionManifestBuildpacksV3,
+				}))
+			})
 		})
 
 		Context("when the droplet flag is passed and the API version is below the minimum", func() {
@@ -172,8 +187,7 @@ var _ = Describe("push Command", func() {
 									{Host: "route3", Domain: v2action.Domain{Name: "example.com"}},
 									{Host: "route4", Domain: v2action.Domain{Name: "example.com"}},
 								},
-								TargetedSpaceGUID: "some-space-guid",
-								Path:              pwd,
+								Path: pwd,
 							},
 						}
 						fakeActor.ConvertToApplicationConfigsReturns(appConfigs, pushaction.Warnings{"some-config-warnings"}, nil)
@@ -192,7 +206,6 @@ var _ = Describe("push Command", func() {
 								updatedConfig = pushaction.ApplicationConfig{
 									CurrentApplication: pushaction.Application{Application: v2action.Application{Name: appName, GUID: "some-app-guid"}},
 									DesiredApplication: pushaction.Application{Application: v2action.Application{Name: appName, GUID: "some-app-guid"}},
-									TargetedSpaceGUID:  "some-space-guid",
 									Path:               pwd,
 								}
 

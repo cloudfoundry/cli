@@ -177,4 +177,130 @@ var _ = Describe("Build Actions", func() {
 			})
 		})
 	})
+
+	Describe("StageApplicationPackage", func() {
+		var (
+			build      Build
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			build, warnings, executeErr = actor.StageApplicationPackage("some-package-guid")
+		})
+
+		Context("when the creation is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateBuildReturns(ccv3.Build{GUID: "some-build-guid"}, ccv3.Warnings{"create-warnings-1", "create-warnings-2"}, nil)
+			})
+
+			It("returns the build and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(build).To(Equal(Build{GUID: "some-build-guid"}))
+				Expect(warnings).To(ConsistOf("create-warnings-1", "create-warnings-2"))
+			})
+		})
+
+		Context("when the creation fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateBuildReturns(ccv3.Build{}, ccv3.Warnings{"create-warnings-1", "create-warnings-2"}, errors.New("blurp"))
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("blurp"))
+				Expect(warnings).To(ConsistOf("create-warnings-1", "create-warnings-2"))
+			})
+		})
+	})
+
+	Describe("PollBuild", func() {
+		var (
+			droplet    Droplet
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			droplet, warnings, executeErr = actor.PollBuild("some-build-guid", "some-app")
+		})
+
+		Context("when getting the build yields a 'Staged' build", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetBuildReturnsOnCall(0, ccv3.Build{State: constant.BuildStaging}, ccv3.Warnings{"some-get-build-warnings"}, nil)
+				fakeCloudControllerClient.GetBuildReturnsOnCall(1, ccv3.Build{GUID: "some-build-guid", DropletGUID: "some-droplet-guid", State: constant.BuildStaged}, ccv3.Warnings{"some-get-build-warnings"}, nil)
+				fakeConfig.StagingTimeoutReturns(500 * time.Millisecond)
+			})
+
+			It("gets the droplet", func() {
+				Expect(fakeCloudControllerClient.GetBuildCallCount()).To(Equal(2))
+
+				Expect(fakeCloudControllerClient.GetDropletCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetDropletArgsForCall(0)).To(Equal("some-droplet-guid"))
+			})
+
+			Context("when getting the droplet is successful", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{GUID: "some-droplet-guid", CreatedAt: "some-droplet-time", State: constant.DropletStaged}, ccv3.Warnings{"some-get-droplet-warnings"}, nil)
+				})
+
+				It("returns the droplet and warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(warnings).To(ConsistOf("some-get-build-warnings", "some-get-build-warnings", "some-get-droplet-warnings"))
+					Expect(droplet).To(Equal(Droplet{
+						GUID:      "some-droplet-guid",
+						CreatedAt: "some-droplet-time",
+						State:     constant.DropletStaged,
+					}))
+				})
+			})
+
+			Context("when getting the droplet fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{}, ccv3.Warnings{"some-get-droplet-warnings"}, errors.New("no rain"))
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(executeErr).To(MatchError("no rain"))
+					Expect(warnings).To(ConsistOf("some-get-build-warnings", "some-get-build-warnings", "some-get-droplet-warnings"))
+				})
+			})
+		})
+
+		Context("when getting the build yields a 'Failed' build", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetBuildReturnsOnCall(0, ccv3.Build{State: constant.BuildFailed, Error: "ded build"}, ccv3.Warnings{"some-get-build-warnings"}, nil)
+				fakeConfig.StagingTimeoutReturns(500 * time.Millisecond)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("ded build"))
+				Expect(warnings).To(ConsistOf("some-get-build-warnings"))
+			})
+		})
+
+		Context("when getting the build fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetBuildReturnsOnCall(0, ccv3.Build{}, ccv3.Warnings{"some-get-build-warnings"}, errors.New("some-poll-build-error"))
+				fakeConfig.StagingTimeoutReturns(500 * time.Millisecond)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError("some-poll-build-error"))
+				Expect(warnings).To(ConsistOf("some-get-build-warnings"))
+			})
+		})
+
+		Context("when polling the build times out", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetBuildReturnsOnCall(0, ccv3.Build{}, ccv3.Warnings{"some-get-build-warnings"}, nil)
+				fakeConfig.StagingTimeoutReturns(500 * time.Millisecond)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(actionerror.StagingTimeoutError{AppName: "some-app", Timeout: 500 * time.Millisecond}))
+				Expect(warnings).To(ConsistOf("some-get-build-warnings"))
+			})
+		})
+	})
 })

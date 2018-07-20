@@ -34,7 +34,7 @@ var _ = Describe("V3UnexpectedResponseError", func() {
 				},
 			}
 
-			Expect(err.Error()).To(Equal(`Unexpected Response
+			Expect(err).To(MatchError(`Unexpected Response
 Response Code: 418
 Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95
 Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f

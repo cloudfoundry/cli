@@ -1,8 +1,48 @@
 package helpers
 
 import (
+	"sort"
+
 	uuid "github.com/nu7hatch/gouuid"
 )
+
+// TODO: Is this working???
+func GenerateHigherName(randomNameGenerator func() string, names ...string) string {
+	name := randomNameGenerator()
+
+	var safe bool
+	for !safe {
+		safe = true
+		for _, nameToBeLowerThan := range names {
+			// regenerate name if name is NOT higher
+			if !sort.StringsAreSorted([]string{nameToBeLowerThan, name}) {
+				name = randomNameGenerator()
+				safe = false
+				break
+			}
+		}
+	}
+	return name
+}
+
+// TODO: Is this working???
+func GenerateLowerName(randomNameGenerator func() string, names ...string) string {
+	name := randomNameGenerator()
+
+	var safe bool
+	for !safe {
+		safe = true
+		for _, nameToBeHigherThan := range names {
+			// regenerate name if name is NOT lower
+			if !sort.StringsAreSorted([]string{name, nameToBeHigherThan}) {
+				name = randomNameGenerator()
+				safe = false
+				break
+			}
+		}
+	}
+	return name
+}
 
 func NewAppName() string {
 	return PrefixedRandomName("INTEGRATION-APP")
@@ -18,6 +58,10 @@ func NewOrgName() string {
 
 func NewServiceBrokerName() string {
 	return PrefixedRandomName("INTEGRATION-SERVICE-BROKER")
+}
+
+func NewPlanName() string {
+	return PrefixedRandomName("INTEGRATION-PLAN")
 }
 
 func NewPassword() string {
@@ -38,6 +82,10 @@ func NewSpaceName() string {
 
 func NewUsername() string {
 	return PrefixedRandomName("INTEGRATION-USER")
+}
+
+func NewBuildpack() string {
+	return PrefixedRandomName("INTEGRATION-BUILDPACK")
 }
 
 func PrefixedRandomName(namePrefix string) string {

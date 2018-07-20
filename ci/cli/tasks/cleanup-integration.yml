@@ -15,6 +15,9 @@ inputs:
 outputs:
 - name: cleanup-integration-outputs
 
+params:
+  ARGS:
+
 run:
   path: bash
   args:
@@ -24,14 +27,14 @@ run:
 
     ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
 
-    export CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
+    export CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
     # output password into a temp file for consumption by Windows
-    echo $CF_PASSWORD > cleanup-integration-outputs/cf-password
+    echo $CF_INT_PASSWORD > cleanup-integration-outputs/cf-password
 
     set -ex
 
     domain=$(cat bosh-lite-lock/name)
-    export CF_API="https://api.${domain}"
+    export CF_INT_API="https://api.${domain}"
 
     export PATH=$GOPATH/bin:$PATH
 
@@ -42,4 +45,4 @@ run:
     popd
 
     cd cli-ci
-    bin/cleanup-integration
+    bin/cleanup-integration "${ARGS}"

@@ -52,9 +52,8 @@ var _ = Describe("Manifest", func() {
 
 	Context("when v2Actor.CreateManifestApplication succeeds", func() {
 		BeforeEach(func() {
-			// This only needs to test v2 specific attributes
 			v2Application := manifest.Application{
-				Buildpack: types.FilteredString{IsSet: true, Value: "some-buildpack"},
+				Buildpacks: []string{"some-buildpack"},
 			}
 
 			fakeV2Actor.CreateApplicationManifestByNameAndSpaceReturns(v2Application, v2action.Warnings{"v2-action-warnings"}, nil)
@@ -125,8 +124,8 @@ var _ = Describe("Manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("v2-action-warnings"))
 				Expect(manifestApp).To(MatchFields(IgnoreExtras, Fields{
-					"Buildpack":  Equal(types.FilteredString{IsSet: true, Value: "some-buildpack"}),
-					"Buildpacks": BeNil(),
+					"Buildpack":  Equal(types.FilteredString{}),
+					"Buildpacks": ConsistOf("some-buildpack"),
 				}))
 			})
 		})

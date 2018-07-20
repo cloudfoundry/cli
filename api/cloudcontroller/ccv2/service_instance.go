@@ -52,20 +52,14 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	var ccServiceInstance struct {
 		Metadata internal.Metadata
 		Entity   struct {
-			Name            string   `json:"name"`
-			SpaceGUID       string   `json:"space_guid"`
-			ServiceGUID     string   `json:"service_guid"`
-			ServicePlanGUID string   `json:"service_plan_guid"`
-			Type            string   `json:"type"`
-			Tags            []string `json:"tags"`
-			DashboardURL    string   `json:"dashboard_url"`
-			LastOperation   struct {
-				Type        string `json:"type"`
-				State       string `json:"state"`
-				Description string `json:"description"`
-				UpdatedAt   string `json:"updated_at"`
-				CreatedAt   string `json:"created_at"`
-			} `json:"last_operation"`
+			Name            string        `json:"name"`
+			SpaceGUID       string        `json:"space_guid"`
+			ServiceGUID     string        `json:"service_guid"`
+			ServicePlanGUID string        `json:"service_plan_guid"`
+			Type            string        `json:"type"`
+			Tags            []string      `json:"tags"`
+			DashboardURL    string        `json:"dashboard_url"`
+			LastOperation   LastOperation `json:"last_operation"`
 		}
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccServiceInstance)
@@ -81,7 +75,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	serviceInstance.Type = constant.ServiceInstanceType(ccServiceInstance.Entity.Type)
 	serviceInstance.Tags = ccServiceInstance.Entity.Tags
 	serviceInstance.DashboardURL = ccServiceInstance.Entity.DashboardURL
-	serviceInstance.LastOperation = LastOperation(ccServiceInstance.Entity.LastOperation)
+	serviceInstance.LastOperation = ccServiceInstance.Entity.LastOperation
 	return nil
 }
 

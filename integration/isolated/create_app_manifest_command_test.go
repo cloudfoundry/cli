@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/manifest"
 	. "github.com/onsi/ginkgo"
@@ -16,11 +17,11 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func createManifest(appName string) (manifest.Manifest, error) {
+func createManifest(appName string) (manifest.Manifest, string, error) {
 	tmpDir, err := ioutil.TempDir("", "")
 	defer os.RemoveAll(tmpDir)
 	if err != nil {
-		return manifest.Manifest{}, err
+		return manifest.Manifest{}, "", err
 	}
 
 	manifestPath := filepath.Join(tmpDir, "manifest.yml")
@@ -28,16 +29,16 @@ func createManifest(appName string) (manifest.Manifest, error) {
 
 	manifestContents, err := ioutil.ReadFile(manifestPath)
 	if err != nil {
-		return manifest.Manifest{}, err
+		return manifest.Manifest{}, "", err
 	}
 
 	var appsManifest manifest.Manifest
 	err = yaml.Unmarshal(manifestContents, &appsManifest)
 	if err != nil {
-		return manifest.Manifest{}, err
+		return manifest.Manifest{}, "", err
 	}
 
-	return appsManifest, nil
+	return appsManifest, string(manifestContents), nil
 }
 
 var _ = Describe("create-app-manifest command", func() {
@@ -268,11 +269,44 @@ var _ = Describe("create-app-manifest command", func() {
 		})
 
 		Context("when app was created with docker image", func() {
-			var (
-				oldDockerPassword string
-			)
 
 			BeforeEach(func() {
+				Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
+			})
+
+			It("creates the manifest", func() {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-v")
+				Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("OK"))
+				expectedFilePath := helpers.ConvertPathToRegularExpression(fmt.Sprintf(".%s%s_manifest.yml", string(os.PathSeparator), appName))
+				Eventually(session).Should(Say("Manifest file created successfully at %s", expectedFilePath))
+
+				expectedFile := fmt.Sprintf(`applications:
+- name: %s
+  disk_quota: 1G
+  docker:
+    image: %s
+  instances: 1
+  memory: 32M
+  routes:
+  - route: %s.%s
+  stack: cflinuxfs2
+`, appName, DockerImage, strings.ToLower(appName), domainName)
+
+				createdFile, err := ioutil.ReadFile(manifestFilePath)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(createdFile)).To(Equal(expectedFile))
+
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("when the API supports docker credentials", func() {
+			var oldDockerPassword string
+
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionDockerCredentialsV2)
+
 				oldDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
 				Expect(os.Setenv("CF_DOCKER_PASSWORD", "my-docker-password")).To(Succeed())
 
@@ -309,6 +343,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 				Eventually(session).Should(Exit(0))
 			})
+
 		})
 
 		Context("when app has no hostname", func() {
@@ -324,7 +359,7 @@ var _ = Describe("create-app-manifest command", func() {
 			})
 
 			It("contains routes without hostnames", func() {
-				appManifest, err := createManifest(appName)
+				appManifest, _, err := createManifest(appName)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(appManifest.Applications).To(HaveLen(1))
@@ -340,28 +375,30 @@ var _ = Describe("create-app-manifest command", func() {
 				})
 			})
 
-			FIt("returns a manifest with multiple buildpacks", func() {
-				appManifest, err := createManifest(appName)
+			It("returns a manifest with one buildpack under buildpacks", func() {
+				appManifest, rawManifest, err := createManifest(appName)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(appManifest.Applications).To(HaveLen(1))
-				Expect(appManifest.Applications[0].Buildpacks).To(Equal([]string{"staticfile_buildpack"}))
+				Expect(appManifest.Applications[0].Buildpacks).To(ConsistOf("staticfile_buildpack"), fmt.Sprintf("Manifest should have a staticfile_buildpack:\n%s\n", rawManifest))
 			})
 		})
 
 		Context("when the app has multiple buildpacks", func() {
 			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
+
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start", "-b", "ruby_buildpack", "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
 
-			FIt("returns a manifest with multiple buildpacks", func() {
-				appManifest, err := createManifest(appName)
+			It("returns a manifest with multiple buildpacks", func() {
+				appManifest, rawManifest, err := createManifest(appName)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(appManifest.Applications).To(HaveLen(1))
-				Expect(appManifest.Applications[0].Buildpacks).To(Equal([]string{"ruby_buildpack", "staticfile_buildpack"}))
+				Expect(appManifest.Applications[0].Buildpacks).To(ConsistOf("ruby_buildpack", "staticfile_buildpack"), fmt.Sprintf("Manifest should have ruby and staticfile:\n%s\n", rawManifest))
 			})
 		})
 	})

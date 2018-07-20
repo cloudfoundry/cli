@@ -12,10 +12,21 @@ type OldFakeBuildpackRepository struct {
 	FindByNameName        string
 	FindByNameBuildpack   models.Buildpack
 	FindByNameAPIResponse error
+	FindByNameAmbiguous   bool
 
-	CreateBuildpackExists bool
-	CreateBuildpack       models.Buildpack
-	CreateAPIResponse     error
+	FindByNameAndStackNotFound  bool
+	FindByNameAndStackName      string
+	FindByNameAndStackStack     string
+	FindByNameAndStackBuildpack models.Buildpack
+
+	FindByNameWithNilStackNotFound  bool
+	FindByNameWithNilStackName      string
+	FindByNameWithNilStackBuildpack models.Buildpack
+
+	CreateBuildpackExists             bool
+	CreateBuildpackWithNilStackExists bool
+	CreateBuildpack                   models.Buildpack
+	CreateAPIResponse                 error
 
 	DeleteBuildpackGUID string
 	DeleteAPIResponse   error
@@ -42,6 +53,31 @@ func (repo *OldFakeBuildpackRepository) FindByName(name string) (buildpack model
 
 	if repo.FindByNameNotFound {
 		apiErr = errors.NewModelNotFoundError("Buildpack", name)
+	} else if repo.FindByNameAmbiguous {
+		apiErr = errors.NewAmbiguousModelError("Buildpack", name)
+	}
+
+	return
+}
+
+func (repo *OldFakeBuildpackRepository) FindByNameAndStack(name, stack string) (buildpack models.Buildpack, apiErr error) {
+	repo.FindByNameAndStackName = name
+	repo.FindByNameAndStackStack = stack
+	buildpack = repo.FindByNameAndStackBuildpack
+
+	if repo.FindByNameAndStackNotFound {
+		apiErr = errors.NewModelNotFoundError("Buildpack", name)
+	}
+
+	return
+}
+
+func (repo *OldFakeBuildpackRepository) FindByNameWithNilStack(name string) (buildpack models.Buildpack, apiErr error) {
+	repo.FindByNameWithNilStackName = name
+	buildpack = repo.FindByNameWithNilStackBuildpack
+
+	if repo.FindByNameWithNilStackNotFound {
+		apiErr = errors.NewModelNotFoundError("Buildpack", name)
 	}
 
 	return
@@ -50,9 +86,11 @@ func (repo *OldFakeBuildpackRepository) FindByName(name string) (buildpack model
 func (repo *OldFakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error) {
 	if repo.CreateBuildpackExists {
 		return repo.CreateBuildpack, errors.NewHTTPError(400, errors.BuildpackNameTaken, "Buildpack already exists")
+	} else if repo.CreateBuildpackWithNilStackExists {
+		return repo.CreateBuildpack, errors.NewHTTPError(400, errors.StackUnique, "stack unique")
 	}
 
-	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked}
+	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked, GUID: "BUILDPACK-GUID-X"}
 	return repo.CreateBuildpack, repo.CreateAPIResponse
 }
 

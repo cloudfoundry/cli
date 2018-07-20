@@ -8,22 +8,24 @@ import (
 	"code.cloudfoundry.org/bytefmt"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 )
 
 type AppSummaryDisplayer struct {
-	UI              command.UI
-	Config          command.Config
-	Actor           V3AppSummaryActor
-	V2AppRouteActor V2AppRouteActor
-	AppName         string
+	UI         command.UI
+	Config     command.Config
+	Actor      V3AppSummaryActor
+	V2AppActor V2AppActor
+	AppName    string
 }
 
-//go:generate counterfeiter . V2AppRouteActor
+//go:generate counterfeiter . V2AppActor
 
-type V2AppRouteActor interface {
+type V2AppActor interface {
 	GetApplicationRoutes(appGUID string) (v2action.Routes, v2action.Warnings, error)
+	GetApplicationInstancesWithStatsByApplication(guid string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)
 }
 
 //go:generate counterfeiter . V3AppSummaryActor
@@ -41,28 +43,86 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 	summary.ProcessSummaries.Sort()
 
 	var routes v2action.Routes
+	var appStats []v2action.ApplicationInstanceWithStats
 	if len(summary.ProcessSummaries) > 0 {
 		var routeWarnings v2action.Warnings
-		routes, routeWarnings, err = display.V2AppRouteActor.GetApplicationRoutes(summary.Application.GUID)
+		routes, routeWarnings, err = display.V2AppActor.GetApplicationRoutes(summary.Application.GUID)
 		display.UI.DisplayWarnings(routeWarnings)
-		if err != nil {
+		if _, ok := err.(ccerror.ResourceNotFoundError); err != nil && !ok {
 			return err
+		}
+
+		if summary.State == constant.ApplicationStarted {
+			var instanceWarnings v2action.Warnings
+			appStats, instanceWarnings, err = display.V2AppActor.GetApplicationInstancesWithStatsByApplication(summary.Application.GUID)
+			display.UI.DisplayWarnings(instanceWarnings)
+			if _, ok := err.(ccerror.ResourceNotFoundError); err != nil && !ok {
+				return err
+			}
 		}
 	}
 
-	display.displayAppTable(summary, routes)
+	display.displayAppTable(summary, routes, appStats)
 
 	return nil
+}
+
+func (display AppSummaryDisplayer) DisplayAppProcessInfo() error {
+	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID)
+	display.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+	summary.ProcessSummaries.Sort()
+
+	display.displayProcessTable(summary)
+	return nil
+}
+
+func GetCreatedTime(summary v3action.ApplicationSummary) time.Time {
+	timestamp, _ := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
+	return timestamp
+}
+
+func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes, appStats []v2action.ApplicationInstanceWithStats) {
+	var isoRow []string
+	if len(appStats) > 0 && len(appStats[0].IsolationSegment) > 0 {
+		isoRow = append(isoRow, display.UI.TranslateText("isolation segment:"), appStats[0].IsolationSegment)
+	}
+
+	var lifecycleInfo []string
+	if summary.LifecycleType == constant.AppLifecycleTypeDocker {
+		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
+	} else {
+		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)}
+	}
+
+	keyValueTable := [][]string{
+		{display.UI.TranslateText("name:"), summary.Application.Name},
+		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
+		isoRow,
+		{display.UI.TranslateText("routes:"), routes.Summary()},
+		{display.UI.TranslateText("last uploaded:"), display.UI.UserFriendlyDate(GetCreatedTime(summary))},
+		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
+		lifecycleInfo,
+	}
+
+	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
+
+	display.displayProcessTable(summary)
 }
 
 func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v3action.ProcessSummary) {
 	display.UI.DisplayNewline()
 
-	display.UI.DisplayTextWithBold("{{.ProcessType}}:{{.HealthyInstanceCount}}/{{.TotalInstanceCount}}", map[string]interface{}{
-		"ProcessType":          processSummary.Type,
-		"HealthyInstanceCount": processSummary.HealthyInstanceCount(),
-		"TotalInstanceCount":   processSummary.TotalInstanceCount(),
-	})
+	// TODO: figure out how to align key-value output
+	keyValueTable := [][]string{
+		{display.UI.TranslateText("type:"), processSummary.Type},
+		{display.UI.TranslateText("instances:"), fmt.Sprintf("%d/%d", processSummary.HealthyInstanceCount(), processSummary.TotalInstanceCount())},
+		{display.UI.TranslateText("memory usage:"), fmt.Sprintf("%dM", processSummary.MemoryInMB.Value)},
+	}
+
+	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
 
 	if !display.processHasAnInstance(&processSummary) {
 		return
@@ -97,50 +157,6 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v3act
 	}
 
 	display.UI.DisplayInstancesTableForApp(table)
-}
-
-func (display AppSummaryDisplayer) DisplayAppProcessInfo() error {
-	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID)
-	display.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return err
-	}
-	summary.ProcessSummaries.Sort()
-
-	display.displayProcessTable(summary)
-	return nil
-}
-
-func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes) {
-	keyValueTable := [][]string{
-		{display.UI.TranslateText("name:"), summary.Application.Name},
-		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
-		{display.UI.TranslateText("processes:"), summary.ProcessSummaries.String()},
-		{display.UI.TranslateText("memory usage:"), display.usageSummary(summary.ProcessSummaries)},
-		{display.UI.TranslateText("routes:"), routes.Summary()},
-		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
-	}
-
-	var lifecycleInfo []string
-
-	if summary.LifecycleType == constant.AppLifecycleTypeDocker {
-		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
-	} else {
-		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)}
-	}
-
-	keyValueTable = append(keyValueTable, lifecycleInfo)
-
-	crashedProcesses := []string{}
-	for i := range summary.ProcessSummaries {
-		if display.processInstancesAreAllCrashed(&summary.ProcessSummaries[i]) {
-			crashedProcesses = append(crashedProcesses, summary.ProcessSummaries[i].Type)
-		}
-	}
-
-	display.UI.DisplayKeyValueTableForV3App(keyValueTable, crashedProcesses)
-
-	display.displayProcessTable(summary)
 }
 
 func (display AppSummaryDisplayer) displayProcessTable(summary v3action.ApplicationSummary) {

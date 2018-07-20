@@ -11,6 +11,11 @@ import (
 
 const PushRetries = 3
 
+// Apply use the V2 API to create/update the application settings and
+// eventually uploads the application bits.
+//
+// If multiple buildpacks are being applied to the application, the V3 API is
+// used to set those buildpacks.
 func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-chan ApplicationConfig, <-chan Event, <-chan Warnings, <-chan error) {
 	configStream := make(chan ApplicationConfig)
 	eventStream := make(chan Event)

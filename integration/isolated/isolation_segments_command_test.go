@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -10,6 +11,10 @@ import (
 )
 
 var _ = Describe("isolation-segments command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
+	})
+
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {

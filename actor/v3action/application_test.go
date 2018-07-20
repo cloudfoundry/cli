@@ -730,4 +730,51 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 	})
+
+	Describe("RestartApplication", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.RestartApplication("some-app-guid")
+		})
+
+		Context("when there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateApplicationRestartReturns(
+					ccv3.Application{GUID: "some-app-guid"},
+					ccv3.Warnings{"restart-application-warning"},
+					nil,
+				)
+			})
+
+			It("stops the application", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("restart-application-warning"))
+
+				Expect(fakeCloudControllerClient.UpdateApplicationRestartCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UpdateApplicationRestartArgsForCall(0)).To(Equal("some-app-guid"))
+			})
+		})
+
+		Context("when restarting the application fails", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("some set restart-application error")
+				fakeCloudControllerClient.UpdateApplicationRestartReturns(
+					ccv3.Application{},
+					ccv3.Warnings{"restart-application-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("restart-application-warning"))
+			})
+		})
+	})
+
 })

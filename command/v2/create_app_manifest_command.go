@@ -44,10 +44,10 @@ func (cmd *CreateAppManifestCommand) Setup(config command.Config, ui command.UI)
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	ccClientV3, uaaClientV3, err := sharedV3.NewClients(config, ui, true)
+	ccClientV3, uaaClientV3, err := sharedV3.NewClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionShareServiceV3}
+			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionV3}
 		}
 		return err
 	}

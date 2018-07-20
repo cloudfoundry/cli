@@ -46,6 +46,8 @@ var _ = Describe("v3-ssh command", func() {
 			Eventually(session).Should(Say(`--request-pseudo-tty, -t\s+Request pseudo-tty allocation`))
 			Eventually(session).Should(Say(`--skip-host-validation, -k\s+Skip host key validation\. Not recommended!`))
 			Eventually(session).Should(Say(`--skip-remote-execution, -N\s+Do not execute a remote command`))
+			Eventually(session).Should(Say(`ENVIRONMENT:`))
+			Eventually(session).Should(Say(`all_proxy=\s+Specify a proxy server to enable proxying for all requests`))
 			Eventually(session).Should(Say(`SEE ALSO:`))
 			Eventually(session).Should(Say(`allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled`))
 			Eventually(session).Should(Exit(0))

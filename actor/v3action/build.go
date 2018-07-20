@@ -7,7 +7,13 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+
+	log "github.com/sirupsen/logrus"
 )
+
+type Build struct {
+	GUID string
+}
 
 func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Droplet, <-chan Warnings, <-chan error) {
 	dropletStream := make(chan Droplet)
@@ -47,7 +53,7 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 				time.Sleep(actor.Config.PollingInterval())
 			default:
 
-				//TODO: uncommend after #150569020
+				//TODO: uncomment after #150569020
 				// ccv3Droplet, warnings, err := actor.CloudControllerClient.GetDroplet(build.DropletGUID)
 				// warningsStream <- Warnings(warnings)
 				// if err != nil {
@@ -70,4 +76,60 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 	}()
 
 	return dropletStream, warningsStream, errorStream
+}
+
+func (actor Actor) StageApplicationPackage(packageGUID string) (Build, Warnings, error) {
+	var allWarnings Warnings
+
+	build := ccv3.Build{PackageGUID: packageGUID}
+	build, warnings, err := actor.CloudControllerClient.CreateBuild(build)
+	log.Debug("created build")
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Build{}, allWarnings, err
+	}
+
+	log.Debug("no errors creating build")
+	return Build{GUID: build.GUID}, allWarnings, nil
+}
+
+func (actor Actor) PollBuild(buildGUID string, appName string) (Droplet, Warnings, error) {
+	var allWarnings Warnings
+
+	timeout := time.After(actor.Config.StagingTimeout())
+	interval := time.NewTimer(0)
+
+	for {
+		select {
+		case <-interval.C:
+			build, warnings, err := actor.CloudControllerClient.GetBuild(buildGUID)
+			allWarnings = append(allWarnings, warnings...)
+			if err != nil {
+				return Droplet{}, allWarnings, err
+			}
+
+			switch build.State {
+			case constant.BuildFailed:
+				return Droplet{}, allWarnings, errors.New(build.Error)
+
+			case constant.BuildStaged:
+				droplet, warnings, err := actor.CloudControllerClient.GetDroplet(build.DropletGUID)
+				allWarnings = append(allWarnings, warnings...)
+				if err != nil {
+					return Droplet{}, allWarnings, err
+				}
+
+				return Droplet{
+					GUID:      droplet.GUID,
+					State:     droplet.State,
+					CreatedAt: droplet.CreatedAt,
+				}, allWarnings, nil
+			}
+
+			interval.Reset(actor.Config.PollingInterval())
+
+		case <-timeout:
+			return Droplet{}, allWarnings, actionerror.StagingTimeoutError{AppName: appName, Timeout: actor.Config.StagingTimeout()}
+		}
+	}
 }

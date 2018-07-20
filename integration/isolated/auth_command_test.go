@@ -1,8 +1,6 @@
 package isolated
 
 import (
-	"os"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -47,17 +45,6 @@ var _ = Describe("auth command", func() {
 
 	Context("when no positional arguments are provided", func() {
 		Context("and no env variables are provided", func() {
-			var oldPassword string
-
-			BeforeEach(func() {
-				oldPassword = os.Getenv("CF_PASSWORD")
-				os.Unsetenv("CF_PASSWORD")
-			})
-
-			AfterEach(func() {
-				os.Setenv("CF_PASSWORD", oldPassword)
-			})
-
 			It("errors-out with the help information", func() {
 				session := helpers.CF("auth")
 				Eventually(session.Err).Should(Say("Username and password not provided."))
@@ -87,17 +74,6 @@ var _ = Describe("auth command", func() {
 	})
 
 	Context("when only a username is provided", func() {
-		var oldPassword string
-
-		BeforeEach(func() {
-			oldPassword = os.Getenv("CF_PASSWORD")
-			os.Unsetenv("CF_PASSWORD")
-		})
-
-		AfterEach(func() {
-			os.Setenv("CF_PASSWORD", oldPassword)
-		})
-
 		It("errors-out with a password required error and the help information", func() {
 			session := helpers.CF("auth", "some-user")
 			Eventually(session.Err).Should(Say("Password not provided."))

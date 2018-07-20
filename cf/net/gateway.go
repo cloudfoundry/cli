@@ -434,9 +434,11 @@ func (gateway Gateway) doRequest(request *http.Request) (*http.Response, error) 
 
 	httpClient.DumpResponse(response)
 
-	header := http.CanonicalHeaderKey("X-Cf-Warnings")
-	rawWarnings := response.Header[header]
+	rawWarnings := strings.Split(response.Header.Get("X-Cf-Warnings"), ",")
 	for _, rawWarning := range rawWarnings {
+		if rawWarning == "" {
+			continue
+		}
 		warning, _ := url.QueryUnescape(rawWarning)
 		*gateway.warnings = append(*gateway.warnings, warning)
 	}

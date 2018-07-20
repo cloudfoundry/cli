@@ -299,20 +299,18 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10010,
-								Detail: "App not found",
-								Title:  "CF-ResourceNotFound",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
 						},
 					},
 				}))
@@ -432,20 +430,18 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10010,
-								Detail: "App not found",
-								Title:  "CF-ResourceNotFound",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
 						},
 					},
 				}))
@@ -557,20 +553,18 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10010,
-								Detail: "App not found",
-								Title:  "CF-ResourceNotFound",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
 						},
 					},
 				}))
@@ -642,20 +636,18 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns no app, the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10010,
-								Detail: "App not found",
-								Title:  "CF-ResourceNotFound",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
 						},
 					},
 				}))
@@ -722,20 +714,101 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10010,
-								Detail: "App not found",
-								Title:  "CF-ResourceNotFound",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("UpdateApplicationRestart", func() {
+		var (
+			responseApp Application
+			warnings    Warnings
+			executeErr  error
+		)
+
+		JustBeforeEach(func() {
+			responseApp, warnings, executeErr = client.UpdateApplicationRestart("some-app-guid")
+		})
+
+		Context("when the response succeeds", func() {
+			BeforeEach(func() {
+				response := `
+{
+	"guid": "some-app-guid",
+	"name": "some-app",
+	"state": "STARTED"
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/actions/restart"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the application, warnings, and no error", func() {
+				Expect(responseApp).To(Equal(Application{
+					GUID:  "some-app-guid",
+					Name:  "some-app",
+					State: constant.ApplicationStarted,
+				}))
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when the CC returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/actions/restart"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns no app, the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
 						},
 					},
 				}))

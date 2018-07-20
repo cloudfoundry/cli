@@ -179,6 +179,30 @@ var _ = Describe("Applications", func() {
 				})
 			})
 
+			Context("when builpacks is set as an empty array (autodetect)", func() {
+				BeforeEach(func() {
+					buildpacks = []string{}
+					config.DesiredApplication.Buildpacks = buildpacks
+
+					updatedApplication = v2action.Application{Buildpack: types.FilteredString{
+						Value: "",
+						IsSet: true,
+					}}
+					fakeV2Actor.UpdateApplicationReturns(updatedApplication, v2action.Warnings{"update-warning"}, nil)
+				})
+
+				It("sets buildpack to the only provided buildpack in buildpacks", func() {
+					Expect(fakeV2Actor.UpdateApplicationCallCount()).To(Equal(1))
+					submitApp := fakeV2Actor.UpdateApplicationArgsForCall(0)
+					Expect(submitApp).To(MatchFields(IgnoreExtras, Fields{
+						"Buildpack": Equal(types.FilteredString{Value: "", IsSet: true}),
+					}))
+
+					Expect(fakeV3Actor.UpdateApplicationCallCount()).To(Equal(0))
+					Expect(returnedConfig.DesiredApplication.Application).To(Equal(updatedApplication))
+				})
+			})
+
 			Context("when buildpacks is set with one buildpack", func() {
 				BeforeEach(func() {
 					buildpacks = []string{"ruby"}

@@ -44,9 +44,10 @@ var _ = Describe("v3-set-health-check Command", func() {
 		healthCheckType = "some-health-check-type"
 
 		cmd = v3.V3SetHealthCheckCommand{
-			RequiredArgs: flag.SetHealthCheckArgs{AppName: app, HealthCheck: flag.HealthCheckType{Type: healthCheckType}},
-			HTTPEndpoint: "some-http-endpoint",
-			ProcessType:  "some-process-type",
+			RequiredArgs:      flag.SetHealthCheckArgs{AppName: app, HealthCheck: flag.HealthCheckType{Type: healthCheckType}},
+			HTTPEndpoint:      "some-http-endpoint",
+			ProcessType:       "some-process-type",
+			InvocationTimeout: flag.PositiveInteger{Value: 42},
 
 			UI:          testUI,
 			Config:      fakeConfig,
@@ -155,12 +156,13 @@ var _ = Describe("v3-set-health-check Command", func() {
 			Expect(testUI.Out).To(Say("TIP: An app restart is required for the change to take effect\\."))
 
 			Expect(fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceCallCount()).To(Equal(1))
-			appName, spaceGUID, healthCheckType, httpEndpoint, processType := fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall(0)
+			appName, spaceGUID, healthCheckType, httpEndpoint, processType, invocationTimeout := fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall(0)
 			Expect(appName).To(Equal("some-app"))
 			Expect(spaceGUID).To(Equal("some-space-guid"))
 			Expect(healthCheckType).To(Equal("some-health-check-type"))
 			Expect(httpEndpoint).To(Equal("some-http-endpoint"))
 			Expect(processType).To(Equal("some-process-type"))
+			Expect(invocationTimeout).To(Equal(42))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))

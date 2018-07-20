@@ -65,6 +65,8 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname (e.g. my-subdomain)")}
 	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Path to app directory or to a zip file of the contents of the app directory")}
 	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")}
+	fs["vars-file"] = &flags.StringFlag{Usage: T("Path to a variable substitution file for manifest; can specify multiple times")}
+	fs["var"] = &flags.StringFlag{Usage: T("Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times")}
 	fs["t"] = &flags.StringFlag{ShortName: "t", Usage: T("Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app")}
 	fs["docker-image"] = &flags.StringFlag{Name: "docker-image", ShortName: "o", Usage: T("Docker-image to be used (e.g. user/docker-image-name)")}
 	fs["docker-username"] = &flags.StringFlag{Name: "docker-username", Usage: T("Repository username; used with password from environment variable CF_DOCKER_PASSWORD")}
@@ -105,6 +107,17 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 
 	if fc.String("app-ports") != "" {
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--app-ports'", cf.MultipleAppPortsMinimumAPIVersion))
+	}
+
+	if fc.String("vars-file") != "" || fc.String("var") != "" {
+		var flags []string
+		if fc.String("vars-file") != "" {
+			flags = append(flags, "vars-file")
+		}
+		if fc.String("var") != "" {
+			flags = append(flags, "var")
+		}
+		reqs = append(reqs, requirementsFactory.NewUnsupportedLegacyFlagRequirement(flags...))
 	}
 
 	reqs = append(reqs, []requirements.Requirement{

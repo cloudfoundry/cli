@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
+	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("Process", func() {
@@ -36,6 +37,42 @@ var _ = Describe("Process", func() {
 			JustBeforeEach(func() {
 				processBytes, err = process.MarshalJSON()
 				Expect(err).ToNot(HaveOccurred())
+			})
+
+			Context("when instances is provided", func() {
+				BeforeEach(func() {
+					process = Process{
+						Instances: types.NullInt{Value: 0, IsSet: true},
+					}
+				})
+
+				It("sets the instances to be set", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{"instances": 0}`))
+				})
+			})
+
+			Context("when memory is provided", func() {
+				BeforeEach(func() {
+					process = Process{
+						MemoryInMB: types.NullUint64{Value: 0, IsSet: true},
+					}
+				})
+
+				It("sets the memory to be set", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{"memory_in_mb": 0}`))
+				})
+			})
+
+			Context("when disk is provided", func() {
+				BeforeEach(func() {
+					process = Process{
+						DiskInMB: types.NullUint64{Value: 0, IsSet: true},
+					}
+				})
+
+				It("sets the disk to be set", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{"disk_in_mb": 0}`))
+				})
 			})
 
 			Context("when health check type http is provided", func() {
@@ -74,6 +111,16 @@ var _ = Describe("Process", func() {
 					Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"process", "data": {"endpoint": null}}}`))
 				})
 			})
+
+			Context("when process has no fields provided", func() {
+				BeforeEach(func() {
+					process = Process{}
+				})
+
+				It("sets the health check type to process", func() {
+					Expect(string(processBytes)).To(MatchJSON(`{}`))
+				})
+			})
 		})
 
 		Describe("UnmarshalJSON", func() {
@@ -96,9 +143,9 @@ var _ = Describe("Process", func() {
 				})
 
 				It("sets the health check type to http and has an endpoint", func() {
-					Expect(process).To(Equal(Process{
-						HealthCheckType:     "http",
-						HealthCheckEndpoint: "some-endpoint",
+					Expect(process).To(MatchFields(IgnoreExtras, Fields{
+						"HealthCheckType":     Equal("http"),
+						"HealthCheckEndpoint": Equal("some-endpoint"),
 					}))
 				})
 			})
@@ -109,8 +156,8 @@ var _ = Describe("Process", func() {
 				})
 
 				It("sets the health check type to port", func() {
-					Expect(process).To(Equal(Process{
-						HealthCheckType: "port",
+					Expect(process).To(MatchFields(IgnoreExtras, Fields{
+						"HealthCheckType": Equal("port"),
 					}))
 				})
 			})
@@ -121,8 +168,8 @@ var _ = Describe("Process", func() {
 				})
 
 				It("sets the health check type to process", func() {
-					Expect(process).To(Equal(Process{
-						HealthCheckType: "process",
+					Expect(process).To(MatchFields(IgnoreExtras, Fields{
+						"HealthCheckType": Equal("process"),
 					}))
 				})
 			})
@@ -159,7 +206,7 @@ var _ = Describe("Process", func() {
 
 			It("scales the application process; returns the scaled process and all warnings", func() {
 				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
-				Expect(process).To(Equal(Process{GUID: "some-process-guid"}))
+				Expect(process).To(MatchFields(IgnoreExtras, Fields{"GUID": Equal("some-process-guid")}))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -192,7 +239,7 @@ var _ = Describe("Process", func() {
 
 			It("scales the application process to 0 values; returns the scaled process and all warnings", func() {
 				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
-				Expect(process).To(Equal(Process{GUID: "some-process-guid"}))
+				Expect(process).To(MatchFields(IgnoreExtras, Fields{"GUID": Equal("some-process-guid")}))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -219,7 +266,10 @@ var _ = Describe("Process", func() {
 
 			It("scales the application process; returns the process object and all warnings", func() {
 				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
-				Expect(process).To(Equal(Process{GUID: "some-process-guid", Instances: types.NullInt{Value: 2, IsSet: true}}))
+				Expect(process).To(MatchFields(IgnoreExtras, Fields{
+					"GUID":      Equal("some-process-guid"),
+					"Instances": Equal(types.NullInt{Value: 2, IsSet: true}),
+				}))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -253,20 +303,18 @@ var _ = Describe("Process", func() {
 			It("returns an empty process, the error and all warnings", func() {
 				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
 				Expect(process).To(BeZero())
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10009,
-								Detail: "Some CC Error",
-								Title:  "CF-SomeNewError",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10009,
+							Detail: "Some CC Error",
+							Title:  "CF-SomeNewError",
 						},
 					},
 				}))
@@ -291,12 +339,15 @@ var _ = Describe("Process", func() {
 				response := `{
 					"guid": "process-1-guid",
 					"type": "some-type",
+					"instances": 22,
 					"memory_in_mb": 32,
+					"disk_in_mb": 1024,
 					"health_check": {
 						"type": "http",
 						"data": {
 							"timeout": 90,
-							"endpoint": "/health"
+							"endpoint": "/health",
+							"invocation_timeout": 42
 						}
 					}
 				}`
@@ -311,12 +362,15 @@ var _ = Describe("Process", func() {
 			It("returns the process and all warnings", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(process).To(Equal(Process{
-					GUID:                "process-1-guid",
-					Type:                "some-type",
-					MemoryInMB:          types.NullUint64{Value: 32, IsSet: true},
-					HealthCheckType:     "http",
-					HealthCheckEndpoint: "/health",
+				Expect(process).To(MatchAllFields(Fields{
+					"GUID":                         Equal("process-1-guid"),
+					"Type":                         Equal("some-type"),
+					"Instances":                    Equal(types.NullInt{Value: 22, IsSet: true}),
+					"MemoryInMB":                   Equal(types.NullUint64{Value: 32, IsSet: true}),
+					"DiskInMB":                     Equal(types.NullUint64{Value: 1024, IsSet: true}),
+					"HealthCheckType":              Equal("http"),
+					"HealthCheckEndpoint":          Equal("/health"),
+					"HealthCheckInvocationTimeout": Equal(42),
 				}))
 			})
 		})
@@ -371,20 +425,18 @@ var _ = Describe("Process", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10009,
-								Detail: "Some CC Error",
-								Title:  "CF-SomeNewError",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10009,
+							Detail: "Some CC Error",
+							Title:  "CF-SomeNewError",
 						},
 					},
 				}))
@@ -521,7 +573,8 @@ var _ = Describe("Process", func() {
 
 	Describe("PatchApplicationProcessHealthCheck", func() {
 		var (
-			endpoint string
+			endpoint          string
+			invocationTimeout int
 
 			process  Process
 			warnings []string
@@ -529,13 +582,15 @@ var _ = Describe("Process", func() {
 		)
 
 		JustBeforeEach(func() {
-			process, warnings, err = client.PatchApplicationProcessHealthCheck("some-process-guid", "some-type", endpoint)
+			process, warnings, err = client.PatchApplicationProcessHealthCheck("some-process-guid", "some-type", endpoint, invocationTimeout)
 		})
 
 		Context("when patching the process succeeds", func() {
-			Context("and the endpoint is non-empty", func() {
+			Context("and the endpoint is set", func() {
 				BeforeEach(func() {
 					endpoint = "some-endpoint"
+					invocationTimeout = 0
+
 					expectedBody := `{
 					"health_check": {
 						"type": "some-type",
@@ -548,7 +603,50 @@ var _ = Describe("Process", func() {
 					"health_check": {
 						"type": "some-type",
 						"data": {
-							"endpoint": "some-endpoint"
+							"endpoint": "some-endpoint",
+							"invocation_timeout": null
+						}
+					}
+				}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
+							VerifyJSON(expectedBody),
+							RespondWith(http.StatusOK, expectedResponse, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("patches this process's health check", func() {
+					Expect(process).To(MatchFields(IgnoreExtras, Fields{
+						"HealthCheckType":     Equal("some-type"),
+						"HealthCheckEndpoint": Equal("some-endpoint"),
+					}))
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+
+			Context("and invocation timeout is set", func() {
+				BeforeEach(func() {
+					endpoint = ""
+					invocationTimeout = 42
+
+					expectedBody := `{
+					"health_check": {
+						"type": "some-type",
+						"data": {
+							"endpoint": null,
+							"invocation_timeout": 42
+						}
+					}
+				}`
+					expectedResponse := `{
+					"health_check": {
+						"type": "some-type",
+						"data": {
+							"endpoint": null,
+							"invocation_timeout": 42
 						}
 					}
 				}`
@@ -563,17 +661,20 @@ var _ = Describe("Process", func() {
 
 				It("patches this process's health check", func() {
 					Expect(process).To(Equal(Process{
-						HealthCheckType:     "some-type",
-						HealthCheckEndpoint: "some-endpoint",
+						HealthCheckType:              "some-type",
+						HealthCheckEndpoint:          "",
+						HealthCheckInvocationTimeout: 42,
 					}))
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
 			})
 
-			Context("and the endpoint is empty", func() {
+			Context("and the endpoint and timeout are not set", func() {
 				BeforeEach(func() {
 					endpoint = ""
+					invocationTimeout = 0
+
 					expectedBody := `{
 					"health_check": {
 						"type": "some-type",
@@ -583,7 +684,6 @@ var _ = Describe("Process", func() {
 					}
 				}`
 					responseBody := `{
-					"guid": "some-process-guid",
 					"health_check": {
 						"type": "some-type",
 						"data": {
@@ -601,7 +701,10 @@ var _ = Describe("Process", func() {
 				})
 
 				It("patches this process's health check", func() {
-					Expect(process).To(Equal(Process{GUID: "some-process-guid", HealthCheckType: "some-type"}))
+					Expect(process).To(MatchFields(IgnoreExtras, Fields{
+						"HealthCheckType":     Equal("some-type"),
+						"HealthCheckEndpoint": Equal(""),
+					}))
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
@@ -661,20 +764,18 @@ var _ = Describe("Process", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.MultiError{
 					ResponseCode: http.StatusTeapot,
-					V3ErrorResponse: ccerror.V3ErrorResponse{
-						Errors: []ccerror.V3Error{
-							{
-								Code:   10008,
-								Detail: "The request is semantically invalid: command presence",
-								Title:  "CF-UnprocessableEntity",
-							},
-							{
-								Code:   10009,
-								Detail: "Some CC Error",
-								Title:  "CF-SomeNewError",
-							},
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10009,
+							Detail: "Some CC Error",
+							Title:  "CF-SomeNewError",
 						},
 					},
 				}))

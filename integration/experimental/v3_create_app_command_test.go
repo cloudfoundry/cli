@@ -175,7 +175,7 @@ var _ = Describe("v3-create-app command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				session = helpers.CF("v3-app", appName)
+				session = helpers.CF("app", appName)
 				Eventually(session).Should(Say("buildpacks:"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -188,7 +188,7 @@ var _ = Describe("v3-create-app command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("v3-app", appName)
+					session = helpers.CF("app", appName)
 					Eventually(session).Should(Say("docker image:"))
 					Eventually(session).Should(Exit(0))
 				})

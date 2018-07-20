@@ -1,6 +1,8 @@
 package v3action
 
 import (
+	"io"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
@@ -10,7 +12,6 @@ import (
 type CloudControllerClient interface {
 	AppSSHEndpoint() string
 	AppSSHHostKeyFingerprint() string
-	AssignSpaceToIsolationSegment(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	CloudControllerAPIVersion() string
 	CreateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
 	CreateApplicationProcessScale(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
@@ -21,6 +22,7 @@ type CloudControllerClient interface {
 	DeleteApplication(guid string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (ccv3.Warnings, error)
 	DeleteIsolationSegment(guid string) (ccv3.Warnings, error)
+	DeleteIsolationSegmentOrganization(isolationSegmentGUID string, organizationGUID string) (ccv3.Warnings, error)
 	DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error)
 	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	GetApplicationDropletCurrent(appGUID string) (ccv3.Droplet, ccv3.Warnings, error)
@@ -43,10 +45,8 @@ type CloudControllerClient interface {
 	GetServiceInstances(query ...ccv3.Query) ([]ccv3.ServiceInstance, ccv3.Warnings, error)
 	GetSpaceIsolationSegment(spaceGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	GetSpaces(query ...ccv3.Query) ([]ccv3.Space, ccv3.Warnings, error)
-	PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string) (ccv3.Process, ccv3.Warnings, error)
-	PatchOrganizationDefaultIsolationSegment(orgGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
+	PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, processHealthCheckInvocationTimeout int) (ccv3.Process, ccv3.Warnings, error)
 	PollJob(jobURL ccv3.JobURL) (ccv3.Warnings, error)
-	RevokeIsolationSegmentFromOrganization(isolationSegmentGUID string, organizationGUID string) (ccv3.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	UpdateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
@@ -54,6 +54,10 @@ type CloudControllerClient interface {
 	UpdateApplicationEnvironmentVariables(appGUID string, envVars ccv3.EnvironmentVariables) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
 	UpdateApplicationStart(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	UpdateApplicationStop(appGUID string) (ccv3.Application, ccv3.Warnings, error)
-	UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
+	UpdateApplicationRestart(appGUID string) (ccv3.Application, ccv3.Warnings, error)
+	UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
+	UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
+	UpdateTaskCancel(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
+	UploadBitsPackage(pkg ccv3.Package, existingResources []ccv3.Resource, newResources io.Reader, newResourcesLength int64) (ccv3.Package, ccv3.Warnings, error)
 	UploadPackage(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error)
 }

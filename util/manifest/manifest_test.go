@@ -348,6 +348,49 @@ applications:
 					}))
 				})
 			})
+
+			Context("when the manifest sets buildpacks to an empty array", func() {
+				BeforeEach(func() {
+					manifest = `---
+applications:
+- name: app-1
+  buildpacks: []
+  memory: 200M
+  instances: 10
+`
+					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("returns a merged set of applications", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(apps).To(HaveLen(1))
+
+					Expect(apps[0]).To(MatchFields(IgnoreExtras, Fields{
+						"Buildpack": Equal(types.FilteredString{
+							IsSet: false,
+							Value: "",
+						}),
+						"Buildpacks": Equal([]string{}),
+					}))
+				})
+			})
+
+			Context("when the manifest contains an empty buildpacks attribute", func() {
+				BeforeEach(func() {
+					manifest = `---
+applications:
+- name: app-1
+  buildpacks:
+`
+					err := ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("raises an error", func() {
+					Expect(executeErr).ToNot(MatchError(new(EmptyBuildpacksError)))
+				})
+			})
 		})
 
 		Context("when the manifest contains variables that need interpolation", func() {

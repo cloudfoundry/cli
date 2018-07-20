@@ -28,7 +28,7 @@ var _ = Describe("v3-apps Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v3fakes.FakeV3AppsActor
-		fakeV2Actor     *sharedfakes.FakeV2AppRouteActor
+		fakeV2Actor     *sharedfakes.FakeV2AppActor
 		binaryName      string
 		executeErr      error
 	)
@@ -38,17 +38,17 @@ var _ = Describe("v3-apps Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3AppsActor)
-		fakeV2Actor = new(sharedfakes.FakeV2AppRouteActor)
+		fakeV2Actor = new(sharedfakes.FakeV2AppActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = v3.V3AppsCommand{
-			UI:              testUI,
-			Config:          fakeConfig,
-			Actor:           fakeActor,
-			V2AppRouteActor: fakeV2Actor,
-			SharedActor:     fakeSharedActor,
+			UI:          testUI,
+			Config:      fakeConfig,
+			Actor:       fakeActor,
+			V2AppActor:  fakeV2Actor,
+			SharedActor: fakeSharedActor,
 		}
 
 		fakeConfig.TargetedOrganizationReturns(configv3.Organization{

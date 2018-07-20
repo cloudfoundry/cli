@@ -90,7 +90,7 @@ var _ = Describe("push with only an app name", func() {
 		Context("when the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(dir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "push", appName)).Should(Exit(0))
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)).Should(Exit(0))
 				})
 			})
 

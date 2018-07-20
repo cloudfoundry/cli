@@ -19,9 +19,9 @@ const (
 	DeleteRouteAppRequest                                = "DeleteRouteApp"
 	DeleteRouteRequest                                   = "DeleteRoute"
 	DeleteSecurityGroupSpaceRequest                      = "DeleteSecurityGroupSpace"
+	DeleteSecurityGroupStagingSpaceRequest               = "DeleteSecurityGroupStagingSpace"
 	DeleteServiceBindingRequest                          = "DeleteServiceBinding"
 	DeleteSpaceRequest                                   = "DeleteSpace"
-	DeleteSecurityGroupStagingSpaceRequest               = "DeleteSecurityGroupStagingSpace"
 	GetAppInstancesRequest                               = "GetAppInstances"
 	GetAppRequest                                        = "GetApp"
 	GetAppRoutesRequest                                  = "GetAppRoutes"
@@ -40,23 +40,27 @@ const (
 	GetRouteAppsRequest                                  = "GetRouteApps"
 	GetRouteMappingRequest                               = "GetRouteMapping"
 	GetRouteMappingsRequest                              = "GetRouteMappings"
+	GetRouteRequest                                      = "GetRoute"
 	GetRouteReservedDeprecatedRequest                    = "GetRouteReservedDeprecated"
 	GetRouteReservedRequest                              = "GetRouteReserved"
 	GetRouteRouteMappingsRequest                         = "GetRouteRouteMappings"
-	GetRouteRequest                                      = "GetRoute"
 	GetRoutesRequest                                     = "GetRoutes"
 	GetSecurityGroupSpacesRequest                        = "GetSecurityGroupSpaces"
 	GetSecurityGroupsRequest                             = "GetSecurityGroups"
 	GetSecurityGroupStagingSpacesRequest                 = "GetSecurityGroupStagingSpaces"
 	GetServiceBindingRequest                             = "GetServiceBinding"
 	GetServiceBindingsRequest                            = "GetServiceBindings"
+	GetServiceBrokersRequest                             = "GetServiceBrokers"
 	GetServiceInstanceRequest                            = "GetServiceInstance"
 	GetServiceInstanceServiceBindingsRequest             = "GetServiceInstanceServiceBindings"
 	GetServiceInstanceSharedFromRequest                  = "GetServiceInstanceSharedFrom"
 	GetServiceInstanceSharedToRequest                    = "GetServiceInstanceSharedTo"
 	GetServiceInstancesRequest                           = "GetServiceInstances"
 	GetServicePlanRequest                                = "GetServicePlan"
+	GetServicePlansRequest                               = "GetServicePlans"
+	GetServicePlanVisibilitiesRequest                    = "GetServicePlanVisibilities"
 	GetServiceRequest                                    = "GetService"
+	GetServicesRequest                                   = "GetServices"
 	GetSharedDomainRequest                               = "GetSharedDomain"
 	GetSharedDomainsRequest                              = "GetSharedDomains"
 	GetSpaceQuotaDefinitionRequest                       = "GetSpaceQuotaDefinition"
@@ -67,16 +71,18 @@ const (
 	GetSpaceStagingSecurityGroupsRequest                 = "GetSpaceStagingSecurityGroups"
 	GetStackRequest                                      = "GetStack"
 	GetStacksRequest                                     = "GetStacks"
-	GetUserProvidedServiceInstancesRequest               = "GetUserProvidedServiceInstances"
 	GetUserProvidedServiceInstanceServiceBindingsRequest = "GetUserProvidedServiceInstanceServiceBindings"
+	GetUserProvidedServiceInstancesRequest               = "GetUserProvidedServiceInstances"
 	GetUsersRequest                                      = "GetUsers"
 	PostAppRequest                                       = "PostApp"
 	PostAppRestageRequest                                = "PostAppRestage"
+	PostBuildpackRequest                                 = "PostBuildpack"
 	PostRouteRequest                                     = "PostRoute"
 	PostServiceBindingRequest                            = "PostServiceBinding"
 	PostUserRequest                                      = "PostUser"
 	PutAppBitsRequest                                    = "PutAppBits"
 	PutAppRequest                                        = "PutApp"
+	PutBuildpackRequest                                  = "PutBuildpack"
 	PutDropletRequest                                    = "PutDroplet"
 	PutResourceMatchRequest                              = "PutResourceMatch"
 	PutRouteAppRequest                                   = "PutRouteApp"
@@ -97,6 +103,8 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/apps/:app_guid/restage", Method: http.MethodPost, Name: PostAppRestageRequest},
 	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: GetAppRoutesRequest},
 	{Path: "/v2/apps/:app_guid/stats", Method: http.MethodGet, Name: GetAppStatsRequest},
+	{Path: "/v2/buildpacks", Method: http.MethodPost, Name: PostBuildpackRequest},
+	{Path: "/v2/buildpacks/:buildpack_guid/bits", Method: http.MethodPut, Name: PutBuildpackRequest},
 	{Path: "/v2/config/feature_flags", Method: http.MethodGet, Name: GetConfigFeatureFlagsRequest},
 	{Path: "/v2/events", Method: http.MethodGet, Name: GetEventsRequest},
 	{Path: "/v2/info", Method: http.MethodGet, Name: GetInfoRequest},
@@ -129,15 +137,19 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/security_groups/:security_group_guid/staging_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupStagingSpaceRequest},
 	{Path: "/v2/security_groups/:security_group_guid/staging_spaces/:space_guid", Method: http.MethodPut, Name: PutSecurityGroupStagingSpaceRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodGet, Name: GetServiceBindingsRequest},
-	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodGet, Name: GetServiceBindingRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodPost, Name: PostServiceBindingRequest},
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodDelete, Name: DeleteServiceBindingRequest},
+	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodGet, Name: GetServiceBindingRequest},
+	{Path: "/v2/service_brokers", Method: http.MethodGet, Name: GetServiceBrokersRequest},
 	{Path: "/v2/service_instances", Method: http.MethodGet, Name: GetServiceInstancesRequest},
 	{Path: "/v2/service_instances/:service_instance_guid", Method: http.MethodGet, Name: GetServiceInstanceRequest},
 	{Path: "/v2/service_instances/:service_instance_guid/service_bindings", Method: http.MethodGet, Name: GetServiceInstanceServiceBindingsRequest},
 	{Path: "/v2/service_instances/:service_instance_guid/shared_from", Method: http.MethodGet, Name: GetServiceInstanceSharedFromRequest},
 	{Path: "/v2/service_instances/:service_instance_guid/shared_to", Method: http.MethodGet, Name: GetServiceInstanceSharedToRequest},
+	{Path: "/v2/service_plan_visibilities", Method: http.MethodGet, Name: GetServicePlanVisibilitiesRequest},
+	{Path: "/v2/service_plans", Method: http.MethodGet, Name: GetServicePlansRequest},
 	{Path: "/v2/service_plans/:service_plan_guid", Method: http.MethodGet, Name: GetServicePlanRequest},
+	{Path: "/v2/services", Method: http.MethodGet, Name: GetServicesRequest},
 	{Path: "/v2/services/:service_guid", Method: http.MethodGet, Name: GetServiceRequest},
 	{Path: "/v2/shared_domains", Method: http.MethodGet, Name: GetSharedDomainsRequest},
 	{Path: "/v2/shared_domains/:shared_domain_guid", Method: http.MethodGet, Name: GetSharedDomainRequest},

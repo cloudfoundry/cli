@@ -9,11 +9,16 @@ import (
 )
 
 var Commands commandList
+var V2Commands V2CommandList
+
+type V2CommandList struct {
+	V2App v2.AppCommand `command:"app" description:"Display health and status for an app"`
+}
 
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	V3App                v3.V3AppCommand                `command:"v3-app" description:"Display health and status for an app"`
+	V3App                v3.V3AppCommand                `command:"app" description:"Display health and status for an app"`
 	V3Apps               v3.V3AppsCommand               `command:"v3-apps" description:"List all apps in the target space"`
 	V3ApplyManifest      v3.V3ApplyManifestCommand      `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
 	V3CreateApp          v3.V3CreateAppCommand          `command:"v3-create-app" description:"Create a V3 App"`
@@ -41,7 +46,6 @@ type commandList struct {
 	AllowSpaceSSH                      v2.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	Api                                v2.ApiCommand                                `command:"api" description:"Set or view target api url"`
 	Apps                               v2.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
-	App                                v2.AppCommand                                `command:"app" description:"Display health and status for an app"`
 	Auth                               v2.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
 	BindRouteService                   v2.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
 	BindRunningSecurityGroup           v2.BindRunningSecurityGroupCommand           `command:"bind-running-security-group" description:"Bind a security group to the list of security groups to be used for running applications"`
@@ -122,7 +126,7 @@ type commandList struct {
 	Plugins                            plugin.PluginsCommand                        `command:"plugins" description:"List commands of installed plugins"`
 	PurgeServiceInstance               v2.PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
 	PurgeServiceOffering               v2.PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"`
-	Push                               v2.V2PushCommand                             `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
+	Push                               v2.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
 	Quotas                             v2.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	Quota                              v2.QuotaCommand                              `command:"quota" description:"Show quota info"`
 	RemoveNetworkPolicy                v3.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`

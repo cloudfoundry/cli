@@ -32,7 +32,7 @@ var _ = Describe("v3-app Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v3fakes.FakeV3AppActor
-		fakeV2Actor     *sharedfakes.FakeV2AppRouteActor
+		fakeV2Actor     *sharedfakes.FakeV2AppActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -43,18 +43,18 @@ var _ = Describe("v3-app Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3AppActor)
-		fakeV2Actor = new(sharedfakes.FakeV2AppRouteActor)
+		fakeV2Actor = new(sharedfakes.FakeV2AppActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		app = "some-app"
 
 		appSummaryDisplayer := shared.AppSummaryDisplayer{
-			UI:              testUI,
-			Config:          fakeConfig,
-			Actor:           fakeActor,
-			V2AppRouteActor: fakeV2Actor,
-			AppName:         app,
+			UI:         testUI,
+			Config:     fakeConfig,
+			Actor:      fakeActor,
+			V2AppActor: fakeV2Actor,
+			AppName:    app,
 		}
 
 		cmd = v3.V3AppCommand{
@@ -94,10 +94,6 @@ var _ = Describe("v3-app Command", func() {
 				CurrentVersion: "0.0.0",
 				MinimumVersion: ccversion.MinVersionV3,
 			}))
-		})
-
-		It("displays the experimental warning", func() {
-			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		})
 	})
 
@@ -237,8 +233,6 @@ var _ = Describe("v3-app Command", func() {
 			Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\.\n\n"))
 			Expect(testUI.Out).To(Say("name:\\s+some-app"))
 			Expect(testUI.Out).To(Say("requested state:\\s+started"))
-			Expect(testUI.Out).To(Say("processes:\\s+\\n"))
-			Expect(testUI.Out).To(Say("memory usage:\\s+\\n"))
 			Expect(testUI.Out).To(Say("routes:\\s+\\n"))
 			Expect(testUI.Out).To(Say("stack:\\s+\\n"))
 			Expect(testUI.Out).To(Say("(?m)docker image:\\s+docker/some-image$\\n"))
@@ -275,8 +269,6 @@ var _ = Describe("v3-app Command", func() {
 			Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\.\n\n"))
 			Expect(testUI.Out).To(Say("name:\\s+some-app"))
 			Expect(testUI.Out).To(Say("requested state:\\s+started"))
-			Expect(testUI.Out).To(Say("processes:\\s+\\n"))
-			Expect(testUI.Out).To(Say("memory usage:\\s+\\n"))
 			Expect(testUI.Out).To(Say("routes:\\s+\\n"))
 			Expect(testUI.Out).To(Say("stack:\\s+\\n"))
 			Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+$\\n"))
@@ -547,20 +539,25 @@ var _ = Describe("v3-app Command", func() {
 					Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\.\n\n"))
 					Expect(testUI.Out).To(Say("name:\\s+some-app"))
 					Expect(testUI.Out).To(Say("requested state:\\s+started"))
-					Expect(testUI.Out).To(Say("processes:\\s+web:3/3, console:0/0, worker:0/1"))
-					Expect(testUI.Out).To(Say("memory usage:\\s+32M x 3, 64M x 1"))
 					Expect(testUI.Out).To(Say("routes:\\s+some-other-domain, some-domain"))
 					Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
 					Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output, some-buildpack\n\n"))
-					Expect(testUI.Out).To(Say("web:3/3"))
+
+					Expect(testUI.Out).To(Say("type:\\s+web"))
+					Expect(testUI.Out).To(Say("instances:\\s+3/3"))
+					Expect(testUI.Out).To(Say("memory usage:\\s+32M"))
 					Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
 					Expect(testUI.Out).To(Say("#0\\s+running\\s+1978-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+976.6K of 32M\\s+976.6K of 1.9M"))
 					Expect(testUI.Out).To(Say("#1\\s+running\\s+1980-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+1.9M of 32M\\s+1.9M of 3.8M"))
 					Expect(testUI.Out).To(Say("#2\\s+running\\s+2010-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+2.9M of 32M\\s+2.9M of 5.7M"))
 
-					Expect(testUI.Out).To(Say("console:0/0"))
+					Expect(testUI.Out).To(Say("type:\\s+console"))
+					Expect(testUI.Out).To(Say("instances:\\s+0/0"))
+					Expect(testUI.Out).To(Say("memory usage:\\s+128M"))
 
-					Expect(testUI.Out).To(Say("worker:0/1"))
+					Expect(testUI.Out).To(Say("type:\\s+worker"))
+					Expect(testUI.Out).To(Say("instances:\\s+0/1"))
+					Expect(testUI.Out).To(Say("memory usage:\\s+64M"))
 
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))

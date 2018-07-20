@@ -3,6 +3,8 @@ package ccv2
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -11,12 +13,14 @@ import (
 
 // ServiceBinding represents a Cloud Controller Service Binding.
 type ServiceBinding struct {
-	// GUID is the unique Service Binding identifier.
-	GUID string
-	// Name is the name of the service binding
-	Name string
 	// AppGUID is the associated application GUID.
 	AppGUID string
+	// GUID is the unique Service Binding identifier.
+	GUID string
+	// LastOperation
+	LastOperation LastOperation
+	// Name is the name of the service binding
+	Name string
 	// ServiceInstanceGUID is the associated service GUID.
 	ServiceInstanceGUID string
 }
@@ -26,9 +30,10 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 	var ccServiceBinding struct {
 		Metadata internal.Metadata
 		Entity   struct {
-			AppGUID             string `json:"app_guid"`
-			ServiceInstanceGUID string `json:"service_instance_guid"`
-			Name                string `json:"name"`
+			AppGUID             string        `json:"app_guid"`
+			ServiceInstanceGUID string        `json:"service_instance_guid"`
+			Name                string        `json:"name"`
+			LastOperation       LastOperation `json:"last_operation"`
 		} `json:"entity"`
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccServiceBinding)
@@ -40,6 +45,7 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 	serviceBinding.GUID = ccServiceBinding.Metadata.GUID
 	serviceBinding.ServiceInstanceGUID = ccServiceBinding.Entity.ServiceInstanceGUID
 	serviceBinding.Name = ccServiceBinding.Entity.Name
+	serviceBinding.LastOperation = ccServiceBinding.Entity.LastOperation
 	return nil
 }
 
@@ -52,7 +58,7 @@ type serviceBindingRequestBody struct {
 	Parameters          map[string]interface{} `json:"parameters"`
 }
 
-func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID string, bindingName string, parameters map[string]interface{}) (ServiceBinding, Warnings, error) {
+func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID string, bindingName string, acceptsIncomplete bool, parameters map[string]interface{}) (ServiceBinding, Warnings, error) {
 	requestBody := serviceBindingRequestBody{
 		ServiceInstanceGUID: serviceInstanceGUID,
 		AppGUID:             appGUID,
@@ -68,6 +74,7 @@ func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID s
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostServiceBindingRequest,
 		Body:        bytes.NewReader(bodyBytes),
+		Query:       url.Values{"accepts_incomplete": {fmt.Sprint(acceptsIncomplete)}},
 	})
 	if err != nil {
 		return ServiceBinding{}, nil, err
@@ -86,22 +93,31 @@ func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID s
 	return serviceBinding, response.Warnings, nil
 }
 
-// DeleteServiceBinding will destroy the requested Service Binding.
-func (client *Client) DeleteServiceBinding(serviceBindingGUID string) (Warnings, error) {
+// DeleteServiceBinding deletes the specified Service Binding. An updated
+// service binding is returned only if acceptsIncomplete is true.
+func (client *Client) DeleteServiceBinding(serviceBindingGUID string, acceptsIncomplete bool) (ServiceBinding, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteServiceBindingRequest,
 		URIParams:   map[string]string{"service_binding_guid": serviceBindingGUID},
+		Query:       url.Values{"accepts_incomplete": {fmt.Sprint(acceptsIncomplete)}},
 	})
 	if err != nil {
-		return nil, err
+		return ServiceBinding{}, nil, err
 	}
 
 	var response cloudcontroller.Response
+	var serviceBinding ServiceBinding
+	if acceptsIncomplete {
+		response = cloudcontroller.Response{
+			Result: &serviceBinding,
+		}
+	}
+
 	err = client.connection.Make(request, &response)
-	return response.Warnings, err
+	return serviceBinding, response.Warnings, err
 }
 
-// GetServiceBinding returns back a service binding with the proviced guid
+// GetServiceBinding returns back a service binding with the provided GUID.
 func (client *Client) GetServiceBinding(guid string) (ServiceBinding, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetServiceBindingRequest,

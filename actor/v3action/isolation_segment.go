@@ -95,7 +95,7 @@ func (actor Actor) AssignIsolationSegmentToSpaceByNameAndSpace(isolationSegmentN
 		return warnings, err
 	}
 
-	_, apiWarnings, err := actor.CloudControllerClient.AssignSpaceToIsolationSegment(spaceGUID, seg.GUID)
+	_, apiWarnings, err := actor.CloudControllerClient.UpdateSpaceIsolationSegmentRelationship(spaceGUID, seg.GUID)
 	return append(warnings, apiWarnings...), err
 }
 
@@ -163,7 +163,7 @@ func (actor Actor) GetIsolationSegmentsByOrganization(orgGUID string) ([]Isolati
 	return isolationSegments, Warnings(warnings), nil
 }
 
-func (actor Actor) RevokeIsolationSegmentFromOrganizationByName(isolationSegmentName string, orgName string) (Warnings, error) {
+func (actor Actor) DeleteIsolationSegmentOrganizationByName(isolationSegmentName string, orgName string) (Warnings, error) {
 	segment, warnings, err := actor.GetIsolationSegmentByName(isolationSegmentName)
 	allWarnings := append(Warnings{}, warnings...)
 	if err != nil {
@@ -177,7 +177,7 @@ func (actor Actor) RevokeIsolationSegmentFromOrganizationByName(isolationSegment
 		return allWarnings, err
 	}
 
-	apiWarnings, err := actor.CloudControllerClient.RevokeIsolationSegmentFromOrganization(segment.GUID, org.GUID)
+	apiWarnings, err := actor.CloudControllerClient.DeleteIsolationSegmentOrganization(segment.GUID, org.GUID)
 
 	allWarnings = append(allWarnings, apiWarnings...)
 	return allWarnings, err
@@ -186,13 +186,13 @@ func (actor Actor) RevokeIsolationSegmentFromOrganizationByName(isolationSegment
 // SetOrganizationDefaultIsolationSegment sets a default isolation segment on
 // an organization.
 func (actor Actor) SetOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (Warnings, error) {
-	_, apiWarnings, err := actor.CloudControllerClient.PatchOrganizationDefaultIsolationSegment(orgGUID, isoSegGUID)
+	_, apiWarnings, err := actor.CloudControllerClient.UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID, isoSegGUID)
 	return Warnings(apiWarnings), err
 }
 
 // ResetOrganizationDefaultIsolationSegment resets the default isolation segment fon
 // an organization.
 func (actor Actor) ResetOrganizationDefaultIsolationSegment(orgGUID string) (Warnings, error) {
-	_, apiWarnings, err := actor.CloudControllerClient.PatchOrganizationDefaultIsolationSegment(orgGUID, "")
+	_, apiWarnings, err := actor.CloudControllerClient.UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID, "")
 	return Warnings(apiWarnings), err
 }

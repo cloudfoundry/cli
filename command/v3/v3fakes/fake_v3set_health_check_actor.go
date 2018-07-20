@@ -18,14 +18,15 @@ type FakeV3SetHealthCheckActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	SetApplicationProcessHealthCheckTypeByNameAndSpaceStub        func(appName string, spaceGUID string, healthCheckType string, httpEndpoint string, processType string) (v3action.Application, v3action.Warnings, error)
+	SetApplicationProcessHealthCheckTypeByNameAndSpaceStub        func(appName string, spaceGUID string, healthCheckType string, httpEndpoint string, processType string, invocationTimeout int) (v3action.Application, v3action.Warnings, error)
 	setApplicationProcessHealthCheckTypeByNameAndSpaceMutex       sync.RWMutex
 	setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall []struct {
-		appName         string
-		spaceGUID       string
-		healthCheckType string
-		httpEndpoint    string
-		processType     string
+		appName           string
+		spaceGUID         string
+		healthCheckType   string
+		httpEndpoint      string
+		processType       string
+		invocationTimeout int
 	}
 	setApplicationProcessHealthCheckTypeByNameAndSpaceReturns struct {
 		result1 v3action.Application
@@ -81,20 +82,21 @@ func (fake *FakeV3SetHealthCheckActor) CloudControllerAPIVersionReturnsOnCall(i 
 	}{result1}
 }
 
-func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType string, httpEndpoint string, processType string) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType string, httpEndpoint string, processType string, invocationTimeout int) (v3action.Application, v3action.Warnings, error) {
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.setApplicationProcessHealthCheckTypeByNameAndSpaceReturnsOnCall[len(fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall)]
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall = append(fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall, struct {
-		appName         string
-		spaceGUID       string
-		healthCheckType string
-		httpEndpoint    string
-		processType     string
-	}{appName, spaceGUID, healthCheckType, httpEndpoint, processType})
-	fake.recordInvocation("SetApplicationProcessHealthCheckTypeByNameAndSpace", []interface{}{appName, spaceGUID, healthCheckType, httpEndpoint, processType})
+		appName           string
+		spaceGUID         string
+		healthCheckType   string
+		httpEndpoint      string
+		processType       string
+		invocationTimeout int
+	}{appName, spaceGUID, healthCheckType, httpEndpoint, processType, invocationTimeout})
+	fake.recordInvocation("SetApplicationProcessHealthCheckTypeByNameAndSpace", []interface{}{appName, spaceGUID, healthCheckType, httpEndpoint, processType, invocationTimeout})
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.Unlock()
 	if fake.SetApplicationProcessHealthCheckTypeByNameAndSpaceStub != nil {
-		return fake.SetApplicationProcessHealthCheckTypeByNameAndSpaceStub(appName, spaceGUID, healthCheckType, httpEndpoint, processType)
+		return fake.SetApplicationProcessHealthCheckTypeByNameAndSpaceStub(appName, spaceGUID, healthCheckType, httpEndpoint, processType, invocationTimeout)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -108,10 +110,10 @@ func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNam
 	return len(fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, string, string, string) {
+func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, string, string, string, int) {
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.RLock()
 	defer fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.RUnlock()
-	return fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].appName, fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].spaceGUID, fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].healthCheckType, fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].httpEndpoint, fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].processType
+	return fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].appName, fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].spaceGUID, fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].healthCheckType, fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].httpEndpoint, fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].processType, fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i].invocationTimeout
 }
 
 func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {

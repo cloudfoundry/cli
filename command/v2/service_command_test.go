@@ -283,10 +283,14 @@ var _ = Describe("service Command", func() {
 									{
 										AppName:            "app-2",
 										ServiceBindingName: "binding-name-2",
+										LastOperationState: constant.LastOperationInProgress,
+										Message:            "10% complete",
 									},
 									{
 										AppName:            "app-3",
 										ServiceBindingName: "binding-name-3",
+										LastOperationState: constant.LastOperationFailed,
+										Message:            "Binding failed",
 									},
 								}
 								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
@@ -314,19 +318,19 @@ var _ = Describe("service Command", func() {
 								Expect(testUI.Out).ToNot(Say("org\\s+space\\s+bindings"))
 								Expect(testUI.Out).ToNot(Say("This service is not currently shared."))
 
-								Expect(testUI.Out).To(Say("bound apps:"))
-								Expect(testUI.Out).To(Say("name\\s+binding name"))
-								Expect(testUI.Out).To(Say("app-1\\s+binding-name-1"))
-								Expect(testUI.Out).To(Say("app-2\\s+binding-name-2"))
-								Expect(testUI.Out).To(Say("app-3\\s+binding-name-3"))
-								Expect(testUI.Out).To(Say("\n\n"))
-
 								Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
 								Expect(testUI.Out).To(Say("\n\n"))
 								Expect(testUI.Out).To(Say("status:\\s+some-type some-state"))
 								Expect(testUI.Out).To(Say("message:\\s+some-last-operation-description"))
 								Expect(testUI.Out).To(Say("started:\\s+some-created-at-time"))
 								Expect(testUI.Out).To(Say("updated:\\s+some-updated-at-time"))
+								Expect(testUI.Out).To(Say("\n\n"))
+
+								Expect(testUI.Out).To(Say("bound apps:"))
+								Expect(testUI.Out).To(Say("name\\s+binding name\\s+status\\s+message"))
+								Expect(testUI.Out).To(Say("app-1\\s+binding-name-1"))
+								Expect(testUI.Out).To(Say("app-2\\s+binding-name-2\\s+in progress\\s+10\\% complete"))
+								Expect(testUI.Out).To(Say("app-3\\s+binding-name-3\\s+failed\\s+Binding failed"))
 
 								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
 								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
@@ -576,13 +580,13 @@ var _ = Describe("service Command", func() {
 									Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
 									Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
 									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+									Expect(testUI.Out).To(Say("\n\n"))
 									Expect(testUI.Out).To(Say("bound apps:"))
-									Expect(testUI.Out).To(Say("name\\s+binding name"))
+									Expect(testUI.Out).To(Say("name\\s+binding name\\s+status\\s+message"))
 									Expect(testUI.Out).To(Say("app-1\\s+binding-name-1"))
 									Expect(testUI.Out).To(Say("app-2\\s+binding-name-2"))
 									Expect(testUI.Out).To(Say("app-3\\s+binding-name-3"))
-									Expect(testUI.Out).To(Say("\n\n"))
-									Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
 
 									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
 									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
@@ -618,13 +622,13 @@ var _ = Describe("service Command", func() {
 									Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
 									Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
 									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+									Expect(testUI.Out).To(Say("\n\n"))
 									Expect(testUI.Out).To(Say("bound apps:"))
-									Expect(testUI.Out).To(Say("name\\s+binding name"))
+									Expect(testUI.Out).To(Say("name\\s+binding name\\s+status\\s+message"))
 									Expect(testUI.Out).To(Say("app-1"))
 									Expect(testUI.Out).To(Say("app-2"))
 									Expect(testUI.Out).To(Say("app-3"))
-									Expect(testUI.Out).To(Say("\n\n"))
-									Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
 
 									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
 									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
@@ -648,9 +652,9 @@ var _ = Describe("service Command", func() {
 								Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
 								Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
 								Expect(testUI.Out).To(Say("\n\n"))
-								Expect(testUI.Out).To(Say("There are no bound apps for this service."))
-								Expect(testUI.Out).To(Say("\n\n"))
 								Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+								Expect(testUI.Out).To(Say("\n\n"))
+								Expect(testUI.Out).To(Say("There are no bound apps for this service."))
 
 								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
 								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
@@ -688,7 +692,7 @@ var _ = Describe("service Command", func() {
 							Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
 							Expect(testUI.Out).ToNot(Say("shared from"))
 							Expect(testUI.Out).To(Say("service:\\s+user-provided"))
-							Expect(testUI.Out).ToNot(Say("tags:"))
+							Expect(testUI.Out).To(Say("tags:"))
 							Expect(testUI.Out).ToNot(Say("plan:"))
 							Expect(testUI.Out).ToNot(Say("description:"))
 							Expect(testUI.Out).ToNot(Say("documentation:"))
@@ -749,7 +753,7 @@ var _ = Describe("service Command", func() {
 									Expect(testUI.Out).To(Say("service:\\s+user-provided"))
 									Expect(testUI.Out).To(Say("\n\n"))
 									Expect(testUI.Out).To(Say("bound apps:"))
-									Expect(testUI.Out).To(Say("name\\s+binding name"))
+									Expect(testUI.Out).To(Say("name\\s+binding name\\s+status\\s+message"))
 									Expect(testUI.Out).To(Say("app-1\\s+binding-name-1"))
 									Expect(testUI.Out).To(Say("app-2\\s+binding-name-2"))
 									Expect(testUI.Out).To(Say("app-3\\s+binding-name-3"))
@@ -794,7 +798,7 @@ var _ = Describe("service Command", func() {
 									Expect(testUI.Out).To(Say("service:\\s+user-provided"))
 									Expect(testUI.Out).To(Say("\n\n"))
 									Expect(testUI.Out).To(Say("bound apps:"))
-									Expect(testUI.Out).To(Say("name\\s+binding name"))
+									Expect(testUI.Out).To(Say("name\\s+binding name\\s+status\\s+message"))
 									Expect(testUI.Out).To(Say("app-1"))
 									Expect(testUI.Out).To(Say("app-2"))
 									Expect(testUI.Out).To(Say("app-3"))
@@ -823,6 +827,28 @@ var _ = Describe("service Command", func() {
 								Expect(testUI.Out).To(Say("service:\\s+user-provided"))
 								Expect(testUI.Out).To(Say("\n\n"))
 								Expect(testUI.Out).To(Say("There are no bound apps for this service."))
+							})
+						})
+
+						Context("when the service instance have tags", func() {
+							BeforeEach(func() {
+								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+									v2action.ServiceInstanceSummary{
+										ServiceInstance: v2action.ServiceInstance{
+											Name: "some-service-instance",
+											Type: constant.ServiceInstanceTypeUserProvidedService,
+											Tags: []string{"tag-1", "tag-2", "tag-3"},
+										},
+									},
+									v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+									nil,
+								)
+							})
+
+							It("displays the tags", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say("tags:\\s+tag-1, tag-2, tag-3"))
 							})
 						})
 					})

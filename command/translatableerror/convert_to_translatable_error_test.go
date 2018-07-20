@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/api/uaa"
 	. "code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
+	"code.cloudfoundry.org/cli/util/download"
 	"code.cloudfoundry.org/cli/util/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -62,6 +63,11 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"},
 			DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"}),
 
+		Entry("actionerror.EmptyBuildpacksError -> EmptyBuildpacksError",
+			manifest.EmptyBuildpacksError{},
+			EmptyBuildpacksError{},
+		),
+
 		Entry("actionerror.EmptyDirectoryError -> EmptyDirectoryError",
 			actionerror.EmptyDirectoryError{Path: "some-filename"},
 			EmptyDirectoryError{Path: "some-filename"}),
@@ -85,6 +91,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("actionerror.HTTPHealthCheckInvalidError -> HTTPHealthCheckInvalidError",
 			actionerror.HTTPHealthCheckInvalidError{},
 			HTTPHealthCheckInvalidError{}),
+
+		Entry("actionerror.InvalidBuildpacksError -> InvalidBuildpacksError",
+			actionerror.InvalidBuildpacksError{},
+			InvalidBuildpacksError{}),
 
 		Entry("actionerror.InvalidHTTPRouteSettings -> PortNotAllowedWithHTTPDomainError",
 			actionerror.InvalidHTTPRouteSettings{Domain: "some-domain"},
@@ -275,6 +285,22 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			ccerror.JobTimeoutError{JobGUID: "some-job-guid"},
 			JobTimeoutError{JobGUID: "some-job-guid"}),
 
+		Entry("ccerror.MultiError -> MultiError",
+			ccerror.MultiError{ResponseCode: 418, Errors: []ccerror.V3Error{
+				{
+					Code:   282010,
+					Detail: "detail 1",
+					Title:  "title-1",
+				},
+				{
+					Code:   10242013,
+					Detail: "detail 2",
+					Title:  "title-2",
+				},
+			}},
+			MultiError{Messages: []string{"detail 1", "detail 2"}},
+		),
+
 		Entry("ccerror.RequestError -> APIRequestError",
 			ccerror.RequestError{Err: err},
 			APIRequestError{Err: err}),
@@ -299,6 +325,11 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("ccerror.UnprocessableEntityError without droplet message -> original error",
 			unprocessableEntityError,
 			unprocessableEntityError),
+
+		Entry("download.RawHTTPStatusError -> HTTPStatusError",
+			download.RawHTTPStatusError{Status: "some status"},
+			HTTPStatusError{Status: "some status"},
+		),
 
 		Entry("json.SyntaxError -> JSONSyntaxError",
 			jsonErr,

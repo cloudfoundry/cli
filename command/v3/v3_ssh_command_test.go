@@ -115,20 +115,6 @@ var _ = Describe("v3-ssh Command", func() {
 					fakeActor.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns(sshAuth, v3action.Warnings{"some-warnings"}, nil)
 				})
 
-				Context("when the user doesn't provide a process-type and index", func() {
-					BeforeEach(func() {
-						cmd.ProcessType = ""
-						cmd.ProcessIndex = 0
-					})
-
-					It("defaults to 'web' and index 0", func() {
-						Expect(fakeActor.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexCallCount()).To(Equal(1))
-						_, _, processTypeArg, processIndexArg := fakeActor.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall(0)
-						Expect(processTypeArg).To(Equal("web"))
-						Expect(processIndexArg).To(Equal(uint(0)))
-					})
-				})
-
 				Context("when executing the secure shell succeeds", func() {
 					BeforeEach(func() {
 						cmd.DisablePseudoTTY = true

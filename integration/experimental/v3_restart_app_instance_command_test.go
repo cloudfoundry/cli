@@ -1,7 +1,7 @@
 package experimental
 
 import (
-	"strings"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -189,7 +189,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 
 			Context("when process type is not provided", func() {
 				It("defaults to web process", func() {
-					appOutputSession := helpers.CF("v3-app", appName)
+					appOutputSession := helpers.CF("app", appName)
 					Eventually(appOutputSession).Should(Exit(0))
 					firstAppTable := helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
@@ -201,16 +201,16 @@ var _ = Describe("v3-restart-app-instance command", func() {
 					Eventually(func() string {
 						var restartedAppTable helpers.AppTable
 						Eventually(func() string {
-							appOutputSession := helpers.CF("v3-app", appName)
+							appOutputSession := helpers.CF("app", appName)
 							Eventually(appOutputSession).Should(Exit(0))
 							restartedAppTable = helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
 							if len(restartedAppTable.Processes) > 0 {
-								return restartedAppTable.Processes[0].Title
+								return restartedAppTable.Processes[0].Type
 							}
 
 							return ""
-						}).Should(MatchRegexp(`web:\d/1`))
+						}).Should(Equal(`web`))
 						Expect(restartedAppTable.Processes[0].Instances).ToNot(BeEmpty())
 						return restartedAppTable.Processes[0].Instances[0].Since
 					}).ShouldNot(Equal(firstAppTable.Processes[0].Instances[0].Since))
@@ -231,7 +231,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 					Context("when instance index exists", func() {
 						findConsoleProcess := func(appTable helpers.AppTable) (helpers.AppProcessTable, bool) {
 							for _, process := range appTable.Processes {
-								if strings.HasPrefix(process.Title, "console") {
+								if process.Type == "console" {
 									return process, true
 								}
 							}
@@ -246,15 +246,15 @@ var _ = Describe("v3-restart-app-instance command", func() {
 							By("waiting for worker process to come up")
 							var firstAppTableConsoleProcess helpers.AppProcessTable
 							Eventually(func() string {
-								appOutputSession := helpers.CF("v3-app", appName)
+								appOutputSession := helpers.CF("app", appName)
 								Eventually(appOutputSession).Should(Exit(0))
 								firstAppTable := helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
 								var found bool
 								firstAppTableConsoleProcess, found = findConsoleProcess(firstAppTable)
 								Expect(found).To(BeTrue())
-								return firstAppTableConsoleProcess.Title
-							}).Should(MatchRegexp(`console:1/1`))
+								return fmt.Sprintf("%s, %s", firstAppTableConsoleProcess.Type, firstAppTableConsoleProcess.InstanceCount)
+							}).Should(MatchRegexp(`console, 1/1`))
 
 							By("restarting worker process instance")
 							session = helpers.CF("v3-restart-app-instance", appName, "0", "--process", "console")
@@ -267,7 +267,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 								var restartedAppTableConsoleProcess helpers.AppProcessTable
 
 								Eventually(func() string {
-									appOutputSession := helpers.CF("v3-app", appName)
+									appOutputSession := helpers.CF("app", appName)
 									Eventually(appOutputSession).Should(Exit(0))
 
 									restartedAppTable := helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
@@ -275,8 +275,8 @@ var _ = Describe("v3-restart-app-instance command", func() {
 									restartedAppTableConsoleProcess, found = findConsoleProcess(restartedAppTable)
 									Expect(found).To(BeTrue())
 
-									return restartedAppTableConsoleProcess.Title
-								}).Should(MatchRegexp(`console:1/1`))
+									return fmt.Sprintf("%s, %s", restartedAppTableConsoleProcess.Type, restartedAppTableConsoleProcess.InstanceCount)
+								}).Should(MatchRegexp(`console, 1/1`))
 
 								return restartedAppTableConsoleProcess.Instances[0].Since
 							}).ShouldNot(Equal(firstAppTableConsoleProcess.Instances[0].Since))

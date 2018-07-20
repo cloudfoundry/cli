@@ -1,8 +1,6 @@
 package command_test
 
 import (
-	"strings"
-
 	. "code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -19,12 +17,10 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		apiVersion    string
 		minCLIVersion string
 		binaryVersion string
-		errBuff       *strings.Builder
 	)
 
 	BeforeEach(func() {
-		errBuff = new(strings.Builder)
-		testUI = ui.NewTestUI(nil, NewBuffer(), errBuff)
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 
 		apiVersion = "100.200.3"
@@ -44,7 +40,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 
 			It("displays a recommendation to update the CLI version", func() {
 				err := WarnCLIVersionCheck(fakeConfig, testUI)
-				Expect(errBuff.String()).To(ContainSubstring("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
+				Expect(testUI.Err).To(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
@@ -59,7 +55,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		It("does not display a recommendation to update the CLI version", func() {
 			err := WarnCLIVersionCheck(fakeConfig, testUI)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(errBuff.String()).To(BeEmpty())
+			Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
 		})
 	})
 
@@ -72,7 +68,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 			err := WarnCLIVersionCheck(fakeConfig, testUI)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("No Major.Minor.Patch elements found"))
-			Expect(errBuff.String()).To(BeEmpty())
+			Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
 		})
 	})
 
@@ -87,7 +83,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		It("parses the versions successfully and recommends to update the CLI version", func() {
 			err := WarnCLIVersionCheck(fakeConfig, testUI)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(errBuff.String()).To(ContainSubstring("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
+			Expect(testUI.Err).To(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
 		})
 	})
 
@@ -99,10 +95,9 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 			fakeConfig.BinaryVersionReturns(binaryVersion)
 		})
 
-		It("does not return an error or print a warning", func() {
+		It("does not return an error", func() {
 			err := WarnCLIVersionCheck(fakeConfig, testUI)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(errBuff.String()).To(BeEmpty())
 		})
 	})
 
@@ -117,7 +112,6 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		It("does not return an error or print a warning", func() {
 			err := WarnCLIVersionCheck(fakeConfig, testUI)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(errBuff.String()).To(BeEmpty())
 		})
 	})
 })
@@ -127,12 +121,10 @@ var _ = Describe("WarnAPIVersionCheck", func() {
 		testUI *ui.UI
 
 		apiVersion string
-		errBuff    *strings.Builder
 	)
 
 	BeforeEach(func() {
-		errBuff = new(strings.Builder)
-		testUI = ui.NewTestUI(nil, NewBuffer(), errBuff)
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 	})
 
 	Context("when checking the cloud controller minimum version warning", func() {
@@ -145,7 +137,7 @@ var _ = Describe("WarnAPIVersionCheck", func() {
 				It("outputs a warning telling the user to upgrade their CF version", func() {
 					err := WarnAPIVersionCheck(apiVersion, testUI)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(errBuff.String()).To(ContainSubstring("Your API version is no longer supported. Upgrade to a newer version of the API"))
+					Expect(testUI.Err).To(Say("Your API version is no longer supported. Upgrade to a newer version of the API"))
 				})
 			})
 
@@ -157,7 +149,7 @@ var _ = Describe("WarnAPIVersionCheck", func() {
 				It("continues silently", func() {
 					err := WarnAPIVersionCheck(apiVersion, testUI)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(errBuff.String()).To(BeEmpty())
+					Expect(testUI.Err).NotTo(Say("Your API version is no longer supported. Upgrade to a newer version of the API"))
 				})
 			})
 		})

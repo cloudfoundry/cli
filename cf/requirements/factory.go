@@ -23,10 +23,11 @@ type Factory interface {
 	NewOrganizationRequirement(name string) OrganizationRequirement
 	NewDomainRequirement(name string) DomainRequirement
 	NewUserRequirement(username string, wantGUID bool) UserRequirement
-	NewBuildpackRequirement(buildpack string) BuildpackRequirement
+	NewBuildpackRequirement(buildpack, stack string) BuildpackRequirement
 	NewAPIEndpointRequirement() Requirement
 	NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement
 	NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) Requirement
+	NewUnsupportedLegacyFlagRequirement(flags ...string) Requirement
 	NewUsageRequirement(Usable, string, func() bool) Requirement
 	NewNumberArguments([]string, ...string) Requirement
 }
@@ -127,9 +128,10 @@ func (f apiRequirementFactory) NewUserRequirement(username string, wantGUID bool
 	)
 }
 
-func (f apiRequirementFactory) NewBuildpackRequirement(buildpack string) BuildpackRequirement {
+func (f apiRequirementFactory) NewBuildpackRequirement(buildpack, stack string) BuildpackRequirement {
 	return NewBuildpackRequirement(
 		buildpack,
+		stack,
 		f.repoLocator.GetBuildpackRepository(),
 	)
 }
@@ -162,6 +164,10 @@ func (f apiRequirementFactory) NewMaxAPIVersionRequirement(commandName string, m
 		commandName,
 		maximumVersion,
 	)
+}
+
+func (f apiRequirementFactory) NewUnsupportedLegacyFlagRequirement(flags ...string) Requirement {
+	return NewUnsupportedLegacyFlagRequirement(flags)
 }
 
 func (f apiRequirementFactory) NewUsageRequirement(cmd Usable, errorMessage string, pred func() bool) Requirement {

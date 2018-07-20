@@ -166,6 +166,25 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 	return responseApp, response.Warnings, err
 }
 
+// UpdateApplicationRestart restarts the given application.
+func (client *Client) UpdateApplicationRestart(appGUID string) (Application, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostApplicationActionRestartRequest,
+		URIParams:   map[string]string{"app_guid": appGUID},
+	})
+	if err != nil {
+		return Application{}, nil, err
+	}
+
+	var responseApp Application
+	response := cloudcontroller.Response{
+		Result: &responseApp,
+	}
+	err = client.connection.Make(request, &response)
+
+	return responseApp, response.Warnings, err
+}
+
 // UpdateApplicationStart starts the given application.
 func (client *Client) UpdateApplicationStart(appGUID string) (Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{

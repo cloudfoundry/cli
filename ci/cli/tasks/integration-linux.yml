@@ -21,6 +21,8 @@ params:
   CF_INT_DOCKER_IMAGE:
   CF_INT_DOCKER_USERNAME:
   CF_INT_DOCKER_PASSWORD:
+  CF_INT_IGNORE_API_VERSION_CHECK:
+  NODES: 16
 
 run:
   path: bash
@@ -30,12 +32,12 @@ run:
     set -e
 
     ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
-    export CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
+    export CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
 
     set -x
 
     domain=$(cat bosh-lite-lock/name)
-    export CF_API="https://api.${domain}"
+    export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
 
     export GOPATH=$PWD/go
@@ -52,5 +54,5 @@ run:
 
     go get -u github.com/onsi/ginkgo/ginkgo
 
-    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/isolated integration/plugin integration/push
+    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/isolated integration/plugin integration/push
     ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/global

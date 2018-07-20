@@ -15,7 +15,7 @@ import (
 //go:generate counterfeiter . BindServiceActor
 
 type BindServiceActor interface {
-	BindServiceBySpace(appName string, ServiceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (v2action.Warnings, error)
+	BindServiceBySpace(appName string, ServiceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (v2action.ServiceBinding, v2action.Warnings, error)
 	CloudControllerAPIVersion() string
 }
 
@@ -79,7 +79,7 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	warnings, err := cmd.Actor.BindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, cmd.Config.TargetedSpace().GUID, cmd.BindingName.Value, cmd.ParametersAsJSON)
+	serviceBinding, warnings, err := cmd.Actor.BindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, cmd.Config.TargetedSpace().GUID, cmd.BindingName.Value, cmd.ParametersAsJSON)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, isTakenError := err.(ccerror.ServiceBindingTakenError); isTakenError {
@@ -94,6 +94,20 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
+
+	if serviceBinding.IsInProgress() {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Binding in progress. Use '{{.CFCommand}} {{.ServiceName}}' to check operation status.", map[string]interface{}{
+			"CFCommand":   fmt.Sprintf("%s service", cmd.Config.BinaryName()),
+			"ServiceName": cmd.RequiredArgs.ServiceInstanceName,
+		})
+		cmd.UI.DisplayText("TIP: Once this operation succeeds, use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect.", map[string]interface{}{
+			"CFCommand": fmt.Sprintf("%s restage", cmd.Config.BinaryName()),
+			"AppName":   cmd.RequiredArgs.AppName,
+		})
+		return nil
+	}
+
 	cmd.UI.DisplayText("TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect", map[string]interface{}{
 		"CFCommand": fmt.Sprintf("%s restage", cmd.Config.BinaryName()),
 		"AppName":   cmd.RequiredArgs.AppName,

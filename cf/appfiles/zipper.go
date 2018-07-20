@@ -11,6 +11,7 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/gofileutils/fileutils"
+	securejoin "github.com/cyphar/filepath-securejoin"
 )
 
 //go:generate counterfeiter . Zipper
@@ -271,7 +272,12 @@ func (zipper ApplicationZipper) isZipWithOffsetFileHeaderLocation(name string) b
 
 func (zipper ApplicationZipper) extractFile(f *zip.File, destDir string) error {
 	if f.FileInfo().IsDir() {
-		err := os.MkdirAll(filepath.Join(destDir, f.Name), os.ModeDir|os.ModePerm)
+		path, err := securejoin.SecureJoin(destDir, f.Name)
+		if err != nil {
+			return err
+		}
+
+		err = os.MkdirAll(path, os.ModeDir|os.ModePerm)
 		if err != nil {
 			return err
 		}
@@ -284,7 +290,10 @@ func (zipper ApplicationZipper) extractFile(f *zip.File, destDir string) error {
 	}
 	defer src.Close()
 
-	destFilePath := filepath.Join(destDir, f.Name)
+	destFilePath, err := securejoin.SecureJoin(destDir, f.Name)
+	if err != nil {
+		return err
+	}
 
 	err = os.MkdirAll(filepath.Dir(destFilePath), os.ModeDir|os.ModePerm)
 	if err != nil {

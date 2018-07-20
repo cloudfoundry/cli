@@ -15,15 +15,14 @@ GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path 
 
 all : test build
 
-build : out/cf-cli_linux_x86-64
-	cp out/cf-cli_linux_x86-64 out/cf
+build : out/cf
 
 check-target-env :
-ifndef CF_API
-	$(error CF_API is undefined)
+ifndef CF_INT_API
+	$(error CF_INT_API is undefined)
 endif
-ifndef CF_PASSWORD
-	$(error CF_PASSWORD is undefined)
+ifndef CF_INT_PASSWORD
+	$(error CF_INT_PASSWORD is undefined)
 endif
 
 clean :
@@ -33,7 +32,7 @@ format :
 	go fmt ./...
 
 fly-windows-experimental : check-target-env
-	CF_CLI_EXPERIMENTAL=true CF_TEST_SUITE=./integration/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
+	CF_TEST_SUITE=./integration/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
 
 fly-windows-isolated : check-target-env
 	CF_TEST_SUITE=./integration/isolated fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
@@ -44,6 +43,9 @@ fly-windows-plugin : check-target-env
 fly-windows-push : check-target-env
 	CF_TEST_SUITE=./integration/push fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
 
+fly-windows-global : check-target-env
+	CF_TEST_SUITE=./integration/global fly -t ci execute -c ci/cli/tasks/integration-windows-serial.yml -i cli=./
+
 fly-windows-units :
 	fly -t ci execute -c ci/cli/tasks/units-windows.yml -i cli=./ -i cli-ci=./
 
@@ -51,7 +53,7 @@ integration-cleanup :
 	$(PWD)/bin/cleanup-integration
 
 integration-experimental : build integration-cleanup
-	CF_CLI_EXPERIMENTAL=true ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/experimental
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/experimental
 
 integration-global : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
@@ -81,6 +83,11 @@ lint :
 	@bash -c "go run bin/style/main.go api util/{configv3,manifest,randomword,sorting,ui}"
 	@echo "No lint errors!"
 	@echo
+
+out/cf: $(GOSRC)
+	CGO_ENABLED=0 go build \
+		$(REQUIRED_FOR_STATIC_BINARY) \
+		-ldflags "$(LD_FLAGS_LINUX)" -o out/cf .
 
 out/cf-cli_linux_i686 : $(GOSRC)
 	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
@@ -115,7 +122,7 @@ test : units
 
 units : format vet lint build
 	ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites \
-		api actor command types util version
+		api actor command types util version integration/helpers
 	@echo "\nSWEET SUITE SUCCESS"
 
 units-full : format vet lint build

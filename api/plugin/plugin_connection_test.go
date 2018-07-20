@@ -190,16 +190,16 @@ var _ = Describe("Plugin Connection", func() {
 						connection = NewConnection(false, 0)
 					})
 
-					// loopback.cli.ci.cf-app.com is a custom DNS record setup to point to 127.0.0.1
+					// loopback.cli.fun is a custom DNS record setup to point to 127.0.0.1
 					It("returns a SSLValidationHostnameError", func() {
-						altHostURL := strings.Replace(server.URL(), "127.0.0.1", "loopback.cli.ci.cf-app.com", -1)
+						altHostURL := strings.Replace(server.URL(), "127.0.0.1", "loopback.cli.fun", -1)
 						request, err := http.NewRequest(http.MethodGet, altHostURL, nil)
 						Expect(err).ToNot(HaveOccurred())
 
 						var response Response
 						err = connection.Make(request, &response, nil)
 						Expect(err).To(MatchError(pluginerror.SSLValidationHostnameError{
-							Message: "x509: certificate is valid for example.com, not loopback.cli.ci.cf-app.com",
+							Message: "x509: certificate is valid for example.com, not loopback.cli.fun",
 						}))
 					})
 				})

@@ -88,6 +88,7 @@ const (
 
 type AppParams struct {
 	BuildpackURL            *string
+	Buildpacks              []string
 	Command                 *string
 	DiskQuota               *int64
 	Domains                 []string

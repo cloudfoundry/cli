@@ -32,7 +32,7 @@ var _ = Describe("v3-scale Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v3fakes.FakeV3ScaleActor
-		fakeV2Actor     *sharedfakes.FakeV2AppRouteActor
+		fakeV2Actor     *sharedfakes.FakeV2AppActor
 		appName         string
 		binaryName      string
 		executeErr      error
@@ -45,7 +45,7 @@ var _ = Describe("v3-scale Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3ScaleActor)
-		fakeV2Actor = new(sharedfakes.FakeV2AppRouteActor)
+		fakeV2Actor = new(sharedfakes.FakeV2AppActor)
 		appName = "some-app"
 
 		cmd = v3.V3ScaleCommand{
@@ -54,11 +54,11 @@ var _ = Describe("v3-scale Command", func() {
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
 			AppSummaryDisplayer: shared.AppSummaryDisplayer{
-				UI:              testUI,
-				Config:          fakeConfig,
-				Actor:           fakeActor,
-				V2AppRouteActor: fakeV2Actor,
-				AppName:         appName,
+				UI:         testUI,
+				Config:     fakeConfig,
+				Actor:      fakeActor,
+				V2AppActor: fakeV2Actor,
+				AppName:    appName,
 			},
 		}
 
@@ -265,7 +265,9 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(len(firstAppTable.Processes)).To(Equal(2))
 
 					webProcessSummary := firstAppTable.Processes[0]
-					Expect(webProcessSummary.Title).To(Equal("web:3/3"))
+					Expect(webProcessSummary.Type).To(Equal("web"))
+					Expect(webProcessSummary.InstanceCount).To(Equal("3/3"))
+					Expect(webProcessSummary.MemUsage).To(Equal("32M"))
 
 					Expect(webProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 					Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
@@ -280,7 +282,9 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(webProcessSummary.Instances[2].CPU).To(Equal("0.0%"))
 
 					consoleProcessSummary := firstAppTable.Processes[1]
-					Expect(consoleProcessSummary.Title).To(Equal("console:1/1"))
+					Expect(consoleProcessSummary.Type).To(Equal("console"))
+					Expect(consoleProcessSummary.InstanceCount).To(Equal("1/1"))
+					Expect(consoleProcessSummary.MemUsage).To(Equal("16M"))
 
 					Expect(consoleProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 					Expect(consoleProcessSummary.Instances[0].Disk).To(Equal("976.6K of 7.6M"))
@@ -405,7 +409,9 @@ var _ = Describe("v3-scale Command", func() {
 								Expect(len(firstAppTable.Processes)).To(Equal(2))
 
 								webProcessSummary := firstAppTable.Processes[0]
-								Expect(webProcessSummary.Title).To(Equal("web:3/3"))
+								Expect(webProcessSummary.Type).To(Equal("web"))
+								Expect(webProcessSummary.InstanceCount).To(Equal("3/3"))
+								Expect(webProcessSummary.MemUsage).To(Equal("32M"))
 
 								Expect(webProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 								Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
@@ -420,7 +426,9 @@ var _ = Describe("v3-scale Command", func() {
 								Expect(webProcessSummary.Instances[2].CPU).To(Equal("0.0%"))
 
 								consoleProcessSummary := firstAppTable.Processes[1]
-								Expect(consoleProcessSummary.Title).To(Equal("console:1/1"))
+								Expect(consoleProcessSummary.Type).To(Equal("console"))
+								Expect(consoleProcessSummary.InstanceCount).To(Equal("1/1"))
+								Expect(consoleProcessSummary.MemUsage).To(Equal("16M"))
 
 								Expect(consoleProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 								Expect(consoleProcessSummary.Instances[0].Disk).To(Equal("976.6K of 7.6M"))

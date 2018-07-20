@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
+	"code.cloudfoundry.org/cli/util/download"
 	"code.cloudfoundry.org/cli/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
@@ -35,6 +36,8 @@ func ConvertToTranslatableError(err error) error {
 		return DockerPasswordNotSetError{}
 	case actionerror.DomainNotFoundError:
 		return DomainNotFoundError(e)
+	case manifest.EmptyBuildpacksError:
+		return EmptyBuildpacksError(e)
 	case actionerror.EmptyDirectoryError:
 		return EmptyDirectoryError(e)
 	case actionerror.FileChangedError:
@@ -45,6 +48,8 @@ func ConvertToTranslatableError(err error) error {
 		return HostnameWithTCPDomainError(e)
 	case actionerror.HTTPHealthCheckInvalidError:
 		return HTTPHealthCheckInvalidError{}
+	case actionerror.InvalidBuildpacksError:
+		return InvalidBuildpacksError{}
 	case actionerror.InvalidHTTPRouteSettings:
 		return PortNotAllowedWithHTTPDomainError(e)
 	case actionerror.InvalidRouteError:
@@ -145,6 +150,8 @@ func ConvertToTranslatableError(err error) error {
 		return JobFailedError(e)
 	case ccerror.JobTimeoutError:
 		return JobTimeoutError{JobGUID: e.JobGUID}
+	case ccerror.MultiError:
+		return MultiError{Messages: e.Details()}
 	case ccerror.UnprocessableEntityError:
 		if strings.Contains(e.Message, "Task must have a droplet. Specify droplet or assign current droplet to app.") {
 			return RunTaskError{Message: "App is not staged."}
@@ -183,6 +190,10 @@ func ConvertToTranslatableError(err error) error {
 		return UnauthorizedToPerformActionError{}
 	case uaa.InvalidAuthTokenError:
 		return InvalidRefreshTokenError{}
+
+	// Other Errors
+	case download.RawHTTPStatusError:
+		return HTTPStatusError{Status: e.Status}
 	}
 
 	return err

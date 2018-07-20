@@ -1,16 +1,26 @@
 <!--
 ## Requirements
 
-* Your contribution will be analyzed for product fit and engineering quality prior to merging.  
+* Your contribution will be analyzed for product fit and engineering quality prior to merging.
 If your contribution includes a change that is exposed to cf CLI users (e.g. introducing a new command or flag), please submit an issue to discuss it first.
-* We're not allowed to accept any PRs without a signed CLA, no matter how small.  
-If your contribution falls under a company CLA but your membership is not public, expect delays while we confirm. 
+* We're not allowed to accept any PRs without a signed CLA, no matter how small.
+If your contribution falls under a company CLA but your membership is not public, expect delays while we confirm.
 * All new code requires tests to protect against regressions.
 -->
 
 ## What Need Does It Address?
 
-<!-- What benefits will be realized by the code change? What type of users will benefit? -->
+<!-- What benefits will be realized by the code change? Explain its value to users. What is their current solution to the problem, and why is it insufficient? -->
+
+## Who Is The Functionality For?
+
+<!--
+Explain who specifically the change would benefit. What users would want this change? Is there broad demand for the change, or is there a single customer who benefits?
+-->
+
+## How Often Will This Functionality Be Used?
+
+<!-- How often will the change be used? -->
 
 ## Possible Drawbacks
 
@@ -18,7 +28,7 @@ If your contribution falls under a company CLA but your membership is not public
 
 ## Why Should This Be In Core?
 
-<!-- Explain why this functionality should be in the cf CLI, as opposed to a plugin? -->
+<!-- Explain why this functionality should be in the cf CLI, as opposed to a plugin. -->
 
 ## Description of the Change
 
@@ -35,3 +45,11 @@ have worked with the code here recently, so please walk us through the concepts.
 ## Applicable Issues
 
 <!-- List any applicable Issues here -->
+
+## How Urgent Is The Change?
+
+<!-- Is the change urgent? If so, explain why it is time-sensitive.-->
+
+## Other Relevant Parties
+
+<!-- Who else is affected by the change? -->

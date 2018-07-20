@@ -10,6 +10,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// MergeAndValidateSettingsAndManifests merges command line settings and
+// manifest settings. It does this by:
+// - Validating command line setting and their effect on the provided manifests
+// - Override manifest settings with command line settings (when applicable)
+// - Sanitizing the inputs
+// - Validate merged manifest
 func (actor Actor) MergeAndValidateSettingsAndManifests(cmdLineSettings CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error) {
 	var mergedApps []manifest.Application
 
@@ -182,6 +188,9 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			if app.Buildpack.IsSet {
 				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "buildpack"}}
 			}
+			if app.Buildpacks != nil {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "buildpacks"}}
+			}
 			if app.Path != "" {
 				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "path"}}
 			}
@@ -190,8 +199,16 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 			}
 		}
 
-		if app.DropletPath != "" && app.Path != "" {
-			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "path"}}
+		if app.DropletPath != "" {
+			if app.Path != "" {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "path"}}
+			}
+			if app.Buildpack.IsSet {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "buildpack"}}
+			}
+			if app.Buildpacks != nil {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"droplet", "buildpacks"}}
+			}
 		}
 
 		if app.DockerImage == "" && app.DropletPath == "" {
@@ -216,6 +233,18 @@ func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 
 		if app.HealthCheckHTTPEndpoint != "" && app.HealthCheckType != "http" {
 			return actionerror.HTTPHealthCheckInvalidError{}
+		}
+
+		if app.Buildpacks != nil && app.Buildpack.IsSet {
+			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"buildpack", "buildpacks"}}
+		}
+
+		if len(app.Buildpacks) > 1 {
+			for _, b := range app.Buildpacks {
+				if b == "null" || b == "default" {
+					return actionerror.InvalidBuildpacksError{}
+				}
+			}
 		}
 	}
 	return nil

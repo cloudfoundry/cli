@@ -41,7 +41,7 @@ type V2PushActor interface {
 	ReadManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]manifest.Application, pushaction.Warnings, error)
 }
 
-type V2PushCommand struct {
+type PushCommand struct {
 	OptionalArgs        flag.OptionalAppName          `positional-args:"yes"`
 	Buildpacks          []string                      `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	Command             flag.Command                  `short:"c" description:"Startup command, set to null to reset to default start command"`
@@ -70,7 +70,7 @@ type V2PushCommand struct {
 	envCFStartupTimeout interface{}                   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 	dockerPassword      interface{}                   `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
 
-	usage           interface{} `usage:"CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]...\n\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]...\n\n   CF_NAME push APP_NAME --droplet DROPLET_PATH\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--var KEY=VALUE] [--vars-file VARS_FILE_PATH]...\n\n   CF_NAME push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]"`
+	usage           interface{} `usage:"CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--var KEY=VALUE]... [--vars-file VARS_FILE_PATH]...\n\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--var KEY=VALUE]... [--vars-file VARS_FILE_PATH]...\n\n   CF_NAME push APP_NAME --droplet DROPLET_PATH\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--var KEY=VALUE]... [--vars-file VARS_FILE_PATH]...\n\n   CF_NAME push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]"`
 	relatedCommands interface{} `related_commands:"apps, create-app-manifest, logs, ssh, start"`
 
 	UI          command.UI
@@ -83,7 +83,7 @@ type V2PushCommand struct {
 	NOAAClient   *consumer.Consumer
 }
 
-func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	sharedActor := sharedaction.NewActor(config)
@@ -93,7 +93,7 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	ccClientV3, _, err := sharedV3.NewClients(config, ui, true)
+	ccClientV3, _, err := sharedV3.NewClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
@@ -111,9 +111,15 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd V2PushCommand) Execute(args []string) error {
+func (cmd PushCommand) Execute(args []string) error {
 	if cmd.DropletPath != "" {
 		if err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV2APIVersion(), ccversion.MinVersionDropletUploadV2, "Option '--droplet'"); err != nil {
+			return err
+		}
+	}
+
+	if len(cmd.Buildpacks) > 1 {
+		if err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "Multiple option '-b'"); err != nil {
 			return err
 		}
 	}
@@ -234,7 +240,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 // GetCommandLineSettings generates a push CommandLineSettings object from the
 // command's command line flags. It also validates those settings, preventing
 // contradictory flags.
-func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSettings, error) {
+func (cmd PushCommand) GetCommandLineSettings() (pushaction.CommandLineSettings, error) {
 	err := cmd.validateArgs()
 	if err != nil {
 		return pushaction.CommandLineSettings{}, err
@@ -284,7 +290,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 	return config, nil
 }
 
-func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.CommandLineSettings) ([]manifest.Application, error) {
+func (cmd PushCommand) findAndReadManifestWithFlavorText(settings pushaction.CommandLineSettings) ([]manifest.Application, error) {
 	var (
 		pathToManifest string
 	)
@@ -370,7 +376,7 @@ func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.C
 	return apps, err
 }
 
-func (cmd V2PushCommand) processApplyStreams(
+func (cmd PushCommand) processApplyStreams(
 	user configv3.User,
 	appConfig pushaction.ApplicationConfig,
 	configStream <-chan pushaction.ApplicationConfig,
@@ -423,7 +429,7 @@ func (cmd V2PushCommand) processApplyStreams(
 	return updatedConfig, nil
 }
 
-func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.ApplicationConfig, event pushaction.Event) bool {
+func (cmd PushCommand) processEvent(user configv3.User, appConfig pushaction.ApplicationConfig, event pushaction.Event) bool {
 	log.Infoln("received apply event:", event)
 
 	switch event {
@@ -466,7 +472,7 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	return false
 }
 
-func (cmd V2PushCommand) validateArgs() error {
+func (cmd PushCommand) validateArgs() error {
 	switch {
 	case cmd.DropletPath != "" && cmd.AppPath != "":
 		return translatableerror.ArgumentCombinationError{

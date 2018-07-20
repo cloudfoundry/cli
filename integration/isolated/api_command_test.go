@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
 
@@ -254,6 +255,26 @@ var _ = Describe("api command", func() {
 		})
 	})
 
+	Context("when the v3 api supports routing", func() {
+		BeforeEach(func() {
+			helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
+		})
+
+		It("sets the routing endpoing in the config file", func() {
+			session := helpers.CF("api", apiURL, skipSSLValidation)
+			Eventually(session).Should(Exit(0))
+
+			rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+			Expect(err).NotTo(HaveOccurred())
+
+			var configFile configv3.JSONConfig
+			err = json.Unmarshal(rawConfig, &configFile)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(configFile.RoutingEndpoint).NotTo(BeEmpty())
+		})
+	})
+
 	It("sets the config file", func() {
 		session := helpers.CF("api", apiURL, skipSSLValidation)
 		Eventually(session).Should(Exit(0))
@@ -270,7 +291,6 @@ var _ = Describe("api command", func() {
 		Expect(configFile.APIVersion).To(MatchRegexp("\\d+\\.\\d+\\.\\d+"))
 		Expect(configFile.AuthorizationEndpoint).ToNot(BeEmpty())
 		Expect(configFile.DopplerEndpoint).To(MatchRegexp("^wss://"))
-		Expect(configFile.RoutingEndpoint).NotTo(BeEmpty())
 		Expect(configFile.UAAEndpoint).To(BeEmpty())
 		Expect(configFile.AccessToken).To(BeEmpty())
 		Expect(configFile.RefreshToken).To(BeEmpty())

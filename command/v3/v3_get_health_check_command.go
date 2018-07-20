@@ -1,6 +1,7 @@
 package v3
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -36,7 +37,7 @@ func (cmd *V3GetHealthCheckCommand) Setup(config command.Config, ui command.UI) 
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.NewClients(config, ui, true)
+	ccClient, _, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionV3}
@@ -92,14 +93,21 @@ func (cmd V3GetHealthCheckCommand) Execute(args []string) error {
 			cmd.UI.TranslateText("process"),
 			cmd.UI.TranslateText("health check"),
 			cmd.UI.TranslateText("endpoint (for http)"),
+			cmd.UI.TranslateText("invocation timeout"),
 		},
 	}
 
 	for _, healthCheck := range processHealthChecks {
+		invocationTimeout := healthCheck.InvocationTimeout
+		if invocationTimeout == 0 {
+			invocationTimeout = 1
+		}
+
 		table = append(table, []string{
 			healthCheck.ProcessType,
 			healthCheck.HealthCheckType,
 			healthCheck.Endpoint,
+			fmt.Sprint(invocationTimeout),
 		})
 	}
 

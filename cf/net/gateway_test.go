@@ -613,7 +613,6 @@ var _ = Describe("Gateway", func() {
 					fmt.Fprintln(writer, `{ "metadata": { "url": "/v2/jobs/the-job-guid" } }`)
 				case "/v2/warning2":
 					writer.Header().Add("X-Cf-Warnings", url.QueryEscape("Something a little awful"))
-					writer.Header().Add("X-Cf-Warnings", url.QueryEscape("Don't worry, but be careful"))
 					writer.WriteHeader(http.StatusInternalServerError)
 					fmt.Fprintf(writer, `{ "key": "value" }`)
 				}
@@ -645,7 +644,7 @@ var _ = Describe("Gateway", func() {
 			ccGateway.PerformRequest(request)
 
 			Expect(ccGateway.Warnings()).To(Equal(
-				[]string{"Something not too awful has happened", "Something a little awful", "Don't worry, but be careful"},
+				[]string{"Something not too awful has happened", "Something a little awful"},
 			))
 		})
 
