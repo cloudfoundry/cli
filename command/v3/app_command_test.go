@@ -27,11 +27,11 @@ import (
 
 var _ = Describe("v3-app Command", func() {
 	var (
-		cmd             v3.V3AppCommand
+		cmd             v3.AppCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v3fakes.FakeV3AppActor
+		fakeActor       *v3fakes.FakeAppActor
 		fakeV2Actor     *sharedfakes.FakeV2AppActor
 		binaryName      string
 		executeErr      error
@@ -42,7 +42,7 @@ var _ = Describe("v3-app Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v3fakes.FakeV3AppActor)
+		fakeActor = new(v3fakes.FakeAppActor)
 		fakeV2Actor = new(sharedfakes.FakeV2AppActor)
 
 		binaryName = "faceman"
@@ -57,7 +57,7 @@ var _ = Describe("v3-app Command", func() {
 			AppName:    app,
 		}
 
-		cmd = v3.V3AppCommand{
+		cmd = v3.AppCommand{
 			RequiredArgs: flag.AppName{AppName: app},
 
 			UI:                  testUI,
