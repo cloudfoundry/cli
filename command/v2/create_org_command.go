@@ -1,9 +1,6 @@
 package v2
 
 import (
-	"os"
-	"strconv"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -49,12 +46,11 @@ func (cmd *CreateOrgCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd CreateOrgCommand) Execute(args []string) error {
-	experimental, err := strconv.ParseBool(os.Getenv("CF_CLI_EXPERIMENTAL"))
-	if !experimental || err != nil {
+	if !cmd.Config.Experimental() {
 		return translatableerror.UnrefactoredCommandError{}
 	}
 
-	err = cmd.SharedActor.CheckTarget(false, false)
+	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
