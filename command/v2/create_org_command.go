@@ -29,11 +29,12 @@ type CreateOrgCommand struct {
 }
 
 func (cmd *CreateOrgCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+
 	if !config.Experimental() {
 		return nil
 	}
-	cmd.UI = ui
-	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
