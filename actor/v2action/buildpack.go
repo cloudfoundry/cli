@@ -178,13 +178,12 @@ func Zipit(source, target, prefix string) error {
 		}
 
 		header.Name = filepath.ToSlash(header.Name)
-
 		if info.IsDir() {
 			header.Name += "/"
-			header.SetMode(0755)
+			header.SetMode(info.Mode())
 		} else {
 			header.Method = zip.Deflate
-			header.SetMode(0744)
+			header.SetMode(info.Mode())
 		}
 
 		writer, err := archive.CreateHeader(header)
