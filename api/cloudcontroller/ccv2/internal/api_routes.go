@@ -33,6 +33,7 @@ const (
 	GetInfoRequest                                       = "GetInfo"
 	GetJobRequest                                        = "GetJob"
 	GetOrganizationPrivateDomainsRequest                 = "GetOrganizationPrivateDomains"
+	GetOrganizationQuotaDefinitionsRequest               = "GetOrganizationQuotaDefinitions"
 	GetOrganizationQuotaDefinitionRequest                = "GetOrganizationQuotaDefinition"
 	GetOrganizationRequest                               = "GetOrganization"
 	GetOrganizationsRequest                              = "GetOrganizations"
@@ -87,6 +88,7 @@ const (
 	PutBuildpackRequest                                  = "PutBuildpack"
 	PutBuildpackBitsRequest                              = "PutBuildpackBits"
 	PutDropletRequest                                    = "PutDroplet"
+	PutOrganizationManagerRequest                        = "PutOrganizationManager"
 	PutResourceMatchRequest                              = "PutResourceMatch"
 	PutRouteAppRequest                                   = "PutRouteApp"
 	PutSecurityGroupSpaceRequest                         = "PutSecurityGroupSpace"
@@ -118,10 +120,12 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/organizations", Method: http.MethodPost, Name: PostOrganizationRequest},
 	{Path: "/v2/organizations/:organization_guid", Method: http.MethodDelete, Name: DeleteOrganizationRequest},
 	{Path: "/v2/organizations/:organization_guid", Method: http.MethodGet, Name: GetOrganizationRequest},
+	{Path: "/v2/organizations/:organization_guid/managers", Method: http.MethodPut, Name: PutOrganizationManagerRequest},
 	{Path: "/v2/organizations/:organization_guid/private_domains", Method: http.MethodGet, Name: GetOrganizationPrivateDomainsRequest},
 	{Path: "/v2/private_domains", Method: http.MethodGet, Name: GetPrivateDomainsRequest},
 	{Path: "/v2/private_domains/:private_domain_guid", Method: http.MethodGet, Name: GetPrivateDomainRequest},
 	{Path: "/v2/quota_definitions/:organization_quota_guid", Method: http.MethodGet, Name: GetOrganizationQuotaDefinitionRequest},
+	{Path: "/v2/quota_definitions", Method: http.MethodGet, Name: GetOrganizationQuotaDefinitionsRequest},
 	{Path: "/v2/resource_match", Method: http.MethodPut, Name: PutResourceMatchRequest},
 	{Path: "/v2/route_mappings", Method: http.MethodGet, Name: GetRouteMappingsRequest},
 	{Path: "/v2/route_mappings/:route_mapping_guid", Method: http.MethodGet, Name: GetRouteMappingRequest},

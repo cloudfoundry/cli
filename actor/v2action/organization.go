@@ -49,20 +49,36 @@ func (actor Actor) GetOrganizationByName(orgName string) (Organization, Warnings
 
 // GrantOrgManagerByUsername gives the Org Manager role to the provided user.
 func (actor Actor) GrantOrgManagerByUsername(guid string, username string) (Warnings, error) {
-	return Warnings{}, nil
+	warnings, err := actor.CloudControllerClient.UpdateOrganizationManagerByUsername(guid, username)
+	return Warnings(warnings), err
 }
 
 // CreateOrganization creates an Organization based on the provided orgName.
-func (actor Actor) CreateOrganization(orgName string) (Organization, Warnings, error) {
-	org, warnings, _ := actor.CloudControllerClient.CreateOrganization(orgName)
+func (actor Actor) CreateOrganization(orgName string, quotaName string) (Organization, Warnings, error) {
+	var quotaGUID string
+	var allWarnings Warnings
 
-	/*
+	if quotaName != "" {
+		quota, warnings, err := actor.GetOrganizationQuotaByName(quotaName)
+
+		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
-			return Organization{}, Warnings(warnings), err
+			return Organization{}, allWarnings, err
 		}
-	*/
 
-	return Organization(org), Warnings(warnings), nil
+		quotaGUID = quota.GUID
+	}
+
+	org, warnings, err := actor.CloudControllerClient.CreateOrganization(orgName, quotaGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if _, ok := err.(ccerror.OrganizationNameTakenError); ok {
+		return Organization{}, allWarnings, actionerror.OrganizationNameTakenError{Name: orgName}
+	}
+	if err != nil {
+		return Organization{}, allWarnings, err
+	}
+
+	return Organization(org), allWarnings, nil
 }
 
 // DeleteOrganization deletes the Organization associated with the provided

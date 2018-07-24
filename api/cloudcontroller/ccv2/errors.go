@@ -95,6 +95,8 @@ func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
 		return ccerror.NotStagedError{Message: errorResponse.Description}
 	case "CF-ServiceBindingAppServiceTaken":
 		return ccerror.ServiceBindingTakenError{Message: errorResponse.Description}
+	case "CF-OrganizationNameTaken":
+		return ccerror.OrganizationNameTakenError{Message: errorResponse.Description}
 	default:
 		return ccerror.BadRequestError{Message: errorResponse.Description}
 	}

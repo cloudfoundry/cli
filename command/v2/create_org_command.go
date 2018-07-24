@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -12,7 +13,7 @@ import (
 //go:generate counterfeiter . CreateOrgActor
 
 type CreateOrgActor interface {
-	CreateOrganization(orgName string) (v2action.Organization, v2action.Warnings, error)
+	CreateOrganization(orgName string, quotaName string) (v2action.Organization, v2action.Warnings, error)
 	GrantOrgManagerByUsername(guid string, username string) (v2action.Warnings, error)
 }
 
@@ -69,10 +70,18 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 			"Username": user.Name,
 		})
 
-	org, warnings, err := cmd.Actor.CreateOrganization(orgName)
+	org, warnings, err := cmd.Actor.CreateOrganization(orgName, cmd.Quota)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		if _, ok := err.(actionerror.OrganizationNameTakenError); ok {
+			cmd.UI.DisplayOK()
+			cmd.UI.DisplayWarning("Org {{.OrgName}} already exists.", map[string]interface{}{
+				"OrgName": cmd.RequiredArgs.Organization,
+			})
+			return nil
+		} else {
+			return err
+		}
 	}
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
@@ -82,8 +91,12 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 			"OrgName":  orgName,
 			"Username": user.Name,
 		})
-	warnings, _ = cmd.Actor.GrantOrgManagerByUsername(org.GUID, user.Name)
+
+	warnings, err = cmd.Actor.GrantOrgManagerByUsername(org.GUID, user.Name)
 	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
 
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()

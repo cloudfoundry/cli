@@ -85,6 +85,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("NoSpaceTargetedError", NoSpaceTargetedError{}),
 		Entry("NotLoggedInError", NotLoggedInError{}),
 		Entry("OrgNotFoundError", OrganizationNotFoundError{}),
+		Entry("OrganizationQuotaNotFoundForNameError", OrganizationQuotaNotFoundForNameError{}),
 		Entry("ParseArgumentError", ParseArgumentError{}),
 		Entry("PasswordGrantTypeLogoutRequiredError", PasswordGrantTypeLogoutRequiredError{}),
 		Entry("PluginAlreadyInstalledError", PluginAlreadyInstalledError{}),

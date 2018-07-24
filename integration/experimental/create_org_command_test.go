@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("create-org", func() {
-	When("invoked with --help", func() {
+	Context("when invoked with --help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("create-org", "--help")
 			Eventually(session).Should(Say(`NAME:`))
@@ -44,32 +44,6 @@ var _ = Describe("create-org", func() {
 			user = helpers.LoginCF()
 		})
 
-		When("the logged in user is not allowed to create orgs", func() {
-			BeforeEach(func() {
-				nonAdminUser := helpers.NewUsername()
-				nonAdminPassword := helpers.NewPassword()
-
-				session := helpers.CF("create-user", nonAdminUser, nonAdminPassword)
-				Eventually(session).Should(Exit(0))
-
-				env := map[string]string{
-					"CF_USERNAME": nonAdminUser,
-					"CF_PASSWORD": nonAdminPassword,
-				}
-
-				session = helpers.CFWithEnv(env, "auth")
-				Eventually(session).Should(Exit(0))
-			})
-
-			XIt("fails with an insufficient scope error", func() {
-				orgName := helpers.NewOrgName()
-				session := helpers.CF("create-org", orgName)
-				Eventually(session.Out).Should(Say("Error creating organization %s\\.", orgName))
-				Eventually(session.Err).Should(Say("You are not authorized to perform the requested action\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
 		When("the org does not exist yet", func() {
 			It("creates the org", func() {
 				orgName := helpers.NewOrgName()
@@ -83,6 +57,16 @@ var _ = Describe("create-org", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
+			It("makes the user an org manager", func() {
+				orgName := helpers.NewOrgName()
+				session := helpers.CF("create-org", orgName)
+				Eventually(session).Should(Exit(0))
+
+				session = helpers.CF("org-users", orgName)
+				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(Say("ORG MANAGER\\n\\s+%s", user))
+			})
+
 			When("an existing quota is provided", func() {
 				var quotaName string
 
@@ -92,7 +76,7 @@ var _ = Describe("create-org", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				XIt("creates the org with the provided quota", func() {
+				It("creates the org with the provided quota", func() {
 					orgName := helpers.NewOrgName()
 					session := helpers.CF("create-org", orgName, "-q", quotaName)
 					Eventually(session).Should(Exit(0))
@@ -104,14 +88,14 @@ var _ = Describe("create-org", func() {
 			})
 
 			When("a nonexistent quota is provided", func() {
-				XIt("fails with an error and does not create the org", func() {
+				It("fails with an error and does not create the org", func() {
 					orgName := helpers.NewOrgName()
 					session := helpers.CF("create-org", orgName, "-q", "no-such-quota")
-					Eventually(session.Err).Should(Say("FAILED\\n"))
 					Eventually(session.Err).Should(Say("Quota no-such-quota not found"))
+					Eventually(session).Should(Say("FAILED\\n"))
 					Eventually(session).Should(Exit(1))
 
-					Expect(helpers.CF("org", orgName)).To(Exit(1))
+					Eventually(helpers.CF("org", orgName)).Should(Exit(1))
 				})
 			})
 		})
@@ -125,7 +109,7 @@ var _ = Describe("create-org", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			XIt("warns the user that the org already exists", func() {
+			It("warns the user that the org already exists", func() {
 				session := helpers.CF("create-org", orgName)
 				Eventually(session.Out).Should(Say("Creating org %s as %s\\.\\.\\.", orgName, user))
 				Eventually(session.Out).Should(Say("OK\\n"))

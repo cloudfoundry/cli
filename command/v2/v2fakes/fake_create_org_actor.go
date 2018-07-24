@@ -9,10 +9,11 @@ import (
 )
 
 type FakeCreateOrgActor struct {
-	CreateOrganizationStub        func(orgName string) (v2action.Organization, v2action.Warnings, error)
+	CreateOrganizationStub        func(orgName string, quotaName string) (v2action.Organization, v2action.Warnings, error)
 	createOrganizationMutex       sync.RWMutex
 	createOrganizationArgsForCall []struct {
-		orgName string
+		orgName   string
+		quotaName string
 	}
 	createOrganizationReturns struct {
 		result1 v2action.Organization
@@ -42,16 +43,17 @@ type FakeCreateOrgActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateOrgActor) CreateOrganization(orgName string) (v2action.Organization, v2action.Warnings, error) {
+func (fake *FakeCreateOrgActor) CreateOrganization(orgName string, quotaName string) (v2action.Organization, v2action.Warnings, error) {
 	fake.createOrganizationMutex.Lock()
 	ret, specificReturn := fake.createOrganizationReturnsOnCall[len(fake.createOrganizationArgsForCall)]
 	fake.createOrganizationArgsForCall = append(fake.createOrganizationArgsForCall, struct {
-		orgName string
-	}{orgName})
-	fake.recordInvocation("CreateOrganization", []interface{}{orgName})
+		orgName   string
+		quotaName string
+	}{orgName, quotaName})
+	fake.recordInvocation("CreateOrganization", []interface{}{orgName, quotaName})
 	fake.createOrganizationMutex.Unlock()
 	if fake.CreateOrganizationStub != nil {
-		return fake.CreateOrganizationStub(orgName)
+		return fake.CreateOrganizationStub(orgName, quotaName)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -65,10 +67,10 @@ func (fake *FakeCreateOrgActor) CreateOrganizationCallCount() int {
 	return len(fake.createOrganizationArgsForCall)
 }
 
-func (fake *FakeCreateOrgActor) CreateOrganizationArgsForCall(i int) string {
+func (fake *FakeCreateOrgActor) CreateOrganizationArgsForCall(i int) (string, string) {
 	fake.createOrganizationMutex.RLock()
 	defer fake.createOrganizationMutex.RUnlock()
-	return fake.createOrganizationArgsForCall[i].orgName
+	return fake.createOrganizationArgsForCall[i].orgName, fake.createOrganizationArgsForCall[i].quotaName
 }
 
 func (fake *FakeCreateOrgActor) CreateOrganizationReturns(result1 v2action.Organization, result2 v2action.Warnings, result3 error) {

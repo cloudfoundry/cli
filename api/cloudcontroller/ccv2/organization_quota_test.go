@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -72,5 +73,133 @@ var _ = Describe("OrganizationQuota", func() {
 			})
 		})
 
+	})
+
+	Describe("GetOrganizationQuotas", func() {
+		var (
+			quotas     []OrganizationQuota
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			quotas, warnings, executeErr = client.GetOrganizationQuotas(Filter{
+				Type:     "some-query",
+				Operator: constant.EqualOperator,
+				Values:   []string{"some-value"},
+			})
+		})
+
+		When("listing the quotas succeeds", func() {
+			BeforeEach(func() {
+				response1 := `{
+					"next_url": "/v2/quota_definitions?q=some-query:some-value&page=2",
+					"resources": [
+						{
+							"metadata": {
+								"guid": "some-org-quota-guid-1"
+							},
+							"entity": {
+								"name": "some-quota-name-1"
+							}
+						},
+						{
+							"metadata": {
+								"guid": "some-org-quota-guid-2"
+							},
+							"entity": {
+								"name": "some-quota-name-2"
+							}
+						}
+					]
+				}`
+
+				response2 := `{
+					"next_url": null,
+					"resources": [
+						{
+							"metadata": {
+								"guid": "some-org-quota-guid-3"
+							},
+							"entity": {
+								"name": "some-quota-name-3"
+							}
+						},
+						{
+							"metadata": {
+								"guid": "some-org-quota-guid-4"
+							},
+							"entity": {
+								"name": "some-quota-name-4"
+							}
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/quota_definitions", "q=some-query:some-value"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/quota_definitions", "q=some-query:some-value&page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
+					),
+				)
+			})
+
+			It("returns paginated results and all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+				Expect(quotas).To(Equal([]OrganizationQuota{
+					{
+						GUID: "some-org-quota-guid-1",
+						Name: "some-quota-name-1",
+					},
+					{
+						GUID: "some-org-quota-guid-2",
+						Name: "some-quota-name-2",
+					},
+					{
+						GUID: "some-org-quota-guid-3",
+						Name: "some-quota-name-3",
+					},
+					{
+						GUID: "some-org-quota-guid-4",
+						Name: "some-quota-name-4",
+					},
+				}))
+
+			})
+		})
+
+		Context("when the server errors", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 10001,
+					"description": "Some Error",
+					"error_code": "CF-SomeError"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/quota_definitions", "q=some-query:some-value"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns warnings and errors", func() {
+				Expect(executeErr).To(MatchError(ccerror.V2UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        10001,
+						Description: "Some Error",
+						ErrorCode:   "CF-SomeError",
+					},
+				}))
+				Expect(warnings).To(Equal(Warnings{"warning-1"}))
+			})
+		})
 	})
 })

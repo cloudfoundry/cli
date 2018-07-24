@@ -179,6 +179,23 @@ var _ = Describe("Error Wrapper", func() {
 							}))
 						})
 					})
+
+					When("creating an organization fails because the name is taken", func() {
+						BeforeEach(func() {
+							serverResponse = `{
+								"code": 30002,
+								"description": "The organization name is taken: potato",
+								"error_code": "CF-OrganizationNameTaken"
+							  }`
+						})
+
+						It("returns a OrganizationNameTakenError", func() {
+							_, _, err := client.GetApplications()
+							Expect(err).To(MatchError(ccerror.OrganizationNameTakenError{
+								Message: "The organization name is taken: potato",
+							}))
+						})
+					})
 				})
 
 				Context("(401) Unauthorized", func() {
