@@ -6,6 +6,8 @@ import "code.cloudfoundry.org/cli/actor/v2action"
 
 type V2Actor interface {
 	ManifestV2Actor
+	GetApplicationInstancesWithStatsByApplication(guid string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)
+	GetApplicationRoutes(appGUID string) (v2action.Routes, v2action.Warnings, error)
 	GetFeatureFlags() ([]v2action.FeatureFlag, v2action.Warnings, error)
 	GetService(serviceGUID string) (v2action.Service, v2action.Warnings, error)
 	GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error)
