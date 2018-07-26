@@ -1,7 +1,6 @@
 package download
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -31,13 +30,8 @@ func NewDownloader(dialTimeout time.Duration) *Downloader {
 	}
 }
 
-func (downloader Downloader) Download(url string) (string, error) {
-	dir, err := ioutil.TempDir("", "buildpack-tempDir")
-	if err != nil {
-		return "", err
-	}
-
-	bpFileName := filepath.Join(dir, filepath.Base(url))
+func (downloader Downloader) Download(url string, tmpDirPath string) (string, error) {
+	bpFileName := filepath.Join(tmpDirPath, filepath.Base(url))
 
 	resp, err := downloader.HTTPClient.Get(url)
 	if err != nil {
@@ -66,6 +60,5 @@ func (downloader Downloader) Download(url string) (string, error) {
 		return bpFileName, err
 	}
 
-	fmt.Printf("bpfilename inside download %s", bpFileName)
 	return bpFileName, nil
 }

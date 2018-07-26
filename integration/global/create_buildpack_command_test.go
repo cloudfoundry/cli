@@ -85,12 +85,17 @@ var _ = Describe("create buildpack command", func() {
 					Expect(err).ToNot(HaveOccurred())
 				})
 
+				AfterEach(func() {
+					Expect(os.RemoveAll(buildpackDir)).ToNot(HaveOccurred())
+				})
+
 				It("successfully uploads a buildpack", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CF("create-buildpack", buildpackName, buildpackDir, "1")
 					Eventually(session).Should(Say("Creating buildpack %s as %s...", buildpackName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Say("Uploading buildpack %s as %s...", buildpackName, username))
+					Eventually(session).Should(Say("Done uploading"))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -320,6 +325,7 @@ var _ = Describe("create buildpack command", func() {
 					Eventually(session).Should(Say("Creating buildpack %s as %s...", buildpackName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Say("Uploading buildpack %s as %s...", buildpackName, username))
+					Eventually(session).Should(Say("Done uploading"))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})

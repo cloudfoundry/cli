@@ -2,7 +2,6 @@ package v2action
 
 import (
 	"archive/zip"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -11,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/util"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -19,7 +19,7 @@ type Buildpack ccv2.Buildpack
 //go:generate counterfeiter . Downloader
 
 type Downloader interface {
-	Download(string) (string, error)
+	Download(url string, tmpDirPath string) (string, error)
 }
 
 //go:generate counterfeiter . SimpleProgressBar
@@ -80,45 +80,35 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 	return Buildpack{GUID: ccBuildpack.GUID}, Warnings(warnings), err
 }
 
-func (actor *Actor) PrepareBuildpackBits(path string, downloader Downloader) (string, error) {
-	if util.IsHTTPScheme(path) {
-		tempPath, err := downloader.Download(path)
+func (actor *Actor) PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader Downloader) (string, error) {
+	if util.IsHTTPScheme(inputPath) {
+		pathToDownloadedBits, err := downloader.Download(inputPath, tmpDirPath)
 		if err != nil {
-			parentDir, _ := filepath.Split(tempPath)
-			os.RemoveAll(parentDir)
-
 			return "", err
 		}
-		fmt.Printf("prepare bp temppath: %s", tempPath)
-		return tempPath, nil
+		return pathToDownloadedBits, nil
 	}
 
-	if filepath.Ext(path) == ".zip" {
-		return path, nil
+	if filepath.Ext(inputPath) == ".zip" {
+		return inputPath, nil
 	}
 
-	info, err := os.Stat(path)
+	info, err := os.Stat(inputPath)
 	if err != nil {
 		return "", err
 	}
 
 	if info.IsDir() {
-		tmpDir, err := ioutil.TempDir("", "")
-		if err != nil {
-			os.RemoveAll(tmpDir)
-			return "", nil
-		}
+		archive := filepath.Join(tmpDirPath, filepath.Base(inputPath)) + ".zip"
 
-		archive := filepath.Join(tmpDir, filepath.Base(path)) + ".zip"
-
-		err = Zipit(path, archive, "")
+		err = Zipit(inputPath, archive, "")
 		if err != nil {
 			return "", err
 		}
 		return archive, nil
 	}
 
-	return path, nil
+	return inputPath, nil
 }
 
 func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, progBar SimpleProgressBar) (Warnings, error) {

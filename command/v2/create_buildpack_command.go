@@ -25,7 +25,7 @@ type Downloader interface {
 type CreateBuildpackActor interface {
 	CreateBuildpack(name string, position int, enabled bool) (v2action.Buildpack, v2action.Warnings, error)
 	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
-	PrepareBuildpackBits(path string, tmpDirPath string, downloader v2action.Downloader) (string, error)
+	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error)
 }
 
 type CreateBuildpackCommand struct {
@@ -107,23 +107,6 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-
-	// clean up tmp dirs that were created when downloading buildpack from url or zipping from directory
-	// if util.IsHTTPScheme(string(cmd.RequiredArgs.Path)) {
-	// 	parentTempDir, _ := filepath.Split(pathToBuildpackBits)
-	// 	defer os.RemoveAll(parentTempDir)
-	// } else {
-	// 	var info os.FileInfo
-	// 	info, err = os.Stat(string(cmd.RequiredArgs.Path))
-	// 	if err != nil {
-	// 		return err
-	// 	}
-
-	// 	if info.IsDir() {
-	// 		parentTempDir, _ := filepath.Split(pathToBuildpackBits)
-	// 		defer os.RemoveAll(parentTempDir)
-	// 	}
-	// }
 
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{
 		"Buildpack": cmd.RequiredArgs.Buildpack,
