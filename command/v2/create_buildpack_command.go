@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -104,9 +105,24 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 		return err
 	}
 
+	// clean up tmp dirs that were created when downloading buildpack from url or zipping from directory
 	if util.IsHTTPScheme(string(cmd.RequiredArgs.Path)) {
-		parentTempDir := filepath.Dir(pathToBuildpackBits)
+		parentTempDir, _ := filepath.Split(pathToBuildpackBits)
+		fmt.Printf("pathtobp bits when is URL: %s", pathToBuildpackBits)
+		fmt.Printf("parenttempdir when is URL: %s", parentTempDir)
 		defer os.RemoveAll(parentTempDir)
+	} else {
+		var info os.FileInfo
+		info, err = os.Stat(string(cmd.RequiredArgs.Path))
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			parentTempDir, _ := filepath.Split(pathToBuildpackBits)
+			fmt.Printf("parenttempdir when is dir: %s", parentTempDir)
+			defer os.RemoveAll(parentTempDir)
+		}
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{

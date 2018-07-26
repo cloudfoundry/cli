@@ -93,7 +93,7 @@ var _ = Describe("Buildpack", func() {
 		})
 	})
 
-	Describe("PrepareBuildpackBits", func() {
+	FDescribe("PrepareBuildpackBits", func() {
 		var (
 			inPath         string
 			outPath        string
@@ -140,7 +140,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the buildpack path points to a directory", func() {
+		FContext("when the buildpack path points to a directory", func() {
 			BeforeEach(func() {
 				var err error
 				inPath, err = ioutil.TempDir("", "buildpackdir-")
@@ -148,7 +148,7 @@ var _ = Describe("Buildpack", func() {
 			})
 
 			AfterEach(func() {
-				os.RemoveAll(inPath)
+				Expect(os.RemoveAll(inPath)).ToNot(HaveOccurred())
 			})
 
 			It("returns a path to the zipped directory", func() {

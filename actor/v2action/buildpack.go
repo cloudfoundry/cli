@@ -2,6 +2,7 @@ package v2action
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -81,6 +82,47 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 	return Buildpack{GUID: ccBuildpack.GUID}, Warnings(warnings), err
 }
 
+func (actor *Actor) PrepareBuildpackBits(path string, downloader Downloader) (string, error) {
+	if util.IsHTTPScheme(path) {
+		tempPath, err := downloader.Download(path)
+		if err != nil {
+			parentDir, _ := filepath.Split(tempPath)
+			os.RemoveAll(parentDir)
+
+			return "", err
+		}
+		fmt.Printf("prepare bp temppath: %s", tempPath)
+		return tempPath, nil
+	}
+
+	if filepath.Ext(path) == ".zip" {
+		return path, nil
+	}
+
+	info, err := os.Stat(path)
+	if err != nil {
+		return "", err
+	}
+
+	if info.IsDir() {
+		tmpDir, err := ioutil.TempDir("", "")
+		if err != nil {
+			os.RemoveAll(tmpDir)
+			return "", nil
+		}
+
+		archive := filepath.Join(tmpDir, filepath.Base(path)) + ".zip"
+
+		err = Zipit(path, archive, "")
+		if err != nil {
+			return "", err
+		}
+		return archive, nil
+	}
+
+	return path, nil
+}
+
 func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, progBar SimpleProgressBar) (Warnings, error) {
 	progressBarReader, size, err := progBar.Initialize(pathToBuildpackBits)
 	if err != nil {
@@ -97,45 +139,6 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 
 	progBar.Terminate()
 	return Warnings(warnings), nil
-}
-
-func (actor *Actor) PrepareBuildpackBits(path string, downloader Downloader) (string, error) {
-	if util.IsHTTPScheme(path) {
-		tempPath, err := downloader.Download(path)
-		if err != nil {
-			parentDir, _ := filepath.Split(tempPath)
-			os.RemoveAll(parentDir)
-
-			return "", err
-		}
-		return tempPath, nil
-	}
-
-	if filepath.Ext(path) == ".zip" {
-		return path, nil
-	}
-
-	info, err := os.Stat(path)
-	if err != nil {
-		return "", err
-	}
-
-	if info.IsDir() {
-		tmpDir, err := ioutil.TempDir("", "")
-		if err != nil {
-			return "", nil
-		}
-
-		archive := filepath.Join(tmpDir, filepath.Base(path)) + ".zip"
-
-		err = Zipit(path, archive, "")
-		if err != nil {
-			return "", err
-		}
-		return archive, nil
-	}
-
-	return path, nil
 }
 
 // Zipit zips the source into a .zip file in the target dir

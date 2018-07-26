@@ -1,6 +1,7 @@
 package download
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -65,5 +66,6 @@ func (downloader Downloader) Download(url string) (string, error) {
 		return bpFileName, err
 	}
 
+	fmt.Printf("bpfilename inside download %s", bpFileName)
 	return bpFileName, nil
 }

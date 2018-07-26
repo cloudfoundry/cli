@@ -67,6 +67,10 @@ var _ = Describe("create buildpack command", func() {
 					buildpackDir = "some/nonexistent/dir"
 				})
 
+				AfterEach(func() {
+					Expect(os.RemoveAll(buildpackDir)).ToNot(HaveOccurred())
+				})
+
 				It("returns an error", func() {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackDir, "1")
 					Eventually(session).Should(Exit(1))
