@@ -2,6 +2,7 @@ package v2
 
 import (
 	"io/ioutil"
+	"os"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -97,11 +98,11 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	downloader := download.NewDownloader(time.Second * 30)
-
 	tmpDirPath, err := ioutil.TempDir("", "buildpack-dir-")
 	if err != nil {
 		return err
 	}
+	defer os.RemoveAll(tmpDirPath)
 
 	pathToBuildpackBits, err := cmd.Actor.PrepareBuildpackBits(string(cmd.RequiredArgs.Path), tmpDirPath, downloader)
 	if err != nil {
