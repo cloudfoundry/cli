@@ -118,6 +118,23 @@ var _ = Describe("app command", func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 				})
 
+				Context("when the app is created but not pushed", func() {
+					BeforeEach(func() {
+						Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
+					})
+
+					It("displays blank fields for unpopulated fields", func() {
+						session := helpers.CF("app", appName)
+						Eventually(session).Should(Say("name:\\s+%s", appName))
+						Eventually(session).Should(Say("requested state:\\s+stopped"))
+						Eventually(session).Should(Say("routes:\\s+\n"))
+						Eventually(session).Should(Say("last uploaded:\\s+\n"))
+						Eventually(session).Should(Say("stack:\\s+\n"))
+						Eventually(session).Should(Say("buildpacks:\\s+\n"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
 				Context("when the app is a buildpack app", func() {
 					var domainName string
 
