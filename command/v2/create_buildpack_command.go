@@ -1,9 +1,7 @@
 package v2
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
+	"io/ioutil"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -13,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
-	"code.cloudfoundry.org/cli/util"
 	"code.cloudfoundry.org/cli/util/download"
 )
 
@@ -28,7 +25,7 @@ type Downloader interface {
 type CreateBuildpackActor interface {
 	CreateBuildpack(name string, position int, enabled bool) (v2action.Buildpack, v2action.Warnings, error)
 	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
-	PrepareBuildpackBits(path string, downloader v2action.Downloader) (string, error)
+	PrepareBuildpackBits(path string, tmpDirPath string, downloader v2action.Downloader) (string, error)
 }
 
 type CreateBuildpackCommand struct {
@@ -100,30 +97,33 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	downloader := download.NewDownloader(time.Second * 30)
-	pathToBuildpackBits, err := cmd.Actor.PrepareBuildpackBits(string(cmd.RequiredArgs.Path), downloader)
+
+	tmpDirPath, err := ioutil.TempDir("", "buildpack-dir-")
+	if err != nil {
+		return err
+	}
+
+	pathToBuildpackBits, err := cmd.Actor.PrepareBuildpackBits(string(cmd.RequiredArgs.Path), tmpDirPath, downloader)
 	if err != nil {
 		return err
 	}
 
 	// clean up tmp dirs that were created when downloading buildpack from url or zipping from directory
-	if util.IsHTTPScheme(string(cmd.RequiredArgs.Path)) {
-		parentTempDir, _ := filepath.Split(pathToBuildpackBits)
-		fmt.Printf("pathtobp bits when is URL: %s", pathToBuildpackBits)
-		fmt.Printf("parenttempdir when is URL: %s", parentTempDir)
-		defer os.RemoveAll(parentTempDir)
-	} else {
-		var info os.FileInfo
-		info, err = os.Stat(string(cmd.RequiredArgs.Path))
-		if err != nil {
-			return err
-		}
+	// if util.IsHTTPScheme(string(cmd.RequiredArgs.Path)) {
+	// 	parentTempDir, _ := filepath.Split(pathToBuildpackBits)
+	// 	defer os.RemoveAll(parentTempDir)
+	// } else {
+	// 	var info os.FileInfo
+	// 	info, err = os.Stat(string(cmd.RequiredArgs.Path))
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		if info.IsDir() {
-			parentTempDir, _ := filepath.Split(pathToBuildpackBits)
-			fmt.Printf("parenttempdir when is dir: %s", parentTempDir)
-			defer os.RemoveAll(parentTempDir)
-		}
-	}
+	// 	if info.IsDir() {
+	// 		parentTempDir, _ := filepath.Split(pathToBuildpackBits)
+	// 		defer os.RemoveAll(parentTempDir)
+	// 	}
+	// }
 
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{
 		"Buildpack": cmd.RequiredArgs.Buildpack,

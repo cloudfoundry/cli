@@ -41,10 +41,11 @@ type FakeCreateBuildpackActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
-	PrepareBuildpackBitsStub        func(path string, downloader v2action.Downloader) (string, error)
+	PrepareBuildpackBitsStub        func(path string, tmpDirPath string, downloader v2action.Downloader) (string, error)
 	prepareBuildpackBitsMutex       sync.RWMutex
 	prepareBuildpackBitsArgsForCall []struct {
 		path       string
+		tmpDirPath string
 		downloader v2action.Downloader
 	}
 	prepareBuildpackBitsReturns struct {
@@ -168,17 +169,18 @@ func (fake *FakeCreateBuildpackActor) UploadBuildpackReturnsOnCall(i int, result
 	}{result1, result2}
 }
 
-func (fake *FakeCreateBuildpackActor) PrepareBuildpackBits(path string, downloader v2action.Downloader) (string, error) {
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBits(path string, tmpDirPath string, downloader v2action.Downloader) (string, error) {
 	fake.prepareBuildpackBitsMutex.Lock()
 	ret, specificReturn := fake.prepareBuildpackBitsReturnsOnCall[len(fake.prepareBuildpackBitsArgsForCall)]
 	fake.prepareBuildpackBitsArgsForCall = append(fake.prepareBuildpackBitsArgsForCall, struct {
 		path       string
+		tmpDirPath string
 		downloader v2action.Downloader
-	}{path, downloader})
-	fake.recordInvocation("PrepareBuildpackBits", []interface{}{path, downloader})
+	}{path, tmpDirPath, downloader})
+	fake.recordInvocation("PrepareBuildpackBits", []interface{}{path, tmpDirPath, downloader})
 	fake.prepareBuildpackBitsMutex.Unlock()
 	if fake.PrepareBuildpackBitsStub != nil {
-		return fake.PrepareBuildpackBitsStub(path, downloader)
+		return fake.PrepareBuildpackBitsStub(path, tmpDirPath, downloader)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -192,10 +194,10 @@ func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsCallCount() int {
 	return len(fake.prepareBuildpackBitsArgsForCall)
 }
 
-func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsArgsForCall(i int) (string, v2action.Downloader) {
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsArgsForCall(i int) (string, string, v2action.Downloader) {
 	fake.prepareBuildpackBitsMutex.RLock()
 	defer fake.prepareBuildpackBitsMutex.RUnlock()
-	return fake.prepareBuildpackBitsArgsForCall[i].path, fake.prepareBuildpackBitsArgsForCall[i].downloader
+	return fake.prepareBuildpackBitsArgsForCall[i].path, fake.prepareBuildpackBitsArgsForCall[i].tmpDirPath, fake.prepareBuildpackBitsArgsForCall[i].downloader
 }
 
 func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsReturns(result1 string, result2 error) {
