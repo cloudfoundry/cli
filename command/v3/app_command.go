@@ -3,6 +3,7 @@ package v3
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
@@ -10,6 +11,12 @@ import (
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
+
+//go:generate counterfeiter . AppSummaryActor
+
+type AppSummaryActor interface {
+	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v2v3action.ApplicationSummary, v2v3action.Warnings, error)
+}
 
 //go:generate counterfeiter . AppActor
 
@@ -25,11 +32,11 @@ type AppCommand struct {
 	usage           interface{}  `usage:"CF_NAME app APP_NAME [--guid]"`
 	relatedCommands interface{}  `related_commands:"apps, events, logs, map-route, unmap-route, push"`
 
-	UI                  command.UI
-	Config              command.Config
-	SharedActor         command.SharedActor
-	Actor               AppActor
-	AppSummaryDisplayer shared.AppSummaryDisplayer
+	UI              command.UI
+	Config          command.Config
+	SharedActor     command.SharedActor
+	AppSummaryActor AppSummaryActor
+	Actor           AppActor
 }
 
 func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
@@ -42,27 +49,20 @@ func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
-
 	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
 
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
+	v3Actor := v3action.NewActor(ccClient, config, nil, nil)
+	cmd.AppSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
+	cmd.Actor = v3Actor
 
-	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
-		UI:         cmd.UI,
-		Config:     cmd.Config,
-		Actor:      cmd.Actor,
-		V2AppActor: v2Actor,
-		AppName:    cmd.RequiredArgs.AppName,
-	}
 	return nil
 }
 
 func (cmd AppCommand) Execute(args []string) error {
-
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
 	if err != nil {
 		return err
@@ -90,7 +90,15 @@ func (cmd AppCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	return cmd.AppSummaryDisplayer.DisplayAppInfo()
+	appSummaryDisplayer := shared.NewAppSummaryDisplayer2(cmd.UI)
+	summary, warnings, err := cmd.AppSummaryActor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	appSummaryDisplayer.AppDisplay(summary)
+	return nil
 }
 
 func (cmd AppCommand) displayAppGUID() error {
