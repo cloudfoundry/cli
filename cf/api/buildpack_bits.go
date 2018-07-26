@@ -190,16 +190,18 @@ func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) error {
 }
 
 func findBuildpackPath(zipFiles []*zip.File) (parentPath string, foundBuildpack bool) {
-	needle := "bin/compile"
+	needles := []string{"bin/compile", "bin/supply"}
 
 	for _, file := range zipFiles {
-		if strings.HasSuffix(file.Name, needle) {
-			foundBuildpack = true
-			parentPath = path.Join(file.Name, "..", "..")
-			if parentPath == "." {
-				parentPath = ""
+		for _, needle := range needles {
+			if strings.HasSuffix(file.Name, needle) {
+				foundBuildpack = true
+				parentPath = path.Join(file.Name, "..", "..")
+				if parentPath == "." {
+					parentPath = ""
+				}
+				return
 			}
-			return
 		}
 	}
 	return
