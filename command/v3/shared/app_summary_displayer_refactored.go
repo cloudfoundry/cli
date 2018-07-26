@@ -22,15 +22,6 @@ func NewAppSummaryDisplayer2(ui command.UI) *AppSummaryDisplayer2 {
 	}
 }
 
-func (display AppSummaryDisplayer2) GetCreatedTime(summary v2v3action.ApplicationSummary) string {
-	if summary.CurrentDroplet.CreatedAt != "" {
-		timestamp, _ := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
-		return display.UI.UserFriendlyDate(timestamp)
-	}
-
-	return ""
-}
-
 func (display AppSummaryDisplayer2) AppDisplay(summary v2v3action.ApplicationSummary) {
 	var isoRow []string
 	if name, exists := summary.GetIsolationSegmentName(); exists {
@@ -49,7 +40,7 @@ func (display AppSummaryDisplayer2) AppDisplay(summary v2v3action.ApplicationSum
 		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
 		isoRow,
 		{display.UI.TranslateText("routes:"), summary.Routes.Summary()},
-		{display.UI.TranslateText("last uploaded:"), display.GetCreatedTime(summary)},
+		{display.UI.TranslateText("last uploaded:"), display.getCreatedTime(summary)},
 		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
 		lifecycleInfo,
 	}
@@ -114,6 +105,15 @@ func (display AppSummaryDisplayer2) displayProcessTable(summary v3action.Applica
 			display.UI.DisplayText("There are no running instances of this process.")
 		}
 	}
+}
+
+func (display AppSummaryDisplayer2) getCreatedTime(summary v2v3action.ApplicationSummary) string {
+	if summary.CurrentDroplet.CreatedAt != "" {
+		timestamp, _ := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
+		return display.UI.UserFriendlyDate(timestamp)
+	}
+
+	return ""
 }
 
 func (AppSummaryDisplayer2) usageSummary(processSummaries v3action.ProcessSummaries) string {

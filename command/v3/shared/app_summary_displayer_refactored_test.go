@@ -314,12 +314,19 @@ var _ = Describe("app summary displayer", func() {
 
 		Describe("last upload time", func() {
 			Context("when the application has a last uploaded time", func() {
+				var createdTime string
+
 				BeforeEach(func() {
-					summary.CurrentDroplet.CreatedAt = "2006-01-02T15:04:05Z07:00"
+					createdTime = "2006-01-02T15:04:05-07:00"
+					summary.CurrentDroplet.CreatedAt = createdTime
 				})
 
 				It("displays the uploaded time", func() {
-					Expect(testUI.Out).To(Say("last uploaded:\\s+%s", "Sun 31 Dec 16:07:02 LMT 0000"))
+					t, err := time.Parse(time.RFC3339, createdTime)
+					Expect(err).To(Not(HaveOccurred()))
+
+					time := t.Local().Format("Mon 02 Jan 15:04:05 MST 2006")
+					Expect(testUI.Out).To(Say("last uploaded:\\s+%s", time))
 				})
 			})
 
