@@ -51,20 +51,6 @@ func (display AppSummaryDisplayer2) AppDisplay(summary v2v3action.ApplicationSum
 }
 
 func (display AppSummaryDisplayer2) displayAppInstancesTable(processSummary v3action.ProcessSummary) {
-	display.UI.DisplayNewline()
-
-	keyValueTable := [][]string{
-		{display.UI.TranslateText("type:"), processSummary.Type},
-		{display.UI.TranslateText("instances:"), fmt.Sprintf("%d/%d", processSummary.HealthyInstanceCount(), processSummary.TotalInstanceCount())},
-		{display.UI.TranslateText("memory usage:"), fmt.Sprintf("%dM", processSummary.MemoryInMB.Value)},
-	}
-
-	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
-
-	if !display.processHasAnInstanceUp(&processSummary) {
-		return
-	}
-
 	table := [][]string{
 		{
 			"",
@@ -98,12 +84,22 @@ func (display AppSummaryDisplayer2) displayAppInstancesTable(processSummary v3ac
 
 func (display AppSummaryDisplayer2) displayProcessTable(summary v3action.ApplicationSummary) {
 	for _, process := range summary.ProcessSummaries {
-		display.displayAppInstancesTable(process)
+		display.UI.DisplayNewline()
 
-		if !display.processHasAnInstanceUp(&process) || len(process.InstanceDetails) == 0 {
+		keyValueTable := [][]string{
+			{display.UI.TranslateText("type:"), process.Type},
+			{display.UI.TranslateText("instances:"), fmt.Sprintf("%d/%d", process.HealthyInstanceCount(), process.TotalInstanceCount())},
+			{display.UI.TranslateText("memory usage:"), fmt.Sprintf("%dM", process.MemoryInMB.Value)},
+		}
+
+		display.UI.DisplayKeyValueTable("", keyValueTable, 3)
+
+		if len(process.InstanceDetails) == 0 || summary.State == constant.ApplicationStopped {
 			display.UI.DisplayNewline()
 			display.UI.DisplayText("There are no running instances of this process.")
+			continue
 		}
+		display.displayAppInstancesTable(process)
 	}
 }
 
