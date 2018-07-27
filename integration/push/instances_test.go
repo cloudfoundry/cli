@@ -73,7 +73,7 @@ var _ = Describe("push with different instances values", func() {
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("app", appName)
-						Eventually(session).Should(Say("There are no running instances of this app."))
+						Eventually(session).Should(Say("There are no running instances of this process."))
 						Eventually(session).Should(Exit(0))
 
 						By("updating an app to 1 instance")
@@ -99,7 +99,7 @@ var _ = Describe("push with different instances values", func() {
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("app", appName)
-						Eventually(session).Should(Say("There are no running instances of this app."))
+						Eventually(session).Should(Say("There are no running instances of this process."))
 						Eventually(session).Should(Exit(0))
 					})
 				})
