@@ -133,45 +133,8 @@ var _ = Describe("CreateBuildpackCommand", func() {
 			Context("when creating the buildpack succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{GUID: "some-guid"}, v2action.Warnings{"some-create-bp-warning"}, nil)
-				})
-
-				Context("when a zip is provided as the path", func() {
 					BeforeEach(func() {
-						cmd.RequiredArgs.Path = "some.zip"
-					})
-
-					It("displays that the buildpack was created successfully", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("OK"))
-
-						Expect(fakeActor.CreateBuildpackCallCount()).To(Equal(1))
-						bpName, bpPosition, enabled := fakeActor.CreateBuildpackArgsForCall(0)
-						Expect(bpName).To(Equal("bp-name"))
-						Expect(bpPosition).To(Equal(3))
-						Expect(enabled).To(Equal(true))
-					})
-				})
-
-				Context("when a directory is provided as the path", func() {
-					BeforeEach(func() {
-						cmd.RequiredArgs.Path = "some/path"
-					})
-
-					It("displays that the buildpack was created successfully", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("OK"))
-
-						Expect(fakeActor.CreateBuildpackCallCount()).To(Equal(1))
-						bpName, bpPosition, enabled := fakeActor.CreateBuildpackArgsForCall(0)
-						Expect(bpName).To(Equal("bp-name"))
-						Expect(bpPosition).To(Equal(3))
-						Expect(enabled).To(Equal(true))
-					})
-				})
-
-				Context("when a URL is provided as the path", func() {
-					BeforeEach(func() {
-						cmd.RequiredArgs.Path = "https://foo.buildpack.zip"
+						cmd.RequiredArgs.Path = "some-path/to/buildpack.zip"
 					})
 
 					It("displays that the buildpack was created successfully", func() {
@@ -193,14 +156,12 @@ var _ = Describe("CreateBuildpackCommand", func() {
 						It("returns an error", func() {
 							Expect(executeErr).To(MatchError("some-prepare-bp-error"))
 							Expect(fakeActor.PrepareBuildpackBitsCallCount()).To(Equal(1))
-							path, _, _ := fakeActor.PrepareBuildpackBitsArgsForCall(0)
-							Expect(path).To(Equal("https://foo.buildpack.zip"))
 						})
 					})
 
 					Context("when preparing the buildpack bits succeeds", func() {
 						BeforeEach(func() {
-							fakeActor.PrepareBuildpackBitsReturns("foo.buildpack.zip", nil)
+							fakeActor.PrepareBuildpackBitsReturns("buildpack.zip", nil)
 						})
 
 						It("displays that upload is starting", func() {
@@ -209,7 +170,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 
 							Expect(fakeActor.PrepareBuildpackBitsCallCount()).To(Equal(1))
 							path, _, _ := fakeActor.PrepareBuildpackBitsArgsForCall(0)
-							Expect(path).To(Equal("https://foo.buildpack.zip"))
+							Expect(path).To(Equal("some-path/to/buildpack.zip"))
 						})
 
 						Context("when uploading the buildpack fails because a buildpack with that stack already exists", func() {
@@ -252,13 +213,11 @@ var _ = Describe("CreateBuildpackCommand", func() {
 								Expect(fakeActor.UploadBuildpackCallCount()).To(Equal(1))
 								guid, path, _ := fakeActor.UploadBuildpackArgsForCall(0)
 								Expect(guid).To(Equal("some-guid"))
-								Expect(path).To(Equal("foo.buildpack.zip"))
+								Expect(path).To(Equal("buildpack.zip"))
 							})
 						})
 					})
-
 				})
-
 			})
 
 			Context("when both --enable and --disable are provided", func() {
@@ -315,5 +274,4 @@ var _ = Describe("CreateBuildpackCommand", func() {
 
 		})
 	})
-
 })
