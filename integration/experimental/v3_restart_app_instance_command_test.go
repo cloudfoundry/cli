@@ -206,11 +206,11 @@ var _ = Describe("v3-restart-app-instance command", func() {
 							restartedAppTable = helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
 							if len(restartedAppTable.Processes) > 0 {
-								return restartedAppTable.Processes[0].Type
+								return fmt.Sprintf("%s, %s", restartedAppTable.Processes[0].Type, restartedAppTable.Processes[0].InstanceCount)
 							}
 
 							return ""
-						}).Should(Equal(`web`))
+						}).Should(Equal(`web, 1/1`))
 						Expect(restartedAppTable.Processes[0].Instances).ToNot(BeEmpty())
 						return restartedAppTable.Processes[0].Instances[0].Since
 					}).ShouldNot(Equal(firstAppTable.Processes[0].Instances[0].Since))
