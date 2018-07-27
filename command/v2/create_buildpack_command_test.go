@@ -143,11 +143,11 @@ var _ = Describe("CreateBuildpackCommand", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Err).To(Say("some-create-bp-warning"))
 					Expect(testUI.Err).To(Say("Buildpack bp-name already exists"))
-					Expect(testUI.Out).To(Say("TIP: use 'faceman update-buildpack' to update this buildpack"))
+					Expect(testUI.Out).To(Say("TIP: use 'faceman buildpacks' and 'faceman delete-buildpack' to delete buildpack bp-name"))
 				})
 			})
 
-			Context("when creating the buildpack fails because a buildpack with the nil stack already exists", func() {
+			PContext("when creating the buildpack fails because a buildpack with the nil stack already exists", func() {
 				BeforeEach(func() {
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackAlreadyExistsWithoutStackError("bp-name"))
 					cmd.RequiredArgs.Buildpack = "bp-name"
@@ -212,7 +212,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 						Expect(testUI.Out).To(Say("Uploading buildpack bp-name as some-user"))
 					})
 
-					Context("when uploading the buildpack fails because a buildpack with that stack already exists", func() {
+					PContext("when uploading the buildpack fails because a buildpack with that stack already exists", func() {
 						BeforeEach(func() {
 							fakeActor.UploadBuildpackReturns(v2action.Warnings{"some-upload-bp-warning"}, actionerror.BuildpackAlreadyExistsForStackError{Message: "bp error"})
 						})

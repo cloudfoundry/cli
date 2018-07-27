@@ -19,7 +19,7 @@ import (
 
 func successfulUpdate(ui *testterm.FakeUI, buildpackName string) {
 	Expect(ui.Outputs()).To(ContainSubstrings(
-		[]string{"Updating buildpack", buildpackName, " with stack cflinuxfs99"},
+		[]string{"Updating buildpack", buildpackName},
 		[]string{"OK"},
 	))
 }
@@ -55,7 +55,7 @@ var _ = Describe("Updating buildpack command", func() {
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		buildpackReq := new(requirementsfakes.FakeBuildpackRequirement)
-		buildpackReq.GetBuildpackReturns(models.Buildpack{Name: buildpackName, GUID: "buildpack-guid", Stack: "cflinuxfs99"})
+		buildpackReq.GetBuildpackReturns(models.Buildpack{Name: buildpackName, GUID: "buildpack-guid"})
 		requirementsFactory.NewBuildpackRequirementReturns(buildpackReq)
 		ui = new(testterm.FakeUI)
 		repo = new(apifakes.OldFakeBuildpackRepository)
@@ -123,7 +123,7 @@ var _ = Describe("Updating buildpack command", func() {
 	})
 
 	Describe("flags", func() {
-		Context("stack flag", func() {
+		PContext("stack flag", func() {
 			It("updates the specific buildpack by name and stack, when stack is provided", func() {
 				runCommand("-i", "999", buildpackName, "-s", "cflinuxfs99")
 

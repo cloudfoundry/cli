@@ -86,10 +86,11 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 
 	if err != nil {
 		if _, ok := err.(actionerror.BuildpackAlreadyExistsWithoutStackError); ok {
-			cmd.displayAlreadyExistingBuildpackWithoutStack(err)
+			err = actionerror.BuildpackNameTakenError(cmd.RequiredArgs.Buildpack)
+			cmd.displayAlreadyExistingBuildpack(err)
 			return nil
 		} else if _, ok := err.(actionerror.BuildpackNameTakenError); ok {
-			cmd.displayAlreadyExistingBuildpackWithStack(err)
+			cmd.displayAlreadyExistingBuildpack(err)
 			return nil
 		}
 		return err
@@ -119,14 +120,17 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	if err != nil {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayNewline()
-		if _, ok := err.(actionerror.BuildpackAlreadyExistsForStackError); ok {
-			cmd.UI.DisplayWarning(err.Error())
-			cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
-				map[string]interface{}{
-					"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
-				})
-			return nil
-		} else if httpErr, ok := err.(download.RawHTTPStatusError); ok {
+
+		// if cmd.Config.Experimental() {
+		// 	if _, ok := err.(actionerror.BuildpackAlreadyExistsForStackError); ok {
+		// 		cmd.UI.DisplayWarning(err.Error())
+		// 		cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
+		// 			map[string]interface{}{
+		// 				"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
+		// 			})
+		// 		return nil
+		// 	}
+		if httpErr, ok := err.(download.RawHTTPStatusError); ok {
 			return translatableerror.HTTPStatusError{Status: httpErr.Status}
 		}
 		return err
@@ -138,6 +142,7 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 
 	return nil
 }
+
 func (cmd CreateBuildpackCommand) displayAlreadyExistingBuildpackWithoutStack(err error) {
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayWarning(err.Error())
@@ -156,4 +161,14 @@ func (cmd CreateBuildpackCommand) displayAlreadyExistingBuildpackWithStack(err e
 		map[string]interface{}{
 			"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
 		})
+}
+
+func (cmd CreateBuildpackCommand) displayAlreadyExistingBuildpack(err error) {
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayWarning(err.Error())
+	cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfBuildpacksCommand}}' and '{{.CfDeleteBuildpackCommand}}' to delete buildpack {{.BuildpackName}}.", map[string]interface{}{
+		"CfBuildpacksCommand":      cmd.Config.BinaryName() + " buildpacks",
+		"CfDeleteBuildpackCommand": cmd.Config.BinaryName() + " delete-buildpack",
+		"BuildpackName":            cmd.RequiredArgs.Buildpack,
+	})
 }

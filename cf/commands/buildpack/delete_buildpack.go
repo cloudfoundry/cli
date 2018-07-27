@@ -1,8 +1,6 @@
 package buildpack
 
 import (
-	"fmt"
-
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/errors"
@@ -31,13 +29,12 @@ func (cmd *DeleteBuildpack) SetDependency(deps commandregistry.Dependency, plugi
 func (cmd *DeleteBuildpack) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
-	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Specify stack to disambiguate buildpacks with the same name")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "delete-buildpack",
 		Description: T("Delete a buildpack"),
 		Usage: []string{
-			T("CF_NAME delete-buildpack BUILDPACK [-f] [-s STACK]"),
+			T("CF_NAME delete-buildpack BUILDPACK [-f]"),
 		},
 		Flags: fs,
 	}
@@ -67,7 +64,6 @@ func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) error {
 	)
 
 	buildpackName := c.Args()[0]
-	stack := c.String("s")
 
 	force := c.Bool("f")
 
@@ -78,13 +74,8 @@ func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) error {
 		}
 	}
 
-	if stack == "" {
-		buildpack, err = cmd.buildpackRepo.FindByName(buildpackName)
-		cmd.ui.Say(T("Deleting buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
-	} else {
-		buildpack, err = cmd.buildpackRepo.FindByNameAndStack(buildpackName, stack)
-		cmd.ui.Say(T("Deleting buildpack {{.BuildpackName}} with stack {{.Stack}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName), "Stack": terminal.EntityNameColor(stack)}))
-	}
+	buildpack, err = cmd.buildpackRepo.FindByName(buildpackName)
+	cmd.ui.Say(T("Deleting buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
 
 	switch err.(type) {
 	case nil: //do nothing
@@ -92,15 +83,8 @@ func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) error {
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Buildpack {{.BuildpackName}} does not exist.", map[string]interface{}{"BuildpackName": buildpackName}))
 		return nil
-	case *errors.AmbiguousModelError:
-		var err2 error
-		buildpack, err2 = cmd.buildpackRepo.FindByNameWithNilStack(buildpackName)
-		if err2 != nil {
-			return fmt.Errorf("%s Specify the stack (using -s) to disambiguate.", err.Error())
-		}
 	default:
 		return err
-
 	}
 
 	err = cmd.buildpackRepo.Delete(buildpack.GUID)
