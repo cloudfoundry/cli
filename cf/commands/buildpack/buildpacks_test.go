@@ -79,7 +79,6 @@ var _ = Describe("ListBuildpacks", func() {
 			p3 := 15
 			t := true
 			f := false
-			linux := "cflinuxfs2"
 
 			buildpackRepo.Buildpacks = []models.Buildpack{
 				{Name: "Buildpack-2", Position: &p2, Enabled: &f, Locked: &t},
