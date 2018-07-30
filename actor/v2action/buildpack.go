@@ -174,7 +174,7 @@ func Zipit(source, target, prefix string) error {
 			header.SetMode(info.Mode())
 		} else {
 			header.Method = zip.Deflate
-			header.SetMode(info.Mode())
+			header.SetMode(fixMode(info.Mode()))
 		}
 
 		writer, err := archive.CreateHeader(header)
