@@ -46,7 +46,7 @@ var _ = Describe("push with different buildpack values", func() {
 						"-b", "null",
 					)
 					Eventually(session).Should(Say(`\-\s+buildpack:\s+binary_buildpack`))
-					Eventually(session).Should(Say(`buildpack:\s+staticfile`))
+					Eventually(session).Should(Say(`buildpacks?:\s+staticfile`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -58,7 +58,7 @@ var _ = Describe("push with different buildpack values", func() {
 						"-b", "default",
 					)
 					Eventually(session).Should(Say(`\-\s+buildpack:\s+binary_buildpack`))
-					Eventually(session).Should(Say(`buildpack:\s+staticfile`))
+					Eventually(session).Should(Say(`buildpacks?:\s+staticfile`))
 					Eventually(session).Should(Exit(0))
 				})
 			})

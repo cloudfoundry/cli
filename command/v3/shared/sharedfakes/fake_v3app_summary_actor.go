@@ -9,11 +9,12 @@ import (
 )
 
 type FakeV3AppSummaryActor struct {
-	GetApplicationSummaryByNameAndSpaceStub        func(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
+	GetApplicationSummaryByNameAndSpaceStub        func(appName string, spaceGUID string, withObfuscatedValues bool) (v3action.ApplicationSummary, v3action.Warnings, error)
 	getApplicationSummaryByNameAndSpaceMutex       sync.RWMutex
 	getApplicationSummaryByNameAndSpaceArgsForCall []struct {
-		appName   string
-		spaceGUID string
+		appName              string
+		spaceGUID            string
+		withObfuscatedValues bool
 	}
 	getApplicationSummaryByNameAndSpaceReturns struct {
 		result1 v3action.ApplicationSummary
@@ -29,17 +30,18 @@ type FakeV3AppSummaryActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3AppSummaryActor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error) {
+func (fake *FakeV3AppSummaryActor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v3action.ApplicationSummary, v3action.Warnings, error) {
 	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationSummaryByNameAndSpaceReturnsOnCall[len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)]
 	fake.getApplicationSummaryByNameAndSpaceArgsForCall = append(fake.getApplicationSummaryByNameAndSpaceArgsForCall, struct {
-		appName   string
-		spaceGUID string
-	}{appName, spaceGUID})
-	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{appName, spaceGUID})
+		appName              string
+		spaceGUID            string
+		withObfuscatedValues bool
+	}{appName, spaceGUID, withObfuscatedValues})
+	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{appName, spaceGUID, withObfuscatedValues})
 	fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationSummaryByNameAndSpaceStub != nil {
-		return fake.GetApplicationSummaryByNameAndSpaceStub(appName, spaceGUID)
+		return fake.GetApplicationSummaryByNameAndSpaceStub(appName, spaceGUID, withObfuscatedValues)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -53,10 +55,10 @@ func (fake *FakeV3AppSummaryActor) GetApplicationSummaryByNameAndSpaceCallCount(
 	return len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV3AppSummaryActor) GetApplicationSummaryByNameAndSpaceArgsForCall(i int) (string, string) {
+func (fake *FakeV3AppSummaryActor) GetApplicationSummaryByNameAndSpaceArgsForCall(i int) (string, string, bool) {
 	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
-	return fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].appName, fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].spaceGUID
+	return fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].appName, fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].spaceGUID, fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].withObfuscatedValues
 }
 
 func (fake *FakeV3AppSummaryActor) GetApplicationSummaryByNameAndSpaceReturns(result1 v3action.ApplicationSummary, result2 v3action.Warnings, result3 error) {

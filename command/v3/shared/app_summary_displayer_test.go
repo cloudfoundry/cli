@@ -236,9 +236,10 @@ var _ = Describe("app summary displayer", func() {
 					Expect(testUI.Err).To(Say("get-app-summary-warning"))
 
 					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					passedAppName, spaceName := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+					passedAppName, spaceName, withObfuscatedValues := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
 					Expect(passedAppName).To(Equal("some-app"))
 					Expect(spaceName).To(Equal("some-space-guid"))
+					Expect(withObfuscatedValues).To(BeFalse())
 				})
 			})
 

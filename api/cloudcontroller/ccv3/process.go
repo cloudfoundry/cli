@@ -12,8 +12,10 @@ import (
 )
 
 type Process struct {
-	GUID                         string           `json:"guid"`
-	Type                         string           `json:"type"`
+	GUID string `json:"guid"`
+	Type string `json:"type"`
+	// Command is the process start command. Note: This value will be obfuscated when obtained from listing.
+	Command                      string           `json:"command,omitempty"`
 	HealthCheckType              string           `json:"-"`
 	HealthCheckEndpoint          string           `json:"-"`
 	HealthCheckInvocationTimeout int              `json:"-"`
@@ -133,7 +135,8 @@ func (client *Client) GetApplicationProcessByType(appGUID string, processType st
 	return process, response.Warnings, err
 }
 
-// GetApplicationProcesses lists processes for a given app
+// GetApplicationProcesses lists processes for a given application. **Note**:
+// Due to security, the API obfuscates certain values such as `command`.
 func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetApplicationProcessesRequest,

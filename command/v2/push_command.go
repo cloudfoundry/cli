@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
@@ -73,11 +74,12 @@ type PushCommand struct {
 	usage           interface{} `usage:"CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--var KEY=VALUE]... [--vars-file VARS_FILE_PATH]...\n\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--var KEY=VALUE]... [--vars-file VARS_FILE_PATH]...\n\n   CF_NAME push APP_NAME --droplet DROPLET_PATH\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH] [--var KEY=VALUE]... [--vars-file VARS_FILE_PATH]...\n\n   CF_NAME push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]"`
 	relatedCommands interface{} `related_commands:"apps, create-app-manifest, logs, ssh, start"`
 
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       V2PushActor
-	ProgressBar ProgressBar
+	UI                      command.UI
+	Config                  command.Config
+	SharedActor             command.SharedActor
+	Actor                   V2PushActor
+	ApplicationSummaryActor shared.ApplicationSummaryActor
+	ProgressBar             ProgressBar
 
 	RestartActor RestartActor
 	NOAAClient   *consumer.Consumer
@@ -87,6 +89,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -104,7 +107,8 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.RestartActor = v2Actor
 	cmd.Actor = pushaction.NewActor(v2Actor, v3Actor, sharedActor)
 
-	cmd.SharedActor = sharedActor
+	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
+
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
 
 	cmd.ProgressBar = progressbar.NewProgressBar()
@@ -227,7 +231,18 @@ func (cmd PushCommand) Execute(args []string) error {
 			return err
 		}
 
-		shared.DisplayAppSummary(cmd.UI, appSummary, true)
+		if err := command.MinimumAPIVersionCheck(cmd.ApplicationSummaryActor.CloudControllerV3APIVersion(), ccversion.MinVersionV3); err != nil {
+			log.WithField("v3_api_version", cmd.ApplicationSummaryActor.CloudControllerV3APIVersion()).Debug("using v2 for app display")
+			shared.DisplayAppSummary(cmd.UI, appSummary, true)
+		} else {
+			log.WithField("v3_api_version", cmd.ApplicationSummaryActor.CloudControllerV3APIVersion()).Debug("using v3 for app display")
+			summary, warnings, err := cmd.ApplicationSummaryActor.GetApplicationSummaryByNameAndSpace(appSummary.Name, cmd.Config.TargetedSpace().GUID, true)
+			cmd.UI.DisplayWarnings(warnings)
+			if err != nil {
+				return err
+			}
+			sharedV3.NewAppSummaryDisplayer2(cmd.UI).AppDisplay(summary, true)
+		}
 
 		if appNumber+1 <= len(appConfigs) {
 			cmd.UI.DisplayNewline()

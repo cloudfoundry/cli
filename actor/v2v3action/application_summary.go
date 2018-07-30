@@ -20,11 +20,11 @@ func (summary ApplicationSummary) GetIsolationSegmentName() (string, bool) {
 	return "", false
 }
 
-func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (ApplicationSummary, Warnings, error) {
+func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (ApplicationSummary, Warnings, error) {
 	var summary ApplicationSummary
 	var allWarnings Warnings
 
-	v3Summary, warnings, err := actor.V3Actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID)
+	v3Summary, warnings, err := actor.V3Actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return ApplicationSummary{}, allWarnings, err

@@ -33,7 +33,8 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 		return SSHAuthentication{}, Warnings{}, err
 	}
 
-	appSummary, warnings, err := actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID)
+	// TODO: don't use Summary object for this
+	appSummary, warnings, err := actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, false)
 	if err != nil {
 		return SSHAuthentication{}, warnings, err
 	}

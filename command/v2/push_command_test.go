@@ -11,12 +11,15 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2v3action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
+	"code.cloudfoundry.org/cli/command/v2/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -32,15 +35,16 @@ import (
 
 var _ = Describe("push Command", func() {
 	var (
-		cmd              PushCommand
-		testUI           *ui.UI
-		fakeConfig       *commandfakes.FakeConfig
-		fakeSharedActor  *commandfakes.FakeSharedActor
-		fakeActor        *v2fakes.FakeV2PushActor
-		fakeRestartActor *v2fakes.FakeRestartActor
-		fakeProgressBar  *v2fakes.FakeProgressBar
-		input            *Buffer
-		binaryName       string
+		cmd                         PushCommand
+		testUI                      *ui.UI
+		fakeConfig                  *commandfakes.FakeConfig
+		fakeSharedActor             *commandfakes.FakeSharedActor
+		fakeActor                   *v2fakes.FakeV2PushActor
+		fakeRestartActor            *v2fakes.FakeRestartActor
+		fakeApplicationSummaryActor *sharedfakes.FakeApplicationSummaryActor
+		fakeProgressBar             *v2fakes.FakeProgressBar
+		input                       *Buffer
+		binaryName                  string
 
 		appName    string
 		executeErr error
@@ -54,15 +58,17 @@ var _ = Describe("push Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeV2PushActor)
 		fakeRestartActor = new(v2fakes.FakeRestartActor)
+		fakeApplicationSummaryActor = new(sharedfakes.FakeApplicationSummaryActor)
 		fakeProgressBar = new(v2fakes.FakeProgressBar)
 
 		cmd = PushCommand{
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
-			RestartActor: fakeRestartActor,
-			ProgressBar:  fakeProgressBar,
+			UI:                      testUI,
+			Config:                  fakeConfig,
+			SharedActor:             fakeSharedActor,
+			Actor:                   fakeActor,
+			RestartActor:            fakeRestartActor,
+			ApplicationSummaryActor: fakeApplicationSummaryActor,
+			ProgressBar:             fakeProgressBar,
 		}
 
 		appName = "some-app"
@@ -410,7 +416,6 @@ var _ = Describe("push Command", func() {
 										Expect(manifestApps).To(BeNil())
 									})
 								})
-
 							})
 
 							Context("via a manifest.yaml in the current directory", func() {
@@ -755,19 +760,81 @@ var _ = Describe("push Command", func() {
 								Expect(appConfig).To(Equal(updatedConfig.CurrentApplication.Application))
 							})
 
-							It("displays the app summary with isolation segments as well as warnings", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(testUI.Out).To(Say("name:\\s+%s", appName))
-								Expect(testUI.Out).To(Say("requested state:\\s+started"))
-								Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
-								Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
-								Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-								Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-								Expect(testUI.Out).To(Say("stack:\\s+potatos"))
-								Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
-								Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+							Context("when the API is below MinVersionV3", func() {
+								BeforeEach(func() {
+									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.4.0")
+								})
 
-								Expect(testUI.Err).To(Say("app-summary-warning"))
+								It("displays the app summary with isolation segments as well as warnings", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+									Expect(testUI.Out).To(Say("name:\\s+%s", appName))
+									Expect(testUI.Out).To(Say("requested state:\\s+started"))
+									Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
+									Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
+									Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
+									Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+									Expect(testUI.Out).To(Say("stack:\\s+potatos"))
+									Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
+									Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+
+									Expect(testUI.Err).To(Say("app-summary-warning"))
+								})
+							})
+
+							Context("when the api is equal/above MinVersionV3", func() {
+								BeforeEach(func() {
+									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.50.0")
+									fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(
+										v2v3action.ApplicationSummary{
+											ApplicationSummary: v3action.ApplicationSummary{
+												Application: v3action.Application{
+													Name: appName,
+												},
+												ProcessSummaries: v3action.ProcessSummaries{
+													{
+														Process: v3action.Process{
+															Type:       "aba",
+															Command:    "some-command-1",
+															MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+															DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
+														},
+													},
+													{
+														Process: v3action.Process{
+															Type:       "console",
+															Command:    "some-command-2",
+															MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
+															DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+														},
+													},
+												},
+											},
+										},
+										v2v3action.Warnings{"combo-summary-warning"},
+										nil)
+								})
+
+								It("displays process information", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(testUI.Out).To(Say("name:\\s+%s", appName))
+									Expect(testUI.Out).To(Say("type:\\s+aba"))
+									Expect(testUI.Out).To(Say("instances:\\s+0/0"))
+									Expect(testUI.Out).To(Say("memory usage:\\s+32M"))
+									Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
+									Expect(testUI.Out).To(Say("type:\\s+console"))
+									Expect(testUI.Out).To(Say("instances:\\s+0/0"))
+									Expect(testUI.Out).To(Say("memory usage:\\s+16M"))
+									Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+
+									Expect(testUI.Err).To(Say("combo-summary-warning"))
+
+									Expect(fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+									passedAppName, spaceGUID, withObfuscatedValues := fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+									Expect(passedAppName).To(Equal(appName))
+									Expect(spaceGUID).To(Equal("some-space-guid"))
+									Expect(withObfuscatedValues).To(BeTrue())
+								})
 							})
 
 							Context("when the start command is explicitly set", func() {
@@ -905,7 +972,6 @@ var _ = Describe("push Command", func() {
 							Expect(testUI.Err).To(Say("apply-2"))
 						})
 					})
-
 				})
 
 				Context("when there is an error converting the app setting into a config", func() {

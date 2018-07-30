@@ -24,7 +24,7 @@ func (actor Actor) GetApplicationsWithProcessesBySpace(spaceGUID string) ([]Appl
 	var appSummaries []ApplicationWithProcessSummary
 
 	for _, app := range apps {
-		processSummaries, processWarnings, err := actor.getProcessSummariesForApp(app.GUID)
+		processSummaries, processWarnings, err := actor.getProcessSummariesForApp(app.GUID, false)
 		allWarnings = append(allWarnings, processWarnings...)
 		if err != nil {
 			return nil, allWarnings, err

@@ -32,11 +32,12 @@ var _ = Describe("app summary displayer", func() {
 
 	Describe("AppDisplay", func() {
 		var (
-			summary v2v3action.ApplicationSummary
+			summary             v2v3action.ApplicationSummary
+			displayStartCommand bool
 		)
 
 		JustBeforeEach(func() {
-			appSummaryDisplayer.AppDisplay(summary)
+			appSummaryDisplayer.AppDisplay(summary, displayStartCommand)
 		})
 
 		Context("when the app has instances", func() {
@@ -184,6 +185,57 @@ var _ = Describe("app summary displayer", func() {
 					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk`))
 					Expect(testUI.Out).To(Say("type:\\s+console"))
 					Expect(testUI.Out).To(Say("There are no running instances of this process."))
+				})
+			})
+
+			Describe("start command", func() {
+				BeforeEach(func() {
+					summary = v2v3action.ApplicationSummary{
+						ApplicationSummary: v3action.ApplicationSummary{
+							Application: v3action.Application{
+								GUID:  "some-app-guid",
+								State: constant.ApplicationStarted,
+							},
+							ProcessSummaries: v3action.ProcessSummaries{
+								{
+									Process: v3action.Process{
+										Type:    constant.ProcessTypeWeb,
+										Command: "some-command-1",
+									},
+								},
+								{
+									Process: v3action.Process{
+										Type:    "console",
+										Command: "some-command-2",
+									},
+								},
+							},
+						},
+					}
+				})
+
+				Context("when displayStartCommand is true", func() {
+					BeforeEach(func() {
+						displayStartCommand = true
+					})
+
+					It("displays the start command for each process", func() {
+						Expect(testUI.Out).To(Say("type:\\s+web"))
+						Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
+
+						Expect(testUI.Out).To(Say("type:\\s+console"))
+						Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+					})
+				})
+
+				Context("when displayStartCommand is false", func() {
+					BeforeEach(func() {
+						displayStartCommand = false
+					})
+
+					It("hides the start command", func() {
+						Expect(testUI.Out).ToNot(Say("start command:"))
+					})
 				})
 			})
 		})

@@ -15,7 +15,7 @@ import (
 //go:generate counterfeiter . AppSummaryActor
 
 type AppSummaryActor interface {
-	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v2v3action.ApplicationSummary, v2v3action.Warnings, error)
+	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v2v3action.ApplicationSummary, v2v3action.Warnings, error)
 }
 
 //go:generate counterfeiter . AppActor
@@ -91,13 +91,13 @@ func (cmd AppCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	appSummaryDisplayer := shared.NewAppSummaryDisplayer2(cmd.UI)
-	summary, warnings, err := cmd.AppSummaryActor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	summary, warnings, err := cmd.AppSummaryActor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
-	appSummaryDisplayer.AppDisplay(summary)
+	appSummaryDisplayer.AppDisplay(summary, false)
 	return nil
 }
 

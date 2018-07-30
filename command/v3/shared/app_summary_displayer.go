@@ -31,11 +31,11 @@ type V2AppActor interface {
 //go:generate counterfeiter . V3AppSummaryActor
 
 type V3AppSummaryActor interface {
-	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
+	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v3action.ApplicationSummary, v3action.Warnings, error)
 }
 
 func (display AppSummaryDisplayer) DisplayAppInfo() error {
-	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID)
+	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID, false)
 	display.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -68,7 +68,7 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 }
 
 func (display AppSummaryDisplayer) DisplayAppProcessInfo() error {
-	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID)
+	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID, false)
 	display.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

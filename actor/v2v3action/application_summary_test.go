@@ -58,8 +58,9 @@ var _ = Describe("Application Summary Actions", func() {
 
 	Describe("GetApplicationSummaryByNameAndSpace", func() {
 		var (
-			appName   string
-			spaceGUID string
+			appName              string
+			spaceGUID            string
+			withObfuscatedValues bool
 
 			summary    ApplicationSummary
 			warnings   Warnings
@@ -69,10 +70,11 @@ var _ = Describe("Application Summary Actions", func() {
 		BeforeEach(func() {
 			appName = "some-app-name"
 			spaceGUID = "some-space-guid"
+			withObfuscatedValues = true
 		})
 
 		JustBeforeEach(func() {
-			summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID)
+			summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues)
 		})
 
 		Context("when getting the V3 Application Summary is successful", func() {
@@ -104,9 +106,10 @@ var _ = Describe("Application Summary Actions", func() {
 					}))
 
 					Expect(fakeV3Actor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					passedAppName, passedSpaceGUID := fakeV3Actor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+					passedAppName, passedSpaceGUID, passedWithObfuscatedValues := fakeV3Actor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
 					Expect(passedAppName).To(Equal(appName))
 					Expect(passedSpaceGUID).To(Equal(spaceGUID))
+					Expect(passedWithObfuscatedValues).To(Equal(withObfuscatedValues))
 				})
 
 				Context("when getting the routes is successful", func() {

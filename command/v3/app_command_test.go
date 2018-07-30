@@ -217,6 +217,20 @@ var _ = Describe("app Command", func() {
 								},
 							},
 						},
+						ProcessSummaries: v3action.ProcessSummaries{
+							{
+								Process: v3action.Process{
+									Type:    constant.ProcessTypeWeb,
+									Command: "some-command-1",
+								},
+							},
+							{
+								Process: v3action.Process{
+									Type:    "console",
+									Command: "some-command-2",
+								},
+							},
+						},
 					},
 				}
 				fakeAppSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(summary, v2v3action.Warnings{"warning-1", "warning-2"}, nil)
@@ -228,14 +242,16 @@ var _ = Describe("app Command", func() {
 				Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\.\n\n"))
 				Expect(testUI.Out).To(Say("name:\\s+some-app"))
 				Expect(testUI.Out).To(Say("requested state:\\s+started"))
+				Expect(testUI.Out).ToNot(Say("start command:"))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
 
 				Expect(fakeAppSummaryActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-				appName, spaceGUID := fakeAppSummaryActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+				appName, spaceGUID, withObfuscatedValues := fakeAppSummaryActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
 				Expect(appName).To(Equal("some-app"))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(withObfuscatedValues).To(BeFalse())
 			})
 		})
 	})

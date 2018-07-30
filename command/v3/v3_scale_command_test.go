@@ -293,11 +293,6 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(testUI.Err).To(Say("get-app-warning"))
 					Expect(testUI.Err).To(Say("get-app-summary-warning"))
 
-					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					passedAppName, spaceName := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-					Expect(passedAppName).To(Equal("some-app"))
-					Expect(spaceName).To(Equal("some-space-guid"))
-
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(0))
 				})
 
@@ -460,11 +455,6 @@ var _ = Describe("v3-scale Command", func() {
 
 								Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
 								Expect(fakeActor.StartApplicationArgsForCall(0)).To(Equal("some-app-guid"))
-
-								Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-								passedAppName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-								Expect(passedAppName).To(Equal("some-app"))
-								Expect(spaceGUID).To(Equal("some-space-guid"))
 							})
 						})
 
@@ -561,11 +551,6 @@ var _ = Describe("v3-scale Command", func() {
 
 					Expect(fakeActor.StopApplicationCallCount()).To(Equal(0))
 					Expect(fakeActor.StartApplicationCallCount()).To(Equal(0))
-
-					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					passedAppName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-					Expect(passedAppName).To(Equal("some-app"))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 			})
 
@@ -619,9 +604,6 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(appGUID).To(Equal("some-app-guid"))
 
 					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					passedAppName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-					Expect(passedAppName).To(Equal("some-app"))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 			})
 
@@ -672,11 +654,6 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
 					appGUID = fakeActor.StartApplicationArgsForCall(0)
 					Expect(appGUID).To(Equal("some-app-guid"))
-
-					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					passedAppName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-					Expect(passedAppName).To(Equal("some-app"))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 			})
 
@@ -717,11 +694,6 @@ var _ = Describe("v3-scale Command", func() {
 						Type:      "some-process-type",
 						Instances: types.NullInt{Value: 2, IsSet: true},
 					}))
-
-					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					passedAppName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-					Expect(passedAppName).To(Equal("some-app"))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 			})
 

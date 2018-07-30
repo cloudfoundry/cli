@@ -22,7 +22,7 @@ func NewAppSummaryDisplayer2(ui command.UI) *AppSummaryDisplayer2 {
 	}
 }
 
-func (display AppSummaryDisplayer2) AppDisplay(summary v2v3action.ApplicationSummary) {
+func (display AppSummaryDisplayer2) AppDisplay(summary v2v3action.ApplicationSummary, displayStartCommand bool) {
 	var isoRow []string
 	if name, exists := summary.GetIsolationSegmentName(); exists {
 		isoRow = append(isoRow, display.UI.TranslateText("isolation segment:"), name)
@@ -47,7 +47,7 @@ func (display AppSummaryDisplayer2) AppDisplay(summary v2v3action.ApplicationSum
 
 	display.UI.DisplayKeyValueTable("", keyValueTable, 3)
 
-	display.displayProcessTable(summary.ApplicationSummary)
+	display.displayProcessTable(summary.ApplicationSummary, displayStartCommand)
 }
 
 func (display AppSummaryDisplayer2) displayAppInstancesTable(processSummary v3action.ProcessSummary) {
@@ -82,14 +82,20 @@ func (display AppSummaryDisplayer2) displayAppInstancesTable(processSummary v3ac
 	display.UI.DisplayInstancesTableForApp(table)
 }
 
-func (display AppSummaryDisplayer2) displayProcessTable(summary v3action.ApplicationSummary) {
+func (display AppSummaryDisplayer2) displayProcessTable(summary v3action.ApplicationSummary, displayStartCommand bool) {
 	for _, process := range summary.ProcessSummaries {
 		display.UI.DisplayNewline()
+
+		var startCommandRow []string
+		if displayStartCommand {
+			startCommandRow = append(startCommandRow, display.UI.TranslateText("start command:"), process.Command)
+		}
 
 		keyValueTable := [][]string{
 			{display.UI.TranslateText("type:"), process.Type},
 			{display.UI.TranslateText("instances:"), fmt.Sprintf("%d/%d", process.HealthyInstanceCount(), process.TotalInstanceCount())},
 			{display.UI.TranslateText("memory usage:"), fmt.Sprintf("%dM", process.MemoryInMB.Value)},
+			startCommandRow,
 		}
 
 		display.UI.DisplayKeyValueTable("", keyValueTable, 3)

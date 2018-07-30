@@ -11,14 +11,13 @@ type ApplicationSummary struct {
 
 // GetApplicationSummaryByNameAndSpace returns an application with process and
 // instance stats.
-func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
-	spaceGUID string) (ApplicationSummary, Warnings, error) {
+func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (ApplicationSummary, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return ApplicationSummary{}, allWarnings, err
 	}
 
-	processSummaries, processWarnings, err := actor.getProcessSummariesForApp(app.GUID)
+	processSummaries, processWarnings, err := actor.getProcessSummariesForApp(app.GUID, withObfuscatedValues)
 	allWarnings = append(allWarnings, processWarnings...)
 	if err != nil {
 		return ApplicationSummary{}, allWarnings, err

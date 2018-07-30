@@ -339,6 +339,7 @@ var _ = Describe("Process", func() {
 				response := `{
 					"guid": "process-1-guid",
 					"type": "some-type",
+					"command": "start-command-1",
 					"instances": 22,
 					"memory_in_mb": 32,
 					"disk_in_mb": 1024,
@@ -365,6 +366,7 @@ var _ = Describe("Process", func() {
 				Expect(process).To(MatchAllFields(Fields{
 					"GUID":                         Equal("process-1-guid"),
 					"Type":                         Equal("some-type"),
+					"Command":                      Equal("start-command-1"),
 					"Instances":                    Equal(types.NullInt{Value: 22, IsSet: true}),
 					"MemoryInMB":                   Equal(types.NullUint64{Value: 32, IsSet: true}),
 					"DiskInMB":                     Equal(types.NullUint64{Value: 1024, IsSet: true}),
@@ -459,6 +461,7 @@ var _ = Describe("Process", func() {
 							{
 								"guid": "process-1-guid",
 								"type": "web",
+								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
 								"memory_in_mb": 32,
 								"health_check": {
                   "type": "port",
@@ -471,6 +474,7 @@ var _ = Describe("Process", func() {
 							{
 								"guid": "process-2-guid",
 								"type": "worker",
+								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
 								"memory_in_mb": 64,
 								"health_check": {
                   "type": "http",
@@ -491,6 +495,7 @@ var _ = Describe("Process", func() {
 							{
 								"guid": "process-3-guid",
 								"type": "console",
+								"command": "[PRIVATE DATA HIDDEN IN LISTS]",
 								"memory_in_mb": 128,
 								"health_check": {
                   "type": "process",
@@ -524,12 +529,14 @@ var _ = Describe("Process", func() {
 					Process{
 						GUID:            "process-1-guid",
 						Type:            constant.ProcessTypeWeb,
+						Command:         "[PRIVATE DATA HIDDEN IN LISTS]",
 						MemoryInMB:      types.NullUint64{Value: 32, IsSet: true},
 						HealthCheckType: "port",
 					},
 					Process{
 						GUID:                "process-2-guid",
 						Type:                "worker",
+						Command:             "[PRIVATE DATA HIDDEN IN LISTS]",
 						MemoryInMB:          types.NullUint64{Value: 64, IsSet: true},
 						HealthCheckType:     "http",
 						HealthCheckEndpoint: "/health",
@@ -537,6 +544,7 @@ var _ = Describe("Process", func() {
 					Process{
 						GUID:            "process-3-guid",
 						Type:            "console",
+						Command:         "[PRIVATE DATA HIDDEN IN LISTS]",
 						MemoryInMB:      types.NullUint64{Value: 128, IsSet: true},
 						HealthCheckType: "process",
 					},

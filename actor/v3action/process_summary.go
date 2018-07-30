@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	log "github.com/sirupsen/logrus"
 )
 
 // ProcessSummary represents a process with instance details.
@@ -68,33 +69,54 @@ func (ps ProcessSummaries) String() string {
 	return strings.Join(summaries, ", ")
 }
 
-func (actor Actor) getProcessSummariesForApp(appGUID string) (ProcessSummaries, Warnings, error) {
-	var allWarnings Warnings
+func (actor Actor) getProcessSummariesForApp(appGUID string, withObfuscatedValues bool) (ProcessSummaries, Warnings, error) {
+	log.WithFields(log.Fields{
+		"appGUID":              appGUID,
+		"withObfuscatedValues": withObfuscatedValues,
+	}).Info("retieving process information")
 
 	ccv3Processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
-	allWarnings = Warnings(warnings)
+	allWarnings := Warnings(warnings)
 	if err != nil {
 		return nil, allWarnings, err
 	}
 
 	var processSummaries ProcessSummaries
 	for _, ccv3Process := range ccv3Processes {
-		processGUID := ccv3Process.GUID
-		instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(processGUID)
-		allWarnings = append(allWarnings, Warnings(warnings)...)
-		if err != nil {
-			return nil, allWarnings, err
+		process := ccv3Process
+		if withObfuscatedValues {
+			fullProcess, warnings, err := actor.CloudControllerClient.GetApplicationProcessByType(appGUID, ccv3Process.Type)
+			allWarnings = append(allWarnings, warnings...)
+			if err != nil {
+				return nil, allWarnings, err
+			}
+			process = fullProcess
 		}
 
-		processSummary := ProcessSummary{
-			Process: Process(ccv3Process),
-		}
-		for _, instance := range instances {
-			processSummary.InstanceDetails = append(processSummary.InstanceDetails, ProcessInstance(instance))
+		processSummary, warnings, err := actor.getProcessSummary(Process(process))
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return nil, allWarnings, err
 		}
 
 		processSummaries = append(processSummaries, processSummary)
 	}
 
 	return processSummaries, allWarnings, nil
+}
+
+func (actor Actor) getProcessSummary(process Process) (ProcessSummary, Warnings, error) {
+	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
+	allWarnings := Warnings(warnings)
+	if err != nil {
+		return ProcessSummary{}, allWarnings, err
+	}
+
+	processSummary := ProcessSummary{
+		Process: process,
+	}
+	for _, instance := range instances {
+		processSummary.InstanceDetails = append(processSummary.InstanceDetails, ProcessInstance(instance))
+	}
+	return processSummary, allWarnings, nil
 }

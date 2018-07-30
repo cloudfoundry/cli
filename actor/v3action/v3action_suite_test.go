@@ -9,6 +9,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	log "github.com/sirupsen/logrus"
 
 	"testing"
 )
@@ -17,6 +18,10 @@ func TestV3Action(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "V3 Actions Suite")
 }
+
+var _ = BeforeEach(func() {
+	log.SetLevel(log.PanicLevel)
+})
 
 // Thanks to Svett Ralchev
 // http://blog.ralch.com/tutorial/golang-working-with-zip/

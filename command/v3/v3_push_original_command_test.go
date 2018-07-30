@@ -781,12 +781,13 @@ var _ = Describe("v3-push Command", func() {
 													Expect(testUI.Err).To(Say("route-warning-2"))
 
 													Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-													appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+													appName, spaceGUID, withObfuscatedValues := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
 													Expect(appName).To(Equal("some-app"))
 													Expect(spaceGUID).To(Equal("some-space-guid"))
 
 													Expect(fakeV2AppActor.GetApplicationRoutesCallCount()).To(Equal(1))
 													Expect(fakeV2AppActor.GetApplicationRoutesArgsForCall(0)).To(Equal("some-app-guid"))
+													Expect(withObfuscatedValues).To(BeFalse())
 												})
 											})
 										})
