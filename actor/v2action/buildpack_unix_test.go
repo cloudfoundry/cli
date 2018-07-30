@@ -42,7 +42,7 @@ var _ = Describe("Buildpack", func() {
 				ioutil.WriteFile(filepath.Join(source, "file2"), []byte{}, 0644)
 				subDir, err = ioutil.TempDir(source, "zipit-subdir-")
 				Expect(err).ToNot(HaveOccurred())
-				ioutil.WriteFile(filepath.Join(subDir, "file3"), []byte{}, 0775)
+				ioutil.WriteFile(filepath.Join(subDir, "file3"), []byte{}, 0755)
 
 				p := filepath.FromSlash(fmt.Sprintf("buildpack-%s.zip", helpers.RandomName()))
 				target, err = filepath.Abs(p)
@@ -76,7 +76,7 @@ var _ = Describe("Buildpack", func() {
 				Expect(reader.File[2].Mode()).To(Equal(os.ModeDir | 0700))
 
 				Expect(reader.File[3].Name).To(Equal(filepath.Join(dirName, "file3")))
-				Expect(reader.File[3].Mode()).To(Equal(os.FileMode(0775)))
+				Expect(reader.File[3].Mode()).To(Equal(os.FileMode(0755)))
 			})
 		})
 	})
