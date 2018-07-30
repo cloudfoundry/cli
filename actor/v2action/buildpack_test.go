@@ -2,6 +2,7 @@ package v2action_test
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -16,6 +17,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/ykk"
 )
 
 var _ = Describe("Buildpack", func() {
@@ -251,6 +254,80 @@ var _ = Describe("Buildpack", func() {
 				Expect(path).To(Equal(bpFilePath))
 				Expect(pbReader).To(Equal(bpFile))
 				Expect(warnings).To(ConsistOf("some-create-warning"))
+			})
+		})
+	})
+
+	Describe("Zipit", func() {
+		var (
+			source string
+			target string
+
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			executeErr = Zipit(source, target, "testzip-")
+		})
+
+		Context("when the source directory exists", func() {
+			var subDir string
+			BeforeEach(func() {
+				var err error
+
+				source, err = ioutil.TempDir("", "zipit-source-")
+				Expect(err).ToNot(HaveOccurred())
+
+				ioutil.WriteFile(filepath.Join(source, "file1"), []byte{}, 0700)
+				ioutil.WriteFile(filepath.Join(source, "file2"), []byte{}, 0644)
+				subDir, err = ioutil.TempDir(source, "zipit-subdir-")
+				Expect(err).ToNot(HaveOccurred())
+				ioutil.WriteFile(filepath.Join(subDir, "file3"), []byte{}, 0775)
+
+				p := filepath.FromSlash(fmt.Sprintf("buildpack-%s.zip", helpers.RandomName()))
+				target, err = filepath.Abs(p)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(source)).ToNot(HaveOccurred())
+				Expect(os.RemoveAll(target)).ToNot(HaveOccurred())
+			})
+
+			It("creates a zip from the source files at the target location", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				zipFile, err := os.Open(target)
+				Expect(err).ToNot(HaveOccurred())
+				defer zipFile.Close()
+
+				zipStat, err := zipFile.Stat()
+				reader, err := ykk.NewReader(zipFile, zipStat.Size())
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(reader.File).To(HaveLen(4))
+				Expect(reader.File[0].Name).To(Equal("file1"))
+				Expect(reader.File[0].Mode()).To(Equal(os.FileMode(0700)))
+
+				Expect(reader.File[1].Name).To(Equal("file2"))
+				Expect(reader.File[1].Mode()).To(Equal(os.FileMode(0644)))
+
+				dirName := fmt.Sprintf("%s/", filepath.Base(subDir))
+				Expect(reader.File[2].Name).To(Equal(dirName))
+				Expect(reader.File[2].Mode()).To(Equal(os.ModeDir | 0700))
+
+				Expect(reader.File[3].Name).To(Equal(filepath.Join(dirName, "file3")))
+				Expect(reader.File[3].Mode()).To(Equal(os.FileMode(0775)))
+			})
+		})
+
+		Context("when the source directory does not exist", func() {
+			BeforeEach(func() {
+				source = ""
+				target = ""
+			})
+
+			It("returns an error", func() {
+				Expect(os.IsNotExist(executeErr)).To(BeTrue())
 			})
 		})
 	})
