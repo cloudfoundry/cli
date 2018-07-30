@@ -36,7 +36,7 @@ func (actor Actor) BindServiceBySpace(appName string, serviceInstanceName string
 		return ServiceBinding{}, allWarnings, err
 	}
 
-	serviceBinding, ccv2Warnings, err := actor.CloudControllerClient.CreateServiceBinding(app.GUID, serviceInstance.GUID, bindingName, true, parameters)
+	serviceBinding, ccv2Warnings, err := actor.CloudControllerClient.CreateServiceBinding(app.GUID, serviceInstance.GUID, bindingName, false, parameters)
 	allWarnings = append(allWarnings, ccv2Warnings...)
 
 	return ServiceBinding(serviceBinding), allWarnings, err
@@ -95,7 +95,7 @@ func (actor Actor) UnbindServiceBySpace(appName string, serviceInstanceName stri
 		return ServiceBinding{}, allWarnings, err
 	}
 
-	deletedBinding, ccWarnings, err := actor.CloudControllerClient.DeleteServiceBinding(serviceBinding.GUID, true)
+	deletedBinding, ccWarnings, err := actor.CloudControllerClient.DeleteServiceBinding(serviceBinding.GUID, false)
 	allWarnings = append(allWarnings, ccWarnings...)
 
 	return ServiceBinding(deletedBinding), allWarnings, err

@@ -3,7 +3,6 @@ package ccv2
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -74,7 +73,7 @@ func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID s
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostServiceBindingRequest,
 		Body:        bytes.NewReader(bodyBytes),
-		Query:       url.Values{"accepts_incomplete": {fmt.Sprint(acceptsIncomplete)}},
+		Query:       url.Values{"accepts_incomplete": {"false"}},
 	})
 	if err != nil {
 		return ServiceBinding{}, nil, err
@@ -99,7 +98,7 @@ func (client *Client) DeleteServiceBinding(serviceBindingGUID string, acceptsInc
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteServiceBindingRequest,
 		URIParams:   map[string]string{"service_binding_guid": serviceBindingGUID},
-		Query:       url.Values{"accepts_incomplete": {fmt.Sprint(acceptsIncomplete)}},
+		Query:       url.Values{"accepts_incomplete": {"false"}},
 	})
 	if err != nil {
 		return ServiceBinding{}, nil, err
