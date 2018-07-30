@@ -1,6 +1,7 @@
 package v2action
 
 import (
+	"archive/zip"
 	"io"
 	"os"
 	"path/filepath"
@@ -18,7 +19,7 @@ type Buildpack ccv2.Buildpack
 //go:generate counterfeiter . Downloader
 
 type Downloader interface {
-	Download(string) (string, error)
+	Download(url string, tmpDirPath string) (string, error)
 }
 
 //go:generate counterfeiter . SimpleProgressBar
@@ -79,6 +80,37 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 	return Buildpack{GUID: ccBuildpack.GUID}, Warnings(warnings), err
 }
 
+func (actor *Actor) PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader Downloader) (string, error) {
+	if util.IsHTTPScheme(inputPath) {
+		pathToDownloadedBits, err := downloader.Download(inputPath, tmpDirPath)
+		if err != nil {
+			return "", err
+		}
+		return pathToDownloadedBits, nil
+	}
+
+	if filepath.Ext(inputPath) == ".zip" {
+		return inputPath, nil
+	}
+
+	info, err := os.Stat(inputPath)
+	if err != nil {
+		return "", err
+	}
+
+	if info.IsDir() {
+		archive := filepath.Join(tmpDirPath, filepath.Base(inputPath)) + ".zip"
+
+		err = Zipit(inputPath, archive, "")
+		if err != nil {
+			return "", err
+		}
+		return archive, nil
+	}
+
+	return inputPath, nil
+}
+
 func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, progBar SimpleProgressBar) (Warnings, error) {
 	progressBarReader, size, err := progBar.Initialize(pathToBuildpackBits)
 	if err != nil {
@@ -97,16 +129,72 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 	return Warnings(warnings), nil
 }
 
-func (actor *Actor) PrepareBuildpackBits(path string, downloader Downloader) (string, error) {
-	if util.IsHTTPScheme(path) {
-		tempPath, err := downloader.Download(path)
-		if err != nil {
-			parentDir, _ := filepath.Split(tempPath)
-			os.RemoveAll(parentDir)
+// Zipit zips the source into a .zip file in the target dir
+func Zipit(source, target, prefix string) error {
+	// Thanks to Svett Ralchev
+	// http://blog.ralch.com/tutorial/golang-working-with-zip/
 
-			return "", err
-		}
-		return tempPath, nil
+	zipfile, err := os.Create(target)
+	if err != nil {
+		return err
 	}
-	return path, nil
+	defer zipfile.Close()
+
+	if prefix != "" {
+		_, err = io.WriteString(zipfile, prefix)
+		if err != nil {
+			return err
+		}
+	}
+
+	archive := zip.NewWriter(zipfile)
+	defer archive.Close()
+
+	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if path == source {
+			return nil
+		}
+
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+		header.Name, err = filepath.Rel(source, path)
+		if err != nil {
+			return err
+		}
+
+		header.Name = filepath.ToSlash(header.Name)
+		if info.IsDir() {
+			header.Name += "/"
+			header.SetMode(info.Mode())
+		} else {
+			header.Method = zip.Deflate
+			header.SetMode(info.Mode())
+		}
+
+		writer, err := archive.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		_, err = io.Copy(writer, file)
+		return err
+	})
+
+	return err
 }

@@ -1,8 +1,8 @@
 package v2
 
 import (
+	"io/ioutil"
 	"os"
-	"path/filepath"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -12,7 +12,6 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
-	"code.cloudfoundry.org/cli/util"
 	"code.cloudfoundry.org/cli/util/download"
 )
 
@@ -27,7 +26,7 @@ type Downloader interface {
 type CreateBuildpackActor interface {
 	CreateBuildpack(name string, position int, enabled bool) (v2action.Buildpack, v2action.Warnings, error)
 	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
-	PrepareBuildpackBits(path string, downloader v2action.Downloader) (string, error)
+	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error)
 }
 
 type CreateBuildpackCommand struct {
@@ -100,14 +99,15 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	downloader := download.NewDownloader(time.Second * 30)
-	pathToBuildpackBits, err := cmd.Actor.PrepareBuildpackBits(string(cmd.RequiredArgs.Path), downloader)
+	tmpDirPath, err := ioutil.TempDir("", "buildpack-dir-")
 	if err != nil {
 		return err
 	}
+	defer os.RemoveAll(tmpDirPath)
 
-	if util.IsHTTPScheme(string(cmd.RequiredArgs.Path)) {
-		parentTempDir := filepath.Dir(pathToBuildpackBits)
-		defer os.RemoveAll(parentTempDir)
+	pathToBuildpackBits, err := cmd.Actor.PrepareBuildpackBits(string(cmd.RequiredArgs.Path), tmpDirPath, downloader)
+	if err != nil {
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{

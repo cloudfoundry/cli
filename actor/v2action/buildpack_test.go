@@ -2,7 +2,11 @@ package v2action_test
 
 import (
 	"errors"
+	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 
 	. "github.com/onsi/ginkgo"
@@ -13,6 +17,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/ykk"
 )
 
 var _ = Describe("Buildpack", func() {
@@ -90,6 +96,100 @@ var _ = Describe("Buildpack", func() {
 		})
 	})
 
+	Describe("PrepareBuildpackBits", func() {
+		var (
+			inPath         string
+			outPath        string
+			tmpDirPath     string
+			fakeDownloader *v2actionfakes.FakeDownloader
+
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			fakeDownloader = new(v2actionfakes.FakeDownloader)
+		})
+
+		JustBeforeEach(func() {
+			outPath, executeErr = actor.PrepareBuildpackBits(inPath, tmpDirPath, fakeDownloader)
+		})
+
+		Context("when the buildpack path is a url", func() {
+			BeforeEach(func() {
+				inPath = "http://buildpacks.com/a.zip"
+				fakeDownloader = new(v2actionfakes.FakeDownloader)
+
+				var err error
+				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(tmpDirPath)).ToNot(HaveOccurred())
+			})
+
+			Context("when downloading the file succeeds", func() {
+				BeforeEach(func() {
+					fakeDownloader.DownloadReturns("/tmp/buildpackdir-100/a.zip", nil)
+				})
+
+				It("downloads the buildpack to a local file", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeDownloader.DownloadCallCount()).To(Equal(1))
+
+					inputPath, inputTmpDirPath := fakeDownloader.DownloadArgsForCall(0)
+					Expect(inputPath).To(Equal("http://buildpacks.com/a.zip"))
+					Expect(inputTmpDirPath).To(Equal(tmpDirPath))
+				})
+			})
+
+			Context("when downloading the file fails", func() {
+				BeforeEach(func() {
+					fakeDownloader.DownloadReturns("", errors.New("some-download-error"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("some-download-error"))
+				})
+			})
+		})
+
+		Context("when the buildpack path points to a directory", func() {
+			BeforeEach(func() {
+				var err error
+				inPath, err = ioutil.TempDir("", "buildpackdir-")
+				Expect(err).ToNot(HaveOccurred())
+
+				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(inPath)).ToNot(HaveOccurred())
+				Expect(os.RemoveAll(tmpDirPath)).ToNot(HaveOccurred())
+			})
+
+			It("returns a path to the zipped directory", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeDownloader.DownloadCallCount()).To(Equal(0))
+
+				Expect(filepath.Base(outPath)).To(Equal(filepath.Base(inPath) + ".zip"))
+			})
+		})
+
+		Context("when the buildpack path points to a zip file", func() {
+			BeforeEach(func() {
+				inPath = "/foo/buildpacks/a.zip"
+			})
+
+			It("returns the local filepath", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeDownloader.DownloadCallCount()).To(Equal(0))
+				Expect(outPath).To(Equal("/foo/buildpacks/a.zip"))
+			})
+		})
+	})
+
 	Describe("UploadBuildpack", func() {
 		var (
 			bpFile     io.Reader
@@ -158,62 +258,76 @@ var _ = Describe("Buildpack", func() {
 		})
 	})
 
-	Describe("PrepareBuildpackBits", func() {
+	Describe("Zipit", func() {
 		var (
-			inPath         string
-			outPath        string
-			fakeDownloader *v2actionfakes.FakeDownloader
+			source string
+			target string
 
 			executeErr error
 		)
 
-		BeforeEach(func() {
-			fakeDownloader = new(v2actionfakes.FakeDownloader)
-		})
-
 		JustBeforeEach(func() {
-			outPath, executeErr = actor.PrepareBuildpackBits(inPath, fakeDownloader)
+			executeErr = Zipit(source, target, "testzip-")
 		})
 
-		Context("when the buildpack path is a url", func() {
+		Context("when the source directory exists", func() {
+			var subDir string
 			BeforeEach(func() {
-				inPath = "http://buildpacks.com/a.zip"
-				fakeDownloader = new(v2actionfakes.FakeDownloader)
+				var err error
+
+				source, err = ioutil.TempDir("", "zipit-source-")
+				Expect(err).ToNot(HaveOccurred())
+
+				ioutil.WriteFile(filepath.Join(source, "file1"), []byte{}, 0700)
+				ioutil.WriteFile(filepath.Join(source, "file2"), []byte{}, 0644)
+				subDir, err = ioutil.TempDir(source, "zipit-subdir-")
+				Expect(err).ToNot(HaveOccurred())
+				ioutil.WriteFile(filepath.Join(subDir, "file3"), []byte{}, 0775)
+
+				p := filepath.FromSlash(fmt.Sprintf("buildpack-%s.zip", helpers.RandomName()))
+				target, err = filepath.Abs(p)
+				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when downloading the file succeeds", func() {
-				BeforeEach(func() {
-					fakeDownloader.DownloadReturns("/tmp/a.zip", nil)
-				})
-
-				It("downloads the buildpack to a local file", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(fakeDownloader.DownloadCallCount()).To(Equal(1))
-					Expect(fakeDownloader.DownloadArgsForCall(0)).To(Equal("http://buildpacks.com/a.zip"))
-					Expect(outPath).To(Equal("/tmp/a.zip"))
-				})
+			AfterEach(func() {
+				Expect(os.RemoveAll(source)).ToNot(HaveOccurred())
+				Expect(os.RemoveAll(target)).ToNot(HaveOccurred())
 			})
 
-			Context("when downloading the file fails", func() {
-				BeforeEach(func() {
-					fakeDownloader.DownloadReturns("", errors.New("bad"))
-				})
-
-				It("returns the error", func() {
-					Expect(executeErr).To(MatchError("bad"))
-				})
-			})
-		})
-
-		Context("when the buildpack path points to a file", func() {
-			BeforeEach(func() {
-				inPath = "/foo/buildpacks/a.zip"
-			})
-
-			It("returns the local filepath", func() {
+			It("creates a zip from the source files at the target location", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeDownloader.DownloadCallCount()).To(Equal(0))
-				Expect(outPath).To(Equal("/foo/buildpacks/a.zip"))
+				zipFile, err := os.Open(target)
+				Expect(err).ToNot(HaveOccurred())
+				defer zipFile.Close()
+
+				zipStat, err := zipFile.Stat()
+				reader, err := ykk.NewReader(zipFile, zipStat.Size())
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(reader.File).To(HaveLen(4))
+				Expect(reader.File[0].Name).To(Equal("file1"))
+				Expect(reader.File[0].Mode()).To(Equal(os.FileMode(0700)))
+
+				Expect(reader.File[1].Name).To(Equal("file2"))
+				Expect(reader.File[1].Mode()).To(Equal(os.FileMode(0644)))
+
+				dirName := fmt.Sprintf("%s/", filepath.Base(subDir))
+				Expect(reader.File[2].Name).To(Equal(dirName))
+				Expect(reader.File[2].Mode()).To(Equal(os.ModeDir | 0700))
+
+				Expect(reader.File[3].Name).To(Equal(filepath.Join(dirName, "file3")))
+				Expect(reader.File[3].Mode()).To(Equal(os.FileMode(0775)))
+			})
+		})
+
+		Context("when the source directory does not exist", func() {
+			BeforeEach(func() {
+				source = ""
+				target = ""
+			})
+
+			It("returns an error", func() {
+				Expect(os.IsNotExist(executeErr)).To(BeTrue())
 			})
 		})
 	})

@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	. "github.com/onsi/ginkgo"
@@ -31,21 +30,25 @@ var _ = Describe("Downloader", func() {
 	Describe("Download", func() {
 		var (
 			url        string
+			tmpDirPath string
 			file       string
 			executeErr error
 		)
 
 		BeforeEach(func() {
 			url = "https://some.url"
+
+			var err error
+			tmpDirPath, err = ioutil.TempDir("", "bpdir-")
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		AfterEach(func() {
-			parentTempDir, _ := filepath.Split(file)
-			Expect(os.RemoveAll(parentTempDir)).ToNot(HaveOccurred())
+			Expect(os.RemoveAll(tmpDirPath)).ToNot(HaveOccurred())
 		})
 
 		JustBeforeEach(func() {
-			file, executeErr = downloader.Download(url)
+			file, executeErr = downloader.Download(url, tmpDirPath)
 		})
 
 		Context("when the download is successful", func() {
