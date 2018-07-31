@@ -49,6 +49,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
+		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {

@@ -59,6 +59,10 @@ func (cmd *CreateBuildpackCommand) Setup(config command.Config, ui command.UI) e
 }
 
 func (cmd *CreateBuildpackCommand) Execute(args []string) error {
+	if !cmd.Config.Experimental() {
+		return translatableerror.UnrefactoredCommandError{}
+	}
+
 	if cmd.Enable && cmd.Disable {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--enable", "--disable"},
@@ -120,16 +124,6 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	if err != nil {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayNewline()
-
-		// if cmd.Config.Experimental() {
-		// 	if _, ok := err.(actionerror.BuildpackAlreadyExistsForStackError); ok {
-		// 		cmd.UI.DisplayWarning(err.Error())
-		// 		cmd.UI.DisplayTextWithFlavor("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
-		// 			map[string]interface{}{
-		// 				"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
-		// 			})
-		// 		return nil
-		// 	}
 		if httpErr, ok := err.(download.RawHTTPStatusError); ok {
 			return translatableerror.HTTPStatusError{Status: httpErr.Status}
 		}
