@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("create buildpack command", func() {
+var _ = Describe("create buildpack command", func() {
 	var buildpackName string
 
 	BeforeEach(func() {
@@ -381,7 +381,7 @@ var _ = FDescribe("create buildpack command", func() {
 
 					session := helpers.CF("buildpacks")
 					Eventually(session).Should(Exit(0))
-					Expect(session.Out).To(Say(`%s\s+3`, buildpackName))
+					Expect(session.Out).To(Say(`%s\s+4`, buildpackName))
 				})
 			})
 		})
