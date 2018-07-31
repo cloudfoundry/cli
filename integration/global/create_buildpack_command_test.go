@@ -1,4 +1,4 @@
-package experimental
+package global
 
 import (
 	"bytes"
@@ -17,7 +17,9 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("create buildpack command", func() {
+// Pending until we can release stack association
+// Can't live in experimental due to test pollution when asserting buildpack order
+var _ = PDescribe("create buildpack command", func() {
 	var buildpackName string
 
 	BeforeEach(func() {
@@ -381,7 +383,7 @@ var _ = Describe("create buildpack command", func() {
 
 					session := helpers.CF("buildpacks")
 					Eventually(session).Should(Exit(0))
-					Expect(session.Out).To(Say(`%s\s+4`, buildpackName))
+					Expect(session.Out).To(Say(`%s\s+3`, buildpackName))
 				})
 			})
 		})
