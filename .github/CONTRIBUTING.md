@@ -46,12 +46,9 @@ export PATH=$GOPATH/src/code.cloudfoundry.org/cli/out:$PATH
 
 ## Install bosh-lite and deploy Cloud Foundry
 
-The CLI integration tests need a Cloud Foundry deployment. The easiest way to
-deploy a local Cloud Foundry for testing is to use
-[bosh-lite](https://github.com/cloudfoundry/bosh-lite). Follow these
-instructions:
-
-https://github.com/cloudfoundry/bosh-lite#deploy-cloud-foundry
+The CLI integration tests require a Cloud Foundry deployment. The easiest way to
+deploy a local Cloud Foundry for testing is to use bosh-lite - see 
+[Quick Start](https://bosh.io/docs/quick-start/) and [cf-deployment](https://github.com/cloudfoundry/cf-deployment) to deploy CF.
 
 
 ## Updating tests
