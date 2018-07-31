@@ -100,7 +100,6 @@ type AppParams struct {
 	DockerImage             *string
 	DockerUsername          *string
 	DockerPassword          *string
-	Diego                   *bool
 	EnableSSH               *bool
 	Hosts                   []string
 	RoutePath               *string

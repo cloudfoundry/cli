@@ -456,7 +456,6 @@ var _ = Describe("App", func() {
 					Expect(getAppModel.State).To(Equal("started"))
 					Expect(getAppModel.Guid).To(Equal("fake-app-guid"))
 					Expect(getAppModel.Command).To(Equal("fake-command"))
-					Expect(getAppModel.Diego).To(BeTrue())
 					Expect(getAppModel.DetectedStartCommand).To(Equal("fake-detected-start-command"))
 					Expect(getAppModel.DiskQuota).To(Equal(int64(1024)))
 					Expect(getAppModel.EnvironmentVars).To(Equal(map[string]interface{}{"fake-env-var": "fake-env-var-value"}))

@@ -31,17 +31,6 @@ type FakeFactory struct {
 	newDEAApplicationRequirementReturnsOnCall map[int]struct {
 		result1 requirements.DEAApplicationRequirement
 	}
-	NewDiegoApplicationRequirementStub        func(name string) requirements.DiegoApplicationRequirement
-	newDiegoApplicationRequirementMutex       sync.RWMutex
-	newDiegoApplicationRequirementArgsForCall []struct {
-		name string
-	}
-	newDiegoApplicationRequirementReturns struct {
-		result1 requirements.DiegoApplicationRequirement
-	}
-	newDiegoApplicationRequirementReturnsOnCall map[int]struct {
-		result1 requirements.DiegoApplicationRequirement
-	}
 	NewServiceInstanceRequirementStub        func(name string) requirements.ServiceInstanceRequirement
 	newServiceInstanceRequirementMutex       sync.RWMutex
 	newServiceInstanceRequirementArgsForCall []struct {
@@ -312,54 +301,6 @@ func (fake *FakeFactory) NewDEAApplicationRequirementReturnsOnCall(i int, result
 	}
 	fake.newDEAApplicationRequirementReturnsOnCall[i] = struct {
 		result1 requirements.DEAApplicationRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewDiegoApplicationRequirement(name string) requirements.DiegoApplicationRequirement {
-	fake.newDiegoApplicationRequirementMutex.Lock()
-	ret, specificReturn := fake.newDiegoApplicationRequirementReturnsOnCall[len(fake.newDiegoApplicationRequirementArgsForCall)]
-	fake.newDiegoApplicationRequirementArgsForCall = append(fake.newDiegoApplicationRequirementArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("NewDiegoApplicationRequirement", []interface{}{name})
-	fake.newDiegoApplicationRequirementMutex.Unlock()
-	if fake.NewDiegoApplicationRequirementStub != nil {
-		return fake.NewDiegoApplicationRequirementStub(name)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newDiegoApplicationRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewDiegoApplicationRequirementCallCount() int {
-	fake.newDiegoApplicationRequirementMutex.RLock()
-	defer fake.newDiegoApplicationRequirementMutex.RUnlock()
-	return len(fake.newDiegoApplicationRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewDiegoApplicationRequirementArgsForCall(i int) string {
-	fake.newDiegoApplicationRequirementMutex.RLock()
-	defer fake.newDiegoApplicationRequirementMutex.RUnlock()
-	return fake.newDiegoApplicationRequirementArgsForCall[i].name
-}
-
-func (fake *FakeFactory) NewDiegoApplicationRequirementReturns(result1 requirements.DiegoApplicationRequirement) {
-	fake.NewDiegoApplicationRequirementStub = nil
-	fake.newDiegoApplicationRequirementReturns = struct {
-		result1 requirements.DiegoApplicationRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewDiegoApplicationRequirementReturnsOnCall(i int, result1 requirements.DiegoApplicationRequirement) {
-	fake.NewDiegoApplicationRequirementStub = nil
-	if fake.newDiegoApplicationRequirementReturnsOnCall == nil {
-		fake.newDiegoApplicationRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.DiegoApplicationRequirement
-		})
-	}
-	fake.newDiegoApplicationRequirementReturnsOnCall[i] = struct {
-		result1 requirements.DiegoApplicationRequirement
 	}{result1}
 }
 
@@ -1110,8 +1051,6 @@ func (fake *FakeFactory) Invocations() map[string][][]interface{} {
 	defer fake.newApplicationRequirementMutex.RUnlock()
 	fake.newDEAApplicationRequirementMutex.RLock()
 	defer fake.newDEAApplicationRequirementMutex.RUnlock()
-	fake.newDiegoApplicationRequirementMutex.RLock()
-	defer fake.newDiegoApplicationRequirementMutex.RUnlock()
 	fake.newServiceInstanceRequirementMutex.RLock()
 	defer fake.newServiceInstanceRequirementMutex.RUnlock()
 	fake.newLoginRequirementMutex.RLock()

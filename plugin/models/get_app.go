@@ -7,7 +7,6 @@ type GetAppModel struct {
 	Name                 string
 	BuildpackUrl         string
 	Command              string
-	Diego                bool
 	DetectedStartCommand string
 	DiskQuota            int64 // in Megabytes
 	EnvironmentVars      map[string]interface{}

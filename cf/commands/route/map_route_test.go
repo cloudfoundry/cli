@@ -36,11 +36,10 @@ var _ = Describe("MapRoute", func() {
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
-		loginRequirement            requirements.Requirement
-		applicationRequirement      *requirementsfakes.FakeApplicationRequirement
-		domainRequirement           *requirementsfakes.FakeDomainRequirement
-		minAPIVersionRequirement    requirements.Requirement
-		diegoApplicationRequirement *requirementsfakes.FakeDiegoApplicationRequirement
+		loginRequirement         requirements.Requirement
+		applicationRequirement   *requirementsfakes.FakeApplicationRequirement
+		domainRequirement        *requirementsfakes.FakeDomainRequirement
+		minAPIVersionRequirement requirements.Requirement
 
 		originalCreateRouteCmd commandregistry.Command
 		fakeCreateRouteCmd     commandregistry.Command
@@ -92,9 +91,6 @@ var _ = Describe("MapRoute", func() {
 
 		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
 		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
-
-		diegoApplicationRequirement = new(requirementsfakes.FakeDiegoApplicationRequirement)
-		factory.NewDiegoApplicationRequirementReturns(diegoApplicationRequirement)
 	})
 
 	AfterEach(func() {
@@ -232,16 +228,6 @@ var _ = Describe("MapRoute", func() {
 					Expect(requiredVersion).To(Equal(expectedVersion))
 					Expect(actualRequirements[0]).To(Equal(minAPIVersionRequirement))
 				})
-
-				It("returns a DiegoApplicationRequirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(factory.NewDiegoApplicationRequirementCallCount()).To(Equal(1))
-					actualAppName := factory.NewDiegoApplicationRequirementArgsForCall(0)
-					Expect(appName).To(Equal(actualAppName))
-					Expect(actualRequirements).NotTo(BeEmpty())
-				})
 			})
 
 			Context("when the --random-port option is given", func() {
@@ -264,16 +250,6 @@ var _ = Describe("MapRoute", func() {
 					Expect(feature).To(Equal("Option '--random-port'"))
 					Expect(requiredVersion).To(Equal(expectedVersion))
 					Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
-				})
-
-				It("returns a DiegoApplicationRequirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(factory.NewDiegoApplicationRequirementCallCount()).To(Equal(1))
-					actualAppName := factory.NewDiegoApplicationRequirementArgsForCall(0)
-					Expect(appName).To(Equal(actualAppName))
-					Expect(actualRequirements).NotTo(BeEmpty())
 				})
 			})
 

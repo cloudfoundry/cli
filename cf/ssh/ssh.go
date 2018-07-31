@@ -327,10 +327,6 @@ func (c *secureShell) validateTarget(opts *options.SSHOptions) error {
 		return fmt.Errorf("Application %q is not in the STARTED state", opts.AppName)
 	}
 
-	if !c.app.Diego {
-		return fmt.Errorf("Application %q is not running on Diego", opts.AppName)
-	}
-
 	return nil
 }
 

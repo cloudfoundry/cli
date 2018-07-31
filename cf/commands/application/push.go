@@ -210,11 +210,6 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 			return err
 		}
 
-		if appParams.DockerImage != nil {
-			diego := true
-			appParams.Diego = &diego
-		}
-
 		var app, existingApp models.Application
 		existingApp, err = cmd.appRepo.Read(*appParams.Name)
 		switch err.(type) {

@@ -132,28 +132,15 @@ var _ = Describe("SSH", func() {
 			BeforeEach(func() {
 				token = ""
 				currentApp.State = "STARTED"
-				currentApp.Diego = true
 			})
 
 			Context("when the app is not in the 'STARTED' state", func() {
 				BeforeEach(func() {
 					currentApp.State = "STOPPED"
-					currentApp.Diego = true
 				})
 
 				It("returns an error", func() {
 					Expect(connectErr).To(MatchError(MatchRegexp("Application.*not in the STARTED state")))
-				})
-			})
-
-			Context("when the app is not a Diego app", func() {
-				BeforeEach(func() {
-					currentApp.State = "STARTED"
-					currentApp.Diego = false
-				})
-
-				It("returns an error", func() {
-					Expect(connectErr).To(MatchError(MatchRegexp("Application.*not running on Diego")))
 				})
 			})
 
@@ -186,7 +173,6 @@ var _ = Describe("SSH", func() {
 			}
 
 			currentApp.State = "STARTED"
-			currentApp.Diego = true
 			currentApp.GUID = "app-guid"
 			token = "bearer token"
 
@@ -910,7 +896,6 @@ var _ = Describe("SSH", func() {
 			}
 
 			currentApp.State = "STARTED"
-			currentApp.Diego = true
 
 			sshEndpointFingerprint = ""
 			sshEndpoint = ""
@@ -1175,7 +1160,6 @@ var _ = Describe("SSH", func() {
 			}
 
 			currentApp.State = "STARTED"
-			currentApp.Diego = true
 
 			sshEndpointFingerprint = ""
 			sshEndpoint = ""
@@ -1243,7 +1227,6 @@ var _ = Describe("SSH", func() {
 			}
 
 			currentApp.State = "STARTED"
-			currentApp.Diego = true
 
 			sshEndpointFingerprint = ""
 			sshEndpoint = ""

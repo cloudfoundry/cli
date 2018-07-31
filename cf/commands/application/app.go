@@ -223,7 +223,6 @@ func (cmd *ShowApp) populatePluginModel(
 	cmd.pluginAppModel.BuildpackUrl = getSummaryApp.BuildpackURL
 	cmd.pluginAppModel.Command = getSummaryApp.Command
 	cmd.pluginAppModel.DetectedStartCommand = getSummaryApp.DetectedStartCommand
-	cmd.pluginAppModel.Diego = getSummaryApp.Diego
 	cmd.pluginAppModel.DiskQuota = getSummaryApp.DiskQuota
 	cmd.pluginAppModel.EnvironmentVars = getSummaryApp.EnvironmentVars
 	cmd.pluginAppModel.Guid = getSummaryApp.GUID

@@ -816,14 +816,6 @@ var _ = Describe("Push Command", func() {
 						args = []string{"testApp", "--docker-image", "sample/dockerImage"}
 					})
 
-					It("sets diego to true", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-
-						Expect(appRepo.CreateCallCount()).To(Equal(1))
-						params := appRepo.CreateArgsForCall(0)
-						Expect(*params.Diego).To(BeTrue())
-					})
-
 					It("sets docker_image", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 

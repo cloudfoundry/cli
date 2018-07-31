@@ -45,7 +45,7 @@ var _ = Describe("Application resources", func() {
 			diskQuota, memory                 int64
 			healthCheckTimeout, instanceCount int
 			healthCheckHTTPEndpoint           string
-			diego, enableSSH                  bool
+			enableSSH                         bool
 			packageUpdatedAt                  time.Time
 			appPorts                          []int
 			environmentVars                   map[string]interface{}
@@ -76,7 +76,6 @@ var _ = Describe("Application resources", func() {
 			dockerImage = "docker-image"
 			dockerUsername = "docker-user"
 			dockerPassword = "docker-pass"
-			diego = true
 			enableSSH = true
 			instanceCount = 5
 			memory = int64(2048)
@@ -98,7 +97,6 @@ var _ = Describe("Application resources", func() {
 				DockerImage:             &dockerImage,
 				DockerUsername:          &dockerUsername,
 				DockerPassword:          &dockerPassword,
-				Diego:                   &diego,
 				EnableSSH:               &enableSSH,
 				InstanceCount:           &instanceCount,
 				Memory:                  &memory,
@@ -127,7 +125,6 @@ var _ = Describe("Application resources", func() {
 			Expect(*entity.DockerImage).To(Equal(dockerImage))
 			Expect(entity.DockerCredentials.Username).To(Equal(dockerUsername))
 			Expect(entity.DockerCredentials.Password).To(Equal(dockerPassword))
-			Expect(*entity.Diego).To(Equal(diego))
 			Expect(*entity.EnableSSH).To(Equal(enableSSH))
 			Expect(*entity.PackageUpdatedAt).To(Equal(packageUpdatedAt))
 			Expect(*entity.AppPorts).To(Equal(appPorts))

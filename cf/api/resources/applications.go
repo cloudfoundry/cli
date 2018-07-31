@@ -68,7 +68,6 @@ type ApplicationEntity struct {
 	HealthCheckTimeout      *int                    `json:"health_check_timeout,omitempty"`
 	PackageState            *string                 `json:"package_state,omitempty"`
 	StagingFailedReason     *string                 `json:"staging_failed_reason,omitempty"`
-	Diego                   *bool                   `json:"diego,omitempty"`
 	DockerImage             *string                 `json:"docker_image,omitempty"`
 	DockerCredentials       *DockerCredentials      `json:"docker_credentials,omitempty"`
 	EnableSSH               *bool                   `json:"enable_ssh,omitempty"`
@@ -111,7 +110,6 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 		HealthCheckTimeout:      app.HealthCheckTimeout,
 		HealthCheckHTTPEndpoint: app.HealthCheckHTTPEndpoint,
 		DockerImage:             app.DockerImage,
-		Diego:                   app.Diego,
 		EnableSSH:               app.EnableSSH,
 		PackageUpdatedAt:        app.PackageUpdatedAt,
 		AppPorts:                app.AppPorts,
@@ -188,9 +186,6 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	}
 	if entity.HealthCheckHTTPEndpoint != nil {
 		app.HealthCheckHTTPEndpoint = *entity.HealthCheckHTTPEndpoint
-	}
-	if entity.Diego != nil {
-		app.Diego = *entity.Diego
 	}
 	if entity.EnableSSH != nil {
 		app.EnableSSH = *entity.EnableSSH
