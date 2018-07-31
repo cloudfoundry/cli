@@ -18,7 +18,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 	)
 
 	BeforeEach(func() {
-		actor = NewActor(nil, nil, nil)
+		actor, _, _, _ = getTestPushActor()
 	})
 
 	DescribeTable("validation errors",

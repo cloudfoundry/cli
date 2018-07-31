@@ -27,8 +27,8 @@ func (app *Application) SetStack(stack v2action.Stack) {
 }
 
 func (actor Actor) CreateApplication(config ApplicationConfig) (ApplicationConfig, Event, Warnings, error) {
+	log.Debug("creating application")
 	var warnings Warnings
-	log.Debugf("creating application")
 	v2App := config.DesiredApplication.Application
 	v2App.Buildpack = actor.setBuildpack(config)
 
@@ -54,8 +54,8 @@ func (actor Actor) CreateApplication(config ApplicationConfig) (ApplicationConfi
 }
 
 func (actor Actor) UpdateApplication(config ApplicationConfig) (ApplicationConfig, Event, Warnings, error) {
+	log.Debug("updating application")
 	var warnings Warnings
-	log.Debugf("updating application")
 	v2App := config.DesiredApplication.Application
 	v2App.Buildpack = actor.setBuildpack(config)
 
@@ -140,29 +140,23 @@ func (Actor) setBuildpack(config ApplicationConfig) types.FilteredString {
 	buildpacks := config.DesiredApplication.Buildpacks
 
 	if len(buildpacks) == 1 {
-		filtered := new(types.FilteredString)
+		var filtered types.FilteredString
 		filtered.ParseValue(buildpacks[0])
-		return *filtered
+		return filtered
 	}
 
 	if buildpacks != nil && len(buildpacks) == 0 {
-		filtered := types.FilteredString{IsSet: true}
-		return filtered
+		return types.FilteredString{IsSet: true}
 	}
 
 	return config.DesiredApplication.Buildpack
 }
 
 func (actor Actor) updateBuildpacks(config ApplicationConfig, v2App v2action.Application) (Warnings, error) {
-	var buildpacks []string
-	for _, buildpack := range config.DesiredApplication.Buildpacks {
-		buildpacks = append(buildpacks, buildpack)
-	}
-
 	v3App := v3action.Application{
 		Name:                v2App.Name,
 		GUID:                v2App.GUID,
-		LifecycleBuildpacks: buildpacks,
+		LifecycleBuildpacks: config.DesiredApplication.Buildpacks,
 		LifecycleType:       constant.AppLifecycleTypeBuildpack,
 	}
 

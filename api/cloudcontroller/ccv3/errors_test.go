@@ -128,6 +128,25 @@ var _ = Describe("Error Wrapper", func() {
 						serverResponseCode = http.StatusNotFound
 					})
 
+					Context("API is not found", func() {
+
+						BeforeEach(func() {
+							serverResponse = `{
+								"errors": [
+									{
+										"detail": "Unknown request",
+										"title": "CF-NotFound",
+										"code": 10000
+									}
+								]
+							}`
+						})
+
+						It("returns a APINotFoundError", func() {
+							Expect(makeError).To(MatchError(ccerror.APINotFoundError{URL: server.URL() + "/v3/apps"}))
+						})
+					})
+
 					Context("when a process is not found", func() {
 						BeforeEach(func() {
 							serverResponse = `

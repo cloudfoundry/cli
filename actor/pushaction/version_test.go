@@ -14,8 +14,7 @@ var _ = Describe("Version Check Actions", func() {
 	)
 
 	BeforeEach(func() {
-		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		actor = NewActor(fakeV2Actor, nil, nil)
+		actor, fakeV2Actor, _, _ = getTestPushActor()
 	})
 
 	Describe("CloudControllerAPIVersion", func() {

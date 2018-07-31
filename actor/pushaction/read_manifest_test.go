@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	. "code.cloudfoundry.org/cli/actor/pushaction"
-	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
 
@@ -17,9 +16,7 @@ import (
 
 var _ = Describe("ReadManifest", func() {
 	var (
-		actor           *Actor
-		fakeV2Actor     *pushactionfakes.FakeV2Actor
-		fakeSharedActor *pushactionfakes.FakeSharedActor
+		actor *Actor
 
 		tmpDir         string
 		manifestPath   string
@@ -32,9 +29,7 @@ var _ = Describe("ReadManifest", func() {
 	)
 
 	BeforeEach(func() {
-		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		fakeSharedActor = new(pushactionfakes.FakeSharedActor)
-		actor = NewActor(fakeV2Actor, nil, fakeSharedActor)
+		actor, _, _, _ = getTestPushActor()
 
 		var err error
 		tmpDir, err = ioutil.TempDir("", "read-manifest-test")

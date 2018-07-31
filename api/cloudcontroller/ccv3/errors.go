@@ -27,7 +27,7 @@ func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cl
 		if rawHTTPStatusErr.StatusCode >= http.StatusInternalServerError {
 			return convert500(rawHTTPStatusErr)
 		}
-		return convert400(rawHTTPStatusErr)
+		return convert400(rawHTTPStatusErr, request)
 	}
 	return err
 }
@@ -38,7 +38,7 @@ func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcon
 	return e
 }
 
-func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
+func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError, request *cloudcontroller.Request) error {
 	firstErr, errorResponse, err := unmarshalFirstV3Error(rawHTTPStatusErr)
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	case http.StatusForbidden: // 403
 		return ccerror.ForbiddenError{Message: firstErr.Detail}
 	case http.StatusNotFound: // 404
-		return handleNotFound(firstErr)
+		return handleNotFound(firstErr, request)
 	case http.StatusUnprocessableEntity: // 422
 		return handleUnprocessableEntity(firstErr)
 	case http.StatusServiceUnavailable: // 503
@@ -98,7 +98,7 @@ func convert500(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	}
 }
 
-func handleNotFound(errorResponse ccerror.V3Error) error {
+func handleNotFound(errorResponse ccerror.V3Error, request *cloudcontroller.Request) error {
 	switch errorResponse.Detail {
 	case "App not found":
 		return ccerror.ApplicationNotFoundError{}
@@ -108,6 +108,8 @@ func handleNotFound(errorResponse ccerror.V3Error) error {
 		return ccerror.InstanceNotFoundError{}
 	case "Process not found":
 		return ccerror.ProcessNotFoundError{}
+	case "Unknown request":
+		return ccerror.APINotFoundError{URL: request.URL.String()}
 	default:
 		return ccerror.ResourceNotFoundError{Message: errorResponse.Detail}
 	}

@@ -24,9 +24,7 @@ var _ = Describe("Applications", func() {
 	)
 
 	BeforeEach(func() {
-		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		fakeV3Actor = new(pushactionfakes.FakeV3Actor)
-		actor = NewActor(fakeV2Actor, fakeV3Actor, nil)
+		actor, fakeV2Actor, fakeV3Actor, _ = getTestPushActor()
 	})
 
 	Describe("UpdateApplication", func() {

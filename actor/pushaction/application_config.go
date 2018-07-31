@@ -56,30 +56,22 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 
 	log.Infof("iterating through %d app configuration(s)", len(apps))
 	for _, app := range apps {
+		config := ApplicationConfig{
+			NoRoute: app.NoRoute,
+		}
 
-		var (
-			config  ApplicationConfig
-			absPath string
-			err     error
-		)
 		if app.DropletPath != "" {
-			absPath, err = filepath.EvalSymlinks(app.DropletPath)
+			absPath, err := filepath.EvalSymlinks(app.DropletPath)
 			if err != nil {
 				return nil, nil, err
 			}
-			config = ApplicationConfig{
-				DropletPath: absPath,
-				NoRoute:     app.NoRoute,
-			}
+			config.DropletPath = absPath
 		} else {
-			absPath, err = filepath.EvalSymlinks(app.Path)
+			absPath, err := filepath.EvalSymlinks(app.Path)
 			if err != nil {
 				return nil, nil, err
 			}
-			config = ApplicationConfig{
-				Path:    absPath,
-				NoRoute: app.NoRoute,
-			}
+			config.Path = absPath
 		}
 
 		log.Infoln("searching for app", app.Name)

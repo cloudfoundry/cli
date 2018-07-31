@@ -23,9 +23,7 @@ var _ = Describe("Resources", func() {
 	)
 
 	BeforeEach(func() {
-		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		fakeSharedActor = new(pushactionfakes.FakeSharedActor)
-		actor = NewActor(fakeV2Actor, nil, fakeSharedActor)
+		actor, fakeV2Actor, _, fakeSharedActor = getTestPushActor()
 	})
 
 	Describe("CreateArchive", func() {

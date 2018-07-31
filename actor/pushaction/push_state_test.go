@@ -18,7 +18,6 @@ import (
 var _ = Describe("Push State", func() {
 	var (
 		actor           *Actor
-		fakeV2Actor     *pushactionfakes.FakeV2Actor
 		fakeV3Actor     *pushactionfakes.FakeV3Actor
 		fakeSharedActor *pushactionfakes.FakeSharedActor
 
@@ -26,10 +25,7 @@ var _ = Describe("Push State", func() {
 	)
 
 	BeforeEach(func() {
-		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		fakeV3Actor = new(pushactionfakes.FakeV3Actor)
-		fakeSharedActor = new(pushactionfakes.FakeSharedActor)
-		actor = NewActor(fakeV2Actor, fakeV3Actor, fakeSharedActor)
+		actor, _, fakeV3Actor, fakeSharedActor = getTestPushActor()
 	})
 
 	Describe("Conceptualize", func() {
