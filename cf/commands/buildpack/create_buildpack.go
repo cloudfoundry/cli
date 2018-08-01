@@ -78,14 +78,10 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) error {
 	buildpack, err := cmd.createBuildpack(buildpackName, c)
 
 	if err != nil {
-		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.BuildpackNameTaken {
+		if httpErr, ok := err.(errors.HTTPError); ok && (httpErr.ErrorCode() == errors.BuildpackNameTaken || httpErr.ErrorCode() == errors.StackUnique) {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("Buildpack {{.BuildpackName}} already exists", map[string]interface{}{"BuildpackName": buildpackName}))
 			cmd.ui.Say(T("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack", map[string]interface{}{"CfUpdateBuildpackCommand": terminal.CommandColor(cf.Name + " " + "update-buildpack")}))
-		} else if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.StackUnique {
-			cmd.ui.Ok()
-			cmd.ui.Warn(T("Buildpack {{.BuildpackName}} already exists without a stack", map[string]interface{}{"BuildpackName": buildpackName}))
-			cmd.ui.Say(T("TIP: use '{{.CfDeleteBuildpackCommand}}' to delete buildpack {{.BuildpackName}} without a stack", map[string]interface{}{"CfDeleteBuildpackCommand": terminal.CommandColor(cf.Name + " " + "delete-buildpack"), "BuildpackName": buildpackName}))
 		} else {
 			return err
 		}
@@ -99,8 +95,8 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) error {
 	err = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, buildpackFile, buildpackFileName)
 	if err != nil {
 		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.BuildpackNameStackTaken {
-			cmd.ui.Ok()
-			cmd.ui.Warn(httpErr.Error())
+			cmd.buildpackRepo.Delete(buildpack.GUID)
+			cmd.ui.Warn(T("Buildpack {{.BuildpackName}} already exists", map[string]interface{}{"BuildpackName": buildpackName}))
 			cmd.ui.Say(T("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack", map[string]interface{}{"CfUpdateBuildpackCommand": terminal.CommandColor(cf.Name + " " + "update-buildpack")}))
 		} else {
 			return err
