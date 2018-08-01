@@ -85,6 +85,9 @@ var _ = PDescribe("create buildpack command", func() {
 					var err error
 					buildpackDir, err = ioutil.TempDir("", "buildpackdir-")
 					Expect(err).ToNot(HaveOccurred())
+					file, err := ioutil.TempFile(buildpackDir, "myfile-")
+					defer file.Close()
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				AfterEach(func() {
