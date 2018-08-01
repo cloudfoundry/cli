@@ -19,7 +19,6 @@ type TerminateTaskActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (v3action.Task, v3action.Warnings, error)
 	TerminateTask(taskGUID string) (v3action.Task, v3action.Warnings, error)
-	CloudControllerAPIVersion() string
 }
 
 type TerminateTaskCommand struct {
@@ -52,7 +51,7 @@ func (cmd *TerminateTaskCommand) Setup(config command.Config, ui command.UI) err
 }
 
 func (cmd TerminateTaskCommand) Execute(args []string) error {
-	sequenceId, err := flag.ParseStringToInt(cmd.RequiredArgs.SequenceID)
+	sequenceID, err := flag.ParseStringToInt(cmd.RequiredArgs.SequenceID)
 	if err != nil {
 		return translatableerror.ParseArgumentError{
 			ArgumentName: "TASK_ID",
@@ -60,7 +59,6 @@ func (cmd TerminateTaskCommand) Execute(args []string) error {
 		}
 	}
 
-	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionRunTaskV3)
 	if err != nil {
 		return err
 	}
@@ -83,7 +81,7 @@ func (cmd TerminateTaskCommand) Execute(args []string) error {
 		return err
 	}
 
-	task, warnings, err := cmd.Actor.GetTaskBySequenceIDAndApplication(sequenceId, application.GUID)
+	task, warnings, err := cmd.Actor.GetTaskBySequenceIDAndApplication(sequenceID, application.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

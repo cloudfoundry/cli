@@ -12,17 +12,17 @@ func MinimumAPIVersionCheck(current string, minimum string) error {
 		return nil
 	}
 
-	currentSemvar, err := semver.Make(current)
+	currentSemver, err := semver.Make(current)
 	if err != nil {
 		return err
 	}
 
-	minimumSemvar, err := semver.Make(minimum)
+	minimumSemver, err := semver.Make(minimum)
 	if err != nil {
 		return err
 	}
 
-	if currentSemvar.Compare(minimumSemvar) == -1 {
+	if currentSemver.Compare(minimumSemver) == -1 {
 		return ccerror.MinimumAPIVersionNotMetError{
 			CurrentVersion: current,
 			MinimumVersion: minimum,

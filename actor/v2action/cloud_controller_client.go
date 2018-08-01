@@ -10,6 +10,7 @@ import (
 
 // CloudControllerClient is a Cloud Controller V2 client.
 type CloudControllerClient interface {
+	CheckRoute(route ccv2.Route) (bool, ccv2.Warnings, error)
 	CreateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	CreateBuildpack(buildpack ccv2.Buildpack) (ccv2.Buildpack, ccv2.Warnings, error)
 	CreateOrganization(orgName string) (ccv2.Organization, ccv2.Warnings, error)
@@ -23,7 +24,6 @@ type CloudControllerClient interface {
 	DeleteSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	DeleteServiceBinding(serviceBindingGUID string, acceptsIncomplete bool) (ccv2.ServiceBinding, ccv2.Warnings, error)
 	DeleteSpaceJob(spaceGUID string) (ccv2.Job, ccv2.Warnings, error)
-	DoesRouteExist(route ccv2.Route) (bool, ccv2.Warnings, error)
 	GetApplication(guid string) (ccv2.Application, ccv2.Warnings, error)
 	GetApplicationApplicationInstances(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error)
 	GetApplicationApplicationInstanceStatuses(guid string) (map[int]ccv2.ApplicationInstanceStatus, ccv2.Warnings, error)

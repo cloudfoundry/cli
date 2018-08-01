@@ -228,7 +228,7 @@ func (actor Actor) DeleteRoute(routeGUID string) (Warnings, error) {
 }
 
 func (actor Actor) CheckRoute(route Route) (bool, Warnings, error) {
-	exists, warnings, err := actor.CloudControllerClient.DoesRouteExist(ActorToCCRoute(route))
+	exists, warnings, err := actor.CloudControllerClient.CheckRoute(ActorToCCRoute(route))
 	return exists, Warnings(warnings), err
 }
 

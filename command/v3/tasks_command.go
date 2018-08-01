@@ -29,7 +29,6 @@ const (
 type TasksActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationTasks(appGUID string, sortOrder v3action.SortOrder) ([]v3action.Task, v3action.Warnings, error)
-	CloudControllerAPIVersion() string
 }
 
 type TasksCommand struct {
@@ -62,12 +61,7 @@ func (cmd *TasksCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd TasksCommand) Execute(args []string) error {
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionRunTaskV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/types"
 )
 
@@ -60,6 +59,37 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 	route.DomainGUID = ccRoute.Entity.DomainGUID
 	route.SpaceGUID = ccRoute.Entity.SpaceGUID
 	return nil
+}
+
+// CheckRoute returns true if the route exists in the CF instance.
+func (client *Client) CheckRoute(route Route) (bool, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRouteReservedRequest,
+		URIParams:   map[string]string{"domain_guid": route.DomainGUID},
+	})
+	if err != nil {
+		return false, nil, err
+	}
+
+	queryParams := url.Values{}
+	if route.Host != "" {
+		queryParams.Add("host", route.Host)
+	}
+	if route.Path != "" {
+		queryParams.Add("path", route.Path)
+	}
+	if route.Port.IsSet {
+		queryParams.Add("port", fmt.Sprint(route.Port.Value))
+	}
+	request.URL.RawQuery = queryParams.Encode()
+
+	var response cloudcontroller.Response
+	err = client.connection.Make(request, &response)
+	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
+		return false, response.Warnings, nil
+	}
+
+	return response.HTTPResponse.StatusCode == http.StatusNoContent, response.Warnings, err
 }
 
 // CreateRoute creates the route with the given properties; SpaceGUID and
@@ -128,20 +158,6 @@ func (client *Client) DeleteRouteApplication(routeGUID string, appGUID string) (
 	var response cloudcontroller.Response
 	err = client.connection.Make(request, &response)
 	return response.Warnings, err
-}
-
-// DoesRouteExist returns true if the route exists in the CF instance. DomainGUID
-// is required for check. This call will only work for CC API 2.55 or higher.
-func (client *Client) DoesRouteExist(route Route) (bool, Warnings, error) {
-	currentVersion := client.APIVersion()
-	switch {
-	case cloudcontroller.MinimumAPIVersionCheck(currentVersion, ccversion.MinVersionNoHostInReservedRouteEndpoint) == nil:
-		return client.checkRoute(route)
-	case cloudcontroller.MinimumAPIVersionCheck(currentVersion, ccversion.MinVersionHTTPRoutePath) == nil:
-		return client.checkRouteDeprecated(route.DomainGUID, route.Host, route.Path)
-	default:
-		return client.checkRouteDeprecated(route.DomainGUID, route.Host, "")
-	}
 }
 
 // GetApplicationRoutes returns a list of Routes associated with the provided
@@ -265,36 +281,6 @@ func (client *Client) UpdateRouteApplication(routeGUID string, appGUID string) (
 	err = client.connection.Make(request, &response)
 
 	return route, response.Warnings, err
-}
-
-func (client *Client) checkRoute(route Route) (bool, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetRouteReservedRequest,
-		URIParams:   map[string]string{"domain_guid": route.DomainGUID},
-	})
-	if err != nil {
-		return false, nil, err
-	}
-
-	queryParams := url.Values{}
-	if route.Host != "" {
-		queryParams.Add("host", route.Host)
-	}
-	if route.Path != "" {
-		queryParams.Add("path", route.Path)
-	}
-	if route.Port.IsSet {
-		queryParams.Add("port", fmt.Sprint(route.Port.Value))
-	}
-	request.URL.RawQuery = queryParams.Encode()
-
-	var response cloudcontroller.Response
-	err = client.connection.Make(request, &response)
-	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
-		return false, response.Warnings, nil
-	}
-
-	return response.HTTPResponse.StatusCode == http.StatusNoContent, response.Warnings, err
 }
 
 func (client *Client) checkRouteDeprecated(domainGUID string, host string, path string) (bool, Warnings, error) {

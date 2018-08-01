@@ -1,15 +1,11 @@
 package isolated
 
 import (
-	"fmt"
-	"net/http"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("unbind-security-group command", func() {
@@ -66,40 +62,6 @@ var _ = Describe("unbind-security-group command", func() {
 	Context("when the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "unbind-security-group", securityGroupName)
-		})
-	})
-
-	Context("when the server's API version is too low", func() {
-		var server *Server
-
-		BeforeEach(func() {
-			server = NewTLSServer()
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/v2/info"),
-					RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
-				),
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/v2/info"),
-					RespondWith(http.StatusOK, fmt.Sprintf(`{"api_version":"2.34.0", "authorization_endpoint": "%s"}`, server.URL())),
-				),
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/login"),
-					RespondWith(http.StatusOK, `{}`),
-				),
-			)
-			Eventually(helpers.CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
-		})
-
-		AfterEach(func() {
-			server.Close()
-		})
-
-		It("reports an error with a minimum-version message", func() {
-			session := helpers.CF("unbind-security-group", securityGroupName, orgName, spaceName, "--lifecycle", "staging")
-
-			Eventually(session.Err).Should(Say("Lifecycle value 'staging' requires CF API version 2\\.68\\.0\\ or higher. Your target is 2\\.34\\.0\\."))
-			Eventually(session).Should(Exit(1))
 		})
 	})
 

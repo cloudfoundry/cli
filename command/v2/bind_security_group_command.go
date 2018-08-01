@@ -4,10 +4,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
@@ -50,20 +48,6 @@ func (cmd *BindSecurityGroupCommand) Setup(config command.Config, ui command.UI)
 
 func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 	var err error
-	if constant.SecurityGroupLifecycle(cmd.Lifecycle) == constant.SecurityGroupLifecycleStaging {
-		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
-		if err != nil {
-			switch e := err.(type) {
-			case translatableerror.MinimumAPIVersionNotMetError:
-				return translatableerror.LifecycleMinimumAPIVersionNotMetError{
-					CurrentVersion: e.CurrentVersion,
-					MinimumVersion: e.MinimumVersion,
-				}
-			default:
-				return err
-			}
-		}
-	}
 
 	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {

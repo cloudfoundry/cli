@@ -7,9 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -47,24 +45,10 @@ var _ = Describe("tasks Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionRunTaskV3)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	Context("when the API version is below the minimum", func() {
-		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
-		})
-
-		It("returns a MinimumAPIVersionNotMetError", func() {
-			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: "0.0.0",
-				MinimumVersion: ccversion.MinVersionRunTaskV3,
-			}))
-		})
 	})
 
 	Context("when checking target fails", func() {

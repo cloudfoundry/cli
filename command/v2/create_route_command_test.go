@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -48,7 +47,6 @@ var _ = Describe("Create Route Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionTCPRouting)
 	})
 
 	DescribeTable("argument combinations",
@@ -77,46 +75,6 @@ var _ = Describe("Create Route Command", func() {
 		Entry("port", nil, "", "", flag.Port{NullInt: types.NullInt{IsSet: true}}, false),
 		Entry("random port", nil, "", "", flag.Port{NullInt: types.NullInt{IsSet: false}}, true),
 		Entry("port and random port", translatableerror.ArgumentCombinationError{Args: []string{"--port", "--random-port"}}, "", "", flag.Port{NullInt: types.NullInt{IsSet: true}}, true),
-	)
-
-	DescribeTable("minimum api version checks",
-		func(expectedErr error, port flag.Port, randomPort bool, path string, apiVersion string) {
-			cmd.Port = port
-			cmd.RandomPort = randomPort
-			cmd.Path = path
-			fakeActor.CloudControllerAPIVersionReturns(apiVersion)
-
-			executeErr := cmd.Execute(nil)
-			if expectedErr == nil {
-				Expect(executeErr).To(BeNil())
-			} else {
-				Expect(executeErr).To(Equal(expectedErr))
-			}
-		},
-
-		Entry("port, CC Version 2.52.0", translatableerror.MinimumAPIVersionNotMetError{
-			Command:        "Option '--port'",
-			CurrentVersion: "2.52.0",
-			MinimumVersion: ccversion.MinVersionTCPRouting,
-		}, flag.Port{NullInt: types.NullInt{IsSet: true}}, false, "", "2.52.0"),
-
-		Entry("port, CC Version 2.53.0", nil, flag.Port{NullInt: types.NullInt{IsSet: true}}, false, "", ccversion.MinVersionTCPRouting),
-
-		Entry("random-port, CC Version 2.52.0", translatableerror.MinimumAPIVersionNotMetError{
-			Command:        "Option '--random-port'",
-			CurrentVersion: "2.52.0",
-			MinimumVersion: ccversion.MinVersionTCPRouting,
-		}, flag.Port{}, true, "", "2.52.0"),
-
-		Entry("random-port, CC Version 2.53.0", nil, flag.Port{}, true, "", ccversion.MinVersionTCPRouting),
-
-		Entry("path, CC Version 2.35.0", translatableerror.MinimumAPIVersionNotMetError{
-			Command:        "Option '--path'",
-			CurrentVersion: "2.35.0",
-			MinimumVersion: ccversion.MinVersionHTTPRoutePath,
-		}, flag.Port{}, false, "some-path", "2.35.0"),
-
-		Entry("path, CC Version 2.36.0", nil, flag.Port{}, false, "some-path", ccversion.MinVersionHTTPRoutePath),
 	)
 
 	Context("when all the arguments check out", func() {

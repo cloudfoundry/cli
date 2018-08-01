@@ -41,10 +41,10 @@ type FakeCreateBuildpackActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
-	PrepareBuildpackBitsStub        func(path string, tmpDirPath string, downloader v2action.Downloader) (string, error)
+	PrepareBuildpackBitsStub        func(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error)
 	prepareBuildpackBitsMutex       sync.RWMutex
 	prepareBuildpackBitsArgsForCall []struct {
-		path       string
+		inputPath  string
 		tmpDirPath string
 		downloader v2action.Downloader
 	}
@@ -169,18 +169,18 @@ func (fake *FakeCreateBuildpackActor) UploadBuildpackReturnsOnCall(i int, result
 	}{result1, result2}
 }
 
-func (fake *FakeCreateBuildpackActor) PrepareBuildpackBits(path string, tmpDirPath string, downloader v2action.Downloader) (string, error) {
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error) {
 	fake.prepareBuildpackBitsMutex.Lock()
 	ret, specificReturn := fake.prepareBuildpackBitsReturnsOnCall[len(fake.prepareBuildpackBitsArgsForCall)]
 	fake.prepareBuildpackBitsArgsForCall = append(fake.prepareBuildpackBitsArgsForCall, struct {
-		path       string
+		inputPath  string
 		tmpDirPath string
 		downloader v2action.Downloader
-	}{path, tmpDirPath, downloader})
-	fake.recordInvocation("PrepareBuildpackBits", []interface{}{path, tmpDirPath, downloader})
+	}{inputPath, tmpDirPath, downloader})
+	fake.recordInvocation("PrepareBuildpackBits", []interface{}{inputPath, tmpDirPath, downloader})
 	fake.prepareBuildpackBitsMutex.Unlock()
 	if fake.PrepareBuildpackBitsStub != nil {
-		return fake.PrepareBuildpackBitsStub(path, tmpDirPath, downloader)
+		return fake.PrepareBuildpackBitsStub(inputPath, tmpDirPath, downloader)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -197,7 +197,7 @@ func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsCallCount() int {
 func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsArgsForCall(i int) (string, string, v2action.Downloader) {
 	fake.prepareBuildpackBitsMutex.RLock()
 	defer fake.prepareBuildpackBitsMutex.RUnlock()
-	return fake.prepareBuildpackBitsArgsForCall[i].path, fake.prepareBuildpackBitsArgsForCall[i].tmpDirPath, fake.prepareBuildpackBitsArgsForCall[i].downloader
+	return fake.prepareBuildpackBitsArgsForCall[i].inputPath, fake.prepareBuildpackBitsArgsForCall[i].tmpDirPath, fake.prepareBuildpackBitsArgsForCall[i].downloader
 }
 
 func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsReturns(result1 string, result2 error) {

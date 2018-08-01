@@ -27,7 +27,7 @@ type SpaceSummary struct {
 	SecurityGroupRules             []SecurityGroupRule
 }
 
-func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name string, includeStagingSecurityGroupsRules bool) (SpaceSummary, Warnings, error) {
+func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name string) (SpaceSummary, Warnings, error) {
 	var allWarnings Warnings
 
 	org, warnings, err := actor.GetOrganization(orgGUID)
@@ -93,20 +93,18 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 
 	sort.Strings(runningSecurityGroupNames)
 
-	if includeStagingSecurityGroupsRules {
-		securityGroups, warnings, err = actor.GetSpaceStagingSecurityGroupsBySpace(space.GUID)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return SpaceSummary{}, allWarnings, err
-		}
-
-		for _, securityGroup := range securityGroups {
-			stagingSecurityGroupNames = append(stagingSecurityGroupNames, securityGroup.Name)
-			securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, constant.SecurityGroupLifecycleStaging)...)
-		}
-
-		sort.Strings(stagingSecurityGroupNames)
+	securityGroups, warnings, err = actor.GetSpaceStagingSecurityGroupsBySpace(space.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return SpaceSummary{}, allWarnings, err
 	}
+
+	for _, securityGroup := range securityGroups {
+		stagingSecurityGroupNames = append(stagingSecurityGroupNames, securityGroup.Name)
+		securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, constant.SecurityGroupLifecycleStaging)...)
+	}
+
+	sort.Strings(stagingSecurityGroupNames)
 
 	sort.Slice(securityGroupRules, func(i int, j int) bool {
 		if securityGroupRules[i].Name < securityGroupRules[j].Name {

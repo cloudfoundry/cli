@@ -1669,7 +1669,7 @@ var _ = Describe("Route Actions", func() {
 	Describe("CheckRoute", func() {
 		Context("when the API calls succeed", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.DoesRouteExistReturns(true, ccv2.Warnings{"some-check-route-warnings"}, nil)
+				fakeCloudControllerClient.CheckRouteReturns(true, ccv2.Warnings{"some-check-route-warnings"}, nil)
 			})
 
 			It("returns the bool and warnings", func() {
@@ -1686,8 +1686,8 @@ var _ = Describe("Route Actions", func() {
 				Expect(warnings).To(ConsistOf("some-check-route-warnings"))
 				Expect(exists).To(BeTrue())
 
-				Expect(fakeCloudControllerClient.DoesRouteExistCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.DoesRouteExistArgsForCall(0)).To(Equal(ccv2.Route{
+				Expect(fakeCloudControllerClient.CheckRouteCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.CheckRouteArgsForCall(0)).To(Equal(ccv2.Route{
 					Host:       "some-host",
 					DomainGUID: "some-domain-guid",
 					Path:       "some-path",
@@ -1701,7 +1701,7 @@ var _ = Describe("Route Actions", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("booo")
-				fakeCloudControllerClient.DoesRouteExistReturns(false, ccv2.Warnings{"some-check-route-warnings"}, expectedErr)
+				fakeCloudControllerClient.CheckRouteReturns(false, ccv2.Warnings{"some-check-route-warnings"}, expectedErr)
 			})
 
 			It("returns the bool and warnings", func() {
@@ -1780,7 +1780,7 @@ var _ = Describe("Route Actions", func() {
 			Context("when the user does not have access to the route", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get route warning"}, nil)
-					fakeCloudControllerClient.DoesRouteExistReturns(true, ccv2.Warnings{"check route warning"}, nil)
+					fakeCloudControllerClient.CheckRouteReturns(true, ccv2.Warnings{"check route warning"}, nil)
 				})
 
 				It("returns a RouteInDifferentSpaceError", func() {
@@ -1796,7 +1796,7 @@ var _ = Describe("Route Actions", func() {
 			BeforeEach(func() {
 				expectedErr = actionerror.RouteNotFoundError{Host: route.Host, DomainGUID: route.Domain.GUID, Path: route.Path}
 				fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get route warning"}, nil)
-				fakeCloudControllerClient.DoesRouteExistReturns(false, ccv2.Warnings{"check route warning"}, nil)
+				fakeCloudControllerClient.CheckRouteReturns(false, ccv2.Warnings{"check route warning"}, nil)
 			})
 
 			It("returns the route", func() {

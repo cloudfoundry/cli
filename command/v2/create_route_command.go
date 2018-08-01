@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -53,11 +52,6 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.minimumFlagVersions()
-	if err != nil {
-		return err
-	}
-
 	err = cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return err
@@ -102,20 +96,6 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayOK()
 
-	return nil
-}
-
-func (cmd CreateRouteCommand) minimumFlagVersions() error {
-	ccVersion := cmd.Actor.CloudControllerAPIVersion()
-	if err := command.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionHTTPRoutePath, "Option '--path'"); cmd.Path != "" && err != nil {
-		return err
-	}
-	if err := command.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionTCPRouting, "Option '--port'"); cmd.Port.IsSet && err != nil {
-		return err
-	}
-	if err := command.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionTCPRouting, "Option '--random-port'"); cmd.RandomPort && err != nil {
-		return err
-	}
 	return nil
 }
 

@@ -5,9 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -55,17 +53,6 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 	}
 
 	includeStaging := true
-
-	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
-	if err != nil {
-		switch err.(type) {
-		case translatableerror.MinimumAPIVersionNotMetError:
-			includeStaging = false
-
-		default:
-			return err
-		}
-	}
 
 	cmd.UI.DisplayTextWithFlavor("Getting security groups as {{.UserName}}...",
 		map[string]interface{}{"UserName": user.Name})

@@ -46,7 +46,6 @@ var _ = Describe("space Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionLifecyleStagingV2)
 		fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 	})
 
@@ -218,10 +217,9 @@ var _ = Describe("space Command", func() {
 
 					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 					Expect(fakeActor.GetSpaceSummaryByOrganizationAndNameCallCount()).To(Equal(1))
-					orgGUID, spaceName, includeStagingSecurityGroupRules := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
+					orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
 					Expect(orgGUID).To(Equal("some-org-guid"))
 					Expect(spaceName).To(Equal("some-space"))
-					Expect(includeStagingSecurityGroupRules).To(BeTrue())
 					Expect(fakeActorV3.GetEffectiveIsolationSegmentBySpaceCallCount()).To(Equal(1))
 					spaceGUID, orgDefaultIsolationSegmentGUID := fakeActorV3.GetEffectiveIsolationSegmentBySpaceArgsForCall(0)
 					Expect(spaceGUID).To(Equal("some-space-guid"))
@@ -231,7 +229,7 @@ var _ = Describe("space Command", func() {
 
 			Context("when v3 api version is below 3.11.0 and the v2 api version is no less than 2.68.0", func() {
 				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionLifecyleStagingV2)
+					fakeActor.CloudControllerAPIVersionReturns("2.69.0")
 					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
 				})
 
@@ -240,29 +238,9 @@ var _ = Describe("space Command", func() {
 
 					Expect(testUI.Out).NotTo(Say("isolation segment:"))
 
-					orgGUID, spaceName, includeStagingSecurityGroupRules := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
+					orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
 					Expect(orgGUID).To(Equal("some-org-guid"))
 					Expect(spaceName).To(Equal("some-space"))
-					Expect(includeStagingSecurityGroupRules).To(BeTrue())
-					Expect(fakeActorV3.GetEffectiveIsolationSegmentBySpaceCallCount()).To(Equal(0))
-				})
-			})
-
-			Context("when v3 api version is below 3.11.0 and the v2 api version is less than 2.68.0 (v2 will never be above 2.68.0 if v3 is lower than 3.11.0)", func() {
-				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns("2.54.0")
-					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
-				})
-
-				It("displays warnings and a table with no values for staging security groups", func() {
-					Expect(executeErr).To(BeNil())
-
-					Expect(testUI.Out).NotTo(Say("isolation segment:"))
-
-					orgGUID, spaceName, includeStagingSecurityGroupRules := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
-					Expect(orgGUID).To(Equal("some-org-guid"))
-					Expect(spaceName).To(Equal("some-space"))
-					Expect(includeStagingSecurityGroupRules).To(BeFalse())
 					Expect(fakeActorV3.GetEffectiveIsolationSegmentBySpaceCallCount()).To(Equal(0))
 				})
 			})
@@ -428,10 +406,9 @@ var _ = Describe("space Command", func() {
 		It("displays warnings and security group rules", func() {
 			Expect(executeErr).To(BeNil())
 
-			orgGUID, spaceName, includeStagingSecurityGroupRules := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
+			orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
 			Expect(orgGUID).To(Equal("some-org-guid"))
 			Expect(spaceName).To(Equal("some-space"))
-			Expect(includeStagingSecurityGroupRules).To(BeTrue())
 
 			Expect(testUI.Out).To(Say("name:\\s+some-space"))
 			Expect(testUI.Out).To(Say("running security groups:\\s+public_networks, dns, load_balancer"))

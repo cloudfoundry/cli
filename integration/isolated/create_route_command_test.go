@@ -2,7 +2,6 @@ package isolated
 
 import (
 	"fmt"
-	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -10,7 +9,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("create-route command", func() {
@@ -138,64 +136,6 @@ var _ = Describe("create-route command", func() {
 				Eventually(session).Should(Say(`FAILED`))
 				Eventually(session.Err).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org\.`))
 				Eventually(session).Should(Exit(1))
-			})
-		})
-	})
-
-	Context("when the server's API version is too low", func() {
-		var server *Server
-
-		BeforeEach(func() {
-			server = NewTLSServer()
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/v2/info"),
-					RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
-				),
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/v2/info"),
-					RespondWith(http.StatusOK, fmt.Sprintf(`{"api_version":"2.34.0", "authorization_endpoint": "%s"}`, server.URL())),
-				),
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/login"),
-					RespondWith(http.StatusOK, `{}`),
-				),
-			)
-			Eventually(helpers.CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
-		})
-
-		AfterEach(func() {
-			server.Close()
-		})
-
-		Context("for HTTP routes", func() {
-			Context("when specifying --path", func() {
-				It("reports an error with a minimum-version message", func() {
-					session := helpers.CF("create-route", "some-space", "example.com", "--path", "/foo")
-					Eventually(session).Should(Say(`FAILED`))
-					Eventually(session.Err).Should(Say(`Option '--path' requires CF API version 2\.36\.0 or higher. Your target is 2\.34\.0\.`))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-		})
-
-		Context("for TCP routes", func() {
-			Context("when specifying --port", func() {
-				It("reports an error with a minimum-version message", func() {
-					session := helpers.CF("create-route", "some-space", "example.com", "--port", "1025")
-					Eventually(session).Should(Say(`FAILED`))
-					Eventually(session.Err).Should(Say(`Option '--port' requires CF API version 2\.53\.0 or higher\. Your target is 2\.34\.0\.`))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			Context("when specifying --random-port", func() {
-				It("reports an error with a minimum-version message", func() {
-					session := helpers.CF("create-route", "some-space", "example.com", "--random-port")
-					Eventually(session).Should(Say(`FAILED`))
-					Eventually(session.Err).Should(Say(`Option '--random-port' requires CF API version 2\.53\.0 or higher\. Your target is 2\.34\.0\.`))
-					Eventually(session).Should(Exit(1))
-				})
 			})
 		})
 	})

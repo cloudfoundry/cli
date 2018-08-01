@@ -22,7 +22,7 @@ import (
 type SpaceActor interface {
 	CloudControllerAPIVersion() string
 	GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
-	GetSpaceSummaryByOrganizationAndName(orgGUID string, spaceName string, includeStagingSecurityGroupsRules bool) (v2action.SpaceSummary, v2action.Warnings, error)
+	GetSpaceSummaryByOrganizationAndName(orgGUID string, spaceName string) (v2action.SpaceSummary, v2action.Warnings, error)
 }
 
 //go:generate counterfeiter . SpaceActorV3
@@ -108,10 +108,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 	})
 	cmd.UI.DisplayNewline()
 
-	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
-	includeStagingSecurityGroupsRules := err == nil
-
-	spaceSummary, warnings, err := cmd.Actor.GetSpaceSummaryByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.Space, includeStagingSecurityGroupsRules)
+	spaceSummary, warnings, err := cmd.Actor.GetSpaceSummaryByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.Space)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -15,7 +14,6 @@ import (
 //go:generate counterfeiter . UnbindSecurityGroupActor
 
 type UnbindSecurityGroupActor interface {
-	CloudControllerAPIVersion() string
 	UnbindSecurityGroupByNameAndSpace(securityGroupName string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (v2action.Warnings, error)
 	UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securityGroupName string, orgName string, spaceName string, lifecycle constant.SecurityGroupLifecycle) (v2action.Warnings, error)
 }
@@ -48,20 +46,6 @@ func (cmd *UnbindSecurityGroupCommand) Setup(config command.Config, ui command.U
 
 func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 	var err error
-	if constant.SecurityGroupLifecycle(cmd.Lifecycle) == constant.SecurityGroupLifecycleStaging {
-		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
-		if err != nil {
-			switch e := err.(type) {
-			case translatableerror.MinimumAPIVersionNotMetError:
-				return translatableerror.LifecycleMinimumAPIVersionNotMetError{
-					CurrentVersion: e.CurrentVersion,
-					MinimumVersion: e.MinimumVersion,
-				}
-			default:
-				return err
-			}
-		}
-	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {

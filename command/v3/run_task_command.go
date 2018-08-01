@@ -19,7 +19,6 @@ import (
 type RunTaskActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	RunTask(appGUID string, task v3action.Task) (v3action.Task, v3action.Warnings, error)
-	CloudControllerAPIVersion() string
 }
 
 type RunTaskCommand struct {
@@ -55,12 +54,7 @@ func (cmd *RunTaskCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd RunTaskCommand) Execute(args []string) error {
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionRunTaskV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}

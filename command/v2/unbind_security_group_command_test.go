@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -293,38 +292,6 @@ var _ = Describe("unbind-security-group Command", func() {
 				Expect(testUI.Out).NotTo(Say("Unbinding security group"))
 
 				Expect(fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameCallCount()).To(Equal(0))
-			})
-		})
-	})
-
-	Context("when lifecycle is 'running'", func() {
-		BeforeEach(func() {
-			cmd.Lifecycle = flag.SecurityGroupLifecycle(constant.SecurityGroupLifecycleRunning)
-			fakeActor.CloudControllerAPIVersionReturns("2.34.0")
-		})
-
-		It("does no version check", func() {
-			Expect(executeErr).NotTo(HaveOccurred())
-		})
-	})
-
-	Context("when lifecycle is 'staging'", func() {
-		BeforeEach(func() {
-			cmd.Lifecycle = flag.SecurityGroupLifecycle(constant.SecurityGroupLifecycleStaging)
-		})
-
-		Context("when the version check fails", func() {
-			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns("2.34.0")
-			})
-
-			It("returns a MinimumAPIVersionNotMetError", func() {
-				Expect(executeErr).To(MatchError(translatableerror.LifecycleMinimumAPIVersionNotMetError{
-					CurrentVersion: "2.34.0",
-					MinimumVersion: ccversion.MinVersionLifecyleStagingV2,
-				}))
-				Expect(fakeActor.CloudControllerAPIVersionCallCount()).To(Equal(1))
-				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(0))
 			})
 		})
 	})

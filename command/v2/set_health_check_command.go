@@ -4,11 +4,9 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
@@ -16,7 +14,6 @@ import (
 
 type SetHealthCheckActor interface {
 	SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType constant.ApplicationHealthCheckType, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
-	CloudControllerAPIVersion() string
 }
 
 type SetHealthCheckCommand struct {
@@ -46,23 +43,6 @@ func (cmd *SetHealthCheckCommand) Setup(config command.Config, ui command.UI) er
 
 func (cmd *SetHealthCheckCommand) Execute(args []string) error {
 	var err error
-
-	switch cmd.RequiredArgs.HealthCheck.Type {
-	case "http":
-		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionProcessHealthCheckV2)
-		if err != nil {
-			return translatableerror.HealthCheckTypeUnsupportedError{SupportedTypes: []string{"port", "none"}}
-		}
-		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionHTTPEndpointHealthCheckV2)
-		if err != nil {
-			return translatableerror.HealthCheckTypeUnsupportedError{SupportedTypes: []string{"port", "none", "process"}}
-		}
-	case "process":
-		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionProcessHealthCheckV2)
-		if err != nil {
-			return translatableerror.HealthCheckTypeUnsupportedError{SupportedTypes: []string{"port", "none"}}
-		}
-	}
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {

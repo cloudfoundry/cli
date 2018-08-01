@@ -46,17 +46,17 @@ func checkVersionOutdated(current string, minimum string) (bool, error) {
 		return false, nil
 	}
 
-	currentSemvar, err := semver.Make(current)
+	currentSemver, err := semver.Make(current)
 	if err != nil {
 		return false, err
 	}
 
-	minimumSemvar, err := semver.Make(minimum)
+	minimumSemver, err := semver.Make(minimum)
 	if err != nil {
 		return false, err
 	}
 
-	if currentSemvar.Compare(minimumSemvar) == -1 {
+	if currentSemver.Compare(minimumSemver) == -1 {
 		return true, nil
 	}
 
