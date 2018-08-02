@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/actors/planbuilder"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
@@ -82,10 +81,6 @@ func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory,
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
-	}
-
-	if fc.String("p") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Updating a plan", cf.UpdateServicePlanMinimumAPIVersion))
 	}
 
 	return reqs, nil
