@@ -3,7 +3,6 @@ package servicebroker
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -52,7 +51,6 @@ func (cmd *CreateServiceBroker) Requirements(requirementsFactory requirements.Fa
 		reqs = append(
 			reqs,
 			requirementsFactory.NewTargetedSpaceRequirement(),
-			requirementsFactory.NewMinAPIVersionRequirement("--space-scoped", cf.SpaceScopedMaximumAPIVersion),
 		)
 	}
 
