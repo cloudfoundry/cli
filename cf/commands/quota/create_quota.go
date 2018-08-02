@@ -5,7 +5,6 @@ import (
 
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api/quotas"
 	"code.cloudfoundry.org/cli/cf/api/resources"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
@@ -66,10 +65,6 @@ func (cmd *CreateQuota) Requirements(requirementsFactory requirements.Factory, f
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
-	}
-
-	if fc.IsSet("a") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.OrgAppInstanceLimitMinimumAPIVersion))
 	}
 
 	return reqs, nil

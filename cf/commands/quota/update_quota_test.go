@@ -18,7 +18,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	"github.com/blang/semver"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -45,7 +44,6 @@ var _ = Describe("app Command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
-		requirementsFactory.NewMinAPIVersionRequirementReturns(requirements.Passing{})
 		quotaRepo = new(quotasfakes.FakeQuotaRepository)
 	})
 
@@ -306,8 +304,7 @@ var _ = Describe("app Command", func() {
 			quotaRepo   *quotasfakes.FakeQuotaRepository
 			flagContext flags.FlagContext
 
-			loginRequirement         requirements.Requirement
-			minAPIVersionRequirement requirements.Requirement
+			loginRequirement requirements.Requirement
 		)
 
 		BeforeEach(func() {
@@ -332,9 +329,6 @@ var _ = Describe("app Command", func() {
 
 			loginRequirement = &passingRequirement{Name: "login-requirement"}
 			requirementsFactory.NewLoginRequirementReturns(loginRequirement)
-
-			minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
-			requirementsFactory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 		})
 
 		Context("when not provided exactly one arg", func() {
@@ -362,34 +356,6 @@ var _ = Describe("app Command", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(requirementsFactory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
-			})
-
-			It("does not return a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(requirementsFactory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
-				Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
-			})
-
-			Context("when an app instance limit is passed", func() {
-				BeforeEach(func() {
-					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-					flagContext.Parse("domain-name", "-a", "2")
-				})
-
-				It("returns a MinAPIVersionRequirement as the second requirement", func() {
-					actualRequirements, err := cmd.Requirements(requirementsFactory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
-
-					expectedVersion, err := semver.Make("2.33.0")
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-					feature, requiredVersion := requirementsFactory.NewMinAPIVersionRequirementArgsForCall(0)
-					Expect(feature).To(Equal("Option '-a'"))
-					Expect(requiredVersion).To(Equal(expectedVersion))
-					Expect(actualRequirements[1]).To(Equal(minAPIVersionRequirement))
-				})
 			})
 		})
 	})
