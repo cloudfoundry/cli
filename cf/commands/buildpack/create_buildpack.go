@@ -95,9 +95,7 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) error {
 	err = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, buildpackFile, buildpackFileName)
 	if err != nil {
 		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.BuildpackNameStackTaken {
-			cmd.buildpackRepo.Delete(buildpack.GUID)
 			cmd.ui.Warn(T("Buildpack {{.BuildpackName}} already exists", map[string]interface{}{"BuildpackName": buildpackName}))
-			cmd.ui.Say(T("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack", map[string]interface{}{"CfUpdateBuildpackCommand": terminal.CommandColor(cf.Name + " " + "update-buildpack")}))
 		} else {
 			return err
 		}
