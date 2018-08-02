@@ -391,27 +391,6 @@ var _ = Describe("app Command", func() {
 					Expect(actualRequirements[1]).To(Equal(minAPIVersionRequirement))
 				})
 			})
-
-			Context("when reserved route ports limit is passed", func() {
-				BeforeEach(func() {
-					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-					flagContext.Parse("domain-name", "--reserved-route-ports", "3")
-				})
-
-				It("returns a MinAPIVersionRequirement as the second requirement", func() {
-					actualRequirements, err := cmd.Requirements(requirementsFactory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
-
-					expectedVersion, err := semver.Make("2.55.0")
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-					feature, requiredVersion := requirementsFactory.NewMinAPIVersionRequirementArgsForCall(0)
-					Expect(feature).To(Equal("Option '--reserved-route-ports'"))
-					Expect(requiredVersion).To(Equal(expectedVersion))
-					Expect(actualRequirements[1]).To(Equal(minAPIVersionRequirement))
-				})
-			})
 		})
 	})
 })

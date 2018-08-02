@@ -72,10 +72,6 @@ func (cmd *CreateQuota) Requirements(requirementsFactory requirements.Factory, f
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.OrgAppInstanceLimitMinimumAPIVersion))
 	}
 
-	if fc.IsSet("reserved-route-ports") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--reserved-route-ports'", cf.ReservedRoutePortsMinimumAPIVersion))
-	}
-
 	return reqs, nil
 }
 

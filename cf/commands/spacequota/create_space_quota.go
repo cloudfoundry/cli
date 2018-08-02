@@ -73,10 +73,6 @@ func (cmd *CreateSpaceQuota) Requirements(requirementsFactory requirements.Facto
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.SpaceAppInstanceLimitMinimumAPIVersion))
 	}
 
-	if fc.IsSet("reserved-route-ports") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--reserved-route-ports'", cf.ReservedRoutePortsMinimumAPIVersion))
-	}
-
 	return reqs, nil
 }
 
