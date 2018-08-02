@@ -188,6 +188,51 @@ var _ = Describe("app summary displayer", func() {
 				})
 			})
 
+			Context("when all the instances in all processes are down", func() {
+				BeforeEach(func() {
+					summary = v2v3action.ApplicationSummary{
+						ApplicationSummary: v3action.ApplicationSummary{
+							ProcessSummaries: []v3action.ProcessSummary{
+								{
+									Process: v3action.Process{
+										Type:       constant.ProcessTypeWeb,
+										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+									},
+									InstanceDetails: []v3action.ProcessInstance{{State: constant.ProcessInstanceDown}},
+								},
+								{
+									Process: v3action.Process{
+										Type:       "console",
+										MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
+									},
+									InstanceDetails: []v3action.ProcessInstance{{State: constant.ProcessInstanceDown}},
+								},
+								{
+									Process: v3action.Process{
+										Type:       "worker",
+										MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+									},
+									InstanceDetails: []v3action.ProcessInstance{{State: constant.ProcessInstanceDown}},
+								},
+							},
+						},
+					}
+				})
+
+				It("says no instances are running", func() {
+					Expect(testUI.Out).To(Say("type:\\s+web"))
+					Expect(testUI.Out).To(Say("There are no running instances of this process."))
+					Expect(testUI.Out).To(Say("type:\\s+console"))
+					Expect(testUI.Out).To(Say("There are no running instances of this process."))
+					Expect(testUI.Out).To(Say("type:\\s+worker"))
+					Expect(testUI.Out).To(Say("There are no running instances of this process."))
+				})
+
+				It("does not display the instance table", func() {
+					Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+				})
+			})
+
 			Describe("start command", func() {
 				BeforeEach(func() {
 					summary = v2v3action.ApplicationSummary{
