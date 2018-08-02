@@ -110,73 +110,50 @@ var _ = Describe("SetOrgRole", func() {
 				Expect(actualRequirements).To(ContainElement(organizationRequirement))
 			})
 
-			Context("when the config version is >=2.37.0", func() {
+			It("requests the set_roles_by_username flag", func() {
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(flagRepo.FindByNameCallCount()).To(Equal(1))
+				Expect(flagRepo.FindByNameArgsForCall(0)).To(Equal("set_roles_by_username"))
+			})
+
+			Context("when the set_roles_by_username flag exists and is enabled", func() {
 				BeforeEach(func() {
-					configRepo.SetAPIVersion("2.37.0")
+					flagRepo.FindByNameReturns(models.FeatureFlag{Enabled: true}, nil)
 				})
 
-				It("requests the set_roles_by_username flag", func() {
-					_, err := cmd.Requirements(factory, flagContext)
+				It("returns a UserRequirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(flagRepo.FindByNameCallCount()).To(Equal(1))
-					Expect(flagRepo.FindByNameArgsForCall(0)).To(Equal("set_roles_by_username"))
-				})
+					Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
+					actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
+					Expect(actualUsername).To(Equal("the-user-name"))
+					Expect(actualWantGUID).To(BeFalse())
 
-				Context("when the set_roles_by_username flag exists and is enabled", func() {
-					BeforeEach(func() {
-						flagRepo.FindByNameReturns(models.FeatureFlag{Enabled: true}, nil)
-					})
-
-					It("returns a UserRequirement", func() {
-						actualRequirements, err := cmd.Requirements(factory, flagContext)
-						Expect(err).NotTo(HaveOccurred())
-						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
-						Expect(actualUsername).To(Equal("the-user-name"))
-						Expect(actualWantGUID).To(BeFalse())
-
-						Expect(actualRequirements).To(ContainElement(userRequirement))
-					})
-				})
-
-				Context("when the set_roles_by_username flag exists and is disabled", func() {
-					BeforeEach(func() {
-						flagRepo.FindByNameReturns(models.FeatureFlag{Enabled: false}, nil)
-					})
-
-					It("returns a UserRequirement", func() {
-						actualRequirements, err := cmd.Requirements(factory, flagContext)
-						Expect(err).NotTo(HaveOccurred())
-						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
-						Expect(actualUsername).To(Equal("the-user-name"))
-						Expect(actualWantGUID).To(BeTrue())
-
-						Expect(actualRequirements).To(ContainElement(userRequirement))
-					})
-				})
-
-				Context("when the set_roles_by_username flag cannot be retrieved", func() {
-					BeforeEach(func() {
-						flagRepo.FindByNameReturns(models.FeatureFlag{}, errors.New("some error"))
-					})
-
-					It("returns a UserRequirement", func() {
-						actualRequirements, err := cmd.Requirements(factory, flagContext)
-						Expect(err).NotTo(HaveOccurred())
-						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
-						Expect(actualUsername).To(Equal("the-user-name"))
-						Expect(actualWantGUID).To(BeTrue())
-
-						Expect(actualRequirements).To(ContainElement(userRequirement))
-					})
+					Expect(actualRequirements).To(ContainElement(userRequirement))
 				})
 			})
 
-			Context("when the config version is <2.37.0", func() {
+			Context("when the set_roles_by_username flag exists and is disabled", func() {
 				BeforeEach(func() {
-					configRepo.SetAPIVersion("2.36.0")
+					flagRepo.FindByNameReturns(models.FeatureFlag{Enabled: false}, nil)
+				})
+
+				It("returns a UserRequirement", func() {
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
+					actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
+					Expect(actualUsername).To(Equal("the-user-name"))
+					Expect(actualWantGUID).To(BeTrue())
+
+					Expect(actualRequirements).To(ContainElement(userRequirement))
+				})
+			})
+
+			Context("when the set_roles_by_username flag cannot be retrieved", func() {
+				BeforeEach(func() {
+					flagRepo.FindByNameReturns(models.FeatureFlag{}, errors.New("some error"))
 				})
 
 				It("returns a UserRequirement", func() {

@@ -107,33 +107,31 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) error {
 
 	cmd.ui.Ok()
 
-	if cmd.config.IsMinAPIVersion(cf.SetRolesByUsernameMinimumAPIVersion) {
-		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
+	setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
+	if err != nil {
+		cmd.ui.Warn(T("Warning: accessing feature flag 'set_roles_by_username'") + " - " + err.Error() + "\n" + T("Skip assigning org role to user"))
+	}
+
+	if setRolesByUsernameFlag.Enabled {
+		org, err := cmd.orgRepo.FindByName(name)
 		if err != nil {
-			cmd.ui.Warn(T("Warning: accessing feature flag 'set_roles_by_username'") + " - " + err.Error() + "\n" + T("Skip assigning org role to user"))
+			return errors.New(T("Error accessing org {{.OrgName}} for GUID': ", map[string]interface{}{"Orgname": name}) + err.Error() + "\n" + T("Skip assigning org role to user"))
 		}
 
-		if setRolesByUsernameFlag.Enabled {
-			org, err := cmd.orgRepo.FindByName(name)
-			if err != nil {
-				return errors.New(T("Error accessing org {{.OrgName}} for GUID': ", map[string]interface{}{"Orgname": name}) + err.Error() + "\n" + T("Skip assigning org role to user"))
-			}
+		cmd.ui.Say("")
+		cmd.ui.Say(T("Assigning role {{.Role}} to user {{.CurrentUser}} in org {{.TargetOrg}} ...",
+			map[string]interface{}{
+				"Role":        terminal.EntityNameColor("OrgManager"),
+				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+				"TargetOrg":   terminal.EntityNameColor(name),
+			}))
 
-			cmd.ui.Say("")
-			cmd.ui.Say(T("Assigning role {{.Role}} to user {{.CurrentUser}} in org {{.TargetOrg}} ...",
-				map[string]interface{}{
-					"Role":        terminal.EntityNameColor("OrgManager"),
-					"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
-					"TargetOrg":   terminal.EntityNameColor(name),
-				}))
-
-			err = cmd.orgRoleSetter.SetOrgRole(org.GUID, models.RoleOrgManager, "", cmd.config.Username())
-			if err != nil {
-				return errors.New(T("Failed assigning org role to user: ") + err.Error())
-			}
-
-			cmd.ui.Ok()
+		err = cmd.orgRoleSetter.SetOrgRole(org.GUID, models.RoleOrgManager, "", cmd.config.Username())
+		if err != nil {
+			return errors.New(T("Failed assigning org role to user: ") + err.Error())
 		}
+
+		cmd.ui.Ok()
 	}
 
 	cmd.ui.Say(T("\nTIP: Use '{{.Command}}' to target new org",

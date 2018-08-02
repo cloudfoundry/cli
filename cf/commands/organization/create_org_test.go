@@ -122,9 +122,8 @@ var _ = Describe("create-org command", func() {
 			))
 		})
 
-		Context("when CC api version supports assigning orgRole by name, and feature-flag 'set_roles_by_username' is enabled", func() {
+		Context("when feature-flag 'set_roles_by_username' is enabled", func() {
 			BeforeEach(func() {
-				config.SetAPIVersion("2.37.0")
 				flagRepo.FindByNameReturns(models.FeatureFlag{
 					Name:    "set_roles_by_username",
 					Enabled: true,

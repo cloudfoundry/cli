@@ -3,7 +3,6 @@ package user
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/api/featureflags"
 	"code.cloudfoundry.org/cli/cf/api/spaces"
@@ -50,13 +49,8 @@ func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory
 		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 4)
 	}
 
-	var wantGUID bool
-	if cmd.config.IsMinAPIVersion(cf.SetRolesByUsernameMinimumAPIVersion) {
-		unsetRolesByUsernameFlag, err := cmd.flagRepo.FindByName("unset_roles_by_username")
-		wantGUID = (err != nil || !unsetRolesByUsernameFlag.Enabled)
-	} else {
-		wantGUID = true
-	}
+	unsetRolesByUsernameFlag, err := cmd.flagRepo.FindByName("unset_roles_by_username")
+	wantGUID := (err != nil || !unsetRolesByUsernameFlag.Enabled)
 
 	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])

@@ -3,7 +3,6 @@ package user
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/api/featureflags"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
@@ -55,13 +54,8 @@ func (cmd *SetOrgRole) Requirements(requirementsFactory requirements.Factory, fc
 		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 3)
 	}
 
-	var wantGUID bool
-	if cmd.config.IsMinAPIVersion(cf.SetRolesByUsernameMinimumAPIVersion) {
-		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
-		wantGUID = (err != nil || !setRolesByUsernameFlag.Enabled)
-	} else {
-		wantGUID = true
-	}
+	setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
+	wantGUID := (err != nil || !setRolesByUsernameFlag.Enabled)
 
 	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
