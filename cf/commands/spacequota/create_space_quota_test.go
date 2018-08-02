@@ -18,7 +18,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/commands/spacequota"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/util/testhelpers/matchers"
-	"github.com/blang/semver"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -107,29 +106,7 @@ var _ = Describe("create-space-quota", func() {
 					Expect(reqFactory.NewTargetedOrgRequirementCallCount()).To(Equal(1))
 					Expect(actualRequirements).To(ContainElement(targetedOrgReq))
 				})
-
-				It("does not return a min api requirement", func() {
-					Expect(reqFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
-				})
 			})
-
-			Context("when the -a flag is provided", func() {
-				BeforeEach(func() {
-					flagContext.Parse("myquota", "-a", "2")
-					actualRequirements, err = cmd.Requirements(reqFactory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
-				})
-
-				It("returns a min api version requirement", func() {
-					Expect(reqFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-					commandName, requiredVersion := reqFactory.NewMinAPIVersionRequirementArgsForCall(0)
-					Expect(commandName).To(Equal("Option '-a'"))
-					expectVersion, _ := semver.Make("2.40.0")
-					Expect(requiredVersion).To(Equal(expectVersion))
-					Expect(actualRequirements).To(ContainElement(minApiVersionReq))
-				})
-			})
-
 		})
 	})
 
