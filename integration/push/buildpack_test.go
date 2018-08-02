@@ -34,7 +34,8 @@ var _ = Describe("push with different buildpack values", func() {
 						"-b", "binary_buildpack",
 						"--no-start",
 					)
-					Eventually(session).Should(Say("buildpack:\\s+binary_buildpack"))
+
+					Eventually(session).Should(Say("(?m)\\s+buildpacks:\\s+\\+\\s+binary_buildpack"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -45,7 +46,7 @@ var _ = Describe("push with different buildpack values", func() {
 						PushCommandName, appName,
 						"-b", "null",
 					)
-					Eventually(session).Should(Say(`\-\s+buildpack:\s+binary_buildpack`))
+					Eventually(session).Should(Say(`(?m)\s+buildpacks:\s+-\s+binary_buildpack`))
 					Eventually(session).Should(Say(`buildpacks?:\s+staticfile`))
 					Eventually(session).Should(Exit(0))
 				})
@@ -57,7 +58,7 @@ var _ = Describe("push with different buildpack values", func() {
 						PushCommandName, appName,
 						"-b", "default",
 					)
-					Eventually(session).Should(Say(`\-\s+buildpack:\s+binary_buildpack`))
+					Eventually(session).Should(Say(`(?m)\s+buildpacks:\s+-\s+binary_buildpack`))
 					Eventually(session).Should(Say(`buildpacks?:\s+staticfile`))
 					Eventually(session).Should(Exit(0))
 				})
@@ -182,7 +183,7 @@ var _ = Describe("push with different buildpack values", func() {
 					},
 				})
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "no-start")
-				Eventually(session).Should(Say(`\s+buildpack:\s+staticfile_buildpack`))
+				Eventually(session).Should(Say("(?m)\\s+buildpacks:\\s+\\+\\s+staticfile_buildpack"))
 				Eventually(session.Err).Should(Say(`Deprecation warning: Use of 'buildpack'`))
 				Eventually(session).Should(Exit(0))
 			})

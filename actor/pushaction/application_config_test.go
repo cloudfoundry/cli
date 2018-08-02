@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
@@ -18,18 +19,20 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("Application Config", func() {
 	var (
 		actor                   *Actor
 		fakeV2Actor             *pushactionfakes.FakeV2Actor
+		fakeV3Actor             *pushactionfakes.FakeV3Actor
 		fakeSharedActor         *pushactionfakes.FakeSharedActor
 		fakeRandomWordGenerator *pushactionfakes.FakeRandomWordGenerator
 	)
 
 	BeforeEach(func() {
-		actor, fakeV2Actor, _, fakeSharedActor = getTestPushActor()
+		actor, fakeV2Actor, fakeV3Actor, fakeSharedActor = getTestPushActor()
 
 		fakeRandomWordGenerator = new(pushactionfakes.FakeRandomWordGenerator)
 		actor.WordGenerator = fakeRandomWordGenerator
@@ -448,21 +451,27 @@ var _ = Describe("Application Config", func() {
 				It("overrides the current application properties", func() {
 					Expect(warnings).To(ConsistOf("some-stack-warning", "private-domain-warnings", "shared-domain-warnings"))
 
-					Expect(firstConfig.DesiredApplication.Buildpack).To(Equal(types.FilteredString{IsSet: true, Value: "some-buildpack"}))
-					Expect(firstConfig.DesiredApplication.Command).To(Equal(types.FilteredString{IsSet: true, Value: "some-command"}))
-					Expect(firstConfig.DesiredApplication.DockerImage).To(Equal("some-docker-image"))
-					Expect(firstConfig.DesiredApplication.DockerCredentials.Username).To(Equal("some-docker-username"))
-					Expect(firstConfig.DesiredApplication.DockerCredentials.Password).To(Equal("some-docker-password"))
-					Expect(firstConfig.DesiredApplication.EnvironmentVariables).To(Equal(map[string]string{
-						"env1": "1",
-						"env3": "3",
+					Expect(firstConfig.DesiredApplication).To(MatchFields(IgnoreExtras, Fields{
+						"Application": MatchFields(IgnoreExtras, Fields{
+							"Command":     Equal(types.FilteredString{IsSet: true, Value: "some-command"}),
+							"DockerImage": Equal("some-docker-image"),
+							"DockerCredentials": MatchFields(IgnoreExtras, Fields{
+								"Username": Equal("some-docker-username"),
+								"Password": Equal("some-docker-password"),
+							}),
+							"EnvironmentVariables": Equal(map[string]string{
+								"env1": "1",
+								"env3": "3",
+							}),
+							"HealthCheckTimeout": Equal(5),
+							"Instances":          Equal(types.NullInt{Value: 1, IsSet: true}),
+							"DiskQuota":          Equal(types.NullByteSizeInMb{IsSet: true, Value: 2}),
+							"Memory":             Equal(types.NullByteSizeInMb{IsSet: true, Value: 3}),
+							"StackGUID":          Equal("some-stack-guid"),
+						}),
+						"Buildpacks": ConsistOf("some-buildpack"),
+						"Stack":      Equal(stack),
 					}))
-					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
-					Expect(firstConfig.DesiredApplication.Instances).To(Equal(types.NullInt{Value: 1, IsSet: true}))
-					Expect(firstConfig.DesiredApplication.DiskQuota).To(Equal(types.NullByteSizeInMb{IsSet: true, Value: 2}))
-					Expect(firstConfig.DesiredApplication.Memory).To(Equal(types.NullByteSizeInMb{IsSet: true, Value: 3}))
-					Expect(firstConfig.DesiredApplication.StackGUID).To(Equal("some-stack-guid"))
-					Expect(firstConfig.DesiredApplication.Stack).To(Equal(stack))
 
 					Expect(fakeV2Actor.GetStackByNameCallCount()).To(Equal(1))
 					Expect(fakeV2Actor.GetStackByNameArgsForCall(0)).To(Equal("some-stack"))
@@ -639,6 +648,158 @@ var _ = Describe("Application Config", func() {
 				It("sets the desired app state to stopped", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(firstConfig.DesiredApplication.Stopped()).To(BeTrue())
+				})
+			})
+
+			Describe("Buildpacks", func() {
+				Context("when the application is new", func() {
+					Context("when the 'buildpack' field is set", func() {
+						Context("when a buildpack name is provided", func() {
+							BeforeEach(func() {
+								manifestApps[0].Buildpack = types.FilteredString{
+									IsSet: true,
+									Value: "banana",
+								}
+							})
+
+							It("sets buildpacks to the provided buildpack name", func() {
+								Expect(firstConfig.DesiredApplication.Buildpacks).To(ConsistOf("banana"))
+							})
+						})
+
+						Context("when buildpack auto detection is set", func() {
+							BeforeEach(func() {
+								manifestApps[0].Buildpack = types.FilteredString{
+									IsSet: true,
+								}
+							})
+
+							It("sets buildpacks to the provided buildpack name", func() {
+								Expect(firstConfig.DesiredApplication.Buildpacks).To(Equal([]string{}))
+							})
+						})
+					})
+
+					Context("when the 'buildpacks' field is set", func() {
+						Context("when multiple buildpacks are provided", func() {
+							BeforeEach(func() {
+								manifestApps[0].Buildpacks = []string{"banana", "strawberry"}
+							})
+
+							It("sets buildpacks to the provided buildpack names", func() {
+								Expect(firstConfig.DesiredApplication.Buildpacks).To(ConsistOf("banana", "strawberry"))
+							})
+						})
+
+						Context("when a single buildpack is provided", func() {
+							BeforeEach(func() {
+								manifestApps[0].Buildpacks = []string{"banana"}
+							})
+
+							It("sets buildpacks to the provided buildpack names", func() {
+								Expect(firstConfig.DesiredApplication.Buildpacks).To(ConsistOf("banana"))
+							})
+						})
+
+						Context("when buildpack auto detection is set", func() {
+							BeforeEach(func() {
+								manifestApps[0].Buildpacks = []string{}
+							})
+
+							It("sets buildpacks to an empty slice", func() {
+								Expect(firstConfig.DesiredApplication.Buildpacks).To(Equal([]string{}))
+							})
+						})
+					})
+
+					Context("when nothing is set", func() {
+						It("leaves buildpack and buildpacks unset", func() {
+							Expect(firstConfig.DesiredApplication.Buildpack).To(Equal(types.FilteredString{}))
+							Expect(firstConfig.DesiredApplication.Buildpacks).To(BeNil())
+						})
+					})
+				})
+
+				Context("when the application exists", func() {
+					BeforeEach(func() {
+						fakeV2Actor.GetApplicationByNameAndSpaceReturns(v2action.Application{
+							Name:      appName,
+							GUID:      "some-app-guid",
+							SpaceGUID: spaceGUID,
+							Buildpack: types.FilteredString{IsSet: true, Value: "something-I-don't-care"},
+						},
+							nil, nil)
+
+						fakeV3Actor.GetApplicationByNameAndSpaceReturns(
+							v3action.Application{LifecycleBuildpacks: []string{"something-I-don't-care"}},
+							nil, nil)
+					})
+
+					Context("when the 'buildpack' field is set", func() {
+						Context("when a buildpack name is provided", func() {
+							BeforeEach(func() {
+								manifestApps[0].Buildpack = types.FilteredString{
+									IsSet: true,
+									Value: "banana",
+								}
+							})
+
+							It("sets buildpacks to the provided buildpack name", func() {
+								Expect(firstConfig.DesiredApplication.Buildpacks).To(ConsistOf("banana"))
+							})
+						})
+
+						Context("when buildpack auto detection is set", func() {
+							BeforeEach(func() {
+								manifestApps[0].Buildpack = types.FilteredString{
+									IsSet: true,
+								}
+							})
+
+							It("sets buildpacks to the provided buildpack name", func() {
+								Expect(firstConfig.DesiredApplication.Buildpacks).To(Equal([]string{}))
+							})
+						})
+					})
+
+					Context("when the 'buildpacks' field is set", func() {
+						Context("when multiple buildpacks are provided", func() {
+							BeforeEach(func() {
+								manifestApps[0].Buildpacks = []string{"banana", "strawberry"}
+							})
+
+							It("sets buildpacks to the provided buildpack names", func() {
+								Expect(firstConfig.DesiredApplication.Buildpacks).To(ConsistOf("banana", "strawberry"))
+							})
+						})
+
+						Context("when a single buildpack is provided", func() {
+							BeforeEach(func() {
+								manifestApps[0].Buildpacks = []string{"banana"}
+							})
+
+							It("sets buildpacks to the provided buildpack names", func() {
+								Expect(firstConfig.DesiredApplication.Buildpacks).To(ConsistOf("banana"))
+							})
+						})
+
+						Context("when buildpack auto detection is set", func() {
+							BeforeEach(func() {
+								manifestApps[0].Buildpacks = []string{}
+							})
+
+							It("sets buildpacks to an empty slice", func() {
+								Expect(firstConfig.DesiredApplication.Buildpacks).To(Equal([]string{}))
+							})
+						})
+					})
+
+					Context("when nothing is set", func() {
+						It("use the original values", func() {
+							Expect(firstConfig.DesiredApplication.Buildpack).To(Equal(types.FilteredString{IsSet: true, Value: "something-I-don't-care"}))
+							Expect(firstConfig.DesiredApplication.Buildpacks).To(ConsistOf("something-I-don't-care"))
+						})
+					})
 				})
 			})
 		})

@@ -8,10 +8,12 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 )
@@ -25,6 +27,40 @@ var _ = Describe("Applications", func() {
 
 	BeforeEach(func() {
 		actor, fakeV2Actor, fakeV3Actor, _ = getTestPushActor()
+	})
+
+	Describe("Application", func() {
+		DescribeTable("CalculatedBuildpacks",
+			func(v2Buildpack string, v3Buildpacks []string, expected []string) {
+				var buildpack types.FilteredString
+				if len(v2Buildpack) > 0 {
+					buildpack = types.FilteredString{
+						Value: v2Buildpack,
+						IsSet: true,
+					}
+				}
+				Expect(Application{
+					Application: v2action.Application{
+						Buildpack: buildpack,
+					},
+					Buildpacks: v3Buildpacks,
+				}.CalculatedBuildpacks()).To(Equal(expected))
+			},
+
+			Entry("returns buildpacks when it contains values",
+				"some-buildpack", []string{"some-buildpack", "some-other-buildpack"},
+				[]string{"some-buildpack", "some-other-buildpack"}),
+
+			Entry("always returns buildpacks when it is set",
+				"some-buildpack", []string{},
+				[]string{}),
+
+			Entry("returns v2 buildpack when buildpacks is not set",
+				"some-buildpack", nil,
+				[]string{"some-buildpack"}),
+
+			Entry("returns empty when nothing is set", "", nil, nil),
+		)
 	})
 
 	Describe("UpdateApplication", func() {
@@ -496,10 +532,81 @@ var _ = Describe("Applications", func() {
 	})
 
 	Describe("FindOrReturnPartialApp", func() {
-		var expectedStack v2action.Stack
-		var expectedApp v2action.Application
+		var (
+			appName   string
+			spaceGUID string
+
+			found      bool
+			app        Application
+			warnings   v2action.Warnings
+			executeErr error
+
+			expectedStack v2action.Stack
+			expectedApp   v2action.Application
+		)
+
+		BeforeEach(func() {
+			appName = "some-app"
+			spaceGUID = "some-space-guid"
+		})
+
+		JustBeforeEach(func() {
+			found, app, warnings, executeErr = actor.FindOrReturnPartialApp(appName, spaceGUID)
+		})
 
 		Context("when the app exists", func() {
+			BeforeEach(func() {
+				expectedApp = v2action.Application{
+					GUID:      "some-app-guid",
+					Name:      "some-app",
+					StackGUID: expectedStack.GUID,
+				}
+				fakeV2Actor.GetApplicationByNameAndSpaceReturns(expectedApp, v2action.Warnings{"app-warnings"}, nil)
+			})
+
+			Describe("buildpacks", func() {
+				Context("when getting the app returns an API not found error", func() {
+					BeforeEach(func() {
+						fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"some-v3-app-warning"}, ccerror.APINotFoundError{})
+					})
+
+					It("ignores the error and sets buildpacks to nil", func() {
+						Expect(found).To(BeTrue())
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("app-warnings", "some-v3-app-warning"))
+						Expect(app.Buildpacks).To(BeNil())
+					})
+				})
+
+				Context("when getting the app returns a generic error", func() {
+					BeforeEach(func() {
+						fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"some-v3-app-warning"}, errors.New("some-generic-error"))
+					})
+
+					It("returns the error and warnings", func() {
+						Expect(found).To(BeFalse())
+						Expect(executeErr).To(MatchError(errors.New("some-generic-error")))
+						Expect(warnings).To(ConsistOf("app-warnings", "some-v3-app-warning"))
+					})
+				})
+
+				Context("when getting the app is successful", func() {
+					BeforeEach(func() {
+						fakeV3Actor.GetApplicationByNameAndSpaceReturns(
+							v3action.Application{LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"}},
+							v3action.Warnings{"some-v3-app-warning"},
+							nil)
+					})
+
+					It("sets the buildpacks", func() {
+						Expect(found).To(BeTrue())
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("app-warnings", "some-v3-app-warning"))
+						Expect(app.Buildpacks).To(ConsistOf("buildpack-1", "buildpack-2"))
+					})
+				})
+			})
+
 			Context("when retrieving the stack is successful", func() {
 				BeforeEach(func() {
 					expectedStack = v2action.Stack{
@@ -507,18 +614,10 @@ var _ = Describe("Applications", func() {
 						GUID: "some-stack-guid",
 					}
 					fakeV2Actor.GetStackReturns(expectedStack, v2action.Warnings{"stack-warnings"}, nil)
-
-					expectedApp = v2action.Application{
-						GUID:      "some-app-guid",
-						Name:      "some-app",
-						StackGUID: expectedStack.GUID,
-					}
-					fakeV2Actor.GetApplicationByNameAndSpaceReturns(expectedApp, v2action.Warnings{"app-warnings"}, nil)
 				})
 
 				It("fills in the stack", func() {
-					found, app, warnings, err := actor.FindOrReturnPartialApp("some-app", "some-space-guid")
-					Expect(err).ToNot(HaveOccurred())
+					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("app-warnings", "stack-warnings"))
 					Expect(found).To(BeTrue())
 					Expect(app).To(Equal(Application{
@@ -544,8 +643,7 @@ var _ = Describe("Applications", func() {
 				})
 
 				It("returns error and warnings", func() {
-					found, _, warnings, err := actor.FindOrReturnPartialApp("some-app", "some-space-guid")
-					Expect(err).To(MatchError(expectedErr))
+					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("app-warnings", "stack-warnings"))
 					Expect(found).To(BeFalse())
 				})
@@ -558,8 +656,7 @@ var _ = Describe("Applications", func() {
 			})
 
 			It("returns a partial app and warnings", func() {
-				found, app, warnings, err := actor.FindOrReturnPartialApp("some-app", "some-space-guid")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2"))
 				Expect(found).To(BeFalse())
 				Expect(app).To(Equal(Application{
@@ -579,8 +676,7 @@ var _ = Describe("Applications", func() {
 			})
 
 			It("returns a errors and warnings", func() {
-				found, _, warnings, err := actor.FindOrReturnPartialApp("some-app", "some-space-guid")
-				Expect(err).To(MatchError(expectedErr))
+				Expect(executeErr).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2"))
 				Expect(found).To(BeFalse())
 			})

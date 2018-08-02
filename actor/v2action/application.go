@@ -87,7 +87,7 @@ func (application Application) Stopped() bool {
 
 func (application Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Detected Buildpack IsSet: %t, Detected Buildpack: '%s', Detected Start Command IsSet: %t, Detected Start Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Space GUID: '%s',Stack GUID: '%s', State: '%s'",
+		"App Name: '%s', Buildpack (%t, '%s'), Command: (%t, '%s'), Detected Buildpack: (%t, '%s'), Detected Start Command: (%t, '%s'), Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: (%t, '%d'), Memory: '%d', Space GUID: '%s', Stack GUID: '%s', State: '%s'",
 		application.Name,
 		application.Buildpack.IsSet,
 		application.Buildpack.Value,

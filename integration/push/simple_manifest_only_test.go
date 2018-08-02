@@ -153,7 +153,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
 							Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
-							Eventually(session).Should(Say("\\s+buildpack:\\s+staticfile_buildpack"))
+							Eventually(session).Should(Say("(?m)\\s+buildpacks:\\s+\\+\\s+staticfile_buildpack"))
 							Eventually(session).Should(Say("\\s+command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
 							Eventually(session).Should(Say("\\s+disk quota:\\s+300M"))
 							Eventually(session).Should(Say("\\s+health check http endpoint:\\s+/"))

@@ -38,7 +38,7 @@ func (config ApplicationConfig) UpdatingApplication() bool {
 	return !config.CreatingApplication()
 }
 
-func (config ApplicationConfig) HasV3Buildpacks() bool {
+func (config ApplicationConfig) HasMultipleBuildpacks() bool {
 	return len(config.DesiredApplication.Buildpacks) > 1
 }
 
@@ -240,22 +240,21 @@ func (actor Actor) configureResources(config ApplicationConfig) (ApplicationConf
 }
 
 func (Actor) overrideApplicationProperties(application Application, manifest manifest.Application, noStart bool) Application {
-
 	if manifest.Buildpack.IsSet {
-		application.Buildpack = manifest.Buildpack
+		application.Buildpacks = []string{}
+		if len(manifest.Buildpack.Value) > 0 {
+			application.Buildpacks = append(application.Buildpacks, manifest.Buildpack.Value)
+		}
 	}
 
 	if manifest.Buildpacks != nil {
-		application.Buildpacks = []string{}
-	}
-
-	for _, buildpack := range manifest.Buildpacks {
-		application.Buildpacks = append(application.Buildpacks, buildpack)
+		application.Buildpacks = append([]string{}, manifest.Buildpacks...)
 	}
 
 	if manifest.Command.IsSet {
 		application.Command = manifest.Command
 	}
+
 	if manifest.DockerImage != "" {
 		application.DockerImage = manifest.DockerImage
 		if manifest.DockerUsername != "" {

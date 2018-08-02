@@ -102,68 +102,34 @@ var _ = Describe("GetApplicationChanges", func() {
 		})
 	})
 
-	Describe("buildpack", func() {
+	Describe("buildpacks", func() {
 		Context("new app with no specified buildpack AND no specified buildpacks(plural)", func() {
 			It("does not provide a buildpack change", func() {
 				for i, change := range changes {
-					Expect(change.Header).ToNot(Equal("buildpack:"), fmt.Sprintf("entry %d should not be a buildpack", i))
+					Expect(change.Header).ToNot(Equal("buildpacks:"), fmt.Sprintf("entry %d should not be a buildpack", i))
 				}
 			})
 		})
 
 		DescribeTable("non-empty values",
 			func(
-				currentBuildpack types.FilteredString, currentDetectedBuildpack types.FilteredString,
-				desiredBuildpack types.FilteredString, desiredDetectedBuildpack types.FilteredString,
-				currentValue string, newValue string,
+				currentBuildpacks []string, desiredBuildpacks []string,
 			) {
-				appConfig.CurrentApplication.Buildpack = currentBuildpack
-				appConfig.CurrentApplication.DetectedBuildpack = currentDetectedBuildpack
-				appConfig.DesiredApplication.Buildpack = desiredBuildpack
-				appConfig.DesiredApplication.DetectedBuildpack = desiredDetectedBuildpack
+				appConfig.CurrentApplication.Buildpacks = currentBuildpacks
+				appConfig.DesiredApplication.Buildpacks = desiredBuildpacks
 
 				changes = GetApplicationChanges(appConfig)
 
 				Expect(changes[2]).To(Equal(ui.Change{
-					Header:       "buildpack:",
-					CurrentValue: currentValue,
-					NewValue:     newValue,
+					Header:       "buildpacks:",
+					CurrentValue: currentBuildpacks,
+					NewValue:     desiredBuildpacks,
 				}))
 			},
 
-			Entry("new app with buildpack specified",
-				types.FilteredString{}, types.FilteredString{},
-				types.FilteredString{IsSet: true, Value: "some-new-buildpack"}, types.FilteredString{},
-				"", "some-new-buildpack",
-			),
-			Entry("existing buildpack with new buildpack specified",
-				types.FilteredString{IsSet: true, Value: "some-old-buildpack"}, types.FilteredString{},
-				types.FilteredString{IsSet: true, Value: "some-new-buildpack"}, types.FilteredString{},
-				"some-old-buildpack", "some-new-buildpack",
-			),
-			Entry("existing detected buildpack with new buildpack specified",
-				types.FilteredString{}, types.FilteredString{IsSet: true, Value: "some-detected-buildpack"},
-				types.FilteredString{IsSet: true, Value: "some-new-buildpack"}, types.FilteredString{},
-				"some-detected-buildpack", "some-new-buildpack",
-			),
-			Entry("existing detected buildpack with new detected buildpack",
-				types.FilteredString{}, types.FilteredString{IsSet: true, Value: "some-detected-buildpack"},
-				types.FilteredString{}, types.FilteredString{IsSet: true, Value: "some-detected-buildpack"},
-				"some-detected-buildpack", "some-detected-buildpack",
-			),
-
-			// Can never happen because desired starts as a copy of current
-			Entry("existing buildpack with no new buildpack specified",
-				types.FilteredString{IsSet: true, Value: "some-old-buildpack"}, types.FilteredString{},
-				types.FilteredString{}, types.FilteredString{},
-				"some-old-buildpack", "",
-			),
-			// Can never happen because desired starts as a copy of current
-			Entry("existing detected buildpack with no new buildpack specified",
-				types.FilteredString{}, types.FilteredString{IsSet: true, Value: "some-detected-buildpack"},
-				types.FilteredString{}, types.FilteredString{},
-				"some-detected-buildpack", "",
-			),
+			Entry("new app with buildpack specified", nil, []string{"buildpack-1", "buildpack-2"}),
+			Entry("existing app with buildpack specified", []string{"buildpack-1"}, []string{"buildpack-1", "buildpack-2"}),
+			Entry("existing app with forcing auto-detection", []string{"buildpack-1"}, nil),
 		)
 	})
 

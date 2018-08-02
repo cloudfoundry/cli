@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
 	log "github.com/sirupsen/logrus"
@@ -15,6 +16,19 @@ type Application struct {
 	v2action.Application
 	Buildpacks []string
 	Stack      v2action.Stack
+}
+
+// CalculatedBuildpacks will return back the buildpacks for the application.
+func (app Application) CalculatedBuildpacks() []string {
+	buildpack := app.CalculatedBuildpack()
+	switch {
+	case app.Buildpacks != nil:
+		return app.Buildpacks
+	case len(buildpack) > 0:
+		return []string{buildpack}
+	default:
+		return nil
+	}
 }
 
 func (app Application) String() string {
@@ -28,10 +42,11 @@ func (app *Application) SetStack(stack v2action.Stack) {
 
 func (actor Actor) CreateApplication(config ApplicationConfig) (ApplicationConfig, Event, Warnings, error) {
 	log.Debug("creating application")
-	var warnings Warnings
 	v2App := config.DesiredApplication.Application
 	v2App.Buildpack = actor.setBuildpack(config)
 
+	log.WithField("application", v2App).Debug("creating application with these settings")
+	var warnings Warnings
 	newApp, v2warnings, err := actor.V2Actor.CreateApplication(v2App)
 	warnings = append(warnings, v2warnings...)
 	if err != nil {
@@ -39,7 +54,7 @@ func (actor Actor) CreateApplication(config ApplicationConfig) (ApplicationConfi
 		return ApplicationConfig{}, "", Warnings(warnings), err
 	}
 
-	if config.HasV3Buildpacks() {
+	if config.HasMultipleBuildpacks() {
 		v3Warnings, v3Err := actor.updateBuildpacks(config, newApp)
 		warnings = append(warnings, v3Warnings...)
 		if v3Err != nil {
@@ -55,13 +70,14 @@ func (actor Actor) CreateApplication(config ApplicationConfig) (ApplicationConfi
 
 func (actor Actor) UpdateApplication(config ApplicationConfig) (ApplicationConfig, Event, Warnings, error) {
 	log.Debug("updating application")
-	var warnings Warnings
 	v2App := config.DesiredApplication.Application
 	v2App.Buildpack = actor.setBuildpack(config)
 
 	v2App = actor.ignoreSameState(config, v2App)
 	v2App = actor.ignoreSameStackGUID(config, v2App)
 
+	log.WithField("application", v2App).Debug("updating application with these settings")
+	var warnings Warnings
 	updatedApp, v2Warnings, err := actor.V2Actor.UpdateApplication(v2App)
 	warnings = append(warnings, v2Warnings...)
 	if err != nil {
@@ -69,7 +85,7 @@ func (actor Actor) UpdateApplication(config ApplicationConfig) (ApplicationConfi
 		return ApplicationConfig{}, "", Warnings(warnings), err
 	}
 
-	if config.HasV3Buildpacks() {
+	if config.HasMultipleBuildpacks() {
 		v3Warnings, v3Err := actor.updateBuildpacks(config, updatedApp)
 		warnings = append(warnings, v3Warnings...)
 		if v3Err != nil {
@@ -105,11 +121,21 @@ func (actor Actor) FindOrReturnPartialApp(appName string, spaceGUID string) (boo
 		return false, Application{}, warnings, err
 	}
 
+	v3App, v3AppWarnings, err := actor.V3Actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	warnings = append(warnings, v3AppWarnings...)
+	if err != nil {
+		if _, ok := err.(ccerror.APINotFoundError); !ok {
+			return false, Application{}, warnings, err
+		}
+	}
+
+	// if err api don't exist - ignore, else return error
 	app := Application{
 		Application: foundApp,
 		Stack:       stack,
+		Buildpacks:  v3App.LifecycleBuildpacks,
 	}
-	return true, app, warnings, err
+	return true, app, warnings, nil
 }
 
 // For some versions of CC, sending state will always result in CC
@@ -153,6 +179,7 @@ func (Actor) setBuildpack(config ApplicationConfig) types.FilteredString {
 }
 
 func (actor Actor) updateBuildpacks(config ApplicationConfig, v2App v2action.Application) (Warnings, error) {
+	log.WithField("buildpacks", config.DesiredApplication.Buildpacks).Debug("updating with multiple buildpacks")
 	v3App := v3action.Application{
 		Name:                v2App.Name,
 		GUID:                v2App.GUID,
