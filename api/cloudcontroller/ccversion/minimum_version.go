@@ -3,7 +3,6 @@ package ccversion
 const (
 	MinVersionBindingNameV2             = "2.99.0"
 	MinVersionDockerCredentialsV2       = "2.82.0"
-	MinVersionDropletUploadV2           = "2.63.0"
 	MinVersionSymlinkedFilesV2          = "2.107.0"
 	MinVersionZeroAppInstancesV2        = "2.70.0"
 	MinVersionUserProvidedServiceTagsV2 = "2.104.0"

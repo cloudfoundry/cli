@@ -116,12 +116,6 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd PushCommand) Execute(args []string) error {
-	if cmd.DropletPath != "" {
-		if err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV2APIVersion(), ccversion.MinVersionDropletUploadV2, "Option '--droplet'"); err != nil {
-			return err
-		}
-	}
-
 	if len(cmd.Buildpacks) > 1 {
 		if err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "Multiple option '-b'"); err != nil {
 			return err

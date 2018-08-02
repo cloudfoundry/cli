@@ -101,21 +101,6 @@ var _ = Describe("push Command", func() {
 			})
 		})
 
-		Context("when the droplet flag is passed and the API version is below the minimum", func() {
-			BeforeEach(func() {
-				fakeActor.CloudControllerV2APIVersionReturns("2.6.1")
-				cmd.DropletPath = "some-droplet-path"
-			})
-
-			It("returns a MinimumAPIVersionNotMetError", func() {
-				Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-					Command:        "Option '--droplet'",
-					CurrentVersion: "2.6.1",
-					MinimumVersion: ccversion.MinVersionDropletUploadV2,
-				}))
-			})
-		})
-
 		Context("when checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
