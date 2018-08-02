@@ -43,7 +43,6 @@ var _ = Describe("CreateSharedDomain", func() {
 		flagContext flags.FlagContext
 
 		loginRequirement         requirements.Requirement
-		routingAPIRequirement    requirements.Requirement
 		minAPIVersionRequirement requirements.Requirement
 
 		routerGroups models.RouterGroups
@@ -73,9 +72,6 @@ var _ = Describe("CreateSharedDomain", func() {
 
 		loginRequirement = &passingRequirement{Name: "Login"}
 		factory.NewLoginRequirementReturns(loginRequirement)
-
-		routingAPIRequirement = &passingRequirement{Name: "RoutingApi"}
-		factory.NewRoutingAPIRequirementReturns(routingAPIRequirement)
 
 		minAPIVersionRequirement = &passingRequirement{"MinAPIVersionRequirement"}
 		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
@@ -130,13 +126,6 @@ var _ = Describe("CreateSharedDomain", func() {
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
-			It("does not return a RoutingAPIRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(factory.NewRoutingAPIRequirementCallCount()).To(Equal(0))
-				Expect(actualRequirements).ToNot(ContainElement(routingAPIRequirement))
-			})
-
 			It("does not return a MinAPIVersionRequirement", func() {
 				actualRequirements, err := cmd.Requirements(factory, flagContext)
 				Expect(err).NotTo(HaveOccurred())
@@ -153,14 +142,6 @@ var _ = Describe("CreateSharedDomain", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 					Expect(actualRequirements).To(ContainElement(loginRequirement))
-				})
-
-				It("returns a RoutingAPIRequirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(factory.NewRoutingAPIRequirementCallCount()).To(Equal(1))
-					Expect(actualRequirements).To(ContainElement(routingAPIRequirement))
 				})
 
 				It("returns a MinAPIVersionRequirement", func() {

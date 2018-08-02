@@ -52,7 +52,6 @@ func (cmd *CreateSharedDomain) Requirements(requirementsFactory requirements.Fac
 	if fc.String("router-group") != "" {
 		reqs = append(reqs, []requirements.Requirement{
 			requirementsFactory.NewMinAPIVersionRequirement("Option '--router-group'", cf.RoutePathMinimumAPIVersion),
-			requirementsFactory.NewRoutingAPIRequirement(),
 		}...)
 	}
 

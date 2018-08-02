@@ -140,48 +140,6 @@ var _ = Describe("CreateRoute", func() {
 			})
 		})
 
-		Context("when the --port option is given", func() {
-			BeforeEach(func() {
-				err := flagContext.Parse("space-name", "domain-name", "--port", "9090")
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			It("returns a MinAPIVersionRequirement", func() {
-				expectedVersion, err := semver.Make("2.53.0")
-				Expect(err).NotTo(HaveOccurred())
-
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
-
-				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
-				Expect(feature).To(Equal("Option '--port'"))
-				Expect(requiredVersion).To(Equal(expectedVersion))
-				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
-			})
-		})
-
-		Context("when the --random-port option is given", func() {
-			BeforeEach(func() {
-				err := flagContext.Parse("space-name", "domain-name", "--random-port")
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			It("returns a MinAPIVersionRequirement", func() {
-				expectedVersion, err := semver.Make("2.53.0")
-				Expect(err).NotTo(HaveOccurred())
-
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
-
-				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
-				Expect(feature).To(Equal("Option '--random-port'"))
-				Expect(requiredVersion).To(Equal(expectedVersion))
-				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
-			})
-		})
-
 		Context("when the --path option is not given", func() {
 			BeforeEach(func() {
 				err := flagContext.Parse("space-name", "domain-name")

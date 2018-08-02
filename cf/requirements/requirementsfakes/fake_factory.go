@@ -51,15 +51,6 @@ type FakeFactory struct {
 	newLoginRequirementReturnsOnCall map[int]struct {
 		result1 requirements.Requirement
 	}
-	NewRoutingAPIRequirementStub        func() requirements.Requirement
-	newRoutingAPIRequirementMutex       sync.RWMutex
-	newRoutingAPIRequirementArgsForCall []struct{}
-	newRoutingAPIRequirementReturns     struct {
-		result1 requirements.Requirement
-	}
-	newRoutingAPIRequirementReturnsOnCall map[int]struct {
-		result1 requirements.Requirement
-	}
 	NewSpaceRequirementStub        func(name string) requirements.SpaceRequirement
 	newSpaceRequirementMutex       sync.RWMutex
 	newSpaceRequirementArgsForCall []struct {
@@ -388,46 +379,6 @@ func (fake *FakeFactory) NewLoginRequirementReturnsOnCall(i int, result1 require
 		})
 	}
 	fake.newLoginRequirementReturnsOnCall[i] = struct {
-		result1 requirements.Requirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewRoutingAPIRequirement() requirements.Requirement {
-	fake.newRoutingAPIRequirementMutex.Lock()
-	ret, specificReturn := fake.newRoutingAPIRequirementReturnsOnCall[len(fake.newRoutingAPIRequirementArgsForCall)]
-	fake.newRoutingAPIRequirementArgsForCall = append(fake.newRoutingAPIRequirementArgsForCall, struct{}{})
-	fake.recordInvocation("NewRoutingAPIRequirement", []interface{}{})
-	fake.newRoutingAPIRequirementMutex.Unlock()
-	if fake.NewRoutingAPIRequirementStub != nil {
-		return fake.NewRoutingAPIRequirementStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newRoutingAPIRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewRoutingAPIRequirementCallCount() int {
-	fake.newRoutingAPIRequirementMutex.RLock()
-	defer fake.newRoutingAPIRequirementMutex.RUnlock()
-	return len(fake.newRoutingAPIRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewRoutingAPIRequirementReturns(result1 requirements.Requirement) {
-	fake.NewRoutingAPIRequirementStub = nil
-	fake.newRoutingAPIRequirementReturns = struct {
-		result1 requirements.Requirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewRoutingAPIRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
-	fake.NewRoutingAPIRequirementStub = nil
-	if fake.newRoutingAPIRequirementReturnsOnCall == nil {
-		fake.newRoutingAPIRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.Requirement
-		})
-	}
-	fake.newRoutingAPIRequirementReturnsOnCall[i] = struct {
 		result1 requirements.Requirement
 	}{result1}
 }
@@ -1055,8 +1006,6 @@ func (fake *FakeFactory) Invocations() map[string][][]interface{} {
 	defer fake.newServiceInstanceRequirementMutex.RUnlock()
 	fake.newLoginRequirementMutex.RLock()
 	defer fake.newLoginRequirementMutex.RUnlock()
-	fake.newRoutingAPIRequirementMutex.RLock()
-	defer fake.newRoutingAPIRequirementMutex.RUnlock()
 	fake.newSpaceRequirementMutex.RLock()
 	defer fake.newSpaceRequirementMutex.RUnlock()
 	fake.newTargetedSpaceRequirementMutex.RLock()

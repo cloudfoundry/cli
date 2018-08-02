@@ -224,26 +224,6 @@ var _ = Describe("UnmapRoute", func() {
 					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 				})
 			})
-
-			Context("when a port is passed", func() {
-				BeforeEach(func() {
-					flagContext.Parse("app-name", "domain-name", "--port", "5000")
-				})
-
-				It("returns a MinAPIVersionRequirement as the first requirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
-
-					expectedVersion, err := semver.Make("2.53.0")
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-					feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
-					Expect(feature).To(Equal("Option '--port'"))
-					Expect(requiredVersion).To(Equal(expectedVersion))
-					Expect(actualRequirements[0]).To(Equal(minAPIVersionRequirement))
-				})
-			})
 		})
 	})
 

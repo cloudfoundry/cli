@@ -206,26 +206,6 @@ var _ = Describe("DeleteRoute", func() {
 						))
 					})
 				})
-
-				Context("when a port is passed", func() {
-					BeforeEach(func() {
-						flagContext.Parse("example.com", "--port", "8080")
-					})
-
-					It("returns a MinAPIVersionRequirement as the first requirement", func() {
-						actualRequirements, err := cmd.Requirements(factory, flagContext)
-						Expect(err).NotTo(HaveOccurred())
-
-						expectedVersion, err := semver.Make("2.53.0")
-						Expect(err).NotTo(HaveOccurred())
-
-						Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-						feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
-						Expect(feature).To(Equal("Option '--port'"))
-						Expect(requiredVersion).To(Equal(expectedVersion))
-						Expect(actualRequirements[0]).To(Equal(minAPIVersionRequirement))
-					})
-				})
 			})
 		})
 	})

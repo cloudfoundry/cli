@@ -97,14 +97,6 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", cf.RoutePathMinimumAPIVersion))
 	}
 
-	if fc.IsSet("port") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", cf.TCPRoutingMinimumAPIVersion))
-	}
-
-	if fc.IsSet("random-port") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--random-port'", cf.TCPRoutingMinimumAPIVersion))
-	}
-
 	return reqs, nil
 }
 

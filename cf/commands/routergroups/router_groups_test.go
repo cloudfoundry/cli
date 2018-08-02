@@ -30,10 +30,9 @@ var _ = Describe("RouterGroups", func() {
 		repoLocator    api.RepositoryLocator
 		config         coreconfig.Repository
 
-		requirementsFactory           *requirementsfakes.FakeFactory
-		minAPIVersionRequirement      *requirementsfakes.FakeRequirement
-		loginRequirement              *requirementsfakes.FakeRequirement
-		routingAPIEndpoingRequirement *requirementsfakes.FakeRequirement
+		requirementsFactory      *requirementsfakes.FakeFactory
+		minAPIVersionRequirement *requirementsfakes.FakeRequirement
+		loginRequirement         *requirementsfakes.FakeRequirement
 	)
 
 	BeforeEach(func() {
@@ -49,12 +48,10 @@ var _ = Describe("RouterGroups", func() {
 
 		minAPIVersionRequirement = new(requirementsfakes.FakeRequirement)
 		loginRequirement = new(requirementsfakes.FakeRequirement)
-		routingAPIEndpoingRequirement = new(requirementsfakes.FakeRequirement)
 
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		requirementsFactory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 		requirementsFactory.NewLoginRequirementReturns(loginRequirement)
-		requirementsFactory.NewRoutingAPIRequirementReturns(routingAPIEndpoingRequirement)
 
 		cmd = new(routergroups.RouterGroups)
 		cmd = cmd.SetDependency(deps, false).(*routergroups.RouterGroups)
@@ -66,12 +63,6 @@ var _ = Describe("RouterGroups", func() {
 			cmd.Requirements(requirementsFactory, flagContext)
 
 			Expect(requirementsFactory.NewLoginRequirementCallCount()).To(Equal(1))
-		})
-
-		It("fails when the routing API endpoint is not set", func() {
-			cmd.Requirements(requirementsFactory, flagContext)
-
-			Expect(requirementsFactory.NewRoutingAPIRequirementCallCount()).To(Equal(1))
 		})
 
 		It("should fail with usage", func() {

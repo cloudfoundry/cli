@@ -1,10 +1,8 @@
 package requirements
 
 import (
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	. "code.cloudfoundry.org/cli/cf/i18n"
 	"github.com/blang/semver"
 )
 
@@ -15,7 +13,6 @@ type Factory interface {
 	NewDEAApplicationRequirement(name string) DEAApplicationRequirement
 	NewServiceInstanceRequirement(name string) ServiceInstanceRequirement
 	NewLoginRequirement() Requirement
-	NewRoutingAPIRequirement() Requirement
 	NewSpaceRequirement(name string) SpaceRequirement
 	NewTargetedSpaceRequirement() Requirement
 	NewTargetedOrgRequirement() TargetedOrgRequirement
@@ -65,17 +62,6 @@ func (f apiRequirementFactory) NewLoginRequirement() Requirement {
 	return NewLoginRequirement(
 		f.config,
 	)
-}
-
-func (f apiRequirementFactory) NewRoutingAPIRequirement() Requirement {
-	req := Requirements{
-		f.NewMinAPIVersionRequirement(T("This command"), cf.TCPRoutingMinimumAPIVersion),
-		NewRoutingAPIRequirement(
-			f.config,
-		),
-	}
-
-	return req
 }
 
 func (f apiRequirementFactory) NewSpaceRequirement(name string) SpaceRequirement {

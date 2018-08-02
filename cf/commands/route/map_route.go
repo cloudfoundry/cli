@@ -90,18 +90,6 @@ func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc f
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", cf.RoutePathMinimumAPIVersion))
 	}
 
-	var flag string
-	switch {
-	case fc.IsSet("port"):
-		flag = "port"
-	case fc.IsSet("random-port"):
-		flag = "random-port"
-	}
-
-	if flag != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement(fmt.Sprintf("Option '--%s'", flag), cf.TCPRoutingMinimumAPIVersion))
-	}
-
 	reqs = append(reqs, []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.appReq,

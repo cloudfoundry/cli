@@ -79,10 +79,6 @@ func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", cf.RoutePathMinimumAPIVersion))
 	}
 
-	if fc.IsSet("port") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", cf.TCPRoutingMinimumAPIVersion))
-	}
-
 	reqs = append(reqs, []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.appReq,

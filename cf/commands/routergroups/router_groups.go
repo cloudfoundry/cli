@@ -42,7 +42,6 @@ func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, 
 			},
 		),
 		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewRoutingAPIRequirement(),
 	}, nil
 }
 
