@@ -143,7 +143,7 @@ func (AppSummaryDisplayer2) buildpackNames(buildpacks []v3action.Buildpack) stri
 }
 
 func (AppSummaryDisplayer2) appInstanceDate(input time.Time) string {
-	return input.Local().Format(time.RFC3339)
+	return input.UTC().Format(time.RFC3339)
 }
 
 func (AppSummaryDisplayer2) processHasAnInstanceUp(processSummary *v3action.ProcessSummary) bool {

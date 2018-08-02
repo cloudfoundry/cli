@@ -122,6 +122,7 @@ var _ = Describe("app summary displayer", func() {
 					Expect(webProcessSummary.MemUsage).To(Equal("32M"))
 
 					Expect(webProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
+					Expect(webProcessSummary.Instances[0].Since).To(MatchRegexp("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
 					Expect(time.Parse(time.RFC3339, webProcessSummary.Instances[0].Since)).To(BeTemporally("~", time.Now().Add(-uptime), 2*time.Second))
 					Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
 					Expect(webProcessSummary.Instances[0].CPU).To(Equal("0.0%"))

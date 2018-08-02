@@ -180,10 +180,10 @@ applications:
 							Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 							Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
 							Eventually(session).Should(Say("type:\\s+web"))
-							Eventually(session).Should(Or(Say("instances:\\s+1/2"), Say("instances:\\s+2/2")))
+							Eventually(session).Should(Say("instances:\\s+\\d/2"))
 							Eventually(session).Should(Say("memory usage:\\s+128M"))
 							Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-							Eventually(session).Should(Or(Say("#0\\s+starting\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"), Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M")))
+							Eventually(session).Should(Say("#0\\s+(starting|running)\\s+\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
 
 							Eventually(session).Should(Exit(0))
 						})
