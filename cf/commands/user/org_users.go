@@ -3,7 +3,6 @@ package user
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/actors/userprint"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
@@ -93,13 +92,13 @@ func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {
 	if cmd.pluginCall {
 		return userprint.NewOrgUsersPluginPrinter(
 			cmd.pluginModel,
-			cmd.userLister(),
+			cmd.userRepo.ListUsersInOrgForRoleWithNoUAA,
 			roles,
 		)
 	}
 	return &userprint.OrgUsersUIPrinter{
 		UI:         cmd.ui,
-		UserLister: cmd.userLister(),
+		UserLister: cmd.userRepo.ListUsersInOrgForRoleWithNoUAA,
 		Roles:      roles,
 		RoleDisplayNames: map[models.Role]string{
 			models.RoleOrgUser:        T("USERS"),
@@ -108,11 +107,4 @@ func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {
 			models.RoleOrgAuditor:     T("ORG AUDITOR"),
 		},
 	}
-}
-
-func (cmd *OrgUsers) userLister() func(orgGUID string, role models.Role) ([]models.UserFields, error) {
-	if cmd.config.IsMinAPIVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumAPIVersion) {
-		return cmd.userRepo.ListUsersInOrgForRoleWithNoUAA
-	}
-	return cmd.userRepo.ListUsersInOrgForRole
 }
