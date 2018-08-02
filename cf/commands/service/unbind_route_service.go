@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -67,13 +66,7 @@ func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Fac
 	domainName := fc.Args()[0]
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
 
-	minAPIVersionRequirement := requirementsFactory.NewMinAPIVersionRequirement(
-		"unbind-route-service",
-		cf.MultipleAppPortsMinimumAPIVersion,
-	)
-
 	reqs := []requirements.Requirement{
-		minAPIVersionRequirement,
 		requirementsFactory.NewLoginRequirement(),
 		cmd.domainReq,
 		cmd.serviceInstanceReq,

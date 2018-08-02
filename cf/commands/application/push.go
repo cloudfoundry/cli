@@ -77,8 +77,6 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 	fs["no-start"] = &flags.BoolFlag{Name: "no-start", Usage: T("Do not start an app after pushing")}
 	fs["random-route"] = &flags.BoolFlag{Name: "random-route", Usage: T("Create a random route for this app")}
 	fs["route-path"] = &flags.StringFlag{Name: "route-path", Usage: T("Path for the route")}
-	// Hidden:true to hide app-ports for release #117189491
-	fs["app-ports"] = &flags.StringFlag{Name: "app-ports", Usage: T("Comma delimited list of ports the application may listen on"), Hidden: true}
 
 	return commandregistry.CommandMetadata{
 		Name:        "push",
@@ -103,10 +101,6 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 
 	if fc.String("route-path") != "" {
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", cf.RoutePathMinimumAPIVersion))
-	}
-
-	if fc.String("app-ports") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--app-ports'", cf.MultipleAppPortsMinimumAPIVersion))
 	}
 
 	if fc.String("vars-file") != "" || fc.String("var") != "" {
@@ -711,23 +705,6 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 	if c.String("route-path") != "" {
 		routePath := c.String("route-path")
 		appParams.RoutePath = &routePath
-	}
-
-	if c.String("app-ports") != "" {
-		appPortStrings := strings.Split(c.String("app-ports"), ",")
-		appPorts := make([]int, len(appPortStrings))
-
-		for i, s := range appPortStrings {
-			p, err := strconv.Atoi(s)
-			if err != nil {
-				return models.AppParams{}, errors.New(T("Invalid app port: {{.AppPort}}\nApp port must be a number", map[string]interface{}{
-					"AppPort": s,
-				}))
-			}
-			appPorts[i] = p
-		}
-
-		appParams.AppPorts = &appPorts
 	}
 
 	if c.String("b") != "" {

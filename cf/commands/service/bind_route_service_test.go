@@ -13,7 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	"github.com/blang/semver"
 
 	"code.cloudfoundry.org/cli/cf/api/apifakes"
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
@@ -127,19 +126,6 @@ var _ = Describe("BindRouteService", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewServiceInstanceRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(serviceInstanceRequirement))
-			})
-
-			It("returns a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
-
-				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
-				Expect(feature).To(Equal("bind-route-service"))
-				expectedRequiredVersion, err := semver.Make("2.51.0")
-				Expect(err).NotTo(HaveOccurred())
-				Expect(requiredVersion).To(Equal(expectedRequiredVersion))
 			})
 		})
 	})

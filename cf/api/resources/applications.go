@@ -72,7 +72,6 @@ type ApplicationEntity struct {
 	DockerCredentials       *DockerCredentials      `json:"docker_credentials,omitempty"`
 	EnableSSH               *bool                   `json:"enable_ssh,omitempty"`
 	PackageUpdatedAt        *time.Time              `json:"package_updated_at,omitempty"`
-	AppPorts                *[]int                  `json:"ports,omitempty"`
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
@@ -112,7 +111,6 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 		DockerImage:             app.DockerImage,
 		EnableSSH:               app.EnableSSH,
 		PackageUpdatedAt:        app.PackageUpdatedAt,
-		AppPorts:                app.AppPorts,
 	}
 
 	if app.State != nil {

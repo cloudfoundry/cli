@@ -29,7 +29,6 @@ type App interface {
 	Route(string, string, string, string, int)
 	GetContents() []models.Application
 	Stack(string, string)
-	AppPorts(string, []int)
 	Save(f io.Writer) error
 }
 
@@ -38,7 +37,6 @@ type Application struct {
 	Instances               int                    `yaml:"instances,omitempty"`
 	Memory                  string                 `yaml:"memory,omitempty"`
 	DiskQuota               string                 `yaml:"disk_quota,omitempty"`
-	AppPorts                []int                  `yaml:"app-ports,omitempty"`
 	Routes                  []map[string]string    `yaml:"routes,omitempty"`
 	NoRoute                 bool                   `yaml:"no-route,omitempty"`
 	Buildpack               string                 `yaml:"buildpack,omitempty"`
@@ -136,11 +134,6 @@ func (m *appManifest) EnvironmentVars(appName string, key, value string) {
 	m.contents[i].EnvironmentVars[key] = value
 }
 
-func (m *appManifest) AppPorts(appName string, appPorts []int) {
-	i := m.findOrCreateApplication(appName)
-	m.contents[i].AppPorts = appPorts
-}
-
 func (m *appManifest) GetContents() []models.Application {
 	return m.contents
 }
@@ -182,7 +175,6 @@ func generateAppMap(app models.Application) (Application, error) {
 		Instances:               app.InstanceCount,
 		DiskQuota:               fmt.Sprintf("%dM", app.DiskQuota),
 		Stack:                   app.Stack.Name,
-		AppPorts:                app.AppPorts,
 		Routes:                  routes,
 		HealthCheckType:         app.HealthCheckType,
 		HealthCheckHTTPEndpoint: app.HealthCheckHTTPEndpoint,

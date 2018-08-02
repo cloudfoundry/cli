@@ -83,10 +83,6 @@ func (cmd *CreateUserProvidedService) Requirements(requirementsFactory requireme
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
-	if fc.IsSet("r") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-r'", cf.MultipleAppPortsMinimumAPIVersion))
-	}
-
 	if fc.IsSet("t") {
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-t'", cf.UserProvidedServiceTagsMinimumAPIVersion))
 	}

@@ -204,15 +204,6 @@ var _ = Describe("help Command", func() {
 						})
 					})
 
-					Context("has hidden options", func() {
-						It("does not display the hidden option", func() {
-							err := cmd.Execute(nil)
-							Expect(err).ToNot(HaveOccurred())
-
-							Expect(testUI.Out).ToNot(Say("--app-ports"))
-						})
-					})
-
 					Context("has a default for an option", func() {
 						It("displays the default", func() {
 							err := cmd.Execute(nil)

@@ -189,28 +189,6 @@ var _ = Describe("CreateAppManifest", func() {
 				Expect(instances).To(Equal(2))
 			})
 
-			Context("when there are app ports specified", func() {
-				BeforeEach(func() {
-					application.AppPorts = []int{1111, 2222}
-					appSummaryRepo.GetSummaryReturns(application, nil)
-				})
-
-				It("sets app ports", func() {
-					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(fakeManifest.AppPortsCallCount()).To(Equal(1))
-					name, appPorts := fakeManifest.AppPortsArgsForCall(0)
-					Expect(name).To(Equal("app-name"))
-					Expect(appPorts).To(Equal([]int{1111, 2222}))
-				})
-			})
-
-			Context("when app ports are not specified", func() {
-				It("does not set app ports", func() {
-					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(fakeManifest.AppPortsCallCount()).To(Equal(0))
-				})
-			})
-
 			It("tries to get stacks", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(stackRepo.FindByGUIDCallCount()).To(Equal(1))

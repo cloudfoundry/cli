@@ -9,7 +9,6 @@ type GetAppsModel struct {
 	Memory           int64
 	DiskQuota        int64
 	Routes           []GetAppsRouteSummary
-	AppPorts         []int
 }
 
 type GetAppsRouteSummary struct {

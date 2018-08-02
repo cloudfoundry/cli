@@ -135,16 +135,6 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) e
 	cmd.ui.Say("\n%s %s", terminal.HeaderColor(T("requested state:")), uihelpers.ColoredAppState(application.ApplicationFields))
 	cmd.ui.Say("%s %s", terminal.HeaderColor(T("instances:")), uihelpers.ColoredAppInstances(application.ApplicationFields))
 
-	// Commented to hide app-ports for release #117189491
-	// if len(application.AppPorts) > 0 {
-	// 	appPorts := make([]string, len(application.AppPorts))
-	// 	for i, p := range application.AppPorts {
-	// 		appPorts[i] = strconv.Itoa(p)
-	// 	}
-
-	// 	cmd.ui.Say("%s %s", terminal.HeaderColor(T("app ports:")), strings.Join(appPorts, ", "))
-	// }
-
 	cmd.ui.Say(T("{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
 		map[string]interface{}{
 			"Usage":           terminal.HeaderColor(T("usage:")),
@@ -234,7 +224,6 @@ func (cmd *ShowApp) populatePluginModel(
 	cmd.pluginAppModel.PackageUpdatedAt = getSummaryApp.PackageUpdatedAt
 	cmd.pluginAppModel.RunningInstances = getSummaryApp.RunningInstances
 	cmd.pluginAppModel.SpaceGuid = getSummaryApp.SpaceGUID
-	cmd.pluginAppModel.AppPorts = getSummaryApp.AppPorts
 	cmd.pluginAppModel.Stack = &plugin_models.GetApp_Stack{
 		Name: stack.Name,
 		Guid: stack.GUID,

@@ -92,12 +92,6 @@ type FakeApp struct {
 		arg1 string
 		arg2 string
 	}
-	AppPortsStub        func(string, []int)
-	appPortsMutex       sync.RWMutex
-	appPortsArgsForCall []struct {
-		arg1 string
-		arg2 []int
-	}
 	SaveStub        func(f io.Writer) error
 	saveMutex       sync.RWMutex
 	saveArgsForCall []struct {
@@ -439,36 +433,6 @@ func (fake *FakeApp) StackArgsForCall(i int) (string, string) {
 	return fake.stackArgsForCall[i].arg1, fake.stackArgsForCall[i].arg2
 }
 
-func (fake *FakeApp) AppPorts(arg1 string, arg2 []int) {
-	var arg2Copy []int
-	if arg2 != nil {
-		arg2Copy = make([]int, len(arg2))
-		copy(arg2Copy, arg2)
-	}
-	fake.appPortsMutex.Lock()
-	fake.appPortsArgsForCall = append(fake.appPortsArgsForCall, struct {
-		arg1 string
-		arg2 []int
-	}{arg1, arg2Copy})
-	fake.recordInvocation("AppPorts", []interface{}{arg1, arg2Copy})
-	fake.appPortsMutex.Unlock()
-	if fake.AppPortsStub != nil {
-		fake.AppPortsStub(arg1, arg2)
-	}
-}
-
-func (fake *FakeApp) AppPortsCallCount() int {
-	fake.appPortsMutex.RLock()
-	defer fake.appPortsMutex.RUnlock()
-	return len(fake.appPortsArgsForCall)
-}
-
-func (fake *FakeApp) AppPortsArgsForCall(i int) (string, []int) {
-	fake.appPortsMutex.RLock()
-	defer fake.appPortsMutex.RUnlock()
-	return fake.appPortsArgsForCall[i].arg1, fake.appPortsArgsForCall[i].arg2
-}
-
 func (fake *FakeApp) Save(f io.Writer) error {
 	fake.saveMutex.Lock()
 	fake.saveArgsForCall = append(fake.saveArgsForCall, struct {
@@ -531,11 +495,13 @@ func (fake *FakeApp) Invocations() map[string][][]interface{} {
 	defer fake.getContentsMutex.RUnlock()
 	fake.stackMutex.RLock()
 	defer fake.stackMutex.RUnlock()
-	fake.appPortsMutex.RLock()
-	defer fake.appPortsMutex.RUnlock()
 	fake.saveMutex.RLock()
 	defer fake.saveMutex.RUnlock()
-	return fake.invocations
+	copiedInvocations := map[string][][]interface{}{}
+	for key, value := range fake.invocations {
+		copiedInvocations[key] = value
+	}
+	return copiedInvocations
 }
 
 func (fake *FakeApp) recordInvocation(key string, args []interface{}) {

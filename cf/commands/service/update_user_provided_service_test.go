@@ -96,25 +96,6 @@ var _ = Describe("UpdateUserProvidedService", func() {
 			})
 		})
 
-		Context("when provided the -r flag", func() {
-			BeforeEach(func() {
-				flagContext.Parse("service-instance", "-r", "route-service-url")
-			})
-
-			It("returns a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
-
-				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
-				Expect(feature).To(Equal("Option '-r'"))
-				expectedRequiredVersion, err := semver.Make("2.51.0")
-				Expect(err).NotTo(HaveOccurred())
-				Expect(requiredVersion).To(Equal(expectedRequiredVersion))
-			})
-		})
-
 		Context("when provided the -t flag", func() {
 			BeforeEach(func() {
 				flagContext.Parse("service-instance", "-t", "tag,a,service")

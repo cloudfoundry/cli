@@ -73,7 +73,6 @@ type ApplicationFields struct {
 	DetectedBuildpack       string
 	DockerImage             string
 	EnableSSH               bool
-	AppPorts                []int
 }
 
 const (
@@ -117,14 +116,10 @@ type AppParams struct {
 	StackName               *string
 	State                   *string
 	PackageUpdatedAt        *time.Time
-	AppPorts                *[]int
 	Routes                  []ManifestRoute
 }
 
 func (app *AppParams) Merge(flagContext *AppParams) {
-	if flagContext.AppPorts != nil {
-		app.AppPorts = flagContext.AppPorts
-	}
 	if flagContext.BuildpackURL != nil {
 		app.BuildpackURL = flagContext.BuildpackURL
 	}

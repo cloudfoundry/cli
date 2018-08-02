@@ -425,7 +425,6 @@
     "bind-staging-security-group",
     "unshare-private-domain",
     "unset",
-    "app-ports",
     "set_roles_by_username",
     "delete-service",
     "paid",

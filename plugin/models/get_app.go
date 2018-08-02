@@ -19,7 +19,6 @@ type GetAppModel struct {
 	PackageUpdatedAt     *time.Time
 	PackageState         string
 	StagingFailedReason  string
-	AppPorts             []int
 	Stack                *GetApp_Stack
 	Instances            []GetApp_AppInstanceFields
 	Routes               []GetApp_RouteSummary

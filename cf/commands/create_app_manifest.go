@@ -122,10 +122,6 @@ func (cmd *CreateAppManifest) createManifest(app models.Application) error {
 	cmd.manifest.Instances(app.Name, app.InstanceCount)
 	cmd.manifest.Stack(app.Name, app.Stack.Name)
 
-	if len(app.AppPorts) > 0 {
-		cmd.manifest.AppPorts(app.Name, app.AppPorts)
-	}
-
 	if app.Command != "" {
 		cmd.manifest.StartCommand(app.Name, app.Command)
 	}

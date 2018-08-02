@@ -69,20 +69,6 @@ var _ = Describe("generate_manifest", func() {
 				Expect(applications[1].HealthCheckHTTPEndpoint).To(Equal("/some-endpoint"))
 			})
 
-			Context("when an application has app-ports", func() {
-				BeforeEach(func() {
-					m.AppPorts("app1", []int{1111, 2222})
-				})
-
-				It("includes app-ports for that app", func() {
-					err := m.Save(f)
-					Expect(err).NotTo(HaveOccurred())
-					applications := getYaml(f).Applications
-
-					Expect(applications[0].AppPorts).To(Equal([]int{1111, 2222}))
-				})
-			})
-
 			Context("when an application has services", func() {
 				BeforeEach(func() {
 					m.Service("app1", "service1")
@@ -327,7 +313,6 @@ type YApplication struct {
 	NoRoute                 bool                   `yaml:"no-route"`
 	DiskQuota               string                 `yaml:"disk_quota"`
 	Stack                   string                 `yaml:"stack"`
-	AppPorts                []int                  `yaml:"app-ports"`
 	HealthCheckType         string                 `yaml:"health-check-type"`
 	HealthCheckHTTPEndpoint string                 `yaml:"health-check-http-endpoint"`
 }

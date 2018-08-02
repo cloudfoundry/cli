@@ -47,7 +47,6 @@ var _ = Describe("Application resources", func() {
 			healthCheckHTTPEndpoint           string
 			enableSSH                         bool
 			packageUpdatedAt                  time.Time
-			appPorts                          []int
 			environmentVars                   map[string]interface{}
 
 			buildpackURL,
@@ -84,7 +83,6 @@ var _ = Describe("Application resources", func() {
 			stackGUID = "stack-guid"
 			state = "state"
 			packageUpdatedAt = time.Now()
-			appPorts = []int{9090, 123}
 
 			appParams = models.AppParams{
 				BuildpackURL:            &buildpackURL,
@@ -105,7 +103,6 @@ var _ = Describe("Application resources", func() {
 				StackGUID:               &stackGUID,
 				State:                   &state,
 				PackageUpdatedAt:        &packageUpdatedAt,
-				AppPorts:                &appPorts,
 			}
 		})
 
@@ -127,7 +124,6 @@ var _ = Describe("Application resources", func() {
 			Expect(entity.DockerCredentials.Password).To(Equal(dockerPassword))
 			Expect(*entity.EnableSSH).To(Equal(enableSSH))
 			Expect(*entity.PackageUpdatedAt).To(Equal(packageUpdatedAt))
-			Expect(*entity.AppPorts).To(Equal(appPorts))
 		})
 
 		It("upcases the state", func() {

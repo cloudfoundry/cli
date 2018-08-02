@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -77,16 +76,10 @@ func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Facto
 	serviceName := fc.Args()[1]
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(serviceName)
 
-	minAPIVersionRequirement := requirementsFactory.NewMinAPIVersionRequirement(
-		"bind-route-service",
-		cf.MultipleAppPortsMinimumAPIVersion,
-	)
-
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.domainReq,
 		cmd.serviceInstanceReq,
-		minAPIVersionRequirement,
 	}
 	return reqs, nil
 }

@@ -66,7 +66,6 @@ var _ = Describe("AppSummaryRepository", func() {
 			Expect(app1.RunningInstances).To(Equal(1))
 			Expect(app1.Memory).To(Equal(int64(128)))
 			Expect(app1.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2014-10-24T19:54:00Z"))
-			Expect(app1.AppPorts).To(Equal([]int{8080, 9090}))
 
 			app2 := apps[1]
 			Expect(app2.Name).To(Equal("app2"))
@@ -75,7 +74,6 @@ var _ = Describe("AppSummaryRepository", func() {
 			Expect(len(app2.Routes)).To(Equal(2))
 			Expect(app2.Routes[0].URL()).To(Equal("app2.cfapps.io"))
 			Expect(app2.Routes[1].URL()).To(Equal("foo.cfapps.io"))
-			Expect(app2.AppPorts).To(HaveLen(0))
 
 			Expect(app2.State).To(Equal("started"))
 			Expect(app2.InstanceCount).To(Equal(3))

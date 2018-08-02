@@ -1,7 +1,6 @@
 package application
 
 import (
-	"strconv"
 	"strings"
 
 	"code.cloudfoundry.org/cli/cf/commandregistry"
@@ -95,8 +94,6 @@ func (cmd *ListApps) Execute(c flags.FlagContext) error {
 		T("instances"),
 		T("memory"),
 		T("disk"),
-		// Hide this column #117189491
-		// T("app ports"),
 		T("urls"),
 	})
 
@@ -106,19 +103,12 @@ func (cmd *ListApps) Execute(c flags.FlagContext) error {
 			urls = append(urls, route.URL())
 		}
 
-		appPorts := make([]string, len(application.AppPorts))
-		for i, p := range application.AppPorts {
-			appPorts[i] = strconv.Itoa(p)
-		}
-
 		table.Add(
 			application.Name,
 			uihelpers.ColoredAppState(application.ApplicationFields),
 			uihelpers.ColoredAppInstances(application.ApplicationFields),
 			formatters.ByteSize(application.Memory*formatters.MEGABYTE),
 			formatters.ByteSize(application.DiskQuota*formatters.MEGABYTE),
-			// Hide this column #117189491
-			// strings.Join(appPorts, ", "),
 			strings.Join(urls, ", "),
 		)
 	}
@@ -143,7 +133,6 @@ func (cmd *ListApps) populatePluginModel(apps []models.Application) {
 		appModel.Memory = app.Memory
 		appModel.State = app.State
 		appModel.DiskQuota = app.DiskQuota
-		appModel.AppPorts = app.AppPorts
 
 		*(cmd.pluginAppModels) = append(*(cmd.pluginAppModels), appModel)
 
