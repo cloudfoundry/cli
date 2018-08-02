@@ -3,7 +3,6 @@ package route
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -71,10 +70,6 @@ func (cmd *DeleteRoute) Requirements(requirementsFactory requirements.Factory, f
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(fc.Args()[0])
 
 	var reqs []requirements.Requirement
-
-	if fc.String("path") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", cf.RoutePathMinimumAPIVersion))
-	}
 
 	reqs = append(reqs, []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),

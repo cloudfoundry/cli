@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/actors/actorsfakes"
 	"code.cloudfoundry.org/cli/cf/api/apifakes"
 	"code.cloudfoundry.org/cli/cf/api/applications/applicationsfakes"
@@ -172,26 +171,6 @@ var _ = Describe("Push Command", func() {
 		It("checks the number of args", func() {
 			Expect(requirementsFactory.NewUsageRequirementCallCount()).To(Equal(1))
 			Expect(reqs).To(ContainElement(usageReq))
-		})
-
-		Context("when --route-path is passed in", func() {
-			BeforeEach(func() {
-				err := flagContext.Parse("app-name", "--route-path", "the-path")
-				Expect(err).NotTo(HaveOccurred())
-
-				reqs, err = cmd.Requirements(requirementsFactory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			It("returns a minAPIVersionRequirement", func() {
-				Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-
-				option, version := requirementsFactory.NewMinAPIVersionRequirementArgsForCall(0)
-				Expect(option).To(Equal("Option '--route-path'"))
-				Expect(version).To(Equal(cf.RoutePathMinimumAPIVersion))
-
-				Expect(reqs).To(ContainElement(minVersionReq))
-			})
 		})
 	})
 

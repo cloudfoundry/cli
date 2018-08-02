@@ -11,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	"github.com/blang/semver"
 
 	"code.cloudfoundry.org/cli/cf/api/apifakes"
 
@@ -34,9 +33,8 @@ var _ = Describe("DeleteRoute", func() {
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
-		loginRequirement         requirements.Requirement
-		domainRequirement        *requirementsfakes.FakeDomainRequirement
-		minAPIVersionRequirement requirements.Requirement
+		loginRequirement  requirements.Requirement
+		domainRequirement *requirementsfakes.FakeDomainRequirement
 
 		fakeDomain models.DomainFields
 	)
@@ -72,9 +70,6 @@ var _ = Describe("DeleteRoute", func() {
 			Name: "fake-domain-name",
 		}
 		domainRequirement.GetDomainReturns(fakeDomain)
-
-		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
-		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 	})
 
 	Describe("Help text", func() {
@@ -140,40 +135,6 @@ var _ = Describe("DeleteRoute", func() {
 
 				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
 				Expect(actualRequirements).To(ContainElement(domainRequirement))
-			})
-
-			Context("when a path is passed", func() {
-				BeforeEach(func() {
-					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-					flagContext.Parse("domain-name", "--path", "the-path")
-				})
-
-				It("returns a MinAPIVersionRequirement as the first requirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
-
-					expectedVersion, err := semver.Make("2.36.0")
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-					feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
-					Expect(feature).To(Equal("Option '--path'"))
-					Expect(requiredVersion).To(Equal(expectedVersion))
-					Expect(actualRequirements[0]).To(Equal(minAPIVersionRequirement))
-				})
-			})
-
-			Context("when a path is not passed", func() {
-				BeforeEach(func() {
-					flagContext.Parse("domain-name")
-				})
-
-				It("does not return a MinAPIVersionRequirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
-					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
-				})
 			})
 
 			Describe("deleting a tcp route", func() {

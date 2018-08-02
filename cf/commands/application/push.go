@@ -11,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/actors"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/api/applications"
@@ -98,10 +97,6 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 	)
 
 	reqs = append(reqs, usageReq)
-
-	if fc.String("route-path") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", cf.RoutePathMinimumAPIVersion))
-	}
 
 	if fc.String("vars-file") != "" || fc.String("var") != "" {
 		var flags []string

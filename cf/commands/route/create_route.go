@@ -3,7 +3,6 @@ package route
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -91,10 +90,6 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 		requirementsFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 		cmd.domainReq,
-	}
-
-	if fc.IsSet("path") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", cf.RoutePathMinimumAPIVersion))
 	}
 
 	return reqs, nil

@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/errors"
@@ -46,7 +45,6 @@ func (cmd *PurgeServiceInstance) Requirements(requirementsFactory requirements.F
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewMinAPIVersionRequirement("purge-service-instance", cf.RoutePathMinimumAPIVersion),
 	}
 
 	return reqs, nil

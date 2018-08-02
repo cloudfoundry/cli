@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -47,12 +46,6 @@ func (cmd *CreateSharedDomain) Requirements(requirementsFactory requirements.Fac
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
-	}
-
-	if fc.String("router-group") != "" {
-		reqs = append(reqs, []requirements.Requirement{
-			requirementsFactory.NewMinAPIVersionRequirement("Option '--router-group'", cf.RoutePathMinimumAPIVersion),
-		}...)
 	}
 
 	return reqs, nil

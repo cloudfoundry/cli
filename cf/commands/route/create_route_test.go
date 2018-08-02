@@ -9,10 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/cf/flags"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	"github.com/blang/semver"
 
 	"code.cloudfoundry.org/cli/cf/api/apifakes"
-	"code.cloudfoundry.org/cli/cf/requirements"
 
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
@@ -34,9 +32,8 @@ var _ = Describe("CreateRoute", func() {
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
-		spaceRequirement         *requirementsfakes.FakeSpaceRequirement
-		domainRequirement        *requirementsfakes.FakeDomainRequirement
-		minAPIVersionRequirement requirements.Requirement
+		spaceRequirement  *requirementsfakes.FakeSpaceRequirement
+		domainRequirement *requirementsfakes.FakeDomainRequirement
 	)
 
 	BeforeEach(func() {
@@ -71,9 +68,6 @@ var _ = Describe("CreateRoute", func() {
 			Name: "domain-name",
 		})
 		factory.NewDomainRequirementReturns(domainRequirement)
-
-		minAPIVersionRequirement = &passingRequirement{}
-		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 	})
 
 	Describe("Requirements", func() {
@@ -116,40 +110,6 @@ var _ = Describe("CreateRoute", func() {
 				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
 
 				Expect(actualRequirements).To(ContainElement(domainRequirement))
-			})
-		})
-
-		Context("when the --path option is given", func() {
-			BeforeEach(func() {
-				err := flagContext.Parse("space-name", "domain-name", "--path", "path")
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			It("returns a MinAPIVersionRequirement", func() {
-				expectedVersion, err := semver.Make("2.36.0")
-				Expect(err).NotTo(HaveOccurred())
-
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
-
-				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
-				Expect(feature).To(Equal("Option '--path'"))
-				Expect(requiredVersion).To(Equal(expectedVersion))
-				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
-			})
-		})
-
-		Context("when the --path option is not given", func() {
-			BeforeEach(func() {
-				err := flagContext.Parse("space-name", "domain-name")
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			It("does not return a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 			})
 		})
 
