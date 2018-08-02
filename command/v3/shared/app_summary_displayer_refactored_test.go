@@ -42,7 +42,10 @@ var _ = Describe("app summary displayer", func() {
 
 		Context("when the app has instances", func() {
 			Context("when the process instances are running", func() {
+				var uptime time.Duration
+
 				BeforeEach(func() {
+					uptime = time.Now().Sub(time.Unix(267321600, 0))
 					summary = v2v3action.ApplicationSummary{
 						ApplicationSummary: v3action.ApplicationSummary{
 							Application: v3action.Application{
@@ -64,7 +67,7 @@ var _ = Describe("app summary displayer", func() {
 											DiskUsage:   1000000,
 											MemoryQuota: 33554432,
 											DiskQuota:   2000000,
-											Uptime:      int(time.Now().Sub(time.Unix(267321600, 0)).Seconds()),
+											Uptime:      int(uptime.Seconds()),
 										},
 										v3action.ProcessInstance{
 											Index:       1,
@@ -119,6 +122,7 @@ var _ = Describe("app summary displayer", func() {
 					Expect(webProcessSummary.MemUsage).To(Equal("32M"))
 
 					Expect(webProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
+					Expect(time.Parse(time.RFC3339, webProcessSummary.Instances[0].Since)).To(BeTemporally("~", time.Now().Add(-uptime), 2*time.Second))
 					Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
 					Expect(webProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
 
@@ -505,9 +509,5 @@ var _ = Describe("app summary displayer", func() {
 				Expect(testUI.Out).To(Say("buildpacks:\\s+some-detect-output, some-buildpack"))
 			})
 		})
-
-		Context("when app has no processes", func() {
-		})
-
 	})
 })
