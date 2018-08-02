@@ -11,7 +11,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("when a droplet is provided", func() {
@@ -45,7 +44,6 @@ var _ = Describe("when a droplet is provided", func() {
 	})
 
 	Context("when the app does not exist", func() {
-
 		It("creates the app", func() {
 			session := helpers.CF(PushCommandName, appName, "--droplet", dropletPath)
 			Eventually(session).Should(Say("Getting app info\\.\\.\\."))
