@@ -130,7 +130,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 			Eventually(session).Should(Say("instances:\\s+2/2"))
 			Eventually(session).Should(Say("memory usage:\\s+70M"))
 			Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-			Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+			Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
 			Eventually(session).Should(Exit(0))
 		})
 	})
