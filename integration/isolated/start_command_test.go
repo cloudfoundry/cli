@@ -128,9 +128,9 @@ applications:
 							It("uses the multiprocess display", func() {
 								userName, _ := helpers.GetCredentials()
 
-								session := helpers.CF("app", appName)
+								session := helpers.CF("start", appName)
 
-								Eventually(session).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
 								Eventually(session).Should(Say("name:\\s+%s", appName))
 								Eventually(session).Should(Say("requested state:\\s+started"))
@@ -259,9 +259,9 @@ applications:
 									It("uses the multiprocess display", func() {
 										userName, _ := helpers.GetCredentials()
 
-										session := helpers.CF("app", appName)
+										session := helpers.CF("start", appName)
 
-										Eventually(session).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+										Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
 										Eventually(session).Should(Say("name:\\s+%s", appName))
 										Eventually(session).Should(Say("requested state:\\s+started"))

@@ -7,10 +7,13 @@ import (
 	"code.cloudfoundry.org/bytefmt"
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2v3action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
+	"code.cloudfoundry.org/cli/command/v2/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -22,13 +25,15 @@ import (
 
 var _ = Describe("Start Command", func() {
 	var (
-		cmd             StartCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v2fakes.FakeStartActor
-		binaryName      string
-		executeErr      error
+		cmd                         StartCommand
+		testUI                      *ui.UI
+		fakeConfig                  *commandfakes.FakeConfig
+		fakeSharedActor             *commandfakes.FakeSharedActor
+		fakeActor                   *v2fakes.FakeStartActor
+		fakeApplicationSummaryActor *sharedfakes.FakeApplicationSummaryActor
+		binaryName                  string
+		appName                     string
+		executeErr                  error
 	)
 
 	BeforeEach(func() {
@@ -36,15 +41,18 @@ var _ = Describe("Start Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeStartActor)
+		fakeApplicationSummaryActor = new(sharedfakes.FakeApplicationSummaryActor)
 
 		cmd = StartCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
+			ApplicationSummaryActor: fakeApplicationSummaryActor,
 		}
 
-		cmd.RequiredArgs.AppName = "some-app"
+		appName = "some-app"
+		cmd.RequiredArgs.AppName = appName
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -120,7 +128,7 @@ var _ = Describe("Start Command", func() {
 		})
 
 		It("displays flavor text", func() {
-			Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as some-user..."))
+			Expect(testUI.Out).To(Say("Starting app %s in org some-org / space some-space as some-user...", appName))
 		})
 
 		Context("when the app exists", func() {
@@ -136,7 +144,7 @@ var _ = Describe("Start Command", func() {
 				It("short circuits and displays message", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("App some-app is already started"))
+					Expect(testUI.Out).To(Say("App %s is already started", appName))
 
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
@@ -256,7 +264,7 @@ var _ = Describe("Start Command", func() {
 
 							applicationSummary := v2action.ApplicationSummary{
 								Application: v2action.Application{
-									Name:                 "some-app",
+									Name:                 appName,
 									GUID:                 "some-app-guid",
 									Instances:            types.NullInt{Value: 3, IsSet: true},
 									Memory:               types.NullByteSizeInMb{IsSet: true, Value: 128},
@@ -297,7 +305,7 @@ var _ = Describe("Start Command", func() {
 							Expect(testUI.Out).To(Say("message 2"))
 							Expect(testUI.Out).To(Say("message 3"))
 							Expect(testUI.Err).To(Say("timeout connecting to log server, no log will be shown"))
-							Expect(testUI.Out).To(Say("name:\\s+some-app"))
+							Expect(testUI.Out).To(Say("name:\\s+%s", appName))
 						})
 					})
 
@@ -447,155 +455,230 @@ var _ = Describe("Start Command", func() {
 
 					Context("staging timed out", func() {
 						BeforeEach(func() {
-							apiErr = actionerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}
+							apiErr = actionerror.StagingTimeoutError{AppName: appName, Timeout: time.Nanosecond}
 						})
 
 						It("stops logging and returns StagingTimeoutError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}))
+							Expect(executeErr).To(MatchError(translatableerror.StagingTimeoutError{AppName: appName, Timeout: time.Nanosecond}))
 						})
 					})
 
 					Context("when the app instance crashes", func() {
 						BeforeEach(func() {
-							apiErr = actionerror.ApplicationInstanceCrashedError{Name: "some-app"}
+							apiErr = actionerror.ApplicationInstanceCrashedError{Name: appName}
 						})
 
 						It("stops logging and returns UnsuccessfulStartError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
+							Expect(executeErr).To(MatchError(translatableerror.UnsuccessfulStartError{AppName: appName, BinaryName: "faceman"}))
 						})
 					})
 
 					Context("when the app instance flaps", func() {
 						BeforeEach(func() {
-							apiErr = actionerror.ApplicationInstanceFlappingError{Name: "some-app"}
+							apiErr = actionerror.ApplicationInstanceFlappingError{Name: appName}
 						})
 
 						It("stops logging and returns UnsuccessfulStartError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
+							Expect(executeErr).To(MatchError(translatableerror.UnsuccessfulStartError{AppName: appName, BinaryName: "faceman"}))
 						})
 					})
 
 					Context("starting timeout", func() {
 						BeforeEach(func() {
-							apiErr = actionerror.StartupTimeoutError{Name: "some-app"}
+							apiErr = actionerror.StartupTimeoutError{Name: appName}
 						})
 
 						It("stops logging and returns StartupTimeoutError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{AppName: "some-app", BinaryName: "faceman"}))
+							Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{AppName: appName, BinaryName: "faceman"}))
 						})
 					})
 				})
 
 				Context("when the app finishes starting", func() {
-					var (
-						applicationSummary v2action.ApplicationSummary
-						warnings           []string
-					)
+					Describe("version-dependent display", func() {
+						Context("when CC API >= 3.27.0", func() {
+							var (
+								applicationSummary v2v3action.ApplicationSummary
+							)
 
-					BeforeEach(func() {
-						applicationSummary = v2action.ApplicationSummary{
-							Application: v2action.Application{
-								Name:                 "some-app",
-								GUID:                 "some-app-guid",
-								Instances:            types.NullInt{Value: 3, IsSet: true},
-								Memory:               types.NullByteSizeInMb{IsSet: true, Value: 128},
-								PackageUpdatedAt:     time.Unix(0, 0),
-								DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
-								State:                "STARTED",
-								DetectedStartCommand: types.FilteredString{IsSet: true, Value: "some start command"},
-							},
-							IsolationSegment: "some-isolation-segment",
-							Stack: v2action.Stack{
-								Name: "potatos",
-							},
-							Routes: []v2action.Route{
-								{
-									Host: "banana",
-									Domain: v2action.Domain{
-										Name: "fruit.com",
+							BeforeEach(func() {
+								fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.50.0")
+								v3ApplicationSummary := v3action.ApplicationSummary{
+									Application: v3action.Application{
+										Name: appName,
 									},
-									Path: "/hi",
-								},
-								{
-									Domain: v2action.Domain{
-										Name: "foobar.com",
+									ProcessSummaries: v3action.ProcessSummaries{
+										{
+											Process: v3action.Process{
+												Type:       "aba",
+												Command:    "some-command-1",
+												MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+												DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
+											},
+										},
+										{
+											Process: v3action.Process{
+												Type:       "console",
+												Command:    "some-command-2",
+												MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
+												DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
+											},
+										},
 									},
-									Port: types.NullInt{IsSet: true, Value: 13},
-								},
-							},
-						}
-						warnings = []string{"app-summary-warning"}
+								}
+								applicationSummary = v2v3action.ApplicationSummary{
+									ApplicationSummary: v3ApplicationSummary,
+								}
 
-						applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{
-							{
-								ID:          0,
-								State:       v2action.ApplicationInstanceState(constant.ApplicationInstanceRunning),
-								Since:       1403140717.984577,
-								CPU:         0.73,
-								Disk:        50 * bytefmt.MEGABYTE,
-								DiskQuota:   2048 * bytefmt.MEGABYTE,
-								Memory:      100 * bytefmt.MEGABYTE,
-								MemoryQuota: 128 * bytefmt.MEGABYTE,
-								Details:     "info from the backend",
-							},
-						}
+								fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(
+									applicationSummary,
+									v2v3action.Warnings{"combo-summary-warning"},
+									nil)
+
+							})
+
+							It("uses the multiprocess display", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+								passedAppName, spaceGUID, withObfuscatedValues := fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+								Expect(passedAppName).To(Equal(appName))
+								Expect(spaceGUID).To(Equal("some-space-guid"))
+								Expect(withObfuscatedValues).To(BeTrue())
+								
+								Expect(testUI.Out).To(Say("name:\\s+%s", appName))
+								Expect(testUI.Out).To(Say("type:\\s+aba"))
+								Expect(testUI.Out).To(Say("instances:\\s+0/0"))
+								Expect(testUI.Out).To(Say("memory usage:\\s+32M"))
+								Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
+								Expect(testUI.Out).To(Say("type:\\s+console"))
+								Expect(testUI.Out).To(Say("instances:\\s+0/0"))
+								Expect(testUI.Out).To(Say("memory usage:\\s+16M"))
+								Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+
+								Expect(testUI.Err).To(Say("combo-summary-warning"))					
+							})
+						})
+
+						Context("when CC API < 3.27.0", func() {
+							var (
+								applicationSummary v2action.ApplicationSummary
+							)
+
+							BeforeEach(func() {
+								fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.26.0")
+
+								applicationSummary = v2action.ApplicationSummary{
+									Application: v2action.Application{
+										Name:                 appName,
+										GUID:                 "some-app-guid",
+										Instances:            types.NullInt{Value: 3, IsSet: true},
+										Memory:               types.NullByteSizeInMb{IsSet: true, Value: 128},
+										PackageUpdatedAt:     time.Unix(0, 0),
+										DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
+										State:                "STARTED",
+										DetectedStartCommand: types.FilteredString{IsSet: true, Value: "some start command"},
+									},
+									Stack: v2action.Stack{
+										Name: "potatos",
+									},
+									Routes: []v2action.Route{
+										{
+											Host: "banana",
+											Domain: v2action.Domain{
+												Name: "fruit.com",
+											},
+											Path: "/hi",
+										},
+										{
+											Domain: v2action.Domain{
+												Name: "foobar.com",
+											},
+											Port: types.NullInt{IsSet: true, Value: 13},
+										},
+									},
+								}
+								warnings := []string{"app-summary-warning"}
+
+								applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{
+									{
+										ID:          0,
+										State:       v2action.ApplicationInstanceState(constant.ApplicationInstanceRunning),
+										Since:       1403140717.984577,
+										CPU:         0.73,
+										Disk:        50 * bytefmt.MEGABYTE,
+										DiskQuota:   2048 * bytefmt.MEGABYTE,
+										Memory:      100 * bytefmt.MEGABYTE,
+										MemoryQuota: 128 * bytefmt.MEGABYTE,
+										Details:     "info from the backend",
+									},
+								}
+
+								fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
+							})
+
+							It("uses the v2 display", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(testUI.Out).To(Say("name:\\s+some-app"))
+								Expect(testUI.Out).To(Say("requested state:\\s+started"))
+								Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
+								Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
+								Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
+								Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+								Expect(testUI.Out).To(Say("stack:\\s+potatos"))
+								Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
+								Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+
+								Expect(testUI.Err).To(Say("app-summary-warning"))
+							})
+						})
 					})
 
 					Context("when the isolation segment is not empty", func() {
 						BeforeEach(func() {
+							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.26.0")
+
+							applicationSummary := v2action.ApplicationSummary{
+								Application: v2action.Application{
+									Name: appName,
+								},
+								IsolationSegment: "some-isolation-segment",
+							}
+							warnings := []string{"app-summary-warning"}
+
 							fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 						})
 
 						It("displays the app summary with isolation segments as well as warnings", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(testUI.Out).To(Say("name:\\s+some-app"))
-							Expect(testUI.Out).To(Say("requested state:\\s+started"))
-							Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
 							Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
-							Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
-							Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-							Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-							Expect(testUI.Out).To(Say("stack:\\s+potatos"))
-							Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
-							Expect(testUI.Out).To(Say("start command:\\s+some start command"))
 
 							Expect(testUI.Err).To(Say("app-summary-warning"))
 						})
-
-						It("should display the instance table", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk"))
-							Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
-						})
-
 					})
 
 					Context("when the isolation segment is empty", func() {
 						BeforeEach(func() {
-							applicationSummary.IsolationSegment = ""
+							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.26.0")
+
+							applicationSummary := v2action.ApplicationSummary{
+								Application: v2action.Application{
+									Name: appName,
+								},
+								IsolationSegment: "",
+							}
+							warnings := []string{"app-summary-warning"}
+
 							fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 						})
 
 						It("displays the app summary without isolation segment as well as warnings", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(testUI.Out).To(Say("name:\\s+some-app"))
-							Expect(testUI.Out).To(Say("requested state:\\s+started"))
-							Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
 							Expect(testUI.Out).NotTo(Say("isolation segment:"))
-							Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
-							Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-							Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-							Expect(testUI.Out).To(Say("stack:\\s+potatos"))
-							Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
-							Expect(testUI.Out).To(Say("start command:\\s+some start command"))
 
 							Expect(testUI.Err).To(Say("app-summary-warning"))
-						})
-
-						It("should display the instance table", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk"))
-							Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
 						})
 					})
 				})
@@ -607,7 +690,7 @@ var _ = Describe("Start Command", func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
 					v2action.Application{},
 					v2action.Warnings{"warning-1", "warning-2"},
-					actionerror.ApplicationNotFoundError{Name: "some-app"},
+					actionerror.ApplicationNotFoundError{Name: appName},
 				)
 			})
 
