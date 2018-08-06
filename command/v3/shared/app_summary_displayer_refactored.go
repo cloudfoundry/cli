@@ -87,7 +87,7 @@ func (display AppSummaryDisplayer2) displayProcessTable(summary v3action.Applica
 		display.UI.DisplayNewline()
 
 		var startCommandRow []string
-		if displayStartCommand {
+		if displayStartCommand && len(process.Command) > 0 {
 			startCommandRow = append(startCommandRow, display.UI.TranslateText("start command:"), process.Command)
 		}
 

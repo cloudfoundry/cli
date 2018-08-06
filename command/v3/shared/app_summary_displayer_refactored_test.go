@@ -259,6 +259,11 @@ var _ = Describe("app summary displayer", func() {
 										Command: "some-command-2",
 									},
 								},
+								{
+									Process: v3action.Process{
+										Type: "random",
+									},
+								},
 							},
 						},
 					}
@@ -269,12 +274,15 @@ var _ = Describe("app summary displayer", func() {
 						displayStartCommand = true
 					})
 
-					It("displays the start command for each process", func() {
+					It("displays the non-empty start command for each process", func() {
 						Expect(testUI.Out).To(Say("type:\\s+web"))
 						Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
 
 						Expect(testUI.Out).To(Say("type:\\s+console"))
 						Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+
+						Expect(testUI.Out).To(Say("type:\\s+random"))
+						Expect(testUI.Out).ToNot(Say("start command:"))
 					})
 				})
 
