@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -43,6 +44,7 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// CreateBuildpack creates a new buildpack.
 func (client *Client) CreateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {
 	body, err := json.Marshal(buildpack)
 	if err != nil {
@@ -56,7 +58,6 @@ func (client *Client) CreateBuildpack(buildpack Buildpack) (Buildpack, Warnings,
 	if err != nil {
 		return Buildpack{}, nil, err
 	}
-
 	var createdBuildpack Buildpack
 	response := cloudcontroller.Response{
 		Result: &createdBuildpack,
@@ -66,6 +67,63 @@ func (client *Client) CreateBuildpack(buildpack Buildpack) (Buildpack, Warnings,
 	return createdBuildpack, response.Warnings, err
 }
 
+// GetBuildpacks searches for a buildpack with the given name and returns it if it exists.
+func (client *Client) GetBuildpacks(filters ...Filter) ([]Buildpack, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetBuildpacksRequest,
+		Query:       ConvertFilterParameters(filters),
+	})
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var buildpacks []Buildpack
+	warnings, err := client.paginate(request, Buildpack{}, func(item interface{}) error {
+		if buildpack, ok := item.(Buildpack); ok {
+			buildpacks = append(buildpacks, buildpack)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Buildpack{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return buildpacks, warnings, err
+}
+
+// UpdateBuildpack updates the buildpack with the provided GUID and returns the updated buildpack.
+func (client *Client) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {
+	body, err := json.Marshal(buildpack)
+	if err != nil {
+		return Buildpack{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutBuildpackRequest,
+		URIParams:   Params{"buildpack_guid": buildpack.GUID},
+		Body:        bytes.NewReader(body),
+	})
+	if err != nil {
+		return Buildpack{}, nil, err
+	}
+
+	var updatedBuildpack Buildpack
+	response := cloudcontroller.Response{
+		Result: &updatedBuildpack,
+	}
+
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return Buildpack{}, response.Warnings, err
+	}
+
+	return updatedBuildpack, response.Warnings, nil
+}
+
+// UploadBuildpack uploads the contents of a buildpack zip to the server.
 func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (Warnings, error) {
 
 	contentLength, err := client.calculateBuildpackRequestSize(buildpackLength, buildpackPath)
@@ -76,7 +134,7 @@ func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string
 	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForBuildpack(buildpack, buildpackPath)
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutBuildpackRequest,
+		RequestName: internal.PutBuildpackBitsRequest,
 		URIParams:   Params{"buildpack_guid": buildpackGUID},
 		Body:        body,
 	})

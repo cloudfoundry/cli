@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/util"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
@@ -127,6 +128,43 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 
 	progBar.Terminate()
 	return Warnings(warnings), nil
+}
+
+func (actor *Actor) GetBuildpackByName(name string) (Buildpack, Warnings, error) {
+	bpName := ccv2.Filter{
+		Type:     constant.NameFilter,
+		Operator: constant.EqualOperator,
+		Values:   []string{name},
+	}
+
+	buildpacks, warnings, err := actor.CloudControllerClient.GetBuildpacks(bpName)
+	if err != nil {
+		return Buildpack{}, Warnings(warnings), err
+	}
+
+	if len(buildpacks) == 0 {
+		return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: name}
+	}
+
+	if len(buildpacks) > 1 {
+		return Buildpack{}, Warnings(warnings), actionerror.MultipleBuildpacksFoundError{BuildpackName: name}
+	}
+
+	return Buildpack(buildpacks[0]), Warnings(warnings), nil
+}
+
+func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {
+	updatedBuildpack, warnings, err := actor.CloudControllerClient.UpdateBuildpack(ccv2.Buildpack(buildpack))
+	if err != nil {
+		if _, ok := err.(ccerror.ResourceNotFoundError); ok {
+			return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpack.Name}
+		} else if _, ok := err.(ccerror.BuildpackAlreadyExistsWithoutStackError); ok {
+			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError(buildpack.Name)
+		}
+		return Buildpack{}, Warnings(warnings), err
+	}
+
+	return Buildpack(updatedBuildpack), Warnings(warnings), nil
 }
 
 // Zipit zips the source into a .zip file in the target dir

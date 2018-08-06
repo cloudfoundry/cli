@@ -51,6 +51,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.AssignDropletError{Message: "some-message"},
 			AssignDropletError{Message: "some-message"}),
 
+		Entry("actionerror.BuildpackNotFoundError -> BuildpackNotFoundError",
+			actionerror.BuildpackNotFoundError{},
+			BuildpackNotFoundError{}),
+
 		Entry("actionerror.CommandLineOptionsWithMultipleAppsError -> CommandLineArgsWithMultipleAppsError",
 			actionerror.CommandLineOptionsWithMultipleAppsError{},
 			CommandLineArgsWithMultipleAppsError{}),
@@ -111,6 +115,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("actionerror.MissingNameError -> RequiredNameForPushError",
 			actionerror.MissingNameError{},
 			RequiredNameForPushError{}),
+
+		Entry("actionerror.MultipleBuildpacksFoundError -> MultipleBuildpacksFoundError",
+			actionerror.MultipleBuildpacksFoundError{BuildpackName: "some-bp-name"},
+			MultipleBuildpacksFoundError{BuildpackName: "some-bp-name"}),
 
 		Entry("actionerror.NoCompatibleBinaryError -> NoCompatibleBinaryError",
 			actionerror.NoCompatibleBinaryError{},

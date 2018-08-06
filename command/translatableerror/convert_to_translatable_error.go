@@ -30,6 +30,8 @@ func ConvertToTranslatableError(err error) error {
 		return AppNotFoundInManifestError(e)
 	case actionerror.AssignDropletError:
 		return AssignDropletError(e)
+	case actionerror.BuildpackNotFoundError:
+		return BuildpackNotFoundError(e)
 	case actionerror.CommandLineOptionsWithMultipleAppsError:
 		return CommandLineArgsWithMultipleAppsError{}
 	case actionerror.DockerPasswordNotSetError:
@@ -60,6 +62,8 @@ func ConvertToTranslatableError(err error) error {
 		return IsolationSegmentNotFoundError(e)
 	case actionerror.MissingNameError:
 		return RequiredNameForPushError{}
+	case actionerror.MultipleBuildpacksFoundError:
+		return MultipleBuildpacksFoundError(e)
 	case actionerror.NoCompatibleBinaryError:
 		return NoCompatibleBinaryError{}
 	case actionerror.NoDomainsFoundError:
