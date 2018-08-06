@@ -119,28 +119,65 @@ applications:
 						Eventually(helpers.CF("stop", appName)).Should(Exit(0))
 					})
 
-					It("displays the app information with instances table", func() {
-						userName, _ := helpers.GetCredentials()
-						session := helpers.CF("start", appName)
-						Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-						Consistently(session).ShouldNot(Say("Staging app and tracing logs\\.\\.\\."))
+					Describe("version dependent display", func() {
+						Context("when CC API >= 3.27.0", func() {
+							BeforeEach(func() {
+								helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+							})
 
-						Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
+							It("uses the multiprocess display", func() {
+								userName, _ := helpers.GetCredentials()
 
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+started"))
-						Eventually(session).Should(Say("instances:\\s+2/2"))
-						Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-						Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
-						Eventually(session).Should(Say("last uploaded:"))
-						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-						Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
-						Eventually(session).Should(Say("start command:"))
+								session := helpers.CF("app", appName)
 
-						Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
-						Eventually(session).Should(Say("#0\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
-						Eventually(session).Should(Say("#1\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
-						Eventually(session).Should(Exit(0))
+								Eventually(session).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+
+								Eventually(session).Should(Say("name:\\s+%s", appName))
+								Eventually(session).Should(Say("requested state:\\s+started"))
+								Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+								Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
+								Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+								Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
+								Eventually(session).Should(Say("type:\\s+web"))
+								Eventually(session).Should(Say("instances:\\s+\\d/2"))
+								Eventually(session).Should(Say("memory usage:\\s+128M"))
+								Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
+								Eventually(session).Should(Say("#0\\s+(starting|running)\\s+\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
+
+								Eventually(session).Should(Exit(0))
+							})
+
+						})
+
+						Context("when CC API < 3.27.0", func() {
+							BeforeEach(func() {
+								helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+							})
+
+							It("displays the app logs and information with instances table", func() {
+								userName, _ := helpers.GetCredentials()
+								session := helpers.CF("start", appName)
+								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+								Consistently(session).ShouldNot(Say("Staging app and tracing logs\\.\\.\\."))
+
+								Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
+
+								Eventually(session).Should(Say("name:\\s+%s", appName))
+								Eventually(session).Should(Say("requested state:\\s+started"))
+								Eventually(session).Should(Say("instances:\\s+2/2"))
+								Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
+								Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
+								Eventually(session).Should(Say("last uploaded:"))
+								Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+								Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+								Eventually(session).Should(Say("start command:"))
+
+								Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
+								Eventually(session).Should(Say("#0\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
+								Eventually(session).Should(Say("#1\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
+								Eventually(session).Should(Exit(0))
+							})
+						})
 					})
 				})
 
@@ -213,28 +250,65 @@ applications:
 								})
 							})
 
-							It("displays the app logs and information with instances table", func() {
-								userName, _ := helpers.GetCredentials()
-								session := helpers.CF("start", appName)
-								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Describe("version dependent display", func() {
+								Context("when CC API >= 3.27.0", func() {
+									BeforeEach(func() {
+										helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+									})
 
-								helpers.ConfirmStagingLogs(session)
+									It("uses the multiprocess display", func() {
+										userName, _ := helpers.GetCredentials()
 
-								Eventually(session).Should(Say("name:\\s+%s", appName))
-								Eventually(session).Should(Say("requested state:\\s+started"))
-								Eventually(session).Should(Say("instances:\\s+2/2"))
-								Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-								Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
-								Eventually(session).Should(Say("last uploaded:"))
-								Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-								Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
-								Eventually(session).Should(Say("start command:"))
+										session := helpers.CF("app", appName)
 
-								Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
+										Eventually(session).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
-								Eventually(session).Should(Say("#0\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
-								Eventually(session).Should(Say("#1\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
-								Eventually(session).Should(Exit(0))
+										Eventually(session).Should(Say("name:\\s+%s", appName))
+										Eventually(session).Should(Say("requested state:\\s+started"))
+										Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+										Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
+										Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+										Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
+										Eventually(session).Should(Say("type:\\s+web"))
+										Eventually(session).Should(Say("instances:\\s+\\d/2"))
+										Eventually(session).Should(Say("memory usage:\\s+128M"))
+										Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
+										Eventually(session).Should(Say("#0\\s+(starting|running)\\s+\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
+
+										Eventually(session).Should(Exit(0))
+									})
+
+								})
+
+								Context("when CC API < 3.27.0", func() {
+									BeforeEach(func() {
+										helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+									})
+
+									It("displays the app logs and information with instances table", func() {
+										userName, _ := helpers.GetCredentials()
+										session := helpers.CF("start", appName)
+										Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+
+										helpers.ConfirmStagingLogs(session)
+
+										Eventually(session).Should(Say("name:\\s+%s", appName))
+										Eventually(session).Should(Say("requested state:\\s+started"))
+										Eventually(session).Should(Say("instances:\\s+2/2"))
+										Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
+										Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
+										Eventually(session).Should(Say("last uploaded:"))
+										Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+										Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+										Eventually(session).Should(Say("start command:"))
+
+										Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
+
+										Eventually(session).Should(Say("#0\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
+										Eventually(session).Should(Say("#1\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
+										Eventually(session).Should(Exit(0))
+									})
+								})
 							})
 
 							Context("when using isolation segments", func() {
