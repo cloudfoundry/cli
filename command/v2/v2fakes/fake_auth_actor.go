@@ -26,7 +26,7 @@ type FakeAuthActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAuthActor) Authenticate(ID string, secret string, grantType constant.GrantType) error {
+func (fake *FakeAuthActor) Authenticate(ID string, secret string, origin string, grantType constant.GrantType) error {
 	fake.authenticateMutex.Lock()
 	ret, specificReturn := fake.authenticateReturnsOnCall[len(fake.authenticateArgsForCall)]
 	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {

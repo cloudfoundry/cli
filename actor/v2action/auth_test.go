@@ -31,7 +31,7 @@ var _ = Describe("Auth Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			actualErr = actor.Authenticate("some-username", "some-password", grantType)
+			actualErr = actor.Authenticate("some-username", "some-password", "", grantType)
 		})
 
 		Context("when no API errors occur", func() {
