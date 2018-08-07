@@ -13,7 +13,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks
-    tag_filter: v6.*
+    tag_filter: v7.*
 - name: cli-ci
   type: git
   source:
@@ -24,12 +24,12 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment
-    tag_filter: v2.*
+    tag_filter: v3.*
 - name: ops-files
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment
-    tag_filter: v2.*
+    tag_filter: v3.*
 - name: state
   type: git
   source:
@@ -38,14 +38,6 @@ resources:
     branch: master
     paths:
     - ci/infrastructure/((stack-name))/bbl-state.json
-- name: cf-state
-  type: git
-  source:
-    uri: git@github.com:cloudfoundry/cli-private
-    private_key: ((cli-private-github-private-key))
-    branch: master
-    paths:
-    - ci/infrastructure/((stack-name))/deployment-vars.yml
 - name: gcp-bosh-pool
   type: pool
   source:
@@ -69,7 +61,6 @@ jobs:
         claim: ((stack-name)).cli.fun
     - get: ops-files
     - get: cli-ci
-    - get: cf-state
   - task: setup-infrastructure
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
     input_mapping:
@@ -108,7 +99,6 @@ jobs:
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
       bbl-state: state
-      vars-store: cf-state
       vars-files: vars_path
       ops-files: combine_inputs_output
     params:
@@ -129,10 +119,6 @@ jobs:
       - put: state
         params:
           repository: updated-bbl-state
-          rebase: true
-      - put: cf-state
-        params:
-          repository: updated-vars-store
           rebase: true
       - put: gcp-bosh-pool
         params:
