@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("rename buildpack command", func() {
 	BeforeEach(func() {
-		Pending("until #126256867 is complete")
+		Skip("until #126256867 is complete")
 	})
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
