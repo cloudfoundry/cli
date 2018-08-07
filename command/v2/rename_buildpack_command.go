@@ -43,6 +43,10 @@ func (cmd *RenameBuildpackCommand) Setup(config command.Config, ui command.UI) e
 }
 
 func (cmd RenameBuildpackCommand) Execute(args []string) error {
+	if !cmd.Config.Experimental() {
+		return translatableerror.UnrefactoredCommandError{}
+	}
+
 	if err := cmd.SharedActor.CheckTarget(false, false); err != nil {
 		return err
 	}

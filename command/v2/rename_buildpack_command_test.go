@@ -34,7 +34,8 @@ var _ = Describe("rename buildpack command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeRenameBuildpackActor)
-		// bpName = "some-new-bp-name"
+
+		fakeConfig.ExperimentalReturns(true)
 
 		cmd = RenameBuildpackCommand{
 			UI:          testUI,
