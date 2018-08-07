@@ -9,155 +9,81 @@ import (
 )
 
 type FakeRenameBuildpackActor struct {
-	GetBuildpackByNameStub        func(name string) (v2action.Buildpack, v2action.Warnings, error)
-	getBuildpackByNameMutex       sync.RWMutex
-	getBuildpackByNameArgsForCall []struct {
-		name string
+	RenameBuildpackStub        func(oldName string, newName string) (v2action.Warnings, error)
+	renameBuildpackMutex       sync.RWMutex
+	renameBuildpackArgsForCall []struct {
+		oldName string
+		newName string
 	}
-	getBuildpackByNameReturns struct {
-		result1 v2action.Buildpack
-		result2 v2action.Warnings
-		result3 error
+	renameBuildpackReturns struct {
+		result1 v2action.Warnings
+		result2 error
 	}
-	getBuildpackByNameReturnsOnCall map[int]struct {
-		result1 v2action.Buildpack
-		result2 v2action.Warnings
-		result3 error
-	}
-	UpdateBuildpackStub        func(buildpack v2action.Buildpack) (v2action.Buildpack, v2action.Warnings, error)
-	updateBuildpackMutex       sync.RWMutex
-	updateBuildpackArgsForCall []struct {
-		buildpack v2action.Buildpack
-	}
-	updateBuildpackReturns struct {
-		result1 v2action.Buildpack
-		result2 v2action.Warnings
-		result3 error
-	}
-	updateBuildpackReturnsOnCall map[int]struct {
-		result1 v2action.Buildpack
-		result2 v2action.Warnings
-		result3 error
+	renameBuildpackReturnsOnCall map[int]struct {
+		result1 v2action.Warnings
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRenameBuildpackActor) GetBuildpackByName(name string) (v2action.Buildpack, v2action.Warnings, error) {
-	fake.getBuildpackByNameMutex.Lock()
-	ret, specificReturn := fake.getBuildpackByNameReturnsOnCall[len(fake.getBuildpackByNameArgsForCall)]
-	fake.getBuildpackByNameArgsForCall = append(fake.getBuildpackByNameArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("GetBuildpackByName", []interface{}{name})
-	fake.getBuildpackByNameMutex.Unlock()
-	if fake.GetBuildpackByNameStub != nil {
-		return fake.GetBuildpackByNameStub(name)
+func (fake *FakeRenameBuildpackActor) RenameBuildpack(oldName string, newName string) (v2action.Warnings, error) {
+	fake.renameBuildpackMutex.Lock()
+	ret, specificReturn := fake.renameBuildpackReturnsOnCall[len(fake.renameBuildpackArgsForCall)]
+	fake.renameBuildpackArgsForCall = append(fake.renameBuildpackArgsForCall, struct {
+		oldName string
+		newName string
+	}{oldName, newName})
+	fake.recordInvocation("RenameBuildpack", []interface{}{oldName, newName})
+	fake.renameBuildpackMutex.Unlock()
+	if fake.RenameBuildpackStub != nil {
+		return fake.RenameBuildpackStub(oldName, newName)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1, ret.result2
 	}
-	return fake.getBuildpackByNameReturns.result1, fake.getBuildpackByNameReturns.result2, fake.getBuildpackByNameReturns.result3
+	return fake.renameBuildpackReturns.result1, fake.renameBuildpackReturns.result2
 }
 
-func (fake *FakeRenameBuildpackActor) GetBuildpackByNameCallCount() int {
-	fake.getBuildpackByNameMutex.RLock()
-	defer fake.getBuildpackByNameMutex.RUnlock()
-	return len(fake.getBuildpackByNameArgsForCall)
+func (fake *FakeRenameBuildpackActor) RenameBuildpackCallCount() int {
+	fake.renameBuildpackMutex.RLock()
+	defer fake.renameBuildpackMutex.RUnlock()
+	return len(fake.renameBuildpackArgsForCall)
 }
 
-func (fake *FakeRenameBuildpackActor) GetBuildpackByNameArgsForCall(i int) string {
-	fake.getBuildpackByNameMutex.RLock()
-	defer fake.getBuildpackByNameMutex.RUnlock()
-	return fake.getBuildpackByNameArgsForCall[i].name
+func (fake *FakeRenameBuildpackActor) RenameBuildpackArgsForCall(i int) (string, string) {
+	fake.renameBuildpackMutex.RLock()
+	defer fake.renameBuildpackMutex.RUnlock()
+	return fake.renameBuildpackArgsForCall[i].oldName, fake.renameBuildpackArgsForCall[i].newName
 }
 
-func (fake *FakeRenameBuildpackActor) GetBuildpackByNameReturns(result1 v2action.Buildpack, result2 v2action.Warnings, result3 error) {
-	fake.GetBuildpackByNameStub = nil
-	fake.getBuildpackByNameReturns = struct {
-		result1 v2action.Buildpack
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
+func (fake *FakeRenameBuildpackActor) RenameBuildpackReturns(result1 v2action.Warnings, result2 error) {
+	fake.RenameBuildpackStub = nil
+	fake.renameBuildpackReturns = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeRenameBuildpackActor) GetBuildpackByNameReturnsOnCall(i int, result1 v2action.Buildpack, result2 v2action.Warnings, result3 error) {
-	fake.GetBuildpackByNameStub = nil
-	if fake.getBuildpackByNameReturnsOnCall == nil {
-		fake.getBuildpackByNameReturnsOnCall = make(map[int]struct {
-			result1 v2action.Buildpack
-			result2 v2action.Warnings
-			result3 error
+func (fake *FakeRenameBuildpackActor) RenameBuildpackReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.RenameBuildpackStub = nil
+	if fake.renameBuildpackReturnsOnCall == nil {
+		fake.renameBuildpackReturnsOnCall = make(map[int]struct {
+			result1 v2action.Warnings
+			result2 error
 		})
 	}
-	fake.getBuildpackByNameReturnsOnCall[i] = struct {
-		result1 v2action.Buildpack
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeRenameBuildpackActor) UpdateBuildpack(buildpack v2action.Buildpack) (v2action.Buildpack, v2action.Warnings, error) {
-	fake.updateBuildpackMutex.Lock()
-	ret, specificReturn := fake.updateBuildpackReturnsOnCall[len(fake.updateBuildpackArgsForCall)]
-	fake.updateBuildpackArgsForCall = append(fake.updateBuildpackArgsForCall, struct {
-		buildpack v2action.Buildpack
-	}{buildpack})
-	fake.recordInvocation("UpdateBuildpack", []interface{}{buildpack})
-	fake.updateBuildpackMutex.Unlock()
-	if fake.UpdateBuildpackStub != nil {
-		return fake.UpdateBuildpackStub(buildpack)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.updateBuildpackReturns.result1, fake.updateBuildpackReturns.result2, fake.updateBuildpackReturns.result3
-}
-
-func (fake *FakeRenameBuildpackActor) UpdateBuildpackCallCount() int {
-	fake.updateBuildpackMutex.RLock()
-	defer fake.updateBuildpackMutex.RUnlock()
-	return len(fake.updateBuildpackArgsForCall)
-}
-
-func (fake *FakeRenameBuildpackActor) UpdateBuildpackArgsForCall(i int) v2action.Buildpack {
-	fake.updateBuildpackMutex.RLock()
-	defer fake.updateBuildpackMutex.RUnlock()
-	return fake.updateBuildpackArgsForCall[i].buildpack
-}
-
-func (fake *FakeRenameBuildpackActor) UpdateBuildpackReturns(result1 v2action.Buildpack, result2 v2action.Warnings, result3 error) {
-	fake.UpdateBuildpackStub = nil
-	fake.updateBuildpackReturns = struct {
-		result1 v2action.Buildpack
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeRenameBuildpackActor) UpdateBuildpackReturnsOnCall(i int, result1 v2action.Buildpack, result2 v2action.Warnings, result3 error) {
-	fake.UpdateBuildpackStub = nil
-	if fake.updateBuildpackReturnsOnCall == nil {
-		fake.updateBuildpackReturnsOnCall = make(map[int]struct {
-			result1 v2action.Buildpack
-			result2 v2action.Warnings
-			result3 error
-		})
-	}
-	fake.updateBuildpackReturnsOnCall[i] = struct {
-		result1 v2action.Buildpack
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
+	fake.renameBuildpackReturnsOnCall[i] = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeRenameBuildpackActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getBuildpackByNameMutex.RLock()
-	defer fake.getBuildpackByNameMutex.RUnlock()
-	fake.updateBuildpackMutex.RLock()
-	defer fake.updateBuildpackMutex.RUnlock()
+	fake.renameBuildpackMutex.RLock()
+	defer fake.renameBuildpackMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

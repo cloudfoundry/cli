@@ -89,7 +89,7 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 
 	if err != nil {
 		if _, ok := err.(actionerror.BuildpackAlreadyExistsWithoutStackError); ok {
-			err = actionerror.BuildpackNameTakenError(cmd.RequiredArgs.Buildpack)
+			err = actionerror.BuildpackNameTakenError{Name: cmd.RequiredArgs.Buildpack}
 			cmd.displayAlreadyExistingBuildpack(err)
 			return nil
 		} else if _, ok := err.(actionerror.BuildpackNameTakenError); ok {

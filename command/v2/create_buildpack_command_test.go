@@ -95,7 +95,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 
 			Context("when creating the buildpack fails because a buildpack already exists", func() {
 				BeforeEach(func() {
-					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackNameTakenError("bp-name"))
+					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackNameTakenError{Name: "bp-name"})
 				})
 
 				It("prints the error message as a warning but does not return it", func() {

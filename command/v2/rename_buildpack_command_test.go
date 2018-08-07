@@ -1,13 +1,10 @@
 package v2_test
 
 import (
-	"errors"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -16,17 +13,14 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("rename buildpack command", func() {
+var _ = FDescribe("rename buildpack command", func() {
 	var (
 		cmd             RenameBuildpackCommand
 		fakeActor       *v2fakes.FakeRenameBuildpackActor
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		testUI          *ui.UI
-
-		// bpName string
-		// buildpack  v2action.Buildpack
-		executeErr error
+		executeErr      error
 	)
 
 	BeforeEach(func() {
@@ -35,14 +29,11 @@ var _ = Describe("rename buildpack command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeRenameBuildpackActor)
 
-		fakeConfig.ExperimentalReturns(true)
-
 		cmd = RenameBuildpackCommand{
 			UI:          testUI,
 			Actor:       fakeActor,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
-			// RequiredArgs: flag.RenameBuildpackArgs{},
 		}
 	})
 
@@ -86,102 +77,35 @@ var _ = Describe("rename buildpack command", func() {
 
 		Context("when renaming to a unique buildpack name", func() {
 			BeforeEach(func() {
-				fakeActor.GetBuildpackByNameReturns(v2action.Buildpack{
-					Name: oldName,
-					GUID: "some-guid",
-				}, v2action.Warnings{"warning1", "warning2"}, nil)
-				fakeActor.UpdateBuildpackReturns(v2action.Buildpack{
-					Name: newName,
-					GUID: "some-guid",
-				}, v2action.Warnings{"warning3", "warning4"}, nil)
+				fakeActor.RenameBuildpackReturns(v2action.Warnings{"warning1", "warning2"}, nil)
 			})
 
 			It("successfully renames the buildpack and displays any warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeActor.GetBuildpackByNameCallCount()).To(Equal(1))
-				Expect(fakeActor.GetBuildpackByNameArgsForCall(0)).To(Equal(oldName))
+				Expect(fakeActor.RenameBuildpackCallCount()).To(Equal(1))
 
-				Expect(fakeActor.UpdateBuildpackCallCount()).To(Equal(1))
-				Expect(fakeActor.UpdateBuildpackArgsForCall(0)).To(Equal(v2action.Buildpack{
-					Name: newName,
-					GUID: "some-guid",
-				}))
+				oldBuildpackName, newBuildpackName := fakeActor.RenameBuildpackArgsForCall(0)
+				Expect(oldBuildpackName).To(Equal(oldName))
+				Expect(newBuildpackName).To(Equal(newName))
 
 				Expect(testUI.Out).To(Say("Renaming buildpack %s to %s...", oldName, newName))
-				Expect(testUI.Err).To(Say("warning1\\nwarning2"))
-				Expect(testUI.Err).To(Say("warning3\\nwarning4"))
-			})
-		})
-
-		// Context("when renaming to the same name", func() {
-		// 	BeforeEach(func() {
-		// 		fakeActor.GetBuildpackByNameReturns(v2action.Buildpack{
-		// 			Name: oldName,
-		// 			GUID: "some-guid",
-		// 		}, v2action.Warnings{"warning1", "warning2"}, nil)
-		// 		fakeActor.UpdateBuildpackReturns(v2action.Buildpack{
-		// 			Name: newName,
-		// 			GUID: "some-guid",
-		// 		}, v2action.Warnings{"warning3", "warning4"}, nil)
-		// 	})
-
-		// 	It("successfully renames the buildpack", func() {
-		// 	})
-		// })
-
-		Context("when the actor returns a multiple buildpacks found error", func() {
-			BeforeEach(func() {
-				fakeActor.GetBuildpackByNameReturns(v2action.Buildpack{}, v2action.Warnings{"warning1", "warning2"}, actionerror.MultipleBuildpacksFoundError{BuildpackName: "some-bp-name"})
-			})
-
-			It("returns an error and prints warnings", func() {
-				Expect(executeErr).To(MatchError(translatableerror.MultipleBuildpacksFoundError{BuildpackName: "some-bp-name"}))
-				Expect(testUI.Err).To(Say("warning1\\nwarning2"))
-			})
-		})
-
-		Context("when the actor errors when looking up the buildpack", func() {
-			BeforeEach(func() {
-				fakeActor.GetBuildpackByNameReturns(v2action.Buildpack{}, v2action.Warnings{"warning1", "warning2"}, errors.New("buildpack error!"))
-			})
-
-			It("returns an error and prints warnings", func() {
-				Expect(executeErr).To(MatchError("buildpack error!"))
-				Expect(testUI.Err).To(Say("warning1\\nwarning2"))
-			})
-		})
-
-		Context("when the actor errors because the target buildpack does not exist", func() {
-			BeforeEach(func() {
-				fakeActor.GetBuildpackByNameReturns(v2action.Buildpack{}, v2action.Warnings{"warning1", "warning2"}, actionerror.BuildpackNotFoundError{BuildpackName: oldName})
-			})
-
-			It("returns an error and prints warnings", func() {
-				Expect(executeErr).To(MatchError(translatableerror.BuildpackNotFoundError{BuildpackName: oldName}))
-				Expect(testUI.Err).To(Say("warning1\\nwarning2"))
+				Expect(testUI.Err).To(Say("warning1"))
+				Expect(testUI.Err).To(Say("warning2"))
 			})
 		})
 
 		Context("when the actor errors because a buildpack with the desired name already exists", func() {
 			BeforeEach(func() {
-				fakeActor.UpdateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"warning1", "warning2"}, actionerror.BuildpackNameTakenError(newName))
+				fakeActor.RenameBuildpackReturns(
+					v2action.Warnings{"warning1", "warning2"},
+					actionerror.BuildpackNameTakenError{Name: newName})
 			})
 
 			It("returns an error and prints warnings", func() {
-				Expect(executeErr).To(MatchError(actionerror.BuildpackNameTakenError(newName)))
-				Expect(testUI.Err).To(Say("warning1\\nwarning2"))
-			})
-		})
-
-		Context("when the actor errors when updating the buildpack", func() {
-			BeforeEach(func() {
-				fakeActor.UpdateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"warning1", "warning2"}, errors.New("update error!"))
-			})
-
-			It("returns an error and prints warnings", func() {
-				Expect(executeErr).To(MatchError("update error!"))
-				Expect(testUI.Err).To(Say("warning1\\nwarning2"))
+				Expect(executeErr).To(MatchError(actionerror.BuildpackNameTakenError{Name: newName}))
+				Expect(testUI.Err).To(Say("warning1"))
+				Expect(testUI.Err).To(Say("warning2"))
 			})
 		})
 	})

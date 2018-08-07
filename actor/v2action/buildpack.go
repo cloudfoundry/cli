@@ -75,7 +75,7 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 	}
 
 	if _, ok := err.(ccerror.BuildpackNameTakenError); ok {
-		return Buildpack{}, Warnings(warnings), actionerror.BuildpackNameTakenError(name)
+		return Buildpack{}, Warnings(warnings), actionerror.BuildpackNameTakenError{Name: name}
 	}
 
 	return Buildpack{GUID: ccBuildpack.GUID}, Warnings(warnings), err
@@ -165,6 +165,28 @@ func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, e
 	}
 
 	return Buildpack(updatedBuildpack), Warnings(warnings), nil
+}
+
+func (actor *Actor) RenameBuildpack(oldName string, newName string) (Warnings, error) {
+	var allWarnings Warnings
+
+	oldBp, getWarnings, err := actor.GetBuildpackByName(oldName)
+
+	allWarnings = append(allWarnings, getWarnings...)
+
+	if err != nil {
+		return Warnings(allWarnings), err
+	}
+
+	oldBp.Name = newName
+
+	_, updateWarnings, err := actor.UpdateBuildpack(oldBp)
+	allWarnings = append(allWarnings, updateWarnings...)
+	if err != nil {
+		return Warnings(allWarnings), err
+	}
+
+	return Warnings(allWarnings), nil
 }
 
 // Zipit zips the source into a .zip file in the target dir

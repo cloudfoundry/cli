@@ -1,20 +1,17 @@
 package v2
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
 //go:generate counterfeiter . RenameBuildpackActor
 
 type RenameBuildpackActor interface {
-	GetBuildpackByName(name string) (v2action.Buildpack, v2action.Warnings, error)
-	UpdateBuildpack(buildpack v2action.Buildpack) (v2action.Buildpack, v2action.Warnings, error)
+	RenameBuildpack(oldName string, newName string) (v2action.Warnings, error)
 }
 
 type RenameBuildpackCommand struct {
@@ -43,10 +40,6 @@ func (cmd *RenameBuildpackCommand) Setup(config command.Config, ui command.UI) e
 }
 
 func (cmd RenameBuildpackCommand) Execute(args []string) error {
-	if !cmd.Config.Experimental() {
-		return translatableerror.UnrefactoredCommandError{}
-	}
-
 	if err := cmd.SharedActor.CheckTarget(false, false); err != nil {
 		return err
 	}
@@ -56,24 +49,12 @@ func (cmd RenameBuildpackCommand) Execute(args []string) error {
 		"NewName": cmd.RequiredArgs.NewBuildpackName,
 	})
 
-	oldBp, warnings, err := cmd.Actor.GetBuildpackByName(cmd.RequiredArgs.OldBuildpackName)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		if _, notFound := err.(actionerror.BuildpackNotFoundError); notFound {
-			return translatableerror.ConvertToTranslatableError(err)
-		} else if _, ambiguousBuildpacks := err.(actionerror.MultipleBuildpacksFoundError); ambiguousBuildpacks {
-			return translatableerror.ConvertToTranslatableError(err)
-		}
-		return err
-	}
-
-	oldBp.Name = cmd.RequiredArgs.NewBuildpackName
-
-	_, warnings, err = cmd.Actor.UpdateBuildpack(oldBp)
+	warnings, err := cmd.Actor.RenameBuildpack(cmd.RequiredArgs.OldBuildpackName, cmd.RequiredArgs.NewBuildpackName)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
+
 	cmd.UI.DisplayOK()
 
 	return nil
