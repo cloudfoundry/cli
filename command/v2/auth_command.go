@@ -14,13 +14,14 @@ import (
 //go:generate counterfeiter . AuthActor
 
 type AuthActor interface {
-	Authenticate(ID string, secret string, grantType constant.GrantType) error
+	Authenticate(ID string, secret string, origin string, grantType constant.GrantType) error
 }
 
 type AuthCommand struct {
 	RequiredArgs      flag.Authentication `positional-args:"yes"`
 	ClientCredentials bool                `long:"client-credentials" description:"Use (non-user) service account (also called client credentials)"`
-	usage             interface{}         `usage:"CF_NAME auth USERNAME PASSWORD\n   CF_NAME auth CLIENT_ID CLIENT_SECRET --client-credentials\n\nENVIRONMENT VARIABLES:\n   CF_USERNAME=user		Authenticating user. Overridden if USERNAME argument is provided.\n   CF_PASSWORD=password		Password associated with user. Overriden if PASSWORD argument is provided.\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n   Consider using the CF_PASSWORD environment variable instead\n\nEXAMPLES:\n   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"`
+	Origin            string              `long:"origin" description:"Indicates the identity provider to be used for authentication"`
+	usage             interface{}         `usage:"CF_NAME auth USERNAME PASSWORD\n   CF_NAME auth USERNAME PASSWORD --origin ORIGIN\n   CF_NAME auth CLIENT_ID CLIENT_SECRET --client-credentials\n\nENVIRONMENT VARIABLES:\n   CF_USERNAME=user          Authenticating user. Overridden if USERNAME argument is provided.\n   CF_PASSWORD=password      Password associated with user. Overriden if PASSWORD argument is provided.\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n   Consider using the CF_PASSWORD environment variable instead\n\nEXAMPLES:\n   CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n   CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"`
 	relatedCommands   interface{}         `related_commands:"api, login, target"`
 
 	UI     command.UI
@@ -64,7 +65,7 @@ func (cmd AuthCommand) Execute(args []string) error {
 		grantType = constant.GrantTypeClientCredentials
 	}
 
-	err = cmd.Actor.Authenticate(username, password, grantType)
+	err = cmd.Actor.Authenticate(username, password, cmd.Origin, grantType)
 	if err != nil {
 		return err
 	}
