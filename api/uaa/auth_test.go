@@ -30,6 +30,7 @@ var _ = Describe("Auth", func() {
 		var (
 			identity  string
 			secret    string
+			origin    string
 			grantType constant.GrantType
 
 			accessToken  string
@@ -38,7 +39,7 @@ var _ = Describe("Auth", func() {
 		)
 
 		JustBeforeEach(func() {
-			accessToken, refreshToken, executeErr = client.Authenticate(identity, secret, grantType)
+			accessToken, refreshToken, executeErr = client.Authenticate(identity, secret, origin, grantType)
 		})
 
 		Context("when no errors occur", func() {
