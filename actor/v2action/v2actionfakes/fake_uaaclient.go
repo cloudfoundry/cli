@@ -10,7 +10,7 @@ import (
 )
 
 type FakeUAAClient struct {
-	AuthenticateStub        func(ID string, secret string, grantType constant.GrantType) (string, string, error)
+	AuthenticateStub        func(ID string, secret string, origin string, grantType constant.GrantType) (string, string, error)
 	authenticateMutex       sync.RWMutex
 	authenticateArgsForCall []struct {
 		ID        string
@@ -73,7 +73,7 @@ type FakeUAAClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUAAClient) Authenticate(ID string, secret string, grantType constant.GrantType) (string, string, error) {
+func (fake *FakeUAAClient) Authenticate(ID string, secret string, origin string, grantType constant.GrantType) (string, string, error) {
 	fake.authenticateMutex.Lock()
 	ret, specificReturn := fake.authenticateReturnsOnCall[len(fake.authenticateArgsForCall)]
 	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
@@ -84,7 +84,7 @@ func (fake *FakeUAAClient) Authenticate(ID string, secret string, grantType cons
 	fake.recordInvocation("Authenticate", []interface{}{ID, secret, grantType})
 	fake.authenticateMutex.Unlock()
 	if fake.AuthenticateStub != nil {
-		return fake.AuthenticateStub(ID, secret, grantType)
+		return fake.AuthenticateStub(ID, secret, "", grantType)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
