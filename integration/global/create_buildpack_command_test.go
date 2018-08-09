@@ -75,8 +75,8 @@ var _ = PDescribe("create buildpack command", func() {
 
 				It("returns an error", func() {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackDir, "1")
+					Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'some/nonexistent/dir' does not exist."))
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).To(Say("Incorrect Usage: The specified path 'some/nonexistent/dir' does not exist."))
 				})
 			})
 
@@ -124,8 +124,8 @@ var _ = PDescribe("create buildpack command", func() {
 							}, "")
 
 							session := helpers.CF("buildpacks")
+							Eventually(session).Should(Say(`%s\s+1`, buildpackName))
 							Eventually(session).Should(Exit(0))
-							Expect(session.Out).To(Say(`%s\s+1`, buildpackName))
 						})
 					})
 
@@ -141,8 +141,8 @@ var _ = PDescribe("create buildpack command", func() {
 							}, stacks[0])
 
 							session := helpers.CF("buildpacks")
+							Eventually(session).Should(Say(`%s\s+%s\s+1`, buildpackName, stacks[0]))
 							Eventually(session).Should(Exit(0))
-							Expect(session.Out).To(Say(`%s\s+%s\s+1`, buildpackName, stacks[0]))
 						})
 					})
 				})
@@ -155,8 +155,8 @@ var _ = PDescribe("create buildpack command", func() {
 					It("returns the appropriate error", func() {
 						helpers.BuildpackWithStack(func(buildpackPath string) {
 							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+							Eventually(session.Err).Should(Say("Uploaded buildpack stack \\(fake-stack\\) does not exist"))
 							Eventually(session).Should(Exit(1))
-							Expect(session.Err).To(Say("Uploaded buildpack stack \\(fake-stack\\) does not exist"))
 						}, "fake-stack")
 					})
 				})
@@ -190,9 +190,9 @@ var _ = PDescribe("create buildpack command", func() {
 								}, stacks[0])
 
 								session := helpers.CF("buildpacks")
+								Eventually(session).Should(Say(`%s\s+1`, buildpackName))
+								Eventually(session).Should(Say(`%s\s+%s\s+6`, existingBuildpack, stacks[0]))
 								Eventually(session).Should(Exit(0))
-								Expect(session.Out).To(Say(`%s\s+1`, buildpackName))
-								Expect(session.Out).To(Say(`%s\s+%s\s+6`, existingBuildpack, stacks[0]))
 							})
 						})
 
@@ -207,13 +207,13 @@ var _ = PDescribe("create buildpack command", func() {
 							It("prints a warning", func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-									Eventually(session).Should(Exit(0))
 									Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", buildpackName))
+									Eventually(session).Should(Exit(0))
 								}, "")
 
 								session := helpers.CF("buildpacks")
+								Eventually(session).Should(Say(`%s\s+5`, existingBuildpack))
 								Eventually(session).Should(Exit(0))
-								Expect(session).To(Say(`%s\s+5`, existingBuildpack))
 							})
 						})
 					})
@@ -239,9 +239,9 @@ var _ = PDescribe("create buildpack command", func() {
 								}, stacks[0])
 
 								session := helpers.CF("buildpacks")
+								Eventually(session).Should(Say(`%s\s+%s\s+1`, buildpackName, stacks[0]))
+								Eventually(session).Should(Say(`%s\s+%s\s+6`, existingBuildpack, stacks[1]))
 								Eventually(session).Should(Exit(0))
-								Expect(session.Out).To(Say(`%s\s+%s\s+1`, buildpackName, stacks[0]))
-								Expect(session.Out).To(Say(`%s\s+%s\s+6`, existingBuildpack, stacks[1]))
 							})
 						})
 
@@ -256,9 +256,9 @@ var _ = PDescribe("create buildpack command", func() {
 							It("prints a warning and tip but doesn't exit 1", func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-									Eventually(session).Should(Exit(0))
 									Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", buildpackName))
-									Eventually(session.Out).Should(Say("TIP: use 'cf buildpacks' and 'cf delete-buildpack' to delete buildpack %s without a stack", buildpackName))
+									Eventually(session).Should(Say("TIP: use 'cf buildpacks' and 'cf delete-buildpack' to delete buildpack %s without a stack", buildpackName))
+									Eventually(session).Should(Exit(0))
 								}, stacks[0])
 
 							})
@@ -276,9 +276,9 @@ var _ = PDescribe("create buildpack command", func() {
 							It("prints a warning but doesn't exit 1", func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+									Eventually(session.Err).Should(Say("The buildpack name %s is already in use for the stack %s", buildpackName, stacks[0]))
+									Eventually(session).Should(Say("TIP: use 'cf update-buildpack' to update this buildpack"))
 									Eventually(session).Should(Exit(0))
-									Expect(session.Err).To(Say("The buildpack name %s is already in use for the stack %s", buildpackName, stacks[0]))
-									Expect(session.Out).To(Say("TIP: use 'cf update-buildpack' to update this buildpack"))
 								}, stacks[0])
 							})
 						})
@@ -297,9 +297,9 @@ var _ = PDescribe("create buildpack command", func() {
 						It("prints a warning but doesn't exit 1", func() {
 							helpers.BuildpackWithStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", "-v", buildpackName, buildpackPath, "1")
-								Eventually(session).Should(Exit(0))
 								Eventually(session.Err).Should(Say("Buildpack %s already exists", buildpackName))
-								Eventually(session.Out).Should(Say("TIP: use 'cf buildpacks' and 'cf delete-buildpack' to delete buildpack %s", buildpackName))
+								Eventually(session).Should(Say("TIP: use 'cf buildpacks' and 'cf delete-buildpack' to delete buildpack %s", buildpackName))
+								Eventually(session).Should(Exit(0))
 							}, "")
 						})
 					})
@@ -309,9 +309,9 @@ var _ = PDescribe("create buildpack command", func() {
 			Context("when specifying an invalid path", func() {
 				It("returns the appropriate error", func() {
 					session := helpers.CF("create-buildpack", buildpackName, "bogus-path", "1")
-					Eventually(session).Should(Exit(1))
 
-					Expect(session.Err).To(Say("Incorrect Usage: The specified path 'bogus-path' does not exist"))
+					Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'bogus-path' does not exist"))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})
@@ -385,8 +385,8 @@ var _ = PDescribe("create buildpack command", func() {
 					}, "")
 
 					session := helpers.CF("buildpacks")
+					Eventually(session).Should(Say(`%s\s+3`, buildpackName))
 					Eventually(session).Should(Exit(0))
-					Expect(session.Out).To(Say(`%s\s+3`, buildpackName))
 				})
 			})
 		})
@@ -400,8 +400,8 @@ var _ = PDescribe("create buildpack command", func() {
 					}, "")
 
 					session := helpers.CF("buildpacks")
+					Eventually(session).Should(Say(`%s\s+1\s+false`, buildpackName))
 					Eventually(session).Should(Exit(0))
-					Expect(session.Out).To(Say(`%s\s+1\s+false`, buildpackName))
 				})
 			})
 
@@ -409,9 +409,9 @@ var _ = PDescribe("create buildpack command", func() {
 				It("returns the appropriate error", func() {
 					helpers.BuildpackWithStack(func(buildpackPath string) {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--enable", "--disable")
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --enable, --disable"))
 						Eventually(session).Should(Exit(1))
-						Expect(session.Out).To(Say("FAILED"))
-						Expect(session.Err).To(Say("Incorrect Usage: The following arguments cannot be used together: --enable, --disable"))
 					}, "")
 				})
 			})
