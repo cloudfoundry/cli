@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = FDescribe("rename buildpack command", func() {
+var _ = Describe("rename buildpack command", func() {
 	var (
 		cmd             RenameBuildpackCommand
 		fakeActor       *v2fakes.FakeRenameBuildpackActor
