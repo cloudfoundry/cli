@@ -26,6 +26,9 @@ func AddOrReplaceEnvironment(env []string, newEnvName string, newEnvVal string) 
 	return env
 }
 
+// CheckEnvironmentTargetedCorrectly will confirm if the command requires an
+// API to be targeted and logged in to run. It can optionally check if the
+// command requires org and space to be targeted.
 func CheckEnvironmentTargetedCorrectly(targetedOrganizationRequired bool, targetedSpaceRequired bool, testOrg string, command ...string) {
 	LoginCF()
 
