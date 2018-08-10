@@ -73,9 +73,10 @@ var _ = Describe("auth Command", func() {
 				Expect(testUI.Out).To(Say("Use '%s target' to view or set your target org and space", binaryName))
 
 				Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-				ID, secret, grantType := fakeActor.AuthenticateArgsForCall(0)
+				ID, secret, origin, grantType := fakeActor.AuthenticateArgsForCall(0)
 				Expect(ID).To(Equal(testID))
 				Expect(secret).To(Equal(testSecret))
+				Expect(origin).To(Equal(""))
 				Expect(grantType).To(Equal(constant.GrantTypeClientCredentials))
 			})
 		})
@@ -96,9 +97,10 @@ var _ = Describe("auth Command", func() {
 					Expect(testUI.Out).To(Say("Use '%s target' to view or set your target org and space", binaryName))
 
 					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-					username, password, grantType := fakeActor.AuthenticateArgsForCall(0)
+					username, password, origin, grantType := fakeActor.AuthenticateArgsForCall(0)
 					Expect(username).To(Equal(testID))
 					Expect(password).To(Equal(testSecret))
+					Expect(origin).To(Equal(""))
 					Expect(grantType).To(Equal(constant.GrantTypePassword))
 				})
 			})
@@ -121,9 +123,10 @@ var _ = Describe("auth Command", func() {
 						Expect(err).ToNot(HaveOccurred())
 
 						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-						username, password, _ := fakeActor.AuthenticateArgsForCall(0)
+						username, password, origin, _ := fakeActor.AuthenticateArgsForCall(0)
 						Expect(username).To(Equal(envUsername))
 						Expect(password).To(Equal(envPassword))
+						Expect(origin).To(Equal(""))
 					})
 				})
 
@@ -137,9 +140,10 @@ var _ = Describe("auth Command", func() {
 						Expect(err).ToNot(HaveOccurred())
 
 						Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-						username, password, _ := fakeActor.AuthenticateArgsForCall(0)
+						username, password, origin, _ := fakeActor.AuthenticateArgsForCall(0)
 						Expect(username).To(Equal(testID))
 						Expect(password).To(Equal(testSecret))
+						Expect(origin).To(Equal(""))
 					})
 				})
 			})

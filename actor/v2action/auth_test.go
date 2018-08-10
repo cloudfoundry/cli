@@ -52,9 +52,10 @@ var _ = Describe("Auth Actions", func() {
 					Expect(actualErr).NotTo(HaveOccurred())
 
 					Expect(fakeUAAClient.AuthenticateCallCount()).To(Equal(1))
-					ID, secret, passedGrantType := fakeUAAClient.AuthenticateArgsForCall(0)
+					ID, secret, origin, passedGrantType := fakeUAAClient.AuthenticateArgsForCall(0)
 					Expect(ID).To(Equal("some-username"))
 					Expect(secret).To(Equal("some-password"))
+					Expect(origin).To(Equal("uaa"))
 					Expect(passedGrantType).To(Equal(constant.GrantTypePassword))
 
 					Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
