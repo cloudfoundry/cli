@@ -1,7 +1,6 @@
 package uaa
 
 import (
-	"errors"
 	"net/http"
 	"net/url"
 	"strings"
@@ -27,15 +26,15 @@ func (client Client) Authenticate(ID string, secret string, origin string, grant
 	case constant.GrantTypeClientCredentials:
 		requestBody.Set("client_id", ID)
 		requestBody.Set("client_secret", secret)
-		if origin != "" {
-			return "", "", errors.New("Incorrect Usage: The following arguments cannot be used together: --client-credentials, --origin")
-		}
 	default:
 		requestBody.Set("username", ID)
 		requestBody.Set("password", secret)
-		if origin != "" {
-			requestBody.Set("login_hint", "{\"origin\":\""+origin+"\"}")
-		}
+	}
+
+	var query url.Values
+	if origin != "" {
+		query = url.Values{}
+		query.Set("login_hint", "{\"origin\":\""+origin+"\"}")
 	}
 
 	request, err := client.newRequest(requestOptions{
@@ -43,7 +42,8 @@ func (client Client) Authenticate(ID string, secret string, origin string, grant
 		Header: http.Header{
 			"Content-Type": {"application/x-www-form-urlencoded"},
 		},
-		Body: strings.NewReader(requestBody.Encode()),
+		Body:  strings.NewReader(requestBody.Encode()),
+		Query: query,
 	})
 
 	if err != nil {
