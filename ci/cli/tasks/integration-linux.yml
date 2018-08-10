@@ -37,7 +37,7 @@ run:
     popd
 
     credhub login
-    export CF_INT_PASSWORD=$(credhub get -n /bosh-${target}/cf/cf_admin_password | bosh interpolate --path /value -)
+    export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
 
     set -x
 
