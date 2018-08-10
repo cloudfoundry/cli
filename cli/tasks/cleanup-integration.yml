@@ -27,7 +27,13 @@ run:
 
     ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
 
-    export CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
+    pushd vars-store/ci/infrastructure/$ENV
+    eval "$(bbl print-env)"
+    popd
+
+    credhub login
+    export CF_INT_PASSWORD=$(credhub get -n /bosh-${target}/cf/cf_admin_password | bosh interpolate --path /value -)
+
     # output password into a temp file for consumption by Windows
     echo $CF_INT_PASSWORD > cleanup-integration-outputs/cf-password
 
