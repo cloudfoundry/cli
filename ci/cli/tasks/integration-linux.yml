@@ -32,12 +32,17 @@ run:
     set -e
 
     ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
-    pushd vars-store/ci/infrastructure/$ENV
-    eval "$(bbl print-env)"
-    popd
 
-    credhub login
-    export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+    if [[ $ENV == "homeroom" ]]; then
+-    export CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
+    else
+      pushd vars-store/ci/infrastructure/$ENV
+        eval "$(bbl print-env)"
+      popd
+
+      credhub login
+      export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+    fi
 
     set -x
 
