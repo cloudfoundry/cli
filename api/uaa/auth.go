@@ -33,8 +33,9 @@ func (client Client) Authenticate(ID string, secret string, origin string, grant
 
 	var query url.Values
 	if origin != "" {
-		query = url.Values{}
-		query.Set("login_hint", "{\"origin\":\""+origin+"\"}")
+		query = url.Values{
+			"login_hint": {string("{\"origin\":\"" + origin + "\"}")},
+		}
 	}
 
 	request, err := client.newRequest(requestOptions{

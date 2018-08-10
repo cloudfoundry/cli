@@ -81,6 +81,21 @@ var _ = Describe("auth Command", func() {
 			})
 		})
 
+		Context("when --client-credentials and --origin are set", func() {
+			BeforeEach(func() {
+				cmd.ClientCredentials = true
+				cmd.RequiredArgs.Username = testID
+				cmd.RequiredArgs.Password = testSecret
+				cmd.Origin = "uaa"
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				Expect(err).To(HaveOccurred())
+				_, ok := err.(translatableerror.ArgumentCombinationError)
+				Expect(ok).To(Equal(true))
+			})
+		})
+
 		Context("when --client-credentials is not set", func() {
 			Context("when username and password are only provided as arguments", func() {
 				BeforeEach(func() {
