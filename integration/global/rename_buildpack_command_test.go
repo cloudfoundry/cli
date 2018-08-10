@@ -10,10 +10,6 @@ import (
 )
 
 var _ = Describe("rename buildpack command", func() {
-	BeforeEach(func() {
-		Skip("until #158613755 is complete")
-	})
-
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
