@@ -53,6 +53,12 @@ func (cmd AuthCommand) Execute(args []string) error {
 		return err
 	}
 
+	if cmd.ClientCredentials && cmd.Origin != "" {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--client-credentials", "--origin"},
+		}
+	}
+
 	cmd.UI.DisplayTextWithFlavor(
 		"API endpoint: {{.Endpoint}}",
 		map[string]interface{}{
