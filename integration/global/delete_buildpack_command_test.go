@@ -46,7 +46,7 @@ var _ = Describe("delete-buildpack command", func() {
 		})
 	})
 
-	PContext("there is exactly one buildpack with the specified name", func() {
+	Context("there is exactly one buildpack with the specified name", func() {
 
 		BeforeEach(func() {
 			stacks = helpers.FetchStacks()

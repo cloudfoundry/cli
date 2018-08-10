@@ -17,9 +17,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-// Pending until we can release stack association
-// Can't live in experimental due to test pollution when asserting buildpack order
-var _ = PDescribe("create buildpack command", func() {
+var _ = Describe("create buildpack command", func() {
 	var buildpackName string
 
 	BeforeEach(func() {
@@ -298,7 +296,7 @@ var _ = PDescribe("create buildpack command", func() {
 							helpers.BuildpackWithStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", "-v", buildpackName, buildpackPath, "1")
 								Eventually(session.Err).Should(Say("Buildpack %s already exists", buildpackName))
-								Eventually(session).Should(Say("TIP: use 'cf buildpacks' and 'cf delete-buildpack' to delete buildpack %s", buildpackName))
+								Eventually(session.Out).Should(Say("TIP: use 'cf update-buildpack' to update this buildpack"))
 								Eventually(session).Should(Exit(0))
 							}, "")
 						})

@@ -102,7 +102,7 @@ var _ = Describe("create-buildpack command", func() {
 		})
 	})
 
-	PIt("warns the user when the buildpack with nil stack already exists", func() {
+	It("warns the user when the buildpack with nil stack already exists", func() {
 		repo.CreateBuildpackWithNilStackExists = true
 		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
@@ -115,7 +115,7 @@ var _ = Describe("create-buildpack command", func() {
 		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
-	PIt("warns the user when the buildpack with actual stack already exists", func() {
+	It("warns the user when the buildpack with actual stack already exists", func() {
 		bitsRepo.UploadBuildpackReturns(errors.NewHTTPError(433, errors.BuildpackNameStackTaken, "test error"))
 		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 

@@ -49,7 +49,6 @@ var _ = Describe("CreateBuildpackCommand", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
@@ -102,11 +101,11 @@ var _ = Describe("CreateBuildpackCommand", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Err).To(Say("some-create-bp-warning"))
 					Expect(testUI.Err).To(Say("Buildpack bp-name already exists"))
-					Expect(testUI.Out).To(Say("TIP: use 'faceman buildpacks' and 'faceman delete-buildpack' to delete buildpack bp-name"))
+					Expect(testUI.Out).To(Say("TIP: use 'faceman update-buildpack' to update this buildpack"))
 				})
 			})
 
-			PContext("when creating the buildpack fails because a buildpack with the nil stack already exists", func() {
+			Context("when creating the buildpack fails because a buildpack with the nil stack already exists", func() {
 				BeforeEach(func() {
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackAlreadyExistsWithoutStackError("bp-name"))
 					cmd.RequiredArgs.Buildpack = "bp-name"

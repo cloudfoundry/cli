@@ -58,7 +58,7 @@ func (cmd *ListBuildpacks) SetDependency(deps commandregistry.Dependency, plugin
 func (cmd *ListBuildpacks) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Getting buildpacks...\n"))
 
-	table := cmd.ui.Table([]string{"buildpack", T("position"), T("enabled"), T("locked"), T("filename")})
+	table := cmd.ui.Table([]string{"buildpack", T("stack"), T("position"), T("enabled"), T("locked"), T("filename")})
 	noBuildpacks := true
 
 	apiErr := cmd.buildpackRepo.ListBuildpacks(func(buildpack models.Buildpack) bool {
@@ -76,6 +76,7 @@ func (cmd *ListBuildpacks) Execute(c flags.FlagContext) error {
 		}
 		table.Add(
 			buildpack.Name,
+			buildpack.Stack,
 			position,
 			enabled,
 			locked,

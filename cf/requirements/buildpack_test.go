@@ -36,7 +36,7 @@ var _ = Describe("BuildpackRequirement", func() {
 		Expect(err.Error()).To(ContainSubstring("Multiple buildpacks named foo found"))
 	})
 
-	PIt("finds buildpacks by stack if specified, in addition to name", func() {
+	It("finds buildpacks by stack if specified, in addition to name", func() {
 		buildpack := models.Buildpack{Name: "my-buildpack", Stack: "my-stack"}
 		buildpackRepo := &apifakes.OldFakeBuildpackRepository{FindByNameAndStackBuildpack: buildpack}
 

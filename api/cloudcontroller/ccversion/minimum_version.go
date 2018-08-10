@@ -17,5 +17,5 @@ const (
 	MinVersionV3                 = "3.27.0"
 
 	MinVersionManifestBuildpacksV3        = "3.25.0"
-	MinVersionBuildpackStackAssociationV3 = "99.0.0"
+	MinVersionBuildpackStackAssociationV3 = "3.47.0"
 )

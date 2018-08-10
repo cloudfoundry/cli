@@ -29,11 +29,11 @@ func NewBuildpackRequirement(name, stack string, bR api.BuildpackRepository) (re
 
 func (req *buildpackAPIRequirement) Execute() error {
 	var apiErr error
-	// if req.stack == "" {
-	req.buildpack, apiErr = req.buildpackRepo.FindByName(req.name)
-	// } else {
-	// 	req.buildpack, apiErr = req.buildpackRepo.FindByNameAndStack(req.name, req.stack)
-	// }
+	if req.stack == "" {
+		req.buildpack, apiErr = req.buildpackRepo.FindByName(req.name)
+	} else {
+		req.buildpack, apiErr = req.buildpackRepo.FindByNameAndStack(req.name, req.stack)
+	}
 
 	if apiErr != nil {
 		return apiErr
