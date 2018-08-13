@@ -73,6 +73,7 @@ var _ = Describe("rename buildpack command", func() {
 
 			Context("when renaming to the same name as another buildpack", func() {
 				BeforeEach(func() {
+					Skip("Pending until #158613755")
 					existingBuildpackName = helpers.NewBuildpack()
 
 					helpers.BuildpackWithStack(func(buildpackPath string) {
