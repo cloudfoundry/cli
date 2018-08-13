@@ -545,7 +545,7 @@ var _ = Describe("Start Command", func() {
 								Expect(passedAppName).To(Equal(appName))
 								Expect(spaceGUID).To(Equal("some-space-guid"))
 								Expect(withObfuscatedValues).To(BeTrue())
-								
+
 								Expect(testUI.Out).To(Say("name:\\s+%s", appName))
 								Expect(testUI.Out).To(Say("type:\\s+aba"))
 								Expect(testUI.Out).To(Say("instances:\\s+0/0"))
@@ -556,7 +556,7 @@ var _ = Describe("Start Command", func() {
 								Expect(testUI.Out).To(Say("memory usage:\\s+16M"))
 								Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
 
-								Expect(testUI.Err).To(Say("combo-summary-warning"))					
+								Expect(testUI.Err).To(Say("combo-summary-warning"))
 							})
 						})
 

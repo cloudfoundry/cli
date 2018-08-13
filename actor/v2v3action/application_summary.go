@@ -21,6 +21,7 @@ func (summary ApplicationSummary) GetIsolationSegmentName() (string, bool) {
 }
 
 func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (ApplicationSummary, Warnings, error) {
+
 	var summary ApplicationSummary
 	var allWarnings Warnings
 

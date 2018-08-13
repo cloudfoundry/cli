@@ -766,7 +766,7 @@ var _ = Describe("push Command", func() {
 								})
 							})
 
-							Context("when the api is equal/above MinVersionV3", func() {
+							Context("when the api is at least MinVersionV3", func() {
 								BeforeEach(func() {
 									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.50.0")
 									fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(
