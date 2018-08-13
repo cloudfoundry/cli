@@ -140,6 +140,7 @@
     type: certificate
     options:
       ca: uaa-oidc_ca
+      common_name: saml_oidc
 
 - type: replace
   path: /variables?/-
