@@ -34,7 +34,8 @@ var _ = Describe("auth command", func() {
 			Eventually(session).Should(Say("cf auth name@example\\.com \\\"\\\\\"password\\\\\"\\\" \\(escape quotes if used in password\\)\n\n"))
 
 			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say("--client-credentials\\s+Use \\(non-user\\) service account \\(also called client credentials\\)\n\n"))
+			Eventually(session).Should(Say("--client-credentials\\s+Use \\(non-user\\) service account \\(also called client credentials\\)\n"))
+			Eventually(session).Should(Say("--origin\\s+Indicates the identity provider to be used for authentication\n\n"))
 
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("api, login, target"))
