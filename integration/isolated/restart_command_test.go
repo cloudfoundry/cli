@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("restart command", func() {
+var _ = FDescribe("restart command", func() {
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
