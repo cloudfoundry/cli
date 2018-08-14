@@ -8,6 +8,8 @@ SET PATH=%CD%;%PATH%
 
 SET /p DOMAIN=<%CD%\bosh-lite-lock\name
 SET /p CF_INT_PASSWORD=<%CD%\cf-credentials\cf-password
+SET /p CF_INT_OIDC_PASSWORD=<%CD%\cf-credentials\uaa-oidc-password
+SET CF_INT_OIDC_USERNAME=admin
 SET CF_INT_API=https://api.%DOMAIN%
 
 pushd %CD%\cf-cli-binaries
