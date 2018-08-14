@@ -33,90 +33,310 @@ var _ = Describe("rename buildpack command", func() {
 
 	Context("when the user is logged in", func() {
 		var (
-			oldBuildpackName      string
-			newBuildpackName      string
-			existingBuildpackName string
+			oldBuildpackName string
+			newBuildpackName string
+			stacks           []string
+			username         string
 		)
 
 		BeforeEach(func() {
 			helpers.LoginCF()
+			oldBuildpackName = helpers.NewBuildpack()
+			newBuildpackName = helpers.NewBuildpack()
+			stacks = helpers.FetchStacks()
+
+			username, _ = helpers.GetCredentials()
 		})
 
-		Context("when the buildpack exists", func() {
-			BeforeEach(func() {
-				oldBuildpackName = helpers.NewBuildpack()
-				newBuildpackName = helpers.NewBuildpack()
+		Context("when the user provides a stack", func() {
+			var session *Session
 
-				helpers.BuildpackWithStack(func(buildpackPath string) {
-					session := helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "1")
-					Eventually(session).Should(Exit(0))
-				}, "")
+			JustBeforeEach(func() {
+				session = helpers.CF("rename-buildpack", oldBuildpackName, newBuildpackName, "-s", stacks[0])
 			})
 
-			Context("when renaming to a unique name", func() {
-				It("successfully renames buildpack", func() {
-					session := helpers.CF("rename-buildpack", oldBuildpackName, newBuildpackName)
-					Eventually(session).Should(Say("Renaming buildpack %s to %s", oldBuildpackName, newBuildpackName))
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Exit(0))
+			Context("when no buildpack with the name/stack combo is found", func() {
+				Context("when no buildpacks with the same name exist", func() {
+					It("returns a buildpack not found error", func() {
+						Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", oldBuildpackName, stacks[0]))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				Context("when no buildpacks with the same name and stack exist", func() {
+					BeforeEach(func() {
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session = helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "10")
+							Eventually(session).Should(Exit(0))
+						}, "")
+					})
+
+					It("returns a buildpack not found error", func() {
+						Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", oldBuildpackName, stacks[0]))
+						Eventually(session).Should(Exit(1))
+					})
 				})
 			})
 
-			Context("when renaming to the same name", func() {
-				It("successfully renames buildpack", func() {
-					session := helpers.CF("rename-buildpack", oldBuildpackName, oldBuildpackName)
-					Eventually(session).Should(Say("Renaming buildpack %s to %s", oldBuildpackName, oldBuildpackName))
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Exit(0))
+			Context("when there are multiple existing buildpacks with the specified old name", func() {
+				Context("when one of the existing buildpacks has an empty stack", func() {
+					BeforeEach(func() {
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session = helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "10")
+							Eventually(session).Should(Exit(0))
+						}, stacks[0])
+
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session = helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "10")
+							Eventually(session).Should(Exit(0))
+						}, "")
+					})
+
+					Context("when renaming to unique name", func() {
+						It("successfully renames the buildpack", func() {
+							Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when renaming to the same name as another buildpack", func() {
+						Context("when the existing existing buildpack with the new name has the same stack", func() {
+							BeforeEach(func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session = helpers.CF("create-buildpack", newBuildpackName, buildpackPath, "10")
+									Eventually(session).Should(Exit(0))
+								}, stacks[0])
+							})
+							It("returns an error", func() {
+								Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+								Eventually(session).Should(Say("FAILED"))
+								Eventually(session.Err).Should(Say("The buildpack name %s is already in use with stack %s", newBuildpackName, stacks[0]))
+								Eventually(session).Should(Exit(1))
+							})
+						})
+
+						Context("when the existing buildpack with the new name has a different stack", func() {
+							BeforeEach(func() {
+								helpers.SkipIfOneStack()
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session = helpers.CF("create-buildpack", newBuildpackName, buildpackPath, "10")
+									Eventually(session).Should(Exit(0))
+								}, stacks[1])
+							})
+
+							It("successfully renames the buildpack", func() {
+								Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+								Eventually(session).Should(Say("OK"))
+								Eventually(session).Should(Exit(0))
+							})
+						})
+
+						Context("when the existing existing buildpack with the new name has an empty stack", func() {
+							BeforeEach(func() {
+								helpers.SkipIfOneStack()
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session = helpers.CF("create-buildpack", newBuildpackName, buildpackPath, "10")
+									Eventually(session).Should(Exit(0))
+								}, "")
+
+								It("successfully renames the buildpack", func() {
+									Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+									Eventually(session).Should(Say("OK"))
+									Eventually(session).Should(Exit(0))
+								})
+							})
+						})
+					})
+				})
+
+				Context("when neither of the existing buildpacks has an empty stack", func() {
+					BeforeEach(func() {
+						helpers.SkipIfOneStack()
+
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session = helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "10")
+							Eventually(session).Should(Exit(0))
+						}, stacks[0])
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session = helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "10")
+							Eventually(session).Should(Exit(0))
+						}, stacks[1])
+					})
+
+					Context("when renaming to unique name", func() {
+						It("successfully renames the buildpack", func() {
+							Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
 				})
 			})
 
-			Context("when renaming to the same name as another buildpack", func() {
+			Context("when just one buildpack is found with the name/stack combo", func() {
 				BeforeEach(func() {
-					Skip("Pending until #158613755")
-					existingBuildpackName = helpers.NewBuildpack()
-
 					helpers.BuildpackWithStack(func(buildpackPath string) {
-						session := helpers.CF("create-buildpack", existingBuildpackName, buildpackPath, "1")
+						session = helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "10")
 						Eventually(session).Should(Exit(0))
-					}, "")
+					}, stacks[0])
 				})
 
-				It("returns the appropriate error", func() {
-					session := helpers.CF("rename-buildpack", oldBuildpackName, existingBuildpackName)
-					Eventually(session).Should(Say("Renaming buildpack %s to %s", oldBuildpackName, existingBuildpackName))
+				Context("when renaming to unique name", func() {
+					It("successfully renames the buildpack", func() {
+						Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				Context("when renaming to the same name as another buildpack", func() {
+					Context("when the existing buildpack with the new name has the same stack", func() {
+						BeforeEach(func() {
+							helpers.BuildpackWithStack(func(buildpackPath string) {
+								session = helpers.CF("create-buildpack", newBuildpackName, buildpackPath, "10")
+								Eventually(session).Should(Exit(0))
+							}, stacks[0])
+						})
+
+						It("returns a buildpack name/stack taken error", func() {
+							Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session.Err).Should(Say("The buildpack name %s is already in use with stack %s", newBuildpackName, stacks[0]))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					Context("when the existing buildpack with the new name has a different stack", func() {
+						BeforeEach(func() {
+							helpers.SkipIfOneStack()
+
+							helpers.BuildpackWithStack(func(buildpackPath string) {
+								session = helpers.CF("create-buildpack", newBuildpackName, buildpackPath, "10")
+								Eventually(session).Should(Exit(0))
+							}, stacks[1])
+						})
+						It("successfully renames the buildpack", func() {
+							Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the existing buildpack with the new name has an empty stack", func() {
+						BeforeEach(func() {
+							helpers.BuildpackWithStack(func(buildpackPath string) {
+								session = helpers.CF("create-buildpack", newBuildpackName, buildpackPath, "10")
+								Eventually(session).Should(Exit(0))
+							}, "")
+							It("successfully renames the buildpack", func() {
+								Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
+								Eventually(session).Should(Say("OK"))
+								Eventually(session).Should(Exit(0))
+							})
+						})
+					})
+				})
+			})
+		})
+
+		//If the user does not provide a stack, and there are multiple ambiguous buildpacks, we assume that they intended to rename the one with an empty stack.
+		Context("when the user does not provide a stack", func() {
+			var session *Session
+
+			JustBeforeEach(func() {
+				session = helpers.CF("rename-buildpack", oldBuildpackName, newBuildpackName)
+			})
+
+			Context("when no buildpacks with the old name exist", func() {
+				It("returns a buildpack not found error", func() {
+					Eventually(session).Should(Say("Renaming buildpack %s to %s as %s...", oldBuildpackName, newBuildpackName, username))
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", existingBuildpackName))
+					Eventually(session.Err).Should(Say("Buildpack %s not found", oldBuildpackName))
 					Eventually(session).Should(Exit(1))
 				})
 			})
-		})
 
-		Context("when there are multiple ambiguous buildpacks", func() {
-			BeforeEach(func() {
-				helpers.SkipIfOneStack()
+			Context("when there are multiple existing buildpacks with the old name", func() {
+				Context("when none of the buildpacks has an empty stack", func() {
+					BeforeEach(func() {
+						helpers.SkipIfOneStack()
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session = helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "10")
+							Eventually(session).Should(Exit(0))
+						}, stacks[0])
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session = helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "10")
+							Eventually(session).Should(Exit(0))
+						}, stacks[1])
+					})
 
-				stacks := helpers.FetchStacks()
+					It("returns a buildpack not found error", func() {
+						Eventually(session).Should(Say("Renaming buildpack %s to %s as %s...", oldBuildpackName, newBuildpackName, username))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Multiple buildpacks named %s found", oldBuildpackName))
+						Eventually(session).Should(Exit(1))
+					})
+				})
 
-				oldBuildpackName = helpers.NewBuildpack()
-				newBuildpackName = helpers.NewBuildpack()
+				Context("when one of the existing buildpacks with the old name has an empty stack", func() {
+					BeforeEach(func() {
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session = helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "10")
+							Eventually(session).Should(Exit(0))
+						}, stacks[0])
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session = helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "10")
+							Eventually(session).Should(Exit(0))
+						}, "")
+					})
 
-				helpers.BuildpackWithStack(func(buildpackPath string) {
-					session := helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "1")
-					Eventually(session).Should(Exit(0))
-				}, stacks[0])
-				helpers.BuildpackWithStack(func(buildpackPath string) {
-					session := helpers.CF("create-buildpack", oldBuildpackName, buildpackPath, "1")
-					Eventually(session).Should(Exit(0))
-				}, stacks[1])
-			})
+					Context("when renaming to unique name", func() {
+						It("successfully renames the buildpack", func() {
+							Eventually(session).Should(Say("Renaming buildpack %s to %s as %s...", oldBuildpackName, newBuildpackName, username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
 
-			It("returns multiple buildpacks found error", func() {
-				session := helpers.CF("rename-buildpack", oldBuildpackName, newBuildpackName)
-				Eventually(session).Should(Say("Renaming buildpack %s to %s", oldBuildpackName, newBuildpackName))
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Multiple buildpacks named %s found.", oldBuildpackName))
-				Eventually(session).Should(Exit(1))
+					Context("when renaming to the same name as another buildpack", func() {
+						Context("when the existing buildpack with the new name has a non-empty stack", func() {
+							BeforeEach(func() {
+								helpers.SkipIfOneStack()
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session = helpers.CF("create-buildpack", newBuildpackName, buildpackPath, "10")
+									Eventually(session).Should(Exit(0))
+								}, stacks[1])
+							})
+
+							It("successfully renames the buildpack", func() {
+								Eventually(session).Should(Say("Renaming buildpack %s to %s as %s...", oldBuildpackName, newBuildpackName, username))
+								Eventually(session).Should(Say("OK"))
+								Eventually(session).Should(Exit(0))
+							})
+						})
+
+						Context("when the existing buildpack with the new name has an empty stack", func() {
+							BeforeEach(func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session = helpers.CF("create-buildpack", newBuildpackName, buildpackPath, "10")
+									Eventually(session).Should(Exit(0))
+								}, "")
+
+								It("returns a buildpack name/stack taken error", func() {
+									Eventually(session).Should(Say("Renaming buildpack %s to %s as %s...", oldBuildpackName, newBuildpackName, username))
+									Eventually(session).Should(Say("FAILED"))
+									Eventually(session.Err).Should(Say("Buildpack %s is already in use without a stack", newBuildpackName))
+									Eventually(session).Should(Exit(1))
+								})
+							})
+						})
+					})
+				})
 			})
 		})
 	})

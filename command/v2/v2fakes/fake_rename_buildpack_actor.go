@@ -9,11 +9,12 @@ import (
 )
 
 type FakeRenameBuildpackActor struct {
-	RenameBuildpackStub        func(oldName string, newName string) (v2action.Warnings, error)
+	RenameBuildpackStub        func(oldName string, newName string, stackName string) (v2action.Warnings, error)
 	renameBuildpackMutex       sync.RWMutex
 	renameBuildpackArgsForCall []struct {
-		oldName string
-		newName string
+		oldName   string
+		newName   string
+		stackName string
 	}
 	renameBuildpackReturns struct {
 		result1 v2action.Warnings
@@ -27,17 +28,18 @@ type FakeRenameBuildpackActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRenameBuildpackActor) RenameBuildpack(oldName string, newName string) (v2action.Warnings, error) {
+func (fake *FakeRenameBuildpackActor) RenameBuildpack(oldName string, newName string, stackName string) (v2action.Warnings, error) {
 	fake.renameBuildpackMutex.Lock()
 	ret, specificReturn := fake.renameBuildpackReturnsOnCall[len(fake.renameBuildpackArgsForCall)]
 	fake.renameBuildpackArgsForCall = append(fake.renameBuildpackArgsForCall, struct {
-		oldName string
-		newName string
-	}{oldName, newName})
-	fake.recordInvocation("RenameBuildpack", []interface{}{oldName, newName})
+		oldName   string
+		newName   string
+		stackName string
+	}{oldName, newName, stackName})
+	fake.recordInvocation("RenameBuildpack", []interface{}{oldName, newName, stackName})
 	fake.renameBuildpackMutex.Unlock()
 	if fake.RenameBuildpackStub != nil {
-		return fake.RenameBuildpackStub(oldName, newName)
+		return fake.RenameBuildpackStub(oldName, newName, stackName)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -51,10 +53,10 @@ func (fake *FakeRenameBuildpackActor) RenameBuildpackCallCount() int {
 	return len(fake.renameBuildpackArgsForCall)
 }
 
-func (fake *FakeRenameBuildpackActor) RenameBuildpackArgsForCall(i int) (string, string) {
+func (fake *FakeRenameBuildpackActor) RenameBuildpackArgsForCall(i int) (string, string, string) {
 	fake.renameBuildpackMutex.RLock()
 	defer fake.renameBuildpackMutex.RUnlock()
-	return fake.renameBuildpackArgsForCall[i].oldName, fake.renameBuildpackArgsForCall[i].newName
+	return fake.renameBuildpackArgsForCall[i].oldName, fake.renameBuildpackArgsForCall[i].newName, fake.renameBuildpackArgsForCall[i].stackName
 }
 
 func (fake *FakeRenameBuildpackActor) RenameBuildpackReturns(result1 v2action.Warnings, result2 error) {

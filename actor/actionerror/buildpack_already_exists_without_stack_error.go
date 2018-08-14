@@ -2,8 +2,10 @@ package actionerror
 
 import "fmt"
 
-type BuildpackAlreadyExistsWithoutStackError string
+type BuildpackAlreadyExistsWithoutStackError struct {
+	BuildpackName string
+}
 
 func (e BuildpackAlreadyExistsWithoutStackError) Error() string {
-	return fmt.Sprintf("Buildpack %s already exists without a stack", string(e))
+	return fmt.Sprintf("Buildpack %s already exists without a stack", e.BuildpackName)
 }

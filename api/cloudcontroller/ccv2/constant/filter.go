@@ -33,7 +33,8 @@ const (
 	PathFilter FilterType = "path"
 	// PortFilter is the name of the 'port' filter.
 	PortFilter FilterType = "port"
-
+	//StackFilter is the name of the 'stack' filter.
+	StackFilter FilterType = "stack"
 	// TimestampFilter is the name of the 'timestamp' filter.
 	TimestampFilter FilterType = "timestamp"
 	// TypeFilter is the name of the 'type' filter.

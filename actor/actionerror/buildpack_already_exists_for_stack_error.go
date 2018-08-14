@@ -1,9 +1,12 @@
 package actionerror
 
+import "fmt"
+
 type BuildpackAlreadyExistsForStackError struct {
-	Message string
+	BuildpackName string
+	StackName     string
 }
 
 func (e BuildpackAlreadyExistsForStackError) Error() string {
-	return e.Message
+	return fmt.Sprintf("The buildpack name %s is already in use with stack %s", e.BuildpackName, e.StackName)
 }

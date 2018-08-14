@@ -94,3 +94,7 @@ func SetupV2InfoResponse(apiVersion string) {
 		),
 	)
 }
+
+func validateV2InfoPlusNumberOfRequests(numberOfPostInfoRequests int) {
+	Expect(server.ReceivedRequests()).To(HaveLen(numberOfPostInfoRequests + 1))
+}

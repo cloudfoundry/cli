@@ -11,11 +11,12 @@ import (
 //go:generate counterfeiter . RenameBuildpackActor
 
 type RenameBuildpackActor interface {
-	RenameBuildpack(oldName string, newName string) (v2action.Warnings, error)
+	RenameBuildpack(oldName string, newName string, stackName string) (v2action.Warnings, error)
 }
 
 type RenameBuildpackCommand struct {
 	RequiredArgs    flag.RenameBuildpackArgs `positional-args:"yes"`
+	Stack           string                   `short:"s" description:"Specify which buildpack to rename by stack"`
 	usage           interface{}              `usage:"CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"`
 	relatedCommands interface{}              `related_commands:"update-buildpack"`
 
@@ -44,12 +45,27 @@ func (cmd RenameBuildpackCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Renaming buildpack {{.OldName}} to {{.NewName}}...", map[string]interface{}{
-		"OldName": cmd.RequiredArgs.OldBuildpackName,
-		"NewName": cmd.RequiredArgs.NewBuildpackName,
-	})
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return err
+	}
 
-	warnings, err := cmd.Actor.RenameBuildpack(cmd.RequiredArgs.OldBuildpackName, cmd.RequiredArgs.NewBuildpackName)
+	if cmd.Stack == "" {
+		cmd.UI.DisplayTextWithFlavor("Renaming buildpack {{.OldName}} to {{.NewName}} as {{.CurrentUser}}...", map[string]interface{}{
+			"OldName":     cmd.RequiredArgs.OldBuildpackName,
+			"NewName":     cmd.RequiredArgs.NewBuildpackName,
+			"CurrentUser": user.Name,
+		})
+	} else {
+		cmd.UI.DisplayTextWithFlavor("Renaming buildpack {{.OldName}} to {{.NewName}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
+			"OldName":     cmd.RequiredArgs.OldBuildpackName,
+			"NewName":     cmd.RequiredArgs.NewBuildpackName,
+			"Stack":       cmd.Stack,
+			"CurrentUser": user.Name,
+		})
+	}
+
+	warnings, err := cmd.Actor.RenameBuildpack(cmd.RequiredArgs.OldBuildpackName, cmd.RequiredArgs.NewBuildpackName, cmd.Stack)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

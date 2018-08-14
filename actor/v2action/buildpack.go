@@ -11,11 +11,17 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util"
+
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
 type Buildpack ccv2.Buildpack
+
+func (buildpack Buildpack) NoStack() bool {
+	return len(buildpack.Stack) == 0
+}
 
 //go:generate counterfeiter . Downloader
 
@@ -65,13 +71,13 @@ func (p *ProgressBar) Terminate() {
 func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Buildpack, Warnings, error) {
 	buildpack := ccv2.Buildpack{
 		Name:     name,
-		Position: position,
-		Enabled:  enabled,
+		Position: types.NullInt{IsSet: true, Value: position},
+		Enabled:  types.NullBool{IsSet: true, Value: enabled},
 	}
 
 	ccBuildpack, warnings, err := actor.CloudControllerClient.CreateBuildpack(buildpack)
 	if _, ok := err.(ccerror.BuildpackAlreadyExistsWithoutStackError); ok {
-		return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError(name)
+		return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: name}
 	}
 
 	if _, ok := err.(ccerror.BuildpackNameTakenError); ok {
@@ -121,7 +127,7 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 	warnings, err := actor.CloudControllerClient.UploadBuildpack(GUID, pathToBuildpackBits, progressBarReader, size)
 	if err != nil {
 		if _, ok := err.(ccerror.BuildpackAlreadyExistsForStackError); ok {
-			return Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: err.Error()}
+			return Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{}
 		}
 		return Warnings(warnings), err
 	}
@@ -130,6 +136,8 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 	return Warnings(warnings), nil
 }
 
+// GetBuildpackByName returns a given buildpack with the provided name. It
+// assumes the stack name is empty.
 func (actor *Actor) GetBuildpackByName(name string) (Buildpack, Warnings, error) {
 	bpName := ccv2.Filter{
 		Type:     constant.NameFilter,
@@ -142,35 +150,81 @@ func (actor *Actor) GetBuildpackByName(name string) (Buildpack, Warnings, error)
 		return Buildpack{}, Warnings(warnings), err
 	}
 
-	if len(buildpacks) == 0 {
+	switch len(buildpacks) {
+	case 0:
 		return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: name}
-	}
-
-	if len(buildpacks) > 1 {
+	case 1:
+		return Buildpack(buildpacks[0]), Warnings(warnings), nil
+	default:
+		for _, bp := range buildpacks {
+			if buildpack := Buildpack(bp); buildpack.NoStack() {
+				return buildpack, Warnings(warnings), nil
+			}
+		}
 		return Buildpack{}, Warnings(warnings), actionerror.MultipleBuildpacksFoundError{BuildpackName: name}
 	}
+}
 
-	return Buildpack(buildpacks[0]), Warnings(warnings), nil
+func (actor *Actor) GetBuildpackByNameAndStack(buildpackName string, stackName string) (Buildpack, Warnings, error) {
+	bpFilter := ccv2.Filter{
+		Type:     constant.NameFilter,
+		Operator: constant.EqualOperator,
+		Values:   []string{buildpackName},
+	}
+
+	stackFilter := ccv2.Filter{
+		Type:     constant.StackFilter,
+		Operator: constant.EqualOperator,
+		Values:   []string{stackName},
+	}
+
+	buildpacks, warnings, err := actor.CloudControllerClient.GetBuildpacks(bpFilter, stackFilter)
+	if err != nil {
+		return Buildpack{}, Warnings(warnings), err
+	}
+
+	switch len(buildpacks) {
+	case 0:
+		return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, StackName: stackName}
+	case 1:
+		return Buildpack(buildpacks[0]), Warnings(warnings), nil
+	default:
+		return Buildpack{}, Warnings(warnings), actionerror.MultipleBuildpacksFoundError{BuildpackName: buildpackName}
+	}
 }
 
 func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {
 	updatedBuildpack, warnings, err := actor.CloudControllerClient.UpdateBuildpack(ccv2.Buildpack(buildpack))
 	if err != nil {
-		if _, ok := err.(ccerror.ResourceNotFoundError); ok {
+		switch err.(type) {
+		case ccerror.ResourceNotFoundError:
 			return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpack.Name}
-		} else if _, ok := err.(ccerror.BuildpackAlreadyExistsWithoutStackError); ok {
-			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError(buildpack.Name)
+		case ccerror.BuildpackAlreadyExistsWithoutStackError:
+			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: buildpack.Name}
+		case ccerror.BuildpackAlreadyExistsForStackError:
+			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{BuildpackName: buildpack.Name, StackName: buildpack.Stack}
+		default:
+			return Buildpack{}, Warnings(warnings), err
 		}
-		return Buildpack{}, Warnings(warnings), err
 	}
 
 	return Buildpack(updatedBuildpack), Warnings(warnings), nil
 }
 
-func (actor *Actor) RenameBuildpack(oldName string, newName string) (Warnings, error) {
-	var allWarnings Warnings
+func (actor *Actor) RenameBuildpack(oldName string, newName string, stackName string) (Warnings, error) {
+	var (
+		getWarnings Warnings
+		allWarnings Warnings
 
-	oldBp, getWarnings, err := actor.GetBuildpackByName(oldName)
+		oldBp Buildpack
+		err   error
+	)
+
+	if len(stackName) == 0 {
+		oldBp, getWarnings, err = actor.GetBuildpackByName(oldName)
+	} else {
+		oldBp, getWarnings, err = actor.GetBuildpackByNameAndStack(oldName, stackName)
+	}
 
 	allWarnings = append(allWarnings, getWarnings...)
 
