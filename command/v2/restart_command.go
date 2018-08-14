@@ -55,8 +55,9 @@ func (cmd *RestartCommand) Setup(config command.Config, ui command.UI) error {
 	v2Actor := v2action.NewActor(ccClient, uaaClient, config)
 	v3Actor := v3action.NewActor(ccClientV3, config, sharedActor, nil)
 
-	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
+	cmd.Actor = v2Actor
 	cmd.ApplicationSummaryActor = v2v3action.NewActor(v2Actor, v3Actor)
+
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
 
 	return nil
