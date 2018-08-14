@@ -5,7 +5,7 @@ type MultipleBuildpacksFoundError struct {
 }
 
 func (MultipleBuildpacksFoundError) Error() string {
-	return "Multiple buildpacks named {{.BuildpackName}} found."
+	return "Multiple buildpacks named {{.BuildpackName}} found. Specify a stack name by using a '-s' flag."
 }
 
 func (e MultipleBuildpacksFoundError) Translate(translate func(string, ...interface{}) string) string {

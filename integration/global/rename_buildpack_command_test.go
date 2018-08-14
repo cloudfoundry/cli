@@ -278,7 +278,7 @@ var _ = Describe("rename buildpack command", func() {
 					It("returns a buildpack not found error", func() {
 						Eventually(session).Should(Say("Renaming buildpack %s to %s as %s...", oldBuildpackName, newBuildpackName, username))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Multiple buildpacks named %s found", oldBuildpackName))
+						Eventually(session.Err).Should(Say("Multiple buildpacks named %s found\\. Specify a stack name by using a '-s' flag\\.", oldBuildpackName))
 						Eventually(session).Should(Exit(1))
 					})
 				})
