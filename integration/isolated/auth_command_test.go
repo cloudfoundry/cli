@@ -108,6 +108,14 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
+	Context("when --client-credentials and --origin are set", func() {
+		It("displays the appropriate error message", func() {
+			session := helpers.CF("auth", "some-username", "some-password", "--client-credentials", "sumcredz", "--origin", "garbaje")
+
+			Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --client-credentials, --origin"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
 	Context("when the API endpoint is not set", func() {
 		BeforeEach(func() {
 			helpers.UnsetAPI()

@@ -90,9 +90,9 @@ var _ = Describe("auth Command", func() {
 			})
 
 			It("returns an ArgumentCombinationError", func() {
-				Expect(err).To(HaveOccurred())
-				_, ok := err.(translatableerror.ArgumentCombinationError)
-				Expect(ok).To(Equal(true))
+				Expect(err).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"--client-credentials", "--origin"},
+				}))
 			})
 		})
 
