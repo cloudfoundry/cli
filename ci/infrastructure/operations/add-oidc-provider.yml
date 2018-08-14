@@ -71,7 +71,7 @@
             user:
               override: true
             users:
-              - name: admin
+              - name: admin-oidc
                 password: "((uaa_oidc_admin_password))"
                 groups:
                   - uaa.admin

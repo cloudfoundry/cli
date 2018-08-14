@@ -45,7 +45,7 @@ run:
       credhub login
       export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
 
-      export CF_INT_OIDC_USERNAME="admin"
+      export CF_INT_OIDC_USERNAME="admin-oidc"
       export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
     fi
 
