@@ -10,13 +10,11 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
-	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -527,8 +525,7 @@ var _ = Describe("Restart Command", func() {
 						)
 
 						BeforeEach(func() {
-							helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
-
+							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("1.0.0")
 							applicationSummary = v2action.ApplicationSummary{
 								Application: v2action.Application{
 									Name:                 "some-app",
