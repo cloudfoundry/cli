@@ -230,5 +230,34 @@ var _ = Describe("auth command", func() {
 				Eventually(session).Should(Exit(1))
 			})
 		})
+
+	})
+
+	Context("when the origin flag is set", func() {
+		Context("when a user authenticates with valid user credentials for that origin", func() {
+			It("authenticates the user", func() {
+				username, password := helpers.GetOIDCCredentials()
+				session := helpers.CF("auth", username, password, "--origin", "garbage")
+
+				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("when the user provides the default origin and valid credentials", func() {
+			It("authenticates the user", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("auth", username, password, "--origin", "uaa")
+
+				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
 	})
 })

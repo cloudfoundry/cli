@@ -43,7 +43,7 @@ var _ = Describe("Auth", func() {
 		})
 
 		Context("when no errors occur", func() {
-			Context("when the grant type is password and origin is set", func() {
+			Context("when the grant type is password and origin is not set", func() {
 				BeforeEach(func() {
 					response := `{
 						"access_token":"some-access-token",
@@ -79,12 +79,13 @@ var _ = Describe("Auth", func() {
 					}`
 					identity = helpers.NewUsername()
 					secret = helpers.NewPassword()
-					origin = "uaa"
+					origin = "some-fake-origin"
 					grantType = constant.GrantTypePassword
+					expectedQuery := "login_hint=%7B%22origin%22%3A%22" + origin + "%22%7D"
 					server.AppendHandlers(
 						CombineHandlers(
 							verifyRequestHost(TestAuthorizationResource),
-							VerifyRequest(http.MethodPost, "/oauth/token"),
+							VerifyRequest(http.MethodPost, "/oauth/token", expectedQuery),
 							VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
 							VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
 							VerifyBody([]byte(fmt.Sprintf("grant_type=%s&password=%s&username=%s", grantType, secret, identity))),

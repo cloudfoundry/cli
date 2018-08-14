@@ -1,6 +1,7 @@
 package uaa
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -34,7 +35,7 @@ func (client Client) Authenticate(ID string, secret string, origin string, grant
 	var query url.Values
 	if origin != "" {
 		query = url.Values{
-			"login_hint": {string("{\"origin\":\"" + origin + "\"}")},
+			"login_hint": {fmt.Sprintf(`{"origin":"%s"}`, origin)},
 		}
 	}
 

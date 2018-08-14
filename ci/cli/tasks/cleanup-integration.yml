@@ -35,6 +35,7 @@ run:
       popd
 
       credhub login
+      export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
       export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
     fi
 
@@ -42,6 +43,7 @@ run:
 
     # output password into a temp file for consumption by Windows
     echo $CF_INT_PASSWORD > cleanup-integration-outputs/cf-password
+    echo $CF_INT_OIDC_PASSWORD > cleanup-integration-outputs/uaa-oidc-password
 
     set -ex
 

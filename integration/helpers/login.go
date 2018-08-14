@@ -75,6 +75,19 @@ func GetCredentials() (string, string) {
 	return username, password
 }
 
+// GetOIDCCredentials returns back the username and the password for OIDC origin.
+func GetOIDCCredentials() (string, string) {
+	username := os.Getenv("CF_INT_OIDC_USERNAME")
+	if username == "" {
+		username = "admin_oidc"
+	}
+	password := os.Getenv("CF_INT_OIDC_PASSWORD")
+	if password == "" {
+		password = "admin"
+	}
+	return username, password
+}
+
 func LogoutCF() {
 	Eventually(CF("logout")).Should(Exit(0))
 }
