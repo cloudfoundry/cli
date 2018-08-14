@@ -237,7 +237,7 @@ var _ = Describe("auth command", func() {
 		Context("when a user authenticates with valid user credentials for that origin", func() {
 			It("authenticates the user", func() {
 				username, password := helpers.GetOIDCCredentials()
-				session := helpers.CF("auth", username, password, "--origin", "garbage")
+				session := helpers.CF("auth", username, password, "--origin", "cli-oidc-provider")
 
 				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
 				Eventually(session).Should(Say("Authenticating\\.\\.\\."))
