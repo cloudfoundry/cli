@@ -19,7 +19,7 @@ var _ = Describe("Build", func() {
 	})
 
 	Describe("CreateBuild", func() {
-		Context("when the build successfully is created", func() {
+		When("the build successfully is created", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-build-guid",
@@ -56,7 +56,7 @@ var _ = Describe("Build", func() {
 			})
 		})
 
-		Context("when cc returns back an error or warnings", func() {
+		When("cc returns back an error or warnings", func() {
 			BeforeEach(func() {
 				response := ` {
   "errors": [
@@ -103,7 +103,7 @@ var _ = Describe("Build", func() {
 	})
 
 	Describe("GetBuild", func() {
-		Context("when the build exists", func() {
+		When("the build exists", func() {
 			BeforeEach(func() {
 				response := `{
 					"created_at": "some-time",
@@ -138,7 +138,7 @@ var _ = Describe("Build", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := ` {
 					"errors": [

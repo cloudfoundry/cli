@@ -54,7 +54,7 @@ var _ = Describe("logs command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the checkTarget fails", func() {
+	When("the checkTarget fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(
 				actionerror.NotLoggedInError{BinaryName: binaryName})
@@ -69,7 +69,7 @@ var _ = Describe("logs command", func() {
 		})
 	})
 
-	Context("when checkTarget succeeds", func() {
+	When("checkTarget succeeds", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				Name: "some-space-name",
@@ -80,7 +80,7 @@ var _ = Describe("logs command", func() {
 			})
 		})
 
-		Context("when the --recent flag is provided", func() {
+		When("the --recent flag is provided", func() {
 			BeforeEach(func() {
 				cmd.Recent = true
 			})
@@ -89,7 +89,7 @@ var _ = Describe("logs command", func() {
 				Expect(testUI.Out).To(Say("Retrieving logs for app some-app in org some-org-name / space some-space-name as some-user..."))
 			})
 
-			Context("when the logs actor returns an error", func() {
+			When("the logs actor returns an error", func() {
 				var expectedErr error
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
@@ -106,7 +106,7 @@ var _ = Describe("logs command", func() {
 				})
 			})
 
-			Context("when the logs actor returns logs", func() {
+			When("the logs actor returns logs", func() {
 				BeforeEach(func() {
 					fakeActor.GetRecentLogsForApplicationByNameAndSpaceReturns(
 						[]v2action.LogMessage{
@@ -147,12 +147,12 @@ var _ = Describe("logs command", func() {
 			})
 		})
 
-		Context("when the --recent flag is not provided", func() {
+		When("the --recent flag is not provided", func() {
 			BeforeEach(func() {
 				cmd.Recent = false
 			})
 
-			Context("when the logs setup returns an error", func() {
+			When("the logs setup returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -167,7 +167,7 @@ var _ = Describe("logs command", func() {
 				})
 			})
 
-			Context("when the logs stream returns an error", func() {
+			When("the logs stream returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -194,7 +194,7 @@ var _ = Describe("logs command", func() {
 				})
 			})
 
-			Context("when the logs actor returns logs", func() {
+			When("the logs actor returns logs", func() {
 				BeforeEach(func() {
 					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(_ string, _ string, _ v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error) {
 						messages := make(chan *v2action.LogMessage)

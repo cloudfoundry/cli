@@ -17,7 +17,7 @@ var _ = Describe("Service Instance Shared To", func() {
 	})
 
 	Describe("GetServiceInstanceSharedTos", func() {
-		Context("when the cc api returns a valid response", func() {
+		When("the cc api returns a valid response", func() {
 			BeforeEach(func() {
 				response1 := `{
 				"total_results": 3,
@@ -64,7 +64,7 @@ var _ = Describe("Service Instance Shared To", func() {
 				)
 			})
 
-			Context("when the service instance exist", func() {
+			When("the service instance exist", func() {
 				It("returns all the shared-to resources", func() {
 					serviceInstances, warnings, err := client.GetServiceInstanceSharedTos("some-service-instance-guid")
 					Expect(err).NotTo(HaveOccurred())
@@ -79,7 +79,7 @@ var _ = Describe("Service Instance Shared To", func() {
 			})
 		})
 
-		Context("when the cc api returns an invalid response", func() {
+		When("the cc api returns an invalid response", func() {
 			BeforeEach(func() {
 				invalidResponse := `{"foo": "bar"}`
 

@@ -28,7 +28,7 @@ var _ = Describe("Feature Flag", func() {
 			featureFlags, warnings, err = client.GetConfigFeatureFlags()
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				response := `[
 				  {
@@ -57,7 +57,7 @@ var _ = Describe("Feature Flag", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10001,

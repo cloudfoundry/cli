@@ -23,7 +23,7 @@ var _ = Describe("push with different domain values", func() {
 		domainName = helpers.DomainName("http-domain")
 	})
 
-	Context("when the domain flag is not provided", func() {
+	When("the domain flag is not provided", func() {
 		It("creates a route with the first shared domain", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
@@ -35,8 +35,8 @@ var _ = Describe("push with different domain values", func() {
 		})
 	})
 
-	Context("when only the domain flag is provided", func() {
-		Context("When the domain does not exist", func() {
+	When("only the domain flag is provided", func() {
+		When("the domain does not exist", func() {
 			It("creates a route that has the specified domain", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
@@ -49,7 +49,7 @@ var _ = Describe("push with different domain values", func() {
 			})
 		})
 
-		Context("when domain is an HTTP domain", func() {
+		When("domain is an HTTP domain", func() {
 			var domain helpers.Domain
 
 			BeforeEach(func() {
@@ -73,7 +73,7 @@ var _ = Describe("push with different domain values", func() {
 			})
 		})
 
-		Context("when domain is a TCP domain", func() {
+		When("domain is a TCP domain", func() {
 			var domain helpers.Domain
 
 			BeforeEach(func() {

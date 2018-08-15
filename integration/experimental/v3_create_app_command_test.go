@@ -23,7 +23,7 @@ var _ = Describe("v3-create-app command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-create-app", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -37,7 +37,7 @@ var _ = Describe("v3-create-app command", func() {
 		})
 	})
 
-	Context("when the app name is not provided", func() {
+	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-create-app")
 
@@ -53,7 +53,7 @@ var _ = Describe("v3-create-app command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when app type is not supported", func() {
+	When("app type is not supported", func() {
 		It("tells the user that the app type is incorrect, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-create-app", appName, "--app-type", "unknown-app-type")
 
@@ -63,8 +63,8 @@ var _ = Describe("v3-create-app command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -77,7 +77,7 @@ var _ = Describe("v3-create-app command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -96,7 +96,7 @@ var _ = Describe("v3-create-app command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -115,7 +115,7 @@ var _ = Describe("v3-create-app command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -128,7 +128,7 @@ var _ = Describe("v3-create-app command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -142,7 +142,7 @@ var _ = Describe("v3-create-app command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -158,7 +158,7 @@ var _ = Describe("v3-create-app command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -167,7 +167,7 @@ var _ = Describe("v3-create-app command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("creates the app with default app type buildpack", func() {
 				session := helpers.CF("v3-create-app", appName)
 				userName, _ := helpers.GetCredentials()
@@ -180,7 +180,7 @@ var _ = Describe("v3-create-app command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when app type is specified", func() {
+			When("app type is specified", func() {
 				It("creates the app with the specified app type", func() {
 					session := helpers.CF("v3-create-app", appName, "--app-type", "docker")
 					userName, _ := helpers.GetCredentials()
@@ -195,7 +195,7 @@ var _ = Describe("v3-create-app command", func() {
 			})
 		})
 
-		Context("when the app already exists", func() {
+		When("the app already exists", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
 			})

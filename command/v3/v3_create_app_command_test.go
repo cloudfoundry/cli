@@ -55,7 +55,7 @@ var _ = Describe("v3-create-app Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -72,7 +72,7 @@ var _ = Describe("v3-create-app Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -87,14 +87,14 @@ var _ = Describe("v3-create-app Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 		})
 
-		Context("when the create is successful", func() {
+		When("the create is successful", func() {
 			BeforeEach(func() {
 				fakeActor.CreateApplicationInSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
@@ -117,7 +117,7 @@ var _ = Describe("v3-create-app Command", func() {
 				Expect(createSpaceGUID).To(Equal("some-space-guid"))
 			})
 
-			Context("when app type is specified", func() {
+			When("app type is specified", func() {
 				BeforeEach(func() {
 					cmd.AppType = "docker"
 				})
@@ -137,7 +137,7 @@ var _ = Describe("v3-create-app Command", func() {
 			})
 		})
 
-		Context("when the create is unsuccessful", func() {
+		When("the create is unsuccessful", func() {
 			Context("due to an unexpected error", func() {
 				var expectedErr error
 

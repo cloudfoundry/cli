@@ -21,8 +21,8 @@ var _ = Describe("pushing with no-hostname", func() {
 		domainName = helpers.DomainName()
 	})
 
-	Context("when pushing with no manifest", func() {
-		Context("when using a private domain", func() {
+	When("pushing with no manifest", func() {
+		When("using a private domain", func() {
 			var domain helpers.Domain
 
 			BeforeEach(func() {
@@ -49,8 +49,8 @@ var _ = Describe("pushing with no-hostname", func() {
 			})
 		})
 
-		Context("when using a shared domain", func() {
-			Context("when using an HTTP domain", func() {
+		When("using a shared domain", func() {
+			When("using an HTTP domain", func() {
 				It("returns an invalid route error", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-hostname", "--no-start")
@@ -60,7 +60,7 @@ var _ = Describe("pushing with no-hostname", func() {
 				})
 			})
 
-			Context("when using a TCP domain", func() {
+			When("using a TCP domain", func() {
 				var domain helpers.Domain
 
 				BeforeEach(func() {

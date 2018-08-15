@@ -66,7 +66,7 @@ var _ = Describe("v3-packages Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -83,7 +83,7 @@ var _ = Describe("v3-packages Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -98,7 +98,7 @@ var _ = Describe("v3-packages Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -111,7 +111,7 @@ var _ = Describe("v3-packages Command", func() {
 		})
 	})
 
-	Context("when getting the application packages returns an error", func() {
+	When("getting the application packages returns an error", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -129,7 +129,7 @@ var _ = Describe("v3-packages Command", func() {
 		})
 	})
 
-	Context("when getting the application packages returns some packages", func() {
+	When("getting the application packages returns some packages", func() {
 		var package1UTC, package2UTC string
 
 		BeforeEach(func() {
@@ -174,7 +174,7 @@ var _ = Describe("v3-packages Command", func() {
 		})
 	})
 
-	Context("when getting the application packages returns no packages", func() {
+	When("getting the application packages returns no packages", func() {
 		BeforeEach(func() {
 			fakeActor.GetApplicationPackagesReturns([]v3action.Package{}, v3action.Warnings{"warning-1", "warning-2"}, nil)
 		})

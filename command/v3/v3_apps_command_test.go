@@ -68,7 +68,7 @@ var _ = Describe("v3-apps Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -85,7 +85,7 @@ var _ = Describe("v3-apps Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -100,7 +100,7 @@ var _ = Describe("v3-apps Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -113,7 +113,7 @@ var _ = Describe("v3-apps Command", func() {
 		})
 	})
 
-	Context("when getting the applications returns an error", func() {
+	When("getting the applications returns an error", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -131,7 +131,7 @@ var _ = Describe("v3-apps Command", func() {
 		})
 	})
 
-	Context("when getting routes returns an error", func() {
+	When("getting routes returns an error", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -162,7 +162,7 @@ var _ = Describe("v3-apps Command", func() {
 		})
 	})
 
-	Context("when the route actor does not return any errors", func() {
+	When("the route actor does not return any errors", func() {
 		BeforeEach(func() {
 			fakeV2Actor.GetApplicationRoutesStub = func(appGUID string) (v2action.Routes, v2action.Warnings, error) {
 				switch appGUID {
@@ -295,7 +295,7 @@ var _ = Describe("v3-apps Command", func() {
 			})
 		})
 
-		Context("when app does not have processes", func() {
+		When("app does not have processes", func() {
 			BeforeEach(func() {
 				appSummaries := []v3action.ApplicationWithProcessSummary{
 					{

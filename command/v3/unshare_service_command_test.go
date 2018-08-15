@@ -54,7 +54,7 @@ var _ = Describe("unshare-service Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerV3APIVersionReturns("0.0.0")
 		})
@@ -67,7 +67,7 @@ var _ = Describe("unshare-service Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -82,7 +82,7 @@ var _ = Describe("unshare-service Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, and a space and org are targeted", func() {
+	When("the user is logged in, and a space and org are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				GUID: "some-org-guid",
@@ -94,7 +94,7 @@ var _ = Describe("unshare-service Command", func() {
 			})
 		})
 
-		Context("when an error occurs getting the current user", func() {
+		When("an error occurs getting the current user", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -110,24 +110,24 @@ var _ = Describe("unshare-service Command", func() {
 			})
 		})
 
-		Context("when no errors occur getting the current user", func() {
+		When("no errors occur getting the current user", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})
 
-			Context("when the '-f' flag is provided (to force non-prompting)", func() {
+			When("the '-f' flag is provided (to force non-prompting)", func() {
 				BeforeEach(func() {
 					cmd.Force = true
 				})
 
-				Context("when the '-o' flag is NOT provided (when we want to unshare a space in the currently targeted org)", func() {
+				When("the '-o' flag is NOT provided (when we want to unshare a space in the currently targeted org)", func() {
 					BeforeEach(func() {
 						cmd.SharedToSpaceName = "some-shared-to-space"
 					})
 
-					Context("when no errors occur unsharing the service instance", func() {
+					When("no errors occur unsharing the service instance", func() {
 						BeforeEach(func() {
 							fakeActor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceReturns(
 								v2v3action.Warnings{"unshare-service-warning"},
@@ -152,7 +152,7 @@ var _ = Describe("unshare-service Command", func() {
 						})
 					})
 
-					Context("when an error occurs unsharing the service instance", func() {
+					When("an error occurs unsharing the service instance", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -168,7 +168,7 @@ var _ = Describe("unshare-service Command", func() {
 						})
 					})
 
-					Context("when the service instance is not shared to the space we want to unshare from", func() {
+					When("the service instance is not shared to the space we want to unshare from", func() {
 						BeforeEach(func() {
 							fakeActor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpaceReturns(
 								v2v3action.Warnings{"unshare-service-warning"},
@@ -184,7 +184,7 @@ var _ = Describe("unshare-service Command", func() {
 					})
 				})
 
-				Context("when the '-o' flag is provided (when the space we want to unshare does not belong to the currently targeted org)", func() {
+				When("the '-o' flag is provided (when the space we want to unshare does not belong to the currently targeted org)", func() {
 					BeforeEach(func() {
 						cmd.SharedToSpaceName = "some-other-space"
 						cmd.SharedToOrgName = "some-other-org"
@@ -213,13 +213,13 @@ var _ = Describe("unshare-service Command", func() {
 				})
 			})
 
-			Context("when the -f flag is NOT provided", func() {
+			When("the -f flag is NOT provided", func() {
 				BeforeEach(func() {
 					cmd.Force = false
 					cmd.SharedToSpaceName = "some-shared-to-space"
 				})
 
-				Context("when the user inputs yes", func() {
+				When("the user inputs yes", func() {
 					BeforeEach(func() {
 						_, err := input.Write([]byte("y\n"))
 						Expect(err).ToNot(HaveOccurred())
@@ -248,7 +248,7 @@ var _ = Describe("unshare-service Command", func() {
 					})
 				})
 
-				Context("when the user inputs no", func() {
+				When("the user inputs no", func() {
 					BeforeEach(func() {
 						_, err := input.Write([]byte("n\n"))
 						Expect(err).ToNot(HaveOccurred())
@@ -266,7 +266,7 @@ var _ = Describe("unshare-service Command", func() {
 					})
 				})
 
-				Context("when the user chooses the default", func() {
+				When("the user chooses the default", func() {
 					BeforeEach(func() {
 						_, err := input.Write([]byte("\n"))
 						Expect(err).ToNot(HaveOccurred())
@@ -284,7 +284,7 @@ var _ = Describe("unshare-service Command", func() {
 					})
 				})
 
-				Context("when the user input is invalid", func() {
+				When("the user input is invalid", func() {
 					BeforeEach(func() {
 						_, err := input.Write([]byte("e\n\n"))
 						Expect(err).ToNot(HaveOccurred())

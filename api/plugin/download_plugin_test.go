@@ -37,7 +37,7 @@ var _ = Describe("DownloadPlugin", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	Context("when there are no errors", func() {
+	When("there are no errors", func() {
 		var (
 			data []byte
 		)
@@ -69,7 +69,7 @@ var _ = Describe("DownloadPlugin", func() {
 		})
 	})
 
-	Context("when the URL is invalid", func() {
+	When("the URL is invalid", func() {
 		It("returns an URL error", func() {
 			err := client.DownloadPlugin("://", tempPath, nil)
 			_, isURLError := err.(*url.Error)
@@ -77,7 +77,7 @@ var _ = Describe("DownloadPlugin", func() {
 		})
 	})
 
-	Context("when downloading the plugin errors", func() {
+	When("downloading the plugin errors", func() {
 		BeforeEach(func() {
 			server.AppendHandlers(
 				CombineHandlers(
@@ -93,7 +93,7 @@ var _ = Describe("DownloadPlugin", func() {
 		})
 	})
 
-	Context("when the path is not writeable", func() {
+	When("the path is not writeable", func() {
 		BeforeEach(func() {
 			server.AppendHandlers(
 				CombineHandlers(

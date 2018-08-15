@@ -29,7 +29,7 @@ var _ = Describe("Organization", func() {
 			org, warnings, executeErr = client.CreateOrganization("some-org")
 		})
 
-		Context("when the organization exists", func() {
+		When("the organization exists", func() {
 			BeforeEach(func() {
 				response := `{
 					"metadata": {
@@ -68,7 +68,7 @@ var _ = Describe("Organization", func() {
 	})
 
 	Describe("DeleteOrganization", func() {
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				jsonResponse := `{
 				"metadata": {
@@ -99,7 +99,7 @@ var _ = Describe("Organization", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
 "code": 30003,
@@ -125,7 +125,7 @@ var _ = Describe("Organization", func() {
 	})
 
 	Describe("GetOrganization", func() {
-		Context("when the organization exists", func() {
+		When("the organization exists", func() {
 			BeforeEach(func() {
 				response := `{
 					"metadata": {
@@ -158,7 +158,7 @@ var _ = Describe("Organization", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10001,
@@ -189,8 +189,8 @@ var _ = Describe("Organization", func() {
 	})
 
 	Describe("GetOrganizations", func() {
-		Context("when no errors are encountered", func() {
-			Context("when results are paginated", func() {
+		When("no errors are encountered", func() {
+			When("results are paginated", func() {
 				BeforeEach(func() {
 					response1 := `{
 					"next_url": "/v2/organizations?q=some-query:some-value&page=2&order-by=name",
@@ -290,7 +290,7 @@ var _ = Describe("Organization", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
   "code": 10001,

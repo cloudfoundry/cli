@@ -23,8 +23,8 @@ var _ = Describe("push with route path", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when the default domain is a HTTP domain", func() {
-		Context("when the route path is provided", func() {
+	When("the default domain is a HTTP domain", func() {
+		When("the route path is provided", func() {
 			var routePath string
 
 			BeforeEach(func() {
@@ -32,7 +32,7 @@ var _ = Describe("push with route path", func() {
 				route = fmt.Sprintf("%s.%s/%s", strings.ToLower(appName), helpers.DefaultSharedDomain(), routePath)
 			})
 
-			Context("when the default route with path does not exist", func() {
+			When("the default route with path does not exist", func() {
 				It("creates and maps the route", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--route-path", routePath, "--no-start")
@@ -68,7 +68,7 @@ var _ = Describe("push with route path", func() {
 				})
 			})
 
-			Context("when the default route with path exists and is mapped to the application", func() {
+			When("the default route with path exists and is mapped to the application", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--route-path", routePath, "--no-start")).Should(Exit(0))
@@ -91,7 +91,7 @@ var _ = Describe("push with route path", func() {
 			})
 		})
 
-		Context("when using a tcp domain", func() {
+		When("using a tcp domain", func() {
 			var (
 				domain     helpers.Domain
 				domainName string

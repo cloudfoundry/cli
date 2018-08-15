@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("disable-feature-flag command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("disable-feature-flag", "--help")
 				Eventually(session).Should(Say("NAME:"))

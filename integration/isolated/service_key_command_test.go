@@ -37,7 +37,7 @@ var _ = Describe("service-key command", func() {
 		helpers.QuickDeleteOrg(org)
 	})
 
-	Context("when the service key is not found", func() {
+	When("the service key is not found", func() {
 		BeforeEach(func() {
 			broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
 			broker.Push()
@@ -59,7 +59,7 @@ var _ = Describe("service-key command", func() {
 			Eventually(session).Should(Exit(1))
 		})
 
-		Context("when the --guid option is given", func() {
+		When("the --guid option is given", func() {
 			It("outputs nothing and exits 0", func() {
 				session := helpers.CF("service-key", serviceInstance, "some-service-key", "--guid")
 				Eventually(session).Should(Exit(0))

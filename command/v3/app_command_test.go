@@ -71,7 +71,7 @@ var _ = Describe("app Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -84,7 +84,7 @@ var _ = Describe("app Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -99,7 +99,7 @@ var _ = Describe("app Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -112,12 +112,12 @@ var _ = Describe("app Command", func() {
 		})
 	})
 
-	Context("when the --guid flag is provided", func() {
+	When("the --guid flag is provided", func() {
 		BeforeEach(func() {
 			cmd.GUID = true
 		})
 
-		Context("when no errors occur", func() {
+		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
 					v3action.Application{GUID: "some-guid"},
@@ -139,8 +139,8 @@ var _ = Describe("app Command", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the app", func() {
-			Context("when the error is translatable", func() {
+		When("an error is encountered getting the app", func() {
+			When("the error is translatable", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v3action.Application{},
@@ -156,7 +156,7 @@ var _ = Describe("app Command", func() {
 				})
 			})
 
-			Context("when the error is not translatable", func() {
+			When("the error is not translatable", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -177,8 +177,8 @@ var _ = Describe("app Command", func() {
 		})
 	})
 
-	Context("when the --guid is not passed", func() {
-		Context("when getting the application summary returns an error", func() {
+	When("the --guid is not passed", func() {
+		When("getting the application summary returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

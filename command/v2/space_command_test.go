@@ -53,7 +53,7 @@ var _ = Describe("space Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking the target fails", func() {
+	When("checking the target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(
 				actionerror.NotLoggedInError{BinaryName: binaryName})
@@ -69,13 +69,13 @@ var _ = Describe("space Command", func() {
 		})
 	})
 
-	Context("when the --guid flag is provided", func() {
+	When("the --guid flag is provided", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.Space = "some-space"
 			cmd.GUID = true
 		})
 
-		Context("when no errors occur", func() {
+		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetedOrganizationReturns(
 					configv3.Organization{GUID: "some-org-guid"},
@@ -100,8 +100,8 @@ var _ = Describe("space Command", func() {
 			})
 		})
 
-		Context("when getting the space returns an error", func() {
-			Context("when the error is translatable", func() {
+		When("getting the space returns an error", func() {
+			When("the error is translatable", func() {
 				BeforeEach(func() {
 					fakeActor.GetSpaceByOrganizationAndNameReturns(
 						v2action.Space{},
@@ -117,7 +117,7 @@ var _ = Describe("space Command", func() {
 				})
 			})
 
-			Context("when the error is not translatable", func() {
+			When("the error is not translatable", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -138,8 +138,8 @@ var _ = Describe("space Command", func() {
 		})
 	})
 
-	Context("when the --guid flag is not provided", func() {
-		Context("when no errors occur", func() {
+	When("the --guid flag is not provided", func() {
+		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{
@@ -175,7 +175,7 @@ var _ = Describe("space Command", func() {
 				)
 			})
 
-			Context("when there is no v3 API", func() {
+			When("there is no v3 API", func() {
 				BeforeEach(func() {
 					cmd.ActorV3 = nil
 				})
@@ -186,7 +186,7 @@ var _ = Describe("space Command", func() {
 				})
 			})
 
-			Context("when there is a v3 API", func() {
+			When("there is a v3 API", func() {
 				BeforeEach(func() {
 					fakeActorV3.GetEffectiveIsolationSegmentBySpaceReturns(
 						v3action.IsolationSegment{
@@ -227,7 +227,7 @@ var _ = Describe("space Command", func() {
 				})
 			})
 
-			Context("when v3 api version is below 3.11.0 and the v2 api version is no less than 2.68.0", func() {
+			When("v3 api version is below 3.11.0 and the v2 api version is no less than 2.68.0", func() {
 				BeforeEach(func() {
 					fakeActor.CloudControllerAPIVersionReturns("2.69.0")
 					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
@@ -247,7 +247,7 @@ var _ = Describe("space Command", func() {
 		})
 	})
 
-	Context("when getting the current user returns an error", func() {
+	When("getting the current user returns an error", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -262,8 +262,8 @@ var _ = Describe("space Command", func() {
 		})
 	})
 
-	Context("when getting the space summary returns an error", func() {
-		Context("when the error is translatable", func() {
+	When("getting the space summary returns an error", func() {
+		When("the error is translatable", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceSummaryByOrganizationAndNameReturns(
 					v2action.SpaceSummary{},
@@ -279,7 +279,7 @@ var _ = Describe("space Command", func() {
 			})
 		})
 
-		Context("when the error is not translatable", func() {
+		When("the error is not translatable", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -299,7 +299,7 @@ var _ = Describe("space Command", func() {
 		})
 	})
 
-	Context("when getting the isolation segment returns an error", func() {
+	When("getting the isolation segment returns an error", func() {
 		Context("a generic error", func() {
 			var expectedErr error
 
@@ -334,7 +334,7 @@ var _ = Describe("space Command", func() {
 		})
 	})
 
-	Context("when the --security-group-rules flag is provided", func() {
+	When("the --security-group-rules flag is provided", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(
 				configv3.User{

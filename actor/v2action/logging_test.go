@@ -28,14 +28,14 @@ var _ = Describe("Logging Actions", func() {
 
 	Describe("LogMessage", func() {
 		Describe("Staging", func() {
-			Context("when the log is a staging log", func() {
+			When("the log is a staging log", func() {
 				It("returns true", func() {
 					message := NewLogMessage("", 0, time.Now(), "STG", "")
 					Expect(message.Staging()).To(BeTrue())
 				})
 			})
 
-			Context("when the log is any other kind of log", func() {
+			When("the log is any other kind of log", func() {
 				It("returns true", func() {
 					message := NewLogMessage("", 0, time.Now(), "APP", "")
 					Expect(message.Staging()).To(BeFalse())
@@ -76,7 +76,7 @@ var _ = Describe("Logging Actions", func() {
 			messages, errs = actor.GetStreamingLogs(expectedAppGUID, fakeNOAAClient)
 		})
 
-		Context("when receiving events", func() {
+		When("receiving events", func() {
 			BeforeEach(func() {
 				fakeNOAAClient.TailingLogsStub = func(appGUID string, authToken string) (<-chan *events.LogMessage, <-chan error) {
 					Expect(appGUID).To(Equal(expectedAppGUID))
@@ -164,7 +164,7 @@ var _ = Describe("Logging Actions", func() {
 			})
 		})
 
-		Context("when receiving errors", func() {
+		When("receiving errors", func() {
 			var (
 				err1 error
 				err2 error
@@ -213,7 +213,7 @@ var _ = Describe("Logging Actions", func() {
 			})
 
 			Describe("NOAA's RetryError", func() {
-				Context("when NOAA is able to recover", func() {
+				When("NOAA is able to recover", func() {
 					BeforeEach(func() {
 						fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
 							go func() {
@@ -247,7 +247,7 @@ var _ = Describe("Logging Actions", func() {
 	})
 
 	Describe("GetRecentLogsForApplicationByNameAndSpace", func() {
-		Context("when the application can be found", func() {
+		When("the application can be found", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv2.Application{
@@ -261,7 +261,7 @@ var _ = Describe("Logging Actions", func() {
 				)
 			})
 
-			Context("when NOAA returns logs", func() {
+			When("NOAA returns logs", func() {
 				BeforeEach(func() {
 					outMessage := events.LogMessage_OUT
 					ts1 := int64(10)
@@ -306,7 +306,7 @@ var _ = Describe("Logging Actions", func() {
 				})
 			})
 
-			Context("when NOAA errors", func() {
+			When("NOAA errors", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -322,7 +322,7 @@ var _ = Describe("Logging Actions", func() {
 			})
 		})
 
-		Context("when finding the application errors", func() {
+		When("finding the application errors", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -345,7 +345,7 @@ var _ = Describe("Logging Actions", func() {
 	})
 
 	Describe("GetStreamingLogsForApplicationByNameAndSpace", func() {
-		Context("when the application can be found", func() {
+		When("the application can be found", func() {
 			var (
 				expectedAppGUID string
 
@@ -441,7 +441,7 @@ var _ = Describe("Logging Actions", func() {
 			})
 		})
 
-		Context("when finding the application errors", func() {
+		When("finding the application errors", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

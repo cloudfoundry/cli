@@ -22,7 +22,7 @@ var _ = Describe("v3-delete command", func() {
 		appName = helpers.PrefixedRandomName("app")
 	})
 
-	Context("when --help flag is set", func() {
+	When("--help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("v3-delete", "--help")
 			Eventually(session).Should(Say("NAME:"))
@@ -35,7 +35,7 @@ var _ = Describe("v3-delete command", func() {
 		})
 	})
 
-	Context("when the app name is not provided", func() {
+	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-delete")
 
@@ -51,8 +51,8 @@ var _ = Describe("v3-delete command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -65,7 +65,7 @@ var _ = Describe("v3-delete command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -84,7 +84,7 @@ var _ = Describe("v3-delete command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -103,7 +103,7 @@ var _ = Describe("v3-delete command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -116,7 +116,7 @@ var _ = Describe("v3-delete command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -130,7 +130,7 @@ var _ = Describe("v3-delete command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -146,7 +146,7 @@ var _ = Describe("v3-delete command", func() {
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -155,8 +155,8 @@ var _ = Describe("v3-delete command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
-			Context("when the -f flag is provided", func() {
+		When("the app does not exist", func() {
+			When("the -f flag is provided", func() {
 				It("it displays the app does not exist", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CF("v3-delete", appName, "-f")
@@ -167,14 +167,14 @@ var _ = Describe("v3-delete command", func() {
 				})
 			})
 
-			Context("when the -f flag not is provided", func() {
+			When("the -f flag not is provided", func() {
 				var buffer *Buffer
 
 				BeforeEach(func() {
 					buffer = NewBuffer()
 				})
 
-				Context("when the user enters 'y'", func() {
+				When("the user enters 'y'", func() {
 					BeforeEach(func() {
 						buffer.Write([]byte("y\n"))
 					})
@@ -190,7 +190,7 @@ var _ = Describe("v3-delete command", func() {
 					})
 				})
 
-				Context("when the user enters 'n'", func() {
+				When("the user enters 'n'", func() {
 					BeforeEach(func() {
 						buffer.Write([]byte("n\n"))
 					})
@@ -203,7 +203,7 @@ var _ = Describe("v3-delete command", func() {
 					})
 				})
 
-				Context("when the user enters the default input (hits return)", func() {
+				When("the user enters the default input (hits return)", func() {
 					BeforeEach(func() {
 						buffer.Write([]byte("\n"))
 					})
@@ -216,7 +216,7 @@ var _ = Describe("v3-delete command", func() {
 					})
 				})
 
-				Context("when the user enters an invalid answer", func() {
+				When("the user enters an invalid answer", func() {
 					BeforeEach(func() {
 						// The second '\n' is intentional. Otherwise the buffer will be
 						// closed while the interaction is still waiting for input; it gets
@@ -235,7 +235,7 @@ var _ = Describe("v3-delete command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))

@@ -52,13 +52,13 @@ var _ = Describe("delete-space Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when a cloud controller API endpoint is set", func() {
+	When("a cloud controller API endpoint is set", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns("some-url")
 		})
 
-		Context("when checking target fails", func() {
-			Context("when an org is provided", func() {
+		When("checking target fails", func() {
+			When("an org is provided", func() {
 				BeforeEach(func() {
 					cmd.Org = "some-org"
 					fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
@@ -73,7 +73,7 @@ var _ = Describe("delete-space Command", func() {
 				})
 			})
 
-			Context("when an org is NOT provided", func() {
+			When("an org is NOT provided", func() {
 				BeforeEach(func() {
 					fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{})
 				})
@@ -88,8 +88,8 @@ var _ = Describe("delete-space Command", func() {
 			})
 		})
 
-		Context("when the user is logged in", func() {
-			Context("when getting the current user returns an error", func() {
+		When("the user is logged in", func() {
+			When("getting the current user returns an error", func() {
 				var returnedErr error
 
 				BeforeEach(func() {
@@ -102,17 +102,17 @@ var _ = Describe("delete-space Command", func() {
 				})
 			})
 
-			Context("when the -o flag is provided", func() {
+			When("the -o flag is provided", func() {
 				BeforeEach(func() {
 					cmd.Org = "some-org"
 				})
 
-				Context("when the -f flag is provided", func() {
+				When("the -f flag is provided", func() {
 					BeforeEach(func() {
 						cmd.Force = true
 					})
 
-					Context("when the deleting the space errors", func() {
+					When("the deleting the space errors", func() {
 						BeforeEach(func() {
 							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(v2action.Warnings{"warning-1", "warning-2"}, actionerror.SpaceNotFoundError{Name: "some-space"})
 						})
@@ -126,12 +126,12 @@ var _ = Describe("delete-space Command", func() {
 						})
 					})
 
-					Context("when the deleting the space succeeds", func() {
+					When("the deleting the space succeeds", func() {
 						BeforeEach(func() {
 							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(v2action.Warnings{"warning-1", "warning-2"}, nil)
 						})
 
-						Context("when the user was targeted to the space", func() {
+						When("the user was targeted to the space", func() {
 							BeforeEach(func() {
 								fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space"})
 								fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
@@ -155,7 +155,7 @@ var _ = Describe("delete-space Command", func() {
 							})
 						})
 
-						Context("when the user was NOT targeted to the space", func() {
+						When("the user was NOT targeted to the space", func() {
 							BeforeEach(func() {
 								fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space"})
 								fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-other-org"})
@@ -177,12 +177,12 @@ var _ = Describe("delete-space Command", func() {
 					})
 				})
 
-				Context("when the -f flag is NOT provided", func() {
+				When("the -f flag is NOT provided", func() {
 					BeforeEach(func() {
 						cmd.Force = false
 					})
 
-					Context("when the user inputs yes", func() {
+					When("the user inputs yes", func() {
 						BeforeEach(func() {
 							_, err := input.Write([]byte("y\n"))
 							Expect(err).ToNot(HaveOccurred())
@@ -203,7 +203,7 @@ var _ = Describe("delete-space Command", func() {
 						})
 					})
 
-					Context("when the user inputs no", func() {
+					When("the user inputs no", func() {
 						BeforeEach(func() {
 							_, err := input.Write([]byte("n\n"))
 							Expect(err).ToNot(HaveOccurred())
@@ -217,7 +217,7 @@ var _ = Describe("delete-space Command", func() {
 						})
 					})
 
-					Context("when the user chooses the default", func() {
+					When("the user chooses the default", func() {
 						BeforeEach(func() {
 							_, err := input.Write([]byte("\n"))
 							Expect(err).ToNot(HaveOccurred())
@@ -231,7 +231,7 @@ var _ = Describe("delete-space Command", func() {
 						})
 					})
 
-					Context("when the user input is invalid", func() {
+					When("the user input is invalid", func() {
 						BeforeEach(func() {
 							_, err := input.Write([]byte("e\n\n"))
 							Expect(err).ToNot(HaveOccurred())
@@ -250,7 +250,7 @@ var _ = Describe("delete-space Command", func() {
 				})
 			})
 
-			Context("when the -o flag is NOT provided", func() {
+			When("the -o flag is NOT provided", func() {
 				BeforeEach(func() {
 					cmd.Org = ""
 					cmd.Force = true
@@ -273,7 +273,7 @@ var _ = Describe("delete-space Command", func() {
 					Expect(orgArg).To(Equal("some-targeted-org"))
 				})
 
-				Context("when deleting a targeted space", func() {
+				When("deleting a targeted space", func() {
 					BeforeEach(func() {
 						fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space"})
 					})

@@ -58,8 +58,8 @@ var _ = Describe("app summary displayer", func() {
 			executeErr = appSummaryDisplayer.DisplayAppInfo()
 		})
 
-		Context("when getting the app summary succeeds", func() {
-			Context("when the app has instances", func() {
+		When("getting the app summary succeeds", func() {
+			When("the app has instances", func() {
 				BeforeEach(func() {
 					appSummary := v3action.ApplicationSummary{
 						Application: v3action.Application{
@@ -130,7 +130,7 @@ var _ = Describe("app summary displayer", func() {
 						nil)
 				})
 
-				Context("when the isolation segment name is provided", func() {
+				When("the isolation segment name is provided", func() {
 					var isolationSegmentName string
 					BeforeEach(func() {
 						isolationSegmentName = "potato beans"
@@ -153,7 +153,7 @@ var _ = Describe("app summary displayer", func() {
 					})
 				})
 
-				Context("when the isolation segment name is missing", func() {
+				When("the isolation segment name is missing", func() {
 					BeforeEach(func() {
 						fakeV2Actor.GetApplicationInstancesWithStatsByApplicationReturns(
 							[]v2action.ApplicationInstanceWithStats{{}},
@@ -169,8 +169,8 @@ var _ = Describe("app summary displayer", func() {
 					})
 				})
 
-				Context("when getting the isolation segment information errors", func() {
-					Context("when a random error is returned", func() {
+				When("getting the isolation segment information errors", func() {
+					When("a random error is returned", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -186,7 +186,7 @@ var _ = Describe("app summary displayer", func() {
 						})
 					})
 
-					Context("when a random error is returned", func() {
+					When("a random error is returned", func() {
 						BeforeEach(func() {
 							fakeV2Actor.GetApplicationInstancesWithStatsByApplicationReturns(nil, v2action.Warnings{"some-instance-stats-warning"}, ccerror.ResourceNotFoundError{})
 						})
@@ -243,7 +243,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 			})
 
-			Context("when the app has no instances", func() {
+			When("the app has no instances", func() {
 				BeforeEach(func() {
 					appSummary := v3action.ApplicationSummary{
 						Application: v3action.Application{
@@ -266,7 +266,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 			})
 
-			Context("when the app is stopped", func() {
+			When("the app is stopped", func() {
 				BeforeEach(func() {
 					appSummary := v3action.ApplicationSummary{
 						Application: v3action.Application{
@@ -292,7 +292,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 		})
 
-		Context("when getting the app summary fails", func() {
+		When("getting the app summary fails", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 					v3action.ApplicationSummary{},

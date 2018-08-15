@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("Suggest Command", func() {
-	Context("when a command is provided that is almost a command", func() {
+	When("a command is provided that is almost a command", func() {
 		It("gives suggestions", func() {
 			command := exec.Command("cf", "logn")
 			session, err := Start(command, GinkgoWriter, GinkgoWriter)
@@ -25,7 +25,7 @@ var _ = Describe("Suggest Command", func() {
 		})
 	})
 
-	Context("when a command is provided that is not even close", func() {
+	When("a command is provided that is not even close", func() {
 		It("gives suggestions", func() {
 			command := exec.Command("cf", "zzz")
 			session, err := Start(command, GinkgoWriter, GinkgoWriter)

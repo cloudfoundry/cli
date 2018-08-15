@@ -48,7 +48,7 @@ var _ = Describe("ReadManifest", func() {
 		apps, warnings, executeErr = actor.ReadManifest(manifestPath, varsFilesPaths, varsKV)
 	})
 
-	Context("when provided `buildpack`", func() {
+	When("provided `buildpack`", func() {
 		BeforeEach(func() {
 			manifest := []byte(`
 ---

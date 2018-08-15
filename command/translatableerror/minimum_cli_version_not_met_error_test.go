@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("MinimumCLIVersionNotMetError", func() {
 	Describe("Error", func() {
-		Context("when BinaryVersion is not empty", func() {
+		When("BinaryVersion is not empty", func() {
 			It("returns a template with the value of the BinaryVersion field", func() {
 				err := MinimumCLIVersionNotMetError{
 					BinaryVersion: "1.2.3",

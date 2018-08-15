@@ -19,7 +19,7 @@ var _ = Describe("add-network-policy command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("add-network-policy", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -40,12 +40,12 @@ var _ = Describe("add-network-policy command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "add-network-policy", "some-app", "--destination-app", "some-other-app")
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -65,7 +65,7 @@ var _ = Describe("add-network-policy command", func() {
 		})
 	})
 
-	Context("when the org and space are properly targetted", func() {
+	When("the org and space are properly targetted", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -88,7 +88,7 @@ var _ = Describe("add-network-policy command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when an app exists", func() {
+		When("an app exists", func() {
 			It("creates a policy", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "--port", "8080-8090", "--protocol", "udp")
 
@@ -105,7 +105,7 @@ var _ = Describe("add-network-policy command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when port and protocol are not specified", func() {
+			When("port and protocol are not specified", func() {
 				It("creates a policy with the default values", func() {
 					session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
 
@@ -124,7 +124,7 @@ var _ = Describe("add-network-policy command", func() {
 			})
 		})
 
-		Context("when the source app does not exist", func() {
+		When("the source app does not exist", func() {
 			It("returns an error", func() {
 				session := helpers.CF("add-network-policy", "pineapple", "--destination-app", appName)
 
@@ -136,7 +136,7 @@ var _ = Describe("add-network-policy command", func() {
 			})
 		})
 
-		Context("when the dest app does not exist", func() {
+		When("the dest app does not exist", func() {
 			It("returns an error", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", "pineapple")
 
@@ -148,7 +148,7 @@ var _ = Describe("add-network-policy command", func() {
 			})
 		})
 
-		Context("when port is specified but protocol is not", func() {
+		When("port is specified but protocol is not", func() {
 			It("returns an error", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "--port", "8080")
 
@@ -159,7 +159,7 @@ var _ = Describe("add-network-policy command", func() {
 			})
 		})
 
-		Context("when protocol is specified but port is not", func() {
+		When("protocol is specified but port is not", func() {
 			It("returns an error", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "--protocol", "tcp")
 

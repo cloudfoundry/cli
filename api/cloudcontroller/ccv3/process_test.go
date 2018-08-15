@@ -39,7 +39,7 @@ var _ = Describe("Process", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when instances is provided", func() {
+			When("instances is provided", func() {
 				BeforeEach(func() {
 					process = Process{
 						Instances: types.NullInt{Value: 0, IsSet: true},
@@ -51,7 +51,7 @@ var _ = Describe("Process", func() {
 				})
 			})
 
-			Context("when memory is provided", func() {
+			When("memory is provided", func() {
 				BeforeEach(func() {
 					process = Process{
 						MemoryInMB: types.NullUint64{Value: 0, IsSet: true},
@@ -63,7 +63,7 @@ var _ = Describe("Process", func() {
 				})
 			})
 
-			Context("when disk is provided", func() {
+			When("disk is provided", func() {
 				BeforeEach(func() {
 					process = Process{
 						DiskInMB: types.NullUint64{Value: 0, IsSet: true},
@@ -75,7 +75,7 @@ var _ = Describe("Process", func() {
 				})
 			})
 
-			Context("when health check type http is provided", func() {
+			When("health check type http is provided", func() {
 				BeforeEach(func() {
 					process = Process{
 						HealthCheckType:     "http",
@@ -88,7 +88,7 @@ var _ = Describe("Process", func() {
 				})
 			})
 
-			Context("when health check type port is provided", func() {
+			When("health check type port is provided", func() {
 				BeforeEach(func() {
 					process = Process{
 						HealthCheckType: "port",
@@ -100,7 +100,7 @@ var _ = Describe("Process", func() {
 				})
 			})
 
-			Context("when health check type process is provided", func() {
+			When("health check type process is provided", func() {
 				BeforeEach(func() {
 					process = Process{
 						HealthCheckType: "process",
@@ -112,7 +112,7 @@ var _ = Describe("Process", func() {
 				})
 			})
 
-			Context("when process has no fields provided", func() {
+			When("process has no fields provided", func() {
 				BeforeEach(func() {
 					process = Process{}
 				})
@@ -137,7 +137,7 @@ var _ = Describe("Process", func() {
 				err = json.Unmarshal(processBytes, &process)
 				Expect(err).ToNot(HaveOccurred())
 			})
-			Context("when health check type http is provided", func() {
+			When("health check type http is provided", func() {
 				BeforeEach(func() {
 					processBytes = []byte(`{"health_check":{"type":"http", "data": {"endpoint": "some-endpoint"}}}`)
 				})
@@ -150,7 +150,7 @@ var _ = Describe("Process", func() {
 				})
 			})
 
-			Context("when health check type port is provided", func() {
+			When("health check type port is provided", func() {
 				BeforeEach(func() {
 					processBytes = []byte(`{"health_check":{"type":"port", "data": {"endpoint": null}}}`)
 				})
@@ -162,7 +162,7 @@ var _ = Describe("Process", func() {
 				})
 			})
 
-			Context("when health check type process is provided", func() {
+			When("health check type process is provided", func() {
 				BeforeEach(func() {
 					processBytes = []byte(`{"health_check":{"type":"process", "data": {"endpoint": null}}}`)
 				})
@@ -179,7 +179,7 @@ var _ = Describe("Process", func() {
 	Describe("CreateApplicationProcessScale", func() {
 		var passedProcess Process
 
-		Context("when providing all scale options", func() {
+		When("providing all scale options", func() {
 			BeforeEach(func() {
 				passedProcess = Process{
 					Type:       constant.ProcessTypeWeb,
@@ -212,7 +212,7 @@ var _ = Describe("Process", func() {
 			})
 		})
 
-		Context("when providing all scale options with 0 values", func() {
+		When("providing all scale options with 0 values", func() {
 			BeforeEach(func() {
 				passedProcess = Process{
 					Type:       constant.ProcessTypeWeb,
@@ -245,7 +245,7 @@ var _ = Describe("Process", func() {
 			})
 		})
 
-		Context("when providing only one scale option", func() {
+		When("providing only one scale option", func() {
 			BeforeEach(func() {
 				passedProcess = Process{Type: constant.ProcessTypeWeb, Instances: types.NullInt{Value: 2, IsSet: true}}
 				expectedBody := `{
@@ -275,7 +275,7 @@ var _ = Describe("Process", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				passedProcess = Process{Type: constant.ProcessTypeWeb, Instances: types.NullInt{Value: 2, IsSet: true}}
 				response := `{
@@ -334,7 +334,7 @@ var _ = Describe("Process", func() {
 			process, warnings, err = client.GetApplicationProcessByType("some-app-guid", "some-type")
 		})
 
-		Context("when the process exists", func() {
+		When("the process exists", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "process-1-guid",
@@ -377,7 +377,7 @@ var _ = Describe("Process", func() {
 			})
 		})
 
-		Context("when the application does not exist", func() {
+		When("the application does not exist", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -402,7 +402,7 @@ var _ = Describe("Process", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -448,7 +448,7 @@ var _ = Describe("Process", func() {
 	})
 
 	Describe("GetApplicationProcesses", func() {
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`
 					{
@@ -553,7 +553,7 @@ var _ = Describe("Process", func() {
 			})
 		})
 
-		Context("when cloud controller returns an error", func() {
+		When("cloud controller returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -593,7 +593,7 @@ var _ = Describe("Process", func() {
 			process, warnings, err = client.PatchApplicationProcessHealthCheck("some-process-guid", "some-type", endpoint, invocationTimeout)
 		})
 
-		Context("when patching the process succeeds", func() {
+		When("patching the process succeeds", func() {
 			Context("and the endpoint is set", func() {
 				BeforeEach(func() {
 					endpoint = "some-endpoint"
@@ -719,7 +719,7 @@ var _ = Describe("Process", func() {
 			})
 		})
 
-		Context("when the process does not exist", func() {
+		When("the process does not exist", func() {
 			BeforeEach(func() {
 				endpoint = "some-endpoint"
 				response := `{
@@ -746,7 +746,7 @@ var _ = Describe("Process", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				endpoint = "some-endpoint"
 				response := `{

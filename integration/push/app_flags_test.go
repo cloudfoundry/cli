@@ -23,7 +23,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when the API version is below 3.27.0 and health check type is not http", func() {
+	When("the API version is below 3.27.0 and health check type is not http", func() {
 		BeforeEach(func() {
 			helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
 		})
@@ -77,7 +77,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 		})
 	})
 
-	Context("when the API version is above 3.27.0 and health check type is not http", func() {
+	When("the API version is above 3.27.0 and health check type is not http", func() {
 		BeforeEach(func() {
 			helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 		})
@@ -135,7 +135,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 		})
 	})
 
-	Context("when the API version is below 3.27.0 and health check type is http", func() {
+	When("the API version is below 3.27.0 and health check type is http", func() {
 		BeforeEach(func() {
 			helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
 		})
@@ -191,7 +191,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 		})
 	})
 
-	Context("when the API version is above 3.27.0 and health check type is http", func() {
+	When("the API version is above 3.27.0 and health check type is http", func() {
 		BeforeEach(func() {
 			helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 		})

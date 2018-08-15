@@ -9,13 +9,13 @@ import (
 )
 
 var _ = Describe("service-access command", func() {
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "service-access")
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var (
 			orgName1   string
 			spaceName1 string

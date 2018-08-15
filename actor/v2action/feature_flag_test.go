@@ -32,7 +32,7 @@ var _ = Describe("Feature Flag Actions", func() {
 			featureFlags, warnings, err = actor.GetFeatureFlags()
 		})
 
-		Context("when an error is encountered getting feature flags", func() {
+		When("an error is encountered getting feature flags", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -51,7 +51,7 @@ var _ = Describe("Feature Flag Actions", func() {
 			})
 		})
 
-		Context("when no errors are encountered getting feature flags", func() {
+		When("no errors are encountered getting feature flags", func() {
 			var featureFlag1 ccv2.FeatureFlag
 			var featureFlag2 ccv2.FeatureFlag
 

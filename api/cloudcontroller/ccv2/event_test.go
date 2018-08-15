@@ -40,7 +40,7 @@ var _ = Describe("Event", func() {
 				},
 			)
 		})
-		Context("when getting events errors", func() {
+		When("getting events errors", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 1,
@@ -69,7 +69,7 @@ var _ = Describe("Event", func() {
 			})
 		})
 
-		Context("when getting events succeeds", func() {
+		When("getting events succeeds", func() {
 			BeforeEach(func() {
 				response1 := `{
 				"next_url": "/v2/events?q=timestamp>2015-03-10T23:11:54Z&q=type+IN+audit.app.create,audit.app.delete-request&page=2",

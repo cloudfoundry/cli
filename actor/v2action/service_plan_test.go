@@ -32,7 +32,7 @@ var _ = Describe("Service Plan Actions", func() {
 			servicePlan, servicePlanWarnings, servicePlanErr = actor.GetServicePlan("some-service-plan-guid")
 		})
 
-		Context("when the service plan exists", func() {
+		When("the service plan exists", func() {
 			var returnedServicePlan ccv2.ServicePlan
 
 			BeforeEach(func() {
@@ -56,7 +56,7 @@ var _ = Describe("Service Plan Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the service plan", func() {
+		When("an error is encountered getting the service plan", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

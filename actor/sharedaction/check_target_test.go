@@ -23,7 +23,7 @@ var _ = Describe("CheckTarget", func() {
 		actor = NewActor(fakeConfig)
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		It("returns an error", func() {
 			err := actor.CheckTarget(false, false)
 			Expect(err).To(MatchError(actionerror.NotLoggedInError{
@@ -32,7 +32,7 @@ var _ = Describe("CheckTarget", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.AccessTokenReturns("some-access-token")
 			fakeConfig.RefreshTokenReturns("some-refresh-token")
@@ -57,7 +57,7 @@ var _ = Describe("CheckTarget", func() {
 			Entry("it does not return an error", true, true, nil),
 		)
 
-		Context("when the organization is targeted", func() {
+		When("the organization is targeted", func() {
 			BeforeEach(func() {
 				fakeConfig.HasTargetedOrganizationReturns(true)
 			})

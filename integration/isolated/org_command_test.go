@@ -23,7 +23,7 @@ var _ = Describe("org command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("org", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -39,18 +39,18 @@ var _ = Describe("org command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "org", "org-name")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})
 
-		Context("when the org does not exist", func() {
+		When("the org does not exist", func() {
 			It("displays org not found and exits 1", func() {
 				session := helpers.CF("org", orgName)
 				userName, _ := helpers.GetCredentials()
@@ -61,7 +61,7 @@ var _ = Describe("org command", func() {
 			})
 		})
 
-		Context("when the org exists", func() {
+		When("the org exists", func() {
 			BeforeEach(func() {
 				helpers.SetupCF(orgName, spaceName)
 			})
@@ -70,7 +70,7 @@ var _ = Describe("org command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			Context("when the --guid flag is used", func() {
+			When("the --guid flag is used", func() {
 				It("displays the org guid", func() {
 					session := helpers.CF("org", "--guid", orgName)
 					Eventually(session).Should(Say("[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}"))
@@ -78,7 +78,7 @@ var _ = Describe("org command", func() {
 				})
 			})
 
-			Context("when no flags are used", func() {
+			When("no flags are used", func() {
 				var (
 					domainName string
 					quotaName  string
@@ -121,7 +121,7 @@ var _ = Describe("org command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when isolation segments are available", func() {
+				When("isolation segments are available", func() {
 					var isolationSegmentsSorted []string
 
 					BeforeEach(func() {

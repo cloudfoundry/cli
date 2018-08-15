@@ -39,8 +39,8 @@ var _ = Describe("Help Actions", func() {
 	})
 
 	Describe("CommandInfoByName", func() {
-		Context("when the command exists", func() {
-			Context("when passed the command name", func() {
+		When("the command exists", func() {
+			When("passed the command name", func() {
 				It("returns command info", func() {
 					commandInfo, err := actor.CommandInfoByName(commandList{}, "app")
 					Expect(err).NotTo(HaveOccurred())
@@ -61,7 +61,7 @@ var _ = Describe("Help Actions", func() {
 					}))
 				})
 
-				Context("when the command uses timeout environment variables", func() {
+				When("the command uses timeout environment variables", func() {
 					It("has timeout environment variables", func() {
 						commandInfo, err := actor.CommandInfoByName(commandList{}, "restage")
 						Expect(err).NotTo(HaveOccurred())
@@ -80,7 +80,7 @@ var _ = Describe("Help Actions", func() {
 					})
 				})
 
-				Context("when the command does not use environment variables", func() {
+				When("the command does not use environment variables", func() {
 					It("does not have environment variables", func() {
 						commandInfo, err := actor.CommandInfoByName(commandList{}, "app")
 						Expect(err).NotTo(HaveOccurred())
@@ -90,7 +90,7 @@ var _ = Describe("Help Actions", func() {
 				})
 			})
 
-			Context("when passed the command alias", func() {
+			When("passed the command alias", func() {
 				It("returns command info", func() {
 					commandInfo, err := actor.CommandInfoByName(commandList{}, "h")
 					Expect(err).NotTo(HaveOccurred())
@@ -110,7 +110,7 @@ var _ = Describe("Help Actions", func() {
 			})
 		})
 
-		Context("when the command does not exist", func() {
+		When("the command does not exist", func() {
 			It("returns err", func() {
 				_, err := actor.CommandInfoByName(commandList{}, "does-not-exist")
 

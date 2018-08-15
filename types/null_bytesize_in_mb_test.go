@@ -14,7 +14,7 @@ var _ = Describe("NullByteSizeInMb", func() {
 	})
 
 	Describe("String", func() {
-		Context("when a NullByteSize value is not set", func() {
+		When("a NullByteSize value is not set", func() {
 			It("returns an empty string", func() {
 				nullByteSize.IsSet = false
 				returnedString := nullByteSize.String()
@@ -22,8 +22,8 @@ var _ = Describe("NullByteSizeInMb", func() {
 			})
 		})
 
-		Context("when a NullByteSize value is set", func() {
-			Context("when NullByteSize value is in megabytes", func() {
+		When("a NullByteSize value is set", func() {
+			When("NullByteSize value is in megabytes", func() {
 				It("returns a formatted byte size", func() {
 					nullByteSize.IsSet = true
 					nullByteSize.Value = 1024
@@ -35,7 +35,7 @@ var _ = Describe("NullByteSizeInMb", func() {
 	})
 
 	Describe("ParseStringValue", func() {
-		Context("when the empty string is provided", func() {
+		When("the empty string is provided", func() {
 			It("sets IsSet to false", func() {
 				err := nullByteSize.ParseStringValue("")
 				Expect(err).ToNot(HaveOccurred())
@@ -43,7 +43,7 @@ var _ = Describe("NullByteSizeInMb", func() {
 			})
 		})
 
-		Context("when an invalid byte size is provided", func() {
+		When("an invalid byte size is provided", func() {
 			It("returns an error", func() {
 				err := nullByteSize.ParseStringValue("abcdef")
 				Expect(err).To(HaveOccurred())
@@ -51,7 +51,7 @@ var _ = Describe("NullByteSizeInMb", func() {
 			})
 		})
 
-		Context("when a unit size is not provided", func() {
+		When("a unit size is not provided", func() {
 			It("returns an error", func() {
 				err := nullByteSize.ParseStringValue("1")
 				Expect(err).To(HaveOccurred())
@@ -59,7 +59,7 @@ var _ = Describe("NullByteSizeInMb", func() {
 			})
 		})
 
-		Context("when a valid byte size is provided", func() {
+		When("a valid byte size is provided", func() {
 			It("stores the integer and sets IsSet to true", func() {
 				err := nullByteSize.ParseStringValue("1G")
 				Expect(err).ToNot(HaveOccurred())
@@ -69,14 +69,14 @@ var _ = Describe("NullByteSizeInMb", func() {
 	})
 
 	Describe("ParseUint64Value", func() {
-		Context("when nil is provided", func() {
+		When("nil is provided", func() {
 			It("sets IsSet to false", func() {
 				nullByteSize.ParseUint64Value(nil)
 				Expect(nullByteSize).To(Equal(NullByteSizeInMb{Value: 0, IsSet: false}))
 			})
 		})
 
-		Context("when non-nil pointer is provided", func() {
+		When("non-nil pointer is provided", func() {
 			It("sets IsSet to true and Value to provided value", func() {
 				n := uint64(5)
 				nullByteSize.ParseUint64Value(&n)
@@ -86,7 +86,7 @@ var _ = Describe("NullByteSizeInMb", func() {
 	})
 
 	Describe("UnmarshalJSON", func() {
-		Context("when integer value is provided", func() {
+		When("integer value is provided", func() {
 			It("parses JSON number correctly", func() {
 				err := nullByteSize.UnmarshalJSON([]byte("42"))
 				Expect(err).ToNot(HaveOccurred())
@@ -94,7 +94,7 @@ var _ = Describe("NullByteSizeInMb", func() {
 			})
 		})
 
-		Context("when empty json is provided", func() {
+		When("empty json is provided", func() {
 			It("returns an unset NullUint64", func() {
 				err := nullByteSize.UnmarshalJSON([]byte(`""`))
 				Expect(err).ToNot(HaveOccurred())

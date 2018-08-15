@@ -26,12 +26,12 @@ var _ = Describe("Space Summary Actions", func() {
 			actor = NewActor(fakeCloudControllerClient, nil, nil)
 		})
 
-		Context("when space staging security groups are requested", func() {
+		When("space staging security groups are requested", func() {
 			JustBeforeEach(func() {
 				spaceSummary, warnings, err = actor.GetSpaceSummaryByOrganizationAndName("some-org-guid", "some-space")
 			})
 
-			Context("when no errors are encountered", func() {
+			When("no errors are encountered", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetOrganizationReturns(
 						ccv2.Organization{
@@ -316,7 +316,7 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(queriesStaging).To(BeNil())
 				})
 
-				Context("when no space quota is assigned", func() {
+				When("no space quota is assigned", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetSpacesReturns(
 							[]ccv2.Space{
@@ -336,7 +336,7 @@ var _ = Describe("Space Summary Actions", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the organization", func() {
+			When("an error is encountered getting the organization", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -356,7 +356,7 @@ var _ = Describe("Space Summary Actions", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the space", func() {
+			When("an error is encountered getting the space", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -382,7 +382,7 @@ var _ = Describe("Space Summary Actions", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the application", func() {
+			When("an error is encountered getting the application", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -419,7 +419,7 @@ var _ = Describe("Space Summary Actions", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the service instances", func() {
+			When("an error is encountered getting the service instances", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -468,7 +468,7 @@ var _ = Describe("Space Summary Actions", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the space quota", func() {
+			When("an error is encountered getting the space quota", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -531,7 +531,7 @@ var _ = Describe("Space Summary Actions", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the running security groups", func() {
+			When("an error is encountered getting the running security groups", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -602,7 +602,7 @@ var _ = Describe("Space Summary Actions", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the staging security groups", func() {
+			When("an error is encountered getting the staging security groups", func() {
 				var expectedErr error
 
 				BeforeEach(func() {

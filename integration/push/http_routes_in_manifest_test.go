@@ -33,14 +33,14 @@ var _ = Describe("HTTP routes in manifest", func() {
 		routeStar = helpers.NewRoute(space, subdomain.Name, "*", "")
 	})
 
-	Context("when the domain exist", func() {
+	When("the domain exist", func() {
 		BeforeEach(func() {
 			domain.Create()
 			subdomain.Create()
 		})
 
-		Context("when the routes don't have a path", func() {
-			Context("when the routes are new", func() {
+		When("the routes don't have a path", func() {
+			When("the routes are new", func() {
 				It("creates and maps the routes", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -74,7 +74,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when --random-route is also specified", func() {
+				When("--random-route is also specified", func() {
 					It("creates and maps the routes", func() {
 						helpers.WithHelloWorldApp(func(dir string) {
 							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -109,8 +109,8 @@ var _ = Describe("HTTP routes in manifest", func() {
 				})
 			})
 
-			Context("when one of the routes exists", func() {
-				Context("when the route is in the current space", func() {
+			When("one of the routes exists", func() {
+				When("the route is in the current space", func() {
 					BeforeEach(func() {
 						route2.Create()
 					})
@@ -147,7 +147,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 					})
 				})
 
-				Context("when the route is in a different space", func() {
+				When("the route is in a different space", func() {
 					BeforeEach(func() {
 						otherSpace := helpers.NewSpaceName()
 						helpers.CreateSpace(otherSpace)
@@ -178,7 +178,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 				})
 			})
 
-			Context("when the route contains a port", func() {
+			When("the route contains a port", func() {
 				BeforeEach(func() {
 					route1.Port = 1234
 				})
@@ -206,9 +206,9 @@ var _ = Describe("HTTP routes in manifest", func() {
 			})
 		})
 
-		Context("when the route has a path", func() {
+		When("the route has a path", func() {
 
-			Context("when the route is new", func() {
+			When("the route is new", func() {
 				It("creates and maps the route", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -238,7 +238,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 				})
 
 				// This test refers to this dev consideration [https://www.pivotaltracker.com/story/show/126256733/comments/181122853]
-				Context("when a route with the same hostname and domain exists", func() {
+				When("a route with the same hostname and domain exists", func() {
 					var routeWithoutPath helpers.Route
 
 					BeforeEach(func() {
@@ -278,8 +278,8 @@ var _ = Describe("HTTP routes in manifest", func() {
 				})
 			})
 
-			Context("when the route exists", func() {
-				Context("when the route exists in the same space", func() {
+			When("the route exists", func() {
+				When("the route exists in the same space", func() {
 					BeforeEach(func() {
 						routeWithPath.Create()
 					})
@@ -314,7 +314,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 					})
 				})
 
-				Context("when the route exists in another space", func() {
+				When("the route exists in another space", func() {
 					BeforeEach(func() {
 						otherSpace := helpers.NewSpaceName()
 						helpers.CreateSpace(otherSpace)
@@ -346,7 +346,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 		})
 	})
 
-	Context("when the domain does not exist", func() {
+	When("the domain does not exist", func() {
 		It("returns an error", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{

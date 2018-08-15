@@ -34,7 +34,7 @@ var _ = Describe("New Clients", func() {
 		Expect(client).NotTo(BeNil())
 	})
 
-	Context("when the network policy api endpoint is not set", func() {
+	When("the network policy api endpoint is not set", func() {
 		It("returns an error", func() {
 			_, err := NewNetworkingClient("", fakeConfig, fakeUAAClient, testUI)
 			Expect(err).To(MatchError("This command requires Network Policy API V1. Your targeted endpoint does not expose it."))

@@ -51,7 +51,7 @@ var _ = Describe("security-groups Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -66,7 +66,7 @@ var _ = Describe("security-groups Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, and a space and org are targeted", func() {
+	When("the user is logged in, and a space and org are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -80,7 +80,7 @@ var _ = Describe("security-groups Command", func() {
 			})
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -95,14 +95,14 @@ var _ = Describe("security-groups Command", func() {
 			})
 		})
 
-		Context("when getting the current user does not return an error", func() {
+		When("getting the current user does not return an error", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})
 
-			Context("when the list of security groups is returned", func() {
+			When("the list of security groups is returned", func() {
 				var secGroups []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle
 
 				BeforeEach(func() {
@@ -181,7 +181,7 @@ var _ = Describe("security-groups Command", func() {
 				})
 			})
 
-			Context("when an error is encountered fetching the security groups", func() {
+			When("an error is encountered fetching the security groups", func() {
 				BeforeEach(func() {
 					fakeActor.GetSecurityGroupsWithOrganizationSpaceAndLifecycleReturns(nil, v2action.Warnings{"warning-1", "warning-2"}, errors.New("generic"))
 				})

@@ -25,7 +25,7 @@ var _ = Describe("v3-set-droplet command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-set-droplet", "--help")
 
@@ -41,7 +41,7 @@ var _ = Describe("v3-set-droplet command", func() {
 		})
 	})
 
-	Context("when the app name is not provided", func() {
+	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-set-droplet", "-d", "some-droplet-guid")
 
@@ -57,7 +57,7 @@ var _ = Describe("v3-set-droplet command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when the package GUID flag is missing", func() {
+	When("the package GUID flag is missing", func() {
 		It("displays incorrect usage", func() {
 			session := helpers.CF("v3-set-droplet", "some-app")
 
@@ -68,8 +68,8 @@ var _ = Describe("v3-set-droplet command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -82,7 +82,7 @@ var _ = Describe("v3-set-droplet command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -101,7 +101,7 @@ var _ = Describe("v3-set-droplet command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -120,7 +120,7 @@ var _ = Describe("v3-set-droplet command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -133,7 +133,7 @@ var _ = Describe("v3-set-droplet command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -147,7 +147,7 @@ var _ = Describe("v3-set-droplet command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -163,7 +163,7 @@ var _ = Describe("v3-set-droplet command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -172,7 +172,7 @@ var _ = Describe("v3-set-droplet command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			var dropletGUID string
 
 			BeforeEach(func() {
@@ -211,7 +211,7 @@ var _ = Describe("v3-set-droplet command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when the app does not exist", func() {
+			When("the app does not exist", func() {
 				It("displays app not found and exits 1", func() {
 					invalidAppName := "invalid-app-name"
 					session := helpers.CF("v3-set-droplet", invalidAppName, "-d", dropletGUID)
@@ -225,7 +225,7 @@ var _ = Describe("v3-set-droplet command", func() {
 				})
 			})
 
-			Context("when the droplet does not exist", func() {
+			When("the droplet does not exist", func() {
 				It("displays droplet not found and exits 1", func() {
 					invalidDropletGUID := "some-droplet-guid"
 					session := helpers.CF("v3-set-droplet", appName, "-d", invalidDropletGUID)

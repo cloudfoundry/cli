@@ -57,7 +57,7 @@ var _ = Describe("v3-stop Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -74,7 +74,7 @@ var _ = Describe("v3-stop Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -89,7 +89,7 @@ var _ = Describe("v3-stop Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -102,7 +102,7 @@ var _ = Describe("v3-stop Command", func() {
 		})
 	})
 
-	Context("when the actor does not return an error", func() {
+	When("the actor does not return an error", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
@@ -133,7 +133,7 @@ var _ = Describe("v3-stop Command", func() {
 		})
 	})
 
-	Context("when the get app call returns a ApplicationNotFoundError", func() {
+	When("the get app call returns a ApplicationNotFoundError", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -157,7 +157,7 @@ var _ = Describe("v3-stop Command", func() {
 		})
 	})
 
-	Context("when the stop app call returns a ApplicationNotFoundError (someone else deleted app after we fetched summary)", func() {
+	When("the stop app call returns a ApplicationNotFoundError (someone else deleted app after we fetched summary)", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -184,7 +184,7 @@ var _ = Describe("v3-stop Command", func() {
 		})
 	})
 
-	Context("when the app is already stopped", func() {
+	When("the app is already stopped", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
@@ -209,7 +209,7 @@ var _ = Describe("v3-stop Command", func() {
 		})
 	})
 
-	Context("when the get application returns an unknown error", func() {
+	When("the get application returns an unknown error", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -235,7 +235,7 @@ var _ = Describe("v3-stop Command", func() {
 		})
 	})
 
-	Context("when the stop application returns an unknown error", func() {
+	When("the stop application returns an unknown error", func() {
 		var expectedErr error
 
 		BeforeEach(func() {

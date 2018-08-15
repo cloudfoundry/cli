@@ -28,8 +28,8 @@ var _ = Describe("Service Instance Shared From", func() {
 	})
 
 	Describe("GetServiceInstanceSharedFrom", func() {
-		Context("when the cc api returns no errors", func() {
-			Context("when the response is not an http 204", func() {
+		When("the cc api returns no errors", func() {
+			When("the response is not an http 204", func() {
 				BeforeEach(func() {
 					response1 := `{
 			  "space_guid": "some-space-guid",
@@ -57,7 +57,7 @@ var _ = Describe("Service Instance Shared From", func() {
 				})
 			})
 
-			Context("when the response is an http 204", func() {
+			When("the response is an http 204", func() {
 				BeforeEach(func() {
 					server.AppendHandlers(
 						CombineHandlers(
@@ -75,7 +75,7 @@ var _ = Describe("Service Instance Shared From", func() {
 			})
 		})
 
-		Context("when the cc api encounters an error", func() {
+		When("the cc api encounters an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10001,

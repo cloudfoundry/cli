@@ -19,7 +19,7 @@ var _ = Describe("OrganizationQuota", func() {
 
 	Describe("GetOrganizationQuota", func() {
 
-		Context("when getting the organization quota does not return an error", func() {
+		When("getting the organization quota does not return an error", func() {
 			BeforeEach(func() {
 				response := `{
 				"metadata": {
@@ -48,7 +48,7 @@ var _ = Describe("OrganizationQuota", func() {
 			})
 		})
 
-		Context("when the organization quota returns an error", func() {
+		When("the organization quota returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 				  "description": "Quota Definition could not be found: some-org-quota-guid",

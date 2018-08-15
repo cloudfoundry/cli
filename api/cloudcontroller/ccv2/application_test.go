@@ -21,8 +21,8 @@ var _ = Describe("Application", func() {
 	})
 
 	Describe("CreateApplication", func() {
-		Context("when the update is successful", func() {
-			Context("when setting the minimum", func() { // are we **only** encoding the things we want
+		When("the update is successful", func() {
+			When("setting the minimum", func() { // are we **only** encoding the things we want
 				BeforeEach(func() {
 					response := `
 						{
@@ -64,7 +64,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when the create returns an error", func() {
+		When("the create returns an error", func() {
 			BeforeEach(func() {
 				response := `
 					{
@@ -135,7 +135,7 @@ var _ = Describe("Application", func() {
 			)
 		})
 
-		Context("when apps exist", func() {
+		When("apps exist", func() {
 			It("returns the app", func() {
 				app, warnings, err := client.GetApplication("app-guid-1")
 				Expect(err).NotTo(HaveOccurred())
@@ -257,7 +257,7 @@ var _ = Describe("Application", func() {
 			)
 		})
 
-		Context("when apps exist", func() {
+		When("apps exist", func() {
 			It("returns all the queried apps", func() {
 				apps, warnings, err := client.GetApplications(Filter{
 					Type:     constant.SpaceGUIDFilter,
@@ -302,7 +302,7 @@ var _ = Describe("Application", func() {
 	})
 
 	Describe("GetRouteApplications", func() {
-		Context("when the route guid is not found", func() {
+		When("the route guid is not found", func() {
 			BeforeEach(func() {
 				response := `
 {
@@ -327,7 +327,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when there are applications associated with this route", func() {
+		When("there are applications associated with this route", func() {
 			BeforeEach(func() {
 				response1 := `{
 				"next_url": "/v2/routes/some-route-guid/apps?q=space_guid:some-space-guid&page=2",
@@ -406,7 +406,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when there are no applications associated with this route", func() {
+		When("there are no applications associated with this route", func() {
 			BeforeEach(func() {
 				response := `{
 				"next_url": "",
@@ -429,7 +429,7 @@ var _ = Describe("Application", func() {
 	})
 
 	Describe("RestageApplication", func() {
-		Context("when the restage is successful", func() {
+		When("the restage is successful", func() {
 			BeforeEach(func() {
 				response := `{
 					"metadata": {
@@ -494,7 +494,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when the restage returns an error", func() {
+		When("the restage returns an error", func() {
 			BeforeEach(func() {
 				response := `
 {
@@ -523,8 +523,8 @@ var _ = Describe("Application", func() {
 	})
 
 	Describe("UpdateApplication", func() {
-		Context("when the update is successful", func() {
-			Context("when updating all fields", func() { //are we encoding everything correctly?
+		When("the update is successful", func() {
+			When("updating all fields", func() { //are we encoding everything correctly?
 				BeforeEach(func() {
 					response1 := `{
 				"metadata": {
@@ -648,7 +648,7 @@ var _ = Describe("Application", func() {
 				})
 			})
 
-			Context("when only updating one field", func() { // are we **only** encoding the things we want
+			When("only updating one field", func() { // are we **only** encoding the things we want
 				BeforeEach(func() {
 					response1 := `{
 				"metadata": {
@@ -709,7 +709,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when the update returns an error", func() {
+		When("the update returns an error", func() {
 			BeforeEach(func() {
 				response := `
 {

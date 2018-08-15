@@ -36,7 +36,7 @@ var _ = Describe("install actions", func() {
 	})
 
 	Describe("CreateExecutableCopy", func() {
-		Context("when the file exists", func() {
+		When("the file exists", func() {
 			var pluginPath string
 
 			BeforeEach(func() {
@@ -110,7 +110,7 @@ var _ = Describe("install actions", func() {
 			installErr = actor.InstallPluginFromPath(pluginPath, plugin)
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginHomeReturns(pluginHomeDir)
 			})

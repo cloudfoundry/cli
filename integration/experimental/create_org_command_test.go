@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("create-org", func() {
-	Context("when invoked with --help", func() {
+	When("invoked with --help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("create-org", "--help")
 			Eventually(session).Should(Say(`NAME:`))
@@ -31,20 +31,20 @@ var _ = Describe("create-org", func() {
 		})
 	})
 
-	Context("when the environment is not set up correctly", func() {
+	When("the environment is not set up correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, "", "create-org", "some-org")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var user string
 
 		BeforeEach(func() {
 			user = helpers.LoginCF()
 		})
 
-		Context("when the logged in user is not allowed to create orgs", func() {
+		When("the logged in user is not allowed to create orgs", func() {
 			BeforeEach(func() {
 				nonAdminUser := helpers.NewUsername()
 				nonAdminPassword := helpers.NewPassword()
@@ -70,7 +70,7 @@ var _ = Describe("create-org", func() {
 			})
 		})
 
-		Context("when the org does not exist yet", func() {
+		When("the org does not exist yet", func() {
 			It("creates the org", func() {
 				orgName := helpers.NewOrgName()
 				session := helpers.CF("create-org", orgName)
@@ -83,7 +83,7 @@ var _ = Describe("create-org", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when an existing quota is provided", func() {
+			When("an existing quota is provided", func() {
 				var quotaName string
 
 				BeforeEach(func() {
@@ -103,7 +103,7 @@ var _ = Describe("create-org", func() {
 				})
 			})
 
-			Context("when a nonexistent quota is provided", func() {
+			When("a nonexistent quota is provided", func() {
 				XIt("fails with an error and does not create the org", func() {
 					orgName := helpers.NewOrgName()
 					session := helpers.CF("create-org", orgName, "-q", "no-such-quota")
@@ -116,7 +116,7 @@ var _ = Describe("create-org", func() {
 			})
 		})
 
-		Context("when the org already exists", func() {
+		When("the org already exists", func() {
 			var orgName string
 
 			BeforeEach(func() {

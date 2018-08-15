@@ -75,7 +75,7 @@ var _ = Describe("help Command", func() {
 			})
 
 			Describe("related commands", func() {
-				Context("when the command has related commands", func() {
+				When("the command has related commands", func() {
 					BeforeEach(func() {
 						commandInfo := sharedaction.CommandInfo{
 							Name:            "app",
@@ -94,7 +94,7 @@ var _ = Describe("help Command", func() {
 					})
 				})
 
-				Context("when the command does not have related commands", func() {
+				When("the command does not have related commands", func() {
 					It("displays the related commands for help", func() {
 						err := cmd.Execute(nil)
 						Expect(err).ToNot(HaveOccurred())
@@ -106,7 +106,7 @@ var _ = Describe("help Command", func() {
 			})
 
 			Describe("aliases", func() {
-				Context("when the command has an alias", func() {
+				When("the command has an alias", func() {
 					It("displays the alias for help", func() {
 						err := cmd.Execute(nil)
 						Expect(err).ToNot(HaveOccurred())
@@ -117,7 +117,7 @@ var _ = Describe("help Command", func() {
 					})
 				})
 
-				Context("when the command does not have an alias", func() {
+				When("the command does not have an alias", func() {
 					BeforeEach(func() {
 						cmd.OptionalArgs = flag.CommandName{
 							CommandName: "app",
@@ -139,7 +139,7 @@ var _ = Describe("help Command", func() {
 			})
 
 			Describe("options", func() {
-				Context("when the command has options", func() {
+				When("the command has options", func() {
 					BeforeEach(func() {
 						cmd.OptionalArgs = flag.CommandName{
 							CommandName: "push",
@@ -409,7 +409,7 @@ var _ = Describe("help Command", func() {
 			Expect(testUI.Out).To(Say("Use 'cf help -a' to see all commands\\."))
 		})
 
-		Context("when there are multiple installed plugins", func() {
+		When("there are multiple installed plugins", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginsReturns([]configv3.Plugin{
 					{
@@ -463,7 +463,7 @@ var _ = Describe("help Command", func() {
 	})
 
 	Describe("providing help for all commands", func() {
-		Context("when a command is not provided", func() {
+		When("a command is not provided", func() {
 			BeforeEach(func() {
 				cmd.OptionalArgs = flag.CommandName{
 					CommandName: "",
@@ -628,7 +628,7 @@ var _ = Describe("help Command", func() {
 
 			})
 
-			Context("when there are multiple installed plugins", func() {
+			When("there are multiple installed plugins", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginsReturns([]configv3.Plugin{
 						{

@@ -74,7 +74,7 @@ var _ = Describe("UI", func() {
 	})
 
 	Describe("DisplayKeyValueTableForApp", func() {
-		Context("when the app is running properly", func() {
+		When("the app is running properly", func() {
 			BeforeEach(func() {
 				ui.DisplayKeyValueTableForApp([][]string{
 					{"name:", "dora"},
@@ -90,7 +90,7 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		Context("when the app is stopped and has 0 instances", func() {
+		When("the app is stopped and has 0 instances", func() {
 			Context("in english", func() {
 				BeforeEach(func() {
 					ui.DisplayKeyValueTableForApp([][]string{
@@ -132,7 +132,7 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		Context("when the app is not stopped and has 0 instances", func() {
+		When("the app is not stopped and has 0 instances", func() {
 			Context("in english", func() {
 				BeforeEach(func() {
 					ui.DisplayKeyValueTableForApp([][]string{

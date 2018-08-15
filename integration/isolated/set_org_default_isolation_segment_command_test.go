@@ -24,7 +24,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("set-org-default-isolation-segment", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -38,12 +38,12 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "set-org-default-isolation-segment", "orgname", "segment-name")
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -62,7 +62,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -82,7 +82,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is set-up correctly", func() {
+	When("the environment is set-up correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -90,7 +90,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 			userName, _ = helpers.GetCredentials()
 		})
 
-		Context("when the org does not exist", func() {
+		When("the org does not exist", func() {
 			It("fails with org not found message", func() {
 				session := helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentName)
 				Eventually(session).Should(Say("Setting isolation segment %s to default on org %s as %s\\.\\.\\.", isolationSegmentName, orgName, userName))
@@ -100,7 +100,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the org exists", func() {
+		When("the org exists", func() {
 			BeforeEach(func() {
 				helpers.CreateOrg(orgName)
 			})
@@ -109,7 +109,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			Context("when the isolation segment does not exist", func() {
+			When("the isolation segment does not exist", func() {
 				It("fails with isolation segment not found message", func() {
 					session := helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentName)
 					Eventually(session).Should(Say("Setting isolation segment %s to default on org %s as %s\\.\\.\\.", isolationSegmentName, orgName, userName))
@@ -119,12 +119,12 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 				})
 			})
 
-			Context("when the isolation segment exists", func() {
+			When("the isolation segment exists", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 				})
 
-				Context("when the isolation segment is entitled to the organization", func() {
+				When("the isolation segment is entitled to the organization", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName)).Should(Exit(0))
 					})
@@ -137,7 +137,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 
-					Context("when the isolation segment is already set as the org's default", func() {
+					When("the isolation segment is already set as the org's default", func() {
 						BeforeEach(func() {
 							Eventually(helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentName)).Should(Exit(0))
 						})

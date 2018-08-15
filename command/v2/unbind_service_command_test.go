@@ -52,12 +52,12 @@ var _ = Describe("unbind-service Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when a cloud controller API endpoint is set", func() {
+	When("a cloud controller API endpoint is set", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns("some-url")
 		})
 
-		Context("when checking target fails", func() {
+		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 			})
@@ -72,7 +72,7 @@ var _ = Describe("unbind-service Command", func() {
 			})
 		})
 
-		Context("when the user is logged in, and an org and space are targeted", func() {
+		When("the user is logged in, and an org and space are targeted", func() {
 			BeforeEach(func() {
 				fakeConfig.HasTargetedOrganizationReturns(true)
 				fakeConfig.HasTargetedSpaceReturns(true)
@@ -86,7 +86,7 @@ var _ = Describe("unbind-service Command", func() {
 				})
 			})
 
-			Context("when getting the current user returns an error", func() {
+			When("getting the current user returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -101,7 +101,7 @@ var _ = Describe("unbind-service Command", func() {
 				})
 			})
 
-			Context("when getting the current user does not return an error", func() {
+			When("getting the current user does not return an error", func() {
 				BeforeEach(func() {
 					fakeConfig.CurrentUserReturns(
 						configv3.User{Name: "some-user"},
@@ -114,7 +114,7 @@ var _ = Describe("unbind-service Command", func() {
 					Expect(testUI.Out).To(Say("Unbinding app some-app from service some-service in org some-org / space some-space as some-user..."))
 				})
 
-				Context("when unbinding the service instance results in an error not related to service binding", func() {
+				When("unbinding the service instance results in an error not related to service binding", func() {
 					BeforeEach(func() {
 						fakeActor.UnbindServiceBySpaceReturns(v2action.ServiceBinding{}, nil, actionerror.ApplicationNotFoundError{Name: "some-app"})
 					})
@@ -126,7 +126,7 @@ var _ = Describe("unbind-service Command", func() {
 					})
 				})
 
-				Context("when the service binding does not exist", func() {
+				When("the service binding does not exist", func() {
 					BeforeEach(func() {
 						fakeActor.UnbindServiceBySpaceReturns(
 							v2action.ServiceBinding{},
@@ -144,7 +144,7 @@ var _ = Describe("unbind-service Command", func() {
 					})
 				})
 
-				Context("when the service binding exists", func() {
+				When("the service binding exists", func() {
 					It("displays OK", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
@@ -158,7 +158,7 @@ var _ = Describe("unbind-service Command", func() {
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 					})
 
-					Context("when the service unbind is async", func() {
+					When("the service unbind is async", func() {
 						BeforeEach(func() {
 							fakeActor.UnbindServiceBySpaceReturns(
 								v2action.ServiceBinding{LastOperation: ccv2.LastOperation{State: constant.LastOperationInProgress}},

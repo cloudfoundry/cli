@@ -85,7 +85,7 @@ var _ = Describe("Restart Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -100,7 +100,7 @@ var _ = Describe("Restart Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, and org and space are targeted", func() {
+	When("the user is logged in, and org and space are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
@@ -113,7 +113,7 @@ var _ = Describe("Restart Command", func() {
 				nil)
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -132,8 +132,8 @@ var _ = Describe("Restart Command", func() {
 			Expect(testUI.Out).To(Say("Restarting app some-app in org some-org / space some-space as some-user..."))
 		})
 
-		Context("when the app exists", func() {
-			Context("when the app is started", func() {
+		When("the app exists", func() {
+			When("the app is started", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v2action.Application{State: constant.ApplicationStarted},
@@ -155,7 +155,7 @@ var _ = Describe("Restart Command", func() {
 				})
 			})
 
-			Context("when the app is not already started", func() {
+			When("the app is not already started", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v2action.Application{GUID: "app-guid", State: constant.ApplicationStopped},
@@ -175,7 +175,7 @@ var _ = Describe("Restart Command", func() {
 					Expect(app.GUID).To(Equal("app-guid"))
 				})
 
-				Context("when passed an appStarting message", func() {
+				When("passed an appStarting message", func() {
 					BeforeEach(func() {
 						fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
@@ -209,7 +209,7 @@ var _ = Describe("Restart Command", func() {
 					})
 				})
 
-				Context("when passed a log message", func() {
+				When("passed a log message", func() {
 					BeforeEach(func() {
 						fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
@@ -241,7 +241,7 @@ var _ = Describe("Restart Command", func() {
 					})
 				})
 
-				Context("when passed an log err", func() {
+				When("passed an log err", func() {
 					Context("NOAA connection times out/closes", func() {
 						BeforeEach(func() {
 							fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
@@ -308,7 +308,7 @@ var _ = Describe("Restart Command", func() {
 					})
 				})
 
-				Context("when passed a warning", func() {
+				When("passed a warning", func() {
 					Context("while NOAA is still logging", func() {
 						BeforeEach(func() {
 							fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
@@ -376,7 +376,7 @@ var _ = Describe("Restart Command", func() {
 					})
 				})
 
-				Context("when passed an API err", func() {
+				When("passed an API err", func() {
 					var apiErr error
 
 					BeforeEach(func() {
@@ -430,7 +430,7 @@ var _ = Describe("Restart Command", func() {
 						})
 					})
 
-					Context("when the app instance crashes", func() {
+					When("the app instance crashes", func() {
 						BeforeEach(func() {
 							apiErr = actionerror.ApplicationInstanceCrashedError{Name: "some-app"}
 						})
@@ -440,7 +440,7 @@ var _ = Describe("Restart Command", func() {
 						})
 					})
 
-					Context("when the app instance flaps", func() {
+					When("the app instance flaps", func() {
 						BeforeEach(func() {
 							apiErr = actionerror.ApplicationInstanceFlappingError{Name: "some-app"}
 						})
@@ -461,8 +461,8 @@ var _ = Describe("Restart Command", func() {
 					})
 				})
 
-				Context("when the app finishes starting", func() {
-					Context("when the API is at least 3.27.0", func() {
+				When("the app finishes starting", func() {
+					When("the API is at least 3.27.0", func() {
 						BeforeEach(func() {
 							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.50.0")
 							fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(
@@ -518,7 +518,7 @@ var _ = Describe("Restart Command", func() {
 						})
 					})
 
-					Context("when the API is below 3.27.0", func() {
+					When("the API is below 3.27.0", func() {
 						var (
 							applicationSummary v2action.ApplicationSummary
 							warnings           []string
@@ -574,7 +574,7 @@ var _ = Describe("Restart Command", func() {
 							}
 						})
 
-						Context("when the isolation segment is not empty", func() {
+						When("the isolation segment is not empty", func() {
 							BeforeEach(func() {
 								fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 							})
@@ -603,7 +603,7 @@ var _ = Describe("Restart Command", func() {
 
 						})
 
-						Context("when the isolation segment is empty", func() {
+						When("the isolation segment is empty", func() {
 							BeforeEach(func() {
 								applicationSummary.IsolationSegment = ""
 								fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
@@ -637,7 +637,7 @@ var _ = Describe("Restart Command", func() {
 			})
 		})
 
-		Context("when the app does *not* exists", func() {
+		When("the app does *not* exists", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
 					v2action.Application{},

@@ -53,7 +53,7 @@ var _ = Describe("create-app-manifest Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -68,7 +68,7 @@ var _ = Describe("create-app-manifest Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, and org and space are targeted", func() {
+	When("the user is logged in, and org and space are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
@@ -81,7 +81,7 @@ var _ = Describe("create-app-manifest Command", func() {
 				nil)
 		})
 
-		Context("when creating the manifest errors", func() {
+		When("creating the manifest errors", func() {
 			BeforeEach(func() {
 				fakeActor.CreateApplicationManifestByNameAndSpaceReturns(manifest.Application{}, v2v3action.Warnings{"some-warning"}, errors.New("some-error"))
 			})
@@ -93,7 +93,7 @@ var _ = Describe("create-app-manifest Command", func() {
 			})
 		})
 
-		Context("when creating the manifest succeeds", func() {
+		When("creating the manifest succeeds", func() {
 			BeforeEach(func() {
 				fakeActor.CreateApplicationManifestByNameAndSpaceReturns(manifest.Application{}, v2v3action.Warnings{"some-warning"}, nil)
 			})
@@ -116,7 +116,7 @@ var _ = Describe("create-app-manifest Command", func() {
 				Expect(manifestArg).To(Equal(manifest.Application{}))
 			})
 
-			Context("when no filepath is provided", func() {
+			When("no filepath is provided", func() {
 				BeforeEach(func() {
 					cmd.FilePath = ""
 				})

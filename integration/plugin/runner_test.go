@@ -22,12 +22,12 @@ var _ = Describe("running plugins", func() {
 	})
 
 	Describe("when running plugin commands while CF_HOME is set", func() {
-		Context("when CF_PLUGIN_HOME is unset", func() {
+		When("CF_PLUGIN_HOME is unset", func() {
 			BeforeEach(func() {
 				Expect(os.Setenv("CF_PLUGIN_HOME", "")).NotTo(HaveOccurred())
 			})
 
-			Context("when a plugin is installed", func() {
+			When("a plugin is installed", func() {
 				BeforeEach(func() {
 					installTestPlugin()
 				})
@@ -48,8 +48,8 @@ var _ = Describe("running plugins", func() {
 			})
 		})
 
-		Context("when CF_PLUGIN_HOME is set", func() {
-			Context("when a plugin is installed", func() {
+		When("CF_PLUGIN_HOME is set", func() {
+			When("a plugin is installed", func() {
 				BeforeEach(func() {
 					installTestPlugin()
 				})

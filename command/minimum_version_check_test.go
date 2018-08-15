@@ -30,7 +30,7 @@ var _ = Describe("Minimum Version Check", func() {
 				}))
 			})
 
-			Context("when a custom command is provided", func() {
+			When("a custom command is provided", func() {
 				currentVersion := "1.0.0-alpha.5"
 				It("sets the command on the MinimumAPIVersionNotMetError", func() {
 					err := MinimumAPIVersionCheck(currentVersion, minimumVersion, "some-command")

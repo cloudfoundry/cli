@@ -45,7 +45,7 @@ var _ = Describe("Error Wrapper", func() {
 			)
 		})
 
-		Context("when we can't unmarshal the response successfully", func() {
+		When("we can't unmarshal the response successfully", func() {
 			BeforeEach(func() {
 				serverResponse = "I am not unmarshallable"
 				serverResponseCode = http.StatusNotFound
@@ -57,8 +57,8 @@ var _ = Describe("Error Wrapper", func() {
 			})
 		})
 
-		Context("when the error is from the cloud controller", func() {
-			Context("when the error is a 4XX error", func() {
+		When("the error is from the cloud controller", func() {
+			When("the error is a 4XX error", func() {
 				Context("(400) Bad Request", func() {
 					BeforeEach(func() {
 						serverResponseCode = http.StatusBadRequest
@@ -80,7 +80,7 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
-					Context("when a not staged error is encountered", func() {
+					When("a not staged error is encountered", func() {
 						BeforeEach(func() {
 							serverResponse = `{
 								"description": "App has not finished staging",
@@ -96,7 +96,7 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
-					Context("when an instances error is encountered", func() {
+					When("an instances error is encountered", func() {
 						BeforeEach(func() {
 							serverResponse = `{
 								"description": "instances went bananas",
@@ -112,7 +112,7 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
-					Context("when creating a relation that is invalid", func() {
+					When("creating a relation that is invalid", func() {
 						BeforeEach(func() {
 							serverResponse = `{
 							"code": 1002,
@@ -146,7 +146,7 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
-					Context("when creating a buildpack with nil stack that already exists", func() {
+					When("creating a buildpack with nil stack that already exists", func() {
 						BeforeEach(func() {
 							serverResponse = `{
 							 "description": "Buildpack is invalid: stack unique",
@@ -163,7 +163,7 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
-					Context("when creating a buildpack causes a name collision", func() {
+					When("creating a buildpack causes a name collision", func() {
 						BeforeEach(func() {
 							serverResponse = `{
 							 "code": 290001,
@@ -225,7 +225,7 @@ var _ = Describe("Error Wrapper", func() {
 						serverResponseCode = http.StatusNotFound
 					})
 
-					Context("when the error is a json response from the cloud controller", func() {
+					When("the error is a json response from the cloud controller", func() {
 						It("returns a ResourceNotFoundError", func() {
 							_, _, err := client.GetApplications()
 							Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
@@ -245,7 +245,7 @@ var _ = Describe("Error Wrapper", func() {
 						})
 					})
 
-					Context("when creating a buildpack causes a name and stack collision", func() {
+					When("creating a buildpack causes a name and stack collision", func() {
 						BeforeEach(func() {
 							serverResponse = `{
 							 "code": 290000,
@@ -287,7 +287,7 @@ var _ = Describe("Error Wrapper", func() {
 				})
 			})
 
-			Context("when the error is a 5XX error", func() {
+			When("the error is a 5XX error", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusBadGateway
 					serverResponse = "I am some text"

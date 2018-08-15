@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("create-user command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("create-user", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -32,14 +32,14 @@ var _ = Describe("create-user command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "create-user", "username", "password")
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
-		Context("when the logged in user is not authorized to create new users", func() {
+	When("the environment is setup correctly", func() {
+		When("the logged in user is not authorized to create new users", func() {
 			var (
 				newUser     string
 				newPassword string
@@ -73,12 +73,12 @@ var _ = Describe("create-user command", func() {
 			})
 		})
 
-		Context("when the logged in user is authorized to create new users", func() {
+		When("the logged in user is authorized to create new users", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
 			})
 
-			Context("when passed invalid username", func() {
+			When("passed invalid username", func() {
 				DescribeTable("when passed funkyUsername",
 					func(funkyUsername string) {
 						session := helpers.CF("create-user", funkyUsername, helpers.NewPassword())
@@ -92,7 +92,7 @@ var _ = Describe("create-user command", func() {
 					Entry("fails when passed a backtick", "`"),
 				)
 
-				Context("when the username is empty", func() {
+				When("the username is empty", func() {
 					It("fails with a username must be provided error", func() {
 						session := helpers.CF("create-user", "", helpers.NewPassword())
 						Eventually(session).Should(Say("Error creating user ."))
@@ -103,9 +103,9 @@ var _ = Describe("create-user command", func() {
 				})
 			})
 
-			Context("when the user passes in an origin flag", func() {
-				Context("when the origin is UAA", func() {
-					Context("when password is not present", func() {
+			When("the user passes in an origin flag", func() {
+				When("the origin is UAA", func() {
+					When("password is not present", func() {
 						It("errors and prints usage", func() {
 							newUser := helpers.NewUsername()
 							session := helpers.CF("create-user", newUser, "--origin", "UAA")
@@ -116,8 +116,8 @@ var _ = Describe("create-user command", func() {
 						})
 					})
 				})
-				Context("when the origin is the empty string", func() {
-					Context("when password is not present", func() {
+				When("the origin is the empty string", func() {
+					When("password is not present", func() {
 						It("errors and prints usage", func() {
 							newUser := helpers.NewUsername()
 							session := helpers.CF("create-user", newUser, "--origin", "")
@@ -129,7 +129,7 @@ var _ = Describe("create-user command", func() {
 					})
 				})
 
-				Context("when the origin is not UAA or empty", func() {
+				When("the origin is not UAA or empty", func() {
 					It("creates the new user in the specified origin", func() {
 						newUser := helpers.NewUsername()
 						session := helpers.CF("create-user", newUser, "--origin", "ldap")
@@ -140,7 +140,7 @@ var _ = Describe("create-user command", func() {
 					})
 				})
 
-				Context("when argument for flag is not present", func() {
+				When("argument for flag is not present", func() {
 					It("fails with incorrect usage error", func() {
 						session := helpers.CF("create-user", helpers.NewUsername(), "--origin")
 						Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--origin'"))
@@ -149,7 +149,7 @@ var _ = Describe("create-user command", func() {
 				})
 			})
 
-			Context("when password is not present", func() {
+			When("password is not present", func() {
 				It("fails with incorrect usage error", func() {
 					session := helpers.CF("create-user", helpers.NewUsername())
 					Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
@@ -159,7 +159,7 @@ var _ = Describe("create-user command", func() {
 				})
 			})
 
-			Context("when the user already exists", func() {
+			When("the user already exists", func() {
 				var (
 					newUser     string
 					newPassword string
@@ -180,7 +180,7 @@ var _ = Describe("create-user command", func() {
 				})
 			})
 
-			Context("when the user does not already exist", func() {
+			When("the user does not already exist", func() {
 				It("creates the new user", func() {
 					newUser := helpers.NewUsername()
 					newPassword := helpers.NewPassword()

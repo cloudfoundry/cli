@@ -32,7 +32,7 @@ var _ = Describe("Task", func() {
 			task, warnings, executeErr = client.CreateApplicationTask("some-app-guid", submitTask)
 		})
 
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			var response string
 
 			BeforeEach(func() {
@@ -41,7 +41,7 @@ var _ = Describe("Task", func() {
 				}`
 			})
 
-			Context("when the name is empty", func() {
+			When("the name is empty", func() {
 				BeforeEach(func() {
 					server.AppendHandlers(
 						CombineHandlers(
@@ -62,7 +62,7 @@ var _ = Describe("Task", func() {
 				})
 			})
 
-			Context("when the name is not empty", func() {
+			When("the name is not empty", func() {
 				BeforeEach(func() {
 					server.AppendHandlers(
 						CombineHandlers(
@@ -83,7 +83,7 @@ var _ = Describe("Task", func() {
 				})
 			})
 
-			Context("when the disk size is not 0", func() {
+			When("the disk size is not 0", func() {
 				BeforeEach(func() {
 					response := `{
 						"disk_in_mb": 123,
@@ -107,7 +107,7 @@ var _ = Describe("Task", func() {
 				})
 			})
 
-			Context("when the memory is not 0", func() {
+			When("the memory is not 0", func() {
 				BeforeEach(func() {
 					response := `{
 						"memory_in_mb": 123,
@@ -134,7 +134,7 @@ var _ = Describe("Task", func() {
 
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -194,7 +194,7 @@ var _ = Describe("Task", func() {
 			tasks, warnings, executeErr = client.GetApplicationTasks("some-app-guid", submitQuery)
 		})
 
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
 					"pagination": {
@@ -285,7 +285,7 @@ var _ = Describe("Task", func() {
 			})
 		})
 
-		Context("when the application does not exist", func() {
+		When("the application does not exist", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -309,7 +309,7 @@ var _ = Describe("Task", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -365,7 +365,7 @@ var _ = Describe("Task", func() {
 			task, warnings, executeErr = client.UpdateTaskCancel("some-task-guid")
 		})
 
-		Context("when the request succeeds", func() {
+		When("the request succeeds", func() {
 			BeforeEach(func() {
 				response := `{
           "guid": "task-3-guid",
@@ -398,7 +398,7 @@ var _ = Describe("Task", func() {
 			})
 		})
 
-		Context("when the request fails", func() {
+		When("the request fails", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [

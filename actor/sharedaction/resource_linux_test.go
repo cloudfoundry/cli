@@ -80,7 +80,7 @@ var _ = Describe("Resource Actions", func() {
 			Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
 		})
 
-		Context("when there is a symlinked file in the archive", func() {
+		When("there is a symlinked file in the archive", func() {
 			It("gathers a list of all files in a source archive", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
@@ -108,7 +108,7 @@ var _ = Describe("Resource Actions", func() {
 			gatheredResources, executeErr = actor.GatherDirectoryResources(srcDir)
 		})
 
-		Context("when a symlink file points to an existing file", func() {
+		When("a symlink file points to an existing file", func() {
 			BeforeEach(func() {
 				err := ioutil.WriteFile(filepath.Join(srcDir, "file-that-may-or-may-not-exist"), []byte("Bananarama"), 0655)
 				Expect(err).ToNot(HaveOccurred())
@@ -130,7 +130,7 @@ var _ = Describe("Resource Actions", func() {
 			})
 		})
 
-		Context("when a symlink file points to a file that does not exist", func() {
+		When("a symlink file points to a file that does not exist", func() {
 			It("does not open the symlink but gathers the name and mode", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 

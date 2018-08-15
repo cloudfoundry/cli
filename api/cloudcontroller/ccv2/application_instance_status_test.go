@@ -35,7 +35,7 @@ var _ = Describe("Application Instance Status", func() {
 			instances, warnings, executeErr = client.GetApplicationApplicationInstanceStatuses(appGUID)
 		})
 
-		Context("when the app is found", func() {
+		When("the app is found", func() {
 			BeforeEach(func() {
 				response := `{
 					"0": {
@@ -125,7 +125,7 @@ var _ = Describe("Application Instance Status", func() {
 			})
 		})
 
-		Context("when the client returns an error", func() {
+		When("the client returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 100004,

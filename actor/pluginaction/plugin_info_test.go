@@ -24,8 +24,8 @@ var _ = Describe("plugin info actions", func() {
 	})
 
 	Describe("GetPluginInfoFromRepositoriesForPlatform", func() {
-		Context("when there is a single repository", func() {
-			Context("when getting the plugin repository errors", func() {
+		When("there is a single repository", func() {
+			When("getting the plugin repository errors", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, errors.New("some-error"))
 				})
@@ -39,7 +39,7 @@ var _ = Describe("plugin info actions", func() {
 				})
 			})
 
-			Context("when getting the plugin repository succeeds", func() {
+			When("getting the plugin repository succeeds", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryReturns(plugin.PluginRepository{
 						Plugins: []plugin.Plugin{
@@ -74,7 +74,7 @@ var _ = Describe("plugin info actions", func() {
 					}, nil)
 				})
 
-				Context("when the specified plugin does not exist in the repository", func() {
+				When("the specified plugin does not exist in the repository", func() {
 					It("returns a PluginNotFoundInRepositoryError", func() {
 						_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("plugin-i-dont-exist", []configv3.PluginRepository{{Name: "some-repo", URL: "some-url"}}, "platform-i-dont-exist")
 						Expect(err).To(MatchError(actionerror.PluginNotFoundInAnyRepositoryError{
@@ -83,14 +83,14 @@ var _ = Describe("plugin info actions", func() {
 					})
 				})
 
-				Context("when the specified plugin for the provided platform does not exist in the repository", func() {
+				When("the specified plugin for the provided platform does not exist in the repository", func() {
 					It("returns a NoCompatibleBinaryError", func() {
 						_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("linux-plugin", []configv3.PluginRepository{{Name: "some-repo", URL: "some-url"}}, "platform-i-dont-exist")
 						Expect(err).To(MatchError(actionerror.NoCompatibleBinaryError{}))
 					})
 				})
 
-				Context("when the specified plugin exists", func() {
+				When("the specified plugin exists", func() {
 					It("returns the plugin info", func() {
 						pluginInfo, repos, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", []configv3.PluginRepository{{Name: "some-repo", URL: "some-url"}}, "osx")
 						Expect(err).ToNot(HaveOccurred())
@@ -103,7 +103,7 @@ var _ = Describe("plugin info actions", func() {
 			})
 		})
 
-		Context("when there are multiple repositories", func() {
+		When("there are multiple repositories", func() {
 			var pluginRepositories []configv3.PluginRepository
 
 			BeforeEach(func() {
@@ -114,7 +114,7 @@ var _ = Describe("plugin info actions", func() {
 				}
 			})
 
-			Context("when getting a plugin repository errors", func() {
+			When("getting a plugin repository errors", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryReturnsOnCall(0, plugin.PluginRepository{
 						Plugins: []plugin.Plugin{
@@ -140,14 +140,14 @@ var _ = Describe("plugin info actions", func() {
 				})
 			})
 
-			Context("when the plugin isn't found", func() {
+			When("the plugin isn't found", func() {
 				It("returns the PluginNotFoundInAnyRepositoryError", func() {
 					_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", pluginRepositories, "some-platform")
 					Expect(err).To(Equal(actionerror.PluginNotFoundInAnyRepositoryError{PluginName: "some-plugin"}))
 				})
 			})
 
-			Context("when no compatible binaries are found for the plugin", func() {
+			When("no compatible binaries are found for the plugin", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
 						return plugin.PluginRepository{Plugins: []plugin.Plugin{
@@ -164,7 +164,7 @@ var _ = Describe("plugin info actions", func() {
 				})
 			})
 
-			Context("when some binaries are compatible and some are not", func() {
+			When("some binaries are compatible and some are not", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
 						if repoURL == "url1" {
@@ -197,7 +197,7 @@ var _ = Describe("plugin info actions", func() {
 				})
 			})
 
-			Context("when the plugin is found in one repository", func() {
+			When("the plugin is found in one repository", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
 						if repoURL == "url1" {
@@ -226,7 +226,7 @@ var _ = Describe("plugin info actions", func() {
 				})
 			})
 
-			Context("when the plugin is found in many repositories", func() {
+			When("the plugin is found in many repositories", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
 						return plugin.PluginRepository{Plugins: []plugin.Plugin{
@@ -251,7 +251,7 @@ var _ = Describe("plugin info actions", func() {
 				})
 			})
 
-			Context("when different versions of the plugin are found in all the repositories", func() {
+			When("different versions of the plugin are found in all the repositories", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
 						switch repoURL {
@@ -291,7 +291,7 @@ var _ = Describe("plugin info actions", func() {
 				})
 			})
 
-			Context("when some repositories contain a newer version of the plugin than others", func() {
+			When("some repositories contain a newer version of the plugin than others", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
 						switch repoURL {

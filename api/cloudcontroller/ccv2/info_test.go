@@ -74,7 +74,7 @@ var _ = Describe("Info", func() {
 		})
 	})
 
-	Context("when the API response gives a bad API endpoint", func() {
+	When("the API response gives a bad API endpoint", func() {
 		BeforeEach(func() {
 			response := `i am banana`
 			server.AppendHandlers(

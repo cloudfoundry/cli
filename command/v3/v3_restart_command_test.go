@@ -57,7 +57,7 @@ var _ = Describe("v3-restart Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -74,7 +74,7 @@ var _ = Describe("v3-restart Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -89,7 +89,7 @@ var _ = Describe("v3-restart Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -102,7 +102,7 @@ var _ = Describe("v3-restart Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
@@ -114,17 +114,17 @@ var _ = Describe("v3-restart Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		})
 
-		Context("when stop app does not return an error", func() {
+		When("stop app does not return an error", func() {
 			BeforeEach(func() {
 				fakeActor.StopApplicationReturns(v3action.Warnings{"stop-warning-1", "stop-warning-2"}, nil)
 			})
 
-			Context("when start app does not return an error", func() {
+			When("start app does not return an error", func() {
 				BeforeEach(func() {
 					fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
 				})
 
-				Context("when get app does not return an error", func() {
+				When("get app does not return an error", func() {
 					Context("if the app was already started", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
@@ -194,7 +194,7 @@ var _ = Describe("v3-restart Command", func() {
 					})
 				})
 
-				Context("when the get app call returns an error", func() {
+				When("the get app call returns an error", func() {
 					Context("which is an ApplicationNotFoundError", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"get-warning-1", "get-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
@@ -212,7 +212,7 @@ var _ = Describe("v3-restart Command", func() {
 							Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
 						})
 
-						Context("when it is an unknown error", func() {
+						When("it is an unknown error", func() {
 							var expectedErr error
 
 							BeforeEach(func() {
@@ -236,7 +236,7 @@ var _ = Describe("v3-restart Command", func() {
 				})
 			})
 
-			Context("when the start app call returns an error", func() {
+			When("the start app call returns an error", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 				})
@@ -260,7 +260,7 @@ var _ = Describe("v3-restart Command", func() {
 					})
 				})
 
-				Context("when the start app call returns an ApplicationNotFoundError (someone else deleted app after we fetched app)", func() {
+				When("the start app call returns an ApplicationNotFoundError (someone else deleted app after we fetched app)", func() {
 					BeforeEach(func() {
 						fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
 					})
@@ -278,7 +278,7 @@ var _ = Describe("v3-restart Command", func() {
 			})
 		})
 
-		Context("when the stop app call returns an error", func() {
+		When("the stop app call returns an error", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			})
@@ -304,7 +304,7 @@ var _ = Describe("v3-restart Command", func() {
 				})
 			})
 
-			Context("when the stop app call returns a ApplicationNotFoundError (someone else deleted app after we fetched summary)", func() {
+			When("the stop app call returns a ApplicationNotFoundError (someone else deleted app after we fetched summary)", func() {
 				BeforeEach(func() {
 					fakeActor.StopApplicationReturns(v3action.Warnings{"stop-warning-1", "stop-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
 				})

@@ -11,7 +11,7 @@ import (
 )
 
 var _ = Describe("run-task command", func() {
-	Context("when --help flag is set", func() {
+	When("--help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("run-task", "--help")
 			Eventually(session).Should(Say("NAME:"))
@@ -34,13 +34,13 @@ var _ = Describe("run-task command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "run-task", "app-name", "some-command")
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -59,14 +59,14 @@ var _ = Describe("run-task command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
 
-			Context("when the task name is not provided", func() {
+			When("the task name is not provided", func() {
 				It("creates a new task", func() {
 					session := helpers.CF("run-task", appName, "echo hi")
 					userName, _ := helpers.GetCredentials()
@@ -79,7 +79,7 @@ var _ = Describe("run-task command", func() {
 				})
 			})
 
-			Context("when the task name is provided", func() {
+			When("the task name is provided", func() {
 				It("creates a new task with the provided name", func() {
 					session := helpers.CF("run-task", appName, "echo hi", "--name", "some-task-name")
 					userName, _ := helpers.GetCredentials()
@@ -96,8 +96,8 @@ var _ = Describe("run-task command", func() {
 				})
 			})
 
-			Context("when disk space is provided", func() {
-				Context("when the provided disk space is invalid", func() {
+			When("disk space is provided", func() {
+				When("the provided disk space is invalid", func() {
 					It("displays error and exits 1", func() {
 						session := helpers.CF("run-task", appName, "echo hi", "-k", "invalid")
 						Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
@@ -106,7 +106,7 @@ var _ = Describe("run-task command", func() {
 					})
 				})
 
-				Context("when the provided disk space is valid", func() {
+				When("the provided disk space is valid", func() {
 					It("runs the task with the provided disk space", func() {
 						diskSpace := 123
 						session := helpers.CF("run-task", appName, "echo hi", "-k", fmt.Sprintf("%dM", diskSpace))
@@ -119,8 +119,8 @@ var _ = Describe("run-task command", func() {
 				})
 			})
 
-			Context("when task memory is provided", func() {
-				Context("when the provided memory is invalid", func() {
+			When("task memory is provided", func() {
+				When("the provided memory is invalid", func() {
 					It("displays error and exits 1", func() {
 						session := helpers.CF("run-task", appName, "echo hi", "-m", "invalid")
 						Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
@@ -128,7 +128,7 @@ var _ = Describe("run-task command", func() {
 					})
 				})
 
-				Context("when the provided memory is valid", func() {
+				When("the provided memory is valid", func() {
 					It("runs the task with the provided memory", func() {
 						taskMemory := 123
 						session := helpers.CF("run-task", appName, "echo hi", "-m", fmt.Sprintf("%dM", taskMemory))
@@ -142,7 +142,7 @@ var _ = Describe("run-task command", func() {
 			})
 		})
 
-		Context("when the application is not staged", func() {
+		When("the application is not staged", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
@@ -157,7 +157,7 @@ var _ = Describe("run-task command", func() {
 			})
 		})
 
-		Context("when the application is staged but stopped", func() {
+		When("the application is staged but stopped", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
@@ -178,7 +178,7 @@ var _ = Describe("run-task command", func() {
 			})
 		})
 
-		Context("when the application does not exist", func() {
+		When("the application does not exist", func() {
 			It("fails and outputs an app not found message", func() {
 				session := helpers.CF("run-task", appName, "echo hi")
 				Eventually(session).Should(Say("FAILED"))

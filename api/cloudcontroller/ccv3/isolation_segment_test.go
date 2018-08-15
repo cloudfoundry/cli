@@ -34,7 +34,7 @@ var _ = Describe("Isolation Segments", func() {
 			name = "an_isolation_segment"
 		})
 
-		Context("when the segment does not exist", func() {
+		When("the segment does not exist", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-guid",
@@ -65,7 +65,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -127,7 +127,7 @@ var _ = Describe("Isolation Segments", func() {
 			segments, warnings, executeErr = client.GetIsolationSegments(queries...)
 		})
 
-		Context("when the isolation segments exist", func() {
+		When("the isolation segments exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
 					"pagination": {
@@ -183,7 +183,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -239,7 +239,7 @@ var _ = Describe("Isolation Segments", func() {
 			isolationSegment, warnings, executeErr = client.GetIsolationSegment("some-iso-guid")
 		})
 
-		Context("when the isolation segment exists", func() {
+		When("the isolation segment exists", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-iso-guid",
@@ -263,7 +263,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 		})
 
-		Context("when the isolation segment does not exist", func() {
+		When("the isolation segment does not exist", func() {
 			BeforeEach(func() {
 				response := `
 				{
@@ -289,7 +289,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -344,7 +344,7 @@ var _ = Describe("Isolation Segments", func() {
 			warnings, executeErr = client.DeleteIsolationSegment("some-iso-guid")
 		})
 
-		Context("when the delete is successful", func() {
+		When("the delete is successful", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -360,7 +360,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [

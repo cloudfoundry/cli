@@ -20,8 +20,8 @@ var _ = Describe("HTTP random route", func() {
 		appName = "short-app-name" // used on purpose to fit route length requirement
 	})
 
-	Context("when passed the --random-route flag", func() {
-		Context("when the app does not already exist", func() {
+	When("passed the --random-route flag", func() {
+		When("the app does not already exist", func() {
 			It("generates a random route for the app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--random-route", "--no-start")
@@ -37,7 +37,7 @@ var _ = Describe("HTTP random route", func() {
 			})
 		})
 
-		Context("when the app exists and has an existing route", func() {
+		When("the app exists and has an existing route", func() {
 			It("does not generate a random route for the app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--random-route", "--no-start")
@@ -46,7 +46,7 @@ var _ = Describe("HTTP random route", func() {
 				})
 			})
 
-			Context("when also passed an http domain", func() {
+			When("also passed an http domain", func() {
 				var domain helpers.Domain
 
 				BeforeEach(func() {
@@ -68,7 +68,7 @@ var _ = Describe("HTTP random route", func() {
 			})
 		})
 
-		Context("when also passed an http domain", func() {
+		When("also passed an http domain", func() {
 			var domain helpers.Domain
 
 			BeforeEach(func() {
@@ -90,7 +90,7 @@ var _ = Describe("HTTP random route", func() {
 		})
 	})
 
-	Context("when passed the random-route manifest property", func() {
+	When("passed the random-route manifest property", func() {
 		var manifest map[string]interface{}
 
 		BeforeEach(func() {
@@ -119,7 +119,7 @@ var _ = Describe("HTTP random route", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		Context("when the app has an existing route", func() {
+		When("the app has an existing route", func() {
 			It("does not generate a random route for the app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(path.Join(dir, "manifest.yml"), manifest)

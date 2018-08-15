@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("MissingCredentialsError", func() {
 	Describe("Error", func() {
-		Context("when username was not provided", func() {
+		When("username was not provided", func() {
 			It("prints a message asking for username", func() {
 				err := MissingCredentialsError{
 					MissingUsername: true,
@@ -19,7 +19,7 @@ var _ = Describe("MissingCredentialsError", func() {
 			})
 		})
 
-		Context("when password was not provided", func() {
+		When("password was not provided", func() {
 			It("prints a message asking for username", func() {
 				err := MissingCredentialsError{
 					MissingPassword: true,
@@ -29,7 +29,7 @@ var _ = Describe("MissingCredentialsError", func() {
 			})
 		})
 
-		Context("when neither username nor password was provided", func() {
+		When("neither username nor password was provided", func() {
 			It("prints a message asking for username", func() {
 				err := MissingCredentialsError{
 					MissingUsername: true,

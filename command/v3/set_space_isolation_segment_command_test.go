@@ -59,7 +59,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -72,7 +72,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -87,7 +87,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -99,7 +99,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 		})
 
-		Context("when the space lookup is unsuccessful", func() {
+		When("the space lookup is unsuccessful", func() {
 			BeforeEach(func() {
 				fakeActorV2.GetSpaceByOrganizationAndNameReturns(v2action.Space{}, v2action.Warnings{"I am a warning", "I am also a warning"}, actionerror.SpaceNotFoundError{Name: space})
 			})
@@ -111,7 +111,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 			})
 		})
 
-		Context("when the space lookup is successful", func() {
+		When("the space lookup is successful", func() {
 			BeforeEach(func() {
 				fakeActorV2.GetSpaceByOrganizationAndNameReturns(v2action.Space{
 					Name: space,
@@ -119,7 +119,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 				}, v2action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
 
-			Context("when the entitlement is successful", func() {
+			When("the entitlement is successful", func() {
 				BeforeEach(func() {
 					fakeActor.AssignIsolationSegmentToSpaceByNameAndSpaceReturns(v3action.Warnings{"entitlement-warning", "banana"}, nil)
 				})
@@ -144,7 +144,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 				})
 			})
 
-			Context("when the entitlement errors", func() {
+			When("the entitlement errors", func() {
 				BeforeEach(func() {
 					fakeActor.AssignIsolationSegmentToSpaceByNameAndSpaceReturns(v3action.Warnings{"entitlement-warning", "banana"}, actionerror.IsolationSegmentNotFoundError{Name: "segment1"})
 				})

@@ -28,7 +28,7 @@ var _ = Describe("TCP routes in manifest", func() {
 		route2 = helpers.NewTCPRoute(space, domain.Name, 1025)
 	})
 
-	Context("when the domain exists", func() {
+	When("the domain exists", func() {
 		BeforeEach(func() {
 			domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 		})
@@ -37,7 +37,7 @@ var _ = Describe("TCP routes in manifest", func() {
 			domain.DeleteShared()
 		})
 
-		Context("when the routes are new", func() {
+		When("the routes are new", func() {
 			It("creates and maps the routes", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -70,8 +70,8 @@ var _ = Describe("TCP routes in manifest", func() {
 			})
 		})
 
-		Context("when a route already exist", func() {
-			Context("when the routes exist in the current space", func() {
+		When("a route already exist", func() {
+			When("the routes exist in the current space", func() {
 				BeforeEach(func() {
 					route2.Create()
 				})
@@ -108,7 +108,7 @@ var _ = Describe("TCP routes in manifest", func() {
 				})
 			})
 
-			Context("when the routes exist in another space", func() {
+			When("the routes exist in another space", func() {
 				var otherSpace string
 
 				BeforeEach(func() {
@@ -145,7 +145,7 @@ var _ = Describe("TCP routes in manifest", func() {
 			})
 		})
 
-		Context("when a host is provided", func() {
+		When("a host is provided", func() {
 			BeforeEach(func() {
 				route1.Host = "some-host"
 			})
@@ -172,7 +172,7 @@ var _ = Describe("TCP routes in manifest", func() {
 			})
 		})
 
-		Context("when an path is provided", func() {
+		When("an path is provided", func() {
 			It("returns an error", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -194,7 +194,7 @@ var _ = Describe("TCP routes in manifest", func() {
 		})
 	})
 
-	Context("when the domains don't exist", func() {
+	When("the domains don't exist", func() {
 		It("returns an error", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{

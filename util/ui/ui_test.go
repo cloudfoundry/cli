@@ -37,7 +37,7 @@ var _ = Describe("UI", func() {
 	})
 
 	Describe("DisplayError", func() {
-		Context("when passed a TranslatableError", func() {
+		When("passed a TranslatableError", func() {
 			var fakeTranslateErr *translatableerrorfakes.FakeTranslatableError
 
 			BeforeEach(func() {
@@ -52,7 +52,7 @@ var _ = Describe("UI", func() {
 				Expect(out).To(Say("\x1b\\[31;1mFAILED\x1b\\[0m\n"))
 			})
 
-			Context("when the locale is not set to english", func() {
+			When("the locale is not set to english", func() {
 				It("translates the error text", func() {
 					Expect(fakeTranslateErr.TranslateCallCount()).To(Equal(1))
 					Expect(fakeTranslateErr.TranslateArgsForCall(0)).NotTo(BeNil())
@@ -60,7 +60,7 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		Context("when passed a generic error", func() {
+		When("passed a generic error", func() {
 			It("displays the error text to ui.Err and displays FAILED in bold red to ui.Out", func() {
 				ui.DisplayError(errors.New("I am a BANANA!"))
 				Expect(ui.Err).To(Say("I am a BANANA!\n"))
@@ -75,7 +75,7 @@ var _ = Describe("UI", func() {
 			Expect(out).To(Say("\x1b\\[1msome-header\x1b\\[0m"))
 		})
 
-		Context("when the locale is not set to English", func() {
+		When("the locale is not set to English", func() {
 			BeforeEach(func() {
 				fakeConfig.LocaleReturns("fr-FR")
 
@@ -118,7 +118,7 @@ var _ = Describe("UI", func() {
 			Expect(out).To(Say("template with map-value\n"))
 		})
 
-		Context("when the locale is not set to english", func() {
+		When("the locale is not set to english", func() {
 			BeforeEach(func() {
 				fakeConfig.LocaleReturns("fr-FR")
 
@@ -146,7 +146,7 @@ var _ = Describe("UI", func() {
 			Expect(out).To(Say("some-template"))
 		})
 
-		Context("when an optional map is passed in", func() {
+		When("an optional map is passed in", func() {
 			It("displays the template with map values bolded and substituted in to ui.Out", func() {
 				ui.DisplayTextWithBold(
 					"template with {{.SomeMapValue}}",
@@ -157,7 +157,7 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		Context("when multiple optional maps are passed in", func() {
+		When("multiple optional maps are passed in", func() {
 			It("displays the template with only the first map values bolded and substituted in to ui.Out", func() {
 				ui.DisplayTextWithBold(
 					"template with {{.SomeMapValue}} and {{.SomeOtherMapValue}}",
@@ -171,7 +171,7 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		Context("when the locale is not set to english", func() {
+		When("the locale is not set to english", func() {
 			BeforeEach(func() {
 				fakeConfig.LocaleReturns("fr-FR")
 
@@ -199,7 +199,7 @@ var _ = Describe("UI", func() {
 			Expect(out).To(Say("some-template"))
 		})
 
-		Context("when an optional map is passed in", func() {
+		When("an optional map is passed in", func() {
 			It("displays the template with map values colorized, bolded, and substituted in to ui.Out", func() {
 				ui.DisplayTextWithFlavor(
 					"template with {{.SomeMapValue}}",
@@ -210,7 +210,7 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		Context("when multiple optional maps are passed in", func() {
+		When("multiple optional maps are passed in", func() {
 			It("displays the template with only the first map values colorized, bolded, and substituted in to ui.Out", func() {
 				ui.DisplayTextWithFlavor(
 					"template with {{.SomeMapValue}} and {{.SomeOtherMapValue}}",
@@ -224,7 +224,7 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		Context("when the locale is not set to english", func() {
+		When("the locale is not set to english", func() {
 			BeforeEach(func() {
 				fakeConfig.LocaleReturns("fr-FR")
 
@@ -257,7 +257,7 @@ var _ = Describe("UI", func() {
 			Expect(ui.Err).To(Say("template with map-value\n\n"))
 		})
 
-		Context("when the locale is not set to english", func() {
+		When("the locale is not set to english", func() {
 			BeforeEach(func() {
 				fakeConfig.LocaleReturns("fr-FR")
 
@@ -289,7 +289,7 @@ var _ = Describe("UI", func() {
 			Expect(ui.Err).To(Say("\n"))
 		})
 
-		Context("when the locale is not set to english", func() {
+		When("the locale is not set to english", func() {
 			BeforeEach(func() {
 				fakeConfig.LocaleReturns("fr-FR")
 
@@ -321,7 +321,7 @@ var _ = Describe("UI", func() {
 			Expect(ui.TranslateText("some-template")).To(Equal("some-template"))
 		})
 
-		Context("when an optional map is passed in", func() {
+		When("an optional map is passed in", func() {
 			It("returns the template with map values substituted in", func() {
 				expected := ui.TranslateText(
 					"template {{.SomeMapValue}}",
@@ -332,7 +332,7 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		Context("when multiple optional maps are passed in", func() {
+		When("multiple optional maps are passed in", func() {
 			It("returns the template with only the first map values substituted in", func() {
 				expected := ui.TranslateText(
 					"template with {{.SomeMapValue}} and {{.SomeOtherMapValue}}",
@@ -346,7 +346,7 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		Context("when the locale is not set to english", func() {
+		When("the locale is not set to english", func() {
 			BeforeEach(func() {
 				fakeConfig.LocaleReturns("fr-FR")
 

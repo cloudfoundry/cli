@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("delete-service command", func() {
-	Context("when an api is targeted, the user is logged in, and an org and space are targeted", func() {
+	When("an api is targeted, the user is logged in, and an org and space are targeted", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -25,7 +25,7 @@ var _ = Describe("delete-service command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when there is a service instance and it is bound to an app", func() {
+		When("there is a service instance and it is bound to an app", func() {
 			var (
 				domain      string
 				service     string

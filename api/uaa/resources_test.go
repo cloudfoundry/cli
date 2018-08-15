@@ -27,7 +27,7 @@ var _ = Describe("SetupResources", func() {
 		setupResourcesErr = client.SetupResources(server.URL())
 	})
 
-	Context("when the authentication server returns an error", func() {
+	When("the authentication server returns an error", func() {
 		BeforeEach(func() {
 			server.AppendHandlers(
 				CombineHandlers(
@@ -43,7 +43,7 @@ var _ = Describe("SetupResources", func() {
 		})
 	})
 
-	Context("when the request succeeds", func() {
+	When("the request succeeds", func() {
 		Context("and the UAA field is populated", func() {
 			BeforeEach(func() {
 				response := `{
@@ -67,7 +67,7 @@ var _ = Describe("SetupResources", func() {
 			})
 		})
 
-		Context("when the UAA field is not populated", func() {
+		When("the UAA field is not populated", func() {
 			BeforeEach(func() {
 				response := `{
 				"links": {}

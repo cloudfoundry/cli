@@ -69,7 +69,7 @@ var _ = Describe("v3-delete Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -86,7 +86,7 @@ var _ = Describe("v3-delete Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -101,7 +101,7 @@ var _ = Describe("v3-delete Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -114,12 +114,12 @@ var _ = Describe("v3-delete Command", func() {
 		})
 	})
 
-	Context("when the -f flag is NOT provided", func() {
+	When("the -f flag is NOT provided", func() {
 		BeforeEach(func() {
 			cmd.Force = false
 		})
 
-		Context("when the user inputs yes", func() {
+		When("the user inputs yes", func() {
 			BeforeEach(func() {
 				_, err := input.Write([]byte("y\n"))
 				Expect(err).ToNot(HaveOccurred())
@@ -137,7 +137,7 @@ var _ = Describe("v3-delete Command", func() {
 			})
 		})
 
-		Context("when the user inputs no", func() {
+		When("the user inputs no", func() {
 			BeforeEach(func() {
 				_, err := input.Write([]byte("n\n"))
 				Expect(err).ToNot(HaveOccurred())
@@ -151,7 +151,7 @@ var _ = Describe("v3-delete Command", func() {
 			})
 		})
 
-		Context("when the user chooses the default", func() {
+		When("the user chooses the default", func() {
 			BeforeEach(func() {
 				_, err := input.Write([]byte("\n"))
 				Expect(err).ToNot(HaveOccurred())
@@ -165,7 +165,7 @@ var _ = Describe("v3-delete Command", func() {
 			})
 		})
 
-		Context("when the user input is invalid", func() {
+		When("the user input is invalid", func() {
 			BeforeEach(func() {
 				_, err := input.Write([]byte("e\n\n"))
 				Expect(err).ToNot(HaveOccurred())
@@ -183,12 +183,12 @@ var _ = Describe("v3-delete Command", func() {
 		})
 	})
 
-	Context("when the -f flag is provided", func() {
+	When("the -f flag is provided", func() {
 		BeforeEach(func() {
 			cmd.Force = true
 		})
 
-		Context("when deleting the app errors", func() {
+		When("deleting the app errors", func() {
 			Context("generic error", func() {
 				BeforeEach(func() {
 					fakeActor.DeleteApplicationByNameAndSpaceReturns(v3action.Warnings{"some-warning"}, errors.New("some-error"))
@@ -203,7 +203,7 @@ var _ = Describe("v3-delete Command", func() {
 			})
 		})
 
-		Context("when the app doesn't exist", func() {
+		When("the app doesn't exist", func() {
 			BeforeEach(func() {
 				fakeActor.DeleteApplicationByNameAndSpaceReturns(v3action.Warnings{"some-warning"}, actionerror.ApplicationNotFoundError{Name: "some-app"})
 			})
@@ -218,7 +218,7 @@ var _ = Describe("v3-delete Command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				fakeActor.DeleteApplicationByNameAndSpaceReturns(v3action.Warnings{"some-warning"}, nil)
 			})

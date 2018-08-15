@@ -41,7 +41,7 @@ var _ = Describe("install actions", func() {
 	})
 
 	Describe("CreateExecutableCopy", func() {
-		Context("when the file exists", func() {
+		When("the file exists", func() {
 			var pluginPath string
 
 			BeforeEach(func() {
@@ -71,7 +71,7 @@ var _ = Describe("install actions", func() {
 			})
 		})
 
-		Context("when the file does not exist", func() {
+		When("the file does not exist", func() {
 			It("returns an os.PathError", func() {
 				_, err := actor.CreateExecutableCopy("i-don't-exist", tempPluginDir)
 				_, isPathError := err.(*os.PathError)
@@ -92,7 +92,7 @@ var _ = Describe("install actions", func() {
 			path, downloadErr = actor.DownloadExecutableBinaryFromURL("some-plugin-url.com", tempPluginDir, fakeProxyReader)
 		})
 
-		Context("when the downloaded is successful", func() {
+		When("the downloaded is successful", func() {
 			var (
 				data []byte
 			)
@@ -119,7 +119,7 @@ var _ = Describe("install actions", func() {
 			})
 		})
 
-		Context("when there is an error downloading file", func() {
+		When("there is an error downloading file", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -136,7 +136,7 @@ var _ = Describe("install actions", func() {
 	Describe("FileExists", func() {
 		var pluginPath string
 
-		Context("when the file exists", func() {
+		When("the file exists", func() {
 			BeforeEach(func() {
 				pluginFile, err := ioutil.TempFile("", "")
 				Expect(err).NotTo(HaveOccurred())
@@ -156,7 +156,7 @@ var _ = Describe("install actions", func() {
 			})
 		})
 
-		Context("when the file does not exist", func() {
+		When("the file does not exist", func() {
 			It("returns false", func() {
 				Expect(actor.FileExists("/some/path/that/does/not/exist")).To(BeFalse())
 			})
@@ -180,7 +180,7 @@ var _ = Describe("install actions", func() {
 			plugin, validateErr = actor.GetAndValidatePlugin(fakePluginMetadata, fakeCommandList, "some-plugin-path")
 		})
 
-		Context("when getting the plugin metadata returns an error", func() {
+		When("getting the plugin metadata returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -193,7 +193,7 @@ var _ = Describe("install actions", func() {
 			})
 		})
 
-		Context("when the plugin name is missing", func() {
+		When("the plugin name is missing", func() {
 			BeforeEach(func() {
 				fakePluginMetadata.GetMetadataReturns(configv3.Plugin{}, nil)
 			})
@@ -203,7 +203,7 @@ var _ = Describe("install actions", func() {
 			})
 		})
 
-		Context("when the plugin does not have any commands", func() {
+		When("the plugin does not have any commands", func() {
 			BeforeEach(func() {
 				fakePluginMetadata.GetMetadataReturns(configv3.Plugin{Name: "some-plugin"}, nil)
 			})
@@ -213,7 +213,7 @@ var _ = Describe("install actions", func() {
 			})
 		})
 
-		Context("when there are command conflicts", func() {
+		When("there are command conflicts", func() {
 			BeforeEach(func() {
 				fakePluginMetadata.GetMetadataReturns(configv3.Plugin{
 					Name: "some-plugin",
@@ -231,7 +231,7 @@ var _ = Describe("install actions", func() {
 				}, nil)
 			})
 
-			Context("when the plugin has command names that conflict with native command names", func() {
+			When("the plugin has command names that conflict with native command names", func() {
 				BeforeEach(func() {
 					fakeCommandList.HasCommandStub = func(commandName string) bool {
 						switch commandName {
@@ -253,7 +253,7 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
-			Context("when the plugin has command names that conflict with native command aliases", func() {
+			When("the plugin has command names that conflict with native command aliases", func() {
 				BeforeEach(func() {
 					fakeCommandList.HasAliasStub = func(commandAlias string) bool {
 						switch commandAlias {
@@ -275,7 +275,7 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
-			Context("when the plugin has command aliases that conflict with native command names", func() {
+			When("the plugin has command aliases that conflict with native command names", func() {
 				BeforeEach(func() {
 					fakeCommandList.HasCommandStub = func(commandName string) bool {
 						switch commandName {
@@ -297,7 +297,7 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
-			Context("when the plugin has command aliases that conflict with native command aliases", func() {
+			When("the plugin has command aliases that conflict with native command aliases", func() {
 				BeforeEach(func() {
 					fakeCommandList.HasAliasStub = func(commandAlias string) bool {
 						switch commandAlias {
@@ -319,7 +319,7 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
-			Context("when the plugin has command names that conflict with existing plugin command names", func() {
+			When("the plugin has command names that conflict with existing plugin command names", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginsReturns([]configv3.Plugin{{
 						Name:     "installed-plugin-2",
@@ -337,7 +337,7 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
-			Context("when the plugin has command names that conflict with existing plugin command aliases", func() {
+			When("the plugin has command names that conflict with existing plugin command aliases", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginsReturns([]configv3.Plugin{{
 						Name:     "installed-plugin-2",
@@ -355,7 +355,7 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
-			Context("when the plugin has command aliases that conflict with existing plugin command names", func() {
+			When("the plugin has command aliases that conflict with existing plugin command names", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginsReturns([]configv3.Plugin{{
 						Name:     "installed-plugin-2",
@@ -373,7 +373,7 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
-			Context("when the plugin has command aliases that conflict with existing plugin command aliases", func() {
+			When("the plugin has command aliases that conflict with existing plugin command aliases", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginsReturns([]configv3.Plugin{{
 						Name:     "installed-plugin-2",
@@ -391,7 +391,7 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
-			Context("when the plugin has command names and aliases that conflict with existing native and plugin command names and aliases", func() {
+			When("the plugin has command names and aliases that conflict with existing native and plugin command names and aliases", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginsReturns([]configv3.Plugin{
 						{
@@ -439,7 +439,7 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
-			Context("when the plugin is already installed", func() {
+			When("the plugin is already installed", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginsReturns([]configv3.Plugin{{
 						Name: "some-plugin",
@@ -456,7 +456,7 @@ var _ = Describe("install actions", func() {
 			})
 		})
 
-		Context("when the plugin is valid", func() {
+		When("the plugin is valid", func() {
 			var pluginToBeInstalled configv3.Plugin
 
 			BeforeEach(func() {
@@ -572,7 +572,7 @@ var _ = Describe("install actions", func() {
 			installErr = actor.InstallPluginFromPath(pluginPath, plugin)
 		})
 
-		Context("when an error is encountered copying the plugin to the plugin directory", func() {
+		When("an error is encountered copying the plugin to the plugin directory", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginHomeReturns(pluginPath)
 			})
@@ -583,7 +583,7 @@ var _ = Describe("install actions", func() {
 			})
 		})
 
-		Context("when an error is encountered writing the plugin config to disk", func() {
+		When("an error is encountered writing the plugin config to disk", func() {
 			var (
 				expectedErr error
 			)
@@ -600,7 +600,7 @@ var _ = Describe("install actions", func() {
 			})
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginHomeReturns(pluginHomeDir)
 			})

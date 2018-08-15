@@ -20,8 +20,8 @@ var _ = Describe("Route", func() {
 	})
 
 	Describe("CreateRoute", func() {
-		Context("when route creation is successful", func() {
-			Context("when generate port is true", func() {
+		When("route creation is successful", func() {
+			When("generate port is true", func() {
 				BeforeEach(func() {
 					response := `
 						{
@@ -74,7 +74,7 @@ var _ = Describe("Route", func() {
 				})
 			})
 
-			Context("when generate route is false", func() {
+			When("generate route is false", func() {
 				BeforeEach(func() {
 					response := `
 						{
@@ -127,7 +127,7 @@ var _ = Describe("Route", func() {
 				})
 			})
 
-			Context("when sending a basic route", func() {
+			When("sending a basic route", func() {
 				BeforeEach(func() {
 					response := `
 						{
@@ -170,7 +170,7 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10001,
@@ -201,7 +201,7 @@ var _ = Describe("Route", func() {
 	})
 
 	Describe("DeleteRoute", func() {
-		Context("when the route exists", func() {
+		When("the route exists", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -218,7 +218,7 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when the route does not exist", func() {
+		When("the route does not exist", func() {
 			BeforeEach(func() {
 				response := `{
 				"code": 210002,
@@ -243,7 +243,7 @@ var _ = Describe("Route", func() {
 	})
 
 	Describe("DeleteRouteApplication", func() {
-		Context("when the delete is successful", func() {
+		When("the delete is successful", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -260,7 +260,7 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10001,
@@ -302,7 +302,7 @@ var _ = Describe("Route", func() {
 			exists, warnings, executeErr = client.CheckRoute(route)
 		})
 
-		Context("when the CC errors", func() {
+		When("the CC errors", func() {
 			BeforeEach(func() {
 				response := `{
 						"code": 777,
@@ -331,8 +331,8 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when the CC does not error", func() {
-			Context("when the route exists", func() {
+		When("the CC does not error", func() {
+			When("the route exists", func() {
 				Context("with minimum params", func() {
 					BeforeEach(func() {
 						server.AppendHandlers(
@@ -374,7 +374,7 @@ var _ = Describe("Route", func() {
 				})
 			})
 
-			Context("when the route does not exist", func() {
+			When("the route does not exist", func() {
 				BeforeEach(func() {
 					server.AppendHandlers(
 						CombineHandlers(
@@ -395,7 +395,7 @@ var _ = Describe("Route", func() {
 	})
 
 	Describe("GetApplicationRoutes", func() {
-		Context("when there are routes in this space", func() {
+		When("there are routes in this space", func() {
 			BeforeEach(func() {
 				response1 := `{
 				"next_url": "/v2/apps/some-app-guid/routes?q=organization_guid:some-org-guid&page=2",
@@ -518,7 +518,7 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when there are no routes bound to the app", func() {
+		When("there are no routes bound to the app", func() {
 			BeforeEach(func() {
 				response := `{
 				"next_url": "",
@@ -539,7 +539,7 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when the app is not found", func() {
+		When("the app is not found", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10000,
@@ -575,7 +575,7 @@ var _ = Describe("Route", func() {
 			route, warnings, executeErr = client.GetRoute("some-route-guid")
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 1,
@@ -604,7 +604,7 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when there are no errors", func() {
+		When("there are no errors", func() {
 			BeforeEach(func() {
 				response := `{
 						"metadata": {
@@ -644,7 +644,7 @@ var _ = Describe("Route", func() {
 	})
 
 	Describe("GetRoutes", func() {
-		Context("when there are routes", func() {
+		When("there are routes", func() {
 			BeforeEach(func() {
 				response1 := `{
 				"next_url": "/v2/routes?q=organization_guid:some-org-guid&page=2",
@@ -767,7 +767,7 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10001,
@@ -797,7 +797,7 @@ var _ = Describe("Route", func() {
 	})
 
 	Describe("GetSpaceRoutes", func() {
-		Context("when there are routes in this space", func() {
+		When("there are routes in this space", func() {
 			BeforeEach(func() {
 				response1 := `{
 				"next_url": "/v2/spaces/some-space-guid/routes?q=space_guid:some-space-guid&page=2",
@@ -920,7 +920,7 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when there are no routes in this space", func() {
+		When("there are no routes in this space", func() {
 			BeforeEach(func() {
 				response := `{
 				"next_url": "",
@@ -941,7 +941,7 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when the space is not found", func() {
+		When("the space is not found", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 40004,
@@ -967,7 +967,7 @@ var _ = Describe("Route", func() {
 	})
 
 	Describe("UpdateRouteApplication", func() {
-		Context("when route mapping is successful", func() {
+		When("route mapping is successful", func() {
 			BeforeEach(func() {
 				response := `
 						{
@@ -1006,7 +1006,7 @@ var _ = Describe("Route", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10001,

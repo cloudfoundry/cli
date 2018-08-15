@@ -182,7 +182,7 @@ var _ = Describe("help command", func() {
 			}),
 		)
 
-		Context("when the command uses timeout environment variables", func() {
+		When("the command uses timeout environment variables", func() {
 			DescribeTable("shows the CF_STAGING_TIMEOUT and CF_STARTUP_TIMEOUT environment variables",
 				func(setup func() (*exec.Cmd, int)) {
 					cmd, exitCode := setup()
@@ -220,7 +220,7 @@ ENVIRONMENT:
 		})
 	})
 
-	Context("when the command does not exist", func() {
+	When("the command does not exist", func() {
 		DescribeTable("help displays an error message",
 			func(command func() *exec.Cmd) {
 				session, err := Start(command(), GinkgoWriter, GinkgoWriter)
@@ -241,7 +241,7 @@ ENVIRONMENT:
 
 	})
 
-	Context("when the option does not exist", func() {
+	When("the option does not exist", func() {
 		DescribeTable("help display an error message as well as help for common commands",
 
 			func(command func() *exec.Cmd) {

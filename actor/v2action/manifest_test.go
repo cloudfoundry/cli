@@ -36,7 +36,7 @@ var _ = Describe("Manifest Actions", func() {
 			manifestApp, warnings, createErr = actor.CreateApplicationManifestByNameAndSpace("some-app", "some-space-guid")
 		})
 
-		Context("when getting the application summary errors", func() {
+		When("getting the application summary errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns([]ccv2.Application{}, ccv2.Warnings{"some-app-warning"}, errors.New("some-app-error"))
 			})
@@ -47,17 +47,17 @@ var _ = Describe("Manifest Actions", func() {
 			})
 		})
 
-		Context("when getting the application summary succeeds", func() {
+		When("getting the application summary succeeds", func() {
 			var app ccv2.Application
 
 			Describe("buildpacks", func() {
-				Context("when buildpack is not set", func() {
+				When("buildpack is not set", func() {
 					It("does not populate buildpacks field", func() {
 						Expect(manifestApp.Buildpacks).To(BeNil())
 					})
 				})
 
-				Context("when buildpack is set", func() {
+				When("buildpack is set", func() {
 					BeforeEach(func() {
 						app = ccv2.Application{
 							GUID: "some-app-guid",
@@ -79,7 +79,7 @@ var _ = Describe("Manifest Actions", func() {
 					})
 				})
 
-				Context("when buildpack and detected buildpack are set", func() {
+				When("buildpack and detected buildpack are set", func() {
 					BeforeEach(func() {
 						app = ccv2.Application{
 							GUID: "some-app-guid",
@@ -108,7 +108,7 @@ var _ = Describe("Manifest Actions", func() {
 			})
 
 			Describe("docker images", func() {
-				Context("when docker image and username are provided", func() {
+				When("docker image and username are provided", func() {
 					BeforeEach(func() {
 						app = ccv2.Application{
 							GUID:        "some-app-guid",
@@ -135,7 +135,7 @@ var _ = Describe("Manifest Actions", func() {
 					})
 				})
 
-				Context("when docker image and username are not provided", func() {
+				When("docker image and username are not provided", func() {
 					BeforeEach(func() {
 						app = ccv2.Application{
 							GUID: "some-app-guid",
@@ -158,8 +158,8 @@ var _ = Describe("Manifest Actions", func() {
 			})
 
 			Describe("health check", func() {
-				Context("when the health check type is http", func() {
-					Context("when the health check endpoint path is '/'", func() {
+				When("the health check type is http", func() {
+					When("the health check endpoint path is '/'", func() {
 						BeforeEach(func() {
 							app = ccv2.Application{
 								GUID:                    "some-app-guid",
@@ -182,7 +182,7 @@ var _ = Describe("Manifest Actions", func() {
 						})
 					})
 
-					Context("when the health check endpoint path is not the default", func() {
+					When("the health check endpoint path is not the default", func() {
 						BeforeEach(func() {
 							app = ccv2.Application{
 								GUID:                    "some-app-guid",
@@ -206,7 +206,7 @@ var _ = Describe("Manifest Actions", func() {
 					})
 				})
 
-				Context("when the health check type is process", func() {
+				When("the health check type is process", func() {
 					BeforeEach(func() {
 						app = ccv2.Application{
 							GUID:                    "some-app-guid",
@@ -229,7 +229,7 @@ var _ = Describe("Manifest Actions", func() {
 					})
 				})
 
-				Context("when the health check type is port", func() {
+				When("the health check type is port", func() {
 					BeforeEach(func() {
 						app = ccv2.Application{
 							GUID:                    "some-app-guid",
@@ -266,7 +266,7 @@ var _ = Describe("Manifest Actions", func() {
 						nil)
 				})
 
-				Context("when routes are set", func() {
+				When("routes are set", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationRoutesReturns(
 							[]ccv2.Route{
@@ -295,7 +295,7 @@ var _ = Describe("Manifest Actions", func() {
 					})
 				})
 
-				Context("when there are no routes", func() {
+				When("there are no routes", func() {
 					It("returns the app with no-route set to true", func() {
 						Expect(createErr).NotTo(HaveOccurred())
 						Expect(manifestApp).To(MatchFields(IgnoreExtras, Fields{
@@ -319,7 +319,7 @@ var _ = Describe("Manifest Actions", func() {
 						nil)
 				})
 
-				Context("when getting services fails", func() {
+				When("getting services fails", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetServiceBindingsReturns(
 							[]ccv2.ServiceBinding{},
@@ -334,7 +334,7 @@ var _ = Describe("Manifest Actions", func() {
 					})
 				})
 
-				Context("when getting services succeeds", func() {
+				When("getting services succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetServiceBindingsReturns(
 							[]ccv2.ServiceBinding{

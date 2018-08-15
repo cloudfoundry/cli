@@ -22,8 +22,8 @@ import (
 
 var _ = Describe("api command", func() {
 	Context("no arguments", func() {
-		Context("when the api is set", func() {
-			Context("when the user is not logged in", func() {
+		When("the api is set", func() {
+			When("the user is not logged in", func() {
 				It("outputs the current api", func() {
 					session := helpers.CF("api")
 
@@ -33,7 +33,7 @@ var _ = Describe("api command", func() {
 				})
 			})
 
-			Context("when the user is logged in", func() {
+			When("the user is logged in", func() {
 				var target, apiVersion, org, space string
 
 				BeforeEach(func() {
@@ -68,7 +68,7 @@ var _ = Describe("api command", func() {
 			})
 		})
 
-		Context("when the api is not set", func() {
+		When("the api is not set", func() {
 			BeforeEach(func() {
 				os.RemoveAll(filepath.Join(homeDir, ".cf"))
 			})
@@ -133,7 +133,7 @@ var _ = Describe("api command", func() {
 		})
 	})
 
-	Context("when Skip SSL Validation is required", func() {
+	When("Skip SSL Validation is required", func() {
 		Context("api has SSL", func() {
 			BeforeEach(func() {
 				if skipSSLValidation == "" {
@@ -224,7 +224,7 @@ var _ = Describe("api command", func() {
 		})
 	})
 
-	Context("when skip-ssl-validation is not required", func() {
+	When("skip-ssl-validation is not required", func() {
 		BeforeEach(func() {
 			if skipSSLValidation != "" {
 				Skip("SKIP_SSL_VALIDATION is enabled")
@@ -255,7 +255,7 @@ var _ = Describe("api command", func() {
 		})
 	})
 
-	Context("when the v3 api supports routing", func() {
+	When("the v3 api supports routing", func() {
 		BeforeEach(func() {
 			helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
 		})

@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("help text", func() {
-	Context("when --help flag is set", func() {
+	When("--help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF(PushCommandName, "--help")
 			Eventually(session).Should(Say("NAME:"))

@@ -56,7 +56,7 @@ var _ = Describe("v3-apply-manifest Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -73,7 +73,7 @@ var _ = Describe("v3-apply-manifest Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -88,7 +88,7 @@ var _ = Describe("v3-apply-manifest Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -101,7 +101,7 @@ var _ = Describe("v3-apply-manifest Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		var (
 			providedPath string
 		)
@@ -120,7 +120,7 @@ var _ = Describe("v3-apply-manifest Command", func() {
 			cmd.PathToManifest = flag.PathWithExistenceCheck(providedPath)
 		})
 
-		Context("when the parse is successful", func() {
+		When("the parse is successful", func() {
 			BeforeEach(func() {
 				fakeActor.ApplyApplicationManifestReturns(
 					v3action.Warnings{"some-manifest-warning"},
@@ -144,7 +144,7 @@ var _ = Describe("v3-apply-manifest Command", func() {
 			})
 		})
 
-		Context("when the parse errors", func() {
+		When("the parse errors", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

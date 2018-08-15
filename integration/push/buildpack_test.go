@@ -25,8 +25,8 @@ var _ = Describe("push with different buildpack values", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when the buildpack flag is provided", func() {
-		Context("when only one buildpack is provided", func() {
+	When("the buildpack flag is provided", func() {
+		When("only one buildpack is provided", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
@@ -65,12 +65,12 @@ var _ = Describe("push with different buildpack values", func() {
 			})
 		})
 
-		Context("when multiple instances of buildpack are provided", func() {
+		When("multiple instances of buildpack are provided", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			})
 
-			Context("when the app does NOT have existing buildpack configurations", func() {
+			When("the app does NOT have existing buildpack configurations", func() {
 				It("pushes the app successfully with multiple buildpacks", func() {
 					helpers.WithProcfileApp(func(dir string) {
 						tempfile := filepath.Join(dir, "index.html")
@@ -93,7 +93,7 @@ var _ = Describe("push with different buildpack values", func() {
 				})
 			})
 
-			Context("when the app has existing buildpacks", func() {
+			When("the app has existing buildpacks", func() {
 				It("pushes the app successfully and overrides the existing buildpacks", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -123,7 +123,7 @@ var _ = Describe("push with different buildpack values", func() {
 				})
 			})
 
-			Context("when the app has existing `buildpack`", func() {
+			When("the app has existing `buildpack`", func() {
 				It("pushes the app successfully and overrides the existing buildpacks", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -152,7 +152,7 @@ var _ = Describe("push with different buildpack values", func() {
 				})
 			})
 
-			Context("when one of the buildpacks provided is null or default", func() {
+			When("one of the buildpacks provided is null or default", func() {
 				It("fails and prints an error", func() {
 					helpers.WithProcfileApp(func(dir string) {
 						tempfile := filepath.Join(dir, "index.html")
@@ -171,7 +171,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	Context("when buildpack is provided via manifest", func() {
+	When("buildpack is provided via manifest", func() {
 		It("sets buildpack and returns a warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -190,8 +190,8 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	Context("when buildpacks (plural) is provided via manifest", func() {
-		Context("when mutiple buildpacks are specified", func() {
+	When("buildpacks (plural) is provided via manifest", func() {
+		When("mutiple buildpacks are specified", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			})
@@ -221,7 +221,7 @@ var _ = Describe("push with different buildpack values", func() {
 			})
 		})
 
-		Context("when only one buildpack is specified", func() {
+		When("only one buildpack is specified", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			})
@@ -250,7 +250,7 @@ var _ = Describe("push with different buildpack values", func() {
 			})
 		})
 
-		Context("when empty list of buildpacks is specified", func() {
+		When("empty list of buildpacks is specified", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			})
@@ -280,7 +280,7 @@ var _ = Describe("push with different buildpack values", func() {
 			})
 		})
 
-		Context("when an empty string is specified", func() {
+		When("an empty string is specified", func() {
 			It("rasises an error", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -299,7 +299,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	Context("when both buildpack and buildpacks are provided via manifest", func() {
+	When("both buildpack and buildpacks are provided via manifest", func() {
 		It("returns an error", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -321,7 +321,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	Context("when both buildpacks and docker are provided via manfest", func() {
+	When("both buildpacks and docker are provided via manfest", func() {
 		It("returns an error", func() {
 			helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			helpers.WithHelloWorldApp(func(dir string) {
@@ -346,7 +346,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	Context("when both buildpacks and docker are provided via flags", func() {
+	When("both buildpacks and docker are provided via flags", func() {
 		It("returns an error", func() {
 			helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			helpers.WithHelloWorldApp(func(dir string) {
@@ -360,7 +360,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	Context("when buildpack is provided via manifest and droplet is provided via flags", func() {
+	When("buildpack is provided via manifest and droplet is provided via flags", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {
@@ -393,7 +393,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	Context("when buildpacks is provided via manifest and droplet is provided via flags", func() {
+	When("buildpacks is provided via manifest and droplet is provided via flags", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {
@@ -429,7 +429,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	Context("when both buildpack and droplet are provided via flags", func() {
+	When("both buildpack and droplet are provided via flags", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {
@@ -456,7 +456,7 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 	})
 
-	Context("when both buildpacks and droplet are provided via flags", func() {
+	When("both buildpacks and droplet are provided via flags", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {

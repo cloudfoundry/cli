@@ -38,7 +38,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("v3-apply-manifest", "--help")
 
@@ -52,7 +52,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 		})
 	})
 
-	Context("when the -f flag is not given an arg", func() {
+	When("the -f flag is not given an arg", func() {
 		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-apply-manifest", "-f")
 
@@ -62,7 +62,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 		})
 	})
 
-	Context("when the -f flag path does not exist", func() {
+	When("the -f flag path does not exist", func() {
 		It("tells the user that the provided path doesn't exist, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-apply-manifest", "-f", "path/that/does/not/exist")
 
@@ -72,8 +72,8 @@ var _ = Describe("v3-apply-manifest command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -86,7 +86,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 			})
 		})
 
-		PContext("when the v3 api does not exist", func() {
+		PWhen("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -105,7 +105,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -124,7 +124,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -137,7 +137,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -151,7 +151,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -167,7 +167,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -176,14 +176,14 @@ var _ = Describe("v3-apply-manifest command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
 				})
 			})
 
-			Context("when the app name in the manifest is missing", func() {
+			When("the app name in the manifest is missing", func() {
 				BeforeEach(func() {
 					helpers.WriteManifest(manifestPath, map[string]interface{}{
 						"applications": []map[string]interface{}{
@@ -202,7 +202,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 				})
 			})
 
-			Context("when the app name in the manifest doesn't exist", func() {
+			When("the app name in the manifest doesn't exist", func() {
 				var invalidAppName string
 				BeforeEach(func() {
 					invalidAppName = "no-such-app"
@@ -225,8 +225,8 @@ var _ = Describe("v3-apply-manifest command", func() {
 				})
 			})
 
-			Context("when the app name in the manifest does exist", func() {
-				Context("when the instances value is negative", func() {
+			When("the app name in the manifest does exist", func() {
+				When("the instances value is negative", func() {
 					BeforeEach(func() {
 						helpers.WriteManifest(manifestPath, map[string]interface{}{
 							"applications": []map[string]interface{}{
@@ -247,7 +247,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 					})
 				})
 
-				Context("when the instances value is more than the space quota limit", func() {
+				When("the instances value is more than the space quota limit", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("create-space-quota", "some-space-quota-name", "-a", "4")).Should(Exit(0))
 						Eventually(helpers.CF("set-space-quota", spaceName, "some-space-quota-name")).Should(Exit(0))
@@ -270,7 +270,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 					})
 				})
 
-				Context("when instances are specified correctly", func() {
+				When("instances are specified correctly", func() {
 					BeforeEach(func() {
 						helpers.WriteManifest(manifestPath, map[string]interface{}{
 							"applications": []map[string]interface{}{

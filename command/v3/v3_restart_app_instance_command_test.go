@@ -59,7 +59,7 @@ var _ = Describe("v3-restart-app-instance Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -76,7 +76,7 @@ var _ = Describe("v3-restart-app-instance Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -91,7 +91,7 @@ var _ = Describe("v3-restart-app-instance Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -104,7 +104,7 @@ var _ = Describe("v3-restart-app-instance Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
@@ -116,7 +116,7 @@ var _ = Describe("v3-restart-app-instance Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		})
 
-		Context("when restarting the specified instance returns an error", func() {
+		When("restarting the specified instance returns an error", func() {
 			BeforeEach(func() {
 				fakeActor.DeleteInstanceByApplicationNameSpaceProcessTypeAndIndexReturns(v3action.Warnings{"some-warning"}, errors.New("some-error"))
 			})
@@ -129,7 +129,7 @@ var _ = Describe("v3-restart-app-instance Command", func() {
 			})
 		})
 
-		Context("when restarting the specified instance succeeds", func() {
+		When("restarting the specified instance succeeds", func() {
 			BeforeEach(func() {
 				fakeActor.DeleteInstanceByApplicationNameSpaceProcessTypeAndIndexReturns(v3action.Warnings{"some-warning"}, nil)
 			})

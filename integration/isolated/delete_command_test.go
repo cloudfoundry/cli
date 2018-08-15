@@ -37,13 +37,13 @@ var _ = XDescribe("delete command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "delete", "app-name")
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -55,7 +55,7 @@ var _ = XDescribe("delete command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app name is not provided", func() {
+		When("the app name is not provided", func() {
 			It("tells the user that the app name is required, prints help text, and exits 1", func() {
 				session := helpers.CF("delete")
 
@@ -65,7 +65,7 @@ var _ = XDescribe("delete command", func() {
 			})
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("prompts the user and displays app does not exist", func() {
 				buffer := NewBuffer()
 				buffer.Write([]byte("y\n"))
@@ -79,7 +79,7 @@ var _ = XDescribe("delete command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
@@ -90,14 +90,14 @@ var _ = XDescribe("delete command", func() {
 				Eventually(helpers.CF("delete", appName, "-f", "-r")).Should(Exit(0))
 			})
 
-			Context("when the -f flag not is provided", func() {
+			When("the -f flag not is provided", func() {
 				var buffer *Buffer
 
 				BeforeEach(func() {
 					buffer = NewBuffer()
 				})
 
-				Context("when the user enters 'y'", func() {
+				When("the user enters 'y'", func() {
 					BeforeEach(func() {
 						buffer.Write([]byte("y\n"))
 					})
@@ -112,7 +112,7 @@ var _ = XDescribe("delete command", func() {
 					})
 				})
 
-				Context("when the user enters 'n'", func() {
+				When("the user enters 'n'", func() {
 					BeforeEach(func() {
 						buffer.Write([]byte("n\n"))
 					})
@@ -127,7 +127,7 @@ var _ = XDescribe("delete command", func() {
 					})
 				})
 
-				Context("when the user enters the default input (hits return)", func() {
+				When("the user enters the default input (hits return)", func() {
 					BeforeEach(func() {
 						buffer.Write([]byte("\n"))
 					})
@@ -142,7 +142,7 @@ var _ = XDescribe("delete command", func() {
 					})
 				})
 
-				Context("when the user enters an invalid answer", func() {
+				When("the user enters an invalid answer", func() {
 					BeforeEach(func() {
 						// The second '\n' is intentional. Otherwise the buffer will be
 						// closed while the interaction is still waiting for input; it gets
@@ -161,7 +161,7 @@ var _ = XDescribe("delete command", func() {
 				})
 			})
 
-			Context("when the -f flag is provided", func() {
+			When("the -f flag is provided", func() {
 				It("deletes the app without prompting", func() {
 					session := helpers.CF("delete", appName, "-f")
 					Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))

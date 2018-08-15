@@ -23,21 +23,21 @@ var _ = Describe("delete-space command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when the org is provided", func() {
+	When("the environment is not setup correctly", func() {
+		When("the org is provided", func() {
 			It("fails with the appropriate errors", func() {
 				helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "delete-space", "space-name", "-o", ReadOnlyOrg)
 			})
 		})
 
-		Context("when the org is not provided", func() {
+		When("the org is not provided", func() {
 			It("fails with the appropriate errors", func() {
 				helpers.CheckEnvironmentTargetedCorrectly(true, false, ReadOnlyOrg, "delete-space", "space-name")
 			})
 		})
 	})
 
-	Context("when the space name it not provided", func() {
+	When("the space name it not provided", func() {
 		It("displays an error and help", func() {
 			session := helpers.CF("delete-space")
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `SPACE` was not provided"))
@@ -46,7 +46,7 @@ var _ = Describe("delete-space command", func() {
 		})
 	})
 
-	Context("when the space does not exist", func() {
+	When("the space does not exist", func() {
 		var orgName string
 
 		BeforeEach(func() {
@@ -70,7 +70,7 @@ var _ = Describe("delete-space command", func() {
 		})
 	})
 
-	Context("when the space exists", func() {
+	When("the space exists", func() {
 		var orgName string
 		var spaceName string
 
@@ -86,14 +86,14 @@ var _ = Describe("delete-space command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the -f flag not is provided", func() {
+		When("the -f flag not is provided", func() {
 			var buffer *Buffer
 
 			BeforeEach(func() {
 				buffer = NewBuffer()
 			})
 
-			Context("when the user enters 'y'", func() {
+			When("the user enters 'y'", func() {
 				BeforeEach(func() {
 					buffer.Write([]byte("y\n"))
 				})
@@ -109,7 +109,7 @@ var _ = Describe("delete-space command", func() {
 				})
 			})
 
-			Context("when the user enters 'n'", func() {
+			When("the user enters 'n'", func() {
 				BeforeEach(func() {
 					buffer.Write([]byte("n\n"))
 				})
@@ -123,7 +123,7 @@ var _ = Describe("delete-space command", func() {
 				})
 			})
 
-			Context("when the user enters the default input (hits return)", func() {
+			When("the user enters the default input (hits return)", func() {
 				BeforeEach(func() {
 					buffer.Write([]byte("\n"))
 				})
@@ -137,7 +137,7 @@ var _ = Describe("delete-space command", func() {
 				})
 			})
 
-			Context("when the user enters an invalid answer", func() {
+			When("the user enters an invalid answer", func() {
 				BeforeEach(func() {
 					// The second '\n' is intentional. Otherwise the buffer will be
 					// closed while the interaction is still waiting for input; it gets
@@ -156,7 +156,7 @@ var _ = Describe("delete-space command", func() {
 			})
 		})
 
-		Context("when the -f flag is provided", func() {
+		When("the -f flag is provided", func() {
 			It("deletes the space", func() {
 				username, _ := helpers.GetCredentials()
 				session := helpers.CF("delete-space", spaceName, "-f")
@@ -166,7 +166,7 @@ var _ = Describe("delete-space command", func() {
 				Eventually(helpers.CF("space", spaceName)).Should(Exit(1))
 			})
 
-			Context("when the space was targeted", func() {
+			When("the space was targeted", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("target", "-s", spaceName)).Should(Exit(0))
 				})
@@ -189,7 +189,7 @@ var _ = Describe("delete-space command", func() {
 		})
 	})
 
-	Context("when the -o organzation does not exist", func() {
+	When("the -o organzation does not exist", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})

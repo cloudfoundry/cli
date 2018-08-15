@@ -23,13 +23,13 @@ var _ = Describe("push with hostname", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when the default domain is a HTTP domain", func() {
-		Context("when no host is provided / host defaults to app name", func() {
+	When("the default domain is a HTTP domain", func() {
+		When("no host is provided / host defaults to app name", func() {
 			BeforeEach(func() {
 				route = fmt.Sprintf("%s.%s", strings.ToLower(appName), helpers.DefaultSharedDomain())
 			})
 
-			Context("when the default route does not exist", func() {
+			When("the default route does not exist", func() {
 				It("creates and maps the route", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
@@ -65,7 +65,7 @@ var _ = Describe("push with hostname", func() {
 				})
 			})
 
-			Context("when the default route is mapped to the application", func() {
+			When("the default route is mapped to the application", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")).Should(Exit(0))
@@ -88,7 +88,7 @@ var _ = Describe("push with hostname", func() {
 			})
 		})
 
-		Context("when the host is provided", func() {
+		When("the host is provided", func() {
 			var hostname string
 
 			BeforeEach(func() {
@@ -96,7 +96,7 @@ var _ = Describe("push with hostname", func() {
 				route = fmt.Sprintf("%s.%s", hostname, helpers.DefaultSharedDomain())
 			})
 
-			Context("when the default route does not exist", func() {
+			When("the default route does not exist", func() {
 				It("creates and maps the route", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--hostname", hostname, "--no-start")
@@ -140,7 +140,7 @@ var _ = Describe("push with hostname", func() {
 				})
 			})
 
-			Context("when the default route is mapped to the application", func() {
+			When("the default route is mapped to the application", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--hostname", hostname, "--no-start")).Should(Exit(0))
@@ -164,7 +164,7 @@ var _ = Describe("push with hostname", func() {
 		})
 	})
 
-	Context("when using a tcp domain", func() {
+	When("using a tcp domain", func() {
 		var (
 			domain     helpers.Domain
 			domainName string

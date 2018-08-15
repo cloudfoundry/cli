@@ -28,7 +28,7 @@ var _ = Describe("bind-security-group command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("bind-security-group", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -45,7 +45,7 @@ var _ = Describe("bind-security-group command", func() {
 		})
 	})
 
-	Context("when the lifecycle flag is invalid", func() {
+	When("the lifecycle flag is invalid", func() {
 		It("outputs a message and usage", func() {
 			session := helpers.CF("bind-security-group", secGroupName, someOrgName, "--lifecycle", "invalid")
 			Eventually(session.Err).Should(Say("Incorrect Usage: Invalid value `invalid' for option `--lifecycle'. Allowed values are: running or staging"))
@@ -54,7 +54,7 @@ var _ = Describe("bind-security-group command", func() {
 		})
 	})
 
-	Context("when the lifecycle flag has no argument", func() {
+	When("the lifecycle flag has no argument", func() {
 		It("outputs a message and usage", func() {
 			session := helpers.CF("bind-security-group", secGroupName, someOrgName, "--lifecycle")
 			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--lifecycle'"))
@@ -63,14 +63,14 @@ var _ = Describe("bind-security-group command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "bind-security-group", "security-group-name", "org-name", "space-name")
 		})
 	})
 
-	Context("when the input is invalid", func() {
-		Context("when the security group is not provided", func() {
+	When("the input is invalid", func() {
+		When("the security group is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
 				session := helpers.CF("bind-security-group")
 				Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `SECURITY_GROUP` and `ORG` were not provided"))
@@ -79,7 +79,7 @@ var _ = Describe("bind-security-group command", func() {
 			})
 		})
 
-		Context("when the org is not provided", func() {
+		When("the org is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
 				session := helpers.CF("bind-security-group", secGroupName)
 				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `ORG` was not provided"))
@@ -89,7 +89,7 @@ var _ = Describe("bind-security-group command", func() {
 		})
 	})
 
-	Context("when the security group doesn't exist", func() {
+	When("the security group doesn't exist", func() {
 		It("fails with a security group not found message", func() {
 			session := helpers.CF("bind-security-group", "some-security-group-that-doesn't-exist", someOrgName)
 			Eventually(session.Err).Should(Say("Security group 'some-security-group-that-doesn't-exist' not found."))
@@ -98,7 +98,7 @@ var _ = Describe("bind-security-group command", func() {
 		})
 	})
 
-	Context("when the security group exists", func() {
+	When("the security group exists", func() {
 		var someSecurityGroup helpers.SecurityGroup
 
 		BeforeEach(func() {
@@ -106,7 +106,7 @@ var _ = Describe("bind-security-group command", func() {
 			someSecurityGroup.Create()
 		})
 
-		Context("when the org doesn't exist", func() {
+		When("the org doesn't exist", func() {
 			It("fails with an org not found message", func() {
 				session := helpers.CF("bind-security-group", secGroupName, someOrgName)
 				Eventually(session.Err).Should(Say("Organization '%s' not found.", someOrgName))
@@ -115,7 +115,7 @@ var _ = Describe("bind-security-group command", func() {
 			})
 		})
 
-		Context("when the org exists", func() {
+		When("the org exists", func() {
 			BeforeEach(func() {
 				helpers.CreateOrg(orgName)
 				helpers.TargetOrg(orgName)
@@ -125,7 +125,7 @@ var _ = Describe("bind-security-group command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			Context("when the space doesn't exist", func() {
+			When("the space doesn't exist", func() {
 				It("fails with a space not found message", func() {
 					session := helpers.CF("bind-security-group", secGroupName, orgName, "space-doesnt-exist")
 					Eventually(session.Err).Should(Say("Space 'space-doesnt-exist' not found."))
@@ -134,7 +134,7 @@ var _ = Describe("bind-security-group command", func() {
 				})
 			})
 
-			Context("when there are no spaces in this org", func() {
+			When("there are no spaces in this org", func() {
 				It("does not bind the security group to any space", func() {
 					session := helpers.CF("bind-security-group", secGroupName, orgName)
 					Consistently(session).ShouldNot(Say("Assigning security group"))
@@ -144,14 +144,14 @@ var _ = Describe("bind-security-group command", func() {
 				})
 			})
 
-			Context("when there are spaces in this org", func() {
+			When("there are spaces in this org", func() {
 				BeforeEach(func() {
 					helpers.CreateSpace(spaceName1)
 					helpers.CreateSpace(spaceName2)
 				})
 
-				Context("when the lifecycle flag is not set", func() {
-					Context("when binding to all spaces in an org", func() {
+				When("the lifecycle flag is not set", func() {
+					When("binding to all spaces in an org", func() {
 						It("binds the security group to each space", func() {
 							session := helpers.CF("bind-security-group", secGroupName, orgName)
 							userName, _ := helpers.GetCredentials()
@@ -165,7 +165,7 @@ var _ = Describe("bind-security-group command", func() {
 					})
 				})
 
-				Context("when binding to a particular space", func() {
+				When("binding to a particular space", func() {
 					It("binds the security group to the space", func() {
 						session := helpers.CF("bind-security-group", secGroupName, orgName, spaceName1)
 						userName, _ := helpers.GetCredentials()
@@ -176,8 +176,8 @@ var _ = Describe("bind-security-group command", func() {
 					})
 				})
 
-				Context("when the lifecycle flag is running", func() {
-					Context("when binding to a particular space", func() {
+				When("the lifecycle flag is running", func() {
+					When("binding to a particular space", func() {
 						It("binds the security group to the space", func() {
 							session := helpers.CF("bind-security-group", secGroupName, orgName, spaceName1, "--lifecycle", "running")
 							userName, _ := helpers.GetCredentials()
@@ -189,8 +189,8 @@ var _ = Describe("bind-security-group command", func() {
 					})
 				})
 
-				Context("when the lifecycle flag is staging", func() {
-					Context("when binding to all spaces in an org", func() {
+				When("the lifecycle flag is staging", func() {
+					When("binding to all spaces in an org", func() {
 						It("binds the security group to each space", func() {
 							session := helpers.CF("bind-security-group", secGroupName, orgName, "--lifecycle", "staging")
 							userName, _ := helpers.GetCredentials()
@@ -203,7 +203,7 @@ var _ = Describe("bind-security-group command", func() {
 						})
 					})
 
-					Context("when binding to a particular space", func() {
+					When("binding to a particular space", func() {
 						It("binds the security group to the space", func() {
 							session := helpers.CF("bind-security-group", secGroupName, orgName, spaceName1, "--lifecycle", "staging")
 							userName, _ := helpers.GetCredentials()

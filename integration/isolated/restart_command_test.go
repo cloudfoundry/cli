@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("restart command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("restart", "--help")
 
@@ -37,13 +37,13 @@ var _ = Describe("restart command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "restart", "app-name")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -60,7 +60,7 @@ var _ = Describe("restart command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("tells the user that the start is not found and exits 1", func() {
 				appName := helpers.PrefixedRandomName("app")
 				session := helpers.CF("restart", appName)
@@ -71,7 +71,7 @@ var _ = Describe("restart command", func() {
 			})
 		})
 
-		Context("when the app does exist", func() {
+		When("the app does exist", func() {
 			var (
 				domainName string
 				appName    string
@@ -82,7 +82,7 @@ var _ = Describe("restart command", func() {
 				domainName = helpers.DefaultSharedDomain()
 			})
 
-			Context("when the app is started", func() {
+			When("the app is started", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
@@ -100,8 +100,8 @@ var _ = Describe("restart command", func() {
 				})
 			})
 
-			Context("when the app is stopped", func() {
-				Context("when the app has been staged", func() {
+			When("the app is stopped", func() {
+				When("the app has been staged", func() {
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
 							manifestContents := []byte(fmt.Sprintf(`
@@ -124,7 +124,7 @@ applications:
 					})
 
 					Describe("version dependent display", func() {
-						Context("when CC API >= 3.27.0", func() {
+						When("CC API >= 3.27.0", func() {
 							BeforeEach(func() {
 								helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 							})
@@ -153,7 +153,7 @@ applications:
 
 						})
 
-						Context("when CC API < 3.27.0", func() {
+						When("CC API < 3.27.0", func() {
 							BeforeEach(func() {
 								helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
 							})
@@ -185,7 +185,7 @@ applications:
 					})
 				})
 
-				Context("when the app does *not* stage properly because the app was not detected by any buildpacks", func() {
+				When("the app does *not* stage properly because the app was not detected by any buildpacks", func() {
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
 							err := os.Remove(filepath.Join(appDir, "Staticfile"))
@@ -207,8 +207,8 @@ applications:
 					})
 				})
 
-				Context("when the app stages properly", func() {
-					Context("when the app does *not* start properly", func() {
+				When("the app stages properly", func() {
+					When("the app does *not* start properly", func() {
 						BeforeEach(func() {
 							appName = helpers.PrefixedRandomName("app")
 							helpers.WithHelloWorldApp(func(appDir string) {
@@ -227,7 +227,7 @@ applications:
 						})
 					})
 
-					Context("when the app starts properly", func() {
+					When("the app starts properly", func() {
 						BeforeEach(func() {
 							helpers.WithHelloWorldApp(func(appDir string) {
 								manifestContents := []byte(fmt.Sprintf(`
@@ -257,14 +257,14 @@ applications:
 
 							helpers.ConfirmStagingLogs(session)
 
-							Context("when CC API >= 3.27.0", func() {
+							When("CC API >= 3.27.0", func() {
 								helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 								Eventually(session).Should(Say("name:\\s+%s", appName))
 								Eventually(session).Should(Say("memory usage:\\s+128M"))
 								Eventually(session).Should(Exit(0))
 							})
 
-							Context("when CC API < 3.27.0", func() {
+							When("CC API < 3.27.0", func() {
 								helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
 
 								It("displays the app logs and information with instances table", func() {
@@ -277,7 +277,7 @@ applications:
 						})
 					})
 
-					Context("when isolation segments are available", func() {
+					When("isolation segments are available", func() {
 						BeforeEach(func() {
 							helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
 

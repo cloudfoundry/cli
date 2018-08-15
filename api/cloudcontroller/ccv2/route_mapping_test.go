@@ -29,7 +29,7 @@ var _ = Describe("RouteMappings", func() {
 			routeMapping, warnings, executeErr = client.GetRouteMapping("some-route-mapping-guid")
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 1,
@@ -58,7 +58,7 @@ var _ = Describe("RouteMappings", func() {
 			})
 		})
 
-		Context("when there are no errors", func() {
+		When("there are no errors", func() {
 			BeforeEach(func() {
 				response := `{
 						"metadata": {
@@ -95,7 +95,7 @@ var _ = Describe("RouteMappings", func() {
 	})
 
 	Describe("GetRouteMappings", func() {
-		Context("when there are routes", func() {
+		When("there are routes", func() {
 			BeforeEach(func() {
 				response1 := `{
 				"next_url": "/v2/route_mappings?q=organization_guid:some-org-guid&page=2",
@@ -206,7 +206,7 @@ var _ = Describe("RouteMappings", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10001,

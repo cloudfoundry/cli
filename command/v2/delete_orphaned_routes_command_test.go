@@ -49,12 +49,12 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when a cloud controller API endpoint is set", func() {
+	When("a cloud controller API endpoint is set", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns("some-url")
 		})
 
-		Context("when checking target fails", func() {
+		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 			})
@@ -69,7 +69,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 			})
 		})
 
-		Context("when the user is logged in, and org and space are targeted", func() {
+		When("the user is logged in, and org and space are targeted", func() {
 			BeforeEach(func() {
 				fakeConfig.HasTargetedOrganizationReturns(true)
 				fakeConfig.HasTargetedSpaceReturns(true)
@@ -79,7 +79,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 				})
 			})
 
-			Context("when getting the current user returns an error", func() {
+			When("getting the current user returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -94,14 +94,14 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 				})
 			})
 
-			Context("when getting the current user does not return an error", func() {
+			When("getting the current user does not return an error", func() {
 				BeforeEach(func() {
 					fakeConfig.CurrentUserReturns(
 						configv3.User{Name: "some-user"},
 						nil)
 				})
 
-				Context("when the '-f' flag is provided", func() {
+				When("the '-f' flag is provided", func() {
 					BeforeEach(func() {
 						cmd.Force = true
 					})
@@ -113,8 +113,8 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 					})
 				})
 
-				Context("when the '-f' flag is not provided", func() {
-					Context("when user is prompted for confirmation", func() {
+				When("the '-f' flag is not provided", func() {
+					When("user is prompted for confirmation", func() {
 						BeforeEach(func() {
 							_, err := input.Write([]byte("\n"))
 							Expect(err).NotTo(HaveOccurred())
@@ -127,7 +127,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 						})
 					})
 
-					Context("when the user inputs no", func() {
+					When("the user inputs no", func() {
 						BeforeEach(func() {
 							_, err := input.Write([]byte("n\n"))
 							Expect(err).NotTo(HaveOccurred())
@@ -141,7 +141,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 						})
 					})
 
-					Context("when the user input is invalid", func() {
+					When("the user input is invalid", func() {
 						BeforeEach(func() {
 							_, err := input.Write([]byte("e\n"))
 							Expect(err).NotTo(HaveOccurred())
@@ -155,7 +155,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 						})
 					})
 
-					Context("when the user inputs yes", func() {
+					When("the user inputs yes", func() {
 						var routes []v2action.Route
 
 						BeforeEach(func() {
@@ -203,7 +203,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 							Expect(testUI.Out).To(Say("OK"))
 						})
 
-						Context("when there are warnings", func() {
+						When("there are warnings", func() {
 							BeforeEach(func() {
 								fakeActor.GetOrphanedRoutesBySpaceReturns(
 									[]v2action.Route{{GUID: "some-route-guid"}},
@@ -221,10 +221,10 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 							})
 						})
 
-						Context("when getting the routes returns an error", func() {
+						When("getting the routes returns an error", func() {
 							var expectedErr error
 
-							Context("when the error is a DomainNotFoundError", func() {
+							When("the error is a DomainNotFoundError", func() {
 								BeforeEach(func() {
 									fakeActor.GetOrphanedRoutesBySpaceReturns(
 										nil,
@@ -244,7 +244,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 								})
 							})
 
-							Context("when the error is an OrphanedRoutesNotFoundError", func() {
+							When("the error is an OrphanedRoutesNotFoundError", func() {
 								BeforeEach(func() {
 									expectedErr = actionerror.OrphanedRoutesNotFoundError{}
 									fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
@@ -257,7 +257,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 								})
 							})
 
-							Context("when there is a generic error", func() {
+							When("there is a generic error", func() {
 								BeforeEach(func() {
 									expectedErr = errors.New("getting orphaned routes error")
 									fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
@@ -269,7 +269,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 							})
 						})
 
-						Context("when deleting a route returns an error", func() {
+						When("deleting a route returns an error", func() {
 							var expectedErr error
 
 							BeforeEach(func() {

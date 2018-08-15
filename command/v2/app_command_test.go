@@ -53,7 +53,7 @@ var _ = Describe("App Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -68,7 +68,7 @@ var _ = Describe("App Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, and org and space are targeted", func() {
+	When("the user is logged in, and org and space are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
@@ -81,7 +81,7 @@ var _ = Describe("App Command", func() {
 				nil)
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -100,12 +100,12 @@ var _ = Describe("App Command", func() {
 			Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as some-user..."))
 		})
 
-		Context("when the --guid flag is provided", func() {
+		When("the --guid flag is provided", func() {
 			BeforeEach(func() {
 				cmd.GUID = true
 			})
 
-			Context("when no errors occur", func() {
+			When("no errors occur", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v2action.Application{GUID: "some-guid"},
@@ -122,8 +122,8 @@ var _ = Describe("App Command", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the app", func() {
-				Context("when the error is translatable", func() {
+			When("an error is encountered getting the app", func() {
+				When("the error is translatable", func() {
 					BeforeEach(func() {
 						fakeActor.GetApplicationByNameAndSpaceReturns(
 							v2action.Application{},
@@ -139,7 +139,7 @@ var _ = Describe("App Command", func() {
 					})
 				})
 
-				Context("when the error is not translatable", func() {
+				When("the error is not translatable", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -160,9 +160,9 @@ var _ = Describe("App Command", func() {
 			})
 		})
 
-		Context("when the --guid flag is not provided", func() {
-			Context("when the app is a buildpack app", func() {
-				Context("when no errors occur", func() {
+		When("the --guid flag is not provided", func() {
+			When("the app is a buildpack app", func() {
+				When("no errors occur", func() {
 					var (
 						applicationSummary v2action.ApplicationSummary
 						warnings           []string
@@ -202,7 +202,7 @@ var _ = Describe("App Command", func() {
 						warnings = []string{"app-summary-warning"}
 					})
 
-					Context("when the app does not have running instances", func() {
+					When("the app does not have running instances", func() {
 						BeforeEach(func() {
 							applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{}
 							fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
@@ -234,7 +234,7 @@ var _ = Describe("App Command", func() {
 						})
 					})
 
-					Context("when the app has running instances", func() {
+					When("the app has running instances", func() {
 						BeforeEach(func() {
 							applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{
 								{
@@ -262,7 +262,7 @@ var _ = Describe("App Command", func() {
 							}
 						})
 
-						Context("when the isolation segment is not empty", func() {
+						When("the isolation segment is not empty", func() {
 							BeforeEach(func() {
 								fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 							})
@@ -293,7 +293,7 @@ var _ = Describe("App Command", func() {
 							})
 						})
 
-						Context("when the isolation segment is empty", func() {
+						When("the isolation segment is empty", func() {
 							BeforeEach(func() {
 								applicationSummary.IsolationSegment = ""
 								fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
@@ -327,8 +327,8 @@ var _ = Describe("App Command", func() {
 					})
 				})
 
-				Context("when an error is encountered getting app summary", func() {
-					Context("when the error is not translatable", func() {
+				When("an error is encountered getting app summary", func() {
+					When("the error is not translatable", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -344,7 +344,7 @@ var _ = Describe("App Command", func() {
 						})
 					})
 
-					Context("when the error is translatable", func() {
+					When("the error is translatable", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 								v2action.ApplicationSummary{},
@@ -359,7 +359,7 @@ var _ = Describe("App Command", func() {
 				})
 			})
 
-			Context("when the app is a Docker app", func() {
+			When("the app is a Docker app", func() {
 				var applicationSummary v2action.ApplicationSummary
 
 				BeforeEach(func() {

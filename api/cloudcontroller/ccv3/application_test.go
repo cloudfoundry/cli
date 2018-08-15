@@ -37,7 +37,7 @@ var _ = Describe("Application", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when no lifecycle is provided", func() {
+			When("no lifecycle is provided", func() {
 				BeforeEach(func() {
 					app = Application{}
 				})
@@ -47,7 +47,7 @@ var _ = Describe("Application", func() {
 				})
 			})
 
-			Context("when lifecycle type docker is provided", func() {
+			When("lifecycle type docker is provided", func() {
 				BeforeEach(func() {
 					app = Application{
 						LifecycleType: constant.AppLifecycleTypeDocker,
@@ -59,18 +59,18 @@ var _ = Describe("Application", func() {
 				})
 			})
 
-			Context("when lifecycle type buildpack is provided", func() {
+			When("lifecycle type buildpack is provided", func() {
 				BeforeEach(func() {
 					app.LifecycleType = constant.AppLifecycleTypeBuildpack
 				})
 
-				Context("when no buildpacks are provided", func() {
+				When("no buildpacks are provided", func() {
 					It("omits the lifecycle from the JSON", func() {
 						Expect(string(appBytes)).To(Equal("{}"))
 					})
 				})
 
-				Context("when default buildpack is provided", func() {
+				When("default buildpack is provided", func() {
 					BeforeEach(func() {
 						app.LifecycleBuildpacks = []string{"default"}
 					})
@@ -80,7 +80,7 @@ var _ = Describe("Application", func() {
 					})
 				})
 
-				Context("when null buildpack is provided", func() {
+				When("null buildpack is provided", func() {
 					BeforeEach(func() {
 						app.LifecycleBuildpacks = []string{"null"}
 					})
@@ -90,7 +90,7 @@ var _ = Describe("Application", func() {
 					})
 				})
 
-				Context("when other buildpacks are provided", func() {
+				When("other buildpacks are provided", func() {
 					BeforeEach(func() {
 						app.LifecycleBuildpacks = []string{"some-buildpack"}
 					})
@@ -118,7 +118,7 @@ var _ = Describe("Application", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when no lifecycle is provided", func() {
+			When("no lifecycle is provided", func() {
 				BeforeEach(func() {
 					appBytes = []byte("{}")
 				})
@@ -128,7 +128,7 @@ var _ = Describe("Application", func() {
 				})
 			})
 
-			Context("when lifecycle type docker is provided", func() {
+			When("lifecycle type docker is provided", func() {
 				BeforeEach(func() {
 					appBytes = []byte(`{"lifecycle":{"type":"docker","data":{}}}`)
 				})
@@ -139,9 +139,9 @@ var _ = Describe("Application", func() {
 				})
 			})
 
-			Context("when lifecycle type buildpack is provided", func() {
+			When("lifecycle type buildpack is provided", func() {
 
-				Context("when other buildpacks are provided", func() {
+				When("other buildpacks are provided", func() {
 					BeforeEach(func() {
 						appBytes = []byte(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`)
 					})
@@ -170,7 +170,7 @@ var _ = Describe("Application", func() {
 			createdApp, warnings, executeErr = client.CreateApplication(appToCreate)
 		})
 
-		Context("when the application successfully is created", func() {
+		When("the application successfully is created", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-app-guid",
@@ -214,7 +214,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when the caller specifies a buildpack", func() {
+		When("the caller specifies a buildpack", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-app-guid",
@@ -274,7 +274,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when cc returns back an error or warnings", func() {
+		When("cc returns back an error or warnings", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [
@@ -332,7 +332,7 @@ var _ = Describe("Application", func() {
 			apps, warnings, executeErr = client.GetApplications(filters...)
 		})
 
-		Context("when applications exist", func() {
+		When("applications exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
 	"pagination": {
@@ -405,7 +405,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [
@@ -463,7 +463,7 @@ var _ = Describe("Application", func() {
 			updatedApp, warnings, executeErr = client.UpdateApplication(appToUpdate)
 		})
 
-		Context("when the application successfully is updated", func() {
+		When("the application successfully is updated", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-app-guid",
@@ -524,7 +524,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when cc returns back an error or warnings", func() {
+		When("cc returns back an error or warnings", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [
@@ -584,7 +584,7 @@ var _ = Describe("Application", func() {
 			responseApp, warnings, executeErr = client.UpdateApplicationStop("some-app-guid")
 		})
 
-		Context("when the response succeeds", func() {
+		When("the response succeeds", func() {
 			BeforeEach(func() {
 				response := `
 {
@@ -611,7 +611,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when the CC returns an error", func() {
+		When("the CC returns an error", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [
@@ -667,7 +667,7 @@ var _ = Describe("Application", func() {
 			app, warnings, executeErr = client.UpdateApplicationStart("some-app-guid")
 		})
 
-		Context("when the response succeeds", func() {
+		When("the response succeeds", func() {
 			BeforeEach(func() {
 				response := `
 {
@@ -689,7 +689,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when cc returns back an error or warnings", func() {
+		When("cc returns back an error or warnings", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [
@@ -745,7 +745,7 @@ var _ = Describe("Application", func() {
 			responseApp, warnings, executeErr = client.UpdateApplicationRestart("some-app-guid")
 		})
 
-		Context("when the response succeeds", func() {
+		When("the response succeeds", func() {
 			BeforeEach(func() {
 				response := `
 {
@@ -772,7 +772,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Context("when the CC returns an error", func() {
+		When("the CC returns an error", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [

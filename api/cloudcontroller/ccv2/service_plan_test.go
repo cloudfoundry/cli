@@ -19,7 +19,7 @@ var _ = Describe("Service Plan", func() {
 	})
 
 	Describe("GetServicePlan", func() {
-		Context("when the service plan exists", func() {
+		When("the service plan exists", func() {
 			BeforeEach(func() {
 				response := `{
 					"metadata": {
@@ -54,7 +54,7 @@ var _ = Describe("Service Plan", func() {
 			})
 		})
 
-		Context("when the service plan does not exist (testing general error case)", func() {
+		When("the service plan does not exist (testing general error case)", func() {
 			BeforeEach(func() {
 				response := `{
 					"description": "The service plan could not be found: non-existant-service-plan-guid",
@@ -91,7 +91,7 @@ var _ = Describe("Service Plan", func() {
 			})
 		})
 
-		Context("when the cc returns back service plans", func() {
+		When("the cc returns back service plans", func() {
 			BeforeEach(func() {
 				response1 := `{
 					"next_url": "/v2/service_plans?q=service_guid:some-service-guid&page=2",
@@ -167,7 +167,7 @@ var _ = Describe("Service Plan", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"description": "Some description.",

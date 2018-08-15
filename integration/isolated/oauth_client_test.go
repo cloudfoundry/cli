@@ -35,13 +35,13 @@ var _ = Describe("custom oauth client id", func() {
 		configPath = filepath.Join(homeDir, ".cf", "config.json")
 	})
 
-	Context("when the config file exists", func() {
+	When("the config file exists", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 		})
 
-		Context("when the client id and secret keys are set in the config", func() {
+		When("the client id and secret keys are set in the config", func() {
 			BeforeEach(func() {
 				replaceConfig(
 					configPath, `"UAAOAuthClient": ".*"`, `"UAAOAuthClient": "cf2"`)
@@ -82,7 +82,7 @@ var _ = Describe("custom oauth client id", func() {
 			})
 		})
 
-		Context("when the client id in the config is empty", func() {
+		When("the client id in the config is empty", func() {
 			BeforeEach(func() {
 				replaceConfig(
 					configPath, `"UAAOAuthClient": ".*",`, `"UAAOAuthClient": "",`)
@@ -111,7 +111,7 @@ var _ = Describe("custom oauth client id", func() {
 			})
 		})
 
-		Context("when there are no client id and secret keys in the config", func() {
+		When("there are no client id and secret keys in the config", func() {
 			BeforeEach(func() {
 				replaceConfig(
 					configPath, `"UAAOAuthClient": ".*",`, "")
@@ -143,7 +143,7 @@ var _ = Describe("custom oauth client id", func() {
 		})
 	})
 
-	Context("when the config file does not exist", func() {
+	When("the config file does not exist", func() {
 		BeforeEach(func() {
 			err := os.Remove(configPath)
 			Expect(err).ToNot(HaveOccurred())

@@ -31,8 +31,8 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		fakeConfig.BinaryVersionReturns(binaryVersion)
 	})
 
-	Context("when checking the cloud controller minimum version warning", func() {
-		Context("when the CLI version is less than the recommended minimum", func() {
+	When("checking the cloud controller minimum version warning", func() {
+		When("the CLI version is less than the recommended minimum", func() {
 			BeforeEach(func() {
 				binaryVersion = "0.0.0"
 				fakeConfig.BinaryVersionReturns(binaryVersion)
@@ -46,7 +46,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		})
 	})
 
-	Context("when the CLI version is greater or equal to the recommended minimum", func() {
+	When("the CLI version is greater or equal to the recommended minimum", func() {
 		BeforeEach(func() {
 			binaryVersion = "1.0.0"
 			fakeConfig.BinaryVersionReturns(binaryVersion)
@@ -59,7 +59,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		})
 	})
 
-	Context("when an error is encountered while parsing the semver versions", func() {
+	When("an error is encountered while parsing the semver versions", func() {
 		BeforeEach(func() {
 			fakeConfig.BinaryVersionReturns("&#%")
 		})
@@ -101,7 +101,7 @@ var _ = Describe("WarnCLIVersionCheck", func() {
 		})
 	})
 
-	Context("when comparing the default versions", func() {
+	When("comparing the default versions", func() {
 		BeforeEach(func() {
 			minCLIVersion = "1.2.3"
 			fakeConfig.MinCLIVersionReturns(minCLIVersion)
@@ -127,9 +127,9 @@ var _ = Describe("WarnAPIVersionCheck", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 	})
 
-	Context("when checking the cloud controller minimum version warning", func() {
-		Context("when checking for outdated API version", func() {
-			Context("when the API version is older than the minimum supported API version", func() {
+	When("checking the cloud controller minimum version warning", func() {
+		When("checking for outdated API version", func() {
+			When("the API version is older than the minimum supported API version", func() {
 				BeforeEach(func() {
 					apiVersion = "2.68.0"
 				})
@@ -141,7 +141,7 @@ var _ = Describe("WarnAPIVersionCheck", func() {
 				})
 			})
 
-			Context("when the API version is newer than the minimum supported API version", func() {
+			When("the API version is newer than the minimum supported API version", func() {
 				BeforeEach(func() {
 					apiVersion = "2.80.0"
 				})

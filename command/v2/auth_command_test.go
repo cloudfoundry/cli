@@ -44,7 +44,7 @@ var _ = Describe("auth Command", func() {
 		err = cmd.Execute(nil)
 	})
 
-	Context("when there are no errors", func() {
+	When("there are no errors", func() {
 		var (
 			testID     string
 			testSecret string
@@ -57,7 +57,7 @@ var _ = Describe("auth Command", func() {
 			fakeConfig.TargetReturns("some-api-target")
 		})
 
-		Context("when --client-credentials is set", func() {
+		When("--client-credentials is set", func() {
 			BeforeEach(func() {
 				cmd.ClientCredentials = true
 				cmd.RequiredArgs.Username = testID
@@ -81,7 +81,7 @@ var _ = Describe("auth Command", func() {
 			})
 		})
 
-		Context("when --client-credentials and --origin are set", func() {
+		When("--client-credentials and --origin are set", func() {
 			BeforeEach(func() {
 				cmd.ClientCredentials = true
 				cmd.RequiredArgs.Username = testID
@@ -96,8 +96,8 @@ var _ = Describe("auth Command", func() {
 			})
 		})
 
-		Context("when --client-credentials is not set", func() {
-			Context("when username and password are only provided as arguments", func() {
+		When("--client-credentials is not set", func() {
+			When("username and password are only provided as arguments", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs.Username = testID
 					cmd.RequiredArgs.Password = testSecret
@@ -120,7 +120,7 @@ var _ = Describe("auth Command", func() {
 				})
 			})
 
-			Context("when the username and password are provided in env variables", func() {
+			When("the username and password are provided in env variables", func() {
 				var (
 					envUsername string
 					envPassword string
@@ -133,7 +133,7 @@ var _ = Describe("auth Command", func() {
 					fakeConfig.CFPasswordReturns(envPassword)
 				})
 
-				Context("when username and password are not also provided as arguments", func() {
+				When("username and password are not also provided as arguments", func() {
 					It("authenticates with the values in the env variables", func() {
 						Expect(err).ToNot(HaveOccurred())
 
@@ -145,7 +145,7 @@ var _ = Describe("auth Command", func() {
 					})
 				})
 
-				Context("when username and password are also provided as arguments", func() {
+				When("username and password are also provided as arguments", func() {
 					BeforeEach(func() {
 						cmd.RequiredArgs.Username = testID
 						cmd.RequiredArgs.Password = testSecret
@@ -165,8 +165,8 @@ var _ = Describe("auth Command", func() {
 		})
 	})
 
-	Context("when credentials are missing", func() {
-		Context("when username and password are both missing", func() {
+	When("credentials are missing", func() {
+		When("username and password are both missing", func() {
 			It("raises an error", func() {
 				Expect(err).To(MatchError(translatableerror.MissingCredentialsError{
 					MissingUsername: true,
@@ -175,7 +175,7 @@ var _ = Describe("auth Command", func() {
 			})
 		})
 
-		Context("when username is missing", func() {
+		When("username is missing", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs.Password = "mypassword"
 			})
@@ -187,7 +187,7 @@ var _ = Describe("auth Command", func() {
 			})
 		})
 
-		Context("when password is missing", func() {
+		When("password is missing", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs.Username = "myuser"
 			})
@@ -200,7 +200,7 @@ var _ = Describe("auth Command", func() {
 		})
 	})
 
-	Context("when there is an auth error", func() {
+	When("there is an auth error", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.Username = "foo"
 			cmd.RequiredArgs.Password = "bar"
@@ -214,7 +214,7 @@ var _ = Describe("auth Command", func() {
 		})
 	})
 
-	Context("when there is a non-auth error", func() {
+	When("there is a non-auth error", func() {
 		var expectedError error
 
 		BeforeEach(func() {
@@ -273,7 +273,7 @@ var _ = Describe("auth Command", func() {
 			})
 		})
 
-		Context("when the CLI version is invalid", func() {
+		When("the CLI version is invalid", func() {
 			BeforeEach(func() {
 				fakeConfig.BinaryVersionReturns("&#%")
 			})

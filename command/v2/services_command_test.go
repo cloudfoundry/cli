@@ -49,7 +49,7 @@ var _ = Describe("services Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when an error is encountered checking if the environment is setup correctly", func() {
+	When("an error is encountered checking if the environment is setup correctly", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -63,7 +63,7 @@ var _ = Describe("services Command", func() {
 		})
 	})
 
-	Context("when the user is logged in and an org and space are targeted", func() {
+	When("the user is logged in and an org and space are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
@@ -74,7 +74,7 @@ var _ = Describe("services Command", func() {
 			})
 		})
 
-		Context("when getting the current user fails", func() {
+		When("getting the current user fails", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -88,7 +88,7 @@ var _ = Describe("services Command", func() {
 			})
 		})
 
-		Context("when getting the current user succeeds", func() {
+		When("getting the current user succeeds", func() {
 			var (
 				fakeUser configv3.User
 			)
@@ -105,7 +105,7 @@ var _ = Describe("services Command", func() {
 				})
 			})
 
-			Context("when there are no services", func() {
+			When("there are no services", func() {
 				BeforeEach(func() {
 					fakeActor.GetServiceInstancesSummaryBySpaceReturns(
 						nil,
@@ -126,7 +126,7 @@ var _ = Describe("services Command", func() {
 				})
 			})
 
-			Context("when there are services", func() {
+			When("there are services", func() {
 				BeforeEach(func() {
 					fakeActor.GetServiceInstancesSummaryBySpaceReturns(
 						[]v2action.ServiceInstanceSummary{

@@ -55,15 +55,15 @@ var _ = Describe("target Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when a cloud controller API endpoint is set", func() {
+	When("a cloud controller API endpoint is set", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns("some-api-target")
 		})
 
-		Context("when checking the cloud controller minimum version warning", func() {
+		When("checking the cloud controller minimum version warning", func() {
 			var binaryVersion string
 
-			Context("when the CLI version is less than the recommended minimum", func() {
+			When("the CLI version is less than the recommended minimum", func() {
 				BeforeEach(func() {
 					binaryVersion = "0.0.0"
 					fakeConfig.BinaryVersionReturns(binaryVersion)
@@ -74,7 +74,7 @@ var _ = Describe("target Command", func() {
 				})
 			})
 
-			Context("when the CLI version is greater or equal to the recommended minimum", func() {
+			When("the CLI version is greater or equal to the recommended minimum", func() {
 				BeforeEach(func() {
 					binaryVersion = "1.0.0"
 					fakeConfig.BinaryVersionReturns(binaryVersion)
@@ -85,7 +85,7 @@ var _ = Describe("target Command", func() {
 				})
 			})
 
-			Context("when an error is encountered while parsing the semver versions", func() {
+			When("an error is encountered while parsing the semver versions", func() {
 				BeforeEach(func() {
 					fakeConfig.BinaryVersionReturns("&#%")
 				})
@@ -95,7 +95,7 @@ var _ = Describe("target Command", func() {
 				})
 			})
 
-			Context("when the CLI version is invalid", func() {
+			When("the CLI version is invalid", func() {
 				BeforeEach(func() {
 					fakeConfig.BinaryVersionReturns("&#%")
 				})
@@ -106,7 +106,7 @@ var _ = Describe("target Command", func() {
 			})
 		})
 
-		Context("when checking target fails", func() {
+		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 			})
@@ -124,8 +124,8 @@ var _ = Describe("target Command", func() {
 			})
 		})
 
-		Context("when the user is logged in", func() {
-			Context("when getting the current user returns an error", func() {
+		When("the user is logged in", func() {
+			When("getting the current user returns an error", func() {
 				var someErr error
 
 				BeforeEach(func() {
@@ -141,15 +141,15 @@ var _ = Describe("target Command", func() {
 				})
 			})
 
-			Context("when getting the current user does not return an error", func() {
+			When("getting the current user does not return an error", func() {
 				BeforeEach(func() {
 					fakeConfig.CurrentUserReturns(
 						configv3.User{Name: "some-user"},
 						nil)
 				})
 
-				Context("when no arguments are provided", func() {
-					Context("when no org or space are targeted", func() {
+				When("no arguments are provided", func() {
+					When("no org or space are targeted", func() {
 						It("displays how to target an org and space", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
@@ -160,7 +160,7 @@ var _ = Describe("target Command", func() {
 						})
 					})
 
-					Context("when an org but no space is targeted", func() {
+					When("an org but no space is targeted", func() {
 						BeforeEach(func() {
 							fakeConfig.HasTargetedOrganizationReturns(true)
 							fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -180,7 +180,7 @@ var _ = Describe("target Command", func() {
 						})
 					})
 
-					Context("when an org and space are targeted", func() {
+					When("an org and space are targeted", func() {
 						BeforeEach(func() {
 							fakeConfig.HasTargetedOrganizationReturns(true)
 							fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -206,18 +206,18 @@ var _ = Describe("target Command", func() {
 					})
 				})
 
-				Context("when space is provided", func() {
+				When("space is provided", func() {
 					BeforeEach(func() {
 						cmd.Space = "some-space"
 					})
 
-					Context("when an org is already targeted", func() {
+					When("an org is already targeted", func() {
 						BeforeEach(func() {
 							fakeConfig.HasTargetedOrganizationReturns(true)
 							fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "some-org-guid"})
 						})
 
-						Context("when the space exists", func() {
+						When("the space exists", func() {
 							BeforeEach(func() {
 								fakeActor.GetSpaceByOrganizationAndNameReturns(
 									v2action.Space{
@@ -240,7 +240,7 @@ var _ = Describe("target Command", func() {
 							})
 						})
 
-						Context("when the space does not exist", func() {
+						When("the space does not exist", func() {
 							BeforeEach(func() {
 								fakeActor.GetSpaceByOrganizationAndNameReturns(
 									v2action.Space{},
@@ -257,7 +257,7 @@ var _ = Describe("target Command", func() {
 						})
 					})
 
-					Context("when no org is targeted", func() {
+					When("no org is targeted", func() {
 						It("returns NoOrgTargeted error and clears existing space", func() {
 							Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
@@ -267,12 +267,12 @@ var _ = Describe("target Command", func() {
 					})
 				})
 
-				Context("when org is provided", func() {
+				When("org is provided", func() {
 					BeforeEach(func() {
 						cmd.Organization = "some-org"
 					})
 
-					Context("when the org does not exist", func() {
+					When("the org does not exist", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationByNameReturns(
 								v2action.Organization{},
@@ -288,7 +288,7 @@ var _ = Describe("target Command", func() {
 						})
 					})
 
-					Context("when the org exists", func() {
+					When("the org exists", func() {
 						BeforeEach(func() {
 							fakeConfig.HasTargetedOrganizationReturns(true)
 							fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -301,7 +301,7 @@ var _ = Describe("target Command", func() {
 								nil)
 						})
 
-						Context("when getting the organization's spaces returns an error", func() {
+						When("getting the organization's spaces returns an error", func() {
 							var err error
 
 							BeforeEach(func() {
@@ -335,7 +335,7 @@ var _ = Describe("target Command", func() {
 							})
 						})
 
-						Context("when there are no spaces in the targeted org", func() {
+						When("there are no spaces in the targeted org", func() {
 							It("displays all warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
@@ -356,7 +356,7 @@ var _ = Describe("target Command", func() {
 							})
 						})
 
-						Context("when there is only 1 space in the targeted org", func() {
+						When("there is only 1 space in the targeted org", func() {
 							BeforeEach(func() {
 								fakeActor.GetOrganizationSpacesReturns(
 									[]v2action.Space{{
@@ -395,7 +395,7 @@ var _ = Describe("target Command", func() {
 							})
 						})
 
-						Context("when there are multiple spaces in the targeted org", func() {
+						When("there are multiple spaces in the targeted org", func() {
 							BeforeEach(func() {
 								fakeActor.GetOrganizationSpacesReturns(
 									[]v2action.Space{
@@ -431,7 +431,7 @@ var _ = Describe("target Command", func() {
 							})
 						})
 
-						Context("when getting the spaces in org returns an error", func() {
+						When("getting the spaces in org returns an error", func() {
 							var err error
 
 							BeforeEach(func() {
@@ -457,13 +457,13 @@ var _ = Describe("target Command", func() {
 					})
 				})
 
-				Context("when org and space arguments are provided", func() {
+				When("org and space arguments are provided", func() {
 					BeforeEach(func() {
 						cmd.Space = "some-space"
 						cmd.Organization = "some-org"
 					})
 
-					Context("when the org exists", func() {
+					When("the org exists", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationByNameReturns(
 								v2action.Organization{
@@ -476,7 +476,7 @@ var _ = Describe("target Command", func() {
 								nil)
 						})
 
-						Context("when the space exists", func() {
+						When("the space exists", func() {
 							BeforeEach(func() {
 								fakeActor.GetSpaceByOrganizationAndNameReturns(
 									v2action.Space{
@@ -508,7 +508,7 @@ var _ = Describe("target Command", func() {
 							})
 						})
 
-						Context("when the space does not exist", func() {
+						When("the space does not exist", func() {
 							BeforeEach(func() {
 								fakeActor.GetSpaceByOrganizationAndNameReturns(
 									v2action.Space{},
@@ -527,7 +527,7 @@ var _ = Describe("target Command", func() {
 						})
 					})
 
-					Context("when the org does not exist", func() {
+					When("the org does not exist", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationByNameReturns(
 								v2action.Organization{},

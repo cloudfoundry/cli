@@ -62,7 +62,7 @@ var _ = Describe("v3-create-package Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -79,7 +79,7 @@ var _ = Describe("v3-create-package Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -94,15 +94,15 @@ var _ = Describe("v3-create-package Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 		})
 
-		Context("when no flags are set", func() {
-			Context("when the create is successful", func() {
+		When("no flags are set", func() {
+			When("the create is successful", func() {
 				BeforeEach(func() {
 					myPackage := v3action.Package{GUID: "1234"}
 					fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(myPackage, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
@@ -127,7 +127,7 @@ var _ = Describe("v3-create-package Command", func() {
 				})
 			})
 
-			Context("when the create is unsuccessful", func() {
+			When("the create is unsuccessful", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -146,7 +146,7 @@ var _ = Describe("v3-create-package Command", func() {
 			})
 		})
 
-		Context("when the docker image is provided", func() {
+		When("the docker image is provided", func() {
 			BeforeEach(func() {
 				cmd.DockerImage.Path = "some-docker-image"
 				fakeActor.CreateDockerPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "1234"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
@@ -171,7 +171,7 @@ var _ = Describe("v3-create-package Command", func() {
 			})
 		})
 
-		Context("when the path is provided", func() {
+		When("the path is provided", func() {
 			BeforeEach(func() {
 				cmd.AppPath = "some-app-path"
 				fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "1234"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
@@ -194,7 +194,7 @@ var _ = Describe("v3-create-package Command", func() {
 			})
 		})
 
-		Context("when the docker image and path are both provided", func() {
+		When("the docker image and path are both provided", func() {
 			BeforeEach(func() {
 				cmd.AppPath = "some-app-path"
 				cmd.DockerImage.Path = "some-docker-image"

@@ -44,8 +44,8 @@ var _ = Describe("Service Binding", func() {
 			serviceBinding, warnings, executeErr = client.CreateServiceBinding(appGUID, serviceGUID, bindingName, acceptsIncomplete, parameters)
 		})
 
-		Context("when the create is successful", func() {
-			Context("when a service binding name is provided", func() {
+		When("the create is successful", func() {
+			When("a service binding name is provided", func() {
 				BeforeEach(func() {
 					bindingName = "some-binding-name"
 					acceptsIncomplete = false
@@ -81,7 +81,7 @@ var _ = Describe("Service Binding", func() {
 				})
 			})
 
-			Context("when a service binding name is not provided", func() {
+			When("a service binding name is not provided", func() {
 				BeforeEach(func() {
 					bindingName = ""
 					acceptsIncomplete = false
@@ -116,7 +116,7 @@ var _ = Describe("Service Binding", func() {
 				})
 			})
 
-			PContext("when accepts_incomplete is true", func() {
+			PWhen("accepts_incomplete is true", func() {
 				BeforeEach(func() {
 					bindingName = "some-binding-name"
 					acceptsIncomplete = true
@@ -153,7 +153,7 @@ var _ = Describe("Service Binding", func() {
 			})
 		})
 
-		Context("when the create returns an error", func() {
+		When("the create returns an error", func() {
 			BeforeEach(func() {
 				response := `
 				{
@@ -195,8 +195,8 @@ var _ = Describe("Service Binding", func() {
 			serviceBinding, warnings, executeErr = client.DeleteServiceBinding(serviceBindingGUID, acceptsIncomplete)
 		})
 
-		Context("when the service binding exist", func() {
-			PContext("when accepts_incomplete is true", func() {
+		When("the service binding exist", func() {
+			PWhen("accepts_incomplete is true", func() {
 				BeforeEach(func() {
 					acceptsIncomplete = true
 					response := fmt.Sprintf(`{
@@ -233,7 +233,7 @@ var _ = Describe("Service Binding", func() {
 				})
 			})
 
-			Context("when accepts_incomplete is false", func() {
+			When("accepts_incomplete is false", func() {
 				BeforeEach(func() {
 					acceptsIncomplete = false
 					server.AppendHandlers(
@@ -250,7 +250,7 @@ var _ = Describe("Service Binding", func() {
 			})
 		})
 
-		Context("when the service binding does not exist", func() {
+		When("the service binding does not exist", func() {
 			BeforeEach(func() {
 				acceptsIncomplete = false
 				response := `{
@@ -286,7 +286,7 @@ var _ = Describe("Service Binding", func() {
 			serviceBinding, warnings, executeErr = client.GetServiceBinding("some-service-binding-guid")
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 1,
@@ -315,7 +315,7 @@ var _ = Describe("Service Binding", func() {
 			})
 		})
 
-		Context("when there are no errors", func() {
+		When("there are no errors", func() {
 			Context("and entity.last_operation is not present", func() {
 				BeforeEach(func() {
 					response := `{
@@ -446,7 +446,7 @@ var _ = Describe("Service Binding", func() {
 			)
 		})
 
-		Context("when service bindings exist", func() {
+		When("service bindings exist", func() {
 			It("returns all the queried service bindings", func() {
 				serviceBindings, warnings, err := client.GetServiceBindings(Filter{
 					Type:     constant.AppGUIDFilter,
@@ -466,7 +466,7 @@ var _ = Describe("Service Binding", func() {
 	})
 
 	Describe("GetServiceInstanceServiceBindings", func() {
-		Context("when there are service bindings", func() {
+		When("there are service bindings", func() {
 			BeforeEach(func() {
 				response1 := `{
 					"next_url": "/v2/service_instances/some-service-instance-guid/service_bindings?page=2",
@@ -541,7 +541,7 @@ var _ = Describe("Service Binding", func() {
 			})
 		})
 
-		Context("when there are no service bindings", func() {
+		When("there are no service bindings", func() {
 			BeforeEach(func() {
 				response1 := `{
 					"next_url": null,
@@ -562,7 +562,7 @@ var _ = Describe("Service Binding", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
 				 "description": "Unknown request",
@@ -594,7 +594,7 @@ var _ = Describe("Service Binding", func() {
 	})
 
 	Describe("GetUserProvidedServiceInstanceServiceBindings", func() {
-		Context("when there are service bindings", func() {
+		When("there are service bindings", func() {
 			BeforeEach(func() {
 				response1 := `{
 					"next_url": "/v2/user_provided_service_instances/some-user-provided-service-instance-guid/service_bindings?page=2",
@@ -669,7 +669,7 @@ var _ = Describe("Service Binding", func() {
 			})
 		})
 
-		Context("when there are no service bindings", func() {
+		When("there are no service bindings", func() {
 			BeforeEach(func() {
 				response := `{
 					"next_url": null,
@@ -691,7 +691,7 @@ var _ = Describe("Service Binding", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
 				 "description": "Unknown request",

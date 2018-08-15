@@ -47,7 +47,7 @@ var _ = Describe("feature flags Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -62,8 +62,8 @@ var _ = Describe("feature flags Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
-		Context("when getting the current user fails", func() {
+	When("the user is logged in", func() {
+		When("getting the current user fails", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("get-user-error"))
 			})
@@ -73,14 +73,14 @@ var _ = Describe("feature flags Command", func() {
 			})
 		})
 
-		Context("when getting the current user succeeds", func() {
+		When("getting the current user succeeds", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})
 
-			Context("when an error is encountered getting feature flags", func() {
+			When("an error is encountered getting feature flags", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -100,7 +100,7 @@ var _ = Describe("feature flags Command", func() {
 				})
 			})
 
-			Context("when there are no feature flags", func() {
+			When("there are no feature flags", func() {
 				BeforeEach(func() {
 					fakeActor.GetFeatureFlagsReturns(
 						[]v2action.FeatureFlag{},
@@ -121,7 +121,7 @@ var _ = Describe("feature flags Command", func() {
 				})
 			})
 
-			Context("when there are feature flags", func() {
+			When("there are feature flags", func() {
 				BeforeEach(func() {
 					fakeActor.GetFeatureFlagsReturns(
 						[]v2action.FeatureFlag{

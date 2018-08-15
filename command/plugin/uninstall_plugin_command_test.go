@@ -52,12 +52,12 @@ var _ = Describe("uninstall-plugin command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the plugin is installed", func() {
+	When("the plugin is installed", func() {
 		BeforeEach(func() {
 			fakeActor.UninstallPluginReturns(nil)
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			It("uninstalls the plugin and outputs the success message", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
@@ -71,7 +71,7 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("when uninstalling the plugin returns a plugin binary remove failed error", func() {
+		When("uninstalling the plugin returns a plugin binary remove failed error", func() {
 			var pathError error
 
 			BeforeEach(func() {
@@ -92,7 +92,7 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("when uninstalling the plugin returns a plugin execute error", func() {
+		When("uninstalling the plugin returns a plugin execute error", func() {
 			var pathError error
 
 			BeforeEach(func() {
@@ -111,7 +111,7 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("when uninstalling the plugin encounters any other error", func() {
+		When("uninstalling the plugin encounters any other error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -125,7 +125,7 @@ var _ = Describe("uninstall-plugin command", func() {
 		})
 	})
 
-	Context("when the plugin is not installed", func() {
+	When("the plugin is not installed", func() {
 		BeforeEach(func() {
 			fakeActor.UninstallPluginReturns(
 				actionerror.PluginNotFoundError{

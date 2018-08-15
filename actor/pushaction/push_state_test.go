@@ -54,7 +54,7 @@ var _ = Describe("Push State", func() {
 		})
 
 		Describe("application", func() {
-			Context("when the application exists", func() {
+			When("the application exists", func() {
 				var app v3action.Application
 
 				BeforeEach(func() {
@@ -84,7 +84,7 @@ var _ = Describe("Push State", func() {
 				})
 			})
 
-			Context("when the application does not exist", func() {
+			When("the application does not exist", func() {
 				BeforeEach(func() {
 					fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"some-app-warning"}, actionerror.ApplicationNotFoundError{})
 				})
@@ -104,7 +104,7 @@ var _ = Describe("Push State", func() {
 				})
 			})
 
-			Context("when the application lookup errors", func() {
+			When("the application lookup errors", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -120,13 +120,13 @@ var _ = Describe("Push State", func() {
 		})
 
 		Describe("bits path", func() {
-			Context("when no app path is provided in the command line settings", func() {
+			When("no app path is provided in the command line settings", func() {
 				It("sets the bits path to the current directory in the settings", func() {
 					Expect(states[0].BitsPath).To(Equal(pwd))
 				})
 			})
 
-			Context("when an app path is provided in the command line settings", func() {
+			When("an app path is provided in the command line settings", func() {
 				BeforeEach(func() {
 					settings.ProvidedAppPath = "my-app-path"
 				})
@@ -138,10 +138,10 @@ var _ = Describe("Push State", func() {
 		})
 
 		Describe("all resources", func() {
-			Context("when the app resources are given as a directory", func() {
+			When("the app resources are given as a directory", func() {
 				var resources []sharedaction.Resource
 
-				Context("when gathering the resources is successful", func() {
+				When("gathering the resources is successful", func() {
 
 					BeforeEach(func() {
 						resources = []sharedaction.Resource{
@@ -159,7 +159,7 @@ var _ = Describe("Push State", func() {
 					})
 				})
 
-				Context("when gathering the resources errors", func() {
+				When("gathering the resources errors", func() {
 					BeforeEach(func() {
 						fakeSharedActor.GatherDirectoryResourcesReturns(nil, errors.New("kaboom"))
 					})

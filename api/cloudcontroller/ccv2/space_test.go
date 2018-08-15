@@ -19,7 +19,7 @@ var _ = Describe("Space", func() {
 	})
 
 	Describe("DeleteSpace", func() {
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				jsonResponse := `{
 				"metadata": {
@@ -50,7 +50,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
 "code": 30003,
@@ -76,8 +76,8 @@ var _ = Describe("Space", func() {
 	})
 
 	Describe("GetSpaces", func() {
-		Context("when no errors are encountered", func() {
-			Context("when results are paginated", func() {
+		When("no errors are encountered", func() {
+			When("results are paginated", func() {
 				BeforeEach(func() {
 					response1 := `{
 						"next_url": "/v2/spaces?q=some-query:some-value&page=2&order-by=name",
@@ -188,7 +188,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
   "code": 10001,
@@ -219,8 +219,8 @@ var _ = Describe("Space", func() {
 	})
 
 	Describe("GetSecurityGroupSpaces", func() {
-		Context("when no errors are encountered", func() {
-			Context("when results are paginated", func() {
+		When("no errors are encountered", func() {
+			When("results are paginated", func() {
 				BeforeEach(func() {
 					response1 := `{
 						"next_url": "/v2/security_groups/security-group-guid/spaces?page=2",
@@ -327,7 +327,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
   "code": 10001,
@@ -358,8 +358,8 @@ var _ = Describe("Space", func() {
 	})
 
 	Describe("GetSecurityGroupStagingSpaces", func() {
-		Context("when no errors are encountered", func() {
-			Context("when results are paginated", func() {
+		When("no errors are encountered", func() {
+			When("results are paginated", func() {
 				BeforeEach(func() {
 					response1 := `{
 						"next_url": "/v2/security_groups/security-group-guid/staging_spaces?page=2",
@@ -466,7 +466,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
   "code": 10001,

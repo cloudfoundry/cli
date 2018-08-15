@@ -23,7 +23,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 	})
 
 	Context("pushing a directory", func() {
-		Context("when the directory contains files", func() {
+		When("the directory contains files", func() {
 			It("pushes the app from the directory", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					session := helpers.CF(PushCommandName, appName, "-p", appDir)
@@ -45,7 +45,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 			})
 		})
 
-		Context("when the directory is empty", func() {
+		When("the directory is empty", func() {
 			var emptyDir string
 
 			BeforeEach(func() {

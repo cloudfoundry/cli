@@ -53,7 +53,7 @@ var _ = Describe("Poll Start", func() {
 		}()
 	})
 
-	Context("when no API errors appear", func() {
+	When("no API errors appear", func() {
 		It("passes and exits with no errors", func() {
 			appState <- v2action.ApplicationStateStopping
 			appState <- v2action.ApplicationStateStaging
@@ -91,7 +91,7 @@ var _ = Describe("Poll Start", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		Context("when state channel is not set", func() {
+		When("state channel is not set", func() {
 			BeforeEach(func() {
 				appState = nil
 			})

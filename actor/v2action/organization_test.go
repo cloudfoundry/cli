@@ -35,7 +35,7 @@ var _ = Describe("Org Actions", func() {
 			org, warnings, err = actor.GetOrganization("some-org-guid")
 		})
 
-		Context("when the org exists", func() {
+		When("the org exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationReturns(
 					ccv2.Organization{
@@ -62,7 +62,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when the org does not exist", func() {
+		When("the org does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationReturns(
 					ccv2.Organization{},
@@ -77,7 +77,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when client returns an error", func() {
+		When("client returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -107,7 +107,7 @@ var _ = Describe("Org Actions", func() {
 			org, warnings, err = actor.GetOrganizationByName("some-org")
 		})
 
-		Context("when the org exists", func() {
+		When("the org exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv2.Organization{
@@ -133,7 +133,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when the org does not exist", func() {
+		When("the org does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv2.Organization{},
@@ -147,7 +147,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when multiple orgs exist with the same name", func() {
+		When("multiple orgs exist with the same name", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv2.Organization{
@@ -164,7 +164,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			var returnedErr error
 
 			BeforeEach(func() {
@@ -276,7 +276,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when getting the org returns an error", func() {
+		When("getting the org returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv2.Organization{},
@@ -295,7 +295,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when the delete returns an error", func() {
+		When("the delete returns an error", func() {
 			var returnedErr error
 
 			BeforeEach(func() {
@@ -321,7 +321,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when the job polling has an error", func() {
+		When("the job polling has an error", func() {
 			var expectedErr error
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns([]ccv2.Organization{
@@ -353,7 +353,7 @@ var _ = Describe("Org Actions", func() {
 			orgs, warnings, err = actor.GetOrganizations()
 		})
 
-		Context("when there are multiple organizations", func() {
+		When("there are multiple organizations", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv2.Organization{
@@ -383,7 +383,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when there are no orgs", func() {
+		When("there are no orgs", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv2.Organization{},
@@ -400,7 +400,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when client returns an error", func() {
+		When("client returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

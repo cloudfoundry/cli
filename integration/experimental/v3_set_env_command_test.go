@@ -29,7 +29,7 @@ var _ = Describe("v3-set-env command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("v3-set-env", "--help")
 
@@ -44,7 +44,7 @@ var _ = Describe("v3-set-env command", func() {
 		})
 	})
 
-	Context("when the app name is not provided", func() {
+	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-set-env")
 
@@ -54,7 +54,7 @@ var _ = Describe("v3-set-env command", func() {
 		})
 	})
 
-	Context("when ENV_VAR_NAME is not provided", func() {
+	When("ENV_VAR_NAME is not provided", func() {
 		It("tells the user that ENV_VAR_NAME is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-set-env", appName)
 
@@ -64,7 +64,7 @@ var _ = Describe("v3-set-env command", func() {
 		})
 	})
 
-	Context("when the ENV_VAR_VALUE is not provided", func() {
+	When("the ENV_VAR_VALUE is not provided", func() {
 		It("tells the user that ENV_VAR_VALUE is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-set-env", appName, envVarName)
 
@@ -80,8 +80,8 @@ var _ = Describe("v3-set-env command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when the v3 api does not exist", func() {
+	When("the environment is not setup correctly", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -100,7 +100,7 @@ var _ = Describe("v3-set-env command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -119,7 +119,7 @@ var _ = Describe("v3-set-env command", func() {
 			})
 		})
 
-		Context("when no API endpoint is set", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -132,7 +132,7 @@ var _ = Describe("v3-set-env command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -145,7 +145,7 @@ var _ = Describe("v3-set-env command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -159,7 +159,7 @@ var _ = Describe("v3-set-env command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -175,7 +175,7 @@ var _ = Describe("v3-set-env command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -187,7 +187,7 @@ var _ = Describe("v3-set-env command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("displays app not found and exits 1", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("v3-set-env", invalidAppName, envVarName, envVarValue)
@@ -199,14 +199,14 @@ var _ = Describe("v3-set-env command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("v3-push", appName, "-p", appDir)).Should(Exit(0))
 				})
 			})
 
-			Context("when the environment variable has not been previously set", func() {
+			When("the environment variable has not been previously set", func() {
 				It("sets the environment variable value pair", func() {
 					session := helpers.CF("v3-set-env", appName, envVarName, envVarValue)
 
@@ -221,7 +221,7 @@ var _ = Describe("v3-set-env command", func() {
 				})
 
 				// This is to prevent the '-' being read in as another flag
-				Context("when the environment variable value starts with a '-' character", func() {
+				When("the environment variable value starts with a '-' character", func() {
 					BeforeEach(func() {
 						envVarValue = "-" + envVarValue
 					})
@@ -241,7 +241,7 @@ var _ = Describe("v3-set-env command", func() {
 				})
 			})
 
-			Context("when the environment variable has been previously set", func() {
+			When("the environment variable has been previously set", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("v3-set-env", appName, envVarName, envVarValue)).Should(Exit(0))
 				})

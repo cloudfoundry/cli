@@ -132,7 +132,7 @@ var _ = Describe("CLI SSH", func() {
 			connectErr = secureShell.Connect(username, passcode, sshEndpoint, sshEndpointFingerprint, skipHostValidation)
 		})
 
-		Context("when dialing succeeds", func() {
+		When("dialing succeeds", func() {
 			It("creates the ssh client", func() {
 				Expect(connectErr).ToNot(HaveOccurred())
 
@@ -146,10 +146,10 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when dialing fails", func() {
+		When("dialing fails", func() {
 			var dialError error
 
-			Context("when the error is a generic Dial error", func() {
+			When("the error is a generic Dial error", func() {
 				BeforeEach(func() {
 					dialError = errors.New("woops")
 					fakeSecureDialer.DialReturns(nil, dialError)
@@ -161,7 +161,7 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when the dialing error is a golang 'unable to authenticate' error", func() {
+			When("the dialing error is a golang 'unable to authenticate' error", func() {
 				BeforeEach(func() {
 					dialError = fmt.Errorf("ssh: unable to authenticate, attempted methods %v, no supported methods remain", []string{"none", "password"})
 					fakeSecureDialer.DialReturns(nil, dialError)
@@ -201,7 +201,7 @@ var _ = Describe("CLI SSH", func() {
 			interactiveSessionInvoker(secureShell)
 		})
 
-		Context("when host key validation is enabled", func() {
+		When("host key validation is enabled", func() {
 			var (
 				callback func(hostname string, remote net.Addr, key ssh.PublicKey) error
 				addr     net.Addr
@@ -223,7 +223,7 @@ var _ = Describe("CLI SSH", func() {
 				listener.Close()
 			})
 
-			Context("when the md5 fingerprint matches", func() {
+			When("the md5 fingerprint matches", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = "41:ce:56:e6:9c:42:a9:c6:9e:68:ac:e3:4d:f6:38:79"
 				})
@@ -233,7 +233,7 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when the hex sha1 fingerprint matches", func() {
+			When("the hex sha1 fingerprint matches", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = "a8:e2:67:cb:ea:2a:6e:23:a1:72:ce:8f:07:92:15:ee:1f:82:f8:ca"
 				})
@@ -243,7 +243,7 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when the base64 sha256 fingerprint matches", func() {
+			When("the base64 sha256 fingerprint matches", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = "sp/jrLuj66r+yrLDUKZdJU5tdzt4mq/UaSiNBjpgr+8"
 				})
@@ -253,7 +253,7 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when the base64 SHA256 fingerprint does not match", func() {
+			When("the base64 SHA256 fingerprint does not match", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = "0000000000000000000000000000000000000000000"
 				})
@@ -265,7 +265,7 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when the hex SHA1 fingerprint does not match", func() {
+			When("the hex SHA1 fingerprint does not match", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
 				})
@@ -277,7 +277,7 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when the MD5 fingerprint does not match", func() {
+			When("the MD5 fingerprint does not match", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
 				})
@@ -289,7 +289,7 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when no fingerprint is present in endpoint info", func() {
+			When("no fingerprint is present in endpoint info", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = ""
 					sshEndpoint = ""
@@ -302,7 +302,7 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when the fingerprint length doesn't make sense", func() {
+			When("the fingerprint length doesn't make sense", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = "garbage"
 				})
@@ -314,7 +314,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when the skip host validation flag is set", func() {
+		When("the skip host validation flag is set", func() {
 			BeforeEach(func() {
 				skipHostValidation = true
 			})
@@ -328,7 +328,7 @@ var _ = Describe("CLI SSH", func() {
 		})
 
 		// TODO: see if it's possible to test the piping between the ss client input and outputs and the UI object we pass in
-		Context("when dialing is successful", func() {
+		When("dialing is successful", func() {
 			It("creates a new secure shell session", func() {
 				Expect(fakeSecureClient.NewSessionCallCount()).To(Equal(1))
 			})
@@ -341,7 +341,7 @@ var _ = Describe("CLI SSH", func() {
 				Expect(fakeSecureSession.StdinPipeCallCount()).To(Equal(1))
 			})
 
-			Context("when getting the stdin pipe fails", func() {
+			When("getting the stdin pipe fails", func() {
 				BeforeEach(func() {
 					fakeSecureSession.StdinPipeReturns(nil, errors.New("woops"))
 				})
@@ -355,7 +355,7 @@ var _ = Describe("CLI SSH", func() {
 				Expect(fakeSecureSession.StdoutPipeCallCount()).To(Equal(1))
 			})
 
-			Context("when getting the stdout pipe fails", func() {
+			When("getting the stdout pipe fails", func() {
 				BeforeEach(func() {
 					fakeSecureSession.StdoutPipeReturns(nil, errors.New("woops"))
 				})
@@ -369,7 +369,7 @@ var _ = Describe("CLI SSH", func() {
 				Expect(fakeSecureSession.StderrPipeCallCount()).To(Equal(1))
 			})
 
-			Context("when getting the stderr pipe fails", func() {
+			When("getting the stderr pipe fails", func() {
 				BeforeEach(func() {
 					fakeSecureSession.StderrPipeReturns(nil, errors.New("woops"))
 				})
@@ -380,7 +380,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when stdin is a terminal", func() {
+		When("stdin is a terminal", func() {
 			var master, slave *os.File
 
 			BeforeEach(func() {
@@ -400,7 +400,7 @@ var _ = Describe("CLI SSH", func() {
 				// slave.Close() // race
 			})
 
-			Context("when a command is not specified", func() {
+			When("a command is not specified", func() {
 				var terminalType string
 
 				BeforeEach(func() {
@@ -438,7 +438,7 @@ var _ = Describe("CLI SSH", func() {
 					Expect(modes).To(Equal(expectedModes))
 				})
 
-				Context("when the TERM environment variable is not set", func() {
+				When("the TERM environment variable is not set", func() {
 					BeforeEach(func() {
 						os.Unsetenv("TERM")
 					})
@@ -457,7 +457,7 @@ var _ = Describe("CLI SSH", func() {
 					Expect(fakeTerminalHelper.RestoreTerminalCallCount()).To(Equal(1))
 				})
 
-				Context("when the pty allocation fails", func() {
+				When("the pty allocation fails", func() {
 					var ptyError error
 
 					BeforeEach(func() {
@@ -470,7 +470,7 @@ var _ = Describe("CLI SSH", func() {
 					})
 				})
 
-				Context("when placing the terminal into raw mode fails", func() {
+				When("placing the terminal into raw mode fails", func() {
 					BeforeEach(func() {
 						fakeTerminalHelper.SetRawTerminalReturns(nil, errors.New("woops"))
 					})
@@ -487,12 +487,12 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when a command is specified", func() {
+			When("a command is specified", func() {
 				BeforeEach(func() {
 					commands = []string{"echo", "-n", "hello"}
 				})
 
-				Context("when a terminal is requested", func() {
+				When("a terminal is requested", func() {
 					BeforeEach(func() {
 						terminalRequest = RequestTTYYes
 						fakeTerminalHelper.GetFdInfoReturns(0, true)
@@ -503,7 +503,7 @@ var _ = Describe("CLI SSH", func() {
 					})
 				})
 
-				Context("when a terminal is not explicitly requested", func() {
+				When("a terminal is not explicitly requested", func() {
 					BeforeEach(func() {
 						terminalRequest = RequestTTYAuto
 					})
@@ -515,7 +515,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when stdin is not a terminal", func() {
+		When("stdin is not a terminal", func() {
 			BeforeEach(func() {
 				stdin.ReadStub = func(p []byte) (int, error) {
 					return 0, io.EOF
@@ -526,13 +526,13 @@ var _ = Describe("CLI SSH", func() {
 				fakeTerminalHelper.GetWinsizeStub = terminalHelper.GetWinsize
 			})
 
-			Context("when a terminal is not requested", func() {
+			When("a terminal is not requested", func() {
 				It("does not request a pty", func() {
 					Expect(fakeSecureSession.RequestPtyCallCount()).To(Equal(0))
 				})
 			})
 
-			Context("when a terminal is requested", func() {
+			When("a terminal is requested", func() {
 				BeforeEach(func() {
 					terminalRequest = RequestTTYYes
 				})
@@ -543,7 +543,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		PContext("when a terminal is forced", func() {
+		PWhen("a terminal is forced", func() {
 			BeforeEach(func() {
 				terminalRequest = RequestTTYForce
 			})
@@ -553,7 +553,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when a terminal is disabled", func() {
+		When("a terminal is disabled", func() {
 			BeforeEach(func() {
 				terminalRequest = RequestTTYNo
 			})
@@ -563,12 +563,12 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when a command is not specified", func() {
+		When("a command is not specified", func() {
 			It("requests an interactive shell", func() {
 				Expect(fakeSecureSession.ShellCallCount()).To(Equal(1))
 			})
 
-			Context("when the shell request returns an error", func() {
+			When("the shell request returns an error", func() {
 				BeforeEach(func() {
 					fakeSecureSession.ShellReturns(errors.New("oh bother"))
 				})
@@ -579,7 +579,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when a command is specifed", func() {
+		When("a command is specifed", func() {
 			BeforeEach(func() {
 				commands = []string{"echo", "-n", "hello"}
 			})
@@ -589,7 +589,7 @@ var _ = Describe("CLI SSH", func() {
 				Expect(fakeSecureSession.StartArgsForCall(0)).To(Equal("echo -n hello"))
 			})
 
-			Context("when the command fails to start", func() {
+			When("the command fails to start", func() {
 				BeforeEach(func() {
 					fakeSecureSession.StartReturns(errors.New("oh well"))
 				})
@@ -600,7 +600,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when the shell or command has started", func() {
+		When("the shell or command has started", func() {
 			BeforeEach(func() {
 				stdin.ReadStub = func(p []byte) (int, error) {
 					p[0] = 0
@@ -662,7 +662,7 @@ var _ = Describe("CLI SSH", func() {
 				Expect(sessionErr).To(MatchError("error result"))
 			})
 
-			Context("when the session terminates before stream copies complete", func() {
+			When("the session terminates before stream copies complete", func() {
 				var sessionErrorCh chan error
 
 				BeforeEach(func() {
@@ -700,7 +700,7 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when stdin is closed", func() {
+			When("stdin is closed", func() {
 				BeforeEach(func() {
 					stdin.ReadStub = func(p []byte) (int, error) {
 						defer GinkgoRecover()
@@ -716,7 +716,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when stdout is a terminal and a window size change occurs", func() {
+		When("stdout is a terminal and a window size change occurs", func() {
 			var master, slave *os.File
 
 			BeforeEach(func() {
@@ -933,7 +933,7 @@ var _ = Describe("CLI SSH", func() {
 			validateConnectivity(localAddress)
 		})
 
-		Context("when a local connection is already open", func() {
+		When("a local connection is already open", func() {
 			var conn net.Conn
 
 			JustBeforeEach(func() {
@@ -952,8 +952,8 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when there are multiple port forward specs", func() {
-			Context("when provided a real listener", func() {
+		When("there are multiple port forward specs", func() {
+			When("provided a real listener", func() {
 				var (
 					realLocalListener2 net.Listener
 					localAddress2      string
@@ -1012,7 +1012,7 @@ var _ = Describe("CLI SSH", func() {
 				})
 			})
 
-			Context("when the secure client is closed", func() {
+			When("the secure client is closed", func() {
 				var (
 					fakeLocalListener1 *fake_net.FakeListener
 					fakeLocalListener2 *fake_net.FakeListener
@@ -1052,7 +1052,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when listen fails", func() {
+		When("listen fails", func() {
 			BeforeEach(func() {
 				fakeListenerFactory.ListenReturns(nil, errors.New("failure is an option"))
 			})
@@ -1062,7 +1062,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when the client it closed", func() {
+		When("the client it closed", func() {
 			BeforeEach(func() {
 				fakeLocalListener = new(fake_net.FakeListener)
 				BlockAcceptOnClose(fakeLocalListener)
@@ -1080,7 +1080,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when accept fails", func() {
+		When("accept fails", func() {
 			var fakeConn *fake_net.FakeConn
 
 			BeforeEach(func() {
@@ -1135,7 +1135,7 @@ var _ = Describe("CLI SSH", func() {
 			})
 		})
 
-		Context("when dialing the connect address fails", func() {
+		When("dialing the connect address fails", func() {
 			var fakeTarget *fake_net.FakeConn
 
 			BeforeEach(func() {

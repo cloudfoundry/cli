@@ -21,7 +21,7 @@ var _ = Describe("push with different start command values", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when the start command flag is provided", func() {
+	When("the start command flag is provided", func() {
 		It("sets the start command correctly for the pushed app", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				By("pushing the app with no provided start command uses detected command")
@@ -58,7 +58,7 @@ var _ = Describe("push with different start command values", func() {
 		})
 	})
 
-	Context("when the start command is provided in the manifest", func() {
+	When("the start command is provided in the manifest", func() {
 		It("sets the start command correctly for the pushed app", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				By("pushing the app with no provided start command uses detected command")

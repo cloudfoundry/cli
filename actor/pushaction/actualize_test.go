@@ -118,7 +118,7 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("application creation", func() {
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			BeforeEach(func() {
 				state.Application.GUID = "some-app-guid"
 			})
@@ -138,8 +138,8 @@ var _ = Describe("Actualize", func() {
 			})
 		})
 
-		Context("when the application does not exist", func() {
-			Context("when the creation is successful", func() {
+		When("the application does not exist", func() {
+			When("the creation is successful", func() {
 				var expectedApp v3action.Application
 
 				BeforeEach(func() {
@@ -168,7 +168,7 @@ var _ = Describe("Actualize", func() {
 				})
 			})
 
-			Context("when the creation errors", func() {
+			When("the creation errors", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -186,7 +186,7 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("package upload", func() {
-		Context("when app bits are provided", func() {
+		When("app bits are provided", func() {
 			BeforeEach(func() {
 				state = PushState{
 					Application: v3action.Application{
@@ -215,7 +215,7 @@ var _ = Describe("Actualize", func() {
 				}))
 			})
 
-			Context("when the archive creation is successful", func() {
+			When("the archive creation is successful", func() {
 				BeforeEach(func() {
 					fakeSharedActor.ZipDirectoryResourcesReturns("/some/archive/path", nil)
 				})
@@ -227,7 +227,7 @@ var _ = Describe("Actualize", func() {
 					Expect(fakeV3Actor.CreateBitsPackageByApplicationArgsForCall(0)).To(Equal("some-app-guid"))
 				})
 
-				Context("when the package creation is successful", func() {
+				When("the package creation is successful", func() {
 					BeforeEach(func() {
 						fakeV3Actor.CreateBitsPackageByApplicationReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"some-create-package-warning"}, nil)
 					})
@@ -238,7 +238,7 @@ var _ = Describe("Actualize", func() {
 						Expect(fakeSharedActor.ReadArchiveArgsForCall(0)).To(Equal("/some/archive/path"))
 					})
 
-					Context("when reading the archive is successful", func() {
+					When("reading the archive is successful", func() {
 						BeforeEach(func() {
 							fakeReadCloser := new(pushactionfakes.FakeReadCloser)
 							fakeSharedActor.ReadArchiveReturns(fakeReadCloser, 6, nil)
@@ -257,7 +257,7 @@ var _ = Describe("Actualize", func() {
 							Expect(size).To(BeNumerically("==", 6))
 						})
 
-						Context("when the upload is successful", func() {
+						When("the upload is successful", func() {
 							BeforeEach(func() {
 								fakeV3Actor.UploadBitsPackageReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"some-upload-package-warning"}, nil)
 							})
@@ -268,8 +268,8 @@ var _ = Describe("Actualize", func() {
 								Eventually(eventStream).Should(Receive(Equal(UploadWithArchiveComplete)))
 							})
 
-							Context("when the upload errors", func() {
-								Context("when the upload error is a retryable error", func() {
+							When("the upload errors", func() {
+								When("the upload error is a retryable error", func() {
 									var someErr error
 
 									BeforeEach(func() {
@@ -297,7 +297,7 @@ var _ = Describe("Actualize", func() {
 
 								})
 
-								Context("when the upload error is not a retryable error", func() {
+								When("the upload error is not a retryable error", func() {
 									BeforeEach(func() {
 										fakeV3Actor.UploadBitsPackageReturns(v3action.Package{}, v3action.Warnings{"upload-warnings-1", "upload-warnings-2"}, errors.New("dios mio"))
 									})
@@ -312,7 +312,7 @@ var _ = Describe("Actualize", func() {
 							})
 						})
 
-						Context("when reading the archive fails", func() {
+						When("reading the archive fails", func() {
 							BeforeEach(func() {
 								fakeSharedActor.ReadArchiveReturns(nil, 0, errors.New("the bits!"))
 							})
@@ -324,7 +324,7 @@ var _ = Describe("Actualize", func() {
 						})
 					})
 
-					Context("when the package creation errors", func() {
+					When("the package creation errors", func() {
 						BeforeEach(func() {
 							fakeV3Actor.CreateBitsPackageByApplicationReturns(v3action.Package{}, v3action.Warnings{"package-creation-warning"}, errors.New("the bits!"))
 						})
@@ -338,7 +338,7 @@ var _ = Describe("Actualize", func() {
 					})
 				})
 
-				Context("when the archive creation errors", func() {
+				When("the archive creation errors", func() {
 					BeforeEach(func() {
 						fakeSharedActor.ZipDirectoryResourcesReturns("", errors.New("oh no"))
 					})
@@ -354,7 +354,7 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("polling package", func() {
-		Context("when the the polling is succesful", func() {
+		When("the the polling is succesful", func() {
 			BeforeEach(func() {
 				fakeV3Actor.PollPackageReturns(v3action.Package{}, v3action.Warnings{"some-poll-package-warning"}, nil)
 			})
@@ -366,7 +366,7 @@ var _ = Describe("Actualize", func() {
 
 		})
 
-		Context("when the the polling returns an error", func() {
+		When("the the polling returns an error", func() {
 			var someErr error
 
 			BeforeEach(func() {
@@ -393,7 +393,7 @@ var _ = Describe("Actualize", func() {
 			Expect(fakeV3Actor.StageApplicationPackageArgsForCall(0)).To(Equal("some-pkg-guid"))
 		})
 
-		Context("when staging is successful", func() {
+		When("staging is successful", func() {
 			BeforeEach(func() {
 				fakeV3Actor.StageApplicationPackageReturns(v3action.Build{GUID: "some-build-guid"}, v3action.Warnings{"some-staging-warning"}, nil)
 			})
@@ -405,7 +405,7 @@ var _ = Describe("Actualize", func() {
 			})
 		})
 
-		Context("when staging errors", func() {
+		When("staging errors", func() {
 			BeforeEach(func() {
 				fakeV3Actor.StageApplicationPackageReturns(v3action.Build{}, v3action.Warnings{"some-staging-warning"}, errors.New("ahhh, i failed"))
 			})
@@ -419,7 +419,7 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("polling build", func() {
-		Context("when the the polling is succesful", func() {
+		When("the the polling is succesful", func() {
 			BeforeEach(func() {
 				fakeV3Actor.PollBuildReturns(v3action.Droplet{}, v3action.Warnings{"some-poll-build-warning"}, nil)
 			})
@@ -431,7 +431,7 @@ var _ = Describe("Actualize", func() {
 			})
 		})
 
-		Context("when the the polling returns an error", func() {
+		When("the the polling returns an error", func() {
 			var someErr error
 
 			BeforeEach(func() {
@@ -448,7 +448,7 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("setting droplet", func() {
-		Context("when setting the droplet is successful", func() {
+		When("setting the droplet is successful", func() {
 			BeforeEach(func() {
 				fakeV3Actor.SetApplicationDropletReturns(v3action.Warnings{"some-set-droplet-warning"}, nil)
 			})
@@ -460,7 +460,7 @@ var _ = Describe("Actualize", func() {
 			})
 		})
 
-		Context("when setting the droplet errors", func() {
+		When("setting the droplet errors", func() {
 			BeforeEach(func() {
 				fakeV3Actor.SetApplicationDropletReturns(v3action.Warnings{"some-set-droplet-warning"}, errors.New("the climate is arid"))
 			})
@@ -473,7 +473,7 @@ var _ = Describe("Actualize", func() {
 		})
 	})
 
-	Context("when all operations are finished", func() {
+	When("all operations are finished", func() {
 		It("returns a complete event", func() {
 			Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(Complete))
 		})

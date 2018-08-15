@@ -27,7 +27,7 @@ var _ = Describe("app command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("app", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -43,12 +43,12 @@ var _ = Describe("app command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "app", "some-app")
 		})
 
-		Context("when no API endpoint is set", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -60,7 +60,7 @@ var _ = Describe("app command", func() {
 				Eventually(session).Should(Exit(1))
 			})
 		})
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -73,7 +73,7 @@ var _ = Describe("app command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -87,7 +87,7 @@ var _ = Describe("app command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -103,7 +103,7 @@ var _ = Describe("app command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -113,12 +113,12 @@ var _ = Describe("app command", func() {
 		})
 
 		Describe("version dependent display", func() {
-			Context("when CC API >= 3.27.0", func() {
+			When("CC API >= 3.27.0", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 				})
 
-				Context("when the app is created but not pushed", func() {
+				When("the app is created but not pushed", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
 					})
@@ -135,14 +135,14 @@ var _ = Describe("app command", func() {
 					})
 				})
 
-				Context("when the app is a buildpack app", func() {
+				When("the app is a buildpack app", func() {
 					var domainName string
 
 					BeforeEach(func() {
 						domainName = helpers.DefaultSharedDomain()
 					})
 
-					Context("when the app is started and has 2 instances", func() {
+					When("the app is started and has 2 instances", func() {
 						BeforeEach(func() {
 							helpers.WithHelloWorldApp(func(appDir string) {
 								manifestContents := []byte(fmt.Sprintf(`
@@ -190,7 +190,7 @@ applications:
 					})
 				})
 
-				Context("when the app is stopped", func() {
+				When("the app is stopped", func() {
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
@@ -210,7 +210,7 @@ applications:
 					})
 				})
 
-				Context("when the app has 0 instances", func() {
+				When("the app has 0 instances", func() {
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "-i", "0")).Should(Exit(0))
@@ -230,7 +230,7 @@ applications:
 					})
 				})
 
-				Context("when the --guid flag is given", func() {
+				When("the --guid flag is given", func() {
 					var appGUID string
 
 					BeforeEach(func() {
@@ -255,7 +255,7 @@ applications:
 					})
 				})
 
-				Context("when the app uses multiple buildpacks", func() {
+				When("the app uses multiple buildpacks", func() {
 					BeforeEach(func() {
 						helpers.WithMultiBuildpackApp(func(appDir string) {
 							Eventually(helpers.CF("v3-push", appName, "-p", appDir, "-b", "ruby_buildpack", "-b", "go_buildpack")).Should(Exit(0))
@@ -270,19 +270,19 @@ applications:
 				})
 			})
 
-			Context("when CC API < 3.27.0", func() {
+			When("CC API < 3.27.0", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
 				})
 
-				Context("when the app is a buildpack app", func() {
+				When("the app is a buildpack app", func() {
 					var domainName string
 
 					BeforeEach(func() {
 						domainName = helpers.DefaultSharedDomain()
 					})
 
-					Context("when the app is started and has 2 instances", func() {
+					When("the app is started and has 2 instances", func() {
 						BeforeEach(func() {
 							helpers.WithHelloWorldApp(func(appDir string) {
 								manifestContents := []byte(fmt.Sprintf(`
@@ -323,7 +323,7 @@ applications:
 					})
 				})
 
-				Context("when the app is stopped", func() {
+				When("the app is stopped", func() {
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
@@ -343,7 +343,7 @@ applications:
 					})
 				})
 
-				Context("when the app has 0 instances", func() {
+				When("the app has 0 instances", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionZeroAppInstancesV2)
 						helpers.WithHelloWorldApp(func(appDir string) {
@@ -364,7 +364,7 @@ applications:
 					})
 				})
 
-				Context("when the --guid flag is given", func() {
+				When("the --guid flag is given", func() {
 					var appGUID string
 
 					BeforeEach(func() {
@@ -393,7 +393,7 @@ applications:
 		})
 
 		Describe("version independent display", func() {
-			Context("when the app name is not provided", func() {
+			When("the app name is not provided", func() {
 				It("tells the user that the app name is required, prints help text, and exits 1", func() {
 					session := helpers.CF("app")
 
@@ -403,8 +403,8 @@ applications:
 				})
 			})
 
-			Context("when the app does not exist", func() {
-				Context("when no flags are given", func() {
+			When("the app does not exist", func() {
+				When("no flags are given", func() {
 					It("tells the user that the app is not found and exits 1", func() {
 						session := helpers.CF("app", appName)
 
@@ -414,7 +414,7 @@ applications:
 					})
 				})
 
-				Context("when the --guid flag is given", func() {
+				When("the --guid flag is given", func() {
 					It("tells the user that the app is not found and exits 1", func() {
 						session := helpers.CF("app", "--guid", appName)
 
@@ -425,8 +425,8 @@ applications:
 				})
 			})
 
-			Context("when the app exists", func() {
-				Context("when isolation segments are available", func() {
+			When("the app exists", func() {
+				When("isolation segments are available", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
 
@@ -447,7 +447,7 @@ applications:
 					})
 				})
 
-				Context("when isolation segment is not set for the application", func() {
+				When("isolation segment is not set for the application", func() {
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
@@ -462,7 +462,7 @@ applications:
 					})
 				})
 
-				Context("when the app is a Docker app", func() {
+				When("the app is a Docker app", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
 					})
@@ -481,7 +481,7 @@ applications:
 					})
 				})
 
-				Context("when the app has tcp routes", func() {
+				When("the app has tcp routes", func() {
 					var tcpDomain helpers.Domain
 
 					BeforeEach(func() {

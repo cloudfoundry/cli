@@ -24,7 +24,7 @@ var _ = Describe("unbind-security-group command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("unbind-security-group", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -41,7 +41,7 @@ var _ = Describe("unbind-security-group command", func() {
 		})
 	})
 
-	Context("when the lifecycle flag is invalid", func() {
+	When("the lifecycle flag is invalid", func() {
 		It("outputs a message and usage", func() {
 			session := helpers.CF("unbind-security-group", securityGroupName, "some-org", "--lifecycle", "invalid")
 			Eventually(session.Err).Should(Say("Incorrect Usage: Invalid value `invalid' for option `--lifecycle'. Allowed values are: running or staging"))
@@ -50,7 +50,7 @@ var _ = Describe("unbind-security-group command", func() {
 		})
 	})
 
-	Context("when the lifecycle flag has no argument", func() {
+	When("the lifecycle flag has no argument", func() {
 		It("outputs a message and usage", func() {
 			session := helpers.CF("unbind-security-group", securityGroupName, "some-org", "--lifecycle")
 			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--lifecycle'"))
@@ -59,14 +59,14 @@ var _ = Describe("unbind-security-group command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "unbind-security-group", securityGroupName)
 		})
 	})
 
-	Context("when the input is invalid", func() {
-		Context("when the security group is not provided", func() {
+	When("the input is invalid", func() {
+		When("the security group is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
 				session := helpers.CF("unbind-security-group")
 				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `SECURITY_GROUP` was not provided"))
@@ -75,7 +75,7 @@ var _ = Describe("unbind-security-group command", func() {
 			})
 		})
 
-		Context("when the space is not provided", func() {
+		When("the space is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
 				session := helpers.CF("unbind-security-group", securityGroupName, "some-org")
 				Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `SECURITY_GROUP`, `ORG`, and `SPACE` were not provided"))
@@ -85,7 +85,7 @@ var _ = Describe("unbind-security-group command", func() {
 		})
 	})
 
-	Context("when the security group doesn't exist", func() {
+	When("the security group doesn't exist", func() {
 		BeforeEach(func() {
 			helpers.CreateOrgAndSpace(orgName, spaceName)
 		})
@@ -102,13 +102,13 @@ var _ = Describe("unbind-security-group command", func() {
 		})
 	})
 
-	Context("when the security group exists", func() {
+	When("the security group exists", func() {
 		BeforeEach(func() {
 			someSecurityGroup := helpers.NewSecurityGroup(securityGroupName, "tcp", "127.0.0.1", "8443", "some-description")
 			someSecurityGroup.Create()
 		})
 
-		Context("when the org doesn't exist", func() {
+		When("the org doesn't exist", func() {
 			It("fails with an 'org not found' message", func() {
 				session := helpers.CF("unbind-security-group", securityGroupName, "some-other-org", "some-other-space")
 				Eventually(session).Should(Say("FAILED"))
@@ -117,7 +117,7 @@ var _ = Describe("unbind-security-group command", func() {
 			})
 		})
 
-		Context("when the org exists", func() {
+		When("the org exists", func() {
 			var username string
 
 			BeforeEach(func() {
@@ -131,7 +131,7 @@ var _ = Describe("unbind-security-group command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			Context("when the space doesn't exist", func() {
+			When("the space doesn't exist", func() {
 				It("fails with a 'space not found' message", func() {
 					session := helpers.CF("unbind-security-group", securityGroupName, orgName, "some-other-space")
 					Eventually(session).Should(Say("FAILED"))
@@ -140,12 +140,12 @@ var _ = Describe("unbind-security-group command", func() {
 				})
 			})
 
-			Context("when the space exists", func() {
+			When("the space exists", func() {
 				BeforeEach(func() {
 					helpers.CreateSpace(spaceName)
 				})
 
-				Context("when the space isn't bound to the security group in any lifecycle", func() {
+				When("the space isn't bound to the security group in any lifecycle", func() {
 					It("successfully runs the command", func() {
 						session := helpers.CF("unbind-security-group", securityGroupName, orgName, spaceName)
 						Eventually(session).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
@@ -155,13 +155,13 @@ var _ = Describe("unbind-security-group command", func() {
 					})
 				})
 
-				Context("when a space is bound to a security group in the running lifecycle", func() {
+				When("a space is bound to a security group in the running lifecycle", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("bind-security-group", securityGroupName, orgName, spaceName)).Should(Exit(0))
 					})
 
-					Context("when the lifecycle flag is not set", func() {
-						Context("when the org and space are not provided", func() {
+					When("the lifecycle flag is not set", func() {
+						When("the org and space are not provided", func() {
 							BeforeEach(func() {
 								helpers.TargetOrgAndSpace(orgName, spaceName)
 							})
@@ -175,7 +175,7 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 						})
 
-						Context("when the org and space are provided", func() {
+						When("the org and space are provided", func() {
 							BeforeEach(func() {
 								helpers.ClearTarget()
 							})
@@ -190,8 +190,8 @@ var _ = Describe("unbind-security-group command", func() {
 						})
 					})
 
-					Context("when the lifecycle flag is running", func() {
-						Context("when the org and space are not provided", func() {
+					When("the lifecycle flag is running", func() {
+						When("the org and space are not provided", func() {
 							BeforeEach(func() {
 								helpers.TargetOrgAndSpace(orgName, spaceName)
 							})
@@ -205,7 +205,7 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 						})
 
-						Context("when the org and space are provided", func() {
+						When("the org and space are provided", func() {
 							BeforeEach(func() {
 								helpers.ClearTarget()
 							})
@@ -220,8 +220,8 @@ var _ = Describe("unbind-security-group command", func() {
 						})
 					})
 
-					Context("when the lifecycle flag is staging", func() {
-						Context("when the org and space are not provided", func() {
+					When("the lifecycle flag is staging", func() {
+						When("the org and space are not provided", func() {
 							BeforeEach(func() {
 								helpers.TargetOrgAndSpace(orgName, spaceName)
 							})
@@ -235,7 +235,7 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 						})
 
-						Context("when the org and space are provided", func() {
+						When("the org and space are provided", func() {
 							BeforeEach(func() {
 								helpers.ClearTarget()
 							})
@@ -251,13 +251,13 @@ var _ = Describe("unbind-security-group command", func() {
 					})
 				})
 
-				Context("when a space is bound to a security group in the staging lifecycle", func() {
+				When("a space is bound to a security group in the staging lifecycle", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("bind-security-group", securityGroupName, orgName, spaceName, "--lifecycle", "staging")).Should(Exit(0))
 					})
 
-					Context("when the lifecycle flag is not set", func() {
-						Context("when the org and space are not provided", func() {
+					When("the lifecycle flag is not set", func() {
+						When("the org and space are not provided", func() {
 							BeforeEach(func() {
 								helpers.TargetOrgAndSpace(orgName, spaceName)
 							})
@@ -271,7 +271,7 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 						})
 
-						Context("when the org and space are provided", func() {
+						When("the org and space are provided", func() {
 							BeforeEach(func() {
 								helpers.ClearTarget()
 							})
@@ -286,8 +286,8 @@ var _ = Describe("unbind-security-group command", func() {
 						})
 					})
 
-					Context("when the lifecycle flag is running", func() {
-						Context("when the org and space are not provided", func() {
+					When("the lifecycle flag is running", func() {
+						When("the org and space are not provided", func() {
 							BeforeEach(func() {
 								helpers.TargetOrgAndSpace(orgName, spaceName)
 							})
@@ -301,7 +301,7 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 						})
 
-						Context("when the org and space are provided", func() {
+						When("the org and space are provided", func() {
 							BeforeEach(func() {
 								helpers.ClearTarget()
 							})
@@ -316,8 +316,8 @@ var _ = Describe("unbind-security-group command", func() {
 						})
 					})
 
-					Context("when the lifecycle flag is staging", func() {
-						Context("when the org and space are not provided", func() {
+					When("the lifecycle flag is staging", func() {
+						When("the org and space are not provided", func() {
 							BeforeEach(func() {
 								helpers.TargetOrgAndSpace(orgName, spaceName)
 							})
@@ -331,7 +331,7 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 						})
 
-						Context("when the org and space are provided", func() {
+						When("the org and space are provided", func() {
 							BeforeEach(func() {
 								helpers.ClearTarget()
 							})

@@ -51,7 +51,7 @@ var _ = Describe("service Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when an error is encountered checking if the environment is setup correctly", func() {
+	When("an error is encountered checking if the environment is setup correctly", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -66,7 +66,7 @@ var _ = Describe("service Command", func() {
 		})
 	})
 
-	Context("when the user is logged in and an org and space are targeted", func() {
+	When("the user is logged in and an org and space are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
@@ -77,7 +77,7 @@ var _ = Describe("service Command", func() {
 			})
 		})
 
-		Context("when getting the current user fails", func() {
+		When("getting the current user fails", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("get-user-error"))
 			})
@@ -88,17 +88,17 @@ var _ = Describe("service Command", func() {
 			})
 		})
 
-		Context("when getting the current user succeeds", func() {
+		When("getting the current user succeeds", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			})
 
-			Context("when the '--guid' flag is provided", func() {
+			When("the '--guid' flag is provided", func() {
 				BeforeEach(func() {
 					cmd.GUID = true
 				})
 
-				Context("when the service instance does not exist", func() {
+				When("the service instance does not exist", func() {
 					BeforeEach(func() {
 						fakeActor.GetServiceInstanceByNameAndSpaceReturns(
 							v2action.ServiceInstance{},
@@ -126,7 +126,7 @@ var _ = Describe("service Command", func() {
 					})
 				})
 
-				Context("when an error is encountered getting the service instance", func() {
+				When("an error is encountered getting the service instance", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -152,7 +152,7 @@ var _ = Describe("service Command", func() {
 					})
 				})
 
-				Context("when no errors are encountered getting the service instance", func() {
+				When("no errors are encountered getting the service instance", func() {
 					BeforeEach(func() {
 						fakeActor.GetServiceInstanceByNameAndSpaceReturns(
 							v2action.ServiceInstance{
@@ -180,8 +180,8 @@ var _ = Describe("service Command", func() {
 				})
 			})
 
-			Context("when the '--guid' flag is not provided", func() {
-				Context("when the service instance does not exist", func() {
+			When("the '--guid' flag is not provided", func() {
+				When("the service instance does not exist", func() {
 					BeforeEach(func() {
 						fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
 							v2action.ServiceInstanceSummary{},
@@ -211,7 +211,7 @@ var _ = Describe("service Command", func() {
 					})
 				})
 
-				Context("when an error is encountered getting the service instance summary", func() {
+				When("an error is encountered getting the service instance summary", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -238,8 +238,8 @@ var _ = Describe("service Command", func() {
 					})
 				})
 
-				Context("when no errors are encountered getting the service instance summary", func() {
-					Context("when the service instance is a managed service instance", func() {
+				When("no errors are encountered getting the service instance summary", func() {
+					When("the service instance is a managed service instance", func() {
 						var returnedSummary v2action.ServiceInstanceSummary
 
 						BeforeEach(func() {
@@ -271,7 +271,7 @@ var _ = Describe("service Command", func() {
 								nil)
 						})
 
-						Context("when the service instance is not shared and is not shareable", func() {
+						When("the service instance is not shared and is not shareable", func() {
 							BeforeEach(func() {
 								returnedSummary.ServiceInstanceShareType = v2action.ServiceInstanceIsNotShared
 								returnedSummary.Service.Extra.Shareable = false
@@ -344,7 +344,7 @@ var _ = Describe("service Command", func() {
 							})
 						})
 
-						Context("when the service instance is not shared and is shareable", func() {
+						When("the service instance is not shared and is shareable", func() {
 							BeforeEach(func() {
 								returnedSummary.ServiceInstanceShareType = v2action.ServiceInstanceIsNotShared
 								returnedSummary.ServiceInstanceSharingFeatureFlag = true
@@ -392,7 +392,7 @@ var _ = Describe("service Command", func() {
 							})
 						})
 
-						Context("when the service instance is shared from another space", func() {
+						When("the service instance is shared from another space", func() {
 							BeforeEach(func() {
 								returnedSummary.ServiceInstanceShareType = v2action.ServiceInstanceIsSharedFrom
 								returnedSummary.ServiceInstanceSharedFrom = v2action.ServiceInstanceSharedFrom{
@@ -420,7 +420,7 @@ var _ = Describe("service Command", func() {
 							})
 						})
 
-						Context("when the service instance is shared to other spaces", func() {
+						When("the service instance is shared to other spaces", func() {
 							BeforeEach(func() {
 								returnedSummary.ServiceInstanceShareType = v2action.ServiceInstanceIsSharedTo
 								returnedSummary.ServiceInstanceSharedTos = []v2action.ServiceInstanceSharedTo{
@@ -443,7 +443,7 @@ var _ = Describe("service Command", func() {
 									nil)
 							})
 
-							Context("when the service instance is still shareable", func() {
+							When("the service instance is still shareable", func() {
 								It("displays the shared to info and does not display the shared from info", func() {
 									Expect(executeErr).ToNot(HaveOccurred())
 
@@ -461,7 +461,7 @@ var _ = Describe("service Command", func() {
 								})
 							})
 
-							Context("when the service instance is no longer shareable due to global settings only", func() {
+							When("the service instance is no longer shareable due to global settings only", func() {
 								BeforeEach(func() {
 									returnedSummary.ServiceInstanceSharingFeatureFlag = false
 									returnedSummary.Service.Extra.Shareable = true
@@ -490,7 +490,7 @@ var _ = Describe("service Command", func() {
 								})
 							})
 
-							Context("when the service instance is no longer shareable due to service broker settings only", func() {
+							When("the service instance is no longer shareable due to service broker settings only", func() {
 								BeforeEach(func() {
 									returnedSummary.ServiceInstanceSharingFeatureFlag = true
 									returnedSummary.Service.Extra.Shareable = false
@@ -518,7 +518,7 @@ var _ = Describe("service Command", func() {
 									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
 								})
 							})
-							Context("when the service instance is no longer shareable due to  global settings AND service broker settings", func() {
+							When("the service instance is no longer shareable due to  global settings AND service broker settings", func() {
 								BeforeEach(func() {
 									returnedSummary.ServiceInstanceSharingFeatureFlag = false
 									returnedSummary.Service.Extra.Shareable = false
@@ -548,8 +548,8 @@ var _ = Describe("service Command", func() {
 							})
 						})
 
-						Context("when the service instance has bound apps", func() {
-							Context("when the service bindings have binding names", func() {
+						When("the service instance has bound apps", func() {
+							When("the service bindings have binding names", func() {
 								BeforeEach(func() {
 									returnedSummary.BoundApplications = []v2action.BoundApplication{
 										{
@@ -600,7 +600,7 @@ var _ = Describe("service Command", func() {
 								})
 							})
 
-							Context("when the service bindings do not have binding names", func() {
+							When("the service bindings do not have binding names", func() {
 								BeforeEach(func() {
 									returnedSummary.BoundApplications = []v2action.BoundApplication{
 										{AppName: "app-1"},
@@ -643,7 +643,7 @@ var _ = Describe("service Command", func() {
 							})
 						})
 
-						Context("when the service instance does not have bound apps", func() {
+						When("the service instance does not have bound apps", func() {
 							It("displays a message indicating that there are no bound apps", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
@@ -670,7 +670,7 @@ var _ = Describe("service Command", func() {
 						})
 					})
 
-					Context("when the service instance is a user provided service instance", func() {
+					When("the service instance is a user provided service instance", func() {
 						BeforeEach(func() {
 							fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
 								v2action.ServiceInstanceSummary{
@@ -715,8 +715,8 @@ var _ = Describe("service Command", func() {
 							Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
 						})
 
-						Context("when the service instance has bound apps", func() {
-							Context("when the service bindings have binding names", func() {
+						When("the service instance has bound apps", func() {
+							When("the service bindings have binding names", func() {
 								BeforeEach(func() {
 									fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
 										v2action.ServiceInstanceSummary{
@@ -770,7 +770,7 @@ var _ = Describe("service Command", func() {
 								})
 							})
 
-							Context("when the service bindings do not have binding names", func() {
+							When("the service bindings do not have binding names", func() {
 								BeforeEach(func() {
 									fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
 										v2action.ServiceInstanceSummary{
@@ -817,7 +817,7 @@ var _ = Describe("service Command", func() {
 							})
 						})
 
-						Context("when the service instance does not have bound apps", func() {
+						When("the service instance does not have bound apps", func() {
 							It("displays a message indicating that there are no bound apps", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
@@ -830,7 +830,7 @@ var _ = Describe("service Command", func() {
 							})
 						})
 
-						Context("when the service instance have tags", func() {
+						When("the service instance have tags", func() {
 							BeforeEach(func() {
 								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
 									v2action.ServiceInstanceSummary{

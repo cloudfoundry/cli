@@ -32,7 +32,7 @@ var _ = Describe("Service Actions", func() {
 			service, serviceWarnings, serviceErr = actor.GetService("some-service-guid")
 		})
 
-		Context("when no errors are encountered getting the service", func() {
+		When("no errors are encountered getting the service", func() {
 			var returnedService ccv2.Service
 
 			BeforeEach(func() {
@@ -58,7 +58,7 @@ var _ = Describe("Service Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the service", func() {
+		When("an error is encountered getting the service", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

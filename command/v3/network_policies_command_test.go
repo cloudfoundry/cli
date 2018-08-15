@@ -51,7 +51,7 @@ var _ = Describe("network-policies Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -66,7 +66,7 @@ var _ = Describe("network-policies Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
@@ -77,7 +77,7 @@ var _ = Describe("network-policies Command", func() {
 			Expect(testUI.Out).To(Say(`Listing network policies in org some-org / space some-space as some-user\.\.\.`))
 		})
 
-		Context("when fetching the user fails", func() {
+		When("fetching the user fails", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("some-error"))
 			})
@@ -87,7 +87,7 @@ var _ = Describe("network-policies Command", func() {
 			})
 		})
 
-		Context("when listing policies is successful", func() {
+		When("listing policies is successful", func() {
 			BeforeEach(func() {
 				fakeActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{
 					{
@@ -122,7 +122,7 @@ var _ = Describe("network-policies Command", func() {
 				Expect(testUI.Err).To(Say("some-warning-2"))
 			})
 
-			Context("when a source app name is passed", func() {
+			When("a source app name is passed", func() {
 				BeforeEach(func() {
 					cmd.SourceApp = "some-app"
 					fakeActor.NetworkPoliciesBySpaceAndAppNameReturns([]cfnetworkingaction.Policy{
@@ -161,7 +161,7 @@ var _ = Describe("network-policies Command", func() {
 			})
 		})
 
-		Context("when listing the policies is not successful", func() {
+		When("listing the policies is not successful", func() {
 			BeforeEach(func() {
 				fakeActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.ApplicationNotFoundError{Name: srcApp})
 			})

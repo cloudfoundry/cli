@@ -36,7 +36,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 		commandregistry.Commands.SetCommand(cmd2.SetDependency(deps, true))
 	})
 
-	Context("when command exists and the correct flags are passed", func() {
+	When("command exists and the correct flags are passed", func() {
 		BeforeEach(func() {
 			err := NewCommandRunner().Command([]string{"fake-command"}, deps, false)
 			Expect(err).NotTo(HaveOccurred())
@@ -50,7 +50,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 		})
 	})
 
-	Context("when any of the command requirements fails", func() {
+	When("any of the command requirements fails", func() {
 		It("returns an error", func() {
 			err := NewCommandRunner().Command([]string{"fake-command2"}, deps, false)
 			Expect(err).To(HaveOccurred())
@@ -58,7 +58,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 		})
 	})
 
-	Context("when invalid flags are provided", func() {
+	When("invalid flags are provided", func() {
 		It("returns an error", func() {
 			err := NewCommandRunner().Command([]string{"fake-command", "-badFlag"}, deps, false)
 			Expect(err).To(HaveOccurred())
@@ -66,7 +66,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 		})
 	})
 
-	Context("when the command execute errors", func() {
+	When("the command execute errors", func() {
 		BeforeEach(func() {
 			cmd4 := commandregistry.Commands.FindCommand("fake-command4")
 			commandregistry.Commands.SetCommand(cmd4.SetDependency(deps, true))
@@ -78,7 +78,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 		})
 	})
 
-	Context("when the command execute panics", func() {
+	When("the command execute panics", func() {
 		BeforeEach(func() {
 			cmd3 := commandregistry.Commands.FindCommand("fake-command3")
 			commandregistry.Commands.SetCommand(cmd3.SetDependency(deps, true))

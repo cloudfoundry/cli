@@ -42,7 +42,7 @@ var _ = Describe("Prompts", func() {
 			Expect(out).To(Say("some-prompt \\[yN\\]:"))
 		})
 
-		Context("when the user chooses yes", func() {
+		When("the user chooses yes", func() {
 			BeforeEach(func() {
 				_, err := inBuffer.Write([]byte("y\n"))
 				Expect(err).ToNot(HaveOccurred())
@@ -55,7 +55,7 @@ var _ = Describe("Prompts", func() {
 			})
 		})
 
-		Context("when the user chooses no", func() {
+		When("the user chooses no", func() {
 			BeforeEach(func() {
 				_, err := inBuffer.Write([]byte("n\n"))
 				Expect(err).ToNot(HaveOccurred())
@@ -68,13 +68,13 @@ var _ = Describe("Prompts", func() {
 			})
 		})
 
-		Context("when the user chooses the default", func() {
+		When("the user chooses the default", func() {
 			BeforeEach(func() {
 				_, err := inBuffer.Write([]byte("\n"))
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when the default is true", func() {
+			When("the default is true", func() {
 				It("returns true", func() {
 					response, err := ui.DisplayBoolPrompt(true, "some-prompt", nil)
 					Expect(err).ToNot(HaveOccurred())
@@ -82,7 +82,7 @@ var _ = Describe("Prompts", func() {
 				})
 			})
 
-			Context("when the default is false", func() {
+			When("the default is false", func() {
 				It("returns false", func() {
 					response, err := ui.DisplayBoolPrompt(false, "some-prompt", nil)
 					Expect(err).ToNot(HaveOccurred())
@@ -91,7 +91,7 @@ var _ = Describe("Prompts", func() {
 			})
 		})
 
-		Context("when the interact library returns an error", func() {
+		When("the interact library returns an error", func() {
 			It("returns the error", func() {
 				_, err := inBuffer.Write([]byte("invalid\n"))
 				Expect(err).ToNot(HaveOccurred())
@@ -123,7 +123,7 @@ var _ = Describe("Prompts", func() {
 			Expect(out).ToNot(Say("some-input"))
 		})
 
-		Context("when the locale is not set to English", func() {
+		When("the locale is not set to English", func() {
 			BeforeEach(func() {
 				fakeConfig.LocaleReturns("fr-FR")
 

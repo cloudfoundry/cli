@@ -77,7 +77,7 @@ var _ = Describe("Application Summary Actions", func() {
 			summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues)
 		})
 
-		Context("when getting the V3 Application Summary is successful", func() {
+		When("getting the V3 Application Summary is successful", func() {
 			Context("regardless of the application state", func() {
 				BeforeEach(func() {
 					v3Summary := v3action.ApplicationSummary{
@@ -112,7 +112,7 @@ var _ = Describe("Application Summary Actions", func() {
 					Expect(passedWithObfuscatedValues).To(Equal(withObfuscatedValues))
 				})
 
-				Context("when getting the routes is successful", func() {
+				When("getting the routes is successful", func() {
 					BeforeEach(func() {
 						routes := v2action.Routes{
 							{GUID: "some-route-guid"},
@@ -136,8 +136,8 @@ var _ = Describe("Application Summary Actions", func() {
 					})
 				})
 
-				Context("when getting the application routes errors", func() {
-					Context("when a generic error is returned", func() {
+				When("getting the application routes errors", func() {
+					When("a generic error is returned", func() {
 						BeforeEach(func() {
 							fakeV2Actor.GetApplicationRoutesReturns(nil, v2action.Warnings{"v2-routes-warnings"}, errors.New("some-error"))
 						})
@@ -148,7 +148,7 @@ var _ = Describe("Application Summary Actions", func() {
 						})
 					})
 
-					Context("when a ResourceNotFoundError is returned", func() {
+					When("a ResourceNotFoundError is returned", func() {
 						BeforeEach(func() {
 							fakeV2Actor.GetApplicationRoutesReturns(nil, v2action.Warnings{"v2-routes-warnings"}, ccerror.ResourceNotFoundError{})
 						})
@@ -161,7 +161,7 @@ var _ = Describe("Application Summary Actions", func() {
 				})
 			})
 
-			Context("when the application is running", func() {
+			When("the application is running", func() {
 				BeforeEach(func() {
 					v3Summary := v3action.ApplicationSummary{
 						Application: v3action.Application{
@@ -172,7 +172,7 @@ var _ = Describe("Application Summary Actions", func() {
 					fakeV3Actor.GetApplicationSummaryByNameAndSpaceReturns(v3Summary, v3action.Warnings{"v3-summary-warning"}, nil)
 				})
 
-				Context("when getting the application instances with stats is successful", func() {
+				When("getting the application instances with stats is successful", func() {
 					BeforeEach(func() {
 						stats := []v2action.ApplicationInstanceWithStats{{ID: 0}, {ID: 1}}
 						fakeV2Actor.GetApplicationInstancesWithStatsByApplicationReturns(stats, v2action.Warnings{"v2-app-instances-warning"}, nil)
@@ -187,8 +187,8 @@ var _ = Describe("Application Summary Actions", func() {
 					})
 				})
 
-				Context("when getting the application instances with stats returns an error", func() {
-					Context("when a generic error is returned", func() {
+				When("getting the application instances with stats returns an error", func() {
+					When("a generic error is returned", func() {
 						BeforeEach(func() {
 							fakeV2Actor.GetApplicationInstancesWithStatsByApplicationReturns(nil, v2action.Warnings{"v2-app-instances-warning"}, errors.New("boom"))
 						})
@@ -199,7 +199,7 @@ var _ = Describe("Application Summary Actions", func() {
 						})
 					})
 
-					Context("when a ResourceNotFoundError is returned", func() {
+					When("a ResourceNotFoundError is returned", func() {
 						BeforeEach(func() {
 							fakeV2Actor.GetApplicationInstancesWithStatsByApplicationReturns(nil, v2action.Warnings{"v2-app-instances-warning"}, ccerror.ResourceNotFoundError{})
 						})
@@ -212,7 +212,7 @@ var _ = Describe("Application Summary Actions", func() {
 				})
 			})
 
-			Context("when the application is stopped", func() {
+			When("the application is stopped", func() {
 				BeforeEach(func() {
 					v3Summary := v3action.ApplicationSummary{
 						Application: v3action.Application{
@@ -232,7 +232,7 @@ var _ = Describe("Application Summary Actions", func() {
 			})
 		})
 
-		Context("when getting the V3 Application Summary returns an error", func() {
+		When("getting the V3 Application Summary returns an error", func() {
 			BeforeEach(func() {
 				fakeV3Actor.GetApplicationSummaryByNameAndSpaceReturns(v3action.ApplicationSummary{}, v3action.Warnings{"v3-summary-warning"}, errors.New("CRAZY!"))
 			})

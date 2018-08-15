@@ -59,7 +59,7 @@ var _ = Describe("v3-set-droplet Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -76,7 +76,7 @@ var _ = Describe("v3-set-droplet Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -91,7 +91,7 @@ var _ = Describe("v3-set-droplet Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -104,7 +104,7 @@ var _ = Describe("v3-set-droplet Command", func() {
 		})
 	})
 
-	Context("when the droplet has been set to the app", func() {
+	When("the droplet has been set to the app", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
@@ -134,7 +134,7 @@ var _ = Describe("v3-set-droplet Command", func() {
 		})
 	})
 
-	Context("when the actor returns an error", func() {
+	When("the actor returns an error", func() {
 		var expectedErr error
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{

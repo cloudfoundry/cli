@@ -49,7 +49,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			mergedApps, executeErr = actor.MergeAndValidateSettingsAndManifests(cmdSettings, apps)
 		})
 
-		Context("when app path '\\' is set from the command line", func() {
+		When("app path '\\' is set from the command line", func() {
 			BeforeEach(func() {
 				cmdSettings.ProvidedAppPath = `\`
 			})
@@ -62,7 +62,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			})
 		})
 
-		Context("when app path '\\' is set from the manifest", func() {
+		When("app path '\\' is set from the manifest", func() {
 			BeforeEach(func() {
 				apps[0].Path = `\`
 			})

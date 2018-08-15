@@ -56,7 +56,7 @@ var _ = Describe("v3-set-env Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -73,7 +73,7 @@ var _ = Describe("v3-set-env Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -88,13 +88,13 @@ var _ = Describe("v3-set-env Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, an org is targeted and a space is targeted", func() {
+	When("the user is logged in, an org is targeted and a space is targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("some-error"))
 			})
@@ -104,12 +104,12 @@ var _ = Describe("v3-set-env Command", func() {
 			})
 		})
 
-		Context("when getting the current user succeeds", func() {
+		When("getting the current user succeeds", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			})
 
-			Context("when setting the environment succeeds", func() {
+			When("setting the environment succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.SetEnvironmentVariableByApplicationNameAndSpaceReturns(v3action.Warnings{"set-warning-1", "set-warning-2"}, nil)
 				})
@@ -133,7 +133,7 @@ var _ = Describe("v3-set-env Command", func() {
 				})
 			})
 
-			Context("when the set environment variable returns an unknown error", func() {
+			When("the set environment variable returns an unknown error", func() {
 				var expectedErr error
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")

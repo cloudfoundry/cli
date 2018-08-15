@@ -24,7 +24,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 	})
 
 	Describe("GetApplicationsWithProcessesBySpace", func() {
-		Context("when there are apps", func() {
+		When("there are apps", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv3.Application{
@@ -143,7 +143,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 			})
 		})
 
-		Context("when getting the app processes returns an error", func() {
+		When("getting the app processes returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -174,7 +174,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 			})
 		})
 
-		Context("when getting the app process instances returns an error", func() {
+		When("getting the app process instances returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

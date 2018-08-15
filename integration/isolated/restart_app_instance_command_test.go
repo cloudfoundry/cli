@@ -11,7 +11,7 @@ import (
 
 var _ = XDescribe("restart command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("restart-app-instance", "--help")
 
@@ -26,13 +26,13 @@ var _ = XDescribe("restart command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "restart-app-instance", "app-name", "2")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -53,7 +53,7 @@ var _ = XDescribe("restart command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("tells the user that the start is not found and exits 1", func() {
 				session := helpers.CF("restart", appName, "0")
 
@@ -63,7 +63,7 @@ var _ = XDescribe("restart command", func() {
 			})
 		})
 
-		Context("when the app does exist", func() {
+		When("the app does exist", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))

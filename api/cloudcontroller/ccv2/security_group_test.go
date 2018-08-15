@@ -28,7 +28,7 @@ var _ = Describe("Security Groups", func() {
 			warnings, err = client.DeleteSecurityGroupSpace("security-group-guid", "space-guid")
 		})
 
-		Context("when the client call is successful", func() {
+		When("the client call is successful", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -43,7 +43,7 @@ var _ = Describe("Security Groups", func() {
 			})
 		})
 
-		Context("when the client call is unsuccessful", func() {
+		When("the client call is unsuccessful", func() {
 			BeforeEach(func() {
 				response := `{
   "code": 10001,
@@ -81,7 +81,7 @@ var _ = Describe("Security Groups", func() {
 			warnings, err = client.DeleteSecurityGroupStagingSpace("security-group-guid", "space-guid")
 		})
 
-		Context("when the client call is successful", func() {
+		When("the client call is successful", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -96,7 +96,7 @@ var _ = Describe("Security Groups", func() {
 			})
 		})
 
-		Context("when the client call is unsuccessful", func() {
+		When("the client call is unsuccessful", func() {
 			BeforeEach(func() {
 				response := `{
   "code": 10001,
@@ -125,8 +125,8 @@ var _ = Describe("Security Groups", func() {
 	})
 
 	Describe("GetSecurityGroups", func() {
-		Context("when no errors are encountered", func() {
-			Context("when results are paginated", func() {
+		When("no errors are encountered", func() {
+			When("results are paginated", func() {
 				BeforeEach(func() {
 					response1 := `{
 						"next_url": "/v2/security_groups?q=some-query:some-value&page=2",
@@ -207,7 +207,7 @@ var _ = Describe("Security Groups", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
   "code": 10001,
@@ -238,7 +238,7 @@ var _ = Describe("Security Groups", func() {
 	})
 
 	Describe("GetSpaceSecurityGroups", func() {
-		Context("when the space exists", func() {
+		When("the space exists", func() {
 			BeforeEach(func() {
 				response1 := `{
 					"next_url": "/v2/spaces/some-space-guid/security_groups?q=some-query:some-value&page=2",
@@ -400,7 +400,7 @@ var _ = Describe("Security Groups", func() {
 			})
 		})
 
-		Context("when the client returns an error", func() {
+		When("the client returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 						"code": 40004,
@@ -427,7 +427,7 @@ var _ = Describe("Security Groups", func() {
 	})
 
 	Describe("GetSpaceStagingSecurityGroups", func() {
-		Context("when the space exists", func() {
+		When("the space exists", func() {
 			BeforeEach(func() {
 				response1 := `{
 					"next_url": "/v2/spaces/some-space-guid/staging_security_groups?q=some-query:some-value&page=2",
@@ -589,7 +589,7 @@ var _ = Describe("Security Groups", func() {
 			})
 		})
 
-		Context("when the client returns an error", func() {
+		When("the client returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 						"code": 40004,
@@ -616,7 +616,7 @@ var _ = Describe("Security Groups", func() {
 	})
 
 	Describe("UpdateSecurityGroupSpace", func() {
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				response := `{}`
 				server.AppendHandlers(
@@ -634,7 +634,7 @@ var _ = Describe("Security Groups", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
   "code": 10001,
@@ -665,7 +665,7 @@ var _ = Describe("Security Groups", func() {
 	})
 
 	Describe("UpdateSecurityGroupStagingSpace", func() {
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				response := `{}`
 				server.AppendHandlers(
@@ -683,7 +683,7 @@ var _ = Describe("Security Groups", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
   "code": 10001,

@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("add-plugin-repo command", func() {
 	Describe("help", func() {
-		Context("when --help flag is provided", func() {
+		When("--help flag is provided", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("add-plugin-repo", "--help", "-k")
 
@@ -34,8 +34,8 @@ var _ = Describe("add-plugin-repo command", func() {
 		})
 	})
 
-	Context("when the command line arguments are invalid", func() {
-		Context("when no arguments are provided", func() {
+	When("the command line arguments are invalid", func() {
+		When("no arguments are provided", func() {
 			It("fails with incorrect usage message and displays help", func() {
 				session := helpers.CF("add-plugin-repo", "-k")
 
@@ -45,7 +45,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			})
 		})
 
-		Context("when only one argument is provided", func() {
+		When("only one argument is provided", func() {
 			It("fails with incorrect usage message and displays help", func() {
 				session := helpers.CF("add-plugin-repo", "repo-name", "-k")
 
@@ -56,7 +56,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		})
 	})
 
-	Context("when the user provides a url without a protocol scheme", func() {
+	When("the user provides a url without a protocol scheme", func() {
 		It("defaults to 'https://'", func() {
 			session := helpers.CF("add-plugin-repo", "some-repo", "example.com/repo", "-k")
 
@@ -65,7 +65,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		})
 	})
 
-	Context("when the provided URL is a valid plugin repository", func() {
+	When("the provided URL is a valid plugin repository", func() {
 		var (
 			server     *Server
 			serverURL  string
@@ -91,7 +91,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		Context("when the repo URL is already in use", func() {
+		When("the repo URL is already in use", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("add-plugin-repo", "repo1", serverURL, "-k")).Should(Exit(0))
 			})
@@ -104,12 +104,12 @@ var _ = Describe("add-plugin-repo command", func() {
 			})
 		})
 
-		Context("when the repo name is already in use", func() {
+		When("the repo name is already in use", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("add-plugin-repo", "repo1", serverURL, "-k")).Should(Exit(0))
 			})
 
-			Context("when the repo name is different only in case sensitivity", func() {
+			When("the repo name is different only in case sensitivity", func() {
 				It("succeeds and exists 0", func() {
 					session := helpers.CF("add-plugin-repo", "rEPo1", serverURL, "-k")
 
@@ -118,7 +118,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				})
 			})
 
-			Context("when the URL is different", func() {
+			When("the URL is different", func() {
 				It("errors and says the repo name is taken", func() {
 					session := helpers.CF("add-plugin-repo", "repo1", "some-other-url", "-k")
 
@@ -127,7 +127,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				})
 			})
 
-			Context("when the URL is the same", func() {
+			When("the URL is the same", func() {
 				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "repo1", serverURL, "-k")
 
@@ -136,7 +136,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				})
 			})
 
-			Context("when the URL is the same except for a trailing '/'", func() {
+			When("the URL is the same except for a trailing '/'", func() {
 				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "repo1", fmt.Sprintf("%s/", serverURL), "-k")
 
@@ -146,7 +146,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			})
 		})
 
-		Context("when the repo URL contains a path", func() {
+		When("the repo URL contains a path", func() {
 			BeforeEach(func() {
 				jsonBytes, err := json.Marshal(pluginRepo)
 				Expect(err).ToNot(HaveOccurred())
@@ -160,7 +160,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				)
 			})
 
-			Context("when the repo URL ends with /list", func() {
+			When("the repo URL ends with /list", func() {
 				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "some-repo", fmt.Sprintf("%s/some-path/list", serverURL), "-k")
 
@@ -169,7 +169,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				})
 			})
 
-			Context("when the repo URL does not end with /list", func() {
+			When("the repo URL does not end with /list", func() {
 				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "some-repo", fmt.Sprintf("%s/some-path", serverURL), "-k")
 
@@ -178,7 +178,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				})
 			})
 
-			Context("when the repo URL ends with trailing /", func() {
+			When("the repo URL ends with trailing /", func() {
 				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "some-repo", fmt.Sprintf("%s/some-path/", serverURL), "-k")
 
@@ -189,7 +189,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		})
 	})
 
-	Context("when the provided URL is NOT a valid plugin repository", func() {
+	When("the provided URL is NOT a valid plugin repository", func() {
 		var server *Server
 
 		BeforeEach(func() {
@@ -202,7 +202,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			server.Close()
 		})
 
-		Context("when the protocol is unsupported", func() {
+		When("the protocol is unsupported", func() {
 			It("reports an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", "ftp://example.com/repo", "-k")
 
@@ -212,7 +212,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			})
 		})
 
-		Context("when the domain cannot be reached", func() {
+		When("the domain cannot be reached", func() {
 			It("reports an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", "cfpluginrepothatdoesnotexist.cf-app.com", "-k")
 
@@ -222,7 +222,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			})
 		})
 
-		Context("when the path cannot be found", func() {
+		When("the path cannot be found", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					RespondWith(http.StatusNotFound, "foobar"),
@@ -240,7 +240,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			})
 		})
 
-		Context("when the response is not parseable", func() {
+		When("the response is not parseable", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(RespondWith(http.StatusOK, `{"plugins":[}`))
 			})

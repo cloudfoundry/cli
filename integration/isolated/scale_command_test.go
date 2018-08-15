@@ -22,7 +22,7 @@ var _ = XDescribe("scale command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("scale", "--help")
 
@@ -41,13 +41,13 @@ var _ = XDescribe("scale command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "scale", "app-name")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -59,7 +59,7 @@ var _ = XDescribe("scale command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app name is not provided", func() {
+		When("the app name is not provided", func() {
 			It("tells the user that the app name is required, prints help text, and exits 1", func() {
 				session := helpers.CF("scale")
 
@@ -69,7 +69,7 @@ var _ = XDescribe("scale command", func() {
 			})
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("tells the user that the app is not found and exits 1", func() {
 				session := helpers.CF("scale", appName)
 
@@ -79,7 +79,7 @@ var _ = XDescribe("scale command", func() {
 			})
 		})
 
-		Context("when the app does exist", func() {
+		When("the app does exist", func() {
 			var (
 				domainName string
 			)
@@ -96,8 +96,8 @@ var _ = XDescribe("scale command", func() {
 				Eventually(helpers.CF("delete", appName, "-f", "-r")).Should(Exit(0))
 			})
 
-			Context("when scaling number of instances", func() {
-				Context("when the wrong data type is provided to -i", func() {
+			When("scaling number of instances", func() {
+				When("the wrong data type is provided to -i", func() {
 					It("outputs an error message to the user, provides help text, and exits 1", func() {
 						session := helpers.CF("scale", appName, "-i", "not-an-integer")
 						Eventually(session.Err).Should(Say("Incorrect Usage: invalid argument for flag `-i' \\(expected int\\)"))
@@ -106,7 +106,7 @@ var _ = XDescribe("scale command", func() {
 					})
 				})
 
-				Context("when correct data is provided to -i", func() {
+				When("correct data is provided to -i", func() {
 					It("scales application to specified number of instances", func() {
 						session := helpers.CF("scale", appName, "-i", "2")
 						Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)) // help
@@ -116,8 +116,8 @@ var _ = XDescribe("scale command", func() {
 				})
 			})
 
-			Context("when scaling memory", func() {
-				Context("when the wrong data type is provided to -m", func() {
+			When("scaling memory", func() {
+				When("the wrong data type is provided to -m", func() {
 					It("outputs an error message to the user, provides help text, and exits 1", func() {
 						session := helpers.CF("scale", appName, "-m", "not-a-memory")
 						Eventually(session.Err).Should(Say("Incorrect Usage: invalid argument for flag `-m`"))
@@ -126,15 +126,15 @@ var _ = XDescribe("scale command", func() {
 					})
 				})
 
-				Context("when correct data is provided to -m", func() {
-					Context("when -f flag is not provided", func() {
+				When("correct data is provided to -m", func() {
+					When("-f flag is not provided", func() {
 						var buffer *Buffer
 
 						BeforeEach(func() {
 							buffer = NewBuffer()
 						})
 
-						Context("when user enters y", func() {
+						When("user enters y", func() {
 							It("scales application to specified memory with restart", func() {
 								buffer.Write([]byte("y\n"))
 								session := helpers.CFWithStdin(buffer, "scale", appName, "-m", "256M")
@@ -160,7 +160,7 @@ var _ = XDescribe("scale command", func() {
 							})
 						})
 
-						Context("when user enters n", func() {
+						When("user enters n", func() {
 							It("does not scale the app", func() {
 								buffer.Write([]byte("n\n"))
 								session := helpers.CFWithStdin(buffer, "scale", appName, "-m", "256M")
@@ -174,7 +174,7 @@ var _ = XDescribe("scale command", func() {
 						})
 					})
 
-					Context("when -f flag provided", func() {
+					When("-f flag provided", func() {
 						It("scales without prompt", func() {
 							session := helpers.CF("scale", appName, "-m", "256M", "-f")
 							Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
@@ -184,8 +184,8 @@ var _ = XDescribe("scale command", func() {
 				})
 			})
 
-			Context("when scaling disk", func() {
-				Context("when the wrong data type is provided to -k", func() {
+			When("scaling disk", func() {
+				When("the wrong data type is provided to -k", func() {
 					It("outputs an error message to the user, provides help text, and exits 1", func() {
 						session := helpers.CF("scale", appName, "-k", "not-a-disk")
 						Eventually(session.Err).Should(Say("Incorrect Usage: invalid argument for flag `-k`"))
@@ -217,7 +217,7 @@ var _ = XDescribe("scale command", func() {
 				})
 			})
 
-			Context("when scaling all of them", func() {
+			When("scaling all of them", func() {
 				It("scales application to specified number of instances, memory and disk with restart", func() {
 					session := helpers.CF("scale", appName, "-i", "2", "-m", "256M", "-k", "512M", "-f")
 					Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
@@ -242,7 +242,7 @@ var _ = XDescribe("scale command", func() {
 				})
 			})
 
-			Context("when scaling argument is not provided", func() {
+			When("scaling argument is not provided", func() {
 				It("outputs current scaling information", func() {
 					session := helpers.CF("scale", appName)
 					Eventually(session).Should(Say("Showing current scale of app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))

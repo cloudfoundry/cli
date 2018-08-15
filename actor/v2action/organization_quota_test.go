@@ -24,7 +24,7 @@ var _ = Describe("OrganizationQuota Actions", func() {
 	})
 
 	Describe("GetOrganizationQuota", func() {
-		Context("when the org quota exists", func() {
+		When("the org quota exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotaReturns(
 					ccv2.OrganizationQuota{
@@ -51,7 +51,7 @@ var _ = Describe("OrganizationQuota Actions", func() {
 			})
 		})
 
-		Context("when the org quota does not exist", func() {
+		When("the org quota does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationQuotaReturns(ccv2.OrganizationQuota{}, nil, ccerror.ResourceNotFoundError{})
 			})
@@ -62,7 +62,7 @@ var _ = Describe("OrganizationQuota Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

@@ -22,7 +22,7 @@ var _ = Describe("Relationship", func() {
 
 	Describe("Relationship", func() {
 		Describe("MarshalJSON", func() {
-			Context("when the isolation segment is specified by name", func() {
+			When("the isolation segment is specified by name", func() {
 				It("contains the name in the marshaled JSON", func() {
 					body, err := json.Marshal(Relationship{GUID: "some-iso-guid"})
 					expectedJSON := `{
@@ -36,7 +36,7 @@ var _ = Describe("Relationship", func() {
 				})
 			})
 
-			Context("when the isolation segment is the empty string", func() {
+			When("the isolation segment is the empty string", func() {
 				It("contains null in the marshaled JSON", func() {
 					body, err := json.Marshal(Relationship{GUID: ""})
 					expectedJSON := `{
@@ -51,7 +51,7 @@ var _ = Describe("Relationship", func() {
 	})
 
 	Describe("UpdateSpaceIsolationSegmentRelationship", func() {
-		Context("when the assignment is successful", func() {
+		When("the assignment is successful", func() {
 			BeforeEach(func() {
 				response := `{
 					"data": {
@@ -100,7 +100,7 @@ var _ = Describe("Relationship", func() {
 			warnings, executeErr = client.DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID, spaceGUID)
 		})
 
-		Context("when no errors occur deleting the shared space relationship", func() {
+		When("no errors occur deleting the shared space relationship", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -116,7 +116,7 @@ var _ = Describe("Relationship", func() {
 			})
 		})
 
-		Context("when an error occurs deleting the shared space relationship", func() {
+		When("an error occurs deleting the shared space relationship", func() {
 			BeforeEach(func() {
 				response := `{
 						"errors": [
@@ -162,7 +162,7 @@ var _ = Describe("Relationship", func() {
 	})
 
 	Describe("GetOrganizationDefaultIsolationSegment", func() {
-		Context("when getting the isolation segment is successful", func() {
+		When("getting the isolation segment is successful", func() {
 			BeforeEach(func() {
 				response := `{
 					"data": {
@@ -188,7 +188,7 @@ var _ = Describe("Relationship", func() {
 			})
 		})
 
-		Context("when getting the isolation segment fails with an error", func() {
+		When("getting the isolation segment fails with an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -218,7 +218,7 @@ var _ = Describe("Relationship", func() {
 	})
 
 	Describe("GetSpaceIsolationSegment", func() {
-		Context("when getting the isolation segment is successful", func() {
+		When("getting the isolation segment is successful", func() {
 			BeforeEach(func() {
 				response := `{
 					"data": {
@@ -246,7 +246,7 @@ var _ = Describe("Relationship", func() {
 	})
 
 	Describe("UpdateOrganizationDefaultIsolationSegmentRelationship", func() {
-		Context("when patching the default organization isolation segment with non-empty isolation segment guid", func() {
+		When("patching the default organization isolation segment with non-empty isolation segment guid", func() {
 			BeforeEach(func() {
 				expectedBody := `{
 					"data": {
@@ -276,7 +276,7 @@ var _ = Describe("Relationship", func() {
 			})
 		})
 
-		Context("when patching the default organization isolation segment with empty isolation segment guid", func() {
+		When("patching the default organization isolation segment with empty isolation segment guid", func() {
 			BeforeEach(func() {
 				expectedBody := `{
 					"data": null
@@ -301,7 +301,7 @@ var _ = Describe("Relationship", func() {
 			})
 		})
 
-		Context("when patching the isolation segment fails with an error", func() {
+		When("patching the isolation segment fails with an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -333,7 +333,7 @@ var _ = Describe("Relationship", func() {
 	})
 
 	Describe("DeleteIsolationSegmentOrganization", func() {
-		Context("when relationship exists", func() {
+		When("relationship exists", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -352,7 +352,7 @@ var _ = Describe("Relationship", func() {
 			})
 		})
 
-		Context("when an error occurs", func() {
+		When("an error occurs", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -439,7 +439,7 @@ var _ = Describe("Relationship", func() {
 			})
 		})
 
-		Context("when the CC returns an error", func() {
+		When("the CC returns an error", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [

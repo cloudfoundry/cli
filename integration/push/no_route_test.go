@@ -20,8 +20,8 @@ var _ = Describe("no-route property", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when pushing with a manifest", func() {
-		Context("when pushing a new app", func() {
+	When("pushing with a manifest", func() {
+		When("pushing a new app", func() {
 			It("does not create any routes", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -46,7 +46,7 @@ var _ = Describe("no-route property", func() {
 			})
 		})
 
-		Context("when the app already exists", func() {
+		When("the app already exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
@@ -102,8 +102,8 @@ var _ = Describe("no-route property", func() {
 		})
 	})
 
-	Context("when pushing with no manifest", func() {
-		Context("when pushing a new app", func() {
+	When("pushing with no manifest", func() {
+		When("pushing a new app", func() {
 			It("does not create any routes", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-route", "--no-start")
@@ -119,7 +119,7 @@ var _ = Describe("no-route property", func() {
 			})
 		})
 
-		Context("when the app already exists", func() {
+		When("the app already exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
@@ -144,7 +144,7 @@ var _ = Describe("no-route property", func() {
 		})
 	})
 
-	Context("when pushing with flags and manifest", func() {
+	When("pushing with flags and manifest", func() {
 		It("does not create the routes", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{

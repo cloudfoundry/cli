@@ -40,8 +40,8 @@ var _ = Describe("app summary displayer", func() {
 			appSummaryDisplayer.AppDisplay(summary, displayStartCommand)
 		})
 
-		Context("when the app has instances", func() {
-			Context("when the process instances are running", func() {
+		When("the app has instances", func() {
+			When("the process instances are running", func() {
 				var uptime time.Duration
 
 				BeforeEach(func() {
@@ -146,7 +146,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 			})
 
-			Context("when only one process instance is running", func() {
+			When("only one process instance is running", func() {
 				BeforeEach(func() {
 					summary = v2v3action.ApplicationSummary{
 						ApplicationSummary: v3action.ApplicationSummary{
@@ -193,7 +193,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 			})
 
-			Context("when all the instances in all processes are down", func() {
+			When("all the instances in all processes are down", func() {
 				BeforeEach(func() {
 					summary = v2v3action.ApplicationSummary{
 						ApplicationSummary: v3action.ApplicationSummary{
@@ -269,7 +269,7 @@ var _ = Describe("app summary displayer", func() {
 					}
 				})
 
-				Context("when displayStartCommand is true", func() {
+				When("displayStartCommand is true", func() {
 					BeforeEach(func() {
 						displayStartCommand = true
 					})
@@ -286,7 +286,7 @@ var _ = Describe("app summary displayer", func() {
 					})
 				})
 
-				Context("when displayStartCommand is false", func() {
+				When("displayStartCommand is false", func() {
 					BeforeEach(func() {
 						displayStartCommand = false
 					})
@@ -298,7 +298,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 		})
 
-		Context("when the app has no instances", func() {
+		When("the app has no instances", func() {
 			BeforeEach(func() {
 				summary = v2v3action.ApplicationSummary{
 					ApplicationSummary: v3action.ApplicationSummary{
@@ -343,7 +343,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 		})
 
-		Context("when the app is stopped", func() {
+		When("the app is stopped", func() {
 			BeforeEach(func() {
 				summary = v2v3action.ApplicationSummary{
 					ApplicationSummary: v3action.ApplicationSummary{
@@ -381,7 +381,7 @@ var _ = Describe("app summary displayer", func() {
 		})
 
 		Describe("isolation segments", func() {
-			Context("when the isolation segment name is provided", func() {
+			When("the isolation segment name is provided", func() {
 				var isolationSegmentName string
 				BeforeEach(func() {
 					isolationSegmentName = "potato beans"
@@ -396,7 +396,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 			})
 
-			Context("when the application summary has no isolation segment information", func() {
+			When("the application summary has no isolation segment information", func() {
 				BeforeEach(func() {
 					summary = v2v3action.ApplicationSummary{
 						ApplicationSummary: v3action.ApplicationSummary{
@@ -415,7 +415,7 @@ var _ = Describe("app summary displayer", func() {
 		})
 
 		Describe("last upload time", func() {
-			Context("when the application has a last uploaded time", func() {
+			When("the application has a last uploaded time", func() {
 				var createdTime string
 
 				BeforeEach(func() {
@@ -432,7 +432,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 			})
 
-			Context("when the application does not have a last uploaded time", func() {
+			When("the application does not have a last uploaded time", func() {
 				BeforeEach(func() {
 					summary.CurrentDroplet.CreatedAt = ""
 				})
@@ -443,7 +443,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 		})
 
-		Context("when the application has routes", func() {
+		When("the application has routes", func() {
 			BeforeEach(func() {
 				summary.Routes = []v2action.Route{
 					{Host: "route1", Domain: v2action.Domain{Name: "example.com"}},
@@ -456,7 +456,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 		})
 
-		Context("when the application has a stack", func() {
+		When("the application has a stack", func() {
 			BeforeEach(func() {
 				summary.CurrentDroplet.Stack = "some-stack"
 			})
@@ -466,7 +466,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 		})
 
-		Context("when the application is a docker app", func() {
+		When("the application is a docker app", func() {
 			BeforeEach(func() {
 				summary = v2v3action.ApplicationSummary{
 					ApplicationSummary: v3action.ApplicationSummary{
@@ -492,7 +492,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 		})
 
-		Context("when the application is a buildpack app", func() {
+		When("the application is a buildpack app", func() {
 			BeforeEach(func() {
 				summary = v2v3action.ApplicationSummary{
 					ApplicationSummary: v3action.ApplicationSummary{

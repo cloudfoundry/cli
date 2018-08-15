@@ -42,7 +42,7 @@ var _ = Describe("Relationship List Actions", func() {
 				[]string{shareToSpaceGUID})
 		})
 
-		Context("when no errors occur sharing the service instance", func() {
+		When("no errors occur sharing the service instance", func() {
 			var returnedRelationshipList ccv3.RelationshipList
 
 			BeforeEach(func() {
@@ -67,7 +67,7 @@ var _ = Describe("Relationship List Actions", func() {
 			})
 		})
 
-		Context("when an error occurs sharing the service instance", func() {
+		When("an error occurs sharing the service instance", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

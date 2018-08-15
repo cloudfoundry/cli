@@ -19,7 +19,7 @@ var _ = Describe("network-policies command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("network-policies", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -35,12 +35,12 @@ var _ = Describe("network-policies command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "network-policies")
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -60,7 +60,7 @@ var _ = Describe("network-policies command", func() {
 		})
 	})
 
-	Context("when the org and space are properly targetted", func() {
+	When("the org and space are properly targetted", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -86,7 +86,7 @@ var _ = Describe("network-policies command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when policies exists", func() {
+		When("policies exists", func() {
 			It("lists all the policies", func() {
 				session := helpers.CF("network-policies")
 
@@ -99,7 +99,7 @@ var _ = Describe("network-policies command", func() {
 			})
 		})
 
-		Context("when policies are filtered by a source app", func() {
+		When("policies are filtered by a source app", func() {
 			var srcAppName string
 			BeforeEach(func() {
 				srcAppName = helpers.PrefixedRandomName("app")
@@ -123,7 +123,7 @@ var _ = Describe("network-policies command", func() {
 			})
 		})
 
-		Context("when policies are filtered by a non-existent source app", func() {
+		When("policies are filtered by a non-existent source app", func() {
 			It("returns an error", func() {
 				session := helpers.CF("network-policies", "--source", "pineapple")
 

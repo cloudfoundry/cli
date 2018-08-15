@@ -55,7 +55,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when an error is encountered checking if the environment is setup correctly", func() {
+	When("an error is encountered checking if the environment is setup correctly", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -69,8 +69,8 @@ var _ = Describe("CreateBuildpackCommand", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
-		Context("when getting the current user fails", func() {
+	When("the user is logged in", func() {
+		When("getting the current user fails", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -84,7 +84,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 			})
 		})
 
-		Context("when getting the current user succeeds", func() {
+		When("getting the current user succeeds", func() {
 			var fakeUser configv3.User
 
 			BeforeEach(func() {
@@ -92,7 +92,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				fakeConfig.CurrentUserReturns(fakeUser, nil)
 			})
 
-			Context("when creating the buildpack fails because a buildpack already exists", func() {
+			When("creating the buildpack fails because a buildpack already exists", func() {
 				BeforeEach(func() {
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackNameTakenError{Name: "bp-name"})
 				})
@@ -105,7 +105,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				})
 			})
 
-			Context("when creating the buildpack fails because a buildpack with the nil stack already exists", func() {
+			When("creating the buildpack fails because a buildpack with the nil stack already exists", func() {
 				BeforeEach(func() {
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: "bp-name"})
 					cmd.RequiredArgs.Buildpack = "bp-name"
@@ -119,7 +119,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				})
 			})
 
-			Context("when creating the buildpack fails with a generic error", func() {
+			When("creating the buildpack fails with a generic error", func() {
 				BeforeEach(func() {
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, errors.New("some-create-bp-error"))
 				})
@@ -130,7 +130,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				})
 			})
 
-			Context("when creating the buildpack succeeds", func() {
+			When("creating the buildpack succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{GUID: "some-guid"}, v2action.Warnings{"some-create-bp-warning"}, nil)
 					BeforeEach(func() {
@@ -148,7 +148,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 						Expect(enabled).To(Equal(true))
 					})
 
-					Context("when preparing the buildpack bits fails", func() {
+					When("preparing the buildpack bits fails", func() {
 						BeforeEach(func() {
 							fakeActor.PrepareBuildpackBitsReturns("some/invalid/path", errors.New("some-prepare-bp-error"))
 						})
@@ -159,7 +159,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 						})
 					})
 
-					Context("when preparing the buildpack bits succeeds", func() {
+					When("preparing the buildpack bits succeeds", func() {
 						BeforeEach(func() {
 							fakeActor.PrepareBuildpackBitsReturns("buildpack.zip", nil)
 						})
@@ -173,7 +173,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 							Expect(path).To(Equal("some-path/to/buildpack.zip"))
 						})
 
-						PContext("when uploading the buildpack fails because a buildpack with that stack already exists", func() {
+						PWhen("uploading the buildpack fails because a buildpack with that stack already exists", func() {
 							BeforeEach(func() {
 								fakeActor.UploadBuildpackReturns(v2action.Warnings{"some-upload-bp-warning"}, actionerror.BuildpackAlreadyExistsForStackError{BuildpackName: "bp-name", StackName: "stack-name"})
 							})
@@ -186,7 +186,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 							})
 						})
 
-						Context("when uploading the buildpack fails with a generic error", func() {
+						When("uploading the buildpack fails with a generic error", func() {
 							BeforeEach(func() {
 								fakeActor.UploadBuildpackReturns(v2action.Warnings{"some-upload-bp-warning"}, errors.New("some-upload-bp-error"))
 							})
@@ -199,7 +199,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 
 						})
 
-						Context("when uploading the buildpack succeeds", func() {
+						When("uploading the buildpack succeeds", func() {
 							BeforeEach(func() {
 								fakeActor.UploadBuildpackReturns(v2action.Warnings{"some-upload-bp-warning"}, nil)
 							})
@@ -220,7 +220,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				})
 			})
 
-			Context("when both --enable and --disable are provided", func() {
+			When("both --enable and --disable are provided", func() {
 				BeforeEach(func() {
 					cmd.Enable = true
 					cmd.Disable = true
@@ -234,7 +234,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				})
 			})
 
-			Context("when --enable is provided", func() {
+			When("--enable is provided", func() {
 				BeforeEach(func() {
 					cmd.Enable = true
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{GUID: "some-guid"}, v2action.Warnings{"some-create-bp-warning"}, nil)
@@ -253,7 +253,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				})
 			})
 
-			Context("when --disable is provided", func() {
+			When("--disable is provided", func() {
 				BeforeEach(func() {
 					cmd.Disable = true
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{GUID: "some-guid"}, v2action.Warnings{"some-create-bp-warning"}, nil)

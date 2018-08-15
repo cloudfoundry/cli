@@ -46,7 +46,7 @@ var _ = Describe("Binding Services", func() {
 			returnedConfig, boundServices, warnings, executeErr = actor.BindServices(config)
 		})
 
-		Context("when binding services is successful", func() {
+		When("binding services is successful", func() {
 			BeforeEach(func() {
 				fakeV2Actor.BindServiceByApplicationAndServiceInstanceReturnsOnCall(0, v2action.Warnings{"service-instance-warning-1"}, nil)
 				fakeV2Actor.BindServiceByApplicationAndServiceInstanceReturnsOnCall(1, v2action.Warnings{"service-instance-warning-2"}, nil)
@@ -76,7 +76,7 @@ var _ = Describe("Binding Services", func() {
 			})
 		})
 
-		Context("when binding services fails", func() {
+		When("binding services fails", func() {
 			BeforeEach(func() {
 				fakeV2Actor.BindServiceByApplicationAndServiceInstanceReturns(v2action.Warnings{"service-instance-warning-1"}, errors.New("some-error"))
 			})

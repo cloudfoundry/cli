@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("feature-flags command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("feature-flags", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -26,7 +26,7 @@ var _ = Describe("feature-flags command", func() {
 		})
 	})
 
-	Context("when the API endpoint is not set", func() {
+	When("the API endpoint is not set", func() {
 		BeforeEach(func() {
 			helpers.UnsetAPI()
 		})
@@ -39,7 +39,7 @@ var _ = Describe("feature-flags command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		BeforeEach(func() {
 			helpers.LogoutCF()
 		})
@@ -52,7 +52,7 @@ var _ = Describe("feature-flags command", func() {
 		})
 	})
 
-	Context("when the API endpoint is set and the user is logged in", func() {
+	When("the API endpoint is set and the user is logged in", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})

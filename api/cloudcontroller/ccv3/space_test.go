@@ -31,7 +31,7 @@ var _ = Describe("Spaces", func() {
 			spaces, warnings, executeErr = client.GetSpaces(query)
 		})
 
-		Context("when spaces exist", func() {
+		When("spaces exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
 	"pagination": {
@@ -93,7 +93,7 @@ var _ = Describe("Spaces", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [

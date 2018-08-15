@@ -63,7 +63,7 @@ var _ = Describe("Service Instance Actions", func() {
 			serviceInstance, warnings, executeErr = actor.GetServiceInstance(serviceInstanceGUID)
 		})
 
-		Context("when the service instance exists", func() {
+		When("the service instance exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceReturns(ccv2.ServiceInstance{Name: "some-service-instance", GUID: "service-instance-guid"}, ccv2.Warnings{"service-instance-warnings"}, nil)
 			})
@@ -81,7 +81,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when the service instance does not exist", func() {
+		When("the service instance does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceReturns(ccv2.ServiceInstance{}, ccv2.Warnings{"service-instance-warnings-1"}, ccerror.ResourceNotFoundError{})
 			})
@@ -92,7 +92,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when retrieving the application's bound services returns an error", func() {
+		When("retrieving the application's bound services returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -108,7 +108,7 @@ var _ = Describe("Service Instance Actions", func() {
 	})
 
 	Describe("GetServiceInstanceByNameAndSpace", func() {
-		Context("when the service instance exists", func() {
+		When("the service instance exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
 					[]ccv2.ServiceInstance{
@@ -146,7 +146,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when the service instance does not exists", func() {
+		When("the service instance does not exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceServiceInstancesReturns([]ccv2.ServiceInstance{}, nil, nil)
 			})
@@ -157,7 +157,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var expectedError error
 
 			BeforeEach(func() {
@@ -189,7 +189,7 @@ var _ = Describe("Service Instance Actions", func() {
 			serviceInstances, warnings, executeErr = actor.GetServiceInstancesByApplication(appGUID)
 		})
 
-		Context("when the application has services bound", func() {
+		When("the application has services bound", func() {
 			var serviceBindings []ccv2.ServiceBinding
 
 			BeforeEach(func() {
@@ -202,7 +202,7 @@ var _ = Describe("Service Instance Actions", func() {
 				fakeCloudControllerClient.GetServiceBindingsReturns(serviceBindings, ccv2.Warnings{"service-bindings-warnings-1", "service-bindings-warnings-2"}, nil)
 			})
 
-			Context("when retrieving the service instances is successful", func() {
+			When("retrieving the service instances is successful", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstanceReturnsOnCall(0, ccv2.ServiceInstance{Name: "some-service-instance-1"}, ccv2.Warnings{"service-instance-warnings-1"}, nil)
 					fakeCloudControllerClient.GetServiceInstanceReturnsOnCall(1, ccv2.ServiceInstance{Name: "some-service-instance-2"}, ccv2.Warnings{"service-instance-warnings-2"}, nil)
@@ -225,7 +225,7 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 			})
 
-			Context("when retrieving the service instances returns an error", func() {
+			When("retrieving the service instances returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -240,7 +240,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when the application has no services bound", func() {
+		When("the application has no services bound", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBindingsReturns(nil, ccv2.Warnings{"service-bindings-warnings-1", "service-bindings-warnings-2"}, nil)
 			})
@@ -252,7 +252,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when retrieving the application's bound services returns an error", func() {
+		When("retrieving the application's bound services returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -268,7 +268,7 @@ var _ = Describe("Service Instance Actions", func() {
 	})
 
 	Describe("GetServiceInstancesBySpace", func() {
-		Context("when there are service instances", func() {
+		When("there are service instances", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
 					[]ccv2.ServiceInstance{
@@ -310,7 +310,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var expectedError error
 
 			BeforeEach(func() {

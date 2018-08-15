@@ -18,7 +18,7 @@ var _ = Describe("SpaceRole", func() {
 			forward = SSHPortForwarding{}
 		})
 
-		Context("when passed local_port:remote:remote_port", func() {
+		When("passed local_port:remote:remote_port", func() {
 			It("extracts the local and remote addresses", func() {
 				err := forward.UnmarshalFlag("8888:remote:8080")
 				Expect(err).ToNot(HaveOccurred())
@@ -29,7 +29,7 @@ var _ = Describe("SpaceRole", func() {
 			})
 		})
 
-		Context("when passed local:local_port:remote:remote_port", func() {
+		When("passed local:local_port:remote:remote_port", func() {
 			It("extracts the local and remote addresses", func() {
 				err := forward.UnmarshalFlag("local:8888:remote:8080")
 				Expect(err).ToNot(HaveOccurred())

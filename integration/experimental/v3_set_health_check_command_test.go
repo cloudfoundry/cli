@@ -23,7 +23,7 @@ var _ = Describe("v3-set-health-check command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-set-health-check", "--help")
 
@@ -47,7 +47,7 @@ var _ = Describe("v3-set-health-check command", func() {
 		})
 	})
 
-	Context("when the app name is not provided", func() {
+	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-set-health-check")
 
@@ -57,7 +57,7 @@ var _ = Describe("v3-set-health-check command", func() {
 		})
 	})
 
-	Context("when the health check type is not provided", func() {
+	When("the health check type is not provided", func() {
 		It("tells the user that health check type is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-set-health-check", appName)
 
@@ -73,8 +73,8 @@ var _ = Describe("v3-set-health-check command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -87,7 +87,7 @@ var _ = Describe("v3-set-health-check command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -106,7 +106,7 @@ var _ = Describe("v3-set-health-check command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -125,7 +125,7 @@ var _ = Describe("v3-set-health-check command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -138,7 +138,7 @@ var _ = Describe("v3-set-health-check command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -152,7 +152,7 @@ var _ = Describe("v3-set-health-check command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -168,7 +168,7 @@ var _ = Describe("v3-set-health-check command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -180,14 +180,14 @@ var _ = Describe("v3-set-health-check command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithProcfileApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
 				})
 			})
 
-			Context("when the process type is set", func() {
+			When("the process type is set", func() {
 				It("displays the health check types for each process", func() {
 					session := helpers.CF("v3-set-health-check", appName, "http", "--endpoint", "/healthcheck", "--process", "console")
 					Eventually(session).Should(Say("Updating health check type for app %s process console in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -204,7 +204,7 @@ var _ = Describe("v3-set-health-check command", func() {
 				})
 			})
 
-			Context("when the invocation timeout is set", func() {
+			When("the invocation timeout is set", func() {
 				It("displays the health check types for each process", func() {
 					session := helpers.CF("v3-set-health-check", appName, "http", "--endpoint", "/healthcheck", "--invocation-timeout", "2")
 					Eventually(session).Should(Say("Updating health check type for app %s process web in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -221,7 +221,7 @@ var _ = Describe("v3-set-health-check command", func() {
 
 			})
 
-			Context("when process type and invocation timeout are not set", func() {
+			When("process type and invocation timeout are not set", func() {
 				It("displays the health check types for each process", func() {
 					session := helpers.CF("v3-set-health-check", appName, "http", "--endpoint", "/healthcheck")
 					Eventually(session).Should(Say("Updating health check type for app %s process web in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -238,7 +238,7 @@ var _ = Describe("v3-set-health-check command", func() {
 				})
 			})
 
-			Context("when the process type does not exist", func() {
+			When("the process type does not exist", func() {
 				BeforeEach(func() {
 					helpers.WithProcfileApp(func(appDir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
@@ -254,7 +254,7 @@ var _ = Describe("v3-set-health-check command", func() {
 				})
 			})
 
-			Context("when health check type is not 'http' and endpoint is set", func() {
+			When("health check type is not 'http' and endpoint is set", func() {
 				It("returns an error", func() {
 					session := helpers.CF("v3-set-health-check", appName, "port", "--endpoint", "oh-no", "--process", "console")
 					Eventually(session.Out).Should(Say("Updating health check type for app %s process console in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -264,7 +264,7 @@ var _ = Describe("v3-set-health-check command", func() {
 				})
 			})
 
-			Context("when the invocation timeout is less than one", func() {
+			When("the invocation timeout is less than one", func() {
 				It("returns an error", func() {
 					session := helpers.CF("v3-set-health-check", appName, "port", "--invocation-timeout", "0", "--process", "console")
 					Eventually(session.Err).Should(Say("Value must be greater than or equal to 1."))
@@ -273,7 +273,7 @@ var _ = Describe("v3-set-health-check command", func() {
 			})
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("displays app not found and exits 1", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("v3-set-health-check", invalidAppName, "port")

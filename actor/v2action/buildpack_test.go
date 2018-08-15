@@ -67,7 +67,7 @@ var _ = Describe("Buildpack", func() {
 			buildpack, warnings, executeErr = actor.CreateBuildpack("some-bp-name", 42, true)
 		})
 
-		Context("when creating the buildpack is successful", func() {
+		When("creating the buildpack is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateBuildpackReturns(ccv2.Buildpack{GUID: "some-guid"}, ccv2.Warnings{"some-create-warning"}, nil)
 			})
@@ -86,7 +86,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the buildpack already exists with nil stack", func() {
+		When("the buildpack already exists with nil stack", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-create-warning"}, ccerror.BuildpackAlreadyExistsWithoutStackError{Message: ""})
 			})
@@ -97,7 +97,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the buildpack name is taken", func() {
+		When("the buildpack name is taken", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-create-warning"}, ccerror.BuildpackNameTakenError{Message: ""})
 			})
@@ -108,7 +108,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when a cc create error occurs", func() {
+		When("a cc create error occurs", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-create-warning"}, errors.New("kaboom"))
 			})
@@ -131,8 +131,8 @@ var _ = Describe("Buildpack", func() {
 			buildpack, warnings, executeErr = actor.GetBuildpackByName("some-bp-name")
 		})
 
-		Context("when one buildpack with the same name exists", func() {
-			Context("when the buildpack also has no stack", func() {
+		When("one buildpack with the same name exists", func() {
+			When("the buildpack also has no stack", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{
 						{
@@ -155,7 +155,7 @@ var _ = Describe("Buildpack", func() {
 				})
 			})
 
-			Context("when the buildpack has a stack", func() {
+			When("the buildpack has a stack", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{
 						{
@@ -180,7 +180,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the client returns an empty set of buildpacks", func() {
+		When("the client returns an empty set of buildpacks", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, nil)
 			})
@@ -192,8 +192,8 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the client returns more than one buildpack", func() {
-			Context("when one of the buildpacks has no stack", func() {
+		When("the client returns more than one buildpack", func() {
+			When("one of the buildpacks has no stack", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{
 						{
@@ -245,7 +245,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the client errors", func() {
+		When("the client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, ccerror.APINotFoundError{})
 			})
@@ -269,7 +269,7 @@ var _ = Describe("Buildpack", func() {
 			buildpack, warnings, executeErr = actor.GetBuildpackByNameAndStack("some-bp-name", "some-stack-name")
 		})
 
-		Context("when the client returns a buildpack with the same name and stack", func() {
+		When("the client returns a buildpack with the same name and stack", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{
 					{
@@ -293,7 +293,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the client returns an empty set of buildpacks", func() {
+		When("the client returns an empty set of buildpacks", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, nil)
 			})
@@ -305,7 +305,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the client returns more than one buildpack", func() {
+		When("the client returns more than one buildpack", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{
 					{
@@ -328,7 +328,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the client errors", func() {
+		When("the client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, ccerror.APINotFoundError{})
 			})
@@ -359,7 +359,7 @@ var _ = Describe("Buildpack", func() {
 			outPath, executeErr = actor.PrepareBuildpackBits(inPath, tmpDirPath, fakeDownloader)
 		})
 
-		Context("when the buildpack path is a url", func() {
+		When("the buildpack path is a url", func() {
 			BeforeEach(func() {
 				inPath = "http://buildpacks.com/a.zip"
 				fakeDownloader = new(v2actionfakes.FakeDownloader)
@@ -373,7 +373,7 @@ var _ = Describe("Buildpack", func() {
 				Expect(os.RemoveAll(tmpDirPath)).ToNot(HaveOccurred())
 			})
 
-			Context("when downloading the file succeeds", func() {
+			When("downloading the file succeeds", func() {
 				BeforeEach(func() {
 					fakeDownloader.DownloadReturns("/tmp/buildpackdir-100/a.zip", nil)
 				})
@@ -388,7 +388,7 @@ var _ = Describe("Buildpack", func() {
 				})
 			})
 
-			Context("when downloading the file fails", func() {
+			When("downloading the file fails", func() {
 				BeforeEach(func() {
 					fakeDownloader.DownloadReturns("", errors.New("some-download-error"))
 				})
@@ -399,7 +399,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the buildpack path points to a directory", func() {
+		When("the buildpack path points to a directory", func() {
 			BeforeEach(func() {
 				var err error
 				inPath, err = ioutil.TempDir("", "buildpackdir-")
@@ -422,7 +422,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the buildpack path points to a zip file", func() {
+		When("the buildpack path points to a zip file", func() {
 			BeforeEach(func() {
 				inPath = "/foo/buildpacks/a.zip"
 			})
@@ -453,7 +453,7 @@ var _ = Describe("Buildpack", func() {
 			warnings, executeErr = actor.RenameBuildpack(oldName, newName, stackName)
 		})
 
-		Context("when the lookup succeeds", func() {
+		When("the lookup succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{
 					{},
@@ -462,7 +462,7 @@ var _ = Describe("Buildpack", func() {
 					nil)
 			})
 
-			Context("when the update succeeds", func() {
+			When("the update succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{},
 						ccv2.Warnings{"warning-3", "warning-4"},
@@ -474,7 +474,7 @@ var _ = Describe("Buildpack", func() {
 				})
 			})
 
-			Context("when the update errors", func() {
+			When("the update errors", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{},
 						ccv2.Warnings{"warning-3", "warning-4"},
@@ -488,7 +488,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the lookup errors", func() {
+		When("the lookup errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetBuildpacksReturns(nil,
 					ccv2.Warnings{"warning-1", "warning-2"},
@@ -518,7 +518,7 @@ var _ = Describe("Buildpack", func() {
 			updatedBuildpack, warnings, executeErr = actor.UpdateBuildpack(buildpack)
 		})
 
-		Context("when there are no errors", func() {
+		When("there are no errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{
 					Name:  "some-bp-name",
@@ -536,8 +536,8 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the client errors", func() {
-			Context("when the buildpack is not found", func() {
+		When("the client errors", func() {
+			When("the buildpack is not found", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, ccerror.ResourceNotFoundError{})
 				})
@@ -549,7 +549,7 @@ var _ = Describe("Buildpack", func() {
 				})
 			})
 
-			Context("when the buildpack already exists without a stack association", func() {
+			When("the buildpack already exists without a stack association", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, ccerror.BuildpackAlreadyExistsWithoutStackError{})
 				})
@@ -561,7 +561,7 @@ var _ = Describe("Buildpack", func() {
 				})
 			})
 
-			Context("when the buildpack already exists with a stack association", func() {
+			When("the buildpack already exists with a stack association", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, ccerror.BuildpackAlreadyExistsForStackError{})
 				})
@@ -573,7 +573,7 @@ var _ = Describe("Buildpack", func() {
 				})
 			})
 
-			Context("when the client returns a generic error", func() {
+			When("the client returns a generic error", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, errors.New("some-error"))
 				})
@@ -615,7 +615,7 @@ var _ = Describe("Buildpack", func() {
 			Expect(fakePb.TerminateCallCount()).To(Equal(1))
 		})
 
-		Context("when the upload errors", func() {
+		When("the upload errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-upload-warning"}, errors.New("some-upload-error"))
 			})
@@ -626,7 +626,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the cc returns an error because the buildpack and stack combo already exists", func() {
+		When("the cc returns an error because the buildpack and stack combo already exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-upload-warning"}, ccerror.BuildpackAlreadyExistsForStackError{Message: "cc error message ignored"})
 			})
@@ -637,7 +637,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the upload is successful", func() {
+		When("the upload is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-create-warning"}, nil)
 			})
@@ -668,7 +668,7 @@ var _ = Describe("Buildpack", func() {
 			executeErr = Zipit(source, target, "testzip-")
 		})
 
-		Context("when the source directory does not exist", func() {
+		When("the source directory does not exist", func() {
 			BeforeEach(func() {
 				source = ""
 				target = ""

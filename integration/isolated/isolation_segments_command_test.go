@@ -16,7 +16,7 @@ var _ = Describe("isolation-segments command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("isolation-segments", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -30,12 +30,12 @@ var _ = Describe("isolation-segments command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "isolation-segments")
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -54,7 +54,7 @@ var _ = Describe("isolation-segments command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -74,12 +74,12 @@ var _ = Describe("isolation-segments command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})
 
-		Context("when there are some isolation segments", func() {
+		When("there are some isolation segments", func() {
 			var isolationSegment1 string // No orgs assigned
 			var isolationSegment2 string // One org assigned
 			var isolationSegment3 string // Many orgs assigned

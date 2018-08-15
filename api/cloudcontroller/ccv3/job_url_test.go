@@ -28,7 +28,7 @@ var _ = Describe("Job URL", func() {
 			jobLocation, warnings, executeErr = client.DeleteApplication("some-app-guid")
 		})
 
-		Context("when the application is deleted successfully", func() {
+		When("the application is deleted successfully", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -50,7 +50,7 @@ var _ = Describe("Job URL", func() {
 			})
 		})
 
-		Context("when deleting the application returns an error", func() {
+		When("deleting the application returns an error", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [
@@ -111,7 +111,7 @@ var _ = Describe("Job URL", func() {
 			)
 		})
 
-		Context("when the manifest application is successful", func() {
+		When("the manifest application is successful", func() {
 			var expectedJobURL string
 
 			BeforeEach(func() {
@@ -139,7 +139,7 @@ var _ = Describe("Job URL", func() {
 			})
 		})
 
-		Context("when the manifest application fails", func() {
+		When("the manifest application fails", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [

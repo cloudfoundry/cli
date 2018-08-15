@@ -20,7 +20,7 @@ var _ = Describe("create-isolation-segment command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("create-isolation-segment", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -36,12 +36,12 @@ var _ = Describe("create-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "create-isolation-segment", "isolation-seg-name")
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -60,7 +60,7 @@ var _ = Describe("create-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -80,12 +80,12 @@ var _ = Describe("create-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})
 
-		Context("when the isolation segment does not exist", func() {
+		When("the isolation segment does not exist", func() {
 			It("creates the isolation segment", func() {
 				session := helpers.CF("create-isolation-segment", isolationSegmentName)
 				userName, _ := helpers.GetCredentials()
@@ -95,7 +95,7 @@ var _ = Describe("create-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the isolation segment already exists", func() {
+		When("the isolation segment already exists", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 			})

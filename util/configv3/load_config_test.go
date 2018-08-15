@@ -24,7 +24,7 @@ var _ = Describe("Config", func() {
 	})
 
 	Describe("LoadConfig", func() {
-		Context("when there isn't a config set", func() {
+		When("there isn't a config set", func() {
 			var (
 				oldLang  string
 				oldLCAll string
@@ -87,7 +87,7 @@ var _ = Describe("Config", func() {
 			})
 		})
 
-		Context("when there is a config set", func() {
+		When("there is a config set", func() {
 			var (
 				config *Config
 				err    error
@@ -228,7 +228,7 @@ var _ = Describe("Config", func() {
 				})
 			})
 
-			Context("when UAAOAuthClient is not present", func() {
+			When("UAAOAuthClient is not present", func() {
 				BeforeEach(func() {
 					setConfig(homeDir, `{}`)
 
@@ -245,7 +245,7 @@ var _ = Describe("Config", func() {
 				})
 			})
 
-			Context("when UAAOAuthClient is empty", func() {
+			When("UAAOAuthClient is empty", func() {
 				BeforeEach(func() {
 					rawConfig := `
 					{

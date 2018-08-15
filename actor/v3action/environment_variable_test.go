@@ -34,7 +34,7 @@ var _ = Describe("Environment Variable Actions", func() {
 			fetchedEnvVariables, warnings, executeErr = actor.GetEnvironmentVariablesByApplicationNameAndSpace(appName, spaceGUID)
 		})
 
-		Context("when finding the app fails", func() {
+		When("finding the app fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(nil, ccv3.Warnings{"get-application-warning"}, errors.New("get-application-error"))
 			})
@@ -45,12 +45,12 @@ var _ = Describe("Environment Variable Actions", func() {
 			})
 		})
 
-		Context("when finding the app succeeds", func() {
+		When("finding the app succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", GUID: "some-app-guid"}}, ccv3.Warnings{"get-application-warning"}, nil)
 			})
 
-			Context("when getting the app environment variables fails", func() {
+			When("getting the app environment variables fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationEnvironmentReturns(ccv3.Environment{}, ccv3.Warnings{"some-env-var-warnings"}, errors.New("some-env-var-error"))
 				})
@@ -60,7 +60,7 @@ var _ = Describe("Environment Variable Actions", func() {
 				})
 			})
 
-			Context("when getting the app environment variables succeeds", func() {
+			When("getting the app environment variables succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationEnvironmentReturns(
 						ccv3.Environment{
@@ -121,7 +121,7 @@ var _ = Describe("Environment Variable Actions", func() {
 			warnings, executeErr = actor.SetEnvironmentVariableByApplicationNameAndSpace(appName, spaceGUID, envPair)
 		})
 
-		Context("when finding the app fails", func() {
+		When("finding the app fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(nil, ccv3.Warnings{"get-application-warning"}, errors.New("get-application-error"))
 			})
@@ -132,12 +132,12 @@ var _ = Describe("Environment Variable Actions", func() {
 			})
 		})
 
-		Context("when finding the app succeeds", func() {
+		When("finding the app succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", GUID: "some-app-guid"}}, ccv3.Warnings{"get-application-warning"}, nil)
 			})
 
-			Context("when updating the app environment variables fails", func() {
+			When("updating the app environment variables fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(ccv3.EnvironmentVariables{}, ccv3.Warnings{"some-env-var-warnings"}, errors.New("some-env-var-error"))
 				})
@@ -147,7 +147,7 @@ var _ = Describe("Environment Variable Actions", func() {
 				})
 			})
 
-			Context("when updating the app environment variables succeeds", func() {
+			When("updating the app environment variables succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(
 						ccv3.EnvironmentVariables{
@@ -201,7 +201,7 @@ var _ = Describe("Environment Variable Actions", func() {
 			warnings, executeErr = actor.UnsetEnvironmentVariableByApplicationNameAndSpace(appName, spaceGUID, envVariableName)
 		})
 
-		Context("when finding the app fails", func() {
+		When("finding the app fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(nil, ccv3.Warnings{"get-application-warning"}, errors.New("get-application-error"))
 			})
@@ -212,12 +212,12 @@ var _ = Describe("Environment Variable Actions", func() {
 			})
 		})
 
-		Context("when finding the app succeeds", func() {
+		When("finding the app succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", GUID: "some-app-guid"}}, ccv3.Warnings{"get-application-warning"}, nil)
 			})
 
-			Context("when getting the app environment variables fails", func() {
+			When("getting the app environment variables fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationEnvironmentReturns(ccv3.Environment{}, ccv3.Warnings{"some-get-env-var-warnings"}, errors.New("some-env-var-error"))
 				})
@@ -227,7 +227,7 @@ var _ = Describe("Environment Variable Actions", func() {
 				})
 			})
 
-			Context("when the variable doesn't exists", func() {
+			When("the variable doesn't exists", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationEnvironmentReturns(
 						ccv3.Environment{},
@@ -241,7 +241,7 @@ var _ = Describe("Environment Variable Actions", func() {
 				})
 			})
 
-			Context("when the variable exists", func() {
+			When("the variable exists", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationEnvironmentReturns(
 						ccv3.Environment{
@@ -251,7 +251,7 @@ var _ = Describe("Environment Variable Actions", func() {
 						nil,
 					)
 				})
-				Context("when updating the app environment variables fails", func() {
+				When("updating the app environment variables fails", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(ccv3.EnvironmentVariables{}, ccv3.Warnings{"some-patch-env-var-warnings"}, errors.New("some-env-var-error"))
 					})
@@ -261,7 +261,7 @@ var _ = Describe("Environment Variable Actions", func() {
 					})
 				})
 
-				Context("when updating the app environment variables succeeds", func() {
+				When("updating the app environment variables succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(
 							ccv3.EnvironmentVariables{

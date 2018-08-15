@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("MinimumAPIVersionNotMetError", func() {
 	Describe("Error", func() {
-		Context("when the Command field is not empty and CurrentVersion is not empty", func() {
+		When("the Command field is not empty and CurrentVersion is not empty", func() {
 			It("returns a template with the values of the Command and CurrentVersion fields", func() {
 				err := MinimumAPIVersionNotMetError{
 					Command:        "--some-flag",
@@ -20,7 +20,7 @@ var _ = Describe("MinimumAPIVersionNotMetError", func() {
 			})
 		})
 
-		Context("when the Command field is not empty and CurrentVersion is empty", func() {
+		When("the Command field is not empty and CurrentVersion is empty", func() {
 			It("returns a template with the value of the Command field", func() {
 				err := MinimumAPIVersionNotMetError{
 					Command: "--some-flag",
@@ -30,7 +30,7 @@ var _ = Describe("MinimumAPIVersionNotMetError", func() {
 			})
 		})
 
-		Context("when the Command field is empty and CurrentVersion is not empty", func() {
+		When("the Command field is empty and CurrentVersion is not empty", func() {
 			It("returns a template with the value of the CurrentVersion field", func() {
 				err := MinimumAPIVersionNotMetError{
 					CurrentVersion: "1.2.3",
@@ -40,7 +40,7 @@ var _ = Describe("MinimumAPIVersionNotMetError", func() {
 			})
 		})
 
-		Context("when the Command field is empty and CurrentVersion is empty", func() {
+		When("the Command field is empty and CurrentVersion is empty", func() {
 			It("returns a template without Command or CurrentVersion values", func() {
 				err := MinimumAPIVersionNotMetError{}
 

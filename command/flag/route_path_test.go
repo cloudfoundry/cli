@@ -14,7 +14,7 @@ var _ = Describe("RoutePath", func() {
 			routePath = RoutePath{}
 		})
 
-		Context("when passed a path beginning with a slash", func() {
+		When("passed a path beginning with a slash", func() {
 			It("sets the path", func() {
 				err := routePath.UnmarshalFlag("/banana")
 				Expect(err).ToNot(HaveOccurred())
@@ -22,7 +22,7 @@ var _ = Describe("RoutePath", func() {
 			})
 		})
 
-		Context("when passed a path that doesn't begin with a slash", func() {
+		When("passed a path that doesn't begin with a slash", func() {
 			It("prepends the path with a slash and sets it", func() {
 				err := routePath.UnmarshalFlag("banana")
 				Expect(err).ToNot(HaveOccurred())

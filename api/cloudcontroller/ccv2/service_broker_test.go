@@ -33,7 +33,7 @@ var _ = Describe("Service Broker", func() {
 			})
 		})
 
-		Context("when the cc returns back service brokers", func() {
+		When("the cc returns back service brokers", func() {
 			BeforeEach(func() {
 				response1 := `{
 				"next_url": "/v2/service_brokers?q=name:some-name&page=2",
@@ -103,7 +103,7 @@ var _ = Describe("Service Broker", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"description": "The broker is broken.",

@@ -44,7 +44,7 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when no positional arguments are provided", func() {
+	When("no positional arguments are provided", func() {
 		Context("and no env variables are provided", func() {
 			It("errors-out with the help information", func() {
 				session := helpers.CF("auth")
@@ -55,7 +55,7 @@ var _ = Describe("auth command", func() {
 			})
 		})
 
-		Context("when env variables are provided", func() {
+		When("env variables are provided", func() {
 			It("authenticates the user", func() {
 				username, password := helpers.GetCredentials()
 				env := map[string]string{
@@ -74,7 +74,7 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when only a username is provided", func() {
+	When("only a username is provided", func() {
 		It("errors-out with a password required error and the help information", func() {
 			session := helpers.CF("auth", "some-user")
 			Eventually(session.Err).Should(Say("Password not provided."))
@@ -84,7 +84,7 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when only a password is provided", func() {
+	When("only a password is provided", func() {
 		It("errors-out with a username required error and the help information", func() {
 			env := map[string]string{
 				"CF_PASSWORD": "some-pass",
@@ -97,7 +97,7 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when too many arguments are provided", func() {
+	When("too many arguments are provided", func() {
 		It("displays an 'unknown flag' error message", func() {
 			session := helpers.CF("auth", "some-username", "some-password", "-a", "api.bosh-lite.com")
 
@@ -108,7 +108,7 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when --client-credentials and --origin are set", func() {
+	When("--client-credentials and --origin are set", func() {
 		It("displays the appropriate error message", func() {
 			session := helpers.CF("auth", "some-username", "some-password", "--client-credentials", "sumcredz", "--origin", "garbaje")
 
@@ -116,7 +116,7 @@ var _ = Describe("auth command", func() {
 			Eventually(session).Should(Exit(1))
 		})
 	})
-	Context("when the API endpoint is not set", func() {
+	When("the API endpoint is not set", func() {
 		BeforeEach(func() {
 			helpers.UnsetAPI()
 		})
@@ -131,8 +131,8 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when no flags are set (logging in with password grant type)", func() {
-		Context("when the user provides an invalid username/password combo", func() {
+	When("no flags are set (logging in with password grant type)", func() {
+		When("the user provides an invalid username/password combo", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
 				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
@@ -161,7 +161,7 @@ var _ = Describe("auth command", func() {
 			})
 		})
 
-		Context("when the username and password are valid", func() {
+		When("the username and password are valid", func() {
 			It("authenticates the user", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("auth", username, password)
@@ -176,8 +176,8 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when the 'client-credentials' flag is set", func() {
-		Context("when the user provides an invalid client id/secret combo", func() {
+	When("the 'client-credentials' flag is set", func() {
+		When("the user provides an invalid client id/secret combo", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
 				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
@@ -206,7 +206,7 @@ var _ = Describe("auth command", func() {
 			})
 		})
 
-		Context("when the client id and client secret are valid", func() {
+		When("the client id and client secret are valid", func() {
 			It("authenticates the user", func() {
 				clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
 				session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
@@ -221,14 +221,14 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when a user authenticates with valid client credentials", func() {
+	When("a user authenticates with valid client credentials", func() {
 		BeforeEach(func() {
 			clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
 			session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
 			Eventually(session).Should(Exit(0))
 		})
 
-		Context("when a different user authenticates with valid password credentials", func() {
+		When("a different user authenticates with valid password credentials", func() {
 			It("should fail authentication and display an error informing the user they need to log out", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("auth", username, password)
@@ -241,8 +241,8 @@ var _ = Describe("auth command", func() {
 
 	})
 
-	Context("when the origin flag is set", func() {
-		Context("when a user authenticates with valid user credentials for that origin", func() {
+	When("the origin flag is set", func() {
+		When("a user authenticates with valid user credentials for that origin", func() {
 			It("authenticates the user", func() {
 				username, password := helpers.GetOIDCCredentials()
 				session := helpers.CF("auth", username, password, "--origin", "cli-oidc-provider")
@@ -255,7 +255,7 @@ var _ = Describe("auth command", func() {
 			})
 		})
 
-		Context("when the user provides the default origin and valid credentials", func() {
+		When("the user provides the default origin and valid credentials", func() {
 			It("authenticates the user", func() {
 				username, password := helpers.GetCredentials()
 				session := helpers.CF("auth", username, password, "--origin", "uaa")

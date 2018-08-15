@@ -52,7 +52,7 @@ var _ = Describe("terminate-task Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the task id argument is not an integer", func() {
+	When("the task id argument is not an integer", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.SequenceID = "not-an-integer"
 		})
@@ -65,7 +65,7 @@ var _ = Describe("terminate-task Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -80,7 +80,7 @@ var _ = Describe("terminate-task Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, and a space and org are targeted", func() {
+	When("the user is logged in, and a space and org are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -94,7 +94,7 @@ var _ = Describe("terminate-task Command", func() {
 			})
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -109,14 +109,14 @@ var _ = Describe("terminate-task Command", func() {
 			})
 		})
 
-		Context("when getting the current user does not return an error", func() {
+		When("getting the current user does not return an error", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})
 
-			Context("when provided a valid application name and task sequence ID", func() {
+			When("provided a valid application name and task sequence ID", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v3action.Application{GUID: "some-app-guid"},
@@ -157,8 +157,8 @@ var _ = Describe("terminate-task Command", func() {
 				})
 			})
 
-			Context("when there are errors", func() {
-				Context("when the error is translatable", func() {
+			When("there are errors", func() {
+				When("the error is translatable", func() {
 					var (
 						returnedErr error
 						expectedErr error
@@ -169,7 +169,7 @@ var _ = Describe("terminate-task Command", func() {
 						returnedErr = ccerror.RequestError{Err: expectedErr}
 					})
 
-					Context("when getting the app returns the error", func() {
+					When("getting the app returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
 								v3action.Application{GUID: "some-app-guid"},
@@ -182,7 +182,7 @@ var _ = Describe("terminate-task Command", func() {
 						})
 					})
 
-					Context("when getting the task returns the error", func() {
+					When("getting the task returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
 								v3action.Application{GUID: "some-app-guid"},
@@ -199,7 +199,7 @@ var _ = Describe("terminate-task Command", func() {
 						})
 					})
 
-					Context("when terminating the task returns the error", func() {
+					When("terminating the task returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
 								v3action.Application{GUID: "some-app-guid"},
@@ -221,14 +221,14 @@ var _ = Describe("terminate-task Command", func() {
 					})
 				})
 
-				Context("when the error is not translatable", func() {
+				When("the error is not translatable", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
 						expectedErr = errors.New("bananapants")
 					})
 
-					Context("when getting the app returns the error", func() {
+					When("getting the app returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
 								v3action.Application{GUID: "some-app-guid"},
@@ -244,7 +244,7 @@ var _ = Describe("terminate-task Command", func() {
 						})
 					})
 
-					Context("when getting the task returns the error", func() {
+					When("getting the task returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
 								v3action.Application{GUID: "some-app-guid"},
@@ -264,7 +264,7 @@ var _ = Describe("terminate-task Command", func() {
 						})
 					})
 
-					Context("when terminating the task returns the error", func() {
+					When("terminating the task returns the error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
 								v3action.Application{GUID: "some-app-guid"},

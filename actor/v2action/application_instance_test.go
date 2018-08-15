@@ -81,7 +81,7 @@ var _ = Describe("Application Instance Actions", func() {
 	})
 
 	Describe("GetApplicationInstancesByApplication", func() {
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationApplicationInstancesReturns(
 					map[int]ccv2.ApplicationInstance{
@@ -115,7 +115,7 @@ var _ = Describe("Application Instance Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -132,7 +132,7 @@ var _ = Describe("Application Instance Actions", func() {
 				Expect(warnings).To(ConsistOf("instances-warning"))
 			})
 
-			Context("when the application does not exist", func() {
+			When("the application does not exist", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationApplicationInstancesReturns(
 						nil,
@@ -146,8 +146,8 @@ var _ = Describe("Application Instance Actions", func() {
 				})
 			})
 
-			Context("when the app has not been staged yet", func() {
-				Context("when getting instances returns a CF-NotStaged error", func() {
+			When("the app has not been staged yet", func() {
+				When("getting instances returns a CF-NotStaged error", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationApplicationInstancesReturns(
 							nil,
@@ -162,7 +162,7 @@ var _ = Describe("Application Instance Actions", func() {
 				})
 			})
 
-			Context("when getting instances returns a CF-InstancesError", func() {
+			When("getting instances returns a CF-InstancesError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationApplicationInstancesReturns(
 						nil,

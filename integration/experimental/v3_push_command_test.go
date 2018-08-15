@@ -37,7 +37,7 @@ var _ = Describe("v3-push command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-push", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -61,7 +61,7 @@ var _ = Describe("v3-push command", func() {
 		})
 	})
 
-	Context("when the app name is not provided", func() {
+	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-push")
 
@@ -77,7 +77,7 @@ var _ = Describe("v3-push command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when the -b flag is not given an arg", func() {
+	When("the -b flag is not given an arg", func() {
 		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-push", appName, "-b")
 
@@ -87,7 +87,7 @@ var _ = Describe("v3-push command", func() {
 		})
 	})
 
-	Context("when the -p flag is not given an arg", func() {
+	When("the -p flag is not given an arg", func() {
 		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-push", appName, "-p")
 
@@ -97,7 +97,7 @@ var _ = Describe("v3-push command", func() {
 		})
 	})
 
-	Context("when the -p flag path does not exist", func() {
+	When("the -p flag path does not exist", func() {
 		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-push", appName, "-p", "path/that/does/not/exist")
 
@@ -107,8 +107,8 @@ var _ = Describe("v3-push command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -121,7 +121,7 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -140,7 +140,7 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -159,7 +159,7 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -172,7 +172,7 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -186,7 +186,7 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -202,7 +202,7 @@ var _ = Describe("v3-push command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var domainName string
 
 		BeforeEach(func() {
@@ -214,7 +214,7 @@ var _ = Describe("v3-push command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			var session *Session
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
@@ -267,7 +267,7 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when the app does not already exist", func() {
+		When("the app does not already exist", func() {
 			var session *Session
 
 			BeforeEach(func() {
@@ -313,7 +313,7 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when the app crashes", func() {
+		When("the app crashes", func() {
 			var session *Session
 
 			BeforeEach(func() {
@@ -359,9 +359,9 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when the -p flag is provided", func() {
-			Context("when the path is a directory", func() {
-				Context("when the directory contains files", func() {
+		When("the -p flag is provided", func() {
+			When("the path is a directory", func() {
+				When("the directory contains files", func() {
 					It("pushes the app from the directory", func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
 							session := helpers.CF("v3-push", appName, "-p", appDir)
@@ -387,7 +387,7 @@ var _ = Describe("v3-push command", func() {
 					})
 				})
 
-				Context("when the directory is empty", func() {
+				When("the directory is empty", func() {
 					var emptyDir string
 
 					BeforeEach(func() {
@@ -408,7 +408,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when the path is a zip file", func() {
+			When("the path is a zip file", func() {
 				Context("pushing a zip file", func() {
 					var archive string
 
@@ -452,7 +452,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when the path is a symlink to a directory", func() {
+			When("the path is a symlink to a directory", func() {
 				var symlinkPath string
 
 				BeforeEach(func() {
@@ -495,7 +495,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when the path is a symlink to a zip file", func() {
+			When("the path is a symlink to a zip file", func() {
 				var (
 					archive     string
 					symlinkPath string
@@ -550,7 +550,7 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when the --no-route flag is set", func() {
+		When("the --no-route flag is set", func() {
 			var session *Session
 
 			BeforeEach(func() {
@@ -576,10 +576,10 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when the -b flag is set", func() {
+		When("the -b flag is set", func() {
 			var session *Session
 
-			Context("when pushing a multi-buildpack app", func() {
+			When("pushing a multi-buildpack app", func() {
 				BeforeEach(func() {
 					helpers.WithMultiBuildpackApp(func(appDir string) {
 						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "ruby_buildpack", "-b", "go_buildpack")
@@ -599,7 +599,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when resetting the buildpack to default", func() {
+			When("resetting the buildpack to default", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "java_buildpack")).Should(Exit(1))
@@ -615,7 +615,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when omitting the buildpack", func() {
+			When("omitting the buildpack", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "java_buildpack")).Should(Exit(1))
@@ -629,7 +629,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when the buildpack is invalid", func() {
+			When("the buildpack is invalid", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "wut")
@@ -644,7 +644,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when the buildpack is valid", func() {
+			When("the buildpack is valid", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "https://github.com/cloudfoundry/staticfile-buildpack")
@@ -670,8 +670,8 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when the -o flag is set", func() {
-			Context("when the docker image is valid", func() {
+		When("the -o flag is set", func() {
+			When("the docker image is valid", func() {
 				It("uses the specified docker image", func() {
 					session := helpers.CF("v3-push", appName, "-o", PublicDockerImage)
 
@@ -691,7 +691,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when the docker image is invalid", func() {
+			When("the docker image is invalid", func() {
 				It("displays an error and exits 1", func() {
 					session := helpers.CF("v3-push", appName, "-o", "some-invalid-docker-image")
 					Eventually(session).Should(Say("FAILED"))
@@ -700,7 +700,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when a docker username and password are provided with a private image", func() {
+			When("a docker username and password are provided with a private image", func() {
 				var (
 					privateDockerImage    string
 					privateDockerUsername string
@@ -743,7 +743,7 @@ var _ = Describe("v3-push command", func() {
 		})
 
 		Describe("argument combination errors", func() {
-			Context("when the --docker-username is provided without the -o flag", func() {
+			When("the --docker-username is provided without the -o flag", func() {
 				It("displays an error and exits 1", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session := helpers.CF("v3-push", appName, "--docker-username", "some-username")
@@ -755,7 +755,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when the --docker-username and -p flags are provided together", func() {
+			When("the --docker-username and -p flags are provided together", func() {
 				It("displays an error and exits 1", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session := helpers.CF("v3-push", appName, "--docker-username", "some-username", "-p", appDir)
@@ -767,7 +767,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when the --docker-username is provided without a password", func() {
+			When("the --docker-username is provided without a password", func() {
 				var oldPassword string
 
 				BeforeEach(func() {
@@ -791,7 +791,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when the -o and -p flags are provided together", func() {
+			When("the -o and -p flags are provided together", func() {
 				It("displays an error and exits 1", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session := helpers.CF("v3-push", appName, "-o", PublicDockerImage, "-p", appDir)
@@ -803,7 +803,7 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 
-			Context("when the -o and -b flags are provided together", func() {
+			When("the -o and -b flags are provided together", func() {
 				It("displays an error and exits 1", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session := helpers.CF("v3-push", appName, "-o", PublicDockerImage, "-b", "some-buildpack")

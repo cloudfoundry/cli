@@ -61,7 +61,7 @@ var _ = Describe("Service Binding Actions", func() {
 			warnings, executeErr = actor.BindServiceByApplicationAndServiceInstance(applicationGUID, serviceInstanceGUID)
 		})
 
-		Context("when the binding is successful", func() {
+		When("the binding is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateServiceBindingReturns(ccv2.ServiceBinding{}, ccv2.Warnings{"some-warnings"}, nil)
 			})
@@ -80,7 +80,7 @@ var _ = Describe("Service Binding Actions", func() {
 			})
 		})
 
-		Context("when the binding fails", func() {
+		When("the binding fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateServiceBindingReturns(ccv2.ServiceBinding{}, ccv2.Warnings{"some-warnings"}, errors.New("some-error"))
 			})
@@ -103,7 +103,7 @@ var _ = Describe("Service Binding Actions", func() {
 			serviceBinding, warnings, executeErr = actor.BindServiceBySpace("some-app-name", "some-service-instance-name", "some-space-guid", "some-binding-name", map[string]interface{}{"some-parameter": "some-value"})
 		})
 
-		Context("when getting the application errors", func() {
+		When("getting the application errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					nil,
@@ -118,7 +118,7 @@ var _ = Describe("Service Binding Actions", func() {
 			})
 		})
 
-		Context("when getting the application succeeds", func() {
+		When("getting the application succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv2.Application{{GUID: "some-app-guid"}},
@@ -127,7 +127,7 @@ var _ = Describe("Service Binding Actions", func() {
 				)
 			})
 
-			Context("when getting the service instance errors", func() {
+			When("getting the service instance errors", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
 						[]ccv2.ServiceInstance{},
@@ -142,7 +142,7 @@ var _ = Describe("Service Binding Actions", func() {
 				})
 			})
 
-			Context("when getting the service instance succeeds", func() {
+			When("getting the service instance succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
 						[]ccv2.ServiceInstance{{GUID: "some-service-instance-guid"}},
@@ -151,7 +151,7 @@ var _ = Describe("Service Binding Actions", func() {
 					)
 				})
 
-				Context("when getting binding the service instance to the application errors", func() {
+				When("getting binding the service instance to the application errors", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.CreateServiceBindingReturns(
 							ccv2.ServiceBinding{},
@@ -166,7 +166,7 @@ var _ = Describe("Service Binding Actions", func() {
 					})
 				})
 
-				Context("when getting binding the service instance to the application succeeds", func() {
+				When("getting binding the service instance to the application succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.CreateServiceBindingReturns(
 							ccv2.ServiceBinding{GUID: "some-service-binding-guid"},
@@ -198,7 +198,7 @@ var _ = Describe("Service Binding Actions", func() {
 	})
 
 	Describe("GetServiceBindingByApplicationAndServiceInstance", func() {
-		Context("when the service binding exists", func() {
+		When("the service binding exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBindingsReturns(
 					[]ccv2.ServiceBinding{
@@ -235,7 +235,7 @@ var _ = Describe("Service Binding Actions", func() {
 			})
 		})
 
-		Context("when the service binding does not exists", func() {
+		When("the service binding does not exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBindingsReturns([]ccv2.ServiceBinding{}, nil, nil)
 			})
@@ -249,7 +249,7 @@ var _ = Describe("Service Binding Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var expectedError error
 
 			BeforeEach(func() {
@@ -275,7 +275,7 @@ var _ = Describe("Service Binding Actions", func() {
 			serviceBinding, warnings, executeErr = actor.UnbindServiceBySpace("some-app", "some-service-instance", "some-space-guid")
 		})
 
-		Context("when the service binding exists", func() {
+		When("the service binding exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv2.Application{
@@ -325,7 +325,7 @@ var _ = Describe("Service Binding Actions", func() {
 				Expect(acceptsIncomplete).To(BeFalse())
 			})
 
-			Context("when the cloud controller API returns warnings and an error", func() {
+			When("the cloud controller API returns warnings and an error", func() {
 				var expectedError error
 
 				BeforeEach(func() {
@@ -352,7 +352,7 @@ var _ = Describe("Service Binding Actions", func() {
 			serviceBindings, serviceBindingsWarnings, serviceBindingsErr = actor.GetServiceBindingsByServiceInstance("some-service-instance-guid")
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstanceServiceBindingsReturns(
 					[]ccv2.ServiceBinding{
@@ -377,7 +377,7 @@ var _ = Describe("Service Binding Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -410,7 +410,7 @@ var _ = Describe("Service Binding Actions", func() {
 			serviceBindings, serviceBindingsWarnings, serviceBindingsErr = actor.GetServiceBindingsByUserProvidedServiceInstance("some-user-provided-service-instance-guid")
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsReturns(
 					[]ccv2.ServiceBinding{
@@ -435,7 +435,7 @@ var _ = Describe("Service Binding Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

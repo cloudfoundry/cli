@@ -42,8 +42,8 @@ var _ = Describe("Service Instance Actions", func() {
 			serviceInstance, warnings, executionError = actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, sourceSpaceGUID)
 		})
 
-		Context("when the cloud controller request is successful", func() {
-			Context("when the cloud controller returns one service instance", func() {
+		When("the cloud controller request is successful", func() {
+			When("the cloud controller returns one service instance", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstancesReturns([]ccv3.ServiceInstance{
 						{
@@ -66,7 +66,7 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 			})
 
-			Context("when the cloud controller returns no service instances", func() {
+			When("the cloud controller returns no service instances", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceInstancesReturns(
 						nil,
@@ -82,7 +82,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller returns an error", func() {
+		When("the cloud controller returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstancesReturns(
 					nil,
@@ -115,7 +115,7 @@ var _ = Describe("Service Instance Actions", func() {
 			warnings, executeErr = actor.UnshareServiceInstanceByServiceInstanceAndSpace(serviceInstanceGUID, sharedToSpaceGUID)
 		})
 
-		Context("when no errors occur deleting the service instance share relationship", func() {
+		When("no errors occur deleting the service instance share relationship", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.DeleteServiceInstanceRelationshipsSharedSpaceReturns(
 					ccv3.Warnings{"delete-share-relationship-warning"},
@@ -133,7 +133,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when an error occurs deleting the service instance share relationship", func() {
+		When("an error occurs deleting the service instance share relationship", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

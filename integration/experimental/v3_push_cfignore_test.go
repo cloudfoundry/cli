@@ -31,8 +31,8 @@ var _ = Describe("v3-push with .cfignore", func() {
 		helpers.QuickDeleteOrg(orgName)
 	})
 
-	Context("when .cfignore file exists", func() {
-		Context("when the .cfignore file doesn't exclude any files", func() {
+	When(".cfignore file exists", func() {
+		When("the .cfignore file doesn't exclude any files", func() {
 			It("pushes all the files except .cfignore", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					file1 := filepath.Join(appDir, "file1")
@@ -83,8 +83,8 @@ var _ = Describe("v3-push with .cfignore", func() {
 			})
 		})
 
-		Context("when the .cfignore file excludes some files", func() {
-			Context("when pushing from the current directory", func() {
+		When("the .cfignore file excludes some files", func() {
+			When("pushing from the current directory", func() {
 				It("does not push those files", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						file1 := filepath.Join(appDir, "file1")
@@ -107,7 +107,7 @@ var _ = Describe("v3-push with .cfignore", func() {
 				})
 			})
 
-			Context("when pushing from a different directory", func() {
+			When("pushing from a different directory", func() {
 				It("does not push those files", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						file1 := filepath.Join(appDir, "file1")
@@ -130,7 +130,7 @@ var _ = Describe("v3-push with .cfignore", func() {
 				})
 			})
 
-			Context("when pushing a zip file", func() {
+			When("pushing a zip file", func() {
 				var archive string
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
@@ -169,7 +169,7 @@ var _ = Describe("v3-push with .cfignore", func() {
 			})
 		})
 
-		Context("when the CF_TRACE file is in the app source directory", func() {
+		When("the CF_TRACE file is in the app source directory", func() {
 			var previousEnv string
 
 			AfterEach(func() {
@@ -195,7 +195,7 @@ var _ = Describe("v3-push with .cfignore", func() {
 		})
 	})
 
-	Context("when .cfignore file does not exists", func() {
+	When(".cfignore file does not exists", func() {
 		It("pushes all the files except for the files ignored by default", func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
 				file1 := filepath.Join(appDir, "file1")

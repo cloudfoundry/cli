@@ -24,7 +24,7 @@ var _ = Describe("SpaceQuota Actions", func() {
 	})
 
 	Describe("GetSpaceQuota", func() {
-		Context("when the space quota exists", func() {
+		When("the space quota exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceQuotaDefinitionReturns(
 					ccv2.SpaceQuota{
@@ -51,7 +51,7 @@ var _ = Describe("SpaceQuota Actions", func() {
 			})
 		})
 
-		Context("when the space quota does not exist", func() {
+		When("the space quota does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceQuotaDefinitionReturns(ccv2.SpaceQuota{}, nil, ccerror.ResourceNotFoundError{})
 			})
@@ -62,7 +62,7 @@ var _ = Describe("SpaceQuota Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

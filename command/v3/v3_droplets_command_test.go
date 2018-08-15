@@ -66,7 +66,7 @@ var _ = Describe("v3-droplets Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -83,7 +83,7 @@ var _ = Describe("v3-droplets Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -98,7 +98,7 @@ var _ = Describe("v3-droplets Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -111,7 +111,7 @@ var _ = Describe("v3-droplets Command", func() {
 		})
 	})
 
-	Context("when getting the application droplets returns an error", func() {
+	When("getting the application droplets returns an error", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -129,7 +129,7 @@ var _ = Describe("v3-droplets Command", func() {
 		})
 	})
 
-	Context("when getting the application droplets returns some droplets", func() {
+	When("getting the application droplets returns some droplets", func() {
 		var createdAtOne, createdAtTwo string
 		BeforeEach(func() {
 			createdAtOne = "2017-08-14T21:16:42Z"
@@ -174,7 +174,7 @@ var _ = Describe("v3-droplets Command", func() {
 		})
 	})
 
-	Context("when getting the application droplets returns no droplets", func() {
+	When("getting the application droplets returns no droplets", func() {
 		BeforeEach(func() {
 			fakeActor.GetApplicationDropletsReturns([]v3action.Droplet{}, v3action.Warnings{"warning-1", "warning-2"}, nil)
 		})

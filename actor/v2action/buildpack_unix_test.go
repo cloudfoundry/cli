@@ -29,7 +29,7 @@ var _ = Describe("Buildpack", func() {
 			executeErr = Zipit(source, target, "testzip-")
 		})
 
-		Context("when the source directory exists", func() {
+		When("the source directory exists", func() {
 			var subDir string
 
 			BeforeEach(func() {

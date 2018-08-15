@@ -64,7 +64,7 @@ var _ = Describe("v3-ssh Command", func() {
 			executeErr = cmd.Execute(nil)
 		})
 
-		Context("when the API version is below the minimum", func() {
+		When("the API version is below the minimum", func() {
 			BeforeEach(func() {
 				fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 			})
@@ -81,7 +81,7 @@ var _ = Describe("v3-ssh Command", func() {
 			})
 		})
 
-		Context("when checking target fails", func() {
+		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: "steve"})
 			})
@@ -96,12 +96,12 @@ var _ = Describe("v3-ssh Command", func() {
 			})
 		})
 
-		Context("when the user is targeted to an organization and space", func() {
+		When("the user is targeted to an organization and space", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: "some-space-guid"})
 			})
 
-			Context("when getting the secure shell authentication information succeeds", func() {
+			When("getting the secure shell authentication information succeeds", func() {
 				var sshAuth v3action.SSHAuthentication
 
 				BeforeEach(func() {
@@ -115,7 +115,7 @@ var _ = Describe("v3-ssh Command", func() {
 					fakeActor.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns(sshAuth, v3action.Warnings{"some-warnings"}, nil)
 				})
 
-				Context("when executing the secure shell succeeds", func() {
+				When("executing the secure shell succeeds", func() {
 					BeforeEach(func() {
 						cmd.DisablePseudoTTY = true
 					})
@@ -145,7 +145,7 @@ var _ = Describe("v3-ssh Command", func() {
 						}))
 					})
 
-					Context("when working with local port forwarding", func() {
+					When("working with local port forwarding", func() {
 						BeforeEach(func() {
 							cmd.LocalPortForwardSpecs = []flag.SSHPortForwarding{
 								{LocalAddress: "localhost:8888", RemoteAddress: "remote:4444"},
@@ -177,7 +177,7 @@ var _ = Describe("v3-ssh Command", func() {
 					})
 				})
 
-				Context("when executing the secure shell fails", func() {
+				When("executing the secure shell fails", func() {
 					BeforeEach(func() {
 						cmd.DisablePseudoTTY = true
 
@@ -191,7 +191,7 @@ var _ = Describe("v3-ssh Command", func() {
 				})
 			})
 
-			Context("when getting the secure shell authentication fails", func() {
+			When("getting the secure shell authentication fails", func() {
 				BeforeEach(func() {
 					fakeActor.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns(v3action.SSHAuthentication{}, v3action.Warnings{"some-warnings"}, errors.New("some-error"))
 				})

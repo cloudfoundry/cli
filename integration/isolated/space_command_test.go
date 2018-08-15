@@ -25,7 +25,7 @@ var _ = Describe("space command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("space", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -42,13 +42,13 @@ var _ = Describe("space command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, false, ReadOnlyOrg, "space", "space-name")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 			helpers.SetupCF(orgName, spaceName)
@@ -59,7 +59,7 @@ var _ = Describe("space command", func() {
 			helpers.ClearTarget()
 		})
 
-		Context("when the space does not exist", func() {
+		When("the space does not exist", func() {
 			It("displays not found and exits 1", func() {
 				badSpaceName := fmt.Sprintf("%s-1", spaceName)
 				session := helpers.CF("space", badSpaceName)
@@ -71,8 +71,8 @@ var _ = Describe("space command", func() {
 			})
 		})
 
-		Context("when the space exists", func() {
-			Context("when the --guid flag is used", func() {
+		When("the space exists", func() {
+			When("the --guid flag is used", func() {
 				It("displays the space guid", func() {
 					session := helpers.CF("space", "--guid", spaceName)
 					Eventually(session).Should(Say("[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}"))
@@ -80,7 +80,7 @@ var _ = Describe("space command", func() {
 				})
 			})
 
-			Context("when the --guid flag is not used", func() {
+			When("the --guid flag is not used", func() {
 				var (
 					securityGroup0      helpers.SecurityGroup
 					securityGroup1      helpers.SecurityGroup
@@ -126,7 +126,7 @@ var _ = Describe("space command", func() {
 					Eventually(helpers.CF("bind-security-group", securityGroupName2, orgName, spaceName, "--lifecycle", "staging")).Should(Exit(0))
 				})
 
-				Context("when no flags are used", func() {
+				When("no flags are used", func() {
 					var (
 						appName              string
 						spaceQuotaName       string
@@ -164,7 +164,7 @@ var _ = Describe("space command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 
-					Context("when isolations segments are enabled", func() {
+					When("isolations segments are enabled", func() {
 						BeforeEach(func() {
 							helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
 
@@ -184,7 +184,7 @@ var _ = Describe("space command", func() {
 					})
 				})
 
-				Context("when the space does not have an isolation segment and its org has a default isolation segment", func() {
+				When("the space does not have an isolation segment and its org has a default isolation segment", func() {
 					var orgIsolationSegmentName string
 
 					BeforeEach(func() {
@@ -202,7 +202,7 @@ var _ = Describe("space command", func() {
 					})
 				})
 
-				Context("when the security group rules flag is used", func() {
+				When("the security group rules flag is used", func() {
 					It("displays the space information as well as all security group rules", func() {
 						session := helpers.CF("space", "--security-group-rules", spaceName)
 						userName, _ := helpers.GetCredentials()

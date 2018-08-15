@@ -19,8 +19,8 @@ var _ = Describe("Service Instance", func() {
 	})
 
 	Describe("Bind", func() {
-		Context("when the update is successful", func() {
-			Context("when setting the minimum", func() { // are we **only** encoding the things we want
+		When("the update is successful", func() {
+			When("setting the minimum", func() { // are we **only** encoding the things we want
 				BeforeEach(func() {
 					response := `
 						{
@@ -62,7 +62,7 @@ var _ = Describe("Service Instance", func() {
 			})
 		})
 
-		Context("when the create returns an error", func() {
+		When("the create returns an error", func() {
 			BeforeEach(func() {
 				response := `
 					{
@@ -89,14 +89,14 @@ var _ = Describe("Service Instance", func() {
 
 	Describe("ServiceInstance", func() {
 		Describe("Managed", func() {
-			Context("when type is MANAGED_SERVICE", func() {
+			When("type is MANAGED_SERVICE", func() {
 				It("returns false", func() {
 					service := ServiceInstance{Type: constant.ServiceInstanceTypeManagedService}
 					Expect(service.Managed()).To(BeTrue())
 				})
 			})
 
-			Context("when type is USER_PROVIDED_SERVICE", func() {
+			When("type is USER_PROVIDED_SERVICE", func() {
 				It("returns true", func() {
 					service := ServiceInstance{Type: constant.ServiceInstanceTypeUserProvidedService}
 					Expect(service.Managed()).To(BeFalse())
@@ -105,14 +105,14 @@ var _ = Describe("Service Instance", func() {
 		})
 
 		Describe("UserProvided", func() {
-			Context("when type is USER_PROVIDED_SERVICE", func() {
+			When("type is USER_PROVIDED_SERVICE", func() {
 				It("returns true", func() {
 					service := ServiceInstance{Type: constant.ServiceInstanceTypeUserProvidedService}
 					Expect(service.UserProvided()).To(BeTrue())
 				})
 			})
 
-			Context("when type is MANAGED_SERVICE", func() {
+			When("type is MANAGED_SERVICE", func() {
 				It("returns false", func() {
 					service := ServiceInstance{Type: constant.ServiceInstanceTypeManagedService}
 					Expect(service.UserProvided()).To(BeFalse())
@@ -156,7 +156,7 @@ var _ = Describe("Service Instance", func() {
 			)
 		})
 
-		Context("when service instances exist", func() {
+		When("service instances exist", func() {
 			It("returns the service instance and warnings", func() {
 				serviceInstance, warnings, err := client.GetServiceInstance("some-service-guid")
 				Expect(err).NotTo(HaveOccurred())
@@ -253,7 +253,7 @@ var _ = Describe("Service Instance", func() {
 			)
 		})
 
-		Context("when service instances exist", func() {
+		When("service instances exist", func() {
 			It("returns all the queried service instances", func() {
 				serviceInstances, warnings, err := client.GetServiceInstances(Filter{
 					Type:     constant.SpaceGUIDFilter,
@@ -365,7 +365,7 @@ var _ = Describe("Service Instance", func() {
 				)
 			})
 
-			Context("when service instances exist", func() {
+			When("service instances exist", func() {
 				It("returns all the queried service instances", func() {
 					serviceInstances, warnings, err := client.GetSpaceServiceInstances("some-space-guid", true, Filter{
 						Type:     constant.NameFilter,
@@ -421,7 +421,7 @@ var _ = Describe("Service Instance", func() {
 				)
 			})
 
-			Context("when service instances exist", func() {
+			When("service instances exist", func() {
 				It("returns all the queried service instances", func() {
 					serviceInstances, warnings, err := client.GetSpaceServiceInstances("some-space-guid", false, Filter{
 						Type:     constant.NameFilter,
@@ -455,7 +455,7 @@ var _ = Describe("Service Instance", func() {
 			})
 		})
 
-		Context("when getting user provided service instances errors", func() {
+		When("getting user provided service instances errors", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 1,
@@ -484,7 +484,7 @@ var _ = Describe("Service Instance", func() {
 			})
 		})
 
-		Context("when getting user provided service instances succeeds", func() {
+		When("getting user provided service instances succeeds", func() {
 			BeforeEach(func() {
 				response1 := `{
 				"next_url": "/v2/user_provided_service_instances?q=space_guid:some-space-guid&page=2",

@@ -19,8 +19,8 @@ var _ = Describe("push with different instances values", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when instances flag is provided", func() {
-		Context("when instances flag is greater than 0", func() {
+	When("instances flag is provided", func() {
+		When("instances flag is greater than 0", func() {
 			It("pushes an app with specified number of instances", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					By("pushing an app with 2 instances")
@@ -51,12 +51,12 @@ var _ = Describe("push with different instances values", func() {
 			})
 		})
 
-		Context("when instances flag is set to 0", func() {
+		When("instances flag is set to 0", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionZeroAppInstancesV2)
 			})
 
-			Context("when the API version is above 3.27.0", func() {
+			When("the API version is above 3.27.0", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 				})
@@ -108,8 +108,8 @@ var _ = Describe("push with different instances values", func() {
 		})
 	})
 
-	Context("when instances flag is not provided", func() {
-		Context("when app does not exist", func() {
+	When("instances flag is not provided", func() {
+		When("app does not exist", func() {
 			It("pushes an app with default number of instances", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
@@ -125,7 +125,7 @@ var _ = Describe("push with different instances values", func() {
 			})
 		})
 
-		Context("when app exists with some instances", func() {
+		When("app exists with some instances", func() {
 			It("does not update the number of instances", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					By("pushing an app with 2 instances")

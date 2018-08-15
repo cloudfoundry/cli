@@ -24,7 +24,7 @@ var _ = Describe("Token Actions", func() {
 	})
 
 	Describe("RefreshAccessToken", func() {
-		Context("when an error is encountered refreshing the access token", func() {
+		When("an error is encountered refreshing the access token", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -43,7 +43,7 @@ var _ = Describe("Token Actions", func() {
 			})
 		})
 
-		Context("when no errors are encountered refreshing the access token", func() {
+		When("no errors are encountered refreshing the access token", func() {
 			BeforeEach(func() {
 				fakeUAAClient.RefreshAccessTokenReturns(
 					uaa.RefreshedTokens{

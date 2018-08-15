@@ -41,7 +41,7 @@ var _ = Describe("target command", func() {
 		})
 	})
 
-	Context("when both the access and refresh tokens are invalid", func() {
+	When("both the access and refresh tokens are invalid", func() {
 		BeforeEach(func() {
 			helpers.SetConfig(func(conf *configv3.Config) {
 				conf.SetAccessToken("bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImtleS0xIiwidHlwIjoiSldUIn0.eyJqdGkiOiJlNzQyMjg1NjNjZjc0ZGQ0YTU5YTA1NTUyMWVlYzlhNCIsInN1YiI6IjhkN2IxZjRlLTJhNGQtNGQwNy1hYWE0LTdjOTVlZDFhN2YzNCIsInNjb3BlIjpbInJvdXRpbmcucm91dGVyX2dyb3Vwcy5yZWFkIiwiY2xvdWRfY29udHJvbGxlci5yZWFkIiwicGFzc3dvcmQud3JpdGUiLCJjbG91ZF9jb250cm9sbGVyLndyaXRlIiwib3BlbmlkIiwicm91dGluZy5yb3V0ZXJfZ3JvdXBzLndyaXRlIiwiZG9wcGxlci5maXJlaG9zZSIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiLCJjbG91ZF9jb250cm9sbGVyLmFkbWluIiwidWFhLnVzZXIiXSwiY2xpZW50X2lkIjoiY2YiLCJjaWQiOiJjZiIsImF6cCI6ImNmIiwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9pZCI6IjhkN2IxZjRlLTJhNGQtNGQwNy1hYWE0LTdjOTVlZDFhN2YzNCIsIm9yaWdpbiI6InVhYSIsInVzZXJfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbiIsInJldl9zaWciOiI2ZjZkM2Y1YyIsImlhdCI6MTQ4Njc2NDQxNywiZXhwIjoxNDg2NzY1MDE3LCJpc3MiOiJodHRwczovL3VhYS5ib3NoLWxpdGUuY29tL29hdXRoL3Rva2VuIiwiemlkIjoidWFhIiwiYXVkIjpbImNsb3VkX2NvbnRyb2xsZXIiLCJzY2ltIiwicGFzc3dvcmQiLCJjZiIsInVhYSIsIm9wZW5pZCIsImRvcHBsZXIiLCJyb3V0aW5nLnJvdXRlcl9ncm91cHMiXX0.AhQI_-u9VzkQ1Z7yzibq7dBWbb5ucTDtwaXjeCf4rakl7hJvQYWI1meO9PSUI8oVbArBgOu0aOU6mfzDE8dSyZ1qAD0mhL5_c2iLGXdqUaPlXrX9vxuJZh_8vMTlxAnJ02c6ixbWaPWujvEIuiLb-QWa0NTbR9RDNyw1MbOQkdQ")
@@ -58,8 +58,8 @@ var _ = Describe("target command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -72,7 +72,7 @@ var _ = Describe("target command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			DescribeTable("fails with not logged in message",
 				func(args ...string) {
 					helpers.LogoutCF()
@@ -91,8 +91,8 @@ var _ = Describe("target command", func() {
 		})
 	})
 
-	Context("when no arguments are provided", func() {
-		Context("when *no* org and space are targeted", func() {
+	When("no arguments are provided", func() {
+		When("*no* org and space are targeted", func() {
 			It("displays current target information", func() {
 				username, _ := helpers.GetCredentials()
 				session := helpers.CF("target")
@@ -104,7 +104,7 @@ var _ = Describe("target command", func() {
 			})
 		})
 
-		Context("when targeted to an org and space", func() {
+		When("targeted to an org and space", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
 				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
@@ -123,8 +123,8 @@ var _ = Describe("target command", func() {
 		})
 	})
 
-	Context("when only an org argument is provided", func() {
-		Context("when the org does not exist", func() {
+	When("only an org argument is provided", func() {
+		When("the org does not exist", func() {
 			// We set targets to verify that the target command
 			// preserves existing targets in failure
 			BeforeEach(func() {
@@ -144,7 +144,7 @@ var _ = Describe("target command", func() {
 			})
 		})
 
-		Context("when the org exists", func() {
+		When("the org exists", func() {
 			BeforeEach(func() {
 				helpers.CreateOrg(orgName)
 				helpers.TargetOrg(orgName)
@@ -154,7 +154,7 @@ var _ = Describe("target command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			Context("when there are no spaces in the org", func() {
+			When("there are no spaces in the org", func() {
 				BeforeEach(func() {
 					helpers.ClearTarget()
 				})
@@ -171,7 +171,7 @@ var _ = Describe("target command", func() {
 				})
 			})
 
-			Context("when there is only one space in the org", func() {
+			When("there is only one space in the org", func() {
 				BeforeEach(func() {
 					helpers.CreateSpace(spaceName)
 					helpers.ClearTarget()
@@ -189,7 +189,7 @@ var _ = Describe("target command", func() {
 				})
 			})
 
-			Context("when there are multiple spaces in the org", func() {
+			When("there are multiple spaces in the org", func() {
 				BeforeEach(func() {
 					helpers.CreateSpace(spaceName)
 					helpers.CreateSpace(helpers.NewSpaceName())
@@ -207,7 +207,7 @@ var _ = Describe("target command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when there is an existing targeted space", func() {
+				When("there is an existing targeted space", func() {
 					BeforeEach(func() {
 						session := helpers.CF("target", "-o", orgName, "-s", spaceName)
 						Eventually(session).Should(Exit(0))
@@ -223,14 +223,14 @@ var _ = Describe("target command", func() {
 		})
 	})
 
-	Context("when only a space argument is provided", func() {
-		Context("when there is an existing targeted org", func() {
+	When("only a space argument is provided", func() {
+		When("there is an existing targeted org", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
 				Eventually(helpers.CF("target", "-o", ReadOnlyOrg)).Should(Exit(0))
 			})
 
-			Context("when the space exists", func() {
+			When("the space exists", func() {
 				It("targets the space and exits 0", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CF("target", "-s", ReadOnlySpace)
@@ -243,7 +243,7 @@ var _ = Describe("target command", func() {
 				})
 			})
 
-			Context("when the space does not exist", func() {
+			When("the space does not exist", func() {
 				It("displays space not found, exits 1, and clears existing targeted space", func() {
 					session := helpers.CF("target", "-s", spaceName)
 					Eventually(session.Err).Should(Say("Space '%s' not found.", spaceName))
@@ -258,7 +258,7 @@ var _ = Describe("target command", func() {
 			})
 		})
 
-		Context("when there is not an existing targeted org", func() {
+		When("there is not an existing targeted org", func() {
 			It("displays org must be targeted first and exits 1", func() {
 				session := helpers.CF("target", "-s", spaceName)
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
@@ -268,7 +268,7 @@ var _ = Describe("target command", func() {
 		})
 	})
 
-	Context("when both org and space arguments are provided", func() {
+	When("both org and space arguments are provided", func() {
 		// We set the targets to verify that the target command preserves existing targets
 		// in failure
 		BeforeEach(func() {
@@ -276,7 +276,7 @@ var _ = Describe("target command", func() {
 			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
 		})
 
-		Context("when the org does not exist", func() {
+		When("the org does not exist", func() {
 			It("displays org not found, exits 1, and clears existing targets", func() {
 				session := helpers.CF("target", "-o", orgName, "-s", spaceName)
 				Eventually(session.Err).Should(Say("Organization '%s' not found", orgName))
@@ -289,7 +289,7 @@ var _ = Describe("target command", func() {
 			})
 		})
 
-		Context("when the org exists", func() {
+		When("the org exists", func() {
 			BeforeEach(func() {
 				helpers.CreateOrg(orgName)
 			})
@@ -298,7 +298,7 @@ var _ = Describe("target command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			Context("when the space exists", func() {
+			When("the space exists", func() {
 				BeforeEach(func() {
 					helpers.TargetOrg(orgName)
 					helpers.CreateSpace(spaceName)
@@ -317,7 +317,7 @@ var _ = Describe("target command", func() {
 				})
 			})
 
-			Context("when the space does not exist", func() {
+			When("the space does not exist", func() {
 				It("displays space not found, exits 1, and clears the existing targets", func() {
 					session := helpers.CF("target", "-o", orgName, "-s", spaceName)
 					Eventually(session.Err).Should(Say("Space '%s' not found.", spaceName))

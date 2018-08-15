@@ -55,7 +55,7 @@ var _ = Describe("unbind-security-group Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when getting the current user fails", func() {
+	When("getting the current user fails", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -68,7 +68,7 @@ var _ = Describe("unbind-security-group Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -83,7 +83,7 @@ var _ = Describe("unbind-security-group Command", func() {
 		})
 	})
 
-	Context("when lifecycle is 'some-lifecycle'", func() {
+	When("lifecycle is 'some-lifecycle'", func() {
 		// By this point in execution, Goflags will have filtered any invalid
 		// lifecycle phase.  We use 'some-lifecycle' to test that the command
 		// merely passes the value presented by Goflags.
@@ -91,12 +91,12 @@ var _ = Describe("unbind-security-group Command", func() {
 			cmd.Lifecycle = flag.SecurityGroupLifecycle("some-lifecycle")
 		})
 
-		Context("when only the security group is provided", func() {
+		When("only the security group is provided", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs.SecurityGroupName = "some-security-group"
 			})
 
-			Context("when org and space are targeted", func() {
+			When("org and space are targeted", func() {
 				BeforeEach(func() {
 					fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 					fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
@@ -122,7 +122,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					Expect(lifecycle).To(Equal(constant.SecurityGroupLifecycle("some-lifecycle")))
 				})
 
-				Context("when the actor returns a security group not found error", func() {
+				When("the actor returns a security group not found error", func() {
 					BeforeEach(func() {
 						fakeActor.UnbindSecurityGroupByNameAndSpaceReturns(
 							v2action.Warnings{"unbind warning"},
@@ -137,7 +137,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					})
 				})
 
-				Context("when the actor returns a security group not bound error", func() {
+				When("the actor returns a security group not bound error", func() {
 					BeforeEach(func() {
 						fakeActor.UnbindSecurityGroupByNameAndSpaceReturns(
 							v2action.Warnings{"unbind warning"},
@@ -158,7 +158,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					})
 				})
 
-				Context("when the actor returns an error", func() {
+				When("the actor returns an error", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -178,14 +178,14 @@ var _ = Describe("unbind-security-group Command", func() {
 			})
 		})
 
-		Context("when the security group, org, and space are provided", func() {
+		When("the security group, org, and space are provided", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs.SecurityGroupName = "some-security-group"
 				cmd.RequiredArgs.OrganizationName = "some-org"
 				cmd.RequiredArgs.SpaceName = "some-space"
 			})
 
-			Context("when checking target fails", func() {
+			When("checking target fails", func() {
 				BeforeEach(func() {
 					fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 				})
@@ -200,7 +200,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				})
 			})
 
-			Context("when the user is logged in", func() {
+			When("the user is logged in", func() {
 				BeforeEach(func() {
 					fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameReturns(
 						v2action.Warnings{"unbind warning"},
@@ -222,7 +222,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				})
 			})
 
-			Context("when the actor returns a security group not found error", func() {
+			When("the actor returns a security group not found error", func() {
 				BeforeEach(func() {
 					fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameReturns(
 						v2action.Warnings{"unbind warning"},
@@ -237,7 +237,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				})
 			})
 
-			Context("when the actor returns a security group not bound error", func() {
+			When("the actor returns a security group not bound error", func() {
 				BeforeEach(func() {
 					fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameReturns(
 						v2action.Warnings{"unbind warning"},
@@ -258,7 +258,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				})
 			})
 
-			Context("when the actor returns an error", func() {
+			When("the actor returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -277,7 +277,7 @@ var _ = Describe("unbind-security-group Command", func() {
 			})
 		})
 
-		Context("when the security group and org are provided, but the space is not", func() {
+		When("the security group and org are provided, but the space is not", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs.SecurityGroupName = "some-security-group"
 				cmd.RequiredArgs.OrganizationName = "some-org"

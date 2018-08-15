@@ -38,7 +38,7 @@ var _ = Describe("ServiceInstanceSharedTo Actions", func() {
 			sharedTos, warnings, getErr = actor.GetServiceInstanceSharedTosByServiceInstance(serviceInstanceGUID)
 		})
 
-		Context("when no errors are encountered getting the service instance shared_to list", func() {
+		When("no errors are encountered getting the service instance shared_to list", func() {
 			var returnedSharedTos []ccv2.ServiceInstanceSharedTo
 			BeforeEach(func() {
 				returnedSharedTos = []ccv2.ServiceInstanceSharedTo{
@@ -72,7 +72,7 @@ var _ = Describe("ServiceInstanceSharedTo Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the service instance shared_to list", func() {
+		When("an error is encountered getting the service instance shared_to list", func() {
 			var expectedErr error
 			BeforeEach(func() {
 				expectedErr = errors.New("some-error")

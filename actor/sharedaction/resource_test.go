@@ -89,7 +89,7 @@ var _ = Describe("Resource Actions", func() {
 			Expect(os.RemoveAll(archivePath)).ToNot(HaveOccurred())
 		})
 
-		Context("when the archive can be accessed properly", func() {
+		When("the archive can be accessed properly", func() {
 			BeforeEach(func() {
 				tmpfile, err := ioutil.TempFile("", "fake-archive")
 				Expect(err).ToNot(HaveOccurred())
@@ -113,7 +113,7 @@ var _ = Describe("Resource Actions", func() {
 			})
 		})
 
-		Context("when the archive returns any access errors", func() {
+		When("the archive returns any access errors", func() {
 			It("returns the error", func() {
 				_, ok := executeErr.(*os.PathError)
 				Expect(ok).To(BeTrue())
@@ -148,8 +148,8 @@ var _ = Describe("Resource Actions", func() {
 			Expect(os.RemoveAll(resultZip)).ToNot(HaveOccurred())
 		})
 
-		Context("when the files have not been changed since scanning them", func() {
-			Context("when there are no symlinks", func() {
+		When("the files have not been changed since scanning them", func() {
+			When("there are no symlinks", func() {
 				BeforeEach(func() {
 					resources = []Resource{
 						{Filename: "/"},
@@ -191,7 +191,7 @@ var _ = Describe("Resource Actions", func() {
 				})
 			})
 
-			Context("when there are relative symlink files", func() {
+			When("there are relative symlink files", func() {
 				BeforeEach(func() {
 					resources = []Resource{
 						{Filename: "/"},
@@ -235,7 +235,7 @@ var _ = Describe("Resource Actions", func() {
 			})
 		})
 
-		Context("when the files have changed since the scanning", func() {
+		When("the files have changed since the scanning", func() {
 			BeforeEach(func() {
 				resources = []Resource{
 					{Filename: "/"},
@@ -268,8 +268,8 @@ var _ = Describe("Resource Actions", func() {
 			Expect(os.RemoveAll(resultZip)).ToNot(HaveOccurred())
 		})
 
-		Context("when the files have not been changed since scanning them", func() {
-			Context("when there are no symlinks", func() {
+		When("the files have not been changed since scanning them", func() {
+			When("there are no symlinks", func() {
 				BeforeEach(func() {
 					resources = []Resource{
 						{Filename: "level1"},
@@ -311,7 +311,7 @@ var _ = Describe("Resource Actions", func() {
 				})
 			})
 
-			Context("when there are relative symlink files", func() {
+			When("there are relative symlink files", func() {
 				BeforeEach(func() {
 					resources = []Resource{
 						{Filename: "level1"},
@@ -353,7 +353,7 @@ var _ = Describe("Resource Actions", func() {
 			})
 		})
 
-		Context("when the files have changed since the scanning", func() {
+		When("the files have changed since the scanning", func() {
 			BeforeEach(func() {
 				resources = []Resource{
 					{Filename: "level1"},

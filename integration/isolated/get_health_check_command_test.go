@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("get-health-check command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("get-health-check", "--help")
 
@@ -24,13 +24,13 @@ var _ = Describe("get-health-check command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "get-health-check", "app-name")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -47,8 +47,8 @@ var _ = Describe("get-health-check command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the input is invalid", func() {
-			Context("when there are not enough arguments", func() {
+		When("the input is invalid", func() {
+			When("there are not enough arguments", func() {
 				It("outputs the usage and exits 1", func() {
 					session := helpers.CF("get-health-check")
 
@@ -58,7 +58,7 @@ var _ = Describe("get-health-check command", func() {
 				})
 			})
 
-			Context("when there too many arguments", func() {
+			When("there too many arguments", func() {
 				It("ignores the extra arguments", func() {
 					appName := helpers.PrefixedRandomName("app")
 					session := helpers.CF("get-health-check", appName, "extra")
@@ -72,7 +72,7 @@ var _ = Describe("get-health-check command", func() {
 			})
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("tells the user that the app is not found and exits 1", func() {
 				appName := helpers.PrefixedRandomName("app")
 				session := helpers.CF("get-health-check", appName)
@@ -85,7 +85,7 @@ var _ = Describe("get-health-check command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			var (
 				appName  string
 				username string
@@ -99,7 +99,7 @@ var _ = Describe("get-health-check command", func() {
 				username, _ = helpers.GetCredentials()
 			})
 
-			Context("when the health check type is http", func() {
+			When("the health check type is http", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("set-health-check", appName, "http")).Should(Exit(0))
 				})
@@ -115,7 +115,7 @@ var _ = Describe("get-health-check command", func() {
 				})
 			})
 
-			Context("when the health check type is http with a custom endpoint", func() {
+			When("the health check type is http with a custom endpoint", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("set-health-check", appName, "http", "--endpoint", "/some-endpoint")).Should(Exit(0))
 				})
@@ -131,7 +131,7 @@ var _ = Describe("get-health-check command", func() {
 				})
 			})
 
-			Context("when the health check type is none", func() {
+			When("the health check type is none", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("set-health-check", appName, "none")).Should(Exit(0))
 				})
@@ -147,7 +147,7 @@ var _ = Describe("get-health-check command", func() {
 				})
 			})
 
-			Context("when the health check type is port", func() {
+			When("the health check type is port", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("set-health-check", appName, "port")).Should(Exit(0))
 				})
@@ -163,7 +163,7 @@ var _ = Describe("get-health-check command", func() {
 				})
 			})
 
-			Context("when the health check type is process", func() {
+			When("the health check type is process", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("set-health-check", appName, "process")).Should(Exit(0))
 				})
@@ -179,7 +179,7 @@ var _ = Describe("get-health-check command", func() {
 				})
 			})
 
-			Context("when the health check type changes from http to another type", func() {
+			When("the health check type changes from http to another type", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("set-health-check", appName, "http", "--endpoint", "/some-endpoint")).Should(Exit(0))
 					Eventually(helpers.CF("set-health-check", appName, "process")).Should(Exit(0))

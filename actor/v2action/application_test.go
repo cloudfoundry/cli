@@ -37,7 +37,7 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("CalculatedCommand", func() {
-			Context("when command is set", func() {
+			When("command is set", func() {
 				BeforeEach(func() {
 					app.Command = types.FilteredString{IsSet: true, Value: "foo"}
 					app.DetectedStartCommand = types.FilteredString{IsSet: true, Value: "bar"}
@@ -66,7 +66,7 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("CalculatedBuildpack", func() {
-			Context("when buildpack is set", func() {
+			When("buildpack is set", func() {
 				BeforeEach(func() {
 					app.Buildpack = types.FilteredString{IsSet: true, Value: "foo"}
 					app.DetectedBuildpack = types.FilteredString{IsSet: true, Value: "bar"}
@@ -95,7 +95,7 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("CalculatedHealthCheckEndpoint", func() {
-			Context("when the health check type is http", func() {
+			When("the health check type is http", func() {
 				BeforeEach(func() {
 					app.HealthCheckType = "http"
 					app.HealthCheckHTTPEndpoint = "/some-endpoint"
@@ -107,7 +107,7 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			Context("when the health check type is not http", func() {
+			When("the health check type is not http", func() {
 				BeforeEach(func() {
 					app.HealthCheckType = "process"
 					app.HealthCheckHTTPEndpoint = "/some-endpoint"
@@ -120,14 +120,14 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("StagingCompleted", func() {
-			Context("when staging the application completes", func() {
+			When("staging the application completes", func() {
 				It("returns true", func() {
 					app.PackageState = constant.ApplicationPackageStaged
 					Expect(app.StagingCompleted()).To(BeTrue())
 				})
 			})
 
-			Context("when the application is *not* staged", func() {
+			When("the application is *not* staged", func() {
 				It("returns false", func() {
 					app.PackageState = constant.ApplicationPackageFailed
 					Expect(app.StagingCompleted()).To(BeFalse())
@@ -136,14 +136,14 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("StagingFailed", func() {
-			Context("when staging the application fails", func() {
+			When("staging the application fails", func() {
 				It("returns true", func() {
 					app.PackageState = constant.ApplicationPackageFailed
 					Expect(app.StagingFailed()).To(BeTrue())
 				})
 			})
 
-			Context("when staging the application does *not* fail", func() {
+			When("staging the application does *not* fail", func() {
 				It("returns false", func() {
 					app.PackageState = constant.ApplicationPackageStaged
 					Expect(app.StagingFailed()).To(BeFalse())
@@ -152,7 +152,7 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("StagingFailedMessage", func() {
-			Context("when the application has a staging failed description", func() {
+			When("the application has a staging failed description", func() {
 				BeforeEach(func() {
 					app.StagingFailedDescription = "An app was not successfully detected by any available buildpack"
 					app.StagingFailedReason = "NoAppDetectedError"
@@ -162,7 +162,7 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			Context("when the application does not have a staging failed description", func() {
+			When("the application does not have a staging failed description", func() {
 				BeforeEach(func() {
 					app.StagingFailedDescription = ""
 					app.StagingFailedReason = "NoAppDetectedError"
@@ -174,14 +174,14 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("StagingFailedNoAppDetected", func() {
-			Context("when staging the application fails due to a no app detected error", func() {
+			When("staging the application fails due to a no app detected error", func() {
 				It("returns true", func() {
 					app.StagingFailedReason = "NoAppDetectedError"
 					Expect(app.StagingFailedNoAppDetected()).To(BeTrue())
 				})
 			})
 
-			Context("when staging the application fails due to any other reason", func() {
+			When("staging the application fails due to any other reason", func() {
 				It("returns false", func() {
 					app.StagingFailedReason = "InsufficientResources"
 					Expect(app.StagingFailedNoAppDetected()).To(BeFalse())
@@ -190,13 +190,13 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("Started", func() {
-			Context("when app is started", func() {
+			When("app is started", func() {
 				It("returns true", func() {
 					Expect(Application{State: constant.ApplicationStarted}.Started()).To(BeTrue())
 				})
 			})
 
-			Context("when app is stopped", func() {
+			When("app is stopped", func() {
 				It("returns false", func() {
 					Expect(Application{State: constant.ApplicationStopped}.Started()).To(BeFalse())
 				})
@@ -204,13 +204,13 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("Stopped", func() {
-			Context("when app is started", func() {
+			When("app is started", func() {
 				It("returns true", func() {
 					Expect(Application{State: constant.ApplicationStopped}.Stopped()).To(BeTrue())
 				})
 			})
 
-			Context("when app is stopped", func() {
+			When("app is stopped", func() {
 				It("returns false", func() {
 					Expect(Application{State: constant.ApplicationStarted}.Stopped()).To(BeFalse())
 				})
@@ -219,7 +219,7 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("CreateApplication", func() {
-		Context("when the create is successful", func() {
+		When("the create is successful", func() {
 			var expectedApp ccv2.Application
 			BeforeEach(func() {
 				expectedApp = ccv2.Application{
@@ -245,7 +245,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when the client returns back an error", func() {
+		When("the client returns back an error", func() {
 			var expectedErr error
 			BeforeEach(func() {
 				expectedErr = errors.New("some create app error")
@@ -265,7 +265,7 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("GetApplication", func() {
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationReturns(
 					ccv2.Application{
@@ -291,7 +291,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when the application does not exist", func() {
+		When("the application does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationReturns(ccv2.Application{}, nil, ccerror.ResourceNotFoundError{})
 			})
@@ -304,7 +304,7 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("GetApplicationByNameAndSpace", func() {
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv2.Application{
@@ -343,7 +343,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when the application does not exists", func() {
+		When("the application does not exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns([]ccv2.Application{}, nil, nil)
 			})
@@ -354,7 +354,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var expectedError error
 
 			BeforeEach(func() {
@@ -370,7 +370,7 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("GetApplicationsBySpace", func() {
-		Context("when the there are applications in the space", func() {
+		When("the there are applications in the space", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv2.Application{
@@ -414,7 +414,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var expectedError error
 
 			BeforeEach(func() {
@@ -434,7 +434,7 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("GetRouteApplications", func() {
-		Context("when the CC client returns no errors", func() {
+		When("the CC client returns no errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetRouteApplicationsReturns(
 					[]ccv2.Application{
@@ -460,7 +460,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when the CC client returns an error", func() {
+		When("the CC client returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetRouteApplicationsReturns(
 					[]ccv2.Application{}, ccv2.Warnings{"route-applications-warning"}, errors.New("get-route-applications-error"))
@@ -479,7 +479,7 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("SetApplicationHealthCheckTypeByNameAndSpace", func() {
-		Context("when setting an http endpoint with a health check that is not http", func() {
+		When("setting an http endpoint with a health check that is not http", func() {
 			It("returns an http health check invalid error", func() {
 				_, _, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
 					"some-app", "some-space-guid", "some-health-check-type", "/foo")
@@ -487,8 +487,8 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
-			Context("when the desired health check type is different", func() {
+		When("the app exists", func() {
+			When("the desired health check type is different", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationsReturns(
 						[]ccv2.Application{
@@ -527,8 +527,8 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			Context("when the desired health check type is 'http'", func() {
-				Context("when the desired http endpoint is already set", func() {
+			When("the desired health check type is 'http'", func() {
+				When("the desired http endpoint is already set", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationsReturns(
 							[]ccv2.Application{
@@ -549,7 +549,7 @@ var _ = Describe("Application Actions", func() {
 					})
 				})
 
-				Context("when the desired http endpoint is not set", func() {
+				When("the desired http endpoint is not set", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationsReturns(
 							[]ccv2.Application{
@@ -583,7 +583,7 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			Context("when the application health check type is already set to the desired type", func() {
+			When("the application health check type is already set to the desired type", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationsReturns(
 						[]ccv2.Application{
@@ -612,7 +612,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when getting the application returns an error", func() {
+		When("getting the application returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv2.Application{}, ccv2.Warnings{"get application warning"}, errors.New("get application error"))
@@ -627,7 +627,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when updating the application returns an error", func() {
+		When("updating the application returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -744,7 +744,7 @@ var _ = Describe("Application Actions", func() {
 
 		var ItHandlesStagingIssues = func() {
 			Context("staging issues", func() {
-				Context("when polling fails", func() {
+				When("polling fails", func() {
 					var expectedErr error
 					BeforeEach(func() {
 						expectedErr = errors.New("I am a banana!!!!")
@@ -765,7 +765,7 @@ var _ = Describe("Application Actions", func() {
 					})
 				})
 
-				Context("when the application fails to stage", func() {
+				When("the application fails to stage", func() {
 					Context("due to a NoAppDetectedError", func() {
 						BeforeEach(func() {
 							fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
@@ -819,7 +819,7 @@ var _ = Describe("Application Actions", func() {
 					})
 				})
 
-				Context("when the application takes too long to stage", func() {
+				When("the application takes too long to stage", func() {
 					BeforeEach(func() {
 						fakeConfig.StagingTimeoutReturns(0)
 						fakeCloudControllerClient.GetApplicationApplicationInstancesStub = nil
@@ -841,7 +841,7 @@ var _ = Describe("Application Actions", func() {
 
 		var ItHandlesStartingIssues = func() {
 			Context("starting issues", func() {
-				Context("when polling fails", func() {
+				When("polling fails", func() {
 					var expectedErr error
 					BeforeEach(func() {
 						expectedErr = errors.New("I am a banana!!!!")
@@ -864,7 +864,7 @@ var _ = Describe("Application Actions", func() {
 					})
 				})
 
-				Context("when the application takes too long to start", func() {
+				When("the application takes too long to start", func() {
 					BeforeEach(func() {
 						fakeConfig.StartupTimeoutReturns(0)
 					})
@@ -883,7 +883,7 @@ var _ = Describe("Application Actions", func() {
 					})
 				})
 
-				Context("when the application crashes", func() {
+				When("the application crashes", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationApplicationInstancesStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
 							return map[int]ccv2.ApplicationInstance{
@@ -907,7 +907,7 @@ var _ = Describe("Application Actions", func() {
 					})
 				})
 
-				Context("when the application flaps", func() {
+				When("the application flaps", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationApplicationInstancesStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
 							return map[int]ccv2.ApplicationInstance{
@@ -934,7 +934,7 @@ var _ = Describe("Application Actions", func() {
 		}
 
 		var ItStartsApplication = func() {
-			Context("when the app is not running", func() {
+			When("the app is not running", func() {
 				It("starts and polls for an app instance", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
 					Eventually(warnings).Should(Receive(Equal("state-warning")))
@@ -959,7 +959,7 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			Context("when the app has zero instances", func() {
+			When("the app has zero instances", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
 						Instances: types.NullInt{Value: 0, IsSet: true},
@@ -988,7 +988,7 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			Context("when updating the application fails", func() {
+			When("updating the application fails", func() {
 				var expectedErr error
 				BeforeEach(func() {
 					expectedErr = errors.New("I am a banana!!!!")
@@ -1023,7 +1023,7 @@ var _ = Describe("Application Actions", func() {
 				messages, logErrs, appState, warnings, errs = actor.StartApplication(app, fakeNOAAClient)
 			})
 
-			Context("when the app is already staged", func() {
+			When("the app is already staged", func() {
 				BeforeEach(func() {
 					app.PackageState = constant.ApplicationPackageStaged
 				})
@@ -1061,7 +1061,7 @@ var _ = Describe("Application Actions", func() {
 				messages, logErrs, appState, warnings, errs = actor.RestartApplication(app, fakeNOAAClient)
 			})
 
-			Context("when application is running", func() {
+			When("application is running", func() {
 				BeforeEach(func() {
 					app.State = constant.ApplicationStarted
 				})
@@ -1097,7 +1097,7 @@ var _ = Describe("Application Actions", func() {
 					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
 
-				Context("when updating the application to stop fails", func() {
+				When("updating the application to stop fails", func() {
 					var expectedErr error
 					BeforeEach(func() {
 						expectedErr = errors.New("I am a banana!!!!")
@@ -1128,7 +1128,7 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			Context("when the app is not running", func() {
+			When("the app is not running", func() {
 				BeforeEach(func() {
 					app.State = constant.ApplicationStopped
 				})
@@ -1151,7 +1151,7 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			Context("when the app is already staged", func() {
+			When("the app is already staged", func() {
 				BeforeEach(func() {
 					app.PackageState = constant.ApplicationPackageStaged
 				})
@@ -1182,7 +1182,7 @@ var _ = Describe("Application Actions", func() {
 				messages, logErrs, appState, warnings, errs = actor.RestageApplication(app, fakeNOAAClient)
 			})
 
-			Context("when restaging succeeds", func() {
+			When("restaging succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.RestageApplicationReturns(ccv2.Application{GUID: "some-app-guid",
 						Instances: types.NullInt{Value: 2, IsSet: true},
@@ -1217,7 +1217,7 @@ var _ = Describe("Application Actions", func() {
 				ItHandlesStartingIssues()
 			})
 
-			Context("when restaging errors", func() {
+			When("restaging errors", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.RestageApplicationReturns(ccv2.Application{GUID: "some-app-guid",
 						Instances: types.NullInt{Value: 2, IsSet: true},
@@ -1239,7 +1239,7 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("UpdateApplication", func() {
-		Context("when the update is successful", func() {
+		When("the update is successful", func() {
 			var expectedApp ccv2.Application
 			BeforeEach(func() {
 				expectedApp = ccv2.Application{
@@ -1265,7 +1265,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when the client returns back an error", func() {
+		When("the client returns back an error", func() {
 			var expectedErr error
 			BeforeEach(func() {
 				expectedErr = errors.New("some update app error")

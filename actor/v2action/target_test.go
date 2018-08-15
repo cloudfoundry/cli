@@ -87,7 +87,7 @@ var _ = Describe("Targeting", func() {
 			Expect(sshOAuthClient).To(BeEmpty())
 		})
 
-		Context("when setting the same API and skip SSL configuration", func() {
+		When("setting the same API and skip SSL configuration", func() {
 			var APIURL string
 
 			BeforeEach(func() {

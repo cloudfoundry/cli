@@ -52,7 +52,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -65,7 +65,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -80,14 +80,14 @@ var _ = Describe("create-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
 			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 		})
 
-		Context("when the create is successful", func() {
+		When("the create is successful", func() {
 			BeforeEach(func() {
 				fakeActor.CreateIsolationSegmentByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
@@ -106,7 +106,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 			})
 		})
 
-		Context("when the create is unsuccessful", func() {
+		When("the create is unsuccessful", func() {
 			Context("due to an unexpected error", func() {
 				var expectedErr error
 

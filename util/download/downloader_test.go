@@ -51,7 +51,7 @@ var _ = Describe("Downloader", func() {
 			file, executeErr = downloader.Download(url, tmpDirPath)
 		})
 
-		Context("when the download is successful", func() {
+		When("the download is successful", func() {
 			var responseBody string
 
 			BeforeEach(func() {
@@ -80,7 +80,7 @@ var _ = Describe("Downloader", func() {
 			})
 		})
 
-		Context("when the client returns an error", func() {
+		When("the client returns an error", func() {
 			BeforeEach(func() {
 				fakeHTTPClient.GetReturns(nil, errors.New("stop all the downloading"))
 			})
@@ -90,7 +90,7 @@ var _ = Describe("Downloader", func() {
 			})
 		})
 
-		Context("when HTTP request returns 4xx or 5xx error", func() {
+		When("HTTP request returns 4xx or 5xx error", func() {
 			var responseBody string
 
 			BeforeEach(func() {

@@ -53,7 +53,7 @@ var _ = Describe("org Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking the target fails", func() {
+	When("checking the target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(
 				actionerror.NotLoggedInError{BinaryName: binaryName})
@@ -69,12 +69,12 @@ var _ = Describe("org Command", func() {
 		})
 	})
 
-	Context("when the --guid flag is provided", func() {
+	When("the --guid flag is provided", func() {
 		BeforeEach(func() {
 			cmd.GUID = true
 		})
 
-		Context("when no errors occur", func() {
+		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeActor.GetOrganizationByNameReturns(
 					v2action.Organization{GUID: "some-org-guid"},
@@ -95,8 +95,8 @@ var _ = Describe("org Command", func() {
 			})
 		})
 
-		Context("when getting the org returns an error", func() {
-			Context("when the error is translatable", func() {
+		When("getting the org returns an error", func() {
+			When("the error is translatable", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationByNameReturns(
 						v2action.Organization{},
@@ -112,7 +112,7 @@ var _ = Describe("org Command", func() {
 				})
 			})
 
-			Context("when the error is not translatable", func() {
+			When("the error is not translatable", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -133,8 +133,8 @@ var _ = Describe("org Command", func() {
 		})
 	})
 
-	Context("when the --guid flag is not provided", func() {
-		Context("when no errors occur", func() {
+	When("the --guid flag is not provided", func() {
+		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{
@@ -165,7 +165,7 @@ var _ = Describe("org Command", func() {
 					nil)
 			})
 
-			Context("when the v3 actor is nil", func() {
+			When("the v3 actor is nil", func() {
 				BeforeEach(func() {
 					cmd.ActorV3 = nil
 				})
@@ -175,7 +175,7 @@ var _ = Describe("org Command", func() {
 				})
 			})
 
-			Context("when api version is above 3.11.0", func() {
+			When("api version is above 3.11.0", func() {
 				BeforeEach(func() {
 					fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
 						[]v3action.IsolationSegment{
@@ -219,7 +219,7 @@ var _ = Describe("org Command", func() {
 				})
 			})
 
-			Context("when api version is below 3.11.0", func() {
+			When("api version is below 3.11.0", func() {
 				BeforeEach(func() {
 					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
 				})
@@ -246,7 +246,7 @@ var _ = Describe("org Command", func() {
 			})
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -261,8 +261,8 @@ var _ = Describe("org Command", func() {
 			})
 		})
 
-		Context("when getting the org summary returns an error", func() {
-			Context("when the error is translatable", func() {
+		When("getting the org summary returns an error", func() {
+			When("the error is translatable", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSummaryByNameReturns(
 						v2action.OrganizationSummary{},
@@ -278,7 +278,7 @@ var _ = Describe("org Command", func() {
 				})
 			})
 
-			Context("when the error is not translatable", func() {
+			When("the error is not translatable", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -298,7 +298,7 @@ var _ = Describe("org Command", func() {
 			})
 		})
 
-		Context("when getting the org isolation segments returns an error", func() {
+		When("getting the org isolation segments returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

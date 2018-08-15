@@ -14,7 +14,7 @@ var _ = Describe("ServiceInstanceNotShareableError", func() {
 	})
 
 	Describe("Error", func() {
-		Context("when feature flag is disabled, and service broker sharing is disabled", func() {
+		When("feature flag is disabled, and service broker sharing is disabled", func() {
 			BeforeEach(func() {
 				serviceInstanceNotShareableErr.FeatureFlagEnabled = false
 				serviceInstanceNotShareableErr.ServiceBrokerSharingEnabled = false
@@ -25,7 +25,7 @@ var _ = Describe("ServiceInstanceNotShareableError", func() {
 			})
 		})
 
-		Context("when feature flag is enabled, and service broker sharing is disabled", func() {
+		When("feature flag is enabled, and service broker sharing is disabled", func() {
 			BeforeEach(func() {
 				serviceInstanceNotShareableErr.FeatureFlagEnabled = true
 				serviceInstanceNotShareableErr.ServiceBrokerSharingEnabled = false
@@ -36,7 +36,7 @@ var _ = Describe("ServiceInstanceNotShareableError", func() {
 			})
 		})
 
-		Context("when feature flag is disabled, and service broker sharing is enabled", func() {
+		When("feature flag is disabled, and service broker sharing is enabled", func() {
 			BeforeEach(func() {
 				serviceInstanceNotShareableErr.FeatureFlagEnabled = false
 				serviceInstanceNotShareableErr.ServiceBrokerSharingEnabled = true
@@ -47,7 +47,7 @@ var _ = Describe("ServiceInstanceNotShareableError", func() {
 			})
 		})
 
-		Context("when feature flag is enabled, and service broker sharing is enabled", func() {
+		When("feature flag is enabled, and service broker sharing is enabled", func() {
 			BeforeEach(func() {
 				serviceInstanceNotShareableErr.FeatureFlagEnabled = true
 				serviceInstanceNotShareableErr.ServiceBrokerSharingEnabled = true

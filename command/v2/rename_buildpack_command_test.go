@@ -42,7 +42,7 @@ var _ = Describe("rename buildpack command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking the target fails", func() {
+	When("checking the target fails", func() {
 		var binaryName string
 
 		BeforeEach(func() {
@@ -60,7 +60,7 @@ var _ = Describe("rename buildpack command", func() {
 		})
 	})
 
-	Context("when checking the target succeeds", func() {
+	When("checking the target succeeds", func() {
 		var (
 			oldName   string
 			newName   string
@@ -82,8 +82,8 @@ var _ = Describe("rename buildpack command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
 		})
 
-		Context("when the user does not specify a stack", func() {
-			Context("when no error is returned", func() {
+		When("the user does not specify a stack", func() {
+			When("no error is returned", func() {
 				BeforeEach(func() {
 					fakeActor.RenameBuildpackReturns(v2action.Warnings{"warning1", "warning2"}, nil)
 				})
@@ -104,7 +104,7 @@ var _ = Describe("rename buildpack command", func() {
 				})
 			})
 
-			Context("when an error is returned", func() {
+			When("an error is returned", func() {
 				BeforeEach(func() {
 					fakeActor.RenameBuildpackReturns(
 						v2action.Warnings{"warning1", "warning2"},
@@ -119,11 +119,11 @@ var _ = Describe("rename buildpack command", func() {
 			})
 		})
 
-		Context("when the user specifies a stack", func() {
+		When("the user specifies a stack", func() {
 			BeforeEach(func() {
 				cmd.Stack = stackName
 			})
-			Context("when no error is returned", func() {
+			When("no error is returned", func() {
 				BeforeEach(func() {
 					fakeActor.RenameBuildpackReturns(v2action.Warnings{"warning1", "warning2"}, nil)
 				})
@@ -149,7 +149,7 @@ var _ = Describe("rename buildpack command", func() {
 				})
 			})
 
-			Context("when an error is returned", func() {
+			When("an error is returned", func() {
 				BeforeEach(func() {
 					fakeActor.RenameBuildpackReturns(
 						v2action.Warnings{"warning1", "warning2"},

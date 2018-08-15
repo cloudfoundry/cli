@@ -20,13 +20,13 @@ var _ = Describe("unbind-service command", func() {
 		appName = helpers.PrefixedRandomName("app")
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "unbind-service", "app-name", "service-name")
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var (
 			org         string
 			space       string
@@ -50,7 +50,7 @@ var _ = Describe("unbind-service command", func() {
 			helpers.QuickDeleteOrg(org)
 		})
 
-		Context("when the service is provided by a user", func() {
+		When("the service is provided by a user", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("create-user-provided-service", serviceInstance, "-p", "{}")).Should(Exit(0))
 			})
@@ -59,7 +59,7 @@ var _ = Describe("unbind-service command", func() {
 				Eventually(helpers.CF("delete-service", serviceInstance, "-f")).Should(Exit(0))
 			})
 
-			Context("when the service is bound to an app", func() {
+			When("the service is bound to an app", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
@@ -80,7 +80,7 @@ var _ = Describe("unbind-service command", func() {
 				})
 			})
 
-			Context("when the service is not bound to an app", func() {
+			When("the service is not bound to an app", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "--no-route")).Should(Exit(0))
@@ -95,7 +95,7 @@ var _ = Describe("unbind-service command", func() {
 				})
 			})
 
-			Context("when the service does not exist", func() {
+			When("the service does not exist", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
@@ -110,7 +110,7 @@ var _ = Describe("unbind-service command", func() {
 				})
 			})
 
-			Context("when the app does not exist", func() {
+			When("the app does not exist", func() {
 				It("fails to unbind the service", func() {
 					session := helpers.CF("unbind-service", "does-not-exist", serviceInstance)
 					Eventually(session).Should(Say("FAILED"))
@@ -120,8 +120,8 @@ var _ = Describe("unbind-service command", func() {
 			})
 		})
 
-		Context("when the service is provided by a broker", func() {
-			Context("when the unbinding is asynchronous", func() {
+		When("the service is provided by a broker", func() {
+			When("the unbinding is asynchronous", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
 					broker = helpers.NewAsynchServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
@@ -153,7 +153,7 @@ var _ = Describe("unbind-service command", func() {
 				})
 			})
 
-			Context("when the unbinding is blocking", func() {
+			When("the unbinding is blocking", func() {
 				BeforeEach(func() {
 					broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
 					broker.Push()
@@ -167,7 +167,7 @@ var _ = Describe("unbind-service command", func() {
 					broker.Destroy()
 				})
 
-				Context("when the service is bound to an app", func() {
+				When("the service is bound to an app", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 						helpers.WithHelloWorldApp(func(appDir string) {
@@ -189,7 +189,7 @@ var _ = Describe("unbind-service command", func() {
 					})
 				})
 
-				Context("when the service is not bound to an app", func() {
+				When("the service is not bound to an app", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 						helpers.WithHelloWorldApp(func(appDir string) {
@@ -205,7 +205,7 @@ var _ = Describe("unbind-service command", func() {
 					})
 				})
 
-				Context("when the service does not exist", func() {
+				When("the service does not exist", func() {
 					BeforeEach(func() {
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
@@ -220,7 +220,7 @@ var _ = Describe("unbind-service command", func() {
 					})
 				})
 
-				Context("when the app does not exist", func() {
+				When("the app does not exist", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 					})

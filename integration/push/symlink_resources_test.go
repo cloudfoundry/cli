@@ -23,9 +23,9 @@ var _ = Describe("push with symlinked resources", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when pushing a directory", func() {
-		Context("when the directory contains a symlink to a file in the directory", func() {
-			Context("when the file exists", func() {
+	When("pushing a directory", func() {
+		When("the directory contains a symlink to a file in the directory", func() {
+			When("the file exists", func() {
 				It("should push the symlink", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						targetFile := filepath.Join(dir, "targetFile")
@@ -45,7 +45,7 @@ var _ = Describe("push with symlinked resources", func() {
 				})
 			})
 
-			Context("when the file doesn't exists", func() {
+			When("the file doesn't exists", func() {
 				It("should push the symlink", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						tempFile, err := ioutil.TempFile(dir, "tempFile")
@@ -68,7 +68,7 @@ var _ = Describe("push with symlinked resources", func() {
 			})
 		})
 
-		Context("when the directory contains a symlink to subdirectory in the directory", func() {
+		When("the directory contains a symlink to subdirectory in the directory", func() {
 			It("should push the symlink", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					targetDir, err := ioutil.TempDir(dir, "target-dir")
@@ -90,14 +90,14 @@ var _ = Describe("push with symlinked resources", func() {
 		})
 	})
 
-	Context("when pushing an archive", func() {
+	When("pushing an archive", func() {
 		var archive string
 
 		AfterEach(func() {
 			Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
 		})
 
-		Context("when the archive contains a symlink to a file in the directory", func() {
+		When("the archive contains a symlink to a file in the directory", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					helpers.WithHelloWorldApp(func(appDir string) {

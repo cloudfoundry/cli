@@ -50,7 +50,7 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("CurrentUser", func() {
-		Context("when using client credentials and the user token is set", func() {
+		When("using client credentials and the user token is set", func() {
 			It("returns the user", func() {
 				config = &Config{
 					ConfigFile: JSONConfig{
@@ -66,7 +66,7 @@ var _ = Describe("JSONConfig", func() {
 			})
 		})
 
-		Context("when using user/password and the user token is set", func() {
+		When("using user/password and the user token is set", func() {
 			It("returns the user", func() {
 				config = &Config{
 					ConfigFile: JSONConfig{
@@ -82,7 +82,7 @@ var _ = Describe("JSONConfig", func() {
 			})
 		})
 
-		Context("when the user token is blank", func() {
+		When("the user token is blank", func() {
 			It("returns the user", func() {
 				config = new(Config)
 				user, err := config.CurrentUser()
@@ -93,7 +93,7 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("HasTargetedOrganization", func() {
-		Context("when an organization is targeted", func() {
+		When("an organization is targeted", func() {
 			It("returns true", func() {
 				config = new(Config)
 				config.SetOrganizationInformation("guid-value-1", "my-org-name")
@@ -101,7 +101,7 @@ var _ = Describe("JSONConfig", func() {
 			})
 		})
 
-		Context("when an organization is not targeted", func() {
+		When("an organization is not targeted", func() {
 			It("returns false", func() {
 				config = new(Config)
 				Expect(config.HasTargetedOrganization()).To(BeFalse())
@@ -110,7 +110,7 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("HasTargetedSpace", func() {
-		Context("when an space is targeted", func() {
+		When("an space is targeted", func() {
 			It("returns true", func() {
 				config = new(Config)
 				config.SetSpaceInformation("guid-value-1", "my-org-name", true)
@@ -118,7 +118,7 @@ var _ = Describe("JSONConfig", func() {
 			})
 		})
 
-		Context("when an space is not targeted", func() {
+		When("an space is not targeted", func() {
 			It("returns false", func() {
 				config = new(Config)
 				Expect(config.HasTargetedSpace()).To(BeFalse())
@@ -139,7 +139,7 @@ var _ = Describe("JSONConfig", func() {
 	})
 
 	Describe("OverallPollingTimeout", func() {
-		Context("when AsyncTimeout is set in config", func() {
+		When("AsyncTimeout is set in config", func() {
 			BeforeEach(func() {
 				rawConfig := `{ "AsyncTimeout":5 }`
 				setConfig(homeDir, rawConfig)

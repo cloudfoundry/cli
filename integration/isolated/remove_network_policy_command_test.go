@@ -19,7 +19,7 @@ var _ = Describe("remove-network-policy command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("remove-network-policy", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -40,12 +40,12 @@ var _ = Describe("remove-network-policy command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "remove-network-policy", "some-app", "--destination-app", "some-other-app", "--port", "8080", "--protocol", "tcp")
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -65,7 +65,7 @@ var _ = Describe("remove-network-policy command", func() {
 		})
 	})
 
-	Context("when the org and space are properly targetted", func() {
+	When("the org and space are properly targetted", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -88,7 +88,7 @@ var _ = Describe("remove-network-policy command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when an app exists", func() {
+		When("an app exists", func() {
 			BeforeEach(func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
 
@@ -121,7 +121,7 @@ var _ = Describe("remove-network-policy command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when the protocol is not provided", func() {
+			When("the protocol is not provided", func() {
 				It("returns a helpful message", func() {
 					session := helpers.CF("remove-network-policy", appName, "--destination-app", appName, "--port", "8080")
 					Eventually(session.Err).Should(Say("Incorrect Usage: the required flag `--protocol' was not specified"))
@@ -131,7 +131,7 @@ var _ = Describe("remove-network-policy command", func() {
 				})
 			})
 
-			Context("when the port is not provided", func() {
+			When("the port is not provided", func() {
 				It("returns a helpful message", func() {
 					session := helpers.CF("remove-network-policy", appName, "--destination-app", appName, "--protocol", "tcp")
 					Eventually(session.Err).Should(Say("Incorrect Usage: the required flag `--port' was not specified"))
@@ -141,7 +141,7 @@ var _ = Describe("remove-network-policy command", func() {
 				})
 			})
 
-			Context("when the policy does not exist", func() {
+			When("the policy does not exist", func() {
 				It("returns a helpful message and exits 0", func() {
 					session := helpers.CF("remove-network-policy", appName, "--destination-app", appName, "--port", "8081", "--protocol", "udp")
 					username, _ := helpers.GetCredentials()
@@ -154,7 +154,7 @@ var _ = Describe("remove-network-policy command", func() {
 			})
 		})
 
-		Context("when the source app does not exist", func() {
+		When("the source app does not exist", func() {
 			It("returns an error", func() {
 				session := helpers.CF("remove-network-policy", "pineapple", "--destination-app", appName, "--port", "8080", "--protocol", "tcp")
 
@@ -166,7 +166,7 @@ var _ = Describe("remove-network-policy command", func() {
 			})
 		})
 
-		Context("when the dest app does not exist", func() {
+		When("the dest app does not exist", func() {
 			It("returns an error", func() {
 				session := helpers.CF("remove-network-policy", appName, "--destination-app", "pineapple", "--port", "8080", "--protocol", "tcp")
 

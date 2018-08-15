@@ -68,7 +68,7 @@ var _ = Describe("v3-stage Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -85,7 +85,7 @@ var _ = Describe("v3-stage Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -100,7 +100,7 @@ var _ = Describe("v3-stage Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -115,7 +115,7 @@ var _ = Describe("v3-stage Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 		})
 
-		Context("when the logging does not error", func() {
+		When("the logging does not error", func() {
 			var allLogsWritten chan bool
 
 			BeforeEach(func() {
@@ -134,7 +134,7 @@ var _ = Describe("v3-stage Command", func() {
 				}
 			})
 
-			Context("when the staging is successful", func() {
+			When("the staging is successful", func() {
 				const dropletCreateTime = "2017-08-14T21:16:42Z"
 
 				BeforeEach(func() {
@@ -202,7 +202,7 @@ var _ = Describe("v3-stage Command", func() {
 				})
 			})
 
-			Context("when the staging returns an error", func() {
+			When("the staging returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -234,7 +234,7 @@ var _ = Describe("v3-stage Command", func() {
 			})
 		})
 
-		Context("when the logging stream has errors", func() {
+		When("the logging stream has errors", func() {
 			var (
 				expectedErr    error
 				allLogsWritten chan bool
@@ -290,7 +290,7 @@ var _ = Describe("v3-stage Command", func() {
 			})
 		})
 
-		Context("when the logging returns an error due to an API error", func() {
+		When("the logging returns an error due to an API error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

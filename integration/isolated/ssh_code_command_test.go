@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("ssh-code command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("ssh-code", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -25,13 +25,13 @@ var _ = Describe("ssh-code command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "ssh-code")
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})

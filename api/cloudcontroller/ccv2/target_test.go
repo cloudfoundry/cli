@@ -52,7 +52,7 @@ var _ = Describe("Target", func() {
 			)
 		})
 
-		Context("when client has wrappers", func() {
+		When("client has wrappers", func() {
 			var fakeWrapper1 *ccv2fakes.FakeConnectionWrapper
 			var fakeWrapper2 *ccv2fakes.FakeConnectionWrapper
 
@@ -82,13 +82,13 @@ var _ = Describe("Target", func() {
 			})
 		})
 
-		Context("when passed a valid API URL", func() {
+		When("passed a valid API URL", func() {
 			BeforeEach(func() {
 				client = NewClient(Config{AppName: "CF CLI API Target Test", AppVersion: "Unknown"})
 			})
 
-			Context("when the api has unverified SSL", func() {
-				Context("when setting the skip ssl flat", func() {
+			When("the api has unverified SSL", func() {
+				When("setting the skip ssl flat", func() {
 					It("sets all the endpoints on the client", func() {
 						_, err := client.TargetCF(TargetSettings{
 							SkipSSLValidation: true,

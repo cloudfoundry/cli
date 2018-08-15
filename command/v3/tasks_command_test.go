@@ -51,7 +51,7 @@ var _ = Describe("tasks Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -66,7 +66,7 @@ var _ = Describe("tasks Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, and a space and org are targeted", func() {
+	When("the user is logged in, and a space and org are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -80,7 +80,7 @@ var _ = Describe("tasks Command", func() {
 			})
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -95,14 +95,14 @@ var _ = Describe("tasks Command", func() {
 			})
 		})
 
-		Context("when getting the current user does not return an error", func() {
+		When("getting the current user does not return an error", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})
 
-			Context("when provided a valid application name", func() {
+			When("provided a valid application name", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v3action.Application{GUID: "some-app-guid"},
@@ -164,7 +164,7 @@ var _ = Describe("tasks Command", func() {
 					Expect(testUI.Err).To(Say("get-tasks-warning-1"))
 				})
 
-				Context("when the tasks' command fields are returned as empty strings", func() {
+				When("the tasks' command fields are returned as empty strings", func() {
 					BeforeEach(func() {
 						fakeActor.GetApplicationTasksReturns(
 							[]v3action.Task{
@@ -197,7 +197,7 @@ var _ = Describe("tasks Command", func() {
 					})
 				})
 
-				Context("when there are no tasks associated with the application", func() {
+				When("there are no tasks associated with the application", func() {
 					BeforeEach(func() {
 						fakeActor.GetApplicationTasksReturns([]v3action.Task{}, nil, nil)
 					})
@@ -211,9 +211,9 @@ var _ = Describe("tasks Command", func() {
 				})
 			})
 
-			Context("when there are errors", func() {
-				Context("when the error is translatable", func() {
-					Context("when getting the application returns the error", func() {
+			When("there are errors", func() {
+				When("the error is translatable", func() {
+					When("getting the application returns the error", func() {
 						var (
 							returnedErr error
 							expectedErr error
@@ -233,7 +233,7 @@ var _ = Describe("tasks Command", func() {
 						})
 					})
 
-					Context("when getting the app's tasks returns the error", func() {
+					When("getting the app's tasks returns the error", func() {
 						var returnedErr error
 
 						BeforeEach(func() {
@@ -254,8 +254,8 @@ var _ = Describe("tasks Command", func() {
 					})
 				})
 
-				Context("when the error is not translatable", func() {
-					Context("when getting the app returns the error", func() {
+				When("the error is not translatable", func() {
+					When("getting the app returns the error", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -274,7 +274,7 @@ var _ = Describe("tasks Command", func() {
 						})
 					})
 
-					Context("when getting the app's tasks returns the error", func() {
+					When("getting the app's tasks returns the error", func() {
 						var expectedErr error
 
 						BeforeEach(func() {

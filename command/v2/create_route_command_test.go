@@ -77,14 +77,14 @@ var _ = Describe("Create Route Command", func() {
 		Entry("port and random port", translatableerror.ArgumentCombinationError{Args: []string{"--port", "--random-port"}}, "", "", flag.Port{NullInt: types.NullInt{IsSet: true}}, true),
 	)
 
-	Context("when all the arguments check out", func() {
+	When("all the arguments check out", func() {
 		var executeErr error
 
 		JustBeforeEach(func() {
 			executeErr = cmd.Execute(nil)
 		})
 
-		Context("when checking target fails", func() {
+		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(translatableerror.NotLoggedInError{BinaryName: binaryName})
 			})
@@ -99,7 +99,7 @@ var _ = Describe("Create Route Command", func() {
 			})
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -114,7 +114,7 @@ var _ = Describe("Create Route Command", func() {
 			})
 		})
 
-		Context("when the user is logged in, and the org is targeted", func() {
+		When("the user is logged in, and the org is targeted", func() {
 			BeforeEach(func() {
 				fakeConfig.HasTargetedOrganizationReturns(true)
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "some-org-guid", Name: "some-org"})
@@ -123,7 +123,7 @@ var _ = Describe("Create Route Command", func() {
 					nil)
 			})
 
-			Context("when no flags are provided", func() {
+			When("no flags are provided", func() {
 				BeforeEach(func() {
 					fakeActor.CreateRouteWithExistenceCheckReturns(v2action.Route{
 						Domain: v2action.Domain{
@@ -150,7 +150,7 @@ var _ = Describe("Create Route Command", func() {
 				})
 			})
 
-			Context("when host and path flags are provided", func() {
+			When("host and path flags are provided", func() {
 				BeforeEach(func() {
 					cmd.Hostname = "some-host"
 					cmd.Path = "some-path"
@@ -183,7 +183,7 @@ var _ = Describe("Create Route Command", func() {
 				})
 			})
 
-			Context("when port flag is provided", func() {
+			When("port flag is provided", func() {
 				BeforeEach(func() {
 					cmd.Port = flag.Port{NullInt: types.NullInt{Value: 42, IsSet: true}}
 
@@ -214,7 +214,7 @@ var _ = Describe("Create Route Command", func() {
 				})
 			})
 
-			Context("when random-port flag is provided", func() {
+			When("random-port flag is provided", func() {
 				BeforeEach(func() {
 					cmd.RandomPort = true
 					fakeActor.CreateRouteWithExistenceCheckReturns(v2action.Route{
@@ -244,7 +244,7 @@ var _ = Describe("Create Route Command", func() {
 				})
 			})
 
-			Context("when creating route returns a DomainNotFoundError error", func() {
+			When("creating route returns a DomainNotFoundError error", func() {
 				BeforeEach(func() {
 					fakeActor.CreateRouteWithExistenceCheckReturns(
 						v2action.Route{},
@@ -266,7 +266,7 @@ var _ = Describe("Create Route Command", func() {
 				})
 			})
 
-			Context("when creating route returns a RouteAlreadyExistsError error", func() {
+			When("creating route returns a RouteAlreadyExistsError error", func() {
 				BeforeEach(func() {
 					cmd.Hostname = "some-host"
 
@@ -292,7 +292,7 @@ var _ = Describe("Create Route Command", func() {
 				})
 			})
 
-			Context("when creating route returns a generic error", func() {
+			When("creating route returns a generic error", func() {
 				var createRouteErr error
 				BeforeEach(func() {
 					createRouteErr = errors.New("Oh nooes")

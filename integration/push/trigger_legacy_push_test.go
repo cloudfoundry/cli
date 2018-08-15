@@ -29,7 +29,7 @@ var _ = Describe("triggering legacy push", func() {
 		domain.Create()
 	})
 
-	Context("when there are global properties in the manifest", func() {
+	When("there are global properties in the manifest", func() {
 		It("triggering old push with deprecation warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -49,7 +49,7 @@ var _ = Describe("triggering legacy push", func() {
 		})
 	})
 
-	Context("when there is an 'inherit' property in the manifest", func() {
+	When("there is an 'inherit' property in the manifest", func() {
 		It("triggering old push with deprecation warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "parent.yml"), map[string]interface{}{
@@ -74,7 +74,7 @@ var _ = Describe("triggering legacy push", func() {
 		})
 	})
 
-	Context("when there is a 'domain' property in the manifest", func() {
+	When("there is a 'domain' property in the manifest", func() {
 		It("triggering old push with deprecation warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -95,7 +95,7 @@ var _ = Describe("triggering legacy push", func() {
 		})
 	})
 
-	Context("when there is a 'domains' property in the manifest", func() {
+	When("there is a 'domains' property in the manifest", func() {
 		It("triggering old push with deprecation warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -116,7 +116,7 @@ var _ = Describe("triggering legacy push", func() {
 		})
 	})
 
-	Context("when there is a 'host' property in the manifest", func() {
+	When("there is a 'host' property in the manifest", func() {
 		It("triggering old push with deprecation warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -137,7 +137,7 @@ var _ = Describe("triggering legacy push", func() {
 		})
 	})
 
-	Context("when there is a 'hosts' property in the manifest", func() {
+	When("there is a 'hosts' property in the manifest", func() {
 		It("triggering old push with deprecation warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -158,7 +158,7 @@ var _ = Describe("triggering legacy push", func() {
 		})
 	})
 
-	Context("when there is a 'no-hostname' property in the manifest", func() {
+	When("there is a 'no-hostname' property in the manifest", func() {
 
 		It("triggering old push with deprecation warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
@@ -180,7 +180,7 @@ var _ = Describe("triggering legacy push", func() {
 		})
 	})
 
-	Context("when there is an 'inherit' property and a 'hostname' property in the manifest", func() {
+	When("there is an 'inherit' property and a 'hostname' property in the manifest", func() {
 		It("triggering old push with deprecation warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "parent.yml"), map[string]interface{}{
@@ -206,7 +206,7 @@ var _ = Describe("triggering legacy push", func() {
 		})
 	})
 
-	Context("when there is a 'domain' property and a 'host' property in the manifest", func() {
+	When("there is a 'domain' property and a 'host' property in the manifest", func() {
 		It("triggering old push with deprecation warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{

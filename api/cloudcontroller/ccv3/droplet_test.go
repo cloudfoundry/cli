@@ -30,7 +30,7 @@ var _ = Describe("Droplet", func() {
 			droplet, warnings, executeErr = client.GetApplicationDropletCurrent("some-guid")
 		})
 
-		Context("when the request succeeds", func() {
+		When("the request succeeds", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-guid",
@@ -79,7 +79,7 @@ var _ = Describe("Droplet", func() {
 			})
 		})
 
-		Context("when cloud controller returns an error", func() {
+		When("cloud controller returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -116,7 +116,7 @@ var _ = Describe("Droplet", func() {
 			droplet, warnings, executeErr = client.GetDroplet("some-guid")
 		})
 
-		Context("when the request succeeds", func() {
+		When("the request succeeds", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-guid",
@@ -165,7 +165,7 @@ var _ = Describe("Droplet", func() {
 			})
 		})
 
-		Context("when cloud controller returns an error", func() {
+		When("cloud controller returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -205,7 +205,7 @@ var _ = Describe("Droplet", func() {
 			)
 		})
 
-		Context("when the CC returns back droplets", func() {
+		When("the CC returns back droplets", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
 					"pagination": {
@@ -314,7 +314,7 @@ var _ = Describe("Droplet", func() {
 			})
 		})
 
-		Context("when cloud controller returns an error", func() {
+		When("cloud controller returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [

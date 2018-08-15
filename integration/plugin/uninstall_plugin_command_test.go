@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("uninstall-plugin command", func() {
 	Describe("help", func() {
-		Context("when --help flag is provided", func() {
+		When("--help flag is provided", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("uninstall-plugin", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -28,7 +28,7 @@ var _ = Describe("uninstall-plugin command", func() {
 		})
 	})
 
-	Context("when the plugin is not installed", func() {
+	When("the plugin is not installed", func() {
 		It("informs the user that no such plugin is present and exits 1", func() {
 			session := helpers.CF("uninstall-plugin", "bananarama")
 			Eventually(session.Err).Should(Say("Plugin bananarama does not exist\\."))
@@ -36,7 +36,7 @@ var _ = Describe("uninstall-plugin command", func() {
 		})
 	})
 
-	Context("when the plugin is installed", func() {
+	When("the plugin is installed", func() {
 		BeforeEach(func() {
 			helpers.InstallConfigurablePlugin("banana-plugin-name-1", "2.0.1", []helpers.PluginCommand{
 				{Name: "banana-command-1", Help: "banana-command-1"},
@@ -46,7 +46,7 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			It("does not list the plugin after it is uninstalled", func() {
 				session := helpers.CF("uninstall-plugin", "banana-plugin-name-1")
 				Eventually(session).Should(Say("Uninstalling plugin banana-plugin-name-1\\.\\.\\."))
@@ -71,7 +71,7 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("when the plugin encounters an error during cleanup", func() {
+		When("the plugin encounters an error during cleanup", func() {
 			BeforeEach(func() {
 				helpers.InstallConfigurablePluginFailsUninstall("failing-plugin", "2.0.1", []helpers.PluginCommand{
 					{Name: "failing-command-1", Help: "failing-command-1"},
@@ -101,7 +101,7 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("when the plugin binary has been deleted", func() {
+		When("the plugin binary has been deleted", func() {
 			BeforeEach(func() {
 				helpers.InstallConfigurablePlugin(
 					"banana-plugin-name-1",

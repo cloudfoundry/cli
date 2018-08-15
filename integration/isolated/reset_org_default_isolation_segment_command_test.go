@@ -20,7 +20,7 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("reset-org-default-isolation-segment", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -34,12 +34,12 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "reset-org-default-isolation-segment", "org-name")
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -58,7 +58,7 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -78,7 +78,7 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is set-up correctly", func() {
+	When("the environment is set-up correctly", func() {
 		var userName string
 		var userOrgName string
 
@@ -94,7 +94,7 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 			helpers.QuickDeleteOrg(userOrgName)
 		})
 
-		Context("when the org does not exist", func() {
+		When("the org does not exist", func() {
 			It("fails with org not found message", func() {
 				session := helpers.CF("reset-org-default-isolation-segment", orgName)
 				Eventually(session).Should(Say("Resetting default isolation segment of org %s as %s\\.\\.\\.", orgName, userName))
@@ -104,7 +104,7 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the org exists", func() {
+		When("the org exists", func() {
 			BeforeEach(func() {
 				helpers.CreateOrg(orgName)
 			})
@@ -113,7 +113,7 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			Context("when the isolation segment is set as the org's default", func() {
+			When("the isolation segment is set as the org's default", func() {
 				BeforeEach(func() {
 					isolationSegmentName := helpers.NewIsolationSegmentName()
 					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
@@ -131,7 +131,7 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 				})
 			})
 
-			Context("when the org has no default isolation segment", func() {
+			When("the org has no default isolation segment", func() {
 				It("displays OK", func() {
 					session := helpers.CF("reset-org-default-isolation-segment", orgName)
 					Eventually(session).Should(Say("Resetting default isolation segment of org %s as %s\\.\\.\\.", orgName, userName))

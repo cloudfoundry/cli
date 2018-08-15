@@ -19,7 +19,7 @@ var _ = Describe("Domain", func() {
 	})
 
 	Describe("GetSharedDomain", func() {
-		Context("when the shared domain exists", func() {
+		When("the shared domain exists", func() {
 			BeforeEach(func() {
 				response := `{
 						"metadata": {
@@ -54,7 +54,7 @@ var _ = Describe("Domain", func() {
 			})
 		})
 
-		Context("when the shared domain does not exist", func() {
+		When("the shared domain does not exist", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 130002,
@@ -80,7 +80,7 @@ var _ = Describe("Domain", func() {
 	})
 
 	Describe("GetPrivateDomain", func() {
-		Context("when the private domain exists", func() {
+		When("the private domain exists", func() {
 			BeforeEach(func() {
 				response := `{
 						"metadata": {
@@ -111,7 +111,7 @@ var _ = Describe("Domain", func() {
 			})
 		})
 
-		Context("when the private domain does not exist", func() {
+		When("the private domain does not exist", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 130002,
@@ -137,7 +137,7 @@ var _ = Describe("Domain", func() {
 	})
 
 	Describe("GetPrivateDomains", func() {
-		Context("when the cloud controller does not return an error", func() {
+		When("the cloud controller does not return an error", func() {
 			BeforeEach(func() {
 				response1 := `{
 					"next_url": "/v2/private_domains?q=name%20IN%20domain-name-1,domain-name-2,domain-name-3,domain-name-4&page=2",
@@ -228,7 +228,7 @@ var _ = Describe("Domain", func() {
 			})
 		})
 
-		Context("when the cloud controller returns an error", func() {
+		When("the cloud controller returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 1,
@@ -260,7 +260,7 @@ var _ = Describe("Domain", func() {
 	})
 
 	Describe("GetSharedDomains", func() {
-		Context("when the cloud controller does not return an error", func() {
+		When("the cloud controller does not return an error", func() {
 			BeforeEach(func() {
 				response1 := `{
 					"next_url": "/v2/shared_domains?q=name%20IN%20domain-name-1,domain-name-2,domain-name-3,domain-name-4&page=2",
@@ -367,7 +367,7 @@ var _ = Describe("Domain", func() {
 			})
 		})
 
-		Context("when the cloud controller returns an error", func() {
+		When("the cloud controller returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 1,
@@ -399,7 +399,7 @@ var _ = Describe("Domain", func() {
 	})
 
 	Describe("GetOrganizationPrivateDomains", func() {
-		Context("when the cloud controller does not return an error", func() {
+		When("the cloud controller does not return an error", func() {
 			BeforeEach(func() {
 				response1 := `{
 					"next_url": "/v2/organizations/some-org-guid/private_domains?page=2",
@@ -486,7 +486,7 @@ var _ = Describe("Domain", func() {
 			})
 		})
 
-		Context("when the client includes includes query parameters for name", func() {
+		When("the client includes includes query parameters for name", func() {
 			It("it includes the query parameters in the request", func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -503,7 +503,7 @@ var _ = Describe("Domain", func() {
 			})
 		})
 
-		Context("when the cloud controller returns an error", func() {
+		When("the cloud controller returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					   "description": "The organization could not be found: glah",

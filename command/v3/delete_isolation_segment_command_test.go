@@ -54,7 +54,7 @@ var _ = Describe("delete-isolation-segment Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -67,7 +67,7 @@ var _ = Describe("delete-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -82,19 +82,19 @@ var _ = Describe("delete-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 		})
 
-		Context("when the -f flag is provided", func() {
+		When("the -f flag is provided", func() {
 			BeforeEach(func() {
 				cmd.Force = true
 			})
 
-			Context("when the iso segment exists", func() {
-				Context("when the delete is successful", func() {
+			When("the iso segment exists", func() {
+				When("the delete is successful", func() {
 					BeforeEach(func() {
 						fakeActor.DeleteIsolationSegmentByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 					})
@@ -113,7 +113,7 @@ var _ = Describe("delete-isolation-segment Command", func() {
 					})
 				})
 
-				Context("when the delete is unsuccessful", func() {
+				When("the delete is unsuccessful", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -132,7 +132,7 @@ var _ = Describe("delete-isolation-segment Command", func() {
 				})
 			})
 
-			Context("when the iso segment does not exist", func() {
+			When("the iso segment does not exist", func() {
 				BeforeEach(func() {
 					fakeActor.DeleteIsolationSegmentByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, actionerror.IsolationSegmentNotFoundError{})
 				})
@@ -145,8 +145,8 @@ var _ = Describe("delete-isolation-segment Command", func() {
 			})
 		})
 
-		Context("when the -f flag is not provided", func() {
-			Context("when the user chooses the default", func() {
+		When("the -f flag is not provided", func() {
+			When("the user chooses the default", func() {
 				BeforeEach(func() {
 					input.Write([]byte("\n"))
 				})
@@ -158,7 +158,7 @@ var _ = Describe("delete-isolation-segment Command", func() {
 				})
 			})
 
-			Context("when the user inputs yes", func() {
+			When("the user inputs yes", func() {
 				BeforeEach(func() {
 					input.Write([]byte("yes\n"))
 				})
@@ -170,7 +170,7 @@ var _ = Describe("delete-isolation-segment Command", func() {
 				})
 			})
 
-			Context("when the user inputs no", func() {
+			When("the user inputs no", func() {
 				BeforeEach(func() {
 					input.Write([]byte("no\n"))
 				})

@@ -18,7 +18,7 @@ var _ = Describe("User", func() {
 	})
 
 	Describe("CreateUser", func() {
-		Context("when an error does not occur", func() {
+		When("an error does not occur", func() {
 			BeforeEach(func() {
 				response := `{
 					 "metadata": {
@@ -58,7 +58,7 @@ var _ = Describe("User", func() {
 			})
 		})
 
-		Context("when cloud controller returns an error and warnings", func() {
+		When("cloud controller returns an error and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10008,

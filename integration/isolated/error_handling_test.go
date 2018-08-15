@@ -15,7 +15,7 @@ var _ = Describe("curl command", func() {
 		Eventually(session).Should(Exit(0))
 	})
 
-	Context("when using -v", func() {
+	When("using -v", func() {
 		It("returns the expected request with verbose output", func() {
 			session := helpers.CF("curl", "-v", "/v2/banana")
 			Eventually(session).Should(Say("GET /v2/banana HTTP/1.1"))

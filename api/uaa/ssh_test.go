@@ -25,7 +25,7 @@ var _ = Describe("SSH", func() {
 	})
 
 	Describe("GetSSHPasscode", func() {
-		Context("when no errors occur", func() {
+		When("no errors occur", func() {
 			var expectedCode string
 
 			BeforeEach(func() {
@@ -47,7 +47,7 @@ var _ = Describe("SSH", func() {
 			})
 		})
 
-		Context("when an error occurs", func() {
+		When("an error occurs", func() {
 			var response string
 
 			BeforeEach(func() {

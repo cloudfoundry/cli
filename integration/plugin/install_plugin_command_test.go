@@ -38,7 +38,7 @@ var _ = Describe("install-plugin command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when the --help flag is given", func() {
+		When("the --help flag is given", func() {
 			It("displays command usage to stdout", func() {
 				session := helpers.CF("install-plugin", "--help")
 
@@ -67,7 +67,7 @@ var _ = Describe("install-plugin command", func() {
 		})
 	})
 
-	Context("when the user does not provide a plugin name or location", func() {
+	When("the user does not provide a plugin name or location", func() {
 		It("errors and displays usage", func() {
 			session := helpers.CF("install-plugin")
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PLUGIN_NAME_OR_LOCATION` was not provided"))
@@ -77,7 +77,7 @@ var _ = Describe("install-plugin command", func() {
 		})
 	})
 
-	Context("when the plugin dir does not exist", func() {
+	When("the plugin dir does not exist", func() {
 		var (
 			newPluginHome string
 
@@ -117,7 +117,7 @@ var _ = Describe("install-plugin command", func() {
 	})
 
 	Describe("installing a plugin from a local file", func() {
-		Context("when the file is compiled for a different os and architecture", func() {
+		When("the file is compiled for a different os and architecture", func() {
 			BeforeEach(func() {
 				goos := os.Getenv("GOOS")
 				goarch := os.Getenv("GOARCH")
@@ -151,7 +151,7 @@ var _ = Describe("install-plugin command", func() {
 			})
 		})
 
-		Context("when the file is compiled for the correct os and architecture", func() {
+		When("the file is compiled for the correct os and architecture", func() {
 			BeforeEach(func() {
 				pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
 					[]helpers.PluginCommand{
@@ -160,7 +160,7 @@ var _ = Describe("install-plugin command", func() {
 				)
 			})
 
-			Context("when the -f flag is given", func() {
+			When("the -f flag is given", func() {
 				It("installs the plugin and cleans up all temp files", func() {
 					session := helpers.CF("install-plugin", pluginPath, "-f")
 
@@ -187,7 +187,7 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(helpSession).Should(Exit(0))
 				})
 
-				Context("when the file does not have executable permissions", func() {
+				When("the file does not have executable permissions", func() {
 					BeforeEach(func() {
 						Expect(os.Chmod(pluginPath, 0666)).ToNot(HaveOccurred())
 					})
@@ -199,7 +199,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("when the plugin is already installed", func() {
+				When("the plugin is already installed", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("install-plugin", pluginPath, "-f")).Should(Exit(0))
 					})
@@ -216,7 +216,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("when the file does not exist", func() {
+				When("the file does not exist", func() {
 					It("tells the user that the file was not found and fails", func() {
 						session := helpers.CF("install-plugin", "some/path/that/does/not/exist", "-f")
 						Eventually(session.Err).Should(Say("Plugin some/path/that/does/not/exist not found on disk or in any registered repo\\."))
@@ -229,7 +229,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("when the file is not an executable", func() {
+				When("the file is not an executable", func() {
 					BeforeEach(func() {
 						badPlugin, err := ioutil.TempFile("", "")
 						Expect(err).ToNot(HaveOccurred())
@@ -251,7 +251,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("when the file is not a plugin", func() {
+				When("the file is not a plugin", func() {
 					BeforeEach(func() {
 						var err error
 						pluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/non_plugin")
@@ -266,7 +266,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("when getting metadata from the plugin errors", func() {
+				When("getting metadata from the plugin errors", func() {
 					BeforeEach(func() {
 						var err error
 						pluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_fails_metadata")
@@ -282,8 +282,8 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("when there is a command conflict", func() {
-					Context("when the plugin has a command that is the same as a built-in command", func() {
+				When("there is a command conflict", func() {
+					When("the plugin has a command that is the same as a built-in command", func() {
 						BeforeEach(func() {
 							pluginPath = helpers.BuildConfigurablePlugin(
 								"configurable_plugin", "some-plugin", "1.1.1",
@@ -305,7 +305,7 @@ var _ = Describe("install-plugin command", func() {
 						})
 					})
 
-					Context("when the plugin has a command that is the same as a built-in alias", func() {
+					When("the plugin has a command that is the same as a built-in alias", func() {
 						BeforeEach(func() {
 							pluginPath = helpers.BuildConfigurablePlugin(
 								"configurable_plugin", "some-plugin", "1.1.1",
@@ -327,7 +327,7 @@ var _ = Describe("install-plugin command", func() {
 						})
 					})
 
-					Context("when the plugin has a command that is the same as another plugin command", func() {
+					When("the plugin has a command that is the same as another plugin command", func() {
 						BeforeEach(func() {
 							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
@@ -354,7 +354,7 @@ var _ = Describe("install-plugin command", func() {
 						})
 					})
 
-					Context("when the plugin has a command that is the same as another plugin alias", func() {
+					When("the plugin has a command that is the same as another plugin alias", func() {
 						BeforeEach(func() {
 							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
@@ -383,7 +383,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				Context("alias conflict", func() {
-					Context("when the plugin has an alias that is the same as a built-in command", func() {
+					When("the plugin has an alias that is the same as a built-in command", func() {
 
 						BeforeEach(func() {
 							pluginPath = helpers.BuildConfigurablePlugin(
@@ -406,7 +406,7 @@ var _ = Describe("install-plugin command", func() {
 						})
 					})
 
-					Context("when the plugin has an alias that is the same as a built-in alias", func() {
+					When("the plugin has an alias that is the same as a built-in alias", func() {
 						BeforeEach(func() {
 							pluginPath = helpers.BuildConfigurablePlugin(
 								"configurable_plugin", "some-plugin", "1.1.1",
@@ -428,7 +428,7 @@ var _ = Describe("install-plugin command", func() {
 						})
 					})
 
-					Context("when the plugin has an alias that is the same as another plugin command", func() {
+					When("the plugin has an alias that is the same as another plugin command", func() {
 						BeforeEach(func() {
 							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
@@ -455,7 +455,7 @@ var _ = Describe("install-plugin command", func() {
 						})
 					})
 
-					Context("when the plugin has an alias that is the same as another plugin alias", func() {
+					When("the plugin has an alias that is the same as another plugin alias", func() {
 						BeforeEach(func() {
 							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
@@ -484,7 +484,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				Context("alias and command conflicts", func() {
-					Context("when the plugin has a command and an alias that are both taken by another plugin", func() {
+					When("the plugin has a command and an alias that are both taken by another plugin", func() {
 						BeforeEach(func() {
 							helpers.InstallConfigurablePlugin("existing-plugin", "1.1.1",
 								[]helpers.PluginCommand{
@@ -513,8 +513,8 @@ var _ = Describe("install-plugin command", func() {
 				})
 			})
 
-			Context("when the -f flag is not given", func() {
-				Context("when the user says yes", func() {
+			When("the -f flag is not given", func() {
+				When("the user says yes", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
 						_, _ = buffer.Write([]byte("y\n"))
@@ -545,7 +545,7 @@ var _ = Describe("install-plugin command", func() {
 						Eventually(helpSession).Should(Exit(0))
 					})
 
-					Context("when the plugin is already installed", func() {
+					When("the plugin is already installed", func() {
 						BeforeEach(func() {
 							Eventually(helpers.CF("install-plugin", pluginPath, "-f")).Should(Exit(0))
 						})
@@ -562,7 +562,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("when the user says no", func() {
+				When("the user says no", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
 						_, _ = buffer.Write([]byte("n\n"))
@@ -579,7 +579,7 @@ var _ = Describe("install-plugin command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 
-					Context("when the plugin is already installed", func() {
+					When("the plugin is already installed", func() {
 						BeforeEach(func() {
 							Eventually(helpers.CF("install-plugin", pluginPath, "-f")).Should(Exit(0))
 						})
@@ -598,7 +598,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("when the user interrupts with control-c", func() {
+				When("the user interrupts with control-c", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
 						_, _ = buffer.Write([]byte("y")) // but not enter
@@ -646,8 +646,8 @@ var _ = Describe("install-plugin command", func() {
 			server.Close()
 		})
 
-		Context("when a URL and the -f flag are provided", func() {
-			Context("when an executable is available for download at the URL", func() {
+		When("a URL and the -f flag are provided", func() {
+			When("an executable is available for download at the URL", func() {
 				var (
 					pluginData []byte
 				)
@@ -691,7 +691,7 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when the URL redirects", func() {
+				When("the URL redirects", func() {
 					BeforeEach(func() {
 						server.Reset()
 						server.AppendHandlers(
@@ -716,7 +716,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("when the plugin has already been installed", func() {
+				When("the plugin has already been installed", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("install-plugin", pluginPath, "-f")).Should(Exit(0))
 					})
@@ -741,7 +741,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 			})
 
-			Context("when a 4xx or 5xx HTTP response status is encountered", func() {
+			When("a 4xx or 5xx HTTP response status is encountered", func() {
 				BeforeEach(func() {
 					server.AppendHandlers(
 						CombineHandlers(
@@ -763,7 +763,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 			})
 
-			Context("when the file is not a plugin", func() {
+			When("the file is not a plugin", func() {
 				BeforeEach(func() {
 					var err error
 					pluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/non_plugin")
@@ -796,7 +796,7 @@ var _ = Describe("install-plugin command", func() {
 			})
 		})
 
-		Context("when the -f flag is not provided", func() {
+		When("the -f flag is not provided", func() {
 			var (
 				pluginData []byte
 			)
@@ -824,7 +824,7 @@ var _ = Describe("install-plugin command", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when the user says yes", func() {
+			When("the user says yes", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
 					_, _ = buffer.Write([]byte("y\n"))
@@ -847,7 +847,7 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when the plugin is already installed", func() {
+				When("the plugin is already installed", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("install-plugin", pluginPath, "-f")).Should(Exit(0))
 					})
@@ -870,7 +870,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 			})
 
-			Context("when the user says no", func() {
+			When("the user says no", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
 					_, _ = buffer.Write([]byte("n\n"))
@@ -890,7 +890,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 			})
 
-			Context("when the user interrupts with control-c", func() {
+			When("the user interrupts with control-c", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
 					_, _ = buffer.Write([]byte("y")) // but not enter

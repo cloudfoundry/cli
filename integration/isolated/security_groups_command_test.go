@@ -14,7 +14,7 @@ var _ = Describe("security-groups command", func() {
 	)
 
 	Describe("help", func() {
-		Context("when --help flag is provided", func() {
+		When("--help flag is provided", func() {
 			It("displays command usage to output", func() {
 				session = helpers.CF("security-groups", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -28,13 +28,13 @@ var _ = Describe("security-groups command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "security-groups")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})
@@ -43,7 +43,7 @@ var _ = Describe("security-groups command", func() {
 			session = helpers.CF("security-groups")
 		})
 
-		Context("when there are security groups", func() {
+		When("there are security groups", func() {
 			var (
 				securityGroup1 helpers.SecurityGroup
 				securityGroup2 helpers.SecurityGroup

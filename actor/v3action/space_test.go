@@ -24,7 +24,7 @@ var _ = Describe("Space", func() {
 	})
 
 	Describe("ResetSpaceIsolationSegment", func() {
-		Context("when the organization does not have a default isolation segment", func() {
+		When("the organization does not have a default isolation segment", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
 					ccv3.Relationship{GUID: ""},
@@ -51,7 +51,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when the organization has a default isolation segment", func() {
+		When("the organization has a default isolation segment", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateSpaceIsolationSegmentRelationshipReturns(
 					ccv3.Relationship{GUID: ""},
@@ -86,7 +86,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when assigning the space returns an error", func() {
+		When("assigning the space returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -103,7 +103,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when getting the org's default isolation segments returns an error", func() {
+		When("getting the org's default isolation segments returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -123,7 +123,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when getting the isolation segment returns an error", func() {
+		When("getting the isolation segment returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -166,8 +166,8 @@ var _ = Describe("Space", func() {
 			space, warnings, executeErr = actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
 		})
 
-		Context("when the GetSpace call is successful", func() {
-			Context("when the cloud controller returns back one space", func() {
+		When("the GetSpace call is successful", func() {
+			When("the cloud controller returns back one space", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv3.Space{{GUID: "some-space-guid", Name: spaceName}},
@@ -191,7 +191,7 @@ var _ = Describe("Space", func() {
 				})
 			})
 
-			Context("when the cloud controller returns back no spaces", func() {
+			When("the cloud controller returns back no spaces", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						nil, ccv3.Warnings{"some-space-warning"}, nil)
@@ -205,7 +205,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when the GetSpace call is unsuccessful", func() {
+		When("the GetSpace call is unsuccessful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpacesReturns(
 					nil,

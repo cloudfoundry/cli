@@ -47,7 +47,7 @@ var _ = Describe("NetworkProtocol", func() {
 			Entry("sets 'udp' when passed 'uDp'", "uDp", "udp"),
 		)
 
-		Context("when passed anything else", func() {
+		When("passed anything else", func() {
 			It("returns an error", func() {
 				err := proto.UnmarshalFlag("banana")
 				Expect(err).To(MatchError(&flags.Error{

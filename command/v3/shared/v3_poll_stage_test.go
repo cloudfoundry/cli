@@ -82,7 +82,7 @@ var _ = Describe("V3PollStage", func() {
 		}()
 	})
 
-	Context("when the droplet stream contains a droplet GUID", func() {
+	When("the droplet stream contains a droplet GUID", func() {
 		BeforeEach(func() {
 			writeEventsAsync(func() {
 				dropletStream <- v3action.Droplet{GUID: "droplet-guid"}
@@ -97,7 +97,7 @@ var _ = Describe("V3PollStage", func() {
 		})
 	})
 
-	Context("when the warnings stream contains warnings", func() {
+	When("the warnings stream contains warnings", func() {
 		BeforeEach(func() {
 			writeEventsAsync(func() {
 				warningsStream <- v3action.Warnings{"warning-1", "warning-2"}
@@ -115,7 +115,7 @@ var _ = Describe("V3PollStage", func() {
 		})
 	})
 
-	Context("when the log stream contains a log message", func() {
+	When("the log stream contains a log message", func() {
 		Context("and the message is a staging message", func() {
 			BeforeEach(func() {
 				writeEventsAsync(func() {
@@ -149,7 +149,7 @@ var _ = Describe("V3PollStage", func() {
 		})
 	})
 
-	Context("when the error stream contains an error", func() {
+	When("the error stream contains an error", func() {
 		BeforeEach(func() {
 			writeEventsAsync(func() {
 				errStream <- errors.New("some error")
@@ -164,7 +164,7 @@ var _ = Describe("V3PollStage", func() {
 		})
 	})
 
-	Context("when the log error stream contains errors", func() {
+	When("the log error stream contains errors", func() {
 		BeforeEach(func() {
 			writeEventsAsync(func() {
 				logErrStream <- errors.New("some-log-error")

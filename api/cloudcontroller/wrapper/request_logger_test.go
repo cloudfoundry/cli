@@ -95,7 +95,7 @@ var _ = Describe("Request Logger", func() {
 			Expect(fakeOutput.DisplayMessageCallCount()).To(Equal(0))
 		})
 
-		Context("when an authorization header is in the request", func() {
+		When("an authorization header is in the request", func() {
 			BeforeEach(func() {
 				request.Header = http.Header{"Authorization": []string{"should not be shown"}}
 			})
@@ -109,8 +109,8 @@ var _ = Describe("Request Logger", func() {
 			})
 		})
 
-		Context("when passed a body", func() {
-			Context("when the request's Content-Type is application/json", func() {
+		When("passed a body", func() {
+			When("the request's Content-Type is application/json", func() {
 				BeforeEach(func() {
 					request.Header.Set("Content-Type", "application/json")
 				})
@@ -127,7 +127,7 @@ var _ = Describe("Request Logger", func() {
 				})
 			})
 
-			Context("when the request's Content-Type is application/x-www-form-urlencoded", func() {
+			When("the request's Content-Type is application/x-www-form-urlencoded", func() {
 				BeforeEach(func() {
 					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 				})
@@ -143,7 +143,7 @@ var _ = Describe("Request Logger", func() {
 				})
 			})
 
-			Context("when request's Content-Type is anything else", func() {
+			When("request's Content-Type is anything else", func() {
 				BeforeEach(func() {
 					request.Header.Set("Content-Type", "banana;rama")
 				})
@@ -157,7 +157,7 @@ var _ = Describe("Request Logger", func() {
 			})
 		})
 
-		Context("when an error occures while trying to log the request", func() {
+		When("an error occures while trying to log the request", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -181,7 +181,7 @@ var _ = Describe("Request Logger", func() {
 			})
 		})
 
-		Context("when the request is successful", func() {
+		When("the request is successful", func() {
 			BeforeEach(func() {
 				response = &cloudcontroller.Response{
 					RawResponse: []byte("some-response-body"),
@@ -226,7 +226,7 @@ var _ = Describe("Request Logger", func() {
 			})
 		})
 
-		Context("when the request is unsuccessful", func() {
+		When("the request is unsuccessful", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -234,7 +234,7 @@ var _ = Describe("Request Logger", func() {
 				fakeConnection.MakeReturns(expectedErr)
 			})
 
-			Context("when the http response is not set", func() {
+			When("the http response is not set", func() {
 				BeforeEach(func() {
 					response = &cloudcontroller.Response{}
 				})
@@ -245,7 +245,7 @@ var _ = Describe("Request Logger", func() {
 				})
 			})
 
-			Context("when the http response is set", func() {
+			When("the http response is set", func() {
 				BeforeEach(func() {
 					response = &cloudcontroller.Response{
 						RawResponse: []byte("some-error-body"),
@@ -291,7 +291,7 @@ var _ = Describe("Request Logger", func() {
 			})
 		})
 
-		Context("when an error occures while trying to log the response", func() {
+		When("an error occures while trying to log the response", func() {
 			var (
 				originalErr error
 				expectedErr error
@@ -326,7 +326,7 @@ var _ = Describe("Request Logger", func() {
 			Expect(fakeOutput.StopCallCount()).To(Equal(2))
 		})
 
-		Context("when displaying the logs have an error", func() {
+		When("displaying the logs have an error", func() {
 			var expectedErr error
 			BeforeEach(func() {
 				expectedErr = errors.New("Display error on request")

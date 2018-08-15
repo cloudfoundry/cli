@@ -28,7 +28,7 @@ var _ = Describe("ProcessInstance", func() {
 			warnings, executeErr = client.DeleteApplicationProcessInstance("some-app-guid", "some-process-type", 666)
 		})
 
-		Context("when the cloud controller returns an error", func() {
+		When("the cloud controller returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -54,7 +54,7 @@ var _ = Describe("ProcessInstance", func() {
 			})
 		})
 
-		Context("when the delete is successful", func() {
+		When("the delete is successful", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -82,7 +82,7 @@ var _ = Describe("ProcessInstance", func() {
 			processes, warnings, executeErr = client.GetProcessInstances("some-process-guid")
 		})
 
-		Context("when the process exists", func() {
+		When("the process exists", func() {
 			BeforeEach(func() {
 				response := `{
 					"resources": [
@@ -149,7 +149,7 @@ var _ = Describe("ProcessInstance", func() {
 			})
 		})
 
-		Context("when cloud controller returns an error", func() {
+		When("cloud controller returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [

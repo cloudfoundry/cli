@@ -25,7 +25,7 @@ var _ = XDescribe("apps command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("apps", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -41,13 +41,13 @@ var _ = XDescribe("apps command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "apps")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -90,7 +90,7 @@ var _ = XDescribe("apps command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when one app is stopped", func() {
+			When("one app is stopped", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("stop", appName1)).Should(Exit(0))
 				})

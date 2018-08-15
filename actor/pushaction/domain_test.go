@@ -38,7 +38,7 @@ var _ = Describe("Domains", func() {
 			defaultDomain, warnings, executeErr = actor.DefaultDomain(orgGUID)
 		})
 
-		Context("when retrieving the domains is successful", func() {
+		When("retrieving the domains is successful", func() {
 			BeforeEach(func() {
 				fakeV2Actor.GetOrganizationDomainsReturns([]v2action.Domain{
 					{
@@ -83,7 +83,7 @@ var _ = Describe("Domains", func() {
 			})
 		})
 
-		Context("when retrieving the domains errors", func() {
+		When("retrieving the domains errors", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

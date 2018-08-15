@@ -29,7 +29,7 @@ var _ = Describe("Organizations", func() {
 			organizations, warnings, executeErr = client.GetIsolationSegmentOrganizations("some-iso-guid")
 		})
 
-		Context("when organizations exist", func() {
+		When("organizations exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
 	"pagination": {
@@ -85,7 +85,7 @@ var _ = Describe("Organizations", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [
@@ -144,7 +144,7 @@ var _ = Describe("Organizations", func() {
 			})
 		})
 
-		Context("when organizations exist", func() {
+		When("organizations exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
 	"pagination": {
@@ -200,7 +200,7 @@ var _ = Describe("Organizations", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [

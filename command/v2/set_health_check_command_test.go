@@ -58,7 +58,7 @@ var _ = Describe("set-health-check Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking the target fails", func() {
+	When("checking the target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(
 				actionerror.NotLoggedInError{BinaryName: binaryName})
@@ -74,7 +74,7 @@ var _ = Describe("set-health-check Command", func() {
 		})
 	})
 
-	Context("when setting the application health check type returns an error", func() {
+	When("setting the application health check type returns an error", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -92,7 +92,7 @@ var _ = Describe("set-health-check Command", func() {
 		})
 	})
 
-	Context("when setting health check is successful", func() {
+	When("setting health check is successful", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.AppName = "some-app"
 			cmd.RequiredArgs.HealthCheck.Type = "some-health-check-type"
@@ -117,7 +117,7 @@ var _ = Describe("set-health-check Command", func() {
 		})
 	})
 
-	Context("when the app is started", func() {
+	When("the app is started", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.AppName = "some-app"
 			cmd.RequiredArgs.HealthCheck.Type = "some-health-check-type"

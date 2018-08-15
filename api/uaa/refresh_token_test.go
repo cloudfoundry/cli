@@ -33,7 +33,7 @@ var _ = Describe("UAA Client", func() {
 			returnedRefreshToken string
 		)
 
-		Context("when the provided grant_type is client_credentials", func() {
+		When("the provided grant_type is client_credentials", func() {
 			BeforeEach(func() {
 				fakeConfig.UAAGrantTypeReturns(string(constant.GrantTypeClientCredentials))
 
@@ -70,7 +70,7 @@ var _ = Describe("UAA Client", func() {
 			})
 		})
 
-		Context("when the provided grant_type is not client_credentials", func() {
+		When("the provided grant_type is not client_credentials", func() {
 			BeforeEach(func() {
 				returnedAccessToken = "I-ACCESS-TOKEN"
 				sentRefreshToken = "I-R-REFRESH-TOKEN"

@@ -45,7 +45,7 @@ var _ = Describe("oauth-token command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking the target fails", func() {
+	When("checking the target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -60,12 +60,12 @@ var _ = Describe("oauth-token command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.RefreshTokenReturns("existing-refresh-token")
 		})
 
-		Context("when an error is encountered refreshing the access token", func() {
+		When("an error is encountered refreshing the access token", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -83,7 +83,7 @@ var _ = Describe("oauth-token command", func() {
 			})
 		})
 
-		Context("when no errors are encountered refreshing the access token", func() {
+		When("no errors are encountered refreshing the access token", func() {
 			BeforeEach(func() {
 				fakeActor.RefreshAccessTokenReturns("new-access-token", nil)
 			})

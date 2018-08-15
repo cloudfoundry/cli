@@ -11,12 +11,12 @@ import (
 )
 
 var _ = Describe("delete-user command", func() {
-	Context("when the logged in user is authorized to delete-users", func() {
+	When("the logged in user is authorized to delete-users", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})
 
-		Context("when deleting a user that exists in multiple origins", func() {
+		When("deleting a user that exists in multiple origins", func() {
 			var newUser string
 
 			BeforeEach(func() {

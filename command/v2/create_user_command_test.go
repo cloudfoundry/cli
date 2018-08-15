@@ -52,7 +52,7 @@ var _ = Describe("create-user Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -67,13 +67,13 @@ var _ = Describe("create-user Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
-		Context("when password is not provided", func() {
+	When("the user is logged in", func() {
+		When("password is not provided", func() {
 			BeforeEach(func() {
 				cmd.Args.Password = nil
 			})
 
-			Context("when origin is empty string", func() {
+			When("origin is empty string", func() {
 				BeforeEach(func() {
 					cmd.Origin = ""
 				})
@@ -83,7 +83,7 @@ var _ = Describe("create-user Command", func() {
 				})
 			})
 
-			Context("when origin is UAA", func() {
+			When("origin is UAA", func() {
 				BeforeEach(func() {
 					cmd.Origin = "UAA"
 				})
@@ -93,7 +93,7 @@ var _ = Describe("create-user Command", func() {
 				})
 			})
 
-			Context("when origin is not UAA or the empty string", func() {
+			When("origin is not UAA or the empty string", func() {
 				BeforeEach(func() {
 					fakeActor.CreateUserReturns(
 						v2action.User{GUID: "new-user-cc-guid"},
@@ -119,7 +119,7 @@ var _ = Describe("create-user Command", func() {
 			})
 		})
 
-		Context("when no errors occur", func() {
+		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakeActor.CreateUserReturns(
 					v2action.User{GUID: "new-user-cc-guid"},
@@ -144,8 +144,8 @@ var _ = Describe("create-user Command", func() {
 			})
 		})
 
-		Context("when an error occurs", func() {
-			Context("when the error is not translatable", func() {
+		When("an error occurs", func() {
+			When("the error is not translatable", func() {
 				var returnedErr error
 
 				BeforeEach(func() {
@@ -163,7 +163,7 @@ var _ = Describe("create-user Command", func() {
 				})
 			})
 
-			Context("when the error is a uaa.ConflictError", func() {
+			When("the error is a uaa.ConflictError", func() {
 				var returnedErr error
 
 				BeforeEach(func() {

@@ -31,7 +31,7 @@ var _ = Describe("Routing", func() {
 				})).Should(Equal(`/a/path/1/with/2/a%20space/in/4`))
 			})
 
-			Context("when the hash is missing params", func() {
+			When("the hash is missing params", func() {
 				It("should error", func() {
 					_, err := route.CreatePath(Params{
 						"param": "1",
@@ -42,7 +42,7 @@ var _ = Describe("Routing", func() {
 				})
 			})
 
-			Context("when the hash has extra params", func() {
+			When("the hash has extra params", func() {
 				It("should totally not care", func() {
 					Expect(route.CreatePath(Params{
 						"param":       "1",
@@ -81,7 +81,7 @@ var _ = Describe("Routing", func() {
 		})
 
 		Describe("CreateRequest", func() {
-			Context("when the route exists", func() {
+			When("the route exists", func() {
 				var badRouteName, routeName string
 				BeforeEach(func() {
 					routeName = "banana"
@@ -93,7 +93,7 @@ var _ = Describe("Routing", func() {
 					}
 				})
 
-				Context("when the resource exists exists", func() {
+				When("the resource exists exists", func() {
 					BeforeEach(func() {
 						resources = map[string]string{
 							"exists": "https://foo.bar.baz/this/is",
@@ -107,7 +107,7 @@ var _ = Describe("Routing", func() {
 					})
 				})
 
-				Context("when the resource exists exists", func() {
+				When("the resource exists exists", func() {
 					It("returns an error", func() {
 						_, err := router.CreateRequest(badRouteName, nil, nil)
 						Expect(err).To(MatchError("No resource exists with the name fake-resource"))
@@ -115,7 +115,7 @@ var _ = Describe("Routing", func() {
 				})
 			})
 
-			Context("when the route does not exists exist", func() {
+			When("the route does not exists exist", func() {
 				It("returns an error", func() {
 					_, err := router.CreateRequest("fake-route", nil, nil)
 					Expect(err).To(MatchError("No route exists with the name fake-route"))

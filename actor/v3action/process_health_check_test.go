@@ -66,7 +66,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			processHealthChecks, warnings, executeErr = actor.GetApplicationProcessHealthChecksByNameAndSpace("some-app-name", "some-space-guid")
 		})
 
-		Context("when application does not exist", func() {
+		When("application does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv3.Application{},
@@ -81,7 +81,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			})
 		})
 
-		Context("when getting application returns an error", func() {
+		When("getting application returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -99,7 +99,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			})
 		})
 
-		Context("when application exists", func() {
+		When("application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv3.Application{
@@ -112,7 +112,7 @@ var _ = Describe("Process Health Check Actions", func() {
 				)
 			})
 
-			Context("when getting application processes returns an error", func() {
+			When("getting application processes returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -130,7 +130,7 @@ var _ = Describe("Process Health Check Actions", func() {
 				})
 			})
 
-			Context("when application has processes", func() {
+			When("application has processes", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
 						[]ccv3.Process{
@@ -193,7 +193,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			app, warnings, err = actor.SetApplicationProcessHealthCheckTypeByNameAndSpace("some-app-name", "some-space-guid", healthCheckType, healthCheckEndpoint, "some-process-type", 42)
 		})
 
-		Context("when the user specifies an endpoint for a non-http health check", func() {
+		When("the user specifies an endpoint for a non-http health check", func() {
 			BeforeEach(func() {
 				healthCheckType = "port"
 				healthCheckEndpoint = "some-http-endpoint"
@@ -205,7 +205,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			})
 		})
 
-		Context("when application does not exist", func() {
+		When("application does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv3.Application{},
@@ -223,7 +223,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			})
 		})
 
-		Context("when getting application returns an error", func() {
+		When("getting application returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -241,7 +241,7 @@ var _ = Describe("Process Health Check Actions", func() {
 			})
 		})
 
-		Context("when application exists", func() {
+		When("application exists", func() {
 			var ccv3App ccv3.Application
 
 			BeforeEach(func() {
@@ -256,10 +256,10 @@ var _ = Describe("Process Health Check Actions", func() {
 				)
 			})
 
-			Context("when getting application process by type returns an error", func() {
+			When("getting application process by type returns an error", func() {
 				var expectedErr error
 
-				Context("when the api returns a ProcessNotFoundError", func() {
+				When("the api returns a ProcessNotFoundError", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
 							ccv3.Process{},
@@ -291,7 +291,7 @@ var _ = Describe("Process Health Check Actions", func() {
 				})
 			})
 
-			Context("when application process exists", func() {
+			When("application process exists", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
 						ccv3.Process{
@@ -302,7 +302,7 @@ var _ = Describe("Process Health Check Actions", func() {
 					)
 				})
 
-				Context("when setting process health check type returns an error", func() {
+				When("setting process health check type returns an error", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -320,7 +320,7 @@ var _ = Describe("Process Health Check Actions", func() {
 					})
 				})
 
-				Context("when setting process health check type succeeds", func() {
+				When("setting process health check type succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.PatchApplicationProcessHealthCheckReturns(
 							ccv3.Process{GUID: "some-process-guid"},
@@ -329,7 +329,7 @@ var _ = Describe("Process Health Check Actions", func() {
 						)
 					})
 
-					Context("when the health check type is http", func() {
+					When("the health check type is http", func() {
 						BeforeEach(func() {
 							healthCheckType = "http"
 							healthCheckEndpoint = "some-http-endpoint"
@@ -357,7 +357,7 @@ var _ = Describe("Process Health Check Actions", func() {
 						})
 					})
 
-					Context("when the health check type is not http", func() {
+					When("the health check type is not http", func() {
 						It("does not send the / endpoint and returns the application", func() {
 							Expect(err).NotTo(HaveOccurred())
 							Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-health-check-warning"}))

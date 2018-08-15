@@ -30,7 +30,7 @@ var _ = Describe("Resource", func() {
 			matchedResources, warnings, executeErr = client.UpdateResourceMatch(resourcesToMatch)
 		})
 
-		Context("when resource matching is successful", func() {
+		When("resource matching is successful", func() {
 			BeforeEach(func() {
 				responseBody := `[
 						{
@@ -119,7 +119,7 @@ var _ = Describe("Resource", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 10001,

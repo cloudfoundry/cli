@@ -22,7 +22,7 @@ var _ = Describe("pushes multiple apps with a single manifest file", func() {
 		secondApp = helpers.NewAppName()
 	})
 
-	Context("when the apps are new", func() {
+	When("the apps are new", func() {
 		Context("with no global properties", func() {
 			It("pushes multiple apps with a single push", func() {
 				helpers.WithHelloWorldApp(func(dir string) {

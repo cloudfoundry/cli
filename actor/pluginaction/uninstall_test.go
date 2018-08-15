@@ -49,7 +49,7 @@ var _ = Describe("Plugin actor", func() {
 			os.RemoveAll(pluginHome)
 		})
 
-		Context("when the plugin does not exist", func() {
+		When("the plugin does not exist", func() {
 			BeforeEach(func() {
 				fakeConfig.GetPluginReturns(configv3.Plugin{}, false)
 			})
@@ -60,7 +60,7 @@ var _ = Describe("Plugin actor", func() {
 			})
 		})
 
-		Context("when the plugin exists", func() {
+		When("the plugin exists", func() {
 			BeforeEach(func() {
 				fakeConfig.GetPluginReturns(configv3.Plugin{
 					Name:     "some-plugin",
@@ -68,7 +68,7 @@ var _ = Describe("Plugin actor", func() {
 				}, true)
 			})
 
-			Context("when no errors are encountered", func() {
+			When("no errors are encountered", func() {
 				It("runs the plugin cleanup, deletes the binary and removes the plugin config", func() {
 					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
 					Expect(err).ToNot(HaveOccurred())
@@ -91,7 +91,7 @@ var _ = Describe("Plugin actor", func() {
 				})
 			})
 
-			Context("when the plugin binary does not exist", func() {
+			When("the plugin binary does not exist", func() {
 				BeforeEach(func() {
 					Expect(os.Remove(binaryPath)).ToNot(HaveOccurred())
 				})
@@ -109,7 +109,7 @@ var _ = Describe("Plugin actor", func() {
 				})
 			})
 
-			Context("when the plugin uninstaller returns an os.PathError", func() {
+			When("the plugin uninstaller returns an os.PathError", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -129,7 +129,7 @@ var _ = Describe("Plugin actor", func() {
 				})
 			})
 
-			Context("when the plugin uninstaller returns an exec.ExitError", func() {
+			When("the plugin uninstaller returns an exec.ExitError", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -149,7 +149,7 @@ var _ = Describe("Plugin actor", func() {
 				})
 			})
 
-			Context("when the plugin uninstaller returns any other error", func() {
+			When("the plugin uninstaller returns any other error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -168,7 +168,7 @@ var _ = Describe("Plugin actor", func() {
 				})
 			})
 
-			Context("when deleting the plugin binary returns a 'file does not exist' error", func() {
+			When("deleting the plugin binary returns a 'file does not exist' error", func() {
 				BeforeEach(func() {
 					err := os.Remove(binaryPath)
 					Expect(err).ToNot(HaveOccurred())
@@ -182,7 +182,7 @@ var _ = Describe("Plugin actor", func() {
 				})
 			})
 
-			Context("when deleting the plugin binary returns a path error", func() {
+			When("deleting the plugin binary returns a path error", func() {
 				BeforeEach(func() {
 					err := os.Remove(binaryPath)
 					Expect(err).ToNot(HaveOccurred())
@@ -204,7 +204,7 @@ var _ = Describe("Plugin actor", func() {
 				})
 			})
 
-			Context("when writing the config returns an error", func() {
+			When("writing the config returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {

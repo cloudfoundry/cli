@@ -44,8 +44,8 @@ var _ = Describe("Package", func() {
 			pkg, warnings, executeErr = client.CreatePackage(inputPackage)
 		})
 
-		Context("when the package successfully is created", func() {
-			Context("when creating a docker package", func() {
+		When("the package successfully is created", func() {
+			When("creating a docker package", func() {
 				BeforeEach(func() {
 					inputPackage = Package{
 						Type: constant.PackageTypeDocker,
@@ -117,7 +117,7 @@ var _ = Describe("Package", func() {
 				})
 			})
 
-			Context("when creating a bits package", func() {
+			When("creating a bits package", func() {
 				BeforeEach(func() {
 					inputPackage = Package{
 						Type: constant.PackageTypeBits,
@@ -173,7 +173,7 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when cc returns back an error or warnings", func() {
+		When("cc returns back an error or warnings", func() {
 			BeforeEach(func() {
 				inputPackage = Package{}
 				response := ` {
@@ -230,7 +230,7 @@ var _ = Describe("Package", func() {
 			pkg, warnings, executeErr = client.GetPackage("some-pkg-guid")
 		})
 
-		Context("when the package exists", func() {
+		When("the package exists", func() {
 			BeforeEach(func() {
 				response := `{
   "guid": "some-pkg-guid",
@@ -265,7 +265,7 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
   "errors": [
@@ -321,7 +321,7 @@ var _ = Describe("Package", func() {
 			pkgs, warnings, executeErr = client.GetPackages(Query{Key: AppGUIDFilter, Values: []string{"some-app-guid"}})
 		})
 
-		Context("when cloud controller returns list of packages", func() {
+		When("cloud controller returns list of packages", func() {
 			BeforeEach(func() {
 				response := `{
 					"resources": [
@@ -386,7 +386,7 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -449,14 +449,14 @@ var _ = Describe("Package", func() {
 			}
 		})
 
-		Context("when the upload is successful", func() {
+		When("the upload is successful", func() {
 			var (
 				resources  []Resource
 				reader     io.Reader
 				readerBody []byte
 			)
 
-			Context("when the upload has application bits to upload", func() {
+			When("the upload has application bits to upload", func() {
 				BeforeEach(func() {
 					resources = []Resource{
 						{Filename: "foo"},
@@ -522,7 +522,7 @@ var _ = Describe("Package", func() {
 				})
 			})
 
-			Context("when there are no application bits to upload", func() {
+			When("there are no application bits to upload", func() {
 				BeforeEach(func() {
 					resources = []Resource{
 						{Filename: "foo"},
@@ -580,7 +580,7 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when the CC returns an error", func() {
+		When("the CC returns an error", func() {
 			BeforeEach(func() {
 				response := ` {
 					"errors": [
@@ -607,14 +607,14 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when passed a nil resources", func() {
+		When("passed a nil resources", func() {
 			It("returns a NilObjectError", func() {
 				_, _, err := client.UploadBitsPackage(inputPackage, nil, bytes.NewReader(nil), 0)
 				Expect(err).To(MatchError(ccerror.NilObjectError{Object: "existingResources"}))
 			})
 		})
 
-		Context("when an error is returned from the new resources reader", func() {
+		When("an error is returned from the new resources reader", func() {
 			var (
 				fakeReader  *ccv3fakes.FakeReader
 				expectedErr error
@@ -636,7 +636,7 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when a retryable error occurs", func() {
+		When("a retryable error occurs", func() {
 			BeforeEach(func() {
 				wrapper := &wrapper.CustomWrapper{
 					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
@@ -661,7 +661,7 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when an http error occurs mid-transfer", func() {
+		When("an http error occurs mid-transfer", func() {
 			var expectedErr error
 			const UploadSize = 33 * 1024
 
@@ -692,7 +692,7 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when the input package does not have an upload link", func() {
+		When("the input package does not have an upload link", func() {
 			It("returns an UploadLinkNotFoundError", func() {
 				_, _, err := client.UploadBitsPackage(Package{GUID: "some-pkg-guid"}, nil, nil, 0)
 				Expect(err).To(MatchError(ccerror.UploadLinkNotFoundError{PackageGUID: "some-pkg-guid"}))
@@ -714,7 +714,7 @@ var _ = Describe("Package", func() {
 			pkg, warnings, executeErr = client.UploadPackage(inputPackage, fileToUpload)
 		})
 
-		Context("when the package successfully is created", func() {
+		When("the package successfully is created", func() {
 			var tempFile *os.File
 
 			BeforeEach(func() {
@@ -798,7 +798,7 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when the package does not have an upload link", func() {
+		When("the package does not have an upload link", func() {
 			BeforeEach(func() {
 				inputPackage = Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload}
 				fileToUpload = "/path/to/foo"
@@ -809,7 +809,7 @@ var _ = Describe("Package", func() {
 			})
 		})
 
-		Context("when cc returns back an error or warnings", func() {
+		When("cc returns back an error or warnings", func() {
 			var tempFile *os.File
 
 			BeforeEach(func() {

@@ -32,7 +32,7 @@ var _ = Describe("unshare-service command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("unshare-service", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -50,7 +50,7 @@ var _ = Describe("unshare-service command", func() {
 		})
 	})
 
-	Context("when the service instance name is not provided", func() {
+	When("the service instance name is not provided", func() {
 		It("tells the user that the service instance name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("unshare-service", "-s", sharedToSpaceName)
 
@@ -60,7 +60,7 @@ var _ = Describe("unshare-service command", func() {
 		})
 	})
 
-	Context("when the space name is not provided", func() {
+	When("the space name is not provided", func() {
 		It("tells the user that the space name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("unshare-service")
 
@@ -70,12 +70,12 @@ var _ = Describe("unshare-service command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "unshare-service", serviceInstance, "-s", sharedToSpaceName)
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -94,7 +94,7 @@ var _ = Describe("unshare-service command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -114,7 +114,7 @@ var _ = Describe("unshare-service command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			domain      string
 			service     string
@@ -136,7 +136,7 @@ var _ = Describe("unshare-service command", func() {
 			helpers.QuickDeleteOrg(sharedToOrgName)
 		})
 
-		Context("when there is a managed service instance in my current targeted space", func() {
+		When("there is a managed service instance in my current targeted space", func() {
 			var broker helpers.ServiceBroker
 
 			BeforeEach(func() {
@@ -153,7 +153,7 @@ var _ = Describe("unshare-service command", func() {
 				broker.Destroy()
 			})
 
-			Context("when the service instance has not been shared to this space", func() {
+			When("the service instance has not been shared to this space", func() {
 				It("displays info and idempotently exits 0", func() {
 					session := helpers.CF("unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName, "-f")
 					Eventually(session).Should(Say("Service instance %s is not shared with space %s in organization %s\\.", serviceInstance, sharedToSpaceName, sharedToOrgName))
@@ -162,13 +162,13 @@ var _ = Describe("unshare-service command", func() {
 				})
 			})
 
-			Context("when I have shared my service instance to a space in another org ('-o' flag provided)", func() {
+			When("I have shared my service instance to a space in another org ('-o' flag provided)", func() {
 				BeforeEach(func() {
 					session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when the org I want to unshare from does not exist", func() {
+				When("the org I want to unshare from does not exist", func() {
 					It("fails with an org not found error", func() {
 						session := helpers.CF("unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", "missing-org", "-f")
 						Eventually(session).Should(Say("Service instance %s is not shared with space %s in organization missing-org\\.", serviceInstance, sharedToSpaceName))
@@ -177,7 +177,7 @@ var _ = Describe("unshare-service command", func() {
 					})
 				})
 
-				Context("when the space I want to unshare from does not exist", func() {
+				When("the space I want to unshare from does not exist", func() {
 					It("fails with a space not found error", func() {
 						session := helpers.CF("unshare-service", serviceInstance, "-s", "missing-space", "-o", sharedToOrgName, "-f")
 						Eventually(session).Should(Say("Service instance %s is not shared with space missing-space in organization %s\\.", serviceInstance, sharedToOrgName))
@@ -186,7 +186,7 @@ var _ = Describe("unshare-service command", func() {
 					})
 				})
 
-				Context("when I want to unshare my service instance from a space and org", func() {
+				When("I want to unshare my service instance from a space and org", func() {
 					It("successfully unshares the service instance", func() {
 						username, _ := helpers.GetCredentials()
 						session := helpers.CF("unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName, "-f")
@@ -197,7 +197,7 @@ var _ = Describe("unshare-service command", func() {
 				})
 			})
 
-			Context("when I have shared my service instance to a space within the targeted org ('-o' flag NOT provided)", func() {
+			When("I have shared my service instance to a space within the targeted org ('-o' flag NOT provided)", func() {
 				BeforeEach(func() {
 					helpers.CreateSpace(sharedToSpaceName)
 
@@ -205,7 +205,7 @@ var _ = Describe("unshare-service command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when the space I want to unshare from does not exist", func() {
+				When("the space I want to unshare from does not exist", func() {
 					It("fails with a space not found error", func() {
 						session := helpers.CF("unshare-service", serviceInstance, "-s", "missing-space", "-f")
 						Eventually(session).Should(Say("Service instance %s is not shared with space missing-space in organization %s\\.", serviceInstance, sourceOrgName))
@@ -214,7 +214,7 @@ var _ = Describe("unshare-service command", func() {
 					})
 				})
 
-				Context("when I want to unshare my service instance from the space", func() {
+				When("I want to unshare my service instance from the space", func() {
 					It("successfully unshares the service instance when I am admin", func() {
 						username, _ := helpers.GetCredentials()
 						session := helpers.CF("unshare-service", serviceInstance, "-s", sharedToSpaceName, "-f")
@@ -223,7 +223,7 @@ var _ = Describe("unshare-service command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 
-					Context("when I have no access to the shared-to space", func() {
+					When("I have no access to the shared-to space", func() {
 						var (
 							username string
 							password string
@@ -260,8 +260,8 @@ var _ = Describe("unshare-service command", func() {
 			})
 		})
 
-		Context("when the service instance does not exist", func() {
-			Context("when the -f flag is provided", func() {
+		When("the service instance does not exist", func() {
+			When("the -f flag is provided", func() {
 				It("fails with a service instance not found error", func() {
 					session := helpers.CF("unshare-service", serviceInstance, "-s", sharedToSpaceName, "-f")
 					Eventually(session).Should(Say("FAILED"))
@@ -270,14 +270,14 @@ var _ = Describe("unshare-service command", func() {
 				})
 			})
 
-			Context("when the -f flag not is provided", func() {
+			When("the -f flag not is provided", func() {
 				var buffer *Buffer
 
 				BeforeEach(func() {
 					buffer = NewBuffer()
 				})
 
-				Context("when the user enters 'y'", func() {
+				When("the user enters 'y'", func() {
 					BeforeEach(func() {
 						buffer.Write([]byte("y\n"))
 					})
@@ -294,7 +294,7 @@ var _ = Describe("unshare-service command", func() {
 					})
 				})
 
-				Context("when the user enters 'n'", func() {
+				When("the user enters 'n'", func() {
 					BeforeEach(func() {
 						buffer.Write([]byte("n\n"))
 					})
@@ -308,7 +308,7 @@ var _ = Describe("unshare-service command", func() {
 					})
 				})
 
-				Context("when the user enters the default input (hits return)", func() {
+				When("the user enters the default input (hits return)", func() {
 					BeforeEach(func() {
 						buffer.Write([]byte("\n"))
 					})
@@ -322,7 +322,7 @@ var _ = Describe("unshare-service command", func() {
 					})
 				})
 
-				Context("when the user enters an invalid answer", func() {
+				When("the user enters an invalid answer", func() {
 					BeforeEach(func() {
 						// The second '\n' is intentional. Otherwise the buffer will be
 						// closed while the interaction is still waiting for input; it gets
@@ -343,7 +343,7 @@ var _ = Describe("unshare-service command", func() {
 			})
 		})
 
-		Context("when there is a shared service instance in my currently targeted space", func() {
+		When("there is a shared service instance in my currently targeted space", func() {
 			var broker helpers.ServiceBroker
 			var user string
 			var password string

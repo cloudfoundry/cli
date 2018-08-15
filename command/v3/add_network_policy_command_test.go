@@ -56,7 +56,7 @@ var _ = Describe("add-network-policy Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -71,14 +71,14 @@ var _ = Describe("add-network-policy Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, an org is targeted, and a space is targeted", func() {
+	When("the user is logged in, an org is targeted, and a space is targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 		})
 
-		Context("when protocol is specified but port is not", func() {
+		When("protocol is specified but port is not", func() {
 			BeforeEach(func() {
 				cmd.Protocol = flag.NetworkProtocol{Protocol: protocol}
 			})
@@ -89,7 +89,7 @@ var _ = Describe("add-network-policy Command", func() {
 			})
 		})
 
-		Context("when port is specified but protocol is not", func() {
+		When("port is specified but protocol is not", func() {
 			BeforeEach(func() {
 				cmd.Port = flag.NetworkPort{StartPort: 8080, EndPort: 8081}
 			})
@@ -100,13 +100,13 @@ var _ = Describe("add-network-policy Command", func() {
 			})
 		})
 
-		Context("when both protocol and port are specificed", func() {
+		When("both protocol and port are specificed", func() {
 			BeforeEach(func() {
 				cmd.Protocol = flag.NetworkProtocol{Protocol: protocol}
 				cmd.Port = flag.NetworkPort{StartPort: 8080, EndPort: 8081}
 			})
 
-			Context("when the policy creation is successful", func() {
+			When("the policy creation is successful", func() {
 				BeforeEach(func() {
 					fakeActor.AddNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
 				})
@@ -129,7 +129,7 @@ var _ = Describe("add-network-policy Command", func() {
 				})
 			})
 
-			Context("when the policy creation is not successful", func() {
+			When("the policy creation is not successful", func() {
 				BeforeEach(func() {
 					fakeActor.AddNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.ApplicationNotFoundError{Name: srcApp})
 				})
@@ -145,7 +145,7 @@ var _ = Describe("add-network-policy Command", func() {
 			})
 		})
 
-		Context("when both protocol and port are not specified", func() {
+		When("both protocol and port are not specified", func() {
 			It("defaults protocol to 'tcp' and port to '8080'", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 

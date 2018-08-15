@@ -30,7 +30,7 @@ var _ = Describe("Organization Summary Actions", func() {
 	})
 
 	Describe("GetOrganizationSummaryByName", func() {
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv2.Organization{
@@ -122,7 +122,7 @@ var _ = Describe("Organization Summary Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the organization", func() {
+		When("an error is encountered getting the organization", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("get-orgs-error")
 				fakeCloudControllerClient.GetOrganizationsReturns(
@@ -141,7 +141,7 @@ var _ = Describe("Organization Summary Actions", func() {
 			})
 		})
 
-		Context("when the organization exists", func() {
+		When("the organization exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv2.Organization{
@@ -155,7 +155,7 @@ var _ = Describe("Organization Summary Actions", func() {
 				)
 			})
 
-			Context("when an error is encountered getting the organization domains", func() {
+			When("an error is encountered getting the organization domains", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("shared domains error")
 					fakeCloudControllerClient.GetSharedDomainsReturns([]ccv2.Domain{}, ccv2.Warnings{"shared domains warning"}, expectedErr)
@@ -167,7 +167,7 @@ var _ = Describe("Organization Summary Actions", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the organization quota", func() {
+			When("an error is encountered getting the organization quota", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("some org quota error")
 					fakeCloudControllerClient.GetOrganizationQuotaReturns(ccv2.OrganizationQuota{}, ccv2.Warnings{"quota warning"}, expectedErr)
@@ -179,7 +179,7 @@ var _ = Describe("Organization Summary Actions", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the organization spaces", func() {
+			When("an error is encountered getting the organization spaces", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("cc-get-spaces-error")
 					fakeCloudControllerClient.GetSpacesReturns(

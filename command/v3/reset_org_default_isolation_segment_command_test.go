@@ -58,7 +58,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -71,7 +71,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -86,7 +86,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when checking file succeeds", func() {
+	When("checking file succeeds", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: orgName,
@@ -94,7 +94,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 			})
 		})
 
-		Context("when the user is not logged in", func() {
+		When("the user is not logged in", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -109,12 +109,12 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 			})
 		})
 
-		Context("when the user is logged in", func() {
+		When("the user is logged in", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			})
 
-			Context("when the org lookup is unsuccessful", func() {
+			When("the org lookup is unsuccessful", func() {
 				BeforeEach(func() {
 					fakeActorV2.GetOrganizationByNameReturns(v2action.Organization{}, v2action.Warnings{"warning-1", "warning-2"}, actionerror.OrganizationNotFoundError{Name: orgName})
 				})
@@ -126,7 +126,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 				})
 			})
 
-			Context("when the org lookup is successful", func() {
+			When("the org lookup is successful", func() {
 				BeforeEach(func() {
 					fakeActorV2.GetOrganizationByNameReturns(v2action.Organization{
 						Name: orgName,
@@ -134,7 +134,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 					}, v2action.Warnings{"warning-1", "warning-2"}, nil)
 				})
 
-				Context("when the reset succeeds", func() {
+				When("the reset succeeds", func() {
 					BeforeEach(func() {
 						fakeActor.ResetOrganizationDefaultIsolationSegmentReturns(v3action.Warnings{"warning-3", "warning-4"}, nil)
 					})
@@ -160,7 +160,7 @@ var _ = Describe("reset-org-default-isolation-segment Command", func() {
 					})
 				})
 
-				Context("when the reset errors", func() {
+				When("the reset errors", func() {
 					var expectedErr error
 					BeforeEach(func() {
 						expectedErr = errors.New("some error")

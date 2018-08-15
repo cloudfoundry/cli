@@ -28,7 +28,7 @@ var _ = Describe("v3-push with --no-start", func() {
 		helpers.TurnOnExperimental()
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -37,7 +37,7 @@ var _ = Describe("v3-push with --no-start", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app exists and is already running", func() {
+		When("the app exists and is already running", func() {
 			var session *Session
 
 			BeforeEach(func() {
@@ -76,7 +76,7 @@ var _ = Describe("v3-push with --no-start", func() {
 			})
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			var session *Session
 
 			It("uploads the app, does not restage or restart it", func() {

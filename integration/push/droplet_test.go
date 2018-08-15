@@ -43,7 +43,7 @@ var _ = Describe("when a droplet is provided", func() {
 		Expect(os.RemoveAll(dropletPath)).ToNot(HaveOccurred())
 	})
 
-	Context("when the app does not exist", func() {
+	When("the app does not exist", func() {
 		It("creates the app", func() {
 			session := helpers.CF(PushCommandName, appName, "--droplet", dropletPath)
 			Eventually(session).Should(Say("Getting app info\\.\\.\\."))
@@ -60,7 +60,7 @@ var _ = Describe("when a droplet is provided", func() {
 		})
 	})
 
-	Context("when the app exists", func() {
+	When("the app exists", func() {
 		BeforeEach(func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
 				Eventually(helpers.CF(PushCommandName, appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))

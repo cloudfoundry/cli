@@ -27,7 +27,7 @@ var _ = Describe("v3-create-package command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-create-package", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -42,7 +42,7 @@ var _ = Describe("v3-create-package command", func() {
 		})
 	})
 
-	Context("when the app name is not provided", func() {
+	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-create-package")
 
@@ -58,7 +58,7 @@ var _ = Describe("v3-create-package command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when the -p flag is not given an arg", func() {
+	When("the -p flag is not given an arg", func() {
 		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-create-package", appName, "-p")
 
@@ -68,7 +68,7 @@ var _ = Describe("v3-create-package command", func() {
 		})
 	})
 
-	Context("when the -p flag path does not exist", func() {
+	When("the -p flag path does not exist", func() {
 		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-create-package", appName, "-p", "path/that/does/not/exist")
 
@@ -78,8 +78,8 @@ var _ = Describe("v3-create-package command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -92,7 +92,7 @@ var _ = Describe("v3-create-package command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -111,7 +111,7 @@ var _ = Describe("v3-create-package command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -130,7 +130,7 @@ var _ = Describe("v3-create-package command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -143,7 +143,7 @@ var _ = Describe("v3-create-package command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -157,7 +157,7 @@ var _ = Describe("v3-create-package command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -173,7 +173,7 @@ var _ = Describe("v3-create-package command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -182,7 +182,7 @@ var _ = Describe("v3-create-package command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("returns a not found error", func() {
 				session := helpers.CF("v3-create-package", appName)
 				userName, _ := helpers.GetCredentials()
@@ -193,7 +193,7 @@ var _ = Describe("v3-create-package command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
 			})
@@ -207,8 +207,8 @@ var _ = Describe("v3-create-package command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when the --docker-image flag is provided", func() {
-				Context("when the docker-image exists", func() {
+			When("the --docker-image flag is provided", func() {
+				When("the docker-image exists", func() {
 					It("creates the package", func() {
 						session := helpers.CF("v3-create-package", appName, "--docker-image", PublicDockerImage)
 						userName, _ := helpers.GetCredentials()
@@ -220,9 +220,9 @@ var _ = Describe("v3-create-package command", func() {
 				})
 			})
 
-			Context("when the -p flag is provided", func() {
-				Context("when the path is a directory", func() {
-					Context("when the directory contains files", func() {
+			When("the -p flag is provided", func() {
+				When("the path is a directory", func() {
+					When("the directory contains files", func() {
 						It("creates and uploads the package from the directory", func() {
 							helpers.WithHelloWorldApp(func(appDir string) {
 								session := helpers.CF("v3-create-package", appName, "-p", appDir)
@@ -236,7 +236,7 @@ var _ = Describe("v3-create-package command", func() {
 						})
 					})
 
-					Context("when the directory is empty", func() {
+					When("the directory is empty", func() {
 						var emptyDir string
 
 						BeforeEach(func() {
@@ -258,7 +258,7 @@ var _ = Describe("v3-create-package command", func() {
 					})
 				})
 
-				Context("when the path is a zip file", func() {
+				When("the path is a zip file", func() {
 					Context("pushing a zip file", func() {
 						var archive string
 
@@ -291,7 +291,7 @@ var _ = Describe("v3-create-package command", func() {
 					})
 				})
 
-				Context("when the path is a symlink to a directory", func() {
+				When("the path is a symlink to a directory", func() {
 					var symlinkPath string
 
 					BeforeEach(func() {
@@ -323,7 +323,7 @@ var _ = Describe("v3-create-package command", func() {
 				})
 			})
 
-			Context("when the path is a symlink to a zip file", func() {
+			When("the path is a symlink to a zip file", func() {
 				var (
 					archive     string
 					symlinkPath string
@@ -366,7 +366,7 @@ var _ = Describe("v3-create-package command", func() {
 				})
 			})
 
-			Context("when the -o and -p flags are provided together", func() {
+			When("the -o and -p flags are provided together", func() {
 				It("displays an error and exits 1", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session := helpers.CF("v3-create-package", appName, "-o", PublicDockerImage, "-p", appDir)

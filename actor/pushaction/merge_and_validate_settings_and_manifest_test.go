@@ -27,7 +27,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		currentDirectory = getCurrentDir()
 	})
 
-	Context("when only passed command line settings", func() {
+	When("only passed command line settings", func() {
 		BeforeEach(func() {
 			cmdSettings = CommandLineSettings{
 				CurrentDirectory: currentDirectory,
@@ -46,7 +46,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		})
 	})
 
-	Context("when passed command line settings and a single manifest application", func() {
+	When("passed command line settings and a single manifest application", func() {
 		var (
 			apps       []manifest.Application
 			mergedApps []manifest.Application
@@ -84,7 +84,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		})
 	})
 
-	Context("when passed command line settings and multiple manifest applications", func() {
+	When("passed command line settings and multiple manifest applications", func() {
 		var (
 			apps       []manifest.Application
 			mergedApps []manifest.Application
@@ -121,8 +121,8 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			))
 		})
 
-		Context("when CommandLineSettings specify an app in the manifests", func() {
-			Context("when the app exists in the manifest", func() {
+		When("CommandLineSettings specify an app in the manifests", func() {
+			When("the app exists in the manifest", func() {
 				BeforeEach(func() {
 					cmdSettings.Name = "app-1"
 				})
@@ -139,7 +139,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				})
 			})
 
-			Context("when the app does *not* exist in the manifest", func() {
+			When("the app does *not* exist in the manifest", func() {
 				BeforeEach(func() {
 					cmdSettings.Name = "app-4"
 				})
@@ -173,7 +173,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			mergedApps, executeErr = actor.MergeAndValidateSettingsAndManifests(cmdSettings, apps)
 		})
 
-		Context("when HealthCheckType is set to http and no endpoint is set", func() {
+		When("HealthCheckType is set to http and no endpoint is set", func() {
 			BeforeEach(func() {
 				apps[0].HealthCheckType = "http"
 				apps[1].HealthCheckType = "http"
@@ -219,7 +219,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			mergedApps, executeErr = actor.MergeAndValidateSettingsAndManifests(cmdSettings, apps)
 		})
 
-		Context("when app path is set from the command line", func() {
+		When("app path is set from the command line", func() {
 			BeforeEach(func() {
 				cmdSettings.ProvidedAppPath = tempDir
 			})
@@ -230,7 +230,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			})
 		})
 
-		Context("when app path is set from the manifest", func() {
+		When("app path is set from the manifest", func() {
 			BeforeEach(func() {
 				apps[0].Path = tempDir
 			})

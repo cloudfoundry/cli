@@ -30,7 +30,7 @@ var _ = Describe("v3-apps command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-apps", "--help")
 
@@ -50,8 +50,8 @@ var _ = Describe("v3-apps command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -64,7 +64,7 @@ var _ = Describe("v3-apps command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -83,7 +83,7 @@ var _ = Describe("v3-apps command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -102,7 +102,7 @@ var _ = Describe("v3-apps command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -115,7 +115,7 @@ var _ = Describe("v3-apps command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -129,7 +129,7 @@ var _ = Describe("v3-apps command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -145,7 +145,7 @@ var _ = Describe("v3-apps command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -188,7 +188,7 @@ var _ = Describe("v3-apps command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when one app is stopped", func() {
+			When("one app is stopped", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("stop", appName1)).Should(Exit(0))
 				})

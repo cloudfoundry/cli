@@ -59,7 +59,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -72,7 +72,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -87,7 +87,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -98,7 +98,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 			cmd.RequiredArgs.SpaceName = space
 		})
 
-		Context("when the space lookup is unsuccessful", func() {
+		When("the space lookup is unsuccessful", func() {
 			BeforeEach(func() {
 				fakeActorV2.GetSpaceByOrganizationAndNameReturns(v2action.Space{}, v2action.Warnings{"warning-1", "warning-2"}, actionerror.SpaceNotFoundError{Name: space})
 			})
@@ -110,7 +110,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 			})
 		})
 
-		Context("when the space lookup is successful", func() {
+		When("the space lookup is successful", func() {
 			BeforeEach(func() {
 				fakeActorV2.GetSpaceByOrganizationAndNameReturns(v2action.Space{
 					Name: space,
@@ -118,7 +118,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 				}, v2action.Warnings{"warning-1", "warning-2"}, nil)
 			})
 
-			Context("when the reset changes the isolation segment to platform default", func() {
+			When("the reset changes the isolation segment to platform default", func() {
 				BeforeEach(func() {
 					fakeActor.ResetSpaceIsolationSegmentReturns("", v3action.Warnings{"warning-3", "warning-4"}, nil)
 				})
@@ -145,7 +145,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 				})
 			})
 
-			Context("when the reset changes the isolation segment to the org's default", func() {
+			When("the reset changes the isolation segment to the org's default", func() {
 				BeforeEach(func() {
 					fakeActor.ResetSpaceIsolationSegmentReturns("some-org-iso-seg-name", v3action.Warnings{"warning-3", "warning-4"}, nil)
 				})
@@ -172,7 +172,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 				})
 			})
 
-			Context("when the reset errors", func() {
+			When("the reset errors", func() {
 				var expectedErr error
 				BeforeEach(func() {
 					expectedErr = errors.New("some error")

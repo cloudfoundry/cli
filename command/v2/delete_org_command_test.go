@@ -50,12 +50,12 @@ var _ = Describe("delete-org Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when a cloud controller API endpoint is set", func() {
+	When("a cloud controller API endpoint is set", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns("some-url")
 		})
 
-		Context("when checking target fails", func() {
+		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 			})
@@ -70,8 +70,8 @@ var _ = Describe("delete-org Command", func() {
 			})
 		})
 
-		Context("when the user is logged in", func() {
-			Context("when getting the current user returns an error", func() {
+		When("the user is logged in", func() {
+			When("getting the current user returns an error", func() {
 				var returnedErr error
 
 				BeforeEach(func() {
@@ -84,19 +84,19 @@ var _ = Describe("delete-org Command", func() {
 				})
 			})
 
-			Context("when getting the current user does not return an error", func() {
+			When("getting the current user does not return an error", func() {
 				BeforeEach(func() {
 					fakeConfig.CurrentUserReturns(
 						configv3.User{Name: "some-user"},
 						nil)
 				})
 
-				Context("when the '-f' flag is provided", func() {
+				When("the '-f' flag is provided", func() {
 					BeforeEach(func() {
 						cmd.Force = true
 					})
 
-					Context("when no errors are encountered", func() {
+					When("no errors are encountered", func() {
 						BeforeEach(func() {
 							fakeActor.DeleteOrganizationReturns(v2action.Warnings{"warning-1", "warning-2"}, nil)
 						})
@@ -117,8 +117,8 @@ var _ = Describe("delete-org Command", func() {
 						})
 					})
 
-					Context("when an error is encountered deleting the org", func() {
-						Context("when the organization does not exist", func() {
+					When("an error is encountered deleting the org", func() {
+						When("the organization does not exist", func() {
 							BeforeEach(func() {
 								fakeActor.DeleteOrganizationReturns(
 									v2action.Warnings{"warning-1", "warning-2"},
@@ -145,7 +145,7 @@ var _ = Describe("delete-org Command", func() {
 							})
 						})
 
-						Context("when the organization does exist", func() {
+						When("the organization does exist", func() {
 							var returnedErr error
 
 							BeforeEach(func() {
@@ -170,8 +170,8 @@ var _ = Describe("delete-org Command", func() {
 				})
 
 				// Testing the prompt.
-				Context("when the '-f' flag is not provided", func() {
-					Context("when the user chooses the default", func() {
+				When("the '-f' flag is not provided", func() {
+					When("the user chooses the default", func() {
 						BeforeEach(func() {
 							input.Write([]byte("\n"))
 						})
@@ -185,7 +185,7 @@ var _ = Describe("delete-org Command", func() {
 						})
 					})
 
-					Context("when the user inputs no", func() {
+					When("the user inputs no", func() {
 						BeforeEach(func() {
 							input.Write([]byte("n\n"))
 						})
@@ -199,7 +199,7 @@ var _ = Describe("delete-org Command", func() {
 						})
 					})
 
-					Context("when the user inputs yes", func() {
+					When("the user inputs yes", func() {
 						BeforeEach(func() {
 							input.Write([]byte("y\n"))
 						})
@@ -218,7 +218,7 @@ var _ = Describe("delete-org Command", func() {
 						})
 					})
 
-					Context("when the user input is invalid", func() {
+					When("the user input is invalid", func() {
 						BeforeEach(func() {
 							input.Write([]byte("e\n\n"))
 						})
@@ -234,7 +234,7 @@ var _ = Describe("delete-org Command", func() {
 						})
 					})
 
-					Context("when displaying the prompt returns an error", func() {
+					When("displaying the prompt returns an error", func() {
 						// if nothing is written to input, display bool prompt returns EOF
 						It("returns the error", func() {
 							Expect(executeErr).To(MatchError("EOF"))
@@ -242,7 +242,7 @@ var _ = Describe("delete-org Command", func() {
 					})
 				})
 
-				Context("when the user deletes the currently targeted org", func() {
+				When("the user deletes the currently targeted org", func() {
 					BeforeEach(func() {
 						cmd.Force = true
 						fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
@@ -254,7 +254,7 @@ var _ = Describe("delete-org Command", func() {
 					})
 				})
 
-				Context("when the user deletes an org that's not the currently targeted org", func() {
+				When("the user deletes an org that's not the currently targeted org", func() {
 					BeforeEach(func() {
 						cmd.Force = true
 					})

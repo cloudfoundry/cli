@@ -58,7 +58,7 @@ var _ = Describe("Job", func() {
 			client = NewTestClient(Config{JobPollingTimeout: time.Minute})
 		})
 
-		Context("when the job starts queued and then finishes successfully", func() {
+		When("the job starts queued and then finishes successfully", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -116,7 +116,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when the job starts queued and then fails", func() {
+		When("the job starts queued and then fails", func() {
 			var jobFailureMessage string
 			BeforeEach(func() {
 				jobFailureMessage = "I am a banana!!!"
@@ -188,7 +188,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when retrieving the job errors", func() {
+		When("retrieving the job errors", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -207,7 +207,7 @@ var _ = Describe("Job", func() {
 		})
 
 		Describe("JobPollingTimeout", func() {
-			Context("when the job runs longer than the OverallPollingTimeout", func() {
+			When("the job runs longer than the OverallPollingTimeout", func() {
 				var jobPollingTimeout time.Duration
 
 				BeforeEach(func() {
@@ -299,7 +299,7 @@ var _ = Describe("Job", func() {
 			client = NewTestClient()
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				jsonResponse := `{
 					"metadata": {
@@ -330,7 +330,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when the job fails", func() {
+		When("the job fails", func() {
 			BeforeEach(func() {
 				jsonResponse := `
 					{
@@ -386,7 +386,7 @@ var _ = Describe("Job", func() {
 			job, warnings, executeErr = client.DeleteOrganizationJob("some-organization-guid")
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				jsonResponse := `{
 				"metadata": {
@@ -417,7 +417,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
 "code": 30003,
@@ -455,7 +455,7 @@ var _ = Describe("Job", func() {
 			job, warnings, executeErr = client.DeleteSpaceJob("some-space-guid")
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				jsonResponse := `{
 				"metadata": {
@@ -486,7 +486,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
 "code": 30003,
@@ -514,14 +514,14 @@ var _ = Describe("Job", func() {
 			client = NewTestClient()
 		})
 
-		Context("when the upload is successful", func() {
+		When("the upload is successful", func() {
 			var (
 				resources  []Resource
 				reader     io.Reader
 				readerBody []byte
 			)
 
-			Context("when the upload has application bits to upload", func() {
+			When("the upload has application bits to upload", func() {
 				BeforeEach(func() {
 					resources = []Resource{
 						{Filename: "foo"},
@@ -591,7 +591,7 @@ var _ = Describe("Job", func() {
 				})
 			})
 
-			Context("when there are no application bits to upload", func() {
+			When("there are no application bits to upload", func() {
 				BeforeEach(func() {
 					resources = []Resource{
 						{Filename: "foo"},
@@ -653,7 +653,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when the CC returns an error", func() {
+		When("the CC returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 30003,
@@ -676,14 +676,14 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when passed a nil resources", func() {
+		When("passed a nil resources", func() {
 			It("returns a NilObjectError", func() {
 				_, _, err := client.UploadApplicationPackage("some-app-guid", nil, bytes.NewReader(nil), 0)
 				Expect(err).To(MatchError(ccerror.NilObjectError{Object: "existingResources"}))
 			})
 		})
 
-		Context("when an error is returned from the new resources reader", func() {
+		When("an error is returned from the new resources reader", func() {
 			var (
 				fakeReader  *ccv2fakes.FakeReader
 				expectedErr error
@@ -705,7 +705,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when a retryable error occurs", func() {
+		When("a retryable error occurs", func() {
 			BeforeEach(func() {
 				wrapper := &wrapper.CustomWrapper{
 					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
@@ -730,7 +730,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when an http error occurs mid-transfer", func() {
+		When("an http error occurs mid-transfer", func() {
 			var expectedErr error
 			const UploadSize = 33 * 1024
 
@@ -777,7 +777,7 @@ var _ = Describe("Job", func() {
 			droplet = bytes.NewReader(readerBody)
 		})
 
-		Context("when the Droplet is successful", func() {
+		When("the Droplet is successful", func() {
 			BeforeEach(func() {
 				verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
 					contentType := req.Header.Get("Content-Type")
@@ -827,7 +827,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when the CC returns an error", func() {
+		When("the CC returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 30003,
@@ -850,7 +850,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when there is an error reading the droplet", func() {
+		When("there is an error reading the droplet", func() {
 			var (
 				fakeReader  *ccv2fakes.FakeReader
 				expectedErr error
@@ -872,7 +872,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when a retryable error occurs", func() {
+		When("a retryable error occurs", func() {
 			BeforeEach(func() {
 				wrapper := &wrapper.CustomWrapper{
 					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
@@ -897,7 +897,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when an http error occurs mid-transfer", func() {
+		When("an http error occurs mid-transfer", func() {
 			var expectedErr error
 			const UploadSize = 33 * 1024
 

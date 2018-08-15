@@ -58,12 +58,12 @@ var _ = Describe("bind-service Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when a cloud controller API endpoint is set", func() {
+	When("a cloud controller API endpoint is set", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns("some-url")
 		})
 
-		Context("when checking target fails", func() {
+		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 			})
@@ -78,7 +78,7 @@ var _ = Describe("bind-service Command", func() {
 			})
 		})
 
-		Context("when the user is logged in, and an org and space are targeted", func() {
+		When("the user is logged in, and an org and space are targeted", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{Name: "some-user"},
@@ -95,7 +95,7 @@ var _ = Describe("bind-service Command", func() {
 				})
 			})
 
-			Context("when a binding name is not passed", func() {
+			When("a binding name is not passed", func() {
 				It("displays flavor text", func() {
 					Expect(testUI.Out).To(Say("Binding service some-service to app some-app in org some-org / space some-space as some-user..."))
 
@@ -115,12 +115,12 @@ var _ = Describe("bind-service Command", func() {
 				})
 			})
 
-			Context("when passed a binding name", func() {
+			When("passed a binding name", func() {
 				BeforeEach(func() {
 					cmd.BindingName.Value = "some-binding-name"
 				})
 
-				Context("when the version check fails", func() {
+				When("the version check fails", func() {
 					BeforeEach(func() {
 						fakeActor.CloudControllerAPIVersionReturns("2.34.0")
 					})
@@ -135,12 +135,12 @@ var _ = Describe("bind-service Command", func() {
 					})
 				})
 
-				Context("when the version check succeeds", func() {
+				When("the version check succeeds", func() {
 					BeforeEach(func() {
 						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionProvideNameForServiceBinding)
 					})
 
-					Context("when getting the current user returns an error", func() {
+					When("getting the current user returns an error", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -155,14 +155,14 @@ var _ = Describe("bind-service Command", func() {
 						})
 					})
 
-					Context("when getting the current user does not return an error", func() {
+					When("getting the current user does not return an error", func() {
 						It("displays flavor text", func() {
 							Expect(testUI.Out).To(Say("Binding service some-service to app some-app with binding name some-binding-name in org some-org / space some-space as some-user..."))
 
 							Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 						})
 
-						Context("when the service was already bound", func() {
+						When("the service was already bound", func() {
 							BeforeEach(func() {
 								fakeActor.BindServiceBySpaceReturns(
 									v2action.ServiceBinding{},
@@ -180,7 +180,7 @@ var _ = Describe("bind-service Command", func() {
 							})
 						})
 
-						Context("when binding the service instance results in an error other than ServiceBindingTakenError", func() {
+						When("binding the service instance results in an error other than ServiceBindingTakenError", func() {
 							BeforeEach(func() {
 								fakeActor.BindServiceBySpaceReturns(
 									v2action.ServiceBinding{},
@@ -195,7 +195,7 @@ var _ = Describe("bind-service Command", func() {
 							})
 						})
 
-						Context("when the service binding is successful", func() {
+						When("the service binding is successful", func() {
 							BeforeEach(func() {
 								fakeActor.BindServiceBySpaceReturns(
 									v2action.ServiceBinding{},
@@ -225,7 +225,7 @@ var _ = Describe("bind-service Command", func() {
 				})
 			})
 
-			Context("when the binding is not created asynchroncously", func() {
+			When("the binding is not created asynchroncously", func() {
 				It("does not display binding in progress", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
@@ -233,7 +233,7 @@ var _ = Describe("bind-service Command", func() {
 				})
 			})
 
-			Context("when the binding is created asynchroncously", func() {
+			When("the binding is created asynchroncously", func() {
 				BeforeEach(func() {
 					fakeActor.BindServiceBySpaceReturns(
 						v2action.ServiceBinding{LastOperation: ccv2.LastOperation{State: constant.LastOperationInProgress}},

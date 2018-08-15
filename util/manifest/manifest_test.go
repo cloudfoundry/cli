@@ -51,7 +51,7 @@ var _ = Describe("Manifest", func() {
 			apps, executeErr = ReadAndInterpolateManifest(pathToManifest, pathsToVarsFiles, vars)
 		})
 
-		Context("when the manifest contains NO variables that need interpolation", func() {
+		When("the manifest contains NO variables that need interpolation", func() {
 			BeforeEach(func() {
 				manifest = `---
 applications:
@@ -113,7 +113,7 @@ applications:
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when the manifest does not contain deprecated fields", func() {
+			When("the manifest does not contain deprecated fields", func() {
 				It("returns a merged set of applications", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(apps).To(HaveLen(7))
@@ -211,8 +211,8 @@ applications:
 				})
 			})
 
-			Context("when provided deprecated fields", func() {
-				Context("when global fields are provided", func() {
+			When("provided deprecated fields", func() {
+				When("global fields are provided", func() {
 					DescribeTable("raises a GlobalFieldsError",
 						func(manifestProperty string, numberOfValues int) {
 							tempManifest, err := ioutil.TempFile("", "manifest-test-")
@@ -260,7 +260,7 @@ applications:
 				})
 			})
 
-			Context("when inheritance is provided", func() {
+			When("inheritance is provided", func() {
 				BeforeEach(func() {
 					manifest = `---
 inherit: "./some-inheritance-file"
@@ -277,7 +277,7 @@ applications:
 				})
 			})
 
-			Context("when the manifest specified a single buildpack", func() {
+			When("the manifest specified a single buildpack", func() {
 				BeforeEach(func() {
 					manifest = `---
 applications:
@@ -304,7 +304,7 @@ applications:
 				})
 			})
 
-			Context("when the manifest contains buildpacks (plural)", func() {
+			When("the manifest contains buildpacks (plural)", func() {
 				BeforeEach(func() {
 					manifest = `---
 applications:
@@ -349,7 +349,7 @@ applications:
 				})
 			})
 
-			Context("when the manifest sets buildpacks to an empty array", func() {
+			When("the manifest sets buildpacks to an empty array", func() {
 				BeforeEach(func() {
 					manifest = `---
 applications:
@@ -376,7 +376,7 @@ applications:
 				})
 			})
 
-			Context("when the manifest contains an empty buildpacks attribute", func() {
+			When("the manifest contains an empty buildpacks attribute", func() {
 				BeforeEach(func() {
 					manifest = `---
 applications:
@@ -393,7 +393,7 @@ applications:
 			})
 		})
 
-		Context("when the manifest contains variables that need interpolation", func() {
+		When("the manifest contains variables that need interpolation", func() {
 			BeforeEach(func() {
 				manifest = `---
 applications:
@@ -404,7 +404,7 @@ applications:
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when only vars files are provided", func() {
+			When("only vars files are provided", func() {
 				var (
 					varsDir string
 				)
@@ -429,7 +429,7 @@ applications:
 					Expect(os.RemoveAll(varsDir)).ToNot(HaveOccurred())
 				})
 
-				Context("when multiple values for the same variable(s) are provided", func() {
+				When("multiple values for the same variable(s) are provided", func() {
 					BeforeEach(func() {
 						varsFilePath1 := filepath.Join(varsDir, "vars-1")
 						err := ioutil.WriteFile(varsFilePath1, []byte("var1: garbageapp\nvar1: app-1\nvar2: 0"), 0666)
@@ -449,7 +449,7 @@ applications:
 					})
 				})
 
-				Context("when the provided files exists and contain valid yaml", func() {
+				When("the provided files exists and contain valid yaml", func() {
 					It("interpolates the placeholder values", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(apps[0].Name).To(Equal("app-1"))
@@ -457,7 +457,7 @@ applications:
 					})
 				})
 
-				Context("when a variable in the manifest is not provided in the vars file", func() {
+				When("a variable in the manifest is not provided in the vars file", func() {
 					BeforeEach(func() {
 						varsFilePath := filepath.Join(varsDir, "vars-1")
 						err := ioutil.WriteFile(varsFilePath, []byte("notvar: foo"), 0666)
@@ -471,7 +471,7 @@ applications:
 					})
 				})
 
-				Context("when the provided file path does not exist", func() {
+				When("the provided file path does not exist", func() {
 					BeforeEach(func() {
 						pathsToVarsFiles = []string{"garbagepath"}
 					})
@@ -482,7 +482,7 @@ applications:
 					})
 				})
 
-				Context("when the provided file is not a valid yaml file", func() {
+				When("the provided file is not a valid yaml file", func() {
 					BeforeEach(func() {
 						varsFilePath := filepath.Join(varsDir, "vars-1")
 						err := ioutil.WriteFile(varsFilePath, []byte(": bad"), 0666)
@@ -500,7 +500,7 @@ applications:
 				})
 			})
 
-			Context("when only vars are provided", func() {
+			When("only vars are provided", func() {
 				BeforeEach(func() {
 					vars = []template.VarKV{
 						{Name: "var1", Value: "app-1"},
@@ -520,7 +520,7 @@ applications:
 				})
 			})
 
-			Context("when vars and vars files are provided", func() {
+			When("vars and vars files are provided", func() {
 				var varsFilePath string
 				BeforeEach(func() {
 					tmp, err := ioutil.TempFile("", "util-manifest-varsilfe")
@@ -574,7 +574,7 @@ applications:
 			executeErr = WriteApplicationManifest(application, filePath)
 		})
 
-		Context("when all app properties are provided", func() {
+		When("all app properties are provided", func() {
 			BeforeEach(func() {
 				application = Application{
 					Name: "app-1",
@@ -656,7 +656,7 @@ applications:
 			})
 		})
 
-		Context("when some properties are not provided", func() {
+		When("some properties are not provided", func() {
 			BeforeEach(func() {
 				application = Application{
 					Name: "app-1",
@@ -673,7 +673,7 @@ applications:
 			})
 		})
 
-		Context("when the file is a relative path", func() {
+		When("the file is a relative path", func() {
 			var pwd string
 
 			BeforeEach(func() {
@@ -703,7 +703,7 @@ applications:
 			})
 		})
 
-		Context("when the file already exists", func() {
+		When("the file already exists", func() {
 			BeforeEach(func() {
 				err := ioutil.WriteFile(filePath, []byte(`{}`), 0644)
 				Expect(err).ToNot(HaveOccurred())

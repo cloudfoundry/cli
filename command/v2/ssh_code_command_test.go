@@ -45,7 +45,7 @@ var _ = Describe("ssh-code Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking the target fails", func() {
+	When("checking the target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(
 				actionerror.NotLoggedInError{BinaryName: binaryName})
@@ -61,7 +61,7 @@ var _ = Describe("ssh-code Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		var code string
 
 		BeforeEach(func() {
@@ -75,7 +75,7 @@ var _ = Describe("ssh-code Command", func() {
 			Expect(fakeActor.GetSSHPasscodeCallCount()).To(Equal(1))
 		})
 
-		Context("when an error is encountered getting the ssh code", func() {
+		When("an error is encountered getting the ssh code", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

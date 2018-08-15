@@ -27,13 +27,13 @@ var _ = Describe("Logs Command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "logs", "app-name")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -49,7 +49,7 @@ var _ = Describe("Logs Command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when input is invalid", func() {
+		When("input is invalid", func() {
 			Context("because no app name is provided", func() {
 				It("gives an incorrect usage message", func() {
 					session := helpers.CF("logs")
@@ -76,7 +76,7 @@ var _ = Describe("Logs Command", func() {
 			})
 		})
 
-		Context("when the specified app exists", func() {
+		When("the specified app exists", func() {
 			var appName string
 
 			BeforeEach(func() {

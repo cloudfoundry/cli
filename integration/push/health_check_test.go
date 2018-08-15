@@ -33,7 +33,7 @@ var _ = Describe("push/update an app using health check type", func() {
 			})
 		})
 
-		Context("when setting the app to http health check type", func() {
+		When("setting the app to http health check type", func() {
 			It("should keep the health check http endpoint", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "http", "--no-start")
@@ -49,7 +49,7 @@ var _ = Describe("push/update an app using health check type", func() {
 			})
 		})
 
-		Context("when setting the app to port health check type", func() {
+		When("setting the app to port health check type", func() {
 			It("should reset the health check http endpoint", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "port", "--no-start")
@@ -66,7 +66,7 @@ var _ = Describe("push/update an app using health check type", func() {
 			})
 		})
 
-		Context("when setting the app to process health check type", func() {
+		When("setting the app to process health check type", func() {
 			It("should reset the health check http endpoint", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "process", "--no-start")
@@ -85,7 +85,7 @@ var _ = Describe("push/update an app using health check type", func() {
 	})
 
 	Context("creating the application", func() {
-		Context("when setting a http health check type", func() {
+		When("setting a http health check type", func() {
 			It("should set the health check type to http and use the default health check endpoint", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "http", "--no-start")
@@ -101,7 +101,7 @@ var _ = Describe("push/update an app using health check type", func() {
 				Eventually(session).Should(Say(`"health_check_http_endpoint":\s+"/"`))
 			})
 
-			Context("when setting a health check endpoint", func() {
+			When("setting a health check endpoint", func() {
 				It("should use the provided endpoint", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -128,7 +128,7 @@ var _ = Describe("push/update an app using health check type", func() {
 			})
 		})
 
-		Context("when setting a port health check type", func() {
+		When("setting a port health check type", func() {
 			It("it should set the health check type to port", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "port", "--no-start")
@@ -143,7 +143,7 @@ var _ = Describe("push/update an app using health check type", func() {
 				Eventually(session).Should(Say(`"health_check_http_endpoint":\s+""`))
 			})
 
-			Context("when setting an health check endpoint", func() {
+			When("setting an health check endpoint", func() {
 				It("should return an error", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -166,7 +166,7 @@ var _ = Describe("push/update an app using health check type", func() {
 			})
 		})
 
-		Context("when setting a process health check type", func() {
+		When("setting a process health check type", func() {
 			It("it should set the health check type to process", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "process", "--no-start")
@@ -181,7 +181,7 @@ var _ = Describe("push/update an app using health check type", func() {
 				Eventually(session).Should(Say(`"health_check_http_endpoint":\s+""`))
 			})
 
-			Context("when setting a health check endpoint", func() {
+			When("setting a health check endpoint", func() {
 				It("should return an error", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{

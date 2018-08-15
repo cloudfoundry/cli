@@ -36,7 +36,7 @@ var _ = Describe("share-service command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("share-service", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -53,7 +53,7 @@ var _ = Describe("share-service command", func() {
 		})
 	})
 
-	Context("when the service instance name is not provided", func() {
+	When("the service instance name is not provided", func() {
 		It("tells the user that the service instance name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("share-service", "-s", sharedToSpaceName)
 
@@ -63,7 +63,7 @@ var _ = Describe("share-service command", func() {
 		})
 	})
 
-	Context("when the space name is not provided", func() {
+	When("the space name is not provided", func() {
 		It("tells the user that the space name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("share-service")
 
@@ -73,12 +73,12 @@ var _ = Describe("share-service command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "share-service", serviceInstance, "-s", sharedToSpaceName)
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -97,7 +97,7 @@ var _ = Describe("share-service command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -117,7 +117,7 @@ var _ = Describe("share-service command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			domain      string
 			service     string
@@ -139,7 +139,7 @@ var _ = Describe("share-service command", func() {
 			helpers.QuickDeleteOrg(sourceOrgName)
 		})
 
-		Context("when there is a managed service instance in my current targeted space", func() {
+		When("there is a managed service instance in my current targeted space", func() {
 			var broker helpers.ServiceBroker
 
 			BeforeEach(func() {
@@ -156,7 +156,7 @@ var _ = Describe("share-service command", func() {
 				broker.Destroy()
 			})
 
-			Context("when I want to share my service instance to a space in another org", func() {
+			When("I want to share my service instance to a space in another org", func() {
 				AfterEach(func() {
 					Eventually(helpers.CF("unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName, "-f")).Should(Exit(0))
 				})
@@ -169,7 +169,7 @@ var _ = Describe("share-service command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when the service instance is already shared with that space", func() {
+				When("the service instance is already shared with that space", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)).Should(Exit(0))
 					})
@@ -184,7 +184,7 @@ var _ = Describe("share-service command", func() {
 				})
 			})
 
-			Context("when I want to share my service instance into another space in my targeted org", func() {
+			When("I want to share my service instance into another space in my targeted org", func() {
 				BeforeEach(func() {
 					helpers.CreateSpace(sharedToSpaceName)
 				})
@@ -201,7 +201,7 @@ var _ = Describe("share-service command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when the service instance is already shared with that space", func() {
+				When("the service instance is already shared with that space", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName)).Should(Exit(0))
 					})
@@ -216,7 +216,7 @@ var _ = Describe("share-service command", func() {
 				})
 			})
 
-			Context("when the org I want to share into does not exist", func() {
+			When("the org I want to share into does not exist", func() {
 				It("fails with an org not found error", func() {
 					session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName, "-o", "missing-org")
 					Eventually(session).Should(Say("FAILED"))
@@ -225,7 +225,7 @@ var _ = Describe("share-service command", func() {
 				})
 			})
 
-			Context("when the space I want to share into does not exist", func() {
+			When("the space I want to share into does not exist", func() {
 				It("fails with a space not found error", func() {
 					session := helpers.CF("share-service", serviceInstance, "-s", "missing-space")
 					Eventually(session).Should(Say("FAILED"))
@@ -234,7 +234,7 @@ var _ = Describe("share-service command", func() {
 				})
 			})
 
-			Context("when I am a SpaceAuditor in the space I want to share into", func() {
+			When("I am a SpaceAuditor in the space I want to share into", func() {
 				var sharedToSpaceGUID string
 				BeforeEach(func() {
 					user := helpers.NewUsername()
@@ -265,7 +265,7 @@ var _ = Describe("share-service command", func() {
 				})
 			})
 
-			Context("when my targeted space is the same as my share-to space", func() {
+			When("my targeted space is the same as my share-to space", func() {
 				It("fails with a cannot share to self error", func() {
 					session := helpers.CF("share-service", serviceInstance, "-s", sourceSpaceName)
 					Eventually(session).Should(Say("FAILED"))
@@ -274,7 +274,7 @@ var _ = Describe("share-service command", func() {
 				})
 			})
 
-			Context("when a service instance with the same name exists in the shared-to space", func() {
+			When("a service instance with the same name exists in the shared-to space", func() {
 				BeforeEach(func() {
 					helpers.CreateSpace(sharedToSpaceName)
 					helpers.TargetOrgAndSpace(sourceOrgName, sharedToSpaceName)
@@ -290,7 +290,7 @@ var _ = Describe("share-service command", func() {
 				})
 			})
 
-			Context("when the service instance is NOT shareable", func() {
+			When("the service instance is NOT shareable", func() {
 				Context("due to global settings", func() {
 					BeforeEach(func() {
 						helpers.DisableFeatureFlag("service_instance_sharing")
@@ -340,7 +340,7 @@ var _ = Describe("share-service command", func() {
 			})
 		})
 
-		Context("when the service instance does not exist", func() {
+		When("the service instance does not exist", func() {
 			It("fails with a service instance not found error", func() {
 				session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
@@ -349,7 +349,7 @@ var _ = Describe("share-service command", func() {
 			})
 		})
 
-		Context("when I try to share a user-provided-service", func() {
+		When("I try to share a user-provided-service", func() {
 			BeforeEach(func() {
 				helpers.CF("create-user-provided-service", serviceInstance, "-p", `{"username":"admin","password":"pa55woRD"}`)
 			})

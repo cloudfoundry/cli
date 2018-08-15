@@ -25,7 +25,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 		appName = helpers.PrefixedRandomName("app")
 	})
 
-	Context("when --help flag is set", func() {
+	When("--help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("v3-restart-app-instance", "--help")
 			Eventually(session).Should(Say("NAME:"))
@@ -38,7 +38,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 		})
 	})
 
-	Context("when the app name is not provided", func() {
+	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-restart-app-instance")
 
@@ -48,7 +48,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 		})
 	})
 
-	Context("when the index is not provided", func() {
+	When("the index is not provided", func() {
 		It("tells the user that the index is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-restart-app-instance", appName)
 
@@ -64,8 +64,8 @@ var _ = Describe("v3-restart-app-instance command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -78,7 +78,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -97,7 +97,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -116,7 +116,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -129,7 +129,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -143,7 +143,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -159,7 +159,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -171,7 +171,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when app does not exist", func() {
+		When("app does not exist", func() {
 			It("fails with error", func() {
 				session := helpers.CF("v3-restart-app-instance", appName, "0", "--process", "some-process")
 				Eventually(session).Should(Say("Restarting instance 0 of process some-process of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
@@ -180,14 +180,14 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			})
 		})
 
-		Context("when app exists", func() {
+		When("app exists", func() {
 			BeforeEach(func() {
 				helpers.WithProcfileApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
 				})
 			})
 
-			Context("when process type is not provided", func() {
+			When("process type is not provided", func() {
 				It("defaults to web process", func() {
 					appOutputSession := helpers.CF("app", appName)
 					Eventually(appOutputSession).Should(Exit(0))
@@ -217,8 +217,8 @@ var _ = Describe("v3-restart-app-instance command", func() {
 				})
 			})
 
-			Context("when a process type is provided", func() {
-				Context("when the process type does not exist", func() {
+			When("a process type is provided", func() {
+				When("the process type does not exist", func() {
 					It("fails with error", func() {
 						session := helpers.CF("v3-restart-app-instance", appName, "0", "--process", "unknown-process")
 						Eventually(session).Should(Say("Restarting instance 0 of process unknown-process of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
@@ -227,8 +227,8 @@ var _ = Describe("v3-restart-app-instance command", func() {
 					})
 				})
 
-				Context("when the process type exists", func() {
-					Context("when instance index exists", func() {
+				When("the process type exists", func() {
+					When("instance index exists", func() {
 						findConsoleProcess := func(appTable helpers.AppTable) (helpers.AppProcessTable, bool) {
 							for _, process := range appTable.Processes {
 								if process.Type == "console" {
@@ -283,7 +283,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 						})
 					})
 
-					Context("when instance index does not exist", func() {
+					When("instance index does not exist", func() {
 						It("fails with error", func() {
 							session := helpers.CF("v3-restart-app-instance", appName, "42", "--process", constant.ProcessTypeWeb)
 							Eventually(session).Should(Say("Restarting instance 42 of process web of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))

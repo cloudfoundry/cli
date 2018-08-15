@@ -67,7 +67,7 @@ var _ = Describe("Command", func() {
 					Expect(rpcHandlers.IsMinCliVersionCallCount()).To(Equal(1))
 				})
 
-				Context("when the min cli version is not met", func() {
+				When("the min cli version is not met", func() {
 					BeforeEach(func() {
 						rpcHandlers.IsMinCliVersionStub = func(_ string, result *bool) error {
 							*result = false

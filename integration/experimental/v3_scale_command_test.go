@@ -28,7 +28,7 @@ var _ = Describe("v3-scale command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("v3-scale", "--help")
 
@@ -59,8 +59,8 @@ var _ = Describe("v3-scale command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -73,7 +73,7 @@ var _ = Describe("v3-scale command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -92,7 +92,7 @@ var _ = Describe("v3-scale command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -111,7 +111,7 @@ var _ = Describe("v3-scale command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -124,7 +124,7 @@ var _ = Describe("v3-scale command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -138,7 +138,7 @@ var _ = Describe("v3-scale command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -154,7 +154,7 @@ var _ = Describe("v3-scale command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -163,7 +163,7 @@ var _ = Describe("v3-scale command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app name is not provided", func() {
+		When("the app name is not provided", func() {
 			It("tells the user that the app name is required, prints help text, and exits 1", func() {
 				session := helpers.CF("v3-scale")
 
@@ -173,7 +173,7 @@ var _ = Describe("v3-scale command", func() {
 			})
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("displays app not found and exits 1", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("v3-scale", invalidAppName)
@@ -183,14 +183,14 @@ var _ = Describe("v3-scale command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithProcfileApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
 				})
 			})
 
-			Context("when scale option flags are not provided", func() {
+			When("scale option flags are not provided", func() {
 				It("displays the current scale properties for all processes", func() {
 					session := helpers.CF("v3-scale", appName)
 
@@ -221,7 +221,7 @@ var _ = Describe("v3-scale command", func() {
 				})
 			})
 
-			Context("when only one scale option flag is provided", func() {
+			When("only one scale option flag is provided", func() {
 				It("scales the app accordingly", func() {
 					By("verifying we start with a single instance")
 					session := helpers.CF("v3-scale", appName)
@@ -299,7 +299,7 @@ var _ = Describe("v3-scale command", func() {
 					Expect(updatedAppTable.Processes).To(BeEmpty())
 				})
 
-				Context("when the user chooses not to restart the app", func() {
+				When("the user chooses not to restart the app", func() {
 					It("cancels the scale", func() {
 						buffer := NewBuffer()
 						buffer.Write([]byte("n\n"))
@@ -317,8 +317,8 @@ var _ = Describe("v3-scale command", func() {
 				})
 			})
 
-			Context("when all scale option flags are provided", func() {
-				Context("when the app starts successfully", func() {
+			When("all scale option flags are provided", func() {
+				When("the app starts successfully", func() {
 					It("scales the app accordingly", func() {
 						buffer := NewBuffer()
 						buffer.Write([]byte("y\n"))
@@ -342,7 +342,7 @@ var _ = Describe("v3-scale command", func() {
 					})
 				})
 
-				Context("when the app does not start successfully", func() {
+				When("the app does not start successfully", func() {
 					It("scales the app and displays the app summary", func() {
 						buffer := NewBuffer()
 						buffer.Write([]byte("y\n"))
@@ -367,7 +367,7 @@ var _ = Describe("v3-scale command", func() {
 				})
 			})
 
-			PContext("when the provided scale options are the same as the existing scale properties", func() {
+			PWhen("the provided scale options are the same as the existing scale properties", func() {
 				var (
 					session          *Session
 					currentInstances string
@@ -407,7 +407,7 @@ var _ = Describe("v3-scale command", func() {
 				})
 			})
 
-			Context("when the process flag is provided", func() {
+			When("the process flag is provided", func() {
 				It("scales the requested process", func() {
 					session := helpers.CF("v3-scale", appName, "-i", "2", "--process", "console")
 					Eventually(session).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -428,8 +428,8 @@ var _ = Describe("v3-scale command", func() {
 		})
 	})
 
-	Context("when invalid scale option values are provided", func() {
-		Context("when a negative value is passed to a flag argument", func() {
+	When("invalid scale option values are provided", func() {
+		When("a negative value is passed to a flag argument", func() {
 			It("outputs an error message to the user, provides help text, and exits 1", func() {
 				session := helpers.CF("v3-scale", "some-app", "-i=-5")
 				Eventually(session.Err).Should(Say("Incorrect Usage: invalid argument for flag '-i' \\(expected int > 0\\)"))
@@ -448,7 +448,7 @@ var _ = Describe("v3-scale command", func() {
 			})
 		})
 
-		Context("when a non-integer value is passed to a flag argument", func() {
+		When("a non-integer value is passed to a flag argument", func() {
 			It("outputs an error message to the user, provides help text, and exits 1", func() {
 				session := helpers.CF("v3-scale", "some-app", "-i", "not-an-integer")
 				Eventually(session.Err).Should(Say("Incorrect Usage: invalid argument for flag '-i' \\(expected int > 0\\)"))
@@ -467,7 +467,7 @@ var _ = Describe("v3-scale command", func() {
 			})
 		})
 
-		Context("when the unit of measurement is not provided", func() {
+		When("the unit of measurement is not provided", func() {
 			It("outputs an error message to the user, provides help text, and exits 1", func() {
 				session := helpers.CF("v3-scale", "some-app", "-k", "9")
 				Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))

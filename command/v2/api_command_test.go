@@ -41,8 +41,8 @@ var _ = Describe("api Command", func() {
 		err = cmd.Execute(nil)
 	})
 
-	Context("when the API endpoint is not provided", func() {
-		Context("when the API is not set", func() {
+	When("the API endpoint is not provided", func() {
+		When("the API is not set", func() {
 			It("displays a tip", func() {
 				Expect(err).ToNot(HaveOccurred())
 
@@ -50,7 +50,7 @@ var _ = Describe("api Command", func() {
 			})
 		})
 
-		Context("when the API is set, the user is logged in and an org and space are targeted", func() {
+		When("the API is set, the user is logged in and an org and space are targeted", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetReturns("some-api-target")
 				fakeConfig.APIVersionReturns("100.200.300")
@@ -72,7 +72,7 @@ var _ = Describe("api Command", func() {
 			})
 		})
 
-		Context("when passed a --unset", func() {
+		When("passed a --unset", func() {
 			BeforeEach(func() {
 				cmd.Unset = true
 			})
@@ -86,8 +86,8 @@ var _ = Describe("api Command", func() {
 		})
 	})
 
-	Context("when a valid API endpoint is provided", func() {
-		Context("when the API has SSL", func() {
+	When("a valid API endpoint is provided", func() {
+		When("the API has SSL", func() {
 			Context("with no protocol", func() {
 				var (
 					CCAPI string
@@ -101,7 +101,7 @@ var _ = Describe("api Command", func() {
 					fakeConfig.APIVersionReturns("100.200.300")
 				})
 
-				Context("when the url has verified SSL", func() {
+				When("the url has verified SSL", func() {
 					It("sets the target", func() {
 						Expect(err).ToNot(HaveOccurred())
 
@@ -119,8 +119,8 @@ api version:    100.200.300`,
 					})
 				})
 
-				Context("when the url has unverified SSL", func() {
-					Context("when --skip-ssl-validation is passed", func() {
+				When("the url has unverified SSL", func() {
+					When("--skip-ssl-validation is passed", func() {
 						BeforeEach(func() {
 							cmd.SkipSSLValidation = true
 						})
@@ -142,7 +142,7 @@ api version:    100.200.300`,
 						})
 					})
 
-					Context("when no additional flags are passed", func() {
+					When("no additional flags are passed", func() {
 						BeforeEach(func() {
 							fakeActor.SetTargetReturns(nil, ccerror.UnverifiedServerError{URL: CCAPI})
 						})
@@ -156,7 +156,7 @@ api version:    100.200.300`,
 			})
 		})
 
-		Context("when the API does not have SSL", func() {
+		When("the API does not have SSL", func() {
 			var CCAPI string
 
 			BeforeEach(func() {
@@ -178,7 +178,7 @@ api version:    100.200.300`,
 			})
 		})
 
-		Context("when the API is set but the user is not logged in", func() {
+		When("the API is set but the user is not logged in", func() {
 			BeforeEach(func() {
 				cmd.OptionalArgs.URL = "https://api.foo.com"
 				fakeConfig.TargetReturns("something")
@@ -191,7 +191,7 @@ api version:    100.200.300`,
 			})
 		})
 
-		Context("when the API is set but the user is logged in", func() {
+		When("the API is set but the user is logged in", func() {
 			BeforeEach(func() {
 				cmd.OptionalArgs.URL = "https://api.foo.com"
 				fakeConfig.TargetReturns("something")
@@ -205,7 +205,7 @@ api version:    100.200.300`,
 			})
 		})
 
-		Context("when the API has an older version", func() {
+		When("the API has an older version", func() {
 			BeforeEach(func() {
 				cmd.OptionalArgs.URL = "https://api.foo.com"
 				fakeConfig.TargetReturns("something")
@@ -219,7 +219,7 @@ api version:    100.200.300`,
 			})
 		})
 
-		Context("when the URL host does not exist", func() {
+		When("the URL host does not exist", func() {
 			var (
 				CCAPI      string
 				requestErr ccerror.RequestError

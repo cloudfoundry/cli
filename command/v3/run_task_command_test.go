@@ -53,7 +53,7 @@ var _ = Describe("run-task Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -68,7 +68,7 @@ var _ = Describe("run-task Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, and a space and org are targeted", func() {
+	When("the user is logged in, and a space and org are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
@@ -82,7 +82,7 @@ var _ = Describe("run-task Command", func() {
 			})
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -97,14 +97,14 @@ var _ = Describe("run-task Command", func() {
 			})
 		})
 
-		Context("when getting the current user does not return an error", func() {
+		When("getting the current user does not return an error", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})
 
-			Context("when provided a valid application name", func() {
+			When("provided a valid application name", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v3action.Application{GUID: "some-app-guid"},
@@ -112,7 +112,7 @@ var _ = Describe("run-task Command", func() {
 						nil)
 				})
 
-				Context("when the task name is not provided", func() {
+				When("the task name is not provided", func() {
 					BeforeEach(func() {
 						fakeActor.RunTaskReturns(
 							v3action.Task{
@@ -149,7 +149,7 @@ var _ = Describe("run-task Command", func() {
 					})
 				})
 
-				Context("when task disk space is provided", func() {
+				When("task disk space is provided", func() {
 					BeforeEach(func() {
 						cmd.Name = "some-task-name"
 						cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{Value: 321, IsSet: true}}
@@ -195,9 +195,9 @@ var _ = Describe("run-task Command", func() {
 				})
 			})
 
-			Context("when there are errors", func() {
-				Context("when the error is translatable", func() {
-					Context("when getting the app returns the error", func() {
+			When("there are errors", func() {
+				When("the error is translatable", func() {
+					When("getting the app returns the error", func() {
 						var (
 							returnedErr error
 							expectedErr error
@@ -217,7 +217,7 @@ var _ = Describe("run-task Command", func() {
 						})
 					})
 
-					Context("when running the task returns the error", func() {
+					When("running the task returns the error", func() {
 						var returnedErr error
 
 						BeforeEach(func() {
@@ -238,8 +238,8 @@ var _ = Describe("run-task Command", func() {
 					})
 				})
 
-				Context("when the error is not translatable", func() {
-					Context("when getting the app returns the error", func() {
+				When("the error is not translatable", func() {
+					When("getting the app returns the error", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -258,7 +258,7 @@ var _ = Describe("run-task Command", func() {
 						})
 					})
 
-					Context("when running the task returns an error", func() {
+					When("running the task returns an error", func() {
 						var expectedErr error
 
 						BeforeEach(func() {

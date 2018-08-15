@@ -60,7 +60,7 @@ var _ = Describe("Resource Actions", func() {
 			matchedResources, unmatchedResources, warnings, executeErr = actor.ResourceMatch(allResources)
 		})
 
-		Context("when given folders", func() {
+		When("given folders", func() {
 			BeforeEach(func() {
 				allResources = []Resource{
 					{Filename: "folder-1", Mode: DefaultFolderPermissions},
@@ -80,7 +80,7 @@ var _ = Describe("Resource Actions", func() {
 			})
 		})
 
-		Context("when given files", func() {
+		When("given files", func() {
 			BeforeEach(func() {
 				allResources = []Resource{
 					{Filename: "file-1", Mode: 0744, Size: 11, SHA1: "some-sha-1"},
@@ -102,14 +102,14 @@ var _ = Describe("Resource Actions", func() {
 				))
 			})
 
-			Context("when none of the files are matched", func() {
+			When("none of the files are matched", func() {
 				It("returns all files [in order] in unmatchedResources", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(unmatchedResources).To(Equal(allResources))
 				})
 			})
 
-			Context("when some files are matched", func() {
+			When("some files are matched", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateResourceMatchReturns(
 						[]ccv2.Resource{
@@ -144,7 +144,7 @@ var _ = Describe("Resource Actions", func() {
 			})
 		})
 
-		Context("when sending a large number of files/folders", func() {
+		When("sending a large number of files/folders", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateResourceMatchReturnsOnCall(
 					0, nil, ccv2.Warnings{"warnings-1"}, nil,
@@ -170,7 +170,7 @@ var _ = Describe("Resource Actions", func() {
 
 		})
 
-		Context("when the CC API returns an error", func() {
+		When("the CC API returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

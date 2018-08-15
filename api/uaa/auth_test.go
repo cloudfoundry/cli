@@ -42,8 +42,8 @@ var _ = Describe("Auth", func() {
 			accessToken, refreshToken, executeErr = client.Authenticate(identity, secret, origin, grantType)
 		})
 
-		Context("when no errors occur", func() {
-			Context("when the grant type is password and origin is not set", func() {
+		When("no errors occur", func() {
+			When("the grant type is password and origin is not set", func() {
 				BeforeEach(func() {
 					response := `{
 						"access_token":"some-access-token",
@@ -71,7 +71,7 @@ var _ = Describe("Auth", func() {
 				})
 			})
 
-			Context("when the grant type is password and origin is set", func() {
+			When("the grant type is password and origin is set", func() {
 				BeforeEach(func() {
 					response := `{
 						"access_token":"some-access-token",
@@ -101,7 +101,7 @@ var _ = Describe("Auth", func() {
 				})
 			})
 
-			Context("when the grant type is client credentials", func() {
+			When("the grant type is client credentials", func() {
 				BeforeEach(func() {
 					response := `{
 						"access_token":"some-access-token"
@@ -130,7 +130,7 @@ var _ = Describe("Auth", func() {
 			})
 		})
 
-		Context("when an error occurs", func() {
+		When("an error occurs", func() {
 			var response string
 
 			BeforeEach(func() {

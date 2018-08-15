@@ -19,7 +19,7 @@ var _ = Describe("Stack", func() {
 	})
 
 	Describe("GetStack", func() {
-		Context("when the stack is found", func() {
+		When("the stack is found", func() {
 			BeforeEach(func() {
 				response := `{
 					"metadata": {
@@ -51,7 +51,7 @@ var _ = Describe("Stack", func() {
 			})
 		})
 
-		Context("when the client returns an error", func() {
+		When("the client returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 250003,
@@ -77,8 +77,8 @@ var _ = Describe("Stack", func() {
 	})
 
 	Describe("GetStacks", func() {
-		Context("when no errors are encountered", func() {
-			Context("when results are paginated", func() {
+		When("no errors are encountered", func() {
+			When("results are paginated", func() {
 				BeforeEach(func() {
 					response1 := `{
 						"next_url": "/v2/stacks?q=some-query:some-value&page=2",
@@ -173,7 +173,7 @@ var _ = Describe("Stack", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			BeforeEach(func() {
 				response := `{
   "code": 10001,

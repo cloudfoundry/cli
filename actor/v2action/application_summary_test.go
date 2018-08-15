@@ -48,7 +48,7 @@ var _ = Describe("Application Summary Actions", func() {
 			}
 		})
 
-		Context("when the application does not exist", func() {
+		When("the application does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv2.Application{},
@@ -63,7 +63,7 @@ var _ = Describe("Application Summary Actions", func() {
 			})
 		})
 
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv2.Application{ccApp},
@@ -71,7 +71,7 @@ var _ = Describe("Application Summary Actions", func() {
 					nil)
 			})
 
-			Context("when the application is STARTED", func() {
+			When("the application is STARTED", func() {
 				BeforeEach(func() {
 					ccApp.State = constant.ApplicationStarted
 					fakeCloudControllerClient.GetApplicationsReturns(
@@ -80,7 +80,7 @@ var _ = Describe("Application Summary Actions", func() {
 						nil)
 				})
 
-				Context("when instance information is available", func() {
+				When("instance information is available", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationApplicationInstanceStatusesReturns(
 							map[int]ccv2.ApplicationInstanceStatus{
@@ -117,7 +117,7 @@ var _ = Describe("Application Summary Actions", func() {
 					})
 				})
 
-				Context("when instance information is not available", func() {
+				When("instance information is not available", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationApplicationInstanceStatusesReturns(
 							nil,
@@ -134,7 +134,7 @@ var _ = Describe("Application Summary Actions", func() {
 				})
 			})
 
-			Context("when the application is not STARTED", func() {
+			When("the application is not STARTED", func() {
 				BeforeEach(func() {
 					ccApp.State = constant.ApplicationStopped
 				})
@@ -149,7 +149,7 @@ var _ = Describe("Application Summary Actions", func() {
 				})
 			})
 
-			Context("when the app has routes", func() {
+			When("the app has routes", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationRoutesReturns(
 						[]ccv2.Route{
@@ -182,7 +182,7 @@ var _ = Describe("Application Summary Actions", func() {
 					))
 				})
 
-				Context("when an error is encountered while getting routes", func() {
+				When("an error is encountered while getting routes", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -203,7 +203,7 @@ var _ = Describe("Application Summary Actions", func() {
 				})
 			})
 
-			Context("when the app has stack information", func() {
+			When("the app has stack information", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStackReturns(
 						ccv2.Stack{Name: "some-stack"},
@@ -218,7 +218,7 @@ var _ = Describe("Application Summary Actions", func() {
 					Expect(app.Stack).To(Equal(Stack{Name: "some-stack"}))
 				})
 
-				Context("when an error is encountered while getting stack", func() {
+				When("an error is encountered while getting stack", func() {
 					var expectedErr error
 
 					BeforeEach(func() {

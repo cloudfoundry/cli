@@ -33,7 +33,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			err = actor.AddPluginRepository("some-repo", "some-URL")
 		})
 
-		Context("when passed a url without a scheme", func() {
+		When("passed a url without a scheme", func() {
 			It("prepends https://", func() {
 				_ = actor.AddPluginRepository("some-repo2", "some-URL")
 				url := fakePluginClient.GetPluginRepositoryArgsForCall(1)
@@ -41,7 +41,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when passed a schemeless IP address with a port", func() {
+		When("passed a schemeless IP address with a port", func() {
 			It("prepends https://", func() {
 				_ = actor.AddPluginRepository("some-repo2", "127.0.0.1:5000")
 				url := fakePluginClient.GetPluginRepositoryArgsForCall(1)
@@ -49,7 +49,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when the repository name is taken", func() {
+		When("the repository name is taken", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
 					{
@@ -68,7 +68,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when the repository name and URL are already taken in the same repo", func() {
+		When("the repository name and URL are already taken in the same repo", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
 					{
@@ -86,7 +86,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when the repository name is the same except for case sensitivity", func() {
+		When("the repository name is the same except for case sensitivity", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
 					{
@@ -104,7 +104,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when the repository name is the same and repostiroy URL is the same except for trailing slash", func() {
+		When("the repository name is the same and repostiroy URL is the same except for trailing slash", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
 					{
@@ -123,7 +123,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when the repository URL is taken", func() {
+		When("the repository URL is taken", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
 					{
@@ -150,7 +150,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when getting the repository errors", func() {
+		When("getting the repository errors", func() {
 			BeforeEach(func() {
 				fakePluginClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, errors.New("generic-error"))
 			})
@@ -164,7 +164,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when no errors occur", func() {
+		When("no errors occur", func() {
 			BeforeEach(func() {
 				fakePluginClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, nil)
 			})
@@ -184,7 +184,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 	})
 
 	Describe("GetPluginRepository", func() {
-		Context("when the repository is registered", func() {
+		When("the repository is registered", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
 					{Name: "some-REPO", URL: "some-url"},
@@ -198,7 +198,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when the repository is not registered", func() {
+		When("the repository is not registered", func() {
 			It("returns a RepositoryNotRegisteredError", func() {
 				_, err := actor.GetPluginRepository("some-rEPO")
 				Expect(err).To(MatchError(actionerror.RepositoryNotRegisteredError{Name: "some-rEPO"}))
@@ -207,7 +207,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 	})
 
 	Describe("IsPluginRepositoryRegistered", func() {
-		Context("when the repository is registered", func() {
+		When("the repository is registered", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
 					{Name: "some-repo"},
@@ -219,7 +219,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when the repository is not registered", func() {
+		When("the repository is not registered", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{})
 			})

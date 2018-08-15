@@ -80,7 +80,7 @@ var _ = Describe("Policy", func() {
 			}))
 		})
 
-		Context("when getting the source app fails ", func() {
+		When("getting the source app fails ", func() {
 			BeforeEach(func() {
 				fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
 			})
@@ -90,7 +90,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		Context("when getting the destination app fails ", func() {
+		When("getting the destination app fails ", func() {
 			BeforeEach(func() {
 				fakeV3Actor.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
 					if appName == "appB" {
@@ -105,7 +105,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		Context("when creating the policy fails", func() {
+		When("creating the policy fails", func() {
 			BeforeEach(func() {
 				fakeNetworkingClient.CreatePoliciesReturns(errors.New("apple"))
 			})
@@ -180,7 +180,7 @@ var _ = Describe("Policy", func() {
 			policies, warnings, executeErr = actor.NetworkPoliciesBySpaceAndAppName(spaceGuid, srcApp)
 		})
 
-		Context("when listing policies based on a source app", func() {
+		When("listing policies based on a source app", func() {
 			BeforeEach(func() {
 				srcApp = "appA"
 			})
@@ -211,7 +211,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		Context("when getting the applications fails", func() {
+		When("getting the applications fails", func() {
 			BeforeEach(func() {
 				fakeV3Actor.GetApplicationsBySpaceReturns([]v3action.Application{}, []string{"GetApplicationsBySpaceWarning"}, errors.New("banana"))
 			})
@@ -223,7 +223,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		Context("when getting the source app fails ", func() {
+		When("getting the source app fails ", func() {
 			BeforeEach(func() {
 				fakeV3Actor.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
 					if appName == "appA" {
@@ -242,7 +242,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		Context("when listing the policy fails", func() {
+		When("listing the policy fails", func() {
 			BeforeEach(func() {
 				fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{}, errors.New("apple"))
 			})
@@ -342,7 +342,7 @@ var _ = Describe("Policy", func() {
 			Expect(fakeNetworkingClient.ListPoliciesArgsForCall(0)).To(BeNil())
 		})
 
-		Context("when getting the applications fails", func() {
+		When("getting the applications fails", func() {
 			BeforeEach(func() {
 				fakeV3Actor.GetApplicationsBySpaceReturns([]v3action.Application{}, []string{"GetApplicationsBySpaceWarning"}, errors.New("banana"))
 			})
@@ -354,7 +354,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		Context("when listing the policy fails", func() {
+		When("listing the policy fails", func() {
 			BeforeEach(func() {
 				fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{}, errors.New("apple"))
 			})
@@ -425,7 +425,7 @@ var _ = Describe("Policy", func() {
 			}))
 		})
 
-		Context("when the policy does not exist", func() {
+		When("the policy does not exist", func() {
 			BeforeEach(func() {
 				fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{}, nil)
 			})
@@ -436,7 +436,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		Context("when getting the source app fails ", func() {
+		When("getting the source app fails ", func() {
 			BeforeEach(func() {
 				fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
 			})
@@ -446,7 +446,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		Context("when getting the destination app fails ", func() {
+		When("getting the destination app fails ", func() {
 			BeforeEach(func() {
 				fakeV3Actor.GetApplicationByNameAndSpaceReturnsOnCall(0, v3action.Application{}, []string{"v3ActorWarningA"}, nil)
 				fakeV3Actor.GetApplicationByNameAndSpaceReturnsOnCall(1, v3action.Application{}, []string{"v3ActorWarningB"}, errors.New("banana"))
@@ -458,7 +458,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		Context("when listing policies fails", func() {
+		When("listing policies fails", func() {
 			BeforeEach(func() {
 				fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{}, errors.New("apple"))
 			})
@@ -467,7 +467,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 
-		Context("when removing the policy fails", func() {
+		When("removing the policy fails", func() {
 			BeforeEach(func() {
 				fakeNetworkingClient.RemovePoliciesReturns(errors.New("apple"))
 			})

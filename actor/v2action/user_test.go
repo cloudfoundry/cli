@@ -35,7 +35,7 @@ var _ = Describe("User Actions", func() {
 			actualUser, actualWarnings, actualErr = actor.CreateUser("some-new-user", "some-password", "some-origin")
 		})
 
-		Context("when no API errors occur", func() {
+		When("no API errors occur", func() {
 			var createdUser ccv2.User
 
 			BeforeEach(func() {
@@ -76,7 +76,7 @@ var _ = Describe("User Actions", func() {
 			})
 		})
 
-		Context("when a create user request to the UAA returns an error", func() {
+		When("a create user request to the UAA returns an error", func() {
 			var returnedErr error
 
 			BeforeEach(func() {
@@ -94,7 +94,7 @@ var _ = Describe("User Actions", func() {
 			})
 		})
 
-		Context("when the CC API returns an error", func() {
+		When("the CC API returns an error", func() {
 			var returnedErr error
 
 			BeforeEach(func() {

@@ -76,13 +76,13 @@ var _ = Describe("create-app-manifest command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "create-app-manifest", "some-app-name")
 		})
 	})
 
-	Context("when app name not provided", func() {
+	When("app name not provided", func() {
 		It("displays a usage error", func() {
 			session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest")
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
@@ -92,7 +92,7 @@ var _ = Describe("create-app-manifest command", func() {
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -114,7 +114,7 @@ var _ = Describe("create-app-manifest command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("displays a usage error", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
 				Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -125,8 +125,8 @@ var _ = Describe("create-app-manifest command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
-			Context("when the app does not have routes", func() {
+		When("the app exists", func() {
+			When("the app does not have routes", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-route")).Should(Exit(0))
@@ -157,7 +157,7 @@ var _ = Describe("create-app-manifest command", func() {
 				})
 			})
 
-			Context("when the app has routes", func() {
+			When("the app has routes", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
@@ -188,8 +188,8 @@ var _ = Describe("create-app-manifest command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when the -p flag is provided", func() {
-					Context("when the specified file is a directory", func() {
+				When("the -p flag is provided", func() {
+					When("the specified file is a directory", func() {
 						It("displays a file creation error", func() {
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", tempDir)
 							Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -200,7 +200,7 @@ var _ = Describe("create-app-manifest command", func() {
 						})
 					})
 
-					Context("when the specified file does not exist", func() {
+					When("the specified file does not exist", func() {
 						var newFile string
 
 						BeforeEach(func() {
@@ -231,7 +231,7 @@ var _ = Describe("create-app-manifest command", func() {
 						})
 					})
 
-					Context("when the specified file exists", func() {
+					When("the specified file exists", func() {
 						var existingFile string
 
 						BeforeEach(func() {
@@ -268,7 +268,7 @@ var _ = Describe("create-app-manifest command", func() {
 			})
 		})
 
-		Context("when app was created with docker image", func() {
+		When("app was created with docker image", func() {
 
 			BeforeEach(func() {
 				Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
@@ -301,7 +301,7 @@ var _ = Describe("create-app-manifest command", func() {
 			})
 		})
 
-		Context("when the API supports docker credentials", func() {
+		When("the API supports docker credentials", func() {
 			var oldDockerPassword string
 
 			BeforeEach(func() {
@@ -346,7 +346,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 		})
 
-		Context("when app has no hostname", func() {
+		When("app has no hostname", func() {
 			var domain helpers.Domain
 
 			BeforeEach(func() {
@@ -368,7 +368,7 @@ var _ = Describe("create-app-manifest command", func() {
 			})
 		})
 
-		Context("when the app has a buildpack", func() {
+		When("the app has a buildpack", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start", "-b", "staticfile_buildpack")).Should(Exit(0))
@@ -384,7 +384,7 @@ var _ = Describe("create-app-manifest command", func() {
 			})
 		})
 
-		Context("when the app has multiple buildpacks", func() {
+		When("the app has multiple buildpacks", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 

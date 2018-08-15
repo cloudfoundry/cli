@@ -18,7 +18,7 @@ var _ = Describe("Token Refreshing", func() {
 			helpers.LoginCF()
 		})
 
-		Context("when the token is invalid", func() {
+		When("the token is invalid", func() {
 			BeforeEach(func() {
 				helpers.SetConfig(func(config *configv3.Config) {
 					config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
@@ -27,8 +27,8 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			Context("when running a v2 command", func() {
-				Context("when the cloud controller client encounters an invalid token response", func() {
+			When("running a v2 command", func() {
+				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						session := helpers.CF("unbind-service", "app", "service")
 						Eventually(session.Err).Should(Say("App app not found"))
@@ -36,7 +36,7 @@ var _ = Describe("Token Refreshing", func() {
 					})
 				})
 
-				Context("when the UAA client encounters an invalid token response", func() {
+				When("the UAA client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						username, _ := helpers.GetCredentials()
 						session := helpers.CF("create-user", username, helpers.NewPassword())
@@ -46,8 +46,8 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			Context("when running a v3 command", func() {
-				Context("when the cloud controller client encounters an invalid token response", func() {
+			When("running a v3 command", func() {
+				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						session := helpers.CF("-v", "run-task", "app", "'echo banana'")
 						Eventually(session.Err).Should(Say("App app not found"))
@@ -63,7 +63,7 @@ var _ = Describe("Token Refreshing", func() {
 			helpers.LoginCFWithClientCredentials()
 		})
 
-		Context("when the token is invalid", func() {
+		When("the token is invalid", func() {
 			BeforeEach(func() {
 				helpers.SetConfig(func(config *configv3.Config) {
 					config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
@@ -72,8 +72,8 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			Context("when running a v2 refactored command", func() {
-				Context("when the cloud controller client encounters an invalid token response", func() {
+			When("running a v2 refactored command", func() {
+				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						session := helpers.CF("unbind-service", "app", "service")
 						Eventually(session.Err).Should(Say("App app not found"))
@@ -81,7 +81,7 @@ var _ = Describe("Token Refreshing", func() {
 					})
 				})
 
-				Context("when the UAA client encounters an invalid token response", func() {
+				When("the UAA client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						username := helpers.NewUsername()
 						session := helpers.CF("create-user", username, helpers.NewPassword())
@@ -91,8 +91,8 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			Context("when running a v2 unrefactored command", func() {
-				Context("when the cloud controller client encounters an invalid token response", func() {
+			When("running a v2 unrefactored command", func() {
+				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						username, _ := helpers.GetCredentials()
 						session := helpers.CF("quotas")
@@ -103,8 +103,8 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			Context("when running a v3 command", func() {
-				Context("when the cloud controller client encounters an invalid token response", func() {
+			When("running a v3 command", func() {
+				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						session := helpers.CF("-v", "run-task", "app", "'echo banana'")
 						Eventually(session.Err).Should(Say("App app not found"))

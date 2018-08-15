@@ -21,13 +21,13 @@ var _ = Describe("delete-buildpack command", func() {
 		buildpackName = helpers.NewBuildpack()
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		XIt("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "delete-buildpack", "nonexistent-buildpack")
 		})
 	})
 
-	Context("when the buildpack name is not provided", func() {
+	When("the buildpack name is not provided", func() {
 		It("displays an error and help", func() {
 			session := helpers.CF("delete-buildpack")
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `BUILDPACK` was not provided"))
@@ -36,7 +36,7 @@ var _ = Describe("delete-buildpack command", func() {
 		})
 	})
 
-	Context("when the buildpack doesn't exist", func() {
+	When("the buildpack doesn't exist", func() {
 		It("displays a warning and exits 0", func() {
 			session := helpers.CF("delete-buildpack", "-f", "nonexistent-buildpack")
 			Eventually(session).Should(Say("Deleting buildpack nonexistent-buildpack"))
@@ -56,7 +56,7 @@ var _ = Describe("delete-buildpack command", func() {
 			}, stacks[0])
 		})
 
-		Context("when the stack is specified", func() {
+		When("the stack is specified", func() {
 			It("deletes the specified buildpack", func() {
 				session := helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")
 				Eventually(session).Should(Exit(0))
@@ -64,7 +64,7 @@ var _ = Describe("delete-buildpack command", func() {
 			})
 		})
 
-		Context("when the stack is not specified", func() {
+		When("the stack is not specified", func() {
 			It("deletes the specified buildpack", func() {
 				session := helpers.CF("delete-buildpack", buildpackName, "-f")
 				Eventually(session).Should(Exit(0))
@@ -144,7 +144,7 @@ var _ = Describe("delete-buildpack command", func() {
 		})
 	})
 
-	Context("when the -f flag not is provided", func() {
+	When("the -f flag not is provided", func() {
 		var buffer *Buffer
 
 		BeforeEach(func() {
@@ -156,7 +156,7 @@ var _ = Describe("delete-buildpack command", func() {
 			}, "")
 		})
 
-		Context("when the user enters 'y'", func() {
+		When("the user enters 'y'", func() {
 			BeforeEach(func() {
 				buffer.Write([]byte("y\n"))
 			})
@@ -169,7 +169,7 @@ var _ = Describe("delete-buildpack command", func() {
 			})
 		})
 
-		Context("when the user enters 'n'", func() {
+		When("the user enters 'n'", func() {
 			BeforeEach(func() {
 				buffer.Write([]byte("n\n"))
 			})
@@ -185,7 +185,7 @@ var _ = Describe("delete-buildpack command", func() {
 			})
 		})
 
-		Context("when the user enters the default input (hits return)", func() {
+		When("the user enters the default input (hits return)", func() {
 			BeforeEach(func() {
 				buffer.Write([]byte("\n"))
 			})
@@ -202,7 +202,7 @@ var _ = Describe("delete-buildpack command", func() {
 		})
 	})
 
-	Context("when the -f flag is provided", func() {
+	When("the -f flag is provided", func() {
 		It("deletes the org", func() {
 			session := helpers.CF("delete-buildpack", buildpackName, "-f")
 			Eventually(session).Should(Say("Deleting buildpack %s", buildpackName))

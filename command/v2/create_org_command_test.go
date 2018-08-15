@@ -50,7 +50,7 @@ var _ = Describe("CreateOrgCommand", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking the target fails", func() {
+	When("checking the target fails", func() {
 		var binaryName string
 
 		BeforeEach(func() {
@@ -69,8 +69,8 @@ var _ = Describe("CreateOrgCommand", func() {
 		})
 	})
 
-	Context("when checking the target succeeds", func() {
-		Context("when fetching the current user succeeds", func() {
+	When("checking the target succeeds", func() {
+		When("fetching the current user succeeds", func() {
 			var username string
 
 			BeforeEach(func() {
@@ -81,7 +81,7 @@ var _ = Describe("CreateOrgCommand", func() {
 				}, nil)
 			})
 
-			Context("when creating the org succeeds", func() {
+			When("creating the org succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.CreateOrganizationReturns(
 						v2action.Organization{GUID: "fake-org-id"},
@@ -90,7 +90,7 @@ var _ = Describe("CreateOrgCommand", func() {
 					)
 				})
 
-				Context("when making the user an org manager succeeds", func() {
+				When("making the user an org manager succeeds", func() {
 					BeforeEach(func() {
 						fakeActor.GrantOrgManagerByUsernameReturns(
 							v2action.Warnings{"warn-role"},
@@ -118,14 +118,14 @@ var _ = Describe("CreateOrgCommand", func() {
 					})
 				})
 
-				Context("when making the user an org manager fails", func() {
+				When("making the user an org manager fails", func() {
 					It("returns an error and prints warnings", func() {
 
 					})
 				})
 			})
 
-			Context("when creating the org fails", func() {
+			When("creating the org fails", func() {
 				BeforeEach(func() {
 					fakeActor.CreateOrganizationReturns(
 						v2action.Organization{},
@@ -141,7 +141,7 @@ var _ = Describe("CreateOrgCommand", func() {
 			})
 		})
 
-		Context("when fetching the user fails", func() {
+		When("fetching the user fails", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("gotta log in"))
 			})

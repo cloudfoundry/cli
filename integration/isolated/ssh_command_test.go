@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("ssh command", func() {
 	Describe("help", func() {
-		Context("when --help flag is provided", func() {
+		When("--help flag is provided", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("ssh", "--help")
 				Eventually(session).Should(Say(`NAME:`))
@@ -37,7 +37,7 @@ var _ = Describe("ssh command", func() {
 		})
 	})
 
-	Context("when an application with multiple instances has been pushed", func() {
+	When("an application with multiple instances has been pushed", func() {
 		var (
 			appName          string
 			appDirForCleanup string
@@ -82,8 +82,8 @@ applications:
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app index is specified", func() {
-			Context("when it is negative", func() {
+		When("the app index is specified", func() {
+			When("it is negative", func() {
 				It("throws an error and informs the user that the app instance index cannot be negative", func() {
 					session := helpers.CF("ssh", appName, "-i", "-1")
 					Eventually(session).Should(Say("FAILED"))
@@ -92,7 +92,7 @@ applications:
 				})
 			})
 
-			Context("when the app index exceeds the last valid index", func() {
+			When("the app index exceeds the last valid index", func() {
 				It("throws an error and informs the user that the specified application does not exist", func() {
 					session := helpers.CF("ssh", appName, "-i", "2")
 					Eventually(session).Should(Say("FAILED"))
@@ -101,7 +101,7 @@ applications:
 				})
 			})
 
-			Context("when it is a valid index", func() {
+			When("it is a valid index", func() {
 				It("does not throw any error", func() {
 					buffer := NewBuffer()
 					buffer.Write([]byte("exit\n"))

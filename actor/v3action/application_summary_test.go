@@ -46,7 +46,7 @@ var _ = Describe("Application Summary Actions", func() {
 			summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues)
 		})
 
-		Context("when retrieving the application is successful", func() {
+		When("retrieving the application is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv3.Application{
@@ -61,7 +61,7 @@ var _ = Describe("Application Summary Actions", func() {
 				)
 			})
 
-			Context("when retrieving the process information is successful", func() {
+			When("retrieving the process information is successful", func() {
 				BeforeEach(func() {
 					listedProcess := ccv3.Process{
 						GUID:       "some-process-guid",
@@ -100,7 +100,7 @@ var _ = Describe("Application Summary Actions", func() {
 					)
 				})
 
-				Context("when app has droplet", func() {
+				When("app has droplet", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
 							ccv3.Droplet{
@@ -179,7 +179,7 @@ var _ = Describe("Application Summary Actions", func() {
 						Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
 					})
 
-					Context("when getting the current droplet returns an error", func() {
+					When("getting the current droplet returns an error", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -198,7 +198,7 @@ var _ = Describe("Application Summary Actions", func() {
 					})
 				})
 
-				Context("when app does not have current droplet", func() {
+				When("app does not have current droplet", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationDropletCurrentReturns(
 							ccv3.Droplet{},
@@ -262,7 +262,7 @@ var _ = Describe("Application Summary Actions", func() {
 				})
 			})
 
-			Context("when getting the app process instances returns an error", func() {
+			When("getting the app process instances returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -298,7 +298,7 @@ var _ = Describe("Application Summary Actions", func() {
 			})
 		})
 
-		Context("when getting the app processes returns an error", func() {
+		When("getting the app processes returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

@@ -75,7 +75,7 @@ var _ = Describe("v3-scale Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -92,7 +92,7 @@ var _ = Describe("v3-scale Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -107,7 +107,7 @@ var _ = Describe("v3-scale Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, and org and space are targeted", func() {
+	When("the user is logged in, and org and space are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
@@ -120,7 +120,7 @@ var _ = Describe("v3-scale Command", func() {
 				nil)
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -135,7 +135,7 @@ var _ = Describe("v3-scale Command", func() {
 			})
 		})
 
-		Context("when the application does not exist", func() {
+		When("the application does not exist", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
 					v3action.Application{},
@@ -157,7 +157,7 @@ var _ = Describe("v3-scale Command", func() {
 			})
 		})
 
-		Context("when an error occurs getting the application", func() {
+		When("an error occurs getting the application", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -174,7 +174,7 @@ var _ = Describe("v3-scale Command", func() {
 			})
 		})
 
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			var appSummary v3action.ApplicationSummary
 
 			BeforeEach(func() {
@@ -243,7 +243,7 @@ var _ = Describe("v3-scale Command", func() {
 					nil)
 			})
 
-			Context("when no flag options are provided", func() {
+			When("no flag options are provided", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 						appSummary,
@@ -296,7 +296,7 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(0))
 				})
 
-				Context("when an error is encountered getting process information", func() {
+				When("an error is encountered getting process information", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -315,7 +315,7 @@ var _ = Describe("v3-scale Command", func() {
 				})
 			})
 
-			Context("when all flag options are provided", func() {
+			When("all flag options are provided", func() {
 				BeforeEach(func() {
 					cmd.Instances.Value = 2
 					cmd.Instances.IsSet = true
@@ -332,8 +332,8 @@ var _ = Describe("v3-scale Command", func() {
 						nil)
 				})
 
-				Context("when force flag is not provided", func() {
-					Context("when the user chooses default", func() {
+				When("force flag is not provided", func() {
+					When("the user chooses default", func() {
 						BeforeEach(func() {
 							_, err := input.Write([]byte("\n"))
 							Expect(err).ToNot(HaveOccurred())
@@ -354,7 +354,7 @@ var _ = Describe("v3-scale Command", func() {
 						})
 					})
 
-					Context("when the user chooses no", func() {
+					When("the user chooses no", func() {
 						BeforeEach(func() {
 							_, err := input.Write([]byte("n\n"))
 							Expect(err).ToNot(HaveOccurred())
@@ -375,13 +375,13 @@ var _ = Describe("v3-scale Command", func() {
 						})
 					})
 
-					Context("when the user chooses yes", func() {
+					When("the user chooses yes", func() {
 						BeforeEach(func() {
 							_, err := input.Write([]byte("y\n"))
 							Expect(err).ToNot(HaveOccurred())
 						})
 
-						Context("when polling succeeds", func() {
+						When("polling succeeds", func() {
 							BeforeEach(func() {
 								fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
 									warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
@@ -458,7 +458,7 @@ var _ = Describe("v3-scale Command", func() {
 							})
 						})
 
-						Context("when polling the start fails", func() {
+						When("polling the start fails", func() {
 							BeforeEach(func() {
 								fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
 									warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
@@ -474,7 +474,7 @@ var _ = Describe("v3-scale Command", func() {
 							})
 						})
 
-						Context("when polling times out", func() {
+						When("polling times out", func() {
 							BeforeEach(func() {
 								fakeActor.PollStartReturns(actionerror.StartupTimeoutError{})
 							})
@@ -489,7 +489,7 @@ var _ = Describe("v3-scale Command", func() {
 					})
 				})
 
-				Context("when force flag is provided", func() {
+				When("force flag is provided", func() {
 					BeforeEach(func() {
 						cmd.Force = true
 					})
@@ -511,7 +511,7 @@ var _ = Describe("v3-scale Command", func() {
 				})
 			})
 
-			Context("when only the instances flag option is provided", func() {
+			When("only the instances flag option is provided", func() {
 				BeforeEach(func() {
 					cmd.Instances.Value = 3
 					cmd.Instances.IsSet = true
@@ -554,7 +554,7 @@ var _ = Describe("v3-scale Command", func() {
 				})
 			})
 
-			Context("when only the memory flag option is provided", func() {
+			When("only the memory flag option is provided", func() {
 				BeforeEach(func() {
 					cmd.MemoryLimit.Value = 256
 					cmd.MemoryLimit.IsSet = true
@@ -607,7 +607,7 @@ var _ = Describe("v3-scale Command", func() {
 				})
 			})
 
-			Context("when only the disk flag option is provided", func() {
+			When("only the disk flag option is provided", func() {
 				BeforeEach(func() {
 					cmd.DiskLimit.Value = 1025
 					cmd.DiskLimit.IsSet = true
@@ -657,7 +657,7 @@ var _ = Describe("v3-scale Command", func() {
 				})
 			})
 
-			Context("when process flag is provided", func() {
+			When("process flag is provided", func() {
 				BeforeEach(func() {
 					cmd.ProcessType = "some-process-type"
 					cmd.Instances.Value = 2
@@ -697,7 +697,7 @@ var _ = Describe("v3-scale Command", func() {
 				})
 			})
 
-			Context("when an error is encountered scaling the application", func() {
+			When("an error is encountered scaling the application", func() {
 				var expectedErr error
 
 				BeforeEach(func() {

@@ -54,7 +54,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -67,7 +67,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -82,7 +82,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
@@ -90,7 +90,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 		})
 
-		Context("when the enable is successful", func() {
+		When("the enable is successful", func() {
 			BeforeEach(func() {
 				fakeActor.EntitleIsolationSegmentToOrganizationByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
@@ -112,7 +112,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 			})
 		})
 
-		Context("when the enable is unsuccessful", func() {
+		When("the enable is unsuccessful", func() {
 			Context("due to an unexpected error", func() {
 				var expectedErr error
 
@@ -131,7 +131,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				})
 			})
 
-			Context("when the isolation segment does not exist", func() {
+			When("the isolation segment does not exist", func() {
 				BeforeEach(func() {
 					fakeActor.EntitleIsolationSegmentToOrganizationByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, actionerror.IsolationSegmentNotFoundError{Name: "segment1"})
 				})
@@ -143,7 +143,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				})
 			})
 
-			Context("when the organization does not exist", func() {
+			When("the organization does not exist", func() {
 				BeforeEach(func() {
 					fakeActor.EntitleIsolationSegmentToOrganizationByNameReturns(
 						v3action.Warnings{"I am a warning", "I am also a warning"},

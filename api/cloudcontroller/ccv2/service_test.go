@@ -19,8 +19,8 @@ var _ = Describe("Service", func() {
 	})
 
 	Describe("GetService", func() {
-		Context("when the service exists", func() {
-			Context("when the value of the 'extra' json key is non-empty", func() {
+		When("the service exists", func() {
+			When("the value of the 'extra' json key is non-empty", func() {
 				BeforeEach(func() {
 					response := `{
 						"metadata": {
@@ -58,7 +58,7 @@ var _ = Describe("Service", func() {
 				})
 			})
 
-			Context("when the value of the 'extra' json key is null", func() {
+			When("the value of the 'extra' json key is null", func() {
 				BeforeEach(func() {
 					response := `{
 						"metadata": {
@@ -87,7 +87,7 @@ var _ = Describe("Service", func() {
 				})
 			})
 
-			Context("when the value of the 'extra' json key is the empty string", func() {
+			When("the value of the 'extra' json key is the empty string", func() {
 				BeforeEach(func() {
 					response := `{
 						"metadata": {
@@ -116,7 +116,7 @@ var _ = Describe("Service", func() {
 				})
 			})
 
-			Context("when the key 'extra' is not in the json response", func() {
+			When("the key 'extra' is not in the json response", func() {
 				BeforeEach(func() {
 					response := `{
 						"metadata": {
@@ -143,7 +143,7 @@ var _ = Describe("Service", func() {
 			})
 		})
 
-		Context("when the service does not exist (testing general error case)", func() {
+		When("the service does not exist (testing general error case)", func() {
 			BeforeEach(func() {
 				response := `{
 					"description": "The service could not be found: non-existant-service-guid",
@@ -180,7 +180,7 @@ var _ = Describe("Service", func() {
 			})
 		})
 
-		Context("when the cc returns back services", func() {
+		When("the cc returns back services", func() {
 			BeforeEach(func() {
 				response1 := `{
 					"next_url": "/v2/services?q=label:some-label&page=2",
@@ -252,7 +252,7 @@ var _ = Describe("Service", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"description": "Some description.",

@@ -37,7 +37,7 @@ var _ = Describe("Security Group Actions", func() {
 			secGroupOrgSpaces, warnings, err = actor.GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeStaging)
 		})
 
-		Context("when an error occurs getting security groups", func() {
+		When("an error occurs getting security groups", func() {
 			var returnedError error
 
 			BeforeEach(func() {
@@ -55,7 +55,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when an error occurs getting running spaces", func() {
+		When("an error occurs getting running spaces", func() {
 			var returnedError error
 
 			BeforeEach(func() {
@@ -71,7 +71,7 @@ var _ = Describe("Security Group Actions", func() {
 				)
 			})
 
-			Context("when the error is generic", func() {
+			When("the error is generic", func() {
 				BeforeEach(func() {
 					returnedError = errors.New("get-spaces-error")
 					fakeCloudControllerClient.GetSecurityGroupSpacesReturns(
@@ -91,7 +91,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the error is a resource not found error", func() {
+			When("the error is a resource not found error", func() {
 				BeforeEach(func() {
 					returnedError = ccerror.ResourceNotFoundError{Message: "could not find security group"}
 					fakeCloudControllerClient.GetSecurityGroupSpacesReturns(
@@ -108,7 +108,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when an error occurs getting staging spaces", func() {
+		When("an error occurs getting staging spaces", func() {
 			var returnedError error
 
 			BeforeEach(func() {
@@ -132,7 +132,7 @@ var _ = Describe("Security Group Actions", func() {
 				)
 			})
 
-			Context("when the error is generic", func() {
+			When("the error is generic", func() {
 				BeforeEach(func() {
 					returnedError = errors.New("get-staging-spaces-error")
 					fakeCloudControllerClient.GetSecurityGroupStagingSpacesReturns(
@@ -161,7 +161,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the error is a resource not found error", func() {
+			When("the error is a resource not found error", func() {
 				BeforeEach(func() {
 					returnedError = ccerror.ResourceNotFoundError{Message: "could not find security group"}
 					fakeCloudControllerClient.GetSecurityGroupStagingSpacesReturns(
@@ -185,7 +185,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when an error occurs getting an organization", func() {
+		When("an error occurs getting an organization", func() {
 			var returnedError error
 
 			BeforeEach(func() {
@@ -225,7 +225,7 @@ var _ = Describe("Security Group Actions", func() {
 				)
 			})
 
-			Context("when the error is generic", func() {
+			When("the error is generic", func() {
 				BeforeEach(func() {
 					returnedError = errors.New("get-org-error")
 					fakeCloudControllerClient.GetOrganizationReturns(
@@ -249,7 +249,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the error is a resource not found error", func() {
+			When("the error is a resource not found error", func() {
 				BeforeEach(func() {
 					returnedError = ccerror.ResourceNotFoundError{Message: "could not find the org"}
 					fakeCloudControllerClient.GetOrganizationReturnsOnCall(0,
@@ -281,7 +281,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			var (
 				expectedSecurityGroup1 SecurityGroup
 				expectedSecurityGroup2 SecurityGroup
@@ -612,7 +612,7 @@ var _ = Describe("Security Group Actions", func() {
 				)
 			})
 
-			Context("when security groups bound to spaces in the staging lifecycle are included", func() {
+			When("security groups bound to spaces in the staging lifecycle are included", func() {
 				BeforeEach(func() {
 					includeStaging = true
 				})
@@ -783,7 +783,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when security groups bound to spaces in the staging lifecycle phase are not included", func() {
+			When("security groups bound to spaces in the staging lifecycle phase are not included", func() {
 				BeforeEach(func() {
 					includeStaging = false
 				})
@@ -930,7 +930,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when interleaved ResourceNotFoundErrors are encountered", func() {
+		When("interleaved ResourceNotFoundErrors are encountered", func() {
 			var (
 				expectedSecurityGroup1 SecurityGroup
 				expectedSecurityGroup2 SecurityGroup
@@ -1108,7 +1108,7 @@ var _ = Describe("Security Group Actions", func() {
 			securityGroup, warnings, err = actor.GetSecurityGroupByName("some-security-group")
 		})
 
-		Context("when the security group exists", func() {
+		When("the security group exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{
@@ -1138,7 +1138,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the security group does not exist", func() {
+		When("the security group does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{},
@@ -1183,7 +1183,7 @@ var _ = Describe("Security Group Actions", func() {
 			warnings, err = actor.BindSecurityGroupToSpace("some-security-group-guid", "some-space-guid", lifecycle)
 		})
 
-		Context("when the lifecycle is neither running nor staging", func() {
+		When("the lifecycle is neither running nor staging", func() {
 			BeforeEach(func() {
 				lifecycle = "bill & ted"
 			})
@@ -1193,12 +1193,12 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the lifecycle is running", func() {
+		When("the lifecycle is running", func() {
 			BeforeEach(func() {
 				lifecycle = constant.SecurityGroupLifecycleRunning
 			})
 
-			Context("when binding the space does not return an error", func() {
+			When("binding the space does not return an error", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateSecurityGroupSpaceReturns(
 						ccv2.Warnings{"warning-1", "warning-2"},
@@ -1216,7 +1216,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when binding the space returns an error", func() {
+			When("binding the space returns an error", func() {
 				var returnedError error
 				BeforeEach(func() {
 					returnedError = errors.New("associate-space-error")
@@ -1233,12 +1233,12 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the lifecycle is staging", func() {
+		When("the lifecycle is staging", func() {
 			BeforeEach(func() {
 				lifecycle = constant.SecurityGroupLifecycleStaging
 			})
 
-			Context("when binding the space does not return an error", func() {
+			When("binding the space does not return an error", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateSecurityGroupStagingSpaceReturns(
 						ccv2.Warnings{"warning-1", "warning-2"},
@@ -1256,7 +1256,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when binding the space returns an error", func() {
+			When("binding the space returns an error", func() {
 				var returnedError error
 				BeforeEach(func() {
 					returnedError = errors.New("associate-space-error")
@@ -1275,7 +1275,7 @@ var _ = Describe("Security Group Actions", func() {
 	})
 
 	Describe("GetSpaceRunningSecurityGroupsBySpace", func() {
-		Context("when the space exists and there are no errors", func() {
+		When("the space exists and there are no errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{
@@ -1312,7 +1312,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the space does not exist", func() {
+		When("the space does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 					nil,
@@ -1326,7 +1326,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when there is an error", func() {
+		When("there is an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -1346,7 +1346,7 @@ var _ = Describe("Security Group Actions", func() {
 	})
 
 	Describe("GetSpaceStagingSecurityGroupsBySpace", func() {
-		Context("when the space exists and there are no errors", func() {
+		When("the space exists and there are no errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{
@@ -1383,7 +1383,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the space does not exist", func() {
+		When("the space does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 					nil,
@@ -1397,7 +1397,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when there is an error", func() {
+		When("there is an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -1427,7 +1427,7 @@ var _ = Describe("Security Group Actions", func() {
 			warnings, err = actor.UnbindSecurityGroupByNameAndSpace("some-security-group", "some-space-guid", lifecycle)
 		})
 
-		Context("when the requested lifecycle is neither running nor staging", func() {
+		When("the requested lifecycle is neither running nor staging", func() {
 			BeforeEach(func() {
 				lifecycle = "bill & ted"
 			})
@@ -1437,7 +1437,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the security group is not found", func() {
+		When("the security group is not found", func() {
 			BeforeEach(func() {
 				lifecycle = constant.SecurityGroupLifecycleStaging
 
@@ -1453,7 +1453,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered fetching security groups", func() {
+		When("an error is encountered fetching security groups", func() {
 			var returnedError error
 
 			BeforeEach(func() {
@@ -1472,7 +1472,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the requested lifecycle is running", func() {
+		When("the requested lifecycle is running", func() {
 			BeforeEach(func() {
 				lifecycle = constant.SecurityGroupLifecycleRunning
 
@@ -1485,7 +1485,7 @@ var _ = Describe("Security Group Actions", func() {
 					nil)
 			})
 
-			Context("when the security group is bound to running", func() {
+			When("the security group is bound to running", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
@@ -1499,7 +1499,7 @@ var _ = Describe("Security Group Actions", func() {
 					)
 				})
 
-				Context("when an error is encountered checking whether the security group is bound to the space in the running phase", func() {
+				When("an error is encountered checking whether the security group is bound to the space in the running phase", func() {
 					var returnedError error
 
 					BeforeEach(func() {
@@ -1522,7 +1522,7 @@ var _ = Describe("Security Group Actions", func() {
 					})
 				})
 
-				Context("when an error is encountered unbinding the security group from the space", func() {
+				When("an error is encountered unbinding the security group from the space", func() {
 					var returnedError error
 
 					BeforeEach(func() {
@@ -1545,7 +1545,7 @@ var _ = Describe("Security Group Actions", func() {
 					})
 				})
 
-				Context("when no errors are encountered", func() {
+				When("no errors are encountered", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.DeleteSecurityGroupSpaceReturns(
 							ccv2.Warnings{"warning-5", "warning-6"},
@@ -1591,7 +1591,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the security group is bound to neither running nor staging", func() {
+			When("the security group is bound to neither running nor staging", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
@@ -1605,7 +1605,7 @@ var _ = Describe("Security Group Actions", func() {
 					)
 				})
 
-				Context("when no errors are encountered", func() {
+				When("no errors are encountered", func() {
 					It("returns all warnings", func() {
 						Expect(warnings).To(ConsistOf([]string{
 							"warning-1",
@@ -1641,7 +1641,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the security group is bound to staging", func() {
+			When("the security group is bound to staging", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
@@ -1698,7 +1698,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the requested lifecycle is staging", func() {
+		When("the requested lifecycle is staging", func() {
 			BeforeEach(func() {
 				lifecycle = constant.SecurityGroupLifecycleStaging
 
@@ -1711,7 +1711,7 @@ var _ = Describe("Security Group Actions", func() {
 					nil)
 			})
 
-			Context("when an error is encountered checking whether the security group is bound to the space in the staging phase", func() {
+			When("an error is encountered checking whether the security group is bound to the space in the staging phase", func() {
 				var returnedError error
 
 				BeforeEach(func() {
@@ -1729,7 +1729,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the security group is bound to staging", func() {
+			When("the security group is bound to staging", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
@@ -1743,7 +1743,7 @@ var _ = Describe("Security Group Actions", func() {
 					)
 				})
 
-				Context("when an error is encountered unbinding the security group the space", func() {
+				When("an error is encountered unbinding the security group the space", func() {
 					var returnedError error
 
 					BeforeEach(func() {
@@ -1766,7 +1766,7 @@ var _ = Describe("Security Group Actions", func() {
 					})
 				})
 
-				Context("when no errors are encountered", func() {
+				When("no errors are encountered", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceReturns(
 							ccv2.Warnings{"warning-5", "warning-6"},
@@ -1812,7 +1812,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the security group is bound to neither running nor staging", func() {
+			When("the security group is bound to neither running nor staging", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
@@ -1826,7 +1826,7 @@ var _ = Describe("Security Group Actions", func() {
 					)
 				})
 
-				Context("when no errors are encountered", func() {
+				When("no errors are encountered", func() {
 					It("returns all warnings", func() {
 						Expect(err).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf([]string{
@@ -1862,7 +1862,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the security group is bound to running", func() {
+			When("the security group is bound to running", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
@@ -1919,7 +1919,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when it is not bound to staging and an error occurs checking whether bound to running", func() {
+			When("it is not bound to staging and an error occurs checking whether bound to running", func() {
 				var returnedError error
 
 				BeforeEach(func() {
@@ -1960,7 +1960,7 @@ var _ = Describe("Security Group Actions", func() {
 			warnings, err = actor.UnbindSecurityGroupByNameOrganizationNameAndSpaceName("some-security-group", "some-org", "some-space", lifecycle)
 		})
 
-		Context("when the requested lifecycle is neither running nor staging", func() {
+		When("the requested lifecycle is neither running nor staging", func() {
 			BeforeEach(func() {
 				lifecycle = "bill & ted"
 			})
@@ -1970,7 +1970,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the security group is not found", func() {
+		When("the security group is not found", func() {
 			BeforeEach(func() {
 				lifecycle = constant.SecurityGroupLifecycleRunning
 
@@ -1986,7 +1986,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the organization", func() {
+		When("an error is encountered getting the organization", func() {
 			BeforeEach(func() {
 				lifecycle = constant.SecurityGroupLifecycleRunning
 
@@ -2009,7 +2009,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the space", func() {
+		When("an error is encountered getting the space", func() {
 			BeforeEach(func() {
 				lifecycle = constant.SecurityGroupLifecycleRunning
 
@@ -2039,7 +2039,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the requested lifecycle is running", func() {
+		When("the requested lifecycle is running", func() {
 			BeforeEach(func() {
 				lifecycle = constant.SecurityGroupLifecycleRunning
 
@@ -2066,7 +2066,7 @@ var _ = Describe("Security Group Actions", func() {
 					nil)
 			})
 
-			Context("when the security group is bound to running", func() {
+			When("the security group is bound to running", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
@@ -2080,7 +2080,7 @@ var _ = Describe("Security Group Actions", func() {
 					)
 				})
 
-				Context("when an error is encountered unbinding the security group from the space", func() {
+				When("an error is encountered unbinding the security group from the space", func() {
 					var returnedError error
 
 					BeforeEach(func() {
@@ -2107,7 +2107,7 @@ var _ = Describe("Security Group Actions", func() {
 					})
 				})
 
-				Context("when no errors are encountered", func() {
+				When("no errors are encountered", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.DeleteSecurityGroupSpaceReturns(
 							ccv2.Warnings{"warning-9", "warning-10"},
@@ -2175,7 +2175,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the security group is bound to neither running nor staging", func() {
+			When("the security group is bound to neither running nor staging", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
@@ -2189,7 +2189,7 @@ var _ = Describe("Security Group Actions", func() {
 					)
 				})
 
-				Context("when no errors are encountered", func() {
+				When("no errors are encountered", func() {
 					It("returns all warnings", func() {
 						Expect(warnings).To(ConsistOf([]string{
 							"warning-1",
@@ -2229,7 +2229,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the security group is bound to staging", func() {
+			When("the security group is bound to staging", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
@@ -2290,7 +2290,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 		})
 
-		Context("when the requested lifecycle is staging", func() {
+		When("the requested lifecycle is staging", func() {
 			BeforeEach(func() {
 				lifecycle = constant.SecurityGroupLifecycleStaging
 
@@ -2317,7 +2317,7 @@ var _ = Describe("Security Group Actions", func() {
 					nil)
 			})
 
-			Context("when the security group is bound to staging", func() {
+			When("the security group is bound to staging", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{
@@ -2331,7 +2331,7 @@ var _ = Describe("Security Group Actions", func() {
 					)
 				})
 
-				Context("when an error is encountered unbinding the security group the space", func() {
+				When("an error is encountered unbinding the security group the space", func() {
 					var returnedError error
 
 					BeforeEach(func() {
@@ -2368,7 +2368,7 @@ var _ = Describe("Security Group Actions", func() {
 					})
 				})
 
-				Context("when no errors are encountered", func() {
+				When("no errors are encountered", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.DeleteSecurityGroupStagingSpaceReturns(
 							ccv2.Warnings{"warning-9", "warning-10"},
@@ -2436,7 +2436,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the security group is bound to neither running nor staging", func() {
+			When("the security group is bound to neither running nor staging", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},
@@ -2450,7 +2450,7 @@ var _ = Describe("Security Group Actions", func() {
 					)
 				})
 
-				Context("when no errors are encountered", func() {
+				When("no errors are encountered", func() {
 					It("returns all warnings", func() {
 						Expect(err).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf([]string{
@@ -2490,7 +2490,7 @@ var _ = Describe("Security Group Actions", func() {
 				})
 			})
 
-			Context("when the security group is bound to running", func() {
+			When("the security group is bound to running", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsReturns(
 						[]ccv2.SecurityGroup{},

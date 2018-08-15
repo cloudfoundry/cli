@@ -64,7 +64,7 @@ var _ = Describe("Route Actions", func() {
 				}
 			})
 
-			Context("when the domain is a tcp domain and there is no port specified", func() {
+			When("the domain is a tcp domain and there is no port specified", func() {
 				BeforeEach(func() {
 					domain = Domain{
 						RouterGroupType: constant.TCPRouterGroup,
@@ -77,7 +77,7 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when the domain is a tcp domain and the port is specified", func() {
+			When("the domain is a tcp domain and the port is specified", func() {
 				BeforeEach(func() {
 					domain = Domain{
 						RouterGroupType: constant.TCPRouterGroup,
@@ -90,7 +90,7 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when the domain is a not tcp domain", func() {
+			When("the domain is a not tcp domain", func() {
 				BeforeEach(func() {
 					domain = Domain{}
 					port = types.NullInt{}
@@ -261,7 +261,7 @@ var _ = Describe("Route Actions", func() {
 	})
 
 	Describe("MapRouteToApplication", func() {
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateRouteApplicationReturns(
 					ccv2.Route{},
@@ -281,7 +281,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			Context("InvalidRelationError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateRouteApplicationReturns(
@@ -318,7 +318,7 @@ var _ = Describe("Route Actions", func() {
 	})
 
 	Describe("UnmapRouteFromApplication", func() {
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.DeleteRouteApplicationReturns(
 					ccv2.Warnings{"map warning"},
@@ -337,7 +337,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -356,7 +356,7 @@ var _ = Describe("Route Actions", func() {
 	})
 
 	Describe("CreateRoute", func() {
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateRouteReturns(
 					ccv2.Route{
@@ -410,7 +410,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when path does not start with /", func() {
+		When("path does not start with /", func() {
 			It("prepends / to path", func() {
 				_, _, err := actor.CreateRoute(
 					Route{
@@ -438,7 +438,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when is not provided", func() {
+		When("is not provided", func() {
 			It("passes empty path", func() {
 				_, _, err := actor.CreateRoute(
 					Route{
@@ -464,7 +464,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		When("an error is encountered", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -537,7 +537,7 @@ var _ = Describe("Route Actions", func() {
 				generatePort)
 		})
 
-		Context("when route does not exist", func() {
+		When("route does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get-routes-warning"}, nil)
 			})
@@ -585,7 +585,7 @@ var _ = Describe("Route Actions", func() {
 				Expect(passedGeneratePort).To(BeFalse())
 			})
 
-			Context("when creating route errors", func() {
+			When("creating route errors", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -603,7 +603,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when route already exists", func() {
+		When("route already exists", func() {
 			var foundRoute ccv2.Route
 
 			BeforeEach(func() {
@@ -631,7 +631,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when looking up the domain GUID", func() {
+		When("looking up the domain GUID", func() {
 			BeforeEach(func() {
 				route = Route{
 					Domain: Domain{
@@ -640,8 +640,8 @@ var _ = Describe("Route Actions", func() {
 				}
 			})
 
-			Context("when the domain exists", func() {
-				Context("when the domain is an HTTP domain", func() {
+			When("the domain exists", func() {
+				When("the domain is an HTTP domain", func() {
 					BeforeEach(func() {
 						route.Host = "some-host"
 						route.Path = "some-path"
@@ -690,7 +690,7 @@ var _ = Describe("Route Actions", func() {
 					})
 				})
 
-				Context("when the domain is a TCP domain", func() {
+				When("the domain is a TCP domain", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetSharedDomainsReturns(
 							[]ccv2.Domain{{
@@ -703,7 +703,7 @@ var _ = Describe("Route Actions", func() {
 						)
 					})
 
-					Context("when specifying a port", func() {
+					When("specifying a port", func() {
 						BeforeEach(func() {
 							route.Port = types.NullInt{IsSet: true, Value: 1234}
 							fakeCloudControllerClient.CreateRouteReturns(
@@ -750,7 +750,7 @@ var _ = Describe("Route Actions", func() {
 						})
 					})
 
-					Context("when generating a random port", func() {
+					When("generating a random port", func() {
 						BeforeEach(func() {
 							generatePort = true
 							fakeCloudControllerClient.CreateRouteReturns(
@@ -796,7 +796,7 @@ var _ = Describe("Route Actions", func() {
 						})
 					})
 
-					Context("when no port options are provided", func() {
+					When("no port options are provided", func() {
 						BeforeEach(func() {
 							generatePort = false
 							route.Port.IsSet = false
@@ -809,7 +809,7 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when the domain doesn't exist", func() {
+			When("the domain doesn't exist", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSharedDomainsReturns(
 						[]ccv2.Domain{},
@@ -834,7 +834,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when the requested route is invalid", func() {
+		When("the requested route is invalid", func() {
 			BeforeEach(func() {
 				generatePort = true
 			})
@@ -845,7 +845,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when getting space errors", func() {
+		When("getting space errors", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -862,7 +862,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when getting routes errors", func() {
+		When("getting routes errors", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -895,7 +895,7 @@ var _ = Describe("Route Actions", func() {
 			}
 		})
 
-		Context("when there are orphaned routes", func() {
+		When("there are orphaned routes", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceRoutesReturns([]ccv2.Route{
 					{
@@ -975,7 +975,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when there are no orphaned routes", func() {
+		When("there are no orphaned routes", func() {
 			var expectedErr actionerror.OrphanedRoutesNotFoundError
 
 			BeforeEach(func() {
@@ -1003,7 +1003,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when there are warnings", func() {
+		When("there are warnings", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceRoutesReturns([]ccv2.Route{
 					ccv2.Route{GUID: "route-guid-1"},
@@ -1020,7 +1020,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when the spaces routes API request returns an error", func() {
+		When("the spaces routes API request returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -1035,7 +1035,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when a route's applications API request returns an error", func() {
+		When("a route's applications API request returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -1055,7 +1055,7 @@ var _ = Describe("Route Actions", func() {
 	})
 
 	Describe("DeleteRoute", func() {
-		Context("when the route exists", func() {
+		When("the route exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.DeleteRouteReturns(nil, nil)
 			})
@@ -1069,7 +1069,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when the API returns both warnings and an error", func() {
+		When("the API returns both warnings and an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -1086,7 +1086,7 @@ var _ = Describe("Route Actions", func() {
 	})
 
 	Describe("GetApplicationRoutes", func() {
-		Context("when the CC API client does not return any errors", func() {
+		When("the CC API client does not return any errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationRoutesReturns([]ccv2.Route{
 					ccv2.Route{
@@ -1146,8 +1146,8 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when the CC API client returns an error", func() {
-			Context("when getting application routes returns an error and warnings", func() {
+		When("the CC API client returns an error", func() {
+			When("getting application routes returns an error and warnings", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationRoutesReturns(
 						[]ccv2.Route{}, ccv2.Warnings{"application-routes-warning"}, errors.New("get-application-routes-error"))
@@ -1161,7 +1161,7 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when getting the domain returns an error and warnings", func() {
+			When("getting the domain returns an error and warnings", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationRoutesReturns([]ccv2.Route{
 						ccv2.Route{
@@ -1188,7 +1188,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when the CC API client returns warnings and no errors", func() {
+		When("the CC API client returns warnings and no errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationRoutesReturns([]ccv2.Route{
 					ccv2.Route{
@@ -1211,7 +1211,7 @@ var _ = Describe("Route Actions", func() {
 	})
 
 	Describe("GetSpaceRoutes", func() {
-		Context("when the CC API client does not return any errors", func() {
+		When("the CC API client does not return any errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceRoutesReturns([]ccv2.Route{
 					ccv2.Route{
@@ -1270,8 +1270,8 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when the CC API client returns an error", func() {
-			Context("when getting space routes returns an error and warnings", func() {
+		When("the CC API client returns an error", func() {
+			When("getting space routes returns an error and warnings", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceRoutesReturns(
 						[]ccv2.Route{}, ccv2.Warnings{"space-routes-warning"}, errors.New("get-space-routes-error"))
@@ -1285,7 +1285,7 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when getting the domain returns an error and warnings", func() {
+			When("getting the domain returns an error and warnings", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpaceRoutesReturns([]ccv2.Route{
 						ccv2.Route{
@@ -1312,7 +1312,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when the CC API client returns warnings and no errors", func() {
+		When("the CC API client returns warnings and no errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceRoutesReturns([]ccv2.Route{
 					ccv2.Route{
@@ -1360,12 +1360,12 @@ var _ = Describe("Route Actions", func() {
 		})
 
 		Context("validation", func() {
-			Context("when the route's domain is a TCP domain", func() {
+			When("the route's domain is a TCP domain", func() {
 				BeforeEach(func() {
 					inputRoute.Domain.RouterGroupType = constant.TCPRouterGroup
 				})
 
-				Context("when a port isn't provided for the query", func() {
+				When("a port isn't provided for the query", func() {
 					BeforeEach(func() {
 						inputRoute.Port.IsSet = false
 					})
@@ -1376,13 +1376,13 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when the route's domain is an HTTP shared domain", func() {
+			When("the route's domain is an HTTP shared domain", func() {
 				BeforeEach(func() {
 					inputRoute.Domain.RouterGroupType = constant.HTTPRouterGroup
 					inputRoute.Domain.Type = constant.SharedDomain
 				})
 
-				Context("when a host is not provided", func() {
+				When("a host is not provided", func() {
 					BeforeEach(func() {
 						inputRoute.Host = ""
 					})
@@ -1394,8 +1394,8 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when finding the route is successful and returns one route", func() {
-			Context("when hostname and path aren't provided", func() {
+		When("finding the route is successful and returns one route", func() {
+			When("hostname and path aren't provided", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{
 						{
@@ -1437,7 +1437,7 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when the hostname is provided", func() {
+			When("the hostname is provided", func() {
 				BeforeEach(func() {
 					inputRoute.Host = "some-host"
 
@@ -1482,7 +1482,7 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when the path is provided", func() {
+			When("the path is provided", func() {
 				BeforeEach(func() {
 					inputRoute.Path = "/some-path"
 
@@ -1527,7 +1527,7 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when the port is provided", func() {
+			When("the port is provided", func() {
 				BeforeEach(func() {
 					inputRoute.Port = types.NullInt{Value: 1234, IsSet: true}
 
@@ -1577,7 +1577,7 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when all parts of the route are provided", func() {
+			When("all parts of the route are provided", func() {
 				BeforeEach(func() {
 					inputRoute.Host = "some-host"
 					inputRoute.Path = "/some-path"
@@ -1632,7 +1632,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when finding the route is successful and returns no routes", func() {
+		When("finding the route is successful and returns no routes", func() {
 			BeforeEach(func() {
 				inputRoute.Host = "some-host"
 				inputRoute.Path = "/some-path"
@@ -1651,7 +1651,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when finding the route returns an error", func() {
+		When("finding the route returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -1667,7 +1667,7 @@ var _ = Describe("Route Actions", func() {
 	})
 
 	Describe("CheckRoute", func() {
-		Context("when the API calls succeed", func() {
+		When("the API calls succeed", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CheckRouteReturns(true, ccv2.Warnings{"some-check-route-warnings"}, nil)
 			})
@@ -1696,7 +1696,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -1744,10 +1744,10 @@ var _ = Describe("Route Actions", func() {
 			returnedRoute, warnings, executeErr = actor.FindRouteBoundToSpaceWithSettings(route)
 		})
 
-		Context("when the route exists in the current space", func() {
+		When("the route exists in the current space", func() {
 			var existingRoute Route
 
-			Context("when the route uses an HTTP domain", func() {
+			When("the route uses an HTTP domain", func() {
 				BeforeEach(func() {
 					existingRoute = route
 					existingRoute.GUID = "some-route-guid"
@@ -1762,8 +1762,8 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when the route exists in a different space", func() {
-			Context("when the user has access to the route", func() {
+		When("the route exists in a different space", func() {
+			When("the user has access to the route", func() {
 				BeforeEach(func() {
 					existingRoute := route
 					existingRoute.GUID = "some-route-guid"
@@ -1777,7 +1777,7 @@ var _ = Describe("Route Actions", func() {
 				})
 			})
 
-			Context("when the user does not have access to the route", func() {
+			When("the user does not have access to the route", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get route warning"}, nil)
 					fakeCloudControllerClient.CheckRouteReturns(true, ccv2.Warnings{"check route warning"}, nil)
@@ -1790,7 +1790,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when the route does not exist", func() {
+		When("the route does not exist", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -1805,7 +1805,7 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when finding the route errors", func() {
+		When("finding the route errors", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

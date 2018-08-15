@@ -110,7 +110,7 @@ var _ = Describe("v3-push Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -177,7 +177,7 @@ var _ = Describe("v3-push Command", func() {
 			}),
 	)
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -192,14 +192,14 @@ var _ = Describe("v3-push Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: spaceName, GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: orgName, GUID: "some-org-guid"})
 		})
 
-		Context("when looking up the application returns some api error", func() {
+		When("looking up the application returns some api error", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"get-warning"}, errors.New("some-error"))
 			})
@@ -211,7 +211,7 @@ var _ = Describe("v3-push Command", func() {
 			})
 		})
 
-		Context("when the application doesn't exist", func() {
+		When("the application doesn't exist", func() {
 			It("doesn't stop the application", func() {
 				Expect(fakeActor.StopApplicationCallCount()).To(Equal(0))
 			})
@@ -220,7 +220,7 @@ var _ = Describe("v3-push Command", func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"get-warning"}, actionerror.ApplicationNotFoundError{Name: "some-app"})
 			})
 
-			Context("when creating the application returns an error", func() {
+			When("creating the application returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -237,7 +237,7 @@ var _ = Describe("v3-push Command", func() {
 				})
 			})
 
-			Context("when creating the application does not error", func() {
+			When("creating the application does not error", func() {
 				BeforeEach(func() {
 					fakeActor.CreateApplicationInSpaceReturns(v3action.Application{Name: "some-app", GUID: "some-app-guid"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 				})
@@ -252,7 +252,7 @@ var _ = Describe("v3-push Command", func() {
 					Expect(createSpaceGUID).To(Equal("some-space-guid"))
 				})
 
-				Context("when creating the package fails", func() {
+				When("creating the package fails", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -272,12 +272,12 @@ var _ = Describe("v3-push Command", func() {
 					})
 				})
 
-				Context("when creating the package succeeds", func() {
+				When("creating the package succeeds", func() {
 					BeforeEach(func() {
 						fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, nil)
 					})
 
-					Context("when the -p flag is provided", func() {
+					When("the -p flag is provided", func() {
 						BeforeEach(func() {
 							cmd.AppPath = "some-app-path"
 						})
@@ -296,7 +296,7 @@ var _ = Describe("v3-push Command", func() {
 						})
 					})
 
-					Context("when the -o flag is provided", func() {
+					When("the -o flag is provided", func() {
 						BeforeEach(func() {
 							cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
 							fakeActor.CreateDockerPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"I am a docker package warning", "I am also a docker package warning"}, nil)
@@ -317,7 +317,7 @@ var _ = Describe("v3-push Command", func() {
 						})
 					})
 
-					Context("when neither -p nor -o flags are provided", func() {
+					When("neither -p nor -o flags are provided", func() {
 						It("calls CreateAndUploadBitsPackageByApplicationNameAndSpace with empty string", func() {
 							Expect(testUI.Out).To(Say("Uploading and creating bits package for app %s in org %s / space %s as %s", app, orgName, spaceName, userName))
 
@@ -328,7 +328,7 @@ var _ = Describe("v3-push Command", func() {
 						})
 					})
 
-					Context("when getting streaming logs fails", func() {
+					When("getting streaming logs fails", func() {
 						var expectedErr error
 						BeforeEach(func() {
 							expectedErr = errors.New("something is wrong!")
@@ -346,7 +346,7 @@ var _ = Describe("v3-push Command", func() {
 						})
 					})
 
-					Context("when --no-start is provided", func() {
+					When("--no-start is provided", func() {
 						BeforeEach(func() {
 							cmd.NoStart = true
 						})
@@ -360,7 +360,7 @@ var _ = Describe("v3-push Command", func() {
 						})
 					})
 
-					Context("when the logging does not error", func() {
+					When("the logging does not error", func() {
 						var allLogsWritten chan bool
 
 						BeforeEach(func() {
@@ -380,7 +380,7 @@ var _ = Describe("v3-push Command", func() {
 							}
 						})
 
-						Context("when the staging returns an error", func() {
+						When("the staging returns an error", func() {
 							var expectedErr error
 
 							BeforeEach(func() {
@@ -415,7 +415,7 @@ var _ = Describe("v3-push Command", func() {
 							})
 						})
 
-						Context("when the staging is successful", func() {
+						When("the staging is successful", func() {
 							BeforeEach(func() {
 								fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
 									dropletStream := make(chan v3action.Droplet)
@@ -469,7 +469,7 @@ var _ = Describe("v3-push Command", func() {
 								Expect(guidArg).To(Equal("some-guid"))
 							})
 
-							Context("when setting the droplet fails", func() {
+							When("setting the droplet fails", func() {
 								BeforeEach(func() {
 									fakeActor.SetApplicationDropletByApplicationNameAndSpaceReturns(v3action.Warnings{"droplet-warning-1", "droplet-warning-2"}, errors.New("some-error"))
 								})
@@ -486,7 +486,7 @@ var _ = Describe("v3-push Command", func() {
 								})
 							})
 
-							Context("when setting the application droplet is successful", func() {
+							When("setting the application droplet is successful", func() {
 								BeforeEach(func() {
 									fakeActor.SetApplicationDropletByApplicationNameAndSpaceReturns(v3action.Warnings{"droplet-warning-1", "droplet-warning-2"}, nil)
 								})
@@ -510,7 +510,7 @@ var _ = Describe("v3-push Command", func() {
 									Expect(dropletGUID).To(Equal("some-droplet-guid"))
 								})
 
-								Context("when --no-route flag is set to true", func() {
+								When("--no-route flag is set to true", func() {
 									BeforeEach(func() {
 										cmd.NoRoute = true
 									})
@@ -522,7 +522,7 @@ var _ = Describe("v3-push Command", func() {
 									})
 								})
 
-								Context("when buildpack(s) are provided via -b flag", func() {
+								When("buildpack(s) are provided via -b flag", func() {
 									BeforeEach(func() {
 										cmd.Buildpacks = []string{"some-buildpack"}
 									})
@@ -539,7 +539,7 @@ var _ = Describe("v3-push Command", func() {
 									})
 								})
 
-								Context("when a docker image is specified", func() {
+								When("a docker image is specified", func() {
 									BeforeEach(func() {
 										cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
 									})
@@ -555,7 +555,7 @@ var _ = Describe("v3-push Command", func() {
 									})
 								})
 
-								Context("when mapping routes fails", func() {
+								When("mapping routes fails", func() {
 									BeforeEach(func() {
 										fakeV2PushActor.CreateAndMapDefaultApplicationRouteReturns(pushaction.Warnings{"route-warning"}, errors.New("some-error"))
 									})
@@ -569,7 +569,7 @@ var _ = Describe("v3-push Command", func() {
 									})
 								})
 
-								Context("when mapping routes succeeds", func() {
+								When("mapping routes succeeds", func() {
 									BeforeEach(func() {
 										fakeV2PushActor.CreateAndMapDefaultApplicationRouteReturns(pushaction.Warnings{"route-warning"}, nil)
 									})
@@ -589,7 +589,7 @@ var _ = Describe("v3-push Command", func() {
 										Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
 									})
 
-									Context("when starting the application fails", func() {
+									When("starting the application fails", func() {
 										BeforeEach(func() {
 											fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, errors.New("some-error"))
 										})
@@ -605,7 +605,7 @@ var _ = Describe("v3-push Command", func() {
 										})
 									})
 
-									Context("when starting the application succeeds", func() {
+									When("starting the application succeeds", func() {
 										BeforeEach(func() {
 											fakeActor.StartApplicationReturns(v3action.Application{GUID: "some-app-guid"}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
 										})
@@ -623,7 +623,7 @@ var _ = Describe("v3-push Command", func() {
 										})
 									})
 
-									Context("when polling the start fails", func() {
+									When("polling the start fails", func() {
 										BeforeEach(func() {
 											fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
 												warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
@@ -641,7 +641,7 @@ var _ = Describe("v3-push Command", func() {
 										})
 									})
 
-									Context("when polling times out", func() {
+									When("polling times out", func() {
 										BeforeEach(func() {
 											fakeActor.PollStartReturns(actionerror.StartupTimeoutError{})
 										})
@@ -654,7 +654,7 @@ var _ = Describe("v3-push Command", func() {
 										})
 									})
 
-									Context("when polling the start succeeds", func() {
+									When("polling the start succeeds", func() {
 										BeforeEach(func() {
 											fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
 												warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
@@ -671,7 +671,7 @@ var _ = Describe("v3-push Command", func() {
 											Expect(executeErr).ToNot(HaveOccurred())
 										})
 
-										Context("when displaying the application info fails", func() {
+										When("displaying the application info fails", func() {
 											BeforeEach(func() {
 												var expectedErr error
 												expectedErr = actionerror.ApplicationNotFoundError{Name: app}
@@ -690,7 +690,7 @@ var _ = Describe("v3-push Command", func() {
 											})
 										})
 
-										Context("when getting the application summary is successful", func() {
+										When("getting the application summary is successful", func() {
 											BeforeEach(func() {
 												summary := v3action.ApplicationSummary{
 													Application: v3action.Application{
@@ -731,7 +731,7 @@ var _ = Describe("v3-push Command", func() {
 												fakeActor.GetApplicationSummaryByNameAndSpaceReturns(summary, v3action.Warnings{"display-warning-1", "display-warning-2"}, nil)
 											})
 
-											Context("when getting the application routes fails", func() {
+											When("getting the application routes fails", func() {
 												BeforeEach(func() {
 													fakeV2AppActor.GetApplicationRoutesReturns([]v2action.Route{},
 														v2action.Warnings{"route-warning-1", "route-warning-2"}, errors.New("some-error"))
@@ -751,7 +751,7 @@ var _ = Describe("v3-push Command", func() {
 												})
 											})
 
-											Context("when getting the application routes is successful", func() {
+											When("getting the application routes is successful", func() {
 												BeforeEach(func() {
 													fakeV2AppActor.GetApplicationRoutesReturns([]v2action.Route{
 														{Domain: v2action.Domain{Name: "some-other-domain"}}, {
@@ -800,7 +800,7 @@ var _ = Describe("v3-push Command", func() {
 			})
 		})
 
-		Context("when looking up the application succeeds", func() {
+		When("looking up the application succeeds", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{
 					Name: "some-app",
@@ -813,7 +813,7 @@ var _ = Describe("v3-push Command", func() {
 				Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(1))
 			})
 
-			Context("when updating the application fails", func() {
+			When("updating the application fails", func() {
 				BeforeEach(func() {
 					fakeActor.UpdateApplicationReturns(v3action.Application{}, v3action.Warnings{"update-warning-1"}, errors.New("some-error"))
 				})
@@ -826,14 +826,14 @@ var _ = Describe("v3-push Command", func() {
 				})
 			})
 
-			Context("when a docker image is provided", func() {
+			When("a docker image is provided", func() {
 				BeforeEach(func() {
 					cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
 					cmd.DockerUsername = "username"
 					fakeConfig.DockerPasswordReturns("password")
 				})
 
-				Context("when a username/password are provided", func() {
+				When("a username/password are provided", func() {
 					It("updates the app with the provided credentials", func() {
 						appName, spaceGuid, dockerImageCredentials := fakeActor.CreateDockerPackageByApplicationNameAndSpaceArgsForCall(0)
 						Expect(appName).To(Equal("some-app"))
@@ -854,8 +854,8 @@ var _ = Describe("v3-push Command", func() {
 				})
 			})
 
-			Context("when the app has a buildpack lifecycle", func() {
-				Context("when a buildpack was not provided", func() {
+			When("the app has a buildpack lifecycle", func() {
+				When("a buildpack was not provided", func() {
 					BeforeEach(func() {
 						cmd.Buildpacks = []string{}
 					})
@@ -870,7 +870,7 @@ var _ = Describe("v3-push Command", func() {
 					})
 				})
 
-				Context("when a buildpack was provided", func() {
+				When("a buildpack was provided", func() {
 					BeforeEach(func() {
 						cmd.Buildpacks = []string{"some-buildpack"}
 					})
@@ -885,7 +885,7 @@ var _ = Describe("v3-push Command", func() {
 					})
 				})
 
-				Context("when multiple buildpacks are provided", func() {
+				When("multiple buildpacks are provided", func() {
 					BeforeEach(func() {
 						cmd.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
 					})
@@ -899,7 +899,7 @@ var _ = Describe("v3-push Command", func() {
 						}))
 					})
 
-					Context("when default was also provided", func() {
+					When("default was also provided", func() {
 						BeforeEach(func() {
 							cmd.Buildpacks = []string{"default", "some-buildpack-2"}
 						})
@@ -910,7 +910,7 @@ var _ = Describe("v3-push Command", func() {
 						})
 					})
 
-					Context("when null was also provided", func() {
+					When("null was also provided", func() {
 						BeforeEach(func() {
 							cmd.Buildpacks = []string{"null", "some-buildpack-2"}
 						})
@@ -923,8 +923,8 @@ var _ = Describe("v3-push Command", func() {
 				})
 			})
 
-			Context("when updating the application succeeds", func() {
-				Context("when the application is stopped", func() {
+			When("updating the application succeeds", func() {
+				When("the application is stopped", func() {
 					BeforeEach(func() {
 						fakeActor.UpdateApplicationReturns(v3action.Application{GUID: "some-app-guid", State: constant.ApplicationStopped}, v3action.Warnings{"update-warning"}, nil)
 					})
@@ -943,7 +943,7 @@ var _ = Describe("v3-push Command", func() {
 					})
 				})
 
-				Context("when the application is started", func() {
+				When("the application is started", func() {
 					BeforeEach(func() {
 						fakeActor.UpdateApplicationReturns(v3action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, nil, nil)
 					})
@@ -957,7 +957,7 @@ var _ = Describe("v3-push Command", func() {
 						Expect(fakeActor.StartApplicationCallCount()).To(Equal(1), "Expected StartApplication to be called")
 					})
 
-					Context("when no-start is provided", func() {
+					When("no-start is provided", func() {
 						BeforeEach(func() {
 							cmd.NoStart = true
 						})

@@ -33,7 +33,7 @@ var _ = Describe("Service Plan Visibility", func() {
 			})
 		})
 
-		Context("when the cc returns back service brokers", func() {
+		When("the cc returns back service brokers", func() {
 			BeforeEach(func() {
 				response1 := `{
 				"next_url": "/v2/service_plan_visibilities?q=organization_guid:some-org-guid&page=2",
@@ -107,7 +107,7 @@ var _ = Describe("Service Plan Visibility", func() {
 			})
 		})
 
-		Context("when the cc returns an error", func() {
+		When("the cc returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"description": "The broker is broken.",

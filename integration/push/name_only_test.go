@@ -25,7 +25,7 @@ var _ = Describe("push with only an app name", func() {
 	})
 
 	Describe("app existence", func() {
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("creates the app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
@@ -52,7 +52,7 @@ var _ = Describe("push with only an app name", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when the app has a non-standard name", func() {
+			When("the app has a non-standard name", func() {
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("App Name One$")
 				})
@@ -87,7 +87,7 @@ var _ = Describe("push with only an app name", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)).Should(Exit(0))

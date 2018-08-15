@@ -25,7 +25,7 @@ var _ = Describe("Task Actions", func() {
 	})
 
 	Describe("RunTask", func() {
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationTaskReturns(
 					ccv3.Task{
@@ -61,7 +61,7 @@ var _ = Describe("Task Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var warnings Warnings
 			var err error
 			var expectedErr error
@@ -70,7 +70,7 @@ var _ = Describe("Task Actions", func() {
 				_, warnings, err = actor.RunTask("some-app-guid", Task{Command: "some command"})
 			})
 
-			Context("when the cloud controller error is generic", func() {
+			When("the cloud controller error is generic", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("I am a CloudControllerClient Error")
 					fakeCloudControllerClient.CreateApplicationTaskReturns(
@@ -86,7 +86,7 @@ var _ = Describe("Task Actions", func() {
 				})
 			})
 
-			Context("when the error is a TaskWorkersUnavailableError", func() {
+			When("the error is a TaskWorkersUnavailableError", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.CreateApplicationTaskReturns(
 						ccv3.Task{},
@@ -104,8 +104,8 @@ var _ = Describe("Task Actions", func() {
 	})
 
 	Describe("GetApplicationTasks", func() {
-		Context("when the application exists", func() {
-			Context("when there are associated tasks", func() {
+		When("the application exists", func() {
+			When("there are associated tasks", func() {
 				var (
 					task1 ccv3.Task
 					task2 ccv3.Task
@@ -164,7 +164,7 @@ var _ = Describe("Task Actions", func() {
 				})
 			})
 
-			Context("when there are no associated tasks", func() {
+			When("there are no associated tasks", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationTasksReturns(
 						[]ccv3.Task{},
@@ -181,7 +181,7 @@ var _ = Describe("Task Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -202,8 +202,8 @@ var _ = Describe("Task Actions", func() {
 	})
 
 	Describe("GetTaskBySequenceIDAndApplication", func() {
-		Context("when the cloud controller client does not return an error", func() {
-			Context("when the task is found", func() {
+		When("the cloud controller client does not return an error", func() {
+			When("the task is found", func() {
 				var task1 ccv3.Task
 
 				BeforeEach(func() {
@@ -226,7 +226,7 @@ var _ = Describe("Task Actions", func() {
 				})
 			})
 
-			Context("when the task is not found", func() {
+			When("the task is not found", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetApplicationTasksReturns(
 						[]ccv3.Task{},
@@ -243,7 +243,7 @@ var _ = Describe("Task Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -264,7 +264,7 @@ var _ = Describe("Task Actions", func() {
 	})
 
 	Describe("TerminateTask", func() {
-		Context("when the task exists", func() {
+		When("the task exists", func() {
 			var returnedTask ccv3.Task
 
 			BeforeEach(func() {
@@ -286,7 +286,7 @@ var _ = Describe("Task Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller returns an error", func() {
+		When("the cloud controller returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

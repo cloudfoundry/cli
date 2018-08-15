@@ -48,7 +48,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				request = &Request{Request: req}
 			})
 
-			Context("when passed a response with a result set", func() {
+			When("passed a response with a result set", func() {
 				It("unmarshals the data into a struct", func() {
 					var body DummyResponse
 					response := Response{
@@ -74,7 +74,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 			})
 
-			Context("when passed an empty response", func() {
+			When("passed an empty response", func() {
 				It("skips the unmarshalling step", func() {
 					var response Response
 					err := connection.Make(request, &response)
@@ -137,7 +137,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 			})
 
 			Describe("X-Cf-Warnings", func() {
-				Context("when there are warnings", func() {
+				When("there are warnings", func() {
 					BeforeEach(func() {
 						server.AppendHandlers(
 							CombineHandlers(
@@ -168,7 +168,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 					})
 				})
 
-				Context("when there are no warnings", func() {
+				When("there are no warnings", func() {
 					BeforeEach(func() {
 						server.AppendHandlers(
 							CombineHandlers(
@@ -195,7 +195,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 		})
 
 		Describe("Errors", func() {
-			Context("when the server does not exist", func() {
+			When("the server does not exist", func() {
 				BeforeEach(func() {
 					connection = NewConnection(Config{})
 				})
@@ -215,7 +215,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 			})
 
-			Context("when the server does not have a verified certificate", func() {
+			When("the server does not have a verified certificate", func() {
 				Context("skipSSLValidation is false", func() {
 					BeforeEach(func() {
 						server.AppendHandlers(
@@ -239,7 +239,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 			})
 
-			Context("when the server's certificate does not match the hostname", func() {
+			When("the server's certificate does not match the hostname", func() {
 				Context("skipSSLValidation is false", func() {
 					BeforeEach(func() {
 						if runtime.GOOS == "windows" {

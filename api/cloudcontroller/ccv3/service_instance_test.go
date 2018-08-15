@@ -32,7 +32,7 @@ var _ = Describe("Service Instance", func() {
 			instances, warnings, executeErr = client.GetServiceInstances(query)
 		})
 
-		Context("when service instances exist", func() {
+		When("service instances exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`
 					{
@@ -106,7 +106,7 @@ var _ = Describe("Service Instance", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 				"errors": [

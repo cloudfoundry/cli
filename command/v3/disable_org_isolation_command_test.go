@@ -54,7 +54,7 @@ var _ = Describe("disable-org-isolation Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -67,7 +67,7 @@ var _ = Describe("disable-org-isolation Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -82,7 +82,7 @@ var _ = Describe("disable-org-isolation Command", func() {
 		})
 	})
 
-	Context("when user is logged in", func() {
+	When("user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "admin"}, nil)
 			cmd.RequiredArgs.OrganizationName = org
@@ -93,7 +93,7 @@ var _ = Describe("disable-org-isolation Command", func() {
 			Expect(testUI.Out).To(Say("Removing entitlement to isolation segment segment1 from org org1 as admin..."))
 		})
 
-		Context("when revoking is successful", func() {
+		When("revoking is successful", func() {
 			BeforeEach(func() {
 				fakeActor.DeleteIsolationSegmentOrganizationByNameReturns(v3action.Warnings{"warning 1", "warning 2"}, nil)
 			})

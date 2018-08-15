@@ -27,7 +27,7 @@ var _ = PDescribe("update-buildpack command", func() {
 		username, _ = helpers.GetCredentials()
 	})
 
-	Context("when --help flag is set", func() {
+	When("--help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("update-buildpack", "--help")
 			Eventually(session).Should(Say("NAME:"))
@@ -50,18 +50,18 @@ var _ = PDescribe("update-buildpack command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "update-buildpack", "fake-buildpack")
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})
 
-		Context("when the buildpack is not provided", func() {
+		When("the buildpack is not provided", func() {
 			It("returns a buildpack argument not provided error", func() {
 				session := helpers.CF("update-buildpack", "-p", ".")
 
@@ -70,8 +70,8 @@ var _ = PDescribe("update-buildpack command", func() {
 			})
 		})
 
-		Context("when the buildpack name is provided", func() {
-			Context("when the buildpack exists", func() {
+		When("the buildpack name is provided", func() {
+			When("the buildpack exists", func() {
 				Context("regardless of the buildpack being enabled or locked", func() {
 					BeforeEach(func() {
 						helpers.BuildpackWithStack(func(buildpackPath string) {
@@ -80,10 +80,10 @@ var _ = PDescribe("update-buildpack command", func() {
 						}, "")
 					})
 
-					Context("when the -p flag is provided", func() {
-						Context("when the path is local", func() {
-							Context("when the buildpack path exists", func() {
-								Context("when uploading from a directory", func() {
+					When("the -p flag is provided", func() {
+						When("the path is local", func() {
+							When("the buildpack path exists", func() {
+								When("uploading from a directory", func() {
 									var buildpackDir string
 
 									BeforeEach(func() {
@@ -108,7 +108,7 @@ var _ = PDescribe("update-buildpack command", func() {
 									})
 								})
 
-								Context("when uploading from a zip", func() {
+								When("uploading from a zip", func() {
 									var filename string
 
 									BeforeEach(func() {
@@ -138,7 +138,7 @@ var _ = PDescribe("update-buildpack command", func() {
 								})
 							})
 
-							Context("when the buildpack path does not exist", func() {
+							When("the buildpack path does not exist", func() {
 								It("returns a buildpack does not exist error", func() {
 									session := helpers.CF("update-buildpack", buildpackName, "-p", "this-is-a-bogus-path")
 
@@ -148,10 +148,10 @@ var _ = PDescribe("update-buildpack command", func() {
 							})
 						})
 
-						Context("when path is a URL", func() {
+						When("path is a URL", func() {
 							var buildpackURL string
 
-							Context("when specifying a valid URL", func() {
+							When("specifying a valid URL", func() {
 								BeforeEach(func() {
 									buildpackURL = "https://github.com/cloudfoundry/binary-buildpack/releases/download/v1.0.21/binary-buildpack-v1.0.21.zip"
 								})
@@ -167,7 +167,7 @@ var _ = PDescribe("update-buildpack command", func() {
 								})
 							})
 
-							Context("when a 4xx or 5xx HTTP response status is encountered", func() {
+							When("a 4xx or 5xx HTTP response status is encountered", func() {
 								var server *Server
 
 								BeforeEach(func() {
@@ -195,7 +195,7 @@ var _ = PDescribe("update-buildpack command", func() {
 								})
 							})
 
-							Context("when specifying an invalid URL", func() {
+							When("specifying an invalid URL", func() {
 								BeforeEach(func() {
 									buildpackURL = "http://not-a-real-url"
 								})
@@ -211,8 +211,8 @@ var _ = PDescribe("update-buildpack command", func() {
 						})
 					})
 
-					Context("when the -i flag is provided", func() {
-						Context("when position is a negative integer", func() {
+					When("the -i flag is provided", func() {
+						When("position is a negative integer", func() {
 							It("successfully uploads buildpack as the first position", func() {
 								session := helpers.CF("update-buildpack", buildpackName, "-i", "-3")
 								Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
@@ -225,7 +225,7 @@ var _ = PDescribe("update-buildpack command", func() {
 							})
 						})
 
-						Context("when position is positive integer", func() {
+						When("position is positive integer", func() {
 							It("successfully uploads buildpack in the provided position", func() {
 								session := helpers.CF("update-buildpack", buildpackName, "-i", "3")
 								Eventually(session).Should(Exit(0))
@@ -237,7 +237,7 @@ var _ = PDescribe("update-buildpack command", func() {
 						})
 					})
 
-					Context("when specifying both enable and disable flags", func() {
+					When("specifying both enable and disable flags", func() {
 						It("returns the appropriate error", func() {
 							session := helpers.CF("update-buildpack", buildpackName, "--enable", "--disable")
 							Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --enable, --disable"))
@@ -246,7 +246,7 @@ var _ = PDescribe("update-buildpack command", func() {
 						})
 					})
 
-					Context("when specifying both lock and unlock flags", func() {
+					When("specifying both lock and unlock flags", func() {
 						It("returns the appropriate error", func() {
 							session := helpers.CF("update-buildpack", buildpackName, "--lock", "--unlock")
 							Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --lock, --unlock"))
@@ -255,7 +255,7 @@ var _ = PDescribe("update-buildpack command", func() {
 						})
 					})
 
-					Context("when specifying both lock then unlock flags", func() {
+					When("specifying both lock then unlock flags", func() {
 						It("locks and then unlocks the buildpack", func() {
 							session := helpers.CF("update-buildpack", buildpackName, "--lock")
 							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
@@ -278,7 +278,7 @@ var _ = PDescribe("update-buildpack command", func() {
 					})
 				})
 
-				Context("when the existing buildpack is disabled", func() {
+				When("the existing buildpack is disabled", func() {
 					BeforeEach(func() {
 						helpers.BuildpackWithStack(func(buildpackPath string) {
 							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--disable")
@@ -286,7 +286,7 @@ var _ = PDescribe("update-buildpack command", func() {
 						}, "")
 					})
 
-					Context("when specifying enable flag", func() {
+					When("specifying enable flag", func() {
 						It("enables buildpack", func() {
 							session := helpers.CF("update-buildpack", buildpackName, "--enable")
 							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
@@ -300,7 +300,7 @@ var _ = PDescribe("update-buildpack command", func() {
 					})
 				})
 
-				Context("when the existing buildpack is enabled", func() {
+				When("the existing buildpack is enabled", func() {
 					BeforeEach(func() {
 						helpers.BuildpackWithStack(func(buildpackPath string) {
 							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
@@ -308,7 +308,7 @@ var _ = PDescribe("update-buildpack command", func() {
 						}, "")
 					})
 
-					Context("when specifying disable flag", func() {
+					When("specifying disable flag", func() {
 						It("disables buildpack", func() {
 							helpers.BuildpackWithStack(func(buildpackPath string) {
 								session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1", "--disable")
@@ -325,7 +325,7 @@ var _ = PDescribe("update-buildpack command", func() {
 
 				})
 
-				Context("when the existing buildpack is locked", func() {
+				When("the existing buildpack is locked", func() {
 					var buildpackURL string
 
 					BeforeEach(func() {
@@ -349,7 +349,7 @@ var _ = PDescribe("update-buildpack command", func() {
 					})
 				})
 
-				Context("when multiple buildpacks with the same name exist", func() {
+				When("multiple buildpacks with the same name exist", func() {
 					// var existingBuildpack string
 
 					// BeforeEach(func() {
@@ -388,8 +388,8 @@ var _ = PDescribe("update-buildpack command", func() {
 					// 	Eventually(session).Should(Exit(0))
 					// })
 
-					// Context("when the new buildpack has a nil stack", func() {
-					// 	Context("when the existing buildpack does not have a nil stack", func() {
+					// When("the new buildpack has a nil stack", func() {
+					// 	When("the existing buildpack does not have a nil stack", func() {
 					// 		BeforeEach(func() {
 					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
 					// 				session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
@@ -410,7 +410,7 @@ var _ = PDescribe("update-buildpack command", func() {
 					// 		})
 					// 	})
 
-					// 	Context("when the existing buildpack has a nil stack", func() {
+					// 	When("the existing buildpack has a nil stack", func() {
 					// 		BeforeEach(func() {
 					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
 					// 				session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
@@ -432,12 +432,12 @@ var _ = PDescribe("update-buildpack command", func() {
 					// 	})
 					// })
 
-					// Context("when the new buildpack has a non-nil stack", func() {
+					// When("the new buildpack has a non-nil stack", func() {
 					// 	BeforeEach(func() {
 					// 		helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
 					// 	})
 
-					// 	Context("when the existing buildpack has a different non-nil stack", func() {
+					// 	When("the existing buildpack has a different non-nil stack", func() {
 					// 		BeforeEach(func() {
 					// 			helpers.SkipIfOneStack()
 					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
@@ -459,7 +459,7 @@ var _ = PDescribe("update-buildpack command", func() {
 					// 		})
 					// 	})
 
-					// 	Context("when the existing buildpack has a nil stack", func() {
+					// 	When("the existing buildpack has a nil stack", func() {
 					// 		BeforeEach(func() {
 					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
 					// 				session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
@@ -478,7 +478,7 @@ var _ = PDescribe("update-buildpack command", func() {
 					// 		})
 					// 	})
 
-					// 	Context("when the existing buildpack has the same non-nil stack", func() {
+					// 	When("the existing buildpack has the same non-nil stack", func() {
 					// 		BeforeEach(func() {
 					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
 					// 				session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
@@ -500,7 +500,7 @@ var _ = PDescribe("update-buildpack command", func() {
 				})
 			})
 
-			Context("when the buildpack does not exist", func() {
+			When("the buildpack does not exist", func() {
 				It("returns an error", func() {
 					session := helpers.CF("update-buildpack", buildpackName, "https://does.not.matter.com", "1")
 					Eventually(session.Err).Should(Say("Buildpack %s not found", buildpackName))

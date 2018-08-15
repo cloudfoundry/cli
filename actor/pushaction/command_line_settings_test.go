@@ -258,7 +258,7 @@ var _ = Describe("CommandLineSettings", func() {
 		})
 
 		Describe("name", func() {
-			Context("when the command line settings provides a name", func() {
+			When("the command line settings provides a name", func() {
 				BeforeEach(func() {
 					settings.Name = "not-steve"
 				})
@@ -268,7 +268,7 @@ var _ = Describe("CommandLineSettings", func() {
 				})
 			})
 
-			Context("when the command line settings name is blank", func() {
+			When("the command line settings name is blank", func() {
 				It("passes the manifest name through", func() {
 					Expect(output.Name).To(Equal("steve"))
 				})

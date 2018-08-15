@@ -31,7 +31,7 @@ var _ = Describe("SSH Actions", func() {
 			fakeConfig.SSHOAuthClientReturns("some-id")
 		})
 
-		Context("when no errors are encountered getting the ssh passcode", func() {
+		When("no errors are encountered getting the ssh passcode", func() {
 			var expectedCode string
 
 			BeforeEach(func() {
@@ -50,7 +50,7 @@ var _ = Describe("SSH Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the ssh passcode", func() {
+		When("an error is encountered getting the ssh passcode", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

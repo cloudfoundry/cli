@@ -15,7 +15,7 @@ var _ = Describe("Docker", func() {
 			docker = DockerImage{}
 		})
 
-		Context("when the docker image URL is a valid user/repo:tag URL", func() {
+		When("the docker image URL is a valid user/repo:tag URL", func() {
 			It("set the path and does not return an error", func() {
 				err := docker.UnmarshalFlag("user/repo:tag")
 				Expect(err).ToNot(HaveOccurred())
@@ -23,7 +23,7 @@ var _ = Describe("Docker", func() {
 			})
 		})
 
-		Context("when the docker image URL is an HTTP URL ", func() {
+		When("the docker image URL is an HTTP URL ", func() {
 			It("set the path and does not return an error", func() {
 				err := docker.UnmarshalFlag("registry.example.com:5000/user/repository/tag")
 				Expect(err).ToNot(HaveOccurred())
@@ -31,7 +31,7 @@ var _ = Describe("Docker", func() {
 			})
 		})
 
-		Context("when the docker image URL is invalid", func() {
+		When("the docker image URL is invalid", func() {
 			It("returns an error", func() {
 				err := docker.UnmarshalFlag("AAAAAA")
 				Expect(err).To(MatchError(&flags.Error{

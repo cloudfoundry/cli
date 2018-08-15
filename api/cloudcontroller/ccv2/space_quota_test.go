@@ -18,7 +18,7 @@ var _ = Describe("Space Quotas", func() {
 	})
 
 	Describe("GetSpaceQuotaDefinition", func() {
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				response := `{
 					"metadata": {
@@ -49,7 +49,7 @@ var _ = Describe("Space Quotas", func() {
 			})
 		})
 
-		Context("when the request returns an error", func() {
+		When("the request returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 					"code": 210002,

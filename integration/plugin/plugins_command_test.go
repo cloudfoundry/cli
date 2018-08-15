@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("plugins command", func() {
 	Describe("help", func() {
-		Context("when --help flag is provided", func() {
+		When("--help flag is provided", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("plugins", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -32,7 +32,7 @@ var _ = Describe("plugins command", func() {
 		})
 	})
 
-	Context("when no plugins are installed", func() {
+	When("no plugins are installed", func() {
 		It("displays an empty table", func() {
 			session := helpers.CF("plugins")
 			Eventually(session).Should(Say("Listing installed plugins..."))
@@ -44,7 +44,7 @@ var _ = Describe("plugins command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		Context("when the --checksum flag is provided", func() {
+		When("the --checksum flag is provided", func() {
 			It("displays an empty checksum table", func() {
 				session := helpers.CF("plugins", "--checksum")
 				Eventually(session).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
@@ -55,7 +55,7 @@ var _ = Describe("plugins command", func() {
 			})
 		})
 
-		Context("when the --outdated flag is provided", func() {
+		When("the --outdated flag is provided", func() {
 			It("errors with no repositories", func() {
 				session := helpers.CF("plugins", "--outdated")
 				Eventually(session).Should(Say("FAILED"))
@@ -66,8 +66,8 @@ var _ = Describe("plugins command", func() {
 		})
 	})
 
-	Context("when plugins are installed", func() {
-		Context("when there are multiple plugins", func() {
+	When("plugins are installed", func() {
+		When("there are multiple plugins", func() {
 			BeforeEach(func() {
 				helpers.InstallConfigurablePlugin("I-should-be-sorted-first", "1.2.0", []helpers.PluginCommand{
 					{Name: "command-1", Help: "some-command-1"},
@@ -100,7 +100,7 @@ var _ = Describe("plugins command", func() {
 			})
 		})
 
-		Context("when plugin version information is 0.0.0", func() {
+		When("plugin version information is 0.0.0", func() {
 			BeforeEach(func() {
 				helpers.InstallConfigurablePlugin("some-plugin", "0.0.0", []helpers.PluginCommand{
 					{Name: "banana-command", Help: "banana-command"},
@@ -114,7 +114,7 @@ var _ = Describe("plugins command", func() {
 			})
 		})
 
-		Context("when a plugin command has an alias", func() {
+		When("a plugin command has an alias", func() {
 			BeforeEach(func() {
 				helpers.InstallConfigurablePlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
 					{Name: "banana-command", Alias: "bc", Help: "banana-command"},
@@ -128,7 +128,7 @@ var _ = Describe("plugins command", func() {
 			})
 		})
 
-		Context("when the --checksum flag is provided", func() {
+		When("the --checksum flag is provided", func() {
 			var installedPluginPath string
 
 			BeforeEach(func() {
@@ -148,7 +148,7 @@ var _ = Describe("plugins command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when an error is encountered calculating the sha1 value", func() {
+			When("an error is encountered calculating the sha1 value", func() {
 				It("displays N/A for the plugin's sha1", func() {
 					err := os.Remove(installedPluginPath)
 					Expect(err).NotTo(HaveOccurred())
@@ -160,8 +160,8 @@ var _ = Describe("plugins command", func() {
 			})
 		})
 
-		Context("when the --outdated flag is provided", func() {
-			Context("when there are no repos", func() {
+		When("the --outdated flag is provided", func() {
+			When("there are no repos", func() {
 				BeforeEach(func() {
 					helpers.InstallConfigurablePlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
 						{Name: "banana-command", Alias: "bc", Help: "banana-command"},
@@ -176,7 +176,7 @@ var _ = Describe("plugins command", func() {
 				})
 			})
 
-			Context("when there is 1 repository", func() {
+			When("there is 1 repository", func() {
 				var (
 					server1 *Server
 				)
@@ -201,7 +201,7 @@ var _ = Describe("plugins command", func() {
 					server1.Close()
 				})
 
-				Context("when nothing is outdated", func() {
+				When("nothing is outdated", func() {
 					BeforeEach(func() {
 						helpers.InstallConfigurablePlugin("plugin-1", "1.0.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
@@ -225,7 +225,7 @@ var _ = Describe("plugins command", func() {
 					})
 				})
 
-				Context("when the plugins are outdated", func() {
+				When("the plugins are outdated", func() {
 					BeforeEach(func() {
 						helpers.InstallConfigurablePlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
@@ -254,7 +254,7 @@ var _ = Describe("plugins command", func() {
 				})
 			})
 
-			Context("when multiple repositories are registered", func() {
+			When("multiple repositories are registered", func() {
 				var (
 					server1 *Server
 					server2 *Server
@@ -284,7 +284,7 @@ var _ = Describe("plugins command", func() {
 					server2.Close()
 				})
 
-				Context("when plugins are outdated", func() {
+				When("plugins are outdated", func() {
 					BeforeEach(func() {
 						helpers.InstallConfigurablePlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
@@ -306,7 +306,7 @@ var _ = Describe("plugins command", func() {
 					})
 				})
 
-				Context("when the same plugin is outdated from multiple repositories", func() {
+				When("the same plugin is outdated from multiple repositories", func() {
 					BeforeEach(func() {
 						helpers.InstallConfigurablePlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},

@@ -25,14 +25,14 @@ var _ = Describe("pushing a docker image", func() {
 	Describe("when the docker image is provided via command line", func() {
 		Describe("a public docker image", func() {
 			Describe("app existence", func() {
-				Context("when the app does not exist", func() {
+				When("the app does not exist", func() {
 					It("creates the app", func() {
 						session := helpers.CF(PushCommandName, appName, "-o", PublicDockerImage)
 						validateDockerPush(session, appName, PublicDockerImage)
 					})
 				})
 
-				Context("when the app exists", func() {
+				When("the app exists", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF(PushCommandName, appName, "-o", PublicDockerImage)).Should(Exit(0))
 					})
@@ -52,7 +52,7 @@ var _ = Describe("pushing a docker image", func() {
 				privateDockerImage, privateDockerUsername, privateDockerPassword = helpers.SkipIfPrivateDockerInfoNotSet()
 			})
 
-			Context("when CF_DOCKER_PASSWORD is set", func() {
+			When("CF_DOCKER_PASSWORD is set", func() {
 				It("push the docker image with those credentials", func() {
 					session := helpers.CustomCF(
 						helpers.CFEnv{
@@ -67,7 +67,7 @@ var _ = Describe("pushing a docker image", func() {
 				})
 			})
 
-			Context("when the CF_DOCKER_PASSWORD is not set", func() {
+			When("the CF_DOCKER_PASSWORD is not set", func() {
 				var buffer *Buffer
 
 				BeforeEach(func() {
@@ -118,7 +118,7 @@ var _ = Describe("pushing a docker image", func() {
 			})
 		})
 
-		Context("when buildpack is set", func() {
+		When("buildpack is set", func() {
 			BeforeEach(func() {
 				appManifest = map[string]interface{}{
 					"applications": []map[string]interface{}{
@@ -146,7 +146,7 @@ var _ = Describe("pushing a docker image", func() {
 			})
 		})
 
-		Context("when path is set", func() {
+		When("path is set", func() {
 			BeforeEach(func() {
 				appManifest = map[string]interface{}{
 					"applications": []map[string]interface{}{
@@ -174,7 +174,7 @@ var _ = Describe("pushing a docker image", func() {
 			})
 		})
 
-		Context("when user is provided in the manifest", func() {
+		When("user is provided in the manifest", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionDockerCredentialsV2)
 				privateDockerImage, privateDockerUsername, privateDockerPassword = helpers.SkipIfPrivateDockerInfoNotSet()
@@ -192,7 +192,7 @@ var _ = Describe("pushing a docker image", func() {
 				}
 			})
 
-			Context("when password is provided in the enviornment", func() {
+			When("password is provided in the enviornment", func() {
 				It("uses the docker image and credentials when pushing", func() {
 					helpers.WithManifest(appManifest, func(manifestDir string) {
 						session := helpers.CustomCF(
@@ -209,7 +209,7 @@ var _ = Describe("pushing a docker image", func() {
 				})
 			})
 
-			Context("when password is not provided in the enviornment", func() {
+			When("password is not provided in the enviornment", func() {
 				It("errors out", func() {
 					helpers.WithManifest(appManifest, func(manifestDir string) {
 						session := helpers.CustomCF(
@@ -228,7 +228,7 @@ var _ = Describe("pushing a docker image", func() {
 	Describe("command line and manifest interaction", func() {
 		var appManifest map[string]interface{}
 
-		Context("when the image and username are provided by both manifest and command line", func() {
+		When("the image and username are provided by both manifest and command line", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionDockerCredentialsV2)
 				privateDockerImage, privateDockerUsername, privateDockerPassword = helpers.SkipIfPrivateDockerInfoNotSet()

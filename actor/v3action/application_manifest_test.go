@@ -42,12 +42,12 @@ var _ = Describe("Application Manifest Actions", func() {
 			warnings, executeErr = actor.ApplyApplicationManifest(fakeParser, spaceGUID)
 		})
 
-		Context("when given at least one application", func() {
+		When("given at least one application", func() {
 			BeforeEach(func() {
 				fakeParser.AppNamesReturns([]string{"app-1"})
 			})
 
-			Context("when getting the raw manifest bytes is successful", func() {
+			When("getting the raw manifest bytes is successful", func() {
 				var manifestContent []byte
 
 				BeforeEach(func() {
@@ -55,7 +55,7 @@ var _ = Describe("Application Manifest Actions", func() {
 					fakeParser.RawManifestReturns(manifestContent, nil)
 				})
 
-				Context("when the app exists", func() {
+				When("the app exists", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationsReturns(
 							[]ccv3.Application{{GUID: "app-1-guid"}},
@@ -64,7 +64,7 @@ var _ = Describe("Application Manifest Actions", func() {
 						)
 					})
 
-					Context("when applying the manifest succeeds", func() {
+					When("applying the manifest succeeds", func() {
 						BeforeEach(func() {
 							fakeCloudControllerClient.UpdateApplicationApplyManifestReturns(
 								"some-job-url",
@@ -73,7 +73,7 @@ var _ = Describe("Application Manifest Actions", func() {
 							)
 						})
 
-						Context("when polling finishes successfully", func() {
+						When("polling finishes successfully", func() {
 							BeforeEach(func() {
 								fakeCloudControllerClient.PollJobReturns(
 									ccv3.Warnings{"poll-1-warning"},
@@ -107,7 +107,7 @@ var _ = Describe("Application Manifest Actions", func() {
 							})
 						})
 
-						Context("when polling returns a generic error", func() {
+						When("polling returns a generic error", func() {
 							var expectedErr error
 
 							BeforeEach(func() {
@@ -124,7 +124,7 @@ var _ = Describe("Application Manifest Actions", func() {
 							})
 						})
 
-						Context("when polling returns an job failed error", func() {
+						When("polling returns an job failed error", func() {
 							var expectedErr error
 
 							BeforeEach(func() {
@@ -142,7 +142,7 @@ var _ = Describe("Application Manifest Actions", func() {
 						})
 					})
 
-					Context("when applying the manifest errors", func() {
+					When("applying the manifest errors", func() {
 						var applyErr error
 
 						BeforeEach(func() {
@@ -161,7 +161,7 @@ var _ = Describe("Application Manifest Actions", func() {
 					})
 				})
 
-				Context("when there's an error retrieving the application", func() {
+				When("there's an error retrieving the application", func() {
 					var getAppErr error
 
 					BeforeEach(func() {
@@ -181,7 +181,7 @@ var _ = Describe("Application Manifest Actions", func() {
 				})
 			})
 
-			Context("when generating the raw manifest errors", func() {
+			When("generating the raw manifest errors", func() {
 				getManifestErr := errors.New("get-manifest-error")
 				BeforeEach(func() {
 					fakeParser.RawManifestReturns(nil, getManifestErr)

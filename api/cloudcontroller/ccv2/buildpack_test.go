@@ -40,8 +40,8 @@ var _ = Describe("Buildpack", func() {
 			resultBuildpack, warnings, executeErr = client.CreateBuildpack(inputBuildpack)
 		})
 
-		Context("when the creation is successful", func() {
-			Context("when all the properties are passed", func() {
+		When("the creation is successful", func() {
+			When("all the properties are passed", func() {
 				BeforeEach(func() {
 					inputBuildpack = Buildpack{
 						Name:     "potato",
@@ -93,7 +93,7 @@ var _ = Describe("Buildpack", func() {
 				})
 			})
 
-			Context("when the minimum properties are being passed", func() {
+			When("the minimum properties are being passed", func() {
 				BeforeEach(func() {
 					inputBuildpack = Buildpack{
 						Name: "potato",
@@ -140,7 +140,7 @@ var _ = Describe("Buildpack", func() {
 
 		})
 
-		Context("when the create returns an error", func() {
+		When("the create returns an error", func() {
 			BeforeEach(func() {
 				response := `
 										{
@@ -181,7 +181,7 @@ var _ = Describe("Buildpack", func() {
 			buildpacks, warnings, executeErr = client.GetBuildpacks(bpName)
 		})
 
-		Context("when buildpacks are found", func() {
+		When("buildpacks are found", func() {
 			BeforeEach(func() {
 				response1 := `{
 										"next_url": "/v2/buildpacks?q=name:some-bp-name",
@@ -270,7 +270,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when no buildpacks are found", func() {
+		When("no buildpacks are found", func() {
 			BeforeEach(func() {
 				response := `{
 										"resources": []
@@ -290,7 +290,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the API responds with an error", func() {
+		When("the API responds with an error", func() {
 			BeforeEach(func() {
 				response := `{
 										"code": 10001,
@@ -331,9 +331,9 @@ var _ = Describe("Buildpack", func() {
 			updatedBuildpack, warnings, executeErr = client.UpdateBuildpack(buildpack)
 		})
 
-		Context("when the buildpack exists", func() {
-			Context("when all the properties are provided", func() {
-				Context("when the provided properties are golang non-zero values", func() {
+		When("the buildpack exists", func() {
+			When("all the properties are provided", func() {
+				When("the provided properties are golang non-zero values", func() {
 					BeforeEach(func() {
 						buildpack = Buildpack{
 							Name:     "some-bp-name",
@@ -379,7 +379,7 @@ var _ = Describe("Buildpack", func() {
 					})
 				})
 
-				Context("when the provided properties are golang zero values", func() {
+				When("the provided properties are golang zero values", func() {
 					BeforeEach(func() {
 						buildpack = Buildpack{
 							Name:     "some-bp-name",
@@ -426,7 +426,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the buildpack does not exist", func() {
+		When("the buildpack does not exist", func() {
 			BeforeEach(func() {
 				response := `{
 										"description": "buildpack not found",
@@ -455,7 +455,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the API errors", func() {
+		When("the API errors", func() {
 			BeforeEach(func() {
 				response := `{
 										"code": 10001,
@@ -508,7 +508,7 @@ var _ = Describe("Buildpack", func() {
 			warnings, executeErr = client.UploadBuildpack("some-buildpack-guid", bpFilePath, bpFile, int64(len(bpContent)))
 		})
 
-		Context("when the upload is successful", func() {
+		When("the upload is successful", func() {
 			BeforeEach(func() {
 				response := `{
 										"metadata": {
@@ -555,7 +555,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when there is an error reading the buildpack", func() {
+		When("there is an error reading the buildpack", func() {
 			var (
 				fakeReader  *ccv2fakes.FakeReader
 				expectedErr error
@@ -577,7 +577,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when the upload returns an error", func() {
+		When("the upload returns an error", func() {
 			BeforeEach(func() {
 				response := `{
 										"code": 30003,
@@ -599,7 +599,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when a retryable error occurs", func() {
+		When("a retryable error occurs", func() {
 			BeforeEach(func() {
 				wrapper := &wrapper.CustomWrapper{
 					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
@@ -623,7 +623,7 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		Context("when an http error occurs mid-transfer", func() {
+		When("an http error occurs mid-transfer", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

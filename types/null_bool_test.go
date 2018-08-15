@@ -15,14 +15,14 @@ var _ = Describe("NullBool", func() {
 	})
 
 	Describe("ParseBoolValue", func() {
-		Context("when nil is provided", func() {
+		When("nil is provided", func() {
 			It("sets IsSet to false", func() {
 				nullBool.ParseBoolValue(nil)
 				Expect(nullBool).To(Equal(NullBool{Value: false, IsSet: false}))
 			})
 		})
 
-		Context("when non-nil pointer is provided", func() {
+		When("non-nil pointer is provided", func() {
 			It("sets IsSet to true and Value to provided value", func() {
 				n := true
 				nullBool.ParseBoolValue(&n)
@@ -32,7 +32,7 @@ var _ = Describe("NullBool", func() {
 	})
 
 	Describe("ParseStringValue", func() {
-		Context("when the empty string is provided", func() {
+		When("the empty string is provided", func() {
 			It("sets IsSet to false", func() {
 				err := nullBool.ParseStringValue("")
 				Expect(err).ToNot(HaveOccurred())
@@ -40,7 +40,7 @@ var _ = Describe("NullBool", func() {
 			})
 		})
 
-		Context("when an invalid integer is provided", func() {
+		When("an invalid integer is provided", func() {
 			It("returns an error", func() {
 				err := nullBool.ParseStringValue("abcdef")
 				Expect(err).To(HaveOccurred())
@@ -48,7 +48,7 @@ var _ = Describe("NullBool", func() {
 			})
 		})
 
-		Context("when a valid integer is provided", func() {
+		When("a valid integer is provided", func() {
 			It("stores the bool and sets IsSet to true", func() {
 				err := nullBool.ParseStringValue("true")
 				Expect(err).ToNot(HaveOccurred())
@@ -58,7 +58,7 @@ var _ = Describe("NullBool", func() {
 	})
 
 	Describe("UnmarshalJSON", func() {
-		Context("when integer value is provided", func() {
+		When("integer value is provided", func() {
 			It("parses JSON number correctly", func() {
 				err := nullBool.UnmarshalJSON([]byte("true"))
 				Expect(err).ToNot(HaveOccurred())
@@ -66,7 +66,7 @@ var _ = Describe("NullBool", func() {
 			})
 		})
 
-		Context("when empty json is provided", func() {
+		When("empty json is provided", func() {
 			It("returns an unset NullBool", func() {
 				err := nullBool.UnmarshalJSON([]byte("null"))
 				Expect(err).ToNot(HaveOccurred())

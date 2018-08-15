@@ -50,7 +50,7 @@ var _ = Describe("HealthCheckType", func() {
 			Entry("sets 'http' when passed 'http'", "http", "http"),
 		)
 
-		Context("when passed anything else", func() {
+		When("passed anything else", func() {
 			It("returns an error", func() {
 				err := healthCheck.UnmarshalFlag("banana")
 				Expect(err).To(MatchError(&flags.Error{

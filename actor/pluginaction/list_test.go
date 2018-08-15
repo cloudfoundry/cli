@@ -33,7 +33,7 @@ var _ = Describe("Plugin actions", func() {
 			})
 		})
 
-		Context("when getting a repository errors", func() {
+		When("getting a repository errors", func() {
 			BeforeEach(func() {
 				fakePluginClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, errors.New("generic-error"))
 			})
@@ -44,7 +44,7 @@ var _ = Describe("Plugin actions", func() {
 			})
 		})
 
-		Context("when no errors are encountered getting repositories", func() {
+		When("no errors are encountered getting repositories", func() {
 			var callNumber int
 			BeforeEach(func() {
 				callNumber = 0
@@ -71,7 +71,7 @@ var _ = Describe("Plugin actions", func() {
 				}
 			})
 
-			Context("when there are outdated plugins", func() {
+			When("there are outdated plugins", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginsReturns([]configv3.Plugin{
 						{Name: "plugin-1", Version: configv3.PluginVersion{Major: 1, Minor: 0, Build: 0}},
@@ -91,7 +91,7 @@ var _ = Describe("Plugin actions", func() {
 				})
 			})
 
-			Context("when there are no outdated plugins", func() {
+			When("there are no outdated plugins", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginsReturns([]configv3.Plugin{
 						{Name: "plugin-1", Version: configv3.PluginVersion{Major: 2, Minor: 0, Build: 0}},

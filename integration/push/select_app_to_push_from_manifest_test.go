@@ -23,7 +23,7 @@ var _ = Describe("pushes specified app from single manifest file", func() {
 		secondApp = helpers.NewAppName()
 	})
 
-	Context("when the specified app is not found in the manifest file", func() {
+	When("the specified app is not found in the manifest file", func() {
 		It("returns an error", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -47,7 +47,7 @@ var _ = Describe("pushes specified app from single manifest file", func() {
 		})
 	})
 
-	Context("when the specified app exists in the manifest file", func() {
+	When("the specified app exists in the manifest file", func() {
 		It("pushes just the app on the command line", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{

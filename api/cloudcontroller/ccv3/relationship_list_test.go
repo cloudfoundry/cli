@@ -20,7 +20,7 @@ var _ = Describe("RelationshipList", func() {
 	})
 
 	Describe("EntitleIsolationSegmentToOrganizations", func() {
-		Context("when the delete is successful", func() {
+		When("the delete is successful", func() {
 			BeforeEach(func() {
 				response := `{
 					"data": [
@@ -55,7 +55,7 @@ var _ = Describe("RelationshipList", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [
@@ -112,7 +112,7 @@ var _ = Describe("RelationshipList", func() {
 			relationshipList, warnings, executeErr = client.ShareServiceInstanceToSpaces(serviceInstanceGUID, spaceGUIDs)
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				response := `{
 					"data": [
@@ -147,7 +147,7 @@ var _ = Describe("RelationshipList", func() {
 			})
 		})
 
-		Context("when the cloud controller returns errors and warnings", func() {
+		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
 					"errors": [

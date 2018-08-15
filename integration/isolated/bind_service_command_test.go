@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("bind-service command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("bind-service", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -64,14 +64,14 @@ var _ = Describe("bind-service command", func() {
 		appName = helpers.PrefixedRandomName("app")
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "bind-service", "app-name", "service-name")
 		})
 	})
 
-	Context("when provided invalid flag values", func() {
-		Context("when the --binding-name flag is provided and its value is the empty string", func() {
+	When("provided invalid flag values", func() {
+		When("the --binding-name flag is provided and its value is the empty string", func() {
 			It("returns an invalid usage error and the help text", func() {
 				session := helpers.CF("bind-service", appName, serviceInstance, "--binding-name", "")
 				Eventually(session.Err).Should(Say("--binding-name must be at least 1 character in length"))
@@ -82,7 +82,7 @@ var _ = Describe("bind-service command", func() {
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var (
 			org         string
 			space       string
@@ -107,7 +107,7 @@ var _ = Describe("bind-service command", func() {
 			helpers.QuickDeleteOrg(org)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("displays FAILED and app not found", func() {
 				session := helpers.CF("bind-service", "does-not-exist", serviceInstance)
 				Eventually(session).Should(Say("FAILED"))
@@ -116,14 +116,14 @@ var _ = Describe("bind-service command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 				})
 			})
 
-			Context("when the service does not exist", func() {
+			When("the service does not exist", func() {
 				It("displays FAILED and service not found", func() {
 					session := helpers.CF("bind-service", appName, "does-not-exist")
 					Eventually(session).Should(Say("FAILED"))
@@ -132,7 +132,7 @@ var _ = Describe("bind-service command", func() {
 				})
 			})
 
-			Context("when the service exists", func() {
+			When("the service exists", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("create-user-provided-service", serviceInstance, "-p", "{}")).Should(Exit(0))
 					helpers.WithHelloWorldApp(func(appDir string) {
@@ -154,7 +154,7 @@ var _ = Describe("bind-service command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when the service is already bound to an app", func() {
+				When("the service is already bound to an app", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("bind-service", appName, serviceInstance)).Should(Exit(0))
 					})
@@ -170,7 +170,7 @@ var _ = Describe("bind-service command", func() {
 					})
 				})
 
-				Context("when the --binding-name flag is provided and the value is a non-empty string", func() {
+				When("the --binding-name flag is provided and the value is a non-empty string", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionProvideNameForServiceBinding)
 					})
@@ -185,10 +185,10 @@ var _ = Describe("bind-service command", func() {
 					})
 				})
 
-				Context("when configuration parameters are provided in a file", func() {
+				When("configuration parameters are provided in a file", func() {
 					var configurationFile *os.File
 
-					Context("when the file-path does not exist", func() {
+					When("the file-path does not exist", func() {
 						It("displays FAILED and the invalid configuration error", func() {
 							session := helpers.CF("bind-service", appName, serviceInstance, "-c", "i-do-not-exist")
 							Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
@@ -197,7 +197,7 @@ var _ = Describe("bind-service command", func() {
 						})
 					})
 
-					Context("when the file contians invalid json", func() {
+					When("the file contians invalid json", func() {
 						BeforeEach(func() {
 							var err error
 							content := []byte("{i-am-very-bad-json")
@@ -223,7 +223,7 @@ var _ = Describe("bind-service command", func() {
 						})
 					})
 
-					Context("when the file-path is relative", func() {
+					When("the file-path is relative", func() {
 						BeforeEach(func() {
 							var err error
 							content := []byte("{\"i-am-good-json\":\"good-boy\"}")
@@ -251,7 +251,7 @@ var _ = Describe("bind-service command", func() {
 						})
 					})
 
-					Context("when the file-path is absolute", func() {
+					When("the file-path is absolute", func() {
 						BeforeEach(func() {
 							var err error
 							content := []byte("{\"i-am-good-json\":\"good-boy\"}")
@@ -282,8 +282,8 @@ var _ = Describe("bind-service command", func() {
 					})
 				})
 
-				Context("when configuration paramters are provided as in-line JSON", func() {
-					Context("when the JSON is invalid", func() {
+				When("configuration paramters are provided as in-line JSON", func() {
+					When("the JSON is invalid", func() {
 						It("displays FAILED and the invalid configuration error", func() {
 							session := helpers.CF("bind-service", appName, serviceInstance, "-c", "i-am-invalid-json")
 							Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
@@ -292,7 +292,7 @@ var _ = Describe("bind-service command", func() {
 						})
 					})
 
-					Context("when the JSON is valid", func() {
+					When("the JSON is valid", func() {
 						It("binds the service to the app, displays OK and TIP", func() {
 							session := helpers.CF("bind-service", appName, serviceInstance, "-c", "{\"i-am-valid-json\":\"dope dude\"}")
 							Eventually(session).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
@@ -305,14 +305,14 @@ var _ = Describe("bind-service command", func() {
 				})
 			})
 
-			Context("when the service is provided by a broker", func() {
+			When("the service is provided by a broker", func() {
 				var broker helpers.ServiceBroker
 
 				AfterEach(func() {
 					broker.Destroy()
 				})
 
-				Context("when the service binding is blocking", func() {
+				When("the service binding is blocking", func() {
 					BeforeEach(func() {
 						broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
 						broker.Push()
@@ -337,7 +337,7 @@ var _ = Describe("bind-service command", func() {
 					})
 				})
 
-				Context("when the service binding is asynchronous", func() {
+				When("the service binding is asynchronous", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionAsyncBindingsV2)
 

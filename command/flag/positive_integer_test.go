@@ -18,7 +18,7 @@ var _ = Describe("Positive Integer", func() {
 			posInt = PositiveInteger{}
 		})
 
-		Context("when passed a positive integer", func() {
+		When("passed a positive integer", func() {
 			It("sets the value", func() {
 				err := posInt.UnmarshalFlag("42")
 				Expect(err).ToNot(HaveOccurred())
@@ -26,7 +26,7 @@ var _ = Describe("Positive Integer", func() {
 			})
 		})
 
-		Context("when passed a non-positive integer", func() {
+		When("passed a non-positive integer", func() {
 			It("it returns an error", func() {
 				err := posInt.UnmarshalFlag("0")
 				Expect(err).To(MatchError(&flags.Error{

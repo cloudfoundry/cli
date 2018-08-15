@@ -28,7 +28,7 @@ var _ = Describe("Environment", func() {
 			fetchedEnvVars, warnings, executeErr = client.GetApplicationEnvironment("some-app-guid")
 		})
 
-		Context("when the request errors", func() {
+		When("the request errors", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -44,7 +44,7 @@ var _ = Describe("Environment", func() {
 			})
 		})
 
-		Context("when the request succeeds", func() {
+		When("the request succeeds", func() {
 			BeforeEach(func() {
 				responseBody := `{
 					"staging_env_json": {

@@ -24,7 +24,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("set-space-isolation-segment", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -38,12 +38,12 @@ var _ = Describe("set-space-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, false, ReadOnlyOrg, "set-space-isolation-segment", "space-name", "isolation-seg-name")
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -62,7 +62,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -82,7 +82,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -96,7 +96,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 			helpers.QuickDeleteOrg(organizationName)
 		})
 
-		Context("when the space does not exist", func() {
+		When("the space does not exist", func() {
 			It("fails with space not found message", func() {
 				session := helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)
 				Eventually(session).Should(Say("Updating isolation segment of space %s in org %s as %s\\.\\.\\.", spaceName, organizationName, userName))
@@ -106,12 +106,12 @@ var _ = Describe("set-space-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the space exists", func() {
+		When("the space exists", func() {
 			BeforeEach(func() {
 				helpers.CreateSpace(spaceName)
 			})
 
-			Context("when the isolation segment does not exist", func() {
+			When("the isolation segment does not exist", func() {
 				It("fails with isolation segment not found message", func() {
 					session := helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)
 					Eventually(session).Should(Say("Updating isolation segment of space %s in org %s as %s\\.\\.\\.", spaceName, organizationName, userName))
@@ -121,12 +121,12 @@ var _ = Describe("set-space-isolation-segment command", func() {
 				})
 			})
 
-			Context("when the isolation segment exists", func() {
+			When("the isolation segment exists", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 				})
 
-				Context("when the isolation segment is entitled to the organization", func() {
+				When("the isolation segment is entitled to the organization", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)).Should(Exit(0))
 					})
@@ -139,7 +139,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 
-					Context("when the isolation is already set to space", func() {
+					When("the isolation is already set to space", func() {
 						BeforeEach(func() {
 							Eventually(helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)).Should(Exit(0))
 						})

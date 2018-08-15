@@ -24,7 +24,7 @@ var _ = Describe("Organization Actions", func() {
 	})
 
 	Describe("GetOrganizationByName", func() {
-		Context("when the org exists", func() {
+		When("the org exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv3.Organization{
@@ -54,7 +54,7 @@ var _ = Describe("Organization Actions", func() {
 			})
 		})
 
-		Context("when the cloud controller client returns an error", func() {
+		When("the cloud controller client returns an error", func() {
 			var expectedError error
 
 			BeforeEach(func() {
@@ -73,7 +73,7 @@ var _ = Describe("Organization Actions", func() {
 		})
 	})
 
-	Context("when the org does not exist", func() {
+	When("the org does not exist", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(
 				[]ccv3.Organization{},

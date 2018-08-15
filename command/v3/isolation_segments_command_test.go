@@ -50,7 +50,7 @@ var _ = Describe("isolation-segments Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -63,7 +63,7 @@ var _ = Describe("isolation-segments Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -78,13 +78,13 @@ var _ = Describe("isolation-segments Command", func() {
 		})
 	})
 
-	Context("when checking target does not fail", func() {
+	When("checking target does not fail", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 		})
 
-		Context("when an error is not encountered getting the isolation segment summaries", func() {
-			Context("when there are isolation segments", func() {
+		When("an error is not encountered getting the isolation segment summaries", func() {
+			When("there are isolation segments", func() {
 				BeforeEach(func() {
 					fakeActor.GetIsolationSegmentSummariesReturns(
 						[]v3action.IsolationSegmentSummary{
@@ -123,7 +123,7 @@ var _ = Describe("isolation-segments Command", func() {
 				})
 			})
 
-			Context("when there are no isolation segments", func() {
+			When("there are no isolation segments", func() {
 				BeforeEach(func() {
 					fakeActor.GetIsolationSegmentSummariesReturns(
 						[]v3action.IsolationSegmentSummary{},
@@ -143,7 +143,7 @@ var _ = Describe("isolation-segments Command", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the isolation segment summaries", func() {
+		When("an error is encountered getting the isolation segment summaries", func() {
 			var expectedError error
 			BeforeEach(func() {
 				expectedError = errors.New("some-error")

@@ -38,7 +38,7 @@ var _ = Describe("Config", func() {
 			}
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			It("writes ConfigFile to homeDir/.cf/config.json", func() {
 				err := WriteConfig(config)
 				Expect(err).ToNot(HaveOccurred())

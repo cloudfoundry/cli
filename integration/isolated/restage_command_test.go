@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("restage command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("restage", "--help")
 
@@ -37,13 +37,13 @@ var _ = Describe("restage command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "restage", "app-name")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -60,7 +60,7 @@ var _ = Describe("restage command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("tells the user that the start is not found and exits 1", func() {
 				appName := helpers.PrefixedRandomName("app")
 				session := helpers.CF("restage", appName)
@@ -71,13 +71,13 @@ var _ = Describe("restage command", func() {
 			})
 		})
 
-		Context("when the app does exist", func() {
+		When("the app does exist", func() {
 			var (
 				domainName string
 				appName    string
 			)
 
-			Context("when the app does *not* stage properly because the app was not detected by any buildpacks", func() {
+			When("the app does *not* stage properly because the app was not detected by any buildpacks", func() {
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("app")
 					domainName = helpers.DefaultSharedDomain()
@@ -100,7 +100,7 @@ var _ = Describe("restage command", func() {
 				})
 			})
 
-			Context("when the app does *not* start properly", func() {
+			When("the app does *not* start properly", func() {
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("app")
 					helpers.WithHelloWorldApp(func(appDir string) {
@@ -119,7 +119,7 @@ var _ = Describe("restage command", func() {
 				})
 			})
 
-			Context("when the app stages and starts properly", func() {
+			When("the app stages and starts properly", func() {
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("app")
 					domainName = helpers.DefaultSharedDomain()
@@ -144,7 +144,7 @@ applications:
 				})
 
 				Describe("version dependent display", func() {
-					Context("when CC API >= 3.27.0", func() {
+					When("CC API >= 3.27.0", func() {
 						BeforeEach(func() {
 							helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 						})
@@ -172,7 +172,7 @@ applications:
 						})
 					})
 
-					Context("when CC API < 3.27.0", func() {
+					When("CC API < 3.27.0", func() {
 						BeforeEach(func() {
 							helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
 						})
@@ -202,7 +202,7 @@ applications:
 					})
 				})
 
-				Context("when isolation segments are available", func() {
+				When("isolation segments are available", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
 

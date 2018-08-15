@@ -47,7 +47,7 @@ var _ = Describe("orgs Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when an error is encountered checking if the environment is setup correctly", func() {
+	When("an error is encountered checking if the environment is setup correctly", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -62,8 +62,8 @@ var _ = Describe("orgs Command", func() {
 		})
 	})
 
-	Context("when the user is logged in and an org is targeted", func() {
-		Context("when getting the current user fails", func() {
+	When("the user is logged in and an org is targeted", func() {
+		When("getting the current user fails", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("get-user-error"))
 			})
@@ -73,14 +73,14 @@ var _ = Describe("orgs Command", func() {
 			})
 		})
 
-		Context("when getting the current user succeeds", func() {
+		When("getting the current user succeeds", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})
 
-			Context("when there are no orgs", func() {
+			When("there are no orgs", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
 						[]v2action.Organization{},
@@ -101,7 +101,7 @@ var _ = Describe("orgs Command", func() {
 				})
 			})
 
-			Context("when there are multiple orgs", func() {
+			When("there are multiple orgs", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
 						[]v2action.Organization{
@@ -127,7 +127,7 @@ var _ = Describe("orgs Command", func() {
 				})
 			})
 
-			Context("when a translatable error is encountered getting orgs", func() {
+			When("a translatable error is encountered getting orgs", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationsReturns(
 						nil,

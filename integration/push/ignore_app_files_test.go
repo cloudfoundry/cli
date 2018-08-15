@@ -22,8 +22,8 @@ var _ = Describe("ignoring files while gathering resources", func() {
 		firstApp = helpers.NewAppName()
 	})
 
-	Context("when the .cfignore file is in the app source directory", func() {
-		Context("when the .cfignore file doesn't exclude any files", func() {
+	When("the .cfignore file is in the app source directory", func() {
+		When("the .cfignore file doesn't exclude any files", func() {
 			It("pushes all the files", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					file1 := filepath.Join(dir, "file1")
@@ -46,7 +46,7 @@ var _ = Describe("ignoring files while gathering resources", func() {
 			})
 		})
 
-		Context("when the .cfignore file excludes some files", func() {
+		When("the .cfignore file excludes some files", func() {
 			Context("ignored files are relative paths", func() {
 				It("does not push those files", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
@@ -95,7 +95,7 @@ var _ = Describe("ignoring files while gathering resources", func() {
 		})
 	})
 
-	Context("when the CF_TRACE file is in the app source directory", func() {
+	When("the CF_TRACE file is in the app source directory", func() {
 		var previousEnv string
 
 		AfterEach(func() {

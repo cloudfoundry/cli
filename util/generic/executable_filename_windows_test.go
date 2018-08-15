@@ -12,7 +12,7 @@ import (
 )
 
 var _ = Describe("ExecutableFilename", func() {
-	Context("when a filename which must be turned into an executable filename is input", func() {
+	When("a filename which must be turned into an executable filename is input", func() {
 		It("appends .exe on Windows if it is not present", func() {
 			myPath := filepath.Join("foo", "bar")
 			Expect(ExecutableFilename(myPath)).To(Equal(fmt.Sprintf("%s.exe", myPath)))

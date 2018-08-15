@@ -96,7 +96,7 @@ var _ = Describe("App-Lister", func() {
 					Expect(session).To(gbytes.Say("api.example.com/v2/apps"))
 				})
 
-				Context("when ApiEndpoint() returns an error", func() {
+				When("ApiEndpoint() returns an error", func() {
 					BeforeEach(func() {
 						rpcHandlers.ApiEndpointStub = func(_ string, retVal *string) error {
 							*retVal = ""
@@ -115,7 +115,7 @@ var _ = Describe("App-Lister", func() {
 					})
 				})
 
-				Context("when getting a list of apps", func() {
+				When("getting a list of apps", func() {
 					Context("without option flag", func() {
 						BeforeEach(func() {
 							rpcHandlers.GetOutputAndResetStub = func(_ bool, retVal *[]string) error {
@@ -173,7 +173,7 @@ var _ = Describe("App-Lister", func() {
 						})
 					})
 
-					Context("when CliCommandWithoutTerminalOutput() returns an error", func() {
+					When("CliCommandWithoutTerminalOutput() returns an error", func() {
 						BeforeEach(func() {
 							rpcHandlers.CallCoreCommandStub = func(_ []string, retVal *bool) error {
 								return errors.New("something went wrong")
@@ -190,7 +190,7 @@ var _ = Describe("App-Lister", func() {
 						})
 					})
 
-					Context("when 'next url' is present in the JSON response", func() {
+					When("'next url' is present in the JSON response", func() {
 						BeforeEach(func() {
 							count := 0
 							rpcHandlers.GetOutputAndResetStub = func(_ bool, retVal *[]string) error {

@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("start command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("start", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -36,13 +36,13 @@ var _ = Describe("start command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "start", "app-name")
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -59,7 +59,7 @@ var _ = Describe("start command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("tells the user that the start is not found and exits 1", func() {
 				appName := helpers.PrefixedRandomName("app")
 				session := helpers.CF("start", appName)
@@ -70,13 +70,13 @@ var _ = Describe("start command", func() {
 			})
 		})
 
-		Context("when the app does exist", func() {
+		When("the app does exist", func() {
 			var (
 				domainName string
 				appName    string
 			)
 
-			Context("when the app is started", func() {
+			When("the app is started", func() {
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("app")
 					domainName = helpers.DefaultSharedDomain()
@@ -94,8 +94,8 @@ var _ = Describe("start command", func() {
 				})
 			})
 
-			Context("when the app is stopped", func() {
-				Context("when the app has been staged", func() {
+			When("the app is stopped", func() {
+				When("the app has been staged", func() {
 					BeforeEach(func() {
 						appName = helpers.PrefixedRandomName("app")
 						domainName = helpers.DefaultSharedDomain()
@@ -120,7 +120,7 @@ applications:
 					})
 
 					Describe("version dependent display", func() {
-						Context("when CC API >= 3.27.0", func() {
+						When("CC API >= 3.27.0", func() {
 							BeforeEach(func() {
 								helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 							})
@@ -149,7 +149,7 @@ applications:
 
 						})
 
-						Context("when CC API < 3.27.0", func() {
+						When("CC API < 3.27.0", func() {
 							BeforeEach(func() {
 								helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
 							})
@@ -181,8 +181,8 @@ applications:
 					})
 				})
 
-				Context("when the app has *not* yet been staged", func() {
-					Context("when the app does *not* stage properly because the app was not detected by any buildpacks", func() {
+				When("the app has *not* yet been staged", func() {
+					When("the app does *not* stage properly because the app was not detected by any buildpacks", func() {
 						BeforeEach(func() {
 							appName = helpers.PrefixedRandomName("app")
 							domainName = helpers.DefaultSharedDomain()
@@ -205,8 +205,8 @@ applications:
 						})
 					})
 
-					Context("when the app stages properly", func() {
-						Context("when the app does *not* start properly", func() {
+					When("the app stages properly", func() {
+						When("the app does *not* start properly", func() {
 							BeforeEach(func() {
 								appName = helpers.PrefixedRandomName("app")
 								helpers.WithHelloWorldApp(func(appDir string) {
@@ -227,7 +227,7 @@ applications:
 							})
 						})
 
-						Context("when the app starts properly", func() {
+						When("the app starts properly", func() {
 							BeforeEach(func() {
 								appName = helpers.PrefixedRandomName("app")
 								domainName = helpers.DefaultSharedDomain()
@@ -251,7 +251,7 @@ applications:
 							})
 
 							Describe("version dependent display", func() {
-								Context("when CC API >= 3.27.0", func() {
+								When("CC API >= 3.27.0", func() {
 									BeforeEach(func() {
 										helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 									})
@@ -280,7 +280,7 @@ applications:
 
 								})
 
-								Context("when CC API < 3.27.0", func() {
+								When("CC API < 3.27.0", func() {
 									BeforeEach(func() {
 										helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
 									})
@@ -311,7 +311,7 @@ applications:
 								})
 							})
 
-							Context("when using isolation segments", func() {
+							When("using isolation segments", func() {
 								BeforeEach(func() {
 									helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
 									Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))

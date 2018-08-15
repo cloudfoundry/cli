@@ -59,7 +59,7 @@ var _ = Describe("Job", func() {
 			job, warnings, executeErr = client.GetJob(jobLocation)
 		})
 
-		Context("when no errors are encountered", func() {
+		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				jsonResponse := `{
 						"guid": "job-guid",
@@ -90,7 +90,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when the job fails", func() {
+		When("the job fails", func() {
 			BeforeEach(func() {
 				jsonResponse := `{
 						"guid": "job-guid",
@@ -152,7 +152,7 @@ var _ = Describe("Job", func() {
 			warnings, executeErr = client.PollJob(jobLocation)
 		})
 
-		Context("when the job starts queued and then finishes successfully", func() {
+		When("the job starts queued and then finishes successfully", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -212,7 +212,7 @@ var _ = Describe("Job", func() {
 			})
 		})
 
-		Context("when the job starts queued and then fails", func() {
+		When("the job starts queued and then fails", func() {
 			var jobFailureMessage string
 
 			BeforeEach(func() {
@@ -285,7 +285,7 @@ var _ = Describe("Job", func() {
 		})
 
 		Context("polling timeouts", func() {
-			Context("when the job runs longer than the OverallPollingTimeout", func() {
+			When("the job runs longer than the OverallPollingTimeout", func() {
 				var jobPollingTimeout time.Duration
 
 				BeforeEach(func() {

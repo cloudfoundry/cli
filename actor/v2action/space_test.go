@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Space", func() {
 	Describe("SpaceNotFoundError#Error", func() {
-		Context("when the name is specified", func() {
+		When("the name is specified", func() {
 			It("returns an error message with the name of the missing space", func() {
 				err := actionerror.SpaceNotFoundError{
 					Name: "some-space",
@@ -23,7 +23,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when the name is not specified, but the GUID is specified", func() {
+		When("the name is not specified, but the GUID is specified", func() {
 			It("returns an error message with the GUID of the missing space", func() {
 				err := actionerror.SpaceNotFoundError{
 					GUID: "some-space-guid",
@@ -32,7 +32,7 @@ var _ = Describe("Space", func() {
 			})
 		})
 
-		Context("when neither the name nor the GUID is specified", func() {
+		When("neither the name nor the GUID is specified", func() {
 			It("returns a generic error message for the missing space", func() {
 				err := actionerror.SpaceNotFoundError{}
 				Expect(err.Error()).To(Equal("Space '' not found."))
@@ -61,7 +61,7 @@ var _ = Describe("Space", func() {
 				warnings, err = actor.DeleteSpaceByNameAndOrganizationName("some-space", "some-org")
 			})
 
-			Context("when the org is not found", func() {
+			When("the org is not found", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetOrganizationsReturns(
 						[]ccv2.Organization{},
@@ -79,7 +79,7 @@ var _ = Describe("Space", func() {
 				})
 			})
 
-			Context("when the org is found", func() {
+			When("the org is found", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetOrganizationsReturns(
 						[]ccv2.Organization{{Name: "some-org", GUID: "some-org-guid"}},
@@ -88,7 +88,7 @@ var _ = Describe("Space", func() {
 					)
 				})
 
-				Context("when the space is not found", func() {
+				When("the space is not found", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetSpacesReturns(
 							[]ccv2.Space{},
@@ -103,7 +103,7 @@ var _ = Describe("Space", func() {
 					})
 				})
 
-				Context("when the space is found", func() {
+				When("the space is found", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetSpacesReturns(
 							[]ccv2.Space{{GUID: "some-space-guid"}},
@@ -112,7 +112,7 @@ var _ = Describe("Space", func() {
 						)
 					})
 
-					Context("when the delete returns an error", func() {
+					When("the delete returns an error", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -130,7 +130,7 @@ var _ = Describe("Space", func() {
 						})
 					})
 
-					Context("when the delete returns a job", func() {
+					When("the delete returns a job", func() {
 						BeforeEach(func() {
 							fakeCloudControllerClient.DeleteSpaceJobReturns(
 								ccv2.Job{GUID: "some-job-guid"},
@@ -139,7 +139,7 @@ var _ = Describe("Space", func() {
 							)
 						})
 
-						Context("when polling errors", func() {
+						When("polling errors", func() {
 							var expectedErr error
 
 							BeforeEach(func() {
@@ -153,7 +153,7 @@ var _ = Describe("Space", func() {
 							})
 						})
 
-						Context("when the job is successful", func() {
+						When("the job is successful", func() {
 							BeforeEach(func() {
 								fakeCloudControllerClient.PollJobReturns(ccv2.Warnings{"warning-7", "warning-8"}, nil)
 							})
@@ -195,7 +195,7 @@ var _ = Describe("Space", func() {
 		})
 
 		Describe("GetOrganizationSpaces", func() {
-			Context("when there are spaces in the org", func() {
+			When("there are spaces in the org", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv2.Space{
@@ -247,7 +247,7 @@ var _ = Describe("Space", func() {
 				})
 			})
 
-			Context("when an error is encountered", func() {
+			When("an error is encountered", func() {
 				var returnedErr error
 
 				BeforeEach(func() {
@@ -269,7 +269,7 @@ var _ = Describe("Space", func() {
 		})
 
 		Describe("GetSpaceByOrganizationAndName", func() {
-			Context("when the space exists", func() {
+			When("the space exists", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv2.Space{
@@ -313,7 +313,7 @@ var _ = Describe("Space", func() {
 				})
 			})
 
-			Context("when an error is encountered", func() {
+			When("an error is encountered", func() {
 				var returnedErr error
 
 				BeforeEach(func() {
@@ -333,7 +333,7 @@ var _ = Describe("Space", func() {
 				})
 			})
 
-			Context("when the space does not exist", func() {
+			When("the space does not exist", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv2.Space{},
@@ -351,7 +351,7 @@ var _ = Describe("Space", func() {
 				})
 			})
 
-			Context("when multiple spaces exists", func() {
+			When("multiple spaces exists", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv2.Space{

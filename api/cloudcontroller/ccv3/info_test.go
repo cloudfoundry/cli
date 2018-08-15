@@ -127,8 +127,8 @@ var _ = Describe("Info", func() {
 		})
 	})
 
-	Context("when the cloud controller encounters an error", func() {
-		Context("when the root response is invalid", func() {
+	When("the cloud controller encounters an error", func() {
+		When("the root response is invalid", func() {
 			BeforeEach(func() {
 				rootRespondWith = RespondWith(
 					http.StatusNotFound,
@@ -143,7 +143,7 @@ var _ = Describe("Info", func() {
 			})
 		})
 
-		Context("when the error occurs making a request to '/'", func() {
+		When("the error occurs making a request to '/'", func() {
 			BeforeEach(func() {
 				rootRespondWith = RespondWith(
 					http.StatusNotFound,
@@ -157,7 +157,7 @@ var _ = Describe("Info", func() {
 			})
 		})
 
-		Context("when the error occurs making a request to '/v3'", func() {
+		When("the error occurs making a request to '/v3'", func() {
 			BeforeEach(func() {
 				rootResponse := fmt.Sprintf(`{
 					"links": {

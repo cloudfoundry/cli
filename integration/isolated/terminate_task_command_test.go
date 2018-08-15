@@ -11,13 +11,13 @@ import (
 )
 
 var _ = Describe("terminate-task command", func() {
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "terminate-task", "app-name", "3")
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -36,7 +36,7 @@ var _ = Describe("terminate-task command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the application does not exist", func() {
+		When("the application does not exist", func() {
 			It("fails to terminate task and outputs an error message", func() {
 				session := helpers.CF("terminate-task", appName, "1")
 				Eventually(session.Err).Should(Say(fmt.Sprintf("App %s not found", appName)))
@@ -45,14 +45,14 @@ var _ = Describe("terminate-task command", func() {
 			})
 		})
 
-		Context("when the application exists", func() {
+		When("the application exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
 
-			Context("when the wrong data type is provided to terminate-task", func() {
+			When("the wrong data type is provided to terminate-task", func() {
 				It("outputs an error message to the user, provides help text, and exits 1", func() {
 					session := helpers.CF("terminate-task", appName, "not-an-integer")
 					Eventually(session.Err).Should(Say("Incorrect usage: Value for TASK_ID must be integer"))
@@ -62,7 +62,7 @@ var _ = Describe("terminate-task command", func() {
 				})
 			})
 
-			Context("when the task is in the RUNNING state", func() {
+			When("the task is in the RUNNING state", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("run-task", appName, "sleep 1000")).Should(Exit(0))
@@ -83,7 +83,7 @@ var _ = Describe("terminate-task command", func() {
 				})
 			})
 
-			Context("when the task is in the SUCCEEDED state", func() {
+			When("the task is in the SUCCEEDED state", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("run-task", appName, "echo test")).Should(Exit(0))
@@ -104,7 +104,7 @@ var _ = Describe("terminate-task command", func() {
 				})
 			})
 
-			Context("when the task is in the FAILED state", func() {
+			When("the task is in the FAILED state", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						Eventually(helpers.CF("run-task", appName, "false")).Should(Exit(0))
@@ -125,7 +125,7 @@ var _ = Describe("terminate-task command", func() {
 				})
 			})
 
-			Context("when the task ID does not exist", func() {
+			When("the task ID does not exist", func() {
 				It("fails to terminate the task and prints an error", func() {
 					session := helpers.CF("terminate-task", appName, "1")
 					Eventually(session.Err).Should(Say("Task sequence ID 1 not found."))

@@ -80,7 +80,7 @@ var _ = Describe("Retry Request", func() {
 		Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 	})
 
-	Context("when a PipeSeekError is returned from ResetBody", func() {
+	When("a PipeSeekError is returned from ResetBody", func() {
 		var (
 			expectedErr error
 			request     *cloudcontroller.Request

@@ -31,7 +31,7 @@ var _ = Describe("New Clients", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 	})
 
-	Context("when the api endpoint is not set", func() {
+	When("the api endpoint is not set", func() {
 		It("returns an error", func() {
 			_, _, err := NewClients(fakeConfig, testUI, true)
 			Expect(err).To(MatchError(translatableerror.NoAPISetError{
@@ -40,7 +40,7 @@ var _ = Describe("New Clients", func() {
 		})
 	})
 
-	Context("when the DialTimeout is set", func() {
+	When("the DialTimeout is set", func() {
 		BeforeEach(func() {
 			if runtime.GOOS == "windows" {
 				Skip("due to timing issues on windows")
@@ -55,7 +55,7 @@ var _ = Describe("New Clients", func() {
 		})
 	})
 
-	Context("when the targeting a CF fails", func() {
+	When("the targeting a CF fails", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns("https://potato.bananapants11122.co.uk")
 		})
@@ -66,7 +66,7 @@ var _ = Describe("New Clients", func() {
 		})
 	})
 
-	Context("when the targeted CF is older than the minimum supported version", func() {
+	When("the targeted CF is older than the minimum supported version", func() {
 		var server *Server
 
 		BeforeEach(func() {
@@ -93,7 +93,7 @@ var _ = Describe("New Clients", func() {
 		})
 	})
 
-	Context("when not targetting", func() {
+	When("not targetting", func() {
 		It("does not target and returns no UAA client", func() {
 			ccClient, uaaClient, err := NewClients(fakeConfig, testUI, false)
 			Expect(err).ToNot(HaveOccurred())

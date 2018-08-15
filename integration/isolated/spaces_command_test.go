@@ -16,7 +16,7 @@ var _ = Describe("spaces command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("spaces", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -30,13 +30,13 @@ var _ = Describe("spaces command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, false, ReadOnlyOrg, "spaces")
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var username string
 
 		BeforeEach(func() {
@@ -45,7 +45,7 @@ var _ = Describe("spaces command", func() {
 			helpers.TargetOrg(orgName)
 		})
 
-		Context("when there are no spaces", func() {
+		When("there are no spaces", func() {
 			It("displays no spaces found", func() {
 				session := helpers.CF("spaces")
 				Eventually(session).Should(Say("Getting spaces in org %s as %s\\.\\.\\.", orgName, username))
@@ -55,7 +55,7 @@ var _ = Describe("spaces command", func() {
 			})
 		})
 
-		Context("when there are multiple spaces", func() {
+		When("there are multiple spaces", func() {
 			var spaceName1, spaceName2, spaceName3, spaceName4, spaceName5, spaceName6 string
 
 			BeforeEach(func() {

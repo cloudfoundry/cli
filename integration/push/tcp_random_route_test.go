@@ -18,8 +18,8 @@ var _ = Describe("TCP random route", func() {
 		appName = "short-app-name" // used on purpose to fit route length requirement
 	})
 
-	Context("when passed the --random-route flag", func() {
-		Context("when also passed a tcp domain", func() {
+	When("passed the --random-route flag", func() {
+		When("also passed a tcp domain", func() {
 			var domain helpers.Domain
 
 			BeforeEach(func() {
@@ -42,7 +42,7 @@ var _ = Describe("TCP random route", func() {
 				})
 			})
 
-			Context("when the app already exists with a tcp route", func() {
+			When("the app already exists with a tcp route", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--random-route", "-d", domain.Name, "--no-start")).Should(Exit(0))

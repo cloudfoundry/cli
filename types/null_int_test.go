@@ -15,14 +15,14 @@ var _ = Describe("NullInt", func() {
 	})
 
 	Describe("ParseIntValue", func() {
-		Context("when nil is provided", func() {
+		When("nil is provided", func() {
 			It("sets IsSet to false", func() {
 				nullInt.ParseIntValue(nil)
 				Expect(nullInt).To(Equal(NullInt{Value: 0, IsSet: false}))
 			})
 		})
 
-		Context("when non-nil pointer is provided", func() {
+		When("non-nil pointer is provided", func() {
 			It("sets IsSet to true and Value to provided value", func() {
 				n := 5
 				nullInt.ParseIntValue(&n)
@@ -32,7 +32,7 @@ var _ = Describe("NullInt", func() {
 	})
 
 	Describe("ParseStringValue", func() {
-		Context("when the empty string is provided", func() {
+		When("the empty string is provided", func() {
 			It("sets IsSet to false", func() {
 				err := nullInt.ParseStringValue("")
 				Expect(err).ToNot(HaveOccurred())
@@ -40,7 +40,7 @@ var _ = Describe("NullInt", func() {
 			})
 		})
 
-		Context("when an invalid integer is provided", func() {
+		When("an invalid integer is provided", func() {
 			It("returns an error", func() {
 				err := nullInt.ParseStringValue("abcdef")
 				Expect(err).To(HaveOccurred())
@@ -48,7 +48,7 @@ var _ = Describe("NullInt", func() {
 			})
 		})
 
-		Context("when a valid integer is provided", func() {
+		When("a valid integer is provided", func() {
 			It("stores the integer and sets IsSet to true", func() {
 				err := nullInt.ParseStringValue("0")
 				Expect(err).ToNot(HaveOccurred())
@@ -58,7 +58,7 @@ var _ = Describe("NullInt", func() {
 	})
 
 	Describe("UnmarshalJSON", func() {
-		Context("when integer value is provided", func() {
+		When("integer value is provided", func() {
 			It("parses JSON number correctly", func() {
 				err := nullInt.UnmarshalJSON([]byte("42"))
 				Expect(err).ToNot(HaveOccurred())
@@ -66,7 +66,7 @@ var _ = Describe("NullInt", func() {
 			})
 		})
 
-		Context("when empty json is provided", func() {
+		When("empty json is provided", func() {
 			It("returns an unset NullInt", func() {
 				err := nullInt.UnmarshalJSON([]byte(`""`))
 				Expect(err).ToNot(HaveOccurred())

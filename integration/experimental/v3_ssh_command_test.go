@@ -26,7 +26,7 @@ var _ = Describe("v3-ssh command", func() {
 		spaceName = helpers.NewSpaceName()
 	})
 
-	Context("when --help flag is set", func() {
+	When("--help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("v3-ssh", "--help")
 
@@ -54,7 +54,7 @@ var _ = Describe("v3-ssh command", func() {
 		})
 	})
 
-	Context("when the app name is not provided", func() {
+	When("the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-ssh")
 
@@ -70,8 +70,8 @@ var _ = Describe("v3-ssh command", func() {
 		Eventually(session).Should(Exit())
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -84,7 +84,7 @@ var _ = Describe("v3-ssh command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -103,7 +103,7 @@ var _ = Describe("v3-ssh command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -122,7 +122,7 @@ var _ = Describe("v3-ssh command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -135,7 +135,7 @@ var _ = Describe("v3-ssh command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -149,7 +149,7 @@ var _ = Describe("v3-ssh command", func() {
 			})
 		})
 
-		Context("when there is no space set", func() {
+		When("there is no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -165,7 +165,7 @@ var _ = Describe("v3-ssh command", func() {
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(orgName, spaceName)
 		})
@@ -174,7 +174,7 @@ var _ = Describe("v3-ssh command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("it displays the app does not exist", func() {
 				session := helpers.CF("v3-ssh", appName)
 				Eventually(session).Should(Say("FAILED"))
@@ -183,7 +183,7 @@ var _ = Describe("v3-ssh command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithProcfileApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
@@ -207,13 +207,13 @@ var _ = Describe("v3-ssh command", func() {
 				// interactive w/ commands     | No            | No      | Yes   | Yes
 				// non-interactive w/ commands | No            | No      | Yes   | No
 
-				Context("when the running session is interactive", func() {
+				When("the running session is interactive", func() {
 					// This should be tested manually (launching an interactive shell in code is hard)
 				})
 
-				Context("when the running session is non-interactive", func() {
-					Context("when providing commands to run on the remote host", func() {
-						Context("when using default tty option (auto)", func() {
+				When("the running session is non-interactive", func() {
+					When("providing commands to run on the remote host", func() {
+						When("using default tty option (auto)", func() {
 							It("the remote shell is not TTY", func() {
 								// we echo hello because a successful ssh call returns the status
 								session := helpers.CF("v3-ssh", appName, "-c tty;", "-c echo hello")
@@ -222,7 +222,7 @@ var _ = Describe("v3-ssh command", func() {
 							})
 						})
 
-						Context("when disable-pseudo-tty is specified", func() {
+						When("disable-pseudo-tty is specified", func() {
 							It("the remote shell is not TTY", func() {
 								session := helpers.CF("v3-ssh", appName, "--disable-pseudo-tty", "-c tty;", "-c echo hello")
 								Eventually(session).Should(Say("not a tty"))
@@ -230,7 +230,7 @@ var _ = Describe("v3-ssh command", func() {
 							})
 						})
 
-						Context("when force-pseudo-tty is specified", func() {
+						When("force-pseudo-tty is specified", func() {
 							It("the remote shell is TTY", func() {
 								session := helpers.CF("v3-ssh", appName, "--force-pseudo-tty", "-c tty;", "-c echo hello")
 								Eventually(session).ShouldNot(Say("not a tty"))
@@ -239,7 +239,7 @@ var _ = Describe("v3-ssh command", func() {
 							})
 						})
 
-						Context("when request-pseudo-tty is specified", func() {
+						When("request-pseudo-tty is specified", func() {
 							It("the remote shell is not TTY", func() {
 								session := helpers.CF("v3-ssh", appName, "--request-pseudo-tty", "-c tty;", "-c echo hello")
 								Eventually(session).Should(Say("not a tty"))
@@ -248,14 +248,14 @@ var _ = Describe("v3-ssh command", func() {
 						})
 					})
 
-					Context("when not providing commands as args", func() {
+					When("not providing commands as args", func() {
 						var buffer *Buffer
 
 						BeforeEach(func() {
 							buffer = NewBuffer()
 						})
 
-						Context("when using default tty option (auto)", func() {
+						When("using default tty option (auto)", func() {
 							It("the remote shell is not TTY", func() {
 								buffer.Write([]byte("tty\n"))
 								buffer.Write([]byte("echo hello\n"))
@@ -266,7 +266,7 @@ var _ = Describe("v3-ssh command", func() {
 							})
 						})
 
-						Context("when disable-pseudo-tty is specified", func() {
+						When("disable-pseudo-tty is specified", func() {
 							It("the remote shell is not TTY", func() {
 								buffer.Write([]byte("tty\n"))
 								buffer.Write([]byte("echo hello\n"))
@@ -277,7 +277,7 @@ var _ = Describe("v3-ssh command", func() {
 							})
 						})
 
-						Context("when force-pseudo-tty is specified", func() {
+						When("force-pseudo-tty is specified", func() {
 							It("the remote shell is TTY", func() {
 								buffer.Write([]byte("tty\n"))
 								buffer.Write([]byte("echo hello\n"))
@@ -289,7 +289,7 @@ var _ = Describe("v3-ssh command", func() {
 							})
 						})
 
-						Context("when request-pseudo-tty is specified", func() {
+						When("request-pseudo-tty is specified", func() {
 							It("the remote shell is TTY", func() {
 								buffer.Write([]byte("tty\n"))
 								buffer.Write([]byte("echo hello\n"))
@@ -312,7 +312,7 @@ var _ = Describe("v3-ssh command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when commands to run are specified", func() {
+			When("commands to run are specified", func() {
 				It("ssh's to the default container and runs the commands", func() {
 					session := helpers.CF("v3-ssh", appName, "-c", "ls;", "-c", "echo $USER")
 					Eventually(session).Should(Say("app"))
@@ -323,7 +323,7 @@ var _ = Describe("v3-ssh command", func() {
 				})
 			})
 
-			Context("when the application hasn't started", func() {
+			When("the application hasn't started", func() {
 				BeforeEach(func() {
 					session := helpers.CF("v3-stop", appName)
 					Eventually(session).Should(Exit(0))
@@ -337,14 +337,14 @@ var _ = Describe("v3-ssh command", func() {
 				})
 			})
 
-			Context("when the remote command exits with a different status code", func() {
+			When("the remote command exits with a different status code", func() {
 				It("exits with that status code", func() {
 					session := helpers.CF("v3-ssh", appName, "-c", "asdf")
 					Eventually(session).Should(Exit(127))
 				})
 			})
 
-			Context("when port forwarding is used", func() {
+			When("port forwarding is used", func() {
 				var port int
 
 				BeforeEach(func() {
@@ -366,8 +366,8 @@ var _ = Describe("v3-ssh command", func() {
 				})
 			})
 
-			Context("when a process is specified", func() {
-				Context("when the process does not exist", func() {
+			When("a process is specified", func() {
+				When("the process does not exist", func() {
 					It("displays the process does not exist", func() {
 						session := helpers.CF("v3-ssh", appName, "--process", "fake-process")
 						Eventually(session).Should(Say("FAILED"))
@@ -376,7 +376,7 @@ var _ = Describe("v3-ssh command", func() {
 					})
 				})
 
-				Context("when the process exists", func() {
+				When("the process exists", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("v3-scale", appName, "--process", "console", "-i", "1")).Should(Exit(0))
 					})
@@ -388,8 +388,8 @@ var _ = Describe("v3-ssh command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 
-					Context("when the index is specified", func() {
-						Context("when the index does not exist", func() {
+					When("the index is specified", func() {
+						When("the index does not exist", func() {
 							It("returns an instance not found error", func() {
 								session := helpers.CF("v3-ssh", appName, "--process", "console", "-i", "1", "-c", "ps aux;", "-c", "env")
 								Eventually(session).Should(Say("FAILED"))
@@ -398,7 +398,7 @@ var _ = Describe("v3-ssh command", func() {
 							})
 						})
 
-						Context("when the index exists", func() {
+						When("the index exists", func() {
 							It("ssh's to the provided index", func() {
 								session := helpers.CF("v3-ssh", appName, "--process", "console", "-i", "0", "-c", "ps aux;", "-c", "env")
 								Eventually(session).Should(Say("vcap.*irb"))
@@ -410,7 +410,7 @@ var _ = Describe("v3-ssh command", func() {
 				})
 			})
 
-			Context("when a user isn't authorized", func() {
+			When("a user isn't authorized", func() {
 				var (
 					newUser string
 					newPass string

@@ -53,7 +53,7 @@ var _ = Describe("SSH Actions", func() {
 			Expect(skipHostValidationArg).To(BeTrue())
 		})
 
-		Context("when connecting fails", func() {
+		When("connecting fails", func() {
 			BeforeEach(func() {
 				fakeSecureShellClient.ConnectReturns(errors.New("some-connect-error"))
 			})
@@ -67,7 +67,7 @@ var _ = Describe("SSH Actions", func() {
 			})
 		})
 
-		Context("when connecting succeeds", func() {
+		When("connecting succeeds", func() {
 			BeforeEach(func() {
 				sshOptions.LocalPortForwardSpecs = []LocalPortForward{
 					{LocalAddress: "local-address-1", RemoteAddress: "remote-address-1"},
@@ -89,7 +89,7 @@ var _ = Describe("SSH Actions", func() {
 				))
 			})
 
-			Context("when local port forwarding fails", func() {
+			When("local port forwarding fails", func() {
 				BeforeEach(func() {
 					fakeSecureShellClient.LocalPortForwardReturns(errors.New("some-forwarding-error"))
 				})
@@ -99,8 +99,8 @@ var _ = Describe("SSH Actions", func() {
 				})
 			})
 
-			Context("when local port forwarding succeeds", func() {
-				Context("when skipping remote execution", func() {
+			When("local port forwarding succeeds", func() {
+				When("skipping remote execution", func() {
 					BeforeEach(func() {
 						sshOptions.SkipRemoteExecution = true
 					})
@@ -110,7 +110,7 @@ var _ = Describe("SSH Actions", func() {
 						Expect(fakeSecureShellClient.InteractiveSessionCallCount()).To(Equal(0))
 					})
 
-					Context("when waiting errors", func() {
+					When("waiting errors", func() {
 						// TODO: Handle different errors caused by interrupt signals
 						BeforeEach(func() {
 							fakeSecureShellClient.WaitReturns(errors.New("some-wait-error"))
@@ -121,14 +121,14 @@ var _ = Describe("SSH Actions", func() {
 						})
 					})
 
-					Context("when waiting succeeds", func() {
+					When("waiting succeeds", func() {
 						It("returns no error", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 						})
 					})
 				})
 
-				Context("when creating an interactive session", func() {
+				When("creating an interactive session", func() {
 					BeforeEach(func() {
 						sshOptions.SkipRemoteExecution = false
 						sshOptions.Commands = []string{"some-command-1", "some-command-2"}
@@ -143,7 +143,7 @@ var _ = Describe("SSH Actions", func() {
 						Expect(fakeSecureShellClient.WaitCallCount()).To(Equal(0))
 					})
 
-					Context("when the interactive session errors", func() {
+					When("the interactive session errors", func() {
 						// TODO: Handle different errors caused by interrupt signals
 						BeforeEach(func() {
 							fakeSecureShellClient.InteractiveSessionReturns(errors.New("some-interactive-session-error"))
@@ -154,7 +154,7 @@ var _ = Describe("SSH Actions", func() {
 						})
 					})
 
-					Context("when the interactive session succeeds", func() {
+					When("the interactive session succeeds", func() {
 						It("returns no error", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 						})

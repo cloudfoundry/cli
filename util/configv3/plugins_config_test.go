@@ -155,7 +155,7 @@ var _ = Describe("PluginsConfig", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when the plugin exists", func() {
+			When("the plugin exists", func() {
 				It("removes the plugin from the config", func() {
 					plugins := config.Plugins()
 
@@ -168,7 +168,7 @@ var _ = Describe("PluginsConfig", func() {
 				})
 			})
 
-			Context("when the plugin does not exist", func() {
+			When("the plugin does not exist", func() {
 				It("doesn't blow up", func() {
 					config.RemovePlugin("does-not-exist")
 				})
@@ -266,7 +266,7 @@ var _ = Describe("PluginsConfig", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when there is a matching plugin", func() {
+			When("there is a matching plugin", func() {
 				It("returns the plugin and true", func() {
 					plugin, exist := config.GetPluginCaseInsensitive("PlUgIn-1")
 					Expect(plugin).To(Equal(Plugin{Name: "plugin-1"}))
@@ -274,7 +274,7 @@ var _ = Describe("PluginsConfig", func() {
 				})
 			})
 
-			Context("when there is no matching plugin", func() {
+			When("there is no matching plugin", func() {
 				It("returns an empty plugin and false", func() {
 					plugin, exist := config.GetPluginCaseInsensitive("plugin-3")
 					Expect(plugin).To(Equal(Plugin{}))
@@ -282,7 +282,7 @@ var _ = Describe("PluginsConfig", func() {
 				})
 			})
 
-			Context("when there are multiple matching plugins", func() {
+			When("there are multiple matching plugins", func() {
 				// this should never happen
 				It("returns one of them", func() {
 					_, exist := config.GetPluginCaseInsensitive("pLuGiN-2")
@@ -354,7 +354,7 @@ var _ = Describe("PluginsConfig", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Context("when no errors are encountered", func() {
+			When("no errors are encountered", func() {
 				It("writes the plugin config to pluginHome/.cf/plugin/config.json", func() {
 					config.RemovePlugin("Diego-Enabler")
 
@@ -367,7 +367,7 @@ var _ = Describe("PluginsConfig", func() {
 				})
 			})
 
-			Context("when an error is encountered", func() {
+			When("an error is encountered", func() {
 				BeforeEach(func() {
 					pluginConfigPath := filepath.Join(homeDir, ".cf", "plugins", "config.json")
 					err := os.Remove(pluginConfigPath)
@@ -410,7 +410,7 @@ var _ = Describe("PluginsConfig", func() {
 				executeErr = config.CreatePluginHome()
 			})
 
-			Context("when it correctly writes a directory", func() {
+			When("it correctly writes a directory", func() {
 				BeforeEach(func() {
 					config.ENV.CFPluginHome = pluginHome
 				})
@@ -423,7 +423,7 @@ var _ = Describe("PluginsConfig", func() {
 				})
 			})
 
-			Context("when it fails to write a directory", func() {
+			When("it fails to write a directory", func() {
 				var tempFile string
 
 				BeforeEach(func() {
@@ -450,7 +450,7 @@ var _ = Describe("PluginsConfig", func() {
 		Describe("CalculateSHA1", func() {
 			var plugin Plugin
 
-			Context("when no errors are encountered calculating the sha1 value", func() {
+			When("no errors are encountered calculating the sha1 value", func() {
 				var file *os.File
 
 				BeforeEach(func() {
@@ -475,7 +475,7 @@ var _ = Describe("PluginsConfig", func() {
 				})
 			})
 
-			Context("when an error is encountered calculating the sha1 value", func() {
+			When("an error is encountered calculating the sha1 value", func() {
 				var dirPath string
 
 				BeforeEach(func() {
@@ -529,7 +529,7 @@ var _ = Describe("PluginsConfig", func() {
 				Expect(version.String()).To(Equal("1.2.3"))
 			})
 
-			Context("when the major, minor, and build are all 0", func() {
+			When("the major, minor, and build are all 0", func() {
 				BeforeEach(func() {
 					version = PluginVersion{
 						Major: 0,
@@ -554,7 +554,7 @@ var _ = Describe("PluginsConfig", func() {
 				Expect(cmd.CommandName()).To(Equal("some-command"))
 			})
 
-			Context("when the command name and command alias are not empty", func() {
+			When("the command name and command alias are not empty", func() {
 				BeforeEach(func() {
 					cmd = PluginCommand{Name: "some-command", Alias: "sp"}
 				})

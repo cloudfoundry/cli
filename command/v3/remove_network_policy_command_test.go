@@ -57,7 +57,7 @@ var _ = Describe("remove-network-policy Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -72,7 +72,7 @@ var _ = Describe("remove-network-policy Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
@@ -83,7 +83,7 @@ var _ = Describe("remove-network-policy Command", func() {
 			Expect(testUI.Out).To(Say(`Removing network policy for app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
 		})
 
-		Context("when the policy deletion is successful", func() {
+		When("the policy deletion is successful", func() {
 			BeforeEach(func() {
 				fakeActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
 			})
@@ -106,7 +106,7 @@ var _ = Describe("remove-network-policy Command", func() {
 			})
 		})
 
-		Context("when the policy does not exist", func() {
+		When("the policy does not exist", func() {
 			BeforeEach(func() {
 				fakeActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.PolicyDoesNotExistError{})
 			})
@@ -130,7 +130,7 @@ var _ = Describe("remove-network-policy Command", func() {
 			})
 		})
 
-		Context("when the policy deletion is not successful", func() {
+		When("the policy deletion is not successful", func() {
 			BeforeEach(func() {
 				fakeActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.ApplicationNotFoundError{Name: srcApp})
 			})

@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("orgs command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("orgs", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -24,20 +24,20 @@ var _ = Describe("orgs command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "orgs")
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var username string
 
 		BeforeEach(func() {
 			username = helpers.LoginCF()
 		})
 
-		Context("when there are multiple orgs", func() {
+		When("there are multiple orgs", func() {
 			var orgName1, orgName2, orgName3, orgName4, orgName5 string
 
 			BeforeEach(func() {

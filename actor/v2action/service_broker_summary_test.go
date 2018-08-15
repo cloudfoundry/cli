@@ -38,8 +38,8 @@ var _ = Describe("Service Broker Summary Actions", func() {
 			summaries, warnings, executeErr = actor.GetServiceBrokerSummaries(broker, service, organization)
 		})
 
-		Context("when no broker, service, organization is specified", func() {
-			Context("when fetching the service broker is successful", func() {
+		When("no broker, service, organization is specified", func() {
+			When("fetching the service broker is successful", func() {
 				BeforeEach(func() {
 					broker = ""
 					service = ""
@@ -54,7 +54,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 						nil)
 				})
 
-				Context("when there broker contains no services", func() {
+				When("there broker contains no services", func() {
 					It("returns expected Service Brokers", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("get-brokers-warning"))
@@ -78,8 +78,8 @@ var _ = Describe("Service Broker Summary Actions", func() {
 					})
 				})
 
-				Context("when the brokers contain services", func() {
-					Context("when fetching the services is successful", func() {
+				When("the brokers contain services", func() {
+					When("fetching the services is successful", func() {
 						BeforeEach(func() {
 							fakeCloudControllerClient.GetServicesReturnsOnCall(0,
 								[]ccv2.Service{
@@ -134,9 +134,9 @@ var _ = Describe("Service Broker Summary Actions", func() {
 							}))
 						})
 
-						Context("when the services contain plans", func() {
-							Context("when fetching service plans is successful", func() {
-								Context("when all plans are public", func() {
+						When("the services contain plans", func() {
+							When("fetching service plans is successful", func() {
+								When("all plans are public", func() {
 									BeforeEach(func() {
 										fakeCloudControllerClient.GetServicePlansReturnsOnCall(0,
 											[]ccv2.ServicePlan{
@@ -197,7 +197,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 									})
 								})
 
-								Context("when there are non-public services plans", func() {
+								When("there are non-public services plans", func() {
 									BeforeEach(func() {
 										// Gets the service plans
 										fakeCloudControllerClient.GetServicePlansReturnsOnCall(0,
@@ -209,7 +209,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 											nil)
 									})
 
-									Context("when fetching orgs and service plan visibilities is successful", func() {
+									When("fetching orgs and service plan visibilities is successful", func() {
 										BeforeEach(func() {
 											// Gets the visibilities for the plans
 											fakeCloudControllerClient.GetServicePlanVisibilitiesReturnsOnCall(0,
@@ -285,7 +285,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 										})
 									})
 
-									Context("when fetching the service plan visibilities fails", func() {
+									When("fetching the service plan visibilities fails", func() {
 										BeforeEach(func() {
 											// Gets the visibilities for the plans
 											fakeCloudControllerClient.GetServicePlanVisibilitiesReturnsOnCall(0,
@@ -305,7 +305,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 										})
 									})
 
-									Context("when fetching the organizations fails", func() {
+									When("fetching the organizations fails", func() {
 										BeforeEach(func() {
 											fakeCloudControllerClient.GetServicePlanVisibilitiesReturnsOnCall(0,
 												[]ccv2.ServicePlanVisibility{
@@ -336,7 +336,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 							})
 						})
 
-						Context("when fetching service plans fails", func() {
+						When("fetching service plans fails", func() {
 							BeforeEach(func() {
 								fakeCloudControllerClient.GetServicePlansReturnsOnCall(0,
 									nil,
@@ -351,7 +351,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 						})
 					})
 
-					Context("when fetching services fails", func() {
+					When("fetching services fails", func() {
 						BeforeEach(func() {
 							fakeCloudControllerClient.GetServicesReturnsOnCall(0,
 								nil,
@@ -367,7 +367,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 				})
 			})
 
-			Context("when fetching service brokers fails", func() {
+			When("fetching service brokers fails", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetServiceBrokersReturns(nil, ccv2.Warnings{"test-warning"}, errors.New("explode"))
 				})
@@ -379,7 +379,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 			})
 		})
 
-		Context("when only a service broker is specified", func() {
+		When("only a service broker is specified", func() {
 			BeforeEach(func() {
 				broker = "broker-1"
 				service = ""

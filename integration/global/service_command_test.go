@@ -17,7 +17,7 @@ var _ = Describe("service command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("service", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -33,13 +33,13 @@ var _ = Describe("service command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "service", "some-service")
 		})
 	})
 
-	Context("when an api is targeted, the user is logged in, and an org and space are targeted", func() {
+	When("an api is targeted, the user is logged in, and an org and space are targeted", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -58,7 +58,7 @@ var _ = Describe("service command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the service instance does not exist", func() {
+		When("the service instance does not exist", func() {
 			It("returns an error and exits 1", func() {
 				session := helpers.CF("service", serviceInstanceName)
 				Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
@@ -69,8 +69,8 @@ var _ = Describe("service command", func() {
 			})
 		})
 
-		Context("when the service instance belongs to this space", func() {
-			Context("when the service instance is a user provided service instance", func() {
+		When("the service instance belongs to this space", func() {
+			When("the service instance is a user provided service instance", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("create-user-provided-service", serviceInstanceName)).Should(Exit(0))
 				})
@@ -79,7 +79,7 @@ var _ = Describe("service command", func() {
 					Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
 				})
 
-				Context("when the --guid flag is provided", func() {
+				When("the --guid flag is provided", func() {
 					It("displays the service instance GUID", func() {
 						session := helpers.CF("service", serviceInstanceName, "--guid")
 						Consistently(session).ShouldNot(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
@@ -88,7 +88,7 @@ var _ = Describe("service command", func() {
 					})
 				})
 
-				Context("when no apps are bound to the service instance", func() {
+				When("no apps are bound to the service instance", func() {
 					It("displays service instance info", func() {
 						session := helpers.CF("service", serviceInstanceName)
 						Eventually(session).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
@@ -102,7 +102,7 @@ var _ = Describe("service command", func() {
 					})
 				})
 
-				Context("when apps are bound to the service instance", func() {
+				When("apps are bound to the service instance", func() {
 					var (
 						appName1 string
 						appName2 string
@@ -123,7 +123,7 @@ var _ = Describe("service command", func() {
 						Eventually(helpers.CF("delete", appName2, "-f")).Should(Exit(0))
 					})
 
-					Context("when the service bindings do not have binding names", func() {
+					When("the service bindings do not have binding names", func() {
 						BeforeEach(func() {
 							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
 							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
@@ -150,7 +150,7 @@ var _ = Describe("service command", func() {
 						})
 					})
 
-					Context("when the service bindings have binding names", func() {
+					When("the service bindings have binding names", func() {
 						var (
 							bindingName1 string
 							bindingName2 string
@@ -186,7 +186,7 @@ var _ = Describe("service command", func() {
 					})
 				})
 
-				Context("when we update the user provided service instance with tags", func() {
+				When("we update the user provided service instance with tags", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionUserProvidedServiceTagsV2)
 						Eventually(helpers.CF("update-user-provided-service", serviceInstanceName,
@@ -202,7 +202,7 @@ var _ = Describe("service command", func() {
 				})
 			})
 
-			Context("when a user-provided service instance is created with tags", func() {
+			When("a user-provided service instance is created with tags", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionUserProvidedServiceTagsV2)
 					Eventually(helpers.CF("create-user-provided-service", serviceInstanceName, "-t", "database, email")).Should(Exit(0))
@@ -216,7 +216,7 @@ var _ = Describe("service command", func() {
 				})
 			})
 
-			Context("when the service instance is a managed service instance", func() {
+			When("the service instance is a managed service instance", func() {
 				var (
 					domain      string
 					service     string
@@ -243,7 +243,7 @@ var _ = Describe("service command", func() {
 					broker.Destroy()
 				})
 
-				Context("when the --guid flag is provided", func() {
+				When("the --guid flag is provided", func() {
 					It("displays the service instance GUID", func() {
 						session := helpers.CF("service", serviceInstanceName, "--guid")
 						Consistently(session).ShouldNot(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
@@ -252,7 +252,7 @@ var _ = Describe("service command", func() {
 					})
 				})
 
-				Context("when apps are bound to the service instance", func() {
+				When("apps are bound to the service instance", func() {
 					var (
 						appName1 string
 						appName2 string
@@ -273,7 +273,7 @@ var _ = Describe("service command", func() {
 						Eventually(helpers.CF("delete", appName2, "-f")).Should(Exit(0))
 					})
 
-					Context("when the service bindings do not have binding names", func() {
+					When("the service bindings do not have binding names", func() {
 						BeforeEach(func() {
 							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
 							Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
@@ -314,7 +314,7 @@ var _ = Describe("service command", func() {
 						})
 					})
 
-					Context("when the service bindings have binding names", func() {
+					When("the service bindings have binding names", func() {
 						var (
 							bindingName1 string
 							bindingName2 string
@@ -363,7 +363,7 @@ var _ = Describe("service command", func() {
 						})
 					})
 
-					Context("when the binding has a state", func() {
+					When("the binding has a state", func() {
 						var (
 							bindingName1 string
 							bindingName2 string
@@ -435,7 +435,7 @@ var _ = Describe("service command", func() {
 		})
 
 		Context("service has no type of shares", func() {
-			Context("when the service is shareable", func() {
+			When("the service is shareable", func() {
 				It("should not display shared from or shared with information, but DOES display not currently shared info", func() {
 					session := helpers.CF("service", serviceInstanceName)
 					Eventually(session).Should(Say("This service is not currently shared."))
@@ -456,8 +456,8 @@ var _ = Describe("service command", func() {
 				Eventually(helpers.CF("share-service", serviceInstanceName, "-s", targetSpaceName)).Should(Exit(0))
 			})
 
-			Context("when the user is targeted to the source space", func() {
-				Context("when there are externally bound apps to the service", func() {
+			When("the user is targeted to the source space", func() {
+				When("there are externally bound apps to the service", func() {
 					BeforeEach(func() {
 						helpers.TargetOrgAndSpace(orgName, targetSpaceName)
 						helpers.WithHelloWorldApp(func(appDir string) {
@@ -481,7 +481,7 @@ var _ = Describe("service command", func() {
 					})
 				})
 
-				Context("when there are no externally bound apps to the service", func() {
+				When("there are no externally bound apps to the service", func() {
 					It("should NOT display the number of bound apps next to the target space name", func() {
 						session := helpers.CF("service", serviceInstanceName)
 						Eventually(session).Should(Say("shared with spaces:"))
@@ -490,7 +490,7 @@ var _ = Describe("service command", func() {
 					})
 				})
 
-				Context("when the service is no longer shareable", func() {
+				When("the service is no longer shareable", func() {
 					Context("due to global settings", func() {
 						BeforeEach(func() {
 							helpers.DisableFeatureFlag("service_instance_sharing")
@@ -540,7 +540,7 @@ var _ = Describe("service command", func() {
 				})
 			})
 
-			Context("when the user is targeted to the target space", func() {
+			When("the user is targeted to the target space", func() {
 				var appName1, appName2 string
 
 				BeforeEach(func() {
@@ -557,7 +557,7 @@ var _ = Describe("service command", func() {
 					})
 				})
 
-				Context("when there are bound apps to the service with no binding names", func() {
+				When("there are bound apps to the service with no binding names", func() {
 					It("should display the bound apps in alphanumeric sort order", func() {
 						session := helpers.CF("service", serviceInstanceName)
 						Eventually(session).Should(Say("shared from org/space:\\s+%s / %s", orgName, sourceSpaceName))

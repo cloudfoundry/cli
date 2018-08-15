@@ -13,7 +13,7 @@ var _ = Describe("table alignment", func() {
 		helpers.LoginCF()
 	})
 
-	Context("when output is in English", func() {
+	When("output is in English", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
@@ -33,7 +33,7 @@ var _ = Describe("table alignment", func() {
 		})
 	})
 
-	Context("when output is in language with multibyte characters", func() {
+	When("output is in language with multibyte characters", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)

@@ -26,7 +26,7 @@ var _ = Describe("FilteredString", func() {
 	)
 
 	Describe("UnmarshalJSON", func() {
-		Context("when a string value is provided", func() {
+		When("a string value is provided", func() {
 			It("parses a out a valid FilteredString", func() {
 				err := nullString.UnmarshalJSON([]byte(`"some-string"`))
 				Expect(err).ToNot(HaveOccurred())
@@ -34,7 +34,7 @@ var _ = Describe("FilteredString", func() {
 			})
 		})
 
-		Context("when an empty string value is provided", func() {
+		When("an empty string value is provided", func() {
 			It("parses a out a valid FilteredString", func() {
 				err := nullString.UnmarshalJSON([]byte(`""`))
 				Expect(err).ToNot(HaveOccurred())
@@ -42,7 +42,7 @@ var _ = Describe("FilteredString", func() {
 			})
 		})
 
-		Context("when an empty JSON is provided", func() {
+		When("an empty JSON is provided", func() {
 			It("parses a out a valid FilteredString", func() {
 				err := nullString.UnmarshalJSON([]byte("null"))
 				Expect(err).ToNot(HaveOccurred())
@@ -52,7 +52,7 @@ var _ = Describe("FilteredString", func() {
 	})
 
 	Describe("MarshalJSON", func() {
-		Context("when a FilteredString is set to some string", func() {
+		When("a FilteredString is set to some string", func() {
 			It("returns a string", func() {
 				nullString = FilteredString{Value: "some-string", IsSet: true}
 				marshalled, err := nullString.MarshalJSON()
@@ -61,7 +61,7 @@ var _ = Describe("FilteredString", func() {
 			})
 		})
 
-		Context("when a FilteredString is set to an empty string", func() {
+		When("a FilteredString is set to an empty string", func() {
 			It("returns an empty string", func() {
 				nullString = FilteredString{Value: "", IsSet: true}
 				marshalled, err := nullString.MarshalJSON()
@@ -70,7 +70,7 @@ var _ = Describe("FilteredString", func() {
 			})
 		})
 
-		Context("when a FilteredString is not set", func() {
+		When("a FilteredString is not set", func() {
 			It("returns null", func() {
 				nullString = FilteredString{Value: "", IsSet: false}
 				marshalled, err := nullString.MarshalJSON()

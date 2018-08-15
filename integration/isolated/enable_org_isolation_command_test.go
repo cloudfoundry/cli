@@ -22,7 +22,7 @@ var _ = Describe("enable-org-isolation command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("enable-org-isolation", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -36,12 +36,12 @@ var _ = Describe("enable-org-isolation command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "enable-org-isolation", "org-name", "segment-name")
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -60,7 +60,7 @@ var _ = Describe("enable-org-isolation command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -80,7 +80,7 @@ var _ = Describe("enable-org-isolation command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -88,7 +88,7 @@ var _ = Describe("enable-org-isolation command", func() {
 			userName, _ = helpers.GetCredentials()
 		})
 
-		Context("when the isolation segment does not exist", func() {
+		When("the isolation segment does not exist", func() {
 			It("fails with isolation segment not found message", func() {
 				session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)
 				Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s...", isolationSegmentName, organizationName, userName))
@@ -98,12 +98,12 @@ var _ = Describe("enable-org-isolation command", func() {
 			})
 		})
 
-		Context("when the isolation segment exists", func() {
+		When("the isolation segment exists", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 			})
 
-			Context("when the organization does not exist", func() {
+			When("the organization does not exist", func() {
 				It("fails with organization not found message", func() {
 					session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)
 					Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s...", isolationSegmentName, organizationName, userName))
@@ -113,7 +113,7 @@ var _ = Describe("enable-org-isolation command", func() {
 				})
 			})
 
-			Context("when the organization exists", func() {
+			When("the organization exists", func() {
 				BeforeEach(func() {
 					helpers.CreateOrg(organizationName)
 					helpers.TargetOrg(organizationName)
@@ -130,7 +130,7 @@ var _ = Describe("enable-org-isolation command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				Context("when the isolation is already enabled", func() {
+				When("the isolation is already enabled", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)).Should(Exit(0))
 					})

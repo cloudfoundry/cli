@@ -18,7 +18,7 @@ var _ = Describe("resource matching", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when the app has all of it's resources matched", func() {
+	When("the app has all of it's resources matched", func() {
 		It("does not display the progress bar", func() {
 			helpers.WithNoResourceMatchedApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")

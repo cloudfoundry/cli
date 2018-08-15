@@ -32,7 +32,7 @@ var _ = Describe("New Clients", func() {
 		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 	})
 
-	Context("when the api endpoint is not set", func() {
+	When("the api endpoint is not set", func() {
 		It("returns the NoAPISetError", func() {
 			_, _, err := NewClients(fakeConfig, testUI, true, "")
 			Expect(err).To(MatchError(translatableerror.NoAPISetError{
@@ -41,7 +41,7 @@ var _ = Describe("New Clients", func() {
 		})
 	})
 
-	Context("when hitting the target returns an error", func() {
+	When("hitting the target returns an error", func() {
 		var server *Server
 		BeforeEach(func() {
 			server = NewTLSServer()
@@ -54,7 +54,7 @@ var _ = Describe("New Clients", func() {
 			server.Close()
 		})
 
-		Context("when the error is a cloud controller request error", func() {
+		When("the error is a cloud controller request error", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetReturns("https://127.0.0.1:9876")
 			})
@@ -65,7 +65,7 @@ var _ = Describe("New Clients", func() {
 			})
 		})
 
-		Context("when the error is a cloud controller api not found error", func() {
+		When("the error is a cloud controller api not found error", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -81,7 +81,7 @@ var _ = Describe("New Clients", func() {
 			})
 		})
 
-		Context("when the error is a V3UnexpectedResponseError and the status code is 404", func() {
+		When("the error is a V3UnexpectedResponseError and the status code is 404", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -98,7 +98,7 @@ var _ = Describe("New Clients", func() {
 			})
 		})
 
-		Context("when the error is generic and the body is valid json", func() {
+		When("the error is generic and the body is valid json", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -115,7 +115,7 @@ var _ = Describe("New Clients", func() {
 		})
 	})
 
-	Context("when the DialTimeout is set", func() {
+	When("the DialTimeout is set", func() {
 		BeforeEach(func() {
 			if runtime.GOOS == "windows" {
 				Skip("due to timing issues on windows")
@@ -130,7 +130,7 @@ var _ = Describe("New Clients", func() {
 		})
 	})
 
-	Context("when not targetting", func() {
+	When("not targetting", func() {
 		It("does not target and returns no UAA client", func() {
 			ccClient, uaaClient, err := NewClients(fakeConfig, testUI, false, "")
 			Expect(err).ToNot(HaveOccurred())

@@ -23,7 +23,7 @@ var _ = Describe("logout command", func() {
 		})
 	})
 
-	Context("when there's user information set in the config", func() {
+	When("there's user information set in the config", func() {
 		BeforeEach(func() {
 			helpers.SetupCF(ReadOnlyOrg, ReadOnlySpace)
 		})

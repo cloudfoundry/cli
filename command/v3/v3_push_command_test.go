@@ -142,7 +142,7 @@ var _ = Describe("v3-push Command", func() {
 			executeErr = cmd.Execute(nil)
 		})
 
-		Context("when the API version is below the minimum", func() {
+		When("the API version is below the minimum", func() {
 			BeforeEach(func() {
 				fakeVersionActor.CloudControllerAPIVersionReturns("0.0.0")
 			})
@@ -155,12 +155,12 @@ var _ = Describe("v3-push Command", func() {
 			})
 		})
 
-		Context("when the API version is met", func() {
+		When("the API version is met", func() {
 			BeforeEach(func() {
 				fakeVersionActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			})
 
-			Context("when checking target fails", func() {
+			When("checking target fails", func() {
 				BeforeEach(func() {
 					fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 				})
@@ -175,7 +175,7 @@ var _ = Describe("v3-push Command", func() {
 				})
 			})
 
-			Context("when checking target fails because the user is not logged in", func() {
+			When("checking target fails because the user is not logged in", func() {
 				BeforeEach(func() {
 					fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 				})
@@ -190,7 +190,7 @@ var _ = Describe("v3-push Command", func() {
 				})
 			})
 
-			Context("when the user is logged in, and org and space are targeted", func() {
+			When("the user is logged in, and org and space are targeted", func() {
 				BeforeEach(func() {
 					fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
 
@@ -208,7 +208,7 @@ var _ = Describe("v3-push Command", func() {
 					Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 				})
 
-				Context("when getting app settings is successful", func() {
+				When("getting app settings is successful", func() {
 					BeforeEach(func() {
 						fakeActor.ConceptualizeReturns(
 							[]pushaction.PushState{
@@ -298,7 +298,7 @@ var _ = Describe("v3-push Command", func() {
 							}, pushaction.PushState{})
 						})
 
-						Context("when there are no logging errors", func() {
+						When("there are no logging errors", func() {
 							BeforeEach(func() {
 								fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
 									[]LogEvent{
@@ -328,7 +328,7 @@ var _ = Describe("v3-push Command", func() {
 							})
 						})
 
-						Context("when there are logging errors", func() {
+						When("there are logging errors", func() {
 							BeforeEach(func() {
 								fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
 									[]LogEvent{
@@ -354,7 +354,7 @@ var _ = Describe("v3-push Command", func() {
 						})
 					})
 
-					Context("when the app is successfully actualized", func() {
+					When("the app is successfully actualized", func() {
 						BeforeEach(func() {
 							fakeActor.ActualizeStub = FillInValues([]Step{
 								{},
@@ -364,7 +364,7 @@ var _ = Describe("v3-push Command", func() {
 						// It("outputs flavor text prior to generating app configuration", func() {
 						// })
 
-						Context("when restarting the app succeeds", func() {
+						When("restarting the app succeeds", func() {
 							BeforeEach(func() {
 								fakeVersionActor.RestartApplicationReturns(v3action.Warnings{"some-restart-warning"}, nil)
 							})
@@ -376,7 +376,7 @@ var _ = Describe("v3-push Command", func() {
 								Expect(testUI.Err).To(Say("some-restart-warning"))
 							})
 
-							Context("when polling the restart succeeds", func() {
+							When("polling the restart succeeds", func() {
 								BeforeEach(func() {
 									fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
 										warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
@@ -392,7 +392,7 @@ var _ = Describe("v3-push Command", func() {
 								})
 							})
 
-							Context("when polling the start fails", func() {
+							When("polling the start fails", func() {
 								BeforeEach(func() {
 									fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
 										warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
@@ -408,7 +408,7 @@ var _ = Describe("v3-push Command", func() {
 								})
 							})
 
-							Context("when polling times out", func() {
+							When("polling times out", func() {
 								BeforeEach(func() {
 									fakeVersionActor.PollStartReturns(actionerror.StartupTimeoutError{})
 								})
@@ -422,7 +422,7 @@ var _ = Describe("v3-push Command", func() {
 							})
 						})
 
-						Context("when restarting the app fails", func() {
+						When("restarting the app fails", func() {
 							BeforeEach(func() {
 								fakeVersionActor.RestartApplicationReturns(v3action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
 							})
@@ -434,7 +434,7 @@ var _ = Describe("v3-push Command", func() {
 						})
 					})
 
-					Context("when actualizing fails", func() {
+					When("actualizing fails", func() {
 						BeforeEach(func() {
 							fakeActor.ActualizeStub = FillInValues([]Step{
 								{
@@ -449,7 +449,7 @@ var _ = Describe("v3-push Command", func() {
 					})
 				})
 
-				Context("when getting app settings returns an error", func() {
+				When("getting app settings returns an error", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -463,7 +463,7 @@ var _ = Describe("v3-push Command", func() {
 					})
 				})
 
-				Context("when app path is specified", func() {
+				When("app path is specified", func() {
 					BeforeEach(func() {
 						cmd.AppPath = "some/app/path"
 					})
@@ -479,7 +479,7 @@ var _ = Describe("v3-push Command", func() {
 					})
 				})
 
-				Context("when buildpack is specified", func() {
+				When("buildpack is specified", func() {
 					BeforeEach(func() {
 						cmd.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
 					})
@@ -510,7 +510,7 @@ var _ = Describe("v3-push Command", func() {
 				Expect(commandLineSettingsErr).ToNot(HaveOccurred())
 			})
 
-			// Context("when general app settings are given", func() {
+			// When("general app settings are given", func() {
 			// 	BeforeEach(func() {
 			// 		cmd.Buildpacks = []string{"some-buildpack"}
 			// 		cmd.Command = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "echo foo bar baz"}}
@@ -536,7 +536,7 @@ var _ = Describe("v3-push Command", func() {
 			// })
 
 			// Context("route related flags", func() {
-			// 	Context("when given customed route settings", func() {
+			// 	When("given customed route settings", func() {
 			// 		BeforeEach(func() {
 			// 			cmd.Domain = "some-domain"
 			// 		})
@@ -546,7 +546,7 @@ var _ = Describe("v3-push Command", func() {
 			// 		})
 			// 	})
 
-			// 	Context("when --hostname is given", func() {
+			// 	When("--hostname is given", func() {
 			// 		BeforeEach(func() {
 			// 			cmd.Hostname = "some-hostname"
 			// 		})
@@ -556,7 +556,7 @@ var _ = Describe("v3-push Command", func() {
 			// 		})
 			// 	})
 
-			// 	Context("when --no-hostname is given", func() {
+			// 	When("--no-hostname is given", func() {
 			// 		BeforeEach(func() {
 			// 			cmd.NoHostname = true
 			// 		})
@@ -566,7 +566,7 @@ var _ = Describe("v3-push Command", func() {
 			// 		})
 			// 	})
 
-			// 	Context("when --random-route is given", func() {
+			// 	When("--random-route is given", func() {
 			// 		BeforeEach(func() {
 			// 			cmd.RandomRoute = true
 			// 		})
@@ -577,7 +577,7 @@ var _ = Describe("v3-push Command", func() {
 			// 		})
 			// 	})
 
-			// 	Context("when --route-path is given", func() {
+			// 	When("--route-path is given", func() {
 			// 		BeforeEach(func() {
 			// 			cmd.RoutePath = flag.RoutePath{Path: "/some-path"}
 			// 		})
@@ -588,7 +588,7 @@ var _ = Describe("v3-push Command", func() {
 			// 		})
 			// 	})
 
-			// 	Context("when --no-route is given", func() {
+			// 	When("--no-route is given", func() {
 			// 		BeforeEach(func() {
 			// 			cmd.NoRoute = true
 			// 		})
@@ -600,7 +600,7 @@ var _ = Describe("v3-push Command", func() {
 			// })
 
 			Context("app bits", func() {
-				Context("when -p flag is given", func() {
+				When("-p flag is given", func() {
 					BeforeEach(func() {
 						cmd.AppPath = "some-directory-path"
 					})
@@ -616,7 +616,7 @@ var _ = Describe("v3-push Command", func() {
 					Expect(settings.CurrentDirectory).To(Equal(pwd))
 				})
 
-				// Context("when the -o flag is given", func() {
+				// When("the -o flag is given", func() {
 				// 	BeforeEach(func() {
 				// 		cmd.DockerImage.Path = "some-docker-image-path"
 				// 	})

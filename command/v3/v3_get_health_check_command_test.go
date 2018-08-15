@@ -67,7 +67,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -84,7 +84,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
@@ -101,7 +101,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
+	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -114,7 +114,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		})
 	})
 
-	Context("when getting the application process health checks returns an error", func() {
+	When("getting the application process health checks returns an error", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -133,7 +133,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		})
 	})
 
-	Context("when app has no processes", func() {
+	When("app has no processes", func() {
 		BeforeEach(func() {
 			fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceReturns(
 				[]v3action.ProcessHealthCheck{},
@@ -155,7 +155,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		})
 	})
 
-	Context("when app has processes", func() {
+	When("app has processes", func() {
 		BeforeEach(func() {
 			appProcessHealthChecks := []v3action.ProcessHealthCheck{
 				{ProcessType: constant.ProcessTypeWeb, HealthCheckType: "http", Endpoint: "/foo", InvocationTimeout: 10},

@@ -59,7 +59,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -72,7 +72,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when checking target fails", func() {
+	When("checking target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -87,7 +87,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when fetching the user fails", func() {
+	When("fetching the user fails", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("some-error"))
 		})
@@ -97,7 +97,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	When("the user is logged in", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
@@ -105,7 +105,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 		})
 
-		Context("when the org lookup is unsuccessful", func() {
+		When("the org lookup is unsuccessful", func() {
 			BeforeEach(func() {
 				fakeActorV2.GetOrganizationByNameReturns(v2action.Organization{}, v2action.Warnings{"I am a warning", "I am also a warning"}, actionerror.OrganizationNotFoundError{Name: org})
 			})
@@ -117,7 +117,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 			})
 		})
 
-		Context("when the org lookup is successful", func() {
+		When("the org lookup is successful", func() {
 			BeforeEach(func() {
 				fakeActorV2.GetOrganizationByNameReturns(v2action.Organization{
 					Name: org,
@@ -125,7 +125,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 				}, v2action.Warnings{"org-warning-1", "org-warning-2"}, nil)
 			})
 
-			Context("when the isolation segment lookup is unsuccessful", func() {
+			When("the isolation segment lookup is unsuccessful", func() {
 				BeforeEach(func() {
 					fakeActor.GetIsolationSegmentByNameReturns(v3action.IsolationSegment{}, v3action.Warnings{"iso-seg-warning-1", "iso-seg-warning-2"}, actionerror.IsolationSegmentNotFoundError{Name: isolationSegment})
 				})
@@ -139,7 +139,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 				})
 			})
 
-			Context("when the entitlement is successful", func() {
+			When("the entitlement is successful", func() {
 				BeforeEach(func() {
 					fakeActor.GetIsolationSegmentByNameReturns(v3action.IsolationSegment{GUID: "some-iso-guid"}, v3action.Warnings{"iso-seg-warning-1", "iso-seg-warning-2"}, nil)
 					fakeActor.SetOrganizationDefaultIsolationSegmentReturns(v3action.Warnings{"entitlement-warning", "banana"}, nil)
@@ -166,7 +166,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 					Expect(isoSegGUID).To(Equal("some-iso-guid"))
 				})
 
-				Context("when the entitlement errors", func() {
+				When("the entitlement errors", func() {
 					BeforeEach(func() {
 						fakeActor.SetOrganizationDefaultIsolationSegmentReturns(v3action.Warnings{"entitlement-warning", "banana"}, actionerror.IsolationSegmentNotFoundError{Name: isolationSegment})
 					})

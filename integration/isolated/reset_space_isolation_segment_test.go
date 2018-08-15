@@ -22,7 +22,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("reset-space-isolation-segment", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -36,8 +36,8 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
+	When("the environment is not setup correctly", func() {
+		When("no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
 			})
@@ -50,7 +50,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -69,7 +69,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -88,7 +88,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 			})
 		})
 
-		Context("when not logged in", func() {
+		When("not logged in", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -101,7 +101,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 			})
 		})
 
-		Context("when there is no org set", func() {
+		When("there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
 			})
@@ -115,7 +115,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -129,7 +129,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 			helpers.QuickDeleteOrg(organizationName)
 		})
 
-		Context("when the space does not exist", func() {
+		When("the space does not exist", func() {
 			It("fails with space not found message", func() {
 				session := helpers.CF("reset-space-isolation-segment", spaceName)
 				Eventually(session).Should(Say("Resetting isolation segment assignment of space %s in org %s as %s...", spaceName, organizationName, userName))
@@ -139,7 +139,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the space exists", func() {
+		When("the space exists", func() {
 			BeforeEach(func() {
 				helpers.CreateSpace(spaceName)
 				isolationSegmentName := helpers.NewIsolationSegmentName()
@@ -148,7 +148,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 				Eventually(helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)).Should(Exit(0))
 			})
 
-			Context("when there is no default org isolation segment", func() {
+			When("there is no default org isolation segment", func() {
 				It("resets the space isolation segment to the shared isolation segment", func() {
 					session := helpers.CF("reset-space-isolation-segment", spaceName)
 					Eventually(session).Should(Say("Resetting isolation segment assignment of space %s in org %s as %s...", spaceName, organizationName, userName))
@@ -164,7 +164,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 				})
 			})
 
-			Context("when there is a default org isolation segment", func() {
+			When("there is a default org isolation segment", func() {
 				var orgIsolationSegmentName string
 
 				BeforeEach(func() {

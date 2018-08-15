@@ -24,14 +24,14 @@ var _ = Describe("push with a simple manifest and flags", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when the app is new", func() {
-		Context("when pushing a single app from the manifest", func() {
-			Context("when the '-f' flag is provided", func() {
+	When("the app is new", func() {
+		When("pushing a single app from the manifest", func() {
+			When("the '-f' flag is provided", func() {
 				var (
 					pathToManifest string // Can be a filepath or a directory with a manifest.
 				)
 
-				Context("when the manifest file is passed", func() {
+				When("the manifest file is passed", func() {
 					BeforeEach(func() {
 						tmpFile, err := ioutil.TempFile("", "combination-manifest")
 						Expect(err).ToNot(HaveOccurred())
@@ -43,7 +43,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 						Expect(os.Remove(pathToManifest)).ToNot(HaveOccurred())
 					})
 
-					Context("when pushing the app from the current directory", func() {
+					When("pushing the app from the current directory", func() {
 						BeforeEach(func() {
 							helpers.WriteManifest(pathToManifest, map[string]interface{}{
 								"applications": []map[string]string{
@@ -78,7 +78,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 						})
 					})
 
-					Context("when the path to the application is provided in the manifest", func() {
+					When("the path to the application is provided in the manifest", func() {
 						It("pushes the app from the path specified in the manifest and uses the manifest for app settings", func() {
 							helpers.WithHelloWorldApp(func(dir string) {
 								helpers.WriteManifest(pathToManifest, map[string]interface{}{
@@ -106,7 +106,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 					})
 				})
 
-				Context("when a directory is passed", func() {
+				When("a directory is passed", func() {
 					var (
 						ymlFile  string
 						yamlFile string
@@ -122,7 +122,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 						Expect(os.RemoveAll(pathToManifest)).ToNot(HaveOccurred())
 					})
 
-					Context("when the directory contains a 'manifest.yml' file", func() {
+					When("the directory contains a 'manifest.yml' file", func() {
 						BeforeEach(func() {
 							ymlFile = filepath.Join(pathToManifest, "manifest.yml")
 							helpers.WriteManifest(ymlFile, map[string]interface{}{
@@ -157,7 +157,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 							Eventually(session).Should(Exit(0))
 						})
 					})
-					Context("when the directory contains a 'manifest.yaml' file", func() {
+					When("the directory contains a 'manifest.yaml' file", func() {
 						BeforeEach(func() {
 							yamlFile = filepath.Join(pathToManifest, "manifest.yaml")
 							helpers.WriteManifest(yamlFile, map[string]interface{}{
@@ -193,7 +193,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 						})
 					})
 
-					Context("when the directory contains both a 'manifest.yml' file and a 'manifest.yaml' file", func() {
+					When("the directory contains both a 'manifest.yml' file and a 'manifest.yaml' file", func() {
 						BeforeEach(func() {
 							ymlFile = filepath.Join(pathToManifest, "manifest.yml")
 							helpers.WriteManifest(ymlFile, map[string]interface{}{
@@ -239,7 +239,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 						})
 					})
 
-					Context("when the directory contains no manifest file", func() {
+					When("the directory contains no manifest file", func() {
 						It("returns a no manifest file error", func() {
 							helpers.WithHelloWorldApp(func(dir string) {
 								session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", pathToManifest, "--no-start")
@@ -313,7 +313,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 				})
 			})
 
-			Context("when the --no-manifest flag is passed", func() {
+			When("the --no-manifest flag is passed", func() {
 				It("does not use the provided manifest", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -346,7 +346,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 				})
 			})
 
-			Context("when the manifest contains 'routes'", func() {
+			When("the manifest contains 'routes'", func() {
 				var manifestContents map[string]interface{}
 
 				BeforeEach(func() {
@@ -363,7 +363,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 					}
 				})
 
-				Context("when the -d flag is provided", func() {
+				When("the -d flag is provided", func() {
 					It("returns an error message and exits 1", func() {
 						helpers.WithHelloWorldApp(func(dir string) {
 							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifestContents)
@@ -376,7 +376,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 					})
 				})
 
-				Context("when the --hostname flag is provided", func() {
+				When("the --hostname flag is provided", func() {
 					It("returns an error message and exits 1", func() {
 						helpers.WithHelloWorldApp(func(dir string) {
 							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifestContents)
@@ -389,7 +389,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 					})
 				})
 
-				Context("when the -n flag is provided", func() {
+				When("the -n flag is provided", func() {
 					It("returns an error message and exits 1", func() {
 						helpers.WithHelloWorldApp(func(dir string) {
 							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifestContents)
@@ -402,7 +402,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 					})
 				})
 
-				Context("when the --no-hostname flag is provided", func() {
+				When("the --no-hostname flag is provided", func() {
 					It("returns an error message and exits 1", func() {
 						helpers.WithHelloWorldApp(func(dir string) {
 							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifestContents)
@@ -415,7 +415,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 					})
 				})
 
-				Context("when the --route-path flag is provided", func() {
+				When("the --route-path flag is provided", func() {
 					It("returns an error message and exits 1", func() {
 						helpers.WithHelloWorldApp(func(dir string) {
 							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifestContents)
@@ -430,7 +430,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 			})
 		})
 
-		Context("when pushing multiple apps from the manifest", func() {
+		When("pushing multiple apps from the manifest", func() {
 			Context("manifest contains multiple apps and '--no-start' is provided", func() {
 				var appName1, appName2 string
 

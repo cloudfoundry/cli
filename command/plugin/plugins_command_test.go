@@ -40,7 +40,7 @@ var _ = Describe("plugins Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when there are no plugins installed", func() {
+	When("there are no plugins installed", func() {
 		It("displays the empty table", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 
@@ -52,7 +52,7 @@ var _ = Describe("plugins Command", func() {
 			Expect(testUI.Out).ToNot(Say("[A-Za-z0-9]+"))
 		})
 
-		Context("when the --checksum flag is provided", func() {
+		When("the --checksum flag is provided", func() {
 			BeforeEach(func() {
 				cmd.Checksum = true
 			})
@@ -69,7 +69,7 @@ var _ = Describe("plugins Command", func() {
 
 	})
 
-	Context("when there are plugins installed", func() {
+	When("there are plugins installed", func() {
 		var plugins []configv3.Plugin
 
 		BeforeEach(func() {
@@ -129,7 +129,7 @@ var _ = Describe("plugins Command", func() {
 			Expect(testUI.Out).To(Say("Use 'faceman repo-plugins' to list plugins in registered repos available to install\\."))
 		})
 
-		Context("when the --checksum flag is provided", func() {
+		When("the --checksum flag is provided", func() {
 			var (
 				file *os.File
 			)
@@ -166,12 +166,12 @@ var _ = Describe("plugins Command", func() {
 			})
 		})
 
-		Context("when the --outdated flag is provided", func() {
+		When("the --outdated flag is provided", func() {
 			BeforeEach(func() {
 				cmd.Outdated = true
 			})
 
-			Context("when there are no repositories", func() {
+			When("there are no repositories", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginRepositoriesReturns(nil)
 				})
@@ -182,7 +182,7 @@ var _ = Describe("plugins Command", func() {
 				})
 			})
 
-			Context("when there are repositories", func() {
+			When("there are repositories", func() {
 				BeforeEach(func() {
 					fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
 						{Name: "repo-1", URL: "https://repo-1.plugins.com"},
@@ -190,7 +190,7 @@ var _ = Describe("plugins Command", func() {
 					})
 				})
 
-				Context("when the actor returns GettingRepositoryError", func() {
+				When("the actor returns GettingRepositoryError", func() {
 					BeforeEach(func() {
 						fakeActor.GetOutdatedPluginsReturns(nil, actionerror.GettingPluginRepositoryError{
 							Name:    "repo-1",
@@ -207,7 +207,7 @@ var _ = Describe("plugins Command", func() {
 					})
 				})
 
-				Context("when there are no outdated plugins", func() {
+				When("there are no outdated plugins", func() {
 					It("displays the empty outdated table", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
@@ -219,7 +219,7 @@ var _ = Describe("plugins Command", func() {
 					})
 				})
 
-				Context("when plugins are outdated", func() {
+				When("plugins are outdated", func() {
 					BeforeEach(func() {
 						fakeActor.GetOutdatedPluginsReturns([]pluginaction.OutdatedPlugin{
 							{Name: "plugin-1", CurrentVersion: "1.0.0", LatestVersion: "2.0.0"},

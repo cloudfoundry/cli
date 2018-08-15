@@ -27,7 +27,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 		userProvidedServiceInstanceName = helpers.PrefixedRandomName("usi")
 	})
 
-	Context("when the services do not exist", func() {
+	When("the services do not exist", func() {
 		It("fails with the service not found message", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -48,7 +48,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 		})
 	})
 
-	Context("when the services do exist", func() {
+	When("the services do exist", func() {
 		var broker helpers.ServiceBroker
 
 		BeforeEach(func() {
@@ -70,7 +70,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 			broker.Destroy()
 		})
 
-		Context("when the app is new", func() {
+		When("the app is new", func() {
 			It("binds the provided services", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -102,7 +102,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 			})
 		})
 
-		Context("when the app already exists", func() {
+		When("the app already exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{

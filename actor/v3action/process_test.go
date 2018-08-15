@@ -38,7 +38,7 @@ var _ = Describe("Process Actions", func() {
 			}
 		})
 
-		Context("when no errors are encountered scaling the application process", func() {
+		When("no errors are encountered scaling the application process", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationProcessScaleReturns(
 					ccv3.Process{GUID: "some-process-guid"},
@@ -64,7 +64,7 @@ var _ = Describe("Process Actions", func() {
 			})
 		})
 
-		Context("when an error is encountered scaling the application process", func() {
+		When("an error is encountered scaling the application process", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -82,7 +82,7 @@ var _ = Describe("Process Actions", func() {
 			})
 		})
 
-		Context("when a ProcessNotFoundError error is encountered scaling the application process", func() {
+		When("a ProcessNotFoundError error is encountered scaling the application process", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationProcessScaleReturns(
 					ccv3.Process{GUID: "some-process-guid"},

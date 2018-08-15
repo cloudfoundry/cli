@@ -31,7 +31,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the provided repo name already exists", func() {
+	When("the provided repo name already exists", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.PluginRepoName = "some-repo"
 			cmd.RequiredArgs.PluginRepoURL = "some-repo-URL"
@@ -43,7 +43,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		})
 	})
 
-	Context("when the provided repo name and URL already exist in the same repo", func() {
+	When("the provided repo name and URL already exist in the same repo", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.PluginRepoName = "some-repo"
 			cmd.RequiredArgs.PluginRepoURL = "some-repo-URL"
@@ -62,7 +62,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		})
 	})
 
-	Context("when an AddPluginRepositoryError is encountered", func() {
+	When("an AddPluginRepositoryError is encountered", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.PluginRepoName = "some-repo"
 			cmd.RequiredArgs.PluginRepoURL = "some-URL"
@@ -74,7 +74,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		})
 	})
 
-	Context("when no errors are encountered", func() {
+	When("no errors are encountered", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.PluginRepoName = "some-repo"
 			cmd.RequiredArgs.PluginRepoURL = "https://some-repo-URL"

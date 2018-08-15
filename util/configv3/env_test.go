@@ -25,7 +25,7 @@ var _ = Describe("Config", func() {
 		teardown(homeDir)
 	})
 
-	Context("when there are environment variables", func() {
+	When("there are environment variables", func() {
 		BeforeEach(func() {
 			Expect(os.Setenv("CF_DIAL_TIMEOUT", "1234")).ToNot(HaveOccurred())
 			Expect(os.Setenv("CF_DOCKER_PASSWORD", "banana")).ToNot(HaveOccurred())

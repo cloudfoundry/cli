@@ -47,7 +47,7 @@ var _ = Describe("Job Actions", func() {
 			job, warnings, executeErr = actor.UploadApplicationPackage(appGUID, existingResources, reader, readerLength)
 		})
 
-		Context("when the upload is successful", func() {
+		When("the upload is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UploadApplicationPackageReturns(ccv2.Job{GUID: "some-job-guid"}, ccv2.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
 			})
@@ -66,7 +66,7 @@ var _ = Describe("Job Actions", func() {
 			})
 		})
 
-		Context("when the upload returns an error", func() {
+		When("the upload returns an error", func() {
 			var err error
 
 			BeforeEach(func() {
@@ -104,7 +104,7 @@ var _ = Describe("Job Actions", func() {
 			job, warnings, executeErr = actor.UploadDroplet(appGUID, droplet, dropletLength)
 		})
 
-		Context("when the upload is successful", func() {
+		When("the upload is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UploadDropletReturns(ccv2.Job{GUID: "some-job-guid"}, ccv2.Warnings{"upload-droplet-warning-1", "upload-droplet-warning-2"}, nil)
 			})
@@ -135,7 +135,7 @@ var _ = Describe("Job Actions", func() {
 			warnings, executeErr = actor.PollJob(job)
 		})
 
-		Context("when the job polling is successful", func() {
+		When("the job polling is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.PollJobReturns(ccv2.Warnings{"polling-warning"}, nil)
 			})
@@ -149,7 +149,7 @@ var _ = Describe("Job Actions", func() {
 			})
 		})
 
-		Context("when polling errors", func() {
+		When("polling errors", func() {
 			var err error
 
 			BeforeEach(func() {

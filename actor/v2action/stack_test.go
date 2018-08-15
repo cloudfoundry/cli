@@ -25,7 +25,7 @@ var _ = Describe("Stack Actions", func() {
 	})
 
 	Describe("GetStack", func() {
-		Context("when the CC API client does not return any errors", func() {
+		When("the CC API client does not return any errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetStackReturns(
 					ccv2.Stack{
@@ -48,7 +48,7 @@ var _ = Describe("Stack Actions", func() {
 			})
 		})
 
-		Context("when the stack does not exist", func() {
+		When("the stack does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetStackReturns(
 					ccv2.Stack{},
@@ -63,7 +63,7 @@ var _ = Describe("Stack Actions", func() {
 			})
 		})
 
-		Context("when the CC API client returns an error", func() {
+		When("the CC API client returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -84,8 +84,8 @@ var _ = Describe("Stack Actions", func() {
 	})
 
 	Describe("GetStackByName", func() {
-		Context("when the CC API client does not return any errors", func() {
-			Context("when it returns one stack", func() {
+		When("the CC API client does not return any errors", func() {
+			When("it returns one stack", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStacksReturns(
 						[]ccv2.Stack{{
@@ -117,7 +117,7 @@ var _ = Describe("Stack Actions", func() {
 				})
 			})
 
-			Context("when it returns no stacks", func() {
+			When("it returns no stacks", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetStacksReturns(
 						[]ccv2.Stack{},
@@ -134,7 +134,7 @@ var _ = Describe("Stack Actions", func() {
 			})
 		})
 
-		Context("when the stack does not exist", func() {
+		When("the stack does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetStackReturns(
 					ccv2.Stack{},
@@ -149,7 +149,7 @@ var _ = Describe("Stack Actions", func() {
 			})
 		})
 
-		Context("when the CC API client returns an error", func() {
+		When("the CC API client returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

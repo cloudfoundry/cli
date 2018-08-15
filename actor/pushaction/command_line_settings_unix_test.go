@@ -35,8 +35,8 @@ var _ = Describe("CommandLineSettings with provided path", func() {
 			Entry("path = provided path; provided path is absolute", "/some-provided-path", "", "/some-provided-path"),
 		)
 
-		Context("when docker image is provided but path is not", func() {
-			Context("when the image is provided via command line setting", func() {
+		When("docker image is provided but path is not", func() {
+			When("the image is provided via command line setting", func() {
 				It("does not set path", func() {
 					settings := CommandLineSettings{
 						CurrentDirectory: currentDirectory,
@@ -49,7 +49,7 @@ var _ = Describe("CommandLineSettings with provided path", func() {
 				})
 			})
 
-			Context("when the image is provided via manifest", func() {
+			When("the image is provided via manifest", func() {
 				It("does not set path", func() {
 					settings := CommandLineSettings{
 						CurrentDirectory: currentDirectory,

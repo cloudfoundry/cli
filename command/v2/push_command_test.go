@@ -86,7 +86,7 @@ var _ = Describe("push Command", func() {
 			executeErr = cmd.Execute(nil)
 		})
 
-		Context("when the mutiple buildpacks are provided, and the API version is below the mutiple buildpacks minimum", func() {
+		When("the mutiple buildpacks are provided, and the API version is below the mutiple buildpacks minimum", func() {
 			BeforeEach(func() {
 				fakeActor.CloudControllerV3APIVersionReturns("3.1.0")
 				cmd.Buildpacks = []string{"some-buildpack", "some-other-buildpack"}
@@ -101,7 +101,7 @@ var _ = Describe("push Command", func() {
 			})
 		})
 
-		Context("when checking target fails", func() {
+		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 			})
@@ -116,7 +116,7 @@ var _ = Describe("push Command", func() {
 			})
 		})
 
-		Context("when the user is logged in, and org and space are targeted", func() {
+		When("the user is logged in, and org and space are targeted", func() {
 			BeforeEach(func() {
 				fakeConfig.HasTargetedOrganizationReturns(true)
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "some-org-guid", Name: "some-org"})
@@ -125,7 +125,7 @@ var _ = Describe("push Command", func() {
 				fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			})
 
-			Context("when the push settings are valid", func() {
+			When("the push settings are valid", func() {
 				var appManifests []manifest.Application
 
 				BeforeEach(func() {
@@ -138,7 +138,7 @@ var _ = Describe("push Command", func() {
 					fakeActor.MergeAndValidateSettingsAndManifestsReturns(appManifests, nil)
 				})
 
-				Context("when buildpacks (plural) is provided in the manifest and the API version is below the minimum", func() {
+				When("buildpacks (plural) is provided in the manifest and the API version is below the minimum", func() {
 					BeforeEach(func() {
 						appManifests = []manifest.Application{
 							{
@@ -162,7 +162,7 @@ var _ = Describe("push Command", func() {
 
 				})
 
-				Context("when the settings can be converted to a valid config", func() {
+				When("the settings can be converted to a valid config", func() {
 					var appConfigs []pushaction.ApplicationConfig
 
 					BeforeEach(func() {
@@ -184,7 +184,7 @@ var _ = Describe("push Command", func() {
 						fakeActor.ConvertToApplicationConfigsReturns(appConfigs, pushaction.Warnings{"some-config-warnings"}, nil)
 					})
 
-					Context("when the apply is successful", func() {
+					When("the apply is successful", func() {
 						var updatedConfig pushaction.ApplicationConfig
 
 						BeforeEach(func() {
@@ -292,7 +292,7 @@ var _ = Describe("push Command", func() {
 							fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 						})
 
-						Context("when no manifest is provided", func() {
+						When("no manifest is provided", func() {
 							It("passes through the command line flags", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
@@ -305,7 +305,7 @@ var _ = Describe("push Command", func() {
 							})
 						})
 
-						Context("when a manifest is provided", func() {
+						When("a manifest is provided", func() {
 							var (
 								tmpDir       string
 								providedPath string
@@ -348,7 +348,7 @@ var _ = Describe("push Command", func() {
 									fakeActor.ReadManifestReturns(expectedApps, nil, nil)
 								})
 
-								Context("when reading the manifest file is successful", func() {
+								When("reading the manifest file is successful", func() {
 									It("merges app manifest and flags", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 
@@ -371,7 +371,7 @@ var _ = Describe("push Command", func() {
 									})
 								})
 
-								Context("when reading manifest file errors", func() {
+								When("reading manifest file errors", func() {
 									var expectedErr error
 
 									BeforeEach(func() {
@@ -385,7 +385,7 @@ var _ = Describe("push Command", func() {
 									})
 								})
 
-								Context("when --no-manifest is specified", func() {
+								When("--no-manifest is specified", func() {
 									BeforeEach(func() {
 										cmd.NoManifest = true
 									})
@@ -427,7 +427,7 @@ var _ = Describe("push Command", func() {
 										providedPath = filepath.Join(tmpDir, "manifest.yml")
 									})
 
-									Context("when the manifest.yml file does not exist", func() {
+									When("the manifest.yml file does not exist", func() {
 										BeforeEach(func() {
 											cmd.PathToManifest = flag.PathWithExistenceCheck(providedPath)
 										})
@@ -442,7 +442,7 @@ var _ = Describe("push Command", func() {
 										})
 									})
 
-									Context("when the manifest.yml file exists", func() {
+									When("the manifest.yml file exists", func() {
 										BeforeEach(func() {
 											err := ioutil.WriteFile(providedPath, []byte(`key: "value"`), 0666)
 											Expect(err).ToNot(HaveOccurred())
@@ -462,7 +462,7 @@ var _ = Describe("push Command", func() {
 
 										Context("variable interpolation", func() {
 											Context("vars file only", func() {
-												Context("when a vars file is also provided", func() {
+												When("a vars file is also provided", func() {
 													var providedVarsFilePath string
 
 													BeforeEach(func() {
@@ -484,7 +484,7 @@ var _ = Describe("push Command", func() {
 													})
 												})
 
-												Context("when multiple vars files are provided", func() {
+												When("multiple vars files are provided", func() {
 													var (
 														firstProvidedVarsFilePath  string
 														secondProvidedVarsFilePath string
@@ -558,7 +558,7 @@ var _ = Describe("push Command", func() {
 										cmd.PathToManifest = flag.PathWithExistenceCheck(providedPath)
 									})
 
-									Context("when the directory does not contain a 'manifest.y{a}ml' file", func() {
+									When("the directory does not contain a 'manifest.y{a}ml' file", func() {
 										It("returns an error", func() {
 											Expect(executeErr).To(MatchError(translatableerror.ManifestFileNotFoundInDirectoryError{PathToManifest: providedPath}))
 											Expect(testUI.Out).ToNot(Say("Pushing from manifest"))
@@ -568,7 +568,7 @@ var _ = Describe("push Command", func() {
 										})
 									})
 
-									Context("when the directory contains a 'manifest.yml' file", func() {
+									When("the directory contains a 'manifest.yml' file", func() {
 										BeforeEach(func() {
 											ymlFile = filepath.Join(providedPath, "manifest.yml")
 											err := ioutil.WriteFile(ymlFile, []byte(`key: "value"`), 0666)
@@ -586,7 +586,7 @@ var _ = Describe("push Command", func() {
 										})
 									})
 
-									Context("when the directory contains a 'manifest.yaml' file", func() {
+									When("the directory contains a 'manifest.yaml' file", func() {
 										BeforeEach(func() {
 											yamlFile = filepath.Join(providedPath, "manifest.yaml")
 											err := ioutil.WriteFile(yamlFile, []byte(`key: "value"`), 0666)
@@ -604,7 +604,7 @@ var _ = Describe("push Command", func() {
 										})
 									})
 
-									Context("when the directory contains both a 'manifest.yml' and 'manifest.yaml' file", func() {
+									When("the directory contains both a 'manifest.yml' and 'manifest.yaml' file", func() {
 										BeforeEach(func() {
 											ymlFile = filepath.Join(providedPath, "manifest.yml")
 											err := ioutil.WriteFile(ymlFile, []byte(`key: "value"`), 0666)
@@ -629,7 +629,7 @@ var _ = Describe("push Command", func() {
 							})
 						})
 
-						Context("when an app name and manifest are provided", func() {
+						When("an app name and manifest are provided", func() {
 							var (
 								tmpDir         string
 								pathToManifest string
@@ -712,7 +712,7 @@ var _ = Describe("push Command", func() {
 							}
 						})
 
-						Context("when the app starts", func() {
+						When("the app starts", func() {
 							It("displays app events and warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
@@ -745,7 +745,7 @@ var _ = Describe("push Command", func() {
 								Expect(appConfig).To(Equal(updatedConfig.CurrentApplication.Application))
 							})
 
-							Context("when the API is below MinVersionV3", func() {
+							When("the API is below MinVersionV3", func() {
 								BeforeEach(func() {
 									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.4.0")
 								})
@@ -766,7 +766,7 @@ var _ = Describe("push Command", func() {
 								})
 							})
 
-							Context("when the api is at least MinVersionV3", func() {
+							When("the api is at least MinVersionV3", func() {
 								BeforeEach(func() {
 									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.50.0")
 									fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(
@@ -822,7 +822,7 @@ var _ = Describe("push Command", func() {
 								})
 							})
 
-							Context("when the start command is explicitly set", func() {
+							When("the start command is explicitly set", func() {
 								BeforeEach(func() {
 									applicationSummary := v2action.ApplicationSummary{
 										Application: v2action.Application{
@@ -870,7 +870,7 @@ var _ = Describe("push Command", func() {
 							})
 						})
 
-						Context("when no-start is set", func() {
+						When("no-start is set", func() {
 							BeforeEach(func() {
 								cmd.NoStart = true
 
@@ -910,7 +910,7 @@ var _ = Describe("push Command", func() {
 								fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 							})
 
-							Context("when the app is not running", func() {
+							When("the app is not running", func() {
 								It("does not start the app", func() {
 									Expect(executeErr).ToNot(HaveOccurred())
 									Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
@@ -923,7 +923,7 @@ var _ = Describe("push Command", func() {
 						})
 					})
 
-					Context("when the apply errors", func() {
+					When("the apply errors", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -959,7 +959,7 @@ var _ = Describe("push Command", func() {
 					})
 				})
 
-				Context("when there is an error converting the app setting into a config", func() {
+				When("there is an error converting the app setting into a config", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -975,7 +975,7 @@ var _ = Describe("push Command", func() {
 				})
 			})
 
-			Context("when the push settings are invalid", func() {
+			When("the push settings are invalid", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -1002,7 +1002,7 @@ var _ = Describe("push Command", func() {
 				Expect(commandLineSettingsErr).ToNot(HaveOccurred())
 			})
 
-			Context("when general app settings are given", func() {
+			When("general app settings are given", func() {
 				BeforeEach(func() {
 					cmd.Buildpacks = []string{"some-buildpack"}
 					cmd.Command = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "echo foo bar baz"}}
@@ -1028,7 +1028,7 @@ var _ = Describe("push Command", func() {
 			})
 
 			Context("route related flags", func() {
-				Context("when given customed route settings", func() {
+				When("given customed route settings", func() {
 					BeforeEach(func() {
 						cmd.Domain = "some-domain"
 					})
@@ -1038,7 +1038,7 @@ var _ = Describe("push Command", func() {
 					})
 				})
 
-				Context("when --hostname is given", func() {
+				When("--hostname is given", func() {
 					BeforeEach(func() {
 						cmd.Hostname = "some-hostname"
 					})
@@ -1048,7 +1048,7 @@ var _ = Describe("push Command", func() {
 					})
 				})
 
-				Context("when --no-hostname is given", func() {
+				When("--no-hostname is given", func() {
 					BeforeEach(func() {
 						cmd.NoHostname = true
 					})
@@ -1058,7 +1058,7 @@ var _ = Describe("push Command", func() {
 					})
 				})
 
-				Context("when --random-route is given", func() {
+				When("--random-route is given", func() {
 					BeforeEach(func() {
 						cmd.RandomRoute = true
 					})
@@ -1069,7 +1069,7 @@ var _ = Describe("push Command", func() {
 					})
 				})
 
-				Context("when --route-path is given", func() {
+				When("--route-path is given", func() {
 					BeforeEach(func() {
 						cmd.RoutePath = flag.RoutePath{Path: "/some-path"}
 					})
@@ -1080,7 +1080,7 @@ var _ = Describe("push Command", func() {
 					})
 				})
 
-				Context("when --no-route is given", func() {
+				When("--no-route is given", func() {
 					BeforeEach(func() {
 						cmd.NoRoute = true
 					})
@@ -1092,7 +1092,7 @@ var _ = Describe("push Command", func() {
 			})
 
 			Context("app bits", func() {
-				Context("when -p flag is given", func() {
+				When("-p flag is given", func() {
 					BeforeEach(func() {
 						cmd.AppPath = "some-directory-path"
 					})
@@ -1102,7 +1102,7 @@ var _ = Describe("push Command", func() {
 					})
 				})
 
-				Context("when the -o flag is given", func() {
+				When("the -o flag is given", func() {
 					BeforeEach(func() {
 						cmd.DockerImage.Path = "some-docker-image-path"
 					})

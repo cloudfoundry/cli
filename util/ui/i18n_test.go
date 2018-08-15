@@ -32,7 +32,7 @@ var _ = Describe("i18n", func() {
 			Entry("when given an unsupported language", "pt-PT"),
 		)
 
-		Context("when the config file is set", func() {
+		When("the config file is set", func() {
 			DescribeTable("returns the correct language translationFunc",
 				func(locale string, expectedTranslation string) {
 					fakeConfig.LocaleReturns(locale)
@@ -59,7 +59,7 @@ var _ = Describe("i18n", func() {
 				Entry("Chinese (Traditional and using Hong Kong terms)", "zh-HK", "\n已啟動應用程式\n"),
 			)
 
-			Context("when provided keys to iterpolate", func() {
+			When("provided keys to iterpolate", func() {
 				BeforeEach(func() {
 					fakeConfig.LocaleReturns("fr-FR")
 				})
@@ -76,7 +76,7 @@ var _ = Describe("i18n", func() {
 			})
 		})
 
-		Context("when the translation does not have a value", func() {
+		When("the translation does not have a value", func() {
 			It("uses the id for the translation", func() {
 				translationFunc, err := GetTranslationFunc(fakeConfig)
 				Expect(err).ToNot(HaveOccurred())

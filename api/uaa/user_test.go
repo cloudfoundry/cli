@@ -24,8 +24,8 @@ var _ = Describe("User", func() {
 	})
 
 	Describe("CreateUser", func() {
-		Context("when no errors occur", func() {
-			Context("when creating user with origin", func() {
+		When("no errors occur", func() {
+			When("creating user with origin", func() {
 				BeforeEach(func() {
 					response := `{
 					"ID": "new-user-id"
@@ -49,7 +49,7 @@ var _ = Describe("User", func() {
 					}))
 				})
 			})
-			Context("when creating user in UAA", func() {
+			When("creating user in UAA", func() {
 				BeforeEach(func() {
 					response := `{
 					"ID": "new-user-id"
@@ -75,7 +75,7 @@ var _ = Describe("User", func() {
 			})
 		})
 
-		Context("when an error occurs", func() {
+		When("an error occurs", func() {
 			var response string
 
 			BeforeEach(func() {

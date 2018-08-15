@@ -11,13 +11,13 @@ import (
 )
 
 var _ = Describe("delete-orphaned-routes command", func() {
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "delete-orphaned-routes")
 		})
 	})
 
-	Context("when the environment is setup correctly", func() {
+	When("the environment is setup correctly", func() {
 		var (
 			orgName    string
 			spaceName  string
@@ -41,7 +41,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when there are orphaned routes", func() {
+		When("there are orphaned routes", func() {
 			var (
 				orphanedRoute1 helpers.Route
 				orphanedRoute2 helpers.Route
@@ -65,7 +65,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 		})
 
-		Context("when there are orphaned routes and bound routes", func() {
+		When("there are orphaned routes and bound routes", func() {
 			var (
 				orphanedRoute1 helpers.Route
 				orphanedRoute2 helpers.Route
@@ -100,7 +100,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 		})
 
-		Context("when there are more than one page of routes", func() {
+		When("there are more than one page of routes", func() {
 			BeforeEach(func() {
 				var orphanedRoute helpers.Route
 				for i := 0; i < 51; i++ {
@@ -118,14 +118,14 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 		})
 
-		Context("when the force flag is not given", func() {
+		When("the force flag is not given", func() {
 			var buffer *Buffer
 			BeforeEach(func() {
 				orphanedRoute := helpers.NewRoute(spaceName, domainName, "orphan", "path")
 				orphanedRoute.Create()
 			})
 
-			Context("when the user inputs y", func() {
+			When("the user inputs y", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
 					buffer.Write([]byte("y\n"))
@@ -143,7 +143,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				})
 			})
 
-			Context("when the user inputs n", func() {
+			When("the user inputs n", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
 					buffer.Write([]byte("n\n"))
@@ -162,7 +162,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 		})
 
-		Context("when there are no orphaned routes", func() {
+		When("there are no orphaned routes", func() {
 			var (
 				boundRoute helpers.Route
 			)
@@ -188,7 +188,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 		})
 
-		Context("when the orphaned routes are attached to both shared and private domains", func() {
+		When("the orphaned routes are attached to both shared and private domains", func() {
 			var (
 				orphanedRoute1   helpers.Route
 				orphanedRoute2   helpers.Route

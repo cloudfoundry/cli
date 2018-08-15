@@ -51,7 +51,7 @@ var _ = Describe("path types", func() {
 		var path Path
 
 		Describe("Complete", func() {
-			Context("when the prefix is empty", func() {
+			When("the prefix is empty", func() {
 				It("returns all files and directories", func() {
 					matches := path.Complete("")
 					Expect(matches).To(ConsistOf(
@@ -67,8 +67,8 @@ var _ = Describe("path types", func() {
 				})
 			})
 
-			Context("when the prefix is not empty", func() {
-				Context("when there are matching paths", func() {
+			When("the prefix is not empty", func() {
+				When("there are matching paths", func() {
 					It("returns the matching paths", func() {
 						matches := path.Complete("a")
 						Expect(matches).To(ConsistOf(
@@ -95,14 +95,14 @@ var _ = Describe("path types", func() {
 					})
 				})
 
-				Context("when there are no matching paths", func() {
+				When("there are no matching paths", func() {
 					It("returns no matches", func() {
 						Expect(path.Complete("z")).To(BeEmpty())
 					})
 				})
 			})
 
-			Context("when the prefix is ~/", func() {
+			When("the prefix is ~/", func() {
 				var prevHome string
 
 				BeforeEach(func() {
@@ -113,7 +113,7 @@ var _ = Describe("path types", func() {
 					os.Setenv("HOME", prevHome)
 				})
 
-				Context("when $HOME is set", func() {
+				When("$HOME is set", func() {
 					var (
 						tempDir string
 						err     error
@@ -152,7 +152,7 @@ var _ = Describe("path types", func() {
 				})
 			})
 
-			Context("when the prefix starts with ~/", func() {
+			When("the prefix starts with ~/", func() {
 				var prevHome string
 
 				BeforeEach(func() {
@@ -163,7 +163,7 @@ var _ = Describe("path types", func() {
 					os.Setenv("HOME", prevHome)
 				})
 
-				Context("when $HOME is set", func() {
+				When("$HOME is set", func() {
 					var (
 						tempDir string
 						err     error
@@ -213,7 +213,7 @@ var _ = Describe("path types", func() {
 		// Path.Complete().
 
 		Describe("UnmarshalFlag", func() {
-			Context("when the path does not exist", func() {
+			When("the path does not exist", func() {
 				It("returns a path does not exist error", func() {
 					err := pathWithExistenceCheck.UnmarshalFlag("./some-dir/some-file")
 					Expect(err).To(MatchError(&flags.Error{
@@ -223,7 +223,7 @@ var _ = Describe("path types", func() {
 				})
 			})
 
-			Context("when the path exists", func() {
+			When("the path exists", func() {
 				It("sets the path", func() {
 					err := pathWithExistenceCheck.UnmarshalFlag("abc")
 					Expect(err).ToNot(HaveOccurred())
@@ -244,10 +244,10 @@ var _ = Describe("path types", func() {
 		// Path.Complete().
 
 		Describe("UnmarshalFlag", func() {
-			Context("when the file exists", func() {
+			When("the file exists", func() {
 				var tempPath string
 
-				Context("when the file has valid JSON", func() {
+				When("the file has valid JSON", func() {
 					BeforeEach(func() {
 						tempPath = tempFile(`{"this is":"valid JSON"}`)
 					})
@@ -261,7 +261,7 @@ var _ = Describe("path types", func() {
 					})
 				})
 
-				Context("when the file has invalid JSON", func() {
+				When("the file has invalid JSON", func() {
 					BeforeEach(func() {
 						tempPath = tempFile(`{"this is":"invalid JSON"`)
 					})
@@ -276,7 +276,7 @@ var _ = Describe("path types", func() {
 				})
 			})
 
-			Context("when the JSON is invalid", func() {
+			When("the JSON is invalid", func() {
 				It("errors with the invalid configuration error", func() {
 					err := jsonOrFile.UnmarshalFlag(`{"this is":"invalid JSON"`)
 					Expect(err).To(Equal(&flags.Error{
@@ -286,7 +286,7 @@ var _ = Describe("path types", func() {
 				})
 			})
 
-			Context("when the JSON is valid", func() {
+			When("the JSON is valid", func() {
 				It("sets the path", func() {
 					err := jsonOrFile.UnmarshalFlag(`{"this is":"valid JSON"}`)
 					Expect(err).ToNot(HaveOccurred())
@@ -309,7 +309,7 @@ var _ = Describe("path types", func() {
 		// Path.Complete().
 
 		Describe("UnmarshalFlag", func() {
-			Context("when the path is a URL", func() {
+			When("the path is a URL", func() {
 				It("sets the path if it starts with 'http://'", func() {
 					err := pathWithExistenceCheckOrURL.UnmarshalFlag("http://example.com/payload.tgz")
 					Expect(err).ToNot(HaveOccurred())
@@ -323,7 +323,7 @@ var _ = Describe("path types", func() {
 				})
 			})
 
-			Context("when the path does not exist", func() {
+			When("the path does not exist", func() {
 				It("returns a path does not exist error", func() {
 					err := pathWithExistenceCheckOrURL.UnmarshalFlag("./some-dir/some-file")
 					Expect(err).To(MatchError(&flags.Error{
@@ -333,7 +333,7 @@ var _ = Describe("path types", func() {
 				})
 			})
 
-			Context("when the path exists", func() {
+			When("the path exists", func() {
 				It("sets the path", func() {
 					err := pathWithExistenceCheckOrURL.UnmarshalFlag("abc")
 					Expect(err).ToNot(HaveOccurred())
@@ -347,20 +347,20 @@ var _ = Describe("path types", func() {
 		var pathWithAt PathWithAt
 
 		Describe("Complete", func() {
-			Context("when the prefix is empty", func() {
+			When("the prefix is empty", func() {
 				It("returns no matches", func() {
 					Expect(pathWithAt.Complete("")).To(BeEmpty())
 				})
 			})
 
-			Context("when the prefix doesn't start with @", func() {
+			When("the prefix doesn't start with @", func() {
 				It("returns no matches", func() {
 					Expect(pathWithAt.Complete("a@b")).To(BeEmpty())
 				})
 			})
 
-			Context("when the prefix starts with @", func() {
-				Context("when there are no characters after the @", func() {
+			When("the prefix starts with @", func() {
+				When("there are no characters after the @", func() {
 					It("returns all files and directories", func() {
 						matches := pathWithAt.Complete("@")
 						Expect(matches).To(ConsistOf(
@@ -376,8 +376,8 @@ var _ = Describe("path types", func() {
 					})
 				})
 
-				Context("when there are characters after the @", func() {
-					Context("when there are matching paths", func() {
+				When("there are characters after the @", func() {
+					When("there are matching paths", func() {
 						It("returns the matching paths", func() {
 							matches := pathWithAt.Complete("@a")
 							Expect(matches).To(ConsistOf(
@@ -396,7 +396,7 @@ var _ = Describe("path types", func() {
 						})
 					})
 
-					Context("when there are no matching paths", func() {
+					When("there are no matching paths", func() {
 						It("returns no matches", func() {
 							Expect(pathWithAt.Complete("@z")).To(BeEmpty())
 						})
@@ -404,7 +404,7 @@ var _ = Describe("path types", func() {
 				})
 			})
 
-			Context("when the prefix is @~/", func() {
+			When("the prefix is @~/", func() {
 				var prevHome string
 
 				BeforeEach(func() {
@@ -415,7 +415,7 @@ var _ = Describe("path types", func() {
 					os.Setenv("HOME", prevHome)
 				})
 
-				Context("when $HOME is set", func() {
+				When("$HOME is set", func() {
 					var (
 						tempDir string
 						err     error
@@ -454,7 +454,7 @@ var _ = Describe("path types", func() {
 				})
 			})
 
-			Context("when the prefix starts with @~/", func() {
+			When("the prefix starts with @~/", func() {
 				var prevHome string
 
 				BeforeEach(func() {
@@ -465,7 +465,7 @@ var _ = Describe("path types", func() {
 					os.Setenv("HOME", prevHome)
 				})
 
-				Context("when $HOME is set", func() {
+				When("$HOME is set", func() {
 					var (
 						tempDir string
 						err     error
@@ -508,7 +508,7 @@ var _ = Describe("path types", func() {
 		var pathWithBool PathWithBool
 
 		Describe("Complete", func() {
-			Context("when the prefix is empty", func() {
+			When("the prefix is empty", func() {
 				It("returns bool choices and all files and directories", func() {
 					matches := pathWithBool.Complete("")
 					Expect(matches).To(ConsistOf(
@@ -526,8 +526,8 @@ var _ = Describe("path types", func() {
 				})
 			})
 
-			Context("when the prefix is not empty", func() {
-				Context("when there are matching bool/paths", func() {
+			When("the prefix is not empty", func() {
+				When("there are matching bool/paths", func() {
 					It("returns the matching bool/paths", func() {
 						matches := pathWithBool.Complete("t")
 						Expect(matches).To(ConsistOf(
@@ -551,7 +551,7 @@ var _ = Describe("path types", func() {
 					})
 				})
 
-				Context("when there are no matching bool/paths", func() {
+				When("there are no matching bool/paths", func() {
 					It("returns no matches", func() {
 						Expect(pathWithBool.Complete("z")).To(BeEmpty())
 					})

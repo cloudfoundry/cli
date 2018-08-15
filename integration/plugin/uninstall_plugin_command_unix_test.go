@@ -15,7 +15,7 @@ import (
 )
 
 var _ = Describe("uninstall-plugin command", func() {
-	Context("when the plugin is not executable", func() {
+	When("the plugin is not executable", func() {
 		var binaryPath string
 
 		BeforeEach(func() {

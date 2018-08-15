@@ -18,7 +18,7 @@ var _ = Describe("push with --no-start", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when the app is new", func() {
+	When("the app is new", func() {
 		It("pushes the app without starting it", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
@@ -38,8 +38,8 @@ var _ = Describe("push with --no-start", func() {
 		})
 	})
 
-	Context("when the app exists", func() {
-		Context("when the app is running", func() {
+	When("the app exists", func() {
+		When("the app is running", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
@@ -68,7 +68,7 @@ var _ = Describe("push with --no-start", func() {
 			})
 		})
 
-		Context("when the app is stopped", func() {
+		When("the app is stopped", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")

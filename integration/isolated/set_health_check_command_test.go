@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("set-health-check command", func() {
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("set-health-check", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -30,13 +30,13 @@ var _ = Describe("set-health-check command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "set-health-check", "app-name", "port")
 		})
 	})
 
-	Context("when the input is invalid", func() {
+	When("the input is invalid", func() {
 		DescribeTable("fails with incorrect usage method",
 			func(args ...string) {
 				cmd := append([]string{"set-health-check"}, args...)
@@ -51,7 +51,7 @@ var _ = Describe("set-health-check command", func() {
 		)
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -68,7 +68,7 @@ var _ = Describe("set-health-check command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		Context("when the app does not exist", func() {
+		When("the app does not exist", func() {
 			It("tells the user that the app is not found and exits 1", func() {
 				appName := helpers.PrefixedRandomName("app")
 				session := helpers.CF("set-health-check", appName, "port")
@@ -79,7 +79,7 @@ var _ = Describe("set-health-check command", func() {
 			})
 		})
 
-		Context("when the app exists", func() {
+		When("the app exists", func() {
 			var appName string
 
 			BeforeEach(func() {
@@ -108,7 +108,7 @@ var _ = Describe("set-health-check command", func() {
 				Entry("when setting the health-check-type to 'http'", "http"),
 			)
 
-			Context("when no http health check endpoint is given", func() {
+			When("no http health check endpoint is given", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("set-health-check", appName, "http")).Should(Exit(0))
 				})
@@ -120,7 +120,7 @@ var _ = Describe("set-health-check command", func() {
 				})
 			})
 
-			Context("when a valid http health check endpoint is given", func() {
+			When("a valid http health check endpoint is given", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("set-health-check", appName, "http", "--endpoint", "/foo")).Should(Exit(0))
 				})
@@ -132,7 +132,7 @@ var _ = Describe("set-health-check command", func() {
 				})
 			})
 
-			Context("when an invalid http health check endpoint is given", func() {
+			When("an invalid http health check endpoint is given", func() {
 				It("outputs an error and exits 1", func() {
 					session := helpers.CF("set-health-check", appName, "http", "--endpoint", "invalid")
 					Eventually(session.Err).Should(Say("The app is invalid: health_check_http_endpoint HTTP health check endpoint is not a valid URI path: invalid"))
@@ -140,7 +140,7 @@ var _ = Describe("set-health-check command", func() {
 				})
 			})
 
-			Context("when an endpoint is given with a non-http health check type", func() {
+			When("an endpoint is given with a non-http health check type", func() {
 				It("outputs an error and exits 1", func() {
 					session := helpers.CF("set-health-check", appName, "port", "--endpoint", "/foo")
 					Eventually(session.Err).Should(Say("Health check type must be 'http' to set a health check HTTP endpoint\\."))
@@ -148,7 +148,7 @@ var _ = Describe("set-health-check command", func() {
 				})
 			})
 
-			Context("when the app is started", func() {
+			When("the app is started", func() {
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("app")
 					helpers.WithHelloWorldApp(func(appDir string) {

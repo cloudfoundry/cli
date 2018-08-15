@@ -48,7 +48,7 @@ var _ = Describe("generic maps", func() {
 			Expect(mergedMap).To(Equal(expectedMap))
 		})
 
-		Context("when the second map overwrites a value in the first map with nil", func() {
+		When("the second map overwrites a value in the first map with nil", func() {
 			It("sets the value to nil", func() {
 				map1 := NewMap(map[interface{}]interface{}{
 					"nest1": map[interface{}]interface{}{},
@@ -63,7 +63,7 @@ var _ = Describe("generic maps", func() {
 			})
 		})
 
-		Context("when the second map overwrites a nil value in the first map", func() {
+		When("the second map overwrites a nil value in the first map", func() {
 			It("overwrites the nil value", func() {
 				expected := map[interface{}]interface{}{}
 

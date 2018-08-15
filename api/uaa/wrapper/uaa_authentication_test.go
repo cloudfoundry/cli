@@ -38,7 +38,7 @@ var _ = Describe("UAA Authentication", func() {
 	})
 
 	Describe("Make", func() {
-		Context("when the client is nil", func() {
+		When("the client is nil", func() {
 			BeforeEach(func() {
 				inner.SetClient(nil)
 
@@ -54,7 +54,7 @@ var _ = Describe("UAA Authentication", func() {
 			})
 		})
 
-		Context("when the token is valid", func() {
+		When("the token is valid", func() {
 			BeforeEach(func() {
 				request = &http.Request{
 					Header: http.Header{},
@@ -72,7 +72,7 @@ var _ = Describe("UAA Authentication", func() {
 				Expect(headers["Authorization"]).To(ConsistOf([]string{"a-ok"}))
 			})
 
-			Context("when the request already has headers", func() {
+			When("the request already has headers", func() {
 				It("preserves existing headers", func() {
 					request.Header.Add("Existing", "header")
 					err := wrapper.Make(request, nil)
@@ -85,7 +85,7 @@ var _ = Describe("UAA Authentication", func() {
 				})
 			})
 
-			Context("when the wrapped connection returns nil", func() {
+			When("the wrapped connection returns nil", func() {
 				It("returns nil", func() {
 					fakeConnection.MakeReturns(nil)
 
@@ -94,7 +94,7 @@ var _ = Describe("UAA Authentication", func() {
 				})
 			})
 
-			Context("when the wrapped connection returns an error", func() {
+			When("the wrapped connection returns an error", func() {
 				It("returns the error", func() {
 					innerError := errors.New("inner error")
 					fakeConnection.MakeReturns(innerError)
@@ -105,7 +105,7 @@ var _ = Describe("UAA Authentication", func() {
 			})
 		})
 
-		Context("when the token is invalid", func() {
+		When("the token is invalid", func() {
 			var expectedBody string
 
 			BeforeEach(func() {
@@ -162,7 +162,7 @@ var _ = Describe("UAA Authentication", func() {
 			})
 		})
 
-		Context("when refreshing the token", func() {
+		When("refreshing the token", func() {
 			var originalAuthHeader string
 			BeforeEach(func() {
 				body := strings.NewReader(url.Values{
@@ -188,7 +188,7 @@ var _ = Describe("UAA Authentication", func() {
 			})
 		})
 
-		Context("when logging in", func() {
+		When("logging in", func() {
 			Context("with password grant_type", func() {
 				var originalAuthHeader string
 				BeforeEach(func() {

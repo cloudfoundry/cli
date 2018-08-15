@@ -53,7 +53,7 @@ var _ = Describe("share-service Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
+	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerV3APIVersionReturns("0.0.0")
 		})
@@ -66,7 +66,7 @@ var _ = Describe("share-service Command", func() {
 		})
 	})
 
-	Context("when the environment is not correctly setup", func() {
+	When("the environment is not correctly setup", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
@@ -81,7 +81,7 @@ var _ = Describe("share-service Command", func() {
 		})
 	})
 
-	Context("when the user is logged in, and a space and org are targeted", func() {
+	When("the user is logged in, and a space and org are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				GUID: "some-org-guid",
@@ -92,7 +92,7 @@ var _ = Describe("share-service Command", func() {
 			})
 		})
 
-		Context("when an error occurs getting the current user", func() {
+		When("an error occurs getting the current user", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -107,15 +107,15 @@ var _ = Describe("share-service Command", func() {
 			})
 		})
 
-		Context("when no errors occur getting the current user", func() {
+		When("no errors occur getting the current user", func() {
 			BeforeEach(func() {
 				fakeConfig.CurrentUserReturns(
 					configv3.User{Name: "some-user"},
 					nil)
 			})
 
-			Context("when '-o' (org name) is not provided", func() {
-				Context("when no errors occur sharing the service instance", func() {
+			When("'-o' (org name) is not provided", func() {
+				When("no errors occur sharing the service instance", func() {
 					BeforeEach(func() {
 						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns(
 							v2v3action.Warnings{"share-service-warning"},
@@ -139,7 +139,7 @@ var _ = Describe("share-service Command", func() {
 					})
 				})
 
-				Context("when an error occurs sharing the service instance", func() {
+				When("an error occurs sharing the service instance", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -157,7 +157,7 @@ var _ = Describe("share-service Command", func() {
 					})
 				})
 
-				Context("when the service instance is not shareable", func() {
+				When("the service instance is not shareable", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -177,7 +177,7 @@ var _ = Describe("share-service Command", func() {
 					})
 				})
 
-				Context("when the service instance is already shared to the space", func() {
+				When("the service instance is already shared to the space", func() {
 					BeforeEach(func() {
 						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationReturns(
 							v2v3action.Warnings{"share-service-warning"},
@@ -195,12 +195,12 @@ var _ = Describe("share-service Command", func() {
 				})
 			})
 
-			Context("when -o (org name) is provided", func() {
+			When("-o (org name) is provided", func() {
 				BeforeEach(func() {
 					cmd.OrgName = "some-other-org"
 				})
 
-				Context("when no errors occur sharing the service instance", func() {
+				When("no errors occur sharing the service instance", func() {
 					BeforeEach(func() {
 						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns(
 							v2v3action.Warnings{"share-service-warning"},
@@ -224,7 +224,7 @@ var _ = Describe("share-service Command", func() {
 					})
 				})
 
-				Context("when an error occurs sharing the service instance", func() {
+				When("an error occurs sharing the service instance", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -242,7 +242,7 @@ var _ = Describe("share-service Command", func() {
 					})
 				})
 
-				Context("when the service instance is not shareable", func() {
+				When("the service instance is not shareable", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -262,7 +262,7 @@ var _ = Describe("share-service Command", func() {
 					})
 				})
 
-				Context("when the service instance is already shared to the space", func() {
+				When("the service instance is already shared to the space", func() {
 					BeforeEach(func() {
 						fakeActor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationNameReturns(
 							v2v3action.Warnings{"share-service-warning"},

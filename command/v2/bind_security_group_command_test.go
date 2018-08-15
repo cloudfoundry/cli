@@ -65,12 +65,12 @@ var _ = Describe("bind-security-group Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when lifecycle is 'running'", func() {
+	When("lifecycle is 'running'", func() {
 		BeforeEach(func() {
 			cmd.Lifecycle = flag.SecurityGroupLifecycle(constant.SecurityGroupLifecycleRunning)
 		})
 
-		Context("when checking target fails", func() {
+		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 			})
@@ -85,7 +85,7 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 		})
 
-		Context("when getting the current user returns an error", func() {
+		When("getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -100,7 +100,7 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 		})
 
-		Context("when the provided security group does not exist", func() {
+		When("the provided security group does not exist", func() {
 			BeforeEach(func() {
 				fakeActor.GetSecurityGroupByNameReturns(
 					v2action.SecurityGroup{},
@@ -114,7 +114,7 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the provided security group", func() {
+		When("an error is encountered getting the provided security group", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -131,7 +131,7 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 		})
 
-		Context("when the provided org does not exist", func() {
+		When("the provided org does not exist", func() {
 			BeforeEach(func() {
 				fakeActor.GetOrganizationByNameReturns(
 					v2action.Organization{},
@@ -146,7 +146,7 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 		})
 
-		Context("when an error is encountered getting the provided org", func() {
+		When("an error is encountered getting the provided org", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -164,12 +164,12 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 		})
 
-		Context("when a space is provided", func() {
+		When("a space is provided", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs.SpaceName = "some-space"
 			})
 
-			Context("when the space does not exist", func() {
+			When("the space does not exist", func() {
 				BeforeEach(func() {
 					fakeActor.GetSpaceByOrganizationAndNameReturns(
 						v2action.Space{},
@@ -185,7 +185,7 @@ var _ = Describe("bind-security-group Command", func() {
 				})
 			})
 
-			Context("when the space exists", func() {
+			When("the space exists", func() {
 				BeforeEach(func() {
 					fakeActor.GetSpaceByOrganizationAndNameReturns(
 						v2action.Space{
@@ -196,7 +196,7 @@ var _ = Describe("bind-security-group Command", func() {
 						nil)
 				})
 
-				Context("when no errors are encountered binding the security group to the space", func() {
+				When("no errors are encountered binding the security group to the space", func() {
 					BeforeEach(func() {
 						fakeActor.BindSecurityGroupToSpaceReturns(
 							v2action.Warnings{"bind security group to space warning"},
@@ -236,7 +236,7 @@ var _ = Describe("bind-security-group Command", func() {
 					})
 				})
 
-				Context("when an error is encountered binding the security group to the space", func() {
+				When("an error is encountered binding the security group to the space", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -259,7 +259,7 @@ var _ = Describe("bind-security-group Command", func() {
 				})
 			})
 
-			Context("when an error is encountered getting the space", func() {
+			When("an error is encountered getting the space", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -279,8 +279,8 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 		})
 
-		Context("when a space is not provided", func() {
-			Context("when there are no spaces in the org", func() {
+		When("a space is not provided", func() {
+			When("there are no spaces in the org", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSpacesReturns(
 						[]v2action.Space{},
@@ -300,7 +300,7 @@ var _ = Describe("bind-security-group Command", func() {
 				})
 			})
 
-			Context("when there are spaces in the org", func() {
+			When("there are spaces in the org", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSpacesReturns(
 						[]v2action.Space{
@@ -317,7 +317,7 @@ var _ = Describe("bind-security-group Command", func() {
 						nil)
 				})
 
-				Context("when no errors are encountered binding the security group to the spaces", func() {
+				When("no errors are encountered binding the security group to the spaces", func() {
 					BeforeEach(func() {
 						fakeActor.BindSecurityGroupToSpaceReturnsOnCall(
 							0,
@@ -362,7 +362,7 @@ var _ = Describe("bind-security-group Command", func() {
 					})
 				})
 
-				Context("when an error is encountered binding the security group to a space", func() {
+				When("an error is encountered binding the security group to a space", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -385,7 +385,7 @@ var _ = Describe("bind-security-group Command", func() {
 				})
 			})
 
-			Context("when an error is encountered getting spaces in the org", func() {
+			When("an error is encountered getting spaces in the org", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -406,17 +406,17 @@ var _ = Describe("bind-security-group Command", func() {
 		})
 	})
 
-	Context("when lifecycle is 'staging'", func() {
+	When("lifecycle is 'staging'", func() {
 		BeforeEach(func() {
 			cmd.Lifecycle = "staging"
 		})
 
-		Context("when a space is provided", func() {
+		When("a space is provided", func() {
 			BeforeEach(func() {
 				cmd.RequiredArgs.SpaceName = "some-space"
 			})
 
-			Context("when the space exists", func() {
+			When("the space exists", func() {
 				BeforeEach(func() {
 					fakeActor.GetSpaceByOrganizationAndNameReturns(
 						v2action.Space{
@@ -427,7 +427,7 @@ var _ = Describe("bind-security-group Command", func() {
 						nil)
 				})
 
-				Context("when no errors are encountered binding the security group to the space", func() {
+				When("no errors are encountered binding the security group to the space", func() {
 					BeforeEach(func() {
 						fakeActor.BindSecurityGroupToSpaceReturns(
 							v2action.Warnings{"bind security group to space warning"},
@@ -468,8 +468,8 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 		})
 
-		Context("when a space is not provided", func() {
-			Context("when there are no spaces in the org", func() {
+		When("a space is not provided", func() {
+			When("there are no spaces in the org", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSpacesReturns(
 						[]v2action.Space{},
@@ -489,7 +489,7 @@ var _ = Describe("bind-security-group Command", func() {
 				})
 			})
 
-			Context("when there are spaces in the org", func() {
+			When("there are spaces in the org", func() {
 				BeforeEach(func() {
 					fakeActor.GetOrganizationSpacesReturns(
 						[]v2action.Space{
@@ -506,7 +506,7 @@ var _ = Describe("bind-security-group Command", func() {
 						nil)
 				})
 
-				Context("when no errors are encountered binding the security group to the spaces", func() {
+				When("no errors are encountered binding the security group to the spaces", func() {
 					BeforeEach(func() {
 						fakeActor.BindSecurityGroupToSpaceReturnsOnCall(
 							0,
@@ -551,7 +551,7 @@ var _ = Describe("bind-security-group Command", func() {
 					})
 				})
 
-				Context("when an error is encountered binding the security group to a space", func() {
+				When("an error is encountered binding the security group to a space", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -574,7 +574,7 @@ var _ = Describe("bind-security-group Command", func() {
 				})
 			})
 
-			Context("when an error is encountered getting spaces in the org", func() {
+			When("an error is encountered getting spaces in the org", func() {
 				var expectedErr error
 
 				BeforeEach(func() {

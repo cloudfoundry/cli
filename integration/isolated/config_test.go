@@ -38,7 +38,7 @@ var _ = Describe("Config", func() {
 	})
 
 	Describe("Lingering Config Temp Files", func() {
-		Context("when lingering tmp files exist from previous failed attempts to write the config", func() {
+		When("lingering tmp files exist from previous failed attempts to write the config", func() {
 			BeforeEach(func() {
 				for i := 0; i < 3; i++ {
 					tmpFile, err := ioutil.TempFile(configDir, "temp-config")
@@ -82,7 +82,7 @@ var _ = Describe("Config", func() {
 	})
 
 	Describe("Enable Color", func() {
-		Context("when color is enabled", func() {
+		When("color is enabled", func() {
 			It("prints colors", func() {
 				session := helpers.CFWithEnv(map[string]string{"CF_COLOR": "true"}, "help")
 				Eventually(session).Should(Say("\x1b\\[1m"))
@@ -90,7 +90,7 @@ var _ = Describe("Config", func() {
 			})
 		})
 
-		Context("when color is disabled", func() {
+		When("color is disabled", func() {
 			It("does not print colors", func() {
 				session := helpers.CFWithEnv(map[string]string{"CF_COLOR": "false"}, "help")
 				Consistently(session).ShouldNot(Say("\x1b\\[1m"))
@@ -100,7 +100,7 @@ var _ = Describe("Config", func() {
 	})
 
 	Describe("Dial Timeout", func() {
-		Context("when the dial timeout is set", func() {
+		When("the dial timeout is set", func() {
 			BeforeEach(func() {
 				config, err := configv3.LoadConfig()
 				Expect(err).ToNot(HaveOccurred())

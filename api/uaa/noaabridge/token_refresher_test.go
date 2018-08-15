@@ -24,7 +24,7 @@ var _ = Describe("TokenRefresher", func() {
 			tokenRefresher = NewTokenRefresher(fakeUAAClient, fakeTokenCache)
 		})
 
-		Context("when UAA communication is successful", func() {
+		When("UAA communication is successful", func() {
 			BeforeEach(func() {
 				fakeTokenCache.RefreshTokenReturns("old-refresh-token")
 
@@ -56,7 +56,7 @@ var _ = Describe("TokenRefresher", func() {
 			})
 		})
 
-		Context("when UAA communication returns an error", func() {
+		When("UAA communication returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

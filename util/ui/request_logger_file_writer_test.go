@@ -150,7 +150,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 		})
 
 		Describe("DisplayJSONBody", func() {
-			Context("when provided well formed JSON", func() {
+			When("provided well formed JSON", func() {
 				It("writes a formatted output", func() {
 					raw := `{"a":"b", "c":"d", "don't escape HTML":"<&>"}`
 					formatted := `{
@@ -176,7 +176,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 				})
 			})
 
-			Context("when the body is empty", func() {
+			When("the body is empty", func() {
 				It("does not write the body", func() {
 					err := display.DisplayJSONBody(nil)
 					Expect(err).ToNot(HaveOccurred())
@@ -194,7 +194,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 				})
 			})
 
-			Context("when provided malformed JSON", func() {
+			When("provided malformed JSON", func() {
 				It("displays the raw body", func() {
 					raw := `[{"data":1, "banana": 2}`
 					err := display.DisplayJSONBody([]byte(raw))

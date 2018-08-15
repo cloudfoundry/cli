@@ -129,14 +129,14 @@ var _ = Describe("Translatable Errors", func() {
 	)
 
 	Describe("PluginInvalidError", func() {
-		Context("when the wrapped error is nil", func() {
+		When("the wrapped error is nil", func() {
 			It("does not concatenate the nil error in the returned Error()", func() {
 				err := PluginInvalidError{}
 				Expect(err.Error()).To(Equal("File is not a valid cf CLI plugin binary."))
 			})
 		})
 
-		Context("when the wrapped error is not nil", func() {
+		When("the wrapped error is not nil", func() {
 			It("does prepends the error message in the returned Error()", func() {
 				err := PluginInvalidError{Err: errors.New("ello")}
 				Expect(err.Error()).To(Equal("ello\nFile is not a valid cf CLI plugin binary."))

@@ -50,9 +50,9 @@ var _ = Describe("Service Instance Actions", func() {
 			warnings, shareErr = actor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganization(shareToSpaceName, serviceInstanceName, sourceSpaceGUID, shareToOrgGUID)
 		})
 
-		Context("when no errors occur getting the service instance", func() {
-			Context("when no errors occur getting the space we are sharing to", func() {
-				Context("when the service instance is a managed service instance", func() {
+		When("no errors occur getting the service instance", func() {
+			When("no errors occur getting the space we are sharing to", func() {
+				When("the service instance is a managed service instance", func() {
 					BeforeEach(func() {
 						fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(
 							v2action.ServiceInstance{
@@ -71,7 +71,7 @@ var _ = Describe("Service Instance Actions", func() {
 							nil)
 					})
 
-					Context("when no errors occur getting the service", func() {
+					When("no errors occur getting the service", func() {
 						BeforeEach(func() {
 							fakeV2Actor.GetServiceReturns(
 								v2action.Service{
@@ -83,7 +83,7 @@ var _ = Describe("Service Instance Actions", func() {
 								nil)
 						})
 
-						Context("when no errors occur getting feature flags", func() {
+						When("no errors occur getting feature flags", func() {
 							BeforeEach(func() {
 								fakeV2Actor.GetFeatureFlagsReturns(
 									[]v2action.FeatureFlag{
@@ -100,7 +100,7 @@ var _ = Describe("Service Instance Actions", func() {
 									nil)
 							})
 
-							Context("when no errors occur getting the spaces the service instance is shared to", func() {
+							When("no errors occur getting the spaces the service instance is shared to", func() {
 								BeforeEach(func() {
 									fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceReturns(
 										[]v2action.ServiceInstanceSharedTo{
@@ -111,8 +111,8 @@ var _ = Describe("Service Instance Actions", func() {
 										nil)
 								})
 
-								Context("when the service instance is NOT already shared with this space", func() {
-									Context("when no errors occur sharing the service instance to this space", func() {
+								When("the service instance is NOT already shared with this space", func() {
+									When("no errors occur sharing the service instance to this space", func() {
 										BeforeEach(func() {
 											fakeV3Actor.ShareServiceInstanceToSpacesReturns(
 												v3action.RelationshipList{
@@ -157,7 +157,7 @@ var _ = Describe("Service Instance Actions", func() {
 										})
 									})
 
-									Context("when an error occurs sharing the service instance to this space", func() {
+									When("an error occurs sharing the service instance to this space", func() {
 										var expectedErr error
 
 										BeforeEach(func() {
@@ -181,7 +181,7 @@ var _ = Describe("Service Instance Actions", func() {
 									})
 								})
 
-								Context("when the service instance IS already shared with this space", func() {
+								When("the service instance IS already shared with this space", func() {
 									BeforeEach(func() {
 										fakeV2Actor.GetSpaceByOrganizationAndNameReturns(
 											v2action.Space{
@@ -204,7 +204,7 @@ var _ = Describe("Service Instance Actions", func() {
 								})
 							})
 
-							Context("when an error occurs getting the spaces the service instance is shared to", func() {
+							When("an error occurs getting the spaces the service instance is shared to", func() {
 								var expectedErr error
 
 								BeforeEach(func() {
@@ -227,7 +227,7 @@ var _ = Describe("Service Instance Actions", func() {
 							})
 						})
 
-						Context("when an error occurs getting feature flags", func() {
+						When("an error occurs getting feature flags", func() {
 							var expectedErr error
 
 							BeforeEach(func() {
@@ -249,7 +249,7 @@ var _ = Describe("Service Instance Actions", func() {
 						})
 					})
 
-					Context("when an error occurs getting the service", func() {
+					When("an error occurs getting the service", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -269,7 +269,7 @@ var _ = Describe("Service Instance Actions", func() {
 						})
 					})
 
-					Context("when service sharing is globally disabled, and service sharing is disabled by the service broker", func() {
+					When("service sharing is globally disabled, and service sharing is disabled by the service broker", func() {
 						BeforeEach(func() {
 							fakeV2Actor.GetServiceReturns(
 								v2action.Service{
@@ -307,7 +307,7 @@ var _ = Describe("Service Instance Actions", func() {
 						})
 					})
 
-					Context("when service sharing is globally enabled, and service sharing is disabled by the service broker", func() {
+					When("service sharing is globally enabled, and service sharing is disabled by the service broker", func() {
 						BeforeEach(func() {
 							fakeV2Actor.GetServiceReturns(
 								v2action.Service{
@@ -345,7 +345,7 @@ var _ = Describe("Service Instance Actions", func() {
 						})
 					})
 
-					Context("when service sharing is globally disabled, and service sharing is enabled by the service broker", func() {
+					When("service sharing is globally disabled, and service sharing is enabled by the service broker", func() {
 						BeforeEach(func() {
 							fakeV2Actor.GetServiceReturns(
 								v2action.Service{
@@ -384,7 +384,7 @@ var _ = Describe("Service Instance Actions", func() {
 					})
 				})
 
-				Context("when the service instance is not a managed service instance", func() {
+				When("the service instance is not a managed service instance", func() {
 					BeforeEach(func() {
 						fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(
 							v2action.ServiceInstance{
@@ -422,7 +422,7 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 			})
 
-			Context("when an error occurs getting the space we are sharing to", func() {
+			When("an error occurs getting the space we are sharing to", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -447,7 +447,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when an error occurs getting the service instance", func() {
+		When("an error occurs getting the service instance", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -464,7 +464,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when the service instance does not exist", func() {
+		When("the service instance does not exist", func() {
 			BeforeEach(func() {
 				fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(
 					v2action.ServiceInstance{},
@@ -501,7 +501,7 @@ var _ = Describe("Service Instance Actions", func() {
 			warnings, shareErr = actor.ShareServiceInstanceToSpaceNameByNameAndSpaceAndOrganizationName(shareToSpaceName, serviceInstanceName, sourceSpaceGUID, shareToOrgName)
 		})
 
-		Context("when no errors occur getting the org", func() {
+		When("no errors occur getting the org", func() {
 			BeforeEach(func() {
 				fakeV3Actor.GetOrganizationByNameReturns(
 					v3action.Organization{
@@ -604,7 +604,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when an error occurs getting the org", func() {
+		When("an error occurs getting the org", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -644,7 +644,7 @@ var _ = Describe("Service Instance Actions", func() {
 			warnings, executeErr = actor.UnshareServiceInstanceFromOrganizationNameAndSpaceNameByNameAndSpace(shareToOrgName, shareToSpaceName, serviceInstanceName, currentlyTargetedSpaceGUID)
 		})
 
-		Context("when no errors occur getting the service instance", func() {
+		When("no errors occur getting the service instance", func() {
 			BeforeEach(func() {
 				fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(
 					v2action.ServiceInstance{
@@ -654,7 +654,7 @@ var _ = Describe("Service Instance Actions", func() {
 					nil)
 			})
 
-			Context("when no errors occur getting the service instance's shared to spaces", func() {
+			When("no errors occur getting the service instance's shared to spaces", func() {
 				BeforeEach(func() {
 					fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceReturns(
 						[]v2action.ServiceInstanceSharedTo{
@@ -673,7 +673,7 @@ var _ = Describe("Service Instance Actions", func() {
 						nil)
 				})
 
-				Context("when no errors occur unsharing the service instance", func() {
+				When("no errors occur unsharing the service instance", func() {
 					BeforeEach(func() {
 						fakeV3Actor.UnshareServiceInstanceByServiceInstanceAndSpaceReturns(
 							v3action.Warnings{"unshare-warning"},
@@ -702,7 +702,7 @@ var _ = Describe("Service Instance Actions", func() {
 					})
 				})
 
-				Context("when an error occurs unsharing the service instance", func() {
+				When("an error occurs unsharing the service instance", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -722,7 +722,7 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 			})
 
-			Context("when an error occurs getting the service instance's shared to spaces", func() {
+			When("an error occurs getting the service instance's shared to spaces", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -741,7 +741,7 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 			})
 
-			Context("when the service instance is not shared to the space we want to unshare with", func() {
+			When("the service instance is not shared to the space we want to unshare with", func() {
 				BeforeEach(func() {
 					fakeV2Actor.GetServiceInstanceSharedTosByServiceInstanceReturns(
 						[]v2action.ServiceInstanceSharedTo{
@@ -766,7 +766,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when an error occurs getting the service instance", func() {
+		When("an error occurs getting the service instance", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -783,7 +783,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 		})
 
-		Context("when the service instance does not exist", func() {
+		When("the service instance does not exist", func() {
 			BeforeEach(func() {
 				fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(
 					v2action.ServiceInstance{},

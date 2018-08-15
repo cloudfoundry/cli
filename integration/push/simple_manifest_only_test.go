@@ -26,10 +26,10 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 		username, _ = helpers.GetCredentials()
 	})
 
-	Context("when the app is new", func() {
-		Context("when the manifest is in the current directory", func() {
+	When("the app is new", func() {
+		When("the manifest is in the current directory", func() {
 			Context("with no global properties", func() {
-				Context("when the API version is below 3.27.0", func() {
+				When("the API version is below 3.27.0", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
 					})
@@ -115,7 +115,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 
 				})
 
-				Context("when the API version is above 3.27.0", func() {
+				When("the API version is above 3.27.0", func() {
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
 					})
@@ -205,7 +205,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 
 				})
 
-				Context("when health-check-type is http and no endpoint is provided", func() {
+				When("health-check-type is http and no endpoint is provided", func() {
 					It("defaults health-check-http-endpoint to '/'", func() {
 						helpers.WithHelloWorldApp(func(dir string) {
 							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -236,7 +236,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 				})
 			})
 
-			Context("when the app has no name", func() {
+			When("the app has no name", func() {
 				It("returns an error", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -254,7 +254,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 				})
 			})
 
-			Context("when the app path does not exist", func() {
+			When("the app path does not exist", func() {
 				It("returns an error", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -285,8 +285,8 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 		})
 	})
 
-	Context("when the app already exists", func() {
-		Context("when the app has manifest properties", func() {
+	When("the app already exists", func() {
+		When("the app has manifest properties", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{

@@ -25,18 +25,18 @@ var _ = Describe("oauth-token command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "oauth-token")
 		})
 	})
 
-	Context("when the environment is setup correctly and user is logged in with password grant", func() {
+	When("the environment is setup correctly and user is logged in with password grant", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})
 
-		Context("when the refresh token is invalid", func() {
+		When("the refresh token is invalid", func() {
 			BeforeEach(func() {
 				helpers.SetConfig(func(conf *configv3.Config) {
 					conf.ConfigFile.RefreshToken = "invalid-refresh-token"
@@ -52,7 +52,7 @@ var _ = Describe("oauth-token command", func() {
 			})
 		})
 
-		Context("when the oauth client ID and secret combination is invalid", func() {
+		When("the oauth client ID and secret combination is invalid", func() {
 			BeforeEach(func() {
 				helpers.SetConfig(func(conf *configv3.Config) {
 					conf.ConfigFile.UAAOAuthClient = "foo"
@@ -69,7 +69,7 @@ var _ = Describe("oauth-token command", func() {
 			})
 		})
 
-		Context("when the refresh token and oauth creds are valid", func() {
+		When("the refresh token and oauth creds are valid", func() {
 			It("refreshes the access token and displays it", func() {
 				session := helpers.CF("oauth-token")
 
@@ -79,12 +79,12 @@ var _ = Describe("oauth-token command", func() {
 		})
 	})
 
-	Context("when the environment is setup correctly and user is logged in with client credentials grant", func() {
+	When("the environment is setup correctly and user is logged in with client credentials grant", func() {
 		BeforeEach(func() {
 			helpers.LoginCFWithClientCredentials()
 		})
 
-		Context("when the oauth client ID and secret combination is invalid", func() {
+		When("the oauth client ID and secret combination is invalid", func() {
 			BeforeEach(func() {
 				helpers.SetConfig(func(conf *configv3.Config) {
 					conf.ConfigFile.UAAOAuthClient = "foo"
@@ -101,7 +101,7 @@ var _ = Describe("oauth-token command", func() {
 			})
 		})
 
-		Context("when the access token is invalid", func() {
+		When("the access token is invalid", func() {
 			BeforeEach(func() {
 				helpers.SetConfig(func(conf *configv3.Config) {
 					conf.ConfigFile.AccessToken = "invalid-access-token"
@@ -116,7 +116,7 @@ var _ = Describe("oauth-token command", func() {
 			})
 		})
 
-		Context("when the oauth creds are valid", func() {
+		When("the oauth creds are valid", func() {
 			It("refreshes the access token and displays it", func() {
 				session := helpers.CF("oauth-token")
 

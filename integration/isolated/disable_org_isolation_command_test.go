@@ -22,7 +22,7 @@ var _ = Describe("disable-org-isolation command", func() {
 	})
 
 	Describe("help", func() {
-		Context("when --help flag is set", func() {
+		When("--help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("disable-org-isolation", "--help")
 				Eventually(session).Should(Say("NAME:"))
@@ -36,12 +36,12 @@ var _ = Describe("disable-org-isolation command", func() {
 		})
 	})
 
-	Context("when the environment is not setup correctly", func() {
+	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "disable-org-isolation", "org-name", "isolation-segment-name")
 		})
 
-		Context("when the v3 api does not exist", func() {
+		When("the v3 api does not exist", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -60,7 +60,7 @@ var _ = Describe("disable-org-isolation command", func() {
 			})
 		})
 
-		Context("when the v3 api version is lower than the minimum version", func() {
+		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
 			BeforeEach(func() {
@@ -80,7 +80,7 @@ var _ = Describe("disable-org-isolation command", func() {
 		})
 	})
 
-	Context("when the environment is set up correctly", func() {
+	When("the environment is set up correctly", func() {
 		var userName string
 
 		BeforeEach(func() {
@@ -88,7 +88,7 @@ var _ = Describe("disable-org-isolation command", func() {
 			userName, _ = helpers.GetCredentials()
 		})
 
-		Context("when the org does not exist", func() {
+		When("the org does not exist", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 			})
@@ -102,7 +102,7 @@ var _ = Describe("disable-org-isolation command", func() {
 			})
 		})
 
-		Context("when the isolation segment does not exist", func() {
+		When("the isolation segment does not exist", func() {
 			It("outputs an error and exits 1", func() {
 				session := helpers.CF("disable-org-isolation", organizationName, isolationSegmentName)
 				Eventually(session).Should(Say("Removing entitlement to isolation segment %s from org %s as %s...", isolationSegmentName, organizationName, userName))
@@ -112,7 +112,7 @@ var _ = Describe("disable-org-isolation command", func() {
 			})
 		})
 
-		Context("when the binding does not exist", func() {
+		When("the binding does not exist", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 				Eventually(helpers.CF("create-org", organizationName)).Should(Exit(0))
@@ -136,7 +136,7 @@ var _ = Describe("disable-org-isolation command", func() {
 			})
 		})
 
-		Context("when everything exists", func() {
+		When("everything exists", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 				Eventually(helpers.CF("create-org", organizationName)).Should(Exit(0))

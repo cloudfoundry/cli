@@ -20,7 +20,7 @@ var _ = Describe("PluginRepository", func() {
 	})
 
 	Describe("GetPluginRepository", func() {
-		Context("when the url points to a valid CF CLI plugin repo", func() {
+		When("the url points to a valid CF CLI plugin repo", func() {
 			var response string
 
 			BeforeEach(func() {
@@ -71,28 +71,28 @@ var _ = Describe("PluginRepository", func() {
 				}))
 			})
 
-			Context("when the URL has a trailing slash", func() {
+			When("the URL has a trailing slash", func() {
 				It("still hits the /list endpoint on the URL", func() {
 					_, err := client.GetPluginRepository(fmt.Sprintf("%s/", server.URL()))
 					Expect(err).ToNot(HaveOccurred())
 				})
 			})
 
-			Context("when the URL has a trailing '/list'", func() {
+			When("the URL has a trailing '/list'", func() {
 				It("still hits the /list endpoint on the URL", func() {
 					_, err := client.GetPluginRepository(fmt.Sprintf("%s/list", server.URL()))
 					Expect(err).ToNot(HaveOccurred())
 				})
 			})
 
-			Context("when the URL has a trailing '/list/'", func() {
+			When("the URL has a trailing '/list/'", func() {
 				It("still hits the /list endpoint on the URL", func() {
 					_, err := client.GetPluginRepository(fmt.Sprintf("%s/list/", server.URL()))
 					Expect(err).ToNot(HaveOccurred())
 				})
 			})
 
-			Context("when the URL has path different from /list", func() {
+			When("the URL has path different from /list", func() {
 				BeforeEach(func() {
 					server.SetHandler(0,
 						CombineHandlers(
@@ -109,14 +109,14 @@ var _ = Describe("PluginRepository", func() {
 			})
 		})
 
-		Context("when the repository URL in invalid", func() {
+		When("the repository URL in invalid", func() {
 			It("returns an error", func() {
 				_, err := client.GetPluginRepository("http://not a valid URL")
 				Expect(err).To(BeAssignableToTypeOf(&url.Error{}))
 			})
 		})
 
-		Context("when the server returns an error", func() {
+		When("the server returns an error", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(

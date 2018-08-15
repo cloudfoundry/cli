@@ -45,7 +45,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 		Expect(os.RemoveAll(manifestPath)).ToNot(HaveOccurred())
 	})
 
-	Context("when only `--vars-file` flags are provided", func() {
+	When("only `--vars-file` flags are provided", func() {
 		var (
 			tmpDir string
 
@@ -63,7 +63,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 			Expect(os.RemoveAll(tmpDir)).ToNot(HaveOccurred())
 		})
 
-		Context("when there are no duplicate variables", func() {
+		When("there are no duplicate variables", func() {
 			BeforeEach(func() {
 				firstVarsFilePath = filepath.Join(tmpDir, "vars1")
 				vars1 := fmt.Sprintf("vars1: %s", appName)
@@ -94,7 +94,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 			})
 		})
 
-		Context("when a variable in manifest is not found in var_file", func() {
+		When("a variable in manifest is not found in var_file", func() {
 			BeforeEach(func() {
 				firstVarsFilePath = filepath.Join(tmpDir, "vars1")
 				vars1 := fmt.Sprintf("vars1: %s", appName)
@@ -119,7 +119,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 			})
 		})
 
-		Context("when there are duplicate variables", func() {
+		When("there are duplicate variables", func() {
 			BeforeEach(func() {
 				firstVarsFilePath = filepath.Join(tmpDir, "vars1")
 				vars1 := fmt.Sprintf("vars1: %s\nvars2: %d", "some-garbage-appname", instances)
@@ -150,7 +150,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 		})
 	})
 
-	Context("when only `--var` flag vars are provided", func() {
+	When("only `--var` flag vars are provided", func() {
 		It("replaces the variables with the provided values", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", manifestPath, "--var", fmt.Sprintf("vars1=%s", appName), "--var", fmt.Sprintf("vars2=%d", instances))
@@ -168,7 +168,7 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 		})
 	})
 
-	Context("when `--vars-file` and `--var` flag vars are provided", func() {
+	When("`--vars-file` and `--var` flag vars are provided", func() {
 		var varsFilePath string
 		BeforeEach(func() {
 			tmp, err := ioutil.TempFile("", "varsfile-interpolation")

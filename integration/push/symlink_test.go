@@ -37,7 +37,7 @@ var _ = Describe("push with symlink path", func() {
 	})
 
 	Context("push with flag options", func() {
-		Context("when pushing from a symlinked current directory", func() {
+		When("pushing from a symlinked current directory", func() {
 			It("should push with the absolute path of the app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					Expect(os.Symlink(dir, symlinkedPath)).ToNot(HaveOccurred())
@@ -49,7 +49,7 @@ var _ = Describe("push with symlink path", func() {
 			})
 		})
 
-		Context("when pushing a symlinked path with the '-p' flag", func() {
+		When("pushing a symlinked path with the '-p' flag", func() {
 			It("should push with the absolute path of the app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					Expect(os.Symlink(dir, symlinkedPath)).ToNot(HaveOccurred())
@@ -61,7 +61,7 @@ var _ = Describe("push with symlink path", func() {
 			})
 		})
 
-		Context("when pushing an symlinked archive with the '-p' flag", func() {
+		When("pushing an symlinked archive with the '-p' flag", func() {
 			var archive string
 
 			BeforeEach(func() {
@@ -90,7 +90,7 @@ var _ = Describe("push with symlink path", func() {
 		})
 
 		Context("push with a single app manifest", func() {
-			Context("when the path property is a symlinked path", func() {
+			When("the path property is a symlinked path", func() {
 				It("should push with the absolute path of the app", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						Expect(os.Symlink(dir, symlinkedPath)).ToNot(HaveOccurred())
