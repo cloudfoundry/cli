@@ -3,8 +3,10 @@ package v2_test
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -36,6 +38,8 @@ var _ = Describe("rename buildpack command", func() {
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 		}
+
+		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionForStackFlagV2)
 	})
 
 	JustBeforeEach(func() {
@@ -123,7 +127,22 @@ var _ = Describe("rename buildpack command", func() {
 			BeforeEach(func() {
 				cmd.Stack = stackName
 			})
-			When("no error is returned", func() {
+
+			When("the version of CAPI is too low", func() {
+				BeforeEach(func() {
+					fakeActor.CloudControllerAPIVersionReturns("2.69.0")
+				})
+
+				It("should warn the user that the version of CAPI is too low and exit with an error", func() {
+					Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+						Command:        "Option `-s`",
+						CurrentVersion: fakeActor.CloudControllerAPIVersion(),
+						MinimumVersion: ccversion.MinVersionForStackFlagV2,
+					}))
+				})
+			})
+
+			When("the actor succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.RenameBuildpackReturns(v2action.Warnings{"warning1", "warning2"}, nil)
 				})
@@ -149,7 +168,7 @@ var _ = Describe("rename buildpack command", func() {
 				})
 			})
 
-			When("an error is returned", func() {
+			When("the actor returns an error", func() {
 				BeforeEach(func() {
 					fakeActor.RenameBuildpackReturns(
 						v2action.Warnings{"warning1", "warning2"},

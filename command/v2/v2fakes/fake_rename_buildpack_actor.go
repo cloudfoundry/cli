@@ -9,6 +9,15 @@ import (
 )
 
 type FakeRenameBuildpackActor struct {
+	CloudControllerAPIVersionStub        func() string
+	cloudControllerAPIVersionMutex       sync.RWMutex
+	cloudControllerAPIVersionArgsForCall []struct{}
+	cloudControllerAPIVersionReturns     struct {
+		result1 string
+	}
+	cloudControllerAPIVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
 	RenameBuildpackStub        func(oldName string, newName string, stackName string) (v2action.Warnings, error)
 	renameBuildpackMutex       sync.RWMutex
 	renameBuildpackArgsForCall []struct {
@@ -26,6 +35,46 @@ type FakeRenameBuildpackActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeRenameBuildpackActor) CloudControllerAPIVersion() string {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
+	fake.cloudControllerAPIVersionMutex.Unlock()
+	if fake.CloudControllerAPIVersionStub != nil {
+		return fake.CloudControllerAPIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.cloudControllerAPIVersionReturns.result1
+}
+
+func (fake *FakeRenameBuildpackActor) CloudControllerAPIVersionCallCount() int {
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	return len(fake.cloudControllerAPIVersionArgsForCall)
+}
+
+func (fake *FakeRenameBuildpackActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.CloudControllerAPIVersionStub = nil
+	fake.cloudControllerAPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRenameBuildpackActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.CloudControllerAPIVersionStub = nil
+	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
+		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeRenameBuildpackActor) RenameBuildpack(oldName string, newName string, stackName string) (v2action.Warnings, error) {
@@ -84,6 +133,8 @@ func (fake *FakeRenameBuildpackActor) RenameBuildpackReturnsOnCall(i int, result
 func (fake *FakeRenameBuildpackActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.renameBuildpackMutex.RLock()
 	defer fake.renameBuildpackMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

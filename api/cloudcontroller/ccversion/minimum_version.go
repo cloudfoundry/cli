@@ -7,6 +7,7 @@ const (
 	MinVersionZeroAppInstancesV2        = "2.70.0"
 	MinVersionUserProvidedServiceTagsV2 = "2.104.0"
 	MinVersionAsyncBindingsV2           = "99.0.0"
+	MinVersionForStackFlagV2            = "2.112.0"
 
 	MinVersionProvideNameForServiceBinding = "2.99.0"
 

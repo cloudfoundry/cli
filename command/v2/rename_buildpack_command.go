@@ -3,6 +3,7 @@ package v2
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -11,6 +12,7 @@ import (
 //go:generate counterfeiter . RenameBuildpackActor
 
 type RenameBuildpackActor interface {
+	CloudControllerAPIVersion() string
 	RenameBuildpack(oldName string, newName string, stackName string) (v2action.Warnings, error)
 }
 
@@ -50,17 +52,21 @@ func (cmd RenameBuildpackCommand) Execute(args []string) error {
 		return err
 	}
 
-	if cmd.Stack == "" {
-		cmd.UI.DisplayTextWithFlavor("Renaming buildpack {{.OldName}} to {{.NewName}} as {{.CurrentUser}}...", map[string]interface{}{
-			"OldName":     cmd.RequiredArgs.OldBuildpackName,
-			"NewName":     cmd.RequiredArgs.NewBuildpackName,
-			"CurrentUser": user.Name,
-		})
-	} else {
+	if cmd.stackSpecified() {
+		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionForStackFlagV2, "Option `-s`")
+		if err != nil {
+			return err
+		}
 		cmd.UI.DisplayTextWithFlavor("Renaming buildpack {{.OldName}} to {{.NewName}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"OldName":     cmd.RequiredArgs.OldBuildpackName,
 			"NewName":     cmd.RequiredArgs.NewBuildpackName,
 			"Stack":       cmd.Stack,
+			"CurrentUser": user.Name,
+		})
+	} else {
+		cmd.UI.DisplayTextWithFlavor("Renaming buildpack {{.OldName}} to {{.NewName}} as {{.CurrentUser}}...", map[string]interface{}{
+			"OldName":     cmd.RequiredArgs.OldBuildpackName,
+			"NewName":     cmd.RequiredArgs.NewBuildpackName,
 			"CurrentUser": user.Name,
 		})
 	}
@@ -74,4 +80,8 @@ func (cmd RenameBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	return nil
+}
+
+func (cmd RenameBuildpackCommand) stackSpecified() bool {
+	return len(cmd.Stack) > 0
 }

@@ -1,6 +1,7 @@
 package global
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -48,8 +49,23 @@ var _ = Describe("rename buildpack command", func() {
 			username, _ = helpers.GetCredentials()
 		})
 
-		When("the user provides a stack", func() {
+		When("the user provides a stack in an unsupported version", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionAtLeast(ccversion.MinVersionForStackFlagV2)
+			})
+
+			It("should report that the version of CAPI is too low", func() {
+				session := helpers.CF("rename-buildpack", oldBuildpackName, newBuildpackName, "-s", stacks[0])
+				Eventually(session.Err).Should(Say("Option `-s` requires CF API version 2.112.0 or higher. Your target is 2\\.\\d+\\.\\d+"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when the user provides a stack", func() {
 			var session *Session
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionForStackFlagV2)
+			})
 
 			JustBeforeEach(func() {
 				session = helpers.CF("rename-buildpack", oldBuildpackName, newBuildpackName, "-s", stacks[0])
