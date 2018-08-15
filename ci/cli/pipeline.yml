@@ -11,7 +11,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
-    branch: develop
+    branch: master
     ignore_paths: &ciPaths
     - bin
     - ci
@@ -28,14 +28,14 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
-    branch: develop
+    branch: master
     paths: *ciPaths
 
 - name: cli-integration
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
-    branch: develop
+    branch: master
     paths:
     - integration
 
@@ -200,14 +200,14 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
-    branch: develop
+    branch: master
     paths: [ci/cli-base/Dockerfile]
 
 - name: cli-ci-package-dockerfile
   type: git
   source:
     uri: https://github.com/cloudfoundry/cli
-    branch: develop
+    branch: master
     paths: [ci/cli-package/Dockerfile]
 
 - name: cf-cli-base-image
