@@ -188,8 +188,8 @@ func ConvertToTranslatableError(err error) error {
 		return SSHUnableToAuthenticateError{}
 
 	// UAA Errors
-	case uaa.BadCredentialsError:
-		return BadCredentialsError{}
+	case uaa.UnauthorizedError:
+		return UnauthorizedError(e)
 	case uaa.InsufficientScopeError:
 		return UnauthorizedToPerformActionError{}
 	case uaa.InvalidAuthTokenError:

@@ -54,7 +54,7 @@ func convert(rawHTTPStatusErr RawHTTPStatusError) error {
 			return InvalidAuthTokenError{Message: uaaErrorResponse.Description}
 		}
 		if uaaErrorResponse.Type == "unauthorized" {
-			return BadCredentialsError{Message: uaaErrorResponse.Description}
+			return UnauthorizedError{Message: uaaErrorResponse.Description}
 		}
 		return rawHTTPStatusErr
 	case http.StatusForbidden: // 403

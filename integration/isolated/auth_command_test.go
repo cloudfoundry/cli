@@ -267,5 +267,14 @@ var _ = Describe("auth command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
+
+		When("when the user provides an invalid origin", func() {
+			It("returns an error", func() {
+				session := helpers.CF("auth", "some-user", "some-password", "--origin", "EA")
+				Eventually(session.Err).Should(Say("The origin provided is invalid."))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
 	})
 })

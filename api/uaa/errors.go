@@ -52,12 +52,12 @@ func (e RequestError) Error() string {
 	return e.Err.Error()
 }
 
-// BadCredentialsError is returned when the credentials are rejected.
-type BadCredentialsError struct {
+// UnauthorizedError is returned when the authentication informatin is invalid.
+type UnauthorizedError struct {
 	Message string
 }
 
-func (e BadCredentialsError) Error() string {
+func (e UnauthorizedError) Error() string {
 	return e.Message
 }
 

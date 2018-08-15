@@ -206,11 +206,11 @@ var _ = Describe("auth Command", func() {
 			cmd.RequiredArgs.Password = "bar"
 
 			fakeConfig.TargetReturns("some-api-target")
-			fakeActor.AuthenticateReturns(uaa.BadCredentialsError{Message: "some message"})
+			fakeActor.AuthenticateReturns(uaa.UnauthorizedError{Message: "some message"})
 		})
 
 		It("returns a BadCredentialsError", func() {
-			Expect(err).To(MatchError(uaa.BadCredentialsError{Message: "some message"}))
+			Expect(err).To(MatchError(uaa.UnauthorizedError{Message: "some message"}))
 		})
 	})
 

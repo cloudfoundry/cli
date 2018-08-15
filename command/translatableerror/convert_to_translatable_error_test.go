@@ -382,8 +382,8 @@ var _ = Describe("ConvertToTranslatableError", func() {
 
 		// UAA Errors
 		Entry("uaa.BadCredentialsError -> BadCredentialsError",
-			uaa.BadCredentialsError{},
-			BadCredentialsError{}),
+			uaa.UnauthorizedError{},
+			UnauthorizedError{}),
 
 		Entry("uaa.InsufficientScopeError -> UnauthorizedToPerformActionError",
 			uaa.InsufficientScopeError{},

@@ -131,7 +131,7 @@ var _ = Describe("Error Wrapper", func() {
 					It("returns a BadCredentialsError", func() {
 						Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 
-						Expect(makeErr).To(MatchError(BadCredentialsError{Message: "Bad credentials"}))
+						Expect(makeErr).To(MatchError(UnauthorizedError{Message: "Bad credentials"}))
 					})
 				})
 			})
