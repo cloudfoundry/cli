@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("delete-buildpack command", func() {
@@ -47,7 +48,6 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	Context("there is exactly one buildpack with the specified name", func() {
-
 		BeforeEach(func() {
 			stacks = helpers.FetchStacks()
 			helpers.BuildpackWithStack(func(buildpackPath string) {
@@ -74,7 +74,6 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	Context("there are two buildpacks with same name", func() {
-
 		BeforeEach(func() {
 			helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
 			helpers.SkipIfOneStack()
@@ -208,6 +207,27 @@ var _ = Describe("delete-buildpack command", func() {
 			Eventually(session).Should(Say("Deleting buildpack %s", buildpackName))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
+		})
+	})
+
+	When("the -s flag is provided", func() {
+		When("the API is less than the minimum", func() {
+			var server *Server
+
+			BeforeEach(func() {
+				server = helpers.StartAndTargetServerWithAPIVersions(ccversion.MinimumVersionV2, ccversion.MinimumVersionV3)
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("fails with no networking api error message", func() {
+				session := helpers.CF("delete-buildpack", "potato", "-s", "ahoyhoy")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Option `-s` requires CF API version %s or higher. Your target is %s.", ccversion.MinVersionForStackFlagV2, ccversion.MinimumVersionV2))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 	})
 })
