@@ -75,7 +75,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 	Context("there are two buildpacks with same name", func() {
 		BeforeEach(func() {
-			helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+			helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 			helpers.SkipIfOneStack()
 		})
 

@@ -350,10 +350,11 @@ var _ = PDescribe("update-buildpack command", func() {
 				})
 
 				When("multiple buildpacks with the same name exist", func() {
+					// TODO: Uncomment and adjust these tests prior to adding support for the `-s` flag in update-buildpack
 					// var existingBuildpack string
 
 					// BeforeEach(func() {
-					// 	helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+					// 	helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 					// 	helpers.SkipIfOneStack()
 
 					// 	stacks = helpers.FetchStacks()
@@ -434,7 +435,7 @@ var _ = PDescribe("update-buildpack command", func() {
 
 					// When("the new buildpack has a non-nil stack", func() {
 					// 	BeforeEach(func() {
-					// 		helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+					// 		helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 					// 	})
 
 					// 	When("the existing buildpack has a different non-nil stack", func() {

@@ -129,7 +129,7 @@ var _ = Describe("create buildpack command", func() {
 
 					When("the new buildpack has a valid stack", func() {
 						BeforeEach(func() {
-							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 						})
 
 						It("successfully uploads a buildpack", func() {
@@ -147,7 +147,7 @@ var _ = Describe("create buildpack command", func() {
 
 				When("the new buildpack has an invalid stack", func() {
 					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 					})
 
 					It("returns the appropriate error", func() {
@@ -170,7 +170,7 @@ var _ = Describe("create buildpack command", func() {
 
 					When("the new buildpack has a nil stack", func() {
 						BeforeEach(func() {
-							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 						})
 
 						When("the existing buildpack does not have a nil stack", func() {
@@ -218,7 +218,7 @@ var _ = Describe("create buildpack command", func() {
 
 					When("the new buildpack has a non-nil stack", func() {
 						BeforeEach(func() {
-							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV3)
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 						})
 
 						When("the existing buildpack has a different non-nil stack", func() {
@@ -284,7 +284,7 @@ var _ = Describe("create buildpack command", func() {
 
 					When("the API doesn't support stack association", func() {
 						BeforeEach(func() {
-							helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV3)
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
 
 							helpers.BuildpackWithStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", existingBuildpack, buildpackPath, "5")
