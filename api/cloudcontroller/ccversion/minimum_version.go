@@ -4,13 +4,13 @@ const (
 	MinimumVersionV2 = "2.69.0"
 	MinimumVersionV3 = "3.4.0"
 
-	MinVersionBindingNameV2             = "2.99.0"
-	MinVersionDockerCredentialsV2       = "2.82.0"
-	MinVersionSymlinkedFilesV2          = "2.107.0"
-	MinVersionZeroAppInstancesV2        = "2.70.0"
-	MinVersionUserProvidedServiceTagsV2 = "2.104.0"
-	MinVersionAsyncBindingsV2           = "99.0.0"
-	MinVersionForStackFlagV2            = "2.114.0"
+	MinVersionBindingNameV2               = "2.99.0"
+	MinVersionDockerCredentialsV2         = "2.82.0"
+	MinVersionSymlinkedFilesV2            = "2.107.0"
+	MinVersionZeroAppInstancesV2          = "2.70.0"
+	MinVersionUserProvidedServiceTagsV2   = "2.104.0"
+	MinVersionAsyncBindingsV2             = "99.0.0"
+	MinVersionBuildpackStackAssociationV2 = "2.114.0"
 
 	MinVersionProvideNameForServiceBinding = "2.99.0"
 

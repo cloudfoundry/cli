@@ -225,7 +225,7 @@ var _ = Describe("delete-buildpack command", func() {
 			It("fails with no networking api error message", func() {
 				session := helpers.CF("delete-buildpack", "potato", "-s", "ahoyhoy")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Option `-s` requires CF API version %s or higher. Your target is %s.", ccversion.MinVersionForStackFlagV2, ccversion.MinimumVersionV2))
+				Eventually(session.Err).Should(Say("Option `-s` requires CF API version %s or higher. Your target is %s.", ccversion.MinVersionBuildpackStackAssociationV2, ccversion.MinimumVersionV2))
 				Eventually(session).Should(Exit(1))
 			})
 		})

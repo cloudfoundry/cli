@@ -51,7 +51,7 @@ var _ = Describe("rename buildpack command", func() {
 
 		When("the user provides a stack in an unsupported version", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionAtLeast(ccversion.MinVersionForStackFlagV2)
+				helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
 			})
 
 			It("should report that the version of CAPI is too low", func() {
@@ -64,7 +64,7 @@ var _ = Describe("rename buildpack command", func() {
 		Context("when the user provides a stack", func() {
 			var session *Session
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionForStackFlagV2)
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 			})
 
 			JustBeforeEach(func() {

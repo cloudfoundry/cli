@@ -43,7 +43,7 @@ func (cmd DeleteBuildpackCommand) Execute(args []string) error {
 	if cmd.stackSpecified() {
 		err := command.MinimumAPIVersionCheck(
 			cmd.Actor.CloudControllerAPIVersion(),
-			ccversion.MinVersionForStackFlagV2,
+			ccversion.MinVersionBuildpackStackAssociationV2,
 			"Option `-s`",
 		)
 		if err != nil {

@@ -58,7 +58,7 @@ var _ = Describe("DeleteBuildpackCommand", func() {
 				Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 					Command:        "Option `-s`",
 					CurrentVersion: fakeActor.CloudControllerAPIVersion(),
-					MinimumVersion: ccversion.MinVersionForStackFlagV2,
+					MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
 				}))
 			})
 		})

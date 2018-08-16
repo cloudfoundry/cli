@@ -39,7 +39,7 @@ var _ = Describe("rename buildpack command", func() {
 			SharedActor: fakeSharedActor,
 		}
 
-		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionForStackFlagV2)
+		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionBuildpackStackAssociationV2)
 	})
 
 	JustBeforeEach(func() {
@@ -137,7 +137,7 @@ var _ = Describe("rename buildpack command", func() {
 					Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 						Command:        "Option `-s`",
 						CurrentVersion: fakeActor.CloudControllerAPIVersion(),
-						MinimumVersion: ccversion.MinVersionForStackFlagV2,
+						MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
 					}))
 				})
 			})
