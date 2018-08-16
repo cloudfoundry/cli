@@ -126,8 +126,8 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 
 	warnings, err := actor.CloudControllerClient.UploadBuildpack(GUID, pathToBuildpackBits, progressBarReader, size)
 	if err != nil {
-		if _, ok := err.(ccerror.BuildpackAlreadyExistsForStackError); ok {
-			return Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{}
+		if e, ok := err.(ccerror.BuildpackAlreadyExistsForStackError); ok {
+			return Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: e.Message}
 		}
 		return Warnings(warnings), err
 	}
@@ -202,7 +202,7 @@ func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, e
 		case ccerror.BuildpackAlreadyExistsWithoutStackError:
 			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: buildpack.Name}
 		case ccerror.BuildpackAlreadyExistsForStackError:
-			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{BuildpackName: buildpack.Name, StackName: buildpack.Stack}
+			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: err.Error()}
 		default:
 			return Buildpack{}, Warnings(warnings), err
 		}

@@ -282,6 +282,5 @@ func (client *Client) uploadBuildpackAsynchronously(request *cloudcontroller.Req
 			break // for for
 		}
 	}
-
 	return buildpack, response.Warnings, firstError
 }

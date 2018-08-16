@@ -563,11 +563,11 @@ var _ = Describe("Buildpack", func() {
 
 			When("the buildpack already exists with a stack association", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, ccerror.BuildpackAlreadyExistsForStackError{})
+					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{}, ccv2.Warnings{"some-warning"}, ccerror.BuildpackAlreadyExistsForStackError{Message: "some-message"})
 				})
 
-				It("returns a buildpack already exists for stack  error", func() {
-					Expect(executeErr).To(MatchError(actionerror.BuildpackAlreadyExistsForStackError{BuildpackName: "some-bp-name", StackName: "some-stack"}))
+				It("returns a buildpack already exists for stack error", func() {
+					Expect(executeErr).To(MatchError(actionerror.BuildpackAlreadyExistsForStackError{Message: "some-message"}))
 					Expect(warnings).To(ConsistOf(Warnings{"some-warning"}))
 					Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
 				})
@@ -628,12 +628,12 @@ var _ = Describe("Buildpack", func() {
 
 		When("the cc returns an error because the buildpack and stack combo already exists", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-upload-warning"}, ccerror.BuildpackAlreadyExistsForStackError{Message: "cc error message ignored"})
+				fakeCloudControllerClient.UploadBuildpackReturns(ccv2.Warnings{"some-upload-warning"}, ccerror.BuildpackAlreadyExistsForStackError{Message: "ya blew it"})
 			})
 
 			It("returns warnings and a BuildpackAlreadyExistsForStackError", func() {
 				Expect(warnings).To(ConsistOf("some-upload-warning"))
-				Expect(executeErr).To(MatchError(actionerror.BuildpackAlreadyExistsForStackError{}))
+				Expect(executeErr).To(MatchError(actionerror.BuildpackAlreadyExistsForStackError{Message: "ya blew it"}))
 			})
 		})
 

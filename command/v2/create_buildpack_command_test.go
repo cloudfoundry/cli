@@ -175,7 +175,7 @@ var _ = Describe("CreateBuildpackCommand", func() {
 
 						PWhen("uploading the buildpack fails because a buildpack with that stack already exists", func() {
 							BeforeEach(func() {
-								fakeActor.UploadBuildpackReturns(v2action.Warnings{"some-upload-bp-warning"}, actionerror.BuildpackAlreadyExistsForStackError{BuildpackName: "bp-name", StackName: "stack-name"})
+								fakeActor.UploadBuildpackReturns(v2action.Warnings{"some-upload-bp-warning"}, actionerror.BuildpackAlreadyExistsForStackError{Message: "The buildpack name bp-name is already in use with stack stack-name"})
 							})
 
 							It("prints the error message as a warning but does not return it", func() {
