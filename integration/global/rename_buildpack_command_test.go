@@ -131,7 +131,7 @@ var _ = Describe("rename buildpack command", func() {
 							It("returns an error", func() {
 								Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
 								Eventually(session).Should(Say("FAILED"))
-								Eventually(session.Err).Should(Say("The buildpack name %s is already in use with stack %s", newBuildpackName, stacks[0]))
+								Eventually(session.Err).Should(Say("%s is already in use", newBuildpackName))
 								Eventually(session).Should(Exit(1))
 							})
 						})
@@ -222,7 +222,7 @@ var _ = Describe("rename buildpack command", func() {
 						It("returns a buildpack name/stack taken error", func() {
 							Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s...", oldBuildpackName, newBuildpackName, stacks[0], username))
 							Eventually(session).Should(Say("FAILED"))
-							Eventually(session.Err).Should(Say("The buildpack name %s is already in use with stack %s", newBuildpackName, stacks[0]))
+							Eventually(session.Err).Should(Say("%s is already in use", newBuildpackName))
 							Eventually(session).Should(Exit(1))
 						})
 					})
