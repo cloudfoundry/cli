@@ -51,13 +51,13 @@ var _ = Describe("DeleteBuildpackCommand", func() {
 
 		When("the api version is below minimum for stack association", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns("2.113.9")
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV2ClientVersion)
 			})
 
 			It("returns a version error", func() {
 				Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 					Command:        "Option `-s`",
-					CurrentVersion: fakeActor.CloudControllerAPIVersion(),
+					CurrentVersion: ccversion.MinV2ClientVersion,
 					MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
 				}))
 			})
@@ -65,7 +65,7 @@ var _ = Describe("DeleteBuildpackCommand", func() {
 
 		When("the api version is at or above minimum for stack association", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns("2.114.0")
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionBuildpackStackAssociationV2)
 			})
 
 			It("returns the unrefactored command error", func() {

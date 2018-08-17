@@ -11,6 +11,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v2v3action/v2v3actionfakes"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
 )
@@ -73,7 +74,7 @@ var _ = Describe("Manifest", func() {
 
 		When("the cc has a v3 buildpacks endpoint ( >= v3.25)", func() {
 			BeforeEach(func() {
-				fakeV3Actor.CloudControllerAPIVersionReturns("3.25.0")
+				fakeV3Actor.CloudControllerAPIVersionReturns(ccversion.MinVersionManifestBuildpacksV3)
 			})
 
 			It("Calls the v3actor.GetApplicationByNameAndSpace with the appName and appSpace", func() {
@@ -113,7 +114,7 @@ var _ = Describe("Manifest", func() {
 
 		When("the cc does not have a v3 buildpacks endpoint ( < v3.25)", func() {
 			BeforeEach(func() {
-				fakeV3Actor.CloudControllerAPIVersionReturns("3.24.0")
+				fakeV3Actor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
 			})
 
 			It("does not call the v3actor.GetApplicationByNameAndSpace", func() {

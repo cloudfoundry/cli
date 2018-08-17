@@ -47,7 +47,6 @@ var _ = Describe("unshare-service Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionShareServiceV3)
 	})
 
 	JustBeforeEach(func() {
@@ -56,12 +55,12 @@ var _ = Describe("unshare-service Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerV3APIVersionReturns("0.0.0")
+			fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinV3ClientVersion)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: "0.0.0",
+				CurrentVersion: ccversion.MinV3ClientVersion,
 				MinimumVersion: ccversion.MinVersionShareServiceV3,
 			}))
 		})
@@ -69,6 +68,7 @@ var _ = Describe("unshare-service Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionShareServiceV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 
@@ -84,6 +84,7 @@ var _ = Describe("unshare-service Command", func() {
 
 	When("the user is logged in, and a space and org are targeted", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionShareServiceV3)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				GUID: "some-org-guid",
 				Name: "some-org",
