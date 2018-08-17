@@ -122,13 +122,13 @@ var _ = Describe("bind-service Command", func() {
 
 				When("the version check fails", func() {
 					BeforeEach(func() {
-						fakeActor.CloudControllerAPIVersionReturns("2.34.0")
+						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV2)
 					})
 
 					It("returns a MinimumAPIVersionNotMetError", func() {
 						Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 							Command:        "Option '--name'",
-							CurrentVersion: "2.34.0",
+							CurrentVersion: ccversion.MinimumVersionV2,
 							MinimumVersion: ccversion.MinVersionProvideNameForServiceBinding,
 						}))
 						Expect(fakeActor.CloudControllerAPIVersionCallCount()).To(Equal(1))

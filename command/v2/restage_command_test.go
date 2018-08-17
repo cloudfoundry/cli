@@ -1,12 +1,16 @@
 package v2_test
 
 import (
+	"errors"
+	"time"
+
 	"code.cloudfoundry.org/bytefmt"
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -15,11 +19,9 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	"time"
 )
 
 var _ = Describe("Restage Command", func() {
@@ -491,13 +493,13 @@ var _ = Describe("Restage Command", func() {
 
 			When("the app finishes starting", func() {
 				Describe("version-dependent display", func() {
-					When("the API is at least 3.27", func() {
+					When("the API is at least MinVersionV3", func() {
 						var (
 							applicationSummary v2v3action.ApplicationSummary
 						)
 
 						BeforeEach(func() {
-							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.50.0")
+							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionV3)
 
 							v3ApplicationSummary := v3action.ApplicationSummary{
 								Application: v3action.Application{
@@ -556,14 +558,15 @@ var _ = Describe("Restage Command", func() {
 						})
 
 					})
-					When("the API is below 3.27", func() {
+
+					When("the API is below MinVersionV3", func() {
 						var (
 							applicationSummary v2action.ApplicationSummary
 							warnings           []string
 						)
 
 						BeforeEach(func() {
-							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns("3.26.0")
+							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinimumVersionV3)
 
 							applicationSummary = v2action.ApplicationSummary{
 								Application: v2action.Application{
@@ -631,7 +634,6 @@ var _ = Describe("Restage Command", func() {
 
 					})
 				})
-
 			})
 		})
 	})

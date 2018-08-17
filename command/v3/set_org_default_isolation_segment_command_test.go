@@ -51,8 +51,6 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		org = "some-org"
 		isolationSegment = "segment1"
-
-		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 	})
 
 	JustBeforeEach(func() {
@@ -74,6 +72,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 
@@ -89,6 +88,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 
 	When("fetching the user fails", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 			fakeConfig.CurrentUserReturns(configv3.User{}, errors.New("some-error"))
 		})
 
@@ -99,6 +99,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 
 	When("the user is logged in", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
 			cmd.RequiredArgs.OrganizationName = org

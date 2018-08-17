@@ -45,7 +45,6 @@ var _ = Describe("create-isolation-segment Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		isolationSegment = "segment1"
-		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 	})
 
 	JustBeforeEach(func() {
@@ -54,12 +53,12 @@ var _ = Describe("create-isolation-segment Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: "0.0.0",
+				CurrentVersion: ccversion.MinimumVersionV3,
 				MinimumVersion: ccversion.MinVersionIsolationSegmentV3,
 			}))
 		})
@@ -67,6 +66,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 
@@ -82,6 +82,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 
 	When("the user is logged in", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
 			cmd.RequiredArgs.IsolationSegmentName = isolationSegment

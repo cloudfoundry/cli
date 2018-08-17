@@ -59,7 +59,6 @@ var _ = Describe("v3-packages Command", func() {
 		})
 
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 	})
 
 	JustBeforeEach(func() {
@@ -68,12 +67,12 @@ var _ = Describe("v3-packages Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: "0.0.0",
+				CurrentVersion: ccversion.MinimumVersionV3,
 				MinimumVersion: ccversion.MinVersionV3,
 			}))
 		})
@@ -85,6 +84,7 @@ var _ = Describe("v3-packages Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
@@ -102,6 +102,7 @@ var _ = Describe("v3-packages Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			expectedErr = errors.New("some current user error")
 			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 		})
@@ -115,6 +116,7 @@ var _ = Describe("v3-packages Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			expectedErr = ccerror.RequestError{}
 			fakeActor.GetApplicationPackagesReturns([]v3action.Package{}, v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
@@ -133,6 +135,7 @@ var _ = Describe("v3-packages Command", func() {
 		var package1UTC, package2UTC string
 
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			package1UTC = "2017-08-14T21:16:42Z"
 			package2UTC = "2017-08-16T00:18:24Z"
 
@@ -176,6 +179,7 @@ var _ = Describe("v3-packages Command", func() {
 
 	When("getting the application packages returns no packages", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			fakeActor.GetApplicationPackagesReturns([]v3action.Package{}, v3action.Warnings{"warning-1", "warning-2"}, nil)
 		})
 

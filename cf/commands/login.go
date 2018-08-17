@@ -4,12 +4,12 @@ import (
 	"errors"
 	"strconv"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v2/constant"
 
 	"code.cloudfoundry.org/cli/cf/api/authentication"
 	"code.cloudfoundry.org/cli/cf/api/organizations"
@@ -96,7 +96,7 @@ func (cmd *Login) Execute(c flags.FlagContext) error {
 		return err
 	}
 
-	err = command.MinimumAPIVersionCheck(cmd.config.APIVersion(), constant.MinimumAPIVersion)
+	err = command.MinimumAPIVersionCheck(cmd.config.APIVersion(), ccversion.MinimumVersionV2)
 	if err != nil {
 		if _, ok := err.(translatableerror.MinimumAPIVersionNotMetError); ok {
 			cmd.ui.Warn("Your API version is no longer supported. Upgrade to a newer version of the API.")

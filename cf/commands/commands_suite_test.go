@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	log "github.com/sirupsen/logrus"
 
 	"testing"
 )
@@ -19,6 +20,10 @@ func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Commands Suite")
 }
+
+var _ = BeforeEach(func() {
+	log.SetLevel(log.PanicLevel)
+})
 
 type passingRequirement struct {
 	Name string

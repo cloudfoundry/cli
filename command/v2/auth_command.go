@@ -48,7 +48,7 @@ func (cmd AuthCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = command.WarnCLIVersionCheck(cmd.Config, cmd.UI)
+	err = command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.UI)
 	if err != nil {
 		return err
 	}

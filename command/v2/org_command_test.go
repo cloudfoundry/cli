@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
@@ -46,7 +47,6 @@ var _ = Describe("org Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		cmd.RequiredArgs.Organization = "some-org"
-		fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
 	})
 
 	JustBeforeEach(func() {
@@ -165,7 +165,7 @@ var _ = Describe("org Command", func() {
 					nil)
 			})
 
-			When("the v3 actor is nil", func() {
+			When("the v3 actor does not exist", func() {
 				BeforeEach(func() {
 					cmd.ActorV3 = nil
 				})
@@ -175,53 +175,75 @@ var _ = Describe("org Command", func() {
 				})
 			})
 
-			When("api version is above 3.11.0", func() {
+			When("API version is above isolation segments minimum version", func() {
 				BeforeEach(func() {
-					fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
-						[]v3action.IsolationSegment{
-							{
-								Name: "isolation-segment-1",
-								GUID: "default-isolation-segment-guid",
-							}, {
-								Name: "isolation-segment-2",
-								GUID: "some-other-isolation-segment-guid",
-							},
-						},
-						v3action.Warnings{"warning-3", "warning-4"},
-						nil)
-					fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
+					fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 				})
 
-				It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {
-					Expect(executeErr).To(BeNil())
+				When("something", func() {
+					BeforeEach(func() {
+						fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
+							[]v3action.IsolationSegment{
+								{
+									Name: "isolation-segment-1",
+									GUID: "default-isolation-segment-guid",
+								}, {
+									Name: "isolation-segment-2",
+									GUID: "some-other-isolation-segment-guid",
+								},
+							},
+							v3action.Warnings{"warning-3", "warning-4"},
+							nil)
+					})
 
-					Expect(testUI.Out).To(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-					Expect(testUI.Err).To(Say("warning-3"))
-					Expect(testUI.Err).To(Say("warning-4"))
+					It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {
+						Expect(executeErr).To(BeNil())
 
-					Expect(testUI.Out).To(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
-					Expect(testUI.Out).To(Say("domains:\\s+a-shared.com, b-private.com, c-shared.com, d-private.com"))
-					Expect(testUI.Out).To(Say("quota:\\s+some-quota"))
-					Expect(testUI.Out).To(Say("spaces:\\s+space1, space2"))
-					Expect(testUI.Out).To(Say("isolation segments:\\s+isolation-segment-1 \\(default\\), isolation-segment-2"))
+						Expect(testUI.Out).To(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
+						Expect(testUI.Err).To(Say("warning-1"))
+						Expect(testUI.Err).To(Say("warning-2"))
+						Expect(testUI.Err).To(Say("warning-3"))
+						Expect(testUI.Err).To(Say("warning-4"))
 
-					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+						Expect(testUI.Out).To(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
+						Expect(testUI.Out).To(Say("domains:\\s+a-shared.com, b-private.com, c-shared.com, d-private.com"))
+						Expect(testUI.Out).To(Say("quota:\\s+some-quota"))
+						Expect(testUI.Out).To(Say("spaces:\\s+space1, space2"))
+						Expect(testUI.Out).To(Say("isolation segments:\\s+isolation-segment-1 \\(default\\), isolation-segment-2"))
 
-					Expect(fakeActor.GetOrganizationSummaryByNameCallCount()).To(Equal(1))
-					orgName := fakeActor.GetOrganizationSummaryByNameArgsForCall(0)
-					Expect(orgName).To(Equal("some-org"))
+						Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 
-					Expect(fakeActorV3.GetIsolationSegmentsByOrganizationCallCount()).To(Equal(1))
-					orgGuid := fakeActorV3.GetIsolationSegmentsByOrganizationArgsForCall(0)
-					Expect(orgGuid).To(Equal("some-org-guid"))
+						Expect(fakeActor.GetOrganizationSummaryByNameCallCount()).To(Equal(1))
+						orgName := fakeActor.GetOrganizationSummaryByNameArgsForCall(0)
+						Expect(orgName).To(Equal("some-org"))
+
+						Expect(fakeActorV3.GetIsolationSegmentsByOrganizationCallCount()).To(Equal(1))
+						orgGuid := fakeActorV3.GetIsolationSegmentsByOrganizationArgsForCall(0)
+						Expect(orgGuid).To(Equal("some-org-guid"))
+					})
+				})
+
+				When("getting the org isolation segments returns an error", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("get org iso segs error")
+						fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
+							nil,
+							v3action.Warnings{"get iso seg warning"},
+							expectedErr)
+					})
+
+					It("returns the error and all warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+						Expect(testUI.Err).To(Say("get iso seg warning"))
+					})
 				})
 			})
 
-			When("api version is below 3.11.0", func() {
+			When("api version is below isolation segments minimum version", func() {
 				BeforeEach(func() {
-					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
+					fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
 				})
 
 				It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {
@@ -295,23 +317,6 @@ var _ = Describe("org Command", func() {
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
 				})
-			})
-		})
-
-		When("getting the org isolation segments returns an error", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("get org iso segs error")
-				fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
-					nil,
-					v3action.Warnings{"get iso seg warning"},
-					expectedErr)
-			})
-
-			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
-				Expect(testUI.Err).To(Say("get iso seg warning"))
 			})
 		})
 	})

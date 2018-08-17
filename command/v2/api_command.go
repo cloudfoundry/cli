@@ -61,7 +61,7 @@ func (cmd *ApiCommand) Execute(args []string) error {
 	}
 
 	if cmd.Config.APIVersion() != "" {
-		err := command.WarnAPIVersionCheck(cmd.Config.APIVersion(), cmd.UI)
+		err := command.WarnIfAPIVersionBelowSupportedMinimum(cmd.Config.APIVersion(), cmd.UI)
 		if err != nil {
 			return err
 		}

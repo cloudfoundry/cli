@@ -1,14 +1,14 @@
 package command
 
 import (
-	"code.cloudfoundry.org/cli/command/v2/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
 )
 
-func WarnCLIVersionCheck(config Config, ui UI) error {
-	minVer := config.MinCLIVersion()
-	currentVer := config.BinaryVersion()
+func WarnIfCLIVersionBelowAPIDefinedMinimum(WarnIfCLIVersionBelowAPIDefinedMinmum Config, ui UI) error {
+	minVer := WarnIfCLIVersionBelowAPIDefinedMinmum.MinCLIVersion()
+	currentVer := WarnIfCLIVersionBelowAPIDefinedMinmum.BinaryVersion()
 
 	isOutdated, err := checkVersionOutdated(currentVer, minVer)
 	if err != nil {
@@ -18,7 +18,7 @@ func WarnCLIVersionCheck(config Config, ui UI) error {
 	if isOutdated {
 		ui.DisplayWarning("Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
 			map[string]interface{}{
-				"APIVersion":    config.APIVersion(),
+				"APIVersion":    WarnIfCLIVersionBelowAPIDefinedMinmum.APIVersion(),
 				"MinCLIVersion": minVer,
 				"BinaryVersion": currentVer,
 			})
@@ -28,8 +28,8 @@ func WarnCLIVersionCheck(config Config, ui UI) error {
 	return nil
 }
 
-func WarnAPIVersionCheck(apiVersion string, ui UI) error {
-	isOutdated, err := checkVersionOutdated(apiVersion, constant.MinimumAPIVersion)
+func WarnIfAPIVersionBelowSupportedMinimum(apiVersion string, ui UI) error {
+	isOutdated, err := checkVersionOutdated(apiVersion, ccversion.MinimumVersionV2)
 	if err != nil {
 		return err
 	}

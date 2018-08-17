@@ -55,7 +55,7 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv2.Clie
 		return nil, nil, err
 	}
 
-	if err = command.WarnAPIVersionCheck(ccClient.APIVersion(), ui); err != nil {
+	if err = command.WarnIfAPIVersionBelowSupportedMinimum(ccClient.APIVersion(), ui); err != nil {
 		return nil, nil, err
 	}
 

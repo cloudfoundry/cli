@@ -46,7 +46,6 @@ var _ = Describe("space Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 	})
 
 	JustBeforeEach(func() {
@@ -187,61 +186,105 @@ var _ = Describe("space Command", func() {
 			})
 
 			When("there is a v3 API", func() {
-				BeforeEach(func() {
-					fakeActorV3.GetEffectiveIsolationSegmentBySpaceReturns(
-						v3action.IsolationSegment{
-							Name: "some-isolation-segment",
-						},
-						v3action.Warnings{"v3-warning-1", "v3-warning-2"},
-						nil,
-					)
+				When("v3 api version is below 3.11.0 and the v2 api version is no less than 2.68.0", func() {
+					BeforeEach(func() {
+						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV2)
+						fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
+					})
+
+					It("displays warnings and a table with space name, org, apps, services, space quota and security groups", func() {
+						Expect(executeErr).To(BeNil())
+
+						Expect(testUI.Out).NotTo(Say("isolation segment:"))
+
+						orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
+						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(spaceName).To(Equal("some-space"))
+						Expect(fakeActorV3.GetEffectiveIsolationSegmentBySpaceCallCount()).To(Equal(0))
+					})
 				})
 
-				It("displays warnings and a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
-					Expect(executeErr).To(BeNil())
+				When("the correct API versions are met", func() {
+					BeforeEach(func() {
+						fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
+					})
 
-					Expect(testUI.Out).To(Say("Getting info for space some-space in org some-org as some-user\\.\\.\\."))
-					Expect(testUI.Out).To(Say("name:\\s+some-space"))
-					Expect(testUI.Out).To(Say("org:\\s+some-org"))
-					Expect(testUI.Out).To(Say("apps:\\s+app1, app2, app3"))
-					Expect(testUI.Out).To(Say("services:\\s+service1, service2, service3"))
-					Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
-					Expect(testUI.Out).To(Say("space quota:\\s+some-space-quota"))
-					Expect(testUI.Out).To(Say("running security groups:\\s+public_networks, dns, load_balancer"))
-					Expect(testUI.Out).To(Say("staging security groups:\\s+staging-sec-1, staging-sec-2"))
+					Context("when retrieving the data is successful", func() {
+						BeforeEach(func() {
+							fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
+							fakeActorV3.GetEffectiveIsolationSegmentBySpaceReturns(
+								v3action.IsolationSegment{
+									Name: "some-isolation-segment",
+								},
+								v3action.Warnings{"v3-warning-1", "v3-warning-2"},
+								nil,
+							)
+						})
 
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-					Expect(testUI.Err).To(Say("v3-warning-1"))
-					Expect(testUI.Err).To(Say("v3-warning-2"))
+						It("displays warnings and a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
+							Expect(executeErr).To(BeNil())
 
-					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
-					Expect(fakeActor.GetSpaceSummaryByOrganizationAndNameCallCount()).To(Equal(1))
-					orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
-					Expect(orgGUID).To(Equal("some-org-guid"))
-					Expect(spaceName).To(Equal("some-space"))
-					Expect(fakeActorV3.GetEffectiveIsolationSegmentBySpaceCallCount()).To(Equal(1))
-					spaceGUID, orgDefaultIsolationSegmentGUID := fakeActorV3.GetEffectiveIsolationSegmentBySpaceArgsForCall(0)
-					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(orgDefaultIsolationSegmentGUID).To(Equal("some-org-default-isolation-segment-guid"))
-				})
-			})
+							Expect(testUI.Out).To(Say("Getting info for space some-space in org some-org as some-user\\.\\.\\."))
+							Expect(testUI.Out).To(Say("name:\\s+some-space"))
+							Expect(testUI.Out).To(Say("org:\\s+some-org"))
+							Expect(testUI.Out).To(Say("apps:\\s+app1, app2, app3"))
+							Expect(testUI.Out).To(Say("services:\\s+service1, service2, service3"))
+							Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
+							Expect(testUI.Out).To(Say("space quota:\\s+some-space-quota"))
+							Expect(testUI.Out).To(Say("running security groups:\\s+public_networks, dns, load_balancer"))
+							Expect(testUI.Out).To(Say("staging security groups:\\s+staging-sec-1, staging-sec-2"))
 
-			When("v3 api version is below 3.11.0 and the v2 api version is no less than 2.68.0", func() {
-				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns("2.69.0")
-					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
-				})
+							Expect(testUI.Err).To(Say("warning-1"))
+							Expect(testUI.Err).To(Say("warning-2"))
+							Expect(testUI.Err).To(Say("v3-warning-1"))
+							Expect(testUI.Err).To(Say("v3-warning-2"))
 
-				It("displays warnings and a table with space name, org, apps, services, space quota and security groups", func() {
-					Expect(executeErr).To(BeNil())
+							Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+							Expect(fakeActor.GetSpaceSummaryByOrganizationAndNameCallCount()).To(Equal(1))
+							orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
+							Expect(orgGUID).To(Equal("some-org-guid"))
+							Expect(spaceName).To(Equal("some-space"))
+							Expect(fakeActorV3.GetEffectiveIsolationSegmentBySpaceCallCount()).To(Equal(1))
+							spaceGUID, orgDefaultIsolationSegmentGUID := fakeActorV3.GetEffectiveIsolationSegmentBySpaceArgsForCall(0)
+							Expect(spaceGUID).To(Equal("some-space-guid"))
+							Expect(orgDefaultIsolationSegmentGUID).To(Equal("some-org-default-isolation-segment-guid"))
+						})
+					})
 
-					Expect(testUI.Out).NotTo(Say("isolation segment:"))
+					When("getting the isolation segment returns an error", func() {
+						Context("a generic error", func() {
+							var expectedErr error
 
-					orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
-					Expect(orgGUID).To(Equal("some-org-guid"))
-					Expect(spaceName).To(Equal("some-space"))
-					Expect(fakeActorV3.GetEffectiveIsolationSegmentBySpaceCallCount()).To(Equal(0))
+							BeforeEach(func() {
+								expectedErr = errors.New("get isolation segment error")
+								fakeActorV3.GetEffectiveIsolationSegmentBySpaceReturns(
+									v3action.IsolationSegment{},
+									v3action.Warnings{"v3-warning-1", "v3-warning-2"},
+									expectedErr)
+							})
+
+							It("returns the error and all warnings", func() {
+								Expect(executeErr).To(MatchError(expectedErr))
+
+								Expect(testUI.Err).To(Say("v3-warning-1"))
+								Expect(testUI.Err).To(Say("v3-warning-2"))
+							})
+						})
+
+						Context("a NoRelationshipError", func() {
+							BeforeEach(func() {
+								fakeActorV3.GetEffectiveIsolationSegmentBySpaceReturns(
+									v3action.IsolationSegment{},
+									v3action.Warnings{"v3-warning-1", "v3-warning-2"},
+									actionerror.NoRelationshipError{})
+							})
+
+							It("does not fill in the isolation segment", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(testUI.Out).To(Say("(?m)isolation segment:\\s*$"))
+							})
+						})
+					})
 				})
 			})
 		})
@@ -295,41 +338,6 @@ var _ = Describe("space Command", func() {
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
-			})
-		})
-	})
-
-	When("getting the isolation segment returns an error", func() {
-		Context("a generic error", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("get isolation segment error")
-				fakeActorV3.GetEffectiveIsolationSegmentBySpaceReturns(
-					v3action.IsolationSegment{},
-					v3action.Warnings{"v3-warning-1", "v3-warning-2"},
-					expectedErr)
-			})
-
-			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
-
-				Expect(testUI.Err).To(Say("v3-warning-1"))
-				Expect(testUI.Err).To(Say("v3-warning-2"))
-			})
-		})
-
-		Context("a NoRelationshipError", func() {
-			BeforeEach(func() {
-				fakeActorV3.GetEffectiveIsolationSegmentBySpaceReturns(
-					v3action.IsolationSegment{},
-					v3action.Warnings{"v3-warning-1", "v3-warning-2"},
-					actionerror.NoRelationshipError{})
-			})
-
-			It("does not fill in the isolation segment", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say("(?m)isolation segment:\\s*$"))
 			})
 		})
 	})

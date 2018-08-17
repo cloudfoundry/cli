@@ -61,7 +61,6 @@ var _ = Describe("v3-apps Command", func() {
 		})
 
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 	})
 
 	JustBeforeEach(func() {
@@ -70,12 +69,12 @@ var _ = Describe("v3-apps Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: "0.0.0",
+				CurrentVersion: ccversion.MinimumVersionV3,
 				MinimumVersion: ccversion.MinVersionV3,
 			}))
 		})
@@ -87,6 +86,7 @@ var _ = Describe("v3-apps Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
@@ -104,6 +104,7 @@ var _ = Describe("v3-apps Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			expectedErr = errors.New("some current user error")
 			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 		})
@@ -117,6 +118,7 @@ var _ = Describe("v3-apps Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			expectedErr = ccerror.RequestError{}
 			fakeActor.GetApplicationsWithProcessesBySpaceReturns([]v3action.ApplicationWithProcessSummary{}, v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
@@ -135,6 +137,7 @@ var _ = Describe("v3-apps Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			expectedErr = ccerror.RequestError{}
 			fakeActor.GetApplicationsWithProcessesBySpaceReturns([]v3action.ApplicationWithProcessSummary{
 				{
@@ -164,6 +167,7 @@ var _ = Describe("v3-apps Command", func() {
 
 	When("the route actor does not return any errors", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			fakeV2Actor.GetApplicationRoutesStub = func(appGUID string) (v2action.Routes, v2action.Warnings, error) {
 				switch appGUID {
 				case "app-guid-1":

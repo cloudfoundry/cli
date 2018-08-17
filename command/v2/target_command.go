@@ -45,7 +45,7 @@ func (cmd *TargetCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *TargetCommand) Execute(args []string) error {
-	err := command.WarnCLIVersionCheck(cmd.Config, cmd.UI)
+	err := command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.UI)
 	if err != nil {
 		return err
 	}

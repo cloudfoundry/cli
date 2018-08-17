@@ -88,7 +88,6 @@ var _ = Describe("v3-push Command", func() {
 			AppSummaryDisplayer: appSummaryDisplayer,
 			PackageDisplayer:    packageDisplayer,
 		}
-		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 
 		// we stub out StagePackage out here so the happy paths below don't hang
 		fakeActor.StagePackageStub = func(_ string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
@@ -112,12 +111,12 @@ var _ = Describe("v3-push Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: "0.0.0",
+				CurrentVersion: ccversion.MinimumVersionV3,
 				MinimumVersion: ccversion.MinVersionV3,
 			}))
 		})
@@ -131,6 +130,8 @@ var _ = Describe("v3-push Command", func() {
 		func(dockerImage string, dockerUsername string, dockerPassword string,
 			buildpacks []string, appPath string,
 			expectedErr error) {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+
 			cmd.DockerImage.Path = dockerImage
 			cmd.DockerUsername = dockerUsername
 			fakeConfig.DockerPasswordReturns(dockerPassword)
@@ -179,6 +180,7 @@ var _ = Describe("v3-push Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 
@@ -194,6 +196,7 @@ var _ = Describe("v3-push Command", func() {
 
 	When("the user is logged in", func() {
 		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 			fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: spaceName, GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: orgName, GUID: "some-org-guid"})
