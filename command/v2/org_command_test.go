@@ -243,7 +243,7 @@ var _ = Describe("org Command", func() {
 
 			When("api version is below isolation segments minimum version", func() {
 				BeforeEach(func() {
-					fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
+					fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
 				})
 
 				It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {

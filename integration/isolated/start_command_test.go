@@ -122,7 +122,7 @@ applications:
 					Describe("version dependent display", func() {
 						When("CC API >= 3.27.0", func() {
 							BeforeEach(func() {
-								helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+								helpers.SkipIfVersionLessThan(ccversion.MinVersionApplicationFlowV3)
 							})
 
 							It("uses the multiprocess display", func() {
@@ -151,7 +151,7 @@ applications:
 
 						When("CC API < 3.27.0", func() {
 							BeforeEach(func() {
-								helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+								helpers.SkipIfVersionAtLeast(ccversion.MinVersionApplicationFlowV3)
 							})
 
 							It("displays the app logs and information with instances table", func() {
@@ -253,7 +253,7 @@ applications:
 							Describe("version dependent display", func() {
 								When("CC API >= 3.27.0", func() {
 									BeforeEach(func() {
-										helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+										helpers.SkipIfVersionLessThan(ccversion.MinVersionApplicationFlowV3)
 									})
 
 									It("uses the multiprocess display", func() {
@@ -282,7 +282,7 @@ applications:
 
 								When("CC API < 3.27.0", func() {
 									BeforeEach(func() {
-										helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+										helpers.SkipIfVersionAtLeast(ccversion.MinVersionApplicationFlowV3)
 									})
 
 									It("displays the app logs and information with instances table", func() {

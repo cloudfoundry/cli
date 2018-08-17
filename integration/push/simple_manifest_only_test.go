@@ -31,7 +31,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 			Context("with no global properties", func() {
 				When("the API version is below 3.27.0", func() {
 					BeforeEach(func() {
-						helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+						helpers.SkipIfVersionAtLeast(ccversion.MinVersionApplicationFlowV3)
 					})
 
 					It("uses the manifest for app settings", func() {
@@ -117,7 +117,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 
 				When("the API version is above 3.27.0", func() {
 					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionApplicationFlowV3)
 					})
 
 					It("uses the manifest for app settings", func() {

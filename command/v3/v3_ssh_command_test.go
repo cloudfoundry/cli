@@ -64,13 +64,13 @@ var _ = Describe("v3-ssh Command", func() {
 
 		When("the API version is below the minimum", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
 			})
 
 			It("returns a MinimumAPIVersionNotMetError", func() {
 				Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-					CurrentVersion: ccversion.MinimumVersionV3,
-					MinimumVersion: ccversion.MinVersionV3,
+					CurrentVersion: ccversion.MinV3ClientVersion,
+					MinimumVersion: ccversion.MinVersionApplicationFlowV3,
 				}))
 			})
 
@@ -81,7 +81,7 @@ var _ = Describe("v3-ssh Command", func() {
 
 		When("checking target fails", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: "steve"})
 			})
 
@@ -97,7 +97,7 @@ var _ = Describe("v3-ssh Command", func() {
 
 		When("the user is targeted to an organization and space", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 				fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: "some-space-guid"})
 			})
 

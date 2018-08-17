@@ -44,7 +44,7 @@ func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.NewClients(config, ui, true, ccversion.MinVersionV3)
+	ccClient, _, err := shared.NewClients(config, ui, true, ccversion.MinVersionApplicationFlowV3)
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd AppCommand) Execute(args []string) error {
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
 	if err != nil {
 		return err
 	}

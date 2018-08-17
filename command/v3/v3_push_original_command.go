@@ -49,7 +49,7 @@ func (cmd *V3PushCommand) OriginalSetup(config command.Config, ui command.UI) er
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionV3}
+			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionApplicationFlowV3}
 		}
 
 		return err
@@ -90,7 +90,7 @@ func (cmd V3PushCommand) OriginalExecute(args []string) error {
 		return err
 	}
 
-	err = command.MinimumAPIVersionCheck(cmd.OriginalActor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
+	err = command.MinimumAPIVersionCheck(cmd.OriginalActor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
 	if err != nil {
 		return err
 	}

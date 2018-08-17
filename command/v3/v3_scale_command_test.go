@@ -75,13 +75,13 @@ var _ = Describe("v3-scale Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: ccversion.MinimumVersionV3,
-				MinimumVersion: ccversion.MinVersionV3,
+				CurrentVersion: ccversion.MinV3ClientVersion,
+				MinimumVersion: ccversion.MinVersionApplicationFlowV3,
 			}))
 		})
 
@@ -92,7 +92,7 @@ var _ = Describe("v3-scale Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 
@@ -108,7 +108,7 @@ var _ = Describe("v3-scale Command", func() {
 
 	When("the user is logged in, and org and space are targeted", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 			fakeConfig.HasTargetedSpaceReturns(true)

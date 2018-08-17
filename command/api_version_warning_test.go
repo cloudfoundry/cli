@@ -39,7 +39,7 @@ var _ = Describe("version checks", func() {
 		When("checking the cloud controller minimum version warning", func() {
 			When("the CLI version is less than the recommended minimum", func() {
 				BeforeEach(func() {
-					apiVersion = ccversion.MinimumVersionV2
+					apiVersion = ccversion.MinV2ClientVersion
 					fakeConfig.APIVersionReturns(apiVersion)
 					minCLIVersion = "1.0.0"
 					fakeConfig.MinCLIVersionReturns(minCLIVersion)
@@ -147,7 +147,7 @@ var _ = Describe("version checks", func() {
 			When("checking for outdated API version", func() {
 				When("the API version is older than the minimum supported API version", func() {
 					BeforeEach(func() {
-						min, err := semver.Make(ccversion.MinimumVersionV2)
+						min, err := semver.Make(ccversion.MinV2ClientVersion)
 						Expect(err).ToNot(HaveOccurred())
 						apiVersion = fmt.Sprintf("%d.%d.%d", min.Major, min.Minor-1, min.Patch)
 					})
@@ -161,7 +161,7 @@ var _ = Describe("version checks", func() {
 
 				When("the API version is newer than the minimum supported API version", func() {
 					BeforeEach(func() {
-						min, err := semver.Make(ccversion.MinimumVersionV2)
+						min, err := semver.Make(ccversion.MinV2ClientVersion)
 						Expect(err).ToNot(HaveOccurred())
 						apiVersion = fmt.Sprintf("%d.%d.%d", min.Major, min.Minor+1, min.Patch)
 					})

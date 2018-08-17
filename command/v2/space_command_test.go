@@ -188,8 +188,8 @@ var _ = Describe("space Command", func() {
 			When("there is a v3 API", func() {
 				When("v3 api version is below 3.11.0 and the v2 api version is no less than 2.68.0", func() {
 					BeforeEach(func() {
-						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV2)
-						fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
+						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV2ClientVersion)
+						fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
 					})
 
 					It("displays warnings and a table with space name, org, apps, services, space quota and security groups", func() {

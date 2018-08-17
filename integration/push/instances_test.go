@@ -58,7 +58,7 @@ var _ = Describe("push with different instances values", func() {
 
 			When("the API version is above 3.27.0", func() {
 				BeforeEach(func() {
-					helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionApplicationFlowV3)
 				})
 
 				It("pushes an app with 0 instances", func() {

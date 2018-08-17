@@ -68,13 +68,13 @@ var _ = Describe("v3-get-health-check Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: ccversion.MinimumVersionV3,
-				MinimumVersion: ccversion.MinVersionV3,
+				CurrentVersion: ccversion.MinV3ClientVersion,
+				MinimumVersion: ccversion.MinVersionApplicationFlowV3,
 			}))
 		})
 
@@ -85,7 +85,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
@@ -105,7 +105,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			expectedErr = errors.New("some current user error")
 			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 		})
@@ -119,7 +119,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 			fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceReturns(nil, v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
@@ -137,7 +137,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 
 	When("app has no processes", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceReturns(
 				[]v3action.ProcessHealthCheck{},
 				v3action.Warnings{"warning-1", "warning-2"},
@@ -160,7 +160,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 
 	When("app has processes", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			appProcessHealthChecks := []v3action.ProcessHealthCheck{
 				{ProcessType: constant.ProcessTypeWeb, HealthCheckType: "http", Endpoint: "/foo", InvocationTimeout: 10},
 				{ProcessType: "queue", HealthCheckType: "port", Endpoint: "", InvocationTimeout: 0},

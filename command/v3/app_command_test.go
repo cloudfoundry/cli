@@ -72,20 +72,20 @@ var _ = Describe("app Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: ccversion.MinimumVersionV3,
-				MinimumVersion: ccversion.MinVersionV3,
+				CurrentVersion: ccversion.MinV3ClientVersion,
+				MinimumVersion: ccversion.MinVersionApplicationFlowV3,
 			}))
 		})
 	})
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
@@ -103,7 +103,7 @@ var _ = Describe("app Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			expectedErr = errors.New("some current user error")
 			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 		})
@@ -115,7 +115,7 @@ var _ = Describe("app Command", func() {
 
 	When("the --guid flag is provided", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			cmd.GUID = true
 		})
 
@@ -184,7 +184,7 @@ var _ = Describe("app Command", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 				expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 				fakeAppSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(v2v3action.ApplicationSummary{}, v2v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
 			})
@@ -201,7 +201,7 @@ var _ = Describe("app Command", func() {
 
 		When("getting the application summary is successful", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 				summary := v2v3action.ApplicationSummary{
 					ApplicationSummary: v3action.ApplicationSummary{
 						Application: v3action.Application{

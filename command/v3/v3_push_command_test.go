@@ -144,20 +144,20 @@ var _ = Describe("v3-push Command", func() {
 
 		When("the API version is below the minimum", func() {
 			BeforeEach(func() {
-				fakeVersionActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
+				fakeVersionActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
 			})
 
 			It("returns a MinimumAPIVersionNotMetError", func() {
 				Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-					CurrentVersion: ccversion.MinimumVersionV3,
-					MinimumVersion: ccversion.MinVersionV3,
+					CurrentVersion: ccversion.MinV3ClientVersion,
+					MinimumVersion: ccversion.MinVersionApplicationFlowV3,
 				}))
 			})
 		})
 
 		When("the API version is met", func() {
 			BeforeEach(func() {
-				fakeVersionActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+				fakeVersionActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			})
 
 			When("checking target fails", func() {

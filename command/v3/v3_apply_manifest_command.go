@@ -47,7 +47,7 @@ func (cmd *V3ApplyManifestCommand) Setup(config command.Config, ui command.UI) e
 	ccClient, _, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionV3}
+			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionApplicationFlowV3}
 		}
 
 		return err
@@ -64,7 +64,7 @@ func (cmd V3ApplyManifestCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
 	// TODO: Update minimum API version when apply-manifest is complete in V3 API
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
 	if err != nil {
 		return err
 	}

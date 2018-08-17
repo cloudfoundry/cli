@@ -499,7 +499,7 @@ var _ = Describe("Restage Command", func() {
 						)
 
 						BeforeEach(func() {
-							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionV3)
+							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 
 							v3ApplicationSummary := v3action.ApplicationSummary{
 								Application: v3action.Application{
@@ -566,7 +566,7 @@ var _ = Describe("Restage Command", func() {
 						)
 
 						BeforeEach(func() {
-							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinimumVersionV3)
+							fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinV3ClientVersion)
 
 							applicationSummary = v2action.ApplicationSummary{
 								Application: v2action.Application{

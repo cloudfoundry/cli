@@ -220,7 +220,7 @@ func (cmd PushCommand) Execute(args []string) error {
 
 		cmd.UI.DisplayNewline()
 
-		if err := command.MinimumAPIVersionCheck(cmd.ApplicationSummaryActor.CloudControllerV3APIVersion(), ccversion.MinVersionV3); err != nil {
+		if err := command.MinimumAPIVersionCheck(cmd.ApplicationSummaryActor.CloudControllerV3APIVersion(), ccversion.MinVersionApplicationFlowV3); err != nil {
 			log.WithField("v3_api_version", cmd.ApplicationSummaryActor.CloudControllerV3APIVersion()).Debug("using v2 for app display")
 			appSummary, warnings, err := cmd.RestartActor.GetApplicationSummaryByNameAndSpace(appConfig.DesiredApplication.Name, cmd.Config.TargetedSpace().GUID)
 			cmd.UI.DisplayWarnings(warnings)

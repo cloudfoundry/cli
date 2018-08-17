@@ -172,7 +172,7 @@ var _ = Describe("bind-service command", func() {
 
 				When("the --binding-name flag is provided and the value is a non-empty string", func() {
 					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionProvideNameForServiceBinding)
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionProvideNameForServiceBindingV2)
 					})
 
 					It("binds the service to the app, displays OK and TIP", func() {

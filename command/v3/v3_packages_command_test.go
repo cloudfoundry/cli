@@ -67,13 +67,13 @@ var _ = Describe("v3-packages Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: ccversion.MinimumVersionV3,
-				MinimumVersion: ccversion.MinVersionV3,
+				CurrentVersion: ccversion.MinV3ClientVersion,
+				MinimumVersion: ccversion.MinVersionApplicationFlowV3,
 			}))
 		})
 
@@ -84,7 +84,7 @@ var _ = Describe("v3-packages Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
@@ -102,7 +102,7 @@ var _ = Describe("v3-packages Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			expectedErr = errors.New("some current user error")
 			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 		})
@@ -116,7 +116,7 @@ var _ = Describe("v3-packages Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			expectedErr = ccerror.RequestError{}
 			fakeActor.GetApplicationPackagesReturns([]v3action.Package{}, v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
@@ -135,7 +135,7 @@ var _ = Describe("v3-packages Command", func() {
 		var package1UTC, package2UTC string
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			package1UTC = "2017-08-14T21:16:42Z"
 			package2UTC = "2017-08-16T00:18:24Z"
 
@@ -179,7 +179,7 @@ var _ = Describe("v3-packages Command", func() {
 
 	When("getting the application packages returns no packages", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeActor.GetApplicationPackagesReturns([]v3action.Package{}, v3action.Warnings{"warning-1", "warning-2"}, nil)
 		})
 

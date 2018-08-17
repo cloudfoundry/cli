@@ -115,7 +115,7 @@ var _ = Describe("app command", func() {
 		Describe("version dependent display", func() {
 			When("CC API >= 3.27.0", func() {
 				BeforeEach(func() {
-					helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionApplicationFlowV3)
 				})
 
 				When("the app is created but not pushed", func() {
@@ -272,7 +272,7 @@ applications:
 
 			When("CC API < 3.27.0", func() {
 				BeforeEach(func() {
-					helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+					helpers.SkipIfVersionAtLeast(ccversion.MinVersionApplicationFlowV3)
 				})
 
 				When("the app is a buildpack app", func() {

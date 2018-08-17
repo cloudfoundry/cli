@@ -25,7 +25,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 
 	When("the API version is below 3.27.0 and health check type is not http", func() {
 		BeforeEach(func() {
-			helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+			helpers.SkipIfVersionAtLeast(ccversion.MinVersionApplicationFlowV3)
 		})
 
 		It("creates the app with the specified settings, with the health check type", func() {
@@ -79,7 +79,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 
 	When("the API version is above 3.27.0 and health check type is not http", func() {
 		BeforeEach(func() {
-			helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+			helpers.SkipIfVersionLessThan(ccversion.MinVersionApplicationFlowV3)
 		})
 
 		It("creates the app with the specified settings, with the health check type", func() {
@@ -137,7 +137,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 
 	When("the API version is below 3.27.0 and health check type is http", func() {
 		BeforeEach(func() {
-			helpers.SkipIfVersionAtLeast(ccversion.MinVersionV3)
+			helpers.SkipIfVersionAtLeast(ccversion.MinVersionApplicationFlowV3)
 		})
 
 		It("creates the app with the specified settings, with the health check type being 'http'", func() {
@@ -193,7 +193,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 
 	When("the API version is above 3.27.0 and health check type is http", func() {
 		BeforeEach(func() {
-			helpers.SkipIfVersionLessThan(ccversion.MinVersionV3)
+			helpers.SkipIfVersionLessThan(ccversion.MinVersionApplicationFlowV3)
 		})
 
 		It("creates the app with the specified settings, with the health check type being 'http'", func() {

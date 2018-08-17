@@ -29,7 +29,7 @@ func WarnIfCLIVersionBelowAPIDefinedMinimum(WarnIfCLIVersionBelowAPIDefinedMinmu
 }
 
 func WarnIfAPIVersionBelowSupportedMinimum(apiVersion string, ui UI) error {
-	isOutdated, err := checkVersionOutdated(apiVersion, ccversion.MinimumVersionV2)
+	isOutdated, err := checkVersionOutdated(apiVersion, ccversion.MinV2ClientVersion)
 	if err != nil {
 		return err
 	}

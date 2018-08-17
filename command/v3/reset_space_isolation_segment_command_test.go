@@ -59,12 +59,12 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinimumVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
-				CurrentVersion: ccversion.MinimumVersionV3,
+				CurrentVersion: ccversion.MinV3ClientVersion,
 				MinimumVersion: ccversion.MinVersionIsolationSegmentV3,
 			}))
 		})

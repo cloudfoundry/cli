@@ -747,7 +747,7 @@ var _ = Describe("push Command", func() {
 
 							When("the API is below MinVersionV3", func() {
 								BeforeEach(func() {
-									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinimumVersionV3)
+									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinV3ClientVersion)
 								})
 
 								It("displays the app summary with isolation segments as well as warnings", func() {
@@ -768,7 +768,7 @@ var _ = Describe("push Command", func() {
 
 							When("the api is at least MinVersionV3", func() {
 								BeforeEach(func() {
-									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionV3)
+									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 									fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(
 										v2v3action.ApplicationSummary{
 											ApplicationSummary: v3action.ApplicationSummary{

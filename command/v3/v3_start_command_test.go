@@ -63,7 +63,7 @@ var _ = Describe("v3-start Command", func() {
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: ccversion.MinVersionV3,
+				MinimumVersion: ccversion.MinVersionApplicationFlowV3,
 			}))
 		})
 
@@ -74,7 +74,7 @@ var _ = Describe("v3-start Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
@@ -92,7 +92,7 @@ var _ = Describe("v3-start Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			expectedErr = errors.New("some current user error")
 			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 		})
@@ -104,7 +104,7 @@ var _ = Describe("v3-start Command", func() {
 
 	When("the actor does not return an error", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
 			})
@@ -138,7 +138,7 @@ var _ = Describe("v3-start Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
 			})
@@ -163,7 +163,7 @@ var _ = Describe("v3-start Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
 			})
@@ -189,7 +189,7 @@ var _ = Describe("v3-start Command", func() {
 
 	When("the app is already started", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
 			})
@@ -217,7 +217,7 @@ var _ = Describe("v3-start Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
 			})
@@ -244,7 +244,7 @@ var _ = Describe("v3-start Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
 			})

@@ -51,7 +51,7 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 	if cmd.BindingName.Value != "" {
 		err := command.MinimumAPIVersionCheck(
 			cmd.Actor.CloudControllerAPIVersion(),
-			ccversion.MinVersionProvideNameForServiceBinding,
+			ccversion.MinVersionProvideNameForServiceBindingV2,
 			"Option '--name'")
 		if err != nil {
 			return err

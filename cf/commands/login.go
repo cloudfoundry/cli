@@ -96,7 +96,7 @@ func (cmd *Login) Execute(c flags.FlagContext) error {
 		return err
 	}
 
-	err = command.MinimumAPIVersionCheck(cmd.config.APIVersion(), ccversion.MinimumVersionV2)
+	err = command.MinimumAPIVersionCheck(cmd.config.APIVersion(), ccversion.MinV2ClientVersion)
 	if err != nil {
 		if _, ok := err.(translatableerror.MinimumAPIVersionNotMetError); ok {
 			cmd.ui.Warn("Your API version is no longer supported. Upgrade to a newer version of the API.")

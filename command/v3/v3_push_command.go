@@ -124,7 +124,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		return cmd.OriginalExecute(args)
 	}
 
-	err := command.MinimumAPIVersionCheck(cmd.VersionActor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
+	err := command.MinimumAPIVersionCheck(cmd.VersionActor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
 	if err != nil {
 		return err
 	}
