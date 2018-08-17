@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -349,155 +350,158 @@ var _ = PDescribe("update-buildpack command", func() {
 					})
 				})
 
-				When("multiple buildpacks with the same name exist", func() {
-					// TODO: Uncomment and adjust these tests prior to adding support for the `-s` flag in update-buildpack
-					// var existingBuildpack string
+				PWhen("multiple buildpacks with the same name exist", func() {
+					// TODO: Unpend and adjust these tests prior to adding support for the `-s` flag in update-buildpack
+					var (
+						existingBuildpack string
+						stacks            []string
+					)
 
-					// BeforeEach(func() {
-					// 	helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
-					// 	helpers.SkipIfOneStack()
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+						helpers.SkipIfOneStack()
 
-					// 	stacks = helpers.FetchStacks()
-					// 	helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 		session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-					// 		Eventually(session).Should(Exit(0))
-					// 	}, stacks[0])
+						stacks = helpers.FetchStacks()
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+							Eventually(session).Should(Exit(0))
+						}, stacks[0])
 
-					// 	helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 		session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-					// 		Eventually(session).Should(Exit(0))
-					// 	}, stacks[1])
-					// 	existingBuildpack = buildpackName
-					// })
+						helpers.BuildpackWithStack(func(buildpackPath string) {
+							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+							Eventually(session).Should(Exit(0))
+						}, stacks[1])
+						existingBuildpack = buildpackName
+					})
 
-					// It("fails when no stack is specified", func() {
-					// 	session := helpers.CF("update-buildpack", buildpackName, "-i", "999")
-					// 	Eventually(session).Should(Exit(1))
-					// 	Eventually(session).Should(Say("FAILED"))
-					// })
+					It("fails when no stack is specified", func() {
+						session := helpers.CF("update-buildpack", buildpackName, "-i", "999")
+						Eventually(session).Should(Exit(1))
+						Eventually(session).Should(Say("FAILED"))
+					})
 
-					// It("fails when a nonexistent stack is specified", func() {
-					// 	session := helpers.CF("update-buildpack", buildpackName, "-i", "999", "-s", "bogus-stack")
-					// 	Eventually(session).Should(Exit(1))
-					// 	Eventually(session).Should(Say("FAILED"))
-					// })
+					It("fails when a nonexistent stack is specified", func() {
+						session := helpers.CF("update-buildpack", buildpackName, "-i", "999", "-s", "bogus-stack")
+						Eventually(session).Should(Exit(1))
+						Eventually(session).Should(Say("FAILED"))
+					})
 
-					// It("succeeds when a stack associated with that buildpack name is specified", func() {
-					// 	session := helpers.CF("update-buildpack", buildpackName, "-s", stacks[0], "-i", "999")
-					// 	Consistently(session.Err).ShouldNot(Say("Incorrect Usage:"))
-					// 	Eventually(session).Should(Say("OK"))
-					// 	Eventually(session).Should(Exit(0))
-					// })
+					It("succeeds when a stack associated with that buildpack name is specified", func() {
+						session := helpers.CF("update-buildpack", buildpackName, "-s", stacks[0], "-i", "999")
+						Consistently(session.Err).ShouldNot(Say("Incorrect Usage:"))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+					})
 
-					// When("the new buildpack has a nil stack", func() {
-					// 	When("the existing buildpack does not have a nil stack", func() {
-					// 		BeforeEach(func() {
-					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 				session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
-					// 				Eventually(session).Should(Exit(0))
-					// 			}, stacks[0])
-					// 		})
+					When("the new buildpack has a nil stack", func() {
+						When("the existing buildpack does not have a nil stack", func() {
+							BeforeEach(func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
+									Eventually(session).Should(Exit(0))
+								}, stacks[0])
+							})
 
-					// 		It("successfully uploads a buildpack", func() {
-					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 				session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1")
-					// 				Eventually(session).Should(Exit(0))
-					// 			}, stacks[0])
+							It("successfully uploads a buildpack", func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1")
+									Eventually(session).Should(Exit(0))
+								}, stacks[0])
 
-					// 			session := helpers.CF("buildpacks")
-					// 			Eventually(session).Should(Exit(0))
-					// 			Expect(session).To(Say(`%s\s+1`, buildpackName))
-					// 			Expect(session).To(Say(`%s\s+%s\s+6`, existingBuildpack, stacks[0]))
-					// 		})
-					// 	})
+								session := helpers.CF("buildpacks")
+								Eventually(session).Should(Exit(0))
+								Expect(session).To(Say(`%s\s+1`, buildpackName))
+								Expect(session).To(Say(`%s\s+%s\s+6`, existingBuildpack, stacks[0]))
+							})
+						})
 
-					// 	When("the existing buildpack has a nil stack", func() {
-					// 		BeforeEach(func() {
-					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 				session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
-					// 				Eventually(session).Should(Exit(0))
-					// 			}, "")
-					// 		})
+						When("the existing buildpack has a nil stack", func() {
+							BeforeEach(func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
+									Eventually(session).Should(Exit(0))
+								}, "")
+							})
 
-					// 		It("prints a warning", func() {
-					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 				session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1")
-					// 				Eventually(session).Should(Exit(0))
-					// 				Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", buildpackName))
-					// 			}, "")
+							It("prints a warning", func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1")
+									Eventually(session).Should(Exit(0))
+									Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", buildpackName))
+								}, "")
 
-					// 			session := helpers.CF("buildpacks")
-					// 			Eventually(session).Should(Exit(0))
-					// 			Expect(session).To(Say(`%s\s+5`, existingBuildpack))
-					// 		})
-					// 	})
-					// })
+								session := helpers.CF("buildpacks")
+								Eventually(session).Should(Exit(0))
+								Expect(session).To(Say(`%s\s+5`, existingBuildpack))
+							})
+						})
+					})
 
-					// When("the new buildpack has a non-nil stack", func() {
-					// 	BeforeEach(func() {
-					// 		helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
-					// 	})
+					When("the new buildpack has a non-nil stack", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+						})
 
-					// 	When("the existing buildpack has a different non-nil stack", func() {
-					// 		BeforeEach(func() {
-					// 			helpers.SkipIfOneStack()
-					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 				session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
-					// 				Eventually(session).Should(Exit(0))
-					// 			}, stacks[1])
-					// 		})
+						When("the existing buildpack has a different non-nil stack", func() {
+							BeforeEach(func() {
+								helpers.SkipIfOneStack()
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
+									Eventually(session).Should(Exit(0))
+								}, stacks[1])
+							})
 
-					// 		It("successfully uploads a buildpack", func() {
-					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 				session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1")
-					// 				Eventually(session).Should(Exit(0))
-					// 			}, stacks[0])
+							It("successfully uploads a buildpack", func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1")
+									Eventually(session).Should(Exit(0))
+								}, stacks[0])
 
-					// 			session := helpers.CF("buildpacks")
-					// 			Eventually(session).Should(Exit(0))
-					// 			Expect(session).To(Say(`%s\s+%s\s+1`, buildpackName, stacks[0]))
-					// 			Expect(session).To(Say(`%s\s+%s\s+6`, existingBuildpack, stacks[1]))
-					// 		})
-					// 	})
+								session := helpers.CF("buildpacks")
+								Eventually(session).Should(Exit(0))
+								Expect(session).To(Say(`%s\s+%s\s+1`, buildpackName, stacks[0]))
+								Expect(session).To(Say(`%s\s+%s\s+6`, existingBuildpack, stacks[1]))
+							})
+						})
 
-					// 	When("the existing buildpack has a nil stack", func() {
-					// 		BeforeEach(func() {
-					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 				session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
-					// 				Eventually(session).Should(Exit(0))
-					// 			}, "")
-					// 		})
+						When("the existing buildpack has a nil stack", func() {
+							BeforeEach(func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
+									Eventually(session).Should(Exit(0))
+								}, "")
+							})
 
-					// 		It("prints a warning and tip but doesn't exit 1", func() {
-					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 				session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1")
-					// 				Eventually(session).Should(Exit(0))
-					// 				Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", buildpackName))
-					// 				Eventually(session).Should(Say("TIP: use 'cf buildpacks' and 'cf delete-buildpack' to delete buildpack %s without a stack", buildpackName))
-					// 			}, stacks[0])
+							It("prints a warning and tip but doesn't exit 1", func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1")
+									Eventually(session).Should(Exit(0))
+									Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", buildpackName))
+									Eventually(session).Should(Say("TIP: use 'cf buildpacks' and 'cf delete-buildpack' to delete buildpack %s without a stack", buildpackName))
+								}, stacks[0])
 
-					// 		})
-					// 	})
+							})
+						})
 
-					// 	When("the existing buildpack has the same non-nil stack", func() {
-					// 		BeforeEach(func() {
-					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 				session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
-					// 				Eventually(session).Should(Exit(0))
-					// 			}, stacks[0])
+						When("the existing buildpack has the same non-nil stack", func() {
+							BeforeEach(func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session := helpers.CF("update-buildpack", existingBuildpack, buildpackPath, "5")
+									Eventually(session).Should(Exit(0))
+								}, stacks[0])
 
-					// 		})
+							})
 
-					// 		It("prints a warning but doesn't exit 1", func() {
-					// 			helpers.BuildpackWithStack(func(buildpackPath string) {
-					// 				session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1")
-					// 				Eventually(session).Should(Exit(0))
-					// 				Expect(session.Err).To(Say("The buildpack name %s is already in use for the stack %s", buildpackName, stacks[0]))
-					// 				Expect(session).To(Say("TIP: use 'cf update-buildpack' to update this buildpack"))
-					// 			}, stacks[0])
-					// 		})
-					// 	})
-					// })
+							It("prints a warning but doesn't exit 1", func() {
+								helpers.BuildpackWithStack(func(buildpackPath string) {
+									session := helpers.CF("update-buildpack", buildpackName, buildpackPath, "1")
+									Eventually(session).Should(Exit(0))
+									Expect(session.Err).To(Say("The buildpack name %s is already in use for the stack %s", buildpackName, stacks[0]))
+									Expect(session).To(Say("TIP: use 'cf update-buildpack' to update this buildpack"))
+								}, stacks[0])
+							})
+						})
+					})
 				})
 			})
 
