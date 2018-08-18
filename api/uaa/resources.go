@@ -7,13 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/api/uaa/internal"
 )
 
-// AuthInfo represents a GET response from a login server
-type AuthInfo struct {
-	Links struct {
-		UAA string `json:"uaa"`
-	} `json:"links"`
-}
-
 // SetupResources configures the client to use the specified settings and diescopers the UAA and Authentication resources
 func (client *Client) SetupResources(bootstrapURL string) error {
 	request, err := client.newRequest(requestOptions{
@@ -25,7 +18,7 @@ func (client *Client) SetupResources(bootstrapURL string) error {
 		return err
 	}
 
-	info := AuthInfo{} // Explicitly initializing
+	info := NewInfo(bootstrapURL)
 	response := Response{
 		Result: &info,
 	}
@@ -35,18 +28,15 @@ func (client *Client) SetupResources(bootstrapURL string) error {
 		return err
 	}
 
-	UAALink := info.Links.UAA
-	if UAALink == "" {
-		UAALink = bootstrapURL
-	}
-	client.config.SetUAAEndpoint(UAALink)
-
 	resources := map[string]string{
-		"uaa": UAALink,
+		"uaa": info.UAALink(),
 		"authorization_endpoint": bootstrapURL,
 	}
 
 	client.router = internal.NewRouter(internal.APIRoutes, resources)
+	client.Info = info
+
+	client.config.SetUAAEndpoint(info.UAALink())
 
 	return nil
 }

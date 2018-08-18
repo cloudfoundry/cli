@@ -47,10 +47,13 @@ var _ = Describe("SetupResources", func() {
 		Context("and the UAA field is populated", func() {
 			BeforeEach(func() {
 				response := `{
-				"links": {
-					"uaa": "https://uaa.bosh-lite.com"
-				}
-			}`
+					"app": {
+						"version": "sem.var"
+					},
+					"links": {
+						"uaa": "https://uaa.bosh-lite.com"
+					}
+				}`
 
 				server.AppendHandlers(
 					CombineHandlers(
@@ -62,6 +65,9 @@ var _ = Describe("SetupResources", func() {
 
 			It("sets the UAA endpoint to the UAA link and does not return an error", func() {
 				Expect(setupResourcesErr).ToNot(HaveOccurred())
+				Expect(client.UAALink()).To(Equal("https://uaa.bosh-lite.com"))
+				Expect(client.APIVersion()).To(Equal("sem.var"))
+
 				Expect(fakeConfig.SetUAAEndpointCallCount()).To(Equal(1))
 				Expect(fakeConfig.SetUAAEndpointArgsForCall(0)).To(Equal("https://uaa.bosh-lite.com"))
 			})

@@ -14,6 +14,8 @@ import (
 
 // Client is the UAA client
 type Client struct {
+	Info
+
 	config Config
 
 	connection Connection
