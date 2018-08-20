@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
@@ -46,7 +47,15 @@ func LoginCF() string {
 		"CF_USERNAME": username,
 		"CF_PASSWORD": password,
 	}
-	Eventually(CFWithEnv(env, "auth")).Should(Exit(0))
+
+	for i := 0; i < 3; i++ {
+		session := CFWithEnv(env, "auth")
+		Eventually(session).Should(Exit())
+		if session.ExitCode() == 0 {
+			break
+		}
+		time.Sleep(3 * time.Second)
+	}
 
 	return username
 }
