@@ -131,12 +131,19 @@ jobs:
   - aggregate:
     - get: cf-deployment-concourse-tasks
     - get: state
+    - put: gcp-bosh-pool
+      params:
+        claim: ((stack-name)).cli.fun
   - task: delete-cf-deployment
     file: cf-deployment-concourse-tasks/bosh-delete-deployment/task.yml
     input_mapping:
       bbl-state: state
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: gcp-bosh-pool
 
 - name: delete-infrastructure
   serial_groups: [((stack-name))]
@@ -145,6 +152,9 @@ jobs:
   - aggregate:
     - get: cf-deployment-concourse-tasks
     - get: state
+    - put: gcp-bosh-pool
+      params:
+        claim: ((stack-name)).cli.fun
   - task: bosh-cleanup
     file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
     input_mapping:
@@ -159,8 +169,12 @@ jobs:
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
       BBL_GCP_SERVICE_ACCOUNT_KEY: ((google-account-creds))
-    ensure:
-      put: state
+  ensure:
+    aggregate:
+    - put: state
       params:
         repository: updated-bbl-state
         rebase: true
+    - put: gcp-bosh-pool
+      params:
+        release: gcp-bosh-pool
