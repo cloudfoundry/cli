@@ -57,6 +57,10 @@ var _ = Describe("delete-buildpack command", func() {
 		})
 
 		When("the stack is specified", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+			})
+
 			It("deletes the specified buildpack", func() {
 				session := helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")
 				Eventually(session).Should(Exit(0))
