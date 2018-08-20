@@ -71,7 +71,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("LifecycleMinimumAPIVersionNotMetError", LifecycleMinimumAPIVersionNotMetError{}),
 		Entry("ManifestCreationError", ManifestCreationError{}),
 		Entry("ManifestFileNotFoundInDirectoryError", ManifestFileNotFoundInDirectoryError{}),
-		Entry("MinimumAPIVersionNotMetError", MinimumAPIVersionNotMetError{}),
+		Entry("MinimumCFAPIVersionNotMetError", MinimumCFAPIVersionNotMetError{}),
 		Entry("MinimumCLIVersionNotMetError", MinimumCLIVersionNotMetError{}),
 		Entry("MissingCredentialsError", MissingCredentialsError{}),
 		Entry("MultiError", MultiError{}),

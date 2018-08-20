@@ -11,7 +11,7 @@ var _ = Describe("MinimumAPIVersionNotMetError", func() {
 	Describe("Error", func() {
 		When("the Command field is not empty and CurrentVersion is not empty", func() {
 			It("returns a template with the values of the Command and CurrentVersion fields", func() {
-				err := MinimumAPIVersionNotMetError{
+				err := MinimumCFAPIVersionNotMetError{
 					Command:        "--some-flag",
 					CurrentVersion: "1.2.3",
 				}
@@ -22,7 +22,7 @@ var _ = Describe("MinimumAPIVersionNotMetError", func() {
 
 		When("the Command field is not empty and CurrentVersion is empty", func() {
 			It("returns a template with the value of the Command field", func() {
-				err := MinimumAPIVersionNotMetError{
+				err := MinimumCFAPIVersionNotMetError{
 					Command: "--some-flag",
 				}
 
@@ -32,7 +32,7 @@ var _ = Describe("MinimumAPIVersionNotMetError", func() {
 
 		When("the Command field is empty and CurrentVersion is not empty", func() {
 			It("returns a template with the value of the CurrentVersion field", func() {
-				err := MinimumAPIVersionNotMetError{
+				err := MinimumCFAPIVersionNotMetError{
 					CurrentVersion: "1.2.3",
 				}
 
@@ -42,7 +42,7 @@ var _ = Describe("MinimumAPIVersionNotMetError", func() {
 
 		When("the Command field is empty and CurrentVersion is empty", func() {
 			It("returns a template without Command or CurrentVersion values", func() {
-				err := MinimumAPIVersionNotMetError{}
+				err := MinimumCFAPIVersionNotMetError{}
 
 				Expect(err.Error()).To(Equal("This command requires CF API version {{.MinimumVersion}} or higher."))
 			})

@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/api/uaa/uaaversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -15,6 +16,7 @@ import (
 
 type AuthActor interface {
 	Authenticate(ID string, secret string, origin string, grantType constant.GrantType) error
+	UAAAPIVersion() string
 }
 
 type AuthCommand struct {
@@ -43,6 +45,19 @@ func (cmd *AuthCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd AuthCommand) Execute(args []string) error {
+	if len(cmd.Origin) > 0 {
+		err := command.MinimumUAAAPIVersionCheck(cmd.Actor.UAAAPIVersion(), uaaversion.MinVersionOrigin, "Option `--origin`")
+		if err != nil {
+			return err
+		}
+	}
+
+	if cmd.ClientCredentials && cmd.Origin != "" {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--client-credentials", "--origin"},
+		}
+	}
+
 	username, password, err := cmd.checkEnvVariables()
 	if err != nil {
 		return err
@@ -51,12 +66,6 @@ func (cmd AuthCommand) Execute(args []string) error {
 	err = command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.UI)
 	if err != nil {
 		return err
-	}
-
-	if cmd.ClientCredentials && cmd.Origin != "" {
-		return translatableerror.ArgumentCombinationError{
-			Args: []string{"--client-credentials", "--origin"},
-		}
 	}
 
 	cmd.UI.DisplayTextWithFlavor(

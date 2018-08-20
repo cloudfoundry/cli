@@ -8,6 +8,7 @@ import (
 //go:generate counterfeiter . UAAClient
 
 type UAAClient interface {
+	APIVersion() string
 	Authenticate(ID string, secret string, origin string, grantType constant.GrantType) (string, string, error)
 	CreateUser(username string, password string, origin string) (uaa.User, error)
 	GetSSHPasscode(accessToken string, sshOAuthClient string) (string, error)

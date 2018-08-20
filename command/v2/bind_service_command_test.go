@@ -126,7 +126,7 @@ var _ = Describe("bind-service Command", func() {
 					})
 
 					It("returns a MinimumAPIVersionNotMetError", func() {
-						Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+						Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 							Command:        "Option '--name'",
 							CurrentVersion: ccversion.MinV2ClientVersion,
 							MinimumVersion: ccversion.MinVersionProvideNameForServiceBindingV2,

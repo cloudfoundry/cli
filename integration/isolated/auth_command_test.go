@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/uaa/uaaversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -116,6 +117,7 @@ var _ = Describe("auth command", func() {
 			Eventually(session).Should(Exit(1))
 		})
 	})
+
 	When("the API endpoint is not set", func() {
 		BeforeEach(func() {
 			helpers.UnsetAPI()
@@ -242,6 +244,10 @@ var _ = Describe("auth command", func() {
 	})
 
 	When("the origin flag is set", func() {
+		BeforeEach(func(){
+			helpers.SkipIfVersionLessThan(uaaversion.MinVersionOrigin)
+		})
+
 		When("a user authenticates with valid user credentials for that origin", func() {
 			It("authenticates the user", func() {
 				username, password := helpers.GetOIDCCredentials()

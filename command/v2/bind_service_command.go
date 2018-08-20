@@ -49,7 +49,7 @@ func (cmd *BindServiceCommand) Setup(config command.Config, ui command.UI) error
 func (cmd BindServiceCommand) Execute(args []string) error {
 	template := "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
 	if cmd.BindingName.Value != "" {
-		err := command.MinimumAPIVersionCheck(
+		err := command.MinimumCCAPIVersionCheck(
 			cmd.Actor.CloudControllerAPIVersion(),
 			ccversion.MinVersionProvideNameForServiceBindingV2,
 			"Option '--name'")

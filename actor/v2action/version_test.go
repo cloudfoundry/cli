@@ -11,11 +11,11 @@ var _ = Describe("Version Check Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
+		fakeUAAClient             *v2actionfakes.FakeUAAClient
 	)
 
 	BeforeEach(func() {
-		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil)
+		actor, fakeCloudControllerClient, fakeUAAClient, _ = NewTestActor()
 	})
 
 	Describe("CloudControllerAPIVersion", func() {
@@ -23,6 +23,14 @@ var _ = Describe("Version Check Actions", func() {
 			expectedVersion := "2.75.0"
 			fakeCloudControllerClient.APIVersionReturns(expectedVersion)
 			Expect(actor.CloudControllerAPIVersion()).To(Equal(expectedVersion))
+		})
+	})
+
+	Describe("UAAAPIVersion", func() {
+		It("returns the V2 CC API version", func() {
+			expectedVersion := "1.96.0"
+			fakeUAAClient.APIVersionReturns(expectedVersion)
+			Expect(actor.UAAAPIVersion()).To(Equal(expectedVersion))
 		})
 	})
 })

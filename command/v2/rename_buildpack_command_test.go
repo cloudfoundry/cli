@@ -132,7 +132,7 @@ var _ = Describe("rename buildpack command", func() {
 				})
 
 				It("should warn the user that the version of CAPI is too low and exit with an error", func() {
-					Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+					Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 						Command:        "Option `-s`",
 						CurrentVersion: fakeActor.CloudControllerAPIVersion(),
 						MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,

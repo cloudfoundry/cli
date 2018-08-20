@@ -55,9 +55,9 @@ func NewClients(config command.Config, ui command.UI, targetCF bool, minVersionV
 	}
 
 	if minVersionV3 != "" {
-		err = command.MinimumAPIVersionCheck(ccClient.CloudControllerAPIVersion(), minVersionV3)
+		err = command.MinimumCCAPIVersionCheck(ccClient.CloudControllerAPIVersion(), minVersionV3)
 		if err != nil {
-			if _, ok := err.(translatableerror.MinimumAPIVersionNotMetError); ok {
+			if _, ok := err.(translatableerror.MinimumCFAPIVersionNotMetError); ok {
 				return nil, nil, translatableerror.V3V2SwitchError{}
 			}
 			return nil, nil, err

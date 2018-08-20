@@ -23,6 +23,15 @@ type FakeAuthActor struct {
 	authenticateReturnsOnCall map[int]struct {
 		result1 error
 	}
+	UAAAPIVersionStub        func() string
+	uAAAPIVersionMutex       sync.RWMutex
+	uAAAPIVersionArgsForCall []struct{}
+	uAAAPIVersionReturns     struct {
+		result1 string
+	}
+	uAAAPIVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -78,11 +87,53 @@ func (fake *FakeAuthActor) AuthenticateReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeAuthActor) UAAAPIVersion() string {
+	fake.uAAAPIVersionMutex.Lock()
+	ret, specificReturn := fake.uAAAPIVersionReturnsOnCall[len(fake.uAAAPIVersionArgsForCall)]
+	fake.uAAAPIVersionArgsForCall = append(fake.uAAAPIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("UAAAPIVersion", []interface{}{})
+	fake.uAAAPIVersionMutex.Unlock()
+	if fake.UAAAPIVersionStub != nil {
+		return fake.UAAAPIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.uAAAPIVersionReturns.result1
+}
+
+func (fake *FakeAuthActor) UAAAPIVersionCallCount() int {
+	fake.uAAAPIVersionMutex.RLock()
+	defer fake.uAAAPIVersionMutex.RUnlock()
+	return len(fake.uAAAPIVersionArgsForCall)
+}
+
+func (fake *FakeAuthActor) UAAAPIVersionReturns(result1 string) {
+	fake.UAAAPIVersionStub = nil
+	fake.uAAAPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeAuthActor) UAAAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.UAAAPIVersionStub = nil
+	if fake.uAAAPIVersionReturnsOnCall == nil {
+		fake.uAAAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uAAAPIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeAuthActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
+	fake.uAAAPIVersionMutex.RLock()
+	defer fake.uAAAPIVersionMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

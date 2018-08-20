@@ -1,12 +1,12 @@
 package translatableerror
 
-type MinimumAPIVersionNotMetError struct {
+type MinimumCFAPIVersionNotMetError struct {
 	Command        string
 	CurrentVersion string
 	MinimumVersion string
 }
 
-func (e MinimumAPIVersionNotMetError) Error() string {
+func (e MinimumCFAPIVersionNotMetError) Error() string {
 	switch {
 	case e.Command != "" && e.CurrentVersion != "":
 		return "{{.Command}} requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
@@ -19,7 +19,7 @@ func (e MinimumAPIVersionNotMetError) Error() string {
 	}
 }
 
-func (e MinimumAPIVersionNotMetError) Translate(translate func(string, ...interface{}) string) string {
+func (e MinimumCFAPIVersionNotMetError) Translate(translate func(string, ...interface{}) string) string {
 	vars := map[string]interface{}{
 		"MinimumVersion": e.MinimumVersion,
 	}

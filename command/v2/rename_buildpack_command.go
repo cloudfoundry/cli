@@ -53,7 +53,7 @@ func (cmd RenameBuildpackCommand) Execute(args []string) error {
 	}
 
 	if cmd.stackSpecified() {
-		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionBuildpackStackAssociationV2, "Option `-s`")
+		err = command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionBuildpackStackAssociationV2, "Option `-s`")
 		if err != nil {
 			return err
 		}

@@ -61,7 +61,7 @@ var _ = Describe("v3-set-env Command", func() {
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
-			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 				CurrentVersion: ccversion.MinV3ClientVersion,
 				MinimumVersion: ccversion.MinVersionApplicationFlowV3,
 			}))

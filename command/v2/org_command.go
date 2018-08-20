@@ -119,7 +119,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 	}
 
 	if cmd.ActorV3 != nil {
-		apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
+		apiCheck := command.MinimumCCAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
 		if apiCheck == nil {
 			isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
 			cmd.UI.DisplayWarnings(v3Warnings)

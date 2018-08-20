@@ -59,7 +59,7 @@ var _ = Describe("unshare-service Command", func() {
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
-			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 				CurrentVersion: ccversion.MinV3ClientVersion,
 				MinimumVersion: ccversion.MinVersionShareServiceV3,
 			}))

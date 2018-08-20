@@ -14,6 +14,9 @@ import (
 	"testing"
 
 	log "github.com/sirupsen/logrus"
+
+	. "code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 )
 
 func TestV2Action(t *testing.T) {
@@ -25,6 +28,15 @@ var _ = BeforeEach(func() {
 	SetDefaultEventuallyTimeout(3 * time.Second)
 	log.SetLevel(log.PanicLevel)
 })
+
+func NewTestActor() (*Actor, *v2actionfakes.FakeCloudControllerClient, *v2actionfakes.FakeUAAClient, *v2actionfakes.FakeConfig) {
+	fakeCloudControllerClient := new(v2actionfakes.FakeCloudControllerClient)
+	fakeUAAClient := new(v2actionfakes.FakeUAAClient)
+	fakeConfig := new(v2actionfakes.FakeConfig)
+	actor := NewActor(fakeCloudControllerClient, fakeUAAClient, fakeConfig)
+
+	return actor, fakeCloudControllerClient, fakeUAAClient, fakeConfig
+}
 
 // Thanks to Svett Ralchev
 // http://blog.ralch.com/tutorial/golang-working-with-zip/

@@ -93,7 +93,7 @@ var _ = Describe("push Command", func() {
 			})
 
 			It("returns a MinimumAPIVersionNotMetError", func() {
-				Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+				Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 					Command:        "Multiple option '-b'",
 					CurrentVersion: "3.1.0",
 					MinimumVersion: ccversion.MinVersionManifestBuildpacksV3,
@@ -153,7 +153,7 @@ var _ = Describe("push Command", func() {
 					})
 
 					It("returns a MinimumAPIVersionNotMetError", func() {
-						Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+						Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 							Command:        "'buildpacks' in manifest",
 							CurrentVersion: "3.13.0",
 							MinimumVersion: ccversion.MinVersionManifestBuildpacksV3,

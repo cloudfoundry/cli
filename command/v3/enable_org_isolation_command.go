@@ -39,7 +39,7 @@ func (cmd *EnableOrgIsolationCommand) Setup(config command.Config, ui command.UI
 	client, _, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionIsolationSegmentV3}
+			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionIsolationSegmentV3}
 		}
 
 		return err
@@ -50,7 +50,7 @@ func (cmd *EnableOrgIsolationCommand) Setup(config command.Config, ui command.UI
 }
 
 func (cmd EnableOrgIsolationCommand) Execute(args []string) error {
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
+	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
 	if err != nil {
 		return err
 	}

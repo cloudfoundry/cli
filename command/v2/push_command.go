@@ -117,7 +117,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 
 func (cmd PushCommand) Execute(args []string) error {
 	if len(cmd.Buildpacks) > 1 {
-		if err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "Multiple option '-b'"); err != nil {
+		if err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "Multiple option '-b'"); err != nil {
 			return err
 		}
 	}
@@ -155,7 +155,7 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	for _, manifestApplication := range manifestApplications {
 		if len(manifestApplication.Buildpacks) > 0 {
-			if err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "'buildpacks' in manifest"); err != nil {
+			if err = command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "'buildpacks' in manifest"); err != nil {
 				return err
 			}
 		}
@@ -220,7 +220,7 @@ func (cmd PushCommand) Execute(args []string) error {
 
 		cmd.UI.DisplayNewline()
 
-		if err := command.MinimumAPIVersionCheck(cmd.ApplicationSummaryActor.CloudControllerV3APIVersion(), ccversion.MinVersionApplicationFlowV3); err != nil {
+		if err := command.MinimumCCAPIVersionCheck(cmd.ApplicationSummaryActor.CloudControllerV3APIVersion(), ccversion.MinVersionApplicationFlowV3); err != nil {
 			log.WithField("v3_api_version", cmd.ApplicationSummaryActor.CloudControllerV3APIVersion()).Debug("using v2 for app display")
 			appSummary, warnings, err := cmd.RestartActor.GetApplicationSummaryByNameAndSpace(appConfig.DesiredApplication.Name, cmd.Config.TargetedSpace().GUID)
 			cmd.UI.DisplayWarnings(warnings)
