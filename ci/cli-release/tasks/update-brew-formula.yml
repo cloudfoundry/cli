@@ -49,7 +49,7 @@ run:
 
       if OS.mac?
         head 'https://packages.cloudfoundry.org/edge?arch=macosx64&source=homebrew'
-        url 'https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=${VERSION}&source=homebrew'
+        url 'https://packages.cloudfoundry.org/homebrew/cf-${VERSION}.tgz'
         sha256 '${CLI_OSX_SHA256}'
       elsif OS.linux?
         head 'https://packages.cloudfoundry.org/edge?arch=linux64&source=homebrew'
