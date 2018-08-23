@@ -52,6 +52,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreateApplicationDeploymentStub        func(appGUID string) (ccv3.Warnings, error)
+	createApplicationDeploymentMutex       sync.RWMutex
+	createApplicationDeploymentArgsForCall []struct {
+		appGUID string
+	}
+	createApplicationDeploymentReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	createApplicationDeploymentReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	CreateApplicationProcessScaleStub        func(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
 	createApplicationProcessScaleMutex       sync.RWMutex
 	createApplicationProcessScaleArgsForCall []struct {
@@ -930,6 +943,57 @@ func (fake *FakeCloudControllerClient) CreateApplicationReturnsOnCall(i int, res
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationDeployment(appGUID string) (ccv3.Warnings, error) {
+	fake.createApplicationDeploymentMutex.Lock()
+	ret, specificReturn := fake.createApplicationDeploymentReturnsOnCall[len(fake.createApplicationDeploymentArgsForCall)]
+	fake.createApplicationDeploymentArgsForCall = append(fake.createApplicationDeploymentArgsForCall, struct {
+		appGUID string
+	}{appGUID})
+	fake.recordInvocation("CreateApplicationDeployment", []interface{}{appGUID})
+	fake.createApplicationDeploymentMutex.Unlock()
+	if fake.CreateApplicationDeploymentStub != nil {
+		return fake.CreateApplicationDeploymentStub(appGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.createApplicationDeploymentReturns.result1, fake.createApplicationDeploymentReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationDeploymentCallCount() int {
+	fake.createApplicationDeploymentMutex.RLock()
+	defer fake.createApplicationDeploymentMutex.RUnlock()
+	return len(fake.createApplicationDeploymentArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationDeploymentArgsForCall(i int) string {
+	fake.createApplicationDeploymentMutex.RLock()
+	defer fake.createApplicationDeploymentMutex.RUnlock()
+	return fake.createApplicationDeploymentArgsForCall[i].appGUID
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationDeploymentReturns(result1 ccv3.Warnings, result2 error) {
+	fake.CreateApplicationDeploymentStub = nil
+	fake.createApplicationDeploymentReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationDeploymentReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.CreateApplicationDeploymentStub = nil
+	if fake.createApplicationDeploymentReturnsOnCall == nil {
+		fake.createApplicationDeploymentReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.createApplicationDeploymentReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) CreateApplicationProcessScale(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error) {
@@ -3454,6 +3518,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
 	defer fake.createApplicationMutex.RUnlock()
+	fake.createApplicationDeploymentMutex.RLock()
+	defer fake.createApplicationDeploymentMutex.RUnlock()
 	fake.createApplicationProcessScaleMutex.RLock()
 	defer fake.createApplicationProcessScaleMutex.RUnlock()
 	fake.createApplicationTaskMutex.RLock()
