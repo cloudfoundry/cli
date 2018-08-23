@@ -3,6 +3,7 @@ package v2action
 import (
 	"archive/zip"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/util/download"
 
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
@@ -85,6 +87,22 @@ func (actor *Actor) CreateBuildpack(name string, position int, enabled bool) (Bu
 	}
 
 	return Buildpack{GUID: ccBuildpack.GUID}, Warnings(warnings), err
+}
+
+func (actor *Actor) UploadBuildpackFromPath(inputPath, buildpackGuid string, progressBar SimpleProgressBar) (Warnings, error) {
+	downloader := download.NewDownloader(time.Second * 30)
+	tmpDirPath, err := ioutil.TempDir("", "buildpack-dir-")
+	if err != nil {
+		return Warnings{}, err
+	}
+	defer os.RemoveAll(tmpDirPath)
+
+	pathToBuildpackBits, err := actor.PrepareBuildpackBits(inputPath, tmpDirPath, downloader)
+	if err != nil {
+		return Warnings{}, err
+	}
+
+	return actor.UploadBuildpack(buildpackGuid, pathToBuildpackBits, progressBar)
 }
 
 func (actor *Actor) PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader Downloader) (string, error) {
@@ -191,6 +209,27 @@ func (actor *Actor) GetBuildpackByNameAndStack(buildpackName string, stackName s
 	default:
 		return Buildpack{}, Warnings(warnings), actionerror.MultipleBuildpacksFoundError{BuildpackName: buildpackName}
 	}
+}
+
+func (actor *Actor) UpdateBuildpackByName(name string, position types.NullInt) (string, Warnings, error) {
+	warnings := Warnings{}
+	buildpack, execWarnings, err := actor.GetBuildpackByName(name)
+	warnings = append(warnings, execWarnings...)
+	if err != nil {
+		return "", warnings, err
+	}
+
+	if position != buildpack.Position {
+		buildpack.Position = position
+		_, execWarnings, err = actor.UpdateBuildpack(buildpack)
+		warnings = append(warnings, execWarnings...)
+	}
+
+	if err != nil {
+		return "", warnings, err
+	}
+
+	return buildpack.GUID, warnings, err
 }
 
 func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {

@@ -42,6 +42,10 @@ func (n *NullInt) ParseIntValue(val *int) {
 	n.IsSet = true
 }
 
+func (n *NullInt) UnmarshalFlag(val string) error {
+	return n.ParseStringValue(val)
+}
+
 func (n *NullInt) UnmarshalJSON(rawJSON []byte) error {
 	var value json.Number
 	err := json.Unmarshal(rawJSON, &value)
