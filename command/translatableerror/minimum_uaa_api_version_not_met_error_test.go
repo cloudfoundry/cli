@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("MinimumUAAAPIVersionNotMetError", func() {
+var _ = Describe("MinimumUAAAPIVersionNotMetError", func() {
 	Describe("Error", func() {
 		When("the Command field is not empty and CurrentVersion is not empty", func() {
 			It("returns a template with the values of the Command and CurrentVersion fields", func() {
