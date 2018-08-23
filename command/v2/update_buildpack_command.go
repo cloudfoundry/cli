@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -17,6 +19,7 @@ import (
 
 //go:generate counterfeiter . UpdateBuildpackActor
 type UpdateBuildpackActor interface {
+	CloudControllerAPIVersion() string
 	UpdateBuildpackByName(name string, position types.NullInt) (string, v2action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error)
 	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
@@ -64,6 +67,17 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
+	}
+
+	if cmd.Stack != "" {
+		err = command.MinimumCCAPIVersionCheck(
+			cmd.Actor.CloudControllerAPIVersion(),
+			ccversion.MinVersionBuildpackStackAssociationV2,
+			"Option `-s`",
+		)
+		if err != nil {
+			return err
+		}
 	}
 
 	user, err := cmd.Config.CurrentUser()

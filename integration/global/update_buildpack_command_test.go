@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,7 +16,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = PDescribe("update-buildpack command", func() {
+var _ = Describe("update-buildpack command", func() {
 	var (
 		buildpackName string
 		username      string
@@ -98,6 +99,19 @@ var _ = PDescribe("update-buildpack command", func() {
 							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					When("the -s flag is provided and the targeted API is older than the minimum version", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
+						})
+
+						It("fails with a minimum version error", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "-s", "some-stack")
+							Eventually(session.Err).Should(Say("Option `-s` requires CF API version %s or higher. Your target is %s.", ccversion.MinVersionBuildpackStackAssociationV2, helpers.GetAPIVersionV2()))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
 						})
 					})
 

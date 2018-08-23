@@ -80,11 +80,15 @@ func SkipIfUAAVersionAtLeast(version string) {
 }
 
 func matchMajorAPIVersion(minVersion string) string {
-	version := getAPIVersionV2()
+	version := GetAPIVersionV2()
 	if strings.HasPrefix(minVersion, "3") {
 		version = getAPIVersionV3()
 	}
 	return version
+}
+
+func GetAPIVersionV2() string {
+	return fetchAPIVersion().Links.CloudContollerV2.Meta.Version
 }
 
 func SkipIfVersionLessThan(minVersion string) {
@@ -134,10 +138,6 @@ type ccRoot struct {
 			Href string `json:"href"`
 		} `json:"uaa"`
 	} `json:"links"`
-}
-
-func getAPIVersionV2() string {
-	return fetchAPIVersion().Links.CloudContollerV2.Meta.Version
 }
 
 func getAPIVersionV3() string {

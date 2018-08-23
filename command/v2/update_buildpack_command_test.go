@@ -3,6 +3,10 @@ package v2_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/command/translatableerror"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -12,6 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+	"github.com/blang/semver"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -126,6 +131,32 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 						Expect(testUI.Err).To(Say("update-bp-warning2"))
 						Expect(testUI.Out).To(Say("Updating buildpack some-bp as some-user..."))
 						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				When("a stack association is specified", func() {
+					BeforeEach(func() {
+						cmd.Stack = "some stack"
+					})
+
+					When("The API does not support stack associations", func() {
+						var versionWithoutStacks string
+
+						BeforeEach(func() {
+							minStackVersion, err := semver.Parse(ccversion.MinVersionBuildpackStackAssociationV2)
+							Expect(err).ToNot(HaveOccurred())
+							minStackVersion.Minor--
+							versionWithoutStacks = minStackVersion.String()
+							fakeActor.CloudControllerAPIVersionReturns(versionWithoutStacks)
+						})
+
+						It("returns an error about not supporting the stack association flag", func() {
+							Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+								Command:        "Option `-s`",
+								CurrentVersion: versionWithoutStacks,
+								MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
+							}))
+						})
 					})
 				})
 
