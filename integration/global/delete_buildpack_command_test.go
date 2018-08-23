@@ -22,6 +22,24 @@ var _ = Describe("delete-buildpack command", func() {
 		buildpackName = helpers.NewBuildpack()
 	})
 
+	When("the --help flag is passed", func() {
+		It("Displays the appropriate help text", func() {
+			session := helpers.CF("delete-buildpack", "--help")
+			Eventually(session).Should(Say("NAME:"))
+			Eventually(session).Should(Say("delete-buildpack - Delete a buildpack"))
+			Eventually(session).Should(Say("\n"))
+			Eventually(session).Should(Say("USAGE:"))
+			Eventually(session).Should(Say("cf delete-buildpack BUILDPACK \\[-f] \\[-s STACK]"))
+			Eventually(session).Should(Say("\n"))
+			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).Should(Say("-f\\s+Force deletion without confirmation"))
+			Eventually(session).Should(Say("-s\\s+Specify stack to disambiguate buildpacks with the same name. Required when buildpack name is ambiguous"))
+			Eventually(session).Should(Say("\n"))
+			Eventually(session).Should(Say("SEE ALSO:"))
+			Eventually(session).Should(Say("buildpacks"))
+		})
+	})
+
 	When("the environment is not setup correctly", func() {
 		XIt("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "delete-buildpack", "nonexistent-buildpack")
