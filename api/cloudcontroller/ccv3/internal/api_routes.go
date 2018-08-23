@@ -44,6 +44,7 @@ const (
 	PostApplicationActionRestartRequest                         = "PostApplicationActionRestart"
 	PostApplicationActionStartRequest                           = "PostApplicationActionStart"
 	PostApplicationActionStopRequest                            = "PostApplicationActionStop"
+	PostApplicationDeploymentRequest                            = "PostApplicationDeployment"
 	PostApplicationProcessActionScaleRequest                    = "PostApplicationProcessActionScale"
 	PostApplicationRequest                                      = "PostApplication"
 	PostApplicationTasksRequest                                 = "PostApplicationTasks"
@@ -77,6 +78,7 @@ var APIRoutes = []Route{
 	{Resource: AppsResource, Path: "/:app_guid/tasks", Method: http.MethodPost, Name: PostApplicationTasksRequest},
 	{Resource: BuildsResource, Path: "/", Method: http.MethodPost, Name: PostBuildRequest},
 	{Resource: BuildsResource, Path: "/:build_guid", Method: http.MethodGet, Name: GetBuildRequest},
+	{Resource: DeploymentsResource, Path: "/", Method: http.MethodPost, Name: PostApplicationDeploymentRequest},
 	{Resource: DropletsResource, Path: "/", Method: http.MethodGet, Name: GetDropletsRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid", Method: http.MethodGet, Name: GetDropletRequest},
 	{Resource: IsolationSegmentsResource, Path: "/", Method: http.MethodGet, Name: GetIsolationSegmentsRequest},
