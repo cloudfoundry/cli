@@ -29,6 +29,7 @@ type commandList struct {
 	V3GetHealthCheck     v3.V3GetHealthCheckCommand     `command:"v3-get-health-check" description:"Show the type of health check performed on an app"`
 	V3Packages           v3.V3PackagesCommand           `command:"v3-packages" description:"List packages of an app"`
 	V3Push               v3.V3PushCommand               `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
+	V3ZdtPush            v3.V3ZeroDowntimePushCommand   `command:"v3-zdt-push" description:"Update an app with zero down time"`
 	V3Restart            v3.V3RestartCommand            `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	V3RestartAppInstance v3.V3RestartAppInstanceCommand `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	V3Scale              v3.V3ScaleCommand              `command:"v3-scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
