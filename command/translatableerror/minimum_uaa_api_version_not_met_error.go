@@ -9,11 +9,11 @@ type MinimumUAAAPIVersionNotMetError struct {
 func (e MinimumUAAAPIVersionNotMetError) Error() string {
 	switch {
 	case e.Command != "" && e.CurrentVersion != "":
-		return "{{.Command}} requires UAA API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
+		return "{{.Command}} requires UAA API version {{.MinimumVersion}} or higher, but your current version is {{.CurrentVersion}}"
 	case e.Command != "" && e.CurrentVersion == "":
 		return "{{.Command}} requires UAA API version {{.MinimumVersion}} or higher."
 	case e.Command == "" && e.CurrentVersion != "":
-		return "This command requires UAA API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
+		return "This command requires UAA API version {{.MinimumVersion}} or higher, but your current version is {{.CurrentVersion}}"
 	default:
 		return "This command requires UAA API version {{.MinimumVersion}} or higher."
 	}

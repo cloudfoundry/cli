@@ -1,8 +1,11 @@
 package helpers
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -20,6 +23,60 @@ func IsVersionMet(minVersion string) bool {
 	Expect(err).ToNot(HaveOccurred())
 
 	return ok
+}
+
+type UAAVersion struct {
+	App struct {
+		Version string `json:"version"`
+	} `json:"app"`
+}
+
+func (v UAAVersion) Version() string {
+	return v.App.Version
+}
+
+func IsUAAVersionAtLeast(minVersion string) bool {
+	info := fetchAPIVersion()
+	uaaUrl := fmt.Sprintf("%s/info", info.Links.UAA.Href)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: len(skipSSLValidation()) > 0},
+	}
+	req, _ := http.NewRequest("GET", uaaUrl, nil)
+	req.Header.Add("Accept", "application/json")
+	client := &http.Client{Transport: tr}
+	resp, err := client.Do(req)
+	Expect(err).ToNot(HaveOccurred())
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		bodyBytes, err2 := ioutil.ReadAll(resp.Body)
+		Expect(err2).ToNot(HaveOccurred())
+
+		version := &UAAVersion{}
+
+		err3 := json.Unmarshal(bodyBytes, &version)
+		Expect(err3).ToNot(HaveOccurred())
+		currentUaaVersion := version.Version()
+		fmt.Printf("Version was %s", currentUaaVersion)
+		ok, err := versioncheck.IsMinimumAPIVersionMet(currentUaaVersion, minVersion)
+		Expect(err).ToNot(HaveOccurred())
+		return ok
+	}
+	Expect(resp.StatusCode).To(Equal(http.StatusOK))
+	return false
+}
+
+func SkipIfUAAVersionLessThan(version string) {
+	if !IsUAAVersionAtLeast(version) {
+		Skip(fmt.Sprintf("Test requires UAA version at least %s", version))
+	}
+}
+
+func SkipIfUAAVersionAtLeast(version string) {
+	if IsUAAVersionAtLeast(version) {
+		Skip(fmt.Sprintf("Test requires UAA version less than %s", version))
+	}
 }
 
 func matchMajorAPIVersion(minVersion string) string {
@@ -72,6 +129,10 @@ type ccRoot struct {
 				Version string
 			}
 		} `json:"cloud_controller_v3"`
+
+		UAA struct {
+			Href string `json:"href"`
+		} `json:"uaa"`
 	} `json:"links"`
 }
 

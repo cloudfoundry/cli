@@ -235,51 +235,63 @@ var _ = Describe("auth command", func() {
 	})
 
 	When("the origin flag is set", func() {
-		BeforeEach(func() {
-			helpers.SkipIfVersionLessThan(uaaversion.MinVersionOrigin)
-		})
-
-		When("--client-credentials is also set", func() {
-			It("displays the appropriate error message", func() {
+		When("the UAA version is too low to use the --origin flag", func() {
+			BeforeEach(func() {
+				helpers.SkipIfUAAVersionAtLeast(uaaversion.MinVersionOrigin)
+			})
+			It("prints an error message", func() {
 				session := helpers.CF("auth", "some-username", "some-password", "--client-credentials", "sumcredz", "--origin", "garbaje")
-
-				Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --client-credentials, --origin"))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("a user authenticates with valid user credentials for that origin", func() {
-			It("authenticates the user", func() {
-				username, password := helpers.GetOIDCCredentials()
-				session := helpers.CF("auth", username, password, "--origin", "cli-oidc-provider")
-
-				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
-				Eventually(session).Should(Say("Authenticating\\.\\.\\."))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
-				Eventually(session).Should(Exit(0))
-			})
-		})
-
-		When("the user provides the default origin and valid credentials", func() {
-			It("authenticates the user", func() {
-				username, password := helpers.GetCredentials()
-				session := helpers.CF("auth", username, password, "--origin", "uaa")
-
-				Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
-				Eventually(session).Should(Say("Authenticating\\.\\.\\."))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
-				Eventually(session).Should(Exit(0))
-			})
-		})
-
-		When("when the user provides an invalid origin", func() {
-			It("returns an error", func() {
-				session := helpers.CF("auth", "some-user", "some-password", "--origin", "EA")
-				Eventually(session.Err).Should(Say("The origin provided is invalid."))
+				Eventually(session.Err).Should(Say("Option `--origin` requires UAA API version 4.19.0 or higher, but your current version is \\d+\\.\\d+\\.\\d+"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
+			})
+		})
+		When("the UAA version is recent enough to support the flag", func() {
+			BeforeEach(func() {
+				helpers.SkipIfUAAVersionLessThan(uaaversion.MinVersionOrigin)
+			})
+			When("--client-credentials is also set", func() {
+				It("displays the appropriate error message", func() {
+					session := helpers.CF("auth", "some-username", "some-password", "--client-credentials", "sumcredz", "--origin", "garbaje")
+
+					Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --client-credentials, --origin"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("a user authenticates with valid user credentials for that origin", func() {
+				It("authenticates the user", func() {
+					username, password := helpers.GetOIDCCredentials()
+					session := helpers.CF("auth", username, password, "--origin", "cli-oidc-provider")
+
+					Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
+					Eventually(session).Should(Say("Authenticating\\.\\.\\."))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the user provides the default origin and valid credentials", func() {
+				It("authenticates the user", func() {
+					username, password := helpers.GetCredentials()
+					session := helpers.CF("auth", username, password, "--origin", "uaa")
+
+					Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))
+					Eventually(session).Should(Say("Authenticating\\.\\.\\."))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("when the user provides an invalid origin", func() {
+				It("returns an error", func() {
+					session := helpers.CF("auth", "some-user", "some-password", "--origin", "EA")
+					Eventually(session.Err).Should(Say("The origin provided is invalid."))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
 			})
 		})
 	})
