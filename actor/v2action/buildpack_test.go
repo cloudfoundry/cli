@@ -400,12 +400,13 @@ var _ = Describe("Buildpack", func() {
 		})
 
 		When("the buildpack path points to a directory", func() {
+			var tempFile *os.File
 			BeforeEach(func() {
 				var err error
 				inPath, err = ioutil.TempDir("", "buildpackdir-")
 				Expect(err).ToNot(HaveOccurred())
 
-				_, err = ioutil.TempFile(inPath, "foo")
+				tempFile, err = ioutil.TempFile(inPath, "foo")
 				Expect(err).ToNot(HaveOccurred())
 
 				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
@@ -413,6 +414,7 @@ var _ = Describe("Buildpack", func() {
 			})
 
 			AfterEach(func() {
+				tempFile.Close()
 				Expect(os.RemoveAll(inPath)).ToNot(HaveOccurred())
 				Expect(os.RemoveAll(tmpDirPath)).ToNot(HaveOccurred())
 			})
