@@ -42,8 +42,6 @@ var _ = Describe("CreateOrgCommand", func() {
 			SharedActor:  fakeSharedActor,
 			RequiredArgs: flag.Organization{Organization: orgName},
 		}
-
-		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {

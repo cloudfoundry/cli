@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
@@ -33,9 +32,6 @@ func (cmd *CreateOrgCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 
-	if !config.Experimental() {
-		return nil
-	}
 	cmd.SharedActor = sharedaction.NewActor(config)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
@@ -48,10 +44,6 @@ func (cmd *CreateOrgCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd CreateOrgCommand) Execute(args []string) error {
-	if !cmd.Config.Experimental() {
-		return translatableerror.UnrefactoredCommandError{}
-	}
-
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
