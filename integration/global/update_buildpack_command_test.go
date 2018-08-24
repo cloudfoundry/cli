@@ -24,15 +24,8 @@ var _ = Describe("update-buildpack command", func() {
 	)
 
 	BeforeEach(func() {
-		err := os.Setenv("CF_CLI_EXPERIMENTAL", "true")
-		Expect(err).ToNot(HaveOccurred())
 		buildpackName = helpers.NewBuildpack()
 		username, _ = helpers.GetCredentials()
-	})
-
-	AfterEach(func() {
-		err := os.Unsetenv("CF_CLI_EXPERIMENTAL")
-		Expect(err).ToNot(HaveOccurred())
 	})
 
 	When("--help flag is set", func() {

@@ -45,10 +45,6 @@ type UpdateBuildpackCommand struct {
 }
 
 func (cmd *UpdateBuildpackCommand) Setup(config command.Config, ui command.UI) error {
-	if !config.Experimental() {
-		return translatableerror.UnrefactoredCommandError{}
-	}
-
 	cmd.UI = ui
 	cmd.Config = config
 
