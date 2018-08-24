@@ -90,6 +90,25 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
+	var buildpackBitsPath string
+
+	if cmd.Path != "" {
+		var (
+			tmpDirPath string
+		)
+		downloader := download.NewDownloader(time.Second * 30)
+		tmpDirPath, err = ioutil.TempDir("", "buildpack-dir-")
+		if err != nil {
+			return err
+		}
+		defer os.RemoveAll(tmpDirPath)
+
+		buildpackBitsPath, err = cmd.Actor.PrepareBuildpackBits(string(cmd.Path), tmpDirPath, downloader)
+		if err != nil {
+			return err
+		}
+	}
+
 	buildpackGuid, warnings, err := cmd.Actor.UpdateBuildpackByName(cmd.RequiredArgs.Buildpack, cmd.Order)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -101,28 +120,12 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	if cmd.Path != "" {
-		var (
-			tmpDirPath string
-			bitsPath   string
-		)
-		downloader := download.NewDownloader(time.Second * 30)
-		tmpDirPath, err = ioutil.TempDir("", "buildpack-dir-")
-		if err != nil {
-			return err
-		}
-		defer os.RemoveAll(tmpDirPath)
-
-		bitsPath, err = cmd.Actor.PrepareBuildpackBits(string(cmd.Path), tmpDirPath, downloader)
-		if err != nil {
-			return err
-		}
-
 		cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{
 			"Buildpack": cmd.RequiredArgs.Buildpack,
 			"Username":  user.Name,
 		})
 
-		warnings, err = cmd.Actor.UploadBuildpack(buildpackGuid, bitsPath, cmd.ProgressBar)
+		warnings, err = cmd.Actor.UploadBuildpack(buildpackGuid, buildpackBitsPath, cmd.ProgressBar)
 		cmd.UI.DisplayWarnings(warnings)
 
 		cmd.UI.DisplayNewline()

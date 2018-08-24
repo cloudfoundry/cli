@@ -42,6 +42,8 @@ func ConvertToTranslatableError(err error) error {
 		return EmptyBuildpacksError(e)
 	case actionerror.EmptyDirectoryError:
 		return EmptyDirectoryError(e)
+	case actionerror.EmptyBuildpackDirectoryError:
+		return EmptyBuildpackDirectoryError(e)
 	case actionerror.FileChangedError:
 		return FileChangedError(e)
 	case actionerror.GettingPluginRepositoryError:

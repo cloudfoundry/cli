@@ -119,6 +119,20 @@ var _ = Describe("CreateBuildpackCommand", func() {
 				})
 			})
 
+			When("the path specified is an empty directory", func() {
+				var emptyDirectoryError error
+				BeforeEach(func() {
+					emptyDirectoryError = actionerror.EmptyBuildpackDirectoryError{Path: "some-directory"}
+					fakeActor.PrepareBuildpackBitsReturns("", emptyDirectoryError)
+					cmd.RequiredArgs.Path = "some empty directory"
+				})
+
+				It("exits without updating if the path points to an empty directory", func() {
+					Expect(executeErr).To(MatchError(emptyDirectoryError))
+					Expect(fakeActor.CreateBuildpackCallCount()).To(Equal(0))
+				})
+			})
+
 			When("creating the buildpack fails with a generic error", func() {
 				BeforeEach(func() {
 					fakeActor.CreateBuildpackReturns(v2action.Buildpack{}, v2action.Warnings{"some-create-bp-warning"}, errors.New("some-create-bp-error"))

@@ -80,16 +80,6 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
-	buildpack, warnings, err := cmd.Actor.CreateBuildpack(cmd.RequiredArgs.Buildpack, cmd.RequiredArgs.Position, !cmd.Disable)
-	cmd.UI.DisplayWarnings(warnings)
-
-	if err != nil {
-		return cmd.displayIfNameCollisionError(err)
-	}
-
-	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
-
 	downloader := download.NewDownloader(time.Second * 30)
 	tmpDirPath, err := ioutil.TempDir("", "buildpack-dir-")
 	if err != nil {
@@ -101,6 +91,16 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+
+	buildpack, warnings, err := cmd.Actor.CreateBuildpack(cmd.RequiredArgs.Buildpack, cmd.RequiredArgs.Position, !cmd.Disable)
+	cmd.UI.DisplayWarnings(warnings)
+
+	if err != nil {
+		return cmd.displayIfNameCollisionError(err)
+	}
+
+	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{
 		"Buildpack": cmd.RequiredArgs.Buildpack,

@@ -127,6 +127,24 @@ var _ = Describe("update-buildpack command", func() {
 
 						When("the path is local", func() {
 							When("the buildpack path exists", func() {
+								When("the buildpack path is an empty directory", func() {
+									BeforeEach(func() {
+										var err error
+										buildpackPath, err = ioutil.TempDir("", "create-buildpack-test-")
+										Expect(err).ToNot(HaveOccurred())
+									})
+
+									AfterEach(func() {
+										err := os.RemoveAll(buildpackPath)
+										Expect(err).ToNot(HaveOccurred())
+									})
+
+									It("prints an error message", func() {
+										Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+										Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", buildpackPath))
+										Eventually(session).Should(Exit(1))
+									})
+								})
 								When("uploading from a directory", func() {
 									BeforeEach(func() {
 										var err error

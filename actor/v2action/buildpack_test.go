@@ -405,6 +405,9 @@ var _ = Describe("Buildpack", func() {
 				inPath, err = ioutil.TempDir("", "buildpackdir-")
 				Expect(err).ToNot(HaveOccurred())
 
+				_, err = ioutil.TempFile(inPath, "foo")
+				Expect(err).ToNot(HaveOccurred())
+
 				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
 				Expect(err).ToNot(HaveOccurred())
 			})
@@ -419,6 +422,21 @@ var _ = Describe("Buildpack", func() {
 				Expect(fakeDownloader.DownloadCallCount()).To(Equal(0))
 
 				Expect(filepath.Base(outPath)).To(Equal(filepath.Base(inPath) + ".zip"))
+			})
+		})
+
+		When("the buildpack path points to an empty directory", func() {
+			BeforeEach(func() {
+				var err error
+				inPath, err = ioutil.TempDir("", "some-empty-dir")
+				Expect(err).ToNot(HaveOccurred())
+
+				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(actionerror.EmptyBuildpackDirectoryError{Path: inPath}))
 			})
 		})
 

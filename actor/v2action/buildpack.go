@@ -124,6 +124,14 @@ func (actor *Actor) PrepareBuildpackBits(inputPath string, tmpDirPath string, do
 	}
 
 	if info.IsDir() {
+		var empty bool
+		empty, err = isEmptyDirectory(inputPath)
+		if err != nil {
+			return "", err
+		}
+		if empty {
+			return "", actionerror.EmptyBuildpackDirectoryError{Path: inputPath}
+		}
 		archive := filepath.Join(tmpDirPath, filepath.Base(inputPath)) + ".zip"
 
 		err = Zipit(inputPath, archive, "")
@@ -134,6 +142,20 @@ func (actor *Actor) PrepareBuildpackBits(inputPath string, tmpDirPath string, do
 	}
 
 	return inputPath, nil
+}
+
+func isEmptyDirectory(name string) (bool, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err
 }
 
 func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, progBar SimpleProgressBar) (Warnings, error) {

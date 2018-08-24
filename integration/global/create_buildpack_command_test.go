@@ -62,13 +62,14 @@ var _ = Describe("create buildpack command", func() {
 		When("uploading from a directory", func() {
 			var buildpackDir string
 
+			AfterEach(func() {
+				err := os.RemoveAll(buildpackDir)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
 			When("zipping the directory errors", func() {
 				BeforeEach(func() {
 					buildpackDir = "some/nonexistent/dir"
-				})
-
-				AfterEach(func() {
-					Expect(os.RemoveAll(buildpackDir)).ToNot(HaveOccurred())
 				})
 
 				It("returns an error", func() {
@@ -88,10 +89,6 @@ var _ = Describe("create buildpack command", func() {
 					Expect(err).ToNot(HaveOccurred())
 				})
 
-				AfterEach(func() {
-					Expect(os.RemoveAll(buildpackDir)).ToNot(HaveOccurred())
-				})
-
 				It("successfully uploads a buildpack", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CF("create-buildpack", buildpackName, buildpackDir, "1")
@@ -101,6 +98,23 @@ var _ = Describe("create buildpack command", func() {
 					Eventually(session).Should(Say("Done uploading"))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the specified directory is empty", func() {
+				var emptyDir string
+				BeforeEach(func() {
+					var err error
+					emptyDir, err = ioutil.TempDir("", "empty-")
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("fails and reports that the directory is empty", func() {
+					username, _ := helpers.GetCredentials()
+					session := helpers.CF("create-buildpack", buildpackName, emptyDir, "1")
+					Eventually(session).Should(Say("Creating buildpack %s as %s...", buildpackName, username))
+					Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", emptyDir))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

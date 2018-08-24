@@ -94,6 +94,20 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 				fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
 			})
 
+			When("the path specified is an empty directory", func() {
+				var emptyDirectoryError error
+				BeforeEach(func() {
+					emptyDirectoryError = actionerror.EmptyBuildpackDirectoryError{Path: "some-directory"}
+					fakeActor.PrepareBuildpackBitsReturns("", emptyDirectoryError)
+					cmd.Path = "some empty directory"
+				})
+
+				It("exits without updating if the path points to an empty directory", func() {
+					Expect(executeErr).To(MatchError(emptyDirectoryError))
+					Expect(fakeActor.UpdateBuildpackByNameCallCount()).To(Equal(0))
+				})
+			})
+
 			When("updating the buildpack fails", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("update-error")

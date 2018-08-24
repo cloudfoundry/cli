@@ -76,9 +76,9 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.EmptyDirectoryError{Path: "some-filename"},
 			EmptyDirectoryError{Path: "some-filename"}),
 
-		Entry("actionerror.EmptyDirectoryError -> EmptyDirectoryError",
-			actionerror.EmptyDirectoryError{Path: "some-path"},
-			EmptyDirectoryError{Path: "some-path"}),
+		Entry("actionerror.EmptyBuildpackDirectoryError -> EmptyBuildpackDirectoryError",
+			actionerror.EmptyBuildpackDirectoryError{Path: "some-path"},
+			EmptyBuildpackDirectoryError{Path: "some-path"}),
 
 		Entry("actionerror.FileChangedError -> FileChangedError",
 			actionerror.FileChangedError{Filename: "some-filename"},
