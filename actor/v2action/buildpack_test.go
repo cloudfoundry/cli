@@ -613,13 +613,15 @@ var _ = Describe("Buildpack", func() {
 			warnings             Warnings
 			executeErr           error
 			newPosition          types.NullInt
+			newLocked            types.NullBool
+			newEnabled           types.NullBool
 			fakeProgressBar      *v2actionfakes.FakeSimpleProgressBar
 			updatedBuildpackGuid string
 		)
 
 		JustBeforeEach(func() {
 			fakeProgressBar = new(v2actionfakes.FakeSimpleProgressBar)
-			updatedBuildpackGuid, warnings, executeErr = actor.UpdateBuildpackByName("some-bp-name", newPosition)
+			updatedBuildpackGuid, warnings, executeErr = actor.UpdateBuildpackByName("some-bp-name", newPosition, newLocked, newEnabled)
 		})
 
 		It("gets the buildpack by name", func() {
@@ -652,45 +654,89 @@ var _ = Describe("Buildpack", func() {
 				Expect(warnings).To(ConsistOf("get warning"))
 			})
 
-			When("updating the buildpack record is not necessary", func() {
+			When("no changes to the buildpack record are specified", func() {
 				BeforeEach(func() {
 					newPosition = types.NullInt{}
+					newLocked = types.NullBool{}
+					newEnabled = types.NullBool{}
 				})
 
-				It("doesn't call the API if no diff is requested", func() {
+				It("doesn't call the CC API", func() {
 					Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(0))
 				})
 			})
 
-			When("updating the buildpack record returns an error", func() {
+			When("a new position is specified", func() {
 				BeforeEach(func() {
 					newPosition = types.NullInt{IsSet: true, Value: 3}
-					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{}, nil, errors.New("failed"))
+					newLocked = types.NullBool{}
+					newEnabled = types.NullBool{}
 				})
 
-				It("returns the error", func() {
-					Expect(executeErr).To(MatchError("failed"))
-				})
-			})
-
-			When("updating the buildpack record succeeds", func() {
-				BeforeEach(func() {
-					newPosition = types.NullInt{IsSet: true, Value: 3}
-					fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{GUID: "some guid"}, ccv2.Warnings{"update warning"}, nil)
-				})
-
-				It("does not return an error", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-				})
-
-				It("returns any warnings", func() {
-					Expect(warnings).To(ConsistOf("get warning", "update warning"))
-				})
-
-				It("makes an API call with the correct arguments", func() {
+				It("makes an API call to update the position", func() {
 					Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
 					passedBuildpack := fakeCloudControllerClient.UpdateBuildpackArgsForCall(0)
 					Expect(passedBuildpack.Position).To(Equal(newPosition))
+				})
+			})
+
+			When("a new locked state is specified", func() {
+				BeforeEach(func() {
+					newPosition = types.NullInt{}
+					newLocked = types.NullBool{IsSet: true, Value: true}
+					newEnabled = types.NullBool{}
+				})
+
+				It("makes an API call to update the locked state", func() {
+					Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
+					passedBuildpack := fakeCloudControllerClient.UpdateBuildpackArgsForCall(0)
+					Expect(passedBuildpack.Locked).To(Equal(newLocked))
+				})
+			})
+
+			When("a new enabled state is specified", func() {
+				BeforeEach(func() {
+					newPosition = types.NullInt{}
+					newLocked = types.NullBool{}
+					newEnabled = types.NullBool{IsSet: true, Value: true}
+				})
+
+				It("makes an API call to update the enabled state", func() {
+					Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
+					passedBuildpack := fakeCloudControllerClient.UpdateBuildpackArgsForCall(0)
+					Expect(passedBuildpack.Enabled).To(Equal(newEnabled))
+				})
+			})
+
+			When("some arguments are specified and buildpack record update is needed", func() {
+				BeforeEach(func() {
+					newPosition = types.NullInt{IsSet: true, Value: 3}
+					newLocked = types.NullBool{IsSet: true, Value: true}
+					newEnabled = types.NullBool{IsSet: true, Value: true}
+				})
+
+				When("updating the buildpack record returns an error", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{}, nil, errors.New("failed"))
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError("failed"))
+					})
+				})
+
+				When("updating the buildpack record succeeds", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.UpdateBuildpackReturns(ccv2.Buildpack{GUID: "some guid"}, ccv2.Warnings{"update warning"}, nil)
+					})
+
+					It("does not return an error", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+					})
+
+					It("returns any warnings", func() {
+						Expect(warnings).To(ConsistOf("get warning", "update warning"))
+					})
 				})
 			})
 		})

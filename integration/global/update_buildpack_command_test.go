@@ -296,7 +296,7 @@ var _ = Describe("update-buildpack command", func() {
 						})
 					})
 
-					PDescribe("flags", func() {
+					Describe("flags", func() {
 						When("specifying both enable and disable flags", func() {
 							It("returns the appropriate error", func() {
 								session := helpers.CF("update-buildpack", buildpackName, "--enable", "--disable")
@@ -330,9 +330,8 @@ var _ = Describe("update-buildpack command", func() {
 
 						When("specifying --lock and -p", func() {
 							It("returns the an error saying that those flags cannot be used together", func() {
-								session := helpers.CF("update-buildpack", buildpackName, "--lock", "-p", "some-fake-path")
-								Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-								Eventually(session.Err).Should(Say("Cannot specify buildpack bits and lock/unlock."))
+								session := helpers.CF("update-buildpack", buildpackName, "--lock", "-p", "http://google.com")
+								Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -p, --lock"))
 								Eventually(session).Should(Say("FAILED"))
 								Eventually(session).Should(Exit(1))
 							})
@@ -340,9 +339,8 @@ var _ = Describe("update-buildpack command", func() {
 
 						When("specifying --unlock and -p", func() {
 							It("returns the an error saying that those flags cannot be used together", func() {
-								session := helpers.CF("update-buildpack", buildpackName, "--unlock", "-p", "some-fake-path")
-								Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-								Eventually(session.Err).Should(Say("Cannot specify buildpack bits and lock/unlock."))
+								session := helpers.CF("update-buildpack", buildpackName, "--unlock", "-p", "http://google.com")
+								Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -p, --unlock"))
 								Eventually(session).Should(Say("FAILED"))
 								Eventually(session).Should(Exit(1))
 							})
@@ -356,14 +354,14 @@ var _ = Describe("update-buildpack command", func() {
 								Eventually(session).Should(Exit(0))
 
 								session = helpers.CF("buildpacks")
-								Eventually(session).Should(Say(`%s\s+1\s+false\s+true`, buildpackName))
+								Eventually(session).Should(Say(`%s\s+\d+\s+false`, buildpackName))
 								Eventually(session).Should(Exit(0))
 							})
 						})
 					})
 				})
 
-				PWhen("the existing buildpack is disabled", func() {
+				When("the existing buildpack is disabled", func() {
 					BeforeEach(func() {
 						helpers.BuildpackWithStack(func(buildpackPath string) {
 							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--disable")
@@ -379,13 +377,13 @@ var _ = Describe("update-buildpack command", func() {
 							Eventually(session).Should(Exit(0))
 
 							session = helpers.CF("buildpacks")
-							Eventually(session).Should(Say(`%s\s+1\s+true`, buildpackName))
+							Eventually(session).Should(Say(`%s\s+\d+\s+true`, buildpackName))
 							Eventually(session).Should(Exit(0))
 						})
 					})
 				})
 
-				PWhen("the existing buildpack is locked", func() {
+				When("the existing buildpack is locked", func() {
 					var buildpackURL string
 
 					BeforeEach(func() {

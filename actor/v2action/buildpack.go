@@ -233,45 +233,6 @@ func (actor *Actor) GetBuildpackByNameAndStack(buildpackName string, stackName s
 	}
 }
 
-func (actor *Actor) UpdateBuildpackByName(name string, position types.NullInt) (string, Warnings, error) {
-	warnings := Warnings{}
-	buildpack, execWarnings, err := actor.GetBuildpackByName(name)
-	warnings = append(warnings, execWarnings...)
-	if err != nil {
-		return "", warnings, err
-	}
-
-	if position != buildpack.Position {
-		buildpack.Position = position
-		_, execWarnings, err = actor.UpdateBuildpack(buildpack)
-		warnings = append(warnings, execWarnings...)
-	}
-
-	if err != nil {
-		return "", warnings, err
-	}
-
-	return buildpack.GUID, warnings, err
-}
-
-func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {
-	updatedBuildpack, warnings, err := actor.CloudControllerClient.UpdateBuildpack(ccv2.Buildpack(buildpack))
-	if err != nil {
-		switch err.(type) {
-		case ccerror.ResourceNotFoundError:
-			return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpack.Name}
-		case ccerror.BuildpackAlreadyExistsWithoutStackError:
-			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: buildpack.Name}
-		case ccerror.BuildpackAlreadyExistsForStackError:
-			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: err.Error()}
-		default:
-			return Buildpack{}, Warnings(warnings), err
-		}
-	}
-
-	return Buildpack(updatedBuildpack), Warnings(warnings), nil
-}
-
 func (actor *Actor) RenameBuildpack(oldName string, newName string, stackName string) (Warnings, error) {
 	var (
 		getWarnings Warnings
@@ -302,6 +263,47 @@ func (actor *Actor) RenameBuildpack(oldName string, newName string, stackName st
 	}
 
 	return Warnings(allWarnings), nil
+}
+
+func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {
+	updatedBuildpack, warnings, err := actor.CloudControllerClient.UpdateBuildpack(ccv2.Buildpack(buildpack))
+	if err != nil {
+		switch err.(type) {
+		case ccerror.ResourceNotFoundError:
+			return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpack.Name}
+		case ccerror.BuildpackAlreadyExistsWithoutStackError:
+			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsWithoutStackError{BuildpackName: buildpack.Name}
+		case ccerror.BuildpackAlreadyExistsForStackError:
+			return Buildpack{}, Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: err.Error()}
+		default:
+			return Buildpack{}, Warnings(warnings), err
+		}
+	}
+
+	return Buildpack(updatedBuildpack), Warnings(warnings), nil
+}
+
+func (actor *Actor) UpdateBuildpackByName(name string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, Warnings, error) {
+	warnings := Warnings{}
+	buildpack, execWarnings, err := actor.GetBuildpackByName(name)
+	warnings = append(warnings, execWarnings...)
+	if err != nil {
+		return "", warnings, err
+	}
+
+	if position != buildpack.Position || locked != buildpack.Enabled || enabled != buildpack.Enabled {
+		buildpack.Position = position
+		buildpack.Locked = locked
+		buildpack.Enabled = enabled
+		_, execWarnings, err = actor.UpdateBuildpack(buildpack)
+		warnings = append(warnings, execWarnings...)
+	}
+
+	if err != nil {
+		return "", warnings, err
+	}
+
+	return buildpack.GUID, warnings, err
 }
 
 // Zipit zips the source into a .zip file in the target dir

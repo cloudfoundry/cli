@@ -59,6 +59,60 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
+	Describe("invalid flag combinations", func() {
+		When("the lock and unlock flags are provided", func() {
+			BeforeEach(func() {
+				cmd.Lock = true
+				cmd.Unlock = true
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"--lock", "--unlock"},
+				}))
+			})
+		})
+
+		When("the lock and path flags are provided", func() {
+			BeforeEach(func() {
+				cmd.Lock = true
+				cmd.Path = "asdf"
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"-p", "--lock"},
+				}))
+			})
+		})
+
+		When("the path and unlock flags are provided", func() {
+			BeforeEach(func() {
+				cmd.Path = "asdf"
+				cmd.Unlock = true
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"-p", "--unlock"},
+				}))
+			})
+		})
+
+		When("the enable and disable flags are provided", func() {
+			BeforeEach(func() {
+				cmd.Enable = true
+				cmd.Disable = true
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"--enable", "--disable"},
+				}))
+			})
+		})
+	})
+
 	When("an error is encountered checking if the environment is setup correctly", func() {
 		BeforeEach(func() {
 			expectedErr = actionerror.NotLoggedInError{BinaryName: "some name"}
@@ -125,6 +179,58 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 				})
 			})
 
+			When("the --lock flag is provided", func() {
+				BeforeEach(func() {
+					cmd.Lock = true
+				})
+
+				It("sets the locked value to true when updating the buildpack", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					_, _, locked, _ := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+					Expect(locked.IsSet).To(Equal(true))
+					Expect(locked.Value).To(Equal(true))
+				})
+			})
+
+			When("the --unlock flag is provided", func() {
+				BeforeEach(func() {
+					cmd.Unlock = true
+				})
+
+				It("sets the locked value to false when updating the buildpack", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					_, _, locked, _ := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+					Expect(locked.IsSet).To(Equal(true))
+					Expect(locked.Value).To(Equal(false))
+				})
+			})
+
+			When("the --enable flag is provided", func() {
+				BeforeEach(func() {
+					cmd.Enable = true
+				})
+
+				It("sets the enabled value to true when updating the buildpack", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					_, _, _, enabled := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+					Expect(enabled.IsSet).To(Equal(true))
+					Expect(enabled.Value).To(Equal(true))
+				})
+			})
+
+			When("the --disable flag is provided", func() {
+				BeforeEach(func() {
+					cmd.Disable = true
+				})
+
+				It("sets the enabled value to false when updating the buildpack", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					_, _, _, enabled := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+					Expect(enabled.IsSet).To(Equal(true))
+					Expect(enabled.Value).To(Equal(false))
+				})
+			})
+
 			When("updating the buildpack succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.UpdateBuildpackByNameReturns(
@@ -137,9 +243,11 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 				When("no arguments are specified", func() {
 					It("makes the actor call to update the buildpack", func() {
 						Expect(fakeActor.UpdateBuildpackByNameCallCount()).To(Equal(1))
-						name, order := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+						name, order, locked, enabled := fakeActor.UpdateBuildpackByNameArgsForCall(0)
 						Expect(name).To(Equal(args.Buildpack))
 						Expect(order.IsSet).To(BeFalse())
+						Expect(locked.IsSet).To(BeFalse())
+						Expect(enabled.IsSet).To(BeFalse())
 
 						Expect(testUI.Err).To(Say("update-bp-warning1"))
 						Expect(testUI.Err).To(Say("update-bp-warning2"))
@@ -181,9 +289,8 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 					It("makes the actor call to update the buildpack", func() {
 						Expect(fakeActor.UpdateBuildpackByNameCallCount()).To(Equal(1))
-						name, order := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+						name, _, _, _ := fakeActor.UpdateBuildpackByNameArgsForCall(0)
 						Expect(name).To(Equal(args.Buildpack))
-						Expect(order.IsSet).To(BeFalse())
 
 						Expect(testUI.Err).To(Say("update-bp-warning1"))
 						Expect(testUI.Err).To(Say("update-bp-warning2"))
@@ -250,7 +357,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 					It("makes the actor call to update the buildpack", func() {
 						Expect(fakeActor.UpdateBuildpackByNameCallCount()).To(Equal(1))
-						name, order := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+						name, order, _, _ := fakeActor.UpdateBuildpackByNameArgsForCall(0)
 						Expect(name).To(Equal(args.Buildpack))
 						Expect(order.IsSet).To(BeTrue())
 						Expect(order.Value).To(Equal(3))

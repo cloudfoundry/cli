@@ -20,7 +20,7 @@ import (
 //go:generate counterfeiter . UpdateBuildpackActor
 type UpdateBuildpackActor interface {
 	CloudControllerAPIVersion() string
-	UpdateBuildpackByName(name string, position types.NullInt) (string, v2action.Warnings, error)
+	UpdateBuildpackByName(name string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error)
 	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
 }
@@ -64,7 +64,12 @@ func (cmd *UpdateBuildpackCommand) Setup(config command.Config, ui command.UI) e
 }
 
 func (cmd UpdateBuildpackCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(false, false)
+	err := cmd.validateFlagCombinations()
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
@@ -109,7 +114,17 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 		}
 	}
 
-	buildpackGuid, warnings, err := cmd.Actor.UpdateBuildpackByName(cmd.RequiredArgs.Buildpack, cmd.Order)
+	enabled := types.NullBool{
+		IsSet: cmd.Enable || cmd.Disable,
+		Value: cmd.Enable,
+	}
+
+	locked := types.NullBool{
+		IsSet: cmd.Lock || cmd.Unlock,
+		Value: cmd.Lock,
+	}
+
+	buildpackGUID, warnings, err := cmd.Actor.UpdateBuildpackByName(cmd.RequiredArgs.Buildpack, cmd.Order, locked, enabled)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -125,7 +140,7 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 			"Username":  user.Name,
 		})
 
-		warnings, err = cmd.Actor.UploadBuildpack(buildpackGuid, buildpackBitsPath, cmd.ProgressBar)
+		warnings, err = cmd.Actor.UploadBuildpack(buildpackGUID, buildpackBitsPath, cmd.ProgressBar)
 		cmd.UI.DisplayWarnings(warnings)
 
 		cmd.UI.DisplayNewline()
@@ -134,4 +149,32 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 
 	}
 	return err
+}
+
+func (cmd UpdateBuildpackCommand) validateFlagCombinations() error {
+	if cmd.Lock && cmd.Unlock {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--lock", "--unlock"},
+		}
+	}
+
+	if cmd.Lock && len(cmd.Path) > 0 {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"-p", "--lock"},
+		}
+	}
+
+	if len(cmd.Path) > 0 && cmd.Unlock {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"-p", "--unlock"},
+		}
+	}
+
+	if cmd.Enable && cmd.Disable {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--enable", "--disable"},
+		}
+	}
+
+	return nil
 }

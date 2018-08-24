@@ -19,11 +19,13 @@ type FakeUpdateBuildpackActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	UpdateBuildpackByNameStub        func(name string, position types.NullInt) (string, v2action.Warnings, error)
+	UpdateBuildpackByNameStub        func(name string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error)
 	updateBuildpackByNameMutex       sync.RWMutex
 	updateBuildpackByNameArgsForCall []struct {
 		name     string
 		position types.NullInt
+		locked   types.NullBool
+		enabled  types.NullBool
 	}
 	updateBuildpackByNameReturns struct {
 		result1 string
@@ -109,17 +111,19 @@ func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersionReturnsOnCall(i i
 	}{result1}
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByName(name string, position types.NullInt) (string, v2action.Warnings, error) {
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByName(name string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error) {
 	fake.updateBuildpackByNameMutex.Lock()
 	ret, specificReturn := fake.updateBuildpackByNameReturnsOnCall[len(fake.updateBuildpackByNameArgsForCall)]
 	fake.updateBuildpackByNameArgsForCall = append(fake.updateBuildpackByNameArgsForCall, struct {
 		name     string
 		position types.NullInt
-	}{name, position})
-	fake.recordInvocation("UpdateBuildpackByName", []interface{}{name, position})
+		locked   types.NullBool
+		enabled  types.NullBool
+	}{name, position, locked, enabled})
+	fake.recordInvocation("UpdateBuildpackByName", []interface{}{name, position, locked, enabled})
 	fake.updateBuildpackByNameMutex.Unlock()
 	if fake.UpdateBuildpackByNameStub != nil {
-		return fake.UpdateBuildpackByNameStub(name, position)
+		return fake.UpdateBuildpackByNameStub(name, position, locked, enabled)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -133,10 +137,10 @@ func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameCallCount() int {
 	return len(fake.updateBuildpackByNameArgsForCall)
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameArgsForCall(i int) (string, types.NullInt) {
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameArgsForCall(i int) (string, types.NullInt, types.NullBool, types.NullBool) {
 	fake.updateBuildpackByNameMutex.RLock()
 	defer fake.updateBuildpackByNameMutex.RUnlock()
-	return fake.updateBuildpackByNameArgsForCall[i].name, fake.updateBuildpackByNameArgsForCall[i].position
+	return fake.updateBuildpackByNameArgsForCall[i].name, fake.updateBuildpackByNameArgsForCall[i].position, fake.updateBuildpackByNameArgsForCall[i].locked, fake.updateBuildpackByNameArgsForCall[i].enabled
 }
 
 func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameReturns(result1 string, result2 v2action.Warnings, result3 error) {

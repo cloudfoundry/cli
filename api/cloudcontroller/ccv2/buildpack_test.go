@@ -339,6 +339,7 @@ var _ = Describe("Buildpack", func() {
 							Name:     "some-bp-name",
 							Position: types.NullInt{IsSet: true, Value: 10},
 							Enabled:  types.NullBool{IsSet: true, Value: true},
+							Locked:   types.NullBool{IsSet: true, Value: true},
 							GUID:     "some-bp-guid",
 						}
 
@@ -351,7 +352,8 @@ var _ = Describe("Buildpack", func() {
 												"name": "some-bp-name",
 												"stack": null,
 												"position": 10,
-												"enabled": true
+												"enabled": true,
+												"locked": true
 											}
 										}
 									`
@@ -360,6 +362,7 @@ var _ = Describe("Buildpack", func() {
 							"name":     "some-bp-name",
 							"position": 10,
 							"enabled":  true,
+							"locked":   true,
 						}
 
 						server.AppendHandlers(
@@ -386,6 +389,7 @@ var _ = Describe("Buildpack", func() {
 							GUID:     "some-bp-guid",
 							Position: types.NullInt{IsSet: true, Value: 0},
 							Enabled:  types.NullBool{IsSet: true, Value: false},
+							Locked:   types.NullBool{IsSet: true, Value: false},
 						}
 
 						response := `
@@ -397,7 +401,8 @@ var _ = Describe("Buildpack", func() {
 												"name": "some-bp-name",
 												"stack": null,
 												"position": 0,
-												"enabled": false
+												"enabled": false,
+												"locked": false
 											}
 										}
 									`
@@ -405,6 +410,7 @@ var _ = Describe("Buildpack", func() {
 							"name":     "some-bp-name",
 							"position": 0,
 							"enabled":  false,
+							"locked":   false,
 						}
 
 						server.AppendHandlers(

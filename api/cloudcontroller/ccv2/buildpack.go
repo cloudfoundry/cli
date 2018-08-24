@@ -15,6 +15,7 @@ import (
 
 // Buildpack represents a Cloud Controller Buildpack.
 type Buildpack struct {
+	Locked   types.NullBool
 	Enabled  types.NullBool
 	GUID     string
 	Name     string
@@ -24,6 +25,7 @@ type Buildpack struct {
 
 func (buildpack Buildpack) MarshalJSON() ([]byte, error) {
 	ccBuildpack := struct {
+		Locked   *bool  `json:"locked,omitempty"`
 		Enabled  *bool  `json:"enabled,omitempty"`
 		Name     string `json:"name"`
 		Position *int   `json:"position,omitempty"`
@@ -39,6 +41,9 @@ func (buildpack Buildpack) MarshalJSON() ([]byte, error) {
 	if buildpack.Enabled.IsSet {
 		ccBuildpack.Enabled = &buildpack.Enabled.Value
 	}
+	if buildpack.Locked.IsSet {
+		ccBuildpack.Locked = &buildpack.Locked.Value
+	}
 
 	return json.Marshal(ccBuildpack)
 }
@@ -47,6 +52,7 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 	var alias struct {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
+			Locked   types.NullBool `json:"locked"`
 			Enabled  types.NullBool `json:"enabled"`
 			Name     string         `json:"name"`
 			Position types.NullInt  `json:"position"`
@@ -59,6 +65,7 @@ func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	buildpack.Locked = alias.Entity.Locked
 	buildpack.Enabled = alias.Entity.Enabled
 	buildpack.GUID = alias.Metadata.GUID
 	buildpack.Name = alias.Entity.Name
