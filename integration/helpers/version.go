@@ -58,7 +58,6 @@ func IsUAAVersionAtLeast(minVersion string) bool {
 		err3 := json.Unmarshal(bodyBytes, &version)
 		Expect(err3).ToNot(HaveOccurred())
 		currentUaaVersion := version.Version()
-		fmt.Printf("Version was %s", currentUaaVersion)
 		ok, err := versioncheck.IsMinimumAPIVersionMet(currentUaaVersion, minVersion)
 		Expect(err).ToNot(HaveOccurred())
 		return ok
