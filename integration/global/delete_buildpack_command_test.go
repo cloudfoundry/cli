@@ -37,6 +37,7 @@ var _ = Describe("delete-buildpack command", func() {
 			Eventually(session).Should(Say("\n"))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("buildpacks"))
+			Eventually(session).Should(Exit(0))
 		})
 	})
 
