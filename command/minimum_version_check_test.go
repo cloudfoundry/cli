@@ -73,7 +73,6 @@ var _ = Describe("Minimum Version Check", func() {
 				currentVersion := "1.0.0-alpha.5"
 				err := MinimumUAAAPIVersionCheck(currentVersion, minimumVersion)
 				Expect(err).To(MatchError(translatableerror.MinimumUAAAPIVersionNotMetError{
-					CurrentVersion: currentVersion,
 					MinimumVersion: minimumVersion,
 				}))
 			})
@@ -84,7 +83,6 @@ var _ = Describe("Minimum Version Check", func() {
 					err := MinimumUAAAPIVersionCheck(currentVersion, minimumVersion, "some-command")
 					Expect(err).To(MatchError(translatableerror.MinimumUAAAPIVersionNotMetError{
 						Command:        "some-command",
-						CurrentVersion: currentVersion,
 						MinimumVersion: minimumVersion,
 					}))
 				})

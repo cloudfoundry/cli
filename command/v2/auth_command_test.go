@@ -57,8 +57,7 @@ var _ = Describe("auth Command", func() {
 
 			It("returns an API version error", func() {
 				Expect(err).To(MatchError(translatableerror.MinimumUAAAPIVersionNotMetError{
-					Command:        "Option `--origin`",
-					CurrentVersion: fakeActor.UAAAPIVersion(),
+					Command:        "Option '--origin'",
 					MinimumVersion: uaaversion.MinVersionOrigin,
 				}))
 			})

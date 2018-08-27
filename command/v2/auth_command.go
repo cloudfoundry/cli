@@ -46,7 +46,7 @@ func (cmd *AuthCommand) Setup(config command.Config, ui command.UI) error {
 
 func (cmd AuthCommand) Execute(args []string) error {
 	if len(cmd.Origin) > 0 {
-		err := command.MinimumUAAAPIVersionCheck(cmd.Actor.UAAAPIVersion(), uaaversion.MinVersionOrigin, "Option `--origin`")
+		err := command.MinimumUAAAPIVersionCheck(cmd.Actor.UAAAPIVersion(), uaaversion.MinVersionOrigin, "Option '--origin'")
 		if err != nil {
 			return err
 		}

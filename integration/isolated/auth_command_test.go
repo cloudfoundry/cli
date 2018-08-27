@@ -241,7 +241,7 @@ var _ = Describe("auth command", func() {
 			})
 			It("prints an error message", func() {
 				session := helpers.CF("auth", "some-username", "some-password", "--client-credentials", "sumcredz", "--origin", "garbaje")
-				Eventually(session.Err).Should(Say("Option `--origin` requires UAA API version 4.19.0 or higher, but your current version is \\d+\\.\\d+\\.\\d+"))
+				Eventually(session.Err).Should(Say("Option '--origin' requires UAA API version 4.19.0 or higher. Update your Cloud Foundry instance."))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

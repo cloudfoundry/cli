@@ -45,7 +45,6 @@ func MinimumUAAAPIVersionCheck(current string, minimum string, customCommand ...
 		log.WithFields(log.Fields{"current": current, "minimum": minimum}).Error("minimum not met")
 		return translatableerror.MinimumUAAAPIVersionNotMetError{
 			Command:        command,
-			CurrentVersion: current,
 			MinimumVersion: minimum,
 		}
 	}
