@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -113,7 +114,7 @@ var _ = Describe("create buildpack command", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CF("create-buildpack", buildpackName, emptyDir, "1")
 					Eventually(session).Should(Say("Creating buildpack %s as %s...", buildpackName, username))
-					Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", emptyDir))
+					Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", regexp.QuoteMeta(emptyDir)))
 					Eventually(session).Should(Exit(1))
 				})
 			})
