@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -134,7 +135,7 @@ var _ = Describe("update-buildpack command", func() {
 
 									It("prints an error message", func() {
 										Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-										Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", buildpackPath))
+										Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", regexp.QuoteMeta(buildpackPath)))
 										Eventually(session).Should(Exit(1))
 									})
 								})
