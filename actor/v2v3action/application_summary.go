@@ -1,6 +1,7 @@
 package v2v3action
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -46,7 +47,7 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID
 	if summary.State == constant.ApplicationStarted {
 		appStats, warnings, err := actor.V2Actor.GetApplicationInstancesWithStatsByApplication(summary.GUID)
 		allWarnings = append(allWarnings, warnings...)
-		if _, ok := err.(ccerror.ResourceNotFoundError); err != nil && !ok {
+		if _, ok := err.(actionerror.ApplicationInstancesNotFoundError); err != nil && !ok {
 			return ApplicationSummary{}, allWarnings, err
 		}
 		summary.ApplicationInstanceWithStats = appStats

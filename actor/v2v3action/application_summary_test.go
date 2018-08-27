@@ -3,6 +3,7 @@ package v2v3action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	. "code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v2v3action/v2v3actionfakes"
@@ -199,9 +200,9 @@ var _ = Describe("Application Summary Actions", func() {
 						})
 					})
 
-					When("a ResourceNotFoundError is returned", func() {
+					When("a ApplicationInstancesNotFoundError is returned", func() {
 						BeforeEach(func() {
-							fakeV2Actor.GetApplicationInstancesWithStatsByApplicationReturns(nil, v2action.Warnings{"v2-app-instances-warning"}, ccerror.ResourceNotFoundError{})
+							fakeV2Actor.GetApplicationInstancesWithStatsByApplicationReturns(nil, v2action.Warnings{"v2-app-instances-warning"}, actionerror.ApplicationInstancesNotFoundError{})
 						})
 
 						It("adds warnings and continues", func() {
