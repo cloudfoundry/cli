@@ -7,7 +7,6 @@ import (
 	. "code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
-	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -38,6 +37,11 @@ var _ = Describe("Auth", func() {
 			executeErr   error
 		)
 
+		BeforeEach(func() {
+			identity = "some-identity"
+			secret = "some-secret"
+		})
+
 		JustBeforeEach(func() {
 			accessToken, refreshToken, executeErr = client.Authenticate(identity, secret, origin, grantType)
 		})
@@ -49,8 +53,7 @@ var _ = Describe("Auth", func() {
 						"access_token":"some-access-token",
 						"refresh_token":"some-refresh-token"
 					}`
-					identity = helpers.NewUsername()
-					secret = helpers.NewPassword()
+					origin = ""
 					grantType = constant.GrantTypePassword
 					server.AppendHandlers(
 						CombineHandlers(
@@ -77,8 +80,6 @@ var _ = Describe("Auth", func() {
 						"access_token":"some-access-token",
 						"refresh_token":"some-refresh-token"
 					}`
-					identity = helpers.NewUsername()
-					secret = helpers.NewPassword()
 					origin = "some-fake-origin"
 					grantType = constant.GrantTypePassword
 					expectedQuery := "login_hint=%7B%22origin%22%3A%22" + origin + "%22%7D"
@@ -107,8 +108,7 @@ var _ = Describe("Auth", func() {
 						"access_token":"some-access-token"
 					}`
 
-					identity = helpers.NewUsername()
-					secret = helpers.NewPassword()
+					origin = ""
 					grantType = constant.GrantTypeClientCredentials
 					server.AppendHandlers(
 						CombineHandlers(
