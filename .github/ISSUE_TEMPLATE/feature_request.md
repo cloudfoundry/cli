@@ -1,3 +1,9 @@
+---
+name: Feature request
+about: Suggest an idea for this project
+
+---
+
 **Please provide details on the following items. Failure to do so may result in deletion of your feature request.** 
 
 **What's the user value of this feature request?**
