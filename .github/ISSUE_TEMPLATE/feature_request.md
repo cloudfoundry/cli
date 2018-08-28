@@ -1,8 +1,20 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Suggest a new feature for the CF CLI
 
 ---
+
+**What's the user value of this feature request?**
+A clear and concise description of what the user value is.
+
+**Who is the functionality for?**
+Who will use this feature? 
+
+**How often will this functionality be used by the user?**
+How often will they use this feature?
+
+**Who else is affected by the change?**
+Does this feature cause a breaking change? Are other users affected by this change?
 
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
