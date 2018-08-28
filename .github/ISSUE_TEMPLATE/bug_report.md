@@ -1,8 +1,3 @@
----
-name: Bug report
-about: Submit an issue so we can investigate
----
-
 **Please fill out the issue checklist below and provide ALL the requested information.**
 
 - [ ] I tried updating to the latest version of the CF CLI to see if it fixed my problem.
