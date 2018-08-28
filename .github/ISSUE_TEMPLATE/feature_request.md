@@ -1,8 +1,4 @@
----
-name: Feature request
-about: Suggest a new feature for the CF CLI
-
----
+**Please provide details on the following items. Failure to do so may result in deletion of your feature request.** 
 
 **What's the user value of this feature request?**
 A clear and concise description of what the user value is.
