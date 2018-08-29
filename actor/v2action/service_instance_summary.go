@@ -5,12 +5,15 @@ import (
 	"sort"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/util/sorting"
 	log "github.com/sirupsen/logrus"
 )
 
 type ServiceInstanceShareType string
+
+type LastOperation ccv2.LastOperation
 
 const (
 	ServiceInstanceIsSharedFrom ServiceInstanceShareType = "SharedFrom"
@@ -48,8 +51,7 @@ func (s ServiceInstanceSummary) IsSharedTo() bool {
 
 type BoundApplication struct {
 	AppName            string
-	LastOperationState constant.LastOperationState
-	Message            string
+	LastOperation      LastOperation
 	ServiceBindingName string
 }
 
@@ -241,8 +243,7 @@ func (actor Actor) getSummaryInfoCompositeForInstance(spaceGUID string, serviceI
 			BoundApplication{
 				AppName:            app.Name,
 				ServiceBindingName: serviceBinding.Name,
-				LastOperationState: serviceBinding.LastOperation.State,
-				Message:            serviceBinding.LastOperation.Description,
+				LastOperation:      LastOperation(serviceBinding.LastOperation),
 			})
 	}
 
