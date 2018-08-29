@@ -78,8 +78,9 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 
-	cmd.UI.DisplayTextWithFlavor("Assigning role OrgManager to user {{.Username}} in org {{.OrgName}}...",
+	cmd.UI.DisplayTextWithFlavor("Assigning role {{.Role}} to user {{.Username}} in org {{.OrgName}}...",
 		map[string]interface{}{
+			"Role":     "OrgManager",
 			"OrgName":  orgName,
 			"Username": user.Name,
 		})
