@@ -21,7 +21,6 @@ var _ = Describe("update-buildpack command", func() {
 	var (
 		buildpackName string
 		username      string
-		// stacks        []string
 	)
 
 	BeforeEach(func() {
@@ -73,21 +72,45 @@ var _ = Describe("update-buildpack command", func() {
 		})
 
 		When("the buildpack name is provided", func() {
-			When("the buildpack exists", func() {
-				Context("buildpack has been created in enabled and unlocked state", func() {
+			When("the buildpack does not exist", func() {
+				It("returns a buildpack not found error", func() {
+					session := helpers.CF("update-buildpack", buildpackName)
+					Eventually(session.Err).Should(Say("Buildpack %s not found", buildpackName))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			Describe("stack association", func() {
+				var stacks []string
+
+				BeforeEach(func() {
+					// TODO: create stacks
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+					stacks = helpers.FetchStacks()
+					Expect(len(stacks)).To(BeNumerically(">=", 2))
+				})
+
+				When("multiple buildpacks with the same name exist in enabled and unlocked state, and one has nil stack", func() {
 					BeforeEach(func() {
 						helpers.BuildpackWithStack(func(buildpackArchive string) {
 							createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "99")
 							Eventually(createSession).Should(Exit(0))
-						}, "")
+						}, stacks[0])
+
+						helpers.BuildpackWithoutStack(func(buildpackArchive string) {
+							createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "99")
+							Eventually(createSession).Should(Exit(0))
+						})
 
 						listSession := helpers.CF("buildpacks")
+						Eventually(listSession).Should(Say(`%s\s+%s\s+\d+\s+true\s+false`, buildpackName, stacks[0]))
 						Eventually(listSession).Should(Say(`%s\s+\d+\s+true\s+false`, buildpackName))
 						Eventually(listSession).Should(Exit(0))
 					})
 
-					When("only a name is provided", func() {
-						It("prints a success message", func() {
+					When("no stack association is specified", func() {
+						It("acts on the buildpack with the nil stack", func() {
 							session := helpers.CF("update-buildpack", buildpackName)
 
 							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
@@ -96,331 +119,489 @@ var _ = Describe("update-buildpack command", func() {
 						})
 					})
 
-					When("the -s flag is provided and the targeted API is older than the minimum version", func() {
-						BeforeEach(func() {
-							helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
-						})
+					When("the user specifies a stack association not matching any of the existing buildpacks with this name", func() {
+						It("reports that it couldn't find the buildpack", func() {
+							nonexistentStack := "some-incorrect-stack-name"
+							session := helpers.CF("update-buildpack", buildpackName, "-s", nonexistentStack)
 
-						It("fails with a minimum version error", func() {
-							session := helpers.CF("update-buildpack", buildpackName, "-s", "some-stack")
-							Eventually(session.Err).Should(Say("Option `-s` requires CF API version %s or higher. Your target is %s.", ccversion.MinVersionBuildpackStackAssociationV2, helpers.GetAPIVersionV2()))
+							Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", buildpackName, nonexistentStack))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
 					})
 
-					When("the -p flag is provided", func() {
-						var (
-							buildpackPath string
-							session       *Session
-						)
+					When("the user specifies a stack association matching one of the existing buildpacks with this name", func() {
+						It("finds the buildpack with the stack specified (and not the buildpack with the nil stack)", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "-s", stacks[0])
 
-						JustBeforeEach(func() {
-							session = helpers.CF("update-buildpack", buildpackName, "-p", buildpackPath)
-						})
-
-						When("the path is local", func() {
-							When("the buildpack path exists", func() {
-								When("the buildpack path is an empty directory", func() {
-									BeforeEach(func() {
-										var err error
-										buildpackPath, err = ioutil.TempDir("", "create-buildpack-test-")
-										Expect(err).ToNot(HaveOccurred())
-									})
-
-									AfterEach(func() {
-										err := os.RemoveAll(buildpackPath)
-										Expect(err).ToNot(HaveOccurred())
-									})
-
-									It("prints an error message", func() {
-										Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-										Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", regexp.QuoteMeta(buildpackPath)))
-										Eventually(session).Should(Exit(1))
-									})
-								})
-								When("uploading from a directory", func() {
-									BeforeEach(func() {
-										var err error
-										buildpackPath, err = ioutil.TempDir("", "create-buildpack-test-")
-										Expect(err).ToNot(HaveOccurred())
-										file, err := ioutil.TempFile(buildpackPath, "")
-										defer file.Close()
-										Expect(err).ToNot(HaveOccurred())
-									})
-
-									AfterEach(func() {
-										err := os.RemoveAll(buildpackPath)
-										Expect(err).ToNot(HaveOccurred())
-									})
-
-									It("updates the buildpack with the given bits", func() {
-										Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-										Eventually(session).Should(Say("OK"))
-										Eventually(session).Should(Exit(0))
-									})
-								})
-
-								When("uploading from a zip", func() {
-									BeforeEach(func() {
-										buildpackPath = helpers.MakeBuildpackArchive("")
-									})
-
-									AfterEach(func() {
-										err := os.Remove(buildpackPath)
-										Expect(err).NotTo(HaveOccurred())
-									})
-
-									It("updates the buildpack with the given bits", func() {
-										Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-										Eventually(session).Should(Say("OK"))
-										Eventually(session).Should(Exit(0))
-									})
-								})
-							})
-
-							When("the buildpack path does not exist", func() {
-								BeforeEach(func() {
-									buildpackPath = "this-is-a-bogus-path"
-								})
-
-								It("returns a buildpack does not exist error", func() {
-									Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'this-is-a-bogus-path' does not exist."))
-									Eventually(session).Should(Exit(1))
-								})
-							})
-						})
-
-						When("path is a URL", func() {
-							When("specifying a valid URL", func() {
-								BeforeEach(func() {
-									buildpackPath = "https://github.com/cloudfoundry/binary-buildpack/releases/download/v1.0.21/binary-buildpack-v1.0.21.zip"
-								})
-
-								It("successfully uploads a buildpack", func() {
-									Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-									Eventually(session).Should(Say("OK"))
-									Eventually(session).Should(Say("Uploading buildpack %s as %s...", buildpackName, username))
-									Eventually(session).Should(Say("Done uploading"))
-									Eventually(session).Should(Say("OK"))
-									Eventually(session).Should(Exit(0))
-								})
-							})
-
-							When("a 4xx or 5xx HTTP response status is encountered", func() {
-								var server *Server
-
-								BeforeEach(func() {
-									server = NewServer()
-									// Suppresses ginkgo server logs
-									server.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
-									server.AppendHandlers(
-										CombineHandlers(
-											VerifyRequest(http.MethodGet, "/"),
-											RespondWith(http.StatusNotFound, nil),
-										),
-									)
-									buildpackPath = server.URL()
-								})
-
-								AfterEach(func() {
-									server.Close()
-								})
-
-								It("displays an appropriate error", func() {
-									Eventually(session.Err).Should(Say("Download attempt failed; server returned 404 Not Found"))
-									Eventually(session.Err).Should(Say("Unable to install; buildpack is not available from the given URL\\."))
-									Eventually(session).Should(Say("FAILED"))
-									Eventually(session).Should(Exit(1))
-								})
-							})
-
-							When("specifying an invalid URL", func() {
-								BeforeEach(func() {
-									buildpackPath = "http://not-a-real-url"
-								})
-
-								It("returns the appropriate error", func() {
-									Eventually(session.Err).Should(Say("Get %s: dial tcp: lookup", buildpackPath))
-									Eventually(session).Should(Say("FAILED"))
-									Eventually(session).Should(Exit(1))
-								})
-							})
-						})
-					})
-
-					When("the -i flag is provided", func() {
-						var (
-							buildpackPosition string
-							session           *Session
-						)
-
-						JustBeforeEach(func() {
-							session = helpers.CF("update-buildpack", buildpackName, "-i", buildpackPosition)
-						})
-
-						When("position is a negative integer", func() {
-							BeforeEach(func() {
-								buildpackPosition = "-3"
-							})
-
-							It("successfully uploads buildpack as the first position", func() {
-								Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-								Eventually(session).Should(Say("OK"))
-								Eventually(session).Should(Exit(0))
-
-								listSession := helpers.CF("buildpacks")
-								Eventually(listSession).Should(Say(`%s\s+1\s`, buildpackName))
-								Eventually(listSession).Should(Exit(0))
-							})
-						})
-
-						When("position is positive integer", func() {
-							BeforeEach(func() {
-								buildpackPosition = "3"
-							})
-
-							It("successfully uploads buildpack in the provided position", func() {
-								Eventually(session).Should(Exit(0))
-
-								listSession := helpers.CF("buildpacks")
-								Eventually(listSession).Should(Say(`%s\s+3\s`, buildpackName))
-								Eventually(listSession).Should(Exit(0))
-							})
-						})
-					})
-
-					Describe("flags", func() {
-						When("specifying both enable and disable flags", func() {
-							It("returns the appropriate error", func() {
-								session := helpers.CF("update-buildpack", buildpackName, "--enable", "--disable")
-								Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --enable, --disable"))
-								Eventually(session).Should(Say("FAILED"))
-								Eventually(session).Should(Exit(1))
-							})
-						})
-
-						When("specifying both lock and unlock flags", func() {
-							It("returns the appropriate error", func() {
-								session := helpers.CF("update-buildpack", buildpackName, "--lock", "--unlock")
-								Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --lock, --unlock"))
-								Eventually(session).Should(Say("FAILED"))
-								Eventually(session).Should(Exit(1))
-							})
-						})
-
-						When("specifying lock flag", func() {
-							It("locks the buildpack", func() {
-								session := helpers.CF("update-buildpack", buildpackName, "--lock")
-								Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-								Eventually(session).Should(Say("OK"))
-								Eventually(session).Should(Exit(0))
-
-								session = helpers.CF("buildpacks")
-								Eventually(session).Should(Say(`%s\s+\d+\s+true\s+true`, buildpackName))
-								Eventually(session).Should(Exit(0))
-							})
-						})
-
-						When("specifying --lock and -p", func() {
-							It("returns the an error saying that those flags cannot be used together", func() {
-								session := helpers.CF("update-buildpack", buildpackName, "--lock", "-p", "http://google.com")
-								Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -p, --lock"))
-								Eventually(session).Should(Say("FAILED"))
-								Eventually(session).Should(Exit(1))
-							})
-						})
-
-						When("specifying --unlock and -p", func() {
-							It("returns the an error saying that those flags cannot be used together", func() {
-								session := helpers.CF("update-buildpack", buildpackName, "--unlock", "-p", "http://google.com")
-								Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -p, --unlock"))
-								Eventually(session).Should(Say("FAILED"))
-								Eventually(session).Should(Exit(1))
-							})
-						})
-
-						When("specifying disable flag", func() {
-							It("disables buildpack", func() {
-								session := helpers.CF("update-buildpack", buildpackName, "--disable")
-								Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-								Eventually(session).Should(Say("OK"))
-								Eventually(session).Should(Exit(0))
-
-								session = helpers.CF("buildpacks")
-								Eventually(session).Should(Say(`%s\s+\d+\s+false`, buildpackName))
-								Eventually(session).Should(Exit(0))
-							})
-						})
-					})
-				})
-
-				When("the existing buildpack is disabled", func() {
-					BeforeEach(func() {
-						helpers.BuildpackWithStack(func(buildpackPath string) {
-							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--disable")
-							Eventually(session).Should(Exit(0))
-						}, "")
-					})
-
-					When("specifying enable flag", func() {
-						It("enables buildpack", func() {
-							session := helpers.CF("update-buildpack", buildpackName, "--enable")
-							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+							Eventually(session).Should(Say("Updating buildpack %s with stack %s as %s...",
+								buildpackName, stacks[0], username,
+							))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
-
-							session = helpers.CF("buildpacks")
-							Eventually(session).Should(Say(`%s\s+\d+\s+true`, buildpackName))
-							Eventually(session).Should(Exit(0))
 						})
 					})
 				})
 
-				When("the existing buildpack is locked", func() {
-					var buildpackURL string
-
+				When("multiple buildpacks with the same name exist in enabled and unlocked state, and all have stacks", func() {
 					BeforeEach(func() {
-						helpers.BuildpackWithStack(func(buildpackPath string) {
-							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-							Eventually(session).Should(Exit(0))
-							session = helpers.CF("update-buildpack", buildpackName, "--lock")
-							Eventually(session).Should(Exit(0))
-						}, "")
-						buildpackURL = "https://github.com/cloudfoundry/binary-buildpack/releases/download/v1.0.21/binary-buildpack-v1.0.21.zip"
+						helpers.BuildpackWithStack(func(buildpackArchive string) {
+							createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "99")
+							Eventually(createSession).Should(Exit(0))
+						}, stacks[0])
+
+						helpers.BuildpackWithStack(func(buildpackArchive string) {
+							createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "99")
+							Eventually(createSession).Should(Exit(0))
+						}, stacks[1])
+
+						listSession := helpers.CF("buildpacks")
+						Eventually(listSession).Should(Say(`%s\s+%s\s+\d+\s+true\s+false`, buildpackName, stacks[0]))
+						Eventually(listSession).Should(Say(`%s\s+%s\s+\d+\s+true\s+false`, buildpackName, stacks[1]))
+						Eventually(listSession).Should(Exit(0))
 					})
 
-					Context("specifying -p argument", func() {
-						It("fails to update buildpack", func() {
-							session := helpers.CF("update-buildpack", buildpackName, "-p", buildpackURL)
-							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+					When("no stack association is specified", func() {
+						It("reports that it couldn't find the buildpack", func() {
+							session := helpers.CF("update-buildpack", buildpackName)
+
+							Eventually(session.Err).Should(Say("Multiple buildpacks named %s found\\. Specify a stack name by using a '-s' flag\\.", buildpackName))
 							Eventually(session).Should(Say("FAILED"))
-							Eventually(session.Err).Should(Say("The buildpack is locked"))
 							Eventually(session).Should(Exit(1))
 						})
 					})
 
-					Context("specifying unlock flag", func() {
-						It("unlocks the buildpack", func() {
-							session := helpers.CF("update-buildpack", buildpackName, "--unlock")
+					When("the user specifies a stack association not matching any of the existing buildpacks with this name", func() {
+						It("reports that it couldn't find the buildpack", func() {
+							nonexistentStack := "some-incorrect-stack-name"
+							session := helpers.CF("update-buildpack", buildpackName, "-s", nonexistentStack)
+
+							Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", buildpackName, nonexistentStack))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("the user specifies a stack association matching one of the existing buildpacks with this name", func() {
+						It("finds the buildpack with the stack specified (and not the buildpack with the nil stack)", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "-s", stacks[0])
+
+							Eventually(session).Should(Say("Updating buildpack %s with stack %s as %s...",
+								buildpackName, stacks[0], username,
+							))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+
+				When("one buildpack with the given name exists in enabled and unlocked state with a stack association", func() {
+					BeforeEach(func() {
+						helpers.BuildpackWithStack(func(buildpackArchive string) {
+							createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "99")
+							Eventually(createSession).Should(Exit(0))
+						}, stacks[0])
+
+						listSession := helpers.CF("buildpacks")
+						Eventually(listSession).Should(Say(`%s\s+%s\s+\d+\s+true\s+false`, buildpackName, stacks[0]))
+						Eventually(listSession).Should(Exit(0))
+					})
+
+					When("no stack association is specified", func() {
+						It("updates the only buildpack with that name", func() {
+							session := helpers.CF("update-buildpack", buildpackName)
+
 							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
+						})
+					})
 
-							session = helpers.CF("buildpacks")
-							Eventually(session).Should(Say(`%s\s+\d+\s+true\s+false`, buildpackName))
+					When("the user specifies a stack association not matching any of the existing buildpacks with this name", func() {
+						It("reports that it couldn't find the buildpack", func() {
+							nonexistentStack := "some-incorrect-stack-name"
+							session := helpers.CF("update-buildpack", buildpackName, "-s", nonexistentStack)
+
+							Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", buildpackName, nonexistentStack))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("the user specifies a stack association matching one of the existing buildpacks with this name", func() {
+						It("finds the buildpack with the stack specified (and not the buildpack with the nil stack)", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "-s", stacks[0])
+
+							Eventually(session).Should(Say("Updating buildpack %s with stack %s as %s...",
+								buildpackName, stacks[0], username,
+							))
+							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 						})
 					})
 				})
 			})
 
-			When("the buildpack does not exist", func() {
-				It("returns an error", func() {
-					session := helpers.CF("update-buildpack", buildpackName)
-					Eventually(session.Err).Should(Say("Buildpack %s not found", buildpackName))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
+			When("one buildpack with given name exists in enabled and unlocked state with no stack association", func() {
+				BeforeEach(func() {
+					helpers.BuildpackWithoutStack(func(buildpackArchive string) {
+						createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "99")
+						Eventually(createSession).Should(Exit(0))
+					})
+
+					listSession := helpers.CF("buildpacks")
+					Eventually(listSession).Should(Say(`%s\s+\d+\s+true\s+false`, buildpackName))
+					Eventually(listSession).Should(Exit(0))
+				})
+
+				When("only a name is provided", func() {
+					It("prints a success message", func() {
+						session := helpers.CF("update-buildpack", buildpackName)
+
+						Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("the user provides a stack", func() {
+					var (
+						stackName string
+						session   *Session
+					)
+
+					BeforeEach(func() {
+						stackName = "some-stack"
+						session = helpers.CF("update-buildpack", buildpackName, "-s", stackName)
+					})
+
+					When("the targeted API does not support stack associations", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
+						})
+
+						It("fails with a minimum version error", func() {
+							Eventually(session.Err).Should(Say("Option '-s' requires CF API version %s or higher. Your target is %s.", ccversion.MinVersionBuildpackStackAssociationV2, helpers.GetAPIVersionV2()))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("the targeted API supports stack associations", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+						})
+
+						It("returns a buildpack with stack not found error", func() {
+							Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", buildpackName, stackName))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+				})
+
+				When("the -p flag is provided", func() {
+					var (
+						buildpackPath string
+						session       *Session
+					)
+
+					JustBeforeEach(func() {
+						session = helpers.CF("update-buildpack", buildpackName, "-p", buildpackPath)
+					})
+
+					When("the path is local", func() {
+						When("the buildpack path exists", func() {
+							When("the buildpack path is an empty directory", func() {
+								BeforeEach(func() {
+									var err error
+									buildpackPath, err = ioutil.TempDir("", "create-buildpack-test-")
+									Expect(err).ToNot(HaveOccurred())
+								})
+
+								AfterEach(func() {
+									err := os.RemoveAll(buildpackPath)
+									Expect(err).ToNot(HaveOccurred())
+								})
+
+								It("prints an error message", func() {
+									Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+									Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", regexp.QuoteMeta(buildpackPath)))
+									Eventually(session).Should(Exit(1))
+								})
+							})
+							When("uploading from a directory", func() {
+								BeforeEach(func() {
+									var err error
+									buildpackPath, err = ioutil.TempDir("", "create-buildpack-test-")
+									Expect(err).ToNot(HaveOccurred())
+									file, err := ioutil.TempFile(buildpackPath, "")
+									defer file.Close()
+									Expect(err).ToNot(HaveOccurred())
+								})
+
+								AfterEach(func() {
+									err := os.RemoveAll(buildpackPath)
+									Expect(err).ToNot(HaveOccurred())
+								})
+
+								It("updates the buildpack with the given bits", func() {
+									Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+									Eventually(session).Should(Say("OK"))
+									Eventually(session).Should(Exit(0))
+								})
+							})
+
+							When("uploading from a zip", func() {
+								BeforeEach(func() {
+									buildpackPath = helpers.MakeBuildpackArchive("")
+								})
+
+								AfterEach(func() {
+									err := os.Remove(buildpackPath)
+									Expect(err).NotTo(HaveOccurred())
+								})
+
+								It("updates the buildpack with the given bits", func() {
+									Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+									Eventually(session).Should(Say("OK"))
+									Eventually(session).Should(Exit(0))
+								})
+							})
+						})
+
+						When("the buildpack path does not exist", func() {
+							BeforeEach(func() {
+								buildpackPath = "this-is-a-bogus-path"
+							})
+
+							It("returns a buildpack does not exist error", func() {
+								Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'this-is-a-bogus-path' does not exist."))
+								Eventually(session).Should(Exit(1))
+							})
+						})
+					})
+
+					When("path is a URL", func() {
+						When("specifying a valid URL", func() {
+							BeforeEach(func() {
+								buildpackPath = "https://github.com/cloudfoundry/binary-buildpack/releases/download/v1.0.21/binary-buildpack-v1.0.21.zip"
+							})
+
+							It("successfully uploads a buildpack", func() {
+								Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+								Eventually(session).Should(Say("OK"))
+								Eventually(session).Should(Say("Uploading buildpack %s as %s...", buildpackName, username))
+								Eventually(session).Should(Say("Done uploading"))
+								Eventually(session).Should(Say("OK"))
+								Eventually(session).Should(Exit(0))
+							})
+						})
+
+						When("a 4xx or 5xx HTTP response status is encountered", func() {
+							var server *Server
+
+							BeforeEach(func() {
+								server = NewServer()
+								// Suppresses ginkgo server logs
+								server.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
+								server.AppendHandlers(
+									CombineHandlers(
+										VerifyRequest(http.MethodGet, "/"),
+										RespondWith(http.StatusNotFound, nil),
+									),
+								)
+								buildpackPath = server.URL()
+							})
+
+							AfterEach(func() {
+								server.Close()
+							})
+
+							It("displays an appropriate error", func() {
+								Eventually(session.Err).Should(Say("Download attempt failed; server returned 404 Not Found"))
+								Eventually(session.Err).Should(Say("Unable to install; buildpack is not available from the given URL\\."))
+								Eventually(session).Should(Say("FAILED"))
+								Eventually(session).Should(Exit(1))
+							})
+						})
+
+						When("specifying an invalid URL", func() {
+							BeforeEach(func() {
+								buildpackPath = "http://not-a-real-url"
+							})
+
+							It("returns the appropriate error", func() {
+								Eventually(session.Err).Should(Say("Get %s: dial tcp: lookup", buildpackPath))
+								Eventually(session).Should(Say("FAILED"))
+								Eventually(session).Should(Exit(1))
+							})
+						})
+					})
+				})
+
+				When("the -i flag is provided", func() {
+					var (
+						buildpackPosition string
+						session           *Session
+					)
+
+					JustBeforeEach(func() {
+						session = helpers.CF("update-buildpack", buildpackName, "-i", buildpackPosition)
+					})
+
+					When("position is a negative integer", func() {
+						BeforeEach(func() {
+							buildpackPosition = "-3"
+						})
+
+						It("successfully uploads buildpack as the first position", func() {
+							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							listSession := helpers.CF("buildpacks")
+							Eventually(listSession).Should(Say(`%s\s+1\s`, buildpackName))
+							Eventually(listSession).Should(Exit(0))
+						})
+					})
+
+					When("position is positive integer", func() {
+						BeforeEach(func() {
+							buildpackPosition = "3"
+						})
+
+						It("successfully uploads buildpack in the provided position", func() {
+							Eventually(session).Should(Exit(0))
+
+							listSession := helpers.CF("buildpacks")
+							Eventually(listSession).Should(Say(`%s\s+3\s`, buildpackName))
+							Eventually(listSession).Should(Exit(0))
+						})
+					})
+				})
+
+				Describe("flags", func() {
+					When("specifying both enable and disable flags", func() {
+						It("returns the appropriate error", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--enable", "--disable")
+							Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --enable, --disable"))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("specifying both lock and unlock flags", func() {
+						It("returns the appropriate error", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--lock", "--unlock")
+							Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --lock, --unlock"))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("specifying lock flag", func() {
+						It("locks the buildpack", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--lock")
+							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							session = helpers.CF("buildpacks")
+							Eventually(session).Should(Say(`%s\s+\d+\s+true\s+true`, buildpackName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					When("specifying --lock and -p", func() {
+						It("returns the an error saying that those flags cannot be used together", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--lock", "-p", "http://google.com")
+							Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -p, --lock"))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("specifying --unlock and -p", func() {
+						It("returns the an error saying that those flags cannot be used together", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--unlock", "-p", "http://google.com")
+							Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -p, --unlock"))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("specifying disable flag", func() {
+						It("disables buildpack", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--disable")
+							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							session = helpers.CF("buildpacks")
+							Eventually(session).Should(Say(`%s\s+\d+\s+false`, buildpackName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+			})
+
+			When("the buildpack exists and is disabled", func() {
+				BeforeEach(func() {
+					helpers.BuildpackWithStack(func(buildpackPath string) {
+						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--disable")
+						Eventually(session).Should(Exit(0))
+					}, "")
+				})
+
+				When("specifying enable flag", func() {
+					It("enables buildpack", func() {
+						session := helpers.CF("update-buildpack", buildpackName, "--enable")
+						Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("buildpacks")
+						Eventually(session).Should(Say(`%s\s+\d+\s+true`, buildpackName))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			When("the buildpack exists and is locked", func() {
+				var buildpackURL string
+
+				BeforeEach(func() {
+					helpers.BuildpackWithStack(func(buildpackPath string) {
+						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+						Eventually(session).Should(Exit(0))
+						session = helpers.CF("update-buildpack", buildpackName, "--lock")
+						Eventually(session).Should(Exit(0))
+					}, "")
+					buildpackURL = "https://github.com/cloudfoundry/binary-buildpack/releases/download/v1.0.21/binary-buildpack-v1.0.21.zip"
+				})
+
+				Context("specifying -p argument", func() {
+					It("fails to update buildpack", func() {
+						session := helpers.CF("update-buildpack", buildpackName, "-p", buildpackURL)
+						Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("The buildpack is locked"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				Context("specifying unlock flag", func() {
+					It("unlocks the buildpack", func() {
+						session := helpers.CF("update-buildpack", buildpackName, "--unlock")
+						Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("buildpacks")
+						Eventually(session).Should(Say(`%s\s+\d+\s+true\s+false`, buildpackName))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 		})

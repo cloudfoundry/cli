@@ -607,7 +607,7 @@ var _ = Describe("Buildpack", func() {
 		})
 	})
 
-	Describe("UpdateBuildpackByName", func() {
+	Describe("UpdateBuildpackByNameAndStack", func() {
 		var (
 			expectedError        error
 			warnings             Warnings
@@ -617,16 +617,37 @@ var _ = Describe("Buildpack", func() {
 			newEnabled           types.NullBool
 			fakeProgressBar      *v2actionfakes.FakeSimpleProgressBar
 			updatedBuildpackGuid string
+			stackName            string
 		)
 
 		JustBeforeEach(func() {
 			fakeProgressBar = new(v2actionfakes.FakeSimpleProgressBar)
-			updatedBuildpackGuid, warnings, executeErr = actor.UpdateBuildpackByName("some-bp-name", newPosition, newLocked, newEnabled)
+			updatedBuildpackGuid, warnings, executeErr = actor.UpdateBuildpackByNameAndStack("some-bp-name", stackName, newPosition, newLocked, newEnabled)
 		})
 
-		It("gets the buildpack by name", func() {
-			args := fakeCloudControllerClient.GetBuildpacksArgsForCall(0)
-			Expect(args[0].Values[0]).To(Equal("some-bp-name"))
+		When("stack is an empty string", func() {
+			BeforeEach(func() {
+				stackName = ""
+			})
+
+			It("gets the buildpack by name only", func() {
+				args := fakeCloudControllerClient.GetBuildpacksArgsForCall(0)
+				Expect(len(args)).To(Equal(1))
+				Expect(args[0].Values[0]).To(Equal("some-bp-name"))
+			})
+		})
+
+		When("a non-empty stack name is passed", func() {
+			BeforeEach(func() {
+				stackName = "some-stack"
+			})
+
+			It("gets the buildpack by name and stack", func() {
+				args := fakeCloudControllerClient.GetBuildpacksArgsForCall(0)
+				Expect(len(args)).To(Equal(2))
+				Expect(args[0].Values[0]).To(Equal("some-bp-name"))
+				Expect(args[1].Values[0]).To(Equal(stackName))
+			})
 		})
 
 		When("getting the buildpack fails", func() {

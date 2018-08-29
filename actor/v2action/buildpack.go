@@ -283,9 +283,18 @@ func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, e
 	return Buildpack(updatedBuildpack), Warnings(warnings), nil
 }
 
-func (actor *Actor) UpdateBuildpackByName(name string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, Warnings, error) {
+func (actor *Actor) UpdateBuildpackByNameAndStack(name, stack string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, Warnings, error) {
 	warnings := Warnings{}
-	buildpack, execWarnings, err := actor.GetBuildpackByName(name)
+	var (
+		buildpack    Buildpack
+		execWarnings Warnings
+		err          error
+	)
+	if len(stack) > 0 {
+		buildpack, execWarnings, err = actor.GetBuildpackByNameAndStack(name, stack)
+	} else {
+		buildpack, execWarnings, err = actor.GetBuildpackByName(name)
+	}
 	warnings = append(warnings, execWarnings...)
 	if err != nil {
 		return "", warnings, err

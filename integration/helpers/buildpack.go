@@ -39,3 +39,7 @@ func BuildpackWithStack(f func(buildpackArchive string), stackName string) {
 
 	f(buildpackZip)
 }
+
+func BuildpackWithoutStack(f func(buildpackArchive string)) {
+	BuildpackWithStack(f, "")
+}

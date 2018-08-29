@@ -158,14 +158,14 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("exits without updating if the path points to an empty directory", func() {
 					Expect(executeErr).To(MatchError(emptyDirectoryError))
-					Expect(fakeActor.UpdateBuildpackByNameCallCount()).To(Equal(0))
+					Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(0))
 				})
 			})
 
 			When("updating the buildpack fails", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("update-error")
-					fakeActor.UpdateBuildpackByNameReturns(
+					fakeActor.UpdateBuildpackByNameAndStackReturns(
 						"",
 						v2action.Warnings{"update-bp-warning1", "update-bp-warning2"},
 						expectedErr,
@@ -186,7 +186,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the locked value to true when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, locked, _ := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+					_, _, _, locked, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 					Expect(locked.IsSet).To(Equal(true))
 					Expect(locked.Value).To(Equal(true))
 				})
@@ -199,7 +199,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the locked value to false when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, locked, _ := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+					_, _, _, locked, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 					Expect(locked.IsSet).To(Equal(true))
 					Expect(locked.Value).To(Equal(false))
 				})
@@ -212,7 +212,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the enabled value to true when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, _, enabled := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+					_, _, _, _, enabled := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 					Expect(enabled.IsSet).To(Equal(true))
 					Expect(enabled.Value).To(Equal(true))
 				})
@@ -225,7 +225,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the enabled value to false when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, _, enabled := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+					_, _, _, _, enabled := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 					Expect(enabled.IsSet).To(Equal(true))
 					Expect(enabled.Value).To(Equal(false))
 				})
@@ -233,7 +233,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 			When("updating the buildpack succeeds", func() {
 				BeforeEach(func() {
-					fakeActor.UpdateBuildpackByNameReturns(
+					fakeActor.UpdateBuildpackByNameAndStackReturns(
 						buildpackGUID,
 						v2action.Warnings{"update-bp-warning1", "update-bp-warning2"},
 						nil,
@@ -242,42 +242,59 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				When("no arguments are specified", func() {
 					It("makes the actor call to update the buildpack", func() {
-						Expect(fakeActor.UpdateBuildpackByNameCallCount()).To(Equal(1))
-						name, order, locked, enabled := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+						Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
+						name, stack, order, locked, enabled := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 						Expect(name).To(Equal(args.Buildpack))
+						Expect(stack).To(Equal(""))
 						Expect(order.IsSet).To(BeFalse())
 						Expect(locked.IsSet).To(BeFalse())
 						Expect(enabled.IsSet).To(BeFalse())
 
 						Expect(testUI.Err).To(Say("update-bp-warning1"))
 						Expect(testUI.Err).To(Say("update-bp-warning2"))
-						Expect(testUI.Out).To(Say("Updating buildpack some-bp as some-user..."))
+						Expect(testUI.Out).To(Say("Updating buildpack %s as %s...", args.Buildpack, userName))
 						Expect(testUI.Out).To(Say("OK"))
 					})
 				})
 
 				When("a stack association is specified", func() {
 					BeforeEach(func() {
-						cmd.Stack = "some stack"
+						cmd.Stack = "some-stack"
 					})
 
 					When("The API does not support stack associations", func() {
 						var versionWithoutStacks string
 
 						BeforeEach(func() {
-							minStackVersion, err := semver.Parse(ccversion.MinVersionBuildpackStackAssociationV2)
+							workingVersion, err := semver.Parse(ccversion.MinVersionBuildpackStackAssociationV2)
 							Expect(err).ToNot(HaveOccurred())
-							minStackVersion.Minor--
-							versionWithoutStacks = minStackVersion.String()
+							workingVersion.Minor--
+							versionWithoutStacks = workingVersion.String()
 							fakeActor.CloudControllerAPIVersionReturns(versionWithoutStacks)
 						})
 
 						It("returns an error about not supporting the stack association flag", func() {
 							Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-								Command:        "Option `-s`",
+								Command:        "Option '-s'",
 								CurrentVersion: versionWithoutStacks,
 								MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
 							}))
+						})
+					})
+
+					When("the API supports stack associations", func() {
+						BeforeEach(func() {
+							fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionBuildpackStackAssociationV2)
+						})
+
+						It("attempts to retrieve buildpack by name and stack", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
+
+							Expect(testUI.Err).To(Say("update-bp-warning1"))
+							Expect(testUI.Err).To(Say("update-bp-warning2"))
+							Expect(testUI.Out).To(Say("Updating buildpack %s with stack %s as %s...", args.Buildpack, cmd.Stack, userName))
+							Expect(testUI.Out).To(Say("OK"))
 						})
 					})
 				})
@@ -288,13 +305,13 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 					})
 
 					It("makes the actor call to update the buildpack", func() {
-						Expect(fakeActor.UpdateBuildpackByNameCallCount()).To(Equal(1))
-						name, _, _, _ := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+						Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
+						name, _, _, _, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 						Expect(name).To(Equal(args.Buildpack))
 
 						Expect(testUI.Err).To(Say("update-bp-warning1"))
 						Expect(testUI.Err).To(Say("update-bp-warning2"))
-						Expect(testUI.Out).To(Say("Updating buildpack some-bp as some-user..."))
+						Expect(testUI.Out).To(Say("Updating buildpack %s as %s...", args.Buildpack, userName))
 						Expect(testUI.Out).To(Say("OK"))
 					})
 
@@ -356,15 +373,15 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 					})
 
 					It("makes the actor call to update the buildpack", func() {
-						Expect(fakeActor.UpdateBuildpackByNameCallCount()).To(Equal(1))
-						name, order, _, _ := fakeActor.UpdateBuildpackByNameArgsForCall(0)
+						Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
+						name, _, order, _, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 						Expect(name).To(Equal(args.Buildpack))
 						Expect(order.IsSet).To(BeTrue())
 						Expect(order.Value).To(Equal(3))
 
 						Expect(testUI.Err).To(Say("update-bp-warning1"))
 						Expect(testUI.Err).To(Say("update-bp-warning2"))
-						Expect(testUI.Out).To(Say("Updating buildpack some-bp as some-user..."))
+						Expect(testUI.Out).To(Say("Updating buildpack %s as %s...", args.Buildpack, userName))
 						Expect(testUI.Out).To(Say("OK"))
 					})
 				})

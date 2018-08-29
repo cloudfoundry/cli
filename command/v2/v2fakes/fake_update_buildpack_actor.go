@@ -19,20 +19,21 @@ type FakeUpdateBuildpackActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	UpdateBuildpackByNameStub        func(name string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error)
-	updateBuildpackByNameMutex       sync.RWMutex
-	updateBuildpackByNameArgsForCall []struct {
+	UpdateBuildpackByNameAndStackStub        func(name, stack string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error)
+	updateBuildpackByNameAndStackMutex       sync.RWMutex
+	updateBuildpackByNameAndStackArgsForCall []struct {
 		name     string
+		stack    string
 		position types.NullInt
 		locked   types.NullBool
 		enabled  types.NullBool
 	}
-	updateBuildpackByNameReturns struct {
+	updateBuildpackByNameAndStackReturns struct {
 		result1 string
 		result2 v2action.Warnings
 		result3 error
 	}
-	updateBuildpackByNameReturnsOnCall map[int]struct {
+	updateBuildpackByNameAndStackReturnsOnCall map[int]struct {
 		result1 string
 		result2 v2action.Warnings
 		result3 error
@@ -111,57 +112,58 @@ func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersionReturnsOnCall(i i
 	}{result1}
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByName(name string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error) {
-	fake.updateBuildpackByNameMutex.Lock()
-	ret, specificReturn := fake.updateBuildpackByNameReturnsOnCall[len(fake.updateBuildpackByNameArgsForCall)]
-	fake.updateBuildpackByNameArgsForCall = append(fake.updateBuildpackByNameArgsForCall, struct {
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStack(name string, stack string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error) {
+	fake.updateBuildpackByNameAndStackMutex.Lock()
+	ret, specificReturn := fake.updateBuildpackByNameAndStackReturnsOnCall[len(fake.updateBuildpackByNameAndStackArgsForCall)]
+	fake.updateBuildpackByNameAndStackArgsForCall = append(fake.updateBuildpackByNameAndStackArgsForCall, struct {
 		name     string
+		stack    string
 		position types.NullInt
 		locked   types.NullBool
 		enabled  types.NullBool
-	}{name, position, locked, enabled})
-	fake.recordInvocation("UpdateBuildpackByName", []interface{}{name, position, locked, enabled})
-	fake.updateBuildpackByNameMutex.Unlock()
-	if fake.UpdateBuildpackByNameStub != nil {
-		return fake.UpdateBuildpackByNameStub(name, position, locked, enabled)
+	}{name, stack, position, locked, enabled})
+	fake.recordInvocation("UpdateBuildpackByNameAndStack", []interface{}{name, stack, position, locked, enabled})
+	fake.updateBuildpackByNameAndStackMutex.Unlock()
+	if fake.UpdateBuildpackByNameAndStackStub != nil {
+		return fake.UpdateBuildpackByNameAndStackStub(name, stack, position, locked, enabled)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.updateBuildpackByNameReturns.result1, fake.updateBuildpackByNameReturns.result2, fake.updateBuildpackByNameReturns.result3
+	return fake.updateBuildpackByNameAndStackReturns.result1, fake.updateBuildpackByNameAndStackReturns.result2, fake.updateBuildpackByNameAndStackReturns.result3
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameCallCount() int {
-	fake.updateBuildpackByNameMutex.RLock()
-	defer fake.updateBuildpackByNameMutex.RUnlock()
-	return len(fake.updateBuildpackByNameArgsForCall)
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackCallCount() int {
+	fake.updateBuildpackByNameAndStackMutex.RLock()
+	defer fake.updateBuildpackByNameAndStackMutex.RUnlock()
+	return len(fake.updateBuildpackByNameAndStackArgsForCall)
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameArgsForCall(i int) (string, types.NullInt, types.NullBool, types.NullBool) {
-	fake.updateBuildpackByNameMutex.RLock()
-	defer fake.updateBuildpackByNameMutex.RUnlock()
-	return fake.updateBuildpackByNameArgsForCall[i].name, fake.updateBuildpackByNameArgsForCall[i].position, fake.updateBuildpackByNameArgsForCall[i].locked, fake.updateBuildpackByNameArgsForCall[i].enabled
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackArgsForCall(i int) (string, string, types.NullInt, types.NullBool, types.NullBool) {
+	fake.updateBuildpackByNameAndStackMutex.RLock()
+	defer fake.updateBuildpackByNameAndStackMutex.RUnlock()
+	return fake.updateBuildpackByNameAndStackArgsForCall[i].name, fake.updateBuildpackByNameAndStackArgsForCall[i].stack, fake.updateBuildpackByNameAndStackArgsForCall[i].position, fake.updateBuildpackByNameAndStackArgsForCall[i].locked, fake.updateBuildpackByNameAndStackArgsForCall[i].enabled
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameReturns(result1 string, result2 v2action.Warnings, result3 error) {
-	fake.UpdateBuildpackByNameStub = nil
-	fake.updateBuildpackByNameReturns = struct {
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackReturns(result1 string, result2 v2action.Warnings, result3 error) {
+	fake.UpdateBuildpackByNameAndStackStub = nil
+	fake.updateBuildpackByNameAndStackReturns = struct {
 		result1 string
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameReturnsOnCall(i int, result1 string, result2 v2action.Warnings, result3 error) {
-	fake.UpdateBuildpackByNameStub = nil
-	if fake.updateBuildpackByNameReturnsOnCall == nil {
-		fake.updateBuildpackByNameReturnsOnCall = make(map[int]struct {
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackReturnsOnCall(i int, result1 string, result2 v2action.Warnings, result3 error) {
+	fake.UpdateBuildpackByNameAndStackStub = nil
+	if fake.updateBuildpackByNameAndStackReturnsOnCall == nil {
+		fake.updateBuildpackByNameAndStackReturnsOnCall = make(map[int]struct {
 			result1 string
 			result2 v2action.Warnings
 			result3 error
 		})
 	}
-	fake.updateBuildpackByNameReturnsOnCall[i] = struct {
+	fake.updateBuildpackByNameAndStackReturnsOnCall[i] = struct {
 		result1 string
 		result2 v2action.Warnings
 		result3 error
@@ -279,8 +281,8 @@ func (fake *FakeUpdateBuildpackActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	fake.updateBuildpackByNameMutex.RLock()
-	defer fake.updateBuildpackByNameMutex.RUnlock()
+	fake.updateBuildpackByNameAndStackMutex.RLock()
+	defer fake.updateBuildpackByNameAndStackMutex.RUnlock()
 	fake.prepareBuildpackBitsMutex.RLock()
 	defer fake.prepareBuildpackBitsMutex.RUnlock()
 	fake.uploadBuildpackMutex.RLock()

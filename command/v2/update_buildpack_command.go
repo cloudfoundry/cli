@@ -20,7 +20,7 @@ import (
 //go:generate counterfeiter . UpdateBuildpackActor
 type UpdateBuildpackActor interface {
 	CloudControllerAPIVersion() string
-	UpdateBuildpackByName(name string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error)
+	UpdateBuildpackByNameAndStack(name, stack string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error)
 	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
 }
@@ -70,15 +70,9 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 		return err
 	}
 
-	if cmd.Stack != "" {
-		err = command.MinimumCCAPIVersionCheck(
-			cmd.Actor.CloudControllerAPIVersion(),
-			ccversion.MinVersionBuildpackStackAssociationV2,
-			"Option `-s`",
-		)
-		if err != nil {
-			return err
-		}
+	err = cmd.minAPIVersionCheck()
+	if err != nil {
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -86,10 +80,7 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
-		"Buildpack":   cmd.RequiredArgs.Buildpack,
-		"CurrentUser": user.Name,
-	})
+	cmd.printInitialText(user.Name)
 
 	var buildpackBitsPath string
 
@@ -120,7 +111,7 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 		Value: cmd.Lock,
 	}
 
-	buildpackGUID, warnings, err := cmd.Actor.UpdateBuildpackByName(cmd.RequiredArgs.Buildpack, cmd.Order, locked, enabled)
+	buildpackGUID, warnings, err := cmd.Actor.UpdateBuildpackByNameAndStack(cmd.RequiredArgs.Buildpack, cmd.Stack, cmd.Order, locked, enabled)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -130,7 +121,7 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("Done updating")
 	cmd.UI.DisplayOK()
 
-	if cmd.Path != "" {
+	if buildpackBitsPath != "" {
 		cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{
 			"Buildpack": cmd.RequiredArgs.Buildpack,
 			"Username":  user.Name,
@@ -138,6 +129,9 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 
 		warnings, err = cmd.Actor.UploadBuildpack(buildpackGUID, buildpackBitsPath, cmd.ProgressBar)
 		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
 
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Done uploading")
@@ -145,6 +139,32 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 
 	}
 	return err
+}
+
+func (cmd UpdateBuildpackCommand) minAPIVersionCheck() error {
+	if cmd.Stack != "" {
+		return command.MinimumCCAPIVersionCheck(
+			cmd.Actor.CloudControllerAPIVersion(),
+			ccversion.MinVersionBuildpackStackAssociationV2,
+			"Option '-s'",
+		)
+	}
+	return nil
+}
+
+func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
+	if cmd.Stack == "" {
+		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
+			"Buildpack":   cmd.RequiredArgs.Buildpack,
+			"CurrentUser": userName,
+		})
+	} else {
+		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
+			"Buildpack":   cmd.RequiredArgs.Buildpack,
+			"CurrentUser": userName,
+			"Stack":       cmd.Stack,
+		})
+	}
 }
 
 func (cmd UpdateBuildpackCommand) validateFlagCombinations() error {
