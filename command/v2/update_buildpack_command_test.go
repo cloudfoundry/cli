@@ -360,7 +360,6 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 							It("displays success test and any warnings", func() {
 								Expect(testUI.Err).To(Say("upload-warning1"))
 								Expect(testUI.Err).To(Say("upload-warning2"))
-								Expect(testUI.Out).To(Say("Done uploading"))
 								Expect(testUI.Out).To(Say("OK"))
 							})
 						})

@@ -85,7 +85,6 @@ var _ = Describe("update-buildpack command", func() {
 				var stacks []string
 
 				BeforeEach(func() {
-					// TODO: create stacks
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 					stacks = helpers.FetchStacks()
 					Expect(len(stacks)).To(BeNumerically(">=", 2))
@@ -392,7 +391,6 @@ var _ = Describe("update-buildpack command", func() {
 								Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
 								Eventually(session).Should(Say("OK"))
 								Eventually(session).Should(Say("Uploading buildpack %s as %s...", buildpackName, username))
-								Eventually(session).Should(Say("Done uploading"))
 								Eventually(session).Should(Say("OK"))
 								Eventually(session).Should(Exit(0))
 							})

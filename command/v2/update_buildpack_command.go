@@ -117,8 +117,6 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayText("Done updating")
 	cmd.UI.DisplayOK()
 
 	if buildpackBitsPath != "" {
@@ -133,8 +131,6 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 			return err
 		}
 
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("Done uploading")
 		cmd.UI.DisplayOK()
 
 	}
