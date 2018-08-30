@@ -1,0 +1,4 @@
+---
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/authentication?/policy/global/lockoutAfterFailures
+  value: 60

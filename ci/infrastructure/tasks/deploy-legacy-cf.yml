@@ -55,6 +55,7 @@ run:
       -o $cli_operations_dir/default-app-memory.yml \
       -o $cli_operations_dir/diego-cell-instances.yml \
       -o $cli_operations_dir/add-uaa-client-credentials.yml \
+      -o $cli_operations_dir/adjust-user-retry-attempts.yml \
       -v system_domain=$SYSTEM_DOMAIN \
       --vars-store="vars-store/${VARS_STORE_FILE}" \
       --vars-file=./vars.yml
