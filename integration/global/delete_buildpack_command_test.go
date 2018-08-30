@@ -146,10 +146,10 @@ var _ = Describe("delete-buildpack command", func() {
 					Eventually(session).Should(Exit(0))
 				}, stacks[0])
 
-				helpers.BuildpackWithStack(func(buildpackPath string) {
+				helpers.BuildpackWithoutStack(func(buildpackPath string) {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 					Eventually(session).Should(Exit(0))
-				}, "")
+				})
 			})
 
 			It("properly handles ambiguity", func() {
@@ -172,10 +172,10 @@ var _ = Describe("delete-buildpack command", func() {
 		BeforeEach(func() {
 			buffer = NewBuffer()
 
-			helpers.BuildpackWithStack(func(buildpackPath string) {
+			helpers.BuildpackWithoutStack(func(buildpackPath string) {
 				session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 				Eventually(session).Should(Exit(0))
-			}, "")
+			})
 		})
 
 		When("the user enters 'y'", func() {

@@ -546,10 +546,10 @@ var _ = Describe("update-buildpack command", func() {
 
 			When("the buildpack exists and is disabled", func() {
 				BeforeEach(func() {
-					helpers.BuildpackWithStack(func(buildpackPath string) {
+					helpers.BuildpackWithoutStack(func(buildpackPath string) {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--disable")
 						Eventually(session).Should(Exit(0))
-					}, "")
+					})
 				})
 
 				When("specifying enable flag", func() {
@@ -570,12 +570,12 @@ var _ = Describe("update-buildpack command", func() {
 				var buildpackURL string
 
 				BeforeEach(func() {
-					helpers.BuildpackWithStack(func(buildpackPath string) {
+					helpers.BuildpackWithoutStack(func(buildpackPath string) {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 						Eventually(session).Should(Exit(0))
 						session = helpers.CF("update-buildpack", buildpackName, "--lock")
 						Eventually(session).Should(Exit(0))
-					}, "")
+					})
 					buildpackURL = "https://github.com/cloudfoundry/binary-buildpack/releases/download/v1.0.21/binary-buildpack-v1.0.21.zip"
 				})
 

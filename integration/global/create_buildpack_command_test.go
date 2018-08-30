@@ -131,10 +131,10 @@ var _ = Describe("create buildpack command", func() {
 				When("the new buildpack is unique", func() {
 					When("the new buildpack has a nil stack", func() {
 						It("successfully uploads a buildpack", func() {
-							helpers.BuildpackWithStack(func(buildpackPath string) {
+							helpers.BuildpackWithoutStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 								Eventually(session).Should(Exit(0))
-							}, "")
+							})
 
 							session := helpers.CF("buildpacks")
 							Eventually(session).Should(Say(`%s\s+1`, buildpackName))
@@ -211,18 +211,18 @@ var _ = Describe("create buildpack command", func() {
 
 						When("the existing buildpack has a nil stack", func() {
 							BeforeEach(func() {
-								helpers.BuildpackWithStack(func(buildpackPath string) {
+								helpers.BuildpackWithoutStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", existingBuildpack, buildpackPath, "5")
 									Eventually(session).Should(Exit(0))
-								}, "")
+								})
 							})
 
 							It("prints a warning", func() {
-								helpers.BuildpackWithStack(func(buildpackPath string) {
+								helpers.BuildpackWithoutStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 									Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", buildpackName))
 									Eventually(session).Should(Exit(0))
-								}, "")
+								})
 
 								session := helpers.CF("buildpacks")
 								Eventually(session).Should(Say(`%s\s+5`, existingBuildpack))
@@ -260,10 +260,10 @@ var _ = Describe("create buildpack command", func() {
 
 						When("the existing buildpack has a nil stack", func() {
 							BeforeEach(func() {
-								helpers.BuildpackWithStack(func(buildpackPath string) {
+								helpers.BuildpackWithoutStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", existingBuildpack, buildpackPath, "5")
 									Eventually(session).Should(Exit(0))
-								}, "")
+								})
 							})
 
 							It("prints a warning and tip but doesn't exit 1", func() {
@@ -301,19 +301,19 @@ var _ = Describe("create buildpack command", func() {
 						BeforeEach(func() {
 							helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
 
-							helpers.BuildpackWithStack(func(buildpackPath string) {
+							helpers.BuildpackWithoutStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", existingBuildpack, buildpackPath, "5")
 								Eventually(session).Should(Exit(0))
-							}, "")
+							})
 						})
 
 						It("prints a warning but doesn't exit 1", func() {
-							helpers.BuildpackWithStack(func(buildpackPath string) {
+							helpers.BuildpackWithoutStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", "-v", buildpackName, buildpackPath, "1")
 								Eventually(session.Err).Should(Say("Buildpack %s already exists", buildpackName))
 								Eventually(session.Out).Should(Say("TIP: use 'cf update-buildpack' to update this buildpack"))
 								Eventually(session).Should(Exit(0))
-							}, "")
+							})
 						})
 					})
 				})
@@ -392,10 +392,10 @@ var _ = Describe("create buildpack command", func() {
 		When("specifying the position flag", func() {
 			When("position is positive integer", func() {
 				It("successfully uploads buildpack in correct position", func() {
-					helpers.BuildpackWithStack(func(buildpackPath string) {
+					helpers.BuildpackWithoutStack(func(buildpackPath string) {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "3")
 						Eventually(session).Should(Exit(0))
-					}, "")
+					})
 
 					session := helpers.CF("buildpacks")
 					Eventually(session).Should(Say(`%s\s+3`, buildpackName))
@@ -407,10 +407,10 @@ var _ = Describe("create buildpack command", func() {
 		When("using the enable/disable flags", func() {
 			When("specifying disable flag", func() {
 				It("disables buildpack", func() {
-					helpers.BuildpackWithStack(func(buildpackPath string) {
+					helpers.BuildpackWithoutStack(func(buildpackPath string) {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--disable")
 						Eventually(session).Should(Exit(0))
-					}, "")
+					})
 
 					session := helpers.CF("buildpacks")
 					Eventually(session).Should(Say(`%s\s+1\s+false`, buildpackName))
@@ -420,12 +420,12 @@ var _ = Describe("create buildpack command", func() {
 
 			When("specifying both enable and disable flags", func() {
 				It("returns the appropriate error", func() {
-					helpers.BuildpackWithStack(func(buildpackPath string) {
+					helpers.BuildpackWithoutStack(func(buildpackPath string) {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--enable", "--disable")
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --enable, --disable"))
 						Eventually(session).Should(Exit(1))
-					}, "")
+					})
 				})
 			})
 		})
