@@ -269,7 +269,7 @@ var _ = Describe("update-buildpack command", func() {
 						session   *Session
 					)
 
-					BeforeEach(func() {
+					JustBeforeEach(func() {
 						stackName = "some-stack"
 						session = helpers.CF("update-buildpack", buildpackName, "-s", stackName)
 					})
