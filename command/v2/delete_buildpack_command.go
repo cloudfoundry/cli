@@ -44,7 +44,7 @@ func (cmd DeleteBuildpackCommand) Execute(args []string) error {
 		err := command.MinimumCCAPIVersionCheck(
 			cmd.Actor.CloudControllerAPIVersion(),
 			ccversion.MinVersionBuildpackStackAssociationV2,
-			"Option `-s`",
+			"Option '-s'",
 		)
 		if err != nil {
 			return err

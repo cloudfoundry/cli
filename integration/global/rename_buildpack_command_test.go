@@ -56,7 +56,7 @@ var _ = Describe("rename buildpack command", func() {
 
 			It("should report that the version of CAPI is too low", func() {
 				session := helpers.CF("rename-buildpack", oldBuildpackName, newBuildpackName, "-s", stacks[0])
-				Eventually(session.Err).Should(Say("Option `-s` requires CF API version %s or higher. Your target is 2\\.\\d+\\.\\d+", ccversion.MinVersionBuildpackStackAssociationV2))
+				Eventually(session.Err).Should(Say("Option '-s' requires CF API version %s or higher. Your target is 2\\.\\d+\\.\\d+", ccversion.MinVersionBuildpackStackAssociationV2))
 				Eventually(session).Should(Exit(1))
 			})
 		})

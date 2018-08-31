@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	)
+)
 
 func MakeBuildpackArchive(stackName string) string {
 	archiveFile, err := ioutil.TempFile("", "buildpack-archive-file-")
