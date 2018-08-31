@@ -189,7 +189,7 @@ var _ = Describe("Service Binding Actions", func() {
 						Expect(appGUID).To(Equal("some-app-guid"))
 						Expect(serviceInstanceGUID).To(Equal("some-service-instance-guid"))
 						Expect(bindingName).To(Equal("some-binding-name"))
-						Expect(acceptsIncomplete).To(BeFalse())
+						Expect(acceptsIncomplete).To(BeTrue())
 						Expect(parameters).To(Equal(map[string]interface{}{"some-parameter": "some-value"}))
 					})
 				})
@@ -322,7 +322,7 @@ var _ = Describe("Service Binding Actions", func() {
 				Expect(fakeCloudControllerClient.DeleteServiceBindingCallCount()).To(Equal(1))
 				passedGUID, acceptsIncomplete := fakeCloudControllerClient.DeleteServiceBindingArgsForCall(0)
 				Expect(passedGUID).To(Equal("some-service-binding-guid"))
-				Expect(acceptsIncomplete).To(BeFalse())
+				Expect(acceptsIncomplete).To(BeTrue())
 			})
 
 			When("the cloud controller API returns warnings and an error", func() {

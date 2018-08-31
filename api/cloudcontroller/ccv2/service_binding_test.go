@@ -116,7 +116,7 @@ var _ = Describe("Service Binding", func() {
 				})
 			})
 
-			PWhen("accepts_incomplete is true", func() {
+			When("accepts_incomplete is true", func() {
 				BeforeEach(func() {
 					bindingName = "some-binding-name"
 					acceptsIncomplete = true
@@ -137,7 +137,7 @@ var _ = Describe("Service Binding", func() {
 						}`
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest(http.MethodPost, "/v2/service_bindings", "accepts_incomplete=false"),
+							VerifyRequest(http.MethodPost, "/v2/service_bindings", "accepts_incomplete=true"),
 							VerifyJSONRepresenting(expectedRequestBody),
 							RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 						),
@@ -196,7 +196,7 @@ var _ = Describe("Service Binding", func() {
 		})
 
 		When("the service binding exist", func() {
-			PWhen("accepts_incomplete is true", func() {
+			When("accepts_incomplete is true", func() {
 				BeforeEach(func() {
 					acceptsIncomplete = true
 					response := fmt.Sprintf(`{
