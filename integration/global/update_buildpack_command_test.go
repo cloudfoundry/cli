@@ -24,7 +24,7 @@ var _ = Describe("update-buildpack command", func() {
 	)
 
 	BeforeEach(func() {
-		buildpackName = helpers.NewBuildpack()
+		buildpackName = helpers.NewBuildpackName()
 		username, _ = helpers.GetCredentials()
 	})
 
@@ -86,8 +86,7 @@ var _ = Describe("update-buildpack command", func() {
 
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
-					stacks = helpers.FetchStacks()
-					Expect(len(stacks)).To(BeNumerically(">=", 2))
+					stacks = helpers.EnsureMinimumNumberOfStacks(2)
 				})
 
 				When("multiple buildpacks with the same name exist in enabled and unlocked state, and one has nil stack", func() {

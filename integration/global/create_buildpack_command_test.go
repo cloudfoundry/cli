@@ -23,7 +23,7 @@ var _ = Describe("create buildpack command", func() {
 
 	BeforeEach(func() {
 
-		buildpackName = helpers.NewBuildpack()
+		buildpackName = helpers.NewBuildpackName()
 	})
 
 	Describe("help", func() {
@@ -103,18 +103,17 @@ var _ = Describe("create buildpack command", func() {
 			})
 
 			When("the specified directory is empty", func() {
-				var emptyDir string
 				BeforeEach(func() {
 					var err error
-					emptyDir, err = ioutil.TempDir("", "empty-")
+					buildpackDir, err = ioutil.TempDir("", "empty-")
 					Expect(err).ToNot(HaveOccurred())
 				})
 
 				It("fails and reports that the directory is empty", func() {
 					username, _ := helpers.GetCredentials()
-					session := helpers.CF("create-buildpack", buildpackName, emptyDir, "1")
+					session := helpers.CF("create-buildpack", buildpackName, buildpackDir, "1")
 					Eventually(session).Should(Say("Creating buildpack %s as %s...", buildpackName, username))
-					Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", regexp.QuoteMeta(emptyDir)))
+					Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", regexp.QuoteMeta(buildpackDir)))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -124,7 +123,7 @@ var _ = Describe("create buildpack command", func() {
 			var stacks []string
 
 			BeforeEach(func() {
-				stacks = helpers.FetchStacks()
+				stacks = helpers.EnsureMinimumNumberOfStacks(2)
 			})
 
 			When("specifying a valid path", func() {
@@ -238,7 +237,6 @@ var _ = Describe("create buildpack command", func() {
 
 						When("the existing buildpack has a different non-nil stack", func() {
 							BeforeEach(func() {
-								helpers.SkipIfOneStack()
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", existingBuildpack, buildpackPath, "5")
 									Eventually(session).Should(Exit(0))

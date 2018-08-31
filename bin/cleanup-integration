@@ -34,6 +34,7 @@ cf target -o temp-org
 
 cf domains | egrep -i ^\(sub.\)?integration- | cut -d " " -f1 | xargs_func cf delete-shared-domain -f
 
+# This is required for older stacks where the delete-security-group API call was not implemented recursively by the CC.
 if [[ $1 == "unbind-first" ]]; then
   cf security-groups | grep -i "integration-sec-group" | grep -v \<all\>| grep -i staging | awk '{print $2 " " $3 " " $4}' | uniq - | xargs -n 3 -P 15 -r cf unbind-security-group --lifecycle staging
   cf security-groups | grep -i "integration-sec-group" | grep -v \<all\>| grep -i staging | awk '{print $1 " " $2 " " $3}' | uniq - | xargs -n 3 -P 15 -r cf unbind-security-group --lifecycle staging
@@ -56,6 +57,12 @@ for stack in $(cf stacks | tail -n +5 | awk '{print $1}'); do
     grep -i -e \\s${stack}\\s | \
     awk '{print $1}' | \
     xargs_func cf delete-buildpack -f -s $stack
+
+  # Delete stack if stack happens to be integration stack
+  if [[ $stack == INTEGRATION-STACK* ]]; then
+    echo Deleting $stack
+    cf curl -X DELETE /v2/stacks/$(cf stack --guid $stack)
+  fi
 done
 cf buildpacks | grep -i -e ^integration-buildpack | awk '{print $1}' | xargs_func cf delete-buildpack -f
 

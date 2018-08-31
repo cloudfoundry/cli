@@ -19,7 +19,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 	BeforeEach(func() {
 		helpers.LoginCF()
-		buildpackName = helpers.NewBuildpack()
+		buildpackName = helpers.NewBuildpackName()
 	})
 
 	When("the --help flag is passed", func() {
@@ -59,7 +59,7 @@ var _ = Describe("delete-buildpack command", func() {
 	When("the buildpack doesn't exist", func() {
 		It("displays a warning and exits 0", func() {
 			session := helpers.CF("delete-buildpack", "-f", "nonexistent-buildpack")
-			Eventually(session).Should(Say("Deleting buildpack nonexistent-buildpack"))
+			Eventually(session).Should(Say("Deleting buildpack nonexistent-buildpack\\.\\.\\."))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Say("Buildpack nonexistent-buildpack does not exist."))
 			Eventually(session).Should(Exit(0))
@@ -67,31 +67,28 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	Context("there is exactly one buildpack with the specified name", func() {
-		BeforeEach(func() {
-			stacks = helpers.FetchStacks()
-			helpers.BuildpackWithStack(func(buildpackPath string) {
-				session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-				Eventually(session).Should(Exit(0))
-			}, stacks[0])
-		})
-
 		When("the stack is specified", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+				stacks = helpers.FetchStacks()
+				helpers.BuildpackWithStack(func(buildpackPath string) {
+					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
+					Eventually(session).Should(Exit(0))
+				}, stacks[0])
 			})
 
 			It("deletes the specified buildpack", func() {
 				session := helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")
-				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 
 		When("the stack is not specified", func() {
 			It("deletes the specified buildpack", func() {
 				session := helpers.CF("delete-buildpack", buildpackName, "-f")
-				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
@@ -99,13 +96,11 @@ var _ = Describe("delete-buildpack command", func() {
 	Context("there are two buildpacks with same name", func() {
 		BeforeEach(func() {
 			helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
-			helpers.SkipIfOneStack()
+			stacks = helpers.EnsureMinimumNumberOfStacks(2)
 		})
 
 		Context("neither buildpack has a nil stack", func() {
 			BeforeEach(func() {
-				stacks = helpers.FetchStacks()
-
 				helpers.BuildpackWithStack(func(buildpackPath string) {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 					Eventually(session).Should(Exit(0))
@@ -121,26 +116,33 @@ var _ = Describe("delete-buildpack command", func() {
 				By("failing when no stack specified")
 
 				session := helpers.CF("delete-buildpack", buildpackName, "-f")
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Out).Should(Say("FAILED"))
+
+				By("succeeding with warning when the buildpack name matches but the stack does not")
+
+				session = helpers.CF("delete-buildpack", buildpackName, "-s", "not-a-real-stack", "-f")
+				Eventually(session).Should(Say("Deleting buildpack %s with stack not-a-real-stack\\.\\.\\.", buildpackName))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Buildpack %s does not exist\\.", buildpackName))
+				Eventually(session).Should(Exit(0))
 
 				By("deleting the buildpack when the associated stack is specified")
 
 				session = helpers.CF("delete-buildpack", buildpackName, "-s", stacks[0], "-f")
+				Eventually(session).Should(Say("Deleting buildpack %s with stack %s\\.\\.\\.", buildpackName, stacks[0]))
+				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
-				Eventually(session.Out).Should(Say("OK"))
 
 				session = helpers.CF("delete-buildpack", buildpackName, "-s", stacks[1], "-f")
+				Eventually(session).Should(Say("Deleting buildpack %s with stack %s\\.\\.\\.", buildpackName, stacks[1]))
+				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
-				Eventually(session.Out).Should(Say("OK"))
 			})
 		})
 
 		Context("one buildpack has a nil stack", func() {
-
 			BeforeEach(func() {
-				stacks = helpers.FetchStacks()
-
 				helpers.BuildpackWithStack(func(buildpackPath string) {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 					Eventually(session).Should(Exit(0))
@@ -155,13 +157,13 @@ var _ = Describe("delete-buildpack command", func() {
 			It("properly handles ambiguity", func() {
 				By("deleting nil buildpack when no stack specified")
 				session := helpers.CF("delete-buildpack", buildpackName, "-f")
-				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
 
 				By("deleting the remaining buildpack when no stack is specified")
 				session = helpers.CF("delete-buildpack", buildpackName, "-f")
-				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
@@ -185,7 +187,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 			It("deletes the buildpack", func() {
 				session := helpers.CFWithStdin(buffer, "delete-buildpack", buildpackName)
-				Eventually(session).Should(Say("Deleting buildpack %s", buildpackName))
+				Eventually(session).Should(Say("Deleting buildpack %s\\.\\.\\.", buildpackName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -227,7 +229,7 @@ var _ = Describe("delete-buildpack command", func() {
 	When("the -f flag is provided", func() {
 		It("deletes the org", func() {
 			session := helpers.CF("delete-buildpack", buildpackName, "-f")
-			Eventually(session).Should(Say("Deleting buildpack %s", buildpackName))
+			Eventually(session).Should(Say("Deleting buildpack %s\\.\\.\\.", buildpackName))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 		})

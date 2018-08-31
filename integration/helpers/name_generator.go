@@ -84,8 +84,12 @@ func NewUsername() string {
 	return PrefixedRandomName("INTEGRATION-USER")
 }
 
-func NewBuildpack() string {
+func NewBuildpackName() string {
 	return PrefixedRandomName("INTEGRATION-BUILDPACK")
+}
+
+func NewStackName() string {
+	return PrefixedRandomName("INTEGRATION-STACK")
 }
 
 func PrefixedRandomName(namePrefix string) string {
