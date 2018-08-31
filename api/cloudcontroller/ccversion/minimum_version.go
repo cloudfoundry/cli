@@ -4,7 +4,7 @@ const (
 	MinV2ClientVersion = "2.69.0"
 	MinV3ClientVersion = "3.4.0"
 
-	MinVersionAsyncBindingsV2                = "99.0.0"
+	MinVersionAsyncBindingsV2                = "2.120.0"
 	MinVersionBindingNameV2                  = "2.99.0"
 	MinVersionBuildpackStackAssociationV2    = "2.114.0"
 	MinVersionDockerCredentialsV2            = "2.82.0"
