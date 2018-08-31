@@ -7,7 +7,9 @@ import (
 	"path/filepath"
 
 	. "github.com/onsi/gomega"
-)
+	. "github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/gexec"
+	)
 
 func MakeBuildpackArchive(stackName string) string {
 	archiveFile, err := ioutil.TempFile("", "buildpack-archive-file-")
@@ -42,4 +44,17 @@ func BuildpackWithStack(f func(buildpackArchive string), stackName string) {
 
 func BuildpackWithoutStack(f func(buildpackArchive string)) {
 	BuildpackWithStack(f, "")
+}
+
+func SetupBuildpackWithStack(buildpackName, stack string) {
+	BuildpackWithStack(func(buildpackPath string) {
+		session := CF("create-buildpack", buildpackName, buildpackPath, "99")
+		Eventually(session).Should(Say("OK"))
+		Eventually(session).Should(Say("OK"))
+		Eventually(session).Should(Exit(0))
+	}, stack)
+}
+
+func SetupBuildpackWithoutStack(buildpackName string) {
+	SetupBuildpackWithStack(buildpackName, "")
 }
