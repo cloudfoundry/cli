@@ -144,7 +144,7 @@ var _ = Describe("update-buildpack command", func() {
 				When("multiple buildpacks with the same name exist in enabled and unlocked state, and all have stacks", func() {
 					BeforeEach(func() {
 						helpers.BuildpackWithStack(func(buildpackArchive string) {
-							createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "99")
+							createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "98")
 							Eventually(createSession).Should(Exit(0))
 						}, stacks[0])
 
