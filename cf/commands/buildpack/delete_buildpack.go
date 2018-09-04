@@ -90,7 +90,11 @@ func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) error {
 	case nil: //do nothing
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn(T("Buildpack {{.BuildpackName}} does not exist.", map[string]interface{}{"BuildpackName": buildpackName}))
+		if stack == "" {
+			cmd.ui.Warn(T("Buildpack {{.BuildpackName}} does not exist.", map[string]interface{}{"BuildpackName": buildpackName}))
+		} else {
+			cmd.ui.Warn(T("Buildpack {{.BuildpackName}} with stack {{.Stack}} not found.", map[string]interface{}{"BuildpackName": buildpackName, "Stack": stack}))
+		}
 		return nil
 	case *errors.AmbiguousModelError:
 		var err2 error

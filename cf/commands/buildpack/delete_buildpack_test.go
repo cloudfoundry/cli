@@ -153,6 +153,7 @@ var _ = Describe("delete-buildpack command", func() {
 						))
 					})
 				})
+
 				Context("buildpack not found", func() {
 					BeforeEach(func() {
 						ui = &testterm.FakeUI{Inputs: []string{"y"}}
@@ -170,7 +171,7 @@ var _ = Describe("delete-buildpack command", func() {
 							[]string{"OK"},
 						))
 
-						Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"my-buildpack", "does not exist"}))
+						Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"Buildpack my-buildpack with stack my-stack not found."}))
 					})
 				})
 			})
