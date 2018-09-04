@@ -1,4 +1,4 @@
-package global
+package isolated
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
