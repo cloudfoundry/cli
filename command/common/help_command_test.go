@@ -506,6 +506,8 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("SERVICES:"))
 				Expect(testUI.Out).To(Say("   marketplace\\s+List available offerings in the marketplace"))
 				Expect(testUI.Out).To(Say("   create-service\\s+Create a service instance"))
+				Expect(testUI.Out).To(Say("   share-service\\s+Share a service instance with another space"))
+				Expect(testUI.Out).To(Say("   unshare-service\\s+Unshare a shared service instance from a space"))
 				Expect(testUI.Out).To(Say(""))
 				Expect(testUI.Out).To(Say("ORGS:"))
 				Expect(testUI.Out).To(Say("   orgs\\s+List all orgs"))
@@ -622,10 +624,6 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("   v3-packages\\s+List packages of an app"))
 				Expect(testUI.Out).To(Say("   v3-create-package\\s+Uploads a V3 Package"))
 				Expect(testUI.Out).To(Say("   v3-ssh\\s+SSH to an application container instance"))
-				Expect(testUI.Out).To(Say("SERVICES \\(experimental\\):"))
-				Expect(testUI.Out).To(Say("   share-service\\s+Share a service instance with another space"))
-				Expect(testUI.Out).To(Say("   unshare-service\\s+Unshare a shared service instance from a space"))
-
 			})
 
 			When("there are multiple installed plugins", func() {
