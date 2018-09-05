@@ -67,8 +67,6 @@ func (cmd *ShareServiceCommand) Setup(config command.Config, ui command.UI) erro
 }
 
 func (cmd ShareServiceCommand) Execute(args []string) error {
-	cmd.UI.DisplayWarning(command.ExperimentalWarning)
-
 	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionShareServiceV3)
 	if err != nil {
 		return err

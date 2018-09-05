@@ -1,4 +1,4 @@
-package experimental
+package global
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
