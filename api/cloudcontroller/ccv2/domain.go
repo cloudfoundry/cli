@@ -12,6 +12,9 @@ type Domain struct {
 	// GUID is the unique domain identifier.
 	GUID string
 
+	// Internal indicates whether the domain is an internal domain.
+	Internal bool
+
 	// Name is the name given to the domain.
 	Name string
 
@@ -36,6 +39,7 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 			Name            string `json:"name"`
 			RouterGroupGUID string `json:"router_group_guid"`
 			RouterGroupType string `json:"router_group_type"`
+			Internal        bool   `json:"internal"`
 		} `json:"entity"`
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccDomain)
@@ -47,6 +51,7 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 	domain.Name = ccDomain.Entity.Name
 	domain.RouterGroupGUID = ccDomain.Entity.RouterGroupGUID
 	domain.RouterGroupType = constant.RouterGroupType(ccDomain.Entity.RouterGroupType)
+	domain.Internal = ccDomain.Entity.Internal
 	return nil
 }
 

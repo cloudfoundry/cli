@@ -39,36 +39,65 @@ var _ = Describe("Domains", func() {
 		})
 
 		When("retrieving the domains is successful", func() {
-			BeforeEach(func() {
-				fakeV2Actor.GetOrganizationDomainsReturns([]v2action.Domain{
-					{
-						Name: "private-domain.com",
-						GUID: "some-private-domain-guid",
+			When("there is an external domain", func() {
+				BeforeEach(func() {
+					fakeV2Actor.GetOrganizationDomainsReturns([]v2action.Domain{
+						{
+							Name:     "private-domain.com",
+							GUID:     "some-private-domain-guid",
+							Internal: true,
+						},
+						{
+							Name: "private-domain-2.com",
+							GUID: "some-private-domain-guid-2",
+						},
+						{
+							Name: "shared-domain.com",
+							GUID: "some-shared-domain-guid",
+						},
 					},
-					{
+						v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"},
+						nil,
+					)
+				})
+
+				It("returns the first external domain and warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+					Expect(defaultDomain).To(Equal(v2action.Domain{
 						Name: "private-domain-2.com",
 						GUID: "some-private-domain-guid-2",
-					},
-					{
-						Name: "shared-domain.com",
-						GUID: "some-shared-domain-guid",
-					},
-				},
-					v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"},
-					nil,
-				)
+					}))
+
+					Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(1))
+					Expect(fakeV2Actor.GetOrganizationDomainsArgsForCall(0)).To(Equal(orgGUID))
+				})
 			})
 
-			It("returns the first domain and warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
-				Expect(defaultDomain).To(Equal(v2action.Domain{
-					Name: "private-domain.com",
-					GUID: "some-private-domain-guid",
-				}))
+			When("all the domains are internal", func() {
+				BeforeEach(func() {
+					fakeV2Actor.GetOrganizationDomainsReturns([]v2action.Domain{
+						{
+							Name:     "internal-domain-1.com",
+							GUID:     "some-internal-domain-guid",
+							Internal: true,
+						},
+						{
+							Name:     "internal-domain-2.com",
+							GUID:     "some-internal-domain-guid",
+							Internal: true,
+						},
+					},
+						v2action.Warnings{"warnings-1", "warnings-2"},
+						nil,
+					)
+				})
 
-				Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(1))
-				Expect(fakeV2Actor.GetOrganizationDomainsArgsForCall(0)).To(Equal(orgGUID))
+				It("returns an error and warnings", func() {
+					Expect(executeErr).To(MatchError(actionerror.NoDomainsFoundError{OrganizationGUID: orgGUID}))
+					Expect(warnings).To(ConsistOf("warnings-1", "warnings-2"))
+				})
+
 			})
 		})
 
@@ -77,7 +106,7 @@ var _ = Describe("Domains", func() {
 				fakeV2Actor.GetOrganizationDomainsReturns([]v2action.Domain{}, v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"}, nil)
 			})
 
-			It("returns the first shared domain and warnings", func() {
+			It("returns an error and warnings", func() {
 				Expect(executeErr).To(MatchError(actionerror.NoDomainsFoundError{OrganizationGUID: orgGUID}))
 				Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
 			})

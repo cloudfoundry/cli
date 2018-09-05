@@ -17,11 +17,20 @@ func (actor Actor) DefaultDomain(orgGUID string) (v2action.Domain, Warnings, err
 		return v2action.Domain{}, Warnings(warnings), err
 	}
 
-	if len(domains) == 0 {
+	log.Debugf("filtering out internal domains from all found domains: %#v", domains)
+	var externalDomains []v2action.Domain
+
+	for _, d := range domains {
+		if !d.Internal {
+			externalDomains = append(externalDomains, d)
+		}
+	}
+
+	if len(externalDomains) == 0 {
 		log.Error("no domains found")
 		return v2action.Domain{}, Warnings(warnings), actionerror.NoDomainsFoundError{OrganizationGUID: orgGUID}
 	}
 
-	log.Debugf("selecting first domain as default domain: %#v", domains)
-	return domains[0], Warnings(warnings), nil
+	log.Debugf("selecting first external domain as default domain: %#v", externalDomains)
+	return externalDomains[0], Warnings(warnings), nil
 }
