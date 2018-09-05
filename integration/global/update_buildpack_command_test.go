@@ -97,13 +97,14 @@ var _ = Describe("update-buildpack command", func() {
 						}, stacks[0])
 
 						helpers.BuildpackWithoutStack(func(buildpackArchive string) {
-							createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "99")
+							createSession := helpers.CF("create-buildpack", buildpackName, buildpackArchive, "100")
 							Eventually(createSession).Should(Exit(0))
 						})
 
 						listSession := helpers.CF("buildpacks")
-						Eventually(listSession).Should(Say(`%s\s+%s\s+\d+\s+true\s+false`, buildpackName, stacks[0]))
-						Eventually(listSession).Should(Say(`%s\s+\d+\s+true\s+false`, buildpackName))
+						Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+							Name: buildpackName, Stack: stacks[0]})))
+						Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{Name: buildpackName})))
 						Eventually(listSession).Should(Exit(0))
 					})
 
@@ -154,8 +155,10 @@ var _ = Describe("update-buildpack command", func() {
 						}, stacks[1])
 
 						listSession := helpers.CF("buildpacks")
-						Eventually(listSession).Should(Say(`%s\s+%s\s+\d+\s+true\s+false`, buildpackName, stacks[0]))
-						Eventually(listSession).Should(Say(`%s\s+%s\s+\d+\s+true\s+false`, buildpackName, stacks[1]))
+						Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+							Name: buildpackName, Stack: stacks[0]})))
+						Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+							Name: buildpackName, Stack: stacks[1]})))
 						Eventually(listSession).Should(Exit(0))
 					})
 
@@ -201,7 +204,8 @@ var _ = Describe("update-buildpack command", func() {
 						}, stacks[0])
 
 						listSession := helpers.CF("buildpacks")
-						Eventually(listSession).Should(Say(`%s\s+%s\s+\d+\s+true\s+false`, buildpackName, stacks[0]))
+						Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+							Name: buildpackName, Stack: stacks[0]})))
 						Eventually(listSession).Should(Exit(0))
 					})
 
@@ -248,7 +252,7 @@ var _ = Describe("update-buildpack command", func() {
 					})
 
 					listSession := helpers.CF("buildpacks")
-					Eventually(listSession).Should(Say(`%s\s+\d+\s+true\s+false`, buildpackName))
+					Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{Name: buildpackName})))
 					Eventually(listSession).Should(Exit(0))
 				})
 
@@ -505,7 +509,10 @@ var _ = Describe("update-buildpack command", func() {
 							Eventually(session).Should(Exit(0))
 
 							session = helpers.CF("buildpacks")
-							Eventually(session).Should(Say(`%s\s+\d+\s+true\s+true`, buildpackName))
+							Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+								Name:   buildpackName,
+								Locked: "true",
+							})))
 							Eventually(session).Should(Exit(0))
 						})
 					})
@@ -559,7 +566,7 @@ var _ = Describe("update-buildpack command", func() {
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("buildpacks")
-						Eventually(session).Should(Say(`%s\s+\d+\s+true`, buildpackName))
+						Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{Name: buildpackName})))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -596,7 +603,7 @@ var _ = Describe("update-buildpack command", func() {
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("buildpacks")
-						Eventually(session).Should(Say(`%s\s+\d+\s+true\s+false`, buildpackName))
+						Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{Name: buildpackName})))
 						Eventually(session).Should(Exit(0))
 					})
 				})

@@ -144,7 +144,8 @@ var _ = Describe("create buildpack command", func() {
 							})
 
 							session := helpers.CF("buildpacks")
-							Eventually(session).Should(Say(`%s\s+1`, buildpackName))
+							Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+								Name: buildpackName, Position: "1"})))
 							Eventually(session).Should(Exit(0))
 						})
 					})
@@ -166,7 +167,9 @@ var _ = Describe("create buildpack command", func() {
 							}, stacks[0])
 
 							session := helpers.CF("buildpacks")
-							Eventually(session).Should(Say(`%s\s+%s\s+1`, buildpackName, stacks[0]))
+							Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+								Name: buildpackName, Stack: stacks[0], Position: "1",
+							})))
 							Eventually(session).Should(Exit(0))
 						})
 					})
@@ -221,8 +224,10 @@ var _ = Describe("create buildpack command", func() {
 								}, stacks[0])
 
 								session := helpers.CF("buildpacks")
-								Eventually(session).Should(Say(`%s\s+1`, buildpackName))
-								Eventually(session).Should(Say(`%s\s+%s\s+6`, existingBuildpack, stacks[0]))
+								Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+									Name: buildpackName, Position: "1"})))
+								Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+									Name: existingBuildpack, Stack: stacks[0], Position: "6"})))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -275,8 +280,10 @@ var _ = Describe("create buildpack command", func() {
 								}, stacks[0])
 
 								session := helpers.CF("buildpacks")
-								Eventually(session).Should(Say(`%s\s+%s\s+1`, buildpackName, stacks[0]))
-								Eventually(session).Should(Say(`%s\s+%s\s+6`, existingBuildpack, stacks[1]))
+								Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+									Name: buildpackName, Stack: stacks[0]})))
+								Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+									Name: existingBuildpack, Stack: stacks[1]})))
 								Eventually(session).Should(Exit(0))
 							})
 						})
