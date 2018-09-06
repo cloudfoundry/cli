@@ -48,26 +48,20 @@ var _ = Describe("Logging Actions", func() {
 		var (
 			expectedAppGUID string
 
-			messages    <-chan *LogMessage
-			errs        <-chan error
-			eventStream chan *events.LogMessage
-			errStream   chan error
+			messages <-chan *LogMessage
+			errs     <-chan error
+
+			message *LogMessage
 		)
 
 		BeforeEach(func() {
 			expectedAppGUID = "some-app-guid"
-
-			eventStream = make(chan *events.LogMessage, 100)
-			errStream = make(chan error)
 		})
 
 		// If tests panic due to this close, it is likely you have a failing
 		// expectation and the channels are being closed because the test has
 		// failed/short circuited and is going through teardown.
 		AfterEach(func() {
-			close(eventStream)
-			close(errStream)
-
 			Eventually(messages).Should(BeClosed())
 			Eventually(errs).Should(BeClosed())
 		})
@@ -82,7 +76,13 @@ var _ = Describe("Logging Actions", func() {
 					Expect(appGUID).To(Equal(expectedAppGUID))
 					Expect(authToken).To(BeEmpty())
 
+					eventStream := make(chan *events.LogMessage)
+					errStream := make(chan error, 1)
+
 					go func() {
+						defer close(eventStream)
+						defer close(errStream)
+
 						outMessage := events.LogMessage_OUT
 						ts1 := int64(10)
 						sourceType := "some-source-type"
@@ -106,6 +106,24 @@ var _ = Describe("Logging Actions", func() {
 							SourceType:     &sourceType,
 							SourceInstance: &sourceInstance,
 						}
+
+						ts3 := int64(0)
+						eventStream <- &events.LogMessage{
+							Message:        []byte("message-3"),
+							MessageType:    &outMessage,
+							Timestamp:      &ts3,
+							SourceType:     &sourceType,
+							SourceInstance: &sourceInstance,
+						}
+
+						ts4 := int64(15)
+						eventStream <- &events.LogMessage{
+							Message:        []byte("message-4"),
+							MessageType:    &errMessage,
+							Timestamp:      &ts4,
+							SourceType:     &sourceType,
+							SourceInstance: &sourceInstance,
+						}
 					}()
 
 					return eventStream, errStream
@@ -113,55 +131,26 @@ var _ = Describe("Logging Actions", func() {
 			})
 
 			It("converts them to log messages and passes them through the messages channel", func() {
-				message := <-messages
+				Eventually(messages).Should(Receive(&message))
+				Expect(message.Message()).To(Equal("message-3"))
+				Expect(message.Type()).To(Equal("OUT"))
+				Expect(message.Timestamp()).To(Equal(time.Unix(0, 0)))
+				Expect(message.SourceType()).To(Equal("some-source-type"))
+				Expect(message.SourceInstance()).To(Equal("some-source-instance"))
+
+				Eventually(messages).Should(Receive(&message))
 				Expect(message.Message()).To(Equal("message-1"))
 				Expect(message.Type()).To(Equal("OUT"))
 				Expect(message.Timestamp()).To(Equal(time.Unix(0, 10)))
-				Expect(message.SourceType()).To(Equal("some-source-type"))
-				Expect(message.SourceInstance()).To(Equal("some-source-instance"))
 
-				message = <-messages
-				Expect(message.Message()).To(Equal("message-2"))
+				Eventually(messages).Should(Receive(&message))
+				Expect(message.Message()).To(Equal("message-4"))
 				Expect(message.Type()).To(Equal("ERR"))
-				Expect(message.Timestamp()).To(Equal(time.Unix(0, 20)))
-				Expect(message.SourceType()).To(Equal("some-source-type"))
-				Expect(message.SourceInstance()).To(Equal("some-source-instance"))
-			})
-
-			It("sorts the logs by timestamp", func() {
-				outMessage := events.LogMessage_OUT
-				sourceType := "some-source-type"
-				sourceInstance := "some-source-instance"
-
-				ts3 := int64(0)
-				eventStream <- &events.LogMessage{
-					Message:        []byte("message-3"),
-					MessageType:    &outMessage,
-					Timestamp:      &ts3,
-					SourceType:     &sourceType,
-					SourceInstance: &sourceInstance,
-				}
-
-				errMessage := events.LogMessage_ERR
-				ts4 := int64(15)
-				eventStream <- &events.LogMessage{
-					Message:        []byte("message-4"),
-					MessageType:    &errMessage,
-					Timestamp:      &ts4,
-					SourceType:     &sourceType,
-					SourceInstance: &sourceInstance,
-				}
-
-				message := <-messages
-				Expect(message.Timestamp()).To(Equal(time.Unix(0, 0)))
-
-				message = <-messages
-				Expect(message.Timestamp()).To(Equal(time.Unix(0, 10)))
-
-				message = <-messages
 				Expect(message.Timestamp()).To(Equal(time.Unix(0, 15)))
 
-				message = <-messages
+				Eventually(messages).Should(Receive(&message))
+				Expect(message.Message()).To(Equal("message-2"))
+				Expect(message.Type()).To(Equal("ERR"))
 				Expect(message.Timestamp()).To(Equal(time.Unix(0, 20)))
 			})
 		})
@@ -178,7 +167,12 @@ var _ = Describe("Logging Actions", func() {
 				BeforeEach(func() {
 					waiting = make(chan bool)
 					fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
+						eventStream := make(chan *events.LogMessage)
+						errStream := make(chan error, 1)
+
 						go func() {
+							defer close(eventStream)
+							defer close(errStream)
 							errStream <- nil
 							close(waiting)
 						}()
@@ -199,7 +193,12 @@ var _ = Describe("Logging Actions", func() {
 					err2 = errors.New("Fiddlesticks")
 
 					fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
+						eventStream := make(chan *events.LogMessage)
+						errStream := make(chan error, 1)
+
 						go func() {
+							defer close(eventStream)
+							defer close(errStream)
 							errStream <- err1
 							errStream <- err2
 						}()
@@ -218,7 +217,12 @@ var _ = Describe("Logging Actions", func() {
 				When("NOAA is able to recover", func() {
 					BeforeEach(func() {
 						fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
+							eventStream := make(chan *events.LogMessage)
+							errStream := make(chan error, 1)
+
 							go func() {
+								defer close(eventStream)
+								defer close(errStream)
 								errStream <- noaaErrors.NewRetryError(errors.New("error 1"))
 
 								outMessage := events.LogMessage_OUT

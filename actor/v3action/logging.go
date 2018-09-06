@@ -6,6 +6,7 @@ import (
 
 	noaaErrors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
+	log "github.com/sirupsen/logrus"
 )
 
 const StagingLog = "STG"
@@ -69,7 +70,8 @@ func (lm LogMessages) Swap(i, j int) {
 	lm[i], lm[j] = lm[j], lm[i]
 }
 
-func (Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *LogMessage, <-chan error) {
+func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *LogMessage, <-chan error) {
+	log.Info("Start Tailing Logs")
 	// Do not pass in token because client should have a TokenRefresher set
 	eventStream, errStream := client.TailingLogs(appGUID, "")
 
@@ -77,6 +79,8 @@ func (Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *LogMes
 	errs := make(chan error)
 
 	go func() {
+		log.Info("Processing Log Stream")
+
 		defer close(messages)
 		defer close(errs)
 
@@ -84,12 +88,18 @@ func (Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *LogMes
 		defer ticker.Stop()
 
 		var logs LogMessages
+		var eventClosed, errClosed bool
+
 	dance:
 		for {
 			select {
 			case event, ok := <-eventStream:
 				if !ok {
-					break dance
+					if !errClosed {
+						log.Debug("logging event stream closed")
+					}
+					eventClosed = true
+					break
 				}
 
 				logs = append(logs, &LogMessage{
@@ -101,7 +111,11 @@ func (Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *LogMes
 				})
 			case err, ok := <-errStream:
 				if !ok {
-					break dance
+					if !errClosed {
+						log.Debug("logging error stream closed")
+					}
+					errClosed = true
+					break
 				}
 
 				if _, ok := err.(noaaErrors.RetryError); ok {
@@ -112,12 +126,12 @@ func (Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *LogMes
 					errs <- err
 				}
 			case <-ticker.C:
-				sort.Stable(logs)
-				for _, l := range logs {
-					messages <- l
+				log.Debug("processing cached logs")
+				logs = actor.flushLogs(logs, messages)
+				if eventClosed && errClosed {
+					log.Debug("stopping log processing")
+					break dance
 				}
-
-				logs = logs[0:0]
 			}
 		}
 	}()
@@ -134,4 +148,12 @@ func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, 
 	messages, logErrs := actor.GetStreamingLogs(app.GUID, client)
 
 	return messages, logErrs, allWarnings, err
+}
+
+func (Actor) flushLogs(logs LogMessages, messages chan<- *LogMessage) LogMessages {
+	sort.Stable(logs)
+	for _, l := range logs {
+		messages <- l
+	}
+	return LogMessages{}
 }
