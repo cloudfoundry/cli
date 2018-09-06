@@ -162,6 +162,23 @@ type updateOrgManagerByUsernameRequestBody struct {
 	Username string `json:"username"`
 }
 
+// UpdateOrganizationManager assigns the org manager role to the UAA user or client with the provided ID.
+func (client *Client) UpdateOrganizationManager(guid string, uaaID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutOrganizationManagerRequest,
+		URIParams:   Params{"organization_guid": guid, "manager_guid": uaaID},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
+}
+
+// UpdateOrganizationManagerByUsername assigns the org manager role to the user with the provided name.
 func (client *Client) UpdateOrganizationManagerByUsername(guid string, username string) (Warnings, error) {
 	requestBody := updateOrgManagerByUsernameRequestBody{
 		Username: username,

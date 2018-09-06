@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("create-org", func() {
-	Context("when invoked with --help", func() {
+	When("invoked with --help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("create-org", "--help")
 			Eventually(session).Should(Say(`NAME:`))
@@ -37,7 +37,27 @@ var _ = Describe("create-org", func() {
 		})
 	})
 
-	When("the environment is set up correctly", func() {
+	When("logged in as a client", func() {
+		var client string
+
+		BeforeEach(func() {
+			client = helpers.LoginCFWithClientCredentials()
+		})
+
+		It("successfully creates an org", func() {
+			orgName := helpers.NewOrgName()
+			session := helpers.CF("create-org", orgName)
+
+			Eventually(session.Out).Should(Say("Creating org %s as %s\\.\\.\\.", orgName, client))
+			Eventually(session.Out).Should(Say("OK\\n\\n"))
+			Eventually(session.Out).Should(Say("Assigning role OrgManager to user %s in org %s\\.\\.\\.", client, orgName))
+			Eventually(session.Out).Should(Say("OK\\n\\n"))
+			Eventually(session.Out).Should(Say(`TIP: Use 'cf target -o "%s"' to target new org`, orgName))
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
+	When("logged in as a user", func() {
 		var user string
 
 		BeforeEach(func() {

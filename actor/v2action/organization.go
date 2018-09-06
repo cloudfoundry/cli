@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	uaaconst "code.cloudfoundry.org/cli/api/uaa/constant"
 )
 
 // Organization represents a CLI Organization.
@@ -49,7 +50,15 @@ func (actor Actor) GetOrganizationByName(orgName string) (Organization, Warnings
 
 // GrantOrgManagerByUsername gives the Org Manager role to the provided user.
 func (actor Actor) GrantOrgManagerByUsername(guid string, username string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.UpdateOrganizationManagerByUsername(guid, username)
+	var warnings ccv2.Warnings
+	var err error
+
+	if actor.Config.UAAGrantType() != string(uaaconst.GrantTypeClientCredentials) {
+		warnings, err = actor.CloudControllerClient.UpdateOrganizationManagerByUsername(guid, username)
+	} else {
+		warnings, err = actor.CloudControllerClient.UpdateOrganizationManager(guid, username)
+	}
+
 	return Warnings(warnings), err
 }
 

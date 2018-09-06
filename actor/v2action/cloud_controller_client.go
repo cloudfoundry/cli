@@ -71,6 +71,7 @@ type CloudControllerClient interface {
 	TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error)
 	UpdateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	UpdateBuildpack(buildpack ccv2.Buildpack) (ccv2.Buildpack, ccv2.Warnings, error)
+	UpdateOrganizationManager(guid string, uaaID string) (ccv2.Warnings, error)
 	UpdateOrganizationManagerByUsername(guid string, username string) (ccv2.Warnings, error)
 	UpdateResourceMatch(resourcesToMatch []ccv2.Resource) ([]ccv2.Resource, ccv2.Warnings, error)
 	UpdateRouteApplication(routeGUID string, appGUID string) (ccv2.Route, ccv2.Warnings, error)

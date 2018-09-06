@@ -89,6 +89,7 @@ const (
 	PutBuildpackBitsRequest                              = "PutBuildpackBits"
 	PutDropletRequest                                    = "PutDroplet"
 	PutOrganizationManagerByUsernameRequest              = "PutOrganizationManagerByUsername"
+	PutOrganizationManagerRequest                        = "PutOrganizationManager"
 	PutResourceMatchRequest                              = "PutResourceMatch"
 	PutRouteAppRequest                                   = "PutRouteApp"
 	PutSecurityGroupSpaceRequest                         = "PutSecurityGroupSpace"
@@ -121,6 +122,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/organizations/:organization_guid", Method: http.MethodDelete, Name: DeleteOrganizationRequest},
 	{Path: "/v2/organizations/:organization_guid", Method: http.MethodGet, Name: GetOrganizationRequest},
 	{Path: "/v2/organizations/:organization_guid/managers", Method: http.MethodPut, Name: PutOrganizationManagerByUsernameRequest},
+	{Path: "/v2/organizations/:organization_guid/managers/:manager_guid", Method: http.MethodPut, Name: PutOrganizationManagerRequest},
 	{Path: "/v2/organizations/:organization_guid/private_domains", Method: http.MethodGet, Name: GetOrganizationPrivateDomainsRequest},
 	{Path: "/v2/private_domains", Method: http.MethodGet, Name: GetPrivateDomainsRequest},
 	{Path: "/v2/private_domains/:private_domain_guid", Method: http.MethodGet, Name: GetPrivateDomainRequest},
