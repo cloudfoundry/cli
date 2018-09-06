@@ -173,7 +173,7 @@ func (client *Client) UpdateOrganizationManagerByUsername(guid string, username 
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutOrganizationManagerRequest,
+		RequestName: internal.PutOrganizationManagerByUsernameRequest,
 		Body:        bytes.NewReader(body),
 		URIParams:   Params{"organization_guid": guid},
 	})
