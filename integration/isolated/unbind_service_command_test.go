@@ -146,10 +146,10 @@ var _ = Describe("unbind-service command", func() {
 				})
 
 				It("returns that the unbind is in progress", func() {
-					session := helpers.CF("unbind-service", "-v", appName, serviceInstance)
-					Eventually(session).Should(Exit(0))
+					session := helpers.CF("unbind-service", appName, serviceInstance)
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Say("Unbinding in progress. Use 'cf service %s' to check operation status.", serviceInstance))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 

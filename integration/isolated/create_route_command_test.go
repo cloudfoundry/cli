@@ -379,7 +379,7 @@ var _ = Describe("create-route command", func() {
 
 						When("the path is provided", func() {
 							It("fails with an error message and exits 1", func() {
-								session := helpers.CF("create-route", spaceName, domainName, "-v", "--path", path)
+								session := helpers.CF("create-route", spaceName, domainName, "--path", path)
 								Eventually(session).Should(Say(`Creating route %s/%s for org %s / space %s as %s\.\.\.`, domainName, path, orgName, spaceName, userName))
 								Eventually(session.Err).Should(Say(`The route is invalid: host is required for shared-domains`))
 								Eventually(session).Should(Exit(1))

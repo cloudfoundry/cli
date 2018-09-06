@@ -339,7 +339,7 @@ var _ = Describe("create buildpack command", func() {
 
 						It("prints a warning but doesn't exit 1", func() {
 							helpers.BuildpackWithoutStack(func(buildpackPath string) {
-								session := helpers.CF("create-buildpack", "-v", buildpackName, buildpackPath, "1")
+								session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 								Eventually(session.Err).Should(Say("Buildpack %s already exists", buildpackName))
 								Eventually(session).Should(Say("TIP: use 'cf update-buildpack' to update this buildpack"))
 								Eventually(session).Should(Exit(0))

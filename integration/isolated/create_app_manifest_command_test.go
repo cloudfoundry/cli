@@ -269,9 +269,8 @@ var _ = Describe("create-app-manifest command", func() {
 		})
 
 		When("app was created with docker image", func() {
-
 			BeforeEach(func() {
-				Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
+				Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit(0))
 			})
 
 			It("creates the manifest", func() {
@@ -280,6 +279,7 @@ var _ = Describe("create-app-manifest command", func() {
 				Eventually(session).Should(Say("OK"))
 				expectedFilePath := helpers.ConvertPathToRegularExpression(fmt.Sprintf(".%s%s_manifest.yml", string(os.PathSeparator), appName))
 				Eventually(session).Should(Say("Manifest file created successfully at %s", expectedFilePath))
+				Eventually(session).Should(Exit(0))
 
 				expectedFile := fmt.Sprintf(`applications:
 - name: %s
@@ -296,8 +296,6 @@ var _ = Describe("create-app-manifest command", func() {
 				createdFile, err := ioutil.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(createdFile)).To(Equal(expectedFile))
-
-				Eventually(session).Should(Exit(0))
 			})
 		})
 

@@ -151,7 +151,7 @@ applications:
 
 						It("uses the multiprocess display", func() {
 							userName, _ := helpers.GetCredentials()
-							session := helpers.CF("restage", appName, "-v")
+							session := helpers.CF("restage", appName)
 							Eventually(session).Should(Say("Restaging app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
 							helpers.ConfirmStagingLogs(session)
@@ -179,7 +179,7 @@ applications:
 
 						It("displays the app logs and information with instances table", func() {
 							userName, _ := helpers.GetCredentials()
-							session := helpers.CF("restage", appName, "-v")
+							session := helpers.CF("restage", appName)
 							Eventually(session).Should(Say("Restaging app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
 							helpers.ConfirmStagingLogs(session)
@@ -212,7 +212,7 @@ applications:
 					})
 
 					It("displays app isolation segment information", func() {
-						session := helpers.CF("restage", appName, "-v")
+						session := helpers.CF("restage", appName)
 						Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
 					})
 				})
