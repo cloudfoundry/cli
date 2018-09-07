@@ -31,5 +31,5 @@ run:
 
     echo -e "\n Vetting packages for potential issues..."
     go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
-    CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites -race -nodes 2 -skipPackage integration,cf/ssh
+    CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites -race -skipPackage integration,cf/ssh
     CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites -race -flakeAttempts 3 cf/ssh
