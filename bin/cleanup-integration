@@ -54,7 +54,7 @@ cf delete-org -f temp-org
 for stack in $(cf stacks | tail -n +5 | awk '{print $1}'); do
   cf buildpacks | \
     grep -i ^integration-buildpack | \
-    grep -i -e \\s${stack}\\s | \
+    grep -i -e \\s${stack} | \
     awk '{print $1}' | \
     xargs_func cf delete-buildpack -f -s $stack
 
