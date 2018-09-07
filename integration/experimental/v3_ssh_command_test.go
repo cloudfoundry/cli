@@ -355,7 +355,7 @@ var _ = Describe("v3-ssh command", func() {
 				It("configures local port to connect to the app port", func() {
 					session := helpers.CF("v3-ssh", appName, "-N", "-L", fmt.Sprintf("%d:localhost:8080", port))
 
-					time.Sleep(5 * time.Second) // Need to wait a few seconds for pipes to connect.
+					time.Sleep(15 * time.Second) // Need to wait a few seconds for pipes to connect.
 					response, err := http.Get(fmt.Sprintf("http://localhost:%d/", port))
 					Expect(err).ToNot(HaveOccurred())
 					defer response.Body.Close()
