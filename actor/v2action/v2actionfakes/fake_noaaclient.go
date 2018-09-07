@@ -32,6 +32,11 @@ type FakeNOAAClient struct {
 		result1 []*events.LogMessage
 		result2 error
 	}
+	SetOnConnectCallbackStub        func(cb func())
+	setOnConnectCallbackMutex       sync.RWMutex
+	setOnConnectCallbackArgsForCall []struct {
+		cb func()
+	}
 	TailingLogsStub        func(appGuid, authToken string) (<-chan *events.LogMessage, <-chan error)
 	tailingLogsMutex       sync.RWMutex
 	tailingLogsArgsForCall []struct {
@@ -142,6 +147,30 @@ func (fake *FakeNOAAClient) RecentLogsReturnsOnCall(i int, result1 []*events.Log
 	}{result1, result2}
 }
 
+func (fake *FakeNOAAClient) SetOnConnectCallback(cb func()) {
+	fake.setOnConnectCallbackMutex.Lock()
+	fake.setOnConnectCallbackArgsForCall = append(fake.setOnConnectCallbackArgsForCall, struct {
+		cb func()
+	}{cb})
+	fake.recordInvocation("SetOnConnectCallback", []interface{}{cb})
+	fake.setOnConnectCallbackMutex.Unlock()
+	if fake.SetOnConnectCallbackStub != nil {
+		fake.SetOnConnectCallbackStub(cb)
+	}
+}
+
+func (fake *FakeNOAAClient) SetOnConnectCallbackCallCount() int {
+	fake.setOnConnectCallbackMutex.RLock()
+	defer fake.setOnConnectCallbackMutex.RUnlock()
+	return len(fake.setOnConnectCallbackArgsForCall)
+}
+
+func (fake *FakeNOAAClient) SetOnConnectCallbackArgsForCall(i int) func() {
+	fake.setOnConnectCallbackMutex.RLock()
+	defer fake.setOnConnectCallbackMutex.RUnlock()
+	return fake.setOnConnectCallbackArgsForCall[i].cb
+}
+
 func (fake *FakeNOAAClient) TailingLogs(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
 	fake.tailingLogsMutex.Lock()
 	ret, specificReturn := fake.tailingLogsReturnsOnCall[len(fake.tailingLogsArgsForCall)]
@@ -201,6 +230,8 @@ func (fake *FakeNOAAClient) Invocations() map[string][][]interface{} {
 	defer fake.closeMutex.RUnlock()
 	fake.recentLogsMutex.RLock()
 	defer fake.recentLogsMutex.RUnlock()
+	fake.setOnConnectCallbackMutex.RLock()
+	defer fake.setOnConnectCallbackMutex.RUnlock()
 	fake.tailingLogsMutex.RLock()
 	defer fake.tailingLogsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

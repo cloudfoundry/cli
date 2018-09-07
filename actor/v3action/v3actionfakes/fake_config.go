@@ -18,6 +18,15 @@ type FakeConfig struct {
 	accessTokenReturnsOnCall map[int]struct {
 		result1 string
 	}
+	DialTimeoutStub        func() time.Duration
+	dialTimeoutMutex       sync.RWMutex
+	dialTimeoutArgsForCall []struct{}
+	dialTimeoutReturns     struct {
+		result1 time.Duration
+	}
+	dialTimeoutReturnsOnCall map[int]struct {
+		result1 time.Duration
+	}
 	PollingIntervalStub        func() time.Duration
 	pollingIntervalMutex       sync.RWMutex
 	pollingIntervalArgsForCall []struct{}
@@ -95,6 +104,46 @@ func (fake *FakeConfig) AccessTokenReturnsOnCall(i int, result1 string) {
 	}
 	fake.accessTokenReturnsOnCall[i] = struct {
 		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) DialTimeout() time.Duration {
+	fake.dialTimeoutMutex.Lock()
+	ret, specificReturn := fake.dialTimeoutReturnsOnCall[len(fake.dialTimeoutArgsForCall)]
+	fake.dialTimeoutArgsForCall = append(fake.dialTimeoutArgsForCall, struct{}{})
+	fake.recordInvocation("DialTimeout", []interface{}{})
+	fake.dialTimeoutMutex.Unlock()
+	if fake.DialTimeoutStub != nil {
+		return fake.DialTimeoutStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.dialTimeoutReturns.result1
+}
+
+func (fake *FakeConfig) DialTimeoutCallCount() int {
+	fake.dialTimeoutMutex.RLock()
+	defer fake.dialTimeoutMutex.RUnlock()
+	return len(fake.dialTimeoutArgsForCall)
+}
+
+func (fake *FakeConfig) DialTimeoutReturns(result1 time.Duration) {
+	fake.DialTimeoutStub = nil
+	fake.dialTimeoutReturns = struct {
+		result1 time.Duration
+	}{result1}
+}
+
+func (fake *FakeConfig) DialTimeoutReturnsOnCall(i int, result1 time.Duration) {
+	fake.DialTimeoutStub = nil
+	if fake.dialTimeoutReturnsOnCall == nil {
+		fake.dialTimeoutReturnsOnCall = make(map[int]struct {
+			result1 time.Duration
+		})
+	}
+	fake.dialTimeoutReturnsOnCall[i] = struct {
+		result1 time.Duration
 	}{result1}
 }
 
@@ -263,6 +312,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
+	fake.dialTimeoutMutex.RLock()
+	defer fake.dialTimeoutMutex.RUnlock()
 	fake.pollingIntervalMutex.RLock()
 	defer fake.pollingIntervalMutex.RUnlock()
 	fake.sSHOAuthClientMutex.RLock()

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	. "code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -167,6 +168,7 @@ var _ = Describe("V3PollStage", func() {
 	When("the log error stream contains errors", func() {
 		BeforeEach(func() {
 			writeEventsAsync(func() {
+				logErrStream <- actionerror.NOAATimeoutError{}
 				logErrStream <- errors.New("some-log-error")
 			})
 		})
@@ -176,6 +178,7 @@ var _ = Describe("V3PollStage", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(returnedDroplet).To(Equal(v3action.Droplet{}))
 			})
+			Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
 			Eventually(testUI.Err).Should(Say("some-log-error"))
 		})
 	})

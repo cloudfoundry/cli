@@ -25,9 +25,8 @@ var _ = Describe("Application Actions", func() {
 	)
 
 	BeforeEach(func() {
-		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		fakeConfig = new(v2actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, nil, fakeConfig)
+		actor, fakeCloudControllerClient, _, fakeConfig = NewTestActor()
+		fakeConfig.DialTimeoutReturns(time.Millisecond)
 	})
 
 	Describe("Application", func() {
