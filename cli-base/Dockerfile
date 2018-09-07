@@ -15,7 +15,7 @@ RUN sed -i -e 's/httpredir.debian.org/ftp.us.debian.org/' /etc/apt/sources.list
 RUN apt update
 
 # used in CATs tests and building the binaries
-RUN apt install -y jq zip make
+RUN apt install -y jq zip make vi
 
 # used in internationalization tests
 RUN apt install -y locales
