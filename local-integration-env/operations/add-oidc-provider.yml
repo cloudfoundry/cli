@@ -1,0 +1,145 @@
+---
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=uaa/properties/login/oauth?/providers?
+  value:
+    cli-oidc-provider:
+      type: oidc1.0
+      discoveryUrl: https://uaa-oidc.service.cf.internal:8443/.well-known/openid-configuration
+      scopes:
+        - openid
+      linkText: My other uaa Oauth Provider
+      showLinkText: true
+      addShadowUserOnLogin: true
+      relyingPartyId: rp_oidc_admin
+      relyingPartySecret: adminsecret
+      skipSslValidation: true
+      storeCustomAttributes: true
+      passwordGrantEnabled: true
+      attributeMappings:
+        given_name: given_name
+        family_name: family_name
+        user_name: user_name
+
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: uaa-oidc
+    instances: 1
+    azs: [z1, z2, z3]
+    vm_type: default
+    stemcell: default
+    persistent_disk: 500
+    networks:
+    - name: default
+    jobs:
+    - name: uaa
+      release: uaa
+      properties:
+        encryption:
+          active_key_label: 'key-1'
+          encryption_keys:
+            - label: 'key-1'
+              passphrase: 'MY-PASSPHRASE'
+        uaadb:
+          databases:
+          - name: uaa_oidc
+            tag: uaa
+          db_scheme: mysql
+          port: 3306
+          roles:
+          - name: uaa-oidc
+            password: "((uaa_oidc_database_password))"
+            tag: admin
+        uaa:
+          url: https://uaa-oidc.service.cf.internal:8443
+          jwt:
+            policy:
+              active_key_id: key-1
+              keys:
+                key-1:
+                  signingKey: ((uaa-oidc-key1.private_key))
+          sslCertificate: ((uaa-oidc_tls.certificate))
+          sslPrivateKey: ((uaa-oidc_tls.private_key))
+          clients:
+            rp_oidc_admin:
+              authorized-grant-types: authorization_code,client_credentials,refresh_token,user_token,password,urn:ietf:params:oauth:grant-type:saml2-bearer,implicit
+              redirect-uri: https://uaa.service.cf.internal:8443/login/callback/cli-oidc-provider
+              scope: openid,uaa.admin,clients.read,clients.write,clients.secret,scim.read,scim.write,clients.admin,uaa.user
+              authorities: uaa.admin,clients.admin
+              secret: adminsecret
+          scim:
+            user:
+              override: true
+            users:
+              - name: admin_oidc
+                password: admin
+                groups:
+                  - uaa.admin
+        login:
+          protocol: https
+          saml:
+            activeKeyId: key1
+            keys:
+              key1:
+                key: ((saml_oidc-key1.private_key))
+                passphrase: ''
+                certificate: ((saml_oidc-key1.certificate))
+
+- type: replace
+  path: /addons/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties/aliases/-
+  value:
+    domain: uaa-oidc.service.cf.internal
+    targets:
+    - query: '*'
+      instance_group: uaa-oidc
+      deployment: cf
+      network: default
+      domain: bosh
+
+- type: replace
+  path: /instance_groups/name=database/jobs/name=mysql/properties/cf_mysql/mysql/seeded_databases?/-
+  value:
+    name: uaa_oidc
+    username: uaa-oidc
+    password: "((uaa_oidc_database_password))"
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: uaa_oidc_database_password
+    type: password
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: uaa-oidc-key1
+    type: rsa
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: uaa-oidc_ca
+    type: certificate
+    options:
+      is_ca: true
+      common_name: uaa-oidc
+      alternative_names: ["*.uaa-oidc.service.cf.internal"]
+      extended_key_usage:
+      - server_auth
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: saml_oidc-key1
+    type: certificate
+    options:
+      ca: uaa-oidc_ca
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: uaa-oidc_tls
+    type: certificate
+    options:
+      ca: uaa-oidc_ca
+      common_name: uaa-oidc.service.cf.internal
