@@ -3,6 +3,7 @@ package global
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -48,8 +49,12 @@ var _ = Describe("buildpacks command", func() {
 		})
 	})
 
-	When("the command is called correctly", func() {
-		It("lists the buildpacks", func() {
+	When("the targeted API supports stack association", func() {
+		BeforeEach(func() {
+			helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+		})
+
+		It("lists the buildpacks with the stack column", func() {
 			helpers.LoginCF()
 			session := helpers.CF("buildpacks")
 			Eventually(session).Should(Say("Getting buildpacks..."))
@@ -63,6 +68,28 @@ var _ = Describe("buildpacks command", func() {
 
 			Eventually(session).Should(Say(fmt.Sprintf("%s\\s+%s\\s+%s\\s+%s\\s+%s\\s+%s", buildpackNameRegex,
 				positionRegex, boolRegex, boolRegex, buildpackFileRegex, stackRegex)))
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
+	When("the targeted API does not support stack association", func() {
+		BeforeEach(func() {
+			helpers.SkipIfVersionAtLeast(ccversion.MinVersionBuildpackStackAssociationV2)
+		})
+
+		It("includes the stack column but does not include the stack values", func() {
+			helpers.LoginCF()
+			session := helpers.CF("buildpacks")
+			Eventually(session).Should(Say("Getting buildpacks..."))
+			Eventually(session).Should(Say("buildpack\\s+position\\s+enabled\\s+locked\\s+filename\\s+stack\\n"))
+
+			buildpackNameRegex := `staticfile_buildpack`
+			positionRegex := `\d+`
+			boolRegex := `(true|false)`
+			buildpackFileRegex := `staticfile_buildpack-\S+`
+
+			Eventually(session).Should(Say(fmt.Sprintf("%s\\s+%s\\s+%s\\s+%s\\s+%s\\n", buildpackNameRegex,
+				positionRegex, boolRegex, boolRegex, buildpackFileRegex)))
 			Eventually(session).Should(Exit(0))
 		})
 	})
