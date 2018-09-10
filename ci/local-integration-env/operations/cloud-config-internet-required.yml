@@ -1,0 +1,5 @@
+- type: replace
+  path: /vm_extensions/-
+  value:
+    name:
+      internet-required

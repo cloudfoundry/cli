@@ -50,6 +50,15 @@ The CLI integration tests require a Cloud Foundry deployment. The easiest way to
 deploy a local Cloud Foundry for testing is to use bosh-lite - see 
 [Quick Start](https://bosh.io/docs/quick-start/) and [cf-deployment](https://github.com/cloudfoundry/cf-deployment) to deploy CF.
 
+The `ci/local-integration-env` folder contains scripts and documentation for
+deploying a Cloud Foundry with the configuration that our integration tests
+expect to be present.
+
+Before using the scripts, make sure that you have installed the following
+dependencies:
+* BOSH CLI and its
+  [dependencies](https://bosh.io/docs/cli-v2-install/#additional-dependencies)
+* [VirtualBox](https://www.virtualbox.org/)
 
 ## Updating tests
 

@@ -1,0 +1,4 @@
+---
+- type: replace
+  path: /instance_groups/name=isolated-diego-cell/jobs/name=rep/properties?/set_kernel_parameters
+  value: false
