@@ -41,8 +41,7 @@ func GetAPI() string {
 	return apiURL
 }
 
-func LoginCF() string {
-	username, password := GetCredentials()
+func LoginAs(username, password string) {
 	env := map[string]string{
 		"CF_USERNAME": username,
 		"CF_PASSWORD": password,
@@ -56,7 +55,11 @@ func LoginCF() string {
 		}
 		time.Sleep(3 * time.Second)
 	}
+}
 
+func LoginCF() string {
+	username, password := GetCredentials()
+	LoginAs(username, password)
 	return username
 }
 
@@ -118,4 +121,25 @@ func SetupCF(org string, space string) {
 	LoginCF()
 	CreateOrgAndSpace(org, space)
 	TargetOrgAndSpace(org, space)
+}
+
+func SwitchToNoRole() string {
+	username, password := CreateUser()
+	LogoutCF()
+	LoginAs(username, password)
+	return username
+}
+
+func SwitchToOrgRole(org, role string) string {
+	username, password := CreateUserInOrgRole(org, role)
+	LogoutCF()
+	LoginAs(username, password)
+	return username
+}
+
+func SwitchToSpaceRole(org, space, role string) string {
+	username, password := CreateUserInSpaceRole(org, space, role)
+	LogoutCF()
+	LoginAs(username, password)
+	return username
 }

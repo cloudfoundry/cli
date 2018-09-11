@@ -22,6 +22,13 @@ func SetupReadOnlyOrgAndSpace() (string, string) {
 	return orgName, spaceName1
 }
 
+func CreateAndTargetOrg() string {
+	org := NewOrgName()
+	CreateOrg(org)
+	TargetOrg(org)
+	return org
+}
+
 func CreateOrgAndSpace(org string, space string) {
 	CreateOrg(org)
 	TargetOrg(org)
