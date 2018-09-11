@@ -628,6 +628,8 @@ jobs:
       params:
         NODES: 16
         SKIP_REGEXP: "transparently proxies both reserved"
+        REPORTER_CONFIG_FILE_PATH: ""
+        FLAKE_ATTEMPTS: 2
       on_failure:
         put: slack-alert
         params:
