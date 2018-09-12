@@ -95,8 +95,6 @@ var _ = PDescribe("create-space", func() {
 		})
 
 		When("the space already exists", func() {
-			var spaceName string
-
 			BeforeEach(func() {
 				spaceName = helpers.NewSpaceName()
 				session := helpers.CF("create-space", spaceName)
