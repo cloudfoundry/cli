@@ -88,6 +88,19 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 		})
 
+		It("creates the service binding with no content type when no body is present", func() {
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("PUT", fmt.Sprintf("/v2/user_provided_service_instances/%s/routes/%s", serviceInstanceGUID, routeGUID)),
+					ghttp.RespondWith(http.StatusCreated, nil),
+					ghttp.VerifyContentType(""),
+				),
+			)
+			err := routeServiceBindingRepo.Bind(serviceInstanceGUID, routeGUID, true, ``)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+		})
+
 		Context("when an API error occurs", func() {
 			BeforeEach(func() {
 				ccServer.AppendHandlers(
