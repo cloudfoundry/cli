@@ -1,0 +1,7 @@
+- type: replace
+  path: /resource_pools/name=vms/cloud_properties/cpus
+  value: 8
+
+- type: replace
+  path: /resource_pools/name=vms/cloud_properties/memory
+  value: 8192
