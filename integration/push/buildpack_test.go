@@ -70,6 +70,46 @@ var _ = Describe("push with different buildpack values", func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			})
 
+			When("the buildpacks do not use the default stack", func() {
+				var (
+					buildpacks      []string
+					nonDefaultStack string
+				)
+
+				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+					nonDefaultStack = helpers.CreateStack()
+					buildpacks = []string{helpers.NewBuildpackName(), helpers.NewBuildpackName()}
+					for _, buildpack := range buildpacks {
+						helpers.SetupBuildpackWithStack(buildpack, nonDefaultStack)
+					}
+				})
+
+				When("a stack is provided", func() {
+					It("pushes the app successfully with multiple buildpacks using the stack specified", func() {
+						helpers.WithProcfileApp(func(dir string) {
+							tempfile := filepath.Join(dir, "index.html")
+							err := ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+							Expect(err).ToNot(HaveOccurred())
+
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+								PushCommandName, appName,
+								"-b", buildpacks[0], "-b", buildpacks[1], "-s", nonDefaultStack, "--no-start",
+							)
+							Eventually(session).Should(Exit(0))
+						})
+
+						session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s", helpers.AppGUID(appName)))
+
+						Eventually(session).Should(Say(`\s+"buildpacks":\s+`))
+						Eventually(session).Should(Say(`\s+"%s"`, buildpacks[0]))
+						Eventually(session).Should(Say(`\s+"%s"`, buildpacks[1]))
+						Eventually(session).Should(Say(`"stack":\s+"%s"`, nonDefaultStack))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
 			When("the app does NOT have existing buildpack configurations", func() {
 				It("pushes the app successfully with multiple buildpacks", func() {
 					helpers.WithProcfileApp(func(dir string) {

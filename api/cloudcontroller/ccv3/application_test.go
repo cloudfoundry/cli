@@ -66,7 +66,7 @@ var _ = Describe("Application", func() {
 
 				When("no buildpacks are provided", func() {
 					It("omits the lifecycle from the JSON", func() {
-						Expect(string(appBytes)).To(Equal("{}"))
+						Expect(string(appBytes)).To(MatchJSON("{}"))
 					})
 				})
 
@@ -76,7 +76,7 @@ var _ = Describe("Application", func() {
 					})
 
 					It("sets the lifecycle buildpack to be empty in the JSON", func() {
-						Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+						Expect(string(appBytes)).To(MatchJSON(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
 					})
 				})
 
@@ -86,7 +86,7 @@ var _ = Describe("Application", func() {
 					})
 
 					It("sets the Lifecycle buildpack to be empty in the JSON", func() {
-						Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+						Expect(string(appBytes)).To(MatchJSON(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
 					})
 				})
 
@@ -96,7 +96,7 @@ var _ = Describe("Application", func() {
 					})
 
 					It("sets them in the JSON", func() {
-						Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`))
+						Expect(string(appBytes)).To(MatchJSON(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`))
 					})
 				})
 			})
@@ -396,6 +396,7 @@ var _ = Describe("Application", func() {
 					Application{
 						Name:                "app-name-1",
 						GUID:                "app-guid-1",
+						StackName:           "some-stack",
 						LifecycleType:       constant.AppLifecycleTypeBuildpack,
 						LifecycleBuildpacks: []string{"some-buildpack"},
 					},
@@ -471,7 +472,8 @@ var _ = Describe("Application", func() {
 					"lifecycle": {
 						"type": "buildpack",
 						"data": {
-							"buildpacks": ["some-buildpack"]
+							"buildpacks": ["some-buildpack"],
+							"stack": "some-stack-name"
 						}
 					}
 				}`
@@ -482,6 +484,7 @@ var _ = Describe("Application", func() {
 						"type": "buildpack",
 						"data": map[string]interface{}{
 							"buildpacks": []string{"some-buildpack"},
+							"stack":      "some-stack-name",
 						},
 					},
 					"relationships": map[string]interface{}{
@@ -503,6 +506,7 @@ var _ = Describe("Application", func() {
 				appToUpdate = Application{
 					GUID:                "some-app-guid",
 					Name:                "some-app-name",
+					StackName:           "some-stack-name",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"some-buildpack"},
 					Relationships: Relationships{
@@ -517,6 +521,7 @@ var _ = Describe("Application", func() {
 
 				Expect(updatedApp).To(Equal(Application{
 					GUID:                "some-app-guid",
+					StackName:           "some-stack-name",
 					LifecycleBuildpacks: []string{"some-buildpack"},
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					Name:                "some-app-name",

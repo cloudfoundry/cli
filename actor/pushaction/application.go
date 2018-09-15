@@ -183,6 +183,7 @@ func (actor Actor) updateBuildpacks(config ApplicationConfig, v2App v2action.App
 	v3App := v3action.Application{
 		Name:                v2App.Name,
 		GUID:                v2App.GUID,
+		StackName:           config.DesiredApplication.Stack.Name,
 		LifecycleBuildpacks: config.DesiredApplication.Buildpacks,
 		LifecycleType:       constant.AppLifecycleTypeBuildpack,
 	}

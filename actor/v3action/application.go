@@ -13,6 +13,7 @@ import (
 type Application struct {
 	Name                string
 	GUID                string
+	StackName           string
 	State               constant.ApplicationState
 	LifecycleType       constant.AppLifecycleType
 	LifecycleBuildpacks []string
@@ -158,6 +159,7 @@ func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) er
 func (actor Actor) UpdateApplication(app Application) (Application, Warnings, error) {
 	ccApp := ccv3.Application{
 		GUID:                app.GUID,
+		StackName:           app.StackName,
 		LifecycleType:       app.LifecycleType,
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 	}
@@ -173,6 +175,7 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 	return Application{
 		GUID:                app.GUID,
+		StackName:           app.StackName,
 		LifecycleType:       app.LifecycleType,
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 		Name:                app.Name,

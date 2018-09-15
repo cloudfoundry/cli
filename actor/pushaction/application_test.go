@@ -83,6 +83,11 @@ var _ = Describe("Applications", func() {
 						GUID:      "some-app-guid",
 						SpaceGUID: "some-space-guid",
 					},
+					Stack: v2action.Stack{
+						Name:        "some-stack-name",
+						GUID:        "some-stack-guid",
+						Description: "some-stack-description",
+					},
 				},
 				CurrentApplication: Application{
 					Application: v2action.Application{
@@ -213,7 +218,7 @@ var _ = Describe("Applications", func() {
 				})
 			})
 
-			When("builpacks is set as an empty array (autodetect)", func() {
+			When("buildpacks is set as an empty array (autodetect)", func() {
 				BeforeEach(func() {
 					buildpacks = []string{}
 					config.DesiredApplication.Buildpacks = buildpacks
@@ -310,6 +315,7 @@ var _ = Describe("Applications", func() {
 						submitApp = v3action.Application{
 							Name:                updatedApplication.Name,
 							GUID:                updatedApplication.GUID,
+							StackName:           config.DesiredApplication.Stack.Name,
 							LifecycleBuildpacks: []string{"ruby", "java"},
 							LifecycleType:       constant.AppLifecycleTypeBuildpack,
 						}
@@ -495,6 +501,7 @@ var _ = Describe("Applications", func() {
 						submitApp = v3action.Application{
 							Name:                createdApplication.Name,
 							GUID:                createdApplication.GUID,
+							StackName:           config.DesiredApplication.Stack.Name,
 							LifecycleBuildpacks: []string{"ruby", "java"},
 							LifecycleType:       constant.AppLifecycleTypeBuildpack,
 						}
