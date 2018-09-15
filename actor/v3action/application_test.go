@@ -53,7 +53,7 @@ var _ = Describe("Application Actions", func() {
 
 		When("looking up the app guid succeeds", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{ccv3.Application{Name: "some-app", GUID: "abc123"}}, ccv3.Warnings{"some-get-app-warning"}, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", GUID: "abc123"}}, ccv3.Warnings{"some-get-app-warning"}, nil)
 			})
 
 			When("sending the delete fails", func() {
@@ -607,9 +607,9 @@ var _ = Describe("Application Actions", func() {
 					fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
 						defer func() { processInstanceCallCount++ }()
 						if strings.HasPrefix(processGuid, "good") {
-							return []ccv3.ProcessInstance{ccv3.ProcessInstance{State: constant.ProcessInstanceRunning}}, nil, nil
+							return []ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}}, nil, nil
 						} else {
-							return []ccv3.ProcessInstance{ccv3.ProcessInstance{State: constant.ProcessInstanceStarting}}, nil, nil
+							return []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}}, nil, nil
 						}
 					}
 
