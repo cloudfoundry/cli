@@ -170,9 +170,7 @@ var _ = Describe("push with different buildpack values", func() {
 							"applications": []map[string]interface{}{
 								{
 									"name": appName,
-									"buildpacks": []string{
-										"staticfile_buildpack",
-									},
+									"buildpack": "staticfile_buildpack",
 								},
 							},
 						})
