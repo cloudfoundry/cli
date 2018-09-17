@@ -44,6 +44,36 @@ type ccLifecycle struct {
 	} `json:"data"`
 }
 
+func (a Application) hasAutodetectedBuildpack() bool {
+	return a.LifecycleBuildpacks[0] == "default" || a.LifecycleBuildpacks[0] == "null"
+}
+
+func (ccApp *ccApplication) setBuildpackLifecycle(a Application) {
+	var lifecycle ccLifecycle
+	lifecycle.Type = a.LifecycleType
+	lifecycle.Data.Buildpacks = a.LifecycleBuildpacks
+	lifecycle.Data.Stack = a.StackName
+	ccApp.Lifecycle = lifecycle
+}
+
+func (ccApp *ccApplication) setAutodetectedBuildpackLifecycle() {
+	var nullBuildpackLifecycle struct {
+		Type constant.AppLifecycleType `json:"type,omitempty"`
+		Data struct {
+			Buildpacks []string `json:"buildpacks"`
+			Stack      string   `json:"stack,omitempty"`
+		} `json:"data"`
+	}
+	nullBuildpackLifecycle.Type = constant.AppLifecycleTypeBuildpack
+	ccApp.Lifecycle = nullBuildpackLifecycle
+}
+
+func (ccApp *ccApplication) setDockerLifecycle() {
+	ccApp.Lifecycle = ccLifecycle{
+		Type: constant.AppLifecycleTypeDocker,
+	}
+}
+
 // MarshalJSON converts an Application into a Cloud Controller Application.
 func (a Application) MarshalJSON() ([]byte, error) {
 	ccApp := ccApplication{
@@ -52,30 +82,13 @@ func (a Application) MarshalJSON() ([]byte, error) {
 	}
 
 	if a.LifecycleType == constant.AppLifecycleTypeDocker {
-		ccApp.Lifecycle = ccLifecycle{
-			Type: a.LifecycleType,
-		}
+		ccApp.setDockerLifecycle()
 	} else if a.LifecycleType == constant.AppLifecycleTypeBuildpack {
 		if len(a.LifecycleBuildpacks) > 0 {
-			if a.LifecycleBuildpacks[0] == "default" || a.LifecycleBuildpacks[0] == "null" {
-				var nullBuildpackLifecycle struct {
-					Type constant.AppLifecycleType `json:"type,omitempty"`
-					Data struct {
-						Buildpacks []string `json:"buildpacks"`
-						Stack      string   `json:"stack,omitempty"`
-					} `json:"data"`
-				}
-
-				nullBuildpackLifecycle.Type = a.LifecycleType
-				ccApp.Lifecycle = nullBuildpackLifecycle
+			if a.hasAutodetectedBuildpack() {
+				ccApp.setAutodetectedBuildpackLifecycle()
 			} else {
-				var lifecycle ccLifecycle
-
-				lifecycle.Type = a.LifecycleType
-				lifecycle.Data.Buildpacks = a.LifecycleBuildpacks
-				lifecycle.Data.Stack = a.StackName
-
-				ccApp.Lifecycle = lifecycle
+				ccApp.setBuildpackLifecycle(a)
 			}
 		}
 	}
