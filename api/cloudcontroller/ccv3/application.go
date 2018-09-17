@@ -28,50 +28,54 @@ type Application struct {
 	State constant.ApplicationState
 }
 
+type ccApplication struct {
+	Name          string                    `json:"name,omitempty"`
+	Relationships Relationships             `json:"relationships,omitempty"`
+	Lifecycle     interface{}               `json:"lifecycle,omitempty"`
+	GUID          string                    `json:"guid,omitempty"`
+	State         constant.ApplicationState `json:"state,omitempty"`
+}
+
+type ccLifecycle struct {
+	Type constant.AppLifecycleType `json:"type,omitempty"`
+	Data struct {
+		Buildpacks []string `json:"buildpacks,omitempty"`
+		Stack      string   `json:"stack,omitempty"`
+	} `json:"data"`
+}
+
 // MarshalJSON converts an Application into a Cloud Controller Application.
 func (a Application) MarshalJSON() ([]byte, error) {
-	var ccApp struct {
-		Name          string        `json:"name,omitempty"`
-		Relationships Relationships `json:"relationships,omitempty"`
-		Lifecycle     interface{}   `json:"lifecycle,omitempty"`
-	}
-
-	ccApp.Name = a.Name
-	ccApp.Relationships = a.Relationships
-
-	type lifecycle struct {
-		Type string `json:"type,omitempty"`
-		Data struct {
-			Buildpacks []string `json:"buildpacks,omitempty"`
-			Stack      string   `json:"stack,omitempty"`
-		} `json:"data"`
+	ccApp := ccApplication{
+		Name:          a.Name,
+		Relationships: a.Relationships,
 	}
 
 	if a.LifecycleType == constant.AppLifecycleTypeDocker {
-		ccApp.Lifecycle = lifecycle{
-			Type: (string)(a.LifecycleType),
+		ccApp.Lifecycle = ccLifecycle{
+			Type: a.LifecycleType,
 		}
 	} else if a.LifecycleType == constant.AppLifecycleTypeBuildpack {
 		if len(a.LifecycleBuildpacks) > 0 {
 			if a.LifecycleBuildpacks[0] == "default" || a.LifecycleBuildpacks[0] == "null" {
 				var nullBuildpackLifecycle struct {
-					Type string `json:"type,omitempty"`
+					Type constant.AppLifecycleType `json:"type,omitempty"`
 					Data struct {
 						Buildpacks []string `json:"buildpacks"`
 						Stack      string   `json:"stack,omitempty"`
 					} `json:"data"`
 				}
 
-				nullBuildpackLifecycle.Type = (string)(a.LifecycleType)
+				nullBuildpackLifecycle.Type = a.LifecycleType
 				ccApp.Lifecycle = nullBuildpackLifecycle
 			} else {
-				var ccLifecycle lifecycle
+				var lifecycle ccLifecycle
 
-				ccLifecycle.Type = (string)(a.LifecycleType)
-				ccLifecycle.Data.Buildpacks = a.LifecycleBuildpacks
-				ccLifecycle.Data.Stack = a.StackName
+				lifecycle.Type = a.LifecycleType
+				lifecycle.Data.Buildpacks = a.LifecycleBuildpacks
+				lifecycle.Data.Stack = a.StackName
 
-				ccApp.Lifecycle = ccLifecycle
+				ccApp.Lifecycle = lifecycle
 			}
 		}
 	}
@@ -81,29 +85,23 @@ func (a Application) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Application response.
 func (a *Application) UnmarshalJSON(data []byte) error {
-	type rawApp Application
-	var ccApp struct {
-		*rawApp
-
-		Lifecycle struct {
-			Type constant.AppLifecycleType
-			Data struct {
-				Buildpacks []string
-				Stack      string
-			}
-		}
+	lifecycle := ccLifecycle{}
+	ccApp := ccApplication{
+		Lifecycle: &lifecycle,
 	}
-
-	ccApp.rawApp = (*rawApp)(a)
 
 	err := cloudcontroller.DecodeJSON(data, &ccApp)
 	if err != nil {
 		return err
 	}
 
-	a.LifecycleType = ccApp.Lifecycle.Type
-	a.LifecycleBuildpacks = ccApp.Lifecycle.Data.Buildpacks
-	a.StackName = ccApp.Lifecycle.Data.Stack
+	a.GUID = ccApp.GUID
+	a.StackName = lifecycle.Data.Stack
+	a.LifecycleBuildpacks = lifecycle.Data.Buildpacks
+	a.LifecycleType = lifecycle.Type
+	a.Name = ccApp.Name
+	a.Relationships = ccApp.Relationships
+	a.State = ccApp.State
 
 	return nil
 }
