@@ -1,4 +1,27 @@
 ---
 - type: replace
+  path: /instance_groups/name=scheduler/jobs/name=cc_deployment_updater?
+  value:
+   name: cc_deployment_updater
+   release: capi
+   properties:
+     cc:
+       db_encryption_key: ((cc_db_encryption_key))
+       mutual_tls:
+         ca_cert: "((service_cf_internal_ca.certificate))"
+         private_key: "((cc_tls.private_key))"
+         public_cert: "((cc_tls.certificate))"
+     ccdb:
+       databases:
+       - name: cloud_controller
+         tag: cc
+       db_scheme: mysql
+       port: 3306
+       roles:
+       - name: cloud_controller
+         password: ((cc_database_password))
+         tag: admin
+
+- type: replace
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/temporary_disable_deployments?
   value: false
