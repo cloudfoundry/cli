@@ -158,9 +158,9 @@ var _ = Describe("Service Binding", func() {
 				response := `
 				{
 					  "description": "The app space binding to service is taken: some-app-guid some-service-instance-guid",
-						  "error_code": "CF-ServiceBindingAppServiceTaken",
-							  "code": 90003
-							}
+						"error_code": "CF-ServiceBindingAppServiceTaken",
+						"code": 90003
+				}
 			`
 				server.AppendHandlers(
 					CombineHandlers(
