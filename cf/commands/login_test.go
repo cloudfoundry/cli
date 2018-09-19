@@ -394,10 +394,6 @@ var _ = Describe("Login Command", func() {
 						DisplayName: "Username",
 						Type:        coreconfig.AuthPromptTypeText,
 					},
-					"passcode": {
-						DisplayName: "It's a passcode, what you want it to be???",
-						Type:        coreconfig.AuthPromptTypePassword,
-					},
 					"password": {
 						DisplayName: "Your Password",
 						Type:        coreconfig.AuthPromptTypePassword,
