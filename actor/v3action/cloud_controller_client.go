@@ -12,6 +12,7 @@ import (
 type CloudControllerClient interface {
 	AppSSHEndpoint() string
 	AppSSHHostKeyFingerprint() string
+	CancelDeployment(deploymentGUID string) (ccv3.Warnings, error)
 	CloudControllerAPIVersion() string
 	CreateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
 	CreateApplicationDeployment(appGUID string) (ccv3.Warnings, error)
@@ -33,6 +34,7 @@ type CloudControllerClient interface {
 	GetApplications(query ...ccv3.Query) ([]ccv3.Application, ccv3.Warnings, error)
 	GetApplicationTasks(appGUID string, query ...ccv3.Query) ([]ccv3.Task, ccv3.Warnings, error)
 	GetBuild(guid string) (ccv3.Build, ccv3.Warnings, error)
+	GetDeployments(query ...ccv3.Query) ([]ccv3.Deployment, ccv3.Warnings, error)
 	GetDroplet(guid string) (ccv3.Droplet, ccv3.Warnings, error)
 	GetDroplets(query ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)
 	GetIsolationSegment(guid string) (ccv3.IsolationSegment, ccv3.Warnings, error)

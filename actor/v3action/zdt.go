@@ -1,10 +1,12 @@
 package v3action
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"errors"
 	"regexp"
 	"time"
+
+	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
 func (actor Actor) ZeroDowntimePollStart(appGUID string, warningsChannel chan<- Warnings) error {
@@ -50,4 +52,41 @@ func getDeployingProcess(processes []ccv3.Process) *ccv3.Process {
 		}
 	}
 	return nil
+}
+
+func (actor Actor) CancelDeploymentByAppNameAndSpace(appName string, spaceGUID string) (Warnings, error) {
+	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return warnings, err
+	}
+
+	deploymentGuid, deploymentWarnings, err := actor.GetCurrentDeployment(app.GUID)
+	warnings = append(warnings, deploymentWarnings...)
+	if err != nil {
+		return warnings, err
+	}
+
+	apiWarnings, err := actor.CloudControllerClient.CancelDeployment(deploymentGuid)
+	warnings = append(warnings, apiWarnings...)
+
+	return warnings, err
+}
+
+func (actor Actor) GetCurrentDeployment(appGUID string) (string, Warnings, error) {
+	var collectedWarnings Warnings
+	deployments, warnings, err := actor.CloudControllerClient.GetDeployments(
+		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{appGUID}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{"-created_at"}},
+		ccv3.Query{Key: ccv3.PerPage, Values: []string{"1"}},
+	)
+	collectedWarnings = append(collectedWarnings, warnings...)
+	if err != nil {
+		return "", collectedWarnings, err
+	}
+
+	if len(deployments) < 1 {
+		return "", collectedWarnings, errors.New("failed to find a deployment for that app")
+	}
+
+	return deployments[0].GUID, collectedWarnings, nil
 }
