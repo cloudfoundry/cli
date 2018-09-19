@@ -9,14 +9,14 @@ commands.
 ```sh
 export BOSH_ENVIRONMENT=vbox
 export BOSH_CLIENT=admin
-export BOSH_CLIENT_SECRET=$(bosh int ~/workspace/cli-lite-vars/creds.yml --path /admin_password)
+export BOSH_CLIENT_SECRET=$(bosh int ~/workspace/cli-lite/creds.yml --path /admin_password)
 ```
 
 
 ## ssh to bosh
 
 ```sh
-bosh int ~/deployments/vbox/creds.yml --path /jumpbox_ssh/private_key > private_key
+bosh int ~/workspace/cli-lite/creds.yml --path /jumpbox_ssh/private_key > private_key
 
 chmod 0600 private_key
 
@@ -38,9 +38,9 @@ Upgrade VirtualBox to the latest version because it is more stable.
 
 Make sure the bosh-lite VM is running in VirtualBox.
 
-Edit `~/deployments/vbox/state.json` and remove the `current_manifest_sha` key.
+Edit `~/workspace/cli-lite/state.json` and remove the `current_manifest_sha` key.
 
-Run `~/workspace/cli-workstation/scripts/deploy-cf/deploy_bosh_lite.sh`. This
+Run `$GOPATH/src/code.cloudfoundry.org/cli/ci/local-integration-env/deploy_bosh_lite.sh`. This
 will recreate the bosh-lite but not the containers.
 
 `bosh delete-deployment -d cf --force -n`
@@ -57,7 +57,7 @@ bosh cancel-task <task number from task list>
 bosh update-resurrection off
 ```
 
-Run `~/workspace/cli-workstation/scripts/deploy-cf/deploy_bosh_lite.sh` again
+Run `$GOPATH/src/code.cloudfoundry.org/cli/ci/local-integration-env/deploy_bosh_lite.sh` again
 to recreate the cf deployment. Add the `clean` argument to clean up old
 bosh-lite deployment when restarting the machine puts VirtualBox in a weird
 state.

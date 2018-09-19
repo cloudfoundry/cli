@@ -44,11 +44,11 @@
           databases:
           - name: uaa_oidc
             tag: uaa
-          db_scheme: mysql
-          port: 3306
+          db_scheme: postgresql
+          port: 5524
           roles:
           - name: uaa-oidc
-            password: "((uaa_oidc_database_password))"
+            password: ((uaa_oidc_database_password))
             tag: admin
         uaa:
           url: https://uaa-oidc.service.cf.internal:8443
@@ -97,11 +97,18 @@
       domain: bosh
 
 - type: replace
-  path: /instance_groups/name=database/jobs/name=mysql/properties/cf_mysql/mysql/seeded_databases?/-
+  path: /instance_groups/name=database/jobs/name=postgres/properties/databases/databases?/-
   value:
     name: uaa_oidc
-    username: uaa-oidc
+    citext: true
+    tag: uaa
+
+- type: replace
+  path: /instance_groups/name=database/jobs/name=postgres/properties/databases/roles?/-
+  value:
+    name: uaa-oidc
     password: "((uaa_oidc_database_password))"
+    tag: admin
 
 - type: replace
   path: /variables?/-

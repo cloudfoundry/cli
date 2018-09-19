@@ -83,12 +83,34 @@ First install `ginkgo`.
 go get -u github.com/onsi/ginkgo/ginkgo
 ```
 
+### Running unit tests
+
 Run the tests:
 ```
 cd $GOPATH/src/code.cloudfoundry.org/cli
 
 make test
 ```
+
+### Running integration tests
+
+If you have a BOSH-lite CloudFoundry running as described in [the above section](https://github.com/cloudfoundry/cli/blob/master/.github/CONTRIBUTING.md#install-bosh-lite-and-deploy-cloud-foundry), all you need to do is run:
+```
+cd $GOPATH/src/code.cloudfoundry.org/cli
+
+make integration-tests
+```
+
+If you want to target a different CloudFoundry, set the following environment
+variables before running tests:
+```
+export CF_INT_API=api.my-cf-domain.com
+export CF_INT_PASSWORD=my-admin-cf-password
+```
+
+More information on the integration tests, such as descriptions of the suites
+and integration environment variables, can be found in the [integration
+README](https://github.com/cloudfoundry/cli/blob/master/integration/README.md)
 
 # Architecture Overview
 
