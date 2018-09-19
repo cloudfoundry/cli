@@ -72,7 +72,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionApplicationFlowV3}
+			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionZeroDowntimePushV3}
 		}
 
 		return err
@@ -114,7 +114,7 @@ func (cmd V3ZeroDowntimePushCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = command.MinimumCCAPIVersionCheck(cmd.ZdtActor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
+	err = command.MinimumCCAPIVersionCheck(cmd.ZdtActor.CloudControllerAPIVersion(), ccversion.MinVersionZeroDowntimePushV3)
 	if err != nil {
 		return err
 	}
