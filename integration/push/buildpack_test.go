@@ -169,7 +169,7 @@ var _ = Describe("push with different buildpack values", func() {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
 							"applications": []map[string]interface{}{
 								{
-									"name": appName,
+									"name":      appName,
 									"buildpack": "staticfile_buildpack",
 								},
 							},

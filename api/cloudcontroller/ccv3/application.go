@@ -28,52 +28,6 @@ type Application struct {
 	State constant.ApplicationState
 }
 
-type ccApplication struct {
-	Name          string                    `json:"name,omitempty"`
-	Relationships Relationships             `json:"relationships,omitempty"`
-	Lifecycle     interface{}               `json:"lifecycle,omitempty"`
-	GUID          string                    `json:"guid,omitempty"`
-	State         constant.ApplicationState `json:"state,omitempty"`
-}
-
-type ccLifecycle struct {
-	Type constant.AppLifecycleType `json:"type,omitempty"`
-	Data struct {
-		Buildpacks []string `json:"buildpacks,omitempty"`
-		Stack      string   `json:"stack,omitempty"`
-	} `json:"data"`
-}
-
-func (a Application) hasAutodetectedBuildpack() bool {
-	return a.LifecycleBuildpacks[0] == "default" || a.LifecycleBuildpacks[0] == "null"
-}
-
-func (ccApp *ccApplication) setBuildpackLifecycle(a Application) {
-	var lifecycle ccLifecycle
-	lifecycle.Type = a.LifecycleType
-	lifecycle.Data.Buildpacks = a.LifecycleBuildpacks
-	lifecycle.Data.Stack = a.StackName
-	ccApp.Lifecycle = lifecycle
-}
-
-func (ccApp *ccApplication) setAutodetectedBuildpackLifecycle() {
-	var nullBuildpackLifecycle struct {
-		Type constant.AppLifecycleType `json:"type,omitempty"`
-		Data struct {
-			Buildpacks []string `json:"buildpacks"`
-			Stack      string   `json:"stack,omitempty"`
-		} `json:"data"`
-	}
-	nullBuildpackLifecycle.Type = constant.AppLifecycleTypeBuildpack
-	ccApp.Lifecycle = nullBuildpackLifecycle
-}
-
-func (ccApp *ccApplication) setDockerLifecycle() {
-	ccApp.Lifecycle = ccLifecycle{
-		Type: constant.AppLifecycleTypeDocker,
-	}
-}
-
 // MarshalJSON converts an Application into a Cloud Controller Application.
 func (a Application) MarshalJSON() ([]byte, error) {
 	ccApp := ccApplication{
@@ -117,6 +71,52 @@ func (a *Application) UnmarshalJSON(data []byte) error {
 	a.State = ccApp.State
 
 	return nil
+}
+
+func (a Application) hasAutodetectedBuildpack() bool {
+	return a.LifecycleBuildpacks[0] == "default" || a.LifecycleBuildpacks[0] == "null"
+}
+
+type ccLifecycle struct {
+	Type constant.AppLifecycleType `json:"type,omitempty"`
+	Data struct {
+		Buildpacks []string `json:"buildpacks,omitempty"`
+		Stack      string   `json:"stack,omitempty"`
+	} `json:"data"`
+}
+
+type ccApplication struct {
+	Name          string                    `json:"name,omitempty"`
+	Relationships Relationships             `json:"relationships,omitempty"`
+	Lifecycle     interface{}               `json:"lifecycle,omitempty"`
+	GUID          string                    `json:"guid,omitempty"`
+	State         constant.ApplicationState `json:"state,omitempty"`
+}
+
+func (ccApp *ccApplication) setAutodetectedBuildpackLifecycle() {
+	var nullBuildpackLifecycle struct {
+		Type constant.AppLifecycleType `json:"type,omitempty"`
+		Data struct {
+			Buildpacks []string `json:"buildpacks"`
+			Stack      string   `json:"stack,omitempty"`
+		} `json:"data"`
+	}
+	nullBuildpackLifecycle.Type = constant.AppLifecycleTypeBuildpack
+	ccApp.Lifecycle = nullBuildpackLifecycle
+}
+
+func (ccApp *ccApplication) setBuildpackLifecycle(a Application) {
+	var lifecycle ccLifecycle
+	lifecycle.Type = a.LifecycleType
+	lifecycle.Data.Buildpacks = a.LifecycleBuildpacks
+	lifecycle.Data.Stack = a.StackName
+	ccApp.Lifecycle = lifecycle
+}
+
+func (ccApp *ccApplication) setDockerLifecycle() {
+	ccApp.Lifecycle = ccLifecycle{
+		Type: constant.AppLifecycleTypeDocker,
+	}
 }
 
 // CreateApplication creates an application with the given settings.
