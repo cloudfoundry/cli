@@ -246,6 +246,7 @@ var _ = Describe("auth command", func() {
 				Eventually(session).Should(Exit(1))
 			})
 		})
+
 		When("the UAA version is recent enough to support the flag", func() {
 			BeforeEach(func() {
 				helpers.SkipIfUAAVersionLessThan(uaaversion.MinVersionOrigin)
