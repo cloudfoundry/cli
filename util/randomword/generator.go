@@ -84,7 +84,7 @@ wise
 zany`
 
 const nouns = `ardvark
-aligator
+alligator
 antelope
 baboon
 badger
