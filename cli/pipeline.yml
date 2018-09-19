@@ -17,6 +17,8 @@ resources:
     - ci
     - integration
     - Makefile
+    - README.md
+    - .github
 
 - name: cli-i18n
   type: git
