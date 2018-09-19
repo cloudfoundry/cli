@@ -260,14 +260,9 @@ var _ = Describe("v3-cancel-zdt-push command", func() {
 
 			Context("and it is currently deploying", func() {
 				BeforeEach(func() {
-					// scale up so the deployment takes longer
-					helpers.WithHelloWorldApp(func(appDir string) {
-						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "scale", appName, "-i", "10")
-						Eventually(session).Should(Exit(0))
-					})
-
-					helpers.WithHelloWorldApp(func(appDir string) {
-						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-b", "https://github.com/cloudfoundry/staticfile-buildpack")
+					// zdt-push a crashing app so that underlying deployment never goes from DEPLOYING -> DEPLOYED
+					helpers.WithCrashingApp(func(appDir string) {
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName)
 						Eventually(session).Should(Exit(0))
 					})
 				})
