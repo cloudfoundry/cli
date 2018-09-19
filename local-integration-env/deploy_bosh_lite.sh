@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [[ "$WORKSPACE" -eq "" ]]; then
   WORKSPACE="$HOME/workspace"
 fi
@@ -56,8 +58,7 @@ setup_git_repositories () { # Takes one argument, which is the directory to clon
 
 configure_bosh_environment_access () {
   # Create an environment alias for the bosh lite
-  bosh alias-env vbox \
-    --ca-cert <(bosh int $CLI_BOSHLITE_DIR/creds.yml --path /director_ssl/ca)
+  bosh alias-env vbox --ca-cert <(bosh int $CLI_BOSHLITE_DIR/creds.yml --path /director_ssl/ca)
 
   # Set environment and authentication so that we don't have to pass flags to every bosh command
   export BOSH_ENVIRONMENT=vbox # now that we have an alias we can use the human-friendly name
@@ -122,9 +123,11 @@ if [[ $1 == "clean" ]]; then
   cleanup_vms_and_stemcells
 fi
 
-set -e
-
 setup_git_repositories
+
+if [[ -n "$BOSH_ALL_PROXY" ]]; then
+  unset $BOSH_ALL_PROXY # if this is set, the bosh cli will fail to talk to the bosh director because it will try to proxy its traffic through the value of this variable.
+fi
 
 export BOSH_ENVIRONMENT=192.168.50.6
 export BOSH_NON_INTERACTIVE=true # prevent bosh from issuing y/n prompts
@@ -151,4 +154,8 @@ update_bosh_configs
 CFD_STEMCELL_VERSION="$(bosh int $CF_DEPLOYMENT/cf-deployment.yml --path /stemcells/alias=default/version)"
 bosh upload-stemcell https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-trusty-go_agent?v=$CFD_STEMCELL_VERSION
 
+interpolate_and_deploy_cf
+
 setup_routing_for_bosh_ssh
+
+login_to_cf
