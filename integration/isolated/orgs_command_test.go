@@ -42,9 +42,9 @@ var _ = Describe("orgs command", func() {
 
 			BeforeEach(func() {
 				orgName1 = helpers.PrefixedRandomName("INTEGRATION-ORG-XYZ")
-				orgName2 = helpers.PrefixedRandomName("INTEGRATION-ORG-123")
+				orgName2 = helpers.PrefixedRandomName("INTEGRATION-ORG-456")
 				orgName3 = helpers.PrefixedRandomName("INTEGRATION-ORG-ABC")
-				orgName4 = helpers.PrefixedRandomName("INTEGRATION-ORG---")
+				orgName4 = helpers.PrefixedRandomName("INTEGRATION-ORG-123")
 				orgName5 = helpers.PrefixedRandomName("INTEGRATION-ORG-ghi")
 				helpers.CreateOrg(orgName1)
 				helpers.CreateOrg(orgName2)
