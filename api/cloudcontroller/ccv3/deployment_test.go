@@ -1,6 +1,8 @@
 package ccv3_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"net/http"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -18,12 +20,13 @@ var _ = Describe("Task", func() {
 
 	Describe("CreateApplicationDeployment", func() {
 		var (
-			warnings   Warnings
-			executeErr error
+			deploymentGUID string
+			warnings       Warnings
+			executeErr     error
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = client.CreateApplicationDeployment("some-app-guid")
+			deploymentGUID, warnings, executeErr = client.CreateApplicationDeployment("some-app-guid", "some-droplet-guid")
 		})
 
 		Context("when the application exists", func() {
@@ -47,16 +50,84 @@ var _ = Describe("Task", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPost, "/v3/deployments"),
-							VerifyJSON(`{"relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+							VerifyJSON(`{"droplet":{ "guid":"some-droplet-guid" }, "relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
 							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 						),
 					)
 				})
 
 				It("creates the deployment with no errors and returns all warnings", func() {
+					Expect(deploymentGUID).To(Equal("some-deployment-guid"))
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning"))
 				})
+			})
+		})
+	})
+
+	Describe("GetDeployment", func() {
+		var response string
+		Context("When the deployments exists", func() {
+			BeforeEach(func() {
+				response = `{ 
+				    "guid": "some-deployment-guid",
+					"state": "DEPLOYING",
+					"droplet": {
+ 					  "guid": "some-droplet-guid"
+					},
+ 					"previous_droplet": {
+ 					  "guid": "some-other-droplet-guid"
+ 					},
+ 					"created_at": "some-time",
+ 					"updated_at": "some-later-time",
+ 					"relationships": {
+ 					  "app": {
+ 					    "data": {
+ 					      "guid": "some-app-guid"
+ 					    }
+ 					  }
+ 					}
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/deployments/some-deployment-guid"),
+						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+					),
+				)
+			})
+			It("Successfully returns a deployment object", func() {
+				deployment, warnings, err := client.GetDeployment("some-deployment-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning"))
+				Expect(deployment).To(Not(BeNil()))
+				Expect(deployment.GUID).To(Equal("some-deployment-guid"))
+				Expect(deployment.State).To(Equal(constant.DeploymentDeploying))
+			})
+		})
+
+		Context("when the deployment doesn't exist", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10010,
+							"detail": "Deployment not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/deployments/not-a-deployment"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-deployment"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				_, warnings, err := client.GetDeployment("not-a-deployment")
+				Expect(err).To(MatchError(ccerror.DeploymentNotFoundError{}))
+				Expect(warnings).To(ConsistOf("warning-deployment"))
 			})
 		})
 	})
