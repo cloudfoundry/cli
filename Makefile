@@ -1,5 +1,6 @@
 CF_DIAL_TIMEOUT ?= 15
 NODES ?= 4
+PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
 
 CF_BUILD_VERSION ?= $$(cat BUILD_VERSION)
@@ -122,7 +123,7 @@ test : units
 
 units : format vet lint build
 	ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites \
-		api actor command types util version integration/helpers
+		$(PACKAGES)
 	@echo "\nSWEET SUITE SUCCESS"
 
 units-full : format vet lint build
