@@ -24,6 +24,8 @@ run:
     go get -u github.com/onsi/ginkgo/ginkgo
     ginkgo version
 
+    # we actually want the grep to exit 1 (i.e., no matches found) here
+    set +e
     echo -e "\n Checking that packages have been go formatted..."
     gofmt -l . | grep -v -e  ^vendor
     # if we match anything, we have unformatted files
@@ -31,5 +33,6 @@ run:
       echo "Found unlinted files, please run 'make format' and push again."
       exit 1
     fi
+    set -e
 
     make units-full
