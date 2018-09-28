@@ -14,8 +14,8 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 //go:generate counterfeiter . V3ZeroDowntimeVersionActor
