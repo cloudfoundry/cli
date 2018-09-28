@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
+	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 //go:generate counterfeiter . OriginalV2PushActor
@@ -57,7 +57,7 @@ func (cmd *V3PushCommand) OriginalSetup(config command.Config, ui command.UI) er
 	v3actor := v3action.NewActor(ccClient, config, sharedActor, nil)
 	cmd.OriginalActor = v3actor
 
-	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}

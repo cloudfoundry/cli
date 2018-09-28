@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
+	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -48,7 +48,7 @@ func (cmd *V3AppsCommand) Setup(config command.Config, ui command.UI) error {
 	}
 	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
 
-	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}

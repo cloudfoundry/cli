@@ -15,7 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
+	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/manifest"
 )
 
@@ -51,7 +51,7 @@ func (cmd *CreateAppManifestCommand) Setup(config command.Config, ui command.UI)
 		}
 		return err
 	}
-	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}

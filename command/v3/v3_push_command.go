@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
+	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/progressbar"
 
 	log "github.com/sirupsen/logrus"
@@ -106,7 +106,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	v3Actor := v3action.NewActor(ccClient, config, sharedActor, uaaClient)
 	cmd.VersionActor = v3Actor
 
-	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}

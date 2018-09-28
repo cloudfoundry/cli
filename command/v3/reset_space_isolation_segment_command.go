@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
+	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 //go:generate counterfeiter . ResetSpaceIsolationSegmentActor
@@ -55,7 +55,7 @@ func (cmd *ResetSpaceIsolationSegmentCommand) Setup(config command.Config, ui co
 	}
 	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
 
-	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}

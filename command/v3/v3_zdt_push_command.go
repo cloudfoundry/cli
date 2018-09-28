@@ -15,7 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
+	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 //go:generate counterfeiter . V3ZeroDowntimeVersionActor
@@ -81,7 +81,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	cmd.ZdtActor = v3actor
 	cmd.OriginalV3PushActor = v3actor
 
-	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
