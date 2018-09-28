@@ -1,7 +1,23 @@
 # CLI Integration Tests
+
+## Introduction
+
 These are high-level tests for the CLI that make assertions about the behavior of the `cf` binary.
 
-These tests require that a `cf` binary built from the latest source is available in your `PATH`.
+On most systems `cf` points to an installed version. To test the latest source (most likely source that you're changing), ensure the dev `cf` binary is in your `PATH`:
+
+```
+[[ `which cf` = *"$GOPATH/src/code.cloudfoundry.org/cli/out"* ]] || 
+    export PATH="$GOPATH/src/code.cloudfoundry.org/cli/out:$PATH"
+```
+
+You'll also need to rebuild `cf` after making any relevant changes to the source:
+
+```
+make build
+```
+
+CLI Integration tests are time-consuming to run. Best to constrain runs to relevant tests until a long break in your workday, when you can run `make integration-tests` and cover everything.
 
 ## Explanation of test suites
 - `global` suite is for tests that affect an entire CF instance. *These tests do not run in parallel.*
