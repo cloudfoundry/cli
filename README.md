@@ -122,7 +122,15 @@ If the error remains or feature still missing, check the [open issues](https://g
 
 ## Plugin Development
 
-For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples).
+The CF CLI supports external code execution via the plugins API. For more
+information follow:
+
+* [The CF CLI plugin development guide](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples)
+* [The official plugins repository](https://plugins.cloudfoundry.org/)
+
+When importing the plugin code use `import "code.cloudfoundry.org/cli/plugin"`.
+Older plugins that import `github.com/cloudfoundry/cli/plugin` will still work
+as long they vendor the plugins directory.
 
 ## Contributing & Build Instructions
 
