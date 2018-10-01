@@ -12,21 +12,21 @@ import (
 	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . AppSummaryActor
+//go:generate counterfeiter . V2V3AppSummaryActor
 
-type AppSummaryActor interface {
+type V2V3AppSummaryActor interface {
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v2v3action.ApplicationSummary, v2v3action.Warnings, error)
 }
 
-//go:generate counterfeiter . AppActor
+//go:generate counterfeiter . V3AppActor
 
-type AppActor interface {
+type V3AppActor interface {
 	shared.V3AppSummaryActor
 	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 }
 
-type AppCommand struct {
+type V3AppCommand struct {
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	GUID            bool         `long:"guid" description:"Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."`
 	usage           interface{}  `usage:"CF_NAME app APP_NAME [--guid]"`
@@ -35,11 +35,11 @@ type AppCommand struct {
 	UI              command.UI
 	Config          command.Config
 	SharedActor     command.SharedActor
-	AppSummaryActor AppSummaryActor
-	Actor           AppActor
+	AppSummaryActor V2V3AppSummaryActor
+	Actor           V3AppActor
 }
 
-func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
@@ -62,7 +62,7 @@ func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd AppCommand) Execute(args []string) error {
+func (cmd V3AppCommand) Execute(args []string) error {
 	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
 	if err != nil {
 		return err
@@ -101,7 +101,7 @@ func (cmd AppCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd AppCommand) displayAppGUID() error {
+func (cmd V3AppCommand) displayAppGUID() error {
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

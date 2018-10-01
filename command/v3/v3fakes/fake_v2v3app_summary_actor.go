@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3"
 )
 
-type FakeAppSummaryActor struct {
+type FakeV2V3AppSummaryActor struct {
 	GetApplicationSummaryByNameAndSpaceStub        func(appName string, spaceGUID string, withObfuscatedValues bool) (v2v3action.ApplicationSummary, v2v3action.Warnings, error)
 	getApplicationSummaryByNameAndSpaceMutex       sync.RWMutex
 	getApplicationSummaryByNameAndSpaceArgsForCall []struct {
@@ -30,7 +30,7 @@ type FakeAppSummaryActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAppSummaryActor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v2v3action.ApplicationSummary, v2v3action.Warnings, error) {
+func (fake *FakeV2V3AppSummaryActor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v2v3action.ApplicationSummary, v2v3action.Warnings, error) {
 	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationSummaryByNameAndSpaceReturnsOnCall[len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)]
 	fake.getApplicationSummaryByNameAndSpaceArgsForCall = append(fake.getApplicationSummaryByNameAndSpaceArgsForCall, struct {
@@ -49,19 +49,19 @@ func (fake *FakeAppSummaryActor) GetApplicationSummaryByNameAndSpace(appName str
 	return fake.getApplicationSummaryByNameAndSpaceReturns.result1, fake.getApplicationSummaryByNameAndSpaceReturns.result2, fake.getApplicationSummaryByNameAndSpaceReturns.result3
 }
 
-func (fake *FakeAppSummaryActor) GetApplicationSummaryByNameAndSpaceCallCount() int {
+func (fake *FakeV2V3AppSummaryActor) GetApplicationSummaryByNameAndSpaceCallCount() int {
 	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
 	return len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeAppSummaryActor) GetApplicationSummaryByNameAndSpaceArgsForCall(i int) (string, string, bool) {
+func (fake *FakeV2V3AppSummaryActor) GetApplicationSummaryByNameAndSpaceArgsForCall(i int) (string, string, bool) {
 	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
 	return fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].appName, fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].spaceGUID, fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].withObfuscatedValues
 }
 
-func (fake *FakeAppSummaryActor) GetApplicationSummaryByNameAndSpaceReturns(result1 v2v3action.ApplicationSummary, result2 v2v3action.Warnings, result3 error) {
+func (fake *FakeV2V3AppSummaryActor) GetApplicationSummaryByNameAndSpaceReturns(result1 v2v3action.ApplicationSummary, result2 v2v3action.Warnings, result3 error) {
 	fake.GetApplicationSummaryByNameAndSpaceStub = nil
 	fake.getApplicationSummaryByNameAndSpaceReturns = struct {
 		result1 v2v3action.ApplicationSummary
@@ -70,7 +70,7 @@ func (fake *FakeAppSummaryActor) GetApplicationSummaryByNameAndSpaceReturns(resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeAppSummaryActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i int, result1 v2v3action.ApplicationSummary, result2 v2v3action.Warnings, result3 error) {
+func (fake *FakeV2V3AppSummaryActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i int, result1 v2v3action.ApplicationSummary, result2 v2v3action.Warnings, result3 error) {
 	fake.GetApplicationSummaryByNameAndSpaceStub = nil
 	if fake.getApplicationSummaryByNameAndSpaceReturnsOnCall == nil {
 		fake.getApplicationSummaryByNameAndSpaceReturnsOnCall = make(map[int]struct {
@@ -86,7 +86,7 @@ func (fake *FakeAppSummaryActor) GetApplicationSummaryByNameAndSpaceReturnsOnCal
 	}{result1, result2, result3}
 }
 
-func (fake *FakeAppSummaryActor) Invocations() map[string][][]interface{} {
+func (fake *FakeV2V3AppSummaryActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
@@ -98,7 +98,7 @@ func (fake *FakeAppSummaryActor) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeAppSummaryActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeV2V3AppSummaryActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -110,4 +110,4 @@ func (fake *FakeAppSummaryActor) recordInvocation(key string, args []interface{}
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v3.AppSummaryActor = new(FakeAppSummaryActor)
+var _ v3.V2V3AppSummaryActor = new(FakeV2V3AppSummaryActor)

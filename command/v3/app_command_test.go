@@ -22,12 +22,12 @@ import (
 
 var _ = Describe("app Command", func() {
 	var (
-		cmd                 v3.AppCommand
+		cmd                 v3.V3AppCommand
 		testUI              *ui.UI
 		fakeConfig          *commandfakes.FakeConfig
 		fakeSharedActor     *commandfakes.FakeSharedActor
-		fakeActor           *v3fakes.FakeAppActor
-		fakeAppSummaryActor *v3fakes.FakeAppSummaryActor
+		fakeActor           *v3fakes.FakeV3AppActor
+		fakeAppSummaryActor *v3fakes.FakeV2V3AppSummaryActor
 		binaryName          string
 		executeErr          error
 		app                 string
@@ -37,14 +37,14 @@ var _ = Describe("app Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v3fakes.FakeAppActor)
-		fakeAppSummaryActor = new(v3fakes.FakeAppSummaryActor)
+		fakeActor = new(v3fakes.FakeV3AppActor)
+		fakeAppSummaryActor = new(v3fakes.FakeV2V3AppSummaryActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		app = "some-app"
 
-		cmd = v3.AppCommand{
+		cmd = v3.V3AppCommand{
 			RequiredArgs: flag.AppName{AppName: app},
 
 			UI:              testUI,
