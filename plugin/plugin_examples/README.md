@@ -88,11 +88,15 @@ To see more examples, go [here](https://github.com/cloudfoundry/cli/blob/master/
 ### Uninstalling A Plugin
 Uninstall of the plugin needs to be explicitly handled. When a user calls the `cf uninstall-plugin` command, CLI notifies the plugin via a call with `CLI-MESSAGE-UNINSTALL` as the first item in `[]args` from within the plugin's `Run(...)` method.
 
+### Test Driven Development (TDD)
+An example which was developed using TDD is available:
+- `Test RPC server`: an RPC server to be used as a back-end for the plugin. It allows the plugin to be tested as a stand alone binary without replying on CLI as a back-end. [See example](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples/test_rpc_server_example)
+
 ### Using Command Line Arguments
 
 The `Run(...)` method accepts the command line arguments and flags that you define for a plugin.
 
-  See the [command line arguments example](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin_examples/echo.go) included in this repo.
+  See the [command line arguments example] (https://github.com/cloudfoundry/cli/blob/master/plugin/plugin_examples/echo.go) included in this repo.
 
 #### Global Flags
 There are several global flags that will not be passed to the plugin. These are:
