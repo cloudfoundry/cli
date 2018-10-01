@@ -44,9 +44,9 @@ environment variables can be found [here](https://golang.org/doc/install). While
 the CF CLI might be compatible with other versions of GoLang, this is the only
 version that the `cli` binary is built and tested with.
 
-> To check what Golang version a particular Linux `cf` binary was built with,
-> use `strings cf | grep 'go1\....'` and look for the `go1.x.y` version number
-> in the output.
+> To check what Golang version a particular `cf` binary was built with, use
+> `strings cf | grep 'go1\....'` and look for the `go1.x.y` version number in
+> the output.
 
 ## Development tools
 
