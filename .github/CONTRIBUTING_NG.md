@@ -1,7 +1,7 @@
 # Contributing to CLI
 
 The Cloud Foundry team uses GitHub and accepts code contributions via [pull
-requests](https://help.github.com/articles/using-pull-requests).
+requests](https://help.github.com/articles/about-pull-requests/).
 
 ## CLI V6 & V7
 
@@ -51,13 +51,13 @@ version that the `cli` binary is built and tested with.
 ## Development tools
 
 The CF CLI requires the following development tools in order to run our test:
-- [Ginkgo](github.com/onsi/ginkgo)/[Gomega](https://github.com/onsi/gomega) -
-  Test framework/Matchers Library.
-- [Counterfeiter](https://github.com/maxbrunsfeld/counterfeiter) - Generate
+- [Ginkgo](https://github.com/onsi/ginkgo)/[Gomega](https://github.com/onsi/gomega)
+  - Test framework/Matchers Library.
+- [counterfeiter](https://github.com/maxbrunsfeld/counterfeiter) - Generate
   fakes/mocks for testing.
+- [dep](https://github.com/golang/dep) - `vendor` dependency management tool
 - [make](https://www.gnu.org/software/make/) - tool for building the CLI and
   running it's tests.
-- [dep](https://github.com/golang/dep) - `vendor` dependency management tool
 
 ## Git Checkout
 
@@ -109,12 +109,12 @@ make units-full # will run all unit tests
 make units # runs all non-cf directory unit tests
 ```
 
-**Note: `make units-full` is recommended over `make units` if you're unsure how
-wide reaching the changes you're making are.**
+**Note: `make units-full` is recommended over `make units` if you are unsure of
+how wide reaching the intended changes are.**
 
 ## Running the Integration tests
 
-The [Integration test README](integration/README.md) contains a full set of
+The [Integration test README](/integration/README.md) contains a full set of
 details on how to configure and run the integration tests. In addition to the
 configuration mentioned in the README, the CLI's `Makefile` contains the
 following support commands that will run `make build cleanup-integration` prior
@@ -165,7 +165,7 @@ where `<package>` contains the package with the changed interface.
 
 ## Vendoring Dependencies
 
-The CLI uses [dep](https://github.com/golang/dep) to manage vendored
+The CLI uses [`dep`](https://github.com/golang/dep) to manage vendored
 dependencies. Refer to the [`dep`
 documentation](https://golang.github.io/dep/docs/daily-dep.html) for managing
 dependencies.
@@ -185,7 +185,7 @@ the CLI code and integration tests must be versioned tests. This new
 functionality has the following requirements:
 
 1. The minimum version is added to the [Minimum API version
-   list](api/cloudcontroller/ccversion/minimum_version.go).
+   list](/api/cloudcontroller/ccversion/minimum_version.go).
 1. The feature has an appropriate version check in the `command` layer to prevent
    use of that feature if the targeted API is below the minimum version. **Note:
    commands should FAIL prior to execution when minimum version is not met for
