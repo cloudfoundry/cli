@@ -12,7 +12,7 @@ inputs:
 - name: i18n-data
 
 outputs:
-- name: compiled
+- name: linux-compiled
 
 run:
   path: bash
@@ -41,9 +41,6 @@ run:
       echo "Building 64-bit Linux"
       make out/cf-cli_linux_x86-64
 
-      echo "Building 64-bit Darwin"
-      make out/cf-cli_osx
-
       echo "Building 32-bit Windows"
       make out/cf-cli_win32.exe
 
@@ -51,5 +48,5 @@ run:
       make out/cf-cli_winx64.exe
 
       echo "Creating tarball"
-      tar -cvzf $cwd/compiled/cf-cli-binaries.tgz -C out .
+      tar -cvzf $cwd/linux-compiled/cf-cli-binaries.tgz -C out .
     popd
