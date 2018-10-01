@@ -6,7 +6,7 @@ image_resource:
     repository: cfcli/cli-package
 
 inputs:
-- name: cross-compiled
+- name: linux-compiled
 - name: osx-compiled
 
 outputs:
@@ -23,7 +23,7 @@ run:
 
     mkdir combined
 
-    pushd cross-compiled
+    pushd linux-compiled
       tar -xvf *.tgz
       rm *.tgz
       mv * $cwd/combined
