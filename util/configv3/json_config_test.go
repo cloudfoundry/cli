@@ -92,6 +92,45 @@ var _ = Describe("JSONConfig", func() {
 		})
 	})
 
+	Describe("CurrentUserName", func() {
+		When("using client credentials and the user token is set", func() {
+			It("returns the username", func() {
+				config = &Config{
+					ConfigFile: JSONConfig{
+						AccessToken: AccessTokenForClientUsers,
+					},
+				}
+
+				username, err := config.CurrentUserName()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(username).To(Equal("potato-face"))
+			})
+		})
+
+		When("using user/password and the user token is set", func() {
+			It("returns the username", func() {
+				config = &Config{
+					ConfigFile: JSONConfig{
+						AccessToken: AccessTokenForHumanUsers,
+					},
+				}
+
+				username, err := config.CurrentUserName()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(username).To(Equal("admin"))
+			})
+		})
+
+		When("the user token is blank", func() {
+			It("returns an empty string", func() {
+				config = new(Config)
+				username, err := config.CurrentUserName()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(username).To(BeEmpty())
+			})
+		})
+	})
+
 	Describe("HasTargetedOrganization", func() {
 		When("an organization is targeted", func() {
 			It("returns true", func() {
@@ -347,6 +386,22 @@ var _ = Describe("JSONConfig", func() {
 			}
 
 			Expect(config.TargetedOrganization()).To(Equal(organization))
+		})
+	})
+
+	Describe("TargetedOrganizationName", func() {
+		It("returns the name of targeted organization", func() {
+			organization := Organization{
+				GUID: "some-guid",
+				Name: "some-org",
+			}
+			config = &Config{
+				ConfigFile: JSONConfig{
+					TargetedOrganization: organization,
+				},
+			}
+
+			Expect(config.TargetedOrganizationName()).To(Equal(organization.Name))
 		})
 	})
 

@@ -71,6 +71,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	CreateSpaceStub        func(spaceName string, orgGUID string) (ccv2.Space, ccv2.Warnings, error)
+	createSpaceMutex       sync.RWMutex
+	createSpaceArgsForCall []struct {
+		spaceName string
+		orgGUID   string
+	}
+	createSpaceReturns struct {
+		result1 ccv2.Space
+		result2 ccv2.Warnings
+		result3 error
+	}
+	createSpaceReturnsOnCall map[int]struct {
+		result1 ccv2.Space
+		result2 ccv2.Warnings
+		result3 error
+	}
 	CreateRouteStub        func(route ccv2.Route, generatePort bool) (ccv2.Route, ccv2.Warnings, error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
@@ -733,6 +749,35 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetSpaceQuotasStub        func(orgGUID string) ([]ccv2.SpaceQuota, ccv2.Warnings, error)
+	getSpaceQuotasMutex       sync.RWMutex
+	getSpaceQuotasArgsForCall []struct {
+		orgGUID string
+	}
+	getSpaceQuotasReturns struct {
+		result1 []ccv2.SpaceQuota
+		result2 ccv2.Warnings
+		result3 error
+	}
+	getSpaceQuotasReturnsOnCall map[int]struct {
+		result1 []ccv2.SpaceQuota
+		result2 ccv2.Warnings
+		result3 error
+	}
+	SetSpaceQuotaStub        func(spaceGUID string, quotaGUID string) (ccv2.Warnings, error)
+	setSpaceQuotaMutex       sync.RWMutex
+	setSpaceQuotaArgsForCall []struct {
+		spaceGUID string
+		quotaGUID string
+	}
+	setSpaceQuotaReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	setSpaceQuotaReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	GetSpaceRoutesStub        func(spaceGUID string, filters ...ccv2.Filter) ([]ccv2.Route, ccv2.Warnings, error)
 	getSpaceRoutesMutex       sync.RWMutex
 	getSpaceRoutesArgsForCall []struct {
@@ -857,6 +902,20 @@ type FakeCloudControllerClient struct {
 		result1 []ccv2.ServiceBinding
 		result2 ccv2.Warnings
 		result3 error
+	}
+	GrantSpaceManagerByUsernameStub        func(spaceGUID string, username string) (ccv2.Warnings, error)
+	grantSpaceManagerByUsernameMutex       sync.RWMutex
+	grantSpaceManagerByUsernameArgsForCall []struct {
+		spaceGUID string
+		username  string
+	}
+	grantSpaceManagerByUsernameReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	grantSpaceManagerByUsernameReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
 	}
 	PollJobStub        func(job ccv2.Job) (ccv2.Warnings, error)
 	pollJobMutex       sync.RWMutex
@@ -1346,6 +1405,61 @@ func (fake *FakeCloudControllerClient) CreateOrganizationReturnsOnCall(i int, re
 	}
 	fake.createOrganizationReturnsOnCall[i] = struct {
 		result1 ccv2.Organization
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateSpace(spaceName string, orgGUID string) (ccv2.Space, ccv2.Warnings, error) {
+	fake.createSpaceMutex.Lock()
+	ret, specificReturn := fake.createSpaceReturnsOnCall[len(fake.createSpaceArgsForCall)]
+	fake.createSpaceArgsForCall = append(fake.createSpaceArgsForCall, struct {
+		spaceName string
+		orgGUID   string
+	}{spaceName, orgGUID})
+	fake.recordInvocation("CreateSpace", []interface{}{spaceName, orgGUID})
+	fake.createSpaceMutex.Unlock()
+	if fake.CreateSpaceStub != nil {
+		return fake.CreateSpaceStub(spaceName, orgGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createSpaceReturns.result1, fake.createSpaceReturns.result2, fake.createSpaceReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateSpaceCallCount() int {
+	fake.createSpaceMutex.RLock()
+	defer fake.createSpaceMutex.RUnlock()
+	return len(fake.createSpaceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateSpaceArgsForCall(i int) (string, string) {
+	fake.createSpaceMutex.RLock()
+	defer fake.createSpaceMutex.RUnlock()
+	return fake.createSpaceArgsForCall[i].spaceName, fake.createSpaceArgsForCall[i].orgGUID
+}
+
+func (fake *FakeCloudControllerClient) CreateSpaceReturns(result1 ccv2.Space, result2 ccv2.Warnings, result3 error) {
+	fake.CreateSpaceStub = nil
+	fake.createSpaceReturns = struct {
+		result1 ccv2.Space
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateSpaceReturnsOnCall(i int, result1 ccv2.Space, result2 ccv2.Warnings, result3 error) {
+	fake.CreateSpaceStub = nil
+	if fake.createSpaceReturnsOnCall == nil {
+		fake.createSpaceReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Space
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.createSpaceReturnsOnCall[i] = struct {
+		result1 ccv2.Space
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -3719,6 +3833,112 @@ func (fake *FakeCloudControllerClient) GetSpaceQuotaDefinitionReturnsOnCall(i in
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetSpaceQuotas(orgGUID string) ([]ccv2.SpaceQuota, ccv2.Warnings, error) {
+	fake.getSpaceQuotasMutex.Lock()
+	ret, specificReturn := fake.getSpaceQuotasReturnsOnCall[len(fake.getSpaceQuotasArgsForCall)]
+	fake.getSpaceQuotasArgsForCall = append(fake.getSpaceQuotasArgsForCall, struct {
+		orgGUID string
+	}{orgGUID})
+	fake.recordInvocation("GetSpaceQuotas", []interface{}{orgGUID})
+	fake.getSpaceQuotasMutex.Unlock()
+	if fake.GetSpaceQuotasStub != nil {
+		return fake.GetSpaceQuotasStub(orgGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getSpaceQuotasReturns.result1, fake.getSpaceQuotasReturns.result2, fake.getSpaceQuotasReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceQuotasCallCount() int {
+	fake.getSpaceQuotasMutex.RLock()
+	defer fake.getSpaceQuotasMutex.RUnlock()
+	return len(fake.getSpaceQuotasArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceQuotasArgsForCall(i int) string {
+	fake.getSpaceQuotasMutex.RLock()
+	defer fake.getSpaceQuotasMutex.RUnlock()
+	return fake.getSpaceQuotasArgsForCall[i].orgGUID
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceQuotasReturns(result1 []ccv2.SpaceQuota, result2 ccv2.Warnings, result3 error) {
+	fake.GetSpaceQuotasStub = nil
+	fake.getSpaceQuotasReturns = struct {
+		result1 []ccv2.SpaceQuota
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceQuotasReturnsOnCall(i int, result1 []ccv2.SpaceQuota, result2 ccv2.Warnings, result3 error) {
+	fake.GetSpaceQuotasStub = nil
+	if fake.getSpaceQuotasReturnsOnCall == nil {
+		fake.getSpaceQuotasReturnsOnCall = make(map[int]struct {
+			result1 []ccv2.SpaceQuota
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.getSpaceQuotasReturnsOnCall[i] = struct {
+		result1 []ccv2.SpaceQuota
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) SetSpaceQuota(spaceGUID string, quotaGUID string) (ccv2.Warnings, error) {
+	fake.setSpaceQuotaMutex.Lock()
+	ret, specificReturn := fake.setSpaceQuotaReturnsOnCall[len(fake.setSpaceQuotaArgsForCall)]
+	fake.setSpaceQuotaArgsForCall = append(fake.setSpaceQuotaArgsForCall, struct {
+		spaceGUID string
+		quotaGUID string
+	}{spaceGUID, quotaGUID})
+	fake.recordInvocation("SetSpaceQuota", []interface{}{spaceGUID, quotaGUID})
+	fake.setSpaceQuotaMutex.Unlock()
+	if fake.SetSpaceQuotaStub != nil {
+		return fake.SetSpaceQuotaStub(spaceGUID, quotaGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.setSpaceQuotaReturns.result1, fake.setSpaceQuotaReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) SetSpaceQuotaCallCount() int {
+	fake.setSpaceQuotaMutex.RLock()
+	defer fake.setSpaceQuotaMutex.RUnlock()
+	return len(fake.setSpaceQuotaArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) SetSpaceQuotaArgsForCall(i int) (string, string) {
+	fake.setSpaceQuotaMutex.RLock()
+	defer fake.setSpaceQuotaMutex.RUnlock()
+	return fake.setSpaceQuotaArgsForCall[i].spaceGUID, fake.setSpaceQuotaArgsForCall[i].quotaGUID
+}
+
+func (fake *FakeCloudControllerClient) SetSpaceQuotaReturns(result1 ccv2.Warnings, result2 error) {
+	fake.SetSpaceQuotaStub = nil
+	fake.setSpaceQuotaReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) SetSpaceQuotaReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.SetSpaceQuotaStub = nil
+	if fake.setSpaceQuotaReturnsOnCall == nil {
+		fake.setSpaceQuotaReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.setSpaceQuotaReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) GetSpaceRoutes(spaceGUID string, filters ...ccv2.Filter) ([]ccv2.Route, ccv2.Warnings, error) {
 	fake.getSpaceRoutesMutex.Lock()
 	ret, specificReturn := fake.getSpaceRoutesReturnsOnCall[len(fake.getSpaceRoutesArgsForCall)]
@@ -4154,6 +4374,58 @@ func (fake *FakeCloudControllerClient) GetUserProvidedServiceInstanceServiceBind
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GrantSpaceManagerByUsername(spaceGUID string, username string) (ccv2.Warnings, error) {
+	fake.grantSpaceManagerByUsernameMutex.Lock()
+	ret, specificReturn := fake.grantSpaceManagerByUsernameReturnsOnCall[len(fake.grantSpaceManagerByUsernameArgsForCall)]
+	fake.grantSpaceManagerByUsernameArgsForCall = append(fake.grantSpaceManagerByUsernameArgsForCall, struct {
+		spaceGUID string
+		username  string
+	}{spaceGUID, username})
+	fake.recordInvocation("GrantSpaceManagerByUsername", []interface{}{spaceGUID, username})
+	fake.grantSpaceManagerByUsernameMutex.Unlock()
+	if fake.GrantSpaceManagerByUsernameStub != nil {
+		return fake.GrantSpaceManagerByUsernameStub(spaceGUID, username)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.grantSpaceManagerByUsernameReturns.result1, fake.grantSpaceManagerByUsernameReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) GrantSpaceManagerByUsernameCallCount() int {
+	fake.grantSpaceManagerByUsernameMutex.RLock()
+	defer fake.grantSpaceManagerByUsernameMutex.RUnlock()
+	return len(fake.grantSpaceManagerByUsernameArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GrantSpaceManagerByUsernameArgsForCall(i int) (string, string) {
+	fake.grantSpaceManagerByUsernameMutex.RLock()
+	defer fake.grantSpaceManagerByUsernameMutex.RUnlock()
+	return fake.grantSpaceManagerByUsernameArgsForCall[i].spaceGUID, fake.grantSpaceManagerByUsernameArgsForCall[i].username
+}
+
+func (fake *FakeCloudControllerClient) GrantSpaceManagerByUsernameReturns(result1 ccv2.Warnings, result2 error) {
+	fake.GrantSpaceManagerByUsernameStub = nil
+	fake.grantSpaceManagerByUsernameReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) GrantSpaceManagerByUsernameReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.GrantSpaceManagerByUsernameStub = nil
+	if fake.grantSpaceManagerByUsernameReturnsOnCall == nil {
+		fake.grantSpaceManagerByUsernameReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.grantSpaceManagerByUsernameReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) PollJob(job ccv2.Job) (ccv2.Warnings, error) {
@@ -5205,6 +5477,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createBuildpackMutex.RUnlock()
 	fake.createOrganizationMutex.RLock()
 	defer fake.createOrganizationMutex.RUnlock()
+	fake.createSpaceMutex.RLock()
+	defer fake.createSpaceMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	fake.createServiceBindingMutex.RLock()
@@ -5293,6 +5567,10 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSharedDomainsMutex.RUnlock()
 	fake.getSpaceQuotaDefinitionMutex.RLock()
 	defer fake.getSpaceQuotaDefinitionMutex.RUnlock()
+	fake.getSpaceQuotasMutex.RLock()
+	defer fake.getSpaceQuotasMutex.RUnlock()
+	fake.setSpaceQuotaMutex.RLock()
+	defer fake.setSpaceQuotaMutex.RUnlock()
 	fake.getSpaceRoutesMutex.RLock()
 	defer fake.getSpaceRoutesMutex.RUnlock()
 	fake.getSpacesMutex.RLock()
@@ -5309,6 +5587,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getStacksMutex.RUnlock()
 	fake.getUserProvidedServiceInstanceServiceBindingsMutex.RLock()
 	defer fake.getUserProvidedServiceInstanceServiceBindingsMutex.RUnlock()
+	fake.grantSpaceManagerByUsernameMutex.RLock()
+	defer fake.grantSpaceManagerByUsernameMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
 	fake.restageApplicationMutex.RLock()

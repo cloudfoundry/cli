@@ -59,6 +59,11 @@ func CreateUser() (string, string) {
 	username := NewUsername()
 	password := RandomName()
 
+	// env := map[string]string{
+	// 	"NEW_USER_PASSWORD": password,
+	// }
+
+	// session := CFWithEnv(env, "create-user", username, "$NEW_USER_PASSWORD")
 	session := CF("create-user", username, password)
 	Eventually(session).Should(Exit(0))
 

@@ -29,3 +29,23 @@ func (actor Actor) CheckTarget(targetedOrganizationRequired bool, targetedSpaceR
 
 	return nil
 }
+
+func (actor Actor) RequireCurrentUser() (string, error) {
+	if actor.Config.AccessToken() == "" && actor.Config.RefreshToken() == "" {
+		return "", actionerror.NotLoggedInError{
+			BinaryName: actor.Config.BinaryName(),
+		}
+	}
+
+	return actor.Config.CurrentUserName()
+}
+
+func (actor Actor) RequireTargetedOrg() (string, error) {
+	if !actor.Config.HasTargetedOrganization() {
+		return "", actionerror.NoOrganizationTargetedError{
+			BinaryName: actor.Config.BinaryName(),
+		}
+	}
+
+	return actor.Config.TargetedOrganizationName(), nil
+}

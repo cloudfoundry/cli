@@ -1,6 +1,7 @@
 package ccv2_test
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -193,6 +194,26 @@ var _ = Describe("Error Wrapper", func() {
 							_, _, err := client.GetApplications()
 							Expect(err).To(MatchError(ccerror.OrganizationNameTakenError{
 								Message: "The organization name is taken: potato",
+							}))
+						})
+					})
+
+					When("creating a space fails because the name is taken", func() {
+						BeforeEach(func() {
+							serverResponse = `{
+								"code": 40002,
+								"description": "The app space name is taken: potato",
+								"error_code": "CF-SpaceNameTaken"
+							  }`
+						})
+
+						It("returns a SpaceNameTakenError", func() {
+							_, _, err := client.GetApplications()
+							if e, ok := err.(ccerror.UnknownHTTPSourceError); ok {
+								fmt.Printf("TV %s", string(e.RawResponse))
+							}
+							Expect(err).To(MatchError(ccerror.SpaceNameTakenError{
+								Message: "The app space name is taken: potato",
 							}))
 						})
 					})

@@ -20,6 +20,7 @@ type Config interface {
 	CFUsername() string
 	ColorEnabled() configv3.ColorSetting
 	CurrentUser() (configv3.User, error)
+	CurrentUserName() (string, error)
 	DialTimeout() time.Duration
 	DockerPassword() string
 	Experimental() bool
@@ -53,6 +54,7 @@ type Config interface {
 	StartupTimeout() time.Duration
 	Target() string
 	TargetedOrganization() configv3.Organization
+	TargetedOrganizationName() string
 	TargetedSpace() configv3.Space
 	UAADisableKeepAlives() bool
 	UAAGrantType() string

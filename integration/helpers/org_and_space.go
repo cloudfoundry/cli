@@ -16,8 +16,9 @@ func SetupReadOnlyOrgAndSpace() (string, string) {
 	spaceName1 := NewSpaceName()
 	spaceName2 := NewSpaceName()
 	Eventually(CF("create-org", orgName)).Should(Exit(0))
-	Eventually(CF("create-space", spaceName1, "-o", orgName)).Should(Exit(0))
-	Eventually(CF("create-space", spaceName2, "-o", orgName)).Should(Exit(0))
+	// TODO: remove when create-space works with CF_CLI_EXPERIMENTAL=true
+	Eventually(CFWithEnv(map[string]string{"CF_CLI_EXPERIMENTAL": "false"}, "create-space", spaceName1, "-o", orgName)).Should(Exit(0))
+	Eventually(CFWithEnv(map[string]string{"CF_CLI_EXPERIMENTAL": "false"}, "create-space", spaceName2, "-o", orgName)).Should(Exit(0))
 	DestroyHomeDir(homeDir)
 	return orgName, spaceName1
 }
@@ -40,7 +41,8 @@ func CreateOrg(org string) {
 }
 
 func CreateSpace(space string) {
-	Eventually(CF("create-space", space)).Should(Exit(0))
+	// TODO: remove when create-space works with CF_CLI_EXPERIMENTAL=true
+	Eventually(CFWithEnv(map[string]string{"CF_CLI_EXPERIMENTAL": "false"}, "create-space", space)).Should(Exit(0))
 }
 
 func GetOrgGUID(orgName string) string {

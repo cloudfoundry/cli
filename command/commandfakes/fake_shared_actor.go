@@ -20,6 +20,28 @@ type FakeSharedActor struct {
 	checkTargetReturnsOnCall map[int]struct {
 		result1 error
 	}
+	RequireCurrentUserStub        func() (string, error)
+	requireCurrentUserMutex       sync.RWMutex
+	requireCurrentUserArgsForCall []struct{}
+	requireCurrentUserReturns     struct {
+		result1 string
+		result2 error
+	}
+	requireCurrentUserReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
+	RequireTargetedOrgStub        func() (string, error)
+	requireTargetedOrgMutex       sync.RWMutex
+	requireTargetedOrgArgsForCall []struct{}
+	requireTargetedOrgReturns     struct {
+		result1 string
+		result2 error
+	}
+	requireTargetedOrgReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -73,11 +95,101 @@ func (fake *FakeSharedActor) CheckTargetReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeSharedActor) RequireCurrentUser() (string, error) {
+	fake.requireCurrentUserMutex.Lock()
+	ret, specificReturn := fake.requireCurrentUserReturnsOnCall[len(fake.requireCurrentUserArgsForCall)]
+	fake.requireCurrentUserArgsForCall = append(fake.requireCurrentUserArgsForCall, struct{}{})
+	fake.recordInvocation("RequireCurrentUser", []interface{}{})
+	fake.requireCurrentUserMutex.Unlock()
+	if fake.RequireCurrentUserStub != nil {
+		return fake.RequireCurrentUserStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.requireCurrentUserReturns.result1, fake.requireCurrentUserReturns.result2
+}
+
+func (fake *FakeSharedActor) RequireCurrentUserCallCount() int {
+	fake.requireCurrentUserMutex.RLock()
+	defer fake.requireCurrentUserMutex.RUnlock()
+	return len(fake.requireCurrentUserArgsForCall)
+}
+
+func (fake *FakeSharedActor) RequireCurrentUserReturns(result1 string, result2 error) {
+	fake.RequireCurrentUserStub = nil
+	fake.requireCurrentUserReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSharedActor) RequireCurrentUserReturnsOnCall(i int, result1 string, result2 error) {
+	fake.RequireCurrentUserStub = nil
+	if fake.requireCurrentUserReturnsOnCall == nil {
+		fake.requireCurrentUserReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.requireCurrentUserReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSharedActor) RequireTargetedOrg() (string, error) {
+	fake.requireTargetedOrgMutex.Lock()
+	ret, specificReturn := fake.requireTargetedOrgReturnsOnCall[len(fake.requireTargetedOrgArgsForCall)]
+	fake.requireTargetedOrgArgsForCall = append(fake.requireTargetedOrgArgsForCall, struct{}{})
+	fake.recordInvocation("RequireTargetedOrg", []interface{}{})
+	fake.requireTargetedOrgMutex.Unlock()
+	if fake.RequireTargetedOrgStub != nil {
+		return fake.RequireTargetedOrgStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.requireTargetedOrgReturns.result1, fake.requireTargetedOrgReturns.result2
+}
+
+func (fake *FakeSharedActor) RequireTargetedOrgCallCount() int {
+	fake.requireTargetedOrgMutex.RLock()
+	defer fake.requireTargetedOrgMutex.RUnlock()
+	return len(fake.requireTargetedOrgArgsForCall)
+}
+
+func (fake *FakeSharedActor) RequireTargetedOrgReturns(result1 string, result2 error) {
+	fake.RequireTargetedOrgStub = nil
+	fake.requireTargetedOrgReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSharedActor) RequireTargetedOrgReturnsOnCall(i int, result1 string, result2 error) {
+	fake.RequireTargetedOrgStub = nil
+	if fake.requireTargetedOrgReturnsOnCall == nil {
+		fake.requireTargetedOrgReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.requireTargetedOrgReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeSharedActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.checkTargetMutex.RLock()
 	defer fake.checkTargetMutex.RUnlock()
+	fake.requireCurrentUserMutex.RLock()
+	defer fake.requireCurrentUserMutex.RUnlock()
+	fake.requireTargetedOrgMutex.RLock()
+	defer fake.requireTargetedOrgMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

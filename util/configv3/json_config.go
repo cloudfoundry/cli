@@ -81,6 +81,15 @@ func (config *Config) CurrentUser() (User, error) {
 	return decodeUserFromJWT(config.ConfigFile.AccessToken)
 }
 
+// CurrentUserName returns the name of a user as returned by CurrentUser()
+func (config *Config) CurrentUserName() (string, error) {
+	user, err := config.CurrentUser()
+	if err != nil {
+		return "", err
+	}
+	return user.Name, nil
+}
+
 // HasTargetedOrganization returns true if the organization is set.
 func (config *Config) HasTargetedOrganization() bool {
 	return config.ConfigFile.TargetedOrganization.GUID != ""
@@ -195,6 +204,11 @@ func (config *Config) Target() string {
 // TargetedOrganization returns the currently targeted organization.
 func (config *Config) TargetedOrganization() Organization {
 	return config.ConfigFile.TargetedOrganization
+}
+
+// TargetedOrganizationName returns the name of the targeted organization.
+func (config *Config) TargetedOrganizationName() string {
+	return config.TargetedOrganization().Name
 }
 
 // TargetedSpace returns the currently targeted space.

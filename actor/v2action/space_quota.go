@@ -17,3 +17,26 @@ func (actor Actor) GetSpaceQuota(guid string) (SpaceQuota, Warnings, error) {
 
 	return SpaceQuota(spaceQuota), Warnings(warnings), err
 }
+
+// GetSpaceQuotaByName finds the quota by name and returns an error if not found
+func (actor Actor) GetSpaceQuotaByName(quotaName, orgGUID string) (SpaceQuota, Warnings, error) {
+	quotas, warnings, err := actor.CloudControllerClient.GetSpaceQuotas(orgGUID)
+
+	if err != nil {
+		return SpaceQuota{}, Warnings(warnings), err
+	}
+
+	for _, quota := range quotas {
+		if quota.Name == quotaName {
+			return SpaceQuota(quota), Warnings(warnings), nil
+		}
+	}
+
+	return SpaceQuota{}, Warnings(warnings), actionerror.SpaceQuotaNotFoundByNameError{Name: quotaName}
+}
+
+// SetSpaceQuota sets the space quota for the corresponding space
+func (actor Actor) SetSpaceQuota(spaceGUID, quotaGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.SetSpaceQuota(spaceGUID, quotaGUID)
+	return Warnings(warnings), err
+}

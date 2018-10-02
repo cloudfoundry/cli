@@ -125,6 +125,8 @@ func ConvertToTranslatableError(err error) error {
 		return SharedServiceInstanceNotFoundError(e)
 	case actionerror.SpaceNotFoundError:
 		return SpaceNotFoundError{Name: e.Name}
+	case actionerror.SpaceQuotaNotFoundByNameError:
+		return SpaceQuotaNotFoundByNameError{Name: e.Name}
 	case actionerror.StackNotFoundError:
 		return StackNotFoundError(e)
 	case actionerror.StagingTimeoutError:

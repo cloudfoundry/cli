@@ -113,6 +113,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("ServiceInstanceNotFoundError", ServiceInstanceNotFoundError{}),
 		Entry("SharedServiceInstanceNotFoundError", SharedServiceInstanceNotFoundError{}),
 		Entry("SpaceNotFoundError", SpaceNotFoundError{}),
+		Entry("SpaceQuotaNotFoundByNameError", SpaceQuotaNotFoundByNameError{}),
 		Entry("SSHUnableToAuthenticateError", SSHUnableToAuthenticateError{}),
 		Entry("SSLCertError", SSLCertError{}),
 		Entry("StackNotFoundError with name", SpaceNotFoundError{Name: "steve"}),

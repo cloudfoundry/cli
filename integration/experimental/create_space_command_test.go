@@ -37,17 +37,9 @@ func expectSuccessTextAndExitCode(session *Session, user, orgName, spaceName str
 	Eventually(session).Should(Exit(0))
 }
 
-func createSpaceWhenNotAuthorized(orgName, user string) {
-	helpers.LogoutCF()
-	spaceName := helpers.NewSpaceName()
-	session := helpers.CF("create-space", spaceName)
-	Eventually(session).Should(Say(`Creating space %s in org %s as %s\.\.\.`, spaceName, orgName, user))
-	Eventually(session.Err).Should(Say(`You are not authorized to perform the requested action`))
-	Eventually(session).Should(Say(`FAILED\n`))
-	Eventually(session).Should(Exit(1))
-}
+var _ = XDescribe("create-space", func() {
+	var spaceName string
 
-var _ = PDescribe("create-space", func() {
 	When("invoked with --help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("create-space", "--help")
@@ -59,7 +51,7 @@ var _ = PDescribe("create-space", func() {
 	When("invoked with no arguments", func() {
 		It("shows an error and the help text", func() {
 			session := helpers.CF("create-space")
-			Eventually(session).Should(Say(`Incorrect Usage: the required argument 'SPACE' was not provided`))
+			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `SPACE` was not provided"))
 			expectHelpText(session)
 			Eventually(session).Should(Exit(1))
 		})
@@ -67,8 +59,12 @@ var _ = PDescribe("create-space", func() {
 
 	When("the environment is not set up correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, false, "", "create-space", "some-space")
+			helpers.CheckEnvironmentTargetedCorrectly(false, false, "", "create-space", "some-space")
 		})
+	})
+
+	BeforeEach(func() {
+		spaceName = helpers.NewSpaceName()
 	})
 
 	When("logged in as a client", func() {
@@ -80,14 +76,13 @@ var _ = PDescribe("create-space", func() {
 		})
 
 		It("successfully creates a space", func() {
-			spaceName := helpers.NewSpaceName()
 			session := helpers.CF("create-space", spaceName)
 			expectSuccessTextAndExitCode(session, client, orgName, spaceName)
 		})
 	})
 
 	When("logged in as a user", func() {
-		var user, orgName, spaceName string
+		var user, orgName string
 
 		BeforeEach(func() {
 			user = helpers.LoginCF()
@@ -96,7 +91,6 @@ var _ = PDescribe("create-space", func() {
 
 		When("the space already exists", func() {
 			BeforeEach(func() {
-				spaceName = helpers.NewSpaceName()
 				session := helpers.CF("create-space", spaceName)
 				Eventually(session).Should(Exit(0))
 			})
@@ -104,37 +98,32 @@ var _ = PDescribe("create-space", func() {
 			It("warns the user that the space already exists", func() {
 				session := helpers.CF("create-space", spaceName)
 				Eventually(session).Should(Say(`Creating space %s in org %s as %s\.\.\.`, spaceName, orgName, user))
-				Eventually(session).Should(Say(`OK\n`))
 				Eventually(session.Err).Should(Say(`Space %s already exists`, spaceName))
+				Eventually(session).Should(Say(`OK\n`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
 
 		When("the space does not exist yet", func() {
 			When("a quota is not specified", func() {
-				var session *Session
-
-				JustBeforeEach(func() {
-					spaceName = helpers.NewSpaceName()
-					session = helpers.CF("create-space", spaceName)
-				})
-
-				It("displays success output", func() {
-					expectSuccessTextAndExitCode(session, user, orgName, spaceName)
-				})
-
 				It("creates the space in the targeted org", func() {
+					session := helpers.CF("create-space", spaceName)
+					expectSuccessTextAndExitCode(session, user, orgName, spaceName)
+
 					session = helpers.CF("space", spaceName)
-					Expect(session).To(Say(`name:\s+%s`, spaceName))
-					Expect(session).To(Say(`org:\s+%s`, orgName))
+					Eventually(session).Should(Say(`name:\s+%s`, spaceName))
+					Eventually(session).Should(Say(`org:\s+%s`, orgName))
 					Eventually(session).Should(Exit(0))
 				})
 
-				It("makes the user a space manager and developer", func() {
-					usersSession := helpers.CF("space-users", orgName, spaceName)
-					Expect(usersSession).To(Say(`SPACE MANAGER\n\s+%s`, user))
-					Expect(usersSession).To(Say(`SPACE DEVELOPER\n\s+%s`, user))
-					Eventually(usersSession).Should(Exit(0))
+				It("makes the user a space manager and space developer", func() {
+					session := helpers.CF("create-space", spaceName)
+					expectSuccessTextAndExitCode(session, user, orgName, spaceName)
+
+					session = helpers.CF("space-users", orgName, spaceName)
+					Eventually(session).Should(Say(`SPACE MANAGER\n\s+%s`, user))
+					Eventually(session).Should(Say(`SPACE DEVELOPER\n\s+%s`, user))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
@@ -144,11 +133,6 @@ var _ = PDescribe("create-space", func() {
 					session   *Session
 				)
 
-				JustBeforeEach(func() {
-					spaceName = helpers.NewSpaceName()
-					session = helpers.CF("create-space", spaceName, "-q", quotaName)
-				})
-
 				When("the quota exists", func() {
 					BeforeEach(func() {
 						quotaName = helpers.QuotaName()
@@ -156,14 +140,12 @@ var _ = PDescribe("create-space", func() {
 						Eventually(quotaSession).Should(Exit(0))
 					})
 
-					It("displays success output", func() {
-						expectSuccessTextAndExitCode(session, user, orgName, spaceName)
-					})
-
 					It("creates the space with the provided quota", func() {
+						session = helpers.CF("create-space", spaceName, "-q", quotaName)
+						expectSuccessTextAndExitCode(session, user, orgName, spaceName)
 						session = helpers.CF("space", spaceName)
-						Expect(session).To(Say(`name:\s+%s`, spaceName))
-						Expect(session).To(Say(`space quota:\s+%s`, quotaName))
+						Eventually(session).Should(Say(`name:\s+%s`, spaceName))
+						Eventually(session).Should(Say(`space quota:\s+%s`, quotaName))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -171,6 +153,7 @@ var _ = PDescribe("create-space", func() {
 				When("the quota does not exist", func() {
 					BeforeEach(func() {
 						quotaName = "no-such-quota"
+						session = helpers.CF("create-space", spaceName, "-q", quotaName)
 					})
 
 					It("fails with an error", func() {
@@ -189,11 +172,6 @@ var _ = PDescribe("create-space", func() {
 			When("org is specified", func() {
 				var session *Session
 
-				JustBeforeEach(func() {
-					spaceName = helpers.NewSpaceName()
-					session = helpers.CF("create-space", spaceName, "-o", orgName)
-				})
-
 				When("the org exists", func() {
 					BeforeEach(func() {
 						orgName = helpers.NewOrgName()
@@ -201,11 +179,11 @@ var _ = PDescribe("create-space", func() {
 						Eventually(orgSession).Should(Exit(0))
 					})
 
-					It("displays success output", func() {
-						expectSuccessTextAndExitCode(session, user, orgName, spaceName)
-					})
-
 					It("creates the space in the specified org", func() {
+						session = helpers.CF("create-space", spaceName, "-o", orgName)
+						expectSuccessTextAndExitCode(session, user, orgName, spaceName)
+
+						helpers.TargetOrg(orgName)
 						session = helpers.CF("space", spaceName)
 						Eventually(session).Should(Say(`name:\s+%s`, spaceName))
 						Eventually(session).Should(Say(`org:\s+%s`, orgName))
@@ -218,72 +196,37 @@ var _ = PDescribe("create-space", func() {
 						orgName = "no-such-org"
 					})
 
-					It("fails with an error", func() {
+					It("fails with an error and does not create the space", func() {
+						session = helpers.CF("create-space", spaceName, "-o", orgName)
 						Eventually(session).Should(Say(`Creating space %s in org %s as %s\.\.\.`, spaceName, orgName, user))
-						Eventually(session.Err).Should(Say(`Org no-such-org does not exist or is not accessible`))
+						Eventually(session.Err).Should(Say(`Organization '%s' not found`, orgName))
 						Eventually(session).Should(Say(`FAILED\n`))
 						Eventually(session).Should(Exit(1))
-					})
 
-					It("does not create the space", func() {
 						Eventually(helpers.CF("space", spaceName)).Should(Exit(1))
 					})
 				})
 			})
 
-			When("creating a space as a non-admin user", func() {
+			When("the user is not authorized to create a space", func() {
+				var user string
+
+				BeforeEach(func() {
+					user = helpers.SwitchToOrgRole(orgName, "OrgAuditor")
+				})
+
 				AfterEach(func() {
 					helpers.ClearTarget()
+					Expect(user).To(MatchRegexp(`^INTEGRATION-USER-[\da-f-]+$`))
 					helpers.DeleteUser(user)
 				})
 
-				It("does not allow a user with no roles to create a space", func() {
-					user = helpers.SwitchToNoRole()
-					createSpaceWhenNotAuthorized(orgName, user)
-				})
-
-				Describe("users of another space", func() {
-					var existingSpace string
-
-					BeforeEach(func() {
-						existingSpace = helpers.NewSpaceName()
-						session := helpers.CF("create-space", existingSpace)
-						Eventually(session).Should(Exit(0))
-					})
-
-					It("does not allow a space developer to create a space", func() {
-						user = helpers.SwitchToSpaceRole(orgName, existingSpace, "SpaceDeveloper")
-						createSpaceWhenNotAuthorized(orgName, user)
-					})
-
-					It("does not allow a space auditor to create a space", func() {
-						user = helpers.SwitchToSpaceRole(orgName, existingSpace, "SpaceAuditor")
-						createSpaceWhenNotAuthorized(orgName, user)
-					})
-
-					It("does not allow a space manager to create a space", func() {
-						user = helpers.SwitchToSpaceRole(orgName, existingSpace, "SpaceManager")
-						createSpaceWhenNotAuthorized(orgName, user)
-					})
-				})
-
-				Describe("users of this org", func() {
-					It("does not allow an org auditor so create a space", func() {
-						user = helpers.SwitchToOrgRole(orgName, "OrgAuditor")
-						createSpaceWhenNotAuthorized(orgName, user)
-					})
-
-					It("does not allow an billing manager so create a space", func() {
-						user = helpers.SwitchToOrgRole(orgName, "BillingManager")
-						createSpaceWhenNotAuthorized(orgName, user)
-					})
-
-					It("allows an org manager to create a space", func() {
-						user = helpers.SwitchToOrgRole(orgName, "OrgManager")
-						spaceName = helpers.NewSpaceName()
-						session := helpers.CF("create-space", spaceName)
-						expectSuccessTextAndExitCode(session, user, orgName, spaceName)
-					})
+				It("fails with an error telling the user that they are not authorized", func() {
+					session := helpers.CF("create-space", spaceName, "-o", orgName)
+					Eventually(session).Should(Say(`Creating space %s in org %s as %s\.\.\.`, spaceName, orgName, user))
+					Eventually(session.Err).Should(Say(`You are not authorized to perform the requested action`))
+					Eventually(session).Should(Say(`FAILED\n`))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

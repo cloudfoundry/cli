@@ -246,6 +246,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.SpaceNotFoundError{Name: "some-space"},
 			SpaceNotFoundError{Name: "some-space"}),
 
+		Entry("actionerror.SpaceQuotaNotFoundByNameError -> SpaceQuotaNotFoundByNameError",
+			actionerror.SpaceQuotaNotFoundByNameError{Name: "some-space"},
+			SpaceQuotaNotFoundByNameError{Name: "some-space"}),
+
 		Entry("actionerror.StackNotFoundError -> StackNotFoundError",
 			actionerror.StackNotFoundError{Name: "some-stack-name", GUID: "some-stack-guid"},
 			StackNotFoundError{Name: "some-stack-name", GUID: "some-stack-guid"}),
