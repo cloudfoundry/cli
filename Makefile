@@ -89,7 +89,7 @@ lint :
 # Build dynamic binary for Darwin
 ifeq ($(UNAME_S),Darwin)
 out/cf: $(GOSRC)
-	go build -o out/cf .
+	go build -ldflags "$(LD_FLAGS)" -o out/cf .
 else
 out/cf: $(GOSRC)
 	CGO_ENABLED=0 go build \
