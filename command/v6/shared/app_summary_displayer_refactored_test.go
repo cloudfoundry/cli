@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	. "code.cloudfoundry.org/cli/command/v3/shared"
+	. "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"

@@ -70,7 +70,7 @@ func (cmd *V3PushCommand) OriginalSetup(config command.Config, ui command.UI) er
 	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
-	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
+	cmd.AppSummaryDisplayer = sharedV6.AppSummaryDisplayer{
 		UI:         cmd.UI,
 		Config:     cmd.Config,
 		Actor:      cmd.OriginalActor,

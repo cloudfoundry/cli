@@ -79,7 +79,7 @@ type V3PushCommand struct {
 	Actor               V3PushActor
 	VersionActor        V3PushVersionActor
 	SharedActor         command.SharedActor
-	AppSummaryDisplayer shared.AppSummaryDisplayer
+	AppSummaryDisplayer sharedV6.AppSummaryDisplayer
 	PackageDisplayer    shared.PackageDisplayer
 	ProgressBar         ProgressBar
 

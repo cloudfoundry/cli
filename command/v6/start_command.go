@@ -120,7 +120,7 @@ func (cmd StartCommand) Execute(args []string) error {
 		if err != nil {
 			return err
 		}
-		sharedV3.NewAppSummaryDisplayer2(cmd.UI).AppDisplay(appSummary, true)
+		shared.NewAppSummaryDisplayer2(cmd.UI).AppDisplay(appSummary, true)
 	}
 	return nil
 }

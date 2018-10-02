@@ -19,7 +19,7 @@ import (
 //go:generate counterfeiter . V3ScaleActor
 
 type V3ScaleActor interface {
-	shared.V3AppSummaryActor
+	sharedV6.V3AppSummaryActor
 
 	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
@@ -44,7 +44,7 @@ type V3ScaleCommand struct {
 	Config              command.Config
 	Actor               V3ScaleActor
 	SharedActor         command.SharedActor
-	AppSummaryDisplayer shared.AppSummaryDisplayer
+	AppSummaryDisplayer sharedV6.AppSummaryDisplayer
 }
 
 func (cmd *V3ScaleCommand) Setup(config command.Config, ui command.UI) error {
@@ -68,7 +68,7 @@ func (cmd *V3ScaleCommand) Setup(config command.Config, ui command.UI) error {
 	}
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 
-	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
+	cmd.AppSummaryDisplayer = sharedV6.AppSummaryDisplayer{
 		UI:         ui,
 		Config:     config,
 		Actor:      cmd.Actor,

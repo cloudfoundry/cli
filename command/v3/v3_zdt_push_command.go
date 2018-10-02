@@ -59,7 +59,7 @@ type V3ZeroDowntimePushCommand struct {
 	Actor               V3PushActor
 	VersionActor        V3PushVersionActor
 	SharedActor         command.SharedActor
-	AppSummaryDisplayer shared.AppSummaryDisplayer
+	AppSummaryDisplayer sharedV6.AppSummaryDisplayer
 	PackageDisplayer    shared.PackageDisplayer
 	ProgressBar         ProgressBar
 
@@ -98,7 +98,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
-	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
+	cmd.AppSummaryDisplayer = sharedV6.AppSummaryDisplayer{
 		UI:         cmd.UI,
 		Config:     cmd.Config,
 		Actor:      cmd.OriginalV3PushActor,

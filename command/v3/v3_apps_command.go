@@ -29,7 +29,7 @@ type V3AppsCommand struct {
 	UI          command.UI
 	Config      command.Config
 	Actor       V3AppsActor
-	V2AppActor  shared.V2AppActor
+	V2AppActor  sharedV6.V2AppActor
 	SharedActor command.SharedActor
 }
 

@@ -21,7 +21,7 @@ type V2V3AppSummaryActor interface {
 //go:generate counterfeiter . V3AppActor
 
 type V3AppActor interface {
-	shared.V3AppSummaryActor
+	sharedV6.V3AppSummaryActor
 	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 }
@@ -90,7 +90,7 @@ func (cmd V3AppCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	appSummaryDisplayer := shared.NewAppSummaryDisplayer2(cmd.UI)
+	appSummaryDisplayer := sharedV6.NewAppSummaryDisplayer2(cmd.UI)
 	summary, warnings, err := cmd.AppSummaryActor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
