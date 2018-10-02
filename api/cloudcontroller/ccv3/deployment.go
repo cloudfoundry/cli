@@ -20,13 +20,19 @@ type Deployment struct {
 
 // MarshalJSON converts a Deployment into a Cloud Controller Deployment.
 func (d Deployment) MarshalJSON() ([]byte, error) {
+	type Droplet struct {
+		GUID string `json:"guid,omitempty"`
+	}
+
 	var ccDeployment struct {
-		Droplet struct {
-			GUID string `json:"guid"`
-		} `json:"droplet"`
+		Droplet       *Droplet      `json:"droplet,omitempty"`
 		Relationships Relationships `json:"relationships,omitempty"`
 	}
-	ccDeployment.Droplet.GUID = d.DropletGUID
+
+	if d.DropletGUID != "" {
+		ccDeployment.Droplet = &Droplet{d.DropletGUID}
+	}
+
 	ccDeployment.Relationships = d.Relationships
 
 	return json.Marshal(ccDeployment)
