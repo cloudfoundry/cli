@@ -17,7 +17,7 @@ You'll also need to rebuild `cf` after making any relevant changes to the source
 make build
 ```
 
-CLI Integration tests are time-consuming to run. Best to constrain runs to relevant tests until a long break in your workday, when you can run `make integration-tests` and cover everything.
+Running `make integration-tests` can be time-consuming, because it includes the unparallelized `global` suite. Best to constrain runs to relevant tests until a long break in your workday, when you can run `make integration-tests` and cover everything. If you're primarily working in code that is tested by the parallelized suites, running the rake tasks for those specific suites instead of `integration-tests` and setting the `NODES` environment variable to a higher value will improve your feedback cycle.
 
 ## Explanation of test suites
 - `global` suite is for tests that affect an entire CF instance. *These tests do not run in parallel.*
