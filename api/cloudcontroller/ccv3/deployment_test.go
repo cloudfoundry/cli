@@ -123,15 +123,17 @@ var _ = Describe("Task", func() {
 			deploymentGUID string
 			warnings       Warnings
 			executeErr     error
+			dropletGUID    string
 		)
 
 		JustBeforeEach(func() {
-			deploymentGUID, warnings, executeErr = client.CreateApplicationDeployment("some-app-guid", "some-droplet-guid")
+			deploymentGUID, warnings, executeErr = client.CreateApplicationDeployment("some-app-guid", dropletGUID)
 		})
 
 		Context("when the application exists", func() {
 			var response string
 			BeforeEach(func() {
+				dropletGUID = "some-droplet-guid"
 				response = `{
   "guid": "some-deployment-guid",
   "created_at": "2018-04-25T22:42:10Z",
@@ -158,6 +160,25 @@ var _ = Describe("Task", func() {
 
 				It("creates the deployment with no errors and returns all warnings", func() {
 					Expect(deploymentGUID).To(Equal("some-deployment-guid"))
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning"))
+				})
+
+			})
+
+			Context("when no droplet guid is provided", func() {
+				BeforeEach(func() {
+					dropletGUID = ""
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v3/deployments"),
+							VerifyJSON(`{"relationships":{"app":{"data":{"guid":"some-app-guid"}}}}`),
+							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+						),
+					)
+				})
+
+				It("omits the droplet object in the JSON", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning"))
 				})

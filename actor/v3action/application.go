@@ -23,6 +23,10 @@ func (app Application) Started() bool {
 	return app.State == constant.ApplicationStarted
 }
 
+func (app Application) Stopped() bool {
+	return app.State == constant.ApplicationStopped
+}
+
 func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string) (Warnings, error) {
 	var allWarnings Warnings
 
