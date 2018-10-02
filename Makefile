@@ -125,12 +125,19 @@ units : format vet lint build
 		$(PACKAGES)
 	@echo "\nSWEET SUITE SUCCESS"
 
-units-full : format vet lint build
+units-plugin :
+	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes 1 -randomizeAllSpecs -randomizeSuites -flakeAttempts 2 -skipPackage integration ./**/plugin* ./plugin
+
+units-non-plugin :
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
-	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites -skipPackage integration,cf/ssh
+	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites \
+		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin
 	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites -flakeAttempts 3 cf/ssh
+
 	@echo "\nSWEET SUITE SUCCESS"
+
+units-full: format vet lint build units-plugin units-non-plugin
 
 version :
 	@echo $(CF_BUILD_VERSION)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
