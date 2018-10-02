@@ -13,6 +13,7 @@ LD_FLAGS =-w -s \
 LD_FLAGS_LINUX = -extldflags \"-static\" $(LD_FLAGS)
 REQUIRED_FOR_STATIC_BINARY =-a -tags netgo -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
+UNAME_S := $(shell uname -s)
 
 all : test build
 
@@ -85,10 +86,16 @@ lint :
 	@echo "No lint errors!"
 	@echo
 
+# Build dynamic binary for Darwin
+ifeq ($(UNAME_S),Darwin)
+out/cf: $(GOSRC)
+	go build -o out/cf .
+else
 out/cf: $(GOSRC)
 	CGO_ENABLED=0 go build \
 		$(REQUIRED_FOR_STATIC_BINARY) \
 		-ldflags "$(LD_FLAGS_LINUX)" -o out/cf .
+endif
 
 out/cf-cli_linux_i686 : $(GOSRC)
 	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
