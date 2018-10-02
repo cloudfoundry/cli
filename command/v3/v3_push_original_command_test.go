@@ -15,9 +15,8 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
-	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
-	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v6/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -64,7 +63,7 @@ var _ = Describe("v3-push Command", func() {
 		spaceName = "some-space"
 		orgName = "some-org"
 
-		appSummaryDisplayer := sharedV6.AppSummaryDisplayer{
+		appSummaryDisplayer := shared.AppSummaryDisplayer{
 			UI:         testUI,
 			Config:     fakeConfig,
 			Actor:      fakeActor,

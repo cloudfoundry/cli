@@ -8,8 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 //go:generate counterfeiter . V2V3AppSummaryActor
@@ -21,7 +20,7 @@ type V2V3AppSummaryActor interface {
 //go:generate counterfeiter . V3AppActor
 
 type V3AppActor interface {
-	sharedV6.V3AppSummaryActor
+	shared.V3AppSummaryActor
 	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 }
@@ -44,12 +43,12 @@ func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.NewClients(config, ui, true, ccversion.MinVersionApplicationFlowV3)
+	ccClient, _, err := shared.NewV3BasedClients(config, ui, true, ccversion.MinVersionApplicationFlowV3)
 	if err != nil {
 		return err
 	}
 
-	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
@@ -90,7 +89,7 @@ func (cmd V3AppCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	appSummaryDisplayer := sharedV6.NewAppSummaryDisplayer2(cmd.UI)
+	appSummaryDisplayer := shared.NewAppSummaryDisplayer2(cmd.UI)
 	summary, warnings, err := cmd.AppSummaryActor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

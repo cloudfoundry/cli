@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 //go:generate counterfeiter . V3CancelZdtPushActor
@@ -35,7 +35,7 @@ func (cmd *V3CancelZdtPushCommand) Setup(config command.Config, ui command.UI) e
 	cmd.Config = config
 	sharedActor := sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.NewClients(config, ui, true, "")
+	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionApplicationFlowV3}

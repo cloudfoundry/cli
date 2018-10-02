@@ -12,8 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/progressbar"
 
 	log "github.com/sirupsen/logrus"
@@ -79,7 +78,7 @@ type V3PushCommand struct {
 	Actor               V3PushActor
 	VersionActor        V3PushVersionActor
 	SharedActor         command.SharedActor
-	AppSummaryDisplayer sharedV6.AppSummaryDisplayer
+	AppSummaryDisplayer shared.AppSummaryDisplayer
 	PackageDisplayer    shared.PackageDisplayer
 	ProgressBar         ProgressBar
 
@@ -99,14 +98,14 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	ccClient, uaaClient, err := shared.NewClients(config, ui, true, "")
+	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
 	v3Actor := v3action.NewActor(ccClient, config, sharedActor, uaaClient)
 	cmd.VersionActor = v3Actor
 
-	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}

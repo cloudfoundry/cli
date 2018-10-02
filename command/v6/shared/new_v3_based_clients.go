@@ -9,9 +9,9 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
-// NewClients creates a new V3 Cloud Controller client and UAA client using the
+// NewV3BasedClients creates a new V3 Cloud Controller client and UAA client using the
 // passed in config.
-func NewClients(config command.Config, ui command.UI, targetCF bool, minVersionV3 string) (*ccv3.Client, *uaa.Client, error) {
+func NewV3BasedClients(config command.Config, ui command.UI, targetCF bool, minVersionV3 string) (*ccv3.Client, *uaa.Client, error) {
 	ccWrappers := []ccv3.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()

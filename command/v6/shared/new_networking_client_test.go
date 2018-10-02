@@ -2,7 +2,7 @@ package shared_test
 
 import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	. "code.cloudfoundry.org/cli/command/v3/shared"
+	. "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 
 	"code.cloudfoundry.org/cli/api/uaa"

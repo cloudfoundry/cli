@@ -12,8 +12,8 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v6/shared"
+	sharedV3 "code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 //go:generate counterfeiter . OrgActor
@@ -54,7 +54,7 @@ func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 	}
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
-	ccClientV3, _, err := sharedV3.NewClients(config, ui, true, "")
+	ccClientV3, _, err := sharedV3.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		if _, ok := err.(translatableerror.V3APIDoesNotExistError); !ok {
 			return err

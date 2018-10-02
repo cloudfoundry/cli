@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	. "code.cloudfoundry.org/cli/command/v3/shared"
+	. "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"
@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("New Clients", func() {
+var _ = Describe("New V3 Based Clients", func() {
 	var (
 		binaryName string
 		fakeConfig *commandfakes.FakeConfig
@@ -34,7 +34,7 @@ var _ = Describe("New Clients", func() {
 
 	When("the api endpoint is not set", func() {
 		It("returns the NoAPISetError", func() {
-			_, _, err := NewClients(fakeConfig, testUI, true, "")
+			_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
 			Expect(err).To(MatchError(translatableerror.NoAPISetError{
 				BinaryName: binaryName,
 			}))
@@ -60,7 +60,7 @@ var _ = Describe("New Clients", func() {
 			})
 
 			It("returns a command api request error", func() {
-				_, _, err := NewClients(fakeConfig, testUI, true, "")
+				_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
 				Expect(err).To(MatchError(ContainSubstring("dial")))
 			})
 		})
@@ -76,7 +76,7 @@ var _ = Describe("New Clients", func() {
 			})
 
 			It("returns a command api not found error", func() {
-				_, _, err := NewClients(fakeConfig, testUI, true, "")
+				_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
 				Expect(err).To(MatchError(ccerror.APINotFoundError{URL: server.URL()}))
 			})
 		})
@@ -92,7 +92,7 @@ var _ = Describe("New Clients", func() {
 			})
 
 			It("returns a V3APIDoesNotExistError", func() {
-				_, _, err := NewClients(fakeConfig, testUI, true, "")
+				_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
 				expectedErr := ccerror.V3UnexpectedResponseError{ResponseCode: http.StatusNotFound}
 				Expect(err).To(MatchError(expectedErr))
 			})
@@ -109,7 +109,7 @@ var _ = Describe("New Clients", func() {
 			})
 
 			It("returns a V3UnexpectedResponseError", func() {
-				_, _, err := NewClients(fakeConfig, testUI, true, "")
+				_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{ResponseCode: http.StatusTeapot}))
 			})
 		})
@@ -125,14 +125,14 @@ var _ = Describe("New Clients", func() {
 		})
 
 		It("passes the value to the target", func() {
-			_, _, err := NewClients(fakeConfig, testUI, true, "")
+			_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
 			Expect(err.Error()).To(MatchRegexp("timeout"))
 		})
 	})
 
 	When("not targetting", func() {
 		It("does not target and returns no UAA client", func() {
-			ccClient, uaaClient, err := NewClients(fakeConfig, testUI, false, "")
+			ccClient, uaaClient, err := NewV3BasedClients(fakeConfig, testUI, false, "")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ccClient).ToNot(BeNil())
 			Expect(uaaClient).To(BeNil())

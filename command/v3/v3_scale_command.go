@@ -12,14 +12,13 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 //go:generate counterfeiter . V3ScaleActor
 
 type V3ScaleActor interface {
-	sharedV6.V3AppSummaryActor
+	shared.V3AppSummaryActor
 
 	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
@@ -44,7 +43,7 @@ type V3ScaleCommand struct {
 	Config              command.Config
 	Actor               V3ScaleActor
 	SharedActor         command.SharedActor
-	AppSummaryDisplayer sharedV6.AppSummaryDisplayer
+	AppSummaryDisplayer shared.AppSummaryDisplayer
 }
 
 func (cmd *V3ScaleCommand) Setup(config command.Config, ui command.UI) error {
@@ -52,7 +51,7 @@ func (cmd *V3ScaleCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.NewClients(config, ui, true, "")
+	ccClient, _, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionApplicationFlowV3}
@@ -62,13 +61,13 @@ func (cmd *V3ScaleCommand) Setup(config command.Config, ui command.UI) error {
 	}
 	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
 
-	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 
-	cmd.AppSummaryDisplayer = sharedV6.AppSummaryDisplayer{
+	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
 		UI:         ui,
 		Config:     config,
 		Actor:      cmd.Actor,

@@ -6,7 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	. "code.cloudfoundry.org/cli/command/v3/shared"
+	. "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"

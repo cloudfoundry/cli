@@ -15,8 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 //go:generate counterfeiter . V3ZeroDowntimeVersionActor
@@ -59,7 +58,7 @@ type V3ZeroDowntimePushCommand struct {
 	Actor               V3PushActor
 	VersionActor        V3PushVersionActor
 	SharedActor         command.SharedActor
-	AppSummaryDisplayer sharedV6.AppSummaryDisplayer
+	AppSummaryDisplayer shared.AppSummaryDisplayer
 	PackageDisplayer    shared.PackageDisplayer
 	ProgressBar         ProgressBar
 
@@ -73,7 +72,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	cmd.Config = config
 	sharedActor := sharedaction.NewActor(config)
 
-	ccClient, uaaClient, err := shared.NewClients(config, ui, true, "")
+	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionZeroDowntimePushV3}
@@ -85,7 +84,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	cmd.ZdtActor = v3actor
 	cmd.OriginalV3PushActor = v3actor
 
-	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
@@ -98,7 +97,7 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
-	cmd.AppSummaryDisplayer = sharedV6.AppSummaryDisplayer{
+	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
 		UI:         cmd.UI,
 		Config:     cmd.Config,
 		Actor:      cmd.OriginalV3PushActor,

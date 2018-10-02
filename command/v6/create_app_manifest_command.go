@@ -14,8 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
-	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/manifest"
 )
 
@@ -44,14 +43,14 @@ func (cmd *CreateAppManifestCommand) Setup(config command.Config, ui command.UI)
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	ccClientV3, uaaClientV3, err := sharedV3.NewClients(config, ui, true, "")
+	ccClientV3, uaaClientV3, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionApplicationFlowV3}
 		}
 		return err
 	}
-	ccClientV2, uaaClientV2, err := sharedV6.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}

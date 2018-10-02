@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -43,7 +43,7 @@ func (cmd *TasksCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	client, _, err := shared.NewClients(config, ui, true, "")
+	client, _, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}

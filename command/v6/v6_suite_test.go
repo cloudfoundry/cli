@@ -9,9 +9,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func TestV2(t *testing.T) {
+func TestV6(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "V2 Command Suite")
+	RunSpecs(t, "V6 Command Suite")
 }
 
 var _ = BeforeEach(func() {

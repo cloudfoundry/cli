@@ -13,8 +13,8 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v6/shared"
+	sharedV3 "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifest"
 	"code.cloudfoundry.org/cli/util/progressbar"
@@ -96,7 +96,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	ccClientV3, _, err := sharedV3.NewClients(config, ui, true, "")
+	ccClientV3, _, err := sharedV3.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
