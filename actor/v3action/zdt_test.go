@@ -279,4 +279,146 @@ var _ = Describe("v3-zdt-push", func() {
 
 		})
 	})
+
+	Describe("CreateApplicationDeployment", func() {
+
+		Context("When there is no error", func() {
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateApplicationDeploymentReturns("some-deployment-guid", ccv3.Warnings{"create-deployment-warning"}, nil)
+			})
+
+			It("Returns the deployment GUID when it is non empty", func() {
+				deploymentGUID, warnings, err := actor.CreateDeployment("some-app-guid", "some-droplet-guid")
+				Expect(deploymentGUID).To(Equal("some-deployment-guid"))
+				Expect(warnings).To(ConsistOf("create-deployment-warning"))
+				Expect(err).To(BeNil())
+			})
+		})
+
+		Context("When an error occurs", func() {
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateApplicationDeploymentReturns("", ccv3.Warnings{"create-deployment-warning"}, errors.New("failed create"))
+			})
+
+			It("Returns an error if an error occurred", func() {
+				deploymentGUID, warnings, err := actor.CreateDeployment("some-app-guid", "some-droplet-guid")
+				Expect(deploymentGUID).To(Equal(""))
+				Expect(warnings).To(ConsistOf("create-deployment-warning"))
+				Expect(err).To(MatchError(errors.New("failed create")))
+			})
+		})
+
+	})
+
+	Describe("GetDeploymentState", func() {
+
+		Context("when there is no error", func() {
+
+			BeforeEach(func() {
+				resultDeployment := ccv3.Deployment{State: constant.DeploymentDeploying}
+				fakeCloudControllerClient.GetDeploymentReturns(resultDeployment, ccv3.Warnings{"create-deployment-warning"}, nil)
+			})
+
+			It("returns a state of X", func() {
+				deploymentState, warnings, err := actor.GetDeploymentState("some-deployment-guid")
+				Expect(deploymentState).To(Equal(constant.DeploymentDeploying))
+				Expect(warnings).To(ConsistOf("create-deployment-warning"))
+				Expect(err).To(BeNil())
+			})
+		})
+	})
+
+	Describe("PollDeployment", func() {
+		var warningsChannel chan Warnings
+		var allWarnings Warnings
+		var funcDone chan interface{}
+
+		BeforeEach(func() {
+			fakeConfig.StartupTimeoutReturns(time.Second)
+			fakeConfig.PollingIntervalReturns(0)
+			warningsChannel = make(chan Warnings)
+			allWarnings = Warnings{}
+			funcDone = make(chan interface{})
+			go func() {
+				for {
+					select {
+					case warnings := <-warningsChannel:
+						allWarnings = append(allWarnings, warnings...)
+					case <-funcDone:
+						return
+					}
+				}
+			}()
+		})
+
+		const myDeploymentGUID = "another-great-deployment-guid"
+
+		Context("When the deployment eventually deploys", func() {
+			BeforeEach(func() {
+				getDeploymentCallCount := 0
+
+				fakeCloudControllerClient.GetDeploymentStub = func(deploymentGuid string) (ccv3.Deployment, ccv3.Warnings, error) {
+					defer func() { getDeploymentCallCount++ }()
+					if getDeploymentCallCount == 0 {
+						return ccv3.Deployment{State: constant.DeploymentDeploying},
+							ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
+							nil
+					} else {
+						return ccv3.Deployment{State: constant.DeploymentDeployed},
+							ccv3.Warnings{fmt.Sprintf("get-process-warning-%d", getDeploymentCallCount+2)},
+							nil
+					}
+				}
+			})
+
+			It("returns a nil error", func() {
+				err := actor.PollDeployment(myDeploymentGUID, warningsChannel)
+				funcDone <- nil
+				Expect(err).To(BeNil())
+				Expect(allWarnings).To(ConsistOf("get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
+			})
+		})
+		Context("When the deployment is cancelled", func() {
+			BeforeEach(func() {
+				getDeploymentCallCount := 0
+
+				fakeCloudControllerClient.GetDeploymentStub = func(deploymentGuid string) (ccv3.Deployment, ccv3.Warnings, error) {
+					defer func() { getDeploymentCallCount++ }()
+					if getDeploymentCallCount == 0 {
+						return ccv3.Deployment{State: constant.DeploymentDeploying},
+							ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
+							nil
+					} else {
+						return ccv3.Deployment{State: constant.DeploymentCanceled},
+							ccv3.Warnings{fmt.Sprintf("get-process-warning-%d", getDeploymentCallCount+2)},
+							nil
+					}
+				}
+			})
+			It("throws a deployment canceled error", func() {
+				err := actor.PollDeployment(myDeploymentGUID, warningsChannel)
+				funcDone <- nil
+				Expect(err).To(MatchError(errors.New("Deployment has been canceled")))
+				Expect(allWarnings).To(ConsistOf("get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
+			})
+
+		})
+
+		Context("When waiting for the deployment to finish times out", func() {
+			BeforeEach(func() {
+				fakeConfig.StartupTimeoutReturns(time.Millisecond)
+				fakeConfig.PollingIntervalReturns(time.Millisecond * 2)
+				fakeCloudControllerClient.GetDeploymentReturns(ccv3.Deployment{State: constant.DeploymentDeploying}, ccv3.Warnings{"some-deployment-warning"}, nil)
+			})
+
+			It("Throws a timeout error", func() {
+				err := actor.PollDeployment(myDeploymentGUID, warningsChannel)
+				funcDone <- nil
+				Expect(err).To(MatchError(actionerror.StartupTimeoutError{}))
+				Expect(allWarnings).To(ConsistOf("some-deployment-warning"))
+			})
+		})
+	})
 })

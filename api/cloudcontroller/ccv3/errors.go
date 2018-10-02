@@ -104,6 +104,8 @@ func handleNotFound(errorResponse ccerror.V3Error, request *cloudcontroller.Requ
 		return ccerror.ApplicationNotFoundError{}
 	case "Droplet not found":
 		return ccerror.DropletNotFoundError{}
+	case "Deployment not found":
+		return ccerror.DeploymentNotFoundError{}
 	case "Instance not found":
 		return ccerror.InstanceNotFoundError{}
 	case "Process not found":

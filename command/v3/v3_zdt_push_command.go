@@ -1,6 +1,7 @@
 package v3
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -22,17 +23,19 @@ import (
 
 type V3ZeroDowntimeVersionActor interface {
 	ZeroDowntimePollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error
-	CreateDeployment(appGUID string) (v3action.Warnings, error)
-
+	CreateDeployment(appGUID string, deploymentGUID string) (string, v3action.Warnings, error)
+	PollDeployment(deploymentGUID string, warningsChannel chan<- v3action.Warnings) error
 	CloudControllerAPIVersion() string
 	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
 	CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
 	CreateApplicationInSpace(app v3action.Application, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	GetCurrentDropletByApplication(appGUID string) (v3action.Droplet, v3action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
+	PollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error
 	SetApplicationDropletByApplicationNameAndSpace(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
 	StagePackage(packageGUID string, appName string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error)
-	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
+	RestartApplication(appGUID string) (v3action.Warnings, error)
 	UpdateApplication(app v3action.Application) (v3action.Application, v3action.Warnings, error)
 }
 
@@ -43,6 +46,7 @@ type V3ZeroDowntimePushCommand struct {
 	DockerUsername      string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
 	NoStart             bool                        `long:"no-start" description:"Do not stage and start the app after pushing"`
+	WaitUntilDeployed   bool                        `long:"wait-for-deploy-complete" description:"Wait for the entire deployment to complete"`
 	AppPath             flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	dockerPassword      interface{}                 `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
 	usage               interface{}                 `usage:"CF_NAME v3-zdt-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route] [--no-start]\n   CF_NAME v3-zdt-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start]"`
@@ -163,29 +167,12 @@ func (cmd V3ZeroDowntimePushCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.setApplicationDroplet(dropletGUID, user.Name)
-	if err != nil {
-		return err
-	}
-
 	if !cmd.NoRoute {
 		err = cmd.createAndMapRoutes(app)
 		if err != nil {
 			return err
 		}
 	}
-
-	err = cmd.startApplication(app.GUID, user.Name)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.createDeployment(app.GUID, user.Name)
-	if err != nil {
-		return err
-	}
-
-	cmd.UI.DisplayText("Waiting for app to start...")
 
 	warnings := make(chan v3action.Warnings)
 	done := make(chan bool)
@@ -200,9 +187,39 @@ func (cmd V3ZeroDowntimePushCommand) Execute(args []string) error {
 		}
 	}()
 
-	err = cmd.ZdtActor.ZeroDowntimePollStart(app.GUID, warnings)
-	done <- true
+	switch app.State {
+	case constant.ApplicationStopped:
+		err = cmd.setApplicationDroplet(dropletGUID, user.Name)
+		if err != nil {
+			return err
+		}
 
+		err = cmd.restartApplication(app.GUID, user.Name)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayText("Waiting for app to start...")
+		err = cmd.ZdtActor.PollStart(app.GUID, warnings)
+
+	case constant.ApplicationStarted:
+		var deploymentGUID string
+		deploymentGUID, err = cmd.createDeployment(app.GUID, user.Name, dropletGUID)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayText("Waiting for app to start...")
+		if cmd.WaitUntilDeployed {
+			err = cmd.ZdtActor.PollDeployment(deploymentGUID, warnings) //
+		} else {
+			err = cmd.ZdtActor.ZeroDowntimePollStart(app.GUID, warnings)
+		}
+	default:
+		return fmt.Errorf("inconceivable application state: %s", app.State)
+	}
+
+	done <- true
 	if err != nil {
 		if _, ok := err.(actionerror.StartupTimeoutError); ok {
 			return translatableerror.StartupTimeoutError{
@@ -333,7 +350,7 @@ func (cmd V3ZeroDowntimePushCommand) createAndMapRoutes(app v3action.Application
 }
 
 func (cmd V3ZeroDowntimePushCommand) createPackage() (v3action.Package, error) {
-	isDockerImage := (cmd.DockerImage.Path != "")
+	isDockerImage := cmd.DockerImage.Path != ""
 	err := cmd.PackageDisplayer.DisplaySetupMessage(cmd.RequiredArgs.AppName, isDockerImage)
 	if err != nil {
 		return v3action.Package{}, err
@@ -405,7 +422,7 @@ func (cmd V3ZeroDowntimePushCommand) setApplicationDroplet(dropletGUID string, u
 	return nil
 }
 
-func (cmd V3ZeroDowntimePushCommand) startApplication(appGUID string, userName string) error {
+func (cmd V3ZeroDowntimePushCommand) restartApplication(appGUID string, userName string) error {
 	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
@@ -413,7 +430,7 @@ func (cmd V3ZeroDowntimePushCommand) startApplication(appGUID string, userName s
 		"Username":  userName,
 	})
 
-	_, warnings, err := cmd.ZdtActor.StartApplication(appGUID)
+	warnings, err := cmd.ZdtActor.RestartApplication(appGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -423,7 +440,7 @@ func (cmd V3ZeroDowntimePushCommand) startApplication(appGUID string, userName s
 	return nil
 }
 
-func (cmd V3ZeroDowntimePushCommand) createDeployment(appGUID string, userName string) error {
+func (cmd V3ZeroDowntimePushCommand) createDeployment(appGUID string, userName string, dropletGUID string) (string, error) {
 	cmd.UI.DisplayTextWithFlavor("Starting deployment for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
 		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
@@ -431,12 +448,12 @@ func (cmd V3ZeroDowntimePushCommand) createDeployment(appGUID string, userName s
 		"CurrentUser":  userName,
 	})
 
-	warnings, err := cmd.ZdtActor.CreateDeployment(appGUID)
+	deploymentGUID, warnings, err := cmd.ZdtActor.CreateDeployment(appGUID, dropletGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		return "", err
 	}
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
-	return nil
+	return deploymentGUID, nil
 }
