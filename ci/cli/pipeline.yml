@@ -16,7 +16,6 @@ resources:
     - bin
     - ci
     - integration
-    - Makefile
     - README.md
     - .github
 
