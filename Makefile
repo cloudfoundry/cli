@@ -135,9 +135,8 @@ units-non-plugin :
 		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin
 	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites -flakeAttempts 3 cf/ssh
 
-	@echo "\nSWEET SUITE SUCCESS"
-
 units-full: format vet lint build units-plugin units-non-plugin
+	@echo "\nSWEET SUITE SUCCESS"
 
 version :
 	@echo $(CF_BUILD_VERSION)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
