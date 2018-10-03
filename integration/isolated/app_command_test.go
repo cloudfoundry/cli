@@ -205,7 +205,32 @@ applications:
 						Eventually(session).Should(Say("name:\\s+%s", appName))
 						Eventually(session).Should(Say("requested state:\\s+stopped"))
 						Eventually(session).Should(Say("type:\\s+web"))
-						Eventually(session).Should(Say("There are no running instances of this process"))
+						Eventually(session).Should(Say("#0\\s+down\\s+\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("all instances of the app are down", func() {
+					BeforeEach(func() {
+						infiniteMemQuota := helpers.QuotaName()
+						Eventually(helpers.CF("create-quota", infiniteMemQuota, "-i", "-1", "-r", "-1", "-m", "2000G")).Should(Exit(0))
+						Eventually(helpers.CF("set-quota", orgName, infiniteMemQuota)).Should(Exit(0))
+
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
+						})
+						Eventually(helpers.CFWithEnv(map[string]string{"CF_STAGING_TIMEOUT": "1", "CF_STARTUP_TIMEOUT": "1"}, "scale", appName, "-m", "1000G", "-f")).Should(Exit(1))
+					})
+
+					It("displays the down app instances", func() {
+						session := helpers.CF("app", appName)
+
+						userName, _ := helpers.GetCredentials()
+						Eventually(session).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say("name:\\s+%s", appName))
+						Eventually(session).Should(Say("requested state:\\s+started"))
+						Eventually(session).Should(Say("type:\\s+web"))
+						Eventually(session).Should(Say("#0\\s+down\\s+\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
 						Eventually(session).Should(Exit(0))
 					})
 				})

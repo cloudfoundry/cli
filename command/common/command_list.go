@@ -17,32 +17,31 @@ type V2CommandList struct {
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	App                  v6.V3AppCommand                 `command:"app" description:"Display health and status for an app"`
-	V3Apps               v6.V3AppsCommand                `command:"v3-apps" description:"List all apps in the target space"`
-	V3ApplyManifest      v6.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
-	V3CancelZdtPush      v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
-	V3CreateApp          v6.V3CreateAppCommand           `command:"v3-create-app" description:"Create a V3 App"`
-	V3CreatePackage      v6.V3CreatePackageCommand       `command:"v3-create-package" description:"Uploads a V3 Package"`
-	V3DeleteApp          v6.V3DeleteCommand              `command:"v3-delete" description:"Delete a V3 App"`
-	V3Droplets           v6.V3DropletsCommand            `command:"v3-droplets" description:"List droplets of an app"`
-	V3Env                v6.V3EnvCommand                 `command:"v3-env" description:"Show all env variables for an app"`
-	V3GetHealthCheck     v6.V3GetHealthCheckCommand      `command:"v3-get-health-check" description:"Show the type of health check performed on an app"`
-	V3Packages           v6.V3PackagesCommand            `command:"v3-packages" description:"List packages of an app"`
-	V3Push               v6.V3PushCommand                `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
-	V3ZdtPush            v6.V3ZeroDowntimePushCommand    `command:"v3-zdt-push" description:"Update an app with zero down time"`
-	V3Restart            v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
-	V3RestartAppInstance v6.V3RestartAppInstanceCommand  `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
-	V3ZdtRestart         v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
-	V3Scale              v6.V3ScaleCommand               `command:"v3-scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
-	V3SetDroplet         v6.V3SetDropletCommand          `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
-	V3SetEnv             v6.V3SetEnvCommand              `command:"v3-set-env" description:"Set an env variable for an app"`
-	V3SetHealthCheck     v6.V3SetHealthCheckCommand      `command:"v3-set-health-check" description:"Change type of health check performed on an app's process"`
-	V3Stage              v6.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
-	V3Start              v6.V3StartCommand               `command:"v3-start" description:"Start an app"`
-	V3Stop               v6.V3StopCommand                `command:"v3-stop" description:"Stop an app"`
-	V3UnsetEnv           v6.V3UnsetEnvCommand            `command:"v3-unset-env" description:"Remove an env variable from an app"`
-	V3SSH                v6.V3SSHCommand                 `command:"v3-ssh" description:"SSH to an application container instance"`
-
+	App                                v6.V3AppCommand                              `command:"app" description:"Display health and status for an app"`
+	V3Apps                             v6.V3AppsCommand                             `command:"v3-apps" description:"List all apps in the target space"`
+	V3ApplyManifest                    v6.V3ApplyManifestCommand                    `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
+	V3CancelZdtPush                    v6.V3CancelZdtPushCommand                    `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
+	V3CreateApp                        v6.V3CreateAppCommand                        `command:"v3-create-app" description:"Create a V3 App"`
+	V3CreatePackage                    v6.V3CreatePackageCommand                    `command:"v3-create-package" description:"Uploads a V3 Package"`
+	V3DeleteApp                        v6.V3DeleteCommand                           `command:"v3-delete" description:"Delete a V3 App"`
+	V3Droplets                         v6.V3DropletsCommand                         `command:"v3-droplets" description:"List droplets of an app"`
+	V3Env                              v6.V3EnvCommand                              `command:"v3-env" description:"Show all env variables for an app"`
+	V3GetHealthCheck                   v6.V3GetHealthCheckCommand                   `command:"v3-get-health-check" description:"Show the type of health check performed on an app"`
+	V3Packages                         v6.V3PackagesCommand                         `command:"v3-packages" description:"List packages of an app"`
+	V3Push                             v6.V3PushCommand                             `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
+	V3ZdtPush                          v6.V3ZeroDowntimePushCommand                 `command:"v3-zdt-push" description:"Update an app with zero down time"`
+	V3Restart                          v6.V3RestartCommand                          `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
+	V3RestartAppInstance               v6.V3RestartAppInstanceCommand               `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
+	V3ZdtRestart                       v6.V3ZeroDowntimeRestartCommand              `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
+	V3Scale                            v6.V3ScaleCommand                            `command:"v3-scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
+	V3SetDroplet                       v6.V3SetDropletCommand                       `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
+	V3SetEnv                           v6.V3SetEnvCommand                           `command:"v3-set-env" description:"Set an env variable for an app"`
+	V3SetHealthCheck                   v6.V3SetHealthCheckCommand                   `command:"v3-set-health-check" description:"Change type of health check performed on an app's process"`
+	V3Stage                            v6.V3StageCommand                            `command:"v3-stage" description:"Create a new droplet for an app"`
+	V3Start                            v6.V3StartCommand                            `command:"v3-start" description:"Start an app"`
+	V3Stop                             v6.V3StopCommand                             `command:"v3-stop" description:"Stop an app"`
+	V3UnsetEnv                         v6.V3UnsetEnvCommand                         `command:"v3-unset-env" description:"Remove an env variable from an app"`
+	V3SSH                              v6.V3SSHCommand                              `command:"v3-ssh" description:"SSH to an application container instance"`
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AddNetworkPolicy                   v6.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
 	AllowSpaceSSH                      v6.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
