@@ -711,8 +711,10 @@ var _ = Describe("Apply", func() {
 					})
 
 					It("raises an error", func() {
-						Consistently(nextEvent).ShouldNot(Equal(Complete))
+						Eventually(nextEvent).Should(Equal(ResourceMatching))
+						Eventually(warningsStream).Should(Receive(ConsistOf("resource-warnings-1", "resource-warnings-2")))
 						Eventually(errorStream).Should(Receive(MatchError("some-error")))
+						Consistently(nextEvent).ShouldNot(Equal(Complete))
 					})
 				})
 			})
