@@ -42,9 +42,9 @@ var ParseErr = errors.New("incorrect type for arg")
 
 func main() {
 	defer panichandler.HandlePanic()
-	exitStatus := parse(os.Args[1:], &common.Commands)
+	exitStatus := parse(os.Args[1:], &common.V6Commands)
 	if exitStatus == switchToV2 {
-		exitStatus = parse(os.Args[1:], &common.V2Commands)
+		exitStatus = parse(os.Args[1:], &common.FallackCommands)
 	}
 	if exitStatus != 0 {
 		os.Exit(exitStatus)
@@ -78,9 +78,9 @@ func parse(args []string, commandList interface{}) int {
 func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, extraArgs []string, originalArgs []string, commandList interface{}) int {
 	switch flagErr.Type {
 	case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrExpectedArgument, flags.ErrInvalidChoice:
-		_, found := reflect.TypeOf(common.Commands).FieldByNameFunc(
+		_, found := reflect.TypeOf(common.V6Commands).FieldByNameFunc(
 			func(fieldName string) bool {
-				field, _ := reflect.TypeOf(common.Commands).FieldByName(fieldName)
+				field, _ := reflect.TypeOf(common.V6Commands).FieldByName(fieldName)
 				return parser.Active != nil && parser.Active.Name == field.Tag.Get("command")
 			},
 		)
@@ -134,7 +134,7 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 	case flags.ErrUnknownCommand:
 		cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	case flags.ErrCommandRequired:
-		if common.Commands.VerboseOrVersion {
+		if common.V6Commands.VerboseOrVersion {
 			parse([]string{"version"}, commandList)
 		} else {
 			parse([]string{"help"}, commandList)
@@ -146,9 +146,9 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 }
 
 func isCommand(s string) bool {
-	_, found := reflect.TypeOf(common.Commands).FieldByNameFunc(
+	_, found := reflect.TypeOf(common.V6Commands).FieldByNameFunc(
 		func(fieldName string) bool {
-			field, _ := reflect.TypeOf(common.Commands).FieldByName(fieldName)
+			field, _ := reflect.TypeOf(common.V6Commands).FieldByName(fieldName)
 			return s == field.Tag.Get("command") || s == field.Tag.Get("alias")
 		})
 
@@ -161,7 +161,7 @@ func isOption(s string) bool {
 
 func executionWrapper(cmd flags.Commander, args []string) error {
 	cfConfig, configErr := configv3.LoadConfig(configv3.FlagOverride{
-		Verbose: common.Commands.VerboseOrVersion,
+		Verbose: common.V6Commands.VerboseOrVersion,
 	})
 	if configErr != nil {
 		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {

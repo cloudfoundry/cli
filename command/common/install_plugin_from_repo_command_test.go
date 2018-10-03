@@ -323,7 +323,7 @@ var _ = Describe("install-plugin command", func() {
 
 											Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
 											_, commandsArg, tempDirArg := fakeActor.GetAndValidatePluginArgsForCall(0)
-											Expect(commandsArg).To(Equal(Commands))
+											Expect(commandsArg).To(Equal(V6Commands))
 											Expect(tempDirArg).To(Equal("copy-path"))
 										})
 									})

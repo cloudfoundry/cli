@@ -7,8 +7,8 @@ import (
 	"code.cloudfoundry.org/cli/command/v6"
 )
 
-var Commands commandList
-var V2Commands V2CommandList
+var V6Commands commandList
+var FallackCommands V2CommandList
 
 type V2CommandList struct {
 	V2App v6.AppCommand `command:"app" description:"Display health and status for an app"`

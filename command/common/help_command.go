@@ -63,7 +63,7 @@ func (cmd HelpCommand) Execute(args []string) error {
 func (cmd HelpCommand) displayFullHelp() {
 	if cmd.AllCommands {
 		pluginCommands := cmd.getSortedPluginCommands()
-		cmdInfo := cmd.Actor.CommandInfos(Commands)
+		cmdInfo := cmd.Actor.CommandInfos(V6Commands)
 		longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
 
 		cmd.displayHelpPreamble()
@@ -147,7 +147,7 @@ func (cmd HelpCommand) displayHelpFooter(cmdInfo map[string]sharedaction.Command
 }
 
 func (cmd HelpCommand) displayCommonCommands() {
-	cmdInfo := cmd.Actor.CommandInfos(Commands)
+	cmdInfo := cmd.Actor.CommandInfos(V6Commands)
 
 	cmd.UI.DisplayText("{{.CommandName}} {{.VersionCommand}} {{.Version}}, {{.CLI}}",
 		map[string]interface{}{
@@ -218,7 +218,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 }
 
 func (cmd HelpCommand) displayCommand() error {
-	cmdInfo, err := cmd.Actor.CommandInfoByName(Commands, cmd.OptionalArgs.CommandName)
+	cmdInfo, err := cmd.Actor.CommandInfoByName(V6Commands, cmd.OptionalArgs.CommandName)
 	if err != nil {
 		if err, ok := err.(actionerror.InvalidCommandError); ok {
 			var found bool
