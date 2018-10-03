@@ -4,7 +4,6 @@ import (
 	"reflect"
 
 	"code.cloudfoundry.org/cli/command/plugin"
-	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v6"
 )
 
@@ -18,34 +17,34 @@ type V2CommandList struct {
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	App                  v3.V3AppCommand                 `command:"app" description:"Display health and status for an app"`
-	V3Apps               v3.V3AppsCommand                `command:"v3-apps" description:"List all apps in the target space"`
-	V3ApplyManifest      v3.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
-	V3CancelZdtPush      v3.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
-	V3CreateApp          v3.V3CreateAppCommand           `command:"v3-create-app" description:"Create a V3 App"`
-	V3CreatePackage      v3.V3CreatePackageCommand       `command:"v3-create-package" description:"Uploads a V3 Package"`
-	V3DeleteApp          v3.V3DeleteCommand              `command:"v3-delete" description:"Delete a V3 App"`
-	V3Droplets           v3.V3DropletsCommand            `command:"v3-droplets" description:"List droplets of an app"`
-	V3Env                v3.V3EnvCommand                 `command:"v3-env" description:"Show all env variables for an app"`
-	V3GetHealthCheck     v3.V3GetHealthCheckCommand      `command:"v3-get-health-check" description:"Show the type of health check performed on an app"`
-	V3Packages           v3.V3PackagesCommand            `command:"v3-packages" description:"List packages of an app"`
-	V3Push               v3.V3PushCommand                `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
-	V3ZdtPush            v3.V3ZeroDowntimePushCommand    `command:"v3-zdt-push" description:"Update an app with zero down time"`
-	V3Restart            v3.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
-	V3RestartAppInstance v3.V3RestartAppInstanceCommand  `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
-	V3ZdtRestart         v3.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
-	V3Scale              v3.V3ScaleCommand               `command:"v3-scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
-	V3SetDroplet         v3.V3SetDropletCommand          `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
-	V3SetEnv             v3.V3SetEnvCommand              `command:"v3-set-env" description:"Set an env variable for an app"`
-	V3SetHealthCheck     v3.V3SetHealthCheckCommand      `command:"v3-set-health-check" description:"Change type of health check performed on an app's process"`
-	V3Stage              v3.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
-	V3Start              v3.V3StartCommand               `command:"v3-start" description:"Start an app"`
-	V3Stop               v3.V3StopCommand                `command:"v3-stop" description:"Stop an app"`
-	V3UnsetEnv           v3.V3UnsetEnvCommand            `command:"v3-unset-env" description:"Remove an env variable from an app"`
-	V3SSH                v3.V3SSHCommand                 `command:"v3-ssh" description:"SSH to an application container instance"`
+	App                  v6.V3AppCommand                 `command:"app" description:"Display health and status for an app"`
+	V3Apps               v6.V3AppsCommand                `command:"v3-apps" description:"List all apps in the target space"`
+	V3ApplyManifest      v6.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
+	V3CancelZdtPush      v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
+	V3CreateApp          v6.V3CreateAppCommand           `command:"v3-create-app" description:"Create a V3 App"`
+	V3CreatePackage      v6.V3CreatePackageCommand       `command:"v3-create-package" description:"Uploads a V3 Package"`
+	V3DeleteApp          v6.V3DeleteCommand              `command:"v3-delete" description:"Delete a V3 App"`
+	V3Droplets           v6.V3DropletsCommand            `command:"v3-droplets" description:"List droplets of an app"`
+	V3Env                v6.V3EnvCommand                 `command:"v3-env" description:"Show all env variables for an app"`
+	V3GetHealthCheck     v6.V3GetHealthCheckCommand      `command:"v3-get-health-check" description:"Show the type of health check performed on an app"`
+	V3Packages           v6.V3PackagesCommand            `command:"v3-packages" description:"List packages of an app"`
+	V3Push               v6.V3PushCommand                `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
+	V3ZdtPush            v6.V3ZeroDowntimePushCommand    `command:"v3-zdt-push" description:"Update an app with zero down time"`
+	V3Restart            v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
+	V3RestartAppInstance v6.V3RestartAppInstanceCommand  `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
+	V3ZdtRestart         v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
+	V3Scale              v6.V3ScaleCommand               `command:"v3-scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
+	V3SetDroplet         v6.V3SetDropletCommand          `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
+	V3SetEnv             v6.V3SetEnvCommand              `command:"v3-set-env" description:"Set an env variable for an app"`
+	V3SetHealthCheck     v6.V3SetHealthCheckCommand      `command:"v3-set-health-check" description:"Change type of health check performed on an app's process"`
+	V3Stage              v6.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
+	V3Start              v6.V3StartCommand               `command:"v3-start" description:"Start an app"`
+	V3Stop               v6.V3StopCommand                `command:"v3-stop" description:"Stop an app"`
+	V3UnsetEnv           v6.V3UnsetEnvCommand            `command:"v3-unset-env" description:"Remove an env variable from an app"`
+	V3SSH                v6.V3SSHCommand                 `command:"v3-ssh" description:"SSH to an application container instance"`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
-	AddNetworkPolicy                   v3.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
+	AddNetworkPolicy                   v6.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
 	AllowSpaceSSH                      v6.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	Api                                v6.ApiCommand                                `command:"api" description:"Set or view target api url"`
 	Apps                               v6.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
@@ -62,7 +61,7 @@ type commandList struct {
 	CreateAppManifest                  v6.CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
 	CreateBuildpack                    v6.CreateBuildpackCommand                    `command:"create-buildpack" description:"Create a buildpack"`
 	CreateDomain                       v6.CreateDomainCommand                       `command:"create-domain" description:"Create a domain in an org for later use"`
-	CreateIsolationSegment             v3.CreateIsolationSegmentCommand             `command:"create-isolation-segment" description:"Create an isolation segment"`
+	CreateIsolationSegment             v6.CreateIsolationSegmentCommand             `command:"create-isolation-segment" description:"Create an isolation segment"`
 	CreateOrg                          v6.CreateOrgCommand                          `command:"create-org" alias:"co" description:"Create an org"`
 	CreateQuota                        v6.CreateQuotaCommand                        `command:"create-quota" description:"Define a new resource quota"`
 	CreateRoute                        v6.CreateRouteCommand                        `command:"create-route" description:"Create a url route in a space for later use"`
@@ -79,7 +78,7 @@ type commandList struct {
 	Curl                               v6.CurlCommand                               `command:"curl" description:"Executes a request to the targeted API endpoint"`
 	DeleteBuildpack                    v6.DeleteBuildpackCommand                    `command:"delete-buildpack" description:"Delete a buildpack"`
 	DeleteDomain                       v6.DeleteDomainCommand                       `command:"delete-domain" description:"Delete a domain"`
-	DeleteIsolationSegment             v3.DeleteIsolationSegmentCommand             `command:"delete-isolation-segment" description:"Delete an isolation segment"`
+	DeleteIsolationSegment             v6.DeleteIsolationSegmentCommand             `command:"delete-isolation-segment" description:"Delete an isolation segment"`
 	DeleteOrg                          v6.DeleteOrgCommand                          `command:"delete-org" description:"Delete an org"`
 	DeleteOrphanedRoutes               v6.DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes" description:"Delete all orphaned routes (i.e. those that are not mapped to an app)"`
 	DeleteQuota                        v6.DeleteQuotaCommand                        `command:"delete-quota" description:"Delete a quota"`
@@ -95,13 +94,13 @@ type commandList struct {
 	DeleteUser                         v6.DeleteUserCommand                         `command:"delete-user" description:"Delete a user"`
 	Delete                             v6.DeleteCommand                             `command:"delete" alias:"d" description:"Delete an app"`
 	DisableFeatureFlag                 v6.DisableFeatureFlagCommand                 `command:"disable-feature-flag" description:"Prevent use of a feature"`
-	DisableOrgIsolation                v3.DisableOrgIsolationCommand                `command:"disable-org-isolation" description:"Revoke an organization's entitlement to an isolation segment"`
+	DisableOrgIsolation                v6.DisableOrgIsolationCommand                `command:"disable-org-isolation" description:"Revoke an organization's entitlement to an isolation segment"`
 	DisableServiceAccess               v6.DisableServiceAccessCommand               `command:"disable-service-access" description:"Disable access to a service or service plan for one or all orgs"`
 	DisableSSH                         v6.DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`
 	DisallowSpaceSSH                   v6.DisallowSpaceSSHCommand                   `command:"disallow-space-ssh" description:"Disallow SSH access for the space"`
 	Domains                            v6.DomainsCommand                            `command:"domains" description:"List domains in the target org"`
 	EnableFeatureFlag                  v6.EnableFeatureFlagCommand                  `command:"enable-feature-flag" description:"Allow use of a feature"`
-	EnableOrgIsolation                 v3.EnableOrgIsolationCommand                 `command:"enable-org-isolation" description:"Entitle an organization to an isolation segment"`
+	EnableOrgIsolation                 v6.EnableOrgIsolationCommand                 `command:"enable-org-isolation" description:"Entitle an organization to an isolation segment"`
 	EnableServiceAccess                v6.EnableServiceAccessCommand                `command:"enable-service-access" description:"Enable access to a service or service plan for one or all orgs"`
 	EnableSSH                          v6.EnableSSHCommand                          `command:"enable-ssh" description:"Enable ssh for the application"`
 	Env                                v6.EnvCommand                                `command:"env" alias:"e" description:"Show all env variables for an app"`
@@ -112,8 +111,8 @@ type commandList struct {
 	GetHealthCheck                     v6.GetHealthCheckCommand                     `command:"get-health-check" description:"Show the type of health check performed on an app"`
 	Help                               HelpCommand                                  `command:"help" alias:"h" description:"Show help"`
 	InstallPlugin                      InstallPluginCommand                         `command:"install-plugin" description:"Install CLI plugin"`
-	IsolationSegments                  v3.IsolationSegmentsCommand                  `command:"isolation-segments" description:"List all isolation segments"`
-	NetworkPolicies                    v3.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
+	IsolationSegments                  v6.IsolationSegmentsCommand                  `command:"isolation-segments" description:"List all isolation segments"`
+	NetworkPolicies                    v6.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
 	ListPluginRepos                    plugin.ListPluginReposCommand                `command:"list-plugin-repos" description:"List all the added plugin repositories"`
 	Login                              v6.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
 	Logout                             v6.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
@@ -132,7 +131,7 @@ type commandList struct {
 	Push                               v6.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
 	Quotas                             v6.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	Quota                              v6.QuotaCommand                              `command:"quota" description:"Show quota info"`
-	RemoveNetworkPolicy                v3.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`
+	RemoveNetworkPolicy                v6.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`
 	RemovePluginRepo                   plugin.RemovePluginRepoCommand               `command:"remove-plugin-repo" description:"Remove a plugin repository"`
 	RenameBuildpack                    v6.RenameBuildpackCommand                    `command:"rename-buildpack" description:"Rename a buildpack"`
 	RenameOrg                          v6.RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`
@@ -141,8 +140,8 @@ type commandList struct {
 	RenameSpace                        v6.RenameSpaceCommand                        `command:"rename-space" description:"Rename a space"`
 	Rename                             v6.RenameCommand                             `command:"rename" description:"Rename an app"`
 	RepoPlugins                        plugin.RepoPluginsCommand                    `command:"repo-plugins" description:"List all available plugins in specified repository or in all added repositories"`
-	ResetOrgDefaultIsolationSegment    v3.ResetOrgDefaultIsolationSegmentCommand    `command:"reset-org-default-isolation-segment" description:"Reset the default isolation segment used for apps in spaces of an org"`
-	ResetSpaceIsolationSegment         v3.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
+	ResetOrgDefaultIsolationSegment    v6.ResetOrgDefaultIsolationSegmentCommand    `command:"reset-org-default-isolation-segment" description:"Reset the default isolation segment used for apps in spaces of an org"`
+	ResetSpaceIsolationSegment         v6.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
 	Restage                            v6.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"`
 	RestartAppInstance                 v6.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate, then restart an app instance"`
 	Restart                            v6.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again. This causes downtime."`
@@ -150,7 +149,7 @@ type commandList struct {
 	Routes                             v6.RoutesCommand                             `command:"routes" alias:"r" description:"List all routes in the current space or the current organization"`
 	RunningEnvironmentVariableGroup    v6.RunningEnvironmentVariableGroupCommand    `command:"running-environment-variable-group" alias:"revg" description:"Retrieve the contents of the running environment variable group"`
 	RunningSecurityGroups              v6.RunningSecurityGroupsCommand              `command:"running-security-groups" description:"List security groups in the set of security groups for running applications"`
-	RunTask                            v3.RunTaskCommand                            `command:"run-task" alias:"rt" description:"Run a one-off task on an app"`
+	RunTask                            v6.RunTaskCommand                            `command:"run-task" alias:"rt" description:"Run a one-off task on an app"`
 	Scale                              v6.ScaleCommand                              `command:"scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
 	SecurityGroups                     v6.SecurityGroupsCommand                     `command:"security-groups" description:"List all security groups"`
 	SecurityGroup                      v6.SecurityGroupCommand                      `command:"security-group" description:"Show a single security group"`
@@ -163,16 +162,16 @@ type commandList struct {
 	Service                            v6.ServiceCommand                            `command:"service" description:"Show service instance info"`
 	SetEnv                             v6.SetEnvCommand                             `command:"set-env" alias:"se" description:"Set an env variable for an app"`
 	SetHealthCheck                     v6.SetHealthCheckCommand                     `command:"set-health-check" description:"Change type of health check performed on an app"`
-	SetOrgDefaultIsolationSegment      v3.SetOrgDefaultIsolationSegmentCommand      `command:"set-org-default-isolation-segment" description:"Set the default isolation segment used for apps in spaces in an org"`
+	SetOrgDefaultIsolationSegment      v6.SetOrgDefaultIsolationSegmentCommand      `command:"set-org-default-isolation-segment" description:"Set the default isolation segment used for apps in spaces in an org"`
 	SetOrgRole                         v6.SetOrgRoleCommand                         `command:"set-org-role" description:"Assign an org role to a user"`
 	SetQuota                           v6.SetQuotaCommand                           `command:"set-quota" description:"Assign a quota to an org"`
 	SetRunningEnvironmentVariableGroup v6.SetRunningEnvironmentVariableGroupCommand `command:"set-running-environment-variable-group" alias:"srevg" description:"Pass parameters as JSON to create a running environment variable group"`
-	SetSpaceIsolationSegment           v3.SetSpaceIsolationSegmentCommand           `command:"set-space-isolation-segment" description:"Assign the isolation segment for a space"`
+	SetSpaceIsolationSegment           v6.SetSpaceIsolationSegmentCommand           `command:"set-space-isolation-segment" description:"Assign the isolation segment for a space"`
 	SetSpaceQuota                      v6.SetSpaceQuotaCommand                      `command:"set-space-quota" description:"Assign a space quota definition to a space"`
 	SetSpaceRole                       v6.SetSpaceRoleCommand                       `command:"set-space-role" description:"Assign a space role to a user"`
 	SetStagingEnvironmentVariableGroup v6.SetStagingEnvironmentVariableGroupCommand `command:"set-staging-environment-variable-group" alias:"ssevg" description:"Pass parameters as JSON to create a staging environment variable group"`
 	SharePrivateDomain                 v6.SharePrivateDomainCommand                 `command:"share-private-domain" description:"Share a private domain with an org"`
-	ShareService                       v3.ShareServiceCommand                       `command:"share-service" description:"Share a service instance with another space"`
+	ShareService                       v6.ShareServiceCommand                       `command:"share-service" description:"Share a service instance with another space"`
 	SpaceQuotas                        v6.SpaceQuotasCommand                        `command:"space-quotas" description:"List available space resource quotas"`
 	SpaceQuota                         v6.SpaceQuotaCommand                         `command:"space-quota" description:"Show space quota info"`
 	SpaceSSHAllowed                    v6.SpaceSSHAllowedCommand                    `command:"space-ssh-allowed" description:"Reports whether SSH is allowed in a space"`
@@ -189,8 +188,8 @@ type commandList struct {
 	Start                              v6.StartCommand                              `command:"start" alias:"st" description:"Start an app"`
 	Stop                               v6.StopCommand                               `command:"stop" alias:"sp" description:"Stop an app"`
 	Target                             v6.TargetCommand                             `command:"target" alias:"t" description:"Set or view the targeted org or space"`
-	Tasks                              v3.TasksCommand                              `command:"tasks" description:"List tasks of an app"`
-	TerminateTask                      v3.TerminateTaskCommand                      `command:"terminate-task" description:"Terminate a running task of an app"`
+	Tasks                              v6.TasksCommand                              `command:"tasks" description:"List tasks of an app"`
+	TerminateTask                      v6.TerminateTaskCommand                      `command:"terminate-task" description:"Terminate a running task of an app"`
 	UnbindRouteService                 v6.UnbindRouteServiceCommand                 `command:"unbind-route-service" alias:"urs" description:"Unbind a service instance from an HTTP route"`
 	UnbindRunningSecurityGroup         v6.UnbindRunningSecurityGroupCommand         `command:"unbind-running-security-group" description:"Unbind a security group from the set of security groups for running applications"`
 	UnbindSecurityGroup                v6.UnbindSecurityGroupCommand                `command:"unbind-security-group" description:"Unbind a security group from a space"`
@@ -203,7 +202,7 @@ type commandList struct {
 	UnsetSpaceQuota                    v6.UnsetSpaceQuotaCommand                    `command:"unset-space-quota" description:"Unassign a quota from a space"`
 	UnsetSpaceRole                     v6.UnsetSpaceRoleCommand                     `command:"unset-space-role" description:"Remove a space role from a user"`
 	UnsharePrivateDomain               v6.UnsharePrivateDomainCommand               `command:"unshare-private-domain" description:"Unshare a private domain with an org"`
-	UnshareService                     v3.UnshareServiceCommand                     `command:"unshare-service" description:"Unshare a shared service instance from a space"`
+	UnshareService                     v6.UnshareServiceCommand                     `command:"unshare-service" description:"Unshare a shared service instance from a space"`
 	UpdateBuildpack                    v6.UpdateBuildpackCommand                    `command:"update-buildpack" description:"Update a buildpack"`
 	UpdateQuota                        v6.UpdateQuotaCommand                        `command:"update-quota" description:"Update an existing resource quota"`
 	UpdateSecurityGroup                v6.UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`
