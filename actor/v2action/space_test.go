@@ -496,7 +496,7 @@ var _ = Describe("Space", func() {
 		})
 	})
 
-	FDescribe("GrantSpaceManagerByUsername", func() {
+	Describe("GrantSpaceManagerByUsername", func() {
 		var (
 			warnings   Warnings
 			executeErr error
