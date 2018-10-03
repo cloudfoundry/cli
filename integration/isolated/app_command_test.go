@@ -219,7 +219,7 @@ applications:
 						helpers.WithHelloWorldApp(func(appDir string) {
 							Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
 						})
-						Eventually(helpers.CFWithEnv(map[string]string{"CF_STAGING_TIMEOUT": "1", "CF_STARTUP_TIMEOUT": "1"}, "scale", appName, "-m", "1000G", "-f")).Should(Exit(1))
+						Eventually(helpers.CFWithEnv(map[string]string{"CF_STAGING_TIMEOUT": "0.1", "CF_STARTUP_TIMEOUT": "0.1"}, "scale", appName, "-m", "1000G", "-f")).Should(Exit(1))
 					})
 
 					It("displays the down app instances", func() {

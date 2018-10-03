@@ -122,9 +122,10 @@ func (config *Config) LogLevel() int {
 //   2. Defaults to the DefaultStagingTimeout
 func (config *Config) StagingTimeout() time.Duration {
 	if config.ENV.CFStagingTimeout != "" {
-		val, err := strconv.ParseInt(config.ENV.CFStagingTimeout, 10, 64)
+		timeoutInMin, err := strconv.ParseFloat(config.ENV.CFStagingTimeout, 64)
+		timeoutInSec := int64(timeoutInMin * 60)
 		if err == nil {
-			return time.Duration(val) * time.Minute
+			return time.Duration(timeoutInSec) * time.Second
 		}
 	}
 
@@ -137,9 +138,10 @@ func (config *Config) StagingTimeout() time.Duration {
 //   2. Defaults to the DefaultStartupTimeout
 func (config *Config) StartupTimeout() time.Duration {
 	if config.ENV.CFStartupTimeout != "" {
-		val, err := strconv.ParseInt(config.ENV.CFStartupTimeout, 10, 64)
+		timeoutInMin, err := strconv.ParseFloat(config.ENV.CFStartupTimeout, 64)
+		timeoutInSec := int64(timeoutInMin * 60)
 		if err == nil {
-			return time.Duration(val) * time.Minute
+			return time.Duration(timeoutInSec) * time.Second
 		}
 	}
 
