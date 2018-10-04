@@ -67,7 +67,7 @@ var _ = Describe("create-space", func() {
 		spaceName = helpers.NewSpaceName()
 	})
 
-	When("logged in as a client", func() {
+	PWhen("logged in as a client", func() {
 		var client, orgName string
 
 		BeforeEach(func() {
