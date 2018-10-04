@@ -6,12 +6,13 @@ import (
 )
 
 type AppInstanceRow struct {
-	Index  string
-	State  string
-	Since  string
-	CPU    string
-	Memory string
-	Disk   string
+	Index   string
+	State   string
+	Since   string
+	CPU     string
+	Memory  string
+	Disk    string
+	Details string
 }
 
 type AppProcessTable struct {
@@ -50,13 +51,19 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 		if strings.HasPrefix(row, "#") {
 			// instance row
 			columns := splitColumns(row)
+			details := ""
+			if len(columns) >= 7 {
+				details = columns[6]
+			}
+
 			instanceRow := AppInstanceRow{
-				Index:  columns[0],
-				State:  columns[1],
-				Since:  columns[2],
-				CPU:    columns[3],
-				Memory: columns[4],
-				Disk:   columns[5],
+				Index:   columns[0],
+				State:   columns[1],
+				Since:   columns[2],
+				CPU:     columns[3],
+				Memory:  columns[4],
+				Disk:    columns[5],
+				Details: details,
 			}
 			lastProcessIndex := len(appTable.Processes) - 1
 			appTable.Processes[lastProcessIndex].Instances = append(

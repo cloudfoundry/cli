@@ -28,6 +28,8 @@ type ProcessInstance struct {
 	State constant.ProcessInstanceState
 	//Uptime is the uptime in seconds for the instance.
 	Uptime int
+	//Details is information about errors placing the instance.
+	Details string
 }
 
 // UnmarshalJSON helps unmarshal a V3 Cloud Controller Instance response.
@@ -43,6 +45,7 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 		DiskQuota uint64 `json:"disk_quota"`
 		Index     int    `json:"index"`
 		Uptime    int    `json:"uptime"`
+		Details   string `json:"details"`
 	}
 	err := cloudcontroller.DecodeJSON(data, &inputInstance)
 	if err != nil {
@@ -58,6 +61,7 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 	instance.DiskQuota = inputInstance.DiskQuota
 	instance.Index = inputInstance.Index
 	instance.Uptime = inputInstance.Uptime
+	instance.Details = inputInstance.Details
 
 	return nil
 }

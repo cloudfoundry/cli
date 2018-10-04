@@ -59,6 +59,7 @@ func (display AppSummaryDisplayer2) displayAppInstancesTable(processSummary v3ac
 			display.UI.TranslateText("cpu"),
 			display.UI.TranslateText("memory"),
 			display.UI.TranslateText("disk"),
+			display.UI.TranslateText("details"),
 		},
 	}
 
@@ -76,6 +77,7 @@ func (display AppSummaryDisplayer2) displayAppInstancesTable(processSummary v3ac
 				"DiskUsage": bytefmt.ByteSize(instance.DiskUsage),
 				"DiskQuota": bytefmt.ByteSize(instance.DiskQuota),
 			}),
+			instance.Details,
 		})
 	}
 

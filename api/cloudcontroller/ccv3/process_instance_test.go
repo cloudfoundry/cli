@@ -96,7 +96,8 @@ var _ = Describe("ProcessInstance", func() {
 							"mem_quota": 2000000,
 							"disk_quota": 4000000,
 							"index": 0,
-							"uptime": 123
+							"uptime": 123,
+							"details": "some details"
 						},
 						{
 							"state": "RUNNING",
@@ -133,6 +134,7 @@ var _ = Describe("ProcessInstance", func() {
 						DiskQuota:   4000000,
 						Index:       0,
 						Uptime:      123,
+						Details:     "some details",
 					},
 					ProcessInstance{
 						State:       constant.ProcessInstanceRunning,
