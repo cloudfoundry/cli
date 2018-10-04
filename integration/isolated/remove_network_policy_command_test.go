@@ -10,7 +10,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("remove-network-policy command", func() {
@@ -43,25 +42,6 @@ var _ = Describe("remove-network-policy command", func() {
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "remove-network-policy", "some-app", "--destination-app", "some-other-app", "--port", "8080", "--protocol", "tcp")
-		})
-
-		When("the v3 api does not exist", func() {
-			var server *Server
-
-			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithoutV3API()
-			})
-
-			AfterEach(func() {
-				server.Close()
-			})
-
-			It("fails with no networking api error message", func() {
-				session := helpers.CF("remove-network-policy", "some-app", "--destination-app", "some-app", "--protocol", "tcp", "--port", "8080")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires Network Policy API V1. Your targeted endpoint does not expose it."))
-				Eventually(session).Should(Exit(1))
-			})
 		})
 	})
 

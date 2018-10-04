@@ -14,23 +14,6 @@ const (
 	DefaultV3Version string = "3.33.3"
 )
 
-func StartAndTargetServerWithoutV3API() *Server {
-	server := NewTLSServer()
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest(http.MethodGet, "/v2/info"),
-			RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
-		),
-		CombineHandlers(
-			VerifyRequest(http.MethodGet, "/"),
-			RespondWith(http.StatusNotFound, "{}"),
-		),
-	)
-
-	Eventually(CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
-	return server
-}
-
 func StartAndTargetServerWithAPIVersions(v2Version string, v3Version string) *Server {
 	server := NewTLSServer()
 

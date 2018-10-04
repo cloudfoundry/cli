@@ -78,25 +78,6 @@ var _ = Describe("share-service command", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "share-service", serviceInstance, "-s", sharedToSpaceName)
 		})
 
-		When("the v3 api does not exist", func() {
-			var server *Server
-
-			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithoutV3API()
-			})
-
-			AfterEach(func() {
-				server.Close()
-			})
-
-			It("fails with error message that the minimum version is not met", func() {
-				session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.36\\.0 or higher\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
 		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 

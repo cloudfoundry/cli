@@ -81,23 +81,6 @@ var _ = Describe("New V3 Based Clients", func() {
 			})
 		})
 
-		When("the error is a V3UnexpectedResponseError and the status code is 404", func() {
-			BeforeEach(func() {
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/"),
-						RespondWith(http.StatusNotFound, "{}"),
-					),
-				)
-			})
-
-			It("returns a V3APIDoesNotExistError", func() {
-				_, _, err := NewV3BasedClients(fakeConfig, testUI, true, "")
-				expectedErr := ccerror.V3UnexpectedResponseError{ResponseCode: http.StatusNotFound}
-				Expect(err).To(MatchError(expectedErr))
-			})
-		})
-
 		When("the error is generic and the body is valid json", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(

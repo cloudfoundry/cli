@@ -1,15 +1,11 @@
 package v6
 
 import (
-	"net/http"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 )
@@ -46,10 +42,6 @@ func (cmd *V3ApplyManifestCommand) Setup(config command.Config, ui command.UI) e
 
 	ccClient, _, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
-		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionApplicationFlowV3}
-		}
-
 		return err
 	}
 	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
@@ -63,7 +55,6 @@ func (cmd V3ApplyManifestCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
-	// TODO: Update minimum API version when apply-manifest is complete in V3 API
 	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
 	if err != nil {
 		return err

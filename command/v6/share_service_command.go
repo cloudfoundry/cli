@@ -1,18 +1,14 @@
 package v6
 
 import (
-	"net/http"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
@@ -46,9 +42,6 @@ func (cmd *ShareServiceCommand) Setup(config command.Config, ui command.UI) erro
 
 	ccClientV3, uaaClientV3, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
-		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionShareServiceV3}
-		}
 		return err
 	}
 

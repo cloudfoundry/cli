@@ -43,25 +43,6 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "set-org-default-isolation-segment", "orgname", "segment-name")
 		})
 
-		When("the v3 api does not exist", func() {
-			var server *Server
-
-			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithoutV3API()
-			})
-
-			AfterEach(func() {
-				server.Close()
-			})
-
-			It("fails with error message that the minimum version is not met", func() {
-				session := helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.11\\.0 or higher\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
 		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 

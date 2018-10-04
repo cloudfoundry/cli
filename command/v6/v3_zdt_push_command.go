@@ -2,14 +2,12 @@ package v6
 
 import (
 	"fmt"
-	"net/http"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
@@ -74,10 +72,6 @@ func (cmd *V3ZeroDowntimePushCommand) Setup(config command.Config, ui command.UI
 
 	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
-		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionZeroDowntimePushV3}
-		}
-
 		return err
 	}
 	v3actor := v3action.NewActor(ccClient, config, sharedActor, nil)

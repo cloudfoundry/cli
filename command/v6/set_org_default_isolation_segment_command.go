@@ -1,16 +1,12 @@
 package v6
 
 import (
-	"net/http"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
@@ -47,10 +43,6 @@ func (cmd *SetOrgDefaultIsolationSegmentCommand) Setup(config command.Config, ui
 
 	client, _, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
-		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionIsolationSegmentV3}
-		}
-
 		return err
 	}
 	cmd.Actor = v3action.NewActor(client, config, nil, nil)
