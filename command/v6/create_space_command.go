@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
@@ -45,10 +44,6 @@ func (cmd *CreateSpaceCommand) Setup(config command.Config, ui command.UI) error
 }
 
 func (cmd CreateSpaceCommand) Execute(args []string) error {
-	if !cmd.Config.Experimental() {
-		return translatableerror.UnrefactoredCommandError{}
-	}
-
 	spaceName := cmd.RequiredArgs.Space
 	userName, err := cmd.SharedActor.RequireCurrentUser()
 	if err != nil {
