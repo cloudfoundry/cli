@@ -1,3 +1,5 @@
+// +build !V7
+
 package internal
 
 var CommonHelpCategoryList = []HelpCategory{

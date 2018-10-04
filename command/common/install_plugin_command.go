@@ -108,7 +108,7 @@ func (cmd InstallPluginCommand) Execute([]string) error {
 	}
 	log.Info("started RPC server")
 
-	plugin, err := cmd.Actor.GetAndValidatePlugin(rpcService, V6Commands, executablePath)
+	plugin, err := cmd.Actor.GetAndValidatePlugin(rpcService, Commands, executablePath)
 	if err != nil {
 		return err
 	}

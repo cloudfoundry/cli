@@ -4,20 +4,30 @@ PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
 
 CF_BUILD_VERSION ?= $$(cat BUILD_VERSION)
+CF_BUILD_VERSION_V7 ?= $$(cat BUILD_VERSION_V7)
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 LD_FLAGS =-w -s \
 	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION) \
 	-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
 	-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)
+LD_FLAGS_V7 =-w -s \
+	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION_V7) \
+	-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
+	-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)
 LD_FLAGS_LINUX = -extldflags \"-static\" $(LD_FLAGS)
+LD_FLAGS_LINUX_V7 = -extldflags \"-static\" $(LD_FLAGS)
 REQUIRED_FOR_STATIC_BINARY =-a -tags netgo -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 UNAME_S := $(shell uname -s)
 
 all : test build
 
+ifndef CF_BUILD_V7
 build : out/cf
+else
+build : out/cf7
+endif
 
 check-target-env :
 ifndef CF_INT_API
@@ -97,6 +107,17 @@ out/cf: $(GOSRC)
 		-ldflags "$(LD_FLAGS_LINUX)" -o out/cf .
 endif
 
+# Build dynamic binary for Darwin
+ifeq ($(UNAME_S),Darwin)
+out/cf7: $(GOSRC)
+	go build -tags="V7" -ldflags "$(LD_FLAGS_V7)" -o out/cf7 .
+else
+out/cf7: $(GOSRC)
+	CGO_ENABLED=0 go build -tags="V7" \
+		$(REQUIRED_FOR_STATIC_BINARY) \
+		-ldflags "$(LD_FLAGS_LINUX_V7)" -o out/cf7 .
+endif
+
 out/cf-cli_linux_i686 : $(GOSRC)
 	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
 							$(REQUIRED_FOR_STATIC_BINARY) \
@@ -117,6 +138,28 @@ out/cf-cli_win32.exe : $(GOSRC) rsrc.syso
 
 out/cf-cli_winx64.exe : $(GOSRC) rsrc.syso
 	GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe -ldflags "$(LD_FLAGS)" .
+	rm rsrc.syso
+
+out/cf7-cli_linux_i686 : $(GOSRC)
+	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -tags="V7" \
+							$(REQUIRED_FOR_STATIC_BINARY) \
+							-ldflags "$(LD_FLAGS_LINUX_V7)" -o out/cf7-cli_linux_i686 .
+
+out/cf7-cli_linux_x86-64 : $(GOSRC)
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -tags="V7" \
+							$(REQUIRED_FOR_STATIC_BINARY) \
+							-ldflags "$(LD_FLAGS_LINUX_V7)" -o out/cf7-cli_linux_x86-64 .
+
+out/cf7-cli_osx : $(GOSRC)
+	GOARCH=amd64 GOOS=darwin go build -tags="V7" \
+				 -a -ldflags "$(LD_FLAGS_V7)" -o out/cf7-cli_osx .
+
+out/cf7-cli_win32.exe : $(GOSRC) rsrc.syso
+	GOARCH=386 GOOS=windows go build -tags="forceposix V7" -o out/cf7-cli_win32.exe -ldflags "$(LD_FLAGS_V7)" .
+	rm rsrc.syso
+
+out/cf7-cli_winx64.exe : $(GOSRC) rsrc.syso
+	GOARCH=amd64 GOOS=windows go build -tags="forceposix V7" -o out/cf7-cli_winx64.exe -ldflags "$(LD_FLAGS_V7)" .
 	rm rsrc.syso
 
 rsrc.syso :

@@ -1,3 +1,5 @@
+// +build !V7
+
 package common
 
 import (
@@ -7,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6"
 )
 
-var V6Commands commandList
+var Commands commandList
 var FallackCommands V2CommandList
 
 type V2CommandList struct {

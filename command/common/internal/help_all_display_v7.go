@@ -1,3 +1,5 @@
+// +build V7
+
 package internal
 
 var HelpCategoryList = []HelpCategory{
@@ -158,7 +160,7 @@ var ExperimentalHelpCategoryList = []HelpCategory{
 		CategoryName: "APPS (experimental):",
 		CommandList: [][]string{
 			{"v3-apps", "v3-create-app"},
-			{"v3-push", "v3-scale", "v3-delete"},
+			{"v3-push", "v3-scale"},
 			{"v3-start", "v3-stop", "v3-restart", "v3-stage", "v3-restart-app-instance", "v3-apply-manifest"},
 			{"v3-droplets", "v3-set-droplet"},
 			{"v3-env", "v3-set-env", "v3-unset-env"},
