@@ -586,7 +586,79 @@ var _ = Describe("Space", func() {
 		})
 	})
 
-	Describe("GrantSpaceManagerByUsername", func() {
+	Describe("UpdateSpaceDeveloperByUsername", func() {
+		var (
+			executeErr error
+			warnings   Warnings
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.UpdateSpaceDeveloperByUsername("some-space-guid", "user@example.com")
+		})
+
+		When("no errors are encountered", func() {
+			BeforeEach(func() {
+				jsonResponse := `{
+				"metadata": {
+					"guid": "some-space-guid"
+				},
+				"entity": {
+					"name": "some-space-name",
+					"organization_guid": "some-org-guid",
+					"space_quota_definition_guid": null,
+					"allow_ssh": true
+				}
+				}`
+
+				requestBody := map[string]interface{}{
+					"username": "user@example.com",
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/spaces/some-space-guid/developers"),
+						VerifyJSONRepresenting(requestBody),
+						RespondWith(http.StatusAccepted, jsonResponse, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					))
+			})
+
+			It("makes the user a space developer and returns warnings", func() {
+				Expect(server.ReceivedRequests()).To(HaveLen(2))
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+			})
+		})
+
+		When("the server errors", func() {
+			BeforeEach(func() {
+				jsonResponse := `{
+					"code": 10001,
+					"description": "Some Error",
+					"error_code": "CF-SomeError"
+				  }`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/spaces/some-space-guid/developers"),
+						RespondWith(http.StatusTeapot, jsonResponse, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					))
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V2UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        10001,
+						Description: "Some Error",
+						ErrorCode:   "CF-SomeError",
+					},
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+			})
+		})
+	})
+
+	Describe("UpdateSpaceManagerByUsername", func() {
 		When("no errors are encountered", func() {
 			BeforeEach(func() {
 				jsonResponse := `{
@@ -614,7 +686,7 @@ var _ = Describe("Space", func() {
 			})
 
 			It("grants the permission and returns all warnings", func() {
-				warnings, err := client.GrantSpaceManagerByUsername("some-space-guid", "user@example.com")
+				warnings, err := client.UpdateSpaceManagerByUsername("some-space-guid", "user@example.com")
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
@@ -637,7 +709,7 @@ var _ = Describe("Space", func() {
 			})
 
 			It("grants the permission and returns all warnings", func() {
-				warnings, err := client.GrantSpaceManagerByUsername("some-space-guid", "user@example.com")
+				warnings, err := client.UpdateSpaceManagerByUsername("some-space-guid", "user@example.com")
 
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,

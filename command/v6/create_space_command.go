@@ -14,7 +14,8 @@ import (
 
 type CreateSpaceActor interface {
 	CreateSpace(spaceName, orgName, quotaName string) (v2action.Space, v2action.Warnings, error)
-	GrantSpaceManagerByUsername(spaceGUID string, username string) (v2action.Warnings, error)
+	GrantSpaceManagerByUsername(orgGUID string, spaceGUID string, username string) (v2action.Warnings, error)
+	GrantSpaceDeveloperByUsername(spaceGUID string, username string) (v2action.Warnings, error)
 }
 
 type CreateSpaceCommand struct {
@@ -86,13 +87,14 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 		}
 	}
 
+	cmd.UI.DisplayOK()
 	cmd.UI.DisplayTextWithFlavor("Assigning role SpaceManager to user {{.User}} in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
 		"Space": spaceName,
 		"Org":   orgName,
 		"User":  userName,
 	})
 
-	warnings, err = cmd.Actor.GrantSpaceManagerByUsername(space.GUID, userName)
+	warnings, err = cmd.Actor.GrantSpaceManagerByUsername(space.OrganizationGUID, space.GUID, userName)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
@@ -106,6 +108,14 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 		"Org":   orgName,
 		"User":  userName,
 	})
+
+	warnings, err = cmd.Actor.GrantSpaceDeveloperByUsername(space.GUID, userName)
+	cmd.UI.DisplayWarnings(warnings)
+
+	if err != nil {
+		return err
+	}
+
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 

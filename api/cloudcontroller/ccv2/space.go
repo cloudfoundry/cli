@@ -195,20 +195,43 @@ func (client *Client) GetSpaces(filters ...Filter) ([]Space, Warnings, error) {
 	return fullSpacesList, warnings, err
 }
 
-type GrantSpaceManagerRequestBody struct {
+type updateRoleRequestBody struct {
 	Username string `json:"username"`
 }
 
-// GrantSpaceManagerByUsername grants the given username the space manager permission
-func (client *Client) GrantSpaceManagerByUsername(spaceGUID string, username string) (Warnings, error) {
-	requestBody := GrantSpaceManagerRequestBody{
+// UpdateSpaceDeveloperByUsername grants the given username the space developer role.
+func (client *Client) UpdateSpaceDeveloperByUsername(spaceGUID string, username string) (Warnings, error) {
+	requestBody := updateRoleRequestBody{
 		Username: username,
 	}
 
 	bodyBytes, _ := json.Marshal(requestBody)
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutAssociateManagerWithSpaceByUsername,
+		RequestName: internal.PutSpaceDeveloperByUsernameRequest,
+		URIParams:   map[string]string{"space_guid": spaceGUID},
+		Body:        bytes.NewReader(bodyBytes),
+	})
+	if err != nil {
+		return Warnings{}, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return Warnings(response.Warnings), err
+}
+
+// UpdateSpaceManagerByUsername grants the given username the space manager role.
+func (client *Client) UpdateSpaceManagerByUsername(spaceGUID string, username string) (Warnings, error) {
+	requestBody := updateRoleRequestBody{
+		Username: username,
+	}
+
+	bodyBytes, _ := json.Marshal(requestBody)
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutSpaceManagerByUsernameRequest,
 		URIParams:   map[string]string{"space_guid": spaceGUID},
 		Body:        bytes.NewReader(bodyBytes),
 	})

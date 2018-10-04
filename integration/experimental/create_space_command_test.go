@@ -37,7 +37,7 @@ func expectSuccessTextAndExitCode(session *Session, user, orgName, spaceName str
 	Eventually(session).Should(Exit(0))
 }
 
-var _ = XDescribe("create-space", func() {
+var _ = Describe("create-space", func() {
 	var spaceName string
 
 	When("invoked with --help", func() {

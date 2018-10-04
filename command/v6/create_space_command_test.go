@@ -155,13 +155,13 @@ var _ = Describe("CreateSpaceCommand", func() {
 					When("creating the space succeeds", func() {
 						BeforeEach(func() {
 							fakeActor.CreateSpaceReturns(
-								v2action.Space{GUID: "some-space-guid"},
+								v2action.Space{GUID: "some-space-guid", OrganizationGUID: "some-org-guid"},
 								v2action.Warnings{"warn-1", "warn-2"},
 								nil,
 							)
 						})
 
-						XIt("tells you that it plans to give the user space roles", func() {
+						It("tells you that it plans to give the user space roles", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(testUI.Out).To(Say(`Creating space %s in org %s as %s\.\.\.`, spaceName, orgName, username))
 
@@ -175,9 +175,15 @@ var _ = Describe("CreateSpaceCommand", func() {
 							Eventually(testUI.Out).Should(Say(`TIP: Use 'cf target -o "%s" -s "%s"' to target new space`, orgName, spaceName))
 						})
 
-						When("making the user a space manager succeeds", func() {
-							var spaceGUID string
+						It("attempts to make the user a space manager", func() {
+							Expect(fakeActor.GrantSpaceManagerByUsernameCallCount()).To(Equal(1))
+							orgGUID, spaceGUID, usernameArg := fakeActor.GrantSpaceManagerByUsernameArgsForCall(0)
+							Expect(orgGUID).To(Equal("some-org-guid"))
+							Expect(spaceGUID).To(Equal("some-space-guid"))
+							Expect(usernameArg).To(Equal(username))
+						})
 
+						When("making the user a space manager succeeds", func() {
 							BeforeEach(func() {
 								fakeActor.GrantSpaceManagerByUsernameReturns(
 									v2action.Warnings{"space-manager-warning-1", "space-manager-warning-2"},
@@ -187,14 +193,46 @@ var _ = Describe("CreateSpaceCommand", func() {
 
 							It("prints the warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(fakeActor.GrantSpaceManagerByUsernameCallCount()).To(Equal(1))
-								spaceGUID, username = fakeActor.GrantSpaceManagerByUsernameArgsForCall(0)
-								Expect(spaceGUID).To(Equal("some-space-guid"))
-
-								Expect(username).To(Equal(username))
-								Expect(testUI.Out).To(Say(`Assigning role SpaceManager to user %s in org %s / space %s as %s\.\.\.`, username, orgName, spaceName, username))
 								Expect(testUI.Err).To(Say("space-manager-warning-1\nspace-manager-warning-2\n"))
-								Expect(testUI.Out).To(Say("OK\n"))
+							})
+
+							It("attempts to make the user a space developer", func() {
+								Expect(fakeActor.GrantSpaceDeveloperByUsernameCallCount()).To(Equal(1))
+								spaceGUID, usernameArg := fakeActor.GrantSpaceDeveloperByUsernameArgsForCall(0)
+								Expect(spaceGUID).To(Equal("some-space-guid"))
+								Expect(usernameArg).To(Equal(username))
+							})
+
+							When("making the user a space developer succeeds", func() {
+								BeforeEach(func() {
+									fakeActor.GrantSpaceDeveloperByUsernameReturns(
+										v2action.Warnings{"space-developer-warning", "other-warning"},
+										nil,
+									)
+								})
+
+								It("prints the warnings", func() {
+									Expect(testUI.Err).To(Say("space-developer-warning"))
+									Expect(testUI.Err).To(Say("other-warning"))
+								})
+							})
+
+							When("making the user a space developer fails", func() {
+								BeforeEach(func() {
+									fakeActor.GrantSpaceDeveloperByUsernameReturns(
+										v2action.Warnings{"space-developer-warning", "other-warning"},
+										errors.New("Some terrible failure case"),
+									)
+								})
+
+								It("returns the error", func() {
+									Expect(executeErr).To(MatchError("Some terrible failure case"))
+								})
+
+								It("prints the warnings", func() {
+									Expect(testUI.Err).To(Say("space-developer-warning"))
+									Expect(testUI.Err).To(Say("other-warning"))
+								})
 							})
 						})
 
@@ -210,6 +248,10 @@ var _ = Describe("CreateSpaceCommand", func() {
 								Expect(executeErr).To(MatchError("some error"))
 								Expect(testUI.Out).To(Say(`Assigning role SpaceManager to user %s in org %s / space %s as %s\.\.\.`, username, orgName, spaceName, username))
 								Expect(testUI.Err).To(Say("space-manager-warning-1\nspace-manager-warning-2\n"))
+							})
+
+							It("should not try to grant the user SpaceDeveloper", func() {
+								Expect(fakeActor.GrantSpaceDeveloperByUsernameCallCount()).To(Equal(0))
 							})
 						})
 					})

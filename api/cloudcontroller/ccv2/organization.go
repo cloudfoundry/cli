@@ -203,3 +203,32 @@ func (client *Client) UpdateOrganizationManagerByUsername(guid string, username 
 
 	return response.Warnings, err
 }
+
+type updateOrgUserByUsernameRequestBody struct {
+	Username string `json:"username"`
+}
+
+func (client Client) UpdateOrganizationUserByUsername(orgGUID string, username string) (Warnings, error) {
+	requestBody := updateOrgUserByUsernameRequestBody{
+		Username: username,
+	}
+
+	body, err := json.Marshal(requestBody)
+	if err != nil {
+		return Warnings{}, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutOrganizationUserByUsernameRequest,
+		Body:        bytes.NewReader(body),
+		URIParams:   Params{"organization_guid": orgGUID},
+	})
+	if err != nil {
+		return Warnings{}, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
+}

@@ -423,4 +423,76 @@ var _ = Describe("Organization", func() {
 			})
 		})
 	})
+
+	Describe("UpdateOrganizationUserByUsername", func() {
+		var (
+			warnings Warnings
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			warnings, err = client.UpdateOrganizationUserByUsername("some-org-guid", "some-user")
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				expectedRequest := `{
+					"username": "some-user"
+				}`
+
+				response := `{
+					"metadata": {
+						"guid": "some-org-guid"
+					},
+					"entity": {
+						"name": "some-org",
+						"quota_definition_guid": "some-quota-guid"
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/organizations/some-org-guid/users"),
+						VerifyJSON(expectedRequest),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					))
+			})
+
+			It("returns warnings", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		When("the server returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 10001,
+					"description": "Some Error",
+					"error_code": "CF-SomeError"
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/organizations/some-org-guid/users"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					))
+			})
+
+			It("returns warnings", func() {
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+
+			It("returns the error", func() {
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        10001,
+						Description: "Some Error",
+						ErrorCode:   "CF-SomeError",
+					},
+				}))
+			})
+		})
+	})
 })

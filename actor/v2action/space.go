@@ -127,8 +127,23 @@ func (actor Actor) GetSpaceByOrganizationAndName(orgGUID string, spaceName strin
 
 // GrantSpaceManagerByUsername makes the provided user a Space Manager in the
 // space with the provided guid.
-func (actor Actor) GrantSpaceManagerByUsername(spaceGUID string, username string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.GrantSpaceManagerByUsername(spaceGUID, username)
+func (actor Actor) GrantSpaceManagerByUsername(orgGUID string, spaceGUID string, username string) (Warnings, error) {
+	var warnings Warnings
+	ccv2Warnings, err := actor.CloudControllerClient.UpdateOrganizationUserByUsername(orgGUID, username)
+	warnings = append(warnings, Warnings(ccv2Warnings)...)
+	if err != nil {
+		return warnings, err
+	}
 
+	ccv2Warnings, err = actor.CloudControllerClient.UpdateSpaceManagerByUsername(spaceGUID, username)
+	warnings = append(warnings, Warnings(ccv2Warnings)...)
+
+	return warnings, err
+}
+
+// GrantSpaceDeveloperByUsername makes the provided user a Space Developer in the
+// space with the provided guid.
+func (actor Actor) GrantSpaceDeveloperByUsername(spaceGUID string, username string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.UpdateSpaceDeveloperByUsername(spaceGUID, username)
 	return Warnings(warnings), err
 }
