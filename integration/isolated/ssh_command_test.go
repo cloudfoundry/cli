@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -105,6 +107,15 @@ applications:
 				It("does not throw any error", func() {
 					buffer := NewBuffer()
 					buffer.Write([]byte("exit\n"))
+
+					By("waiting for all instances to be running")
+					Eventually(func() bool {
+						session := helpers.CF("app", appName)
+						Eventually(session).Should(Exit(0))
+						output := session.Out.Contents()
+						return regexp.MustCompile(`#\d.*running.*\n#\d.*running.*`).Match(output)
+					}, 30*time.Second, 2*time.Second).Should(BeTrue())
+
 					session := helpers.CFWithStdin(buffer, "ssh", appName, "-i", "0")
 					Eventually(session).Should(Exit(0))
 				})
