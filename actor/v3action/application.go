@@ -89,6 +89,7 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 		ccv3.Application{
 			LifecycleType:       app.LifecycleType,
 			LifecycleBuildpacks: app.LifecycleBuildpacks,
+			StackName:           app.StackName,
 			Name:                app.Name,
 			Relationships: ccv3.Relationships{
 				constant.RelationshipTypeSpace: ccv3.Relationship{GUID: spaceGUID},

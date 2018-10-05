@@ -68,6 +68,16 @@ var _ = Describe("Application", func() {
 					It("omits the lifecycle from the JSON", func() {
 						Expect(string(appBytes)).To(MatchJSON("{}"))
 					})
+
+					When("but you do specify a stack", func() {
+						BeforeEach(func() {
+							app.StackName = "cflinuxfs9000"
+						})
+
+						It("does, in fact, send the stack in the json", func() {
+							Expect(string(appBytes)).To(MatchJSON(`{"lifecycle":{"data":{"stack":"cflinuxfs9000"},"type":"buildpack"}}`))
+						})
+					})
 				})
 
 				When("default buildpack is provided", func() {

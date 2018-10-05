@@ -38,9 +38,9 @@ func (a Application) MarshalJSON() ([]byte, error) {
 	if a.LifecycleType == constant.AppLifecycleTypeDocker {
 		ccApp.setDockerLifecycle()
 	} else if a.LifecycleType == constant.AppLifecycleTypeBuildpack {
-		if len(a.LifecycleBuildpacks) > 0 {
+		if len(a.LifecycleBuildpacks) > 0 || a.StackName != "" {
 			if a.hasAutodetectedBuildpack() {
-				ccApp.setAutodetectedBuildpackLifecycle()
+				ccApp.setAutodetectedBuildpackLifecycle(a)
 			} else {
 				ccApp.setBuildpackLifecycle(a)
 			}
@@ -74,6 +74,9 @@ func (a *Application) UnmarshalJSON(data []byte) error {
 }
 
 func (a Application) hasAutodetectedBuildpack() bool {
+	if len(a.LifecycleBuildpacks) == 0 {
+		return false
+	}
 	return a.LifecycleBuildpacks[0] == "default" || a.LifecycleBuildpacks[0] == "null"
 }
 
@@ -93,7 +96,7 @@ type ccApplication struct {
 	State         constant.ApplicationState `json:"state,omitempty"`
 }
 
-func (ccApp *ccApplication) setAutodetectedBuildpackLifecycle() {
+func (ccApp *ccApplication) setAutodetectedBuildpackLifecycle(a Application) {
 	var nullBuildpackLifecycle struct {
 		Type constant.AppLifecycleType `json:"type,omitempty"`
 		Data struct {
@@ -102,6 +105,7 @@ func (ccApp *ccApplication) setAutodetectedBuildpackLifecycle() {
 		} `json:"data"`
 	}
 	nullBuildpackLifecycle.Type = constant.AppLifecycleTypeBuildpack
+	nullBuildpackLifecycle.Data.Stack = a.StackName
 	ccApp.Lifecycle = nullBuildpackLifecycle
 }
 
