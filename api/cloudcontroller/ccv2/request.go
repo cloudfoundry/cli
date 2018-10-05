@@ -1,7 +1,6 @@
 package ccv2
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -39,9 +38,24 @@ func (client Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontrol
 	var request *http.Request
 	var err error
 	if passedRequest.URI != "" {
+		var (
+			path *url.URL
+			base *url.URL
+		)
+
+		path, err = url.Parse(passedRequest.URI)
+		if err != nil {
+			return nil, err
+		}
+
+		base, err = url.Parse(client.API())
+		if err != nil {
+			return nil, err
+		}
+
 		request, err = http.NewRequest(
 			passedRequest.Method,
-			fmt.Sprintf("%s%s", client.API(), passedRequest.URI),
+			base.ResolveReference(path).String(),
 			passedRequest.Body,
 		)
 	} else {

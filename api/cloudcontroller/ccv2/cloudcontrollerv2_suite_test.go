@@ -59,7 +59,7 @@ func NewClientWithCustomAPIVersion(apiVersion string, passed ...Config) *Client 
 	client := NewClient(config)
 	warnings, err := client.TargetCF(TargetSettings{
 		SkipSSLValidation: true,
-		URL:               server.URL(),
+		URL:               server.URL() + "/",
 	})
 	Expect(err).ToNot(HaveOccurred())
 	Expect(warnings).To(BeEmpty())

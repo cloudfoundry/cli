@@ -87,7 +87,7 @@ var _ = Describe("Info", func() {
 
 		It("returns back an APINotFoundError", func() {
 			_, _, err := client.Info()
-			Expect(err).To(MatchError(ccerror.APINotFoundError{URL: server.URL()}))
+			Expect(err).To(MatchError(ccerror.APINotFoundError{URL: server.URL() + "/"}))
 		})
 	})
 })
