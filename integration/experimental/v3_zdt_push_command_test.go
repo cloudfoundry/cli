@@ -47,6 +47,7 @@ var _ = Describe("v3-zdt-push command", func() {
 				Eventually(session).Should(Say("cf v3-zdt-push APP_NAME --docker-image \\[REGISTRY_HOST:PORT/\\]IMAGE\\[:TAG\\] \\[--docker-username USERNAME\\] \\[--no-route\\]"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("-b\\s+Custom buildpack by name \\(e\\.g\\. my-buildpack\\) or Git URL \\(e\\.g\\. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e\\.g\\. 'https://github.com/cloudfoundry/java-buildpack\\.git#v3.3.0' for 'v3.3.0' tag\\)\\. To use built-in buildpacks only, specify 'default' or 'null'"))
+				Eventually(session).Should(Say("-s\\s+Stack to use \\(a stack is a pre-built file system, including an operating system, that can run apps\\)"))
 				Eventually(session).Should(Say("--docker-image, -o\\s+Docker image to use \\(e\\.g\\. user/docker-image-name\\)"))
 				Eventually(session).Should(Say("--docker-username\\s+Repository username; used with password from environment variable CF_DOCKER_PASSWORD"))
 				Eventually(session).Should(Say("--no-route\\s+Do not map a route to this app"))
@@ -551,6 +552,37 @@ var _ = Describe("v3-zdt-push command", func() {
 				Eventually(session).Should(Say("memory usage:\\s+32M"))
 				Eventually(session).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
 				Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+			})
+		})
+
+		Context("when the -s flag is set", func() {
+			var session *Session
+			BeforeEach(func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-s", "cflinuxfs2")
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			It("uses the specified stack", func() {
+				Eventually(session).Should(Say("name:\\s+%s", appName))
+				Eventually(session).Should(Say("requested state:\\s+started"))
+				Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+				Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+			})
+
+			Context("but its set to an invalid stack", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-s", "invalid_stack")
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				It("errors", func() {
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say(`Stack must be an existing stack`))
+				})
 			})
 		})
 

@@ -39,6 +39,7 @@ type V3ZeroDowntimeVersionActor interface {
 type V3ZeroDowntimePushCommand struct {
 	RequiredArgs        flag.AppName                `positional-args:"yes"`
 	Buildpacks          []string                    `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	StackName           string                      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	DockerImage         flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername      string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
@@ -265,6 +266,7 @@ func (cmd V3ZeroDowntimePushCommand) createApplication(userName string) (v3actio
 	} else {
 		appToCreate.LifecycleType = constant.AppLifecycleTypeBuildpack
 		appToCreate.LifecycleBuildpacks = cmd.Buildpacks
+		appToCreate.StackName = cmd.StackName
 	}
 
 	app, warnings, err := cmd.ZdtActor.CreateApplicationInSpace(
@@ -316,6 +318,7 @@ func (cmd V3ZeroDowntimePushCommand) updateApplication(userName string, appGUID 
 	} else {
 		appToUpdate.LifecycleType = constant.AppLifecycleTypeBuildpack
 		appToUpdate.LifecycleBuildpacks = cmd.Buildpacks
+		appToUpdate.StackName = cmd.StackName
 	}
 
 	app, warnings, err := cmd.ZdtActor.UpdateApplication(appToUpdate)

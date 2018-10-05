@@ -871,6 +871,21 @@ var _ = Describe("v3-zdt-push Command", func() {
 					})
 				})
 
+				Context("when a stack was provided", func() {
+					BeforeEach(func() {
+						cmd.StackName = "cflinuxfs9000"
+					})
+
+					It("updates the stack", func() {
+						appArg := fakeZdtActor.UpdateApplicationArgsForCall(0)
+						Expect(appArg).To(Equal(v3action.Application{
+							GUID:          "some-app-guid",
+							LifecycleType: constant.AppLifecycleTypeBuildpack,
+							StackName:     "cflinuxfs9000",
+						}))
+					})
+				})
+
 				Context("when multiple buildpacks are provided", func() {
 					BeforeEach(func() {
 						cmd.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
