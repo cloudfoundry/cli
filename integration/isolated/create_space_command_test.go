@@ -1,6 +1,9 @@
 package isolated
 
 import (
+	"fmt"
+	"strings"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -37,6 +40,13 @@ func expectSuccessTextAndExitCode(session *Session, user, orgName, spaceName str
 	Eventually(session).Should(Exit(0))
 }
 
+func expectClientToHaveSpaceRole(clientID, spaceGUID, role string) {
+	spaceRoleEndpoint := fmt.Sprintf("/v2/spaces/%s/%ss", spaceGUID, role)
+	session := helpers.CF("curl", spaceRoleEndpoint)
+	Eventually(session).Should(Say(`"guid": "%s",`, clientID))
+	Eventually(session).Should(Exit(0))
+}
+
 var _ = Describe("create-space", func() {
 	var spaceName string
 
@@ -67,7 +77,7 @@ var _ = Describe("create-space", func() {
 		spaceName = helpers.NewSpaceName()
 	})
 
-	PWhen("logged in as a client", func() {
+	When("logged in as a client", func() {
 		var client, orgName string
 
 		BeforeEach(func() {
@@ -75,9 +85,17 @@ var _ = Describe("create-space", func() {
 			orgName = helpers.CreateAndTargetOrg()
 		})
 
-		It("successfully creates a space", func() {
+		It("successfully creates a space and assigns roles to the client", func() {
 			session := helpers.CF("create-space", spaceName)
 			expectSuccessTextAndExitCode(session, client, orgName, spaceName)
+
+			session = helpers.CF("space", spaceName, "--guid")
+			Eventually(session).Should(Exit(0))
+			spaceGUID := strings.TrimSpace(string(session.Out.Contents()))
+
+			// TODO: #159969808 should allow us to remove this workaround.
+			expectClientToHaveSpaceRole(client, spaceGUID, "manager")
+			expectClientToHaveSpaceRole(client, spaceGUID, "developer")
 		})
 	})
 

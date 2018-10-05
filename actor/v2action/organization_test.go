@@ -197,6 +197,7 @@ var _ = Describe("Org Actions", func() {
 			warnings Warnings
 			err      error
 		)
+
 		JustBeforeEach(func() {
 			warnings, err = actor.GrantOrgManagerByUsername(guid, username)
 		})

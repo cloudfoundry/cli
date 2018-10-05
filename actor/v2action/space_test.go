@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	uaaconst "code.cloudfoundry.org/cli/api/uaa/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -17,11 +18,13 @@ var _ = Describe("Space", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
+		fakeConfig                *v2actionfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil)
+		fakeConfig = new(v2actionfakes.FakeConfig)
+		actor = NewActor(fakeCloudControllerClient, nil, fakeConfig)
 	})
 
 	Describe("CreateSpace", func() {
@@ -506,66 +509,155 @@ var _ = Describe("Space", func() {
 			warnings, executeErr = actor.GrantSpaceManagerByUsername("some-org-guid", "some-space-guid", "some-username")
 		})
 
-		When("ensuring the user is a member of the org fails", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.UpdateOrganizationUserByUsernameReturns(
-					ccv2.Warnings{"some org user warning"},
-					errors.New("could not add user to org"),
-				)
+		When("acting as a user", func() {
+			When("ensuring the user is a member of the org succeeds", func() {
+				When("the cloud controller returns with success", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.UpdateSpaceManagerByUsernameReturns(
+							ccv2.Warnings{"warning-1", "warning-2"},
+							nil,
+						)
+						fakeCloudControllerClient.UpdateOrganizationUserByUsernameReturns(ccv2.Warnings{"org-user-warning"}, nil)
+					})
+
+					It("returns all the warnings", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(warnings).To(ConsistOf("warning-1", "warning-2", "org-user-warning"))
+					})
+
+					It("makes the user a member of the org", func() {
+						Expect(fakeCloudControllerClient.UpdateOrganizationUserByUsernameCallCount()).To(Equal(1))
+						orgGUID, username := fakeCloudControllerClient.UpdateOrganizationUserByUsernameArgsForCall(0)
+						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(username).To(Equal("some-username"))
+					})
+
+					It("makes the user a space manager in the requested space", func() {
+						Expect(fakeCloudControllerClient.UpdateSpaceManagerByUsernameCallCount()).To(Equal(1))
+					})
+				})
 			})
 
-			It("returns the error and warnings", func() {
-				Expect(warnings).To(ConsistOf("some org user warning"))
-				Expect(executeErr).To(MatchError("could not add user to org"))
-			})
-
-			It("does not make the user a space manager", func() {
-				Expect(fakeCloudControllerClient.UpdateSpaceManagerByUsernameCallCount()).To(Equal(0))
-			})
-		})
-
-		When("ensuring the user is a member of the org succeeds", func() {
-			When("the cloud controller returns with success", func() {
+			When("ensuring the user is a member of the org fails", func() {
 				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateOrganizationUserByUsernameReturns(
+						ccv2.Warnings{"some org user warning"},
+						errors.New("could not add user to org"),
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(warnings).To(ConsistOf("some org user warning"))
+					Expect(executeErr).To(MatchError("could not add user to org"))
+				})
+
+				It("does not make the user a space manager", func() {
+					Expect(fakeCloudControllerClient.UpdateSpaceManagerByUsernameCallCount()).To(Equal(0))
+				})
+			})
+
+			When("making the user a space manager errors", func() {
+				var returnedErr error
+
+				BeforeEach(func() {
+					returnedErr = errors.New("cc-grant-space-manager-error")
 					fakeCloudControllerClient.UpdateSpaceManagerByUsernameReturns(
 						ccv2.Warnings{"warning-1", "warning-2"},
-						nil,
+						returnedErr,
 					)
-					fakeCloudControllerClient.UpdateOrganizationUserByUsernameReturns(ccv2.Warnings{"org-user-warning"}, nil)
 				})
 
-				It("returns all the warnings", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "org-user-warning"))
+				It("returns the error and all the warnings", func() {
+					Expect(executeErr).To(MatchError(returnedErr))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
+			})
 
-				It("calls GrantSpaceManagerByUsername on the cloud controller client", func() {
-					Expect(fakeCloudControllerClient.UpdateSpaceManagerByUsernameCallCount()).To(Equal(1))
-				})
-
-				It("calls UpdateOrganizationUserByUsername on the cloud controller client", func() {
-					Expect(fakeCloudControllerClient.UpdateOrganizationUserByUsernameCallCount()).To(Equal(1))
-					orgGUID, username := fakeCloudControllerClient.UpdateOrganizationUserByUsernameArgsForCall(0)
-					Expect(orgGUID).To(Equal("some-org-guid"))
-					Expect(username).To(Equal("some-username"))
-				})
+			It("does not treat the username as a guid", func() {
+				Expect(fakeCloudControllerClient.UpdateOrganizationUserCallCount()).To(Equal(0))
+				Expect(fakeCloudControllerClient.UpdateSpaceManagerCallCount()).To(Equal(0))
 			})
 		})
 
-		When("the cloud controller returns with an error", func() {
-			var returnedErr error
-
+		When("acting as a client", func() {
 			BeforeEach(func() {
-				returnedErr = errors.New("cc-grant-space-manager-error")
-				fakeCloudControllerClient.UpdateSpaceManagerByUsernameReturns(
-					ccv2.Warnings{"warning-1", "warning-2"},
-					returnedErr,
-				)
+				fakeConfig.UAAGrantTypeReturns(string(uaaconst.GrantTypeClientCredentials))
 			})
 
-			It("returns the error and all the warnings", func() {
-				Expect(executeErr).To(MatchError(returnedErr))
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			When("ensuring the client is a member of the org succeeds", func() {
+				When("the cloud controller returns with success", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.UpdateOrganizationUserReturns(ccv2.Warnings{"org-user-warning"}, nil)
+						fakeCloudControllerClient.UpdateSpaceManagerReturns(
+							ccv2.Warnings{"warning-1", "warning-2"},
+							nil,
+						)
+					})
+
+					It("returns all the warnings", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(warnings).To(ConsistOf("warning-1", "warning-2", "org-user-warning"))
+					})
+
+					It("makes the client a member of the org", func() {
+						Expect(fakeCloudControllerClient.UpdateOrganizationUserCallCount()).To(Equal(1))
+						orgGUID, username := fakeCloudControllerClient.UpdateOrganizationUserArgsForCall(0)
+						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(username).To(Equal("some-username"))
+					})
+
+					It("makes the user a space manager for the requested space", func() {
+						Expect(fakeCloudControllerClient.UpdateSpaceManagerCallCount()).To(Equal(1))
+						spaceGUID, clientID := fakeCloudControllerClient.UpdateSpaceManagerArgsForCall(0)
+						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(clientID).To(Equal("some-username"))
+					})
+				})
+			})
+
+			When("ensuring the client is a member of the org fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateOrganizationUserReturns(
+						ccv2.Warnings{"some org user warning"},
+						errors.New("ya done goofed"),
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(warnings).To(ConsistOf("some org user warning"))
+					Expect(executeErr).To(MatchError("ya done goofed"))
+				})
+
+				It("does not make the user a space manager", func() {
+					Expect(fakeCloudControllerClient.UpdateSpaceManagerCallCount()).To(Equal(0))
+				})
+			})
+
+			When("making the client a space manager errors", func() {
+				var returnedErr error
+
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateOrganizationUserReturns(
+						ccv2.Warnings{"some org user warning"},
+						nil,
+					)
+
+					returnedErr = errors.New("cc-grant-space-manager-error")
+					fakeCloudControllerClient.UpdateSpaceManagerReturns(
+						ccv2.Warnings{"warning-1", "warning-2"},
+						returnedErr,
+					)
+				})
+
+				It("returns the error and all the warnings", func() {
+					Expect(executeErr).To(MatchError(returnedErr))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "some org user warning"))
+				})
+			})
+
+			It("does not treat the client ID as a username", func() {
+				Expect(fakeCloudControllerClient.UpdateOrganizationUserByUsernameCallCount()).To(Equal(0))
+				Expect(fakeCloudControllerClient.UpdateSpaceManagerByUsernameCallCount()).To(Equal(0))
 			})
 		})
 	})
@@ -580,40 +672,90 @@ var _ = Describe("Space", func() {
 			warnings, executeErr = actor.GrantSpaceDeveloperByUsername("some-space-guid", "some-username")
 		})
 
-		It("attempts to add the user to the space developers list", func() {
-			Expect(fakeCloudControllerClient.UpdateSpaceDeveloperByUsernameCallCount()).To(Equal(1))
-			spaceGUID, username := fakeCloudControllerClient.UpdateSpaceDeveloperByUsernameArgsForCall(0)
-			Expect(spaceGUID).To(Equal("some-space-guid"))
-			Expect(username).To(Equal("some-username"))
+		When("acting as a user", func() {
+			It("attempts to add the user to the space developers list", func() {
+				Expect(fakeCloudControllerClient.UpdateSpaceDeveloperByUsernameCallCount()).To(Equal(1))
+				spaceGUID, username := fakeCloudControllerClient.UpdateSpaceDeveloperByUsernameArgsForCall(0)
+				Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(username).To(Equal("some-username"))
+			})
+
+			When("the request is successful", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateSpaceDeveloperByUsernameReturns(
+						ccv2.Warnings{"warning-1", "warning-2"},
+						nil,
+					)
+				})
+
+				It("returns all warnings", func() {
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
+			})
+
+			When("the request fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateSpaceDeveloperByUsernameReturns(
+						ccv2.Warnings{"warning-1", "warning-2"},
+						errors.New("the request failed"),
+					)
+				})
+
+				It("return the error", func() {
+					Expect(executeErr).To(MatchError("the request failed"))
+				})
+
+				It("returns all warnings", func() {
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
+			})
 		})
 
-		When("the request is successful", func() {
+		When("acting as a client", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.UpdateSpaceDeveloperByUsernameReturns(
-					ccv2.Warnings{"warning-1", "warning-2"},
-					nil,
-				)
+				fakeConfig.UAAGrantTypeReturns(string(uaaconst.GrantTypeClientCredentials))
 			})
 
-			It("returns all warnings", func() {
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-			})
-		})
-
-		When("the request fails", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.UpdateSpaceDeveloperByUsernameReturns(
-					ccv2.Warnings{"warning-1", "warning-2"},
-					errors.New("the request failed"),
-				)
+			It("attempts to add the client to the space developers list", func() {
+				Expect(fakeCloudControllerClient.UpdateSpaceDeveloperCallCount()).To(Equal(1))
+				spaceGUID, username := fakeCloudControllerClient.UpdateSpaceDeveloperArgsForCall(0)
+				Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(username).To(Equal("some-username"))
 			})
 
-			It("return the error", func() {
-				Expect(executeErr).To(MatchError("the request failed"))
+			It("does not treat the client ID as a username", func() {
+				Expect(fakeCloudControllerClient.UpdateSpaceDeveloperByUsernameCallCount()).To(Equal(0))
 			})
 
-			It("returns all warnings", func() {
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			When("making the user a space developer succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateSpaceDeveloperReturns(
+						ccv2.Warnings{"warning-1", "warning-2"},
+						nil,
+					)
+				})
+
+				It("returns all the warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
+			})
+
+			When("making the user a space developer fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.UpdateSpaceDeveloperReturns(
+						ccv2.Warnings{"warning-1", "warning-2"},
+						errors.New("boom!"),
+					)
+				})
+
+				It("returns all the warnings", func() {
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("boom!"))
+				})
 			})
 		})
 	})

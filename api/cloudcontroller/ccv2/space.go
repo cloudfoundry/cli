@@ -195,6 +195,25 @@ func (client *Client) GetSpaces(filters ...Filter) ([]Space, Warnings, error) {
 	return fullSpacesList, warnings, err
 }
 
+// UpdateSpaceDeveloper grants the space developer role to the user or client
+// associated with the given UAA ID.
+func (client *Client) UpdateSpaceDeveloper(spaceGUID string, uaaID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutSpaceDeveloperRequest,
+		URIParams: map[string]string{
+			"space_guid":     spaceGUID,
+			"developer_guid": uaaID,
+		},
+	})
+	if err != nil {
+		return Warnings{}, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}
+
 type updateRoleRequestBody struct {
 	Username string `json:"username"`
 }
@@ -205,7 +224,10 @@ func (client *Client) UpdateSpaceDeveloperByUsername(spaceGUID string, username 
 		Username: username,
 	}
 
-	bodyBytes, _ := json.Marshal(requestBody)
+	bodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return Warnings{}, err
+	}
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutSpaceDeveloperByUsernameRequest,
@@ -222,14 +244,35 @@ func (client *Client) UpdateSpaceDeveloperByUsername(spaceGUID string, username 
 	return Warnings(response.Warnings), err
 }
 
+// UpdateSpaceManager grants the space manager role to the user or client
+// associated with the given UAA ID.
+func (client *Client) UpdateSpaceManager(spaceGUID string, uaaID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutSpaceManagerRequest,
+		URIParams: map[string]string{
+			"space_guid":   spaceGUID,
+			"manager_guid": uaaID,
+		},
+	})
+	if err != nil {
+		return Warnings{}, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}
+
 // UpdateSpaceManagerByUsername grants the given username the space manager role.
 func (client *Client) UpdateSpaceManagerByUsername(spaceGUID string, username string) (Warnings, error) {
 	requestBody := updateRoleRequestBody{
 		Username: username,
 	}
 
-	bodyBytes, _ := json.Marshal(requestBody)
-
+	bodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return Warnings{}, err
+	}
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutSpaceManagerByUsernameRequest,
 		URIParams:   map[string]string{"space_guid": spaceGUID},

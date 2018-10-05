@@ -1002,6 +1002,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
+	UpdateOrganizationUserStub        func(guid string, uaaID string) (ccv2.Warnings, error)
+	updateOrganizationUserMutex       sync.RWMutex
+	updateOrganizationUserArgsForCall []struct {
+		guid  string
+		uaaID string
+	}
+	updateOrganizationUserReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	updateOrganizationUserReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	UpdateOrganizationUserByUsernameStub        func(guid string, username string) (ccv2.Warnings, error)
 	updateOrganizationUserByUsernameMutex       sync.RWMutex
 	updateOrganizationUserByUsernameArgsForCall []struct {
@@ -1075,6 +1089,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
+	UpdateSpaceDeveloperStub        func(spaceGUID string, uaaID string) (ccv2.Warnings, error)
+	updateSpaceDeveloperMutex       sync.RWMutex
+	updateSpaceDeveloperArgsForCall []struct {
+		spaceGUID string
+		uaaID     string
+	}
+	updateSpaceDeveloperReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	updateSpaceDeveloperReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	UpdateSpaceDeveloperByUsernameStub        func(spaceGUID string, username string) (ccv2.Warnings, error)
 	updateSpaceDeveloperByUsernameMutex       sync.RWMutex
 	updateSpaceDeveloperByUsernameArgsForCall []struct {
@@ -1086,6 +1114,20 @@ type FakeCloudControllerClient struct {
 		result2 error
 	}
 	updateSpaceDeveloperByUsernameReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	UpdateSpaceManagerStub        func(spaceGUID string, uaaID string) (ccv2.Warnings, error)
+	updateSpaceManagerMutex       sync.RWMutex
+	updateSpaceManagerArgsForCall []struct {
+		spaceGUID string
+		uaaID     string
+	}
+	updateSpaceManagerReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	updateSpaceManagerReturnsOnCall map[int]struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
@@ -4772,6 +4814,58 @@ func (fake *FakeCloudControllerClient) UpdateOrganizationManagerByUsernameReturn
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) UpdateOrganizationUser(guid string, uaaID string) (ccv2.Warnings, error) {
+	fake.updateOrganizationUserMutex.Lock()
+	ret, specificReturn := fake.updateOrganizationUserReturnsOnCall[len(fake.updateOrganizationUserArgsForCall)]
+	fake.updateOrganizationUserArgsForCall = append(fake.updateOrganizationUserArgsForCall, struct {
+		guid  string
+		uaaID string
+	}{guid, uaaID})
+	fake.recordInvocation("UpdateOrganizationUser", []interface{}{guid, uaaID})
+	fake.updateOrganizationUserMutex.Unlock()
+	if fake.UpdateOrganizationUserStub != nil {
+		return fake.UpdateOrganizationUserStub(guid, uaaID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.updateOrganizationUserReturns.result1, fake.updateOrganizationUserReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationUserCallCount() int {
+	fake.updateOrganizationUserMutex.RLock()
+	defer fake.updateOrganizationUserMutex.RUnlock()
+	return len(fake.updateOrganizationUserArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationUserArgsForCall(i int) (string, string) {
+	fake.updateOrganizationUserMutex.RLock()
+	defer fake.updateOrganizationUserMutex.RUnlock()
+	return fake.updateOrganizationUserArgsForCall[i].guid, fake.updateOrganizationUserArgsForCall[i].uaaID
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationUserReturns(result1 ccv2.Warnings, result2 error) {
+	fake.UpdateOrganizationUserStub = nil
+	fake.updateOrganizationUserReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationUserReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.UpdateOrganizationUserStub = nil
+	if fake.updateOrganizationUserReturnsOnCall == nil {
+		fake.updateOrganizationUserReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.updateOrganizationUserReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UpdateOrganizationUserByUsername(guid string, username string) (ccv2.Warnings, error) {
 	fake.updateOrganizationUserByUsernameMutex.Lock()
 	ret, specificReturn := fake.updateOrganizationUserByUsernameReturnsOnCall[len(fake.updateOrganizationUserByUsernameArgsForCall)]
@@ -5042,6 +5136,58 @@ func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceReturnsOnC
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) UpdateSpaceDeveloper(spaceGUID string, uaaID string) (ccv2.Warnings, error) {
+	fake.updateSpaceDeveloperMutex.Lock()
+	ret, specificReturn := fake.updateSpaceDeveloperReturnsOnCall[len(fake.updateSpaceDeveloperArgsForCall)]
+	fake.updateSpaceDeveloperArgsForCall = append(fake.updateSpaceDeveloperArgsForCall, struct {
+		spaceGUID string
+		uaaID     string
+	}{spaceGUID, uaaID})
+	fake.recordInvocation("UpdateSpaceDeveloper", []interface{}{spaceGUID, uaaID})
+	fake.updateSpaceDeveloperMutex.Unlock()
+	if fake.UpdateSpaceDeveloperStub != nil {
+		return fake.UpdateSpaceDeveloperStub(spaceGUID, uaaID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.updateSpaceDeveloperReturns.result1, fake.updateSpaceDeveloperReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceDeveloperCallCount() int {
+	fake.updateSpaceDeveloperMutex.RLock()
+	defer fake.updateSpaceDeveloperMutex.RUnlock()
+	return len(fake.updateSpaceDeveloperArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceDeveloperArgsForCall(i int) (string, string) {
+	fake.updateSpaceDeveloperMutex.RLock()
+	defer fake.updateSpaceDeveloperMutex.RUnlock()
+	return fake.updateSpaceDeveloperArgsForCall[i].spaceGUID, fake.updateSpaceDeveloperArgsForCall[i].uaaID
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceDeveloperReturns(result1 ccv2.Warnings, result2 error) {
+	fake.UpdateSpaceDeveloperStub = nil
+	fake.updateSpaceDeveloperReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceDeveloperReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.UpdateSpaceDeveloperStub = nil
+	if fake.updateSpaceDeveloperReturnsOnCall == nil {
+		fake.updateSpaceDeveloperReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.updateSpaceDeveloperReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UpdateSpaceDeveloperByUsername(spaceGUID string, username string) (ccv2.Warnings, error) {
 	fake.updateSpaceDeveloperByUsernameMutex.Lock()
 	ret, specificReturn := fake.updateSpaceDeveloperByUsernameReturnsOnCall[len(fake.updateSpaceDeveloperByUsernameArgsForCall)]
@@ -5089,6 +5235,58 @@ func (fake *FakeCloudControllerClient) UpdateSpaceDeveloperByUsernameReturnsOnCa
 		})
 	}
 	fake.updateSpaceDeveloperByUsernameReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceManager(spaceGUID string, uaaID string) (ccv2.Warnings, error) {
+	fake.updateSpaceManagerMutex.Lock()
+	ret, specificReturn := fake.updateSpaceManagerReturnsOnCall[len(fake.updateSpaceManagerArgsForCall)]
+	fake.updateSpaceManagerArgsForCall = append(fake.updateSpaceManagerArgsForCall, struct {
+		spaceGUID string
+		uaaID     string
+	}{spaceGUID, uaaID})
+	fake.recordInvocation("UpdateSpaceManager", []interface{}{spaceGUID, uaaID})
+	fake.updateSpaceManagerMutex.Unlock()
+	if fake.UpdateSpaceManagerStub != nil {
+		return fake.UpdateSpaceManagerStub(spaceGUID, uaaID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.updateSpaceManagerReturns.result1, fake.updateSpaceManagerReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceManagerCallCount() int {
+	fake.updateSpaceManagerMutex.RLock()
+	defer fake.updateSpaceManagerMutex.RUnlock()
+	return len(fake.updateSpaceManagerArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceManagerArgsForCall(i int) (string, string) {
+	fake.updateSpaceManagerMutex.RLock()
+	defer fake.updateSpaceManagerMutex.RUnlock()
+	return fake.updateSpaceManagerArgsForCall[i].spaceGUID, fake.updateSpaceManagerArgsForCall[i].uaaID
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceManagerReturns(result1 ccv2.Warnings, result2 error) {
+	fake.UpdateSpaceManagerStub = nil
+	fake.updateSpaceManagerReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceManagerReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.UpdateSpaceManagerStub = nil
+	if fake.updateSpaceManagerReturnsOnCall == nil {
+		fake.updateSpaceManagerReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.updateSpaceManagerReturnsOnCall[i] = struct {
 		result1 ccv2.Warnings
 		result2 error
 	}{result1, result2}
@@ -5733,6 +5931,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateOrganizationManagerMutex.RUnlock()
 	fake.updateOrganizationManagerByUsernameMutex.RLock()
 	defer fake.updateOrganizationManagerByUsernameMutex.RUnlock()
+	fake.updateOrganizationUserMutex.RLock()
+	defer fake.updateOrganizationUserMutex.RUnlock()
 	fake.updateOrganizationUserByUsernameMutex.RLock()
 	defer fake.updateOrganizationUserByUsernameMutex.RUnlock()
 	fake.updateResourceMatchMutex.RLock()
@@ -5743,8 +5943,12 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateSecurityGroupSpaceMutex.RUnlock()
 	fake.updateSecurityGroupStagingSpaceMutex.RLock()
 	defer fake.updateSecurityGroupStagingSpaceMutex.RUnlock()
+	fake.updateSpaceDeveloperMutex.RLock()
+	defer fake.updateSpaceDeveloperMutex.RUnlock()
 	fake.updateSpaceDeveloperByUsernameMutex.RLock()
 	defer fake.updateSpaceDeveloperByUsernameMutex.RUnlock()
+	fake.updateSpaceManagerMutex.RLock()
+	defer fake.updateSpaceManagerMutex.RUnlock()
 	fake.updateSpaceManagerByUsernameMutex.RLock()
 	defer fake.updateSpaceManagerByUsernameMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()

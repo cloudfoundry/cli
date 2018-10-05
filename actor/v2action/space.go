@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	uaaconst "code.cloudfoundry.org/cli/api/uaa/constant"
 )
 
 // Space represents a CLI Space
@@ -128,9 +129,32 @@ func (actor Actor) GetSpaceByOrganizationAndName(orgGUID string, spaceName strin
 // GrantSpaceManagerByUsername makes the provided user a Space Manager in the
 // space with the provided guid.
 func (actor Actor) GrantSpaceManagerByUsername(orgGUID string, spaceGUID string, username string) (Warnings, error) {
-	var warnings Warnings
-	ccv2Warnings, err := actor.CloudControllerClient.UpdateOrganizationUserByUsername(orgGUID, username)
+	if actor.Config.UAAGrantType() == string(uaaconst.GrantTypeClientCredentials) {
+		return actor.grantSpaceManagerByClientCredentials(orgGUID, spaceGUID, username)
+	}
+
+	return actor.grantSpaceManagerByUsername(orgGUID, spaceGUID, username)
+}
+
+func (actor Actor) grantSpaceManagerByClientCredentials(orgGUID string, spaceGUID string, clientID string) (Warnings, error) {
+	ccv2Warnings, err := actor.CloudControllerClient.UpdateOrganizationUser(orgGUID, clientID)
+	warnings := Warnings(ccv2Warnings)
+	if err != nil {
+		return warnings, err
+	}
+
+	ccv2Warnings, err = actor.CloudControllerClient.UpdateSpaceManager(spaceGUID, clientID)
 	warnings = append(warnings, Warnings(ccv2Warnings)...)
+	if err != nil {
+		return warnings, err
+	}
+
+	return warnings, err
+}
+
+func (actor Actor) grantSpaceManagerByUsername(orgGUID string, spaceGUID string, username string) (Warnings, error) {
+	ccv2Warnings, err := actor.CloudControllerClient.UpdateOrganizationUserByUsername(orgGUID, username)
+	warnings := Warnings(ccv2Warnings)
 	if err != nil {
 		return warnings, err
 	}
@@ -144,6 +168,12 @@ func (actor Actor) GrantSpaceManagerByUsername(orgGUID string, spaceGUID string,
 // GrantSpaceDeveloperByUsername makes the provided user a Space Developer in the
 // space with the provided guid.
 func (actor Actor) GrantSpaceDeveloperByUsername(spaceGUID string, username string) (Warnings, error) {
+	if actor.Config.UAAGrantType() == string(uaaconst.GrantTypeClientCredentials) {
+		warnings, err := actor.CloudControllerClient.UpdateSpaceDeveloper(spaceGUID, username)
+
+		return Warnings(warnings), err
+	}
+
 	warnings, err := actor.CloudControllerClient.UpdateSpaceDeveloperByUsername(spaceGUID, username)
 	return Warnings(warnings), err
 }

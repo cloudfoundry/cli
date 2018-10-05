@@ -204,10 +204,29 @@ func (client *Client) UpdateOrganizationManagerByUsername(guid string, username 
 	return response.Warnings, err
 }
 
+// UpdateOrganizationUser makes the user or client with the given UAA ID a
+// member of the org.
+func (client *Client) UpdateOrganizationUser(guid string, uaaID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutOrganizationUserRequest,
+		URIParams:   Params{"organization_guid": guid, "user_guid": uaaID},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
+}
+
 type updateOrgUserByUsernameRequestBody struct {
 	Username string `json:"username"`
 }
 
+// UpdateOrganizationUserByUsername makes the user with the given username a member of
+// the org.
 func (client Client) UpdateOrganizationUserByUsername(orgGUID string, username string) (Warnings, error) {
 	requestBody := updateOrgUserByUsernameRequestBody{
 		Username: username,
