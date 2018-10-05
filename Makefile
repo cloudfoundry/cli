@@ -17,6 +17,7 @@ LD_FLAGS_V7 =$(LD_FLAGS_COMMON) \
 LD_FLAGS_LINUX = -extldflags \"-static\" $(LD_FLAGS)
 LD_FLAGS_LINUX_V7 = -extldflags \"-static\" $(LD_FLAGS_V7)
 REQUIRED_FOR_STATIC_BINARY =-a -tags netgo -installsuffix netgo
+REQUIRED_FOR_STATIC_BINARY_V7 =-a -tags "V7 netgo" -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 UNAME_S := $(shell uname -s)
 
@@ -43,19 +44,19 @@ format :
 	go fmt ./...
 
 fly-windows-experimental : check-target-env
-	CF_TEST_SUITE=./integration/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
+	CF_TEST_SUITE=./integration/shared/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
 
 fly-windows-isolated : check-target-env
-	CF_TEST_SUITE=./integration/isolated fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
+	CF_TEST_SUITE=./integration/shared/isolated fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
 
 fly-windows-plugin : check-target-env
-	CF_TEST_SUITE=./integration/plugin fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
+	CF_TEST_SUITE=./integration/shared/plugin fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
 
 fly-windows-push : check-target-env
-	CF_TEST_SUITE=./integration/push fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
+	CF_TEST_SUITE=./integration/shared/push fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
 
 fly-windows-global : check-target-env
-	CF_TEST_SUITE=./integration/global fly -t ci execute -c ci/cli/tasks/integration-windows-serial.yml -i cli=./
+	CF_TEST_SUITE=./integration/shared/global fly -t ci execute -c ci/cli/tasks/integration-windows-serial.yml -i cli=./
 
 fly-windows-units :
 	fly -t ci execute -c ci/cli/tasks/units-windows.yml -i cli=./ -i cli-ci=./
@@ -64,29 +65,29 @@ integration-cleanup :
 	$(PWD)/bin/cleanup-integration
 
 integration-experimental : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/experimental
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/shared/experimental
 
 integration-global : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/shared/global
 
 integration-isolated : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/isolated
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/shared/isolated
 
 integration-plugin : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/plugin
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/shared/plugin
 
 integration-push : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/push
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/shared/push
 
 integration-tests : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/isolated integration/push
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/shared/isolated integration/shared/push
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/shared/global
 	make integration-cleanup
 
 integration-tests-full : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) \
-		integration/isolated integration/push integration/plugin integration/experimental
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
+		integration/shared/isolated integration/shared/push integration/shared/plugin integration/shared/experimental
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/shared/global
 	make integration-cleanup
 
 lint :
@@ -112,8 +113,8 @@ out/cf7: $(GOSRC)
 	go build -tags="V7" -ldflags "$(LD_FLAGS_V7)" -o out/cf7 .
 else
 out/cf7: $(GOSRC)
-	CGO_ENABLED=0 go build -tags="V7" \
-		$(REQUIRED_FOR_STATIC_BINARY) \
+	CGO_ENABLED=0 go build \
+		$(REQUIRED_FOR_STATIC_BINARY_V7) \
 		-ldflags "$(LD_FLAGS_LINUX_V7)" -o out/cf7 .
 endif
 
@@ -140,13 +141,13 @@ out/cf-cli_winx64.exe : $(GOSRC) rsrc.syso
 	rm rsrc.syso
 
 out/cf7-cli_linux_i686 : $(GOSRC)
-	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -tags="V7" \
-							$(REQUIRED_FOR_STATIC_BINARY) \
+	CGO_ENABLED=0 GOARCH=386 GOOS=linux go build \
+							$(REQUIRED_FOR_STATIC_BINARY_V7) \
 							-ldflags "$(LD_FLAGS_LINUX_V7)" -o out/cf7-cli_linux_i686 .
 
 out/cf7-cli_linux_x86-64 : $(GOSRC)
-	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -tags="V7" \
-							$(REQUIRED_FOR_STATIC_BINARY) \
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build \
+							$(REQUIRED_FOR_STATIC_BINARY_V7) \
 							-ldflags "$(LD_FLAGS_LINUX_V7)" -o out/cf7-cli_linux_x86-64 .
 
 out/cf7-cli_osx : $(GOSRC)

@@ -62,7 +62,7 @@ func WithNoResourceMatchedApp(f func(dir string)) {
 }
 
 func WithMultiBuildpackApp(f func(dir string)) {
-	f("../assets/go_calls_ruby")
+	f("../../assets/go_calls_ruby")
 }
 
 // WithProcfileApp creates an application to use with your CLI command
