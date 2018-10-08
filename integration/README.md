@@ -31,12 +31,12 @@ These tests rely on [ginkgo](https://github.com/onsi/ginkgo) to be installed.
 
 Run command for the `isolated`, `push` and `experimental` suite:
 ```
-ginkgo -p -r -randomizeAllSpecs -slowSpecThreshold=120 integration/isolated integration/push integration/experimental
+ginkgo -p -r -randomizeAllSpecs -slowSpecThreshold=120 integration/shared/isolated integration/shared/push integration/shared/experimental
 ```
 
 Run command for the `global` and `plugin` suites:
 ```
-ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/global integration/plugin
+ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/shared/global integration/shared/plugin
 ```
 
 ### Customizations (based on environment variables)
