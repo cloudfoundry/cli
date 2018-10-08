@@ -556,31 +556,72 @@ var _ = Describe("v3-zdt-push command", func() {
 		})
 
 		Context("when the -s flag is set", func() {
-			var session *Session
-			BeforeEach(func() {
-				helpers.WithHelloWorldApp(func(appDir string) {
-					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-s", "cflinuxfs2")
-					Eventually(session).Should(Exit(0))
+			When("the default stack is specified", func() {
+				It("uses the specified stack", func() {
+					var session *Session
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-s", "cflinuxfs2")
+						Eventually(session).Should(Exit(0))
+					})
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("requested state:\\s+started"))
+					Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+				})
+
+			})
+
+			PWhen("a non-default stack is specified", func() {
+				// TODO: unpend this test when we have integration foundations with stack cflinuxfs3
+				It("uses the specified stack", func() {
+					var session *Session
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-s", "cflinuxfs3")
+						Eventually(session).Should(Exit(0))
+					})
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("requested state:\\s+started"))
+					Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+					Eventually(session).Should(Say("stack:\\s+cflinuxfs3"))
+				})
+
+			})
+
+			When("the both -s and -b are specified", func() {
+				When("the buildpack and stack both exist", func() {
+					When("the buildpack specified exists for the stack specified", func() {
+						It("creates the app with the specified stack and buildpack", func() {
+							var session *Session
+							helpers.WithHelloWorldApp(func(appDir string) {
+								session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-b", "https://github.com/cloudfoundry/staticfile-buildpack", "-s", "cflinuxfs2")
+								Eventually(session).Should(Exit(0))
+							})
+							// TODO: assert specific error text when it is written
+						})
+					})
+
+					When("the buildpack specified does not exist for the stack specified", func() {
+						It("prints the appropriate error", func() {
+							var session *Session
+							helpers.WithHelloWorldApp(func(appDir string) {
+								session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-b", "ruby_buildpack", "-s", "windows2012R2")
+								Eventually(session).Should(Exit(1))
+							})
+							// TODO: assert specific error text when it is written
+						})
+					})
 				})
 			})
 
-			It("uses the specified stack", func() {
-				Eventually(session).Should(Say("name:\\s+%s", appName))
-				Eventually(session).Should(Say("requested state:\\s+started"))
-				Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
-				Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-			})
-
-			Context("but its set to an invalid stack", func() {
-				BeforeEach(func() {
+			When("the specified stack does not exist", func() {
+				It("errors", func() {
+					var session *Session
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-s", "invalid_stack")
 						Eventually(session).Should(Exit(1))
 					})
-				})
-
-				It("errors", func() {
 					Eventually(session).Should(Say("FAILED"))
+					// TODO: confirm the text of the error message
 					Eventually(session.Err).Should(Say(`Stack must be an existing stack`))
 				})
 			})
