@@ -20,7 +20,7 @@ var _ = Describe("push with different domain values", func() {
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
-		domainName = helpers.DomainName("http-domain")
+		domainName = helpers.NewDomainName("http-domain")
 	})
 
 	When("the domain flag is not provided", func() {
@@ -79,7 +79,7 @@ var _ = Describe("push with different domain values", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
 
-				domainName = helpers.DomainName("tcp-domain")
+				domainName = helpers.NewDomainName("tcp-domain")
 				domain = helpers.NewDomain(organization, domainName)
 				domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 			})

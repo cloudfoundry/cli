@@ -203,7 +203,7 @@ var _ = Describe("create-route command", func() {
 			)
 
 			BeforeEach(func() {
-				domainName = helpers.DomainName()
+				domainName = helpers.NewDomainName()
 				userName, _ = helpers.GetCredentials()
 			})
 

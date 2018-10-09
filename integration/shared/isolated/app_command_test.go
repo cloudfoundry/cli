@@ -518,7 +518,7 @@ applications:
 					BeforeEach(func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
 
-						tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
+						tcpDomain = helpers.NewDomain(orgName, helpers.NewDomainName("tcp"))
 						tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 						helpers.WithHelloWorldApp(func(appDir string) {
 							manifestContents := []byte(fmt.Sprintf(`

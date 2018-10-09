@@ -25,7 +25,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 
 	BeforeEach(func() {
 		app = helpers.NewAppName()
-		domain = helpers.NewDomain(organization, helpers.DomainName())
+		domain = helpers.NewDomain(organization, helpers.NewDomainName())
 		subdomain = helpers.NewDomain(organization, "sub."+domain.Name)
 		route1 = helpers.NewRoute(space, domain.Name, helpers.PrefixedRandomName("r1"), "")
 		route2 = helpers.NewRoute(space, subdomain.Name, helpers.PrefixedRandomName("r2"), "")

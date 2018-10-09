@@ -23,7 +23,7 @@ var _ = Describe("TCP routes in manifest", func() {
 		helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
 
 		app = helpers.NewAppName()
-		domain = helpers.NewDomain(organization, helpers.DomainName())
+		domain = helpers.NewDomain(organization, helpers.NewDomainName())
 		route1 = helpers.NewTCPRoute(space, domain.Name, 1024)
 		route2 = helpers.NewTCPRoute(space, domain.Name, 1025)
 	})

@@ -29,7 +29,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
-			domainName = helpers.DomainName()
+			domainName = helpers.NewDomainName()
 			appName = helpers.PrefixedRandomName("APP")
 
 			helpers.SetupCF(orgName, spaceName)
@@ -196,7 +196,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			)
 
 			BeforeEach(func() {
-				sharedDomainName = helpers.DomainName()
+				sharedDomainName = helpers.NewDomainName()
 				sharedDomain := helpers.NewDomain(orgName, sharedDomainName)
 				sharedDomain.Create()
 				sharedDomain.Share()

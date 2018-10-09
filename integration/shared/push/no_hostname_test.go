@@ -18,7 +18,7 @@ var _ = Describe("pushing with no-hostname", func() {
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
-		domainName = helpers.DomainName()
+		domainName = helpers.NewDomainName()
 	})
 
 	When("pushing with no manifest", func() {

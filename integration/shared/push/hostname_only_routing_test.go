@@ -173,7 +173,7 @@ var _ = Describe("push with hostname", func() {
 		BeforeEach(func() {
 			helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
 
-			domainName = helpers.DomainName()
+			domainName = helpers.NewDomainName()
 			domain = helpers.NewDomain(organization, domainName)
 			domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 		})

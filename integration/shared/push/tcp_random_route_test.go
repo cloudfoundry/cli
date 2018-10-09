@@ -25,7 +25,7 @@ var _ = Describe("TCP random route", func() {
 			BeforeEach(func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
 
-				domainName := helpers.DomainName("tcp-domain")
+				domainName := helpers.NewDomainName("tcp-domain")
 				domain = helpers.NewDomain(organization, domainName)
 				domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 			})

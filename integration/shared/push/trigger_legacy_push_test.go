@@ -24,7 +24,7 @@ var _ = Describe("triggering legacy push", func() {
 		host = helpers.NewAppName()
 		defaultDomain = helpers.DefaultSharedDomain()
 
-		privateDomain = helpers.DomainName()
+		privateDomain = helpers.NewDomainName()
 		domain := helpers.NewDomain(organization, privateDomain)
 		domain.Create()
 	})

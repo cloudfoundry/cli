@@ -86,7 +86,7 @@ var _ = Describe("org command", func() {
 				)
 
 				BeforeEach(func() {
-					domainName = helpers.DomainName("")
+					domainName = helpers.NewDomainName("")
 					domain := helpers.NewDomain(orgName, domainName)
 					domain.Create()
 

@@ -50,7 +50,7 @@ var _ = Describe("HTTP random route", func() {
 				var domain helpers.Domain
 
 				BeforeEach(func() {
-					domain = helpers.NewDomain(organization, helpers.DomainName("some-domain"))
+					domain = helpers.NewDomain(organization, helpers.NewDomainName("some-domain"))
 					domain.Create()
 				})
 
@@ -72,7 +72,7 @@ var _ = Describe("HTTP random route", func() {
 			var domain helpers.Domain
 
 			BeforeEach(func() {
-				domain = helpers.NewDomain(organization, helpers.DomainName("some-domain"))
+				domain = helpers.NewDomain(organization, helpers.NewDomainName("some-domain"))
 				domain.Create()
 			})
 

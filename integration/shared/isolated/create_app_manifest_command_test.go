@@ -348,7 +348,7 @@ var _ = Describe("create-app-manifest command", func() {
 			var domain helpers.Domain
 
 			BeforeEach(func() {
-				domain = helpers.NewDomain(orgName, helpers.DomainName(""))
+				domain = helpers.NewDomain(orgName, helpers.NewDomainName(""))
 				domain.Create()
 
 				helpers.WithHelloWorldApp(func(appDir string) {
