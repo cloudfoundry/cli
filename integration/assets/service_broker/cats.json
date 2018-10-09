@@ -14,7 +14,7 @@
               "relational"
             ],
             "max_db_per_node": 5,
-            "bindable": true,
+            "bindable": "<bindable>",
             "instances_retrievable": true,
             "bindings_retrievable": true,
             "metadata": {

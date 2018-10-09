@@ -151,7 +151,7 @@ var _ = Describe("Service Binding Actions", func() {
 					)
 				})
 
-				When("getting binding the service instance to the application errors", func() {
+				When("binding the service instance to the application errors", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.CreateServiceBindingReturns(
 							ccv2.ServiceBinding{},
@@ -166,7 +166,7 @@ var _ = Describe("Service Binding Actions", func() {
 					})
 				})
 
-				When("getting binding the service instance to the application succeeds", func() {
+				When("binding the service instance to the application succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.CreateServiceBindingReturns(
 							ccv2.ServiceBinding{GUID: "some-service-binding-guid"},

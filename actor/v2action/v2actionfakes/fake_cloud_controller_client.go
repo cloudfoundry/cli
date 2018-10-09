@@ -106,6 +106,23 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	CreateServiceKeyStub        func(serviceInstanceGUID string, keyName string, parameters map[string]interface{}) (ccv2.ServiceKey, ccv2.Warnings, error)
+	createServiceKeyMutex       sync.RWMutex
+	createServiceKeyArgsForCall []struct {
+		serviceInstanceGUID string
+		keyName             string
+		parameters          map[string]interface{}
+	}
+	createServiceKeyReturns struct {
+		result1 ccv2.ServiceKey
+		result2 ccv2.Warnings
+		result3 error
+	}
+	createServiceKeyReturnsOnCall map[int]struct {
+		result1 ccv2.ServiceKey
+		result2 ccv2.Warnings
+		result3 error
+	}
 	CreateSpaceStub        func(spaceName string, orgGUID string) (ccv2.Space, ccv2.Warnings, error)
 	createSpaceMutex       sync.RWMutex
 	createSpaceArgsForCall []struct {
@@ -1588,6 +1605,62 @@ func (fake *FakeCloudControllerClient) CreateServiceBindingReturnsOnCall(i int, 
 	}
 	fake.createServiceBindingReturnsOnCall[i] = struct {
 		result1 ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceKey(serviceInstanceGUID string, keyName string, parameters map[string]interface{}) (ccv2.ServiceKey, ccv2.Warnings, error) {
+	fake.createServiceKeyMutex.Lock()
+	ret, specificReturn := fake.createServiceKeyReturnsOnCall[len(fake.createServiceKeyArgsForCall)]
+	fake.createServiceKeyArgsForCall = append(fake.createServiceKeyArgsForCall, struct {
+		serviceInstanceGUID string
+		keyName             string
+		parameters          map[string]interface{}
+	}{serviceInstanceGUID, keyName, parameters})
+	fake.recordInvocation("CreateServiceKey", []interface{}{serviceInstanceGUID, keyName, parameters})
+	fake.createServiceKeyMutex.Unlock()
+	if fake.CreateServiceKeyStub != nil {
+		return fake.CreateServiceKeyStub(serviceInstanceGUID, keyName, parameters)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createServiceKeyReturns.result1, fake.createServiceKeyReturns.result2, fake.createServiceKeyReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceKeyCallCount() int {
+	fake.createServiceKeyMutex.RLock()
+	defer fake.createServiceKeyMutex.RUnlock()
+	return len(fake.createServiceKeyArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceKeyArgsForCall(i int) (string, string, map[string]interface{}) {
+	fake.createServiceKeyMutex.RLock()
+	defer fake.createServiceKeyMutex.RUnlock()
+	return fake.createServiceKeyArgsForCall[i].serviceInstanceGUID, fake.createServiceKeyArgsForCall[i].keyName, fake.createServiceKeyArgsForCall[i].parameters
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceKeyReturns(result1 ccv2.ServiceKey, result2 ccv2.Warnings, result3 error) {
+	fake.CreateServiceKeyStub = nil
+	fake.createServiceKeyReturns = struct {
+		result1 ccv2.ServiceKey
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceKeyReturnsOnCall(i int, result1 ccv2.ServiceKey, result2 ccv2.Warnings, result3 error) {
+	fake.CreateServiceKeyStub = nil
+	if fake.createServiceKeyReturnsOnCall == nil {
+		fake.createServiceKeyReturnsOnCall = make(map[int]struct {
+			result1 ccv2.ServiceKey
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.createServiceKeyReturnsOnCall[i] = struct {
+		result1 ccv2.ServiceKey
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -5811,6 +5884,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createRouteMutex.RUnlock()
 	fake.createServiceBindingMutex.RLock()
 	defer fake.createServiceBindingMutex.RUnlock()
+	fake.createServiceKeyMutex.RLock()
+	defer fake.createServiceKeyMutex.RUnlock()
 	fake.createSpaceMutex.RLock()
 	defer fake.createSpaceMutex.RUnlock()
 	fake.createUserMutex.RLock()
