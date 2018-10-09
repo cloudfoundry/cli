@@ -83,6 +83,7 @@ const (
 	PostOrganizationRequest                              = "PostOrganization"
 	PostRouteRequest                                     = "PostRoute"
 	PostServiceBindingRequest                            = "PostServiceBinding"
+	PostServiceKeyRequest                                = "PostServiceKey"
 	PostSpaceRequest                                     = "PostSpace"
 	PostUserRequest                                      = "PostUser"
 	PutAppBitsRequest                                    = "PutAppBits"
@@ -169,6 +170,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/service_instances/:service_instance_guid/service_bindings", Method: http.MethodGet, Name: GetServiceInstanceServiceBindingsRequest},
 	{Path: "/v2/service_instances/:service_instance_guid/shared_from", Method: http.MethodGet, Name: GetServiceInstanceSharedFromRequest},
 	{Path: "/v2/service_instances/:service_instance_guid/shared_to", Method: http.MethodGet, Name: GetServiceInstanceSharedToRequest},
+	{Path: "/v2/service_keys", Method: http.MethodPost, Name: PostServiceKeyRequest},
 	{Path: "/v2/service_plan_visibilities", Method: http.MethodGet, Name: GetServicePlanVisibilitiesRequest},
 	{Path: "/v2/service_plans", Method: http.MethodGet, Name: GetServicePlansRequest},
 	{Path: "/v2/service_plans/:service_plan_guid", Method: http.MethodGet, Name: GetServicePlanRequest},

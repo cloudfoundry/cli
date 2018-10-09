@@ -93,10 +93,12 @@ func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
 		return ccerror.InvalidRelationError{Message: errorResponse.Description}
 	case "CF-NotStaged":
 		return ccerror.NotStagedError{Message: errorResponse.Description}
-	case "CF-OrganizationNameTaken":
-		return ccerror.OrganizationNameTakenError{Message: errorResponse.Description}
 	case "CF-ServiceBindingAppServiceTaken":
 		return ccerror.ServiceBindingTakenError{Message: errorResponse.Description}
+	case "CF-ServiceKeyNameTaken":
+		return ccerror.ServiceKeyTakenError{Message: errorResponse.Description}
+	case "CF-OrganizationNameTaken":
+		return ccerror.OrganizationNameTakenError{Message: errorResponse.Description}
 	case "CF-SpaceNameTaken":
 		return ccerror.SpaceNameTakenError{Message: errorResponse.Description}
 	default:
