@@ -387,8 +387,8 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say("name:\\s+%s", serviceInstanceName))
 							Eventually(session).Should(Say("bound apps:"))
 							Eventually(session).Should(Say("name\\s+binding name\\s+status\\s+message"))
-							Eventually(session).Should(Say("%s\\s+%s\\s+succeeded", appName1, bindingName1))
-							Eventually(session).Should(Say("%s\\s+%s\\s+succeeded", appName2, bindingName2))
+							Eventually(session).Should(Say("%s\\s+%s\\s+create succeeded", appName1, bindingName1))
+							Eventually(session).Should(Say("%s\\s+%s\\s+create succeeded", appName2, bindingName2))
 
 							Eventually(session).Should(Exit(0))
 						})

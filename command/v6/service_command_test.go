@@ -283,14 +283,35 @@ var _ = Describe("service Command", func() {
 									{
 										AppName:            "app-2",
 										ServiceBindingName: "binding-name-2",
-										LastOperationState: constant.LastOperationInProgress,
-										Message:            "10% complete",
+										LastOperation: v2action.LastOperation{
+											Type:        "delete",
+											State:       constant.LastOperationInProgress,
+											Description: "10% complete",
+											UpdatedAt:   "some-updated-at-time",
+											CreatedAt:   "some-created-at-time",
+										},
 									},
 									{
 										AppName:            "app-3",
 										ServiceBindingName: "binding-name-3",
-										LastOperationState: constant.LastOperationFailed,
-										Message:            "Binding failed",
+										LastOperation: v2action.LastOperation{
+											Type:        "create",
+											State:       constant.LastOperationFailed,
+											Description: "Binding failed",
+											UpdatedAt:   "some-updated-at-time",
+											CreatedAt:   "some-created-at-time",
+										},
+									},
+									{
+										AppName:            "app-4",
+										ServiceBindingName: "binding-name-4",
+										LastOperation: v2action.LastOperation{
+											Type:        "create",
+											State:       constant.LastOperationSucceeded,
+											Description: "Binding created",
+											UpdatedAt:   "some-updated-at-time",
+											CreatedAt:   "some-created-at-time",
+										},
 									},
 								}
 								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
@@ -328,9 +349,10 @@ var _ = Describe("service Command", func() {
 
 								Expect(testUI.Out).To(Say("bound apps:"))
 								Expect(testUI.Out).To(Say("name\\s+binding name\\s+status\\s+message"))
-								Expect(testUI.Out).To(Say("app-1\\s+binding-name-1"))
-								Expect(testUI.Out).To(Say("app-2\\s+binding-name-2\\s+in progress\\s+10\\% complete"))
-								Expect(testUI.Out).To(Say("app-3\\s+binding-name-3\\s+failed\\s+Binding failed"))
+								Expect(testUI.Out).To(Say("app-1\\s+binding-name-1\\s+"))
+								Expect(testUI.Out).To(Say("app-2\\s+binding-name-2\\s+delete in progress\\s+10\\% complete"))
+								Expect(testUI.Out).To(Say("app-3\\s+binding-name-3\\s+create failed\\s+Binding failed"))
+								Expect(testUI.Out).To(Say("app-4\\s+binding-name-4\\s+create succeeded\\s+Binding created"))
 
 								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
 								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
