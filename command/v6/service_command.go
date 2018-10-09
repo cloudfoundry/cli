@@ -208,8 +208,8 @@ func (cmd ServiceCommand) displayBoundApplicationsIfExists(serviceInstanceSummar
 		boundAppsTable = append(boundAppsTable, []string{
 			boundApplication.AppName,
 			boundApplication.ServiceBindingName,
-			string(boundApplication.LastOperationState),
-			boundApplication.Message,
+			fmt.Sprintf("%s %s", boundApplication.LastOperation.Type, boundApplication.LastOperation.State),
+			boundApplication.LastOperation.Description,
 		})
 	}
 
