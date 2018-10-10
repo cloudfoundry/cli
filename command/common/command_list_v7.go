@@ -35,7 +35,6 @@ type commandList struct {
 	V3Restart            v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	V3RestartAppInstance v6.V3RestartAppInstanceCommand  `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	V3ZdtRestart         v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
-	V3Scale              v6.V3ScaleCommand               `command:"v3-scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
 	V3SetDroplet         v6.V3SetDropletCommand          `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
 	V3SetEnv             v6.V3SetEnvCommand              `command:"v3-set-env" description:"Set an env variable for an app"`
 	V3SetHealthCheck     v6.V3SetHealthCheckCommand      `command:"v3-set-health-check" description:"Change type of health check performed on an app's process"`
@@ -152,7 +151,7 @@ type commandList struct {
 	RunningEnvironmentVariableGroup    v6.RunningEnvironmentVariableGroupCommand    `command:"running-environment-variable-group" alias:"revg" description:"Retrieve the contents of the running environment variable group"`
 	RunningSecurityGroups              v6.RunningSecurityGroupsCommand              `command:"running-security-groups" description:"List security groups in the set of security groups for running applications"`
 	RunTask                            v6.RunTaskCommand                            `command:"run-task" alias:"rt" description:"Run a one-off task on an app"`
-	Scale                              v6.ScaleCommand                              `command:"scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
+	Scale                              v7.ScaleCommand                              `command:"scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
 	SecurityGroups                     v6.SecurityGroupsCommand                     `command:"security-groups" description:"List all security groups"`
 	SecurityGroup                      v6.SecurityGroupCommand                      `command:"security-group" description:"Show a single security group"`
 	ServiceAccess                      v6.ServiceAccessCommand                      `command:"service-access" description:"List service access settings"`

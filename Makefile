@@ -21,13 +21,15 @@ REQUIRED_FOR_STATIC_BINARY_V7 =-a -tags "V7 netgo" -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 UNAME_S := $(shell uname -s)
 
+ifndef TARGET_V7
+TARGET = v6
+else
+TARGET = v7
+endif
+
 all : test build
 
-ifndef CF_BUILD_V7
 build : out/cf
-else
-build : out/cf7
-endif
 
 check-target-env :
 ifndef CF_INT_API
@@ -96,15 +98,23 @@ lint :
 	@echo "No lint errors!"
 	@echo
 
+ifeq ($(TARGET),v6)
+out/cf : out/cf6
+	cp out/cf6 out/cf
+else
+out/cf : out/cf7
+	cp out/cf7 out/cf
+endif
+
 # Build dynamic binary for Darwin
 ifeq ($(UNAME_S),Darwin)
-out/cf: $(GOSRC)
-	go build -ldflags "$(LD_FLAGS)" -o out/cf .
+out/cf6: $(GOSRC)
+	go build -ldflags "$(LD_FLAGS)" -o out/cf6 .
 else
-out/cf: $(GOSRC)
+out/cf6: $(GOSRC)
 	CGO_ENABLED=0 go build \
 		$(REQUIRED_FOR_STATIC_BINARY) \
-		-ldflags "$(LD_FLAGS_LINUX)" -o out/cf .
+		-ldflags "$(LD_FLAGS_LINUX)" -o out/cf6 .
 endif
 
 # Build dynamic binary for Darwin
