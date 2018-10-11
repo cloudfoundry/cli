@@ -21,6 +21,8 @@ REQUIRED_FOR_STATIC_BINARY_V7 =-a -tags "V7 netgo" -installsuffix netgo
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 UNAME_S := $(shell uname -s)
 
+ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60
+
 ifndef TARGET_V7
 TARGET = v6
 else
@@ -55,7 +57,7 @@ fly-windows-plugin : check-target-env
 	CF_TEST_SUITE=./integration/shared/plugin fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
 
 fly-windows-push : check-target-env
-	CF_TEST_SUITE=./integration/shared/push fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
+	CF_TEST_SUITE=./integration/v6/push fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./
 
 fly-windows-global : check-target-env
 	CF_TEST_SUITE=./integration/shared/global fly -t ci execute -c ci/cli/tasks/integration-windows-serial.yml -i cli=./
@@ -66,31 +68,39 @@ fly-windows-units :
 integration-cleanup :
 	$(PWD)/bin/cleanup-integration
 
-integration-experimental : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/shared/experimental
+integration-experimental : build integration-cleanup integration-experimental-shared integration-experimental-versioned
 
-integration-global : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/shared/global
+integration-experimental-shared : build integration-cleanup
+	$(ginkgo_int) -nodes $(NODES) integration/shared/experimental
 
-integration-isolated : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/shared/isolated
+integration-experimental-versioned : build integration-cleanup
+	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/experimental
+
+integration-global : build integration-cleanup integration-global-shared integration-global-versioned
+
+integration-global-shared : build integration-cleanup
+	$(ginkgo_int) integration/shared/global
+
+integration-global-versioned : build integration-cleanup
+	$(ginkgo_int) integration/$(TARGET)/global
+
+integration-isolated : build integration-cleanup integration-isolated-shared integration-isolated-versioned
+
+integration-isolated-shared : build integration-cleanup
+	$(ginkgo_int) -nodes $(NODES) integration/shared/isolated
+
+integration-isolated-versioned : build integration-cleanup
+	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/isolated
 
 integration-plugin : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/shared/plugin
+	$(ginkgo_int) -nodes $(NODES) integration/shared/plugin
 
 integration-push : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/shared/push
+	$(ginkgo_int) -nodes $(NODES) integration/v6/push
 
-integration-tests : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/shared/isolated integration/shared/push
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/shared/global
-	make integration-cleanup
+integration-tests : build integration-cleanup integration-isolated integration-push integration-global
 
-integration-tests-full : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) \
-		integration/shared/isolated integration/shared/push integration/shared/plugin integration/shared/experimental
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/shared/global
-	make integration-cleanup
+integration-tests-full : build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global
 
 lint :
 	@echo "style linting files:" # this list will grow as we cleanup all the code
