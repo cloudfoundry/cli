@@ -19,4 +19,4 @@ popd
 go get -v -u github.com/onsi/ginkgo/ginkgo
 
 cd %GOPATH%\src\code.cloudfoundry.org\cli
-ginkgo.exe -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/experimental
+ginkgo.exe -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/experimental ./integration/v6/experimental
