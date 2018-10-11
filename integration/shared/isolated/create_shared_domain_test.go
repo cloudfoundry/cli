@@ -23,6 +23,7 @@ var _ = Describe("create-shared-domain command", func() {
 			Eventually(session).Should(Say("--router-group\\s+Routes for this domain will be configured only on the specified router group"))
 			Eventually(session).Should(Say("SEE ALSO:\n"))
 			Eventually(session).Should(Say("create-domain, domains, router-groups"))
+			Eventually(session).Should(Exit(0))
 		})
 	})
 
@@ -41,9 +42,9 @@ var _ = Describe("create-shared-domain command", func() {
 		})
 
 		AfterEach(func() {
-			helpers.QuickDeleteOrg(orgName)
 			session := helpers.CF("delete-shared-domain", domainName, "-f")
 			Eventually(session).Should(Exit(0))
+			helpers.QuickDeleteOrg(orgName)
 		})
 
 		When("No optional flags are specified", func() {
@@ -94,6 +95,18 @@ var _ = Describe("create-shared-domain command", func() {
 		When("With the --router-group flag", func() {
 			var routerGroupName string
 
+			BeforeEach(func() {
+				var response struct {
+					RoutingEndpoint string `json:"routing_endpoint"`
+				}
+				helpers.Curl(&response, "/v2/info")
+
+				// TODO: #161159794 remove this skip and check a nicer error message when available
+				if response.RoutingEndpoint == "" {
+					Skip("Test requires routing endpoint on /v2/info")
+				}
+			})
+
 			When("router-group exists", func() {
 				BeforeEach(func() {
 					routerGroupName = helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode())
@@ -111,21 +124,20 @@ var _ = Describe("create-shared-domain command", func() {
 
 					var sharedDomainResponse struct {
 						Resources []struct {
-							Metadata struct {
+							Entity struct {
 								RouterGroupGUID string `json:"router_group_guid"`
-							} `json:"entity"`
-						} `json:"resources"`
+							}
+						}
 					}
 
 					helpers.Curl(&sharedDomainResponse, "/v2/shared_domains?q=name:%s", domainName)
-					currentRouterGroupGUID := sharedDomainResponse.Resources[0].Metadata.RouterGroupGUID
+					Expect(sharedDomainResponse.Resources).To(HaveLen(1))
+					currentRouterGroupGUID := sharedDomainResponse.Resources[0].Entity.RouterGroupGUID
 
-					type RouterGroup struct {
-						GUID string `json:"guid"`
-					}
-					var routerGroupListResponse []RouterGroup
+					var routerGroupListResponse []struct{ GUID string }
 
 					helpers.Curl(&routerGroupListResponse, "/routing/v1/router_groups?name=%s", routerGroupName)
+					Expect(routerGroupListResponse).To(HaveLen(1))
 					expectedRouterGroupGUID := routerGroupListResponse[0].GUID
 					Expect(currentRouterGroupGUID).Should(Equal(expectedRouterGroupGUID))
 				})
@@ -136,8 +148,8 @@ var _ = Describe("create-shared-domain command", func() {
 				BeforeEach(func() {
 					routerGroupName = "not-a-real-router-group"
 					session := helpers.CF("router-groups")
+					Consistently(session).ShouldNot(Say(routerGroupName))
 					Eventually(session).Should(Exit(0))
-					Eventually(session).ShouldNot(Say(routerGroupName))
 				})
 
 				It("should fail and return an error", func() {
