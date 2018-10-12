@@ -7,7 +7,7 @@ image_resource:
     repository: relintdockerhubpushbot/cf-deployment-concourse-tasks
 
 inputs:
-  - name: bosh-lite-lock
+  - name: bosh-lock
   - name: cf-cli-binaries
   - name: vars-store
 
@@ -28,11 +28,11 @@ run:
   - |
     set -eu
 
-    DOMAIN=`cat bosh-lite-lock/name`
+    DOMAIN=`cat bosh-lock/name`
     API="api.${DOMAIN}"
     CF_INT_USERNAME="admin"
 
-    ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
+    ENV=$(cat bosh-lock/name | cut -d "." -f 1)
     CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
 
     cat << EOF | jq -S . > cats-config/integration_config.json

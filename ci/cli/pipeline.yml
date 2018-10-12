@@ -352,7 +352,7 @@ jobs:
     - get: cli-ci
     - get: cli-integration
     - get: vars-store
-    - put: bosh-lite-lock
+    - put: bosh-lock
       resource: gcp-bosh-pool
       params:
         acquire: true
@@ -381,7 +381,7 @@ jobs:
   ensure:
     put: gcp-bosh-pool
     params:
-      release: bosh-lite-lock
+      release: bosh-lock
 
 - name: integration-windows
   serial: true
@@ -395,7 +395,7 @@ jobs:
     - get: cli-ci
     - get: cli-integration
     - get: vars-store
-    - put: bosh-lite-lock
+    - put: bosh-lock
       resource: gcp-bosh-pool
       params:
         acquire: true
@@ -421,7 +421,7 @@ jobs:
   ensure:
     put: gcp-bosh-pool
     params:
-      release: bosh-lite-lock
+      release: bosh-lock
 
 - name: integration-experimental
   serial: true
@@ -435,7 +435,7 @@ jobs:
     - get: cli-ci
     - get: cli-integration
     - get: vars-store
-    - put: bosh-lite-lock
+    - put: bosh-lock
       resource: gcp-bosh-pool
       params:
         acquire: true
@@ -475,7 +475,7 @@ jobs:
   ensure:
     put: gcp-bosh-pool
     params:
-      release: bosh-lite-lock
+      release: bosh-lock
 
 - name: integration-legacy
   serial: true
@@ -489,7 +489,7 @@ jobs:
     - get: cli-ci
     - get: cli-integration
     - get: vars-store
-    - put: bosh-lite-lock
+    - put: bosh-lock
       resource: legacy-gcp-bosh-pool
       params:
         acquire: true
@@ -519,7 +519,7 @@ jobs:
   ensure:
     put: legacy-gcp-bosh-pool
     params:
-      release: bosh-lite-lock
+      release: bosh-lock
 
 - name: create-installers
   serial: true
@@ -615,7 +615,7 @@ jobs:
       trigger: true
     - get: cli-ci
     - get: vars-store
-    - put: bosh-lite-lock
+    - put: bosh-lock
       resource: gcp-bosh-pool
       params:
         acquire: true
@@ -652,7 +652,7 @@ jobs:
   ensure:
     put: gcp-bosh-pool
     params:
-      release: bosh-lite-lock
+      release: bosh-lock
 
 
 - name: create-cli-base-image
