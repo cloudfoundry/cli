@@ -33,7 +33,7 @@ run:
       VERSION_LDFLAGS="-X code.cloudfoundry.org/cli/version.binaryVersion=${BUILD_VERSION} -X code.cloudfoundry.org/cli/version.binarySHA=${BUILD_SHA} -X code.cloudfoundry.org/cli/version.binaryBuildDate=${BUILD_DATE}"
 
       echo "Building 64-bit Darwin"
-      GOARCH=amd64 GOOS=darwin go build -ldflags "-w -s ${VERSION_LDFLAGS}" -o out/cf-cli_osx .
+      make out/cf7-cli_osx
 
       echo "Creating tarball"
       tar -cvzf $cwd/osx-compiled/cf-cli-osx-binary.tgz -C out .
