@@ -1,0 +1,27 @@
+Summary: Cloud Foundry CLI
+Name: cf7-cli
+Release: 1
+Group: Development/Tools
+License: ASL 2.0
+URL: https://github.com/cloudfoundry/cli
+BugUrl: https://github.com/cloudfoundry/cli/issues
+Source: %{expand:%%(pwd)}
+
+%description
+Cloud Foundry CLI is the official command line client for Cloud Foundry.
+
+%install
+%{__rm} -rf %{buildroot}
+%{__install} -Dp -m0755 %{SOURCEURL0}/cf7 %{buildroot}%{_bindir}/cf7
+%{__install} -Dp -m0644 %{SOURCEURL0}/LICENSE %{buildroot}%{_defaultdocdir}/cf-cli/LICENSE
+%{__install} -Dp -m0644 %{SOURCEURL0}/NOTICE %{buildroot}%{_defaultdocdir}/cf-cli/NOTICE
+%{__install} -Dp -m0644 %{SOURCEURL0}/cf7.bash %{buildroot}%{_sysconfdir}/bash_completion.d/cf7.bash
+
+%clean
+%{__rm} -rf %{buildroot}
+
+%files
+%{_bindir}/cf7
+%{_sysconfdir}/bash_completion.d/cf7.bash
+%license %{_defaultdocdir}/cf-cli/LICENSE
+%license %{_defaultdocdir}/cf-cli/NOTICE
