@@ -19,4 +19,4 @@ params:
   CF_INT_DOCKER_PASSWORD:
 
 run:
-  path: cli-ci/ci/cli/tasks/integration-windows.bat
+  path: cli-ci/ci/cli-v7/tasks/integration-windows.bat
