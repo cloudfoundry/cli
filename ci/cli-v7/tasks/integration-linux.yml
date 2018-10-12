@@ -62,7 +62,7 @@ run:
       tar xvzf cf-cli-binaries.tgz
       chmod +x cf7-cli_linux_x86-64
       mkdir -p $GOPATH/bin
-      mv cf-cli7_linux_x86-64 $GOPATH/bin/cf
+      mv cf7-cli_linux_x86-64 $GOPATH/bin/cf
     popd
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
