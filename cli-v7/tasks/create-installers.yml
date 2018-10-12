@@ -104,7 +104,7 @@ run:
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf7-cli.spec.template >> cf-cli.spec
         rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-        mv build/RPMS/i386/cf-cli*.rpm $root/packaged/cf7-cli-installer_i686.rpm
+        mv build/RPMS/i386/cf7-cli*.rpm $root/packaged/cf7-cli-installer_i686.rpm
       popd
     )
 
@@ -118,7 +118,7 @@ run:
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf7-cli.spec.template >> cf-cli.spec
         rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-        mv build/RPMS/x86_64/cf-cli*.rpm $root/packaged/cf7-cli-installer_x86-64.rpm
+        mv build/RPMS/x86_64/cf7-cli*.rpm $root/packaged/cf7-cli-installer_x86-64.rpm
       popd
     )
 
