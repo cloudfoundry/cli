@@ -54,8 +54,8 @@ run:
 
     pushd cf-cli-binaries
       tar xvzf cf-cli-binaries.tgz
-      chmod +x cf-cli_linux_x86-64
-      mv cf-cli_linux_x86-64 $GOPATH/bin/cf
+      chmod +x cf7-cli_linux_x86-64
+      mv cf-cli7_linux_x86-64 $GOPATH/bin/cf
     popd
 
     cd cli-ci
