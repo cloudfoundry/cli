@@ -9,4 +9,4 @@ outputs:
 - name: winstallers
 
 run:
-  path: cli-ci/ci/cli/tasks/create-installers-windows.bat
+  path: cli-ci/ci/cli-v7/tasks/create-installers-windows.bat

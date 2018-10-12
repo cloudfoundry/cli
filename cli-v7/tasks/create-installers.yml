@@ -33,7 +33,7 @@ run:
 
     echo "Building 32-bit Debian package"
     (
-        SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf-cli_linux_i686 | cut -f 1)"
+        SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_linux_i686 | cut -f 1)"
 
         pushd cli-ci/ci/installers/deb
           mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
@@ -53,19 +53,19 @@ run:
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: i386" >> cf/DEBIAN/control
 
-          cp ../completion/cf cf/usr/share/bash-completion/completions/cf
+          cp ../completion/cf7 cf/usr/share/bash-completion/completions/cf7
 
-          cp $root/extracted-binaries/cf-cli_linux_i686 cf/usr/bin/cf
+          cp $root/extracted-binaries/cf7-cli_linux_i686 cf/usr/bin/cf7
 
-          fakeroot dpkg --build cf cf-cli-installer_i686.deb
-          mv cf-cli-installer_i686.deb $root/packaged
+          fakeroot dpkg --build cf cf7-cli-installer_i686.deb
+          mv cf7-cli-installer_i686.deb $root/packaged
           rm -rf cf
         popd
     )
 
     echo "Building 64-bit Debian package"
     (
-        SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf-cli_linux_x86-64 | cut -f 1)"
+        SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_linux_x86-64 | cut -f 1)"
 
         pushd cli-ci/ci/installers/deb
           mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
@@ -85,53 +85,53 @@ run:
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: amd64" >> cf/DEBIAN/control
 
-          cp ../completion/cf cf/usr/share/bash-completion/completions/cf
+          cp ../completion/cf7 cf/usr/share/bash-completion/completions/cf7
 
-          cp $root/extracted-binaries/cf-cli_linux_x86-64 cf/usr/bin/cf
+          cp $root/extracted-binaries/cf7-cli_linux_x86-64 cf/usr/bin/cf7
 
-          fakeroot dpkg --build cf cf-cli-installer_x86-64.deb
-          mv cf-cli-installer_x86-64.deb $root/packaged
+          fakeroot dpkg --build cf cf7-cli-installer_x86-64.deb
+          mv cf7-cli-installer_x86-64.deb $root/packaged
         popd
     )
 
     echo "Building 32-bit RedHat package"
     (
       pushd cli-ci/ci/installers/rpm
-        cp $root/extracted-binaries/cf-cli_linux_i686 cf
+        cp $root/extracted-binaries/cf7-cli_linux_i686 cf7
         cp ../../license/NOTICE .
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-        cp ../completion/cf cf.bash
+        cp ../completion/cf7 cf7.bash
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf-cli.spec.template >> cf-cli.spec
         rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-        mv build/RPMS/i386/cf-cli*.rpm $root/packaged/cf-cli-installer_i686.rpm
+        mv build/RPMS/i386/cf-cli*.rpm $root/packaged/cf7-cli-installer_i686.rpm
       popd
     )
 
     echo "Building 64-bit RedHat package"
     (
       pushd cli-ci/ci/installers/rpm
-        cp $root/extracted-binaries/cf-cli_linux_x86-64 cf
+        cp $root/extracted-binaries/cf7-cli_linux_x86-64 cf7
         cp ../../license/NOTICE .
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-        cp ../completion/cf cf.bash
+        cp ../completion/cf7 cf7.bash
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf-cli.spec.template >> cf-cli.spec
         rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-        mv build/RPMS/x86_64/cf-cli*.rpm $root/packaged/cf-cli-installer_x86-64.rpm
+        mv build/RPMS/x86_64/cf-cli*.rpm $root/packaged/cf7-cli-installer_x86-64.rpm
       popd
     )
 
     echo "Building OS X installer"
     (
-      SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf-cli_osx | cut -f 1)"
+      SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_osx | cut -f 1)"
 
       pushd cli-ci/ci/installers/osx
         sed -i -e "s/VERSION/${VERSION}/g" Distribution
         sed -i -e "s/SIZE/${SIZE}/g" Distribution
         mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf-cli
 
-        cp $root/extracted-binaries/cf-cli_osx cf-cli/usr/local/bin/cf
+        cp $root/extracted-binaries/cf7-cli_osx cf-cli/usr/local/bin/cf7
         cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf-cli
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf-cli/LICENSE
         chmod -R go-w cf-cli
@@ -141,7 +141,7 @@ run:
         ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
         mkbom -i bom_list Bom
         mv Bom Payload com.cloudfoundry.cli.pkg
-        xar -c --compression none -f cf-cli-installer_osx.pkg com.cloudfoundry.cli.pkg Distribution
-        mv cf-cli-installer_osx.pkg $root/packaged/cf-cli-installer_osx.pkg
+        xar -c --compression none -f cf7-cli-installer_osx.pkg com.cloudfoundry.cli.pkg Distribution
+        mv cf7-cli-installer_osx.pkg $root/packaged/cf7-cli-installer_osx.pkg
       popd
     )
