@@ -1,0 +1,10 @@
+---
+platform: windows
+
+inputs:
+- name: cli
+  path: gopath/src/code.cloudfoundry.org/cli
+- name: cli-ci
+
+run:
+  path: cli-ci/ci/cli/tasks/units-windows.bat

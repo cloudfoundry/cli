@@ -1,0 +1,73 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
+
+inputs:
+- name: cli
+- name: cli-integration
+  path: go/src/code.cloudfoundry.org/cli
+- name: cf-cli-binaries
+- name: bosh-lock
+- name: vars-store
+
+params:
+  CF_CLI_EXPERIMENTAL: false
+  CF_INT_CLIENT_ID:
+  CF_INT_CLIENT_SECRET:
+  CF_INT_DOCKER_IMAGE:
+  CF_INT_DOCKER_USERNAME:
+  CF_INT_DOCKER_PASSWORD:
+  CF_INT_IGNORE_API_VERSION_CHECK:
+  NODES: 16
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e
+
+    ENV=$(cat bosh-lock/name | cut -d "." -f 1)
+
+    if [[ $ENV == "homeroom" ]]; then
+      export CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
+      export CF_INT_OIDC_USERNAME="admin"
+      export CF_INT_OIDC_PASSWORD=$CF_INT_PASSWORD
+    else
+      pushd vars-store/ci/infrastructure/$ENV
+        eval "$(bbl print-env)"
+      popd
+
+      credhub login
+      export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+
+      export CF_INT_OIDC_USERNAME="admin-oidc"
+      export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+    fi
+
+    set -x
+
+    domain=$(cat bosh-lock/name)
+    export CF_INT_API="https://api.${domain}"
+    export CF_DIAL_TIMEOUT=15
+
+    export GOPATH=$PWD/go
+    export PATH=$GOPATH/bin:$PATH
+
+    pushd cf-cli-binaries
+      tar xvzf cf-cli-binaries.tgz
+      chmod +x cf-cli_linux_x86-64
+      mkdir -p $GOPATH/bin
+      mv cf-cli_linux_x86-64 $GOPATH/bin/cf
+    popd
+
+    cd $GOPATH/src/code.cloudfoundry.org/cli
+
+    go get -u github.com/onsi/ginkgo/ginkgo
+
+    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated integration/v6/isolated integration/shared/plugin integration/v6/push
+    ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/global integration/v6/global

@@ -1,0 +1,62 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
+
+inputs:
+- name: cli-ci
+- name: cf-cli-binaries
+- name: bosh-lock
+- name: vars-store
+
+outputs:
+- name: cleanup-integration-outputs
+
+params:
+  ARGS:
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e
+
+    ENV=$(cat bosh-lock/name | cut -d "." -f 1)
+
+    if [[ $ENV == "homeroom" ]]; then
+      export CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
+    else
+      pushd vars-store/ci/infrastructure/$ENV
+        eval "$(bbl print-env)"
+      popd
+
+      credhub login
+      export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+      export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+    fi
+
+    set -x
+
+    # output password into a temp file for consumption by Windows
+    echo $CF_INT_PASSWORD > cleanup-integration-outputs/cf-password
+    echo $CF_INT_OIDC_PASSWORD > cleanup-integration-outputs/uaa-oidc-password
+
+    set -ex
+
+    domain=$(cat bosh-lock/name)
+    export CF_INT_API="https://api.${domain}"
+
+    export PATH=$GOPATH/bin:$PATH
+
+    pushd cf-cli-binaries
+      tar xvzf cf-cli-binaries.tgz
+      chmod +x cf-cli_linux_x86-64
+      mv cf-cli_linux_x86-64 $GOPATH/bin/cf
+    popd
+
+    cd cli-ci
+    bin/cleanup-integration "${ARGS}"
