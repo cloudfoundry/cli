@@ -1,0 +1,89 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: relintdockerhubpushbot/cf-deployment-concourse-tasks
+
+inputs:
+  - name: bosh-lock
+  - name: cf-cli-binaries
+  - name: vars-store
+
+outputs:
+  - name: cats-config
+
+params:
+  INCLUDE_V3:
+  BROKER_START_TIMEOUT:
+  CF_PUSH_TIMEOUT:
+  DEFAULT_TIMEOUT:
+  LONG_CURL_TIMEOUT:
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -eu
+
+    DOMAIN=`cat bosh-lock/name`
+    API="api.${DOMAIN}"
+    CF_INT_USERNAME="admin"
+
+    ENV=$(cat bosh-lock/name | cut -d "." -f 1)
+    CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
+
+    cat << EOF | jq -S . > cats-config/integration_config.json
+    {
+      "admin_password": "${CF_INT_PASSWORD}",
+      "admin_user": "${CF_INT_USERNAME}",
+      "api": "${API}",
+      "apps_domain": "${DOMAIN}",
+      "backend" : "diego",
+      "broker_start_timeout": ${BROKER_START_TIMEOUT},
+      "cf_push_timeout": ${CF_PUSH_TIMEOUT},
+      "default_timeout": ${DEFAULT_TIMEOUT},
+      "long_curl_timeout": ${LONG_CURL_TIMEOUT},
+      "skip_ssl_validation": true,
+      "use_http": false,
+      "include_apps": true,
+      "include_backend_compatibility": false,
+      "include_container_networking": true,
+      "include_detect": true,
+      "include_docker": true,
+      "include_internet_dependent": true,
+      "include_isolation_segments": true,
+      "isolation_segment_name": "persistent_isolation_segment",
+      "include_persistent_app": false,
+      "include_private_docker_registry": false,
+      "include_privileged_container_support": false,
+      "include_route_services": true,
+      "include_routing": true,
+      "include_routing_isolation_segments": false,
+      "include_security_groups": true,
+      "include_services": true,
+      "include_ssh": true,
+      "include_sso": false,
+      "include_tasks": true,
+      "include_v3": ${INCLUDE_V3},
+      "include_zipkin": false
+    }
+    EOF
+
+    bindir=${PWD}/bin
+    mkdir -p ${bindir}
+    export PATH=${bindir}:$PATH
+
+    pushd cf-cli-binaries
+      tar xvf cf-cli-binaries.tgz
+      chmod +x cf-cli_linux_x86-64
+      ln -s ${PWD}/cf-cli_linux_x86-64 ${bindir}/cf
+    popd
+
+    export CF_USERNAME=${CF_INT_USERNAME}
+    export CF_PASSWORD=${CF_INT_PASSWORD}
+    cf api ${API} --skip-ssl-validation
+    cf auth
+    cf enable-feature-flag diego_docker

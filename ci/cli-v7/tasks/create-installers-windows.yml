@@ -1,0 +1,12 @@
+---
+platform: windows
+
+inputs:
+- name: extracted-binaries
+- name: cli-ci
+
+outputs:
+- name: winstallers
+
+run:
+  path: cli-ci/ci/cli/tasks/create-installers-windows.bat

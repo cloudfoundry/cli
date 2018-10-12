@@ -1,0 +1,58 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
+
+inputs:
+- name: cli
+- name: cli-integration
+  path: go/src/code.cloudfoundry.org/cli
+- name: cf-cli-binaries
+- name: bosh-lock
+- name: vars-store
+
+params:
+  CF_INT_CLIENT_ID:
+  CF_INT_CLIENT_SECRET:
+  CF_INT_DOCKER_IMAGE:
+  CF_INT_DOCKER_USERNAME:
+  CF_INT_DOCKER_PASSWORD:
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e
+
+    ENV=$(cat bosh-lock/name | cut -d "." -f 1)
+
+    pushd vars-store/ci/infrastructure/$ENV
+    eval "$(bbl print-env)"
+    popd
+
+    credhub login
+    export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+
+    set -x
+
+    domain=$(cat bosh-lock/name)
+    export CF_INT_API="https://api.${domain}"
+    export CF_DIAL_TIMEOUT=15
+
+    export GOPATH=$PWD/go
+    export PATH=$GOPATH/bin:$PATH
+
+    go get -u github.com/onsi/ginkgo/ginkgo
+
+    pushd cf-cli-binaries
+      tar xvzf cf-cli-binaries.tgz
+      chmod +x cf-cli_linux_x86-64
+      mv cf-cli_linux_x86-64 $GOPATH/bin/cf
+    popd
+
+    cd $GOPATH/src/code.cloudfoundry.org/cli
+    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/experimental integration/v6/experimental

@@ -1,0 +1,21 @@
+---
+platform: windows
+
+inputs:
+- name: cli
+  path: go/src/code.cloudfoundry.org/cli
+
+params:
+  # these will be pulled from the environment where the task is executed
+  CF_INT_API:
+  CF_INT_PASSWORD:
+  CF_TEST_SUITE:
+  CF_CLI_EXPERIMENTAL:
+  CF_INT_CLIENT_ID:
+  CF_INT_CLIENT_SECRET:
+  CF_INT_DOCKER_IMAGE:
+  CF_INT_DOCKER_USERNAME:
+  CF_INT_DOCKER_PASSWORD:
+
+run:
+  path: go/src/code.cloudfoundry.org/cli/ci/cli/tasks/integration-windows-oneoff.bat
