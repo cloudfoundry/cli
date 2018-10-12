@@ -44,7 +44,7 @@ func main() {
 	defer panichandler.HandlePanic()
 	exitStatus := parse(os.Args[1:], &common.Commands)
 	if exitStatus == switchToV2 {
-		exitStatus = parse(os.Args[1:], &common.FallackCommands)
+		exitStatus = parse(os.Args[1:], &common.FallbackCommands)
 	}
 	if exitStatus != 0 {
 		os.Exit(exitStatus)

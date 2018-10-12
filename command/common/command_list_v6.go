@@ -10,7 +10,7 @@ import (
 )
 
 var Commands commandList
-var FallackCommands V2CommandList
+var FallbackCommands V2CommandList
 
 type V2CommandList struct {
 	V2App v6.AppCommand `command:"app" description:"Display health and status for an app"`
