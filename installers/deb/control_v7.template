@@ -1,0 +1,7 @@
+Package: cf7-cli
+Maintainer: CF CLI Team <cf-cli-eng@pivotal.io>
+Source: cf7-cli
+Homepage: https://github.com/cloudfoundry/cli
+Section: misc
+Priority: optional
+Description: Cloud Foundry CLI is the official command line client for Cloud Foundry.

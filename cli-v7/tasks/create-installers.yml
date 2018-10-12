@@ -48,7 +48,7 @@ run:
           cp ../../license/NOTICE cf/usr/share/doc/cf-cli
           cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf-cli/LICENSE
 
-          cp control.template cf/DEBIAN/control
+          cp control_v7.template cf/DEBIAN/control
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: i386" >> cf/DEBIAN/control
@@ -80,7 +80,7 @@ run:
           cp ../../license/NOTICE cf/usr/share/doc/cf-cli
           cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf-cli/LICENSE
 
-          cp control.template cf/DEBIAN/control
+          cp control_v7.template cf/DEBIAN/control
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: amd64" >> cf/DEBIAN/control
@@ -102,7 +102,7 @@ run:
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
         cp ../completion/cf7 cf7.bash
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
-        cat cf-cli.spec.template >> cf-cli.spec
+        cat cf7-cli.spec.template >> cf-cli.spec
         rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
         mv build/RPMS/i386/cf-cli*.rpm $root/packaged/cf7-cli-installer_i686.rpm
       popd
@@ -116,7 +116,7 @@ run:
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
         cp ../completion/cf7 cf7.bash
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
-        cat cf-cli.spec.template >> cf-cli.spec
+        cat cf7-cli.spec.template >> cf-cli.spec
         rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
         mv build/RPMS/x86_64/cf-cli*.rpm $root/packaged/cf7-cli-installer_x86-64.rpm
       popd
