@@ -6,7 +6,7 @@ inputs:
 - name: cli-integration
   path: go/src/code.cloudfoundry.org/cli
 - name: cf-cli-binaries
-- name: bosh-lite-lock
+- name: bosh-lock
 - name: cli-ci
 - name: cf-credentials
 

@@ -11,7 +11,7 @@ inputs:
 - name: cli-integration
   path: go/src/code.cloudfoundry.org/cli
 - name: cf-cli-binaries
-- name: bosh-lite-lock
+- name: bosh-lock
 - name: vars-store
 
 params:
@@ -28,7 +28,7 @@ run:
   - |
     set -e
 
-    ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
+    ENV=$(cat bosh-lock/name | cut -d "." -f 1)
 
     pushd vars-store/ci/infrastructure/$ENV
     eval "$(bbl print-env)"
@@ -39,7 +39,7 @@ run:
 
     set -x
 
-    domain=$(cat bosh-lite-lock/name)
+    domain=$(cat bosh-lock/name)
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
 

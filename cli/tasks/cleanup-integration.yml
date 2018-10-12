@@ -9,7 +9,7 @@ image_resource:
 inputs:
 - name: cli-ci
 - name: cf-cli-binaries
-- name: bosh-lite-lock
+- name: bosh-lock
 - name: vars-store
 
 outputs:
@@ -25,7 +25,7 @@ run:
   - |
     set -e
 
-    ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
+    ENV=$(cat bosh-lock/name | cut -d "." -f 1)
 
     if [[ $ENV == "homeroom" ]]; then
       export CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
@@ -47,7 +47,7 @@ run:
 
     set -ex
 
-    domain=$(cat bosh-lite-lock/name)
+    domain=$(cat bosh-lock/name)
     export CF_INT_API="https://api.${domain}"
 
     export PATH=$GOPATH/bin:$PATH

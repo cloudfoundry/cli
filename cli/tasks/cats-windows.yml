@@ -4,7 +4,7 @@ platform: windows
 inputs:
 - name: cf-acceptance-tests
 - name: cf-cli-binaries
-- name: bosh-lite-lock
+- name: bosh-lock
 - name: cli
 - name: cli-ci
 - name: cats-config
