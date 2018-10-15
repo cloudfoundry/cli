@@ -129,11 +129,11 @@ run:
       pushd cli-ci/ci/installers/osx
         sed -i -e "s/VERSION/${VERSION}/g" Distribution
         sed -i -e "s/SIZE/${SIZE}/g" Distribution
-        mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf-cli
+        mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf7-cli
 
         cp $root/extracted-binaries/cf7-cli_osx cf-cli/usr/local/bin/cf7
-        cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf-cli
-        cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf-cli/LICENSE
+        cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf7-cli
+        cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf7-cli/LICENSE
         chmod -R go-w cf-cli
         pushd cf-cli
           find usr | cpio -o --format=odc | gzip -c > ../Payload
