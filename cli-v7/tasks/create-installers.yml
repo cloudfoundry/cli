@@ -36,17 +36,17 @@ run:
         SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_linux_i686 | cut -f 1)"
 
         pushd cli-ci/ci/installers/deb
-          mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+          mkdir -p cf/usr/bin cf/usr/share/doc/cf7-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
           cp copyright_preamble cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../../LICENSE >> cf/DEBIAN/copyright
           cat copyright_comment_header >> cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
-          cp cf/DEBIAN/copyright cf/usr/share/doc/cf-cli/copyright
+          cp cf/DEBIAN/copyright cf/usr/share/doc/cf7-cli/copyright
 
-          cp ../../license/NOTICE cf/usr/share/doc/cf-cli
-          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf-cli/LICENSE
+          cp ../../license/NOTICE cf/usr/share/doc/cf7-cli
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf7-cli/LICENSE
 
           cp control_v7.template cf/DEBIAN/control
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
@@ -68,17 +68,17 @@ run:
         SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf7-cli_linux_x86-64 | cut -f 1)"
 
         pushd cli-ci/ci/installers/deb
-          mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
+          mkdir -p cf/usr/bin cf/usr/share/doc/cf7-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
           cp copyright_preamble cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../../LICENSE >> cf/DEBIAN/copyright
           cat copyright_comment_header >> cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
-          cp cf/DEBIAN/copyright cf/usr/share/doc/cf-cli/copyright
+          cp cf/DEBIAN/copyright cf/usr/share/doc/cf7-cli/copyright
 
-          cp ../../license/NOTICE cf/usr/share/doc/cf-cli
-          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf-cli/LICENSE
+          cp ../../license/NOTICE cf/usr/share/doc/cf7-cli
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf7-cli/LICENSE
 
           cp control_v7.template cf/DEBIAN/control
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
