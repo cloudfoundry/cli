@@ -27,6 +27,7 @@
                 "longDescription": "A long time ago, in a galaxy far far away..."
               },
               "displayName": "The Fake Broker",
+              "documentationUrl": "http://documentation.url",
               "shareable": "<shareable-service>"
             },
             "dashboard_client": {
