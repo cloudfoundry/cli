@@ -1,4 +1,11 @@
 ---
+resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+    tag: latest
+
 resources:
 - name: cli
   type: git
@@ -9,7 +16,14 @@ resources:
     - bin
     - ci
     - integration
-    - Makefile
+    - README.md
+    - .github
+
+- name: cli-i18n
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli-i18n
+    branch: master
 
 - name: cli-ci
   type: git
@@ -17,6 +31,159 @@ resources:
     uri: https://github.com/cloudfoundry/cli
     branch: master
     paths: *ciPaths
+
+- name: cli-integration
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    paths:
+    - integration
+
+- name: cf-cli-binaries
+  type: s3
+  source:
+    bucket: ((staging-bucket-name))
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: "v7/cf-cli-binaries.tgz"
+
+- name: edge-linux-binary-32
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli_edge_linux_i686.tgz
+    region_name: us-west-1
+
+- name: edge-linux-binary-64
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli_edge_linux_x86-64.tgz
+    region_name: us-west-1
+
+- name: edge-osx-binary-64
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli_edge_osx.tgz
+    region_name: us-west-1
+
+- name: edge-windows-binary-32
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli_edge_win32.zip
+    region_name: us-west-1
+
+- name: edge-windows-binary-64
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli_edge_winx64.zip
+    region_name: us-west-1
+
+- name: edge-deb-installer-32
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_i686.deb
+    region_name: us-west-1
+
+- name: edge-deb-installer-64
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_x86-64.deb
+    region_name: us-west-1
+
+- name: edge-redhat-installer-32
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_i686.rpm
+    region_name: us-west-1
+
+- name: edge-redhat-installer-64
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_x86-64.rpm
+    region_name: us-west-1
+
+- name: edge-osx-installer-64
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_osx.pkg
+    region_name: us-west-1
+
+- name: edge-windows-installer-32
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_win32.zip
+    region_name: us-west-1
+
+- name: edge-windows-installer-64
+  type: s3
+  source:
+    bucket: v7-cf-cli-releases
+    access_key_id: ((cli-team-aws-s3-access-key-id))
+    secret_access_key: ((cli-team-aws-s3-secret-access-key))
+    versioned_file: master/cf7-cli-installer_edge_winx64.zip
+    region_name: us-west-1
+
+- name: gcp-bosh-pool
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/cli-pools
+    private_key: ((cli-pools-github-private-key))
+    branch: master
+    pool: mashed-potato
+
+- name: slack-alert
+  type: slack-notification
+  source:
+    url: ((vat-slack-webhook-url))
+
+- name: vars-store
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-private
+    private_key: ((cli-private-github-private-key))
+    branch: master
+
+# values for this already exist in last pass, blocked on
+# blocked on https://github.com/concourse/concourse/issues/1407
+# - name: cf-cli-tracker
+#   type: tracker
+#   source:
+#     token: ((cf-cli-public-tracker-token))
+#     project_id: ((vat-public-tracker-project-id))
+#     tracker_url: https://www.pivotaltracker.com
 
 jobs:
 - name: units
@@ -29,3 +196,239 @@ jobs:
   - aggregate:
     - task: units-linux
       file: cli-ci/ci/cli-v7/tasks/units-linux.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#v3-acceleration-team'
+           text: |
+             Linux unit tests failed :(
+             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+    - task: units-osx
+      file: cli-ci/ci/cli-v7/tasks/units-osx.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#v3-acceleration-team'
+           text: |
+             OS X unit tests failed :(
+             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+    - task: units-windows
+      file: cli-ci/ci/cli-v7/tasks/units-windows.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#v3-acceleration-team'
+           text: |
+             Windows unit tests failed :(
+             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+
+- name: build-binaries
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      trigger: true
+      passed: [units]
+    - get: cli-ci
+    - get: cli-i18n
+  - task: build-i18n
+    file: cli-ci/ci/cli-v7/tasks/generate-i18n-resources.yml
+    on_failure:
+      put: slack-alert
+      params:
+        channel: '#v3-acceleration-team'
+        text: |
+          i18n generation failed :(
+          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+  - aggregate:
+    - task: build
+      file: cli-ci/ci/cli-v7/tasks/build-binaries.yml
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: |
+            build binaries failed :(
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+    - task: build-osx
+      file: cli-ci/ci/cli-v7/tasks/build-osx-binary.yml
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: |
+            build OS X binaries failed :(
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+  - task: combine-binaries
+    file: cli-ci/ci/cli-v7/tasks/combine-binaries.yml
+  - put: cf-cli-binaries
+    params:
+      file: compiled/cf-cli-binaries.tgz
+
+- name: integration-linux
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [build-binaries]
+    - get: cf-cli-binaries
+      passed: [build-binaries]
+      trigger: true
+    - get: cli-ci
+    - get: cli-integration
+    - get: vars-store
+    - put: bosh-lock
+      resource: gcp-bosh-pool
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+    - task: integration
+      file: cli-ci/ci/cli-v7/tasks/integration-linux.yml
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: |
+            :canada: Linux integration failed :throwing-in-the-towel:
+            :dancing-penguin: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+      params: &integration_params
+        CF_INT_CLIENT_ID: 'potato-face'
+        CF_INT_CLIENT_SECRET: ((client-secret))
+        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
+        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
+        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
+        CF_INT_IGNORE_API_VERSION_CHECK: false
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lock
+
+- name: integration-windows
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [build-binaries]
+    - get: cf-cli-binaries
+      passed: [build-binaries]
+      trigger: true
+    - get: cli-ci
+    - get: cli-integration
+    - get: vars-store
+    - put: bosh-lock
+      resource: gcp-bosh-pool
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+    - task: integration
+      file: cli-ci/ci/cli-v7/tasks/integration-windows.yml
+      params:
+        <<: *integration_params
+      input_mapping:
+        cf-credentials: cleanup-integration-outputs
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#v3-acceleration-team'
+          text: |
+            :canada: Windows integration failed :throwing-in-the-towel:
+            :win95: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lock
+
+- name: create-installers
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [integration-linux, integration-windows]
+    - get: cf-cli-binaries
+      passed: [integration-linux, integration-windows]
+      trigger: true
+    - get: cli-ci
+  - task: extract-binaries
+    file: cli-ci/ci/cli-v7/tasks/extract-binaries.yml
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#v3-acceleration-team'
+         text: |
+           extracting the binaries in installer creation failed :bart:
+           $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+  - aggregate:
+    - task: unix
+      file: cli-ci/ci/cli-v7/tasks/create-installers.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#v3-acceleration-team'
+           text: |
+             :ubuntu: create unix installers failed :redhat:
+             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+    - task: windows
+      file: cli-ci/ci/cli-v7/tasks/create-installers-windows.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#v3-acceleration-team'
+           text: |
+             create windows installer failed :winc:
+             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+  - task: package-binaries
+    file: cli-ci/ci/cli-v7/tasks/package-binaries.yml
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#v3-acceleration-team'
+         text: |
+           extracting the binaries in installer creation failed :package:
+           $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+  - aggregate:
+    - put: edge-linux-binary-32
+      params:
+        file: archives/cf7-cli_edge_linux_i686.tgz
+    - put: edge-linux-binary-64
+      params:
+        file: archives/cf7-cli_edge_linux_x86-64.tgz
+    - put: edge-osx-binary-64
+      params:
+        file: archives/cf7-cli_edge_osx.tgz
+    - put: edge-windows-binary-32
+      params:
+        file: archives/cf7-cli_edge_win32.zip
+    - put: edge-windows-binary-64
+      params:
+        file: archives/cf7-cli_edge_winx64.zip
+    - put: edge-deb-installer-32
+      params:
+        file: archives/cf7-cli-installer_i686.deb
+    - put: edge-deb-installer-64
+      params:
+        file: archives/cf7-cli-installer_x86-64.deb
+    - put: edge-redhat-installer-32
+      params:
+        file: archives/cf7-cli-installer_i686.rpm
+    - put: edge-redhat-installer-64
+      params:
+        file: archives/cf7-cli-installer_x86-64.rpm
+    - put: edge-osx-installer-64
+      params:
+        file: archives/cf7-cli-installer_osx.pkg
+    - put: edge-windows-installer-32
+      params:
+        file: winstallers/cf7-cli-installer_win32.zip
+    - put: edge-windows-installer-64
+      params:
+        file: winstallers/cf7-cli-installer_winx64.zip
