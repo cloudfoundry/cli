@@ -10,7 +10,7 @@ SET PATH=C:\Program Files (x86)\Windows Kits\10\bin\x64;%PATH%
 sed -i -e "s/VERSION/%VERSION%/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
 sed -i -e "s/CF_LICENSE/%ESCAPED_ROOT_DIR%\\LICENSE/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
 sed -i -e "s/CF_NOTICE/%ESCAPED_ROOT_DIR%\\NOTICE/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
-sed -i -e "s/CF_SOURCE/%ESCAPED_ROOT_DIR%\\cf.exe/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
+sed -i -e "s/CF_SOURCE/%ESCAPED_ROOT_DIR%\\cf7.exe/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
 sed -i -e "s/CF_ICON/%ESCAPED_ROOT_DIR%\\cf.ico/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
 
 TYPE %ROOT_DIR%\cli-ci\ci\license\LICENSE-WITH-3RD-PARTY-LICENSES | MORE /P > LICENSE
@@ -28,7 +28,7 @@ MOVE %ROOT_DIR%\cli-ci\ci\installers\windows\Output\mysetup.exe cf7_installer.ex
 sed -i -e "s/VERSION/%VERSION%/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 sed -i -e "s/CF_LICENSE/%ESCAPED_ROOT_DIR%\\LICENSE/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 sed -i -e "s/CF_NOTICE/%ESCAPED_ROOT_DIR%\\NOTICE/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
-sed -i -e "s/CF_SOURCE/%ESCAPED_ROOT_DIR%\\cf.exe/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
+sed -i -e "s/CF_SOURCE/%ESCAPED_ROOT_DIR%\\cf7.exe/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 sed -i -e "s/CF_ICON/%ESCAPED_ROOT_DIR%\\cf.ico/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 
 MOVE %ROOT_DIR%\extracted-binaries\cf7-cli_win32.exe cf7.exe
