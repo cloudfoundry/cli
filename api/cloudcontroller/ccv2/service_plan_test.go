@@ -28,7 +28,9 @@ var _ = Describe("Service Plan", func() {
 					"entity": {
 						"name": "some-service-plan",
 						"public": true,
-						"service_guid": "some-service-guid"
+						"service_guid": "some-service-guid",
+						"description": "some-description",
+						"free": true
 					}
 				}`
 
@@ -49,6 +51,8 @@ var _ = Describe("Service Plan", func() {
 					Name:        "some-service-plan",
 					Public:      true,
 					ServiceGUID: "some-service-guid",
+					Description: "some-description",
+					Free:        true,
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
@@ -76,6 +80,7 @@ var _ = Describe("Service Plan", func() {
 			})
 		})
 	})
+
 	Describe("GetServicePlans", func() {
 		var (
 			services   []ServicePlan
@@ -102,7 +107,9 @@ var _ = Describe("Service Plan", func() {
 							},
 							"entity": {
 								"name": "some-service-plan",
-								"service_guid": "some-service-guid"
+								"service_guid": "some-service-guid",
+								"free": false,
+								"description": "some-description"
 							}
 						},
 						{
@@ -111,7 +118,9 @@ var _ = Describe("Service Plan", func() {
 							},
 							"entity": {
 								"name": "other-service-plan",
-								"service_guid": "some-service-guid"
+								"service_guid": "some-service-guid",
+								"free": true,
+								"description": "other-description"
 							}
 						}
 					]
@@ -126,7 +135,9 @@ var _ = Describe("Service Plan", func() {
 							},
 							"entity": {
 								"name": "some-service-plan",
-								"service_guid": "some-service-guid"
+								"service_guid": "some-service-guid",
+								"free": false,
+								"description": "some-description"
 							}
 						},
 						{
@@ -135,7 +146,9 @@ var _ = Describe("Service Plan", func() {
 							},
 							"entity": {
 								"name": "other-service-plan",
-								"service_guid": "some-service-guid"
+								"service_guid": "some-service-guid",
+								"free": true,
+								"description": "other-description"
 							}
 						}
 					]
@@ -158,10 +171,10 @@ var _ = Describe("Service Plan", func() {
 			It("returns all the queried services", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(services).To(ConsistOf([]ServicePlan{
-					{GUID: "some-service-plan-guid-1", ServiceGUID: "some-service-guid", Name: "some-service-plan"},
-					{GUID: "some-service-plan-guid-2", ServiceGUID: "some-service-guid", Name: "other-service-plan"},
-					{GUID: "some-service-plan-guid-3", ServiceGUID: "some-service-guid", Name: "some-service-plan"},
-					{GUID: "some-service-plan-guid-4", ServiceGUID: "some-service-guid", Name: "other-service-plan"},
+					{GUID: "some-service-plan-guid-1", ServiceGUID: "some-service-guid", Free: false, Description: "some-description", Name: "some-service-plan"},
+					{GUID: "some-service-plan-guid-2", ServiceGUID: "some-service-guid", Free: true, Description: "other-description", Name: "other-service-plan"},
+					{GUID: "some-service-plan-guid-3", ServiceGUID: "some-service-guid", Free: false, Description: "some-description", Name: "some-service-plan"},
+					{GUID: "some-service-plan-guid-4", ServiceGUID: "some-service-guid", Free: true, Description: "other-description", Name: "other-service-plan"},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 			})

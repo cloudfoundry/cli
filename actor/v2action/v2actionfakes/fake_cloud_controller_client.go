@@ -861,6 +861,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetSpaceServicesStub        func(spaceGUID string, filters ...ccv2.Filter) ([]ccv2.Service, ccv2.Warnings, error)
+	getSpaceServicesMutex       sync.RWMutex
+	getSpaceServicesArgsForCall []struct {
+		spaceGUID string
+		filters   []ccv2.Filter
+	}
+	getSpaceServicesReturns struct {
+		result1 []ccv2.Service
+		result2 ccv2.Warnings
+		result3 error
+	}
+	getSpaceServicesReturnsOnCall map[int]struct {
+		result1 []ccv2.Service
+		result2 ccv2.Warnings
+		result3 error
+	}
 	GetStackStub        func(guid string) (ccv2.Stack, ccv2.Warnings, error)
 	getStackMutex       sync.RWMutex
 	getStackArgsForCall []struct {
@@ -4305,6 +4321,61 @@ func (fake *FakeCloudControllerClient) GetSpacesReturnsOnCall(i int, result1 []c
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetSpaceServices(spaceGUID string, filters ...ccv2.Filter) ([]ccv2.Service, ccv2.Warnings, error) {
+	fake.getSpaceServicesMutex.Lock()
+	ret, specificReturn := fake.getSpaceServicesReturnsOnCall[len(fake.getSpaceServicesArgsForCall)]
+	fake.getSpaceServicesArgsForCall = append(fake.getSpaceServicesArgsForCall, struct {
+		spaceGUID string
+		filters   []ccv2.Filter
+	}{spaceGUID, filters})
+	fake.recordInvocation("GetSpaceServices", []interface{}{spaceGUID, filters})
+	fake.getSpaceServicesMutex.Unlock()
+	if fake.GetSpaceServicesStub != nil {
+		return fake.GetSpaceServicesStub(spaceGUID, filters...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getSpaceServicesReturns.result1, fake.getSpaceServicesReturns.result2, fake.getSpaceServicesReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceServicesCallCount() int {
+	fake.getSpaceServicesMutex.RLock()
+	defer fake.getSpaceServicesMutex.RUnlock()
+	return len(fake.getSpaceServicesArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceServicesArgsForCall(i int) (string, []ccv2.Filter) {
+	fake.getSpaceServicesMutex.RLock()
+	defer fake.getSpaceServicesMutex.RUnlock()
+	return fake.getSpaceServicesArgsForCall[i].spaceGUID, fake.getSpaceServicesArgsForCall[i].filters
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceServicesReturns(result1 []ccv2.Service, result2 ccv2.Warnings, result3 error) {
+	fake.GetSpaceServicesStub = nil
+	fake.getSpaceServicesReturns = struct {
+		result1 []ccv2.Service
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceServicesReturnsOnCall(i int, result1 []ccv2.Service, result2 ccv2.Warnings, result3 error) {
+	fake.GetSpaceServicesStub = nil
+	if fake.getSpaceServicesReturnsOnCall == nil {
+		fake.getSpaceServicesReturnsOnCall = make(map[int]struct {
+			result1 []ccv2.Service
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.getSpaceServicesReturnsOnCall[i] = struct {
+		result1 []ccv2.Service
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetStack(guid string) (ccv2.Stack, ccv2.Warnings, error) {
 	fake.getStackMutex.Lock()
 	ret, specificReturn := fake.getStackReturnsOnCall[len(fake.getStackArgsForCall)]
@@ -5984,6 +6055,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSpaceStagingSecurityGroupsMutex.RUnlock()
 	fake.getSpacesMutex.RLock()
 	defer fake.getSpacesMutex.RUnlock()
+	fake.getSpaceServicesMutex.RLock()
+	defer fake.getSpaceServicesMutex.RUnlock()
 	fake.getStackMutex.RLock()
 	defer fake.getStackMutex.RUnlock()
 	fake.getStacksMutex.RLock()

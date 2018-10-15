@@ -280,4 +280,119 @@ var _ = Describe("Service", func() {
 			})
 		})
 	})
+	Describe("GetSpaceServices", func() {
+		var (
+			services   []Service
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			services, warnings, executeErr = client.GetSpaceServices("some-space-guid", Filter{
+				Type:     constant.LabelFilter,
+				Operator: constant.EqualOperator,
+				Values:   []string{"some-label"},
+			})
+		})
+
+		When("the cc returns back services", func() {
+			BeforeEach(func() {
+				response1 := `{
+					"next_url": "/v2/spaces/some-space-guid/services?q=label:some-label&page=2",
+					"resources": [
+						{
+							"metadata": {
+								"guid": "some-service-guid-1"
+							},
+							"entity": {
+								"label": "some-service"
+							}
+						},
+						{
+							"metadata": {
+								"guid": "some-service-guid-2"
+							},
+							"entity": {
+								"label": "other-service"
+							}
+						}
+					]
+				}`
+
+				response2 := `{
+					"next_url": null,
+					"resources": [
+						{
+							"metadata": {
+								"guid": "some-service-guid-3"
+							},
+							"entity": {
+								"label": "some-service"
+							}
+						},
+						{
+							"metadata": {
+								"guid": "some-service-guid-4"
+							},
+							"entity": {
+								"label": "other-service"
+							}
+						}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/services", "q=label:some-label"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/services", "q=label:some-label&page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns all the queried services", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(services).To(ConsistOf([]Service{
+					{GUID: "some-service-guid-1", Label: "some-service"},
+					{GUID: "some-service-guid-2", Label: "other-service"},
+					{GUID: "some-service-guid-3", Label: "some-service"},
+					{GUID: "some-service-guid-4", Label: "other-service"},
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
+			})
+		})
+
+		When("the cc returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"description": "Some description.",
+					"error_code": "CF-Error",
+					"code": 90003
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/services"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V2UnexpectedResponseError{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        90003,
+						Description: "Some description.",
+						ErrorCode:   "CF-Error",
+					},
+					ResponseCode: http.StatusTeapot,
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 })

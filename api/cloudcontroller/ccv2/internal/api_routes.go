@@ -69,6 +69,7 @@ const (
 	GetSpaceQuotaDefinitionRequest                       = "GetSpaceQuotaDefinition"
 	GetSpaceRoutesRequest                                = "GetSpaceRoutes"
 	GetSpaceSecurityGroupsRequest                        = "GetSpaceSecurityGroups"
+	GetSpaceServicesRequest                              = "GetSpaceServices"
 	GetSpaceServiceInstancesRequest                      = "GetSpaceServiceInstances"
 	GetSpacesRequest                                     = "GetSpaces"
 	GetSpaceStagingSecurityGroupsRequest                 = "GetSpaceStagingSecurityGroups"
@@ -186,6 +187,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/spaces/:space_guid/developers", Method: http.MethodPut, Name: PutSpaceDeveloperByUsernameRequest},
 	{Path: "/v2/spaces/:space_guid/developers/:developer_guid", Method: http.MethodPut, Name: PutSpaceDeveloperRequest},
 	{Path: "/v2/spaces/:guid/service_instances", Method: http.MethodGet, Name: GetSpaceServiceInstancesRequest},
+	{Path: "/v2/spaces/:space_guid/services", Method: http.MethodGet, Name: GetSpaceServicesRequest},
 	{Path: "/v2/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceRequest},
 	{Path: "/v2/spaces/:space_guid/routes", Method: http.MethodGet, Name: GetSpaceRoutesRequest},
 	{Path: "/v2/spaces/:space_guid/security_groups", Method: http.MethodGet, Name: GetSpaceSecurityGroupsRequest},
