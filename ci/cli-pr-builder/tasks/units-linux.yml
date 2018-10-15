@@ -1,0 +1,43 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
+
+inputs:
+- name: cli
+  path: gopath/src/code.cloudfoundry.org/cli
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e
+
+    export GOPATH=$PWD/gopath
+    export PATH=$GOPATH/bin:$PATH
+
+    cd $GOPATH/src/code.cloudfoundry.org/cli
+
+    export LC_ALL="en_US.UTF-8"
+
+    go version
+
+    go get -u github.com/onsi/ginkgo/ginkgo
+    ginkgo version
+
+    # we actually want the grep to exit 1 (i.e., no matches found) here
+    set +e
+    echo -e "\n Checking that packages have been go formatted..."
+    gofmt -l . | grep -v -e ^vendor
+    # if we match anything, we have unformatted files
+    if [[ $? -eq 0 ]]; then
+      echo "Found unlinted files, please run 'make format' and push again."
+      exit 1
+    fi
+    set -e
+
+    make units-full
