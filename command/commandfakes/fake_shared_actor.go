@@ -42,6 +42,24 @@ type FakeSharedActor struct {
 		result1 string
 		result2 error
 	}
+	IsLoggedInStub        func() bool
+	isLoggedInMutex       sync.RWMutex
+	isLoggedInArgsForCall []struct{}
+	isLoggedInReturns     struct {
+		result1 bool
+	}
+	isLoggedInReturnsOnCall map[int]struct {
+		result1 bool
+	}
+	CheckOrgSpaceTargetedStub        func() bool
+	checkOrgSpaceTargetedMutex       sync.RWMutex
+	checkOrgSpaceTargetedArgsForCall []struct{}
+	checkOrgSpaceTargetedReturns     struct {
+		result1 bool
+	}
+	checkOrgSpaceTargetedReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -181,6 +199,86 @@ func (fake *FakeSharedActor) RequireTargetedOrgReturnsOnCall(i int, result1 stri
 	}{result1, result2}
 }
 
+func (fake *FakeSharedActor) IsLoggedIn() bool {
+	fake.isLoggedInMutex.Lock()
+	ret, specificReturn := fake.isLoggedInReturnsOnCall[len(fake.isLoggedInArgsForCall)]
+	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct{}{})
+	fake.recordInvocation("IsLoggedIn", []interface{}{})
+	fake.isLoggedInMutex.Unlock()
+	if fake.IsLoggedInStub != nil {
+		return fake.IsLoggedInStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.isLoggedInReturns.result1
+}
+
+func (fake *FakeSharedActor) IsLoggedInCallCount() int {
+	fake.isLoggedInMutex.RLock()
+	defer fake.isLoggedInMutex.RUnlock()
+	return len(fake.isLoggedInArgsForCall)
+}
+
+func (fake *FakeSharedActor) IsLoggedInReturns(result1 bool) {
+	fake.IsLoggedInStub = nil
+	fake.isLoggedInReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeSharedActor) IsLoggedInReturnsOnCall(i int, result1 bool) {
+	fake.IsLoggedInStub = nil
+	if fake.isLoggedInReturnsOnCall == nil {
+		fake.isLoggedInReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.isLoggedInReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeSharedActor) CheckOrgSpaceTargeted() bool {
+	fake.checkOrgSpaceTargetedMutex.Lock()
+	ret, specificReturn := fake.checkOrgSpaceTargetedReturnsOnCall[len(fake.checkOrgSpaceTargetedArgsForCall)]
+	fake.checkOrgSpaceTargetedArgsForCall = append(fake.checkOrgSpaceTargetedArgsForCall, struct{}{})
+	fake.recordInvocation("CheckOrgSpaceTargeted", []interface{}{})
+	fake.checkOrgSpaceTargetedMutex.Unlock()
+	if fake.CheckOrgSpaceTargetedStub != nil {
+		return fake.CheckOrgSpaceTargetedStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.checkOrgSpaceTargetedReturns.result1
+}
+
+func (fake *FakeSharedActor) CheckOrgSpaceTargetedCallCount() int {
+	fake.checkOrgSpaceTargetedMutex.RLock()
+	defer fake.checkOrgSpaceTargetedMutex.RUnlock()
+	return len(fake.checkOrgSpaceTargetedArgsForCall)
+}
+
+func (fake *FakeSharedActor) CheckOrgSpaceTargetedReturns(result1 bool) {
+	fake.CheckOrgSpaceTargetedStub = nil
+	fake.checkOrgSpaceTargetedReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeSharedActor) CheckOrgSpaceTargetedReturnsOnCall(i int, result1 bool) {
+	fake.CheckOrgSpaceTargetedStub = nil
+	if fake.checkOrgSpaceTargetedReturnsOnCall == nil {
+		fake.checkOrgSpaceTargetedReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.checkOrgSpaceTargetedReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *FakeSharedActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -190,6 +288,10 @@ func (fake *FakeSharedActor) Invocations() map[string][][]interface{} {
 	defer fake.requireCurrentUserMutex.RUnlock()
 	fake.requireTargetedOrgMutex.RLock()
 	defer fake.requireTargetedOrgMutex.RUnlock()
+	fake.isLoggedInMutex.RLock()
+	defer fake.isLoggedInMutex.RUnlock()
+	fake.checkOrgSpaceTargetedMutex.RLock()
+	defer fake.checkOrgSpaceTargetedMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
