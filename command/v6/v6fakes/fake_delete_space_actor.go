@@ -2,18 +2,18 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeDeleteSpaceActor struct {
-	DeleteSpaceByNameAndOrganizationNameStub        func(spaceName string, orgName string) (v2action.Warnings, error)
+	DeleteSpaceByNameAndOrganizationNameStub        func(string, string) (v2action.Warnings, error)
 	deleteSpaceByNameAndOrganizationNameMutex       sync.RWMutex
 	deleteSpaceByNameAndOrganizationNameArgsForCall []struct {
-		spaceName string
-		orgName   string
+		arg1 string
+		arg2 string
 	}
 	deleteSpaceByNameAndOrganizationNameReturns struct {
 		result1 v2action.Warnings
@@ -27,22 +27,23 @@ type FakeDeleteSpaceActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDeleteSpaceActor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgName string) (v2action.Warnings, error) {
+func (fake *FakeDeleteSpaceActor) DeleteSpaceByNameAndOrganizationName(arg1 string, arg2 string) (v2action.Warnings, error) {
 	fake.deleteSpaceByNameAndOrganizationNameMutex.Lock()
 	ret, specificReturn := fake.deleteSpaceByNameAndOrganizationNameReturnsOnCall[len(fake.deleteSpaceByNameAndOrganizationNameArgsForCall)]
 	fake.deleteSpaceByNameAndOrganizationNameArgsForCall = append(fake.deleteSpaceByNameAndOrganizationNameArgsForCall, struct {
-		spaceName string
-		orgName   string
-	}{spaceName, orgName})
-	fake.recordInvocation("DeleteSpaceByNameAndOrganizationName", []interface{}{spaceName, orgName})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("DeleteSpaceByNameAndOrganizationName", []interface{}{arg1, arg2})
 	fake.deleteSpaceByNameAndOrganizationNameMutex.Unlock()
 	if fake.DeleteSpaceByNameAndOrganizationNameStub != nil {
-		return fake.DeleteSpaceByNameAndOrganizationNameStub(spaceName, orgName)
+		return fake.DeleteSpaceByNameAndOrganizationNameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.deleteSpaceByNameAndOrganizationNameReturns.result1, fake.deleteSpaceByNameAndOrganizationNameReturns.result2
+	fakeReturns := fake.deleteSpaceByNameAndOrganizationNameReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeDeleteSpaceActor) DeleteSpaceByNameAndOrganizationNameCallCount() int {
@@ -51,13 +52,22 @@ func (fake *FakeDeleteSpaceActor) DeleteSpaceByNameAndOrganizationNameCallCount(
 	return len(fake.deleteSpaceByNameAndOrganizationNameArgsForCall)
 }
 
+func (fake *FakeDeleteSpaceActor) DeleteSpaceByNameAndOrganizationNameCalls(stub func(string, string) (v2action.Warnings, error)) {
+	fake.deleteSpaceByNameAndOrganizationNameMutex.Lock()
+	defer fake.deleteSpaceByNameAndOrganizationNameMutex.Unlock()
+	fake.DeleteSpaceByNameAndOrganizationNameStub = stub
+}
+
 func (fake *FakeDeleteSpaceActor) DeleteSpaceByNameAndOrganizationNameArgsForCall(i int) (string, string) {
 	fake.deleteSpaceByNameAndOrganizationNameMutex.RLock()
 	defer fake.deleteSpaceByNameAndOrganizationNameMutex.RUnlock()
-	return fake.deleteSpaceByNameAndOrganizationNameArgsForCall[i].spaceName, fake.deleteSpaceByNameAndOrganizationNameArgsForCall[i].orgName
+	argsForCall := fake.deleteSpaceByNameAndOrganizationNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeDeleteSpaceActor) DeleteSpaceByNameAndOrganizationNameReturns(result1 v2action.Warnings, result2 error) {
+	fake.deleteSpaceByNameAndOrganizationNameMutex.Lock()
+	defer fake.deleteSpaceByNameAndOrganizationNameMutex.Unlock()
 	fake.DeleteSpaceByNameAndOrganizationNameStub = nil
 	fake.deleteSpaceByNameAndOrganizationNameReturns = struct {
 		result1 v2action.Warnings
@@ -66,6 +76,8 @@ func (fake *FakeDeleteSpaceActor) DeleteSpaceByNameAndOrganizationNameReturns(re
 }
 
 func (fake *FakeDeleteSpaceActor) DeleteSpaceByNameAndOrganizationNameReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.deleteSpaceByNameAndOrganizationNameMutex.Lock()
+	defer fake.deleteSpaceByNameAndOrganizationNameMutex.Unlock()
 	fake.DeleteSpaceByNameAndOrganizationNameStub = nil
 	if fake.deleteSpaceByNameAndOrganizationNameReturnsOnCall == nil {
 		fake.deleteSpaceByNameAndOrganizationNameReturnsOnCall = make(map[int]struct {

@@ -2,18 +2,18 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeSetSpaceIsolationSegmentActorV2 struct {
-	GetSpaceByOrganizationAndNameStub        func(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
+	GetSpaceByOrganizationAndNameStub        func(string, string) (v2action.Space, v2action.Warnings, error)
 	getSpaceByOrganizationAndNameMutex       sync.RWMutex
 	getSpaceByOrganizationAndNameArgsForCall []struct {
-		orgGUID   string
-		spaceName string
+		arg1 string
+		arg2 string
 	}
 	getSpaceByOrganizationAndNameReturns struct {
 		result1 v2action.Space
@@ -29,22 +29,23 @@ type FakeSetSpaceIsolationSegmentActorV2 struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSetSpaceIsolationSegmentActorV2) GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error) {
+func (fake *FakeSetSpaceIsolationSegmentActorV2) GetSpaceByOrganizationAndName(arg1 string, arg2 string) (v2action.Space, v2action.Warnings, error) {
 	fake.getSpaceByOrganizationAndNameMutex.Lock()
 	ret, specificReturn := fake.getSpaceByOrganizationAndNameReturnsOnCall[len(fake.getSpaceByOrganizationAndNameArgsForCall)]
 	fake.getSpaceByOrganizationAndNameArgsForCall = append(fake.getSpaceByOrganizationAndNameArgsForCall, struct {
-		orgGUID   string
-		spaceName string
-	}{orgGUID, spaceName})
-	fake.recordInvocation("GetSpaceByOrganizationAndName", []interface{}{orgGUID, spaceName})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetSpaceByOrganizationAndName", []interface{}{arg1, arg2})
 	fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	if fake.GetSpaceByOrganizationAndNameStub != nil {
-		return fake.GetSpaceByOrganizationAndNameStub(orgGUID, spaceName)
+		return fake.GetSpaceByOrganizationAndNameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getSpaceByOrganizationAndNameReturns.result1, fake.getSpaceByOrganizationAndNameReturns.result2, fake.getSpaceByOrganizationAndNameReturns.result3
+	fakeReturns := fake.getSpaceByOrganizationAndNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeSetSpaceIsolationSegmentActorV2) GetSpaceByOrganizationAndNameCallCount() int {
@@ -53,13 +54,22 @@ func (fake *FakeSetSpaceIsolationSegmentActorV2) GetSpaceByOrganizationAndNameCa
 	return len(fake.getSpaceByOrganizationAndNameArgsForCall)
 }
 
+func (fake *FakeSetSpaceIsolationSegmentActorV2) GetSpaceByOrganizationAndNameCalls(stub func(string, string) (v2action.Space, v2action.Warnings, error)) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
+	fake.GetSpaceByOrganizationAndNameStub = stub
+}
+
 func (fake *FakeSetSpaceIsolationSegmentActorV2) GetSpaceByOrganizationAndNameArgsForCall(i int) (string, string) {
 	fake.getSpaceByOrganizationAndNameMutex.RLock()
 	defer fake.getSpaceByOrganizationAndNameMutex.RUnlock()
-	return fake.getSpaceByOrganizationAndNameArgsForCall[i].orgGUID, fake.getSpaceByOrganizationAndNameArgsForCall[i].spaceName
+	argsForCall := fake.getSpaceByOrganizationAndNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeSetSpaceIsolationSegmentActorV2) GetSpaceByOrganizationAndNameReturns(result1 v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	fake.GetSpaceByOrganizationAndNameStub = nil
 	fake.getSpaceByOrganizationAndNameReturns = struct {
 		result1 v2action.Space
@@ -69,6 +79,8 @@ func (fake *FakeSetSpaceIsolationSegmentActorV2) GetSpaceByOrganizationAndNameRe
 }
 
 func (fake *FakeSetSpaceIsolationSegmentActorV2) GetSpaceByOrganizationAndNameReturnsOnCall(i int, result1 v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	fake.GetSpaceByOrganizationAndNameStub = nil
 	if fake.getSpaceByOrganizationAndNameReturnsOnCall == nil {
 		fake.getSpaceByOrganizationAndNameReturnsOnCall = make(map[int]struct {

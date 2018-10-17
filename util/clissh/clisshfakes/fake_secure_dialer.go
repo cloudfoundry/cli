@@ -2,19 +2,19 @@
 package clisshfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/util/clissh"
-	"golang.org/x/crypto/ssh"
+	clissh "code.cloudfoundry.org/cli/util/clissh"
+	ssh "golang.org/x/crypto/ssh"
 )
 
 type FakeSecureDialer struct {
-	DialStub        func(network, address string, config *ssh.ClientConfig) (clissh.SecureClient, error)
+	DialStub        func(string, string, *ssh.ClientConfig) (clissh.SecureClient, error)
 	dialMutex       sync.RWMutex
 	dialArgsForCall []struct {
-		network string
-		address string
-		config  *ssh.ClientConfig
+		arg1 string
+		arg2 string
+		arg3 *ssh.ClientConfig
 	}
 	dialReturns struct {
 		result1 clissh.SecureClient
@@ -28,23 +28,24 @@ type FakeSecureDialer struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSecureDialer) Dial(network string, address string, config *ssh.ClientConfig) (clissh.SecureClient, error) {
+func (fake *FakeSecureDialer) Dial(arg1 string, arg2 string, arg3 *ssh.ClientConfig) (clissh.SecureClient, error) {
 	fake.dialMutex.Lock()
 	ret, specificReturn := fake.dialReturnsOnCall[len(fake.dialArgsForCall)]
 	fake.dialArgsForCall = append(fake.dialArgsForCall, struct {
-		network string
-		address string
-		config  *ssh.ClientConfig
-	}{network, address, config})
-	fake.recordInvocation("Dial", []interface{}{network, address, config})
+		arg1 string
+		arg2 string
+		arg3 *ssh.ClientConfig
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("Dial", []interface{}{arg1, arg2, arg3})
 	fake.dialMutex.Unlock()
 	if fake.DialStub != nil {
-		return fake.DialStub(network, address, config)
+		return fake.DialStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.dialReturns.result1, fake.dialReturns.result2
+	fakeReturns := fake.dialReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeSecureDialer) DialCallCount() int {
@@ -53,13 +54,22 @@ func (fake *FakeSecureDialer) DialCallCount() int {
 	return len(fake.dialArgsForCall)
 }
 
+func (fake *FakeSecureDialer) DialCalls(stub func(string, string, *ssh.ClientConfig) (clissh.SecureClient, error)) {
+	fake.dialMutex.Lock()
+	defer fake.dialMutex.Unlock()
+	fake.DialStub = stub
+}
+
 func (fake *FakeSecureDialer) DialArgsForCall(i int) (string, string, *ssh.ClientConfig) {
 	fake.dialMutex.RLock()
 	defer fake.dialMutex.RUnlock()
-	return fake.dialArgsForCall[i].network, fake.dialArgsForCall[i].address, fake.dialArgsForCall[i].config
+	argsForCall := fake.dialArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeSecureDialer) DialReturns(result1 clissh.SecureClient, result2 error) {
+	fake.dialMutex.Lock()
+	defer fake.dialMutex.Unlock()
 	fake.DialStub = nil
 	fake.dialReturns = struct {
 		result1 clissh.SecureClient
@@ -68,6 +78,8 @@ func (fake *FakeSecureDialer) DialReturns(result1 clissh.SecureClient, result2 e
 }
 
 func (fake *FakeSecureDialer) DialReturnsOnCall(i int, result1 clissh.SecureClient, result2 error) {
+	fake.dialMutex.Lock()
+	defer fake.dialMutex.Unlock()
 	fake.DialStub = nil
 	if fake.dialReturnsOnCall == nil {
 		fake.dialReturnsOnCall = make(map[int]struct {

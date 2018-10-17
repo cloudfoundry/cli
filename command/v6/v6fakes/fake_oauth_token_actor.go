@@ -2,16 +2,16 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/command/v6"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeOauthTokenActor struct {
-	RefreshAccessTokenStub        func(refreshToken string) (string, error)
+	RefreshAccessTokenStub        func(string) (string, error)
 	refreshAccessTokenMutex       sync.RWMutex
 	refreshAccessTokenArgsForCall []struct {
-		refreshToken string
+		arg1 string
 	}
 	refreshAccessTokenReturns struct {
 		result1 string
@@ -25,21 +25,22 @@ type FakeOauthTokenActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeOauthTokenActor) RefreshAccessToken(refreshToken string) (string, error) {
+func (fake *FakeOauthTokenActor) RefreshAccessToken(arg1 string) (string, error) {
 	fake.refreshAccessTokenMutex.Lock()
 	ret, specificReturn := fake.refreshAccessTokenReturnsOnCall[len(fake.refreshAccessTokenArgsForCall)]
 	fake.refreshAccessTokenArgsForCall = append(fake.refreshAccessTokenArgsForCall, struct {
-		refreshToken string
-	}{refreshToken})
-	fake.recordInvocation("RefreshAccessToken", []interface{}{refreshToken})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("RefreshAccessToken", []interface{}{arg1})
 	fake.refreshAccessTokenMutex.Unlock()
 	if fake.RefreshAccessTokenStub != nil {
-		return fake.RefreshAccessTokenStub(refreshToken)
+		return fake.RefreshAccessTokenStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.refreshAccessTokenReturns.result1, fake.refreshAccessTokenReturns.result2
+	fakeReturns := fake.refreshAccessTokenReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeOauthTokenActor) RefreshAccessTokenCallCount() int {
@@ -48,13 +49,22 @@ func (fake *FakeOauthTokenActor) RefreshAccessTokenCallCount() int {
 	return len(fake.refreshAccessTokenArgsForCall)
 }
 
+func (fake *FakeOauthTokenActor) RefreshAccessTokenCalls(stub func(string) (string, error)) {
+	fake.refreshAccessTokenMutex.Lock()
+	defer fake.refreshAccessTokenMutex.Unlock()
+	fake.RefreshAccessTokenStub = stub
+}
+
 func (fake *FakeOauthTokenActor) RefreshAccessTokenArgsForCall(i int) string {
 	fake.refreshAccessTokenMutex.RLock()
 	defer fake.refreshAccessTokenMutex.RUnlock()
-	return fake.refreshAccessTokenArgsForCall[i].refreshToken
+	argsForCall := fake.refreshAccessTokenArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeOauthTokenActor) RefreshAccessTokenReturns(result1 string, result2 error) {
+	fake.refreshAccessTokenMutex.Lock()
+	defer fake.refreshAccessTokenMutex.Unlock()
 	fake.RefreshAccessTokenStub = nil
 	fake.refreshAccessTokenReturns = struct {
 		result1 string
@@ -63,6 +73,8 @@ func (fake *FakeOauthTokenActor) RefreshAccessTokenReturns(result1 string, resul
 }
 
 func (fake *FakeOauthTokenActor) RefreshAccessTokenReturnsOnCall(i int, result1 string, result2 error) {
+	fake.refreshAccessTokenMutex.Lock()
+	defer fake.refreshAccessTokenMutex.Unlock()
 	fake.RefreshAccessTokenStub = nil
 	if fake.refreshAccessTokenReturnsOnCall == nil {
 		fake.refreshAccessTokenReturnsOnCall = make(map[int]struct {

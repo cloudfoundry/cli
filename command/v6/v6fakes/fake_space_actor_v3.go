@@ -2,27 +2,28 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeSpaceActorV3 struct {
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetEffectiveIsolationSegmentBySpaceStub        func(spaceGUID string, orgDefaultIsolationSegmentGUID string) (v3action.IsolationSegment, v3action.Warnings, error)
+	GetEffectiveIsolationSegmentBySpaceStub        func(string, string) (v3action.IsolationSegment, v3action.Warnings, error)
 	getEffectiveIsolationSegmentBySpaceMutex       sync.RWMutex
 	getEffectiveIsolationSegmentBySpaceArgsForCall []struct {
-		spaceGUID                      string
-		orgDefaultIsolationSegmentGUID string
+		arg1 string
+		arg2 string
 	}
 	getEffectiveIsolationSegmentBySpaceReturns struct {
 		result1 v3action.IsolationSegment
@@ -41,7 +42,8 @@ type FakeSpaceActorV3 struct {
 func (fake *FakeSpaceActorV3) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -50,7 +52,8 @@ func (fake *FakeSpaceActorV3) CloudControllerAPIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeSpaceActorV3) CloudControllerAPIVersionCallCount() int {
@@ -59,7 +62,15 @@ func (fake *FakeSpaceActorV3) CloudControllerAPIVersionCallCount() int {
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeSpaceActorV3) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeSpaceActorV3) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -67,6 +78,8 @@ func (fake *FakeSpaceActorV3) CloudControllerAPIVersionReturns(result1 string) {
 }
 
 func (fake *FakeSpaceActorV3) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -78,22 +91,23 @@ func (fake *FakeSpaceActorV3) CloudControllerAPIVersionReturnsOnCall(i int, resu
 	}{result1}
 }
 
-func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpace(spaceGUID string, orgDefaultIsolationSegmentGUID string) (v3action.IsolationSegment, v3action.Warnings, error) {
+func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpace(arg1 string, arg2 string) (v3action.IsolationSegment, v3action.Warnings, error) {
 	fake.getEffectiveIsolationSegmentBySpaceMutex.Lock()
 	ret, specificReturn := fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall[len(fake.getEffectiveIsolationSegmentBySpaceArgsForCall)]
 	fake.getEffectiveIsolationSegmentBySpaceArgsForCall = append(fake.getEffectiveIsolationSegmentBySpaceArgsForCall, struct {
-		spaceGUID                      string
-		orgDefaultIsolationSegmentGUID string
-	}{spaceGUID, orgDefaultIsolationSegmentGUID})
-	fake.recordInvocation("GetEffectiveIsolationSegmentBySpace", []interface{}{spaceGUID, orgDefaultIsolationSegmentGUID})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetEffectiveIsolationSegmentBySpace", []interface{}{arg1, arg2})
 	fake.getEffectiveIsolationSegmentBySpaceMutex.Unlock()
 	if fake.GetEffectiveIsolationSegmentBySpaceStub != nil {
-		return fake.GetEffectiveIsolationSegmentBySpaceStub(spaceGUID, orgDefaultIsolationSegmentGUID)
+		return fake.GetEffectiveIsolationSegmentBySpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getEffectiveIsolationSegmentBySpaceReturns.result1, fake.getEffectiveIsolationSegmentBySpaceReturns.result2, fake.getEffectiveIsolationSegmentBySpaceReturns.result3
+	fakeReturns := fake.getEffectiveIsolationSegmentBySpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceCallCount() int {
@@ -102,13 +116,22 @@ func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceCallCount() int
 	return len(fake.getEffectiveIsolationSegmentBySpaceArgsForCall)
 }
 
+func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceCalls(stub func(string, string) (v3action.IsolationSegment, v3action.Warnings, error)) {
+	fake.getEffectiveIsolationSegmentBySpaceMutex.Lock()
+	defer fake.getEffectiveIsolationSegmentBySpaceMutex.Unlock()
+	fake.GetEffectiveIsolationSegmentBySpaceStub = stub
+}
+
 func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceArgsForCall(i int) (string, string) {
 	fake.getEffectiveIsolationSegmentBySpaceMutex.RLock()
 	defer fake.getEffectiveIsolationSegmentBySpaceMutex.RUnlock()
-	return fake.getEffectiveIsolationSegmentBySpaceArgsForCall[i].spaceGUID, fake.getEffectiveIsolationSegmentBySpaceArgsForCall[i].orgDefaultIsolationSegmentGUID
+	argsForCall := fake.getEffectiveIsolationSegmentBySpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceReturns(result1 v3action.IsolationSegment, result2 v3action.Warnings, result3 error) {
+	fake.getEffectiveIsolationSegmentBySpaceMutex.Lock()
+	defer fake.getEffectiveIsolationSegmentBySpaceMutex.Unlock()
 	fake.GetEffectiveIsolationSegmentBySpaceStub = nil
 	fake.getEffectiveIsolationSegmentBySpaceReturns = struct {
 		result1 v3action.IsolationSegment
@@ -118,6 +141,8 @@ func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceReturns(result1
 }
 
 func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceReturnsOnCall(i int, result1 v3action.IsolationSegment, result2 v3action.Warnings, result3 error) {
+	fake.getEffectiveIsolationSegmentBySpaceMutex.Lock()
+	defer fake.getEffectiveIsolationSegmentBySpaceMutex.Unlock()
 	fake.GetEffectiveIsolationSegmentBySpaceStub = nil
 	if fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall == nil {
 		fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall = make(map[int]struct {

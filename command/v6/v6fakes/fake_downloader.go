@@ -2,9 +2,9 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/command/v6"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeDownloader struct {
@@ -39,7 +39,8 @@ func (fake *FakeDownloader) Download(arg1 string) (string, error) {
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.downloadReturns.result1, fake.downloadReturns.result2
+	fakeReturns := fake.downloadReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeDownloader) DownloadCallCount() int {
@@ -48,13 +49,22 @@ func (fake *FakeDownloader) DownloadCallCount() int {
 	return len(fake.downloadArgsForCall)
 }
 
+func (fake *FakeDownloader) DownloadCalls(stub func(string) (string, error)) {
+	fake.downloadMutex.Lock()
+	defer fake.downloadMutex.Unlock()
+	fake.DownloadStub = stub
+}
+
 func (fake *FakeDownloader) DownloadArgsForCall(i int) string {
 	fake.downloadMutex.RLock()
 	defer fake.downloadMutex.RUnlock()
-	return fake.downloadArgsForCall[i].arg1
+	argsForCall := fake.downloadArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeDownloader) DownloadReturns(result1 string, result2 error) {
+	fake.downloadMutex.Lock()
+	defer fake.downloadMutex.Unlock()
 	fake.DownloadStub = nil
 	fake.downloadReturns = struct {
 		result1 string
@@ -63,6 +73,8 @@ func (fake *FakeDownloader) DownloadReturns(result1 string, result2 error) {
 }
 
 func (fake *FakeDownloader) DownloadReturnsOnCall(i int, result1 string, result2 error) {
+	fake.downloadMutex.Lock()
+	defer fake.downloadMutex.Unlock()
 	fake.DownloadStub = nil
 	if fake.downloadReturnsOnCall == nil {
 		fake.downloadReturnsOnCall = make(map[int]struct {

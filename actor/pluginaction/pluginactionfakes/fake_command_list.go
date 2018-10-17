@@ -2,23 +2,12 @@
 package pluginactionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
+	pluginaction "code.cloudfoundry.org/cli/actor/pluginaction"
 )
 
 type FakeCommandList struct {
-	HasCommandStub        func(string) bool
-	hasCommandMutex       sync.RWMutex
-	hasCommandArgsForCall []struct {
-		arg1 string
-	}
-	hasCommandReturns struct {
-		result1 bool
-	}
-	hasCommandReturnsOnCall map[int]struct {
-		result1 bool
-	}
 	HasAliasStub        func(string) bool
 	hasAliasMutex       sync.RWMutex
 	hasAliasArgsForCall []struct {
@@ -30,56 +19,19 @@ type FakeCommandList struct {
 	hasAliasReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	HasCommandStub        func(string) bool
+	hasCommandMutex       sync.RWMutex
+	hasCommandArgsForCall []struct {
+		arg1 string
+	}
+	hasCommandReturns struct {
+		result1 bool
+	}
+	hasCommandReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeCommandList) HasCommand(arg1 string) bool {
-	fake.hasCommandMutex.Lock()
-	ret, specificReturn := fake.hasCommandReturnsOnCall[len(fake.hasCommandArgsForCall)]
-	fake.hasCommandArgsForCall = append(fake.hasCommandArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("HasCommand", []interface{}{arg1})
-	fake.hasCommandMutex.Unlock()
-	if fake.HasCommandStub != nil {
-		return fake.HasCommandStub(arg1)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.hasCommandReturns.result1
-}
-
-func (fake *FakeCommandList) HasCommandCallCount() int {
-	fake.hasCommandMutex.RLock()
-	defer fake.hasCommandMutex.RUnlock()
-	return len(fake.hasCommandArgsForCall)
-}
-
-func (fake *FakeCommandList) HasCommandArgsForCall(i int) string {
-	fake.hasCommandMutex.RLock()
-	defer fake.hasCommandMutex.RUnlock()
-	return fake.hasCommandArgsForCall[i].arg1
-}
-
-func (fake *FakeCommandList) HasCommandReturns(result1 bool) {
-	fake.HasCommandStub = nil
-	fake.hasCommandReturns = struct {
-		result1 bool
-	}{result1}
-}
-
-func (fake *FakeCommandList) HasCommandReturnsOnCall(i int, result1 bool) {
-	fake.HasCommandStub = nil
-	if fake.hasCommandReturnsOnCall == nil {
-		fake.hasCommandReturnsOnCall = make(map[int]struct {
-			result1 bool
-		})
-	}
-	fake.hasCommandReturnsOnCall[i] = struct {
-		result1 bool
-	}{result1}
 }
 
 func (fake *FakeCommandList) HasAlias(arg1 string) bool {
@@ -96,7 +48,8 @@ func (fake *FakeCommandList) HasAlias(arg1 string) bool {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.hasAliasReturns.result1
+	fakeReturns := fake.hasAliasReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeCommandList) HasAliasCallCount() int {
@@ -105,13 +58,22 @@ func (fake *FakeCommandList) HasAliasCallCount() int {
 	return len(fake.hasAliasArgsForCall)
 }
 
+func (fake *FakeCommandList) HasAliasCalls(stub func(string) bool) {
+	fake.hasAliasMutex.Lock()
+	defer fake.hasAliasMutex.Unlock()
+	fake.HasAliasStub = stub
+}
+
 func (fake *FakeCommandList) HasAliasArgsForCall(i int) string {
 	fake.hasAliasMutex.RLock()
 	defer fake.hasAliasMutex.RUnlock()
-	return fake.hasAliasArgsForCall[i].arg1
+	argsForCall := fake.hasAliasArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeCommandList) HasAliasReturns(result1 bool) {
+	fake.hasAliasMutex.Lock()
+	defer fake.hasAliasMutex.Unlock()
 	fake.HasAliasStub = nil
 	fake.hasAliasReturns = struct {
 		result1 bool
@@ -119,6 +81,8 @@ func (fake *FakeCommandList) HasAliasReturns(result1 bool) {
 }
 
 func (fake *FakeCommandList) HasAliasReturnsOnCall(i int, result1 bool) {
+	fake.hasAliasMutex.Lock()
+	defer fake.hasAliasMutex.Unlock()
 	fake.HasAliasStub = nil
 	if fake.hasAliasReturnsOnCall == nil {
 		fake.hasAliasReturnsOnCall = make(map[int]struct {
@@ -130,13 +94,73 @@ func (fake *FakeCommandList) HasAliasReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeCommandList) HasCommand(arg1 string) bool {
+	fake.hasCommandMutex.Lock()
+	ret, specificReturn := fake.hasCommandReturnsOnCall[len(fake.hasCommandArgsForCall)]
+	fake.hasCommandArgsForCall = append(fake.hasCommandArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("HasCommand", []interface{}{arg1})
+	fake.hasCommandMutex.Unlock()
+	if fake.HasCommandStub != nil {
+		return fake.HasCommandStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.hasCommandReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeCommandList) HasCommandCallCount() int {
+	fake.hasCommandMutex.RLock()
+	defer fake.hasCommandMutex.RUnlock()
+	return len(fake.hasCommandArgsForCall)
+}
+
+func (fake *FakeCommandList) HasCommandCalls(stub func(string) bool) {
+	fake.hasCommandMutex.Lock()
+	defer fake.hasCommandMutex.Unlock()
+	fake.HasCommandStub = stub
+}
+
+func (fake *FakeCommandList) HasCommandArgsForCall(i int) string {
+	fake.hasCommandMutex.RLock()
+	defer fake.hasCommandMutex.RUnlock()
+	argsForCall := fake.hasCommandArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCommandList) HasCommandReturns(result1 bool) {
+	fake.hasCommandMutex.Lock()
+	defer fake.hasCommandMutex.Unlock()
+	fake.HasCommandStub = nil
+	fake.hasCommandReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeCommandList) HasCommandReturnsOnCall(i int, result1 bool) {
+	fake.hasCommandMutex.Lock()
+	defer fake.hasCommandMutex.Unlock()
+	fake.HasCommandStub = nil
+	if fake.hasCommandReturnsOnCall == nil {
+		fake.hasCommandReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.hasCommandReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *FakeCommandList) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.hasCommandMutex.RLock()
-	defer fake.hasCommandMutex.RUnlock()
 	fake.hasAliasMutex.RLock()
 	defer fake.hasAliasMutex.RUnlock()
+	fake.hasCommandMutex.RLock()
+	defer fake.hasCommandMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

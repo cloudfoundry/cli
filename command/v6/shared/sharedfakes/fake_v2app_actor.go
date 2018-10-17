@@ -2,32 +2,17 @@
 package sharedfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6/shared"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	shared "code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 type FakeV2AppActor struct {
-	GetApplicationRoutesStub        func(appGUID string) (v2action.Routes, v2action.Warnings, error)
-	getApplicationRoutesMutex       sync.RWMutex
-	getApplicationRoutesArgsForCall []struct {
-		appGUID string
-	}
-	getApplicationRoutesReturns struct {
-		result1 v2action.Routes
-		result2 v2action.Warnings
-		result3 error
-	}
-	getApplicationRoutesReturnsOnCall map[int]struct {
-		result1 v2action.Routes
-		result2 v2action.Warnings
-		result3 error
-	}
-	GetApplicationInstancesWithStatsByApplicationStub        func(guid string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)
+	GetApplicationInstancesWithStatsByApplicationStub        func(string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)
 	getApplicationInstancesWithStatsByApplicationMutex       sync.RWMutex
 	getApplicationInstancesWithStatsByApplicationArgsForCall []struct {
-		guid string
+		arg1 string
 	}
 	getApplicationInstancesWithStatsByApplicationReturns struct {
 		result1 []v2action.ApplicationInstanceWithStats
@@ -39,79 +24,41 @@ type FakeV2AppActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	GetApplicationRoutesStub        func(string) (v2action.Routes, v2action.Warnings, error)
+	getApplicationRoutesMutex       sync.RWMutex
+	getApplicationRoutesArgsForCall []struct {
+		arg1 string
+	}
+	getApplicationRoutesReturns struct {
+		result1 v2action.Routes
+		result2 v2action.Warnings
+		result3 error
+	}
+	getApplicationRoutesReturnsOnCall map[int]struct {
+		result1 v2action.Routes
+		result2 v2action.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV2AppActor) GetApplicationRoutes(appGUID string) (v2action.Routes, v2action.Warnings, error) {
-	fake.getApplicationRoutesMutex.Lock()
-	ret, specificReturn := fake.getApplicationRoutesReturnsOnCall[len(fake.getApplicationRoutesArgsForCall)]
-	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
-		appGUID string
-	}{appGUID})
-	fake.recordInvocation("GetApplicationRoutes", []interface{}{appGUID})
-	fake.getApplicationRoutesMutex.Unlock()
-	if fake.GetApplicationRoutesStub != nil {
-		return fake.GetApplicationRoutesStub(appGUID)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.getApplicationRoutesReturns.result1, fake.getApplicationRoutesReturns.result2, fake.getApplicationRoutesReturns.result3
-}
-
-func (fake *FakeV2AppActor) GetApplicationRoutesCallCount() int {
-	fake.getApplicationRoutesMutex.RLock()
-	defer fake.getApplicationRoutesMutex.RUnlock()
-	return len(fake.getApplicationRoutesArgsForCall)
-}
-
-func (fake *FakeV2AppActor) GetApplicationRoutesArgsForCall(i int) string {
-	fake.getApplicationRoutesMutex.RLock()
-	defer fake.getApplicationRoutesMutex.RUnlock()
-	return fake.getApplicationRoutesArgsForCall[i].appGUID
-}
-
-func (fake *FakeV2AppActor) GetApplicationRoutesReturns(result1 v2action.Routes, result2 v2action.Warnings, result3 error) {
-	fake.GetApplicationRoutesStub = nil
-	fake.getApplicationRoutesReturns = struct {
-		result1 v2action.Routes
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeV2AppActor) GetApplicationRoutesReturnsOnCall(i int, result1 v2action.Routes, result2 v2action.Warnings, result3 error) {
-	fake.GetApplicationRoutesStub = nil
-	if fake.getApplicationRoutesReturnsOnCall == nil {
-		fake.getApplicationRoutesReturnsOnCall = make(map[int]struct {
-			result1 v2action.Routes
-			result2 v2action.Warnings
-			result3 error
-		})
-	}
-	fake.getApplicationRoutesReturnsOnCall[i] = struct {
-		result1 v2action.Routes
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplication(guid string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error) {
+func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplication(arg1 string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error) {
 	fake.getApplicationInstancesWithStatsByApplicationMutex.Lock()
 	ret, specificReturn := fake.getApplicationInstancesWithStatsByApplicationReturnsOnCall[len(fake.getApplicationInstancesWithStatsByApplicationArgsForCall)]
 	fake.getApplicationInstancesWithStatsByApplicationArgsForCall = append(fake.getApplicationInstancesWithStatsByApplicationArgsForCall, struct {
-		guid string
-	}{guid})
-	fake.recordInvocation("GetApplicationInstancesWithStatsByApplication", []interface{}{guid})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetApplicationInstancesWithStatsByApplication", []interface{}{arg1})
 	fake.getApplicationInstancesWithStatsByApplicationMutex.Unlock()
 	if fake.GetApplicationInstancesWithStatsByApplicationStub != nil {
-		return fake.GetApplicationInstancesWithStatsByApplicationStub(guid)
+		return fake.GetApplicationInstancesWithStatsByApplicationStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationInstancesWithStatsByApplicationReturns.result1, fake.getApplicationInstancesWithStatsByApplicationReturns.result2, fake.getApplicationInstancesWithStatsByApplicationReturns.result3
+	fakeReturns := fake.getApplicationInstancesWithStatsByApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplicationCallCount() int {
@@ -120,13 +67,22 @@ func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplicationCallCou
 	return len(fake.getApplicationInstancesWithStatsByApplicationArgsForCall)
 }
 
+func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplicationCalls(stub func(string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)) {
+	fake.getApplicationInstancesWithStatsByApplicationMutex.Lock()
+	defer fake.getApplicationInstancesWithStatsByApplicationMutex.Unlock()
+	fake.GetApplicationInstancesWithStatsByApplicationStub = stub
+}
+
 func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplicationArgsForCall(i int) string {
 	fake.getApplicationInstancesWithStatsByApplicationMutex.RLock()
 	defer fake.getApplicationInstancesWithStatsByApplicationMutex.RUnlock()
-	return fake.getApplicationInstancesWithStatsByApplicationArgsForCall[i].guid
+	argsForCall := fake.getApplicationInstancesWithStatsByApplicationArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplicationReturns(result1 []v2action.ApplicationInstanceWithStats, result2 v2action.Warnings, result3 error) {
+	fake.getApplicationInstancesWithStatsByApplicationMutex.Lock()
+	defer fake.getApplicationInstancesWithStatsByApplicationMutex.Unlock()
 	fake.GetApplicationInstancesWithStatsByApplicationStub = nil
 	fake.getApplicationInstancesWithStatsByApplicationReturns = struct {
 		result1 []v2action.ApplicationInstanceWithStats
@@ -136,6 +92,8 @@ func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplicationReturns
 }
 
 func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplicationReturnsOnCall(i int, result1 []v2action.ApplicationInstanceWithStats, result2 v2action.Warnings, result3 error) {
+	fake.getApplicationInstancesWithStatsByApplicationMutex.Lock()
+	defer fake.getApplicationInstancesWithStatsByApplicationMutex.Unlock()
 	fake.GetApplicationInstancesWithStatsByApplicationStub = nil
 	if fake.getApplicationInstancesWithStatsByApplicationReturnsOnCall == nil {
 		fake.getApplicationInstancesWithStatsByApplicationReturnsOnCall = make(map[int]struct {
@@ -151,13 +109,79 @@ func (fake *FakeV2AppActor) GetApplicationInstancesWithStatsByApplicationReturns
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV2AppActor) GetApplicationRoutes(arg1 string) (v2action.Routes, v2action.Warnings, error) {
+	fake.getApplicationRoutesMutex.Lock()
+	ret, specificReturn := fake.getApplicationRoutesReturnsOnCall[len(fake.getApplicationRoutesArgsForCall)]
+	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetApplicationRoutes", []interface{}{arg1})
+	fake.getApplicationRoutesMutex.Unlock()
+	if fake.GetApplicationRoutesStub != nil {
+		return fake.GetApplicationRoutesStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationRoutesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeV2AppActor) GetApplicationRoutesCallCount() int {
+	fake.getApplicationRoutesMutex.RLock()
+	defer fake.getApplicationRoutesMutex.RUnlock()
+	return len(fake.getApplicationRoutesArgsForCall)
+}
+
+func (fake *FakeV2AppActor) GetApplicationRoutesCalls(stub func(string) (v2action.Routes, v2action.Warnings, error)) {
+	fake.getApplicationRoutesMutex.Lock()
+	defer fake.getApplicationRoutesMutex.Unlock()
+	fake.GetApplicationRoutesStub = stub
+}
+
+func (fake *FakeV2AppActor) GetApplicationRoutesArgsForCall(i int) string {
+	fake.getApplicationRoutesMutex.RLock()
+	defer fake.getApplicationRoutesMutex.RUnlock()
+	argsForCall := fake.getApplicationRoutesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeV2AppActor) GetApplicationRoutesReturns(result1 v2action.Routes, result2 v2action.Warnings, result3 error) {
+	fake.getApplicationRoutesMutex.Lock()
+	defer fake.getApplicationRoutesMutex.Unlock()
+	fake.GetApplicationRoutesStub = nil
+	fake.getApplicationRoutesReturns = struct {
+		result1 v2action.Routes
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2AppActor) GetApplicationRoutesReturnsOnCall(i int, result1 v2action.Routes, result2 v2action.Warnings, result3 error) {
+	fake.getApplicationRoutesMutex.Lock()
+	defer fake.getApplicationRoutesMutex.Unlock()
+	fake.GetApplicationRoutesStub = nil
+	if fake.getApplicationRoutesReturnsOnCall == nil {
+		fake.getApplicationRoutesReturnsOnCall = make(map[int]struct {
+			result1 v2action.Routes
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationRoutesReturnsOnCall[i] = struct {
+		result1 v2action.Routes
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV2AppActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getApplicationRoutesMutex.RLock()
-	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getApplicationInstancesWithStatsByApplicationMutex.RLock()
 	defer fake.getApplicationInstancesWithStatsByApplicationMutex.RUnlock()
+	fake.getApplicationRoutesMutex.RLock()
+	defer fake.getApplicationRoutesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

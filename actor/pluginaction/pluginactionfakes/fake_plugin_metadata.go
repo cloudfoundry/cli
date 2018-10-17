@@ -2,17 +2,17 @@
 package pluginactionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/util/configv3"
+	pluginaction "code.cloudfoundry.org/cli/actor/pluginaction"
+	configv3 "code.cloudfoundry.org/cli/util/configv3"
 )
 
 type FakePluginMetadata struct {
-	GetMetadataStub        func(pluginPath string) (configv3.Plugin, error)
+	GetMetadataStub        func(string) (configv3.Plugin, error)
 	getMetadataMutex       sync.RWMutex
 	getMetadataArgsForCall []struct {
-		pluginPath string
+		arg1 string
 	}
 	getMetadataReturns struct {
 		result1 configv3.Plugin
@@ -26,21 +26,22 @@ type FakePluginMetadata struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakePluginMetadata) GetMetadata(pluginPath string) (configv3.Plugin, error) {
+func (fake *FakePluginMetadata) GetMetadata(arg1 string) (configv3.Plugin, error) {
 	fake.getMetadataMutex.Lock()
 	ret, specificReturn := fake.getMetadataReturnsOnCall[len(fake.getMetadataArgsForCall)]
 	fake.getMetadataArgsForCall = append(fake.getMetadataArgsForCall, struct {
-		pluginPath string
-	}{pluginPath})
-	fake.recordInvocation("GetMetadata", []interface{}{pluginPath})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetMetadata", []interface{}{arg1})
 	fake.getMetadataMutex.Unlock()
 	if fake.GetMetadataStub != nil {
-		return fake.GetMetadataStub(pluginPath)
+		return fake.GetMetadataStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.getMetadataReturns.result1, fake.getMetadataReturns.result2
+	fakeReturns := fake.getMetadataReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakePluginMetadata) GetMetadataCallCount() int {
@@ -49,13 +50,22 @@ func (fake *FakePluginMetadata) GetMetadataCallCount() int {
 	return len(fake.getMetadataArgsForCall)
 }
 
+func (fake *FakePluginMetadata) GetMetadataCalls(stub func(string) (configv3.Plugin, error)) {
+	fake.getMetadataMutex.Lock()
+	defer fake.getMetadataMutex.Unlock()
+	fake.GetMetadataStub = stub
+}
+
 func (fake *FakePluginMetadata) GetMetadataArgsForCall(i int) string {
 	fake.getMetadataMutex.RLock()
 	defer fake.getMetadataMutex.RUnlock()
-	return fake.getMetadataArgsForCall[i].pluginPath
+	argsForCall := fake.getMetadataArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakePluginMetadata) GetMetadataReturns(result1 configv3.Plugin, result2 error) {
+	fake.getMetadataMutex.Lock()
+	defer fake.getMetadataMutex.Unlock()
 	fake.GetMetadataStub = nil
 	fake.getMetadataReturns = struct {
 		result1 configv3.Plugin
@@ -64,6 +74,8 @@ func (fake *FakePluginMetadata) GetMetadataReturns(result1 configv3.Plugin, resu
 }
 
 func (fake *FakePluginMetadata) GetMetadataReturnsOnCall(i int, result1 configv3.Plugin, result2 error) {
+	fake.getMetadataMutex.Lock()
+	defer fake.getMetadataMutex.Unlock()
 	fake.GetMetadataStub = nil
 	if fake.getMetadataReturnsOnCall == nil {
 		fake.getMetadataReturnsOnCall = make(map[int]struct {

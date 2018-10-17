@@ -2,30 +2,28 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeV3ZeroDowntimeRestartActor struct {
-	ZeroDowntimePollStartStub        func(appGUID string, warningsChannel chan<- v3action.Warnings) error
-	zeroDowntimePollStartMutex       sync.RWMutex
-	zeroDowntimePollStartArgsForCall []struct {
-		appGUID         string
-		warningsChannel chan<- v3action.Warnings
+	CloudControllerAPIVersionStub        func() string
+	cloudControllerAPIVersionMutex       sync.RWMutex
+	cloudControllerAPIVersionArgsForCall []struct {
 	}
-	zeroDowntimePollStartReturns struct {
-		result1 error
+	cloudControllerAPIVersionReturns struct {
+		result1 string
 	}
-	zeroDowntimePollStartReturnsOnCall map[int]struct {
-		result1 error
+	cloudControllerAPIVersionReturnsOnCall map[int]struct {
+		result1 string
 	}
-	CreateDeploymentStub        func(appGUID, dropletGUID string) (string, v3action.Warnings, error)
+	CreateDeploymentStub        func(string, string) (string, v3action.Warnings, error)
 	createDeploymentMutex       sync.RWMutex
 	createDeploymentArgsForCall []struct {
-		appGUID     string
-		dropletGUID string
+		arg1 string
+		arg2 string
 	}
 	createDeploymentReturns struct {
 		result1 string
@@ -37,20 +35,11 @@ type FakeV3ZeroDowntimeRestartActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	CloudControllerAPIVersionStub        func() string
-	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
-		result1 string
-	}
-	cloudControllerAPIVersionReturnsOnCall map[int]struct {
-		result1 string
-	}
-	GetApplicationByNameAndSpaceStub        func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	GetApplicationByNameAndSpaceStub        func(string, string) (v3action.Application, v3action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
-		appName   string
-		spaceGUID string
+		arg1 string
+		arg2 string
 	}
 	getApplicationByNameAndSpaceReturns struct {
 		result1 v3action.Application
@@ -62,10 +51,10 @@ type FakeV3ZeroDowntimeRestartActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	StartApplicationStub        func(appGUID string) (v3action.Application, v3action.Warnings, error)
+	StartApplicationStub        func(string) (v3action.Application, v3action.Warnings, error)
 	startApplicationMutex       sync.RWMutex
 	startApplicationArgsForCall []struct {
-		appGUID string
+		arg1 string
 	}
 	startApplicationReturns struct {
 		result1 v3action.Application
@@ -77,75 +66,91 @@ type FakeV3ZeroDowntimeRestartActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
+	ZeroDowntimePollStartStub        func(string, chan<- v3action.Warnings) error
+	zeroDowntimePollStartMutex       sync.RWMutex
+	zeroDowntimePollStartArgsForCall []struct {
+		arg1 string
+		arg2 chan<- v3action.Warnings
+	}
+	zeroDowntimePollStartReturns struct {
+		result1 error
+	}
+	zeroDowntimePollStartReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error {
-	fake.zeroDowntimePollStartMutex.Lock()
-	ret, specificReturn := fake.zeroDowntimePollStartReturnsOnCall[len(fake.zeroDowntimePollStartArgsForCall)]
-	fake.zeroDowntimePollStartArgsForCall = append(fake.zeroDowntimePollStartArgsForCall, struct {
-		appGUID         string
-		warningsChannel chan<- v3action.Warnings
-	}{appGUID, warningsChannel})
-	fake.recordInvocation("ZeroDowntimePollStart", []interface{}{appGUID, warningsChannel})
-	fake.zeroDowntimePollStartMutex.Unlock()
-	if fake.ZeroDowntimePollStartStub != nil {
-		return fake.ZeroDowntimePollStartStub(appGUID, warningsChannel)
+func (fake *FakeV3ZeroDowntimeRestartActor) CloudControllerAPIVersion() string {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
+	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
+	fake.cloudControllerAPIVersionMutex.Unlock()
+	if fake.CloudControllerAPIVersionStub != nil {
+		return fake.CloudControllerAPIVersionStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.zeroDowntimePollStartReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
-func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStartCallCount() int {
-	fake.zeroDowntimePollStartMutex.RLock()
-	defer fake.zeroDowntimePollStartMutex.RUnlock()
-	return len(fake.zeroDowntimePollStartArgsForCall)
+func (fake *FakeV3ZeroDowntimeRestartActor) CloudControllerAPIVersionCallCount() int {
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
-func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStartArgsForCall(i int) (string, chan<- v3action.Warnings) {
-	fake.zeroDowntimePollStartMutex.RLock()
-	defer fake.zeroDowntimePollStartMutex.RUnlock()
-	return fake.zeroDowntimePollStartArgsForCall[i].appGUID, fake.zeroDowntimePollStartArgsForCall[i].warningsChannel
+func (fake *FakeV3ZeroDowntimeRestartActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
 }
 
-func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStartReturns(result1 error) {
-	fake.ZeroDowntimePollStartStub = nil
-	fake.zeroDowntimePollStartReturns = struct {
-		result1 error
+func (fake *FakeV3ZeroDowntimeRestartActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = nil
+	fake.cloudControllerAPIVersionReturns = struct {
+		result1 string
 	}{result1}
 }
 
-func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStartReturnsOnCall(i int, result1 error) {
-	fake.ZeroDowntimePollStartStub = nil
-	if fake.zeroDowntimePollStartReturnsOnCall == nil {
-		fake.zeroDowntimePollStartReturnsOnCall = make(map[int]struct {
-			result1 error
+func (fake *FakeV3ZeroDowntimeRestartActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = nil
+	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
+		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
 		})
 	}
-	fake.zeroDowntimePollStartReturnsOnCall[i] = struct {
-		result1 error
+	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
+		result1 string
 	}{result1}
 }
 
-func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeployment(appGUID string, dropletGUID string) (string, v3action.Warnings, error) {
+func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeployment(arg1 string, arg2 string) (string, v3action.Warnings, error) {
 	fake.createDeploymentMutex.Lock()
 	ret, specificReturn := fake.createDeploymentReturnsOnCall[len(fake.createDeploymentArgsForCall)]
 	fake.createDeploymentArgsForCall = append(fake.createDeploymentArgsForCall, struct {
-		appGUID     string
-		dropletGUID string
-	}{appGUID, dropletGUID})
-	fake.recordInvocation("CreateDeployment", []interface{}{appGUID, dropletGUID})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("CreateDeployment", []interface{}{arg1, arg2})
 	fake.createDeploymentMutex.Unlock()
 	if fake.CreateDeploymentStub != nil {
-		return fake.CreateDeploymentStub(appGUID, dropletGUID)
+		return fake.CreateDeploymentStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createDeploymentReturns.result1, fake.createDeploymentReturns.result2, fake.createDeploymentReturns.result3
+	fakeReturns := fake.createDeploymentReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeploymentCallCount() int {
@@ -154,13 +159,22 @@ func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeploymentCallCount() int {
 	return len(fake.createDeploymentArgsForCall)
 }
 
+func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeploymentCalls(stub func(string, string) (string, v3action.Warnings, error)) {
+	fake.createDeploymentMutex.Lock()
+	defer fake.createDeploymentMutex.Unlock()
+	fake.CreateDeploymentStub = stub
+}
+
 func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeploymentArgsForCall(i int) (string, string) {
 	fake.createDeploymentMutex.RLock()
 	defer fake.createDeploymentMutex.RUnlock()
-	return fake.createDeploymentArgsForCall[i].appGUID, fake.createDeploymentArgsForCall[i].dropletGUID
+	argsForCall := fake.createDeploymentArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeploymentReturns(result1 string, result2 v3action.Warnings, result3 error) {
+	fake.createDeploymentMutex.Lock()
+	defer fake.createDeploymentMutex.Unlock()
 	fake.CreateDeploymentStub = nil
 	fake.createDeploymentReturns = struct {
 		result1 string
@@ -170,6 +184,8 @@ func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeploymentReturns(result1 stri
 }
 
 func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeploymentReturnsOnCall(i int, result1 string, result2 v3action.Warnings, result3 error) {
+	fake.createDeploymentMutex.Lock()
+	defer fake.createDeploymentMutex.Unlock()
 	fake.CreateDeploymentStub = nil
 	if fake.createDeploymentReturnsOnCall == nil {
 		fake.createDeploymentReturnsOnCall = make(map[int]struct {
@@ -185,62 +201,23 @@ func (fake *FakeV3ZeroDowntimeRestartActor) CreateDeploymentReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3ZeroDowntimeRestartActor) CloudControllerAPIVersion() string {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
-	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
-	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.cloudControllerAPIVersionReturns.result1
-}
-
-func (fake *FakeV3ZeroDowntimeRestartActor) CloudControllerAPIVersionCallCount() int {
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	return len(fake.cloudControllerAPIVersionArgsForCall)
-}
-
-func (fake *FakeV3ZeroDowntimeRestartActor) CloudControllerAPIVersionReturns(result1 string) {
-	fake.CloudControllerAPIVersionStub = nil
-	fake.cloudControllerAPIVersionReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeV3ZeroDowntimeRestartActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
-	fake.CloudControllerAPIVersionStub = nil
-	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
-		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (v3action.Application, v3action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
 	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
-		appName   string
-		spaceGUID string
-	}{appName, spaceGUID})
-	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{appName, spaceGUID})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationByNameAndSpaceStub != nil {
-		return fake.GetApplicationByNameAndSpaceStub(appName, spaceGUID)
+		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationByNameAndSpaceReturns.result1, fake.getApplicationByNameAndSpaceReturns.result2, fake.getApplicationByNameAndSpaceReturns.result3
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpaceCallCount() int {
@@ -249,13 +226,22 @@ func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpaceCallCoun
 	return len(fake.getApplicationByNameAndSpaceArgsForCall)
 }
 
+func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpaceCalls(stub func(string, string) (v3action.Application, v3action.Warnings, error)) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = stub
+}
+
 func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpaceArgsForCall(i int) (string, string) {
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	return fake.getApplicationByNameAndSpaceArgsForCall[i].appName, fake.getApplicationByNameAndSpaceArgsForCall[i].spaceGUID
+	argsForCall := fake.getApplicationByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpaceReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	fake.getApplicationByNameAndSpaceReturns = struct {
 		result1 v3action.Application
@@ -265,6 +251,8 @@ func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpaceReturns(
 }
 
 func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
 		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
@@ -280,21 +268,22 @@ func (fake *FakeV3ZeroDowntimeRestartActor) GetApplicationByNameAndSpaceReturnsO
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3ZeroDowntimeRestartActor) StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeV3ZeroDowntimeRestartActor) StartApplication(arg1 string) (v3action.Application, v3action.Warnings, error) {
 	fake.startApplicationMutex.Lock()
 	ret, specificReturn := fake.startApplicationReturnsOnCall[len(fake.startApplicationArgsForCall)]
 	fake.startApplicationArgsForCall = append(fake.startApplicationArgsForCall, struct {
-		appGUID string
-	}{appGUID})
-	fake.recordInvocation("StartApplication", []interface{}{appGUID})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("StartApplication", []interface{}{arg1})
 	fake.startApplicationMutex.Unlock()
 	if fake.StartApplicationStub != nil {
-		return fake.StartApplicationStub(appGUID)
+		return fake.StartApplicationStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.startApplicationReturns.result1, fake.startApplicationReturns.result2, fake.startApplicationReturns.result3
+	fakeReturns := fake.startApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV3ZeroDowntimeRestartActor) StartApplicationCallCount() int {
@@ -303,13 +292,22 @@ func (fake *FakeV3ZeroDowntimeRestartActor) StartApplicationCallCount() int {
 	return len(fake.startApplicationArgsForCall)
 }
 
+func (fake *FakeV3ZeroDowntimeRestartActor) StartApplicationCalls(stub func(string) (v3action.Application, v3action.Warnings, error)) {
+	fake.startApplicationMutex.Lock()
+	defer fake.startApplicationMutex.Unlock()
+	fake.StartApplicationStub = stub
+}
+
 func (fake *FakeV3ZeroDowntimeRestartActor) StartApplicationArgsForCall(i int) string {
 	fake.startApplicationMutex.RLock()
 	defer fake.startApplicationMutex.RUnlock()
-	return fake.startApplicationArgsForCall[i].appGUID
+	argsForCall := fake.startApplicationArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeV3ZeroDowntimeRestartActor) StartApplicationReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.startApplicationMutex.Lock()
+	defer fake.startApplicationMutex.Unlock()
 	fake.StartApplicationStub = nil
 	fake.startApplicationReturns = struct {
 		result1 v3action.Application
@@ -319,6 +317,8 @@ func (fake *FakeV3ZeroDowntimeRestartActor) StartApplicationReturns(result1 v3ac
 }
 
 func (fake *FakeV3ZeroDowntimeRestartActor) StartApplicationReturnsOnCall(i int, result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.startApplicationMutex.Lock()
+	defer fake.startApplicationMutex.Unlock()
 	fake.StartApplicationStub = nil
 	if fake.startApplicationReturnsOnCall == nil {
 		fake.startApplicationReturnsOnCall = make(map[int]struct {
@@ -334,19 +334,80 @@ func (fake *FakeV3ZeroDowntimeRestartActor) StartApplicationReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStart(arg1 string, arg2 chan<- v3action.Warnings) error {
+	fake.zeroDowntimePollStartMutex.Lock()
+	ret, specificReturn := fake.zeroDowntimePollStartReturnsOnCall[len(fake.zeroDowntimePollStartArgsForCall)]
+	fake.zeroDowntimePollStartArgsForCall = append(fake.zeroDowntimePollStartArgsForCall, struct {
+		arg1 string
+		arg2 chan<- v3action.Warnings
+	}{arg1, arg2})
+	fake.recordInvocation("ZeroDowntimePollStart", []interface{}{arg1, arg2})
+	fake.zeroDowntimePollStartMutex.Unlock()
+	if fake.ZeroDowntimePollStartStub != nil {
+		return fake.ZeroDowntimePollStartStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.zeroDowntimePollStartReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStartCallCount() int {
+	fake.zeroDowntimePollStartMutex.RLock()
+	defer fake.zeroDowntimePollStartMutex.RUnlock()
+	return len(fake.zeroDowntimePollStartArgsForCall)
+}
+
+func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStartCalls(stub func(string, chan<- v3action.Warnings) error) {
+	fake.zeroDowntimePollStartMutex.Lock()
+	defer fake.zeroDowntimePollStartMutex.Unlock()
+	fake.ZeroDowntimePollStartStub = stub
+}
+
+func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStartArgsForCall(i int) (string, chan<- v3action.Warnings) {
+	fake.zeroDowntimePollStartMutex.RLock()
+	defer fake.zeroDowntimePollStartMutex.RUnlock()
+	argsForCall := fake.zeroDowntimePollStartArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStartReturns(result1 error) {
+	fake.zeroDowntimePollStartMutex.Lock()
+	defer fake.zeroDowntimePollStartMutex.Unlock()
+	fake.ZeroDowntimePollStartStub = nil
+	fake.zeroDowntimePollStartReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeV3ZeroDowntimeRestartActor) ZeroDowntimePollStartReturnsOnCall(i int, result1 error) {
+	fake.zeroDowntimePollStartMutex.Lock()
+	defer fake.zeroDowntimePollStartMutex.Unlock()
+	fake.ZeroDowntimePollStartStub = nil
+	if fake.zeroDowntimePollStartReturnsOnCall == nil {
+		fake.zeroDowntimePollStartReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.zeroDowntimePollStartReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeV3ZeroDowntimeRestartActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.zeroDowntimePollStartMutex.RLock()
-	defer fake.zeroDowntimePollStartMutex.RUnlock()
-	fake.createDeploymentMutex.RLock()
-	defer fake.createDeploymentMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	fake.createDeploymentMutex.RLock()
+	defer fake.createDeploymentMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.startApplicationMutex.RLock()
 	defer fake.startApplicationMutex.RUnlock()
+	fake.zeroDowntimePollStartMutex.RLock()
+	defer fake.zeroDowntimePollStartMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

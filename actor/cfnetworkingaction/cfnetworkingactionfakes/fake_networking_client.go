@@ -2,17 +2,17 @@
 package cfnetworkingactionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
-	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
+	cfnetv1 "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
+	cfnetworkingaction "code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 )
 
 type FakeNetworkingClient struct {
-	CreatePoliciesStub        func(policies []cfnetv1.Policy) error
+	CreatePoliciesStub        func([]cfnetv1.Policy) error
 	createPoliciesMutex       sync.RWMutex
 	createPoliciesArgsForCall []struct {
-		policies []cfnetv1.Policy
+		arg1 []cfnetv1.Policy
 	}
 	createPoliciesReturns struct {
 		result1 error
@@ -20,10 +20,10 @@ type FakeNetworkingClient struct {
 	createPoliciesReturnsOnCall map[int]struct {
 		result1 error
 	}
-	ListPoliciesStub        func(appNames ...string) ([]cfnetv1.Policy, error)
+	ListPoliciesStub        func(...string) ([]cfnetv1.Policy, error)
 	listPoliciesMutex       sync.RWMutex
 	listPoliciesArgsForCall []struct {
-		appNames []string
+		arg1 []string
 	}
 	listPoliciesReturns struct {
 		result1 []cfnetv1.Policy
@@ -33,10 +33,10 @@ type FakeNetworkingClient struct {
 		result1 []cfnetv1.Policy
 		result2 error
 	}
-	RemovePoliciesStub        func(policies []cfnetv1.Policy) error
+	RemovePoliciesStub        func([]cfnetv1.Policy) error
 	removePoliciesMutex       sync.RWMutex
 	removePoliciesArgsForCall []struct {
-		policies []cfnetv1.Policy
+		arg1 []cfnetv1.Policy
 	}
 	removePoliciesReturns struct {
 		result1 error
@@ -48,26 +48,27 @@ type FakeNetworkingClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeNetworkingClient) CreatePolicies(policies []cfnetv1.Policy) error {
-	var policiesCopy []cfnetv1.Policy
-	if policies != nil {
-		policiesCopy = make([]cfnetv1.Policy, len(policies))
-		copy(policiesCopy, policies)
+func (fake *FakeNetworkingClient) CreatePolicies(arg1 []cfnetv1.Policy) error {
+	var arg1Copy []cfnetv1.Policy
+	if arg1 != nil {
+		arg1Copy = make([]cfnetv1.Policy, len(arg1))
+		copy(arg1Copy, arg1)
 	}
 	fake.createPoliciesMutex.Lock()
 	ret, specificReturn := fake.createPoliciesReturnsOnCall[len(fake.createPoliciesArgsForCall)]
 	fake.createPoliciesArgsForCall = append(fake.createPoliciesArgsForCall, struct {
-		policies []cfnetv1.Policy
-	}{policiesCopy})
-	fake.recordInvocation("CreatePolicies", []interface{}{policiesCopy})
+		arg1 []cfnetv1.Policy
+	}{arg1Copy})
+	fake.recordInvocation("CreatePolicies", []interface{}{arg1Copy})
 	fake.createPoliciesMutex.Unlock()
 	if fake.CreatePoliciesStub != nil {
-		return fake.CreatePoliciesStub(policies)
+		return fake.CreatePoliciesStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.createPoliciesReturns.result1
+	fakeReturns := fake.createPoliciesReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeNetworkingClient) CreatePoliciesCallCount() int {
@@ -76,13 +77,22 @@ func (fake *FakeNetworkingClient) CreatePoliciesCallCount() int {
 	return len(fake.createPoliciesArgsForCall)
 }
 
+func (fake *FakeNetworkingClient) CreatePoliciesCalls(stub func([]cfnetv1.Policy) error) {
+	fake.createPoliciesMutex.Lock()
+	defer fake.createPoliciesMutex.Unlock()
+	fake.CreatePoliciesStub = stub
+}
+
 func (fake *FakeNetworkingClient) CreatePoliciesArgsForCall(i int) []cfnetv1.Policy {
 	fake.createPoliciesMutex.RLock()
 	defer fake.createPoliciesMutex.RUnlock()
-	return fake.createPoliciesArgsForCall[i].policies
+	argsForCall := fake.createPoliciesArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeNetworkingClient) CreatePoliciesReturns(result1 error) {
+	fake.createPoliciesMutex.Lock()
+	defer fake.createPoliciesMutex.Unlock()
 	fake.CreatePoliciesStub = nil
 	fake.createPoliciesReturns = struct {
 		result1 error
@@ -90,6 +100,8 @@ func (fake *FakeNetworkingClient) CreatePoliciesReturns(result1 error) {
 }
 
 func (fake *FakeNetworkingClient) CreatePoliciesReturnsOnCall(i int, result1 error) {
+	fake.createPoliciesMutex.Lock()
+	defer fake.createPoliciesMutex.Unlock()
 	fake.CreatePoliciesStub = nil
 	if fake.createPoliciesReturnsOnCall == nil {
 		fake.createPoliciesReturnsOnCall = make(map[int]struct {
@@ -101,21 +113,22 @@ func (fake *FakeNetworkingClient) CreatePoliciesReturnsOnCall(i int, result1 err
 	}{result1}
 }
 
-func (fake *FakeNetworkingClient) ListPolicies(appNames ...string) ([]cfnetv1.Policy, error) {
+func (fake *FakeNetworkingClient) ListPolicies(arg1 ...string) ([]cfnetv1.Policy, error) {
 	fake.listPoliciesMutex.Lock()
 	ret, specificReturn := fake.listPoliciesReturnsOnCall[len(fake.listPoliciesArgsForCall)]
 	fake.listPoliciesArgsForCall = append(fake.listPoliciesArgsForCall, struct {
-		appNames []string
-	}{appNames})
-	fake.recordInvocation("ListPolicies", []interface{}{appNames})
+		arg1 []string
+	}{arg1})
+	fake.recordInvocation("ListPolicies", []interface{}{arg1})
 	fake.listPoliciesMutex.Unlock()
 	if fake.ListPoliciesStub != nil {
-		return fake.ListPoliciesStub(appNames...)
+		return fake.ListPoliciesStub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.listPoliciesReturns.result1, fake.listPoliciesReturns.result2
+	fakeReturns := fake.listPoliciesReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeNetworkingClient) ListPoliciesCallCount() int {
@@ -124,13 +137,22 @@ func (fake *FakeNetworkingClient) ListPoliciesCallCount() int {
 	return len(fake.listPoliciesArgsForCall)
 }
 
+func (fake *FakeNetworkingClient) ListPoliciesCalls(stub func(...string) ([]cfnetv1.Policy, error)) {
+	fake.listPoliciesMutex.Lock()
+	defer fake.listPoliciesMutex.Unlock()
+	fake.ListPoliciesStub = stub
+}
+
 func (fake *FakeNetworkingClient) ListPoliciesArgsForCall(i int) []string {
 	fake.listPoliciesMutex.RLock()
 	defer fake.listPoliciesMutex.RUnlock()
-	return fake.listPoliciesArgsForCall[i].appNames
+	argsForCall := fake.listPoliciesArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeNetworkingClient) ListPoliciesReturns(result1 []cfnetv1.Policy, result2 error) {
+	fake.listPoliciesMutex.Lock()
+	defer fake.listPoliciesMutex.Unlock()
 	fake.ListPoliciesStub = nil
 	fake.listPoliciesReturns = struct {
 		result1 []cfnetv1.Policy
@@ -139,6 +161,8 @@ func (fake *FakeNetworkingClient) ListPoliciesReturns(result1 []cfnetv1.Policy, 
 }
 
 func (fake *FakeNetworkingClient) ListPoliciesReturnsOnCall(i int, result1 []cfnetv1.Policy, result2 error) {
+	fake.listPoliciesMutex.Lock()
+	defer fake.listPoliciesMutex.Unlock()
 	fake.ListPoliciesStub = nil
 	if fake.listPoliciesReturnsOnCall == nil {
 		fake.listPoliciesReturnsOnCall = make(map[int]struct {
@@ -152,26 +176,27 @@ func (fake *FakeNetworkingClient) ListPoliciesReturnsOnCall(i int, result1 []cfn
 	}{result1, result2}
 }
 
-func (fake *FakeNetworkingClient) RemovePolicies(policies []cfnetv1.Policy) error {
-	var policiesCopy []cfnetv1.Policy
-	if policies != nil {
-		policiesCopy = make([]cfnetv1.Policy, len(policies))
-		copy(policiesCopy, policies)
+func (fake *FakeNetworkingClient) RemovePolicies(arg1 []cfnetv1.Policy) error {
+	var arg1Copy []cfnetv1.Policy
+	if arg1 != nil {
+		arg1Copy = make([]cfnetv1.Policy, len(arg1))
+		copy(arg1Copy, arg1)
 	}
 	fake.removePoliciesMutex.Lock()
 	ret, specificReturn := fake.removePoliciesReturnsOnCall[len(fake.removePoliciesArgsForCall)]
 	fake.removePoliciesArgsForCall = append(fake.removePoliciesArgsForCall, struct {
-		policies []cfnetv1.Policy
-	}{policiesCopy})
-	fake.recordInvocation("RemovePolicies", []interface{}{policiesCopy})
+		arg1 []cfnetv1.Policy
+	}{arg1Copy})
+	fake.recordInvocation("RemovePolicies", []interface{}{arg1Copy})
 	fake.removePoliciesMutex.Unlock()
 	if fake.RemovePoliciesStub != nil {
-		return fake.RemovePoliciesStub(policies)
+		return fake.RemovePoliciesStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.removePoliciesReturns.result1
+	fakeReturns := fake.removePoliciesReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeNetworkingClient) RemovePoliciesCallCount() int {
@@ -180,13 +205,22 @@ func (fake *FakeNetworkingClient) RemovePoliciesCallCount() int {
 	return len(fake.removePoliciesArgsForCall)
 }
 
+func (fake *FakeNetworkingClient) RemovePoliciesCalls(stub func([]cfnetv1.Policy) error) {
+	fake.removePoliciesMutex.Lock()
+	defer fake.removePoliciesMutex.Unlock()
+	fake.RemovePoliciesStub = stub
+}
+
 func (fake *FakeNetworkingClient) RemovePoliciesArgsForCall(i int) []cfnetv1.Policy {
 	fake.removePoliciesMutex.RLock()
 	defer fake.removePoliciesMutex.RUnlock()
-	return fake.removePoliciesArgsForCall[i].policies
+	argsForCall := fake.removePoliciesArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeNetworkingClient) RemovePoliciesReturns(result1 error) {
+	fake.removePoliciesMutex.Lock()
+	defer fake.removePoliciesMutex.Unlock()
 	fake.RemovePoliciesStub = nil
 	fake.removePoliciesReturns = struct {
 		result1 error
@@ -194,6 +228,8 @@ func (fake *FakeNetworkingClient) RemovePoliciesReturns(result1 error) {
 }
 
 func (fake *FakeNetworkingClient) RemovePoliciesReturnsOnCall(i int, result1 error) {
+	fake.removePoliciesMutex.Lock()
+	defer fake.removePoliciesMutex.Unlock()
 	fake.RemovePoliciesStub = nil
 	if fake.removePoliciesReturnsOnCall == nil {
 		fake.removePoliciesReturnsOnCall = make(map[int]struct {

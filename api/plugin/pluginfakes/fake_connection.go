@@ -2,19 +2,19 @@
 package pluginfakes
 
 import (
-	"net/http"
-	"sync"
+	http "net/http"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/api/plugin"
+	plugin "code.cloudfoundry.org/cli/api/plugin"
 )
 
 type FakeConnection struct {
-	MakeStub        func(request *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error
+	MakeStub        func(*http.Request, *plugin.Response, plugin.ProxyReader) error
 	makeMutex       sync.RWMutex
 	makeArgsForCall []struct {
-		request        *http.Request
-		passedResponse *plugin.Response
-		proxyReader    plugin.ProxyReader
+		arg1 *http.Request
+		arg2 *plugin.Response
+		arg3 plugin.ProxyReader
 	}
 	makeReturns struct {
 		result1 error
@@ -26,23 +26,24 @@ type FakeConnection struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConnection) Make(request *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error {
+func (fake *FakeConnection) Make(arg1 *http.Request, arg2 *plugin.Response, arg3 plugin.ProxyReader) error {
 	fake.makeMutex.Lock()
 	ret, specificReturn := fake.makeReturnsOnCall[len(fake.makeArgsForCall)]
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
-		request        *http.Request
-		passedResponse *plugin.Response
-		proxyReader    plugin.ProxyReader
-	}{request, passedResponse, proxyReader})
-	fake.recordInvocation("Make", []interface{}{request, passedResponse, proxyReader})
+		arg1 *http.Request
+		arg2 *plugin.Response
+		arg3 plugin.ProxyReader
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("Make", []interface{}{arg1, arg2, arg3})
 	fake.makeMutex.Unlock()
 	if fake.MakeStub != nil {
-		return fake.MakeStub(request, passedResponse, proxyReader)
+		return fake.MakeStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.makeReturns.result1
+	fakeReturns := fake.makeReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConnection) MakeCallCount() int {
@@ -51,13 +52,22 @@ func (fake *FakeConnection) MakeCallCount() int {
 	return len(fake.makeArgsForCall)
 }
 
+func (fake *FakeConnection) MakeCalls(stub func(*http.Request, *plugin.Response, plugin.ProxyReader) error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
+	fake.MakeStub = stub
+}
+
 func (fake *FakeConnection) MakeArgsForCall(i int) (*http.Request, *plugin.Response, plugin.ProxyReader) {
 	fake.makeMutex.RLock()
 	defer fake.makeMutex.RUnlock()
-	return fake.makeArgsForCall[i].request, fake.makeArgsForCall[i].passedResponse, fake.makeArgsForCall[i].proxyReader
+	argsForCall := fake.makeArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeConnection) MakeReturns(result1 error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
 	fake.MakeStub = nil
 	fake.makeReturns = struct {
 		result1 error
@@ -65,6 +75,8 @@ func (fake *FakeConnection) MakeReturns(result1 error) {
 }
 
 func (fake *FakeConnection) MakeReturnsOnCall(i int, result1 error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
 	fake.MakeStub = nil
 	if fake.makeReturnsOnCall == nil {
 		fake.makeReturnsOnCall = make(map[int]struct {

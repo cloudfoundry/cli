@@ -2,18 +2,18 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeCreateOrgActor struct {
-	CreateOrganizationStub        func(orgName string, quotaName string) (v2action.Organization, v2action.Warnings, error)
+	CreateOrganizationStub        func(string, string) (v2action.Organization, v2action.Warnings, error)
 	createOrganizationMutex       sync.RWMutex
 	createOrganizationArgsForCall []struct {
-		orgName   string
-		quotaName string
+		arg1 string
+		arg2 string
 	}
 	createOrganizationReturns struct {
 		result1 v2action.Organization
@@ -25,11 +25,11 @@ type FakeCreateOrgActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GrantOrgManagerByUsernameStub        func(guid string, username string) (v2action.Warnings, error)
+	GrantOrgManagerByUsernameStub        func(string, string) (v2action.Warnings, error)
 	grantOrgManagerByUsernameMutex       sync.RWMutex
 	grantOrgManagerByUsernameArgsForCall []struct {
-		guid     string
-		username string
+		arg1 string
+		arg2 string
 	}
 	grantOrgManagerByUsernameReturns struct {
 		result1 v2action.Warnings
@@ -43,22 +43,23 @@ type FakeCreateOrgActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateOrgActor) CreateOrganization(orgName string, quotaName string) (v2action.Organization, v2action.Warnings, error) {
+func (fake *FakeCreateOrgActor) CreateOrganization(arg1 string, arg2 string) (v2action.Organization, v2action.Warnings, error) {
 	fake.createOrganizationMutex.Lock()
 	ret, specificReturn := fake.createOrganizationReturnsOnCall[len(fake.createOrganizationArgsForCall)]
 	fake.createOrganizationArgsForCall = append(fake.createOrganizationArgsForCall, struct {
-		orgName   string
-		quotaName string
-	}{orgName, quotaName})
-	fake.recordInvocation("CreateOrganization", []interface{}{orgName, quotaName})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("CreateOrganization", []interface{}{arg1, arg2})
 	fake.createOrganizationMutex.Unlock()
 	if fake.CreateOrganizationStub != nil {
-		return fake.CreateOrganizationStub(orgName, quotaName)
+		return fake.CreateOrganizationStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createOrganizationReturns.result1, fake.createOrganizationReturns.result2, fake.createOrganizationReturns.result3
+	fakeReturns := fake.createOrganizationReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeCreateOrgActor) CreateOrganizationCallCount() int {
@@ -67,13 +68,22 @@ func (fake *FakeCreateOrgActor) CreateOrganizationCallCount() int {
 	return len(fake.createOrganizationArgsForCall)
 }
 
+func (fake *FakeCreateOrgActor) CreateOrganizationCalls(stub func(string, string) (v2action.Organization, v2action.Warnings, error)) {
+	fake.createOrganizationMutex.Lock()
+	defer fake.createOrganizationMutex.Unlock()
+	fake.CreateOrganizationStub = stub
+}
+
 func (fake *FakeCreateOrgActor) CreateOrganizationArgsForCall(i int) (string, string) {
 	fake.createOrganizationMutex.RLock()
 	defer fake.createOrganizationMutex.RUnlock()
-	return fake.createOrganizationArgsForCall[i].orgName, fake.createOrganizationArgsForCall[i].quotaName
+	argsForCall := fake.createOrganizationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeCreateOrgActor) CreateOrganizationReturns(result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
+	fake.createOrganizationMutex.Lock()
+	defer fake.createOrganizationMutex.Unlock()
 	fake.CreateOrganizationStub = nil
 	fake.createOrganizationReturns = struct {
 		result1 v2action.Organization
@@ -83,6 +93,8 @@ func (fake *FakeCreateOrgActor) CreateOrganizationReturns(result1 v2action.Organ
 }
 
 func (fake *FakeCreateOrgActor) CreateOrganizationReturnsOnCall(i int, result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
+	fake.createOrganizationMutex.Lock()
+	defer fake.createOrganizationMutex.Unlock()
 	fake.CreateOrganizationStub = nil
 	if fake.createOrganizationReturnsOnCall == nil {
 		fake.createOrganizationReturnsOnCall = make(map[int]struct {
@@ -98,22 +110,23 @@ func (fake *FakeCreateOrgActor) CreateOrganizationReturnsOnCall(i int, result1 v
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCreateOrgActor) GrantOrgManagerByUsername(guid string, username string) (v2action.Warnings, error) {
+func (fake *FakeCreateOrgActor) GrantOrgManagerByUsername(arg1 string, arg2 string) (v2action.Warnings, error) {
 	fake.grantOrgManagerByUsernameMutex.Lock()
 	ret, specificReturn := fake.grantOrgManagerByUsernameReturnsOnCall[len(fake.grantOrgManagerByUsernameArgsForCall)]
 	fake.grantOrgManagerByUsernameArgsForCall = append(fake.grantOrgManagerByUsernameArgsForCall, struct {
-		guid     string
-		username string
-	}{guid, username})
-	fake.recordInvocation("GrantOrgManagerByUsername", []interface{}{guid, username})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GrantOrgManagerByUsername", []interface{}{arg1, arg2})
 	fake.grantOrgManagerByUsernameMutex.Unlock()
 	if fake.GrantOrgManagerByUsernameStub != nil {
-		return fake.GrantOrgManagerByUsernameStub(guid, username)
+		return fake.GrantOrgManagerByUsernameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.grantOrgManagerByUsernameReturns.result1, fake.grantOrgManagerByUsernameReturns.result2
+	fakeReturns := fake.grantOrgManagerByUsernameReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeCreateOrgActor) GrantOrgManagerByUsernameCallCount() int {
@@ -122,13 +135,22 @@ func (fake *FakeCreateOrgActor) GrantOrgManagerByUsernameCallCount() int {
 	return len(fake.grantOrgManagerByUsernameArgsForCall)
 }
 
+func (fake *FakeCreateOrgActor) GrantOrgManagerByUsernameCalls(stub func(string, string) (v2action.Warnings, error)) {
+	fake.grantOrgManagerByUsernameMutex.Lock()
+	defer fake.grantOrgManagerByUsernameMutex.Unlock()
+	fake.GrantOrgManagerByUsernameStub = stub
+}
+
 func (fake *FakeCreateOrgActor) GrantOrgManagerByUsernameArgsForCall(i int) (string, string) {
 	fake.grantOrgManagerByUsernameMutex.RLock()
 	defer fake.grantOrgManagerByUsernameMutex.RUnlock()
-	return fake.grantOrgManagerByUsernameArgsForCall[i].guid, fake.grantOrgManagerByUsernameArgsForCall[i].username
+	argsForCall := fake.grantOrgManagerByUsernameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeCreateOrgActor) GrantOrgManagerByUsernameReturns(result1 v2action.Warnings, result2 error) {
+	fake.grantOrgManagerByUsernameMutex.Lock()
+	defer fake.grantOrgManagerByUsernameMutex.Unlock()
 	fake.GrantOrgManagerByUsernameStub = nil
 	fake.grantOrgManagerByUsernameReturns = struct {
 		result1 v2action.Warnings
@@ -137,6 +159,8 @@ func (fake *FakeCreateOrgActor) GrantOrgManagerByUsernameReturns(result1 v2actio
 }
 
 func (fake *FakeCreateOrgActor) GrantOrgManagerByUsernameReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.grantOrgManagerByUsernameMutex.Lock()
+	defer fake.grantOrgManagerByUsernameMutex.Unlock()
 	fake.GrantOrgManagerByUsernameStub = nil
 	if fake.grantOrgManagerByUsernameReturnsOnCall == nil {
 		fake.grantOrgManagerByUsernameReturnsOnCall = make(map[int]struct {

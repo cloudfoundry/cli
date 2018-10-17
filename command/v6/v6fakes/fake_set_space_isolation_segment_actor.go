@@ -2,27 +2,18 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeSetSpaceIsolationSegmentActor struct {
-	CloudControllerAPIVersionStub        func() string
-	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
-		result1 string
-	}
-	cloudControllerAPIVersionReturnsOnCall map[int]struct {
-		result1 string
-	}
-	AssignIsolationSegmentToSpaceByNameAndSpaceStub        func(isolationSegmentName string, spaceGUID string) (v3action.Warnings, error)
+	AssignIsolationSegmentToSpaceByNameAndSpaceStub        func(string, string) (v3action.Warnings, error)
 	assignIsolationSegmentToSpaceByNameAndSpaceMutex       sync.RWMutex
 	assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall []struct {
-		isolationSegmentName string
-		spaceGUID            string
+		arg1 string
+		arg2 string
 	}
 	assignIsolationSegmentToSpaceByNameAndSpaceReturns struct {
 		result1 v3action.Warnings
@@ -32,66 +23,37 @@ type FakeSetSpaceIsolationSegmentActor struct {
 		result1 v3action.Warnings
 		result2 error
 	}
+	CloudControllerAPIVersionStub        func() string
+	cloudControllerAPIVersionMutex       sync.RWMutex
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
+		result1 string
+	}
+	cloudControllerAPIVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSetSpaceIsolationSegmentActor) CloudControllerAPIVersion() string {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
-	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
-	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.cloudControllerAPIVersionReturns.result1
-}
-
-func (fake *FakeSetSpaceIsolationSegmentActor) CloudControllerAPIVersionCallCount() int {
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	return len(fake.cloudControllerAPIVersionArgsForCall)
-}
-
-func (fake *FakeSetSpaceIsolationSegmentActor) CloudControllerAPIVersionReturns(result1 string) {
-	fake.CloudControllerAPIVersionStub = nil
-	fake.cloudControllerAPIVersionReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeSetSpaceIsolationSegmentActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
-	fake.CloudControllerAPIVersionStub = nil
-	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
-		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeSetSpaceIsolationSegmentActor) AssignIsolationSegmentToSpaceByNameAndSpace(isolationSegmentName string, spaceGUID string) (v3action.Warnings, error) {
+func (fake *FakeSetSpaceIsolationSegmentActor) AssignIsolationSegmentToSpaceByNameAndSpace(arg1 string, arg2 string) (v3action.Warnings, error) {
 	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.assignIsolationSegmentToSpaceByNameAndSpaceReturnsOnCall[len(fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall)]
 	fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall = append(fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall, struct {
-		isolationSegmentName string
-		spaceGUID            string
-	}{isolationSegmentName, spaceGUID})
-	fake.recordInvocation("AssignIsolationSegmentToSpaceByNameAndSpace", []interface{}{isolationSegmentName, spaceGUID})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("AssignIsolationSegmentToSpaceByNameAndSpace", []interface{}{arg1, arg2})
 	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Unlock()
 	if fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub != nil {
-		return fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub(isolationSegmentName, spaceGUID)
+		return fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.assignIsolationSegmentToSpaceByNameAndSpaceReturns.result1, fake.assignIsolationSegmentToSpaceByNameAndSpaceReturns.result2
+	fakeReturns := fake.assignIsolationSegmentToSpaceByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeSetSpaceIsolationSegmentActor) AssignIsolationSegmentToSpaceByNameAndSpaceCallCount() int {
@@ -100,13 +62,22 @@ func (fake *FakeSetSpaceIsolationSegmentActor) AssignIsolationSegmentToSpaceByNa
 	return len(fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall)
 }
 
+func (fake *FakeSetSpaceIsolationSegmentActor) AssignIsolationSegmentToSpaceByNameAndSpaceCalls(stub func(string, string) (v3action.Warnings, error)) {
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Lock()
+	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Unlock()
+	fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub = stub
+}
+
 func (fake *FakeSetSpaceIsolationSegmentActor) AssignIsolationSegmentToSpaceByNameAndSpaceArgsForCall(i int) (string, string) {
 	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RLock()
 	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RUnlock()
-	return fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall[i].isolationSegmentName, fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall[i].spaceGUID
+	argsForCall := fake.assignIsolationSegmentToSpaceByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeSetSpaceIsolationSegmentActor) AssignIsolationSegmentToSpaceByNameAndSpaceReturns(result1 v3action.Warnings, result2 error) {
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Lock()
+	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Unlock()
 	fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub = nil
 	fake.assignIsolationSegmentToSpaceByNameAndSpaceReturns = struct {
 		result1 v3action.Warnings
@@ -115,6 +86,8 @@ func (fake *FakeSetSpaceIsolationSegmentActor) AssignIsolationSegmentToSpaceByNa
 }
 
 func (fake *FakeSetSpaceIsolationSegmentActor) AssignIsolationSegmentToSpaceByNameAndSpaceReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
+	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Lock()
+	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.Unlock()
 	fake.AssignIsolationSegmentToSpaceByNameAndSpaceStub = nil
 	if fake.assignIsolationSegmentToSpaceByNameAndSpaceReturnsOnCall == nil {
 		fake.assignIsolationSegmentToSpaceByNameAndSpaceReturnsOnCall = make(map[int]struct {
@@ -128,13 +101,65 @@ func (fake *FakeSetSpaceIsolationSegmentActor) AssignIsolationSegmentToSpaceByNa
 	}{result1, result2}
 }
 
+func (fake *FakeSetSpaceIsolationSegmentActor) CloudControllerAPIVersion() string {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
+	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
+	fake.cloudControllerAPIVersionMutex.Unlock()
+	if fake.CloudControllerAPIVersionStub != nil {
+		return fake.CloudControllerAPIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeSetSpaceIsolationSegmentActor) CloudControllerAPIVersionCallCount() int {
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	return len(fake.cloudControllerAPIVersionArgsForCall)
+}
+
+func (fake *FakeSetSpaceIsolationSegmentActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
+func (fake *FakeSetSpaceIsolationSegmentActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = nil
+	fake.cloudControllerAPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeSetSpaceIsolationSegmentActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = nil
+	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
+		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeSetSpaceIsolationSegmentActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RLock()
 	defer fake.assignIsolationSegmentToSpaceByNameAndSpaceMutex.RUnlock()
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

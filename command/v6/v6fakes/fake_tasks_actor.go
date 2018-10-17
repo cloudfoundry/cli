@@ -2,18 +2,18 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeTasksActor struct {
-	GetApplicationByNameAndSpaceStub        func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	GetApplicationByNameAndSpaceStub        func(string, string) (v3action.Application, v3action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
-		appName   string
-		spaceGUID string
+		arg1 string
+		arg2 string
 	}
 	getApplicationByNameAndSpaceReturns struct {
 		result1 v3action.Application
@@ -25,11 +25,11 @@ type FakeTasksActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	GetApplicationTasksStub        func(appGUID string, sortOrder v3action.SortOrder) ([]v3action.Task, v3action.Warnings, error)
+	GetApplicationTasksStub        func(string, v3action.SortOrder) ([]v3action.Task, v3action.Warnings, error)
 	getApplicationTasksMutex       sync.RWMutex
 	getApplicationTasksArgsForCall []struct {
-		appGUID   string
-		sortOrder v3action.SortOrder
+		arg1 string
+		arg2 v3action.SortOrder
 	}
 	getApplicationTasksReturns struct {
 		result1 []v3action.Task
@@ -45,22 +45,23 @@ type FakeTasksActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeTasksActor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeTasksActor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (v3action.Application, v3action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
 	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
-		appName   string
-		spaceGUID string
-	}{appName, spaceGUID})
-	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{appName, spaceGUID})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationByNameAndSpaceStub != nil {
-		return fake.GetApplicationByNameAndSpaceStub(appName, spaceGUID)
+		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationByNameAndSpaceReturns.result1, fake.getApplicationByNameAndSpaceReturns.result2, fake.getApplicationByNameAndSpaceReturns.result3
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeTasksActor) GetApplicationByNameAndSpaceCallCount() int {
@@ -69,13 +70,22 @@ func (fake *FakeTasksActor) GetApplicationByNameAndSpaceCallCount() int {
 	return len(fake.getApplicationByNameAndSpaceArgsForCall)
 }
 
+func (fake *FakeTasksActor) GetApplicationByNameAndSpaceCalls(stub func(string, string) (v3action.Application, v3action.Warnings, error)) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = stub
+}
+
 func (fake *FakeTasksActor) GetApplicationByNameAndSpaceArgsForCall(i int) (string, string) {
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	return fake.getApplicationByNameAndSpaceArgsForCall[i].appName, fake.getApplicationByNameAndSpaceArgsForCall[i].spaceGUID
+	argsForCall := fake.getApplicationByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeTasksActor) GetApplicationByNameAndSpaceReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	fake.getApplicationByNameAndSpaceReturns = struct {
 		result1 v3action.Application
@@ -85,6 +95,8 @@ func (fake *FakeTasksActor) GetApplicationByNameAndSpaceReturns(result1 v3action
 }
 
 func (fake *FakeTasksActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
 		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
@@ -100,22 +112,23 @@ func (fake *FakeTasksActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
-func (fake *FakeTasksActor) GetApplicationTasks(appGUID string, sortOrder v3action.SortOrder) ([]v3action.Task, v3action.Warnings, error) {
+func (fake *FakeTasksActor) GetApplicationTasks(arg1 string, arg2 v3action.SortOrder) ([]v3action.Task, v3action.Warnings, error) {
 	fake.getApplicationTasksMutex.Lock()
 	ret, specificReturn := fake.getApplicationTasksReturnsOnCall[len(fake.getApplicationTasksArgsForCall)]
 	fake.getApplicationTasksArgsForCall = append(fake.getApplicationTasksArgsForCall, struct {
-		appGUID   string
-		sortOrder v3action.SortOrder
-	}{appGUID, sortOrder})
-	fake.recordInvocation("GetApplicationTasks", []interface{}{appGUID, sortOrder})
+		arg1 string
+		arg2 v3action.SortOrder
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationTasks", []interface{}{arg1, arg2})
 	fake.getApplicationTasksMutex.Unlock()
 	if fake.GetApplicationTasksStub != nil {
-		return fake.GetApplicationTasksStub(appGUID, sortOrder)
+		return fake.GetApplicationTasksStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationTasksReturns.result1, fake.getApplicationTasksReturns.result2, fake.getApplicationTasksReturns.result3
+	fakeReturns := fake.getApplicationTasksReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeTasksActor) GetApplicationTasksCallCount() int {
@@ -124,13 +137,22 @@ func (fake *FakeTasksActor) GetApplicationTasksCallCount() int {
 	return len(fake.getApplicationTasksArgsForCall)
 }
 
+func (fake *FakeTasksActor) GetApplicationTasksCalls(stub func(string, v3action.SortOrder) ([]v3action.Task, v3action.Warnings, error)) {
+	fake.getApplicationTasksMutex.Lock()
+	defer fake.getApplicationTasksMutex.Unlock()
+	fake.GetApplicationTasksStub = stub
+}
+
 func (fake *FakeTasksActor) GetApplicationTasksArgsForCall(i int) (string, v3action.SortOrder) {
 	fake.getApplicationTasksMutex.RLock()
 	defer fake.getApplicationTasksMutex.RUnlock()
-	return fake.getApplicationTasksArgsForCall[i].appGUID, fake.getApplicationTasksArgsForCall[i].sortOrder
+	argsForCall := fake.getApplicationTasksArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeTasksActor) GetApplicationTasksReturns(result1 []v3action.Task, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationTasksMutex.Lock()
+	defer fake.getApplicationTasksMutex.Unlock()
 	fake.GetApplicationTasksStub = nil
 	fake.getApplicationTasksReturns = struct {
 		result1 []v3action.Task
@@ -140,6 +162,8 @@ func (fake *FakeTasksActor) GetApplicationTasksReturns(result1 []v3action.Task, 
 }
 
 func (fake *FakeTasksActor) GetApplicationTasksReturnsOnCall(i int, result1 []v3action.Task, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationTasksMutex.Lock()
+	defer fake.getApplicationTasksMutex.Unlock()
 	fake.GetApplicationTasksStub = nil
 	if fake.getApplicationTasksReturnsOnCall == nil {
 		fake.getApplicationTasksReturnsOnCall = make(map[int]struct {

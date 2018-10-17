@@ -2,10 +2,10 @@
 package pluginactionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/util/configv3"
+	pluginaction "code.cloudfoundry.org/cli/actor/pluginaction"
+	configv3 "code.cloudfoundry.org/cli/util/configv3"
 )
 
 type FakeConfig struct {
@@ -14,16 +14,16 @@ type FakeConfig struct {
 	addPluginArgsForCall []struct {
 		arg1 configv3.Plugin
 	}
-	AddPluginRepositoryStub        func(repoName string, repoURL string)
+	AddPluginRepositoryStub        func(string, string)
 	addPluginRepositoryMutex       sync.RWMutex
 	addPluginRepositoryArgsForCall []struct {
-		repoName string
-		repoURL  string
+		arg1 string
+		arg2 string
 	}
-	GetPluginStub        func(pluginName string) (configv3.Plugin, bool)
+	GetPluginStub        func(string) (configv3.Plugin, bool)
 	getPluginMutex       sync.RWMutex
 	getPluginArgsForCall []struct {
-		pluginName string
+		arg1 string
 	}
 	getPluginReturns struct {
 		result1 configv3.Plugin
@@ -35,8 +35,9 @@ type FakeConfig struct {
 	}
 	PluginHomeStub        func() string
 	pluginHomeMutex       sync.RWMutex
-	pluginHomeArgsForCall []struct{}
-	pluginHomeReturns     struct {
+	pluginHomeArgsForCall []struct {
+	}
+	pluginHomeReturns struct {
 		result1 string
 	}
 	pluginHomeReturnsOnCall map[int]struct {
@@ -44,8 +45,9 @@ type FakeConfig struct {
 	}
 	PluginRepositoriesStub        func() []configv3.PluginRepository
 	pluginRepositoriesMutex       sync.RWMutex
-	pluginRepositoriesArgsForCall []struct{}
-	pluginRepositoriesReturns     struct {
+	pluginRepositoriesArgsForCall []struct {
+	}
+	pluginRepositoriesReturns struct {
 		result1 []configv3.PluginRepository
 	}
 	pluginRepositoriesReturnsOnCall map[int]struct {
@@ -53,8 +55,9 @@ type FakeConfig struct {
 	}
 	PluginsStub        func() []configv3.Plugin
 	pluginsMutex       sync.RWMutex
-	pluginsArgsForCall []struct{}
-	pluginsReturns     struct {
+	pluginsArgsForCall []struct {
+	}
+	pluginsReturns struct {
 		result1 []configv3.Plugin
 	}
 	pluginsReturnsOnCall map[int]struct {
@@ -67,8 +70,9 @@ type FakeConfig struct {
 	}
 	WritePluginConfigStub        func() error
 	writePluginConfigMutex       sync.RWMutex
-	writePluginConfigArgsForCall []struct{}
-	writePluginConfigReturns     struct {
+	writePluginConfigArgsForCall []struct {
+	}
+	writePluginConfigReturns struct {
 		result1 error
 	}
 	writePluginConfigReturnsOnCall map[int]struct {
@@ -96,22 +100,29 @@ func (fake *FakeConfig) AddPluginCallCount() int {
 	return len(fake.addPluginArgsForCall)
 }
 
+func (fake *FakeConfig) AddPluginCalls(stub func(configv3.Plugin)) {
+	fake.addPluginMutex.Lock()
+	defer fake.addPluginMutex.Unlock()
+	fake.AddPluginStub = stub
+}
+
 func (fake *FakeConfig) AddPluginArgsForCall(i int) configv3.Plugin {
 	fake.addPluginMutex.RLock()
 	defer fake.addPluginMutex.RUnlock()
-	return fake.addPluginArgsForCall[i].arg1
+	argsForCall := fake.addPluginArgsForCall[i]
+	return argsForCall.arg1
 }
 
-func (fake *FakeConfig) AddPluginRepository(repoName string, repoURL string) {
+func (fake *FakeConfig) AddPluginRepository(arg1 string, arg2 string) {
 	fake.addPluginRepositoryMutex.Lock()
 	fake.addPluginRepositoryArgsForCall = append(fake.addPluginRepositoryArgsForCall, struct {
-		repoName string
-		repoURL  string
-	}{repoName, repoURL})
-	fake.recordInvocation("AddPluginRepository", []interface{}{repoName, repoURL})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("AddPluginRepository", []interface{}{arg1, arg2})
 	fake.addPluginRepositoryMutex.Unlock()
 	if fake.AddPluginRepositoryStub != nil {
-		fake.AddPluginRepositoryStub(repoName, repoURL)
+		fake.AddPluginRepositoryStub(arg1, arg2)
 	}
 }
 
@@ -121,27 +132,35 @@ func (fake *FakeConfig) AddPluginRepositoryCallCount() int {
 	return len(fake.addPluginRepositoryArgsForCall)
 }
 
+func (fake *FakeConfig) AddPluginRepositoryCalls(stub func(string, string)) {
+	fake.addPluginRepositoryMutex.Lock()
+	defer fake.addPluginRepositoryMutex.Unlock()
+	fake.AddPluginRepositoryStub = stub
+}
+
 func (fake *FakeConfig) AddPluginRepositoryArgsForCall(i int) (string, string) {
 	fake.addPluginRepositoryMutex.RLock()
 	defer fake.addPluginRepositoryMutex.RUnlock()
-	return fake.addPluginRepositoryArgsForCall[i].repoName, fake.addPluginRepositoryArgsForCall[i].repoURL
+	argsForCall := fake.addPluginRepositoryArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeConfig) GetPlugin(pluginName string) (configv3.Plugin, bool) {
+func (fake *FakeConfig) GetPlugin(arg1 string) (configv3.Plugin, bool) {
 	fake.getPluginMutex.Lock()
 	ret, specificReturn := fake.getPluginReturnsOnCall[len(fake.getPluginArgsForCall)]
 	fake.getPluginArgsForCall = append(fake.getPluginArgsForCall, struct {
-		pluginName string
-	}{pluginName})
-	fake.recordInvocation("GetPlugin", []interface{}{pluginName})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetPlugin", []interface{}{arg1})
 	fake.getPluginMutex.Unlock()
 	if fake.GetPluginStub != nil {
-		return fake.GetPluginStub(pluginName)
+		return fake.GetPluginStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.getPluginReturns.result1, fake.getPluginReturns.result2
+	fakeReturns := fake.getPluginReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeConfig) GetPluginCallCount() int {
@@ -150,13 +169,22 @@ func (fake *FakeConfig) GetPluginCallCount() int {
 	return len(fake.getPluginArgsForCall)
 }
 
+func (fake *FakeConfig) GetPluginCalls(stub func(string) (configv3.Plugin, bool)) {
+	fake.getPluginMutex.Lock()
+	defer fake.getPluginMutex.Unlock()
+	fake.GetPluginStub = stub
+}
+
 func (fake *FakeConfig) GetPluginArgsForCall(i int) string {
 	fake.getPluginMutex.RLock()
 	defer fake.getPluginMutex.RUnlock()
-	return fake.getPluginArgsForCall[i].pluginName
+	argsForCall := fake.getPluginArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeConfig) GetPluginReturns(result1 configv3.Plugin, result2 bool) {
+	fake.getPluginMutex.Lock()
+	defer fake.getPluginMutex.Unlock()
 	fake.GetPluginStub = nil
 	fake.getPluginReturns = struct {
 		result1 configv3.Plugin
@@ -165,6 +193,8 @@ func (fake *FakeConfig) GetPluginReturns(result1 configv3.Plugin, result2 bool) 
 }
 
 func (fake *FakeConfig) GetPluginReturnsOnCall(i int, result1 configv3.Plugin, result2 bool) {
+	fake.getPluginMutex.Lock()
+	defer fake.getPluginMutex.Unlock()
 	fake.GetPluginStub = nil
 	if fake.getPluginReturnsOnCall == nil {
 		fake.getPluginReturnsOnCall = make(map[int]struct {
@@ -181,7 +211,8 @@ func (fake *FakeConfig) GetPluginReturnsOnCall(i int, result1 configv3.Plugin, r
 func (fake *FakeConfig) PluginHome() string {
 	fake.pluginHomeMutex.Lock()
 	ret, specificReturn := fake.pluginHomeReturnsOnCall[len(fake.pluginHomeArgsForCall)]
-	fake.pluginHomeArgsForCall = append(fake.pluginHomeArgsForCall, struct{}{})
+	fake.pluginHomeArgsForCall = append(fake.pluginHomeArgsForCall, struct {
+	}{})
 	fake.recordInvocation("PluginHome", []interface{}{})
 	fake.pluginHomeMutex.Unlock()
 	if fake.PluginHomeStub != nil {
@@ -190,7 +221,8 @@ func (fake *FakeConfig) PluginHome() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.pluginHomeReturns.result1
+	fakeReturns := fake.pluginHomeReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) PluginHomeCallCount() int {
@@ -199,7 +231,15 @@ func (fake *FakeConfig) PluginHomeCallCount() int {
 	return len(fake.pluginHomeArgsForCall)
 }
 
+func (fake *FakeConfig) PluginHomeCalls(stub func() string) {
+	fake.pluginHomeMutex.Lock()
+	defer fake.pluginHomeMutex.Unlock()
+	fake.PluginHomeStub = stub
+}
+
 func (fake *FakeConfig) PluginHomeReturns(result1 string) {
+	fake.pluginHomeMutex.Lock()
+	defer fake.pluginHomeMutex.Unlock()
 	fake.PluginHomeStub = nil
 	fake.pluginHomeReturns = struct {
 		result1 string
@@ -207,6 +247,8 @@ func (fake *FakeConfig) PluginHomeReturns(result1 string) {
 }
 
 func (fake *FakeConfig) PluginHomeReturnsOnCall(i int, result1 string) {
+	fake.pluginHomeMutex.Lock()
+	defer fake.pluginHomeMutex.Unlock()
 	fake.PluginHomeStub = nil
 	if fake.pluginHomeReturnsOnCall == nil {
 		fake.pluginHomeReturnsOnCall = make(map[int]struct {
@@ -221,7 +263,8 @@ func (fake *FakeConfig) PluginHomeReturnsOnCall(i int, result1 string) {
 func (fake *FakeConfig) PluginRepositories() []configv3.PluginRepository {
 	fake.pluginRepositoriesMutex.Lock()
 	ret, specificReturn := fake.pluginRepositoriesReturnsOnCall[len(fake.pluginRepositoriesArgsForCall)]
-	fake.pluginRepositoriesArgsForCall = append(fake.pluginRepositoriesArgsForCall, struct{}{})
+	fake.pluginRepositoriesArgsForCall = append(fake.pluginRepositoriesArgsForCall, struct {
+	}{})
 	fake.recordInvocation("PluginRepositories", []interface{}{})
 	fake.pluginRepositoriesMutex.Unlock()
 	if fake.PluginRepositoriesStub != nil {
@@ -230,7 +273,8 @@ func (fake *FakeConfig) PluginRepositories() []configv3.PluginRepository {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.pluginRepositoriesReturns.result1
+	fakeReturns := fake.pluginRepositoriesReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) PluginRepositoriesCallCount() int {
@@ -239,7 +283,15 @@ func (fake *FakeConfig) PluginRepositoriesCallCount() int {
 	return len(fake.pluginRepositoriesArgsForCall)
 }
 
+func (fake *FakeConfig) PluginRepositoriesCalls(stub func() []configv3.PluginRepository) {
+	fake.pluginRepositoriesMutex.Lock()
+	defer fake.pluginRepositoriesMutex.Unlock()
+	fake.PluginRepositoriesStub = stub
+}
+
 func (fake *FakeConfig) PluginRepositoriesReturns(result1 []configv3.PluginRepository) {
+	fake.pluginRepositoriesMutex.Lock()
+	defer fake.pluginRepositoriesMutex.Unlock()
 	fake.PluginRepositoriesStub = nil
 	fake.pluginRepositoriesReturns = struct {
 		result1 []configv3.PluginRepository
@@ -247,6 +299,8 @@ func (fake *FakeConfig) PluginRepositoriesReturns(result1 []configv3.PluginRepos
 }
 
 func (fake *FakeConfig) PluginRepositoriesReturnsOnCall(i int, result1 []configv3.PluginRepository) {
+	fake.pluginRepositoriesMutex.Lock()
+	defer fake.pluginRepositoriesMutex.Unlock()
 	fake.PluginRepositoriesStub = nil
 	if fake.pluginRepositoriesReturnsOnCall == nil {
 		fake.pluginRepositoriesReturnsOnCall = make(map[int]struct {
@@ -261,7 +315,8 @@ func (fake *FakeConfig) PluginRepositoriesReturnsOnCall(i int, result1 []configv
 func (fake *FakeConfig) Plugins() []configv3.Plugin {
 	fake.pluginsMutex.Lock()
 	ret, specificReturn := fake.pluginsReturnsOnCall[len(fake.pluginsArgsForCall)]
-	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct{}{})
+	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct {
+	}{})
 	fake.recordInvocation("Plugins", []interface{}{})
 	fake.pluginsMutex.Unlock()
 	if fake.PluginsStub != nil {
@@ -270,7 +325,8 @@ func (fake *FakeConfig) Plugins() []configv3.Plugin {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.pluginsReturns.result1
+	fakeReturns := fake.pluginsReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) PluginsCallCount() int {
@@ -279,7 +335,15 @@ func (fake *FakeConfig) PluginsCallCount() int {
 	return len(fake.pluginsArgsForCall)
 }
 
+func (fake *FakeConfig) PluginsCalls(stub func() []configv3.Plugin) {
+	fake.pluginsMutex.Lock()
+	defer fake.pluginsMutex.Unlock()
+	fake.PluginsStub = stub
+}
+
 func (fake *FakeConfig) PluginsReturns(result1 []configv3.Plugin) {
+	fake.pluginsMutex.Lock()
+	defer fake.pluginsMutex.Unlock()
 	fake.PluginsStub = nil
 	fake.pluginsReturns = struct {
 		result1 []configv3.Plugin
@@ -287,6 +351,8 @@ func (fake *FakeConfig) PluginsReturns(result1 []configv3.Plugin) {
 }
 
 func (fake *FakeConfig) PluginsReturnsOnCall(i int, result1 []configv3.Plugin) {
+	fake.pluginsMutex.Lock()
+	defer fake.pluginsMutex.Unlock()
 	fake.PluginsStub = nil
 	if fake.pluginsReturnsOnCall == nil {
 		fake.pluginsReturnsOnCall = make(map[int]struct {
@@ -316,16 +382,24 @@ func (fake *FakeConfig) RemovePluginCallCount() int {
 	return len(fake.removePluginArgsForCall)
 }
 
+func (fake *FakeConfig) RemovePluginCalls(stub func(string)) {
+	fake.removePluginMutex.Lock()
+	defer fake.removePluginMutex.Unlock()
+	fake.RemovePluginStub = stub
+}
+
 func (fake *FakeConfig) RemovePluginArgsForCall(i int) string {
 	fake.removePluginMutex.RLock()
 	defer fake.removePluginMutex.RUnlock()
-	return fake.removePluginArgsForCall[i].arg1
+	argsForCall := fake.removePluginArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeConfig) WritePluginConfig() error {
 	fake.writePluginConfigMutex.Lock()
 	ret, specificReturn := fake.writePluginConfigReturnsOnCall[len(fake.writePluginConfigArgsForCall)]
-	fake.writePluginConfigArgsForCall = append(fake.writePluginConfigArgsForCall, struct{}{})
+	fake.writePluginConfigArgsForCall = append(fake.writePluginConfigArgsForCall, struct {
+	}{})
 	fake.recordInvocation("WritePluginConfig", []interface{}{})
 	fake.writePluginConfigMutex.Unlock()
 	if fake.WritePluginConfigStub != nil {
@@ -334,7 +408,8 @@ func (fake *FakeConfig) WritePluginConfig() error {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.writePluginConfigReturns.result1
+	fakeReturns := fake.writePluginConfigReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) WritePluginConfigCallCount() int {
@@ -343,7 +418,15 @@ func (fake *FakeConfig) WritePluginConfigCallCount() int {
 	return len(fake.writePluginConfigArgsForCall)
 }
 
+func (fake *FakeConfig) WritePluginConfigCalls(stub func() error) {
+	fake.writePluginConfigMutex.Lock()
+	defer fake.writePluginConfigMutex.Unlock()
+	fake.WritePluginConfigStub = stub
+}
+
 func (fake *FakeConfig) WritePluginConfigReturns(result1 error) {
+	fake.writePluginConfigMutex.Lock()
+	defer fake.writePluginConfigMutex.Unlock()
 	fake.WritePluginConfigStub = nil
 	fake.writePluginConfigReturns = struct {
 		result1 error
@@ -351,6 +434,8 @@ func (fake *FakeConfig) WritePluginConfigReturns(result1 error) {
 }
 
 func (fake *FakeConfig) WritePluginConfigReturnsOnCall(i int, result1 error) {
+	fake.writePluginConfigMutex.Lock()
+	defer fake.writePluginConfigMutex.Unlock()
 	fake.WritePluginConfigStub = nil
 	if fake.writePluginConfigReturnsOnCall == nil {
 		fake.writePluginConfigReturnsOnCall = make(map[int]struct {

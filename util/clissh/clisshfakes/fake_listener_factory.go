@@ -2,18 +2,18 @@
 package clisshfakes
 
 import (
-	"net"
-	"sync"
+	net "net"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/util/clissh"
+	clissh "code.cloudfoundry.org/cli/util/clissh"
 )
 
 type FakeListenerFactory struct {
-	ListenStub        func(network, address string) (net.Listener, error)
+	ListenStub        func(string, string) (net.Listener, error)
 	listenMutex       sync.RWMutex
 	listenArgsForCall []struct {
-		network string
-		address string
+		arg1 string
+		arg2 string
 	}
 	listenReturns struct {
 		result1 net.Listener
@@ -27,22 +27,23 @@ type FakeListenerFactory struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeListenerFactory) Listen(network string, address string) (net.Listener, error) {
+func (fake *FakeListenerFactory) Listen(arg1 string, arg2 string) (net.Listener, error) {
 	fake.listenMutex.Lock()
 	ret, specificReturn := fake.listenReturnsOnCall[len(fake.listenArgsForCall)]
 	fake.listenArgsForCall = append(fake.listenArgsForCall, struct {
-		network string
-		address string
-	}{network, address})
-	fake.recordInvocation("Listen", []interface{}{network, address})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("Listen", []interface{}{arg1, arg2})
 	fake.listenMutex.Unlock()
 	if fake.ListenStub != nil {
-		return fake.ListenStub(network, address)
+		return fake.ListenStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.listenReturns.result1, fake.listenReturns.result2
+	fakeReturns := fake.listenReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeListenerFactory) ListenCallCount() int {
@@ -51,13 +52,22 @@ func (fake *FakeListenerFactory) ListenCallCount() int {
 	return len(fake.listenArgsForCall)
 }
 
+func (fake *FakeListenerFactory) ListenCalls(stub func(string, string) (net.Listener, error)) {
+	fake.listenMutex.Lock()
+	defer fake.listenMutex.Unlock()
+	fake.ListenStub = stub
+}
+
 func (fake *FakeListenerFactory) ListenArgsForCall(i int) (string, string) {
 	fake.listenMutex.RLock()
 	defer fake.listenMutex.RUnlock()
-	return fake.listenArgsForCall[i].network, fake.listenArgsForCall[i].address
+	argsForCall := fake.listenArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeListenerFactory) ListenReturns(result1 net.Listener, result2 error) {
+	fake.listenMutex.Lock()
+	defer fake.listenMutex.Unlock()
 	fake.ListenStub = nil
 	fake.listenReturns = struct {
 		result1 net.Listener
@@ -66,6 +76,8 @@ func (fake *FakeListenerFactory) ListenReturns(result1 net.Listener, result2 err
 }
 
 func (fake *FakeListenerFactory) ListenReturnsOnCall(i int, result1 net.Listener, result2 error) {
+	fake.listenMutex.Lock()
+	defer fake.listenMutex.Unlock()
 	fake.ListenStub = nil
 	if fake.listenReturnsOnCall == nil {
 		fake.listenReturnsOnCall = make(map[int]struct {

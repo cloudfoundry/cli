@@ -2,21 +2,21 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	constant "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeSetHealthCheckActor struct {
-	SetApplicationHealthCheckTypeByNameAndSpaceStub        func(name string, spaceGUID string, healthCheckType constant.ApplicationHealthCheckType, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
+	SetApplicationHealthCheckTypeByNameAndSpaceStub        func(string, string, constant.ApplicationHealthCheckType, string) (v2action.Application, v2action.Warnings, error)
 	setApplicationHealthCheckTypeByNameAndSpaceMutex       sync.RWMutex
 	setApplicationHealthCheckTypeByNameAndSpaceArgsForCall []struct {
-		name            string
-		spaceGUID       string
-		healthCheckType constant.ApplicationHealthCheckType
-		httpEndpoint    string
+		arg1 string
+		arg2 string
+		arg3 constant.ApplicationHealthCheckType
+		arg4 string
 	}
 	setApplicationHealthCheckTypeByNameAndSpaceReturns struct {
 		result1 v2action.Application
@@ -32,24 +32,25 @@ type FakeSetHealthCheckActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType constant.ApplicationHealthCheckType, httpEndpoint string) (v2action.Application, v2action.Warnings, error) {
+func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpace(arg1 string, arg2 string, arg3 constant.ApplicationHealthCheckType, arg4 string) (v2action.Application, v2action.Warnings, error) {
 	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.setApplicationHealthCheckTypeByNameAndSpaceReturnsOnCall[len(fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall)]
 	fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall = append(fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall, struct {
-		name            string
-		spaceGUID       string
-		healthCheckType constant.ApplicationHealthCheckType
-		httpEndpoint    string
-	}{name, spaceGUID, healthCheckType, httpEndpoint})
-	fake.recordInvocation("SetApplicationHealthCheckTypeByNameAndSpace", []interface{}{name, spaceGUID, healthCheckType, httpEndpoint})
+		arg1 string
+		arg2 string
+		arg3 constant.ApplicationHealthCheckType
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("SetApplicationHealthCheckTypeByNameAndSpace", []interface{}{arg1, arg2, arg3, arg4})
 	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Unlock()
 	if fake.SetApplicationHealthCheckTypeByNameAndSpaceStub != nil {
-		return fake.SetApplicationHealthCheckTypeByNameAndSpaceStub(name, spaceGUID, healthCheckType, httpEndpoint)
+		return fake.SetApplicationHealthCheckTypeByNameAndSpaceStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.setApplicationHealthCheckTypeByNameAndSpaceReturns.result1, fake.setApplicationHealthCheckTypeByNameAndSpaceReturns.result2, fake.setApplicationHealthCheckTypeByNameAndSpaceReturns.result3
+	fakeReturns := fake.setApplicationHealthCheckTypeByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceCallCount() int {
@@ -58,13 +59,22 @@ func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpace
 	return len(fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall)
 }
 
+func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceCalls(stub func(string, string, constant.ApplicationHealthCheckType, string) (v2action.Application, v2action.Warnings, error)) {
+	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Lock()
+	defer fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Unlock()
+	fake.SetApplicationHealthCheckTypeByNameAndSpaceStub = stub
+}
+
 func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, constant.ApplicationHealthCheckType, string) {
 	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.RLock()
 	defer fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.RUnlock()
-	return fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].name, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].spaceGUID, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].healthCheckType, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].httpEndpoint
+	argsForCall := fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceReturns(result1 v2action.Application, result2 v2action.Warnings, result3 error) {
+	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Lock()
+	defer fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Unlock()
 	fake.SetApplicationHealthCheckTypeByNameAndSpaceStub = nil
 	fake.setApplicationHealthCheckTypeByNameAndSpaceReturns = struct {
 		result1 v2action.Application
@@ -74,6 +84,8 @@ func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpace
 }
 
 func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceReturnsOnCall(i int, result1 v2action.Application, result2 v2action.Warnings, result3 error) {
+	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Lock()
+	defer fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Unlock()
 	fake.SetApplicationHealthCheckTypeByNameAndSpaceStub = nil
 	if fake.setApplicationHealthCheckTypeByNameAndSpaceReturnsOnCall == nil {
 		fake.setApplicationHealthCheckTypeByNameAndSpaceReturnsOnCall = make(map[int]struct {

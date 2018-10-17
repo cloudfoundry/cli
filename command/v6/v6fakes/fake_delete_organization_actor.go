@@ -2,17 +2,17 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeDeleteOrganizationActor struct {
-	DeleteOrganizationStub        func(orgName string) (v2action.Warnings, error)
+	DeleteOrganizationStub        func(string) (v2action.Warnings, error)
 	deleteOrganizationMutex       sync.RWMutex
 	deleteOrganizationArgsForCall []struct {
-		orgName string
+		arg1 string
 	}
 	deleteOrganizationReturns struct {
 		result1 v2action.Warnings
@@ -26,21 +26,22 @@ type FakeDeleteOrganizationActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDeleteOrganizationActor) DeleteOrganization(orgName string) (v2action.Warnings, error) {
+func (fake *FakeDeleteOrganizationActor) DeleteOrganization(arg1 string) (v2action.Warnings, error) {
 	fake.deleteOrganizationMutex.Lock()
 	ret, specificReturn := fake.deleteOrganizationReturnsOnCall[len(fake.deleteOrganizationArgsForCall)]
 	fake.deleteOrganizationArgsForCall = append(fake.deleteOrganizationArgsForCall, struct {
-		orgName string
-	}{orgName})
-	fake.recordInvocation("DeleteOrganization", []interface{}{orgName})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteOrganization", []interface{}{arg1})
 	fake.deleteOrganizationMutex.Unlock()
 	if fake.DeleteOrganizationStub != nil {
-		return fake.DeleteOrganizationStub(orgName)
+		return fake.DeleteOrganizationStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.deleteOrganizationReturns.result1, fake.deleteOrganizationReturns.result2
+	fakeReturns := fake.deleteOrganizationReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeDeleteOrganizationActor) DeleteOrganizationCallCount() int {
@@ -49,13 +50,22 @@ func (fake *FakeDeleteOrganizationActor) DeleteOrganizationCallCount() int {
 	return len(fake.deleteOrganizationArgsForCall)
 }
 
+func (fake *FakeDeleteOrganizationActor) DeleteOrganizationCalls(stub func(string) (v2action.Warnings, error)) {
+	fake.deleteOrganizationMutex.Lock()
+	defer fake.deleteOrganizationMutex.Unlock()
+	fake.DeleteOrganizationStub = stub
+}
+
 func (fake *FakeDeleteOrganizationActor) DeleteOrganizationArgsForCall(i int) string {
 	fake.deleteOrganizationMutex.RLock()
 	defer fake.deleteOrganizationMutex.RUnlock()
-	return fake.deleteOrganizationArgsForCall[i].orgName
+	argsForCall := fake.deleteOrganizationArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeDeleteOrganizationActor) DeleteOrganizationReturns(result1 v2action.Warnings, result2 error) {
+	fake.deleteOrganizationMutex.Lock()
+	defer fake.deleteOrganizationMutex.Unlock()
 	fake.DeleteOrganizationStub = nil
 	fake.deleteOrganizationReturns = struct {
 		result1 v2action.Warnings
@@ -64,6 +74,8 @@ func (fake *FakeDeleteOrganizationActor) DeleteOrganizationReturns(result1 v2act
 }
 
 func (fake *FakeDeleteOrganizationActor) DeleteOrganizationReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.deleteOrganizationMutex.Lock()
+	defer fake.deleteOrganizationMutex.Unlock()
 	fake.DeleteOrganizationStub = nil
 	if fake.deleteOrganizationReturnsOnCall == nil {
 		fake.deleteOrganizationReturnsOnCall = make(map[int]struct {

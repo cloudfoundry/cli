@@ -2,17 +2,17 @@
 package pluginfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/command/plugin"
+	plugin "code.cloudfoundry.org/cli/command/plugin"
 )
 
 type FakeAddPluginRepoActor struct {
-	AddPluginRepositoryStub        func(repoName string, repoURL string) error
+	AddPluginRepositoryStub        func(string, string) error
 	addPluginRepositoryMutex       sync.RWMutex
 	addPluginRepositoryArgsForCall []struct {
-		repoName string
-		repoURL  string
+		arg1 string
+		arg2 string
 	}
 	addPluginRepositoryReturns struct {
 		result1 error
@@ -24,22 +24,23 @@ type FakeAddPluginRepoActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAddPluginRepoActor) AddPluginRepository(repoName string, repoURL string) error {
+func (fake *FakeAddPluginRepoActor) AddPluginRepository(arg1 string, arg2 string) error {
 	fake.addPluginRepositoryMutex.Lock()
 	ret, specificReturn := fake.addPluginRepositoryReturnsOnCall[len(fake.addPluginRepositoryArgsForCall)]
 	fake.addPluginRepositoryArgsForCall = append(fake.addPluginRepositoryArgsForCall, struct {
-		repoName string
-		repoURL  string
-	}{repoName, repoURL})
-	fake.recordInvocation("AddPluginRepository", []interface{}{repoName, repoURL})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("AddPluginRepository", []interface{}{arg1, arg2})
 	fake.addPluginRepositoryMutex.Unlock()
 	if fake.AddPluginRepositoryStub != nil {
-		return fake.AddPluginRepositoryStub(repoName, repoURL)
+		return fake.AddPluginRepositoryStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.addPluginRepositoryReturns.result1
+	fakeReturns := fake.addPluginRepositoryReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeAddPluginRepoActor) AddPluginRepositoryCallCount() int {
@@ -48,13 +49,22 @@ func (fake *FakeAddPluginRepoActor) AddPluginRepositoryCallCount() int {
 	return len(fake.addPluginRepositoryArgsForCall)
 }
 
+func (fake *FakeAddPluginRepoActor) AddPluginRepositoryCalls(stub func(string, string) error) {
+	fake.addPluginRepositoryMutex.Lock()
+	defer fake.addPluginRepositoryMutex.Unlock()
+	fake.AddPluginRepositoryStub = stub
+}
+
 func (fake *FakeAddPluginRepoActor) AddPluginRepositoryArgsForCall(i int) (string, string) {
 	fake.addPluginRepositoryMutex.RLock()
 	defer fake.addPluginRepositoryMutex.RUnlock()
-	return fake.addPluginRepositoryArgsForCall[i].repoName, fake.addPluginRepositoryArgsForCall[i].repoURL
+	argsForCall := fake.addPluginRepositoryArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeAddPluginRepoActor) AddPluginRepositoryReturns(result1 error) {
+	fake.addPluginRepositoryMutex.Lock()
+	defer fake.addPluginRepositoryMutex.Unlock()
 	fake.AddPluginRepositoryStub = nil
 	fake.addPluginRepositoryReturns = struct {
 		result1 error
@@ -62,6 +72,8 @@ func (fake *FakeAddPluginRepoActor) AddPluginRepositoryReturns(result1 error) {
 }
 
 func (fake *FakeAddPluginRepoActor) AddPluginRepositoryReturnsOnCall(i int, result1 error) {
+	fake.addPluginRepositoryMutex.Lock()
+	defer fake.addPluginRepositoryMutex.Unlock()
 	fake.AddPluginRepositoryStub = nil
 	if fake.addPluginRepositoryReturnsOnCall == nil {
 		fake.addPluginRepositoryReturnsOnCall = make(map[int]struct {

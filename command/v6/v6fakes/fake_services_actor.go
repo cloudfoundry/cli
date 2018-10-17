@@ -2,17 +2,17 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeServicesActor struct {
-	GetServiceInstancesSummaryBySpaceStub        func(spaceGUID string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error)
+	GetServiceInstancesSummaryBySpaceStub        func(string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error)
 	getServiceInstancesSummaryBySpaceMutex       sync.RWMutex
 	getServiceInstancesSummaryBySpaceArgsForCall []struct {
-		spaceGUID string
+		arg1 string
 	}
 	getServiceInstancesSummaryBySpaceReturns struct {
 		result1 []v2action.ServiceInstanceSummary
@@ -28,21 +28,22 @@ type FakeServicesActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpace(spaceGUID string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error) {
+func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpace(arg1 string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error) {
 	fake.getServiceInstancesSummaryBySpaceMutex.Lock()
 	ret, specificReturn := fake.getServiceInstancesSummaryBySpaceReturnsOnCall[len(fake.getServiceInstancesSummaryBySpaceArgsForCall)]
 	fake.getServiceInstancesSummaryBySpaceArgsForCall = append(fake.getServiceInstancesSummaryBySpaceArgsForCall, struct {
-		spaceGUID string
-	}{spaceGUID})
-	fake.recordInvocation("GetServiceInstancesSummaryBySpace", []interface{}{spaceGUID})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetServiceInstancesSummaryBySpace", []interface{}{arg1})
 	fake.getServiceInstancesSummaryBySpaceMutex.Unlock()
 	if fake.GetServiceInstancesSummaryBySpaceStub != nil {
-		return fake.GetServiceInstancesSummaryBySpaceStub(spaceGUID)
+		return fake.GetServiceInstancesSummaryBySpaceStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getServiceInstancesSummaryBySpaceReturns.result1, fake.getServiceInstancesSummaryBySpaceReturns.result2, fake.getServiceInstancesSummaryBySpaceReturns.result3
+	fakeReturns := fake.getServiceInstancesSummaryBySpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceCallCount() int {
@@ -51,13 +52,22 @@ func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceCallCount() int 
 	return len(fake.getServiceInstancesSummaryBySpaceArgsForCall)
 }
 
+func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceCalls(stub func(string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error)) {
+	fake.getServiceInstancesSummaryBySpaceMutex.Lock()
+	defer fake.getServiceInstancesSummaryBySpaceMutex.Unlock()
+	fake.GetServiceInstancesSummaryBySpaceStub = stub
+}
+
 func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceArgsForCall(i int) string {
 	fake.getServiceInstancesSummaryBySpaceMutex.RLock()
 	defer fake.getServiceInstancesSummaryBySpaceMutex.RUnlock()
-	return fake.getServiceInstancesSummaryBySpaceArgsForCall[i].spaceGUID
+	argsForCall := fake.getServiceInstancesSummaryBySpaceArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceReturns(result1 []v2action.ServiceInstanceSummary, result2 v2action.Warnings, result3 error) {
+	fake.getServiceInstancesSummaryBySpaceMutex.Lock()
+	defer fake.getServiceInstancesSummaryBySpaceMutex.Unlock()
 	fake.GetServiceInstancesSummaryBySpaceStub = nil
 	fake.getServiceInstancesSummaryBySpaceReturns = struct {
 		result1 []v2action.ServiceInstanceSummary
@@ -67,6 +77,8 @@ func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceReturns(result1 
 }
 
 func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceReturnsOnCall(i int, result1 []v2action.ServiceInstanceSummary, result2 v2action.Warnings, result3 error) {
+	fake.getServiceInstancesSummaryBySpaceMutex.Lock()
+	defer fake.getServiceInstancesSummaryBySpaceMutex.Unlock()
 	fake.GetServiceInstancesSummaryBySpaceStub = nil
 	if fake.getServiceInstancesSummaryBySpaceReturnsOnCall == nil {
 		fake.getServiceInstancesSummaryBySpaceReturnsOnCall = make(map[int]struct {

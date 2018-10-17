@@ -2,17 +2,18 @@
 package pluginfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/command/plugin"
+	pluginaction "code.cloudfoundry.org/cli/actor/pluginaction"
+	plugin "code.cloudfoundry.org/cli/command/plugin"
 )
 
 type FakePluginsActor struct {
 	GetOutdatedPluginsStub        func() ([]pluginaction.OutdatedPlugin, error)
 	getOutdatedPluginsMutex       sync.RWMutex
-	getOutdatedPluginsArgsForCall []struct{}
-	getOutdatedPluginsReturns     struct {
+	getOutdatedPluginsArgsForCall []struct {
+	}
+	getOutdatedPluginsReturns struct {
 		result1 []pluginaction.OutdatedPlugin
 		result2 error
 	}
@@ -27,7 +28,8 @@ type FakePluginsActor struct {
 func (fake *FakePluginsActor) GetOutdatedPlugins() ([]pluginaction.OutdatedPlugin, error) {
 	fake.getOutdatedPluginsMutex.Lock()
 	ret, specificReturn := fake.getOutdatedPluginsReturnsOnCall[len(fake.getOutdatedPluginsArgsForCall)]
-	fake.getOutdatedPluginsArgsForCall = append(fake.getOutdatedPluginsArgsForCall, struct{}{})
+	fake.getOutdatedPluginsArgsForCall = append(fake.getOutdatedPluginsArgsForCall, struct {
+	}{})
 	fake.recordInvocation("GetOutdatedPlugins", []interface{}{})
 	fake.getOutdatedPluginsMutex.Unlock()
 	if fake.GetOutdatedPluginsStub != nil {
@@ -36,7 +38,8 @@ func (fake *FakePluginsActor) GetOutdatedPlugins() ([]pluginaction.OutdatedPlugi
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.getOutdatedPluginsReturns.result1, fake.getOutdatedPluginsReturns.result2
+	fakeReturns := fake.getOutdatedPluginsReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakePluginsActor) GetOutdatedPluginsCallCount() int {
@@ -45,7 +48,15 @@ func (fake *FakePluginsActor) GetOutdatedPluginsCallCount() int {
 	return len(fake.getOutdatedPluginsArgsForCall)
 }
 
+func (fake *FakePluginsActor) GetOutdatedPluginsCalls(stub func() ([]pluginaction.OutdatedPlugin, error)) {
+	fake.getOutdatedPluginsMutex.Lock()
+	defer fake.getOutdatedPluginsMutex.Unlock()
+	fake.GetOutdatedPluginsStub = stub
+}
+
 func (fake *FakePluginsActor) GetOutdatedPluginsReturns(result1 []pluginaction.OutdatedPlugin, result2 error) {
+	fake.getOutdatedPluginsMutex.Lock()
+	defer fake.getOutdatedPluginsMutex.Unlock()
 	fake.GetOutdatedPluginsStub = nil
 	fake.getOutdatedPluginsReturns = struct {
 		result1 []pluginaction.OutdatedPlugin
@@ -54,6 +65,8 @@ func (fake *FakePluginsActor) GetOutdatedPluginsReturns(result1 []pluginaction.O
 }
 
 func (fake *FakePluginsActor) GetOutdatedPluginsReturnsOnCall(i int, result1 []pluginaction.OutdatedPlugin, result2 error) {
+	fake.getOutdatedPluginsMutex.Lock()
+	defer fake.getOutdatedPluginsMutex.Unlock()
 	fake.GetOutdatedPluginsStub = nil
 	if fake.getOutdatedPluginsReturnsOnCall == nil {
 		fake.getOutdatedPluginsReturnsOnCall = make(map[int]struct {

@@ -2,25 +2,26 @@
 package v3actionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
 )
 
 type FakeManifestParser struct {
 	AppNamesStub        func() []string
 	appNamesMutex       sync.RWMutex
-	appNamesArgsForCall []struct{}
-	appNamesReturns     struct {
+	appNamesArgsForCall []struct {
+	}
+	appNamesReturns struct {
 		result1 []string
 	}
 	appNamesReturnsOnCall map[int]struct {
 		result1 []string
 	}
-	RawManifestStub        func(name string) ([]byte, error)
+	RawManifestStub        func(string) ([]byte, error)
 	rawManifestMutex       sync.RWMutex
 	rawManifestArgsForCall []struct {
-		name string
+		arg1 string
 	}
 	rawManifestReturns struct {
 		result1 []byte
@@ -37,7 +38,8 @@ type FakeManifestParser struct {
 func (fake *FakeManifestParser) AppNames() []string {
 	fake.appNamesMutex.Lock()
 	ret, specificReturn := fake.appNamesReturnsOnCall[len(fake.appNamesArgsForCall)]
-	fake.appNamesArgsForCall = append(fake.appNamesArgsForCall, struct{}{})
+	fake.appNamesArgsForCall = append(fake.appNamesArgsForCall, struct {
+	}{})
 	fake.recordInvocation("AppNames", []interface{}{})
 	fake.appNamesMutex.Unlock()
 	if fake.AppNamesStub != nil {
@@ -46,7 +48,8 @@ func (fake *FakeManifestParser) AppNames() []string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.appNamesReturns.result1
+	fakeReturns := fake.appNamesReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeManifestParser) AppNamesCallCount() int {
@@ -55,7 +58,15 @@ func (fake *FakeManifestParser) AppNamesCallCount() int {
 	return len(fake.appNamesArgsForCall)
 }
 
+func (fake *FakeManifestParser) AppNamesCalls(stub func() []string) {
+	fake.appNamesMutex.Lock()
+	defer fake.appNamesMutex.Unlock()
+	fake.AppNamesStub = stub
+}
+
 func (fake *FakeManifestParser) AppNamesReturns(result1 []string) {
+	fake.appNamesMutex.Lock()
+	defer fake.appNamesMutex.Unlock()
 	fake.AppNamesStub = nil
 	fake.appNamesReturns = struct {
 		result1 []string
@@ -63,6 +74,8 @@ func (fake *FakeManifestParser) AppNamesReturns(result1 []string) {
 }
 
 func (fake *FakeManifestParser) AppNamesReturnsOnCall(i int, result1 []string) {
+	fake.appNamesMutex.Lock()
+	defer fake.appNamesMutex.Unlock()
 	fake.AppNamesStub = nil
 	if fake.appNamesReturnsOnCall == nil {
 		fake.appNamesReturnsOnCall = make(map[int]struct {
@@ -74,21 +87,22 @@ func (fake *FakeManifestParser) AppNamesReturnsOnCall(i int, result1 []string) {
 	}{result1}
 }
 
-func (fake *FakeManifestParser) RawManifest(name string) ([]byte, error) {
+func (fake *FakeManifestParser) RawManifest(arg1 string) ([]byte, error) {
 	fake.rawManifestMutex.Lock()
 	ret, specificReturn := fake.rawManifestReturnsOnCall[len(fake.rawManifestArgsForCall)]
 	fake.rawManifestArgsForCall = append(fake.rawManifestArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("RawManifest", []interface{}{name})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("RawManifest", []interface{}{arg1})
 	fake.rawManifestMutex.Unlock()
 	if fake.RawManifestStub != nil {
-		return fake.RawManifestStub(name)
+		return fake.RawManifestStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.rawManifestReturns.result1, fake.rawManifestReturns.result2
+	fakeReturns := fake.rawManifestReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeManifestParser) RawManifestCallCount() int {
@@ -97,13 +111,22 @@ func (fake *FakeManifestParser) RawManifestCallCount() int {
 	return len(fake.rawManifestArgsForCall)
 }
 
+func (fake *FakeManifestParser) RawManifestCalls(stub func(string) ([]byte, error)) {
+	fake.rawManifestMutex.Lock()
+	defer fake.rawManifestMutex.Unlock()
+	fake.RawManifestStub = stub
+}
+
 func (fake *FakeManifestParser) RawManifestArgsForCall(i int) string {
 	fake.rawManifestMutex.RLock()
 	defer fake.rawManifestMutex.RUnlock()
-	return fake.rawManifestArgsForCall[i].name
+	argsForCall := fake.rawManifestArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeManifestParser) RawManifestReturns(result1 []byte, result2 error) {
+	fake.rawManifestMutex.Lock()
+	defer fake.rawManifestMutex.Unlock()
 	fake.RawManifestStub = nil
 	fake.rawManifestReturns = struct {
 		result1 []byte
@@ -112,6 +135,8 @@ func (fake *FakeManifestParser) RawManifestReturns(result1 []byte, result2 error
 }
 
 func (fake *FakeManifestParser) RawManifestReturnsOnCall(i int, result1 []byte, result2 error) {
+	fake.rawManifestMutex.Lock()
+	defer fake.rawManifestMutex.Unlock()
 	fake.RawManifestStub = nil
 	if fake.rawManifestReturnsOnCall == nil {
 		fake.rawManifestReturnsOnCall = make(map[int]struct {

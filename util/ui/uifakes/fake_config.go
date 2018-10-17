@@ -2,44 +2,48 @@
 package uifakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/ui"
+	configv3 "code.cloudfoundry.org/cli/util/configv3"
+	ui "code.cloudfoundry.org/cli/util/ui"
 )
 
 type FakeConfig struct {
 	ColorEnabledStub        func() configv3.ColorSetting
 	colorEnabledMutex       sync.RWMutex
-	colorEnabledArgsForCall []struct{}
-	colorEnabledReturns     struct {
+	colorEnabledArgsForCall []struct {
+	}
+	colorEnabledReturns struct {
 		result1 configv3.ColorSetting
 	}
 	colorEnabledReturnsOnCall map[int]struct {
 		result1 configv3.ColorSetting
 	}
-	LocaleStub        func() string
-	localeMutex       sync.RWMutex
-	localeArgsForCall []struct{}
-	localeReturns     struct {
-		result1 string
-	}
-	localeReturnsOnCall map[int]struct {
-		result1 string
-	}
 	IsTTYStub        func() bool
 	isTTYMutex       sync.RWMutex
-	isTTYArgsForCall []struct{}
-	isTTYReturns     struct {
+	isTTYArgsForCall []struct {
+	}
+	isTTYReturns struct {
 		result1 bool
 	}
 	isTTYReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	LocaleStub        func() string
+	localeMutex       sync.RWMutex
+	localeArgsForCall []struct {
+	}
+	localeReturns struct {
+		result1 string
+	}
+	localeReturnsOnCall map[int]struct {
+		result1 string
+	}
 	TerminalWidthStub        func() int
 	terminalWidthMutex       sync.RWMutex
-	terminalWidthArgsForCall []struct{}
-	terminalWidthReturns     struct {
+	terminalWidthArgsForCall []struct {
+	}
+	terminalWidthReturns struct {
 		result1 int
 	}
 	terminalWidthReturnsOnCall map[int]struct {
@@ -52,7 +56,8 @@ type FakeConfig struct {
 func (fake *FakeConfig) ColorEnabled() configv3.ColorSetting {
 	fake.colorEnabledMutex.Lock()
 	ret, specificReturn := fake.colorEnabledReturnsOnCall[len(fake.colorEnabledArgsForCall)]
-	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct{}{})
+	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct {
+	}{})
 	fake.recordInvocation("ColorEnabled", []interface{}{})
 	fake.colorEnabledMutex.Unlock()
 	if fake.ColorEnabledStub != nil {
@@ -61,7 +66,8 @@ func (fake *FakeConfig) ColorEnabled() configv3.ColorSetting {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.colorEnabledReturns.result1
+	fakeReturns := fake.colorEnabledReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) ColorEnabledCallCount() int {
@@ -70,7 +76,15 @@ func (fake *FakeConfig) ColorEnabledCallCount() int {
 	return len(fake.colorEnabledArgsForCall)
 }
 
+func (fake *FakeConfig) ColorEnabledCalls(stub func() configv3.ColorSetting) {
+	fake.colorEnabledMutex.Lock()
+	defer fake.colorEnabledMutex.Unlock()
+	fake.ColorEnabledStub = stub
+}
+
 func (fake *FakeConfig) ColorEnabledReturns(result1 configv3.ColorSetting) {
+	fake.colorEnabledMutex.Lock()
+	defer fake.colorEnabledMutex.Unlock()
 	fake.ColorEnabledStub = nil
 	fake.colorEnabledReturns = struct {
 		result1 configv3.ColorSetting
@@ -78,6 +92,8 @@ func (fake *FakeConfig) ColorEnabledReturns(result1 configv3.ColorSetting) {
 }
 
 func (fake *FakeConfig) ColorEnabledReturnsOnCall(i int, result1 configv3.ColorSetting) {
+	fake.colorEnabledMutex.Lock()
+	defer fake.colorEnabledMutex.Unlock()
 	fake.ColorEnabledStub = nil
 	if fake.colorEnabledReturnsOnCall == nil {
 		fake.colorEnabledReturnsOnCall = make(map[int]struct {
@@ -89,50 +105,11 @@ func (fake *FakeConfig) ColorEnabledReturnsOnCall(i int, result1 configv3.ColorS
 	}{result1}
 }
 
-func (fake *FakeConfig) Locale() string {
-	fake.localeMutex.Lock()
-	ret, specificReturn := fake.localeReturnsOnCall[len(fake.localeArgsForCall)]
-	fake.localeArgsForCall = append(fake.localeArgsForCall, struct{}{})
-	fake.recordInvocation("Locale", []interface{}{})
-	fake.localeMutex.Unlock()
-	if fake.LocaleStub != nil {
-		return fake.LocaleStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.localeReturns.result1
-}
-
-func (fake *FakeConfig) LocaleCallCount() int {
-	fake.localeMutex.RLock()
-	defer fake.localeMutex.RUnlock()
-	return len(fake.localeArgsForCall)
-}
-
-func (fake *FakeConfig) LocaleReturns(result1 string) {
-	fake.LocaleStub = nil
-	fake.localeReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) LocaleReturnsOnCall(i int, result1 string) {
-	fake.LocaleStub = nil
-	if fake.localeReturnsOnCall == nil {
-		fake.localeReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.localeReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeConfig) IsTTY() bool {
 	fake.isTTYMutex.Lock()
 	ret, specificReturn := fake.isTTYReturnsOnCall[len(fake.isTTYArgsForCall)]
-	fake.isTTYArgsForCall = append(fake.isTTYArgsForCall, struct{}{})
+	fake.isTTYArgsForCall = append(fake.isTTYArgsForCall, struct {
+	}{})
 	fake.recordInvocation("IsTTY", []interface{}{})
 	fake.isTTYMutex.Unlock()
 	if fake.IsTTYStub != nil {
@@ -141,7 +118,8 @@ func (fake *FakeConfig) IsTTY() bool {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.isTTYReturns.result1
+	fakeReturns := fake.isTTYReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) IsTTYCallCount() int {
@@ -150,7 +128,15 @@ func (fake *FakeConfig) IsTTYCallCount() int {
 	return len(fake.isTTYArgsForCall)
 }
 
+func (fake *FakeConfig) IsTTYCalls(stub func() bool) {
+	fake.isTTYMutex.Lock()
+	defer fake.isTTYMutex.Unlock()
+	fake.IsTTYStub = stub
+}
+
 func (fake *FakeConfig) IsTTYReturns(result1 bool) {
+	fake.isTTYMutex.Lock()
+	defer fake.isTTYMutex.Unlock()
 	fake.IsTTYStub = nil
 	fake.isTTYReturns = struct {
 		result1 bool
@@ -158,6 +144,8 @@ func (fake *FakeConfig) IsTTYReturns(result1 bool) {
 }
 
 func (fake *FakeConfig) IsTTYReturnsOnCall(i int, result1 bool) {
+	fake.isTTYMutex.Lock()
+	defer fake.isTTYMutex.Unlock()
 	fake.IsTTYStub = nil
 	if fake.isTTYReturnsOnCall == nil {
 		fake.isTTYReturnsOnCall = make(map[int]struct {
@@ -169,10 +157,63 @@ func (fake *FakeConfig) IsTTYReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeConfig) Locale() string {
+	fake.localeMutex.Lock()
+	ret, specificReturn := fake.localeReturnsOnCall[len(fake.localeArgsForCall)]
+	fake.localeArgsForCall = append(fake.localeArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Locale", []interface{}{})
+	fake.localeMutex.Unlock()
+	if fake.LocaleStub != nil {
+		return fake.LocaleStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.localeReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) LocaleCallCount() int {
+	fake.localeMutex.RLock()
+	defer fake.localeMutex.RUnlock()
+	return len(fake.localeArgsForCall)
+}
+
+func (fake *FakeConfig) LocaleCalls(stub func() string) {
+	fake.localeMutex.Lock()
+	defer fake.localeMutex.Unlock()
+	fake.LocaleStub = stub
+}
+
+func (fake *FakeConfig) LocaleReturns(result1 string) {
+	fake.localeMutex.Lock()
+	defer fake.localeMutex.Unlock()
+	fake.LocaleStub = nil
+	fake.localeReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) LocaleReturnsOnCall(i int, result1 string) {
+	fake.localeMutex.Lock()
+	defer fake.localeMutex.Unlock()
+	fake.LocaleStub = nil
+	if fake.localeReturnsOnCall == nil {
+		fake.localeReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.localeReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) TerminalWidth() int {
 	fake.terminalWidthMutex.Lock()
 	ret, specificReturn := fake.terminalWidthReturnsOnCall[len(fake.terminalWidthArgsForCall)]
-	fake.terminalWidthArgsForCall = append(fake.terminalWidthArgsForCall, struct{}{})
+	fake.terminalWidthArgsForCall = append(fake.terminalWidthArgsForCall, struct {
+	}{})
 	fake.recordInvocation("TerminalWidth", []interface{}{})
 	fake.terminalWidthMutex.Unlock()
 	if fake.TerminalWidthStub != nil {
@@ -181,7 +222,8 @@ func (fake *FakeConfig) TerminalWidth() int {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.terminalWidthReturns.result1
+	fakeReturns := fake.terminalWidthReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) TerminalWidthCallCount() int {
@@ -190,7 +232,15 @@ func (fake *FakeConfig) TerminalWidthCallCount() int {
 	return len(fake.terminalWidthArgsForCall)
 }
 
+func (fake *FakeConfig) TerminalWidthCalls(stub func() int) {
+	fake.terminalWidthMutex.Lock()
+	defer fake.terminalWidthMutex.Unlock()
+	fake.TerminalWidthStub = stub
+}
+
 func (fake *FakeConfig) TerminalWidthReturns(result1 int) {
+	fake.terminalWidthMutex.Lock()
+	defer fake.terminalWidthMutex.Unlock()
 	fake.TerminalWidthStub = nil
 	fake.terminalWidthReturns = struct {
 		result1 int
@@ -198,6 +248,8 @@ func (fake *FakeConfig) TerminalWidthReturns(result1 int) {
 }
 
 func (fake *FakeConfig) TerminalWidthReturnsOnCall(i int, result1 int) {
+	fake.terminalWidthMutex.Lock()
+	defer fake.terminalWidthMutex.Unlock()
 	fake.TerminalWidthStub = nil
 	if fake.terminalWidthReturnsOnCall == nil {
 		fake.terminalWidthReturnsOnCall = make(map[int]struct {
@@ -214,10 +266,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
-	fake.localeMutex.RLock()
-	defer fake.localeMutex.RUnlock()
 	fake.isTTYMutex.RLock()
 	defer fake.isTTYMutex.RUnlock()
+	fake.localeMutex.RLock()
+	defer fake.localeMutex.RUnlock()
 	fake.terminalWidthMutex.RLock()
 	defer fake.terminalWidthMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

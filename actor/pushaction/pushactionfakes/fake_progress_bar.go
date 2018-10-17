@@ -2,18 +2,18 @@
 package pushactionfakes
 
 import (
-	"io"
-	"sync"
+	io "io"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/pushaction"
+	pushaction "code.cloudfoundry.org/cli/actor/pushaction"
 )
 
 type FakeProgressBar struct {
-	NewProgressBarWrapperStub        func(reader io.Reader, sizeOfFile int64) io.Reader
+	NewProgressBarWrapperStub        func(io.Reader, int64) io.Reader
 	newProgressBarWrapperMutex       sync.RWMutex
 	newProgressBarWrapperArgsForCall []struct {
-		reader     io.Reader
-		sizeOfFile int64
+		arg1 io.Reader
+		arg2 int64
 	}
 	newProgressBarWrapperReturns struct {
 		result1 io.Reader
@@ -25,22 +25,23 @@ type FakeProgressBar struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeProgressBar) NewProgressBarWrapper(reader io.Reader, sizeOfFile int64) io.Reader {
+func (fake *FakeProgressBar) NewProgressBarWrapper(arg1 io.Reader, arg2 int64) io.Reader {
 	fake.newProgressBarWrapperMutex.Lock()
 	ret, specificReturn := fake.newProgressBarWrapperReturnsOnCall[len(fake.newProgressBarWrapperArgsForCall)]
 	fake.newProgressBarWrapperArgsForCall = append(fake.newProgressBarWrapperArgsForCall, struct {
-		reader     io.Reader
-		sizeOfFile int64
-	}{reader, sizeOfFile})
-	fake.recordInvocation("NewProgressBarWrapper", []interface{}{reader, sizeOfFile})
+		arg1 io.Reader
+		arg2 int64
+	}{arg1, arg2})
+	fake.recordInvocation("NewProgressBarWrapper", []interface{}{arg1, arg2})
 	fake.newProgressBarWrapperMutex.Unlock()
 	if fake.NewProgressBarWrapperStub != nil {
-		return fake.NewProgressBarWrapperStub(reader, sizeOfFile)
+		return fake.NewProgressBarWrapperStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.newProgressBarWrapperReturns.result1
+	fakeReturns := fake.newProgressBarWrapperReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeProgressBar) NewProgressBarWrapperCallCount() int {
@@ -49,13 +50,22 @@ func (fake *FakeProgressBar) NewProgressBarWrapperCallCount() int {
 	return len(fake.newProgressBarWrapperArgsForCall)
 }
 
+func (fake *FakeProgressBar) NewProgressBarWrapperCalls(stub func(io.Reader, int64) io.Reader) {
+	fake.newProgressBarWrapperMutex.Lock()
+	defer fake.newProgressBarWrapperMutex.Unlock()
+	fake.NewProgressBarWrapperStub = stub
+}
+
 func (fake *FakeProgressBar) NewProgressBarWrapperArgsForCall(i int) (io.Reader, int64) {
 	fake.newProgressBarWrapperMutex.RLock()
 	defer fake.newProgressBarWrapperMutex.RUnlock()
-	return fake.newProgressBarWrapperArgsForCall[i].reader, fake.newProgressBarWrapperArgsForCall[i].sizeOfFile
+	argsForCall := fake.newProgressBarWrapperArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeProgressBar) NewProgressBarWrapperReturns(result1 io.Reader) {
+	fake.newProgressBarWrapperMutex.Lock()
+	defer fake.newProgressBarWrapperMutex.Unlock()
 	fake.NewProgressBarWrapperStub = nil
 	fake.newProgressBarWrapperReturns = struct {
 		result1 io.Reader
@@ -63,6 +73,8 @@ func (fake *FakeProgressBar) NewProgressBarWrapperReturns(result1 io.Reader) {
 }
 
 func (fake *FakeProgressBar) NewProgressBarWrapperReturnsOnCall(i int, result1 io.Reader) {
+	fake.newProgressBarWrapperMutex.Lock()
+	defer fake.newProgressBarWrapperMutex.Unlock()
 	fake.NewProgressBarWrapperStub = nil
 	if fake.newProgressBarWrapperReturnsOnCall == nil {
 		fake.newProgressBarWrapperReturnsOnCall = make(map[int]struct {

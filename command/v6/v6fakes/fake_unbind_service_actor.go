@@ -2,19 +2,19 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeUnbindServiceActor struct {
-	UnbindServiceBySpaceStub        func(appName string, serviceInstanceName string, spaceGUID string) (v2action.ServiceBinding, v2action.Warnings, error)
+	UnbindServiceBySpaceStub        func(string, string, string) (v2action.ServiceBinding, v2action.Warnings, error)
 	unbindServiceBySpaceMutex       sync.RWMutex
 	unbindServiceBySpaceArgsForCall []struct {
-		appName             string
-		serviceInstanceName string
-		spaceGUID           string
+		arg1 string
+		arg2 string
+		arg3 string
 	}
 	unbindServiceBySpaceReturns struct {
 		result1 v2action.ServiceBinding
@@ -30,23 +30,24 @@ type FakeUnbindServiceActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUnbindServiceActor) UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2action.ServiceBinding, v2action.Warnings, error) {
+func (fake *FakeUnbindServiceActor) UnbindServiceBySpace(arg1 string, arg2 string, arg3 string) (v2action.ServiceBinding, v2action.Warnings, error) {
 	fake.unbindServiceBySpaceMutex.Lock()
 	ret, specificReturn := fake.unbindServiceBySpaceReturnsOnCall[len(fake.unbindServiceBySpaceArgsForCall)]
 	fake.unbindServiceBySpaceArgsForCall = append(fake.unbindServiceBySpaceArgsForCall, struct {
-		appName             string
-		serviceInstanceName string
-		spaceGUID           string
-	}{appName, serviceInstanceName, spaceGUID})
-	fake.recordInvocation("UnbindServiceBySpace", []interface{}{appName, serviceInstanceName, spaceGUID})
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UnbindServiceBySpace", []interface{}{arg1, arg2, arg3})
 	fake.unbindServiceBySpaceMutex.Unlock()
 	if fake.UnbindServiceBySpaceStub != nil {
-		return fake.UnbindServiceBySpaceStub(appName, serviceInstanceName, spaceGUID)
+		return fake.UnbindServiceBySpaceStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.unbindServiceBySpaceReturns.result1, fake.unbindServiceBySpaceReturns.result2, fake.unbindServiceBySpaceReturns.result3
+	fakeReturns := fake.unbindServiceBySpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceCallCount() int {
@@ -55,13 +56,22 @@ func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceCallCount() int {
 	return len(fake.unbindServiceBySpaceArgsForCall)
 }
 
+func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceCalls(stub func(string, string, string) (v2action.ServiceBinding, v2action.Warnings, error)) {
+	fake.unbindServiceBySpaceMutex.Lock()
+	defer fake.unbindServiceBySpaceMutex.Unlock()
+	fake.UnbindServiceBySpaceStub = stub
+}
+
 func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceArgsForCall(i int) (string, string, string) {
 	fake.unbindServiceBySpaceMutex.RLock()
 	defer fake.unbindServiceBySpaceMutex.RUnlock()
-	return fake.unbindServiceBySpaceArgsForCall[i].appName, fake.unbindServiceBySpaceArgsForCall[i].serviceInstanceName, fake.unbindServiceBySpaceArgsForCall[i].spaceGUID
+	argsForCall := fake.unbindServiceBySpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturns(result1 v2action.ServiceBinding, result2 v2action.Warnings, result3 error) {
+	fake.unbindServiceBySpaceMutex.Lock()
+	defer fake.unbindServiceBySpaceMutex.Unlock()
 	fake.UnbindServiceBySpaceStub = nil
 	fake.unbindServiceBySpaceReturns = struct {
 		result1 v2action.ServiceBinding
@@ -71,6 +81,8 @@ func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturns(result1 v2action
 }
 
 func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturnsOnCall(i int, result1 v2action.ServiceBinding, result2 v2action.Warnings, result3 error) {
+	fake.unbindServiceBySpaceMutex.Lock()
+	defer fake.unbindServiceBySpaceMutex.Unlock()
 	fake.UnbindServiceBySpaceStub = nil
 	if fake.unbindServiceBySpaceReturnsOnCall == nil {
 		fake.unbindServiceBySpaceReturnsOnCall = make(map[int]struct {

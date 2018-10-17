@@ -2,13 +2,22 @@
 package pluginfakes
 
 import (
-	"io"
-	"sync"
+	io "io"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/api/plugin"
+	plugin "code.cloudfoundry.org/cli/api/plugin"
 )
 
 type FakeProxyReader struct {
+	FinishStub        func()
+	finishMutex       sync.RWMutex
+	finishArgsForCall []struct {
+	}
+	StartStub        func(int64)
+	startMutex       sync.RWMutex
+	startArgsForCall []struct {
+		arg1 int64
+	}
 	WrapStub        func(io.Reader) io.ReadCloser
 	wrapMutex       sync.RWMutex
 	wrapArgsForCall []struct {
@@ -20,64 +29,31 @@ type FakeProxyReader struct {
 	wrapReturnsOnCall map[int]struct {
 		result1 io.ReadCloser
 	}
-	StartStub        func(int64)
-	startMutex       sync.RWMutex
-	startArgsForCall []struct {
-		arg1 int64
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeProxyReader) Finish() {
+	fake.finishMutex.Lock()
+	fake.finishArgsForCall = append(fake.finishArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Finish", []interface{}{})
+	fake.finishMutex.Unlock()
+	if fake.FinishStub != nil {
+		fake.FinishStub()
 	}
-	FinishStub        func()
-	finishMutex       sync.RWMutex
-	finishArgsForCall []struct{}
-	invocations       map[string][][]interface{}
-	invocationsMutex  sync.RWMutex
 }
 
-func (fake *FakeProxyReader) Wrap(arg1 io.Reader) io.ReadCloser {
-	fake.wrapMutex.Lock()
-	ret, specificReturn := fake.wrapReturnsOnCall[len(fake.wrapArgsForCall)]
-	fake.wrapArgsForCall = append(fake.wrapArgsForCall, struct {
-		arg1 io.Reader
-	}{arg1})
-	fake.recordInvocation("Wrap", []interface{}{arg1})
-	fake.wrapMutex.Unlock()
-	if fake.WrapStub != nil {
-		return fake.WrapStub(arg1)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.wrapReturns.result1
+func (fake *FakeProxyReader) FinishCallCount() int {
+	fake.finishMutex.RLock()
+	defer fake.finishMutex.RUnlock()
+	return len(fake.finishArgsForCall)
 }
 
-func (fake *FakeProxyReader) WrapCallCount() int {
-	fake.wrapMutex.RLock()
-	defer fake.wrapMutex.RUnlock()
-	return len(fake.wrapArgsForCall)
-}
-
-func (fake *FakeProxyReader) WrapArgsForCall(i int) io.Reader {
-	fake.wrapMutex.RLock()
-	defer fake.wrapMutex.RUnlock()
-	return fake.wrapArgsForCall[i].arg1
-}
-
-func (fake *FakeProxyReader) WrapReturns(result1 io.ReadCloser) {
-	fake.WrapStub = nil
-	fake.wrapReturns = struct {
-		result1 io.ReadCloser
-	}{result1}
-}
-
-func (fake *FakeProxyReader) WrapReturnsOnCall(i int, result1 io.ReadCloser) {
-	fake.WrapStub = nil
-	if fake.wrapReturnsOnCall == nil {
-		fake.wrapReturnsOnCall = make(map[int]struct {
-			result1 io.ReadCloser
-		})
-	}
-	fake.wrapReturnsOnCall[i] = struct {
-		result1 io.ReadCloser
-	}{result1}
+func (fake *FakeProxyReader) FinishCalls(stub func()) {
+	fake.finishMutex.Lock()
+	defer fake.finishMutex.Unlock()
+	fake.FinishStub = stub
 }
 
 func (fake *FakeProxyReader) Start(arg1 int64) {
@@ -98,37 +74,88 @@ func (fake *FakeProxyReader) StartCallCount() int {
 	return len(fake.startArgsForCall)
 }
 
+func (fake *FakeProxyReader) StartCalls(stub func(int64)) {
+	fake.startMutex.Lock()
+	defer fake.startMutex.Unlock()
+	fake.StartStub = stub
+}
+
 func (fake *FakeProxyReader) StartArgsForCall(i int) int64 {
 	fake.startMutex.RLock()
 	defer fake.startMutex.RUnlock()
-	return fake.startArgsForCall[i].arg1
+	argsForCall := fake.startArgsForCall[i]
+	return argsForCall.arg1
 }
 
-func (fake *FakeProxyReader) Finish() {
-	fake.finishMutex.Lock()
-	fake.finishArgsForCall = append(fake.finishArgsForCall, struct{}{})
-	fake.recordInvocation("Finish", []interface{}{})
-	fake.finishMutex.Unlock()
-	if fake.FinishStub != nil {
-		fake.FinishStub()
+func (fake *FakeProxyReader) Wrap(arg1 io.Reader) io.ReadCloser {
+	fake.wrapMutex.Lock()
+	ret, specificReturn := fake.wrapReturnsOnCall[len(fake.wrapArgsForCall)]
+	fake.wrapArgsForCall = append(fake.wrapArgsForCall, struct {
+		arg1 io.Reader
+	}{arg1})
+	fake.recordInvocation("Wrap", []interface{}{arg1})
+	fake.wrapMutex.Unlock()
+	if fake.WrapStub != nil {
+		return fake.WrapStub(arg1)
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.wrapReturns
+	return fakeReturns.result1
 }
 
-func (fake *FakeProxyReader) FinishCallCount() int {
-	fake.finishMutex.RLock()
-	defer fake.finishMutex.RUnlock()
-	return len(fake.finishArgsForCall)
+func (fake *FakeProxyReader) WrapCallCount() int {
+	fake.wrapMutex.RLock()
+	defer fake.wrapMutex.RUnlock()
+	return len(fake.wrapArgsForCall)
+}
+
+func (fake *FakeProxyReader) WrapCalls(stub func(io.Reader) io.ReadCloser) {
+	fake.wrapMutex.Lock()
+	defer fake.wrapMutex.Unlock()
+	fake.WrapStub = stub
+}
+
+func (fake *FakeProxyReader) WrapArgsForCall(i int) io.Reader {
+	fake.wrapMutex.RLock()
+	defer fake.wrapMutex.RUnlock()
+	argsForCall := fake.wrapArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeProxyReader) WrapReturns(result1 io.ReadCloser) {
+	fake.wrapMutex.Lock()
+	defer fake.wrapMutex.Unlock()
+	fake.WrapStub = nil
+	fake.wrapReturns = struct {
+		result1 io.ReadCloser
+	}{result1}
+}
+
+func (fake *FakeProxyReader) WrapReturnsOnCall(i int, result1 io.ReadCloser) {
+	fake.wrapMutex.Lock()
+	defer fake.wrapMutex.Unlock()
+	fake.WrapStub = nil
+	if fake.wrapReturnsOnCall == nil {
+		fake.wrapReturnsOnCall = make(map[int]struct {
+			result1 io.ReadCloser
+		})
+	}
+	fake.wrapReturnsOnCall[i] = struct {
+		result1 io.ReadCloser
+	}{result1}
 }
 
 func (fake *FakeProxyReader) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.wrapMutex.RLock()
-	defer fake.wrapMutex.RUnlock()
-	fake.startMutex.RLock()
-	defer fake.startMutex.RUnlock()
 	fake.finishMutex.RLock()
 	defer fake.finishMutex.RUnlock()
+	fake.startMutex.RLock()
+	defer fake.startMutex.RUnlock()
+	fake.wrapMutex.RLock()
+	defer fake.wrapMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

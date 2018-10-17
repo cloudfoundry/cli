@@ -2,18 +2,18 @@
 package uaafakes
 
 import (
-	"net/http"
-	"sync"
+	http "net/http"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/api/uaa"
+	uaa "code.cloudfoundry.org/cli/api/uaa"
 )
 
 type FakeConnectionWrapper struct {
-	MakeStub        func(request *http.Request, passedResponse *uaa.Response) error
+	MakeStub        func(*http.Request, *uaa.Response) error
 	makeMutex       sync.RWMutex
 	makeArgsForCall []struct {
-		request        *http.Request
-		passedResponse *uaa.Response
+		arg1 *http.Request
+		arg2 *uaa.Response
 	}
 	makeReturns struct {
 		result1 error
@@ -21,10 +21,10 @@ type FakeConnectionWrapper struct {
 	makeReturnsOnCall map[int]struct {
 		result1 error
 	}
-	WrapStub        func(innerconnection uaa.Connection) uaa.Connection
+	WrapStub        func(uaa.Connection) uaa.Connection
 	wrapMutex       sync.RWMutex
 	wrapArgsForCall []struct {
-		innerconnection uaa.Connection
+		arg1 uaa.Connection
 	}
 	wrapReturns struct {
 		result1 uaa.Connection
@@ -36,22 +36,23 @@ type FakeConnectionWrapper struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConnectionWrapper) Make(request *http.Request, passedResponse *uaa.Response) error {
+func (fake *FakeConnectionWrapper) Make(arg1 *http.Request, arg2 *uaa.Response) error {
 	fake.makeMutex.Lock()
 	ret, specificReturn := fake.makeReturnsOnCall[len(fake.makeArgsForCall)]
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
-		request        *http.Request
-		passedResponse *uaa.Response
-	}{request, passedResponse})
-	fake.recordInvocation("Make", []interface{}{request, passedResponse})
+		arg1 *http.Request
+		arg2 *uaa.Response
+	}{arg1, arg2})
+	fake.recordInvocation("Make", []interface{}{arg1, arg2})
 	fake.makeMutex.Unlock()
 	if fake.MakeStub != nil {
-		return fake.MakeStub(request, passedResponse)
+		return fake.MakeStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.makeReturns.result1
+	fakeReturns := fake.makeReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConnectionWrapper) MakeCallCount() int {
@@ -60,13 +61,22 @@ func (fake *FakeConnectionWrapper) MakeCallCount() int {
 	return len(fake.makeArgsForCall)
 }
 
+func (fake *FakeConnectionWrapper) MakeCalls(stub func(*http.Request, *uaa.Response) error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
+	fake.MakeStub = stub
+}
+
 func (fake *FakeConnectionWrapper) MakeArgsForCall(i int) (*http.Request, *uaa.Response) {
 	fake.makeMutex.RLock()
 	defer fake.makeMutex.RUnlock()
-	return fake.makeArgsForCall[i].request, fake.makeArgsForCall[i].passedResponse
+	argsForCall := fake.makeArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeConnectionWrapper) MakeReturns(result1 error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
 	fake.MakeStub = nil
 	fake.makeReturns = struct {
 		result1 error
@@ -74,6 +84,8 @@ func (fake *FakeConnectionWrapper) MakeReturns(result1 error) {
 }
 
 func (fake *FakeConnectionWrapper) MakeReturnsOnCall(i int, result1 error) {
+	fake.makeMutex.Lock()
+	defer fake.makeMutex.Unlock()
 	fake.MakeStub = nil
 	if fake.makeReturnsOnCall == nil {
 		fake.makeReturnsOnCall = make(map[int]struct {
@@ -85,21 +97,22 @@ func (fake *FakeConnectionWrapper) MakeReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeConnectionWrapper) Wrap(innerconnection uaa.Connection) uaa.Connection {
+func (fake *FakeConnectionWrapper) Wrap(arg1 uaa.Connection) uaa.Connection {
 	fake.wrapMutex.Lock()
 	ret, specificReturn := fake.wrapReturnsOnCall[len(fake.wrapArgsForCall)]
 	fake.wrapArgsForCall = append(fake.wrapArgsForCall, struct {
-		innerconnection uaa.Connection
-	}{innerconnection})
-	fake.recordInvocation("Wrap", []interface{}{innerconnection})
+		arg1 uaa.Connection
+	}{arg1})
+	fake.recordInvocation("Wrap", []interface{}{arg1})
 	fake.wrapMutex.Unlock()
 	if fake.WrapStub != nil {
-		return fake.WrapStub(innerconnection)
+		return fake.WrapStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.wrapReturns.result1
+	fakeReturns := fake.wrapReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConnectionWrapper) WrapCallCount() int {
@@ -108,13 +121,22 @@ func (fake *FakeConnectionWrapper) WrapCallCount() int {
 	return len(fake.wrapArgsForCall)
 }
 
+func (fake *FakeConnectionWrapper) WrapCalls(stub func(uaa.Connection) uaa.Connection) {
+	fake.wrapMutex.Lock()
+	defer fake.wrapMutex.Unlock()
+	fake.WrapStub = stub
+}
+
 func (fake *FakeConnectionWrapper) WrapArgsForCall(i int) uaa.Connection {
 	fake.wrapMutex.RLock()
 	defer fake.wrapMutex.RUnlock()
-	return fake.wrapArgsForCall[i].innerconnection
+	argsForCall := fake.wrapArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeConnectionWrapper) WrapReturns(result1 uaa.Connection) {
+	fake.wrapMutex.Lock()
+	defer fake.wrapMutex.Unlock()
 	fake.WrapStub = nil
 	fake.wrapReturns = struct {
 		result1 uaa.Connection
@@ -122,6 +144,8 @@ func (fake *FakeConnectionWrapper) WrapReturns(result1 uaa.Connection) {
 }
 
 func (fake *FakeConnectionWrapper) WrapReturnsOnCall(i int, result1 uaa.Connection) {
+	fake.wrapMutex.Lock()
+	defer fake.wrapMutex.Unlock()
 	fake.WrapStub = nil
 	if fake.wrapReturnsOnCall == nil {
 		fake.wrapReturnsOnCall = make(map[int]struct {

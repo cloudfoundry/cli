@@ -2,17 +2,18 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeOrgsActor struct {
 	GetOrganizationsStub        func() ([]v2action.Organization, v2action.Warnings, error)
 	getOrganizationsMutex       sync.RWMutex
-	getOrganizationsArgsForCall []struct{}
-	getOrganizationsReturns     struct {
+	getOrganizationsArgsForCall []struct {
+	}
+	getOrganizationsReturns struct {
 		result1 []v2action.Organization
 		result2 v2action.Warnings
 		result3 error
@@ -29,7 +30,8 @@ type FakeOrgsActor struct {
 func (fake *FakeOrgsActor) GetOrganizations() ([]v2action.Organization, v2action.Warnings, error) {
 	fake.getOrganizationsMutex.Lock()
 	ret, specificReturn := fake.getOrganizationsReturnsOnCall[len(fake.getOrganizationsArgsForCall)]
-	fake.getOrganizationsArgsForCall = append(fake.getOrganizationsArgsForCall, struct{}{})
+	fake.getOrganizationsArgsForCall = append(fake.getOrganizationsArgsForCall, struct {
+	}{})
 	fake.recordInvocation("GetOrganizations", []interface{}{})
 	fake.getOrganizationsMutex.Unlock()
 	if fake.GetOrganizationsStub != nil {
@@ -38,7 +40,8 @@ func (fake *FakeOrgsActor) GetOrganizations() ([]v2action.Organization, v2action
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getOrganizationsReturns.result1, fake.getOrganizationsReturns.result2, fake.getOrganizationsReturns.result3
+	fakeReturns := fake.getOrganizationsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeOrgsActor) GetOrganizationsCallCount() int {
@@ -47,7 +50,15 @@ func (fake *FakeOrgsActor) GetOrganizationsCallCount() int {
 	return len(fake.getOrganizationsArgsForCall)
 }
 
+func (fake *FakeOrgsActor) GetOrganizationsCalls(stub func() ([]v2action.Organization, v2action.Warnings, error)) {
+	fake.getOrganizationsMutex.Lock()
+	defer fake.getOrganizationsMutex.Unlock()
+	fake.GetOrganizationsStub = stub
+}
+
 func (fake *FakeOrgsActor) GetOrganizationsReturns(result1 []v2action.Organization, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationsMutex.Lock()
+	defer fake.getOrganizationsMutex.Unlock()
 	fake.GetOrganizationsStub = nil
 	fake.getOrganizationsReturns = struct {
 		result1 []v2action.Organization
@@ -57,6 +68,8 @@ func (fake *FakeOrgsActor) GetOrganizationsReturns(result1 []v2action.Organizati
 }
 
 func (fake *FakeOrgsActor) GetOrganizationsReturnsOnCall(i int, result1 []v2action.Organization, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationsMutex.Lock()
+	defer fake.getOrganizationsMutex.Unlock()
 	fake.GetOrganizationsStub = nil
 	if fake.getOrganizationsReturnsOnCall == nil {
 		fake.getOrganizationsReturnsOnCall = make(map[int]struct {

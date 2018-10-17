@@ -2,16 +2,17 @@
 package wrapperfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	wrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 )
 
 type FakeTokenCache struct {
 	AccessTokenStub        func() string
 	accessTokenMutex       sync.RWMutex
-	accessTokenArgsForCall []struct{}
-	accessTokenReturns     struct {
+	accessTokenArgsForCall []struct {
+	}
+	accessTokenReturns struct {
 		result1 string
 	}
 	accessTokenReturnsOnCall map[int]struct {
@@ -19,22 +20,23 @@ type FakeTokenCache struct {
 	}
 	RefreshTokenStub        func() string
 	refreshTokenMutex       sync.RWMutex
-	refreshTokenArgsForCall []struct{}
-	refreshTokenReturns     struct {
+	refreshTokenArgsForCall []struct {
+	}
+	refreshTokenReturns struct {
 		result1 string
 	}
 	refreshTokenReturnsOnCall map[int]struct {
 		result1 string
 	}
-	SetAccessTokenStub        func(token string)
+	SetAccessTokenStub        func(string)
 	setAccessTokenMutex       sync.RWMutex
 	setAccessTokenArgsForCall []struct {
-		token string
+		arg1 string
 	}
-	SetRefreshTokenStub        func(token string)
+	SetRefreshTokenStub        func(string)
 	setRefreshTokenMutex       sync.RWMutex
 	setRefreshTokenArgsForCall []struct {
-		token string
+		arg1 string
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -43,7 +45,8 @@ type FakeTokenCache struct {
 func (fake *FakeTokenCache) AccessToken() string {
 	fake.accessTokenMutex.Lock()
 	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
-	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
+	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct {
+	}{})
 	fake.recordInvocation("AccessToken", []interface{}{})
 	fake.accessTokenMutex.Unlock()
 	if fake.AccessTokenStub != nil {
@@ -52,7 +55,8 @@ func (fake *FakeTokenCache) AccessToken() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.accessTokenReturns.result1
+	fakeReturns := fake.accessTokenReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeTokenCache) AccessTokenCallCount() int {
@@ -61,7 +65,15 @@ func (fake *FakeTokenCache) AccessTokenCallCount() int {
 	return len(fake.accessTokenArgsForCall)
 }
 
+func (fake *FakeTokenCache) AccessTokenCalls(stub func() string) {
+	fake.accessTokenMutex.Lock()
+	defer fake.accessTokenMutex.Unlock()
+	fake.AccessTokenStub = stub
+}
+
 func (fake *FakeTokenCache) AccessTokenReturns(result1 string) {
+	fake.accessTokenMutex.Lock()
+	defer fake.accessTokenMutex.Unlock()
 	fake.AccessTokenStub = nil
 	fake.accessTokenReturns = struct {
 		result1 string
@@ -69,6 +81,8 @@ func (fake *FakeTokenCache) AccessTokenReturns(result1 string) {
 }
 
 func (fake *FakeTokenCache) AccessTokenReturnsOnCall(i int, result1 string) {
+	fake.accessTokenMutex.Lock()
+	defer fake.accessTokenMutex.Unlock()
 	fake.AccessTokenStub = nil
 	if fake.accessTokenReturnsOnCall == nil {
 		fake.accessTokenReturnsOnCall = make(map[int]struct {
@@ -83,7 +97,8 @@ func (fake *FakeTokenCache) AccessTokenReturnsOnCall(i int, result1 string) {
 func (fake *FakeTokenCache) RefreshToken() string {
 	fake.refreshTokenMutex.Lock()
 	ret, specificReturn := fake.refreshTokenReturnsOnCall[len(fake.refreshTokenArgsForCall)]
-	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct{}{})
+	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct {
+	}{})
 	fake.recordInvocation("RefreshToken", []interface{}{})
 	fake.refreshTokenMutex.Unlock()
 	if fake.RefreshTokenStub != nil {
@@ -92,7 +107,8 @@ func (fake *FakeTokenCache) RefreshToken() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.refreshTokenReturns.result1
+	fakeReturns := fake.refreshTokenReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeTokenCache) RefreshTokenCallCount() int {
@@ -101,7 +117,15 @@ func (fake *FakeTokenCache) RefreshTokenCallCount() int {
 	return len(fake.refreshTokenArgsForCall)
 }
 
+func (fake *FakeTokenCache) RefreshTokenCalls(stub func() string) {
+	fake.refreshTokenMutex.Lock()
+	defer fake.refreshTokenMutex.Unlock()
+	fake.RefreshTokenStub = stub
+}
+
 func (fake *FakeTokenCache) RefreshTokenReturns(result1 string) {
+	fake.refreshTokenMutex.Lock()
+	defer fake.refreshTokenMutex.Unlock()
 	fake.RefreshTokenStub = nil
 	fake.refreshTokenReturns = struct {
 		result1 string
@@ -109,6 +133,8 @@ func (fake *FakeTokenCache) RefreshTokenReturns(result1 string) {
 }
 
 func (fake *FakeTokenCache) RefreshTokenReturnsOnCall(i int, result1 string) {
+	fake.refreshTokenMutex.Lock()
+	defer fake.refreshTokenMutex.Unlock()
 	fake.RefreshTokenStub = nil
 	if fake.refreshTokenReturnsOnCall == nil {
 		fake.refreshTokenReturnsOnCall = make(map[int]struct {
@@ -120,15 +146,15 @@ func (fake *FakeTokenCache) RefreshTokenReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
-func (fake *FakeTokenCache) SetAccessToken(token string) {
+func (fake *FakeTokenCache) SetAccessToken(arg1 string) {
 	fake.setAccessTokenMutex.Lock()
 	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
-		token string
-	}{token})
-	fake.recordInvocation("SetAccessToken", []interface{}{token})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetAccessToken", []interface{}{arg1})
 	fake.setAccessTokenMutex.Unlock()
 	if fake.SetAccessTokenStub != nil {
-		fake.SetAccessTokenStub(token)
+		fake.SetAccessTokenStub(arg1)
 	}
 }
 
@@ -138,21 +164,28 @@ func (fake *FakeTokenCache) SetAccessTokenCallCount() int {
 	return len(fake.setAccessTokenArgsForCall)
 }
 
+func (fake *FakeTokenCache) SetAccessTokenCalls(stub func(string)) {
+	fake.setAccessTokenMutex.Lock()
+	defer fake.setAccessTokenMutex.Unlock()
+	fake.SetAccessTokenStub = stub
+}
+
 func (fake *FakeTokenCache) SetAccessTokenArgsForCall(i int) string {
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
-	return fake.setAccessTokenArgsForCall[i].token
+	argsForCall := fake.setAccessTokenArgsForCall[i]
+	return argsForCall.arg1
 }
 
-func (fake *FakeTokenCache) SetRefreshToken(token string) {
+func (fake *FakeTokenCache) SetRefreshToken(arg1 string) {
 	fake.setRefreshTokenMutex.Lock()
 	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
-		token string
-	}{token})
-	fake.recordInvocation("SetRefreshToken", []interface{}{token})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetRefreshToken", []interface{}{arg1})
 	fake.setRefreshTokenMutex.Unlock()
 	if fake.SetRefreshTokenStub != nil {
-		fake.SetRefreshTokenStub(token)
+		fake.SetRefreshTokenStub(arg1)
 	}
 }
 
@@ -162,10 +195,17 @@ func (fake *FakeTokenCache) SetRefreshTokenCallCount() int {
 	return len(fake.setRefreshTokenArgsForCall)
 }
 
+func (fake *FakeTokenCache) SetRefreshTokenCalls(stub func(string)) {
+	fake.setRefreshTokenMutex.Lock()
+	defer fake.setRefreshTokenMutex.Unlock()
+	fake.SetRefreshTokenStub = stub
+}
+
 func (fake *FakeTokenCache) SetRefreshTokenArgsForCall(i int) string {
 	fake.setRefreshTokenMutex.RLock()
 	defer fake.setRefreshTokenMutex.RUnlock()
-	return fake.setRefreshTokenArgsForCall[i].token
+	argsForCall := fake.setRefreshTokenArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeTokenCache) Invocations() map[string][][]interface{} {
