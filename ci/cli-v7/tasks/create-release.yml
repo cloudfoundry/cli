@@ -1,0 +1,25 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-package
+
+inputs:
+- name: cli
+- name: edge-linux-binary-64
+
+outputs:
+- name: linux-binary-64
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    VERSION=$(cat cli/BUILD_VERSION_V7)
+
+    mv edge-linux-binary-64/cf7-cli_edge_linux_x86-64.tgz linux-binary-64/cf7-cli_${VERSION}_linux_x86-64.tgz
