@@ -121,6 +121,15 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/cloudfoundry/custom-cats-reporters"
+  packages = [
+    "honeycomb",
+    "honeycomb/client"
+  ]
+  revision = "75213ee799079f9e56f345093207fdf43b1a4e51"
+
+[[projects]]
+  branch = "master"
   name = "github.com/cloudfoundry/noaa"
   packages = [
     ".",
@@ -165,6 +174,24 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/facebookgo/clock"
+  packages = ["."]
+  revision = "600d898af40aa09a7a93ecb9265d87b0504b6f03"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/facebookgo/limitgroup"
+  packages = ["."]
+  revision = "6abd8d71ec01451d7f1929eacaa263bbe2935d05"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/facebookgo/muster"
+  packages = ["."]
+  revision = "fd3d7953fd52354a74b9f6b3d70d0c9650c4ec2a"
+
+[[projects]]
+  branch = "master"
   name = "github.com/fatih/color"
   packages = ["."]
   revision = "5df930a27be2502f99b292b7cc09ebad4d0891f4"
@@ -198,10 +225,16 @@
   revision = "b89020ee79b89a7f932c5617d218fc06db382f53"
 
 [[projects]]
+  name = "github.com/honeycombio/libhoney-go"
+  packages = ["."]
+  revision = "86ceb69a9b89f381631caac96f24df15b88bedad"
+  version = "v1.8.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
-  revision = "5ce624ef26b9223c9085c268589891a7a4dbcfda"
+  revision = "dac4e0ac4cd75079a03e408685a6140ef57a6aa3"
   source = "github.com/XenoPhex/go-flags"
 
 [[projects]]
@@ -416,6 +449,12 @@
   revision = "0605a8320aceb4207a5fb3521281e17ec2075476"
 
 [[projects]]
+  name = "gopkg.in/alexcesaro/statsd.v2"
+  packages = ["."]
+  revision = "7fea3f0d2fab1ad973e641e51dba45443a311a90"
+  version = "v2.0.0"
+
+[[projects]]
   name = "gopkg.in/cheggaaa/pb.v1"
   packages = ["."]
   revision = "657164d0228d6bebe316fdf725c69f131a50fb10"
@@ -430,6 +469,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "985f4cf17fececbd2b8dce0108dcae9e68c3065eee35d1c11564fbbfd5fa4c4e"
+  inputs-digest = "c137d97819562d50ae928db939690c54100e437a8ae9138b026d5ef9481be295"
   solver-name = "gps-cdcl"
   solver-version = 1
