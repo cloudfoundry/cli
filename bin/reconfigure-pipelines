@@ -19,7 +19,8 @@ configure_pipeline() {
   fly -t ci set-pipeline \
     -p $name \
     -c $pipeline \
-    -l <(lpass show "Concourse Credentials" --notes)
+    -l <(lpass show "Concourse Credentials" --notes) \
+    -v honeycomb-writer-key="$(lpass show Shared-CLI/Honeycomb --notes)"
 }
 
 configure_infrastructure_pipeline() {
@@ -35,7 +36,6 @@ configure_infrastructure_pipeline() {
     -l <(lpass show "Concourse Credentials" --notes) \
     -l <(lpass show "$creds" --notes) \
     -v pool-name=$potato
-    -v honeycomb-writer-key="$(lpass show Shared-CLI/Honeycomb --notes)"
 }
 
 configure_legacy_infrastructure_pipeline() {
