@@ -14,14 +14,14 @@ inputs:
   - name: cli
   - name: edge-linux-binary-32
   - name: edge-linux-binary-64
-# - name: edge-osx-binary-64
-# - name: edge-windows-binary-32
-# - name: edge-windows-binary-64
-# - name: edge-deb-installer-32
-# - name: edge-deb-installer-64
-# - name: edge-redhat-installer-32
-# - name: edge-redhat-installer-64
-# - name: edge-osx-installer-64
+  - name: edge-osx-binary-64
+  - name: edge-windows-binary-32
+  - name: edge-windows-binary-64
+  - name: edge-deb-installer-32
+  - name: edge-deb-installer-64
+  - name: edge-redhat-installer-32
+  - name: edge-redhat-installer-64
+  - name: edge-osx-installer-64
 
 run:
   path: bash
@@ -35,21 +35,20 @@ run:
 
     mkdir $FINAL_DIR
 
-    mv edge-linux-binary-32/cf7-cli_edge_linux_i686.tgz $FINAL_DIR/cf7-cli_${VERSION}_linux_x86.tgz
+    mv edge-linux-binary-32/cf7-cli_edge_linux_i686.tgz $FINAL_DIR/cf7-cli_${VERSION}_linux_i686.tgz
     mv edge-linux-binary-64/cf7-cli_edge_linux_x86-64.tgz $FINAL_DIR/cf7-cli_${VERSION}_linux_x86-64.tgz
+    mv edge-osx-binary-64/cf7-cli_edge_osx_x86-64.tgz $FINAL_DIR/cf7-cli_${VERSION}_osx.tgz
+    mv edge-windows-binary-32/cf7-cli_edge_win32.zip $FINAL_DIR/cf7-cli_${VERSION}_win32.zip
+    mv edge-windows-binary-64/cf7-cli_edge_winx64.zip $FINAL_DIR/cf7-cli_${VERSION}_winx64.zip
+    mv edge-deb-installer-32/cf7-cli-installer_edge_i686.deb $FINAL_DIR/cf7-cli_${VERSION}_i686.deb
+    mv edge-deb-installer-64/cf7-cli-installer_edge_x86-64.deb $FINAL_DIR/cf7-cli_${VERSION}_x86-64.tgz
+    mv edge-redhat-installer-32/cf7-cli-installer_edge_i686.rpm $FINAL_DIR/cf7-cli_${VERSION}_i686.rpm
+    mv edge-redhat-installer-64/cf7-cli-installer_edge_x86-64.rpm $FINAL_DIR/cf7-cli_${VERSION}_x86-64.rpm
+    mv edge-osx-installer-64/cf7-cli-installer_edge_osx.pkg $FINAL_DIR/cf7-cli_${VERSION}_osx.pkg
 
     # We can't use the s3 resource because it does not support version in folder names:
     # https://github.com/concourse/s3-resource/issues/51
     aws s3 cp $FINAL_DIR/ s3://v7-cf-cli-releases/releases/v${VERSION}/ --recursive
-
-    # mv edge-osx-binary-64
-    # mv edge-windows-binary-32
-    # mv edge-windows-binary-64
-    # mv edge-deb-installer-32
-    # mv edge-deb-installer-64
-    # mv edge-redhat-installer-32
-    # mv edge-redhat-installer-64
-    # mv edge-osx-installer-64
 
 # - name: edge-linux-binary-32
 #     versioned_file: master/cf7-cli_edge_linux_i686.tgz
