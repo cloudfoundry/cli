@@ -11,9 +11,9 @@ params:
   AWS_SECRET_ACCESS_KEY:
 
 inputs:
-- name: cli
-- name: edge-linux-binary-32
-- name: edge-linux-binary-64
+  - name: cli
+  - name: edge-linux-binary-32
+  - name: edge-linux-binary-64
 # - name: edge-osx-binary-64
 # - name: edge-windows-binary-32
 # - name: edge-windows-binary-64
@@ -35,7 +35,7 @@ run:
 
     mkdir $FINAL_DIR
 
-    mv edge-linux-binary-32/cf7-cli_edge_linux_x86.tgz $FINAL_DIR/cf7-cli_${VERSION}_linux_x86.tgz
+    mv edge-linux-binary-32/cf7-cli_edge_linux_i686.tgz $FINAL_DIR/cf7-cli_${VERSION}_linux_x86.tgz
     mv edge-linux-binary-64/cf7-cli_edge_linux_x86-64.tgz $FINAL_DIR/cf7-cli_${VERSION}_linux_x86-64.tgz
 
     # We can't use the s3 resource because it does not support version in folder names:
