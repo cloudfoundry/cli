@@ -37,7 +37,7 @@ run:
 
     mv edge-linux-binary-32/cf7-cli_edge_linux_i686.tgz $FINAL_DIR/cf7-cli_${VERSION}_linux_i686.tgz
     mv edge-linux-binary-64/cf7-cli_edge_linux_x86-64.tgz $FINAL_DIR/cf7-cli_${VERSION}_linux_x86-64.tgz
-    mv edge-osx-binary-64/cf7-cli_edge_osx_x86-64.tgz $FINAL_DIR/cf7-cli_${VERSION}_osx.tgz
+    mv edge-osx-binary-64/cf7-cli_edge_osx.tgz $FINAL_DIR/cf7-cli_${VERSION}_osx.tgz
     mv edge-windows-binary-32/cf7-cli_edge_win32.zip $FINAL_DIR/cf7-cli_${VERSION}_win32.zip
     mv edge-windows-binary-64/cf7-cli_edge_winx64.zip $FINAL_DIR/cf7-cli_${VERSION}_winx64.zip
     mv edge-deb-installer-32/cf7-cli-installer_edge_i686.deb $FINAL_DIR/cf7-cli_${VERSION}_i686.deb
