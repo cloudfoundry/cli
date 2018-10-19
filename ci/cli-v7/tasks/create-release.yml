@@ -14,14 +14,14 @@ inputs:
 - name: cli
 - name: edge-linux-binary-32
 - name: edge-linux-binary-64
-- name: edge-osx-binary-64
-- name: edge-windows-binary-32
-- name: edge-windows-binary-64
-- name: edge-deb-installer-32
-- name: edge-deb-installer-64
-- name: edge-redhat-installer-32
-- name: edge-redhat-installer-64
-- name: edge-osx-installer-64
+# - name: edge-osx-binary-64
+# - name: edge-windows-binary-32
+# - name: edge-windows-binary-64
+# - name: edge-deb-installer-32
+# - name: edge-deb-installer-64
+# - name: edge-redhat-installer-32
+# - name: edge-redhat-installer-64
+# - name: edge-osx-installer-64
 
 run:
   path: bash
