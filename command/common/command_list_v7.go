@@ -20,20 +20,23 @@ type V2CommandList struct {
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	App                  v7.AppCommand                  `command:"app" description:"Display health and status for an app"`
-	V3Apps               v7.V3AppsCommand               `command:"v3-apps" description:"List all apps in the target space"`
-	V3ApplyManifest      v7.V3ApplyManifestCommand      `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
-	V3CreateApp          v7.V3CreateAppCommand          `command:"v3-create-app" description:"Create a V3 App"`
-	V3CreatePackage      v7.V3CreatePackageCommand      `command:"v3-create-package" description:"Uploads a V3 Package"`
-	V3Droplets           v7.V3DropletsCommand           `command:"v3-droplets" description:"List droplets of an app"`
-	V3Packages           v7.V3PackagesCommand           `command:"v3-packages" description:"List packages of an app"`
-	V3Push               v6.V3PushCommand               `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
-	V3Restart            v7.V3RestartCommand            `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
-	V3RestartAppInstance v7.V3RestartAppInstanceCommand `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
-	V3SetDroplet         v7.V3SetDropletCommand         `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
-	V3Stage              v7.V3StageCommand              `command:"v3-stage" description:"Create a new droplet for an app"`
-	V3Start              v7.V3StartCommand              `command:"v3-start" description:"Start an app"`
-	V3Stop               v7.V3StopCommand               `command:"v3-stop" description:"Stop an app"`
+	App                  v7.AppCommand                   `command:"app" description:"Display health and status for an app"`
+	V3ApplyManifest      v7.V3ApplyManifestCommand       `command:"v3-apply-manifest" description:"Applies manifest properties to an application"`
+	V3Apps               v7.V3AppsCommand                `command:"v3-apps" description:"List all apps in the target space"`
+	V3CancelZdtPush      v6.V3CancelZdtPushCommand       `command:"v3-cancel-zdt-push" description:"Cancel the most recent deployment for an app"`
+	V3CreateApp          v7.V3CreateAppCommand           `command:"v3-create-app" description:"Create a V3 App"`
+	V3CreatePackage      v7.V3CreatePackageCommand       `command:"v3-create-package" description:"Uploads a V3 Package"`
+	V3Droplets           v7.V3DropletsCommand            `command:"v3-droplets" description:"List droplets of an app"`
+	V3Packages           v7.V3PackagesCommand            `command:"v3-packages" description:"List packages of an app"`
+	V3Push               v6.V3PushCommand                `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
+	V3Restart            v7.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
+	V3RestartAppInstance v7.V3RestartAppInstanceCommand  `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
+	V3SetDroplet         v7.V3SetDropletCommand          `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
+	V3Stage              v7.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
+	V3Start              v7.V3StartCommand               `command:"v3-start" description:"Start an app"`
+	V3Stop               v7.V3StopCommand                `command:"v3-stop" description:"Stop an app"`
+	V3ZdtPush            v6.V3ZeroDowntimePushCommand    `command:"v3-zdt-push" description:"Update an app with zero down time"`
+	V3ZdtRestart         v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AddNetworkPolicy                   v6.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
