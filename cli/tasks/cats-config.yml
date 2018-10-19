@@ -34,8 +34,8 @@ run:
 
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
 
-		pushd vars-store/ci/infrastructure/$ENV
-			eval "$(bbl print-env)"
+    pushd vars-store/ci/infrastructure/$ENV
+      eval "$(bbl print-env)"
     popd
 
     credhub login
