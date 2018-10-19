@@ -17,6 +17,7 @@ params:
   CF_INT_DOCKER_IMAGE:
   CF_INT_DOCKER_USERNAME:
   CF_INT_DOCKER_PASSWORD:
+  CF_INT_IGNORE_API_VERSION_CHECK:
 
 run:
   path: cli-ci/ci/cli/tasks/integration-windows.bat
