@@ -1,13 +1,18 @@
 package v7_test
 
 import (
-	"testing"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	log "github.com/sirupsen/logrus"
+
+	"testing"
 )
 
-func TestV7(t *testing.T) {
+func TestV3(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "V7 Suite")
+	RunSpecs(t, "V7 Command Suite")
 }
+
+var _ = BeforeEach(func() {
+	log.SetLevel(log.PanicLevel)
+})

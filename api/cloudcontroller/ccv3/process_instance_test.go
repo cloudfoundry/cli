@@ -87,6 +87,7 @@ var _ = Describe("ProcessInstance", func() {
 				response := `{
 					"resources": [
 						{
+						  "type": "web",
 							"state": "RUNNING",
 							"usage": {
 								"cpu": 0.01,
@@ -95,11 +96,13 @@ var _ = Describe("ProcessInstance", func() {
 							},
 							"mem_quota": 2000000,
 							"disk_quota": 4000000,
+							"isolation_segment": "example_iso_segment",
 							"index": 0,
 							"uptime": 123,
 							"details": "some details"
 						},
 						{
+						  "type": "web",
 							"state": "RUNNING",
 							"usage": {
 								"cpu": 0.02,
@@ -108,6 +111,7 @@ var _ = Describe("ProcessInstance", func() {
 							},
 							"mem_quota": 16000000,
 							"disk_quota": 32000000,
+							"isolation_segment": "example_iso_segment",
 							"index": 1,
 							"uptime": 456
 						}
@@ -126,25 +130,29 @@ var _ = Describe("ProcessInstance", func() {
 
 				Expect(processes).To(ConsistOf(
 					ProcessInstance{
-						State:       constant.ProcessInstanceRunning,
-						CPU:         0.01,
-						MemoryUsage: 1000000,
-						DiskUsage:   2000000,
-						MemoryQuota: 2000000,
-						DiskQuota:   4000000,
-						Index:       0,
-						Uptime:      123,
-						Details:     "some details",
+						CPU:              0.01,
+						Details:          "some details",
+						DiskQuota:        4000000,
+						DiskUsage:        2000000,
+						Index:            0,
+						IsolationSegment: "example_iso_segment",
+						MemoryQuota:      2000000,
+						MemoryUsage:      1000000,
+						State:            constant.ProcessInstanceRunning,
+						Type:             "web",
+						Uptime:           123,
 					},
 					ProcessInstance{
-						State:       constant.ProcessInstanceRunning,
-						CPU:         0.02,
-						MemoryUsage: 8000000,
-						DiskUsage:   16000000,
-						MemoryQuota: 16000000,
-						DiskQuota:   32000000,
-						Index:       1,
-						Uptime:      456,
+						CPU:              0.02,
+						DiskQuota:        32000000,
+						DiskUsage:        16000000,
+						Index:            1,
+						IsolationSegment: "example_iso_segment",
+						MemoryQuota:      16000000,
+						MemoryUsage:      8000000,
+						State:            constant.ProcessInstanceRunning,
+						Type:             "web",
+						Uptime:           456,
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1"))
@@ -176,5 +184,4 @@ var _ = Describe("ProcessInstance", func() {
 			})
 		})
 	})
-
 })
