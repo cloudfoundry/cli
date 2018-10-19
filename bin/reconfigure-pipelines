@@ -35,6 +35,7 @@ configure_infrastructure_pipeline() {
     -l <(lpass show "Concourse Credentials" --notes) \
     -l <(lpass show "$creds" --notes) \
     -v pool-name=$potato
+    -v honeycomb-writer-key="$(lpass show Shared-CLI/Honeycomb --notes)"
 }
 
 configure_legacy_infrastructure_pipeline() {

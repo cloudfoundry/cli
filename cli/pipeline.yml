@@ -378,6 +378,7 @@ jobs:
         CF_INT_DOCKER_USERNAME: ((dockerhub-username))
         CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
         CF_INT_IGNORE_API_VERSION_CHECK: false
+        HONEYCOMB_WRITE_KEY: ((honeycomb-writer-key))
   ensure:
     put: gcp-bosh-pool
     params:
