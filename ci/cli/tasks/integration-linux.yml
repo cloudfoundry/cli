@@ -40,7 +40,7 @@ run:
       echo -e "\n Checking that integration tests have been go formatted..."
       # if gofmt outputs anything, we have unformatted files
       unformatted="$(gofmt -l integration)"
-      if [[ -z $unformatted ]]
+      if [[ -z $unformatted ]]; then
         echo "The following files have not been go formatted:"
         echo $unformatted
         echo "Please run 'make format' and push again."
@@ -71,7 +71,6 @@ run:
     domain=$(cat bosh-lock/name)
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
-
 
     pushd cf-cli-binaries
       tar xvzf cf-cli-binaries.tgz

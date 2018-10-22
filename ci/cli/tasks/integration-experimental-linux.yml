@@ -28,6 +28,18 @@ run:
   - |
     set -e
 
+    pushd $GOPATH/src/code.cloudfoundry.org/cli
+      echo -e "\n Checking that integration tests have been go formatted..."
+      # if gofmt outputs anything, we have unformatted files
+      unformatted="$(gofmt -l integration)"
+      if [[ -z $unformatted ]]; then
+        echo "The following files have not been go formatted:"
+        echo $unformatted
+        echo "Please run 'make format' and push again."
+        exit 1
+      fi
+    popd
+
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
 
     pushd vars-store/ci/infrastructure/$ENV
