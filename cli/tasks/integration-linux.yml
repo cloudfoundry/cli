@@ -40,7 +40,7 @@ run:
       echo -e "\n Checking that integration tests have been go formatted..."
       # if gofmt outputs anything, we have unformatted files
       unformatted="$(gofmt -l integration)"
-      if [[ -z $unformatted ]]; then
+      if [[ -n $unformatted ]]; then
         echo "The following files have not been go formatted:"
         echo $unformatted
         echo "Please run 'make format' and push again."
