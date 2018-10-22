@@ -44,35 +44,34 @@ var _ = Describe("v3-push with --no-start", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
 				})
+			})
 
-				It("uploads the app, does not restage or restart it, and stops the initial app", func() {
-					helpers.WithHelloWorldApp(func(appDir string) {
-						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "--no-start")
-						Eventually(session).Should(Say("Updating app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say(""))
-						Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say(""))
-						Eventually(session).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say(""))
-						Consistently(session).ShouldNot(Say("Staging package for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-						Consistently(session).ShouldNot(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-						Eventually(session).Should(Exit(0))
-					})
-
-					session = helpers.CF("v3-app", appName)
-
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Eventually(session).Should(Say("requested state:\\s+stopped"))
-
-					Eventually(session).Should(Say("web:1/1"))
-					Eventually(session).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
-					Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
-
+			It("uploads the app, does not restage or restart it, and stops the initial app", func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "--no-start")
+					Eventually(session).Should(Say("Updating app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(""))
+					Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(""))
+					Eventually(session).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say(""))
+					Consistently(session).ShouldNot(Say("Staging package for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Consistently(session).ShouldNot(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Exit(0))
 				})
+
+				session = helpers.CF("app", appName)
+
+				Eventually(session).Should(Say("name:\\s+%s", appName))
+				Eventually(session).Should(Say("requested state:\\s+stopped"))
+
+				Eventually(session).Should(Say("type:\\s+web"))
+				Eventually(session).Should(Say("instances:\\s+0/1"))
+
+				Eventually(session).Should(Exit(0))
 			})
 		})
 
