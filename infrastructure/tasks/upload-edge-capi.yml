@@ -1,0 +1,45 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: relintdockerhubpushbot/cf-deployment-concourse-tasks
+
+inputs:
+  - name: cli-ci
+  - name: bbl-state
+  - name: release-tarball
+  # Input mapping to directory containing .tgz files
+
+run:
+  path: bash
+  args:
+    - -c
+    - |
+      set -eu
+
+      function setup_bosh_env_vars() {
+        pushd "bbl-state/${BBL_STATE_DIR}"
+          eval "$(bbl print-env)"
+        popd
+      }
+
+      function upload_release() {
+        for filename in release-tarball/*.tgz; do
+          bosh upload-release --sha2 "$filename"
+        done
+      }
+
+      function main() {
+        setup_bosh_env_vars
+        upload_release
+      }
+
+      main
+
+params:
+  BBL_STATE_DIR:
+  # - Optional
+  # - Path to the directory containing the `bbl-state.json` file
+  # - The path is relative to root of the `bbl-state` input
+  # - If unspecified, uses the root of the `bbl-state` input
