@@ -33,6 +33,21 @@ run:
   - |
     set -e
 
+    export GOPATH=$PWD/go
+    export PATH=$GOPATH/bin:$PATH
+
+    pushd $GOPATH/src/code.cloudfoundry.org/cli
+      echo -e "\n Checking that integration tests have been go formatted..."
+      # if gofmt outputs anything, we have unformatted files
+      unformatted="$(gofmt -l integration)"
+      if [[ -z $unformatted ]]
+        echo "The following files have not been go formatted:"
+        echo $unformatted
+        echo "Please run 'make format' and push again."
+        exit 1
+      fi
+    popd
+
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
 
     if [[ $ENV == "homeroom" ]]; then
@@ -57,8 +72,6 @@ run:
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
 
-    export GOPATH=$PWD/go
-    export PATH=$GOPATH/bin:$PATH
 
     pushd cf-cli-binaries
       tar xvzf cf-cli-binaries.tgz
