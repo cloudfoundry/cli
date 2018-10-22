@@ -1,0 +1,10 @@
+---
+- type: replace
+  path: /releases/name=capi/version
+  value: latest
+
+- type: remove
+  path: /releases/name=capi/url?
+
+- type: remove
+  path: /releases/name=capi/sha1?
