@@ -335,7 +335,7 @@ applications:
 							})
 						})
 
-						It("runs the v2 command", func() {
+						It("runs the v6 command", func() {
 							session := helpers.CF("app", appName)
 							Eventually(session).Should(Say("name:\\s+%s", appName))
 							Eventually(session).Should(Say("requested state:\\s+started"))
