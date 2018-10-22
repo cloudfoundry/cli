@@ -1,0 +1,41 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-package
+
+params:
+  CF_API:
+  CF_USERNAME:
+  CF_PASSWORD:
+  CF_ORGANIZATION:
+  CF_SPACE:
+
+inputs:
+- name: cli
+- name: edge-linux-binary-64
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    tar -zxf edge-linux-binary-64/*.tgz
+
+    LATEST_VERSION=$(cat cli/BUILD_VERSION)
+
+    ./cf api "$CF_API"
+    ./cf auth "$CF_CLIENT_ID" "$CF_CLIENT_SECRET" --client-credentials
+    ./cf target -o "$CF_ORGANIZATION" -s "$CF_SPACE"
+    CURRENT_VERSIONS=$(./cf env claw | grep AVAILABLE_VERSIONS | awk '{print $2}')
+
+    if [[ $CURRENT_VERSIONS == *${LATEST_VERSION}* ]]; then
+      exit
+    fi
+
+    ./cf set-env claw AVAILABLE_VERSIONS "${CURRENT_VERSIONS},${LATEST_VERSION}"
+    ./cf restage claw
