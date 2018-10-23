@@ -9,7 +9,8 @@ type Port struct {
 	types.NullInt
 }
 
-func (i *Port) UnmarshalFlag(val string) error {
+// IsValidValue returns an error if the input value is not an integer.
+func (i *Port) IsValidValue(val string) error {
 	err := i.ParseStringValue(val)
 	if err != nil || i.Value < 0 {
 		return &flags.Error{
