@@ -471,15 +471,15 @@ jobs:
       file: cli-ci/ci/cli-v7/tasks/update-claw.yml
       params:
         CF_API: ((cf-api))
-        CF_CLIENT_ID: ((cli-pws-client-id))
-        CF_CLIENT_SECRET: ((cli-pws-client-secret))
+        CF_USERNAME: ((cli-pws-client-id))
+        CF_PASSWORD: ((cli-pws-client-secret))
         CF_ORGANIZATION: ((pivotal-organization))
         CF_SPACE: ((pivotal-space))
     - task: packages.cloudfoundry.org
       file: cli-ci/ci/cli-v7/tasks/update-claw.yml
       params:
         CF_API: ((cf-api))
-        CF_CLIENT_ID: ((cli-pws-client-id))
-        CF_CLIENT_SECRET: ((cli-pws-client-secret))
+        CF_USERNAME: ((cli-pws-client-id))
+        CF_PASSWORD: ((cli-pws-client-secret))
         CF_ORGANIZATION: ((oss-organization))
         CF_SPACE: ((oss-space))
