@@ -20,6 +20,8 @@ popd
 
 go get -v -u github.com/onsi/ginkgo/ginkgo
 
+SET RUN_ID=(openssl rand -hex 16)
+
 cd %GOPATH%\src\code.cloudfoundry.org\cli
 ginkgo.exe -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/isolated ./integration/v6/isolated ./integration/shared/plugin ./integration/v6/push || exit 1
 ginkgo.exe -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/global ./integration/v6/global || exit 1
