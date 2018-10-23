@@ -8,8 +8,8 @@ image_resource:
 
 params:
   CF_API:
-  CF_CLIENT_ID:
-  CF_CLIENT_SECRET:
+  CF_USERNAME:
+  CF_PASSWORD:
   CF_ORGANIZATION:
   CF_SPACE:
 
@@ -29,7 +29,7 @@ run:
     LATEST_VERSION=$(cat cli/BUILD_VERSION_V7)
 
     ./cf7 api "$CF_API"
-    ./cf7 auth "$CF_CLIENT_ID" "$CF_CLIENT_SECRET" --client-credentials
+    ./cf7 auth --client-credentials
     ./cf7 target -o "$CF_ORGANIZATION" -s "$CF_SPACE"
     CURRENT_VERSIONS=$(./cf7 env claw | grep AVAILABLE_VERSIONS | awk '{print $2}')
 
