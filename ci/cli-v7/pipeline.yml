@@ -291,7 +291,7 @@ jobs:
         params:
           channel: '#v3-acceleration-team'
           text: |
-            :canada: Linux integration failed :throwing-in-the-towel:
+            :dr-seuss2: Linux integration failed :throwing-in-the-towel:
             :dancing-penguin: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
@@ -338,7 +338,7 @@ jobs:
         params:
           channel: '#v3-acceleration-team'
           text: |
-            :canada: Windows integration failed :throwing-in-the-towel:
+            :dr-seuss2: Windows integration failed :throwing-in-the-towel:
             :win95: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
