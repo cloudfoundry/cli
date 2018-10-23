@@ -9,7 +9,7 @@ type Instances struct {
 	types.NullInt
 }
 
-func (i *Instances) UnmarshalFlag(val string) error {
+func (i *Instances) IsValidValue(val string) error {
 	err := i.ParseStringValue(val)
 	if err != nil || i.Value < 0 {
 		return &flags.Error{
