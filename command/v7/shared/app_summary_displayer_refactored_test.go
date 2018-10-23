@@ -66,6 +66,7 @@ var _ = Describe("app summary displayer", func() {
 										MemoryQuota: 33554432,
 										DiskQuota:   2000000,
 										Uptime:      int(uptime.Seconds()),
+										Details:     "Some Details 1",
 									},
 									v7action.ProcessInstance{
 										Index:       1,
@@ -75,6 +76,7 @@ var _ = Describe("app summary displayer", func() {
 										MemoryQuota: 33554432,
 										DiskQuota:   4000000,
 										Uptime:      int(time.Now().Sub(time.Unix(330480000, 0)).Seconds()),
+										Details:     "Some Details 2",
 									},
 									v7action.ProcessInstance{
 										Index:       2,
@@ -123,10 +125,12 @@ var _ = Describe("app summary displayer", func() {
 					Expect(time.Parse(time.RFC3339, webProcessSummary.Instances[0].Since)).To(BeTemporally("~", time.Now().Add(-uptime), 2*time.Second))
 					Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
 					Expect(webProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[0].Details).To(Equal("Some Details 1"))
 
 					Expect(webProcessSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
 					Expect(webProcessSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
 					Expect(webProcessSummary.Instances[1].CPU).To(Equal("0.0%"))
+					Expect(webProcessSummary.Instances[1].Details).To(Equal("Some Details 2"))
 
 					Expect(webProcessSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
 					Expect(webProcessSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
@@ -182,7 +186,7 @@ var _ = Describe("app summary displayer", func() {
 
 				It("lists information for each of the processes", func() {
 					Expect(testUI.Out).To(Say("type:\\s+web"))
-					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
 					Expect(testUI.Out).To(Say("type:\\s+console"))
 					Expect(testUI.Out).To(Say("There are no running instances of this process."))
 				})
@@ -228,7 +232,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 
 				It("does not display the instance table", func() {
-					Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+					Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
 				})
 			})
 
@@ -329,7 +333,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("does not display the instance table", func() {
-				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
 			})
 		})
 
@@ -364,7 +368,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("does not display the instance table", func() {
-				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+				Expect(testUI.Out).NotTo(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
 			})
 		})
 
