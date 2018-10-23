@@ -20,6 +20,8 @@ params:
   CF_INT_DOCKER_IMAGE:
   CF_INT_DOCKER_USERNAME:
   CF_INT_DOCKER_PASSWORD:
+  HONEYCOMB_WRITE_KEY:
+  HONEYCOMB_DATASET: "Integration Linux"
 
 run:
   path: bash
@@ -59,6 +61,8 @@ run:
     export PATH=$GOPATH/bin:$PATH
 
     go get -u github.com/onsi/ginkgo/ginkgo
+
+    export RUN_ID=$(openssl rand -hex 16)
 
     pushd cf-cli-binaries
       tar xvzf cf-cli-binaries.tgz
