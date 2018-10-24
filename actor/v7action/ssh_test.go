@@ -90,86 +90,103 @@ var _ = Describe("SSH Actions", func() {
 					fakeUAAClient.GetSSHPasscodeReturns("some-ssh-passcode", nil)
 				})
 
-				When("getting the application summary errors", func() {
+				When("getting the application errors", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationsReturns(nil, ccv3.Warnings{"some-app-warnings"}, errors.New("some-application-summary-error"))
+						fakeCloudControllerClient.GetApplicationsReturns(nil, ccv3.Warnings{"some-app-warnings"}, errors.New("some-application-error"))
 					})
 
 					It("returns all warnings and the error", func() {
-						Expect(executeErr).To(MatchError("some-application-summary-error"))
+						Expect(executeErr).To(MatchError("some-application-error"))
 						Expect(warnings).To(ConsistOf("some-app-warnings"))
 					})
 				})
 
-				When("getting the application summary succeeds", func() {
+				When("getting the application succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app"}}, ccv3.Warnings{"some-app-warnings"}, nil)
 					})
 
-					When("the process does not exist", func() {
-						It("returns all warnings and the error", func() {
-							Expect(executeErr).To(MatchError(actionerror.ProcessNotFoundError{ProcessType: "some-process-type"}))
-							Expect(warnings).To(ConsistOf("some-app-warnings"))
-						})
-					})
-
-					When("the application is not in the STARTED state", func() {
+					When("getting the process summaries fails", func() {
 						BeforeEach(func() {
-							fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
+							fakeCloudControllerClient.GetApplicationProcessesReturns(nil, ccv3.Warnings{"some-process-warnings"}, errors.New("some-process-error"))
 						})
 
-						It("returns a ApplicationNotStartedError", func() {
-							Expect(executeErr).To(MatchError(actionerror.ApplicationNotStartedError{Name: "some-app"}))
+						It("returns all warnings and the error", func() {
+							Expect(executeErr).To(MatchError("some-process-error"))
 							Expect(warnings).To(ConsistOf("some-app-warnings", "some-process-warnings"))
 						})
 					})
 
-					When("the process doesn't have the specified instance index", func() {
-						BeforeEach(func() {
-							fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
-							fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
+					When("getting the process summaries succeeds", func() {
+						When("the process does not exist", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{}, ccv3.Warnings{"some-process-warnings"}, nil)
+							})
+
+							It("returns all warnings and the error", func() {
+								Expect(executeErr).To(MatchError(actionerror.ProcessNotFoundError{ProcessType: "some-process-type"}))
+								Expect(warnings).To(ConsistOf("some-app-warnings", "some-process-warnings"))
+							})
 						})
 
-						It("returns a ProcessIndexNotFoundError", func() {
-							Expect(executeErr).To(MatchError(actionerror.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 0}))
-						})
-					})
+						When("the application is not in the STARTED state", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
+							})
 
-					When("the process instance is not RUNNING", func() {
-						BeforeEach(func() {
-							fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
-							fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
-							fakeCloudControllerClient.GetProcessInstancesReturns([]ccv3.ProcessInstance{{State: constant.ProcessInstanceDown, Index: 0}}, ccv3.Warnings{"some-instance-warnings"}, nil)
-						})
-						It("returns a ProcessInstanceNotRunningError", func() {
-							Expect(executeErr).To(MatchError(actionerror.ProcessInstanceNotRunningError{ProcessType: "some-process-type", InstanceIndex: 0}))
-						})
-					})
-
-					When("the specified process and index exist, app is STARTED and the instance is RUNNING", func() {
-						BeforeEach(func() {
-							fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
-							fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
-							fakeCloudControllerClient.GetProcessInstancesReturns([]ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning, Index: 0}}, ccv3.Warnings{"some-instance-warnings"}, nil)
+							It("returns a ApplicationNotStartedError", func() {
+								Expect(executeErr).To(MatchError(actionerror.ApplicationNotStartedError{Name: "some-app"}))
+								Expect(warnings).To(ConsistOf("some-app-warnings", "some-process-warnings"))
+							})
 						})
 
-						When("starting the secure session succeeds", func() {
-							It("returns all warnings", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(warnings).To(ConsistOf("some-app-warnings", "some-process-warnings", "some-instance-warnings"))
+						When("the process doesn't have the specified instance index", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
+								fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
+							})
 
-								Expect(sshAuth).To(Equal(SSHAuthentication{
-									Endpoint:           "some-app-ssh-endpoint",
-									HostKeyFingerprint: "some-app-ssh-fingerprint",
-									Passcode:           "some-ssh-passcode",
-									Username:           "cf:some-process-guid/0",
-								}))
+							It("returns a ProcessIndexNotFoundError", func() {
+								Expect(executeErr).To(MatchError(actionerror.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 0}))
+							})
+						})
 
-								Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-								Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
-									ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app"}},
-									ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
-								))
+						When("the process instance is not RUNNING", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
+								fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
+								fakeCloudControllerClient.GetProcessInstancesReturns([]ccv3.ProcessInstance{{State: constant.ProcessInstanceDown, Index: 0}}, ccv3.Warnings{"some-instance-warnings"}, nil)
+							})
+							It("returns a ProcessInstanceNotRunningError", func() {
+								Expect(executeErr).To(MatchError(actionerror.ProcessInstanceNotRunningError{ProcessType: "some-process-type", InstanceIndex: 0}))
+							})
+						})
+
+						When("the specified process and index exist, app is STARTED and the instance is RUNNING", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", State: constant.ApplicationStarted}}, ccv3.Warnings{"some-app-warnings"}, nil)
+								fakeCloudControllerClient.GetApplicationProcessesReturns([]ccv3.Process{{Type: "some-process-type", GUID: "some-process-guid"}}, ccv3.Warnings{"some-process-warnings"}, nil)
+								fakeCloudControllerClient.GetProcessInstancesReturns([]ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning, Index: 0}}, ccv3.Warnings{"some-instance-warnings"}, nil)
+							})
+
+							When("starting the secure session succeeds", func() {
+								It("returns all warnings", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+									Expect(warnings).To(ConsistOf("some-app-warnings", "some-process-warnings", "some-instance-warnings"))
+
+									Expect(sshAuth).To(Equal(SSHAuthentication{
+										Endpoint:           "some-app-ssh-endpoint",
+										HostKeyFingerprint: "some-app-ssh-fingerprint",
+										Passcode:           "some-ssh-passcode",
+										Username:           "cf:some-process-guid/0",
+									}))
+
+									Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+									Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+										ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app"}},
+										ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+									))
+								})
 							})
 						})
 					})

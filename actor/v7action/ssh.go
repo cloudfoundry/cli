@@ -33,14 +33,19 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 		return SSHAuthentication{}, Warnings{}, err
 	}
 
-	// TODO: don't use Summary object for this
-	appSummary, warnings, err := actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, false)
+	application, appWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return SSHAuthentication{}, appWarnings, err
+	}
+
+	processSummaries, processWarnings, err := actor.getProcessSummariesForApp(application.GUID, false)
+	warnings := append(appWarnings, processWarnings...)
 	if err != nil {
 		return SSHAuthentication{}, warnings, err
 	}
 
 	var processSummary ProcessSummary
-	for _, appProcessSummary := range appSummary.ProcessSummaries {
+	for _, appProcessSummary := range processSummaries {
 		if appProcessSummary.Type == processType {
 			processSummary = appProcessSummary
 			break
@@ -50,7 +55,7 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 		return SSHAuthentication{}, warnings, actionerror.ProcessNotFoundError{ProcessType: processType}
 	}
 
-	if !appSummary.Application.Started() {
+	if !application.Started() {
 		return SSHAuthentication{}, warnings, actionerror.ApplicationNotStartedError{Name: appName}
 	}
 
