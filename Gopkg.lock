@@ -293,7 +293,7 @@
   version = "v1.8.1"
 
 [[projects]]
-  branch = "master"
+  branch = "cli-vendor"
   digest = "1:1ba4ae8812d32010781560a81c1ce5c4cdada40cbc563d83b63926be34545030"
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
@@ -571,7 +571,7 @@
   version = "v1.0.18"
 
 [[projects]]
-  digest = "1:7c95b35057a0ff2e19f707173cc1a947fa43a6eb5c4d300d196ece0334046082"
+  digest = "0:"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   pruneopts = "NUT"
