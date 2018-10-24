@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/command/v7/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/types"
@@ -30,7 +29,6 @@ var _ = Describe("scale Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v7fakes.FakeScaleActor
-		fakeV2Actor     *sharedfakes.FakeV2AppActor
 		appName         string
 		binaryName      string
 		executeErr      error
@@ -43,7 +41,6 @@ var _ = Describe("scale Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeScaleActor)
-		fakeV2Actor = new(sharedfakes.FakeV2AppActor)
 		appName = "some-app"
 
 		cmd = ScaleCommand{

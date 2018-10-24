@@ -16,6 +16,13 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
+//go:generate counterfeiter . V2AppActor
+
+type V2AppActor interface {
+	GetApplicationRoutes(appGUID string) (v2action.Routes, v2action.Warnings, error)
+	GetApplicationInstancesWithStatsByApplication(guid string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)
+}
+
 //go:generate counterfeiter . V3AppsActor
 
 type V3AppsActor interface {
@@ -29,7 +36,7 @@ type V3AppsCommand struct {
 	UI          command.UI
 	Config      command.Config
 	Actor       V3AppsActor
-	V2AppActor  shared.V2AppActor
+	V2AppActor  V2AppActor
 	SharedActor command.SharedActor
 }
 
