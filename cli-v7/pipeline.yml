@@ -32,6 +32,13 @@ resources:
     branch: master
     paths: *ciPaths
 
+- name: homebrew-tap
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/homebrew-tap
+    private_key: ((homebrew-tap-github-private-key))
+    branch: master
+
 - name: cli-integration
   type: git
   source:
@@ -483,3 +490,18 @@ jobs:
         CF_PASSWORD: ((cli-pws-client-secret))
         CF_ORGANIZATION: ((oss-organization))
         CF_SPACE: ((oss-space))
+
+- name: update-cf7-homebrew
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      trigger: true
+      passed: [publish-beta-release]
+    - get: cli-ci
+    - get: homebrew-tap
+  - task: update-brew-formula
+    file: cli-ci/ci/cli-v7/tasks/update-brew-formula.yml
+  # - put: homebrew-tap
+  #   params:
+  #     repository: update-brew-formula-output/homebrew-tap
