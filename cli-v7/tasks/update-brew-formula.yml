@@ -81,8 +81,8 @@ run:
     else
         echo "no new version to commit"
     fi
+    cat cf7-cli.rb
     popd
 
     cp -R homebrew-tap $OUTPUT_PATH
 
-    cat cf7-cli.rb
