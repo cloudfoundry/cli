@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -52,13 +51,6 @@ var _ = Describe("scale Command", func() {
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
-			AppSummaryDisplayer: shared.AppSummaryDisplayer{
-				UI:         testUI,
-				Config:     fakeConfig,
-				Actor:      fakeActor,
-				V2AppActor: fakeV2Actor,
-				AppName:    appName,
-			},
 		}
 
 		binaryName = "faceman"
@@ -224,7 +216,7 @@ var _ = Describe("scale Command", func() {
 
 			When("no flag options are provided", func() {
 				BeforeEach(func() {
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterReturns(
 						appSummary,
 						v7action.Warnings{"get-app-summary-warning"},
 						nil)
@@ -276,7 +268,7 @@ var _ = Describe("scale Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("get process error")
-						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+						fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterReturns(
 							v7action.ApplicationSummary{},
 							v7action.Warnings{"get-process-warning"},
 							expectedErr,
@@ -301,7 +293,7 @@ var _ = Describe("scale Command", func() {
 					fakeActor.ScaleProcessByApplicationReturns(
 						v7action.Warnings{"scale-warning"},
 						nil)
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterReturns(
 						appSummary,
 						v7action.Warnings{"get-instances-warning"},
 						nil)
@@ -519,7 +511,7 @@ var _ = Describe("scale Command", func() {
 						Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 						Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
 						Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-						Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+						Expect(fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterCallCount()).To(Equal(1))
 					})
 				})
 			})
@@ -531,7 +523,7 @@ var _ = Describe("scale Command", func() {
 					fakeActor.ScaleProcessByApplicationReturns(
 						v7action.Warnings{"scale-warning"},
 						nil)
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterReturns(
 						appSummary,
 						v7action.Warnings{"get-instances-warning"},
 						nil)
@@ -572,7 +564,7 @@ var _ = Describe("scale Command", func() {
 					fakeActor.ScaleProcessByApplicationReturns(
 						v7action.Warnings{"scale-warning"},
 						nil)
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterReturns(
 						appSummary,
 						v7action.Warnings{"get-instances-warning"},
 						nil)
@@ -614,7 +606,7 @@ var _ = Describe("scale Command", func() {
 					appGUID = fakeActor.StartApplicationArgsForCall(0)
 					Expect(appGUID).To(Equal("some-app-guid"))
 
-					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterCallCount()).To(Equal(1))
 				})
 			})
 
@@ -625,7 +617,7 @@ var _ = Describe("scale Command", func() {
 					fakeActor.ScaleProcessByApplicationReturns(
 						v7action.Warnings{"scale-warning"},
 						nil)
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterReturns(
 						appSummary,
 						v7action.Warnings{"get-instances-warning"},
 						nil)
@@ -676,7 +668,7 @@ var _ = Describe("scale Command", func() {
 					fakeActor.ScaleProcessByApplicationReturns(
 						v7action.Warnings{"scale-warning"},
 						nil)
-					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+					fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterReturns(
 						appSummary,
 						v7action.Warnings{"get-instances-warning"},
 						nil)

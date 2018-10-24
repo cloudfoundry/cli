@@ -15,9 +15,8 @@ import (
 //go:generate counterfeiter . ScaleActor
 
 type ScaleActor interface {
-	shared.V3AppSummaryActor
+	AppActor
 
-	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Application, v7action.Warnings, error)
@@ -35,37 +34,30 @@ type ScaleCommand struct {
 	relatedCommands     interface{}    `related_commands:"v3-push"`
 	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	UI                  command.UI
-	Config              command.Config
-	Actor               ScaleActor
-	SharedActor         command.SharedActor
-	AppSummaryDisplayer shared.AppSummaryDisplayer
+	UI          command.UI
+	Config      command.Config
+	Actor       ScaleActor
+	SharedActor command.SharedActor
+	RouteActor  v7action.RouteActor
 }
 
 func (cmd *ScaleCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
 
-	ccClient, _, err := shared.NewClients(config, ui, true, "")
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient)
 
-	ccClientV2, _, err := sharedV2.NewClients(config, ui, false)
+	ccClientV2, _, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
-	v2Actor := v2action.NewActor(ccClientV2, nil, config)
-
-	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
-		UI:         ui,
-		Config:     config,
-		Actor:      cmd.Actor,
-		V2AppActor: v2Actor,
-		AppName:    cmd.RequiredArgs.AppName,
-	}
+	cmd.RouteActor = v2action.NewActor(ccClientV2, uaaClient, config)
 
 	return nil
 }
@@ -216,5 +208,13 @@ func (cmd ScaleCommand) showCurrentScale(userName string) error {
 		"Username":  userName,
 	})
 
-	return cmd.AppSummaryDisplayer.DisplayAppProcessInfo()
+	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpaceWithRouter(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false, cmd.RouteActor)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	appSummaryDisplayer := shared.NewAppSummaryDisplayer2(cmd.UI)
+	appSummaryDisplayer.AppDisplay(summary, false)
+	return nil
 }
