@@ -72,7 +72,7 @@ run:
     end
     EOF
 
-    git add cf-cli.rb
+    git add cf7-cli.rb
     if ! [ -z "$(git status --porcelain)"];
     then
       git config --global user.email "cf-cli-eng@pivotal.io"
