@@ -17,7 +17,7 @@ var _ = Describe("Relationship", func() {
 	)
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("Relationship", func() {

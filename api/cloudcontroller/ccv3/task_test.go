@@ -16,7 +16,7 @@ var _ = Describe("Task", func() {
 	var client *Client
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("CreateApplicationTask", func() {

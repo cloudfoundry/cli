@@ -17,7 +17,7 @@ var _ = Describe("Isolation Segments", func() {
 	)
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("CreateIsolationSegment", func() {

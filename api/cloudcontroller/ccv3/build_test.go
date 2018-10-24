@@ -15,7 +15,7 @@ var _ = Describe("Build", func() {
 	var client *Client
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("CreateBuild", func() {

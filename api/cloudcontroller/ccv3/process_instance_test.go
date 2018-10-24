@@ -15,7 +15,7 @@ var _ = Describe("ProcessInstance", func() {
 	var client *Client
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("DeleteApplicationProcessInstance", func() {

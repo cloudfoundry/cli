@@ -19,7 +19,7 @@ var _ = Describe("Process", func() {
 	var client *Client
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("Process", func() {

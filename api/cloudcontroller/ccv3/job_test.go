@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -51,7 +52,7 @@ var _ = Describe("Job", func() {
 		)
 
 		BeforeEach(func() {
-			client = NewTestClient()
+			client, _ = NewTestClient()
 			jobLocation = JobURL(fmt.Sprintf("%s/some-job-location", server.URL()))
 		})
 
@@ -143,7 +144,7 @@ var _ = Describe("Job", func() {
 		)
 
 		BeforeEach(func() {
-			client = NewTestClient(Config{JobPollingTimeout: time.Minute})
+			client, _ = NewTestClient(Config{JobPollingTimeout: time.Minute})
 			jobLocation = JobURL(fmt.Sprintf("%s/some-job-location", server.URL()))
 		})
 
@@ -286,14 +287,22 @@ var _ = Describe("Job", func() {
 
 		Context("polling timeouts", func() {
 			When("the job runs longer than the OverallPollingTimeout", func() {
-				var jobPollingTimeout time.Duration
+				var (
+					jobPollingTimeout time.Duration
+					fakeClock         *ccv3fakes.FakeClock
+				)
 
 				BeforeEach(func() {
 					jobPollingTimeout = 100 * time.Millisecond
-					client = NewTestClient(Config{
-						JobPollingTimeout:  jobPollingTimeout,
-						JobPollingInterval: 60 * time.Millisecond,
+					client, fakeClock = NewTestClient(Config{
+						JobPollingTimeout: jobPollingTimeout,
 					})
+
+					clockTime := time.Now()
+					fakeClock.NowReturnsOnCall(0, clockTime)
+					fakeClock.NowReturnsOnCall(1, clockTime)
+					fakeClock.NowReturnsOnCall(2, clockTime.Add(60*time.Millisecond))
+					fakeClock.NowReturnsOnCall(3, clockTime.Add(60*time.Millisecond*2))
 
 					server.AppendHandlers(
 						CombineHandlers(

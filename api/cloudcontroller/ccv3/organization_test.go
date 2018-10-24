@@ -15,7 +15,7 @@ var _ = Describe("Organizations", func() {
 	var client *Client
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("GetIsolationSegmentOrganizations", func() {

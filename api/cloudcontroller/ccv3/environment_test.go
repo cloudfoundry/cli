@@ -14,7 +14,7 @@ var _ = Describe("Environment", func() {
 	var client *Client
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("GetApplicationEnvironment", func() {
