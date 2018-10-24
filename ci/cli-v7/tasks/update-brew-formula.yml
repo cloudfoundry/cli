@@ -84,3 +84,5 @@ run:
     popd
 
     cp -R homebrew-tap $OUTPUT_PATH
+
+    cat cf7-cli.rb
