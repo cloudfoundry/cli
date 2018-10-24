@@ -214,7 +214,7 @@ func (cmd ScaleCommand) showCurrentScale(userName string) error {
 		return err
 	}
 
-	appSummaryDisplayer := shared.NewAppSummaryDisplayer2(cmd.UI)
+	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
 	appSummaryDisplayer.AppDisplay(summary, false)
 	return nil
 }

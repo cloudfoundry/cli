@@ -11,17 +11,17 @@ import (
 	"code.cloudfoundry.org/cli/command"
 )
 
-type AppSummaryDisplayer2 struct {
+type AppSummaryDisplayer struct {
 	UI command.UI
 }
 
-func NewAppSummaryDisplayer2(ui command.UI) *AppSummaryDisplayer2 {
-	return &AppSummaryDisplayer2{
+func NewAppSummaryDisplayer(ui command.UI) *AppSummaryDisplayer {
+	return &AppSummaryDisplayer{
 		UI: ui,
 	}
 }
 
-func (display AppSummaryDisplayer2) AppDisplay(summary v7action.ApplicationSummary, displayStartCommand bool) {
+func (display AppSummaryDisplayer) AppDisplay(summary v7action.ApplicationSummary, displayStartCommand bool) {
 	var isoRow []string
 	if name, exists := summary.GetIsolationSegmentName(); exists {
 		isoRow = append(isoRow, display.UI.TranslateText("isolation segment:"), name)
@@ -49,7 +49,7 @@ func (display AppSummaryDisplayer2) AppDisplay(summary v7action.ApplicationSumma
 	display.displayProcessTable(summary, displayStartCommand)
 }
 
-func (display AppSummaryDisplayer2) displayAppInstancesTable(processSummary v7action.ProcessSummary) {
+func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v7action.ProcessSummary) {
 	table := [][]string{
 		{
 			"",
@@ -83,7 +83,7 @@ func (display AppSummaryDisplayer2) displayAppInstancesTable(processSummary v7ac
 	display.UI.DisplayInstancesTableForApp(table)
 }
 
-func (display AppSummaryDisplayer2) displayProcessTable(summary v7action.ApplicationSummary, displayStartCommand bool) {
+func (display AppSummaryDisplayer) displayProcessTable(summary v7action.ApplicationSummary, displayStartCommand bool) {
 	for _, process := range summary.ProcessSummaries {
 		display.UI.DisplayNewline()
 
@@ -110,7 +110,7 @@ func (display AppSummaryDisplayer2) displayProcessTable(summary v7action.Applica
 	}
 }
 
-func (display AppSummaryDisplayer2) getCreatedTime(summary v7action.ApplicationSummary) string {
+func (display AppSummaryDisplayer) getCreatedTime(summary v7action.ApplicationSummary) string {
 	if summary.CurrentDroplet.CreatedAt != "" {
 		timestamp, _ := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
 		return display.UI.UserFriendlyDate(timestamp)
@@ -119,7 +119,7 @@ func (display AppSummaryDisplayer2) getCreatedTime(summary v7action.ApplicationS
 	return ""
 }
 
-func (AppSummaryDisplayer2) usageSummary(processSummaries v7action.ProcessSummaries) string {
+func (AppSummaryDisplayer) usageSummary(processSummaries v7action.ProcessSummaries) string {
 	var usageStrings []string
 	for _, summary := range processSummaries {
 		if summary.TotalInstanceCount() > 0 {
@@ -130,7 +130,7 @@ func (AppSummaryDisplayer2) usageSummary(processSummaries v7action.ProcessSummar
 	return strings.Join(usageStrings, ", ")
 }
 
-func (AppSummaryDisplayer2) buildpackNames(buildpacks []v7action.Buildpack) string {
+func (AppSummaryDisplayer) buildpackNames(buildpacks []v7action.Buildpack) string {
 	var names []string
 	for _, buildpack := range buildpacks {
 		if buildpack.DetectOutput != "" {
@@ -143,11 +143,11 @@ func (AppSummaryDisplayer2) buildpackNames(buildpacks []v7action.Buildpack) stri
 	return strings.Join(names, ", ")
 }
 
-func (AppSummaryDisplayer2) appInstanceDate(input time.Time) string {
+func (AppSummaryDisplayer) appInstanceDate(input time.Time) string {
 	return input.UTC().Format(time.RFC3339)
 }
 
-func (AppSummaryDisplayer2) processHasAnInstanceUp(processSummary *v7action.ProcessSummary) bool {
+func (AppSummaryDisplayer) processHasAnInstanceUp(processSummary *v7action.ProcessSummary) bool {
 	for _, processInstance := range processSummary.InstanceDetails {
 		if processInstance.State != constant.ProcessInstanceDown {
 			return true
@@ -156,7 +156,7 @@ func (AppSummaryDisplayer2) processHasAnInstanceUp(processSummary *v7action.Proc
 	return false
 }
 
-func (AppSummaryDisplayer2) processInstancesAreAllCrashed(processSummary *v7action.ProcessSummary) bool {
+func (AppSummaryDisplayer) processInstancesAreAllCrashed(processSummary *v7action.ProcessSummary) bool {
 	if len(processSummary.InstanceDetails) < 1 {
 		return false
 	}

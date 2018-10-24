@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("app summary displayer", func() {
 	var (
-		appSummaryDisplayer *AppSummaryDisplayer2
+		appSummaryDisplayer *AppSummaryDisplayer
 		output              *Buffer
 		testUI              *ui.UI
 	)
@@ -26,7 +26,7 @@ var _ = Describe("app summary displayer", func() {
 		output = NewBuffer()
 		testUI = ui.NewTestUI(nil, output, NewBuffer())
 
-		appSummaryDisplayer = NewAppSummaryDisplayer2(testUI)
+		appSummaryDisplayer = NewAppSummaryDisplayer(testUI)
 	})
 
 	Describe("AppDisplay", func() {

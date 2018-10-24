@@ -82,7 +82,7 @@ func (cmd AppCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	appSummaryDisplayer := shared.NewAppSummaryDisplayer2(cmd.UI)
+	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
 	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpaceWithRouter(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false, cmd.RouteActor)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
