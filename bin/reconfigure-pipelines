@@ -38,21 +38,6 @@ configure_infrastructure_pipeline() {
     -v pool-name=$potato
 }
 
-configure_vat_infrastructure_pipeline() {
-  local name=$1
-  local creds=$2
-  local potato=$3
-
-  printf "configuring the $name pipeline...\n"
-
-  fly -t ci set-pipeline \
-    -p $name \
-    -c $pipelines_path/infrastructure/vat-pipeline.yml \
-    -l <(lpass show "Concourse Credentials" --notes) \
-    -l <(lpass show "$creds" --notes) \
-    -v pool-name=$potato
-}
-
 configure_legacy_infrastructure_pipeline() {
   local name=$1
   local creds=$2
@@ -95,15 +80,12 @@ lpass sync
 pipelines_path=$(cd $(dirname $0)/.. && pwd)
 
 configure_pipeline cli $pipelines_path/cli/pipeline.yml
-configure_pipeline V7 $pipelines_path/cli-v7/pipeline.yml
 
 configure_infrastructure_pipeline inf-beque beque-pipeline baked-potato
 configure_infrastructure_pipeline inf-hardknox hardknox-pipeline baked-potato
 configure_infrastructure_pipeline inf-lovingcup lovingcup-pipeline baked-potato
 configure_infrastructure_pipeline inf-tartine tartine-pipeline baked-potato
 configure_infrastructure_pipeline inf-arsicault arsicault-pipeline deep-fried-potato
-
-configure_vat_infrastructure_pipeline inf-delfina delfina-pipeline mashed-potato
 
 configure_legacy_infrastructure_pipeline inf-homeroom homeroom-pipeline moldy-gnocchi
 
