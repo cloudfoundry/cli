@@ -30,6 +30,9 @@ run:
   - |
     set -e
 
+    export GOPATH=$PWD/go
+    export PATH=$GOPATH/bin:$PATH
+
     pushd $GOPATH/src/code.cloudfoundry.org/cli
       echo -e "\n Checking that integration tests have been go formatted..."
       # if gofmt outputs anything, we have unformatted files
@@ -56,9 +59,6 @@ run:
     domain=$(cat bosh-lock/name)
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
-
-    export GOPATH=$PWD/go
-    export PATH=$GOPATH/bin:$PATH
 
     go get -u github.com/onsi/ginkgo/ginkgo
 
