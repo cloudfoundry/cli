@@ -63,7 +63,7 @@ var _ = Describe("v3-get-health-check command", func() {
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("v3-get-health-check", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
+				Eventually(session.Err).Should(Say(`No API endpoint set\. Use 'cf login' or 'cf api' to target an endpoint\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -82,7 +82,7 @@ var _ = Describe("v3-get-health-check command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-get-health-check", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.27\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -95,7 +95,7 @@ var _ = Describe("v3-get-health-check command", func() {
 			It("fails with not logged in message", func() {
 				session := helpers.CF("v3-get-health-check", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
+				Eventually(session.Err).Should(Say(`Not logged in\. Use 'cf login' to log in\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -109,7 +109,7 @@ var _ = Describe("v3-get-health-check command", func() {
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("v3-get-health-check", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
+				Eventually(session.Err).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -124,7 +124,7 @@ var _ = Describe("v3-get-health-check command", func() {
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("v3-get-health-check", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
+				Eventually(session.Err).Should(Say(`No space targeted, use 'cf target -s SPACE' to target a space\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -153,7 +153,7 @@ var _ = Describe("v3-get-health-check command", func() {
 				userName, _ = helpers.GetCredentials()
 
 				session := helpers.CF("v3-get-health-check", appName)
-				Eventually(session).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting process health check types for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say(`process\s+health check\s+endpoint \(for http\)\s+invocation timeout\n`))
 				Eventually(session).Should(Say(`web\s+port\s+1\n`))
 				Eventually(session).Should(Say(`console\s+process\s+1\n`))
@@ -167,7 +167,7 @@ var _ = Describe("v3-get-health-check command", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("v3-get-health-check", invalidAppName)
 
-				Eventually(session).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting process health check types for app %s in org %s / space %s as %s\.\.\.`, invalidAppName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
 				Eventually(session).Should(Say("FAILED"))
 

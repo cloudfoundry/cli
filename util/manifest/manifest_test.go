@@ -128,7 +128,7 @@ applications:
 							IsSet: true,
 							Value: "some-command",
 						},
-						HealthCheckHTTPEndpoint: "\\some-endpoint",
+						HealthCheckHTTPEndpoint: `\some-endpoint`,
 						HealthCheckType:         "http",
 						Instances: types.NullInt{
 							Value: 10,
@@ -596,7 +596,7 @@ applications:
 						"env_3": "true",
 						"env_4": "1.00001",
 					},
-					HealthCheckHTTPEndpoint: "\\some-endpoint",
+					HealthCheckHTTPEndpoint: `\some-endpoint`,
 					HealthCheckType:         "http",
 					Instances: types.NullInt{
 						Value: 10,

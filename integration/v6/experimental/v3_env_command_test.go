@@ -74,7 +74,7 @@ var _ = Describe("v3-env command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-env", appName, envVarName, envVarValue)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.27\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -87,7 +87,7 @@ var _ = Describe("v3-env command", func() {
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("v3-env", appName, envVarName, envVarValue)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
+				Eventually(session.Err).Should(Say(`No API endpoint set\. Use 'cf login' or 'cf api' to target an endpoint\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -100,7 +100,7 @@ var _ = Describe("v3-env command", func() {
 			It("fails with not logged in message", func() {
 				session := helpers.CF("v3-env", appName, envVarName, envVarValue)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
+				Eventually(session.Err).Should(Say(`Not logged in\. Use 'cf login' to log in\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -114,7 +114,7 @@ var _ = Describe("v3-env command", func() {
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("v3-env", appName, envVarName, envVarValue)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
+				Eventually(session.Err).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -129,7 +129,7 @@ var _ = Describe("v3-env command", func() {
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("v3-env", appName, envVarName, envVarValue)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
+				Eventually(session.Err).Should(Say(`No space targeted, use 'cf target -s SPACE' to target a space\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -152,7 +152,7 @@ var _ = Describe("v3-env command", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("v3-env", invalidAppName)
 
-				Eventually(session).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, invalidAppName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -186,7 +186,7 @@ var _ = Describe("v3-env command", func() {
 			It("displays the environment variables", func() {
 				By("displaying env variables when they are set")
 				session := helpers.CF("v3-env", appName)
-				Eventually(session).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("System-Provided:"))
 				Eventually(session).Should(Say("VCAP_SERVICES"))
 				Eventually(session).Should(Say("VCAP_APPLICATION"))
@@ -208,7 +208,7 @@ var _ = Describe("v3-env command", func() {
 				Eventually(helpers.CF("set-staging-environment-variable-group", `{}`)).Should(Exit(0))
 
 				session = helpers.CF("v3-env", appName)
-				Eventually(session).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("System-Provided:"))
 				Eventually(session).ShouldNot(Say("VCAP_SERVICES"))
 				Eventually(session).Should(Say("VCAP_APPLICATION"))

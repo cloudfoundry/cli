@@ -28,11 +28,11 @@ var _ = Describe("push with different instances values", func() {
 						PushCommandName, appName,
 						"-i", "2",
 					)
-					Eventually(session).Should(Say("\\s+instances:\\s+2"))
+					Eventually(session).Should(Say(`\s+instances:\s+2`))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("app", appName)
-					Eventually(session).Should(Say("instances:\\s+\\d/2"))
+					Eventually(session).Should(Say(`instances:\s+\d/2`))
 					Eventually(session).Should(Exit(0))
 
 					By("updating an app with 1 instance")
@@ -40,12 +40,12 @@ var _ = Describe("push with different instances values", func() {
 						PushCommandName, appName,
 						"-i", "1",
 					)
-					Eventually(session).Should(Say("\\-\\s+instances:\\s+2"))
-					Eventually(session).Should(Say("\\+\\s+instances:\\s+1"))
+					Eventually(session).Should(Say(`\-\s+instances:\s+2`))
+					Eventually(session).Should(Say(`\+\s+instances:\s+1`))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("app", appName)
-					Eventually(session).Should(Say("instances:\\s+\\d/1"))
+					Eventually(session).Should(Say(`instances:\s+\d/1`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -69,7 +69,7 @@ var _ = Describe("push with different instances values", func() {
 							"-i", "0",
 						)
 
-						Eventually(session).Should(Say("\\s+instances:\\s+0"))
+						Eventually(session).Should(Say(`\s+instances:\s+0`))
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("app", appName)
@@ -81,12 +81,12 @@ var _ = Describe("push with different instances values", func() {
 							PushCommandName, appName,
 							"-i", "1",
 						)
-						Eventually(session).Should(Say("\\-\\s+instances:\\s+0"))
-						Eventually(session).Should(Say("\\+\\s+instances:\\s+1"))
+						Eventually(session).Should(Say(`\-\s+instances:\s+0`))
+						Eventually(session).Should(Say(`\+\s+instances:\s+1`))
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("app", appName)
-						Eventually(session).Should(Say("instances:\\s+\\d/1"))
+						Eventually(session).Should(Say(`instances:\s+\d/1`))
 						Eventually(session).Should(Exit(0))
 
 						By("updating an app back to 0 instances")
@@ -94,8 +94,8 @@ var _ = Describe("push with different instances values", func() {
 							PushCommandName, appName,
 							"-i", "0",
 						)
-						Eventually(session).Should(Say("\\-\\s+instances:\\s+1"))
-						Eventually(session).Should(Say("\\+\\s+instances:\\s+0"))
+						Eventually(session).Should(Say(`\-\s+instances:\s+1`))
+						Eventually(session).Should(Say(`\+\s+instances:\s+0`))
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("app", appName)
@@ -115,12 +115,12 @@ var _ = Describe("push with different instances values", func() {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
 						PushCommandName, appName,
 					)
-					Eventually(session).Should(Say("\\s+instances:\\s+1"))
+					Eventually(session).Should(Say(`\s+instances:\s+1`))
 					Eventually(session).Should(Exit(0))
 				})
 
 				session := helpers.CF("app", appName)
-				Eventually(session).Should(Say("instances:\\s+\\d/1"))
+				Eventually(session).Should(Say(`instances:\s+\d/1`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -133,18 +133,18 @@ var _ = Describe("push with different instances values", func() {
 						PushCommandName, appName,
 						"-i", "2",
 					)
-					Eventually(session).Should(Say("\\s+instances:\\s+2"))
+					Eventually(session).Should(Say(`\s+instances:\s+2`))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("app", appName)
-					Eventually(session).Should(Say("instances:\\s+\\d/2"))
+					Eventually(session).Should(Say(`instances:\s+\d/2`))
 					Eventually(session).Should(Exit(0))
 
 					By("pushing an app with no instances specified")
 					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
 						PushCommandName, appName,
 					)
-					Eventually(session).Should(Say("\\s+instances:\\s+2"))
+					Eventually(session).Should(Say(`\s+instances:\s+2`))
 					Eventually(session).Should(Exit(0))
 				})
 			})

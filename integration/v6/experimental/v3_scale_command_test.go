@@ -37,17 +37,17 @@ var _ = Describe("v3-scale command", func() {
 				Eventually(session).Should(Say("v3-scale - Change or view the instance count, disk space limit, and memory limit for an app"))
 
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf v3-scale APP_NAME \\[--process PROCESS\\] \\[-i INSTANCES\\] \\[-k DISK\\] \\[-m MEMORY\\]"))
+				Eventually(session).Should(Say(`cf v3-scale APP_NAME \[--process PROCESS\] \[-i INSTANCES\] \[-k DISK\] \[-m MEMORY\]`))
 
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("-f\\s+Force restart of app without prompt"))
-				Eventually(session).Should(Say("-i\\s+Number of instances"))
-				Eventually(session).Should(Say("-k\\s+Disk limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
-				Eventually(session).Should(Say("-m\\s+Memory limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
-				Eventually(session).Should(Say("--process\\s+App process to scale \\(Default: web\\)"))
+				Eventually(session).Should(Say(`-f\s+Force restart of app without prompt`))
+				Eventually(session).Should(Say(`-i\s+Number of instances`))
+				Eventually(session).Should(Say(`-k\s+Disk limit \(e\.g\. 256M, 1024M, 1G\)`))
+				Eventually(session).Should(Say(`-m\s+Memory limit \(e\.g\. 256M, 1024M, 1G\)`))
+				Eventually(session).Should(Say(`--process\s+App process to scale \(Default: web\)`))
 
 				Eventually(session).Should(Say("ENVIRONMENT:"))
-				Eventually(session).Should(Say("CF_STARTUP_TIMEOUT=5\\s+Max wait time for app instance startup, in minutes"))
+				Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -69,7 +69,7 @@ var _ = Describe("v3-scale command", func() {
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("v3-scale", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
+				Eventually(session.Err).Should(Say(`No API endpoint set\. Use 'cf login' or 'cf api' to target an endpoint\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -88,7 +88,7 @@ var _ = Describe("v3-scale command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-scale", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.27\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -101,7 +101,7 @@ var _ = Describe("v3-scale command", func() {
 			It("fails with not logged in message", func() {
 				session := helpers.CF("v3-scale", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
+				Eventually(session.Err).Should(Say(`Not logged in\. Use 'cf login' to log in\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -115,7 +115,7 @@ var _ = Describe("v3-scale command", func() {
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("v3-scale", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
+				Eventually(session.Err).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -130,7 +130,7 @@ var _ = Describe("v3-scale command", func() {
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("v3-scale", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
+				Eventually(session.Err).Should(Say(`No space targeted, use 'cf target -s SPACE' to target a space\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -176,7 +176,7 @@ var _ = Describe("v3-scale command", func() {
 				It("displays the current scale properties for all processes", func() {
 					session := helpers.CF("v3-scale", appName)
 
-					Eventually(session).Should(Say("Showing current scale of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Showing current scale of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Consistently(session).ShouldNot(Say("Scaling"))
 					Consistently(session).ShouldNot(Say("This will cause the app to restart"))
 					Consistently(session).ShouldNot(Say("Stopping"))

@@ -29,9 +29,9 @@ var _ = Describe("v3-delete command", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("v3-delete - Delete a V3 App"))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("cf v3-delete APP_NAME \\[-f\\]"))
+			Eventually(session).Should(Say(`cf v3-delete APP_NAME \[-f\]`))
 			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say("\\s+-f\\s+Force deletion without confirmation"))
+			Eventually(session).Should(Say(`\s+-f\s+Force deletion without confirmation`))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -80,7 +80,7 @@ var _ = Describe("v3-delete command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-delete", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.27\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -158,13 +158,13 @@ var _ = Describe("v3-delete command", func() {
 
 				When("the user enters 'y'", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("y\n"))
+						buffer.Write([]byte(`y\n`))
 					})
 
 					It("it displays the app does not exist", func() {
 						username, _ := helpers.GetCredentials()
 						session := helpers.CFWithStdin(buffer, "v3-delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say(`Really delete the app %s\? \[yN\]`, appName))
 						Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
 						Eventually(session).Should(Say("App %s does not exist", appName))
 						Eventually(session).Should(Say("OK"))
@@ -174,12 +174,12 @@ var _ = Describe("v3-delete command", func() {
 
 				When("the user enters 'n'", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("n\n"))
+						buffer.Write([]byte(`n\n`))
 					})
 
 					It("does not delete the app", func() {
 						session := helpers.CFWithStdin(buffer, "v3-delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say(`Really delete the app %s\? \[yN\]`, appName))
 						Eventually(session).Should(Say("Delete cancelled"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -187,12 +187,12 @@ var _ = Describe("v3-delete command", func() {
 
 				When("the user enters the default input (hits return)", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("\n"))
+						buffer.Write([]byte(`\n`))
 					})
 
 					It("does not delete the app", func() {
 						session := helpers.CFWithStdin(buffer, "v3-delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say(`Really delete the app %s\? \[yN\]`, appName))
 						Eventually(session).Should(Say("Delete cancelled"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -208,9 +208,9 @@ var _ = Describe("v3-delete command", func() {
 
 					It("asks again", func() {
 						session := helpers.CFWithStdin(buffer, "v3-delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say(`Really delete the app %s\? \[yN\]`, appName))
+						Eventually(session).Should(Say(`invalid input \(not y, n, yes, or no\)`))
+						Eventually(session).Should(Say(`Really delete the app %s\? \[yN\]`, appName))
 						Eventually(session).Should(Exit(0))
 					})
 				})

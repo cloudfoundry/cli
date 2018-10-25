@@ -37,14 +37,14 @@ var _ = Describe("pushing with no-hostname", func() {
 			It("creates a route with no hostname", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-hostname", "-d", domainName, "--no-start")
-					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-					Eventually(session).Should(Say("\\+\\s+%s", domainName))
+					Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
+					Eventually(session).Should(Say(`\+\s+%s`, domainName))
 					Eventually(session).Should(Exit(0))
 				})
 
 				session := helpers.CF("app", appName)
-				Eventually(session).Should(Say("name:\\s+%s", appName))
-				Eventually(session).Should(Say("(?m)routes:\\s+%s", domainName))
+				Eventually(session).Should(Say(`name:\s+%s`, appName))
+				Eventually(session).Should(Say(`(?m)routes:\s+%s`, domainName))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -77,14 +77,14 @@ var _ = Describe("pushing with no-hostname", func() {
 				It("creates a TCP route", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-hostname", "-d", domainName, "--no-start")
-						Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-						Eventually(session).Should(Say("\\+\\s+%s:", domainName))
+						Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
+						Eventually(session).Should(Say(`\+\s+%s:`, domainName))
 						Eventually(session).Should(Exit(0))
 					})
 
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Eventually(session).Should(Say("(?m)routes:\\s+%s:\\d+", domainName))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`(?m)routes:\s+%s:\d+`, domainName))
 					Eventually(session).Should(Exit(0))
 				})
 			})

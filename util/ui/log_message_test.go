@@ -59,7 +59,7 @@ var _ = Describe("Log Message", func() {
 			Context("single line log message", func() {
 				It("prints out a single line to STDOUT", func() {
 					ui.DisplayLogMessage(message, true)
-					Expect(out).To(Say("2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT This is a log message\n"))
+					Expect(out).To(Say(`2016-07-19T16:08:12.00-0700 \[APP/PROC/WEB/12\] OUT This is a log message\n`))
 				})
 			})
 
@@ -74,8 +74,8 @@ var _ = Describe("Log Message", func() {
 
 				It("prints out mutliple lines to STDOUT", func() {
 					ui.DisplayLogMessage(message, true)
-					Expect(out).To(Say("2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT This is a log message\n"))
-					Expect(out).To(Say("2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT This is also a log message\n"))
+					Expect(out).To(Say(`2016-07-19T16:08:12.00-0700 \[APP/PROC/WEB/12\] OUT This is a log message\n`))
+					Expect(out).To(Say(`2016-07-19T16:08:12.00-0700 \[APP/PROC/WEB/12\] OUT This is also a log message\n`))
 				})
 			})
 		})
