@@ -208,7 +208,7 @@ func (cmd ScaleCommand) showCurrentScale(userName string) error {
 		"Username":  userName,
 	})
 
-	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpaceWithRouter(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false, cmd.RouteActor)
+	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false, cmd.RouteActor)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

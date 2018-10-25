@@ -16,7 +16,7 @@ import (
 type AppActor interface {
 	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
-	GetApplicationSummaryByNameAndSpaceWithRouter(appName string, spaceGUID string, withObfuscatedValues bool, routeActor v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)
+	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool, routeActor v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)
 }
 
 type AppCommand struct {
@@ -83,7 +83,7 @@ func (cmd AppCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
-	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpaceWithRouter(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false, cmd.RouteActor)
+	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false, cmd.RouteActor)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

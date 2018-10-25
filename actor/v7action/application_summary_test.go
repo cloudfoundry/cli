@@ -85,7 +85,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 		Context("when a route actor is not provided", func() {
 			JustBeforeEach(func() {
-				summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpaceWithRouter(appName, spaceGUID, withObfuscatedValues, nil)
+				summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues, nil)
 			})
 
 			When("retrieving the application is successful", func() {
@@ -422,7 +422,7 @@ var _ = Describe("Application Summary Actions", func() {
 			})
 
 			JustBeforeEach(func() {
-				summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpaceWithRouter(appName, spaceGUID, withObfuscatedValues, fakeRouteActor)
+				summary, warnings, executeErr = actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID, withObfuscatedValues, fakeRouteActor)
 			})
 
 			When("getting the routes is successful", func() {

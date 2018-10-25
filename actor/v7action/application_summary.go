@@ -33,15 +33,9 @@ func (a ApplicationSummary) hasIsolationSegment() bool {
 		len(a.ProcessSummaries[0].InstanceDetails[0].IsolationSegment) > 0
 }
 
-// GetApplicationSummaryByNameAndSpace is temporary until we merge to master.
-// Delete after master merge and rename GetApplicationSummaryByNameAndSpaceWithRouter.
-func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (ApplicationSummary, Warnings, error) {
-	return actor.GetApplicationSummaryByNameAndSpaceWithRouter(appName, spaceGUID, withObfuscatedValues, nil)
-}
-
 // GetApplicationSummaryByNameAndSpace returns an application with process and
 // instance stats.
-func (actor Actor) GetApplicationSummaryByNameAndSpaceWithRouter(appName string, spaceGUID string, withObfuscatedValues bool, routeActor RouteActor) (ApplicationSummary, Warnings, error) {
+func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool, routeActor RouteActor) (ApplicationSummary, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return ApplicationSummary{}, allWarnings, err

@@ -35,20 +35,20 @@ type FakeScaleActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	GetApplicationSummaryByNameAndSpaceWithRouterStub        func(string, string, bool, v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)
-	getApplicationSummaryByNameAndSpaceWithRouterMutex       sync.RWMutex
-	getApplicationSummaryByNameAndSpaceWithRouterArgsForCall []struct {
+	GetApplicationSummaryByNameAndSpaceStub        func(string, string, bool, v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)
+	getApplicationSummaryByNameAndSpaceMutex       sync.RWMutex
+	getApplicationSummaryByNameAndSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 bool
 		arg4 v7action.RouteActor
 	}
-	getApplicationSummaryByNameAndSpaceWithRouterReturns struct {
+	getApplicationSummaryByNameAndSpaceReturns struct {
 		result1 v7action.ApplicationSummary
 		result2 v7action.Warnings
 		result3 error
 	}
-	getApplicationSummaryByNameAndSpaceWithRouterReturnsOnCall map[int]struct {
+	getApplicationSummaryByNameAndSpaceReturnsOnCall map[int]struct {
 		result1 v7action.ApplicationSummary
 		result2 v7action.Warnings
 		result3 error
@@ -230,69 +230,69 @@ func (fake *FakeScaleActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
-func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceWithRouter(arg1 string, arg2 string, arg3 bool, arg4 v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error) {
-	fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.Lock()
-	ret, specificReturn := fake.getApplicationSummaryByNameAndSpaceWithRouterReturnsOnCall[len(fake.getApplicationSummaryByNameAndSpaceWithRouterArgsForCall)]
-	fake.getApplicationSummaryByNameAndSpaceWithRouterArgsForCall = append(fake.getApplicationSummaryByNameAndSpaceWithRouterArgsForCall, struct {
+func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpace(arg1 string, arg2 string, arg3 bool, arg4 v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error) {
+	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationSummaryByNameAndSpaceReturnsOnCall[len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)]
+	fake.getApplicationSummaryByNameAndSpaceArgsForCall = append(fake.getApplicationSummaryByNameAndSpaceArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 bool
 		arg4 v7action.RouteActor
 	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("GetApplicationSummaryByNameAndSpaceWithRouter", []interface{}{arg1, arg2, arg3, arg4})
-	fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.Unlock()
-	if fake.GetApplicationSummaryByNameAndSpaceWithRouterStub != nil {
-		return fake.GetApplicationSummaryByNameAndSpaceWithRouterStub(arg1, arg2, arg3, arg4)
+	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{arg1, arg2, arg3, arg4})
+	fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
+	if fake.GetApplicationSummaryByNameAndSpaceStub != nil {
+		return fake.GetApplicationSummaryByNameAndSpaceStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getApplicationSummaryByNameAndSpaceWithRouterReturns
+	fakeReturns := fake.getApplicationSummaryByNameAndSpaceReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceWithRouterCallCount() int {
-	fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.RLock()
-	defer fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.RUnlock()
-	return len(fake.getApplicationSummaryByNameAndSpaceWithRouterArgsForCall)
+func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceCallCount() int {
+	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
+	return len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceWithRouterCalls(stub func(string, string, bool, v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)) {
-	fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.Lock()
-	defer fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.Unlock()
-	fake.GetApplicationSummaryByNameAndSpaceWithRouterStub = stub
+func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceCalls(stub func(string, string, bool, v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)) {
+	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationSummaryByNameAndSpaceStub = stub
 }
 
-func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceWithRouterArgsForCall(i int) (string, string, bool, v7action.RouteActor) {
-	fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.RLock()
-	defer fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.RUnlock()
-	argsForCall := fake.getApplicationSummaryByNameAndSpaceWithRouterArgsForCall[i]
+func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceArgsForCall(i int) (string, string, bool, v7action.RouteActor) {
+	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
+	argsForCall := fake.getApplicationSummaryByNameAndSpaceArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceWithRouterReturns(result1 v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {
-	fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.Lock()
-	defer fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.Unlock()
-	fake.GetApplicationSummaryByNameAndSpaceWithRouterStub = nil
-	fake.getApplicationSummaryByNameAndSpaceWithRouterReturns = struct {
+func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceReturns(result1 v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationSummaryByNameAndSpaceStub = nil
+	fake.getApplicationSummaryByNameAndSpaceReturns = struct {
 		result1 v7action.ApplicationSummary
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceWithRouterReturnsOnCall(i int, result1 v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {
-	fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.Lock()
-	defer fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.Unlock()
-	fake.GetApplicationSummaryByNameAndSpaceWithRouterStub = nil
-	if fake.getApplicationSummaryByNameAndSpaceWithRouterReturnsOnCall == nil {
-		fake.getApplicationSummaryByNameAndSpaceWithRouterReturnsOnCall = make(map[int]struct {
+func (fake *FakeScaleActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i int, result1 v7action.ApplicationSummary, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationSummaryByNameAndSpaceStub = nil
+	if fake.getApplicationSummaryByNameAndSpaceReturnsOnCall == nil {
+		fake.getApplicationSummaryByNameAndSpaceReturnsOnCall = make(map[int]struct {
 			result1 v7action.ApplicationSummary
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.getApplicationSummaryByNameAndSpaceWithRouterReturnsOnCall[i] = struct {
+	fake.getApplicationSummaryByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v7action.ApplicationSummary
 		result2 v7action.Warnings
 		result3 error
@@ -560,8 +560,8 @@ func (fake *FakeScaleActor) Invocations() map[string][][]interface{} {
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.RLock()
-	defer fake.getApplicationSummaryByNameAndSpaceWithRouterMutex.RUnlock()
+	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
+	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
 	fake.pollStartMutex.RLock()
 	defer fake.pollStartMutex.RUnlock()
 	fake.scaleProcessByApplicationMutex.RLock()

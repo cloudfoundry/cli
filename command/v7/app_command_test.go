@@ -182,7 +182,7 @@ var _ = Describe("app Command", func() {
 			BeforeEach(func() {
 				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 				expectedErr = actionerror.ApplicationNotFoundError{Name: app}
-				fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterReturns(v7action.ApplicationSummary{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
+				fakeActor.GetApplicationSummaryByNameAndSpaceReturns(v7action.ApplicationSummary{}, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 			})
 
 			It("returns the error and prints warnings", func() {
@@ -231,7 +231,7 @@ var _ = Describe("app Command", func() {
 						},
 					},
 				}
-				fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
+				fakeActor.GetApplicationSummaryByNameAndSpaceReturns(summary, v7action.Warnings{"warning-1", "warning-2"}, nil)
 			})
 
 			It("prints the application summary and outputs warnings", func() {
@@ -245,8 +245,8 @@ var _ = Describe("app Command", func() {
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
 
-				Expect(fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterCallCount()).To(Equal(1))
-				appName, spaceGUID, withObfuscatedValues, _ := fakeActor.GetApplicationSummaryByNameAndSpaceWithRouterArgsForCall(0)
+				Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+				appName, spaceGUID, withObfuscatedValues, _ := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
 				Expect(appName).To(Equal("some-app"))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(withObfuscatedValues).To(BeFalse())
