@@ -18,6 +18,8 @@ type SSHAuthentication struct {
 func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex(
 	appName string, spaceGUID string, processType string, processIndex uint,
 ) (SSHAuthentication, Warnings, error) {
+	var allWarnings Warnings
+
 	endpoint := actor.CloudControllerClient.AppSSHEndpoint()
 	if endpoint == "" {
 		return SSHAuthentication{}, nil, actionerror.SSHEndpointNotSetError{}
@@ -34,14 +36,33 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 	}
 
 	application, appWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	allWarnings = append(allWarnings, appWarnings...)
 	if err != nil {
-		return SSHAuthentication{}, appWarnings, err
+		return SSHAuthentication{}, allWarnings, err
 	}
 
-	processSummaries, processWarnings, err := actor.getProcessSummariesForApp(application.GUID, false)
-	warnings := append(appWarnings, processWarnings...)
+	if !application.Started() {
+		return SSHAuthentication{}, allWarnings, actionerror.ApplicationNotStartedError{Name: appName}
+	}
+
+	username, processWarnings, err := actor.getUsername(application, processType, processIndex)
+	allWarnings = append(allWarnings, processWarnings...)
 	if err != nil {
-		return SSHAuthentication{}, warnings, err
+		return SSHAuthentication{}, allWarnings, err
+	}
+
+	return SSHAuthentication{
+		Endpoint:           endpoint,
+		HostKeyFingerprint: fingerprint,
+		Passcode:           passcode,
+		Username:           username,
+	}, allWarnings, err
+}
+
+func (actor Actor) getUsername(application Application, processType string, processIndex uint) (string, Warnings, error) {
+	processSummaries, processWarnings, err := actor.getProcessSummariesForApp(application.GUID, false)
+	if err != nil {
+		return "", processWarnings, err
 	}
 
 	var processSummary ProcessSummary
@@ -51,12 +72,9 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 			break
 		}
 	}
-	if processSummary.GUID == "" {
-		return SSHAuthentication{}, warnings, actionerror.ProcessNotFoundError{ProcessType: processType}
-	}
 
-	if !application.Started() {
-		return SSHAuthentication{}, warnings, actionerror.ApplicationNotStartedError{Name: appName}
+	if processSummary.GUID == "" {
+		return "", processWarnings, actionerror.ProcessNotFoundError{ProcessType: processType}
 	}
 
 	var processInstance ProcessInstance
@@ -68,18 +86,12 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 	}
 
 	if processInstance == (ProcessInstance{}) {
-		return SSHAuthentication{}, warnings, actionerror.ProcessInstanceNotFoundError{ProcessType: processType, InstanceIndex: processIndex}
+		return "", processWarnings, actionerror.ProcessInstanceNotFoundError{ProcessType: processType, InstanceIndex: processIndex}
 	}
 
 	if !processInstance.Running() {
-		return SSHAuthentication{}, warnings, actionerror.ProcessInstanceNotRunningError{ProcessType: processType,
-			InstanceIndex: processIndex}
+		return "", processWarnings, actionerror.ProcessInstanceNotRunningError{ProcessType: processType, InstanceIndex: processIndex}
 	}
 
-	return SSHAuthentication{
-		Endpoint:           endpoint,
-		HostKeyFingerprint: fingerprint,
-		Passcode:           passcode,
-		Username:           fmt.Sprintf("cf:%s/%d", processSummary.GUID, processIndex),
-	}, warnings, err
+	return fmt.Sprintf("cf:%s/%d", processSummary.GUID, processIndex), processWarnings, nil
 }
