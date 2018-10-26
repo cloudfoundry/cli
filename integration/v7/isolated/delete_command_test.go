@@ -27,10 +27,10 @@ var _ = Describe("delete command", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("delete - Delete an app"))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("cf delete APP_NAME \\[-r\\] \\[-f\\]"))
+			Eventually(session).Should(Say(`cf delete APP_NAME \[-r\] \[-f\]`))
 			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say("\\s+-f\\s+Force deletion without confirmation"))
-			Eventually(session).Should(Say("\\s+-r\\s+Also delete any mapped routes \\[Not currently functional\\]"))
+			Eventually(session).Should(Say(`\s+-f\s+Force deletion without confirmation`))
+			Eventually(session).Should(Say(`\s+-r\s+Also delete any mapped routes \[Not currently functional\]`))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -138,7 +138,7 @@ var _ = Describe("delete command", func() {
 					It("it displays the app does not exist", func() {
 						username, _ := helpers.GetCredentials()
 						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say(`Really delete the app %s\? \[yN\]`, appName))
 						Eventually(session).Should(Say("Deleting app %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
 						Eventually(session).Should(Say("App %s does not exist", appName))
 						Eventually(session).Should(Say("OK"))
@@ -153,7 +153,7 @@ var _ = Describe("delete command", func() {
 
 					It("does not delete the app", func() {
 						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say(`Really delete the app %s\? \[yN\]`, appName))
 						Eventually(session).Should(Say("Delete cancelled"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -166,7 +166,7 @@ var _ = Describe("delete command", func() {
 
 					It("does not delete the app", func() {
 						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say(`Really delete the app %s\? \[yN\]`, appName))
 						Eventually(session).Should(Say("Delete cancelled"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -182,9 +182,9 @@ var _ = Describe("delete command", func() {
 
 					It("asks again", func() {
 						session := helpers.CFWithStdin(buffer, "delete", appName)
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
-						Eventually(session).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
-						Eventually(session).Should(Say("Really delete the app %s\\? \\[yN\\]", appName))
+						Eventually(session).Should(Say(`Really delete the app %s\? \[yN\]`, appName))
+						Eventually(session).Should(Say(`invalid input \(not y, n, yes, or no\)`))
+						Eventually(session).Should(Say(`Really delete the app %s\? \[yN\]`, appName))
 						Eventually(session).Should(Exit(0))
 					})
 				})

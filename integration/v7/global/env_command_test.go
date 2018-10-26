@@ -62,7 +62,7 @@ var _ = Describe("env command", func() {
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("env", appName, envVarName, envVarValue)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
+				Eventually(session.Err).Should(Say(`No API endpoint set\. Use 'cf login' or 'cf api' to target an endpoint\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -75,7 +75,7 @@ var _ = Describe("env command", func() {
 			It("fails with not logged in message", func() {
 				session := helpers.CF("env", appName, envVarName, envVarValue)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
+				Eventually(session.Err).Should(Say(`Not logged in\. Use 'cf login' to log in\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -89,7 +89,7 @@ var _ = Describe("env command", func() {
 			It("fails with no org targeted error message", func() {
 				session := helpers.CF("env", appName, envVarName, envVarValue)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
+				Eventually(session.Err).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -104,7 +104,7 @@ var _ = Describe("env command", func() {
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("env", appName, envVarName, envVarValue)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
+				Eventually(session.Err).Should(Say(`No space targeted, use 'cf target -s SPACE' to target a space\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -127,7 +127,7 @@ var _ = Describe("env command", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("env", invalidAppName)
 
-				Eventually(session).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, invalidAppName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("OK"))
 
 				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
@@ -166,11 +166,11 @@ var _ = Describe("env command", func() {
 				By("displaying env variables when they are set")
 				session := helpers.CF("env", appName)
 
-				Eventually(session).Should(Say(fmt.Sprintf("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName)))
+				Eventually(session).Should(Say(fmt.Sprintf(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName)))
 				Eventually(session).Should(Say("OK"))
 
 				Eventually(session).Should(Say("System-Provided:"))
-				Eventually(session).Should(Say("VCAP_SERVICES: {\\s*\n"))
+				Eventually(session).Should(Say(`VCAP_SERVICES: {\s*\n`))
 				Eventually(session).Should(Say("VCAP_APPLICATION"))
 
 				Eventually(session).Should(Say("User-Provided:"))
@@ -199,7 +199,7 @@ var _ = Describe("env command", func() {
 				Eventually(helpers.CF("set-staging-environment-variable-group", `{}`)).Should(Exit(0))
 
 				session = helpers.CF("env", appName)
-				Eventually(session).Should(Say("Getting env variables for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting env variables for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("OK"))
 
 				Eventually(session).Should(Say("System-Provided:"))
