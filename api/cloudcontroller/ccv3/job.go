@@ -65,8 +65,8 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 		job         Job
 	)
 
-	startTime := time.Now()
-	for time.Now().Sub(startTime) < client.jobPollingTimeout {
+	startTime := client.clock.Now()
+	for client.clock.Now().Sub(startTime) < client.jobPollingTimeout {
 		job, warnings, err = client.GetJob(jobURL)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {

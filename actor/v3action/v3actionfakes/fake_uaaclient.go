@@ -2,17 +2,17 @@
 package v3actionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
 )
 
 type FakeUAAClient struct {
-	GetSSHPasscodeStub        func(accessToken string, sshOAuthClient string) (string, error)
+	GetSSHPasscodeStub        func(string, string) (string, error)
 	getSSHPasscodeMutex       sync.RWMutex
 	getSSHPasscodeArgsForCall []struct {
-		accessToken    string
-		sshOAuthClient string
+		arg1 string
+		arg2 string
 	}
 	getSSHPasscodeReturns struct {
 		result1 string
@@ -26,22 +26,23 @@ type FakeUAAClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUAAClient) GetSSHPasscode(accessToken string, sshOAuthClient string) (string, error) {
+func (fake *FakeUAAClient) GetSSHPasscode(arg1 string, arg2 string) (string, error) {
 	fake.getSSHPasscodeMutex.Lock()
 	ret, specificReturn := fake.getSSHPasscodeReturnsOnCall[len(fake.getSSHPasscodeArgsForCall)]
 	fake.getSSHPasscodeArgsForCall = append(fake.getSSHPasscodeArgsForCall, struct {
-		accessToken    string
-		sshOAuthClient string
-	}{accessToken, sshOAuthClient})
-	fake.recordInvocation("GetSSHPasscode", []interface{}{accessToken, sshOAuthClient})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetSSHPasscode", []interface{}{arg1, arg2})
 	fake.getSSHPasscodeMutex.Unlock()
 	if fake.GetSSHPasscodeStub != nil {
-		return fake.GetSSHPasscodeStub(accessToken, sshOAuthClient)
+		return fake.GetSSHPasscodeStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.getSSHPasscodeReturns.result1, fake.getSSHPasscodeReturns.result2
+	fakeReturns := fake.getSSHPasscodeReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeUAAClient) GetSSHPasscodeCallCount() int {
@@ -50,13 +51,22 @@ func (fake *FakeUAAClient) GetSSHPasscodeCallCount() int {
 	return len(fake.getSSHPasscodeArgsForCall)
 }
 
+func (fake *FakeUAAClient) GetSSHPasscodeCalls(stub func(string, string) (string, error)) {
+	fake.getSSHPasscodeMutex.Lock()
+	defer fake.getSSHPasscodeMutex.Unlock()
+	fake.GetSSHPasscodeStub = stub
+}
+
 func (fake *FakeUAAClient) GetSSHPasscodeArgsForCall(i int) (string, string) {
 	fake.getSSHPasscodeMutex.RLock()
 	defer fake.getSSHPasscodeMutex.RUnlock()
-	return fake.getSSHPasscodeArgsForCall[i].accessToken, fake.getSSHPasscodeArgsForCall[i].sshOAuthClient
+	argsForCall := fake.getSSHPasscodeArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeUAAClient) GetSSHPasscodeReturns(result1 string, result2 error) {
+	fake.getSSHPasscodeMutex.Lock()
+	defer fake.getSSHPasscodeMutex.Unlock()
 	fake.GetSSHPasscodeStub = nil
 	fake.getSSHPasscodeReturns = struct {
 		result1 string
@@ -65,6 +75,8 @@ func (fake *FakeUAAClient) GetSSHPasscodeReturns(result1 string, result2 error) 
 }
 
 func (fake *FakeUAAClient) GetSSHPasscodeReturnsOnCall(i int, result1 string, result2 error) {
+	fake.getSSHPasscodeMutex.Lock()
+	defer fake.getSSHPasscodeMutex.Unlock()
 	fake.GetSSHPasscodeStub = nil
 	if fake.getSSHPasscodeReturnsOnCall == nil {
 		fake.getSSHPasscodeReturnsOnCall = make(map[int]struct {

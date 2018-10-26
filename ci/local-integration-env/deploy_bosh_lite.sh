@@ -40,7 +40,7 @@ cleanup_vms_and_stemcells () {
 setup_git_repositories () { # Takes one argument, which is the directory to clone the repos into
   if [ ! -d $BOSH_DEPLOYMENT ]; then
     echo "cloning cloudfoundry/bosh-deployment to $BOSH_DEPLOYMENT"
-    git clone https://github.com/cloudfoundry/bosh-deployment.git
+    git clone https://github.com/cloudfoundry/bosh-deployment.git $BOSH_DEPLOYMENT
   fi
   pushd $BOSH_DEPLOYMENT
     git pull
@@ -48,7 +48,7 @@ setup_git_repositories () { # Takes one argument, which is the directory to clon
 
   if [ ! -d $CF_DEPLOYMENT ]; then
     echo "cloning cloudfoundry/cf-deployment to $CF_DEPLOYMENT"
-    git clone https://github.com/cloudfoundry/cf-deployment.git
+    git clone https://github.com/cloudfoundry/cf-deployment.git $CF_DEPLOYMENT
   fi
   pushd $CF_DEPLOYMENT
     git checkout master

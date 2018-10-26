@@ -16,7 +16,7 @@ var _ = Describe("Service Instance", func() {
 	var client *Client
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("GetServiceInstances", func() {

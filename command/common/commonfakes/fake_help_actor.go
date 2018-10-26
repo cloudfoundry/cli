@@ -2,10 +2,10 @@
 package commonfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/command/common"
+	sharedaction "code.cloudfoundry.org/cli/actor/sharedaction"
+	common "code.cloudfoundry.org/cli/command/common"
 )
 
 type FakeHelpActor struct {
@@ -53,7 +53,8 @@ func (fake *FakeHelpActor) CommandInfoByName(arg1 interface{}, arg2 string) (sha
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.commandInfoByNameReturns.result1, fake.commandInfoByNameReturns.result2
+	fakeReturns := fake.commandInfoByNameReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeHelpActor) CommandInfoByNameCallCount() int {
@@ -62,13 +63,22 @@ func (fake *FakeHelpActor) CommandInfoByNameCallCount() int {
 	return len(fake.commandInfoByNameArgsForCall)
 }
 
+func (fake *FakeHelpActor) CommandInfoByNameCalls(stub func(interface{}, string) (sharedaction.CommandInfo, error)) {
+	fake.commandInfoByNameMutex.Lock()
+	defer fake.commandInfoByNameMutex.Unlock()
+	fake.CommandInfoByNameStub = stub
+}
+
 func (fake *FakeHelpActor) CommandInfoByNameArgsForCall(i int) (interface{}, string) {
 	fake.commandInfoByNameMutex.RLock()
 	defer fake.commandInfoByNameMutex.RUnlock()
-	return fake.commandInfoByNameArgsForCall[i].arg1, fake.commandInfoByNameArgsForCall[i].arg2
+	argsForCall := fake.commandInfoByNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeHelpActor) CommandInfoByNameReturns(result1 sharedaction.CommandInfo, result2 error) {
+	fake.commandInfoByNameMutex.Lock()
+	defer fake.commandInfoByNameMutex.Unlock()
 	fake.CommandInfoByNameStub = nil
 	fake.commandInfoByNameReturns = struct {
 		result1 sharedaction.CommandInfo
@@ -77,6 +87,8 @@ func (fake *FakeHelpActor) CommandInfoByNameReturns(result1 sharedaction.Command
 }
 
 func (fake *FakeHelpActor) CommandInfoByNameReturnsOnCall(i int, result1 sharedaction.CommandInfo, result2 error) {
+	fake.commandInfoByNameMutex.Lock()
+	defer fake.commandInfoByNameMutex.Unlock()
 	fake.CommandInfoByNameStub = nil
 	if fake.commandInfoByNameReturnsOnCall == nil {
 		fake.commandInfoByNameReturnsOnCall = make(map[int]struct {
@@ -104,7 +116,8 @@ func (fake *FakeHelpActor) CommandInfos(arg1 interface{}) map[string]sharedactio
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.commandInfosReturns.result1
+	fakeReturns := fake.commandInfosReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeHelpActor) CommandInfosCallCount() int {
@@ -113,13 +126,22 @@ func (fake *FakeHelpActor) CommandInfosCallCount() int {
 	return len(fake.commandInfosArgsForCall)
 }
 
+func (fake *FakeHelpActor) CommandInfosCalls(stub func(interface{}) map[string]sharedaction.CommandInfo) {
+	fake.commandInfosMutex.Lock()
+	defer fake.commandInfosMutex.Unlock()
+	fake.CommandInfosStub = stub
+}
+
 func (fake *FakeHelpActor) CommandInfosArgsForCall(i int) interface{} {
 	fake.commandInfosMutex.RLock()
 	defer fake.commandInfosMutex.RUnlock()
-	return fake.commandInfosArgsForCall[i].arg1
+	argsForCall := fake.commandInfosArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeHelpActor) CommandInfosReturns(result1 map[string]sharedaction.CommandInfo) {
+	fake.commandInfosMutex.Lock()
+	defer fake.commandInfosMutex.Unlock()
 	fake.CommandInfosStub = nil
 	fake.commandInfosReturns = struct {
 		result1 map[string]sharedaction.CommandInfo
@@ -127,6 +149,8 @@ func (fake *FakeHelpActor) CommandInfosReturns(result1 map[string]sharedaction.C
 }
 
 func (fake *FakeHelpActor) CommandInfosReturnsOnCall(i int, result1 map[string]sharedaction.CommandInfo) {
+	fake.commandInfosMutex.Lock()
+	defer fake.commandInfosMutex.Unlock()
 	fake.CommandInfosStub = nil
 	if fake.commandInfosReturnsOnCall == nil {
 		fake.commandInfosReturnsOnCall = make(map[int]struct {

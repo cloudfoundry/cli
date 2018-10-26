@@ -2,17 +2,17 @@
 package v2actionfakes
 
 import (
-	"io"
-	"sync"
+	io "io"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
 )
 
 type FakeSimpleProgressBar struct {
-	InitializeStub        func(path string) (io.Reader, int64, error)
+	InitializeStub        func(string) (io.Reader, int64, error)
 	initializeMutex       sync.RWMutex
 	initializeArgsForCall []struct {
-		path string
+		arg1 string
 	}
 	initializeReturns struct {
 		result1 io.Reader
@@ -26,26 +26,28 @@ type FakeSimpleProgressBar struct {
 	}
 	TerminateStub        func()
 	terminateMutex       sync.RWMutex
-	terminateArgsForCall []struct{}
-	invocations          map[string][][]interface{}
-	invocationsMutex     sync.RWMutex
+	terminateArgsForCall []struct {
+	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSimpleProgressBar) Initialize(path string) (io.Reader, int64, error) {
+func (fake *FakeSimpleProgressBar) Initialize(arg1 string) (io.Reader, int64, error) {
 	fake.initializeMutex.Lock()
 	ret, specificReturn := fake.initializeReturnsOnCall[len(fake.initializeArgsForCall)]
 	fake.initializeArgsForCall = append(fake.initializeArgsForCall, struct {
-		path string
-	}{path})
-	fake.recordInvocation("Initialize", []interface{}{path})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("Initialize", []interface{}{arg1})
 	fake.initializeMutex.Unlock()
 	if fake.InitializeStub != nil {
-		return fake.InitializeStub(path)
+		return fake.InitializeStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.initializeReturns.result1, fake.initializeReturns.result2, fake.initializeReturns.result3
+	fakeReturns := fake.initializeReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeSimpleProgressBar) InitializeCallCount() int {
@@ -54,13 +56,22 @@ func (fake *FakeSimpleProgressBar) InitializeCallCount() int {
 	return len(fake.initializeArgsForCall)
 }
 
+func (fake *FakeSimpleProgressBar) InitializeCalls(stub func(string) (io.Reader, int64, error)) {
+	fake.initializeMutex.Lock()
+	defer fake.initializeMutex.Unlock()
+	fake.InitializeStub = stub
+}
+
 func (fake *FakeSimpleProgressBar) InitializeArgsForCall(i int) string {
 	fake.initializeMutex.RLock()
 	defer fake.initializeMutex.RUnlock()
-	return fake.initializeArgsForCall[i].path
+	argsForCall := fake.initializeArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeSimpleProgressBar) InitializeReturns(result1 io.Reader, result2 int64, result3 error) {
+	fake.initializeMutex.Lock()
+	defer fake.initializeMutex.Unlock()
 	fake.InitializeStub = nil
 	fake.initializeReturns = struct {
 		result1 io.Reader
@@ -70,6 +81,8 @@ func (fake *FakeSimpleProgressBar) InitializeReturns(result1 io.Reader, result2 
 }
 
 func (fake *FakeSimpleProgressBar) InitializeReturnsOnCall(i int, result1 io.Reader, result2 int64, result3 error) {
+	fake.initializeMutex.Lock()
+	defer fake.initializeMutex.Unlock()
 	fake.InitializeStub = nil
 	if fake.initializeReturnsOnCall == nil {
 		fake.initializeReturnsOnCall = make(map[int]struct {
@@ -87,7 +100,8 @@ func (fake *FakeSimpleProgressBar) InitializeReturnsOnCall(i int, result1 io.Rea
 
 func (fake *FakeSimpleProgressBar) Terminate() {
 	fake.terminateMutex.Lock()
-	fake.terminateArgsForCall = append(fake.terminateArgsForCall, struct{}{})
+	fake.terminateArgsForCall = append(fake.terminateArgsForCall, struct {
+	}{})
 	fake.recordInvocation("Terminate", []interface{}{})
 	fake.terminateMutex.Unlock()
 	if fake.TerminateStub != nil {
@@ -99,6 +113,12 @@ func (fake *FakeSimpleProgressBar) TerminateCallCount() int {
 	fake.terminateMutex.RLock()
 	defer fake.terminateMutex.RUnlock()
 	return len(fake.terminateArgsForCall)
+}
+
+func (fake *FakeSimpleProgressBar) TerminateCalls(stub func()) {
+	fake.terminateMutex.Lock()
+	defer fake.terminateMutex.Unlock()
+	fake.TerminateStub = stub
 }
 
 func (fake *FakeSimpleProgressBar) Invocations() map[string][][]interface{} {

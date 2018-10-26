@@ -2,31 +2,47 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
-	"code.cloudfoundry.org/cli/types"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
+	types "code.cloudfoundry.org/cli/types"
 )
 
 type FakeUpdateBuildpackActor struct {
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	UpdateBuildpackByNameAndStackStub        func(name, stack string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error)
+	PrepareBuildpackBitsStub        func(string, string, v2action.Downloader) (string, error)
+	prepareBuildpackBitsMutex       sync.RWMutex
+	prepareBuildpackBitsArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 v2action.Downloader
+	}
+	prepareBuildpackBitsReturns struct {
+		result1 string
+		result2 error
+	}
+	prepareBuildpackBitsReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
+	UpdateBuildpackByNameAndStackStub        func(string, string, types.NullInt, types.NullBool, types.NullBool) (string, v2action.Warnings, error)
 	updateBuildpackByNameAndStackMutex       sync.RWMutex
 	updateBuildpackByNameAndStackArgsForCall []struct {
-		name     string
-		stack    string
-		position types.NullInt
-		locked   types.NullBool
-		enabled  types.NullBool
+		arg1 string
+		arg2 string
+		arg3 types.NullInt
+		arg4 types.NullBool
+		arg5 types.NullBool
 	}
 	updateBuildpackByNameAndStackReturns struct {
 		result1 string
@@ -38,27 +54,12 @@ type FakeUpdateBuildpackActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	PrepareBuildpackBitsStub        func(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error)
-	prepareBuildpackBitsMutex       sync.RWMutex
-	prepareBuildpackBitsArgsForCall []struct {
-		inputPath  string
-		tmpDirPath string
-		downloader v2action.Downloader
-	}
-	prepareBuildpackBitsReturns struct {
-		result1 string
-		result2 error
-	}
-	prepareBuildpackBitsReturnsOnCall map[int]struct {
-		result1 string
-		result2 error
-	}
-	UploadBuildpackStub        func(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
+	UploadBuildpackStub        func(string, string, v2action.SimpleProgressBar) (v2action.Warnings, error)
 	uploadBuildpackMutex       sync.RWMutex
 	uploadBuildpackArgsForCall []struct {
-		GUID    string
-		path    string
-		progBar v2action.SimpleProgressBar
+		arg1 string
+		arg2 string
+		arg3 v2action.SimpleProgressBar
 	}
 	uploadBuildpackReturns struct {
 		result1 v2action.Warnings
@@ -75,7 +76,8 @@ type FakeUpdateBuildpackActor struct {
 func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -84,7 +86,8 @@ func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersionCallCount() int {
@@ -93,7 +96,15 @@ func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersionCallCount() int {
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -101,6 +112,8 @@ func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersionReturns(result1 s
 }
 
 func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -112,25 +125,91 @@ func (fake *FakeUpdateBuildpackActor) CloudControllerAPIVersionReturnsOnCall(i i
 	}{result1}
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStack(name string, stack string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error) {
+func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBits(arg1 string, arg2 string, arg3 v2action.Downloader) (string, error) {
+	fake.prepareBuildpackBitsMutex.Lock()
+	ret, specificReturn := fake.prepareBuildpackBitsReturnsOnCall[len(fake.prepareBuildpackBitsArgsForCall)]
+	fake.prepareBuildpackBitsArgsForCall = append(fake.prepareBuildpackBitsArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 v2action.Downloader
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("PrepareBuildpackBits", []interface{}{arg1, arg2, arg3})
+	fake.prepareBuildpackBitsMutex.Unlock()
+	if fake.PrepareBuildpackBitsStub != nil {
+		return fake.PrepareBuildpackBitsStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.prepareBuildpackBitsReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBitsCallCount() int {
+	fake.prepareBuildpackBitsMutex.RLock()
+	defer fake.prepareBuildpackBitsMutex.RUnlock()
+	return len(fake.prepareBuildpackBitsArgsForCall)
+}
+
+func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBitsCalls(stub func(string, string, v2action.Downloader) (string, error)) {
+	fake.prepareBuildpackBitsMutex.Lock()
+	defer fake.prepareBuildpackBitsMutex.Unlock()
+	fake.PrepareBuildpackBitsStub = stub
+}
+
+func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBitsArgsForCall(i int) (string, string, v2action.Downloader) {
+	fake.prepareBuildpackBitsMutex.RLock()
+	defer fake.prepareBuildpackBitsMutex.RUnlock()
+	argsForCall := fake.prepareBuildpackBitsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBitsReturns(result1 string, result2 error) {
+	fake.prepareBuildpackBitsMutex.Lock()
+	defer fake.prepareBuildpackBitsMutex.Unlock()
+	fake.PrepareBuildpackBitsStub = nil
+	fake.prepareBuildpackBitsReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBitsReturnsOnCall(i int, result1 string, result2 error) {
+	fake.prepareBuildpackBitsMutex.Lock()
+	defer fake.prepareBuildpackBitsMutex.Unlock()
+	fake.PrepareBuildpackBitsStub = nil
+	if fake.prepareBuildpackBitsReturnsOnCall == nil {
+		fake.prepareBuildpackBitsReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.prepareBuildpackBitsReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStack(arg1 string, arg2 string, arg3 types.NullInt, arg4 types.NullBool, arg5 types.NullBool) (string, v2action.Warnings, error) {
 	fake.updateBuildpackByNameAndStackMutex.Lock()
 	ret, specificReturn := fake.updateBuildpackByNameAndStackReturnsOnCall[len(fake.updateBuildpackByNameAndStackArgsForCall)]
 	fake.updateBuildpackByNameAndStackArgsForCall = append(fake.updateBuildpackByNameAndStackArgsForCall, struct {
-		name     string
-		stack    string
-		position types.NullInt
-		locked   types.NullBool
-		enabled  types.NullBool
-	}{name, stack, position, locked, enabled})
-	fake.recordInvocation("UpdateBuildpackByNameAndStack", []interface{}{name, stack, position, locked, enabled})
+		arg1 string
+		arg2 string
+		arg3 types.NullInt
+		arg4 types.NullBool
+		arg5 types.NullBool
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("UpdateBuildpackByNameAndStack", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.updateBuildpackByNameAndStackMutex.Unlock()
 	if fake.UpdateBuildpackByNameAndStackStub != nil {
-		return fake.UpdateBuildpackByNameAndStackStub(name, stack, position, locked, enabled)
+		return fake.UpdateBuildpackByNameAndStackStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.updateBuildpackByNameAndStackReturns.result1, fake.updateBuildpackByNameAndStackReturns.result2, fake.updateBuildpackByNameAndStackReturns.result3
+	fakeReturns := fake.updateBuildpackByNameAndStackReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackCallCount() int {
@@ -139,13 +218,22 @@ func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackCallCount() i
 	return len(fake.updateBuildpackByNameAndStackArgsForCall)
 }
 
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackCalls(stub func(string, string, types.NullInt, types.NullBool, types.NullBool) (string, v2action.Warnings, error)) {
+	fake.updateBuildpackByNameAndStackMutex.Lock()
+	defer fake.updateBuildpackByNameAndStackMutex.Unlock()
+	fake.UpdateBuildpackByNameAndStackStub = stub
+}
+
 func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackArgsForCall(i int) (string, string, types.NullInt, types.NullBool, types.NullBool) {
 	fake.updateBuildpackByNameAndStackMutex.RLock()
 	defer fake.updateBuildpackByNameAndStackMutex.RUnlock()
-	return fake.updateBuildpackByNameAndStackArgsForCall[i].name, fake.updateBuildpackByNameAndStackArgsForCall[i].stack, fake.updateBuildpackByNameAndStackArgsForCall[i].position, fake.updateBuildpackByNameAndStackArgsForCall[i].locked, fake.updateBuildpackByNameAndStackArgsForCall[i].enabled
+	argsForCall := fake.updateBuildpackByNameAndStackArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackReturns(result1 string, result2 v2action.Warnings, result3 error) {
+	fake.updateBuildpackByNameAndStackMutex.Lock()
+	defer fake.updateBuildpackByNameAndStackMutex.Unlock()
 	fake.UpdateBuildpackByNameAndStackStub = nil
 	fake.updateBuildpackByNameAndStackReturns = struct {
 		result1 string
@@ -155,6 +243,8 @@ func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackReturns(resul
 }
 
 func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackReturnsOnCall(i int, result1 string, result2 v2action.Warnings, result3 error) {
+	fake.updateBuildpackByNameAndStackMutex.Lock()
+	defer fake.updateBuildpackByNameAndStackMutex.Unlock()
 	fake.UpdateBuildpackByNameAndStackStub = nil
 	if fake.updateBuildpackByNameAndStackReturnsOnCall == nil {
 		fake.updateBuildpackByNameAndStackReturnsOnCall = make(map[int]struct {
@@ -170,76 +260,24 @@ func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackReturnsOnCall
 	}{result1, result2, result3}
 }
 
-func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error) {
-	fake.prepareBuildpackBitsMutex.Lock()
-	ret, specificReturn := fake.prepareBuildpackBitsReturnsOnCall[len(fake.prepareBuildpackBitsArgsForCall)]
-	fake.prepareBuildpackBitsArgsForCall = append(fake.prepareBuildpackBitsArgsForCall, struct {
-		inputPath  string
-		tmpDirPath string
-		downloader v2action.Downloader
-	}{inputPath, tmpDirPath, downloader})
-	fake.recordInvocation("PrepareBuildpackBits", []interface{}{inputPath, tmpDirPath, downloader})
-	fake.prepareBuildpackBitsMutex.Unlock()
-	if fake.PrepareBuildpackBitsStub != nil {
-		return fake.PrepareBuildpackBitsStub(inputPath, tmpDirPath, downloader)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fake.prepareBuildpackBitsReturns.result1, fake.prepareBuildpackBitsReturns.result2
-}
-
-func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBitsCallCount() int {
-	fake.prepareBuildpackBitsMutex.RLock()
-	defer fake.prepareBuildpackBitsMutex.RUnlock()
-	return len(fake.prepareBuildpackBitsArgsForCall)
-}
-
-func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBitsArgsForCall(i int) (string, string, v2action.Downloader) {
-	fake.prepareBuildpackBitsMutex.RLock()
-	defer fake.prepareBuildpackBitsMutex.RUnlock()
-	return fake.prepareBuildpackBitsArgsForCall[i].inputPath, fake.prepareBuildpackBitsArgsForCall[i].tmpDirPath, fake.prepareBuildpackBitsArgsForCall[i].downloader
-}
-
-func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBitsReturns(result1 string, result2 error) {
-	fake.PrepareBuildpackBitsStub = nil
-	fake.prepareBuildpackBitsReturns = struct {
-		result1 string
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBitsReturnsOnCall(i int, result1 string, result2 error) {
-	fake.PrepareBuildpackBitsStub = nil
-	if fake.prepareBuildpackBitsReturnsOnCall == nil {
-		fake.prepareBuildpackBitsReturnsOnCall = make(map[int]struct {
-			result1 string
-			result2 error
-		})
-	}
-	fake.prepareBuildpackBitsReturnsOnCall[i] = struct {
-		result1 string
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeUpdateBuildpackActor) UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error) {
+func (fake *FakeUpdateBuildpackActor) UploadBuildpack(arg1 string, arg2 string, arg3 v2action.SimpleProgressBar) (v2action.Warnings, error) {
 	fake.uploadBuildpackMutex.Lock()
 	ret, specificReturn := fake.uploadBuildpackReturnsOnCall[len(fake.uploadBuildpackArgsForCall)]
 	fake.uploadBuildpackArgsForCall = append(fake.uploadBuildpackArgsForCall, struct {
-		GUID    string
-		path    string
-		progBar v2action.SimpleProgressBar
-	}{GUID, path, progBar})
-	fake.recordInvocation("UploadBuildpack", []interface{}{GUID, path, progBar})
+		arg1 string
+		arg2 string
+		arg3 v2action.SimpleProgressBar
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("UploadBuildpack", []interface{}{arg1, arg2, arg3})
 	fake.uploadBuildpackMutex.Unlock()
 	if fake.UploadBuildpackStub != nil {
-		return fake.UploadBuildpackStub(GUID, path, progBar)
+		return fake.UploadBuildpackStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.uploadBuildpackReturns.result1, fake.uploadBuildpackReturns.result2
+	fakeReturns := fake.uploadBuildpackReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeUpdateBuildpackActor) UploadBuildpackCallCount() int {
@@ -248,13 +286,22 @@ func (fake *FakeUpdateBuildpackActor) UploadBuildpackCallCount() int {
 	return len(fake.uploadBuildpackArgsForCall)
 }
 
+func (fake *FakeUpdateBuildpackActor) UploadBuildpackCalls(stub func(string, string, v2action.SimpleProgressBar) (v2action.Warnings, error)) {
+	fake.uploadBuildpackMutex.Lock()
+	defer fake.uploadBuildpackMutex.Unlock()
+	fake.UploadBuildpackStub = stub
+}
+
 func (fake *FakeUpdateBuildpackActor) UploadBuildpackArgsForCall(i int) (string, string, v2action.SimpleProgressBar) {
 	fake.uploadBuildpackMutex.RLock()
 	defer fake.uploadBuildpackMutex.RUnlock()
-	return fake.uploadBuildpackArgsForCall[i].GUID, fake.uploadBuildpackArgsForCall[i].path, fake.uploadBuildpackArgsForCall[i].progBar
+	argsForCall := fake.uploadBuildpackArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeUpdateBuildpackActor) UploadBuildpackReturns(result1 v2action.Warnings, result2 error) {
+	fake.uploadBuildpackMutex.Lock()
+	defer fake.uploadBuildpackMutex.Unlock()
 	fake.UploadBuildpackStub = nil
 	fake.uploadBuildpackReturns = struct {
 		result1 v2action.Warnings
@@ -263,6 +310,8 @@ func (fake *FakeUpdateBuildpackActor) UploadBuildpackReturns(result1 v2action.Wa
 }
 
 func (fake *FakeUpdateBuildpackActor) UploadBuildpackReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.uploadBuildpackMutex.Lock()
+	defer fake.uploadBuildpackMutex.Unlock()
 	fake.UploadBuildpackStub = nil
 	if fake.uploadBuildpackReturnsOnCall == nil {
 		fake.uploadBuildpackReturnsOnCall = make(map[int]struct {
@@ -281,10 +330,10 @@ func (fake *FakeUpdateBuildpackActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	fake.updateBuildpackByNameAndStackMutex.RLock()
-	defer fake.updateBuildpackByNameAndStackMutex.RUnlock()
 	fake.prepareBuildpackBitsMutex.RLock()
 	defer fake.prepareBuildpackBitsMutex.RUnlock()
+	fake.updateBuildpackByNameAndStackMutex.RLock()
+	defer fake.updateBuildpackByNameAndStackMutex.RUnlock()
 	fake.uploadBuildpackMutex.RLock()
 	defer fake.uploadBuildpackMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

@@ -19,7 +19,7 @@ var _ = Describe("Cloud Controller Client", func() {
 	)
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("WrapConnection", func() {

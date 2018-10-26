@@ -30,6 +30,12 @@ func (n *NullInt) ParseStringValue(val string) error {
 	return nil
 }
 
+// IsValidValue returns an error if the input value is not an integer.
+func (n *NullInt) IsValidValue(val string) error {
+	_, err := strconv.Atoi(val)
+	return err
+}
+
 // ParseIntValue is used to parse a user provided *int argument.
 func (n *NullInt) ParseIntValue(val *int) {
 	if val == nil {

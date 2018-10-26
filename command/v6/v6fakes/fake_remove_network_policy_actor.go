@@ -2,22 +2,22 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
-	"code.cloudfoundry.org/cli/command/v6"
+	cfnetworkingaction "code.cloudfoundry.org/cli/actor/cfnetworkingaction"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeRemoveNetworkPolicyActor struct {
-	RemoveNetworkPolicyStub        func(spaceGUID string, srcAppName string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
+	RemoveNetworkPolicyStub        func(string, string, string, string, int, int) (cfnetworkingaction.Warnings, error)
 	removeNetworkPolicyMutex       sync.RWMutex
 	removeNetworkPolicyArgsForCall []struct {
-		spaceGUID   string
-		srcAppName  string
-		destAppName string
-		protocol    string
-		startPort   int
-		endPort     int
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 int
+		arg6 int
 	}
 	removeNetworkPolicyReturns struct {
 		result1 cfnetworkingaction.Warnings
@@ -31,26 +31,27 @@ type FakeRemoveNetworkPolicyActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicy(spaceGUID string, srcAppName string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error) {
+func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicy(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int, arg6 int) (cfnetworkingaction.Warnings, error) {
 	fake.removeNetworkPolicyMutex.Lock()
 	ret, specificReturn := fake.removeNetworkPolicyReturnsOnCall[len(fake.removeNetworkPolicyArgsForCall)]
 	fake.removeNetworkPolicyArgsForCall = append(fake.removeNetworkPolicyArgsForCall, struct {
-		spaceGUID   string
-		srcAppName  string
-		destAppName string
-		protocol    string
-		startPort   int
-		endPort     int
-	}{spaceGUID, srcAppName, destAppName, protocol, startPort, endPort})
-	fake.recordInvocation("RemoveNetworkPolicy", []interface{}{spaceGUID, srcAppName, destAppName, protocol, startPort, endPort})
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 int
+		arg6 int
+	}{arg1, arg2, arg3, arg4, arg5, arg6})
+	fake.recordInvocation("RemoveNetworkPolicy", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.removeNetworkPolicyMutex.Unlock()
 	if fake.RemoveNetworkPolicyStub != nil {
-		return fake.RemoveNetworkPolicyStub(spaceGUID, srcAppName, destAppName, protocol, startPort, endPort)
+		return fake.RemoveNetworkPolicyStub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.removeNetworkPolicyReturns.result1, fake.removeNetworkPolicyReturns.result2
+	fakeReturns := fake.removeNetworkPolicyReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyCallCount() int {
@@ -59,13 +60,22 @@ func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyCallCount() int {
 	return len(fake.removeNetworkPolicyArgsForCall)
 }
 
+func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyCalls(stub func(string, string, string, string, int, int) (cfnetworkingaction.Warnings, error)) {
+	fake.removeNetworkPolicyMutex.Lock()
+	defer fake.removeNetworkPolicyMutex.Unlock()
+	fake.RemoveNetworkPolicyStub = stub
+}
+
 func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyArgsForCall(i int) (string, string, string, string, int, int) {
 	fake.removeNetworkPolicyMutex.RLock()
 	defer fake.removeNetworkPolicyMutex.RUnlock()
-	return fake.removeNetworkPolicyArgsForCall[i].spaceGUID, fake.removeNetworkPolicyArgsForCall[i].srcAppName, fake.removeNetworkPolicyArgsForCall[i].destAppName, fake.removeNetworkPolicyArgsForCall[i].protocol, fake.removeNetworkPolicyArgsForCall[i].startPort, fake.removeNetworkPolicyArgsForCall[i].endPort
+	argsForCall := fake.removeNetworkPolicyArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
 }
 
 func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyReturns(result1 cfnetworkingaction.Warnings, result2 error) {
+	fake.removeNetworkPolicyMutex.Lock()
+	defer fake.removeNetworkPolicyMutex.Unlock()
 	fake.RemoveNetworkPolicyStub = nil
 	fake.removeNetworkPolicyReturns = struct {
 		result1 cfnetworkingaction.Warnings
@@ -74,6 +84,8 @@ func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyReturns(result1 cfn
 }
 
 func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyReturnsOnCall(i int, result1 cfnetworkingaction.Warnings, result2 error) {
+	fake.removeNetworkPolicyMutex.Lock()
+	defer fake.removeNetworkPolicyMutex.Unlock()
 	fake.RemoveNetworkPolicyStub = nil
 	if fake.removeNetworkPolicyReturnsOnCall == nil {
 		fake.removeNetworkPolicyReturnsOnCall = make(map[int]struct {

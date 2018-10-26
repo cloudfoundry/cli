@@ -2,26 +2,27 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeResetOrgDefaultIsolationSegmentActor struct {
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	ResetOrganizationDefaultIsolationSegmentStub        func(orgGUID string) (v3action.Warnings, error)
+	ResetOrganizationDefaultIsolationSegmentStub        func(string) (v3action.Warnings, error)
 	resetOrganizationDefaultIsolationSegmentMutex       sync.RWMutex
 	resetOrganizationDefaultIsolationSegmentArgsForCall []struct {
-		orgGUID string
+		arg1 string
 	}
 	resetOrganizationDefaultIsolationSegmentReturns struct {
 		result1 v3action.Warnings
@@ -38,7 +39,8 @@ type FakeResetOrgDefaultIsolationSegmentActor struct {
 func (fake *FakeResetOrgDefaultIsolationSegmentActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -47,7 +49,8 @@ func (fake *FakeResetOrgDefaultIsolationSegmentActor) CloudControllerAPIVersion(
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeResetOrgDefaultIsolationSegmentActor) CloudControllerAPIVersionCallCount() int {
@@ -56,7 +59,15 @@ func (fake *FakeResetOrgDefaultIsolationSegmentActor) CloudControllerAPIVersionC
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeResetOrgDefaultIsolationSegmentActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeResetOrgDefaultIsolationSegmentActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -64,6 +75,8 @@ func (fake *FakeResetOrgDefaultIsolationSegmentActor) CloudControllerAPIVersionR
 }
 
 func (fake *FakeResetOrgDefaultIsolationSegmentActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -75,21 +88,22 @@ func (fake *FakeResetOrgDefaultIsolationSegmentActor) CloudControllerAPIVersionR
 	}{result1}
 }
 
-func (fake *FakeResetOrgDefaultIsolationSegmentActor) ResetOrganizationDefaultIsolationSegment(orgGUID string) (v3action.Warnings, error) {
+func (fake *FakeResetOrgDefaultIsolationSegmentActor) ResetOrganizationDefaultIsolationSegment(arg1 string) (v3action.Warnings, error) {
 	fake.resetOrganizationDefaultIsolationSegmentMutex.Lock()
 	ret, specificReturn := fake.resetOrganizationDefaultIsolationSegmentReturnsOnCall[len(fake.resetOrganizationDefaultIsolationSegmentArgsForCall)]
 	fake.resetOrganizationDefaultIsolationSegmentArgsForCall = append(fake.resetOrganizationDefaultIsolationSegmentArgsForCall, struct {
-		orgGUID string
-	}{orgGUID})
-	fake.recordInvocation("ResetOrganizationDefaultIsolationSegment", []interface{}{orgGUID})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("ResetOrganizationDefaultIsolationSegment", []interface{}{arg1})
 	fake.resetOrganizationDefaultIsolationSegmentMutex.Unlock()
 	if fake.ResetOrganizationDefaultIsolationSegmentStub != nil {
-		return fake.ResetOrganizationDefaultIsolationSegmentStub(orgGUID)
+		return fake.ResetOrganizationDefaultIsolationSegmentStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.resetOrganizationDefaultIsolationSegmentReturns.result1, fake.resetOrganizationDefaultIsolationSegmentReturns.result2
+	fakeReturns := fake.resetOrganizationDefaultIsolationSegmentReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeResetOrgDefaultIsolationSegmentActor) ResetOrganizationDefaultIsolationSegmentCallCount() int {
@@ -98,13 +112,22 @@ func (fake *FakeResetOrgDefaultIsolationSegmentActor) ResetOrganizationDefaultIs
 	return len(fake.resetOrganizationDefaultIsolationSegmentArgsForCall)
 }
 
+func (fake *FakeResetOrgDefaultIsolationSegmentActor) ResetOrganizationDefaultIsolationSegmentCalls(stub func(string) (v3action.Warnings, error)) {
+	fake.resetOrganizationDefaultIsolationSegmentMutex.Lock()
+	defer fake.resetOrganizationDefaultIsolationSegmentMutex.Unlock()
+	fake.ResetOrganizationDefaultIsolationSegmentStub = stub
+}
+
 func (fake *FakeResetOrgDefaultIsolationSegmentActor) ResetOrganizationDefaultIsolationSegmentArgsForCall(i int) string {
 	fake.resetOrganizationDefaultIsolationSegmentMutex.RLock()
 	defer fake.resetOrganizationDefaultIsolationSegmentMutex.RUnlock()
-	return fake.resetOrganizationDefaultIsolationSegmentArgsForCall[i].orgGUID
+	argsForCall := fake.resetOrganizationDefaultIsolationSegmentArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeResetOrgDefaultIsolationSegmentActor) ResetOrganizationDefaultIsolationSegmentReturns(result1 v3action.Warnings, result2 error) {
+	fake.resetOrganizationDefaultIsolationSegmentMutex.Lock()
+	defer fake.resetOrganizationDefaultIsolationSegmentMutex.Unlock()
 	fake.ResetOrganizationDefaultIsolationSegmentStub = nil
 	fake.resetOrganizationDefaultIsolationSegmentReturns = struct {
 		result1 v3action.Warnings
@@ -113,6 +136,8 @@ func (fake *FakeResetOrgDefaultIsolationSegmentActor) ResetOrganizationDefaultIs
 }
 
 func (fake *FakeResetOrgDefaultIsolationSegmentActor) ResetOrganizationDefaultIsolationSegmentReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
+	fake.resetOrganizationDefaultIsolationSegmentMutex.Lock()
+	defer fake.resetOrganizationDefaultIsolationSegmentMutex.Unlock()
 	fake.ResetOrganizationDefaultIsolationSegmentStub = nil
 	if fake.resetOrganizationDefaultIsolationSegmentReturnsOnCall == nil {
 		fake.resetOrganizationDefaultIsolationSegmentReturnsOnCall = make(map[int]struct {

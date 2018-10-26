@@ -2,17 +2,17 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeSpacesActor struct {
-	GetOrganizationSpacesStub        func(orgGUID string) ([]v2action.Space, v2action.Warnings, error)
+	GetOrganizationSpacesStub        func(string) ([]v2action.Space, v2action.Warnings, error)
 	getOrganizationSpacesMutex       sync.RWMutex
 	getOrganizationSpacesArgsForCall []struct {
-		orgGUID string
+		arg1 string
 	}
 	getOrganizationSpacesReturns struct {
 		result1 []v2action.Space
@@ -28,21 +28,22 @@ type FakeSpacesActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSpacesActor) GetOrganizationSpaces(orgGUID string) ([]v2action.Space, v2action.Warnings, error) {
+func (fake *FakeSpacesActor) GetOrganizationSpaces(arg1 string) ([]v2action.Space, v2action.Warnings, error) {
 	fake.getOrganizationSpacesMutex.Lock()
 	ret, specificReturn := fake.getOrganizationSpacesReturnsOnCall[len(fake.getOrganizationSpacesArgsForCall)]
 	fake.getOrganizationSpacesArgsForCall = append(fake.getOrganizationSpacesArgsForCall, struct {
-		orgGUID string
-	}{orgGUID})
-	fake.recordInvocation("GetOrganizationSpaces", []interface{}{orgGUID})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationSpaces", []interface{}{arg1})
 	fake.getOrganizationSpacesMutex.Unlock()
 	if fake.GetOrganizationSpacesStub != nil {
-		return fake.GetOrganizationSpacesStub(orgGUID)
+		return fake.GetOrganizationSpacesStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getOrganizationSpacesReturns.result1, fake.getOrganizationSpacesReturns.result2, fake.getOrganizationSpacesReturns.result3
+	fakeReturns := fake.getOrganizationSpacesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeSpacesActor) GetOrganizationSpacesCallCount() int {
@@ -51,13 +52,22 @@ func (fake *FakeSpacesActor) GetOrganizationSpacesCallCount() int {
 	return len(fake.getOrganizationSpacesArgsForCall)
 }
 
+func (fake *FakeSpacesActor) GetOrganizationSpacesCalls(stub func(string) ([]v2action.Space, v2action.Warnings, error)) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
+	fake.GetOrganizationSpacesStub = stub
+}
+
 func (fake *FakeSpacesActor) GetOrganizationSpacesArgsForCall(i int) string {
 	fake.getOrganizationSpacesMutex.RLock()
 	defer fake.getOrganizationSpacesMutex.RUnlock()
-	return fake.getOrganizationSpacesArgsForCall[i].orgGUID
+	argsForCall := fake.getOrganizationSpacesArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeSpacesActor) GetOrganizationSpacesReturns(result1 []v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
 	fake.GetOrganizationSpacesStub = nil
 	fake.getOrganizationSpacesReturns = struct {
 		result1 []v2action.Space
@@ -67,6 +77,8 @@ func (fake *FakeSpacesActor) GetOrganizationSpacesReturns(result1 []v2action.Spa
 }
 
 func (fake *FakeSpacesActor) GetOrganizationSpacesReturnsOnCall(i int, result1 []v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
 	fake.GetOrganizationSpacesStub = nil
 	if fake.getOrganizationSpacesReturnsOnCall == nil {
 		fake.getOrganizationSpacesReturnsOnCall = make(map[int]struct {

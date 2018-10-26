@@ -4,25 +4,23 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	sharedV6 "code.cloudfoundry.org/cli/command/v6/shared"
+	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
 //go:generate counterfeiter . ScaleActor
 
 type ScaleActor interface {
-	sharedV6.V3AppSummaryActor
+	AppActor
 
-	CloudControllerAPIVersion() string
-	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	ScaleProcessByApplication(appGUID string, process v3action.Process) (v3action.Warnings, error)
-	StopApplication(appGUID string) (v3action.Warnings, error)
-	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
-	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
+	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
+	StopApplication(appGUID string) (v7action.Warnings, error)
+	StartApplication(appGUID string) (v7action.Application, v7action.Warnings, error)
+	PollStart(appGUID string, warnings chan<- v7action.Warnings) error
 }
 
 type ScaleCommand struct {
@@ -36,37 +34,30 @@ type ScaleCommand struct {
 	relatedCommands     interface{}    `related_commands:"v3-push"`
 	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	UI                  command.UI
-	Config              command.Config
-	Actor               ScaleActor
-	SharedActor         command.SharedActor
-	AppSummaryDisplayer sharedV6.AppSummaryDisplayer
+	UI          command.UI
+	Config      command.Config
+	Actor       ScaleActor
+	SharedActor command.SharedActor
+	RouteActor  v7action.RouteActor
 }
 
 func (cmd *ScaleCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config)
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
 
-	ccClient, _, err := shared.NewClients(config, ui, true, "")
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
+	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient)
 
-	ccClientV2, _, err := sharedV6.NewClients(config, ui, false)
+	ccClientV2, _, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
-	v2Actor := v2action.NewActor(ccClientV2, nil, config)
-
-	cmd.AppSummaryDisplayer = sharedV6.AppSummaryDisplayer{
-		UI:         ui,
-		Config:     config,
-		Actor:      cmd.Actor,
-		V2AppActor: v2Actor,
-		AppName:    cmd.RequiredArgs.AppName,
-	}
+	cmd.RouteActor = v2action.NewActor(ccClientV2, uaaClient, config)
 
 	return nil
 }
@@ -100,9 +91,10 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		return nil
 	}
 
-	pollWarnings := make(chan v3action.Warnings)
+	pollWarnings := make(chan v7action.Warnings)
 	done := make(chan bool)
 	go func() {
+		defer close(done)
 		for {
 			select {
 			case message := <-pollWarnings:
@@ -122,9 +114,8 @@ func (cmd ScaleCommand) Execute(args []string) error {
 				AppName:    cmd.RequiredArgs.AppName,
 				BinaryName: cmd.Config.BinaryName(),
 			}
-		} else {
-			return err
 		}
+		return err
 	}
 
 	return cmd.showCurrentScale(user.Name)
@@ -156,7 +147,7 @@ func (cmd ScaleCommand) scaleProcess(appGUID string, username string) (bool, err
 		cmd.UI.DisplayNewline()
 	}
 
-	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, v3action.Process{
+	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, v7action.Process{
 		Type:       cmd.ProcessType,
 		Instances:  cmd.Instances.NullInt,
 		MemoryInMB: cmd.MemoryLimit.NullUint64,
@@ -217,5 +208,13 @@ func (cmd ScaleCommand) showCurrentScale(userName string) error {
 		"Username":  userName,
 	})
 
-	return cmd.AppSummaryDisplayer.DisplayAppProcessInfo()
+	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, false, cmd.RouteActor)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
+	appSummaryDisplayer.AppDisplay(summary, false)
+	return nil
 }

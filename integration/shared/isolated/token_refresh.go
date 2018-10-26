@@ -27,7 +27,7 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			When("running a v2 command", func() {
+			When("running a v6 command", func() {
 				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						session := helpers.CF("unbind-service", "app", "service")
@@ -46,7 +46,7 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			When("running a v3 command", func() {
+			When("running a v7 command", func() {
 				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						session := helpers.CF("run-task", "app", "'echo banana'")
@@ -72,7 +72,7 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			When("running a v2 refactored command", func() {
+			When("running a v6 refactored command", func() {
 				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						session := helpers.CF("unbind-service", "app", "service")
@@ -91,7 +91,7 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			When("running a v2 unrefactored command", func() {
+			When("running a v6 unrefactored command", func() {
 				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						username, _ := helpers.GetCredentials()
@@ -103,7 +103,7 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 
-			When("running a v3 command", func() {
+			When("running a v7 command", func() {
 				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						session := helpers.CF("run-task", "app", "'echo banana'")

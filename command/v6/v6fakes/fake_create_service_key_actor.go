@@ -2,20 +2,20 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeCreateServiceKeyActor struct {
-	CreateServiceKeyStub        func(serviceInstanceName, keyName, spaceGUID string, parameters map[string]interface{}) (v2action.ServiceKey, v2action.Warnings, error)
+	CreateServiceKeyStub        func(string, string, string, map[string]interface{}) (v2action.ServiceKey, v2action.Warnings, error)
 	createServiceKeyMutex       sync.RWMutex
 	createServiceKeyArgsForCall []struct {
-		serviceInstanceName string
-		keyName             string
-		spaceGUID           string
-		parameters          map[string]interface{}
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 map[string]interface{}
 	}
 	createServiceKeyReturns struct {
 		result1 v2action.ServiceKey
@@ -31,24 +31,25 @@ type FakeCreateServiceKeyActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateServiceKeyActor) CreateServiceKey(serviceInstanceName string, keyName string, spaceGUID string, parameters map[string]interface{}) (v2action.ServiceKey, v2action.Warnings, error) {
+func (fake *FakeCreateServiceKeyActor) CreateServiceKey(arg1 string, arg2 string, arg3 string, arg4 map[string]interface{}) (v2action.ServiceKey, v2action.Warnings, error) {
 	fake.createServiceKeyMutex.Lock()
 	ret, specificReturn := fake.createServiceKeyReturnsOnCall[len(fake.createServiceKeyArgsForCall)]
 	fake.createServiceKeyArgsForCall = append(fake.createServiceKeyArgsForCall, struct {
-		serviceInstanceName string
-		keyName             string
-		spaceGUID           string
-		parameters          map[string]interface{}
-	}{serviceInstanceName, keyName, spaceGUID, parameters})
-	fake.recordInvocation("CreateServiceKey", []interface{}{serviceInstanceName, keyName, spaceGUID, parameters})
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 map[string]interface{}
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("CreateServiceKey", []interface{}{arg1, arg2, arg3, arg4})
 	fake.createServiceKeyMutex.Unlock()
 	if fake.CreateServiceKeyStub != nil {
-		return fake.CreateServiceKeyStub(serviceInstanceName, keyName, spaceGUID, parameters)
+		return fake.CreateServiceKeyStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createServiceKeyReturns.result1, fake.createServiceKeyReturns.result2, fake.createServiceKeyReturns.result3
+	fakeReturns := fake.createServiceKeyReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeCreateServiceKeyActor) CreateServiceKeyCallCount() int {
@@ -57,13 +58,22 @@ func (fake *FakeCreateServiceKeyActor) CreateServiceKeyCallCount() int {
 	return len(fake.createServiceKeyArgsForCall)
 }
 
+func (fake *FakeCreateServiceKeyActor) CreateServiceKeyCalls(stub func(string, string, string, map[string]interface{}) (v2action.ServiceKey, v2action.Warnings, error)) {
+	fake.createServiceKeyMutex.Lock()
+	defer fake.createServiceKeyMutex.Unlock()
+	fake.CreateServiceKeyStub = stub
+}
+
 func (fake *FakeCreateServiceKeyActor) CreateServiceKeyArgsForCall(i int) (string, string, string, map[string]interface{}) {
 	fake.createServiceKeyMutex.RLock()
 	defer fake.createServiceKeyMutex.RUnlock()
-	return fake.createServiceKeyArgsForCall[i].serviceInstanceName, fake.createServiceKeyArgsForCall[i].keyName, fake.createServiceKeyArgsForCall[i].spaceGUID, fake.createServiceKeyArgsForCall[i].parameters
+	argsForCall := fake.createServiceKeyArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeCreateServiceKeyActor) CreateServiceKeyReturns(result1 v2action.ServiceKey, result2 v2action.Warnings, result3 error) {
+	fake.createServiceKeyMutex.Lock()
+	defer fake.createServiceKeyMutex.Unlock()
 	fake.CreateServiceKeyStub = nil
 	fake.createServiceKeyReturns = struct {
 		result1 v2action.ServiceKey
@@ -73,6 +83,8 @@ func (fake *FakeCreateServiceKeyActor) CreateServiceKeyReturns(result1 v2action.
 }
 
 func (fake *FakeCreateServiceKeyActor) CreateServiceKeyReturnsOnCall(i int, result1 v2action.ServiceKey, result2 v2action.Warnings, result3 error) {
+	fake.createServiceKeyMutex.Lock()
+	defer fake.createServiceKeyMutex.Unlock()
 	fake.CreateServiceKeyStub = nil
 	if fake.createServiceKeyReturnsOnCall == nil {
 		fake.createServiceKeyReturnsOnCall = make(map[int]struct {

@@ -2,17 +2,17 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeResetOrgDefaultIsolationSegmentActorV2 struct {
-	GetOrganizationByNameStub        func(orgName string) (v2action.Organization, v2action.Warnings, error)
+	GetOrganizationByNameStub        func(string) (v2action.Organization, v2action.Warnings, error)
 	getOrganizationByNameMutex       sync.RWMutex
 	getOrganizationByNameArgsForCall []struct {
-		orgName string
+		arg1 string
 	}
 	getOrganizationByNameReturns struct {
 		result1 v2action.Organization
@@ -28,21 +28,22 @@ type FakeResetOrgDefaultIsolationSegmentActorV2 struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error) {
+func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByName(arg1 string) (v2action.Organization, v2action.Warnings, error) {
 	fake.getOrganizationByNameMutex.Lock()
 	ret, specificReturn := fake.getOrganizationByNameReturnsOnCall[len(fake.getOrganizationByNameArgsForCall)]
 	fake.getOrganizationByNameArgsForCall = append(fake.getOrganizationByNameArgsForCall, struct {
-		orgName string
-	}{orgName})
-	fake.recordInvocation("GetOrganizationByName", []interface{}{orgName})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationByName", []interface{}{arg1})
 	fake.getOrganizationByNameMutex.Unlock()
 	if fake.GetOrganizationByNameStub != nil {
-		return fake.GetOrganizationByNameStub(orgName)
+		return fake.GetOrganizationByNameStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getOrganizationByNameReturns.result1, fake.getOrganizationByNameReturns.result2, fake.getOrganizationByNameReturns.result3
+	fakeReturns := fake.getOrganizationByNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameCallCount() int {
@@ -51,13 +52,22 @@ func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameCal
 	return len(fake.getOrganizationByNameArgsForCall)
 }
 
+func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameCalls(stub func(string) (v2action.Organization, v2action.Warnings, error)) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
+	fake.GetOrganizationByNameStub = stub
+}
+
 func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameArgsForCall(i int) string {
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
-	return fake.getOrganizationByNameArgsForCall[i].orgName
+	argsForCall := fake.getOrganizationByNameArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameReturns(result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
 	fake.GetOrganizationByNameStub = nil
 	fake.getOrganizationByNameReturns = struct {
 		result1 v2action.Organization
@@ -67,6 +77,8 @@ func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameRet
 }
 
 func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameReturnsOnCall(i int, result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
 	fake.GetOrganizationByNameStub = nil
 	if fake.getOrganizationByNameReturnsOnCall == nil {
 		fake.getOrganizationByNameReturnsOnCall = make(map[int]struct {

@@ -108,7 +108,7 @@ var _ = Describe("UI", func() {
 						It("should display the header without differences", func() {
 							err := ui.DisplayChangeForPush("val", 2, false, "old", "old")
 							Expect(err).ToNot(HaveOccurred())
-							Expect(out).To(Say("(?m)^\\s+val  old$"))
+							Expect(out).To(Say(`(?m)^\s+val  old$`))
 						})
 					})
 
@@ -148,7 +148,7 @@ var _ = Describe("UI", func() {
 						It("should display the header without differences", func() {
 							err := ui.DisplayChangeForPush("val", 2, true, "old", "old")
 							Expect(err).ToNot(HaveOccurred())
-							Expect(out).To(Say("(?m)^\\s+val  %s", regexp.QuoteMeta(RedactedValue)))
+							Expect(out).To(Say(`(?m)^\s+val  %s`, regexp.QuoteMeta(RedactedValue)))
 						})
 					})
 
@@ -167,11 +167,11 @@ var _ = Describe("UI", func() {
 					new := []string{"route4", "route2", "route3"}
 					err := ui.DisplayChangeForPush("val", 2, false, old, new)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(out).To(Say("\\s+val"))
+					Expect(out).To(Say(`\s+val`))
 					Expect(out).To(Say("\x1b\\[31m\\-\\s+route1\x1b\\[0m"))
-					Expect(out).To(Say("(?m)^\\s+route2$"))
+					Expect(out).To(Say(`(?m)^\s+route2$`))
 					Expect(out).To(Say("\x1b\\[32m\\+\\s+route3\x1b\\[0m"))
-					Expect(out).To(Say("(?m)^\\s+route4$"))
+					Expect(out).To(Say(`(?m)^\s+route4$`))
 				})
 
 				When("the values are a different type", func() {
@@ -187,7 +187,7 @@ var _ = Describe("UI", func() {
 						new := []string{}
 						err := ui.DisplayChangeForPush("val", 2, false, old, new)
 						Expect(err).ToNot(HaveOccurred())
-						Expect(out).ToNot(Say("\\s+val"))
+						Expect(out).ToNot(Say(`\s+val`))
 					})
 				})
 			})
@@ -216,7 +216,7 @@ var _ = Describe("UI", func() {
 					It("should display the header without differences", func() {
 						err := ui.DisplayChangeForPush("val", 2, false, 3, 3)
 						Expect(err).ToNot(HaveOccurred())
-						Expect(out).To(Say("(?m)^\\s+val  3$"))
+						Expect(out).To(Say(`(?m)^\s+val  3$`))
 					})
 				})
 
@@ -270,7 +270,7 @@ var _ = Describe("UI", func() {
 							IsSet: true,
 						})
 						Expect(err).ToNot(HaveOccurred())
-						Expect(out).To(Say("(?m)^\\s+val  3$"))
+						Expect(out).To(Say(`(?m)^\s+val  3$`))
 					})
 				})
 
@@ -288,12 +288,12 @@ var _ = Describe("UI", func() {
 					new := map[string]string{"key1": "1", "key3": "3", "key4": "4"}
 					err := ui.DisplayChangeForPush("maps", 2, false, old, new)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(out).To(Say("\\s+maps"))
+					Expect(out).To(Say(`\s+maps`))
 					Expect(out).To(Say("\x1b\\[32m\\+\\s+key1\x1b\\[0m"))
 					Expect(out).To(Say("\x1b\\[31m\\-\\s+key2\x1b\\[0m"))
 					Expect(out).To(Say("\x1b\\[31m\\-\\s+key3\x1b\\[0m"))
 					Expect(out).To(Say("\x1b\\[32m\\+\\s+key3\x1b\\[0m"))
-					Expect(out).To(Say("(?m)^\\s+key4"))
+					Expect(out).To(Say(`(?m)^\s+key4`))
 				})
 
 				When("the values are a different type", func() {
@@ -309,7 +309,7 @@ var _ = Describe("UI", func() {
 						new := map[string]string{}
 						err := ui.DisplayChangeForPush("maps", 2, false, old, new)
 						Expect(err).ToNot(HaveOccurred())
-						Expect(out).ToNot(Say("\\s+maps"))
+						Expect(out).ToNot(Say(`\s+maps`))
 					})
 				})
 			})
@@ -334,7 +334,7 @@ var _ = Describe("UI", func() {
 					It("should display the header without differences", func() {
 						err := ui.DisplayChangeForPush("Name", 2, false, "old", "old")
 						Expect(err).ToNot(HaveOccurred())
-						Expect(out).To(Say("(?m)^\\s+Nom  old$"))
+						Expect(out).To(Say(`(?m)^\s+Nom  old$`))
 					})
 				})
 			})
@@ -345,11 +345,11 @@ var _ = Describe("UI", func() {
 					new := []string{"route4", "route2", "route3"}
 					err := ui.DisplayChangeForPush("Name", 2, false, old, new)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(out).To(Say("\\s+Nom"))
+					Expect(out).To(Say(`\s+Nom`))
 					Expect(out).To(Say("\x1b\\[31m\\-\\s+route1\x1b\\[0m"))
-					Expect(out).To(Say("(?m)^\\s+route2$"))
+					Expect(out).To(Say(`(?m)^\s+route2$`))
 					Expect(out).To(Say("\x1b\\[32m\\+\\s+route3\x1b\\[0m"))
-					Expect(out).To(Say("(?m)^\\s+route4$"))
+					Expect(out).To(Say(`(?m)^\s+route4$`))
 				})
 			})
 		})

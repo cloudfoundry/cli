@@ -2,19 +2,19 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeCreateUserActor struct {
-	CreateUserStub        func(username string, password string, origin string) (v2action.User, v2action.Warnings, error)
+	CreateUserStub        func(string, string, string) (v2action.User, v2action.Warnings, error)
 	createUserMutex       sync.RWMutex
 	createUserArgsForCall []struct {
-		username string
-		password string
-		origin   string
+		arg1 string
+		arg2 string
+		arg3 string
 	}
 	createUserReturns struct {
 		result1 v2action.User
@@ -30,23 +30,24 @@ type FakeCreateUserActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateUserActor) CreateUser(username string, password string, origin string) (v2action.User, v2action.Warnings, error) {
+func (fake *FakeCreateUserActor) CreateUser(arg1 string, arg2 string, arg3 string) (v2action.User, v2action.Warnings, error) {
 	fake.createUserMutex.Lock()
 	ret, specificReturn := fake.createUserReturnsOnCall[len(fake.createUserArgsForCall)]
 	fake.createUserArgsForCall = append(fake.createUserArgsForCall, struct {
-		username string
-		password string
-		origin   string
-	}{username, password, origin})
-	fake.recordInvocation("CreateUser", []interface{}{username, password, origin})
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("CreateUser", []interface{}{arg1, arg2, arg3})
 	fake.createUserMutex.Unlock()
 	if fake.CreateUserStub != nil {
-		return fake.CreateUserStub(username, password, origin)
+		return fake.CreateUserStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createUserReturns.result1, fake.createUserReturns.result2, fake.createUserReturns.result3
+	fakeReturns := fake.createUserReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeCreateUserActor) CreateUserCallCount() int {
@@ -55,13 +56,22 @@ func (fake *FakeCreateUserActor) CreateUserCallCount() int {
 	return len(fake.createUserArgsForCall)
 }
 
+func (fake *FakeCreateUserActor) CreateUserCalls(stub func(string, string, string) (v2action.User, v2action.Warnings, error)) {
+	fake.createUserMutex.Lock()
+	defer fake.createUserMutex.Unlock()
+	fake.CreateUserStub = stub
+}
+
 func (fake *FakeCreateUserActor) CreateUserArgsForCall(i int) (string, string, string) {
 	fake.createUserMutex.RLock()
 	defer fake.createUserMutex.RUnlock()
-	return fake.createUserArgsForCall[i].username, fake.createUserArgsForCall[i].password, fake.createUserArgsForCall[i].origin
+	argsForCall := fake.createUserArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeCreateUserActor) CreateUserReturns(result1 v2action.User, result2 v2action.Warnings, result3 error) {
+	fake.createUserMutex.Lock()
+	defer fake.createUserMutex.Unlock()
 	fake.CreateUserStub = nil
 	fake.createUserReturns = struct {
 		result1 v2action.User
@@ -71,6 +81,8 @@ func (fake *FakeCreateUserActor) CreateUserReturns(result1 v2action.User, result
 }
 
 func (fake *FakeCreateUserActor) CreateUserReturnsOnCall(i int, result1 v2action.User, result2 v2action.Warnings, result3 error) {
+	fake.createUserMutex.Lock()
+	defer fake.createUserMutex.Unlock()
 	fake.CreateUserStub = nil
 	if fake.createUserReturnsOnCall == nil {
 		fake.createUserReturnsOnCall = make(map[int]struct {

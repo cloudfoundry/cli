@@ -2,17 +2,17 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeOrgActor struct {
-	GetOrganizationByNameStub        func(orgName string) (v2action.Organization, v2action.Warnings, error)
+	GetOrganizationByNameStub        func(string) (v2action.Organization, v2action.Warnings, error)
 	getOrganizationByNameMutex       sync.RWMutex
 	getOrganizationByNameArgsForCall []struct {
-		orgName string
+		arg1 string
 	}
 	getOrganizationByNameReturns struct {
 		result1 v2action.Organization
@@ -24,10 +24,10 @@ type FakeOrgActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetOrganizationSummaryByNameStub        func(orgName string) (v2action.OrganizationSummary, v2action.Warnings, error)
+	GetOrganizationSummaryByNameStub        func(string) (v2action.OrganizationSummary, v2action.Warnings, error)
 	getOrganizationSummaryByNameMutex       sync.RWMutex
 	getOrganizationSummaryByNameArgsForCall []struct {
-		orgName string
+		arg1 string
 	}
 	getOrganizationSummaryByNameReturns struct {
 		result1 v2action.OrganizationSummary
@@ -43,21 +43,22 @@ type FakeOrgActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeOrgActor) GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error) {
+func (fake *FakeOrgActor) GetOrganizationByName(arg1 string) (v2action.Organization, v2action.Warnings, error) {
 	fake.getOrganizationByNameMutex.Lock()
 	ret, specificReturn := fake.getOrganizationByNameReturnsOnCall[len(fake.getOrganizationByNameArgsForCall)]
 	fake.getOrganizationByNameArgsForCall = append(fake.getOrganizationByNameArgsForCall, struct {
-		orgName string
-	}{orgName})
-	fake.recordInvocation("GetOrganizationByName", []interface{}{orgName})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationByName", []interface{}{arg1})
 	fake.getOrganizationByNameMutex.Unlock()
 	if fake.GetOrganizationByNameStub != nil {
-		return fake.GetOrganizationByNameStub(orgName)
+		return fake.GetOrganizationByNameStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getOrganizationByNameReturns.result1, fake.getOrganizationByNameReturns.result2, fake.getOrganizationByNameReturns.result3
+	fakeReturns := fake.getOrganizationByNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeOrgActor) GetOrganizationByNameCallCount() int {
@@ -66,13 +67,22 @@ func (fake *FakeOrgActor) GetOrganizationByNameCallCount() int {
 	return len(fake.getOrganizationByNameArgsForCall)
 }
 
+func (fake *FakeOrgActor) GetOrganizationByNameCalls(stub func(string) (v2action.Organization, v2action.Warnings, error)) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
+	fake.GetOrganizationByNameStub = stub
+}
+
 func (fake *FakeOrgActor) GetOrganizationByNameArgsForCall(i int) string {
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
-	return fake.getOrganizationByNameArgsForCall[i].orgName
+	argsForCall := fake.getOrganizationByNameArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeOrgActor) GetOrganizationByNameReturns(result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
 	fake.GetOrganizationByNameStub = nil
 	fake.getOrganizationByNameReturns = struct {
 		result1 v2action.Organization
@@ -82,6 +92,8 @@ func (fake *FakeOrgActor) GetOrganizationByNameReturns(result1 v2action.Organiza
 }
 
 func (fake *FakeOrgActor) GetOrganizationByNameReturnsOnCall(i int, result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
 	fake.GetOrganizationByNameStub = nil
 	if fake.getOrganizationByNameReturnsOnCall == nil {
 		fake.getOrganizationByNameReturnsOnCall = make(map[int]struct {
@@ -97,21 +109,22 @@ func (fake *FakeOrgActor) GetOrganizationByNameReturnsOnCall(i int, result1 v2ac
 	}{result1, result2, result3}
 }
 
-func (fake *FakeOrgActor) GetOrganizationSummaryByName(orgName string) (v2action.OrganizationSummary, v2action.Warnings, error) {
+func (fake *FakeOrgActor) GetOrganizationSummaryByName(arg1 string) (v2action.OrganizationSummary, v2action.Warnings, error) {
 	fake.getOrganizationSummaryByNameMutex.Lock()
 	ret, specificReturn := fake.getOrganizationSummaryByNameReturnsOnCall[len(fake.getOrganizationSummaryByNameArgsForCall)]
 	fake.getOrganizationSummaryByNameArgsForCall = append(fake.getOrganizationSummaryByNameArgsForCall, struct {
-		orgName string
-	}{orgName})
-	fake.recordInvocation("GetOrganizationSummaryByName", []interface{}{orgName})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationSummaryByName", []interface{}{arg1})
 	fake.getOrganizationSummaryByNameMutex.Unlock()
 	if fake.GetOrganizationSummaryByNameStub != nil {
-		return fake.GetOrganizationSummaryByNameStub(orgName)
+		return fake.GetOrganizationSummaryByNameStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getOrganizationSummaryByNameReturns.result1, fake.getOrganizationSummaryByNameReturns.result2, fake.getOrganizationSummaryByNameReturns.result3
+	fakeReturns := fake.getOrganizationSummaryByNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeOrgActor) GetOrganizationSummaryByNameCallCount() int {
@@ -120,13 +133,22 @@ func (fake *FakeOrgActor) GetOrganizationSummaryByNameCallCount() int {
 	return len(fake.getOrganizationSummaryByNameArgsForCall)
 }
 
+func (fake *FakeOrgActor) GetOrganizationSummaryByNameCalls(stub func(string) (v2action.OrganizationSummary, v2action.Warnings, error)) {
+	fake.getOrganizationSummaryByNameMutex.Lock()
+	defer fake.getOrganizationSummaryByNameMutex.Unlock()
+	fake.GetOrganizationSummaryByNameStub = stub
+}
+
 func (fake *FakeOrgActor) GetOrganizationSummaryByNameArgsForCall(i int) string {
 	fake.getOrganizationSummaryByNameMutex.RLock()
 	defer fake.getOrganizationSummaryByNameMutex.RUnlock()
-	return fake.getOrganizationSummaryByNameArgsForCall[i].orgName
+	argsForCall := fake.getOrganizationSummaryByNameArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeOrgActor) GetOrganizationSummaryByNameReturns(result1 v2action.OrganizationSummary, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationSummaryByNameMutex.Lock()
+	defer fake.getOrganizationSummaryByNameMutex.Unlock()
 	fake.GetOrganizationSummaryByNameStub = nil
 	fake.getOrganizationSummaryByNameReturns = struct {
 		result1 v2action.OrganizationSummary
@@ -136,6 +158,8 @@ func (fake *FakeOrgActor) GetOrganizationSummaryByNameReturns(result1 v2action.O
 }
 
 func (fake *FakeOrgActor) GetOrganizationSummaryByNameReturnsOnCall(i int, result1 v2action.OrganizationSummary, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationSummaryByNameMutex.Lock()
+	defer fake.getOrganizationSummaryByNameMutex.Unlock()
 	fake.GetOrganizationSummaryByNameStub = nil
 	if fake.getOrganizationSummaryByNameReturnsOnCall == nil {
 		fake.getOrganizationSummaryByNameReturnsOnCall = make(map[int]struct {

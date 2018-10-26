@@ -2,17 +2,18 @@
 package uaafakes
 
 import (
-	"sync"
-	"time"
+	sync "sync"
+	time "time"
 
-	"code.cloudfoundry.org/cli/api/uaa"
+	uaa "code.cloudfoundry.org/cli/api/uaa"
 )
 
 type FakeConfig struct {
 	BinaryNameStub        func() string
 	binaryNameMutex       sync.RWMutex
-	binaryNameArgsForCall []struct{}
-	binaryNameReturns     struct {
+	binaryNameArgsForCall []struct {
+	}
+	binaryNameReturns struct {
 		result1 string
 	}
 	binaryNameReturnsOnCall map[int]struct {
@@ -20,8 +21,9 @@ type FakeConfig struct {
 	}
 	BinaryVersionStub        func() string
 	binaryVersionMutex       sync.RWMutex
-	binaryVersionArgsForCall []struct{}
-	binaryVersionReturns     struct {
+	binaryVersionArgsForCall []struct {
+	}
+	binaryVersionReturns struct {
 		result1 string
 	}
 	binaryVersionReturnsOnCall map[int]struct {
@@ -29,22 +31,24 @@ type FakeConfig struct {
 	}
 	DialTimeoutStub        func() time.Duration
 	dialTimeoutMutex       sync.RWMutex
-	dialTimeoutArgsForCall []struct{}
-	dialTimeoutReturns     struct {
+	dialTimeoutArgsForCall []struct {
+	}
+	dialTimeoutReturns struct {
 		result1 time.Duration
 	}
 	dialTimeoutReturnsOnCall map[int]struct {
 		result1 time.Duration
 	}
-	SetUAAEndpointStub        func(uaaEndpoint string)
+	SetUAAEndpointStub        func(string)
 	setUAAEndpointMutex       sync.RWMutex
 	setUAAEndpointArgsForCall []struct {
-		uaaEndpoint string
+		arg1 string
 	}
 	SkipSSLValidationStub        func() bool
 	skipSSLValidationMutex       sync.RWMutex
-	skipSSLValidationArgsForCall []struct{}
-	skipSSLValidationReturns     struct {
+	skipSSLValidationArgsForCall []struct {
+	}
+	skipSSLValidationReturns struct {
 		result1 bool
 	}
 	skipSSLValidationReturnsOnCall map[int]struct {
@@ -52,8 +56,9 @@ type FakeConfig struct {
 	}
 	UAADisableKeepAlivesStub        func() bool
 	uAADisableKeepAlivesMutex       sync.RWMutex
-	uAADisableKeepAlivesArgsForCall []struct{}
-	uAADisableKeepAlivesReturns     struct {
+	uAADisableKeepAlivesArgsForCall []struct {
+	}
+	uAADisableKeepAlivesReturns struct {
 		result1 bool
 	}
 	uAADisableKeepAlivesReturnsOnCall map[int]struct {
@@ -61,8 +66,9 @@ type FakeConfig struct {
 	}
 	UAAGrantTypeStub        func() string
 	uAAGrantTypeMutex       sync.RWMutex
-	uAAGrantTypeArgsForCall []struct{}
-	uAAGrantTypeReturns     struct {
+	uAAGrantTypeArgsForCall []struct {
+	}
+	uAAGrantTypeReturns struct {
 		result1 string
 	}
 	uAAGrantTypeReturnsOnCall map[int]struct {
@@ -70,8 +76,9 @@ type FakeConfig struct {
 	}
 	UAAOAuthClientStub        func() string
 	uAAOAuthClientMutex       sync.RWMutex
-	uAAOAuthClientArgsForCall []struct{}
-	uAAOAuthClientReturns     struct {
+	uAAOAuthClientArgsForCall []struct {
+	}
+	uAAOAuthClientReturns struct {
 		result1 string
 	}
 	uAAOAuthClientReturnsOnCall map[int]struct {
@@ -79,8 +86,9 @@ type FakeConfig struct {
 	}
 	UAAOAuthClientSecretStub        func() string
 	uAAOAuthClientSecretMutex       sync.RWMutex
-	uAAOAuthClientSecretArgsForCall []struct{}
-	uAAOAuthClientSecretReturns     struct {
+	uAAOAuthClientSecretArgsForCall []struct {
+	}
+	uAAOAuthClientSecretReturns struct {
 		result1 string
 	}
 	uAAOAuthClientSecretReturnsOnCall map[int]struct {
@@ -93,7 +101,8 @@ type FakeConfig struct {
 func (fake *FakeConfig) BinaryName() string {
 	fake.binaryNameMutex.Lock()
 	ret, specificReturn := fake.binaryNameReturnsOnCall[len(fake.binaryNameArgsForCall)]
-	fake.binaryNameArgsForCall = append(fake.binaryNameArgsForCall, struct{}{})
+	fake.binaryNameArgsForCall = append(fake.binaryNameArgsForCall, struct {
+	}{})
 	fake.recordInvocation("BinaryName", []interface{}{})
 	fake.binaryNameMutex.Unlock()
 	if fake.BinaryNameStub != nil {
@@ -102,7 +111,8 @@ func (fake *FakeConfig) BinaryName() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.binaryNameReturns.result1
+	fakeReturns := fake.binaryNameReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) BinaryNameCallCount() int {
@@ -111,7 +121,15 @@ func (fake *FakeConfig) BinaryNameCallCount() int {
 	return len(fake.binaryNameArgsForCall)
 }
 
+func (fake *FakeConfig) BinaryNameCalls(stub func() string) {
+	fake.binaryNameMutex.Lock()
+	defer fake.binaryNameMutex.Unlock()
+	fake.BinaryNameStub = stub
+}
+
 func (fake *FakeConfig) BinaryNameReturns(result1 string) {
+	fake.binaryNameMutex.Lock()
+	defer fake.binaryNameMutex.Unlock()
 	fake.BinaryNameStub = nil
 	fake.binaryNameReturns = struct {
 		result1 string
@@ -119,6 +137,8 @@ func (fake *FakeConfig) BinaryNameReturns(result1 string) {
 }
 
 func (fake *FakeConfig) BinaryNameReturnsOnCall(i int, result1 string) {
+	fake.binaryNameMutex.Lock()
+	defer fake.binaryNameMutex.Unlock()
 	fake.BinaryNameStub = nil
 	if fake.binaryNameReturnsOnCall == nil {
 		fake.binaryNameReturnsOnCall = make(map[int]struct {
@@ -133,7 +153,8 @@ func (fake *FakeConfig) BinaryNameReturnsOnCall(i int, result1 string) {
 func (fake *FakeConfig) BinaryVersion() string {
 	fake.binaryVersionMutex.Lock()
 	ret, specificReturn := fake.binaryVersionReturnsOnCall[len(fake.binaryVersionArgsForCall)]
-	fake.binaryVersionArgsForCall = append(fake.binaryVersionArgsForCall, struct{}{})
+	fake.binaryVersionArgsForCall = append(fake.binaryVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("BinaryVersion", []interface{}{})
 	fake.binaryVersionMutex.Unlock()
 	if fake.BinaryVersionStub != nil {
@@ -142,7 +163,8 @@ func (fake *FakeConfig) BinaryVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.binaryVersionReturns.result1
+	fakeReturns := fake.binaryVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) BinaryVersionCallCount() int {
@@ -151,7 +173,15 @@ func (fake *FakeConfig) BinaryVersionCallCount() int {
 	return len(fake.binaryVersionArgsForCall)
 }
 
+func (fake *FakeConfig) BinaryVersionCalls(stub func() string) {
+	fake.binaryVersionMutex.Lock()
+	defer fake.binaryVersionMutex.Unlock()
+	fake.BinaryVersionStub = stub
+}
+
 func (fake *FakeConfig) BinaryVersionReturns(result1 string) {
+	fake.binaryVersionMutex.Lock()
+	defer fake.binaryVersionMutex.Unlock()
 	fake.BinaryVersionStub = nil
 	fake.binaryVersionReturns = struct {
 		result1 string
@@ -159,6 +189,8 @@ func (fake *FakeConfig) BinaryVersionReturns(result1 string) {
 }
 
 func (fake *FakeConfig) BinaryVersionReturnsOnCall(i int, result1 string) {
+	fake.binaryVersionMutex.Lock()
+	defer fake.binaryVersionMutex.Unlock()
 	fake.BinaryVersionStub = nil
 	if fake.binaryVersionReturnsOnCall == nil {
 		fake.binaryVersionReturnsOnCall = make(map[int]struct {
@@ -173,7 +205,8 @@ func (fake *FakeConfig) BinaryVersionReturnsOnCall(i int, result1 string) {
 func (fake *FakeConfig) DialTimeout() time.Duration {
 	fake.dialTimeoutMutex.Lock()
 	ret, specificReturn := fake.dialTimeoutReturnsOnCall[len(fake.dialTimeoutArgsForCall)]
-	fake.dialTimeoutArgsForCall = append(fake.dialTimeoutArgsForCall, struct{}{})
+	fake.dialTimeoutArgsForCall = append(fake.dialTimeoutArgsForCall, struct {
+	}{})
 	fake.recordInvocation("DialTimeout", []interface{}{})
 	fake.dialTimeoutMutex.Unlock()
 	if fake.DialTimeoutStub != nil {
@@ -182,7 +215,8 @@ func (fake *FakeConfig) DialTimeout() time.Duration {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.dialTimeoutReturns.result1
+	fakeReturns := fake.dialTimeoutReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) DialTimeoutCallCount() int {
@@ -191,7 +225,15 @@ func (fake *FakeConfig) DialTimeoutCallCount() int {
 	return len(fake.dialTimeoutArgsForCall)
 }
 
+func (fake *FakeConfig) DialTimeoutCalls(stub func() time.Duration) {
+	fake.dialTimeoutMutex.Lock()
+	defer fake.dialTimeoutMutex.Unlock()
+	fake.DialTimeoutStub = stub
+}
+
 func (fake *FakeConfig) DialTimeoutReturns(result1 time.Duration) {
+	fake.dialTimeoutMutex.Lock()
+	defer fake.dialTimeoutMutex.Unlock()
 	fake.DialTimeoutStub = nil
 	fake.dialTimeoutReturns = struct {
 		result1 time.Duration
@@ -199,6 +241,8 @@ func (fake *FakeConfig) DialTimeoutReturns(result1 time.Duration) {
 }
 
 func (fake *FakeConfig) DialTimeoutReturnsOnCall(i int, result1 time.Duration) {
+	fake.dialTimeoutMutex.Lock()
+	defer fake.dialTimeoutMutex.Unlock()
 	fake.DialTimeoutStub = nil
 	if fake.dialTimeoutReturnsOnCall == nil {
 		fake.dialTimeoutReturnsOnCall = make(map[int]struct {
@@ -210,15 +254,15 @@ func (fake *FakeConfig) DialTimeoutReturnsOnCall(i int, result1 time.Duration) {
 	}{result1}
 }
 
-func (fake *FakeConfig) SetUAAEndpoint(uaaEndpoint string) {
+func (fake *FakeConfig) SetUAAEndpoint(arg1 string) {
 	fake.setUAAEndpointMutex.Lock()
 	fake.setUAAEndpointArgsForCall = append(fake.setUAAEndpointArgsForCall, struct {
-		uaaEndpoint string
-	}{uaaEndpoint})
-	fake.recordInvocation("SetUAAEndpoint", []interface{}{uaaEndpoint})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetUAAEndpoint", []interface{}{arg1})
 	fake.setUAAEndpointMutex.Unlock()
 	if fake.SetUAAEndpointStub != nil {
-		fake.SetUAAEndpointStub(uaaEndpoint)
+		fake.SetUAAEndpointStub(arg1)
 	}
 }
 
@@ -228,16 +272,24 @@ func (fake *FakeConfig) SetUAAEndpointCallCount() int {
 	return len(fake.setUAAEndpointArgsForCall)
 }
 
+func (fake *FakeConfig) SetUAAEndpointCalls(stub func(string)) {
+	fake.setUAAEndpointMutex.Lock()
+	defer fake.setUAAEndpointMutex.Unlock()
+	fake.SetUAAEndpointStub = stub
+}
+
 func (fake *FakeConfig) SetUAAEndpointArgsForCall(i int) string {
 	fake.setUAAEndpointMutex.RLock()
 	defer fake.setUAAEndpointMutex.RUnlock()
-	return fake.setUAAEndpointArgsForCall[i].uaaEndpoint
+	argsForCall := fake.setUAAEndpointArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeConfig) SkipSSLValidation() bool {
 	fake.skipSSLValidationMutex.Lock()
 	ret, specificReturn := fake.skipSSLValidationReturnsOnCall[len(fake.skipSSLValidationArgsForCall)]
-	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct{}{})
+	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct {
+	}{})
 	fake.recordInvocation("SkipSSLValidation", []interface{}{})
 	fake.skipSSLValidationMutex.Unlock()
 	if fake.SkipSSLValidationStub != nil {
@@ -246,7 +298,8 @@ func (fake *FakeConfig) SkipSSLValidation() bool {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.skipSSLValidationReturns.result1
+	fakeReturns := fake.skipSSLValidationReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) SkipSSLValidationCallCount() int {
@@ -255,7 +308,15 @@ func (fake *FakeConfig) SkipSSLValidationCallCount() int {
 	return len(fake.skipSSLValidationArgsForCall)
 }
 
+func (fake *FakeConfig) SkipSSLValidationCalls(stub func() bool) {
+	fake.skipSSLValidationMutex.Lock()
+	defer fake.skipSSLValidationMutex.Unlock()
+	fake.SkipSSLValidationStub = stub
+}
+
 func (fake *FakeConfig) SkipSSLValidationReturns(result1 bool) {
+	fake.skipSSLValidationMutex.Lock()
+	defer fake.skipSSLValidationMutex.Unlock()
 	fake.SkipSSLValidationStub = nil
 	fake.skipSSLValidationReturns = struct {
 		result1 bool
@@ -263,6 +324,8 @@ func (fake *FakeConfig) SkipSSLValidationReturns(result1 bool) {
 }
 
 func (fake *FakeConfig) SkipSSLValidationReturnsOnCall(i int, result1 bool) {
+	fake.skipSSLValidationMutex.Lock()
+	defer fake.skipSSLValidationMutex.Unlock()
 	fake.SkipSSLValidationStub = nil
 	if fake.skipSSLValidationReturnsOnCall == nil {
 		fake.skipSSLValidationReturnsOnCall = make(map[int]struct {
@@ -277,7 +340,8 @@ func (fake *FakeConfig) SkipSSLValidationReturnsOnCall(i int, result1 bool) {
 func (fake *FakeConfig) UAADisableKeepAlives() bool {
 	fake.uAADisableKeepAlivesMutex.Lock()
 	ret, specificReturn := fake.uAADisableKeepAlivesReturnsOnCall[len(fake.uAADisableKeepAlivesArgsForCall)]
-	fake.uAADisableKeepAlivesArgsForCall = append(fake.uAADisableKeepAlivesArgsForCall, struct{}{})
+	fake.uAADisableKeepAlivesArgsForCall = append(fake.uAADisableKeepAlivesArgsForCall, struct {
+	}{})
 	fake.recordInvocation("UAADisableKeepAlives", []interface{}{})
 	fake.uAADisableKeepAlivesMutex.Unlock()
 	if fake.UAADisableKeepAlivesStub != nil {
@@ -286,7 +350,8 @@ func (fake *FakeConfig) UAADisableKeepAlives() bool {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.uAADisableKeepAlivesReturns.result1
+	fakeReturns := fake.uAADisableKeepAlivesReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) UAADisableKeepAlivesCallCount() int {
@@ -295,7 +360,15 @@ func (fake *FakeConfig) UAADisableKeepAlivesCallCount() int {
 	return len(fake.uAADisableKeepAlivesArgsForCall)
 }
 
+func (fake *FakeConfig) UAADisableKeepAlivesCalls(stub func() bool) {
+	fake.uAADisableKeepAlivesMutex.Lock()
+	defer fake.uAADisableKeepAlivesMutex.Unlock()
+	fake.UAADisableKeepAlivesStub = stub
+}
+
 func (fake *FakeConfig) UAADisableKeepAlivesReturns(result1 bool) {
+	fake.uAADisableKeepAlivesMutex.Lock()
+	defer fake.uAADisableKeepAlivesMutex.Unlock()
 	fake.UAADisableKeepAlivesStub = nil
 	fake.uAADisableKeepAlivesReturns = struct {
 		result1 bool
@@ -303,6 +376,8 @@ func (fake *FakeConfig) UAADisableKeepAlivesReturns(result1 bool) {
 }
 
 func (fake *FakeConfig) UAADisableKeepAlivesReturnsOnCall(i int, result1 bool) {
+	fake.uAADisableKeepAlivesMutex.Lock()
+	defer fake.uAADisableKeepAlivesMutex.Unlock()
 	fake.UAADisableKeepAlivesStub = nil
 	if fake.uAADisableKeepAlivesReturnsOnCall == nil {
 		fake.uAADisableKeepAlivesReturnsOnCall = make(map[int]struct {
@@ -317,7 +392,8 @@ func (fake *FakeConfig) UAADisableKeepAlivesReturnsOnCall(i int, result1 bool) {
 func (fake *FakeConfig) UAAGrantType() string {
 	fake.uAAGrantTypeMutex.Lock()
 	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
-	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct{}{})
+	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct {
+	}{})
 	fake.recordInvocation("UAAGrantType", []interface{}{})
 	fake.uAAGrantTypeMutex.Unlock()
 	if fake.UAAGrantTypeStub != nil {
@@ -326,7 +402,8 @@ func (fake *FakeConfig) UAAGrantType() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.uAAGrantTypeReturns.result1
+	fakeReturns := fake.uAAGrantTypeReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) UAAGrantTypeCallCount() int {
@@ -335,7 +412,15 @@ func (fake *FakeConfig) UAAGrantTypeCallCount() int {
 	return len(fake.uAAGrantTypeArgsForCall)
 }
 
+func (fake *FakeConfig) UAAGrantTypeCalls(stub func() string) {
+	fake.uAAGrantTypeMutex.Lock()
+	defer fake.uAAGrantTypeMutex.Unlock()
+	fake.UAAGrantTypeStub = stub
+}
+
 func (fake *FakeConfig) UAAGrantTypeReturns(result1 string) {
+	fake.uAAGrantTypeMutex.Lock()
+	defer fake.uAAGrantTypeMutex.Unlock()
 	fake.UAAGrantTypeStub = nil
 	fake.uAAGrantTypeReturns = struct {
 		result1 string
@@ -343,6 +428,8 @@ func (fake *FakeConfig) UAAGrantTypeReturns(result1 string) {
 }
 
 func (fake *FakeConfig) UAAGrantTypeReturnsOnCall(i int, result1 string) {
+	fake.uAAGrantTypeMutex.Lock()
+	defer fake.uAAGrantTypeMutex.Unlock()
 	fake.UAAGrantTypeStub = nil
 	if fake.uAAGrantTypeReturnsOnCall == nil {
 		fake.uAAGrantTypeReturnsOnCall = make(map[int]struct {
@@ -357,7 +444,8 @@ func (fake *FakeConfig) UAAGrantTypeReturnsOnCall(i int, result1 string) {
 func (fake *FakeConfig) UAAOAuthClient() string {
 	fake.uAAOAuthClientMutex.Lock()
 	ret, specificReturn := fake.uAAOAuthClientReturnsOnCall[len(fake.uAAOAuthClientArgsForCall)]
-	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct{}{})
+	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct {
+	}{})
 	fake.recordInvocation("UAAOAuthClient", []interface{}{})
 	fake.uAAOAuthClientMutex.Unlock()
 	if fake.UAAOAuthClientStub != nil {
@@ -366,7 +454,8 @@ func (fake *FakeConfig) UAAOAuthClient() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.uAAOAuthClientReturns.result1
+	fakeReturns := fake.uAAOAuthClientReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) UAAOAuthClientCallCount() int {
@@ -375,7 +464,15 @@ func (fake *FakeConfig) UAAOAuthClientCallCount() int {
 	return len(fake.uAAOAuthClientArgsForCall)
 }
 
+func (fake *FakeConfig) UAAOAuthClientCalls(stub func() string) {
+	fake.uAAOAuthClientMutex.Lock()
+	defer fake.uAAOAuthClientMutex.Unlock()
+	fake.UAAOAuthClientStub = stub
+}
+
 func (fake *FakeConfig) UAAOAuthClientReturns(result1 string) {
+	fake.uAAOAuthClientMutex.Lock()
+	defer fake.uAAOAuthClientMutex.Unlock()
 	fake.UAAOAuthClientStub = nil
 	fake.uAAOAuthClientReturns = struct {
 		result1 string
@@ -383,6 +480,8 @@ func (fake *FakeConfig) UAAOAuthClientReturns(result1 string) {
 }
 
 func (fake *FakeConfig) UAAOAuthClientReturnsOnCall(i int, result1 string) {
+	fake.uAAOAuthClientMutex.Lock()
+	defer fake.uAAOAuthClientMutex.Unlock()
 	fake.UAAOAuthClientStub = nil
 	if fake.uAAOAuthClientReturnsOnCall == nil {
 		fake.uAAOAuthClientReturnsOnCall = make(map[int]struct {
@@ -397,7 +496,8 @@ func (fake *FakeConfig) UAAOAuthClientReturnsOnCall(i int, result1 string) {
 func (fake *FakeConfig) UAAOAuthClientSecret() string {
 	fake.uAAOAuthClientSecretMutex.Lock()
 	ret, specificReturn := fake.uAAOAuthClientSecretReturnsOnCall[len(fake.uAAOAuthClientSecretArgsForCall)]
-	fake.uAAOAuthClientSecretArgsForCall = append(fake.uAAOAuthClientSecretArgsForCall, struct{}{})
+	fake.uAAOAuthClientSecretArgsForCall = append(fake.uAAOAuthClientSecretArgsForCall, struct {
+	}{})
 	fake.recordInvocation("UAAOAuthClientSecret", []interface{}{})
 	fake.uAAOAuthClientSecretMutex.Unlock()
 	if fake.UAAOAuthClientSecretStub != nil {
@@ -406,7 +506,8 @@ func (fake *FakeConfig) UAAOAuthClientSecret() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.uAAOAuthClientSecretReturns.result1
+	fakeReturns := fake.uAAOAuthClientSecretReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeConfig) UAAOAuthClientSecretCallCount() int {
@@ -415,7 +516,15 @@ func (fake *FakeConfig) UAAOAuthClientSecretCallCount() int {
 	return len(fake.uAAOAuthClientSecretArgsForCall)
 }
 
+func (fake *FakeConfig) UAAOAuthClientSecretCalls(stub func() string) {
+	fake.uAAOAuthClientSecretMutex.Lock()
+	defer fake.uAAOAuthClientSecretMutex.Unlock()
+	fake.UAAOAuthClientSecretStub = stub
+}
+
 func (fake *FakeConfig) UAAOAuthClientSecretReturns(result1 string) {
+	fake.uAAOAuthClientSecretMutex.Lock()
+	defer fake.uAAOAuthClientSecretMutex.Unlock()
 	fake.UAAOAuthClientSecretStub = nil
 	fake.uAAOAuthClientSecretReturns = struct {
 		result1 string
@@ -423,6 +532,8 @@ func (fake *FakeConfig) UAAOAuthClientSecretReturns(result1 string) {
 }
 
 func (fake *FakeConfig) UAAOAuthClientSecretReturnsOnCall(i int, result1 string) {
+	fake.uAAOAuthClientSecretMutex.Lock()
+	defer fake.uAAOAuthClientSecretMutex.Unlock()
 	fake.UAAOAuthClientSecretStub = nil
 	if fake.uAAOAuthClientSecretReturnsOnCall == nil {
 		fake.uAAOAuthClientSecretReturnsOnCall = make(map[int]struct {

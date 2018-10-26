@@ -2,56 +2,61 @@
 package uifakes
 
 import (
-	"sync"
-	"time"
+	sync "sync"
+	time "time"
 
-	"code.cloudfoundry.org/cli/util/ui"
+	ui "code.cloudfoundry.org/cli/util/ui"
 )
 
 type FakeLogMessage struct {
 	MessageStub        func() string
 	messageMutex       sync.RWMutex
-	messageArgsForCall []struct{}
-	messageReturns     struct {
+	messageArgsForCall []struct {
+	}
+	messageReturns struct {
 		result1 string
 	}
 	messageReturnsOnCall map[int]struct {
 		result1 string
 	}
-	TypeStub        func() string
-	typeMutex       sync.RWMutex
-	typeArgsForCall []struct{}
-	typeReturns     struct {
+	SourceInstanceStub        func() string
+	sourceInstanceMutex       sync.RWMutex
+	sourceInstanceArgsForCall []struct {
+	}
+	sourceInstanceReturns struct {
 		result1 string
 	}
-	typeReturnsOnCall map[int]struct {
+	sourceInstanceReturnsOnCall map[int]struct {
 		result1 string
-	}
-	TimestampStub        func() time.Time
-	timestampMutex       sync.RWMutex
-	timestampArgsForCall []struct{}
-	timestampReturns     struct {
-		result1 time.Time
-	}
-	timestampReturnsOnCall map[int]struct {
-		result1 time.Time
 	}
 	SourceTypeStub        func() string
 	sourceTypeMutex       sync.RWMutex
-	sourceTypeArgsForCall []struct{}
-	sourceTypeReturns     struct {
+	sourceTypeArgsForCall []struct {
+	}
+	sourceTypeReturns struct {
 		result1 string
 	}
 	sourceTypeReturnsOnCall map[int]struct {
 		result1 string
 	}
-	SourceInstanceStub        func() string
-	sourceInstanceMutex       sync.RWMutex
-	sourceInstanceArgsForCall []struct{}
-	sourceInstanceReturns     struct {
+	TimestampStub        func() time.Time
+	timestampMutex       sync.RWMutex
+	timestampArgsForCall []struct {
+	}
+	timestampReturns struct {
+		result1 time.Time
+	}
+	timestampReturnsOnCall map[int]struct {
+		result1 time.Time
+	}
+	TypeStub        func() string
+	typeMutex       sync.RWMutex
+	typeArgsForCall []struct {
+	}
+	typeReturns struct {
 		result1 string
 	}
-	sourceInstanceReturnsOnCall map[int]struct {
+	typeReturnsOnCall map[int]struct {
 		result1 string
 	}
 	invocations      map[string][][]interface{}
@@ -61,7 +66,8 @@ type FakeLogMessage struct {
 func (fake *FakeLogMessage) Message() string {
 	fake.messageMutex.Lock()
 	ret, specificReturn := fake.messageReturnsOnCall[len(fake.messageArgsForCall)]
-	fake.messageArgsForCall = append(fake.messageArgsForCall, struct{}{})
+	fake.messageArgsForCall = append(fake.messageArgsForCall, struct {
+	}{})
 	fake.recordInvocation("Message", []interface{}{})
 	fake.messageMutex.Unlock()
 	if fake.MessageStub != nil {
@@ -70,7 +76,8 @@ func (fake *FakeLogMessage) Message() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.messageReturns.result1
+	fakeReturns := fake.messageReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeLogMessage) MessageCallCount() int {
@@ -79,7 +86,15 @@ func (fake *FakeLogMessage) MessageCallCount() int {
 	return len(fake.messageArgsForCall)
 }
 
+func (fake *FakeLogMessage) MessageCalls(stub func() string) {
+	fake.messageMutex.Lock()
+	defer fake.messageMutex.Unlock()
+	fake.MessageStub = stub
+}
+
 func (fake *FakeLogMessage) MessageReturns(result1 string) {
+	fake.messageMutex.Lock()
+	defer fake.messageMutex.Unlock()
 	fake.MessageStub = nil
 	fake.messageReturns = struct {
 		result1 string
@@ -87,6 +102,8 @@ func (fake *FakeLogMessage) MessageReturns(result1 string) {
 }
 
 func (fake *FakeLogMessage) MessageReturnsOnCall(i int, result1 string) {
+	fake.messageMutex.Lock()
+	defer fake.messageMutex.Unlock()
 	fake.MessageStub = nil
 	if fake.messageReturnsOnCall == nil {
 		fake.messageReturnsOnCall = make(map[int]struct {
@@ -98,130 +115,11 @@ func (fake *FakeLogMessage) MessageReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
-func (fake *FakeLogMessage) Type() string {
-	fake.typeMutex.Lock()
-	ret, specificReturn := fake.typeReturnsOnCall[len(fake.typeArgsForCall)]
-	fake.typeArgsForCall = append(fake.typeArgsForCall, struct{}{})
-	fake.recordInvocation("Type", []interface{}{})
-	fake.typeMutex.Unlock()
-	if fake.TypeStub != nil {
-		return fake.TypeStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.typeReturns.result1
-}
-
-func (fake *FakeLogMessage) TypeCallCount() int {
-	fake.typeMutex.RLock()
-	defer fake.typeMutex.RUnlock()
-	return len(fake.typeArgsForCall)
-}
-
-func (fake *FakeLogMessage) TypeReturns(result1 string) {
-	fake.TypeStub = nil
-	fake.typeReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeLogMessage) TypeReturnsOnCall(i int, result1 string) {
-	fake.TypeStub = nil
-	if fake.typeReturnsOnCall == nil {
-		fake.typeReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.typeReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeLogMessage) Timestamp() time.Time {
-	fake.timestampMutex.Lock()
-	ret, specificReturn := fake.timestampReturnsOnCall[len(fake.timestampArgsForCall)]
-	fake.timestampArgsForCall = append(fake.timestampArgsForCall, struct{}{})
-	fake.recordInvocation("Timestamp", []interface{}{})
-	fake.timestampMutex.Unlock()
-	if fake.TimestampStub != nil {
-		return fake.TimestampStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.timestampReturns.result1
-}
-
-func (fake *FakeLogMessage) TimestampCallCount() int {
-	fake.timestampMutex.RLock()
-	defer fake.timestampMutex.RUnlock()
-	return len(fake.timestampArgsForCall)
-}
-
-func (fake *FakeLogMessage) TimestampReturns(result1 time.Time) {
-	fake.TimestampStub = nil
-	fake.timestampReturns = struct {
-		result1 time.Time
-	}{result1}
-}
-
-func (fake *FakeLogMessage) TimestampReturnsOnCall(i int, result1 time.Time) {
-	fake.TimestampStub = nil
-	if fake.timestampReturnsOnCall == nil {
-		fake.timestampReturnsOnCall = make(map[int]struct {
-			result1 time.Time
-		})
-	}
-	fake.timestampReturnsOnCall[i] = struct {
-		result1 time.Time
-	}{result1}
-}
-
-func (fake *FakeLogMessage) SourceType() string {
-	fake.sourceTypeMutex.Lock()
-	ret, specificReturn := fake.sourceTypeReturnsOnCall[len(fake.sourceTypeArgsForCall)]
-	fake.sourceTypeArgsForCall = append(fake.sourceTypeArgsForCall, struct{}{})
-	fake.recordInvocation("SourceType", []interface{}{})
-	fake.sourceTypeMutex.Unlock()
-	if fake.SourceTypeStub != nil {
-		return fake.SourceTypeStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.sourceTypeReturns.result1
-}
-
-func (fake *FakeLogMessage) SourceTypeCallCount() int {
-	fake.sourceTypeMutex.RLock()
-	defer fake.sourceTypeMutex.RUnlock()
-	return len(fake.sourceTypeArgsForCall)
-}
-
-func (fake *FakeLogMessage) SourceTypeReturns(result1 string) {
-	fake.SourceTypeStub = nil
-	fake.sourceTypeReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeLogMessage) SourceTypeReturnsOnCall(i int, result1 string) {
-	fake.SourceTypeStub = nil
-	if fake.sourceTypeReturnsOnCall == nil {
-		fake.sourceTypeReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.sourceTypeReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeLogMessage) SourceInstance() string {
 	fake.sourceInstanceMutex.Lock()
 	ret, specificReturn := fake.sourceInstanceReturnsOnCall[len(fake.sourceInstanceArgsForCall)]
-	fake.sourceInstanceArgsForCall = append(fake.sourceInstanceArgsForCall, struct{}{})
+	fake.sourceInstanceArgsForCall = append(fake.sourceInstanceArgsForCall, struct {
+	}{})
 	fake.recordInvocation("SourceInstance", []interface{}{})
 	fake.sourceInstanceMutex.Unlock()
 	if fake.SourceInstanceStub != nil {
@@ -230,7 +128,8 @@ func (fake *FakeLogMessage) SourceInstance() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.sourceInstanceReturns.result1
+	fakeReturns := fake.sourceInstanceReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeLogMessage) SourceInstanceCallCount() int {
@@ -239,7 +138,15 @@ func (fake *FakeLogMessage) SourceInstanceCallCount() int {
 	return len(fake.sourceInstanceArgsForCall)
 }
 
+func (fake *FakeLogMessage) SourceInstanceCalls(stub func() string) {
+	fake.sourceInstanceMutex.Lock()
+	defer fake.sourceInstanceMutex.Unlock()
+	fake.SourceInstanceStub = stub
+}
+
 func (fake *FakeLogMessage) SourceInstanceReturns(result1 string) {
+	fake.sourceInstanceMutex.Lock()
+	defer fake.sourceInstanceMutex.Unlock()
 	fake.SourceInstanceStub = nil
 	fake.sourceInstanceReturns = struct {
 		result1 string
@@ -247,6 +154,8 @@ func (fake *FakeLogMessage) SourceInstanceReturns(result1 string) {
 }
 
 func (fake *FakeLogMessage) SourceInstanceReturnsOnCall(i int, result1 string) {
+	fake.sourceInstanceMutex.Lock()
+	defer fake.sourceInstanceMutex.Unlock()
 	fake.SourceInstanceStub = nil
 	if fake.sourceInstanceReturnsOnCall == nil {
 		fake.sourceInstanceReturnsOnCall = make(map[int]struct {
@@ -258,19 +167,175 @@ func (fake *FakeLogMessage) SourceInstanceReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
+func (fake *FakeLogMessage) SourceType() string {
+	fake.sourceTypeMutex.Lock()
+	ret, specificReturn := fake.sourceTypeReturnsOnCall[len(fake.sourceTypeArgsForCall)]
+	fake.sourceTypeArgsForCall = append(fake.sourceTypeArgsForCall, struct {
+	}{})
+	fake.recordInvocation("SourceType", []interface{}{})
+	fake.sourceTypeMutex.Unlock()
+	if fake.SourceTypeStub != nil {
+		return fake.SourceTypeStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.sourceTypeReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeLogMessage) SourceTypeCallCount() int {
+	fake.sourceTypeMutex.RLock()
+	defer fake.sourceTypeMutex.RUnlock()
+	return len(fake.sourceTypeArgsForCall)
+}
+
+func (fake *FakeLogMessage) SourceTypeCalls(stub func() string) {
+	fake.sourceTypeMutex.Lock()
+	defer fake.sourceTypeMutex.Unlock()
+	fake.SourceTypeStub = stub
+}
+
+func (fake *FakeLogMessage) SourceTypeReturns(result1 string) {
+	fake.sourceTypeMutex.Lock()
+	defer fake.sourceTypeMutex.Unlock()
+	fake.SourceTypeStub = nil
+	fake.sourceTypeReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeLogMessage) SourceTypeReturnsOnCall(i int, result1 string) {
+	fake.sourceTypeMutex.Lock()
+	defer fake.sourceTypeMutex.Unlock()
+	fake.SourceTypeStub = nil
+	if fake.sourceTypeReturnsOnCall == nil {
+		fake.sourceTypeReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.sourceTypeReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeLogMessage) Timestamp() time.Time {
+	fake.timestampMutex.Lock()
+	ret, specificReturn := fake.timestampReturnsOnCall[len(fake.timestampArgsForCall)]
+	fake.timestampArgsForCall = append(fake.timestampArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Timestamp", []interface{}{})
+	fake.timestampMutex.Unlock()
+	if fake.TimestampStub != nil {
+		return fake.TimestampStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.timestampReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeLogMessage) TimestampCallCount() int {
+	fake.timestampMutex.RLock()
+	defer fake.timestampMutex.RUnlock()
+	return len(fake.timestampArgsForCall)
+}
+
+func (fake *FakeLogMessage) TimestampCalls(stub func() time.Time) {
+	fake.timestampMutex.Lock()
+	defer fake.timestampMutex.Unlock()
+	fake.TimestampStub = stub
+}
+
+func (fake *FakeLogMessage) TimestampReturns(result1 time.Time) {
+	fake.timestampMutex.Lock()
+	defer fake.timestampMutex.Unlock()
+	fake.TimestampStub = nil
+	fake.timestampReturns = struct {
+		result1 time.Time
+	}{result1}
+}
+
+func (fake *FakeLogMessage) TimestampReturnsOnCall(i int, result1 time.Time) {
+	fake.timestampMutex.Lock()
+	defer fake.timestampMutex.Unlock()
+	fake.TimestampStub = nil
+	if fake.timestampReturnsOnCall == nil {
+		fake.timestampReturnsOnCall = make(map[int]struct {
+			result1 time.Time
+		})
+	}
+	fake.timestampReturnsOnCall[i] = struct {
+		result1 time.Time
+	}{result1}
+}
+
+func (fake *FakeLogMessage) Type() string {
+	fake.typeMutex.Lock()
+	ret, specificReturn := fake.typeReturnsOnCall[len(fake.typeArgsForCall)]
+	fake.typeArgsForCall = append(fake.typeArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Type", []interface{}{})
+	fake.typeMutex.Unlock()
+	if fake.TypeStub != nil {
+		return fake.TypeStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.typeReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeLogMessage) TypeCallCount() int {
+	fake.typeMutex.RLock()
+	defer fake.typeMutex.RUnlock()
+	return len(fake.typeArgsForCall)
+}
+
+func (fake *FakeLogMessage) TypeCalls(stub func() string) {
+	fake.typeMutex.Lock()
+	defer fake.typeMutex.Unlock()
+	fake.TypeStub = stub
+}
+
+func (fake *FakeLogMessage) TypeReturns(result1 string) {
+	fake.typeMutex.Lock()
+	defer fake.typeMutex.Unlock()
+	fake.TypeStub = nil
+	fake.typeReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeLogMessage) TypeReturnsOnCall(i int, result1 string) {
+	fake.typeMutex.Lock()
+	defer fake.typeMutex.Unlock()
+	fake.TypeStub = nil
+	if fake.typeReturnsOnCall == nil {
+		fake.typeReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.typeReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeLogMessage) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.messageMutex.RLock()
 	defer fake.messageMutex.RUnlock()
-	fake.typeMutex.RLock()
-	defer fake.typeMutex.RUnlock()
-	fake.timestampMutex.RLock()
-	defer fake.timestampMutex.RUnlock()
-	fake.sourceTypeMutex.RLock()
-	defer fake.sourceTypeMutex.RUnlock()
 	fake.sourceInstanceMutex.RLock()
 	defer fake.sourceInstanceMutex.RUnlock()
+	fake.sourceTypeMutex.RLock()
+	defer fake.sourceTypeMutex.RUnlock()
+	fake.timestampMutex.RLock()
+	defer fake.timestampMutex.RUnlock()
+	fake.typeMutex.RLock()
+	defer fake.typeMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

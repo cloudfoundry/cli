@@ -14,7 +14,7 @@ After reaching out to the CLI team and the conclusion is to make a PR, please fo
 1. Review the CF CLI's [Style Guide](https://github.com/cloudfoundry/cli/wiki/CF-CLI-Style-Guide)
 1. Fork the project’s repository
 1. Create a feature branch (e.g. `git checkout -b better_cli`) and make changes on this branch
-  * Follow the previous sections on this page to set up your development environment, build `cf` and run the tests.
+   * Follow the previous sections on this page to set up your development environment, build `cf` and run the tests.
 1. Push to your fork (e.g. `git push origin better_cli`) and [submit a pull request](https://help.github.com/articles/creating-a-pull-request)
 
 If you have a CLA on file, your contribution will be analyzed for product fit and engineering quality prior to merging.  

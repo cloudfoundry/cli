@@ -34,13 +34,13 @@ var _ = Describe("push with hostname", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
 						Eventually(session).Should(Say("routes:"))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s", route))
+						Eventually(session).Should(Say(`(?i)\+\s+%s`, route))
 						Eventually(session).Should(Exit(0))
 					})
 
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`routes:\s+%s`, route))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -54,13 +54,13 @@ var _ = Describe("push with hostname", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
 						Eventually(session).Should(Say("routes:"))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s", route))
+						Eventually(session).Should(Say(`(?i)\+\s+%s`, route))
 						Eventually(session).Should(Exit(0))
 					})
 
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`routes:\s+%s`, route))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -76,7 +76,7 @@ var _ = Describe("push with hostname", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
 						Eventually(session).Should(Say("routes:"))
-						Eventually(session).Should(Say("(?i)\\s+%s", route))
+						Eventually(session).Should(Say(`(?i)\s+%s`, route))
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -101,20 +101,20 @@ var _ = Describe("push with hostname", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--hostname", hostname, "--no-start")
 						Eventually(session).Should(Say("routes:"))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s", route))
+						Eventually(session).Should(Say(`(?i)\+\s+%s`, route))
 						Eventually(session).Should(Exit(0))
 					})
 
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`routes:\s+%s`, route))
 					Eventually(session).Should(Exit(0))
 
 					By("does not remap default route after")
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
 						Eventually(session).Should(Say("routes:"))
-						Consistently(session).ShouldNot(Say("(?i)\\+\\s+.*%s.*", helpers.DefaultSharedDomain()))
+						Consistently(session).ShouldNot(Say(`(?i)\+\s+.*%s.*`, helpers.DefaultSharedDomain()))
 						Eventually(session).Should(Exit(0))
 					})
 				})

@@ -364,7 +364,7 @@ var _ = Describe("UI", func() {
 
 	Describe("UserFriendlyDate", func() {
 		It("formats a time into an ISO8601 string", func() {
-			Expect(ui.UserFriendlyDate(time.Unix(0, 0))).To(MatchRegexp("\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+			Expect(ui.UserFriendlyDate(time.Unix(0, 0))).To(MatchRegexp(`\w{3} [0-3]\d \w{3} [0-2]\d:[0-5]\d:[0-5]\d \w+ \d{4}`))
 		})
 	})
 })

@@ -2,18 +2,18 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/command/v6"
+	sharedaction "code.cloudfoundry.org/cli/actor/sharedaction"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeSSHActor struct {
-	ExecuteSecureShellStub        func(sshClient sharedaction.SecureShellClient, sshOptions sharedaction.SSHOptions) error
+	ExecuteSecureShellStub        func(sharedaction.SecureShellClient, sharedaction.SSHOptions) error
 	executeSecureShellMutex       sync.RWMutex
 	executeSecureShellArgsForCall []struct {
-		sshClient  sharedaction.SecureShellClient
-		sshOptions sharedaction.SSHOptions
+		arg1 sharedaction.SecureShellClient
+		arg2 sharedaction.SSHOptions
 	}
 	executeSecureShellReturns struct {
 		result1 error
@@ -25,22 +25,23 @@ type FakeSSHActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSSHActor) ExecuteSecureShell(sshClient sharedaction.SecureShellClient, sshOptions sharedaction.SSHOptions) error {
+func (fake *FakeSSHActor) ExecuteSecureShell(arg1 sharedaction.SecureShellClient, arg2 sharedaction.SSHOptions) error {
 	fake.executeSecureShellMutex.Lock()
 	ret, specificReturn := fake.executeSecureShellReturnsOnCall[len(fake.executeSecureShellArgsForCall)]
 	fake.executeSecureShellArgsForCall = append(fake.executeSecureShellArgsForCall, struct {
-		sshClient  sharedaction.SecureShellClient
-		sshOptions sharedaction.SSHOptions
-	}{sshClient, sshOptions})
-	fake.recordInvocation("ExecuteSecureShell", []interface{}{sshClient, sshOptions})
+		arg1 sharedaction.SecureShellClient
+		arg2 sharedaction.SSHOptions
+	}{arg1, arg2})
+	fake.recordInvocation("ExecuteSecureShell", []interface{}{arg1, arg2})
 	fake.executeSecureShellMutex.Unlock()
 	if fake.ExecuteSecureShellStub != nil {
-		return fake.ExecuteSecureShellStub(sshClient, sshOptions)
+		return fake.ExecuteSecureShellStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.executeSecureShellReturns.result1
+	fakeReturns := fake.executeSecureShellReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeSSHActor) ExecuteSecureShellCallCount() int {
@@ -49,13 +50,22 @@ func (fake *FakeSSHActor) ExecuteSecureShellCallCount() int {
 	return len(fake.executeSecureShellArgsForCall)
 }
 
+func (fake *FakeSSHActor) ExecuteSecureShellCalls(stub func(sharedaction.SecureShellClient, sharedaction.SSHOptions) error) {
+	fake.executeSecureShellMutex.Lock()
+	defer fake.executeSecureShellMutex.Unlock()
+	fake.ExecuteSecureShellStub = stub
+}
+
 func (fake *FakeSSHActor) ExecuteSecureShellArgsForCall(i int) (sharedaction.SecureShellClient, sharedaction.SSHOptions) {
 	fake.executeSecureShellMutex.RLock()
 	defer fake.executeSecureShellMutex.RUnlock()
-	return fake.executeSecureShellArgsForCall[i].sshClient, fake.executeSecureShellArgsForCall[i].sshOptions
+	argsForCall := fake.executeSecureShellArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeSSHActor) ExecuteSecureShellReturns(result1 error) {
+	fake.executeSecureShellMutex.Lock()
+	defer fake.executeSecureShellMutex.Unlock()
 	fake.ExecuteSecureShellStub = nil
 	fake.executeSecureShellReturns = struct {
 		result1 error
@@ -63,6 +73,8 @@ func (fake *FakeSSHActor) ExecuteSecureShellReturns(result1 error) {
 }
 
 func (fake *FakeSSHActor) ExecuteSecureShellReturnsOnCall(i int, result1 error) {
+	fake.executeSecureShellMutex.Lock()
+	defer fake.executeSecureShellMutex.Unlock()
 	fake.ExecuteSecureShellStub = nil
 	if fake.executeSecureShellReturnsOnCall == nil {
 		fake.executeSecureShellReturnsOnCall = make(map[int]struct {

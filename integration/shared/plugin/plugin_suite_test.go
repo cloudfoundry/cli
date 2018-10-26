@@ -30,7 +30,15 @@ var (
 
 func TestGlobal(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Plugin Suite")
+	reporters := []Reporter{}
+
+	honeyCombReporter := helpers.GetHoneyCombReporter("Plugin Suite")
+
+	if honeyCombReporter != nil {
+		reporters = append(reporters, honeyCombReporter)
+	}
+
+	RunSpecsWithDefaultAndCustomReporters(t, "Plugin Suite", reporters)
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {

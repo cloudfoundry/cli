@@ -32,6 +32,13 @@ resources:
     branch: master
     paths: *ciPaths
 
+- name: homebrew-tap
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/homebrew-tap
+    private_key: ((homebrew-tap-github-private-key))
+    branch: master
+
 - name: cli-integration
   type: git
   source:
@@ -291,7 +298,7 @@ jobs:
         params:
           channel: '#v3-acceleration-team'
           text: |
-            :canada: Linux integration failed :throwing-in-the-towel:
+            :dr-seuss2: Linux integration failed :throwing-in-the-towel:
             :dancing-penguin: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
@@ -338,7 +345,7 @@ jobs:
         params:
           channel: '#v3-acceleration-team'
           text: |
-            :canada: Windows integration failed :throwing-in-the-towel:
+            :dr-seuss2: Windows integration failed :throwing-in-the-towel:
             :win95: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
@@ -432,3 +439,69 @@ jobs:
     - put: edge-windows-installer-64
       params:
         file: winstallers/cf7-cli-installer_winx64.zip
+
+- name: create-beta-release
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [create-installers]
+    - get: cli-ci
+    - get: edge-linux-binary-32
+    - get: edge-linux-binary-64
+    - get: edge-osx-binary-64
+    - get: edge-windows-binary-32
+    - get: edge-windows-binary-64
+    - get: edge-deb-installer-32
+    - get: edge-deb-installer-64
+    - get: edge-redhat-installer-32
+    - get: edge-redhat-installer-64
+    - get: edge-osx-installer-64
+  - task: create-release
+    file: cli-ci/ci/cli-v7/tasks/create-release.yml
+    params:
+      AWS_ACCESS_KEY_ID: ((cli-team-aws-s3-access-key-id))
+      AWS_SECRET_ACCESS_KEY: ((cli-team-aws-s3-secret-access-key))
+
+- name: publish-beta-release
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      trigger: true
+      passed: [create-beta-release]
+    - get: cli-ci
+    - get: edge-linux-binary-64
+      passed: [create-beta-release]
+  - aggregate:
+    - task: claw.run.pivotal.io
+      file: cli-ci/ci/cli-v7/tasks/update-claw.yml
+      params:
+        CF_API: ((cf-api))
+        CF_USERNAME: ((cli-pws-client-id))
+        CF_PASSWORD: ((cli-pws-client-secret))
+        CF_ORGANIZATION: ((pivotal-organization))
+        CF_SPACE: ((pivotal-space))
+    - task: packages.cloudfoundry.org
+      file: cli-ci/ci/cli-v7/tasks/update-claw.yml
+      params:
+        CF_API: ((cf-api))
+        CF_USERNAME: ((cli-pws-client-id))
+        CF_PASSWORD: ((cli-pws-client-secret))
+        CF_ORGANIZATION: ((oss-organization))
+        CF_SPACE: ((oss-space))
+
+- name: update-cf7-homebrew
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      trigger: true
+      passed: [publish-beta-release]
+    - get: cli-ci
+    - get: homebrew-tap
+  - task: update-brew-formula
+    file: cli-ci/ci/cli-v7/tasks/update-brew-formula.yml
+  # - put: homebrew-tap
+  #   params:
+  #     repository: update-brew-formula-output/homebrew-tap

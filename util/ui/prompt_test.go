@@ -39,7 +39,7 @@ var _ = Describe("Prompts", func() {
 	Describe("DisplayBoolPrompt", func() {
 		It("displays the passed in string", func() {
 			_, _ = ui.DisplayBoolPrompt(false, "some-prompt", nil)
-			Expect(out).To(Say("some-prompt \\[yN\\]:"))
+			Expect(out).To(Say(`some-prompt \[yN\]:`))
 		})
 
 		When("the user chooses yes", func() {

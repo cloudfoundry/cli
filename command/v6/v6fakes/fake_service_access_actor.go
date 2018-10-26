@@ -2,19 +2,19 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeServiceAccessActor struct {
-	GetServiceBrokerSummariesStub        func(broker string, service string, organization string) ([]v2action.ServiceBrokerSummary, v2action.Warnings, error)
+	GetServiceBrokerSummariesStub        func(string, string, string) ([]v2action.ServiceBrokerSummary, v2action.Warnings, error)
 	getServiceBrokerSummariesMutex       sync.RWMutex
 	getServiceBrokerSummariesArgsForCall []struct {
-		broker       string
-		service      string
-		organization string
+		arg1 string
+		arg2 string
+		arg3 string
 	}
 	getServiceBrokerSummariesReturns struct {
 		result1 []v2action.ServiceBrokerSummary
@@ -30,23 +30,24 @@ type FakeServiceAccessActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeServiceAccessActor) GetServiceBrokerSummaries(broker string, service string, organization string) ([]v2action.ServiceBrokerSummary, v2action.Warnings, error) {
+func (fake *FakeServiceAccessActor) GetServiceBrokerSummaries(arg1 string, arg2 string, arg3 string) ([]v2action.ServiceBrokerSummary, v2action.Warnings, error) {
 	fake.getServiceBrokerSummariesMutex.Lock()
 	ret, specificReturn := fake.getServiceBrokerSummariesReturnsOnCall[len(fake.getServiceBrokerSummariesArgsForCall)]
 	fake.getServiceBrokerSummariesArgsForCall = append(fake.getServiceBrokerSummariesArgsForCall, struct {
-		broker       string
-		service      string
-		organization string
-	}{broker, service, organization})
-	fake.recordInvocation("GetServiceBrokerSummaries", []interface{}{broker, service, organization})
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetServiceBrokerSummaries", []interface{}{arg1, arg2, arg3})
 	fake.getServiceBrokerSummariesMutex.Unlock()
 	if fake.GetServiceBrokerSummariesStub != nil {
-		return fake.GetServiceBrokerSummariesStub(broker, service, organization)
+		return fake.GetServiceBrokerSummariesStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getServiceBrokerSummariesReturns.result1, fake.getServiceBrokerSummariesReturns.result2, fake.getServiceBrokerSummariesReturns.result3
+	fakeReturns := fake.getServiceBrokerSummariesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeServiceAccessActor) GetServiceBrokerSummariesCallCount() int {
@@ -55,13 +56,22 @@ func (fake *FakeServiceAccessActor) GetServiceBrokerSummariesCallCount() int {
 	return len(fake.getServiceBrokerSummariesArgsForCall)
 }
 
+func (fake *FakeServiceAccessActor) GetServiceBrokerSummariesCalls(stub func(string, string, string) ([]v2action.ServiceBrokerSummary, v2action.Warnings, error)) {
+	fake.getServiceBrokerSummariesMutex.Lock()
+	defer fake.getServiceBrokerSummariesMutex.Unlock()
+	fake.GetServiceBrokerSummariesStub = stub
+}
+
 func (fake *FakeServiceAccessActor) GetServiceBrokerSummariesArgsForCall(i int) (string, string, string) {
 	fake.getServiceBrokerSummariesMutex.RLock()
 	defer fake.getServiceBrokerSummariesMutex.RUnlock()
-	return fake.getServiceBrokerSummariesArgsForCall[i].broker, fake.getServiceBrokerSummariesArgsForCall[i].service, fake.getServiceBrokerSummariesArgsForCall[i].organization
+	argsForCall := fake.getServiceBrokerSummariesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeServiceAccessActor) GetServiceBrokerSummariesReturns(result1 []v2action.ServiceBrokerSummary, result2 v2action.Warnings, result3 error) {
+	fake.getServiceBrokerSummariesMutex.Lock()
+	defer fake.getServiceBrokerSummariesMutex.Unlock()
 	fake.GetServiceBrokerSummariesStub = nil
 	fake.getServiceBrokerSummariesReturns = struct {
 		result1 []v2action.ServiceBrokerSummary
@@ -71,6 +81,8 @@ func (fake *FakeServiceAccessActor) GetServiceBrokerSummariesReturns(result1 []v
 }
 
 func (fake *FakeServiceAccessActor) GetServiceBrokerSummariesReturnsOnCall(i int, result1 []v2action.ServiceBrokerSummary, result2 v2action.Warnings, result3 error) {
+	fake.getServiceBrokerSummariesMutex.Lock()
+	defer fake.getServiceBrokerSummariesMutex.Unlock()
 	fake.GetServiceBrokerSummariesStub = nil
 	if fake.getServiceBrokerSummariesReturnsOnCall == nil {
 		fake.getServiceBrokerSummariesReturnsOnCall = make(map[int]struct {

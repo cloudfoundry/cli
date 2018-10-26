@@ -19,3 +19,7 @@ func (i *Instances) UnmarshalFlag(val string) error {
 	}
 	return nil
 }
+
+func (i *Instances) IsValidValue(val string) error {
+	return i.UnmarshalFlag(val)
+}

@@ -2,20 +2,20 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	constant "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeBindSecurityGroupActor struct {
-	BindSecurityGroupToSpaceStub        func(securityGroupGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (v2action.Warnings, error)
+	BindSecurityGroupToSpaceStub        func(string, string, constant.SecurityGroupLifecycle) (v2action.Warnings, error)
 	bindSecurityGroupToSpaceMutex       sync.RWMutex
 	bindSecurityGroupToSpaceArgsForCall []struct {
-		securityGroupGUID string
-		spaceGUID         string
-		lifecycle         constant.SecurityGroupLifecycle
+		arg1 string
+		arg2 string
+		arg3 constant.SecurityGroupLifecycle
 	}
 	bindSecurityGroupToSpaceReturns struct {
 		result1 v2action.Warnings
@@ -27,17 +27,18 @@ type FakeBindSecurityGroupActor struct {
 	}
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetOrganizationByNameStub        func(orgName string) (v2action.Organization, v2action.Warnings, error)
+	GetOrganizationByNameStub        func(string) (v2action.Organization, v2action.Warnings, error)
 	getOrganizationByNameMutex       sync.RWMutex
 	getOrganizationByNameArgsForCall []struct {
-		orgName string
+		arg1 string
 	}
 	getOrganizationByNameReturns struct {
 		result1 v2action.Organization
@@ -49,10 +50,10 @@ type FakeBindSecurityGroupActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetOrganizationSpacesStub        func(orgGUID string) ([]v2action.Space, v2action.Warnings, error)
+	GetOrganizationSpacesStub        func(string) ([]v2action.Space, v2action.Warnings, error)
 	getOrganizationSpacesMutex       sync.RWMutex
 	getOrganizationSpacesArgsForCall []struct {
-		orgGUID string
+		arg1 string
 	}
 	getOrganizationSpacesReturns struct {
 		result1 []v2action.Space
@@ -64,10 +65,10 @@ type FakeBindSecurityGroupActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetSecurityGroupByNameStub        func(securityGroupName string) (v2action.SecurityGroup, v2action.Warnings, error)
+	GetSecurityGroupByNameStub        func(string) (v2action.SecurityGroup, v2action.Warnings, error)
 	getSecurityGroupByNameMutex       sync.RWMutex
 	getSecurityGroupByNameArgsForCall []struct {
-		securityGroupName string
+		arg1 string
 	}
 	getSecurityGroupByNameReturns struct {
 		result1 v2action.SecurityGroup
@@ -79,11 +80,11 @@ type FakeBindSecurityGroupActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetSpaceByOrganizationAndNameStub        func(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
+	GetSpaceByOrganizationAndNameStub        func(string, string) (v2action.Space, v2action.Warnings, error)
 	getSpaceByOrganizationAndNameMutex       sync.RWMutex
 	getSpaceByOrganizationAndNameArgsForCall []struct {
-		orgGUID   string
-		spaceName string
+		arg1 string
+		arg2 string
 	}
 	getSpaceByOrganizationAndNameReturns struct {
 		result1 v2action.Space
@@ -99,23 +100,24 @@ type FakeBindSecurityGroupActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle constant.SecurityGroupLifecycle) (v2action.Warnings, error) {
+func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpace(arg1 string, arg2 string, arg3 constant.SecurityGroupLifecycle) (v2action.Warnings, error) {
 	fake.bindSecurityGroupToSpaceMutex.Lock()
 	ret, specificReturn := fake.bindSecurityGroupToSpaceReturnsOnCall[len(fake.bindSecurityGroupToSpaceArgsForCall)]
 	fake.bindSecurityGroupToSpaceArgsForCall = append(fake.bindSecurityGroupToSpaceArgsForCall, struct {
-		securityGroupGUID string
-		spaceGUID         string
-		lifecycle         constant.SecurityGroupLifecycle
-	}{securityGroupGUID, spaceGUID, lifecycle})
-	fake.recordInvocation("BindSecurityGroupToSpace", []interface{}{securityGroupGUID, spaceGUID, lifecycle})
+		arg1 string
+		arg2 string
+		arg3 constant.SecurityGroupLifecycle
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("BindSecurityGroupToSpace", []interface{}{arg1, arg2, arg3})
 	fake.bindSecurityGroupToSpaceMutex.Unlock()
 	if fake.BindSecurityGroupToSpaceStub != nil {
-		return fake.BindSecurityGroupToSpaceStub(securityGroupGUID, spaceGUID, lifecycle)
+		return fake.BindSecurityGroupToSpaceStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.bindSecurityGroupToSpaceReturns.result1, fake.bindSecurityGroupToSpaceReturns.result2
+	fakeReturns := fake.bindSecurityGroupToSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceCallCount() int {
@@ -124,13 +126,22 @@ func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceCallCount() int 
 	return len(fake.bindSecurityGroupToSpaceArgsForCall)
 }
 
+func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceCalls(stub func(string, string, constant.SecurityGroupLifecycle) (v2action.Warnings, error)) {
+	fake.bindSecurityGroupToSpaceMutex.Lock()
+	defer fake.bindSecurityGroupToSpaceMutex.Unlock()
+	fake.BindSecurityGroupToSpaceStub = stub
+}
+
 func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceArgsForCall(i int) (string, string, constant.SecurityGroupLifecycle) {
 	fake.bindSecurityGroupToSpaceMutex.RLock()
 	defer fake.bindSecurityGroupToSpaceMutex.RUnlock()
-	return fake.bindSecurityGroupToSpaceArgsForCall[i].securityGroupGUID, fake.bindSecurityGroupToSpaceArgsForCall[i].spaceGUID, fake.bindSecurityGroupToSpaceArgsForCall[i].lifecycle
+	argsForCall := fake.bindSecurityGroupToSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceReturns(result1 v2action.Warnings, result2 error) {
+	fake.bindSecurityGroupToSpaceMutex.Lock()
+	defer fake.bindSecurityGroupToSpaceMutex.Unlock()
 	fake.BindSecurityGroupToSpaceStub = nil
 	fake.bindSecurityGroupToSpaceReturns = struct {
 		result1 v2action.Warnings
@@ -139,6 +150,8 @@ func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceReturns(result1 
 }
 
 func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.bindSecurityGroupToSpaceMutex.Lock()
+	defer fake.bindSecurityGroupToSpaceMutex.Unlock()
 	fake.BindSecurityGroupToSpaceStub = nil
 	if fake.bindSecurityGroupToSpaceReturnsOnCall == nil {
 		fake.bindSecurityGroupToSpaceReturnsOnCall = make(map[int]struct {
@@ -155,7 +168,8 @@ func (fake *FakeBindSecurityGroupActor) BindSecurityGroupToSpaceReturnsOnCall(i 
 func (fake *FakeBindSecurityGroupActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -164,7 +178,8 @@ func (fake *FakeBindSecurityGroupActor) CloudControllerAPIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeBindSecurityGroupActor) CloudControllerAPIVersionCallCount() int {
@@ -173,7 +188,15 @@ func (fake *FakeBindSecurityGroupActor) CloudControllerAPIVersionCallCount() int
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeBindSecurityGroupActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeBindSecurityGroupActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -181,6 +204,8 @@ func (fake *FakeBindSecurityGroupActor) CloudControllerAPIVersionReturns(result1
 }
 
 func (fake *FakeBindSecurityGroupActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -192,21 +217,22 @@ func (fake *FakeBindSecurityGroupActor) CloudControllerAPIVersionReturnsOnCall(i
 	}{result1}
 }
 
-func (fake *FakeBindSecurityGroupActor) GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error) {
+func (fake *FakeBindSecurityGroupActor) GetOrganizationByName(arg1 string) (v2action.Organization, v2action.Warnings, error) {
 	fake.getOrganizationByNameMutex.Lock()
 	ret, specificReturn := fake.getOrganizationByNameReturnsOnCall[len(fake.getOrganizationByNameArgsForCall)]
 	fake.getOrganizationByNameArgsForCall = append(fake.getOrganizationByNameArgsForCall, struct {
-		orgName string
-	}{orgName})
-	fake.recordInvocation("GetOrganizationByName", []interface{}{orgName})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationByName", []interface{}{arg1})
 	fake.getOrganizationByNameMutex.Unlock()
 	if fake.GetOrganizationByNameStub != nil {
-		return fake.GetOrganizationByNameStub(orgName)
+		return fake.GetOrganizationByNameStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getOrganizationByNameReturns.result1, fake.getOrganizationByNameReturns.result2, fake.getOrganizationByNameReturns.result3
+	fakeReturns := fake.getOrganizationByNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeBindSecurityGroupActor) GetOrganizationByNameCallCount() int {
@@ -215,13 +241,22 @@ func (fake *FakeBindSecurityGroupActor) GetOrganizationByNameCallCount() int {
 	return len(fake.getOrganizationByNameArgsForCall)
 }
 
+func (fake *FakeBindSecurityGroupActor) GetOrganizationByNameCalls(stub func(string) (v2action.Organization, v2action.Warnings, error)) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
+	fake.GetOrganizationByNameStub = stub
+}
+
 func (fake *FakeBindSecurityGroupActor) GetOrganizationByNameArgsForCall(i int) string {
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
-	return fake.getOrganizationByNameArgsForCall[i].orgName
+	argsForCall := fake.getOrganizationByNameArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeBindSecurityGroupActor) GetOrganizationByNameReturns(result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
 	fake.GetOrganizationByNameStub = nil
 	fake.getOrganizationByNameReturns = struct {
 		result1 v2action.Organization
@@ -231,6 +266,8 @@ func (fake *FakeBindSecurityGroupActor) GetOrganizationByNameReturns(result1 v2a
 }
 
 func (fake *FakeBindSecurityGroupActor) GetOrganizationByNameReturnsOnCall(i int, result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationByNameMutex.Lock()
+	defer fake.getOrganizationByNameMutex.Unlock()
 	fake.GetOrganizationByNameStub = nil
 	if fake.getOrganizationByNameReturnsOnCall == nil {
 		fake.getOrganizationByNameReturnsOnCall = make(map[int]struct {
@@ -246,21 +283,22 @@ func (fake *FakeBindSecurityGroupActor) GetOrganizationByNameReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
-func (fake *FakeBindSecurityGroupActor) GetOrganizationSpaces(orgGUID string) ([]v2action.Space, v2action.Warnings, error) {
+func (fake *FakeBindSecurityGroupActor) GetOrganizationSpaces(arg1 string) ([]v2action.Space, v2action.Warnings, error) {
 	fake.getOrganizationSpacesMutex.Lock()
 	ret, specificReturn := fake.getOrganizationSpacesReturnsOnCall[len(fake.getOrganizationSpacesArgsForCall)]
 	fake.getOrganizationSpacesArgsForCall = append(fake.getOrganizationSpacesArgsForCall, struct {
-		orgGUID string
-	}{orgGUID})
-	fake.recordInvocation("GetOrganizationSpaces", []interface{}{orgGUID})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationSpaces", []interface{}{arg1})
 	fake.getOrganizationSpacesMutex.Unlock()
 	if fake.GetOrganizationSpacesStub != nil {
-		return fake.GetOrganizationSpacesStub(orgGUID)
+		return fake.GetOrganizationSpacesStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getOrganizationSpacesReturns.result1, fake.getOrganizationSpacesReturns.result2, fake.getOrganizationSpacesReturns.result3
+	fakeReturns := fake.getOrganizationSpacesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeBindSecurityGroupActor) GetOrganizationSpacesCallCount() int {
@@ -269,13 +307,22 @@ func (fake *FakeBindSecurityGroupActor) GetOrganizationSpacesCallCount() int {
 	return len(fake.getOrganizationSpacesArgsForCall)
 }
 
+func (fake *FakeBindSecurityGroupActor) GetOrganizationSpacesCalls(stub func(string) ([]v2action.Space, v2action.Warnings, error)) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
+	fake.GetOrganizationSpacesStub = stub
+}
+
 func (fake *FakeBindSecurityGroupActor) GetOrganizationSpacesArgsForCall(i int) string {
 	fake.getOrganizationSpacesMutex.RLock()
 	defer fake.getOrganizationSpacesMutex.RUnlock()
-	return fake.getOrganizationSpacesArgsForCall[i].orgGUID
+	argsForCall := fake.getOrganizationSpacesArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeBindSecurityGroupActor) GetOrganizationSpacesReturns(result1 []v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
 	fake.GetOrganizationSpacesStub = nil
 	fake.getOrganizationSpacesReturns = struct {
 		result1 []v2action.Space
@@ -285,6 +332,8 @@ func (fake *FakeBindSecurityGroupActor) GetOrganizationSpacesReturns(result1 []v
 }
 
 func (fake *FakeBindSecurityGroupActor) GetOrganizationSpacesReturnsOnCall(i int, result1 []v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getOrganizationSpacesMutex.Lock()
+	defer fake.getOrganizationSpacesMutex.Unlock()
 	fake.GetOrganizationSpacesStub = nil
 	if fake.getOrganizationSpacesReturnsOnCall == nil {
 		fake.getOrganizationSpacesReturnsOnCall = make(map[int]struct {
@@ -300,21 +349,22 @@ func (fake *FakeBindSecurityGroupActor) GetOrganizationSpacesReturnsOnCall(i int
 	}{result1, result2, result3}
 }
 
-func (fake *FakeBindSecurityGroupActor) GetSecurityGroupByName(securityGroupName string) (v2action.SecurityGroup, v2action.Warnings, error) {
+func (fake *FakeBindSecurityGroupActor) GetSecurityGroupByName(arg1 string) (v2action.SecurityGroup, v2action.Warnings, error) {
 	fake.getSecurityGroupByNameMutex.Lock()
 	ret, specificReturn := fake.getSecurityGroupByNameReturnsOnCall[len(fake.getSecurityGroupByNameArgsForCall)]
 	fake.getSecurityGroupByNameArgsForCall = append(fake.getSecurityGroupByNameArgsForCall, struct {
-		securityGroupName string
-	}{securityGroupName})
-	fake.recordInvocation("GetSecurityGroupByName", []interface{}{securityGroupName})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetSecurityGroupByName", []interface{}{arg1})
 	fake.getSecurityGroupByNameMutex.Unlock()
 	if fake.GetSecurityGroupByNameStub != nil {
-		return fake.GetSecurityGroupByNameStub(securityGroupName)
+		return fake.GetSecurityGroupByNameStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getSecurityGroupByNameReturns.result1, fake.getSecurityGroupByNameReturns.result2, fake.getSecurityGroupByNameReturns.result3
+	fakeReturns := fake.getSecurityGroupByNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeBindSecurityGroupActor) GetSecurityGroupByNameCallCount() int {
@@ -323,13 +373,22 @@ func (fake *FakeBindSecurityGroupActor) GetSecurityGroupByNameCallCount() int {
 	return len(fake.getSecurityGroupByNameArgsForCall)
 }
 
+func (fake *FakeBindSecurityGroupActor) GetSecurityGroupByNameCalls(stub func(string) (v2action.SecurityGroup, v2action.Warnings, error)) {
+	fake.getSecurityGroupByNameMutex.Lock()
+	defer fake.getSecurityGroupByNameMutex.Unlock()
+	fake.GetSecurityGroupByNameStub = stub
+}
+
 func (fake *FakeBindSecurityGroupActor) GetSecurityGroupByNameArgsForCall(i int) string {
 	fake.getSecurityGroupByNameMutex.RLock()
 	defer fake.getSecurityGroupByNameMutex.RUnlock()
-	return fake.getSecurityGroupByNameArgsForCall[i].securityGroupName
+	argsForCall := fake.getSecurityGroupByNameArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeBindSecurityGroupActor) GetSecurityGroupByNameReturns(result1 v2action.SecurityGroup, result2 v2action.Warnings, result3 error) {
+	fake.getSecurityGroupByNameMutex.Lock()
+	defer fake.getSecurityGroupByNameMutex.Unlock()
 	fake.GetSecurityGroupByNameStub = nil
 	fake.getSecurityGroupByNameReturns = struct {
 		result1 v2action.SecurityGroup
@@ -339,6 +398,8 @@ func (fake *FakeBindSecurityGroupActor) GetSecurityGroupByNameReturns(result1 v2
 }
 
 func (fake *FakeBindSecurityGroupActor) GetSecurityGroupByNameReturnsOnCall(i int, result1 v2action.SecurityGroup, result2 v2action.Warnings, result3 error) {
+	fake.getSecurityGroupByNameMutex.Lock()
+	defer fake.getSecurityGroupByNameMutex.Unlock()
 	fake.GetSecurityGroupByNameStub = nil
 	if fake.getSecurityGroupByNameReturnsOnCall == nil {
 		fake.getSecurityGroupByNameReturnsOnCall = make(map[int]struct {
@@ -354,22 +415,23 @@ func (fake *FakeBindSecurityGroupActor) GetSecurityGroupByNameReturnsOnCall(i in
 	}{result1, result2, result3}
 }
 
-func (fake *FakeBindSecurityGroupActor) GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error) {
+func (fake *FakeBindSecurityGroupActor) GetSpaceByOrganizationAndName(arg1 string, arg2 string) (v2action.Space, v2action.Warnings, error) {
 	fake.getSpaceByOrganizationAndNameMutex.Lock()
 	ret, specificReturn := fake.getSpaceByOrganizationAndNameReturnsOnCall[len(fake.getSpaceByOrganizationAndNameArgsForCall)]
 	fake.getSpaceByOrganizationAndNameArgsForCall = append(fake.getSpaceByOrganizationAndNameArgsForCall, struct {
-		orgGUID   string
-		spaceName string
-	}{orgGUID, spaceName})
-	fake.recordInvocation("GetSpaceByOrganizationAndName", []interface{}{orgGUID, spaceName})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetSpaceByOrganizationAndName", []interface{}{arg1, arg2})
 	fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	if fake.GetSpaceByOrganizationAndNameStub != nil {
-		return fake.GetSpaceByOrganizationAndNameStub(orgGUID, spaceName)
+		return fake.GetSpaceByOrganizationAndNameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getSpaceByOrganizationAndNameReturns.result1, fake.getSpaceByOrganizationAndNameReturns.result2, fake.getSpaceByOrganizationAndNameReturns.result3
+	fakeReturns := fake.getSpaceByOrganizationAndNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeBindSecurityGroupActor) GetSpaceByOrganizationAndNameCallCount() int {
@@ -378,13 +440,22 @@ func (fake *FakeBindSecurityGroupActor) GetSpaceByOrganizationAndNameCallCount()
 	return len(fake.getSpaceByOrganizationAndNameArgsForCall)
 }
 
+func (fake *FakeBindSecurityGroupActor) GetSpaceByOrganizationAndNameCalls(stub func(string, string) (v2action.Space, v2action.Warnings, error)) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
+	fake.GetSpaceByOrganizationAndNameStub = stub
+}
+
 func (fake *FakeBindSecurityGroupActor) GetSpaceByOrganizationAndNameArgsForCall(i int) (string, string) {
 	fake.getSpaceByOrganizationAndNameMutex.RLock()
 	defer fake.getSpaceByOrganizationAndNameMutex.RUnlock()
-	return fake.getSpaceByOrganizationAndNameArgsForCall[i].orgGUID, fake.getSpaceByOrganizationAndNameArgsForCall[i].spaceName
+	argsForCall := fake.getSpaceByOrganizationAndNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeBindSecurityGroupActor) GetSpaceByOrganizationAndNameReturns(result1 v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	fake.GetSpaceByOrganizationAndNameStub = nil
 	fake.getSpaceByOrganizationAndNameReturns = struct {
 		result1 v2action.Space
@@ -394,6 +465,8 @@ func (fake *FakeBindSecurityGroupActor) GetSpaceByOrganizationAndNameReturns(res
 }
 
 func (fake *FakeBindSecurityGroupActor) GetSpaceByOrganizationAndNameReturnsOnCall(i int, result1 v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	fake.GetSpaceByOrganizationAndNameStub = nil
 	if fake.getSpaceByOrganizationAndNameReturnsOnCall == nil {
 		fake.getSpaceByOrganizationAndNameReturnsOnCall = make(map[int]struct {

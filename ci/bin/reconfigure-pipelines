@@ -19,7 +19,8 @@ configure_pipeline() {
   fly -t ci set-pipeline \
     -p $name \
     -c $pipeline \
-    -l <(lpass show "Concourse Credentials" --notes)
+    -l <(lpass show "Concourse Credentials" --notes) \
+    -v honeycomb-writer-key="$(lpass show Shared-CLI/Honeycomb --notes)"
 }
 
 configure_infrastructure_pipeline() {
@@ -52,6 +53,24 @@ configure_legacy_infrastructure_pipeline() {
     -v pool-name=$potato
 }
 
+configure_bosh_lite_pool_pipeline() {
+  local name=$1
+
+  fly -t ci set-pipeline \
+    -p $name \
+    -c $pipelines_path/cli-dev-bosh-lite/pipeline.yml \
+    -v bosh-lite-dns-zone-name=bosh-lite-pool \
+    -v bosh-lite-gcp-json-key="$(lpass show Shared-CLI/bosh-service-account-gcp-creds --notes | jq -c . )" \
+    -v bosh-lite-pools-github-private-key="$(lpass show Shared-CLI/bosh-lite-pool-github-key --notes)" \
+    -v bosh-lite-project-id=cf-cli \
+    -v bosh-lite-region=us-west1 \
+    -v bosh-lite-storage-bucket=bosh-lites \
+    -v bosh-lite-system-domain-suffix=lite.cli.fun \
+    -v git-email=cf-cli-eng@pivotal.io \
+    -v git-username=cf-cli-eng \
+    -v env-pool-repo=git@github.com:cloudfoundry/cli-pools.git
+}
+
 check_installed lpass
 check_installed fly
 
@@ -69,3 +88,5 @@ configure_infrastructure_pipeline inf-tartine tartine-pipeline baked-potato
 configure_infrastructure_pipeline inf-arsicault arsicault-pipeline deep-fried-potato
 
 configure_legacy_infrastructure_pipeline inf-homeroom homeroom-pipeline moldy-gnocchi
+
+configure_bosh_lite_pool_pipeline bosh-lites

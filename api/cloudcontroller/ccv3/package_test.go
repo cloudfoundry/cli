@@ -28,7 +28,7 @@ var _ = Describe("Package", func() {
 	var client *Client
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("CreatePackage", func() {
@@ -437,7 +437,7 @@ var _ = Describe("Package", func() {
 		)
 
 		BeforeEach(func() {
-			client = NewTestClient()
+			client, _ = NewTestClient()
 
 			inputPackage = Package{
 				Links: map[string]APILink{
@@ -652,7 +652,7 @@ var _ = Describe("Package", func() {
 					},
 				}
 
-				client = NewTestClient(Config{Wrappers: []ConnectionWrapper{wrapper}})
+				client, _ = NewTestClient(Config{Wrappers: []ConnectionWrapper{wrapper}})
 			})
 
 			It("returns the PipeSeekError", func() {
@@ -683,7 +683,7 @@ var _ = Describe("Package", func() {
 					},
 				}
 
-				client = NewTestClient(Config{Wrappers: []ConnectionWrapper{wrapper}})
+				client, _ = NewTestClient(Config{Wrappers: []ConnectionWrapper{wrapper}})
 			})
 
 			It("returns the http error", func() {

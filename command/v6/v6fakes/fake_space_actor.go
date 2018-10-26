@@ -2,27 +2,28 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeSpaceActor struct {
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetSpaceByOrganizationAndNameStub        func(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
+	GetSpaceByOrganizationAndNameStub        func(string, string) (v2action.Space, v2action.Warnings, error)
 	getSpaceByOrganizationAndNameMutex       sync.RWMutex
 	getSpaceByOrganizationAndNameArgsForCall []struct {
-		orgGUID   string
-		spaceName string
+		arg1 string
+		arg2 string
 	}
 	getSpaceByOrganizationAndNameReturns struct {
 		result1 v2action.Space
@@ -34,11 +35,11 @@ type FakeSpaceActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetSpaceSummaryByOrganizationAndNameStub        func(orgGUID string, spaceName string) (v2action.SpaceSummary, v2action.Warnings, error)
+	GetSpaceSummaryByOrganizationAndNameStub        func(string, string) (v2action.SpaceSummary, v2action.Warnings, error)
 	getSpaceSummaryByOrganizationAndNameMutex       sync.RWMutex
 	getSpaceSummaryByOrganizationAndNameArgsForCall []struct {
-		orgGUID   string
-		spaceName string
+		arg1 string
+		arg2 string
 	}
 	getSpaceSummaryByOrganizationAndNameReturns struct {
 		result1 v2action.SpaceSummary
@@ -57,7 +58,8 @@ type FakeSpaceActor struct {
 func (fake *FakeSpaceActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -66,7 +68,8 @@ func (fake *FakeSpaceActor) CloudControllerAPIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeSpaceActor) CloudControllerAPIVersionCallCount() int {
@@ -75,7 +78,15 @@ func (fake *FakeSpaceActor) CloudControllerAPIVersionCallCount() int {
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeSpaceActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeSpaceActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -83,6 +94,8 @@ func (fake *FakeSpaceActor) CloudControllerAPIVersionReturns(result1 string) {
 }
 
 func (fake *FakeSpaceActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -94,22 +107,23 @@ func (fake *FakeSpaceActor) CloudControllerAPIVersionReturnsOnCall(i int, result
 	}{result1}
 }
 
-func (fake *FakeSpaceActor) GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error) {
+func (fake *FakeSpaceActor) GetSpaceByOrganizationAndName(arg1 string, arg2 string) (v2action.Space, v2action.Warnings, error) {
 	fake.getSpaceByOrganizationAndNameMutex.Lock()
 	ret, specificReturn := fake.getSpaceByOrganizationAndNameReturnsOnCall[len(fake.getSpaceByOrganizationAndNameArgsForCall)]
 	fake.getSpaceByOrganizationAndNameArgsForCall = append(fake.getSpaceByOrganizationAndNameArgsForCall, struct {
-		orgGUID   string
-		spaceName string
-	}{orgGUID, spaceName})
-	fake.recordInvocation("GetSpaceByOrganizationAndName", []interface{}{orgGUID, spaceName})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetSpaceByOrganizationAndName", []interface{}{arg1, arg2})
 	fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	if fake.GetSpaceByOrganizationAndNameStub != nil {
-		return fake.GetSpaceByOrganizationAndNameStub(orgGUID, spaceName)
+		return fake.GetSpaceByOrganizationAndNameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getSpaceByOrganizationAndNameReturns.result1, fake.getSpaceByOrganizationAndNameReturns.result2, fake.getSpaceByOrganizationAndNameReturns.result3
+	fakeReturns := fake.getSpaceByOrganizationAndNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeSpaceActor) GetSpaceByOrganizationAndNameCallCount() int {
@@ -118,13 +132,22 @@ func (fake *FakeSpaceActor) GetSpaceByOrganizationAndNameCallCount() int {
 	return len(fake.getSpaceByOrganizationAndNameArgsForCall)
 }
 
+func (fake *FakeSpaceActor) GetSpaceByOrganizationAndNameCalls(stub func(string, string) (v2action.Space, v2action.Warnings, error)) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
+	fake.GetSpaceByOrganizationAndNameStub = stub
+}
+
 func (fake *FakeSpaceActor) GetSpaceByOrganizationAndNameArgsForCall(i int) (string, string) {
 	fake.getSpaceByOrganizationAndNameMutex.RLock()
 	defer fake.getSpaceByOrganizationAndNameMutex.RUnlock()
-	return fake.getSpaceByOrganizationAndNameArgsForCall[i].orgGUID, fake.getSpaceByOrganizationAndNameArgsForCall[i].spaceName
+	argsForCall := fake.getSpaceByOrganizationAndNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeSpaceActor) GetSpaceByOrganizationAndNameReturns(result1 v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	fake.GetSpaceByOrganizationAndNameStub = nil
 	fake.getSpaceByOrganizationAndNameReturns = struct {
 		result1 v2action.Space
@@ -134,6 +157,8 @@ func (fake *FakeSpaceActor) GetSpaceByOrganizationAndNameReturns(result1 v2actio
 }
 
 func (fake *FakeSpaceActor) GetSpaceByOrganizationAndNameReturnsOnCall(i int, result1 v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	fake.GetSpaceByOrganizationAndNameStub = nil
 	if fake.getSpaceByOrganizationAndNameReturnsOnCall == nil {
 		fake.getSpaceByOrganizationAndNameReturnsOnCall = make(map[int]struct {
@@ -149,22 +174,23 @@ func (fake *FakeSpaceActor) GetSpaceByOrganizationAndNameReturnsOnCall(i int, re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSpaceActor) GetSpaceSummaryByOrganizationAndName(orgGUID string, spaceName string) (v2action.SpaceSummary, v2action.Warnings, error) {
+func (fake *FakeSpaceActor) GetSpaceSummaryByOrganizationAndName(arg1 string, arg2 string) (v2action.SpaceSummary, v2action.Warnings, error) {
 	fake.getSpaceSummaryByOrganizationAndNameMutex.Lock()
 	ret, specificReturn := fake.getSpaceSummaryByOrganizationAndNameReturnsOnCall[len(fake.getSpaceSummaryByOrganizationAndNameArgsForCall)]
 	fake.getSpaceSummaryByOrganizationAndNameArgsForCall = append(fake.getSpaceSummaryByOrganizationAndNameArgsForCall, struct {
-		orgGUID   string
-		spaceName string
-	}{orgGUID, spaceName})
-	fake.recordInvocation("GetSpaceSummaryByOrganizationAndName", []interface{}{orgGUID, spaceName})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetSpaceSummaryByOrganizationAndName", []interface{}{arg1, arg2})
 	fake.getSpaceSummaryByOrganizationAndNameMutex.Unlock()
 	if fake.GetSpaceSummaryByOrganizationAndNameStub != nil {
-		return fake.GetSpaceSummaryByOrganizationAndNameStub(orgGUID, spaceName)
+		return fake.GetSpaceSummaryByOrganizationAndNameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getSpaceSummaryByOrganizationAndNameReturns.result1, fake.getSpaceSummaryByOrganizationAndNameReturns.result2, fake.getSpaceSummaryByOrganizationAndNameReturns.result3
+	fakeReturns := fake.getSpaceSummaryByOrganizationAndNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeSpaceActor) GetSpaceSummaryByOrganizationAndNameCallCount() int {
@@ -173,13 +199,22 @@ func (fake *FakeSpaceActor) GetSpaceSummaryByOrganizationAndNameCallCount() int 
 	return len(fake.getSpaceSummaryByOrganizationAndNameArgsForCall)
 }
 
+func (fake *FakeSpaceActor) GetSpaceSummaryByOrganizationAndNameCalls(stub func(string, string) (v2action.SpaceSummary, v2action.Warnings, error)) {
+	fake.getSpaceSummaryByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceSummaryByOrganizationAndNameMutex.Unlock()
+	fake.GetSpaceSummaryByOrganizationAndNameStub = stub
+}
+
 func (fake *FakeSpaceActor) GetSpaceSummaryByOrganizationAndNameArgsForCall(i int) (string, string) {
 	fake.getSpaceSummaryByOrganizationAndNameMutex.RLock()
 	defer fake.getSpaceSummaryByOrganizationAndNameMutex.RUnlock()
-	return fake.getSpaceSummaryByOrganizationAndNameArgsForCall[i].orgGUID, fake.getSpaceSummaryByOrganizationAndNameArgsForCall[i].spaceName
+	argsForCall := fake.getSpaceSummaryByOrganizationAndNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeSpaceActor) GetSpaceSummaryByOrganizationAndNameReturns(result1 v2action.SpaceSummary, result2 v2action.Warnings, result3 error) {
+	fake.getSpaceSummaryByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceSummaryByOrganizationAndNameMutex.Unlock()
 	fake.GetSpaceSummaryByOrganizationAndNameStub = nil
 	fake.getSpaceSummaryByOrganizationAndNameReturns = struct {
 		result1 v2action.SpaceSummary
@@ -189,6 +224,8 @@ func (fake *FakeSpaceActor) GetSpaceSummaryByOrganizationAndNameReturns(result1 
 }
 
 func (fake *FakeSpaceActor) GetSpaceSummaryByOrganizationAndNameReturnsOnCall(i int, result1 v2action.SpaceSummary, result2 v2action.Warnings, result3 error) {
+	fake.getSpaceSummaryByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceSummaryByOrganizationAndNameMutex.Unlock()
 	fake.GetSpaceSummaryByOrganizationAndNameStub = nil
 	if fake.getSpaceSummaryByOrganizationAndNameReturnsOnCall == nil {
 		fake.getSpaceSummaryByOrganizationAndNameReturnsOnCall = make(map[int]struct {

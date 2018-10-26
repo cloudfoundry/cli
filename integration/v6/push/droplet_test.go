@@ -46,16 +46,16 @@ var _ = Describe("when a droplet is provided", func() {
 	When("the app does not exist", func() {
 		It("creates the app", func() {
 			session := helpers.CF(PushCommandName, appName, "--droplet", dropletPath)
-			Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-			Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-			Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-			Eventually(session).Should(Say("Uploading droplet\\.\\.\\."))
-			Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
-			Eventually(session).Should(Say("requested state:\\s+started"))
+			Eventually(session).Should(Say(`Getting app info\.\.\.`))
+			Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+			Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
+			Eventually(session).Should(Say(`Uploading droplet\.\.\.`))
+			Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+			Eventually(session).Should(Say(`requested state:\s+started`))
 			Eventually(session).Should(Exit(0))
 
 			session = helpers.CF("app", appName)
-			Eventually(session).Should(Say("name:\\s+%s", appName))
+			Eventually(session).Should(Say(`name:\s+%s`, appName))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -69,8 +69,8 @@ var _ = Describe("when a droplet is provided", func() {
 
 		It("updates the app", func() {
 			session := helpers.CF(PushCommandName, appName, "--droplet", dropletPath)
-			Eventually(session).Should(Say("Updating app with these attributes\\.\\.\\."))
-			Eventually(session).Should(Say("Uploading droplet\\.\\.\\."))
+			Eventually(session).Should(Say(`Updating app with these attributes\.\.\.`))
+			Eventually(session).Should(Say(`Uploading droplet\.\.\.`))
 			Eventually(session).Should(Exit(0))
 		})
 	})

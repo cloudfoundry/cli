@@ -2,17 +2,18 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeFeatureFlagsActor struct {
 	GetFeatureFlagsStub        func() ([]v2action.FeatureFlag, v2action.Warnings, error)
 	getFeatureFlagsMutex       sync.RWMutex
-	getFeatureFlagsArgsForCall []struct{}
-	getFeatureFlagsReturns     struct {
+	getFeatureFlagsArgsForCall []struct {
+	}
+	getFeatureFlagsReturns struct {
 		result1 []v2action.FeatureFlag
 		result2 v2action.Warnings
 		result3 error
@@ -29,7 +30,8 @@ type FakeFeatureFlagsActor struct {
 func (fake *FakeFeatureFlagsActor) GetFeatureFlags() ([]v2action.FeatureFlag, v2action.Warnings, error) {
 	fake.getFeatureFlagsMutex.Lock()
 	ret, specificReturn := fake.getFeatureFlagsReturnsOnCall[len(fake.getFeatureFlagsArgsForCall)]
-	fake.getFeatureFlagsArgsForCall = append(fake.getFeatureFlagsArgsForCall, struct{}{})
+	fake.getFeatureFlagsArgsForCall = append(fake.getFeatureFlagsArgsForCall, struct {
+	}{})
 	fake.recordInvocation("GetFeatureFlags", []interface{}{})
 	fake.getFeatureFlagsMutex.Unlock()
 	if fake.GetFeatureFlagsStub != nil {
@@ -38,7 +40,8 @@ func (fake *FakeFeatureFlagsActor) GetFeatureFlags() ([]v2action.FeatureFlag, v2
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getFeatureFlagsReturns.result1, fake.getFeatureFlagsReturns.result2, fake.getFeatureFlagsReturns.result3
+	fakeReturns := fake.getFeatureFlagsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeFeatureFlagsActor) GetFeatureFlagsCallCount() int {
@@ -47,7 +50,15 @@ func (fake *FakeFeatureFlagsActor) GetFeatureFlagsCallCount() int {
 	return len(fake.getFeatureFlagsArgsForCall)
 }
 
+func (fake *FakeFeatureFlagsActor) GetFeatureFlagsCalls(stub func() ([]v2action.FeatureFlag, v2action.Warnings, error)) {
+	fake.getFeatureFlagsMutex.Lock()
+	defer fake.getFeatureFlagsMutex.Unlock()
+	fake.GetFeatureFlagsStub = stub
+}
+
 func (fake *FakeFeatureFlagsActor) GetFeatureFlagsReturns(result1 []v2action.FeatureFlag, result2 v2action.Warnings, result3 error) {
+	fake.getFeatureFlagsMutex.Lock()
+	defer fake.getFeatureFlagsMutex.Unlock()
 	fake.GetFeatureFlagsStub = nil
 	fake.getFeatureFlagsReturns = struct {
 		result1 []v2action.FeatureFlag
@@ -57,6 +68,8 @@ func (fake *FakeFeatureFlagsActor) GetFeatureFlagsReturns(result1 []v2action.Fea
 }
 
 func (fake *FakeFeatureFlagsActor) GetFeatureFlagsReturnsOnCall(i int, result1 []v2action.FeatureFlag, result2 v2action.Warnings, result3 error) {
+	fake.getFeatureFlagsMutex.Lock()
+	defer fake.getFeatureFlagsMutex.Unlock()
 	fake.GetFeatureFlagsStub = nil
 	if fake.getFeatureFlagsReturnsOnCall == nil {
 		fake.getFeatureFlagsReturnsOnCall = make(map[int]struct {

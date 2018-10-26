@@ -29,7 +29,7 @@ var _ = Describe("push with different domain values", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
 					PushCommandName, appName, "--no-start",
 				)
-				Eventually(session).Should(Say("\\s+routes:\\s+%s.%s", strings.ToLower(appName), helpers.DefaultSharedDomain()))
+				Eventually(session).Should(Say(`\s+routes:\s+%s.%s`, strings.ToLower(appName), helpers.DefaultSharedDomain()))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -67,7 +67,7 @@ var _ = Describe("push with different domain values", func() {
 						PushCommandName, appName, "--no-start",
 						"-d", domainName,
 					)
-					Eventually(session).Should(Say("\\s+routes:\\s+%s.%s", strings.ToLower(appName), domainName))
+					Eventually(session).Should(Say(`\s+routes:\s+%s.%s`, strings.ToLower(appName), domainName))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -94,8 +94,8 @@ var _ = Describe("push with different domain values", func() {
 						PushCommandName, appName, "--no-start",
 						"-d", domainName,
 					)
-					Eventually(session).Should(Say("\\+\\s+%s:\\?\\?\\?\\?", domainName))
-					Eventually(session).Should(Say("\\s+routes:\\s+%s:\\d+", domainName))
+					Eventually(session).Should(Say(`\+\s+%s:\?\?\?\?`, domainName))
+					Eventually(session).Should(Say(`\s+routes:\s+%s:\d+`, domainName))
 					// instead of checking that the port is different each time we push
 					// the same app, we check that the push does not fail
 					Eventually(session).Should(Exit(0))
@@ -104,8 +104,8 @@ var _ = Describe("push with different domain values", func() {
 						PushCommandName, appName,
 						"-d", domainName,
 					)
-					Eventually(session).Should(Say("\\+\\s+%s:\\?\\?\\?\\?", domainName))
-					Eventually(session).Should(Say("\\s+routes:\\s+%s:\\d+", domainName))
+					Eventually(session).Should(Say(`\+\s+%s:\?\?\?\?`, domainName))
+					Eventually(session).Should(Say(`\s+routes:\s+%s:\d+`, domainName))
 					Eventually(session).Should(Exit(0))
 				})
 			})

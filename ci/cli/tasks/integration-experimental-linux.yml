@@ -20,6 +20,8 @@ params:
   CF_INT_DOCKER_IMAGE:
   CF_INT_DOCKER_USERNAME:
   CF_INT_DOCKER_PASSWORD:
+  HONEYCOMB_WRITE_KEY:
+  HONEYCOMB_DATASET: "Integration Linux"
 
 run:
   path: bash
@@ -27,6 +29,21 @@ run:
   - -c
   - |
     set -e
+
+    export GOPATH=$PWD/go
+    export PATH=$GOPATH/bin:$PATH
+
+    pushd $GOPATH/src/code.cloudfoundry.org/cli
+      echo -e "\n Checking that integration tests have been go formatted..."
+      # if gofmt outputs anything, we have unformatted files
+      unformatted="$(gofmt -l integration)"
+      if [[ -n $unformatted ]]; then
+        echo "The following files have not been go formatted:"
+        echo $unformatted
+        echo "Please run 'make format' and push again."
+        exit 1
+      fi
+    popd
 
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
 
@@ -43,10 +60,9 @@ run:
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
 
-    export GOPATH=$PWD/go
-    export PATH=$GOPATH/bin:$PATH
-
     go get -u github.com/onsi/ginkgo/ginkgo
+
+    export RUN_ID=$(openssl rand -hex 16)
 
     pushd cf-cli-binaries
       tar xvzf cf-cli-binaries.tgz

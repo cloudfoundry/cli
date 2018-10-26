@@ -2,27 +2,28 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeV3StopActor struct {
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetApplicationByNameAndSpaceStub        func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	GetApplicationByNameAndSpaceStub        func(string, string) (v3action.Application, v3action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
-		appName   string
-		spaceGUID string
+		arg1 string
+		arg2 string
 	}
 	getApplicationByNameAndSpaceReturns struct {
 		result1 v3action.Application
@@ -34,10 +35,10 @@ type FakeV3StopActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	StopApplicationStub        func(appGUID string) (v3action.Warnings, error)
+	StopApplicationStub        func(string) (v3action.Warnings, error)
 	stopApplicationMutex       sync.RWMutex
 	stopApplicationArgsForCall []struct {
-		appGUID string
+		arg1 string
 	}
 	stopApplicationReturns struct {
 		result1 v3action.Warnings
@@ -54,7 +55,8 @@ type FakeV3StopActor struct {
 func (fake *FakeV3StopActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -63,7 +65,8 @@ func (fake *FakeV3StopActor) CloudControllerAPIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeV3StopActor) CloudControllerAPIVersionCallCount() int {
@@ -72,7 +75,15 @@ func (fake *FakeV3StopActor) CloudControllerAPIVersionCallCount() int {
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeV3StopActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeV3StopActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -80,6 +91,8 @@ func (fake *FakeV3StopActor) CloudControllerAPIVersionReturns(result1 string) {
 }
 
 func (fake *FakeV3StopActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -91,22 +104,23 @@ func (fake *FakeV3StopActor) CloudControllerAPIVersionReturnsOnCall(i int, resul
 	}{result1}
 }
 
-func (fake *FakeV3StopActor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeV3StopActor) GetApplicationByNameAndSpace(arg1 string, arg2 string) (v3action.Application, v3action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
 	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
-		appName   string
-		spaceGUID string
-	}{appName, spaceGUID})
-	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{appName, spaceGUID})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationByNameAndSpaceStub != nil {
-		return fake.GetApplicationByNameAndSpaceStub(appName, spaceGUID)
+		return fake.GetApplicationByNameAndSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationByNameAndSpaceReturns.result1, fake.getApplicationByNameAndSpaceReturns.result2, fake.getApplicationByNameAndSpaceReturns.result3
+	fakeReturns := fake.getApplicationByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV3StopActor) GetApplicationByNameAndSpaceCallCount() int {
@@ -115,13 +129,22 @@ func (fake *FakeV3StopActor) GetApplicationByNameAndSpaceCallCount() int {
 	return len(fake.getApplicationByNameAndSpaceArgsForCall)
 }
 
+func (fake *FakeV3StopActor) GetApplicationByNameAndSpaceCalls(stub func(string, string) (v3action.Application, v3action.Warnings, error)) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationByNameAndSpaceStub = stub
+}
+
 func (fake *FakeV3StopActor) GetApplicationByNameAndSpaceArgsForCall(i int) (string, string) {
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	return fake.getApplicationByNameAndSpaceArgsForCall[i].appName, fake.getApplicationByNameAndSpaceArgsForCall[i].spaceGUID
+	argsForCall := fake.getApplicationByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV3StopActor) GetApplicationByNameAndSpaceReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	fake.getApplicationByNameAndSpaceReturns = struct {
 		result1 v3action.Application
@@ -131,6 +154,8 @@ func (fake *FakeV3StopActor) GetApplicationByNameAndSpaceReturns(result1 v3actio
 }
 
 func (fake *FakeV3StopActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationByNameAndSpaceStub = nil
 	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
 		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
@@ -146,21 +171,22 @@ func (fake *FakeV3StopActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3StopActor) StopApplication(appGUID string) (v3action.Warnings, error) {
+func (fake *FakeV3StopActor) StopApplication(arg1 string) (v3action.Warnings, error) {
 	fake.stopApplicationMutex.Lock()
 	ret, specificReturn := fake.stopApplicationReturnsOnCall[len(fake.stopApplicationArgsForCall)]
 	fake.stopApplicationArgsForCall = append(fake.stopApplicationArgsForCall, struct {
-		appGUID string
-	}{appGUID})
-	fake.recordInvocation("StopApplication", []interface{}{appGUID})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("StopApplication", []interface{}{arg1})
 	fake.stopApplicationMutex.Unlock()
 	if fake.StopApplicationStub != nil {
-		return fake.StopApplicationStub(appGUID)
+		return fake.StopApplicationStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.stopApplicationReturns.result1, fake.stopApplicationReturns.result2
+	fakeReturns := fake.stopApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeV3StopActor) StopApplicationCallCount() int {
@@ -169,13 +195,22 @@ func (fake *FakeV3StopActor) StopApplicationCallCount() int {
 	return len(fake.stopApplicationArgsForCall)
 }
 
+func (fake *FakeV3StopActor) StopApplicationCalls(stub func(string) (v3action.Warnings, error)) {
+	fake.stopApplicationMutex.Lock()
+	defer fake.stopApplicationMutex.Unlock()
+	fake.StopApplicationStub = stub
+}
+
 func (fake *FakeV3StopActor) StopApplicationArgsForCall(i int) string {
 	fake.stopApplicationMutex.RLock()
 	defer fake.stopApplicationMutex.RUnlock()
-	return fake.stopApplicationArgsForCall[i].appGUID
+	argsForCall := fake.stopApplicationArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeV3StopActor) StopApplicationReturns(result1 v3action.Warnings, result2 error) {
+	fake.stopApplicationMutex.Lock()
+	defer fake.stopApplicationMutex.Unlock()
 	fake.StopApplicationStub = nil
 	fake.stopApplicationReturns = struct {
 		result1 v3action.Warnings
@@ -184,6 +219,8 @@ func (fake *FakeV3StopActor) StopApplicationReturns(result1 v3action.Warnings, r
 }
 
 func (fake *FakeV3StopActor) StopApplicationReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
+	fake.stopApplicationMutex.Lock()
+	defer fake.stopApplicationMutex.Unlock()
 	fake.StopApplicationStub = nil
 	if fake.stopApplicationReturnsOnCall == nil {
 		fake.stopApplicationReturnsOnCall = make(map[int]struct {

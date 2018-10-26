@@ -100,7 +100,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 				contents := string(raw)
 
 				Expect(contents).To(MatchRegexp("Connection: Upgrade"))
-				Expect(contents).To(MatchRegexp("Authorization: \\[PRIVATE DATA HIDDEN\\]"))
+				Expect(contents).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 				Expect(contents).To(MatchRegexp("Origin: wss://doppler.bosh-lite.com:443"))
 
 				raw, err = ioutil.ReadFile(logFile2)
@@ -108,7 +108,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 				contents = string(raw)
 
 				Expect(contents).To(MatchRegexp("Connection: Upgrade"))
-				Expect(contents).To(MatchRegexp("Authorization: \\[PRIVATE DATA HIDDEN\\]"))
+				Expect(contents).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 				Expect(contents).To(MatchRegexp("Origin: wss://doppler.bosh-lite.com:443"))
 			})
 		})

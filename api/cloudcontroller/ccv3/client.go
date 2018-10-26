@@ -97,6 +97,8 @@ type Client struct {
 
 	jobPollingInterval time.Duration
 	jobPollingTimeout  time.Duration
+
+	clock Clock
 }
 
 // Config allows the Client to be configured
@@ -121,9 +123,18 @@ type Config struct {
 func NewClient(config Config) *Client {
 	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", config.AppName, config.AppVersion, runtime.Version(), runtime.GOARCH, runtime.GOOS)
 	return &Client{
+		clock:              new(internal.RealTime),
 		userAgent:          userAgent,
 		jobPollingInterval: config.JobPollingInterval,
 		jobPollingTimeout:  config.JobPollingTimeout,
 		wrappers:           append([]ConnectionWrapper{newErrorWrapper()}, config.Wrappers...),
 	}
+}
+
+// TestClient returns a new client explicitly meant for internal testing.  This
+// should not be used for production code.
+func TestClient(config Config, clock Clock) *Client {
+	client := NewClient(config)
+	client.clock = clock
+	return client
 }

@@ -16,7 +16,7 @@ var _ = Describe("Droplet", func() {
 	var client *Client
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("GetApplicationDropletCurrent", func() {

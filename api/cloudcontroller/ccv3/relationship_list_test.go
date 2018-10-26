@@ -16,7 +16,7 @@ var _ = Describe("RelationshipList", func() {
 	)
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("EntitleIsolationSegmentToOrganizations", func() {

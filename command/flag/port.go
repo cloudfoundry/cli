@@ -19,3 +19,8 @@ func (i *Port) UnmarshalFlag(val string) error {
 	}
 	return nil
 }
+
+// IsValidValue returns an error if the input value is not an integer.
+func (i *Port) IsValidValue(val string) error {
+	return i.UnmarshalFlag(val)
+}

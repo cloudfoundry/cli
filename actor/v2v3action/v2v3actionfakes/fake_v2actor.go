@@ -2,11 +2,11 @@
 package v2v3actionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v2v3action"
-	"code.cloudfoundry.org/cli/util/manifest"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v2v3action "code.cloudfoundry.org/cli/actor/v2v3action"
+	manifest "code.cloudfoundry.org/cli/util/manifest"
 )
 
 type FakeV2Actor struct {
@@ -26,10 +26,10 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetApplicationInstancesWithStatsByApplicationStub        func(guid string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)
+	GetApplicationInstancesWithStatsByApplicationStub        func(string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)
 	getApplicationInstancesWithStatsByApplicationMutex       sync.RWMutex
 	getApplicationInstancesWithStatsByApplicationArgsForCall []struct {
-		guid string
+		arg1 string
 	}
 	getApplicationInstancesWithStatsByApplicationReturns struct {
 		result1 []v2action.ApplicationInstanceWithStats
@@ -41,10 +41,10 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetApplicationRoutesStub        func(appGUID string) (v2action.Routes, v2action.Warnings, error)
+	GetApplicationRoutesStub        func(string) (v2action.Routes, v2action.Warnings, error)
 	getApplicationRoutesMutex       sync.RWMutex
 	getApplicationRoutesArgsForCall []struct {
-		appGUID string
+		arg1 string
 	}
 	getApplicationRoutesReturns struct {
 		result1 v2action.Routes
@@ -58,8 +58,9 @@ type FakeV2Actor struct {
 	}
 	GetFeatureFlagsStub        func() ([]v2action.FeatureFlag, v2action.Warnings, error)
 	getFeatureFlagsMutex       sync.RWMutex
-	getFeatureFlagsArgsForCall []struct{}
-	getFeatureFlagsReturns     struct {
+	getFeatureFlagsArgsForCall []struct {
+	}
+	getFeatureFlagsReturns struct {
 		result1 []v2action.FeatureFlag
 		result2 v2action.Warnings
 		result3 error
@@ -69,10 +70,10 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetServiceStub        func(serviceGUID string) (v2action.Service, v2action.Warnings, error)
+	GetServiceStub        func(string) (v2action.Service, v2action.Warnings, error)
 	getServiceMutex       sync.RWMutex
 	getServiceArgsForCall []struct {
-		serviceGUID string
+		arg1 string
 	}
 	getServiceReturns struct {
 		result1 v2action.Service
@@ -84,11 +85,11 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetServiceInstanceByNameAndSpaceStub        func(serviceInstanceName string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error)
+	GetServiceInstanceByNameAndSpaceStub        func(string, string) (v2action.ServiceInstance, v2action.Warnings, error)
 	getServiceInstanceByNameAndSpaceMutex       sync.RWMutex
 	getServiceInstanceByNameAndSpaceArgsForCall []struct {
-		serviceInstanceName string
-		spaceGUID           string
+		arg1 string
+		arg2 string
 	}
 	getServiceInstanceByNameAndSpaceReturns struct {
 		result1 v2action.ServiceInstance
@@ -100,10 +101,10 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetServiceInstanceSharedTosByServiceInstanceStub        func(serviceInstanceGUID string) ([]v2action.ServiceInstanceSharedTo, v2action.Warnings, error)
+	GetServiceInstanceSharedTosByServiceInstanceStub        func(string) ([]v2action.ServiceInstanceSharedTo, v2action.Warnings, error)
 	getServiceInstanceSharedTosByServiceInstanceMutex       sync.RWMutex
 	getServiceInstanceSharedTosByServiceInstanceArgsForCall []struct {
-		serviceInstanceGUID string
+		arg1 string
 	}
 	getServiceInstanceSharedTosByServiceInstanceReturns struct {
 		result1 []v2action.ServiceInstanceSharedTo
@@ -115,11 +116,11 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetSpaceByOrganizationAndNameStub        func(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
+	GetSpaceByOrganizationAndNameStub        func(string, string) (v2action.Space, v2action.Warnings, error)
 	getSpaceByOrganizationAndNameMutex       sync.RWMutex
 	getSpaceByOrganizationAndNameArgsForCall []struct {
-		orgGUID   string
-		spaceName string
+		arg1 string
+		arg2 string
 	}
 	getSpaceByOrganizationAndNameReturns struct {
 		result1 v2action.Space
@@ -150,7 +151,8 @@ func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpace(arg1 string, ar
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createApplicationManifestByNameAndSpaceReturns.result1, fake.createApplicationManifestByNameAndSpaceReturns.result2, fake.createApplicationManifestByNameAndSpaceReturns.result3
+	fakeReturns := fake.createApplicationManifestByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceCallCount() int {
@@ -159,13 +161,22 @@ func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceCallCount() int 
 	return len(fake.createApplicationManifestByNameAndSpaceArgsForCall)
 }
 
+func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceCalls(stub func(string, string) (manifest.Application, v2action.Warnings, error)) {
+	fake.createApplicationManifestByNameAndSpaceMutex.Lock()
+	defer fake.createApplicationManifestByNameAndSpaceMutex.Unlock()
+	fake.CreateApplicationManifestByNameAndSpaceStub = stub
+}
+
 func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceArgsForCall(i int) (string, string) {
 	fake.createApplicationManifestByNameAndSpaceMutex.RLock()
 	defer fake.createApplicationManifestByNameAndSpaceMutex.RUnlock()
-	return fake.createApplicationManifestByNameAndSpaceArgsForCall[i].arg1, fake.createApplicationManifestByNameAndSpaceArgsForCall[i].arg2
+	argsForCall := fake.createApplicationManifestByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceReturns(result1 manifest.Application, result2 v2action.Warnings, result3 error) {
+	fake.createApplicationManifestByNameAndSpaceMutex.Lock()
+	defer fake.createApplicationManifestByNameAndSpaceMutex.Unlock()
 	fake.CreateApplicationManifestByNameAndSpaceStub = nil
 	fake.createApplicationManifestByNameAndSpaceReturns = struct {
 		result1 manifest.Application
@@ -175,6 +186,8 @@ func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceReturns(result1 
 }
 
 func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceReturnsOnCall(i int, result1 manifest.Application, result2 v2action.Warnings, result3 error) {
+	fake.createApplicationManifestByNameAndSpaceMutex.Lock()
+	defer fake.createApplicationManifestByNameAndSpaceMutex.Unlock()
 	fake.CreateApplicationManifestByNameAndSpaceStub = nil
 	if fake.createApplicationManifestByNameAndSpaceReturnsOnCall == nil {
 		fake.createApplicationManifestByNameAndSpaceReturnsOnCall = make(map[int]struct {
@@ -190,21 +203,22 @@ func (fake *FakeV2Actor) CreateApplicationManifestByNameAndSpaceReturnsOnCall(i 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplication(guid string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error) {
+func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplication(arg1 string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error) {
 	fake.getApplicationInstancesWithStatsByApplicationMutex.Lock()
 	ret, specificReturn := fake.getApplicationInstancesWithStatsByApplicationReturnsOnCall[len(fake.getApplicationInstancesWithStatsByApplicationArgsForCall)]
 	fake.getApplicationInstancesWithStatsByApplicationArgsForCall = append(fake.getApplicationInstancesWithStatsByApplicationArgsForCall, struct {
-		guid string
-	}{guid})
-	fake.recordInvocation("GetApplicationInstancesWithStatsByApplication", []interface{}{guid})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetApplicationInstancesWithStatsByApplication", []interface{}{arg1})
 	fake.getApplicationInstancesWithStatsByApplicationMutex.Unlock()
 	if fake.GetApplicationInstancesWithStatsByApplicationStub != nil {
-		return fake.GetApplicationInstancesWithStatsByApplicationStub(guid)
+		return fake.GetApplicationInstancesWithStatsByApplicationStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationInstancesWithStatsByApplicationReturns.result1, fake.getApplicationInstancesWithStatsByApplicationReturns.result2, fake.getApplicationInstancesWithStatsByApplicationReturns.result3
+	fakeReturns := fake.getApplicationInstancesWithStatsByApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplicationCallCount() int {
@@ -213,13 +227,22 @@ func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplicationCallCount(
 	return len(fake.getApplicationInstancesWithStatsByApplicationArgsForCall)
 }
 
+func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplicationCalls(stub func(string) ([]v2action.ApplicationInstanceWithStats, v2action.Warnings, error)) {
+	fake.getApplicationInstancesWithStatsByApplicationMutex.Lock()
+	defer fake.getApplicationInstancesWithStatsByApplicationMutex.Unlock()
+	fake.GetApplicationInstancesWithStatsByApplicationStub = stub
+}
+
 func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplicationArgsForCall(i int) string {
 	fake.getApplicationInstancesWithStatsByApplicationMutex.RLock()
 	defer fake.getApplicationInstancesWithStatsByApplicationMutex.RUnlock()
-	return fake.getApplicationInstancesWithStatsByApplicationArgsForCall[i].guid
+	argsForCall := fake.getApplicationInstancesWithStatsByApplicationArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplicationReturns(result1 []v2action.ApplicationInstanceWithStats, result2 v2action.Warnings, result3 error) {
+	fake.getApplicationInstancesWithStatsByApplicationMutex.Lock()
+	defer fake.getApplicationInstancesWithStatsByApplicationMutex.Unlock()
 	fake.GetApplicationInstancesWithStatsByApplicationStub = nil
 	fake.getApplicationInstancesWithStatsByApplicationReturns = struct {
 		result1 []v2action.ApplicationInstanceWithStats
@@ -229,6 +252,8 @@ func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplicationReturns(re
 }
 
 func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplicationReturnsOnCall(i int, result1 []v2action.ApplicationInstanceWithStats, result2 v2action.Warnings, result3 error) {
+	fake.getApplicationInstancesWithStatsByApplicationMutex.Lock()
+	defer fake.getApplicationInstancesWithStatsByApplicationMutex.Unlock()
 	fake.GetApplicationInstancesWithStatsByApplicationStub = nil
 	if fake.getApplicationInstancesWithStatsByApplicationReturnsOnCall == nil {
 		fake.getApplicationInstancesWithStatsByApplicationReturnsOnCall = make(map[int]struct {
@@ -244,21 +269,22 @@ func (fake *FakeV2Actor) GetApplicationInstancesWithStatsByApplicationReturnsOnC
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) GetApplicationRoutes(appGUID string) (v2action.Routes, v2action.Warnings, error) {
+func (fake *FakeV2Actor) GetApplicationRoutes(arg1 string) (v2action.Routes, v2action.Warnings, error) {
 	fake.getApplicationRoutesMutex.Lock()
 	ret, specificReturn := fake.getApplicationRoutesReturnsOnCall[len(fake.getApplicationRoutesArgsForCall)]
 	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
-		appGUID string
-	}{appGUID})
-	fake.recordInvocation("GetApplicationRoutes", []interface{}{appGUID})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetApplicationRoutes", []interface{}{arg1})
 	fake.getApplicationRoutesMutex.Unlock()
 	if fake.GetApplicationRoutesStub != nil {
-		return fake.GetApplicationRoutesStub(appGUID)
+		return fake.GetApplicationRoutesStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationRoutesReturns.result1, fake.getApplicationRoutesReturns.result2, fake.getApplicationRoutesReturns.result3
+	fakeReturns := fake.getApplicationRoutesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV2Actor) GetApplicationRoutesCallCount() int {
@@ -267,13 +293,22 @@ func (fake *FakeV2Actor) GetApplicationRoutesCallCount() int {
 	return len(fake.getApplicationRoutesArgsForCall)
 }
 
+func (fake *FakeV2Actor) GetApplicationRoutesCalls(stub func(string) (v2action.Routes, v2action.Warnings, error)) {
+	fake.getApplicationRoutesMutex.Lock()
+	defer fake.getApplicationRoutesMutex.Unlock()
+	fake.GetApplicationRoutesStub = stub
+}
+
 func (fake *FakeV2Actor) GetApplicationRoutesArgsForCall(i int) string {
 	fake.getApplicationRoutesMutex.RLock()
 	defer fake.getApplicationRoutesMutex.RUnlock()
-	return fake.getApplicationRoutesArgsForCall[i].appGUID
+	argsForCall := fake.getApplicationRoutesArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeV2Actor) GetApplicationRoutesReturns(result1 v2action.Routes, result2 v2action.Warnings, result3 error) {
+	fake.getApplicationRoutesMutex.Lock()
+	defer fake.getApplicationRoutesMutex.Unlock()
 	fake.GetApplicationRoutesStub = nil
 	fake.getApplicationRoutesReturns = struct {
 		result1 v2action.Routes
@@ -283,6 +318,8 @@ func (fake *FakeV2Actor) GetApplicationRoutesReturns(result1 v2action.Routes, re
 }
 
 func (fake *FakeV2Actor) GetApplicationRoutesReturnsOnCall(i int, result1 v2action.Routes, result2 v2action.Warnings, result3 error) {
+	fake.getApplicationRoutesMutex.Lock()
+	defer fake.getApplicationRoutesMutex.Unlock()
 	fake.GetApplicationRoutesStub = nil
 	if fake.getApplicationRoutesReturnsOnCall == nil {
 		fake.getApplicationRoutesReturnsOnCall = make(map[int]struct {
@@ -301,7 +338,8 @@ func (fake *FakeV2Actor) GetApplicationRoutesReturnsOnCall(i int, result1 v2acti
 func (fake *FakeV2Actor) GetFeatureFlags() ([]v2action.FeatureFlag, v2action.Warnings, error) {
 	fake.getFeatureFlagsMutex.Lock()
 	ret, specificReturn := fake.getFeatureFlagsReturnsOnCall[len(fake.getFeatureFlagsArgsForCall)]
-	fake.getFeatureFlagsArgsForCall = append(fake.getFeatureFlagsArgsForCall, struct{}{})
+	fake.getFeatureFlagsArgsForCall = append(fake.getFeatureFlagsArgsForCall, struct {
+	}{})
 	fake.recordInvocation("GetFeatureFlags", []interface{}{})
 	fake.getFeatureFlagsMutex.Unlock()
 	if fake.GetFeatureFlagsStub != nil {
@@ -310,7 +348,8 @@ func (fake *FakeV2Actor) GetFeatureFlags() ([]v2action.FeatureFlag, v2action.War
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getFeatureFlagsReturns.result1, fake.getFeatureFlagsReturns.result2, fake.getFeatureFlagsReturns.result3
+	fakeReturns := fake.getFeatureFlagsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV2Actor) GetFeatureFlagsCallCount() int {
@@ -319,7 +358,15 @@ func (fake *FakeV2Actor) GetFeatureFlagsCallCount() int {
 	return len(fake.getFeatureFlagsArgsForCall)
 }
 
+func (fake *FakeV2Actor) GetFeatureFlagsCalls(stub func() ([]v2action.FeatureFlag, v2action.Warnings, error)) {
+	fake.getFeatureFlagsMutex.Lock()
+	defer fake.getFeatureFlagsMutex.Unlock()
+	fake.GetFeatureFlagsStub = stub
+}
+
 func (fake *FakeV2Actor) GetFeatureFlagsReturns(result1 []v2action.FeatureFlag, result2 v2action.Warnings, result3 error) {
+	fake.getFeatureFlagsMutex.Lock()
+	defer fake.getFeatureFlagsMutex.Unlock()
 	fake.GetFeatureFlagsStub = nil
 	fake.getFeatureFlagsReturns = struct {
 		result1 []v2action.FeatureFlag
@@ -329,6 +376,8 @@ func (fake *FakeV2Actor) GetFeatureFlagsReturns(result1 []v2action.FeatureFlag, 
 }
 
 func (fake *FakeV2Actor) GetFeatureFlagsReturnsOnCall(i int, result1 []v2action.FeatureFlag, result2 v2action.Warnings, result3 error) {
+	fake.getFeatureFlagsMutex.Lock()
+	defer fake.getFeatureFlagsMutex.Unlock()
 	fake.GetFeatureFlagsStub = nil
 	if fake.getFeatureFlagsReturnsOnCall == nil {
 		fake.getFeatureFlagsReturnsOnCall = make(map[int]struct {
@@ -344,21 +393,22 @@ func (fake *FakeV2Actor) GetFeatureFlagsReturnsOnCall(i int, result1 []v2action.
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) GetService(serviceGUID string) (v2action.Service, v2action.Warnings, error) {
+func (fake *FakeV2Actor) GetService(arg1 string) (v2action.Service, v2action.Warnings, error) {
 	fake.getServiceMutex.Lock()
 	ret, specificReturn := fake.getServiceReturnsOnCall[len(fake.getServiceArgsForCall)]
 	fake.getServiceArgsForCall = append(fake.getServiceArgsForCall, struct {
-		serviceGUID string
-	}{serviceGUID})
-	fake.recordInvocation("GetService", []interface{}{serviceGUID})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetService", []interface{}{arg1})
 	fake.getServiceMutex.Unlock()
 	if fake.GetServiceStub != nil {
-		return fake.GetServiceStub(serviceGUID)
+		return fake.GetServiceStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getServiceReturns.result1, fake.getServiceReturns.result2, fake.getServiceReturns.result3
+	fakeReturns := fake.getServiceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV2Actor) GetServiceCallCount() int {
@@ -367,13 +417,22 @@ func (fake *FakeV2Actor) GetServiceCallCount() int {
 	return len(fake.getServiceArgsForCall)
 }
 
+func (fake *FakeV2Actor) GetServiceCalls(stub func(string) (v2action.Service, v2action.Warnings, error)) {
+	fake.getServiceMutex.Lock()
+	defer fake.getServiceMutex.Unlock()
+	fake.GetServiceStub = stub
+}
+
 func (fake *FakeV2Actor) GetServiceArgsForCall(i int) string {
 	fake.getServiceMutex.RLock()
 	defer fake.getServiceMutex.RUnlock()
-	return fake.getServiceArgsForCall[i].serviceGUID
+	argsForCall := fake.getServiceArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeV2Actor) GetServiceReturns(result1 v2action.Service, result2 v2action.Warnings, result3 error) {
+	fake.getServiceMutex.Lock()
+	defer fake.getServiceMutex.Unlock()
 	fake.GetServiceStub = nil
 	fake.getServiceReturns = struct {
 		result1 v2action.Service
@@ -383,6 +442,8 @@ func (fake *FakeV2Actor) GetServiceReturns(result1 v2action.Service, result2 v2a
 }
 
 func (fake *FakeV2Actor) GetServiceReturnsOnCall(i int, result1 v2action.Service, result2 v2action.Warnings, result3 error) {
+	fake.getServiceMutex.Lock()
+	defer fake.getServiceMutex.Unlock()
 	fake.GetServiceStub = nil
 	if fake.getServiceReturnsOnCall == nil {
 		fake.getServiceReturnsOnCall = make(map[int]struct {
@@ -398,22 +459,23 @@ func (fake *FakeV2Actor) GetServiceReturnsOnCall(i int, result1 v2action.Service
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error) {
+func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpace(arg1 string, arg2 string) (v2action.ServiceInstance, v2action.Warnings, error) {
 	fake.getServiceInstanceByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getServiceInstanceByNameAndSpaceReturnsOnCall[len(fake.getServiceInstanceByNameAndSpaceArgsForCall)]
 	fake.getServiceInstanceByNameAndSpaceArgsForCall = append(fake.getServiceInstanceByNameAndSpaceArgsForCall, struct {
-		serviceInstanceName string
-		spaceGUID           string
-	}{serviceInstanceName, spaceGUID})
-	fake.recordInvocation("GetServiceInstanceByNameAndSpace", []interface{}{serviceInstanceName, spaceGUID})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetServiceInstanceByNameAndSpace", []interface{}{arg1, arg2})
 	fake.getServiceInstanceByNameAndSpaceMutex.Unlock()
 	if fake.GetServiceInstanceByNameAndSpaceStub != nil {
-		return fake.GetServiceInstanceByNameAndSpaceStub(serviceInstanceName, spaceGUID)
+		return fake.GetServiceInstanceByNameAndSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getServiceInstanceByNameAndSpaceReturns.result1, fake.getServiceInstanceByNameAndSpaceReturns.result2, fake.getServiceInstanceByNameAndSpaceReturns.result3
+	fakeReturns := fake.getServiceInstanceByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceCallCount() int {
@@ -422,13 +484,22 @@ func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceCallCount() int {
 	return len(fake.getServiceInstanceByNameAndSpaceArgsForCall)
 }
 
+func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceCalls(stub func(string, string) (v2action.ServiceInstance, v2action.Warnings, error)) {
+	fake.getServiceInstanceByNameAndSpaceMutex.Lock()
+	defer fake.getServiceInstanceByNameAndSpaceMutex.Unlock()
+	fake.GetServiceInstanceByNameAndSpaceStub = stub
+}
+
 func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceArgsForCall(i int) (string, string) {
 	fake.getServiceInstanceByNameAndSpaceMutex.RLock()
 	defer fake.getServiceInstanceByNameAndSpaceMutex.RUnlock()
-	return fake.getServiceInstanceByNameAndSpaceArgsForCall[i].serviceInstanceName, fake.getServiceInstanceByNameAndSpaceArgsForCall[i].spaceGUID
+	argsForCall := fake.getServiceInstanceByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceReturns(result1 v2action.ServiceInstance, result2 v2action.Warnings, result3 error) {
+	fake.getServiceInstanceByNameAndSpaceMutex.Lock()
+	defer fake.getServiceInstanceByNameAndSpaceMutex.Unlock()
 	fake.GetServiceInstanceByNameAndSpaceStub = nil
 	fake.getServiceInstanceByNameAndSpaceReturns = struct {
 		result1 v2action.ServiceInstance
@@ -438,6 +509,8 @@ func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceReturns(result1 v2actio
 }
 
 func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceReturnsOnCall(i int, result1 v2action.ServiceInstance, result2 v2action.Warnings, result3 error) {
+	fake.getServiceInstanceByNameAndSpaceMutex.Lock()
+	defer fake.getServiceInstanceByNameAndSpaceMutex.Unlock()
 	fake.GetServiceInstanceByNameAndSpaceStub = nil
 	if fake.getServiceInstanceByNameAndSpaceReturnsOnCall == nil {
 		fake.getServiceInstanceByNameAndSpaceReturnsOnCall = make(map[int]struct {
@@ -453,21 +526,22 @@ func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceReturnsOnCall(i int, re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) GetServiceInstanceSharedTosByServiceInstance(serviceInstanceGUID string) ([]v2action.ServiceInstanceSharedTo, v2action.Warnings, error) {
+func (fake *FakeV2Actor) GetServiceInstanceSharedTosByServiceInstance(arg1 string) ([]v2action.ServiceInstanceSharedTo, v2action.Warnings, error) {
 	fake.getServiceInstanceSharedTosByServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.getServiceInstanceSharedTosByServiceInstanceReturnsOnCall[len(fake.getServiceInstanceSharedTosByServiceInstanceArgsForCall)]
 	fake.getServiceInstanceSharedTosByServiceInstanceArgsForCall = append(fake.getServiceInstanceSharedTosByServiceInstanceArgsForCall, struct {
-		serviceInstanceGUID string
-	}{serviceInstanceGUID})
-	fake.recordInvocation("GetServiceInstanceSharedTosByServiceInstance", []interface{}{serviceInstanceGUID})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetServiceInstanceSharedTosByServiceInstance", []interface{}{arg1})
 	fake.getServiceInstanceSharedTosByServiceInstanceMutex.Unlock()
 	if fake.GetServiceInstanceSharedTosByServiceInstanceStub != nil {
-		return fake.GetServiceInstanceSharedTosByServiceInstanceStub(serviceInstanceGUID)
+		return fake.GetServiceInstanceSharedTosByServiceInstanceStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getServiceInstanceSharedTosByServiceInstanceReturns.result1, fake.getServiceInstanceSharedTosByServiceInstanceReturns.result2, fake.getServiceInstanceSharedTosByServiceInstanceReturns.result3
+	fakeReturns := fake.getServiceInstanceSharedTosByServiceInstanceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV2Actor) GetServiceInstanceSharedTosByServiceInstanceCallCount() int {
@@ -476,13 +550,22 @@ func (fake *FakeV2Actor) GetServiceInstanceSharedTosByServiceInstanceCallCount()
 	return len(fake.getServiceInstanceSharedTosByServiceInstanceArgsForCall)
 }
 
+func (fake *FakeV2Actor) GetServiceInstanceSharedTosByServiceInstanceCalls(stub func(string) ([]v2action.ServiceInstanceSharedTo, v2action.Warnings, error)) {
+	fake.getServiceInstanceSharedTosByServiceInstanceMutex.Lock()
+	defer fake.getServiceInstanceSharedTosByServiceInstanceMutex.Unlock()
+	fake.GetServiceInstanceSharedTosByServiceInstanceStub = stub
+}
+
 func (fake *FakeV2Actor) GetServiceInstanceSharedTosByServiceInstanceArgsForCall(i int) string {
 	fake.getServiceInstanceSharedTosByServiceInstanceMutex.RLock()
 	defer fake.getServiceInstanceSharedTosByServiceInstanceMutex.RUnlock()
-	return fake.getServiceInstanceSharedTosByServiceInstanceArgsForCall[i].serviceInstanceGUID
+	argsForCall := fake.getServiceInstanceSharedTosByServiceInstanceArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeV2Actor) GetServiceInstanceSharedTosByServiceInstanceReturns(result1 []v2action.ServiceInstanceSharedTo, result2 v2action.Warnings, result3 error) {
+	fake.getServiceInstanceSharedTosByServiceInstanceMutex.Lock()
+	defer fake.getServiceInstanceSharedTosByServiceInstanceMutex.Unlock()
 	fake.GetServiceInstanceSharedTosByServiceInstanceStub = nil
 	fake.getServiceInstanceSharedTosByServiceInstanceReturns = struct {
 		result1 []v2action.ServiceInstanceSharedTo
@@ -492,6 +575,8 @@ func (fake *FakeV2Actor) GetServiceInstanceSharedTosByServiceInstanceReturns(res
 }
 
 func (fake *FakeV2Actor) GetServiceInstanceSharedTosByServiceInstanceReturnsOnCall(i int, result1 []v2action.ServiceInstanceSharedTo, result2 v2action.Warnings, result3 error) {
+	fake.getServiceInstanceSharedTosByServiceInstanceMutex.Lock()
+	defer fake.getServiceInstanceSharedTosByServiceInstanceMutex.Unlock()
 	fake.GetServiceInstanceSharedTosByServiceInstanceStub = nil
 	if fake.getServiceInstanceSharedTosByServiceInstanceReturnsOnCall == nil {
 		fake.getServiceInstanceSharedTosByServiceInstanceReturnsOnCall = make(map[int]struct {
@@ -507,22 +592,23 @@ func (fake *FakeV2Actor) GetServiceInstanceSharedTosByServiceInstanceReturnsOnCa
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error) {
+func (fake *FakeV2Actor) GetSpaceByOrganizationAndName(arg1 string, arg2 string) (v2action.Space, v2action.Warnings, error) {
 	fake.getSpaceByOrganizationAndNameMutex.Lock()
 	ret, specificReturn := fake.getSpaceByOrganizationAndNameReturnsOnCall[len(fake.getSpaceByOrganizationAndNameArgsForCall)]
 	fake.getSpaceByOrganizationAndNameArgsForCall = append(fake.getSpaceByOrganizationAndNameArgsForCall, struct {
-		orgGUID   string
-		spaceName string
-	}{orgGUID, spaceName})
-	fake.recordInvocation("GetSpaceByOrganizationAndName", []interface{}{orgGUID, spaceName})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetSpaceByOrganizationAndName", []interface{}{arg1, arg2})
 	fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	if fake.GetSpaceByOrganizationAndNameStub != nil {
-		return fake.GetSpaceByOrganizationAndNameStub(orgGUID, spaceName)
+		return fake.GetSpaceByOrganizationAndNameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getSpaceByOrganizationAndNameReturns.result1, fake.getSpaceByOrganizationAndNameReturns.result2, fake.getSpaceByOrganizationAndNameReturns.result3
+	fakeReturns := fake.getSpaceByOrganizationAndNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV2Actor) GetSpaceByOrganizationAndNameCallCount() int {
@@ -531,13 +617,22 @@ func (fake *FakeV2Actor) GetSpaceByOrganizationAndNameCallCount() int {
 	return len(fake.getSpaceByOrganizationAndNameArgsForCall)
 }
 
+func (fake *FakeV2Actor) GetSpaceByOrganizationAndNameCalls(stub func(string, string) (v2action.Space, v2action.Warnings, error)) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
+	fake.GetSpaceByOrganizationAndNameStub = stub
+}
+
 func (fake *FakeV2Actor) GetSpaceByOrganizationAndNameArgsForCall(i int) (string, string) {
 	fake.getSpaceByOrganizationAndNameMutex.RLock()
 	defer fake.getSpaceByOrganizationAndNameMutex.RUnlock()
-	return fake.getSpaceByOrganizationAndNameArgsForCall[i].orgGUID, fake.getSpaceByOrganizationAndNameArgsForCall[i].spaceName
+	argsForCall := fake.getSpaceByOrganizationAndNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV2Actor) GetSpaceByOrganizationAndNameReturns(result1 v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	fake.GetSpaceByOrganizationAndNameStub = nil
 	fake.getSpaceByOrganizationAndNameReturns = struct {
 		result1 v2action.Space
@@ -547,6 +642,8 @@ func (fake *FakeV2Actor) GetSpaceByOrganizationAndNameReturns(result1 v2action.S
 }
 
 func (fake *FakeV2Actor) GetSpaceByOrganizationAndNameReturnsOnCall(i int, result1 v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.getSpaceByOrganizationAndNameMutex.Lock()
+	defer fake.getSpaceByOrganizationAndNameMutex.Unlock()
 	fake.GetSpaceByOrganizationAndNameStub = nil
 	if fake.getSpaceByOrganizationAndNameReturnsOnCall == nil {
 		fake.getSpaceByOrganizationAndNameReturnsOnCall = make(map[int]struct {

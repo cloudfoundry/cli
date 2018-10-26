@@ -15,7 +15,7 @@ var _ = Describe("Error Wrapper", func() {
 	var client *Client
 
 	BeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 	})
 
 	Describe("Make", func() {

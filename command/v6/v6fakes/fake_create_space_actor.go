@@ -2,19 +2,19 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeCreateSpaceActor struct {
-	CreateSpaceStub        func(spaceName, orgName, quotaName string) (v2action.Space, v2action.Warnings, error)
+	CreateSpaceStub        func(string, string, string) (v2action.Space, v2action.Warnings, error)
 	createSpaceMutex       sync.RWMutex
 	createSpaceArgsForCall []struct {
-		spaceName string
-		orgName   string
-		quotaName string
+		arg1 string
+		arg2 string
+		arg3 string
 	}
 	createSpaceReturns struct {
 		result1 v2action.Space
@@ -26,26 +26,11 @@ type FakeCreateSpaceActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GrantSpaceManagerByUsernameStub        func(orgGUID string, spaceGUID string, username string) (v2action.Warnings, error)
-	grantSpaceManagerByUsernameMutex       sync.RWMutex
-	grantSpaceManagerByUsernameArgsForCall []struct {
-		orgGUID   string
-		spaceGUID string
-		username  string
-	}
-	grantSpaceManagerByUsernameReturns struct {
-		result1 v2action.Warnings
-		result2 error
-	}
-	grantSpaceManagerByUsernameReturnsOnCall map[int]struct {
-		result1 v2action.Warnings
-		result2 error
-	}
-	GrantSpaceDeveloperByUsernameStub        func(spaceGUID string, username string) (v2action.Warnings, error)
+	GrantSpaceDeveloperByUsernameStub        func(string, string) (v2action.Warnings, error)
 	grantSpaceDeveloperByUsernameMutex       sync.RWMutex
 	grantSpaceDeveloperByUsernameArgsForCall []struct {
-		spaceGUID string
-		username  string
+		arg1 string
+		arg2 string
 	}
 	grantSpaceDeveloperByUsernameReturns struct {
 		result1 v2action.Warnings
@@ -55,27 +40,43 @@ type FakeCreateSpaceActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
+	GrantSpaceManagerByUsernameStub        func(string, string, string) (v2action.Warnings, error)
+	grantSpaceManagerByUsernameMutex       sync.RWMutex
+	grantSpaceManagerByUsernameArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	grantSpaceManagerByUsernameReturns struct {
+		result1 v2action.Warnings
+		result2 error
+	}
+	grantSpaceManagerByUsernameReturnsOnCall map[int]struct {
+		result1 v2action.Warnings
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateSpaceActor) CreateSpace(spaceName string, orgName string, quotaName string) (v2action.Space, v2action.Warnings, error) {
+func (fake *FakeCreateSpaceActor) CreateSpace(arg1 string, arg2 string, arg3 string) (v2action.Space, v2action.Warnings, error) {
 	fake.createSpaceMutex.Lock()
 	ret, specificReturn := fake.createSpaceReturnsOnCall[len(fake.createSpaceArgsForCall)]
 	fake.createSpaceArgsForCall = append(fake.createSpaceArgsForCall, struct {
-		spaceName string
-		orgName   string
-		quotaName string
-	}{spaceName, orgName, quotaName})
-	fake.recordInvocation("CreateSpace", []interface{}{spaceName, orgName, quotaName})
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("CreateSpace", []interface{}{arg1, arg2, arg3})
 	fake.createSpaceMutex.Unlock()
 	if fake.CreateSpaceStub != nil {
-		return fake.CreateSpaceStub(spaceName, orgName, quotaName)
+		return fake.CreateSpaceStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createSpaceReturns.result1, fake.createSpaceReturns.result2, fake.createSpaceReturns.result3
+	fakeReturns := fake.createSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeCreateSpaceActor) CreateSpaceCallCount() int {
@@ -84,13 +85,22 @@ func (fake *FakeCreateSpaceActor) CreateSpaceCallCount() int {
 	return len(fake.createSpaceArgsForCall)
 }
 
+func (fake *FakeCreateSpaceActor) CreateSpaceCalls(stub func(string, string, string) (v2action.Space, v2action.Warnings, error)) {
+	fake.createSpaceMutex.Lock()
+	defer fake.createSpaceMutex.Unlock()
+	fake.CreateSpaceStub = stub
+}
+
 func (fake *FakeCreateSpaceActor) CreateSpaceArgsForCall(i int) (string, string, string) {
 	fake.createSpaceMutex.RLock()
 	defer fake.createSpaceMutex.RUnlock()
-	return fake.createSpaceArgsForCall[i].spaceName, fake.createSpaceArgsForCall[i].orgName, fake.createSpaceArgsForCall[i].quotaName
+	argsForCall := fake.createSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeCreateSpaceActor) CreateSpaceReturns(result1 v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.createSpaceMutex.Lock()
+	defer fake.createSpaceMutex.Unlock()
 	fake.CreateSpaceStub = nil
 	fake.createSpaceReturns = struct {
 		result1 v2action.Space
@@ -100,6 +110,8 @@ func (fake *FakeCreateSpaceActor) CreateSpaceReturns(result1 v2action.Space, res
 }
 
 func (fake *FakeCreateSpaceActor) CreateSpaceReturnsOnCall(i int, result1 v2action.Space, result2 v2action.Warnings, result3 error) {
+	fake.createSpaceMutex.Lock()
+	defer fake.createSpaceMutex.Unlock()
 	fake.CreateSpaceStub = nil
 	if fake.createSpaceReturnsOnCall == nil {
 		fake.createSpaceReturnsOnCall = make(map[int]struct {
@@ -115,75 +127,23 @@ func (fake *FakeCreateSpaceActor) CreateSpaceReturnsOnCall(i int, result1 v2acti
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsername(orgGUID string, spaceGUID string, username string) (v2action.Warnings, error) {
-	fake.grantSpaceManagerByUsernameMutex.Lock()
-	ret, specificReturn := fake.grantSpaceManagerByUsernameReturnsOnCall[len(fake.grantSpaceManagerByUsernameArgsForCall)]
-	fake.grantSpaceManagerByUsernameArgsForCall = append(fake.grantSpaceManagerByUsernameArgsForCall, struct {
-		orgGUID   string
-		spaceGUID string
-		username  string
-	}{orgGUID, spaceGUID, username})
-	fake.recordInvocation("GrantSpaceManagerByUsername", []interface{}{orgGUID, spaceGUID, username})
-	fake.grantSpaceManagerByUsernameMutex.Unlock()
-	if fake.GrantSpaceManagerByUsernameStub != nil {
-		return fake.GrantSpaceManagerByUsernameStub(orgGUID, spaceGUID, username)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fake.grantSpaceManagerByUsernameReturns.result1, fake.grantSpaceManagerByUsernameReturns.result2
-}
-
-func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsernameCallCount() int {
-	fake.grantSpaceManagerByUsernameMutex.RLock()
-	defer fake.grantSpaceManagerByUsernameMutex.RUnlock()
-	return len(fake.grantSpaceManagerByUsernameArgsForCall)
-}
-
-func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsernameArgsForCall(i int) (string, string, string) {
-	fake.grantSpaceManagerByUsernameMutex.RLock()
-	defer fake.grantSpaceManagerByUsernameMutex.RUnlock()
-	return fake.grantSpaceManagerByUsernameArgsForCall[i].orgGUID, fake.grantSpaceManagerByUsernameArgsForCall[i].spaceGUID, fake.grantSpaceManagerByUsernameArgsForCall[i].username
-}
-
-func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsernameReturns(result1 v2action.Warnings, result2 error) {
-	fake.GrantSpaceManagerByUsernameStub = nil
-	fake.grantSpaceManagerByUsernameReturns = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsernameReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
-	fake.GrantSpaceManagerByUsernameStub = nil
-	if fake.grantSpaceManagerByUsernameReturnsOnCall == nil {
-		fake.grantSpaceManagerByUsernameReturnsOnCall = make(map[int]struct {
-			result1 v2action.Warnings
-			result2 error
-		})
-	}
-	fake.grantSpaceManagerByUsernameReturnsOnCall[i] = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeCreateSpaceActor) GrantSpaceDeveloperByUsername(spaceGUID string, username string) (v2action.Warnings, error) {
+func (fake *FakeCreateSpaceActor) GrantSpaceDeveloperByUsername(arg1 string, arg2 string) (v2action.Warnings, error) {
 	fake.grantSpaceDeveloperByUsernameMutex.Lock()
 	ret, specificReturn := fake.grantSpaceDeveloperByUsernameReturnsOnCall[len(fake.grantSpaceDeveloperByUsernameArgsForCall)]
 	fake.grantSpaceDeveloperByUsernameArgsForCall = append(fake.grantSpaceDeveloperByUsernameArgsForCall, struct {
-		spaceGUID string
-		username  string
-	}{spaceGUID, username})
-	fake.recordInvocation("GrantSpaceDeveloperByUsername", []interface{}{spaceGUID, username})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GrantSpaceDeveloperByUsername", []interface{}{arg1, arg2})
 	fake.grantSpaceDeveloperByUsernameMutex.Unlock()
 	if fake.GrantSpaceDeveloperByUsernameStub != nil {
-		return fake.GrantSpaceDeveloperByUsernameStub(spaceGUID, username)
+		return fake.GrantSpaceDeveloperByUsernameStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.grantSpaceDeveloperByUsernameReturns.result1, fake.grantSpaceDeveloperByUsernameReturns.result2
+	fakeReturns := fake.grantSpaceDeveloperByUsernameReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeCreateSpaceActor) GrantSpaceDeveloperByUsernameCallCount() int {
@@ -192,13 +152,22 @@ func (fake *FakeCreateSpaceActor) GrantSpaceDeveloperByUsernameCallCount() int {
 	return len(fake.grantSpaceDeveloperByUsernameArgsForCall)
 }
 
+func (fake *FakeCreateSpaceActor) GrantSpaceDeveloperByUsernameCalls(stub func(string, string) (v2action.Warnings, error)) {
+	fake.grantSpaceDeveloperByUsernameMutex.Lock()
+	defer fake.grantSpaceDeveloperByUsernameMutex.Unlock()
+	fake.GrantSpaceDeveloperByUsernameStub = stub
+}
+
 func (fake *FakeCreateSpaceActor) GrantSpaceDeveloperByUsernameArgsForCall(i int) (string, string) {
 	fake.grantSpaceDeveloperByUsernameMutex.RLock()
 	defer fake.grantSpaceDeveloperByUsernameMutex.RUnlock()
-	return fake.grantSpaceDeveloperByUsernameArgsForCall[i].spaceGUID, fake.grantSpaceDeveloperByUsernameArgsForCall[i].username
+	argsForCall := fake.grantSpaceDeveloperByUsernameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeCreateSpaceActor) GrantSpaceDeveloperByUsernameReturns(result1 v2action.Warnings, result2 error) {
+	fake.grantSpaceDeveloperByUsernameMutex.Lock()
+	defer fake.grantSpaceDeveloperByUsernameMutex.Unlock()
 	fake.GrantSpaceDeveloperByUsernameStub = nil
 	fake.grantSpaceDeveloperByUsernameReturns = struct {
 		result1 v2action.Warnings
@@ -207,6 +176,8 @@ func (fake *FakeCreateSpaceActor) GrantSpaceDeveloperByUsernameReturns(result1 v
 }
 
 func (fake *FakeCreateSpaceActor) GrantSpaceDeveloperByUsernameReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.grantSpaceDeveloperByUsernameMutex.Lock()
+	defer fake.grantSpaceDeveloperByUsernameMutex.Unlock()
 	fake.GrantSpaceDeveloperByUsernameStub = nil
 	if fake.grantSpaceDeveloperByUsernameReturnsOnCall == nil {
 		fake.grantSpaceDeveloperByUsernameReturnsOnCall = make(map[int]struct {
@@ -220,15 +191,80 @@ func (fake *FakeCreateSpaceActor) GrantSpaceDeveloperByUsernameReturnsOnCall(i i
 	}{result1, result2}
 }
 
+func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsername(arg1 string, arg2 string, arg3 string) (v2action.Warnings, error) {
+	fake.grantSpaceManagerByUsernameMutex.Lock()
+	ret, specificReturn := fake.grantSpaceManagerByUsernameReturnsOnCall[len(fake.grantSpaceManagerByUsernameArgsForCall)]
+	fake.grantSpaceManagerByUsernameArgsForCall = append(fake.grantSpaceManagerByUsernameArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GrantSpaceManagerByUsername", []interface{}{arg1, arg2, arg3})
+	fake.grantSpaceManagerByUsernameMutex.Unlock()
+	if fake.GrantSpaceManagerByUsernameStub != nil {
+		return fake.GrantSpaceManagerByUsernameStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.grantSpaceManagerByUsernameReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsernameCallCount() int {
+	fake.grantSpaceManagerByUsernameMutex.RLock()
+	defer fake.grantSpaceManagerByUsernameMutex.RUnlock()
+	return len(fake.grantSpaceManagerByUsernameArgsForCall)
+}
+
+func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsernameCalls(stub func(string, string, string) (v2action.Warnings, error)) {
+	fake.grantSpaceManagerByUsernameMutex.Lock()
+	defer fake.grantSpaceManagerByUsernameMutex.Unlock()
+	fake.GrantSpaceManagerByUsernameStub = stub
+}
+
+func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsernameArgsForCall(i int) (string, string, string) {
+	fake.grantSpaceManagerByUsernameMutex.RLock()
+	defer fake.grantSpaceManagerByUsernameMutex.RUnlock()
+	argsForCall := fake.grantSpaceManagerByUsernameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsernameReturns(result1 v2action.Warnings, result2 error) {
+	fake.grantSpaceManagerByUsernameMutex.Lock()
+	defer fake.grantSpaceManagerByUsernameMutex.Unlock()
+	fake.GrantSpaceManagerByUsernameStub = nil
+	fake.grantSpaceManagerByUsernameReturns = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCreateSpaceActor) GrantSpaceManagerByUsernameReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.grantSpaceManagerByUsernameMutex.Lock()
+	defer fake.grantSpaceManagerByUsernameMutex.Unlock()
+	fake.GrantSpaceManagerByUsernameStub = nil
+	if fake.grantSpaceManagerByUsernameReturnsOnCall == nil {
+		fake.grantSpaceManagerByUsernameReturnsOnCall = make(map[int]struct {
+			result1 v2action.Warnings
+			result2 error
+		})
+	}
+	fake.grantSpaceManagerByUsernameReturnsOnCall[i] = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCreateSpaceActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.createSpaceMutex.RLock()
 	defer fake.createSpaceMutex.RUnlock()
-	fake.grantSpaceManagerByUsernameMutex.RLock()
-	defer fake.grantSpaceManagerByUsernameMutex.RUnlock()
 	fake.grantSpaceDeveloperByUsernameMutex.RLock()
 	defer fake.grantSpaceDeveloperByUsernameMutex.RUnlock()
+	fake.grantSpaceManagerByUsernameMutex.RLock()
+	defer fake.grantSpaceManagerByUsernameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

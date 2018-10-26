@@ -92,6 +92,13 @@ func (r Route) String() string {
 	return routeString
 }
 
+func DomainName(prefix ...string) string {
+	if len(prefix) > 0 {
+		return fmt.Sprintf("integration-%s.com", PrefixedRandomName(prefix[0]))
+	}
+	return fmt.Sprintf("integration%s.com", PrefixedRandomName(""))
+}
+
 type Domain struct {
 	Org  string
 	Name string

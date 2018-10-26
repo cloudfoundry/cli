@@ -31,7 +31,15 @@ var (
 
 func TestExperimental(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Experimental Integration Suite")
+	reporters := []Reporter{}
+
+	honeyCombReporter := helpers.GetHoneyCombReporter("Experimental Test Suite")
+
+	if honeyCombReporter != nil {
+		reporters = append(reporters, honeyCombReporter)
+	}
+
+	RunSpecsWithDefaultAndCustomReporters(t, "Experimental Integration Suite", reporters)
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {

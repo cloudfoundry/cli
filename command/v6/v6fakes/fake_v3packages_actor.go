@@ -2,27 +2,28 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeV3PackagesActor struct {
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetApplicationPackagesStub        func(appName string, spaceGUID string) ([]v3action.Package, v3action.Warnings, error)
+	GetApplicationPackagesStub        func(string, string) ([]v3action.Package, v3action.Warnings, error)
 	getApplicationPackagesMutex       sync.RWMutex
 	getApplicationPackagesArgsForCall []struct {
-		appName   string
-		spaceGUID string
+		arg1 string
+		arg2 string
 	}
 	getApplicationPackagesReturns struct {
 		result1 []v3action.Package
@@ -41,7 +42,8 @@ type FakeV3PackagesActor struct {
 func (fake *FakeV3PackagesActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -50,7 +52,8 @@ func (fake *FakeV3PackagesActor) CloudControllerAPIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeV3PackagesActor) CloudControllerAPIVersionCallCount() int {
@@ -59,7 +62,15 @@ func (fake *FakeV3PackagesActor) CloudControllerAPIVersionCallCount() int {
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeV3PackagesActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeV3PackagesActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -67,6 +78,8 @@ func (fake *FakeV3PackagesActor) CloudControllerAPIVersionReturns(result1 string
 }
 
 func (fake *FakeV3PackagesActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -78,22 +91,23 @@ func (fake *FakeV3PackagesActor) CloudControllerAPIVersionReturnsOnCall(i int, r
 	}{result1}
 }
 
-func (fake *FakeV3PackagesActor) GetApplicationPackages(appName string, spaceGUID string) ([]v3action.Package, v3action.Warnings, error) {
+func (fake *FakeV3PackagesActor) GetApplicationPackages(arg1 string, arg2 string) ([]v3action.Package, v3action.Warnings, error) {
 	fake.getApplicationPackagesMutex.Lock()
 	ret, specificReturn := fake.getApplicationPackagesReturnsOnCall[len(fake.getApplicationPackagesArgsForCall)]
 	fake.getApplicationPackagesArgsForCall = append(fake.getApplicationPackagesArgsForCall, struct {
-		appName   string
-		spaceGUID string
-	}{appName, spaceGUID})
-	fake.recordInvocation("GetApplicationPackages", []interface{}{appName, spaceGUID})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetApplicationPackages", []interface{}{arg1, arg2})
 	fake.getApplicationPackagesMutex.Unlock()
 	if fake.GetApplicationPackagesStub != nil {
-		return fake.GetApplicationPackagesStub(appName, spaceGUID)
+		return fake.GetApplicationPackagesStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationPackagesReturns.result1, fake.getApplicationPackagesReturns.result2, fake.getApplicationPackagesReturns.result3
+	fakeReturns := fake.getApplicationPackagesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV3PackagesActor) GetApplicationPackagesCallCount() int {
@@ -102,13 +116,22 @@ func (fake *FakeV3PackagesActor) GetApplicationPackagesCallCount() int {
 	return len(fake.getApplicationPackagesArgsForCall)
 }
 
+func (fake *FakeV3PackagesActor) GetApplicationPackagesCalls(stub func(string, string) ([]v3action.Package, v3action.Warnings, error)) {
+	fake.getApplicationPackagesMutex.Lock()
+	defer fake.getApplicationPackagesMutex.Unlock()
+	fake.GetApplicationPackagesStub = stub
+}
+
 func (fake *FakeV3PackagesActor) GetApplicationPackagesArgsForCall(i int) (string, string) {
 	fake.getApplicationPackagesMutex.RLock()
 	defer fake.getApplicationPackagesMutex.RUnlock()
-	return fake.getApplicationPackagesArgsForCall[i].appName, fake.getApplicationPackagesArgsForCall[i].spaceGUID
+	argsForCall := fake.getApplicationPackagesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV3PackagesActor) GetApplicationPackagesReturns(result1 []v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationPackagesMutex.Lock()
+	defer fake.getApplicationPackagesMutex.Unlock()
 	fake.GetApplicationPackagesStub = nil
 	fake.getApplicationPackagesReturns = struct {
 		result1 []v3action.Package
@@ -118,6 +141,8 @@ func (fake *FakeV3PackagesActor) GetApplicationPackagesReturns(result1 []v3actio
 }
 
 func (fake *FakeV3PackagesActor) GetApplicationPackagesReturnsOnCall(i int, result1 []v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationPackagesMutex.Lock()
+	defer fake.getApplicationPackagesMutex.Unlock()
 	fake.GetApplicationPackagesStub = nil
 	if fake.getApplicationPackagesReturnsOnCall == nil {
 		fake.getApplicationPackagesReturnsOnCall = make(map[int]struct {

@@ -2,17 +2,17 @@
 package pluginactionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
+	pluginaction "code.cloudfoundry.org/cli/actor/pluginaction"
 )
 
 type FakePluginUninstaller struct {
-	RunStub        func(pluginPath string, command string) error
+	RunStub        func(string, string) error
 	runMutex       sync.RWMutex
 	runArgsForCall []struct {
-		pluginPath string
-		command    string
+		arg1 string
+		arg2 string
 	}
 	runReturns struct {
 		result1 error
@@ -24,22 +24,23 @@ type FakePluginUninstaller struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakePluginUninstaller) Run(pluginPath string, command string) error {
+func (fake *FakePluginUninstaller) Run(arg1 string, arg2 string) error {
 	fake.runMutex.Lock()
 	ret, specificReturn := fake.runReturnsOnCall[len(fake.runArgsForCall)]
 	fake.runArgsForCall = append(fake.runArgsForCall, struct {
-		pluginPath string
-		command    string
-	}{pluginPath, command})
-	fake.recordInvocation("Run", []interface{}{pluginPath, command})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("Run", []interface{}{arg1, arg2})
 	fake.runMutex.Unlock()
 	if fake.RunStub != nil {
-		return fake.RunStub(pluginPath, command)
+		return fake.RunStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.runReturns.result1
+	fakeReturns := fake.runReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakePluginUninstaller) RunCallCount() int {
@@ -48,13 +49,22 @@ func (fake *FakePluginUninstaller) RunCallCount() int {
 	return len(fake.runArgsForCall)
 }
 
+func (fake *FakePluginUninstaller) RunCalls(stub func(string, string) error) {
+	fake.runMutex.Lock()
+	defer fake.runMutex.Unlock()
+	fake.RunStub = stub
+}
+
 func (fake *FakePluginUninstaller) RunArgsForCall(i int) (string, string) {
 	fake.runMutex.RLock()
 	defer fake.runMutex.RUnlock()
-	return fake.runArgsForCall[i].pluginPath, fake.runArgsForCall[i].command
+	argsForCall := fake.runArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakePluginUninstaller) RunReturns(result1 error) {
+	fake.runMutex.Lock()
+	defer fake.runMutex.Unlock()
 	fake.RunStub = nil
 	fake.runReturns = struct {
 		result1 error
@@ -62,6 +72,8 @@ func (fake *FakePluginUninstaller) RunReturns(result1 error) {
 }
 
 func (fake *FakePluginUninstaller) RunReturnsOnCall(i int, result1 error) {
+	fake.runMutex.Lock()
+	defer fake.runMutex.Unlock()
 	fake.RunStub = nil
 	if fake.runReturnsOnCall == nil {
 		fake.runReturnsOnCall = make(map[int]struct {

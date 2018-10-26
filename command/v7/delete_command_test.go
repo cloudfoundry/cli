@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -67,13 +67,13 @@ var _ = Describe("delete Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	When("checking target fails", func() {
+	When("the -r flag is provided", func() {
 		BeforeEach(func() {
 			cmd.DeleteMappedRoutes = true
 			cmd.Force = true
 		})
 
-		It("returns an error", func() {
+		It("prints a warning", func() {
 			Expect(testUI.Err).To(Say("-r flag not implemented - the mapped routes will not be deleted"))
 		})
 	})
@@ -119,7 +119,13 @@ var _ = Describe("delete Command", func() {
 				_, err := input.Write([]byte("y\n"))
 				Expect(err).ToNot(HaveOccurred())
 
-				fakeActor.DeleteApplicationByNameAndSpaceReturns(v3action.Warnings{"some-warning"}, nil)
+				fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, nil)
+			})
+
+			It("delegates to the Actor", func() {
+				actualName, actualSpace := fakeActor.DeleteApplicationByNameAndSpaceArgsForCall(0)
+				Expect(actualName).To(Equal(app))
+				Expect(actualSpace).To(Equal(fakeConfig.TargetedSpace().GUID))
 			})
 
 			It("deletes the app", func() {
@@ -187,7 +193,7 @@ var _ = Describe("delete Command", func() {
 		When("deleting the app errors", func() {
 			Context("generic error", func() {
 				BeforeEach(func() {
-					fakeActor.DeleteApplicationByNameAndSpaceReturns(v3action.Warnings{"some-warning"}, errors.New("some-error"))
+					fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, errors.New("some-error"))
 				})
 
 				It("displays all warnings, and returns the erorr", func() {
@@ -201,7 +207,7 @@ var _ = Describe("delete Command", func() {
 
 		When("the app doesn't exist", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteApplicationByNameAndSpaceReturns(v3action.Warnings{"some-warning"}, actionerror.ApplicationNotFoundError{Name: "some-app"})
+				fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, actionerror.ApplicationNotFoundError{Name: "some-app"})
 			})
 
 			It("displays all warnings, that the app wasn't found, and does not error", func() {
@@ -216,7 +222,7 @@ var _ = Describe("delete Command", func() {
 
 		When("the app exists", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteApplicationByNameAndSpaceReturns(v3action.Warnings{"some-warning"}, nil)
+				fakeActor.DeleteApplicationByNameAndSpaceReturns(v7action.Warnings{"some-warning"}, nil)
 			})
 
 			It("displays all warnings, and does not error", func() {

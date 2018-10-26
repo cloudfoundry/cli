@@ -2,20 +2,20 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/pushaction"
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	pushaction "code.cloudfoundry.org/cli/actor/pushaction"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeOriginalV2PushActor struct {
-	CreateAndMapDefaultApplicationRouteStub        func(orgGUID string, spaceGUID string, app v2action.Application) (pushaction.Warnings, error)
+	CreateAndMapDefaultApplicationRouteStub        func(string, string, v2action.Application) (pushaction.Warnings, error)
 	createAndMapDefaultApplicationRouteMutex       sync.RWMutex
 	createAndMapDefaultApplicationRouteArgsForCall []struct {
-		orgGUID   string
-		spaceGUID string
-		app       v2action.Application
+		arg1 string
+		arg2 string
+		arg3 v2action.Application
 	}
 	createAndMapDefaultApplicationRouteReturns struct {
 		result1 pushaction.Warnings
@@ -29,23 +29,24 @@ type FakeOriginalV2PushActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID string, app v2action.Application) (pushaction.Warnings, error) {
+func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRoute(arg1 string, arg2 string, arg3 v2action.Application) (pushaction.Warnings, error) {
 	fake.createAndMapDefaultApplicationRouteMutex.Lock()
 	ret, specificReturn := fake.createAndMapDefaultApplicationRouteReturnsOnCall[len(fake.createAndMapDefaultApplicationRouteArgsForCall)]
 	fake.createAndMapDefaultApplicationRouteArgsForCall = append(fake.createAndMapDefaultApplicationRouteArgsForCall, struct {
-		orgGUID   string
-		spaceGUID string
-		app       v2action.Application
-	}{orgGUID, spaceGUID, app})
-	fake.recordInvocation("CreateAndMapDefaultApplicationRoute", []interface{}{orgGUID, spaceGUID, app})
+		arg1 string
+		arg2 string
+		arg3 v2action.Application
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("CreateAndMapDefaultApplicationRoute", []interface{}{arg1, arg2, arg3})
 	fake.createAndMapDefaultApplicationRouteMutex.Unlock()
 	if fake.CreateAndMapDefaultApplicationRouteStub != nil {
-		return fake.CreateAndMapDefaultApplicationRouteStub(orgGUID, spaceGUID, app)
+		return fake.CreateAndMapDefaultApplicationRouteStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.createAndMapDefaultApplicationRouteReturns.result1, fake.createAndMapDefaultApplicationRouteReturns.result2
+	fakeReturns := fake.createAndMapDefaultApplicationRouteReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteCallCount() int {
@@ -54,13 +55,22 @@ func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteCallCoun
 	return len(fake.createAndMapDefaultApplicationRouteArgsForCall)
 }
 
+func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteCalls(stub func(string, string, v2action.Application) (pushaction.Warnings, error)) {
+	fake.createAndMapDefaultApplicationRouteMutex.Lock()
+	defer fake.createAndMapDefaultApplicationRouteMutex.Unlock()
+	fake.CreateAndMapDefaultApplicationRouteStub = stub
+}
+
 func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteArgsForCall(i int) (string, string, v2action.Application) {
 	fake.createAndMapDefaultApplicationRouteMutex.RLock()
 	defer fake.createAndMapDefaultApplicationRouteMutex.RUnlock()
-	return fake.createAndMapDefaultApplicationRouteArgsForCall[i].orgGUID, fake.createAndMapDefaultApplicationRouteArgsForCall[i].spaceGUID, fake.createAndMapDefaultApplicationRouteArgsForCall[i].app
+	argsForCall := fake.createAndMapDefaultApplicationRouteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteReturns(result1 pushaction.Warnings, result2 error) {
+	fake.createAndMapDefaultApplicationRouteMutex.Lock()
+	defer fake.createAndMapDefaultApplicationRouteMutex.Unlock()
 	fake.CreateAndMapDefaultApplicationRouteStub = nil
 	fake.createAndMapDefaultApplicationRouteReturns = struct {
 		result1 pushaction.Warnings
@@ -69,6 +79,8 @@ func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteReturns(
 }
 
 func (fake *FakeOriginalV2PushActor) CreateAndMapDefaultApplicationRouteReturnsOnCall(i int, result1 pushaction.Warnings, result2 error) {
+	fake.createAndMapDefaultApplicationRouteMutex.Lock()
+	defer fake.createAndMapDefaultApplicationRouteMutex.Unlock()
 	fake.CreateAndMapDefaultApplicationRouteStub = nil
 	if fake.createAndMapDefaultApplicationRouteReturnsOnCall == nil {
 		fake.createAndMapDefaultApplicationRouteReturnsOnCall = make(map[int]struct {

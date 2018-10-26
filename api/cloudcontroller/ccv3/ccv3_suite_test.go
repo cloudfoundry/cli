@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -38,14 +39,15 @@ var _ = BeforeEach(func() {
 	server.Reset()
 })
 
-func NewTestClient(config ...Config) *Client {
+func NewTestClient(config ...Config) (*Client, *ccv3fakes.FakeClock) {
 	SetupV3Response()
 	var client *Client
+	fakeClock := new(ccv3fakes.FakeClock)
 
 	if config != nil {
-		client = NewClient(config[0])
+		client = TestClient(config[0], fakeClock)
 	} else {
-		client = NewClient(Config{AppName: "CF CLI API V3 Test", AppVersion: "Unknown"})
+		client = TestClient(Config{AppName: "CF CLI API V3 Test", AppVersion: "Unknown"}, fakeClock)
 	}
 	warnings, err := client.TargetCF(TargetSettings{
 		SkipSSLValidation: true,
@@ -54,7 +56,7 @@ func NewTestClient(config ...Config) *Client {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(warnings).To(BeEmpty())
 
-	return client
+	return client, fakeClock
 }
 
 func SetupV3Response() {

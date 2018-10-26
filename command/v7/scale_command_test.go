@@ -5,13 +5,10 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v6/shared"
-	"code.cloudfoundry.org/cli/command/v6/shared/sharedfakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -32,7 +29,6 @@ var _ = Describe("scale Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v7fakes.FakeScaleActor
-		fakeV2Actor     *sharedfakes.FakeV2AppActor
 		appName         string
 		binaryName      string
 		executeErr      error
@@ -45,7 +41,6 @@ var _ = Describe("scale Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeScaleActor)
-		fakeV2Actor = new(sharedfakes.FakeV2AppActor)
 		appName = "some-app"
 
 		cmd = ScaleCommand{
@@ -53,13 +48,6 @@ var _ = Describe("scale Command", func() {
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
-			AppSummaryDisplayer: shared.AppSummaryDisplayer{
-				UI:         testUI,
-				Config:     fakeConfig,
-				Actor:      fakeActor,
-				V2AppActor: fakeV2Actor,
-				AppName:    appName,
-			},
 		}
 
 		binaryName = "faceman"
@@ -75,7 +63,6 @@ var _ = Describe("scale Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 
@@ -91,7 +78,6 @@ var _ = Describe("scale Command", func() {
 
 	When("the user is logged in, and org and space are targeted", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 			fakeConfig.HasTargetedSpaceReturns(true)
@@ -121,16 +107,15 @@ var _ = Describe("scale Command", func() {
 		When("the application does not exist", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v3action.Application{},
-					v3action.Warnings{"get-app-warning"},
+					v7action.Application{},
+					v7action.Warnings{"get-app-warning"},
 					actionerror.ApplicationNotFoundError{Name: appName})
 			})
 
 			It("returns an ApplicationNotFoundError and all warnings", func() {
 				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: appName}))
 
-				Expect(testUI.Out).ToNot(Say("Showing"))
-				Expect(testUI.Out).ToNot(Say("Scaling"))
+				Expect(testUI.Out).ToNot(Say("Showing | Scaling"))
 				Expect(testUI.Err).To(Say("get-app-warning"))
 
 				Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
@@ -146,8 +131,8 @@ var _ = Describe("scale Command", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("get app error")
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v3action.Application{},
-					v3action.Warnings{"get-app-warning"},
+					v7action.Application{},
+					v7action.Warnings{"get-app-warning"},
 					expectedErr)
 			})
 
@@ -158,19 +143,19 @@ var _ = Describe("scale Command", func() {
 		})
 
 		When("the application exists", func() {
-			var appSummary v3action.ApplicationSummary
+			var appSummary v7action.ApplicationSummary
 
 			BeforeEach(func() {
-				appSummary = v3action.ApplicationSummary{
-					ProcessSummaries: v3action.ProcessSummaries{
+				appSummary = v7action.ApplicationSummary{
+					ProcessSummaries: v7action.ProcessSummaries{
 						{
-							Process: v3action.Process{
+							Process: v7action.Process{
 								Type:       constant.ProcessTypeWeb,
 								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 							},
-							InstanceDetails: []v3action.ProcessInstance{
-								v3action.ProcessInstance{
+							InstanceDetails: []v7action.ProcessInstance{
+								v7action.ProcessInstance{
 									Index:       0,
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 1000000,
@@ -179,7 +164,7 @@ var _ = Describe("scale Command", func() {
 									DiskQuota:   2000000,
 									Uptime:      int(time.Now().Sub(time.Unix(267321600, 0)).Seconds()),
 								},
-								v3action.ProcessInstance{
+								v7action.ProcessInstance{
 									Index:       1,
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 2000000,
@@ -188,7 +173,7 @@ var _ = Describe("scale Command", func() {
 									DiskQuota:   4000000,
 									Uptime:      int(time.Now().Sub(time.Unix(330480000, 0)).Seconds()),
 								},
-								v3action.ProcessInstance{
+								v7action.ProcessInstance{
 									Index:       2,
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 3000000,
@@ -200,13 +185,13 @@ var _ = Describe("scale Command", func() {
 							},
 						},
 						{
-							Process: v3action.Process{
+							Process: v7action.Process{
 								Type:       "console",
 								MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 								DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 							},
-							InstanceDetails: []v3action.ProcessInstance{
-								v3action.ProcessInstance{
+							InstanceDetails: []v7action.ProcessInstance{
+								v7action.ProcessInstance{
 									Index:       0,
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 1000000,
@@ -221,8 +206,8 @@ var _ = Describe("scale Command", func() {
 				}
 
 				fakeActor.GetApplicationByNameAndSpaceReturns(
-					v3action.Application{GUID: "some-app-guid"},
-					v3action.Warnings{"get-app-warning"},
+					v7action.Application{GUID: "some-app-guid"},
+					v7action.Warnings{"get-app-warning"},
 					nil)
 			})
 
@@ -230,19 +215,15 @@ var _ = Describe("scale Command", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 						appSummary,
-						v3action.Warnings{"get-app-summary-warning"},
+						v7action.Warnings{"get-app-summary-warning"},
 						nil)
 				})
 
 				It("displays current scale properties and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).ToNot(Say("Scaling"))
-					Expect(testUI.Out).ToNot(Say("This will cause the app to restart"))
-					Expect(testUI.Out).ToNot(Say("Stopping"))
-					Expect(testUI.Out).ToNot(Say("Starting"))
-					Expect(testUI.Out).ToNot(Say("Waiting"))
 					Expect(testUI.Out).To(Say("Showing current scale of app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).ToNot(Say("Scaling | This will cause the app to restart | Stopping | Starting | Waiting"))
 
 					firstAppTable := helpers.ParseV3AppProcessTable(output.Contents())
 					Expect(len(firstAppTable.Processes)).To(Equal(2))
@@ -285,8 +266,8 @@ var _ = Describe("scale Command", func() {
 					BeforeEach(func() {
 						expectedErr = errors.New("get process error")
 						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
-							v3action.ApplicationSummary{},
-							v3action.Warnings{"get-process-warning"},
+							v7action.ApplicationSummary{},
+							v7action.Warnings{"get-process-warning"},
 							expectedErr,
 						)
 					})
@@ -307,11 +288,11 @@ var _ = Describe("scale Command", func() {
 					cmd.MemoryLimit.Value = 100
 					cmd.MemoryLimit.IsSet = true
 					fakeActor.ScaleProcessByApplicationReturns(
-						v3action.Warnings{"scale-warning"},
+						v7action.Warnings{"scale-warning"},
 						nil)
 					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 						appSummary,
-						v3action.Warnings{"get-instances-warning"},
+						v7action.Warnings{"get-instances-warning"},
 						nil)
 				})
 
@@ -325,13 +306,10 @@ var _ = Describe("scale Command", func() {
 						It("does not scale the app", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).ToNot(Say("Showing"))
 							Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
 							Expect(testUI.Out).To(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
 							Expect(testUI.Out).To(Say("Scaling cancelled"))
-							Expect(testUI.Out).ToNot(Say("Stopping"))
-							Expect(testUI.Out).ToNot(Say("Starting"))
-							Expect(testUI.Out).ToNot(Say("Waiting"))
+							Expect(testUI.Out).ToNot(Say("Showing | Stopping | Starting | Waiting"))
 
 							Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(0))
 						})
@@ -346,13 +324,10 @@ var _ = Describe("scale Command", func() {
 						It("does not scale the app", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).ToNot(Say("Showing"))
 							Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
 							Expect(testUI.Out).To(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
 							Expect(testUI.Out).To(Say("Scaling cancelled"))
-							Expect(testUI.Out).ToNot(Say("Stopping"))
-							Expect(testUI.Out).ToNot(Say("Starting"))
-							Expect(testUI.Out).ToNot(Say("Waiting"))
+							Expect(testUI.Out).ToNot(Say("Showing | Stopping | Starting | Waiting"))
 
 							Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(0))
 						})
@@ -366,10 +341,44 @@ var _ = Describe("scale Command", func() {
 
 						When("polling succeeds", func() {
 							BeforeEach(func() {
-								fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
-									warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+								fakeActor.PollStartStub = func(appGUID string, warnings chan<- v7action.Warnings) error {
+									warnings <- v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
 									return nil
 								}
+							})
+
+							It("delegates the right appGUID", func() {
+								actualGUID, _ := fakeActor.PollStartArgsForCall(0)
+								Expect(actualGUID).To(Equal("some-app-guid"))
+							})
+
+							When("Restarting the app fails to stop the app", func() {
+								BeforeEach(func() {
+									fakeActor.StopApplicationReturns(v7action.Warnings{"some-restart-warning"}, errors.New("stop-error"))
+								})
+
+								It("Prints warnings and returns an error", func() {
+									Expect(executeErr).To(MatchError("stop-error"))
+
+									Expect(testUI.Err).To(Say("some-restart-warning"))
+								})
+							})
+
+							When("Restarting the app fails to start the app", func() {
+								BeforeEach(func() {
+									fakeActor.StartApplicationReturns(v7action.Application{}, v7action.Warnings{"some-start-warning"}, errors.New("start-error"))
+								})
+
+								It("Delegates the correct appGUID", func() {
+									actualGUID := fakeActor.StartApplicationArgsForCall(0)
+									Expect(actualGUID).To(Equal("some-app-guid"))
+								})
+
+								It("Prints warnings and returns an error", func() {
+									Expect(executeErr).To(MatchError("start-error"))
+
+									Expect(testUI.Err).To(Say("some-start-warning"))
+								})
 							})
 
 							It("scales, restarts, and displays scale properties", func() {
@@ -426,7 +435,7 @@ var _ = Describe("scale Command", func() {
 								Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 								appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 								Expect(appGUIDArg).To(Equal("some-app-guid"))
-								Expect(scaleProcess).To(Equal(v3action.Process{
+								Expect(scaleProcess).To(Equal(v7action.Process{
 									Type:       constant.ProcessTypeWeb,
 									Instances:  types.NullInt{Value: 2, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 50, IsSet: true},
@@ -443,10 +452,15 @@ var _ = Describe("scale Command", func() {
 
 						When("polling the start fails", func() {
 							BeforeEach(func() {
-								fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
-									warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+								fakeActor.PollStartStub = func(appGUID string, warnings chan<- v7action.Warnings) error {
+									warnings <- v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
 									return errors.New("some-error")
 								}
+							})
+
+							It("delegates the right appGUID", func() {
+								actualGUID, _ := fakeActor.PollStartArgsForCall(0)
+								Expect(actualGUID).To(Equal("some-app-guid"))
 							})
 
 							It("displays all warnings and fails", func() {
@@ -460,6 +474,11 @@ var _ = Describe("scale Command", func() {
 						When("polling times out", func() {
 							BeforeEach(func() {
 								fakeActor.PollStartReturns(actionerror.StartupTimeoutError{})
+							})
+
+							It("delegates the right appGUID", func() {
+								actualGUID, _ := fakeActor.PollStartArgsForCall(0)
+								Expect(actualGUID).To(Equal("some-app-guid"))
 							})
 
 							It("returns the StartupTimeoutError", func() {
@@ -481,9 +500,9 @@ var _ = Describe("scale Command", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-						Expect(testUI.Out).NotTo(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
 						Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as some-user\\.\\.\\."))
 						Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+						Expect(testUI.Out).NotTo(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
 
 						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 						Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
@@ -499,11 +518,11 @@ var _ = Describe("scale Command", func() {
 					cmd.Instances.Value = 3
 					cmd.Instances.IsSet = true
 					fakeActor.ScaleProcessByApplicationReturns(
-						v3action.Warnings{"scale-warning"},
+						v7action.Warnings{"scale-warning"},
 						nil)
 					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 						appSummary,
-						v3action.Warnings{"get-instances-warning"},
+						v7action.Warnings{"get-instances-warning"},
 						nil)
 				})
 
@@ -511,9 +530,7 @@ var _ = Describe("scale Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).To(Say("Scaling"))
-					Expect(testUI.Out).NotTo(Say("This will cause the app to restart"))
-					Expect(testUI.Out).NotTo(Say("Stopping"))
-					Expect(testUI.Out).NotTo(Say("Starting"))
+					Expect(testUI.Out).NotTo(Say("This will cause the app to restart | Stopping | Starting"))
 
 					Expect(testUI.Err).To(Say("get-app-warning"))
 					Expect(testUI.Err).To(Say("scale-warning"))
@@ -527,7 +544,7 @@ var _ = Describe("scale Command", func() {
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(scaleProcess).To(Equal(v3action.Process{
+					Expect(scaleProcess).To(Equal(v7action.Process{
 						Type:      constant.ProcessTypeWeb,
 						Instances: types.NullInt{Value: 3, IsSet: true},
 					}))
@@ -542,11 +559,11 @@ var _ = Describe("scale Command", func() {
 					cmd.MemoryLimit.Value = 256
 					cmd.MemoryLimit.IsSet = true
 					fakeActor.ScaleProcessByApplicationReturns(
-						v3action.Warnings{"scale-warning"},
+						v7action.Warnings{"scale-warning"},
 						nil)
 					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 						appSummary,
-						v3action.Warnings{"get-instances-warning"},
+						v7action.Warnings{"get-instances-warning"},
 						nil)
 
 					_, err := input.Write([]byte("y\n"))
@@ -573,7 +590,7 @@ var _ = Describe("scale Command", func() {
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(scaleProcess).To(Equal(v3action.Process{
+					Expect(scaleProcess).To(Equal(v7action.Process{
 						Type:       constant.ProcessTypeWeb,
 						MemoryInMB: types.NullUint64{Value: 256, IsSet: true},
 					}))
@@ -595,11 +612,11 @@ var _ = Describe("scale Command", func() {
 					cmd.DiskLimit.Value = 1025
 					cmd.DiskLimit.IsSet = true
 					fakeActor.ScaleProcessByApplicationReturns(
-						v3action.Warnings{"scale-warning"},
+						v7action.Warnings{"scale-warning"},
 						nil)
 					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 						appSummary,
-						v3action.Warnings{"get-instances-warning"},
+						v7action.Warnings{"get-instances-warning"},
 						nil)
 					_, err := input.Write([]byte("y\n"))
 					Expect(err).ToNot(HaveOccurred())
@@ -625,7 +642,7 @@ var _ = Describe("scale Command", func() {
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(scaleProcess).To(Equal(v3action.Process{
+					Expect(scaleProcess).To(Equal(v7action.Process{
 						Type:     constant.ProcessTypeWeb,
 						DiskInMB: types.NullUint64{Value: 1025, IsSet: true},
 					}))
@@ -646,11 +663,11 @@ var _ = Describe("scale Command", func() {
 					cmd.Instances.Value = 2
 					cmd.Instances.IsSet = true
 					fakeActor.ScaleProcessByApplicationReturns(
-						v3action.Warnings{"scale-warning"},
+						v7action.Warnings{"scale-warning"},
 						nil)
 					fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 						appSummary,
-						v3action.Warnings{"get-instances-warning"},
+						v7action.Warnings{"get-instances-warning"},
 						nil)
 					_, err := input.Write([]byte("y\n"))
 					Expect(err).ToNot(HaveOccurred())
@@ -673,7 +690,7 @@ var _ = Describe("scale Command", func() {
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(scaleProcess).To(Equal(v3action.Process{
+					Expect(scaleProcess).To(Equal(v7action.Process{
 						Type:      "some-process-type",
 						Instances: types.NullInt{Value: 2, IsSet: true},
 					}))
@@ -688,7 +705,7 @@ var _ = Describe("scale Command", func() {
 					cmd.Instances.IsSet = true
 					expectedErr = errors.New("scale process error")
 					fakeActor.ScaleProcessByApplicationReturns(
-						v3action.Warnings{"scale-process-warning"},
+						v7action.Warnings{"scale-process-warning"},
 						expectedErr,
 					)
 				})

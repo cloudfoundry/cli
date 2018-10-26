@@ -23,20 +23,21 @@ configure_pipeline() {
     -l <(lpass show "VAT Concourse Credentials" --notes)
 }
 
-# configure_infrastructure_pipeline() {
-#   local name=$1
-#   local creds=$2
-#   local potato=$3
+configure_v7_infrastructure_pipeline() {
+  local name=$1
+  local creds=$2
+  local potato=$3
 
-#   printf "configuring the $name pipeline...\n"
+  printf "configuring the $name pipeline...\n"
 
-#   fly -t ci set-pipeline \
-#     -p $name \
-#     -c $pipelines_path/infrastructure/pipeline.yml \
-#     -l <(lpass show "Concourse Credentials" --notes) \
-#     -l <(lpass show "$creds" --notes) \
-#     -v pool-name=$potato
-# }
+  fly -t ci set-pipeline \
+    -p $name \
+    -c $pipelines_path/infrastructure/v7-pipeline.yml \
+    -l <(lpass show "Concourse Credentials" --notes) \
+    -l <(lpass show "$creds" --notes) \
+    -v pool-name=$potato
+}
+
 
 check_installed lpass
 check_installed fly
@@ -48,4 +49,5 @@ pipelines_path=$(cd $(dirname $0)/.. && pwd)
 
 configure_pipeline V7 $pipelines_path/cli-v7/pipeline.yml
 
-# configure_infrastructure_pipeline inf-beque beque-pipeline baked-potato
+configure_v7_infrastructure_pipeline inf-delfina delfina-pipeline mashed-potato
+configure_v7_infrastructure_pipeline inf-nopa nopa-pipeline mashed-potato

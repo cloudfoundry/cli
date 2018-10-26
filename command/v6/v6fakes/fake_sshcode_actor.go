@@ -2,16 +2,17 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/command/v6"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeSSHCodeActor struct {
 	GetSSHPasscodeStub        func() (string, error)
 	getSSHPasscodeMutex       sync.RWMutex
-	getSSHPasscodeArgsForCall []struct{}
-	getSSHPasscodeReturns     struct {
+	getSSHPasscodeArgsForCall []struct {
+	}
+	getSSHPasscodeReturns struct {
 		result1 string
 		result2 error
 	}
@@ -26,7 +27,8 @@ type FakeSSHCodeActor struct {
 func (fake *FakeSSHCodeActor) GetSSHPasscode() (string, error) {
 	fake.getSSHPasscodeMutex.Lock()
 	ret, specificReturn := fake.getSSHPasscodeReturnsOnCall[len(fake.getSSHPasscodeArgsForCall)]
-	fake.getSSHPasscodeArgsForCall = append(fake.getSSHPasscodeArgsForCall, struct{}{})
+	fake.getSSHPasscodeArgsForCall = append(fake.getSSHPasscodeArgsForCall, struct {
+	}{})
 	fake.recordInvocation("GetSSHPasscode", []interface{}{})
 	fake.getSSHPasscodeMutex.Unlock()
 	if fake.GetSSHPasscodeStub != nil {
@@ -35,7 +37,8 @@ func (fake *FakeSSHCodeActor) GetSSHPasscode() (string, error) {
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.getSSHPasscodeReturns.result1, fake.getSSHPasscodeReturns.result2
+	fakeReturns := fake.getSSHPasscodeReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeSSHCodeActor) GetSSHPasscodeCallCount() int {
@@ -44,7 +47,15 @@ func (fake *FakeSSHCodeActor) GetSSHPasscodeCallCount() int {
 	return len(fake.getSSHPasscodeArgsForCall)
 }
 
+func (fake *FakeSSHCodeActor) GetSSHPasscodeCalls(stub func() (string, error)) {
+	fake.getSSHPasscodeMutex.Lock()
+	defer fake.getSSHPasscodeMutex.Unlock()
+	fake.GetSSHPasscodeStub = stub
+}
+
 func (fake *FakeSSHCodeActor) GetSSHPasscodeReturns(result1 string, result2 error) {
+	fake.getSSHPasscodeMutex.Lock()
+	defer fake.getSSHPasscodeMutex.Unlock()
 	fake.GetSSHPasscodeStub = nil
 	fake.getSSHPasscodeReturns = struct {
 		result1 string
@@ -53,6 +64,8 @@ func (fake *FakeSSHCodeActor) GetSSHPasscodeReturns(result1 string, result2 erro
 }
 
 func (fake *FakeSSHCodeActor) GetSSHPasscodeReturnsOnCall(i int, result1 string, result2 error) {
+	fake.getSSHPasscodeMutex.Lock()
+	defer fake.getSSHPasscodeMutex.Unlock()
 	fake.GetSSHPasscodeStub = nil
 	if fake.getSSHPasscodeReturnsOnCall == nil {
 		fake.getSSHPasscodeReturnsOnCall = make(map[int]struct {

@@ -2,28 +2,29 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeV3SetDropletActor struct {
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	SetApplicationDropletByApplicationNameAndSpaceStub        func(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
+	SetApplicationDropletByApplicationNameAndSpaceStub        func(string, string, string) (v3action.Warnings, error)
 	setApplicationDropletByApplicationNameAndSpaceMutex       sync.RWMutex
 	setApplicationDropletByApplicationNameAndSpaceArgsForCall []struct {
-		appName     string
-		spaceGUID   string
-		dropletGUID string
+		arg1 string
+		arg2 string
+		arg3 string
 	}
 	setApplicationDropletByApplicationNameAndSpaceReturns struct {
 		result1 v3action.Warnings
@@ -40,7 +41,8 @@ type FakeV3SetDropletActor struct {
 func (fake *FakeV3SetDropletActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -49,7 +51,8 @@ func (fake *FakeV3SetDropletActor) CloudControllerAPIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeV3SetDropletActor) CloudControllerAPIVersionCallCount() int {
@@ -58,7 +61,15 @@ func (fake *FakeV3SetDropletActor) CloudControllerAPIVersionCallCount() int {
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeV3SetDropletActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeV3SetDropletActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -66,6 +77,8 @@ func (fake *FakeV3SetDropletActor) CloudControllerAPIVersionReturns(result1 stri
 }
 
 func (fake *FakeV3SetDropletActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -77,23 +90,24 @@ func (fake *FakeV3SetDropletActor) CloudControllerAPIVersionReturnsOnCall(i int,
 	}{result1}
 }
 
-func (fake *FakeV3SetDropletActor) SetApplicationDropletByApplicationNameAndSpace(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error) {
+func (fake *FakeV3SetDropletActor) SetApplicationDropletByApplicationNameAndSpace(arg1 string, arg2 string, arg3 string) (v3action.Warnings, error) {
 	fake.setApplicationDropletByApplicationNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.setApplicationDropletByApplicationNameAndSpaceReturnsOnCall[len(fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall)]
 	fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall = append(fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall, struct {
-		appName     string
-		spaceGUID   string
-		dropletGUID string
-	}{appName, spaceGUID, dropletGUID})
-	fake.recordInvocation("SetApplicationDropletByApplicationNameAndSpace", []interface{}{appName, spaceGUID, dropletGUID})
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("SetApplicationDropletByApplicationNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.setApplicationDropletByApplicationNameAndSpaceMutex.Unlock()
 	if fake.SetApplicationDropletByApplicationNameAndSpaceStub != nil {
-		return fake.SetApplicationDropletByApplicationNameAndSpaceStub(appName, spaceGUID, dropletGUID)
+		return fake.SetApplicationDropletByApplicationNameAndSpaceStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.setApplicationDropletByApplicationNameAndSpaceReturns.result1, fake.setApplicationDropletByApplicationNameAndSpaceReturns.result2
+	fakeReturns := fake.setApplicationDropletByApplicationNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeV3SetDropletActor) SetApplicationDropletByApplicationNameAndSpaceCallCount() int {
@@ -102,13 +116,22 @@ func (fake *FakeV3SetDropletActor) SetApplicationDropletByApplicationNameAndSpac
 	return len(fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall)
 }
 
+func (fake *FakeV3SetDropletActor) SetApplicationDropletByApplicationNameAndSpaceCalls(stub func(string, string, string) (v3action.Warnings, error)) {
+	fake.setApplicationDropletByApplicationNameAndSpaceMutex.Lock()
+	defer fake.setApplicationDropletByApplicationNameAndSpaceMutex.Unlock()
+	fake.SetApplicationDropletByApplicationNameAndSpaceStub = stub
+}
+
 func (fake *FakeV3SetDropletActor) SetApplicationDropletByApplicationNameAndSpaceArgsForCall(i int) (string, string, string) {
 	fake.setApplicationDropletByApplicationNameAndSpaceMutex.RLock()
 	defer fake.setApplicationDropletByApplicationNameAndSpaceMutex.RUnlock()
-	return fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall[i].appName, fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall[i].spaceGUID, fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall[i].dropletGUID
+	argsForCall := fake.setApplicationDropletByApplicationNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeV3SetDropletActor) SetApplicationDropletByApplicationNameAndSpaceReturns(result1 v3action.Warnings, result2 error) {
+	fake.setApplicationDropletByApplicationNameAndSpaceMutex.Lock()
+	defer fake.setApplicationDropletByApplicationNameAndSpaceMutex.Unlock()
 	fake.SetApplicationDropletByApplicationNameAndSpaceStub = nil
 	fake.setApplicationDropletByApplicationNameAndSpaceReturns = struct {
 		result1 v3action.Warnings
@@ -117,6 +140,8 @@ func (fake *FakeV3SetDropletActor) SetApplicationDropletByApplicationNameAndSpac
 }
 
 func (fake *FakeV3SetDropletActor) SetApplicationDropletByApplicationNameAndSpaceReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
+	fake.setApplicationDropletByApplicationNameAndSpaceMutex.Lock()
+	defer fake.setApplicationDropletByApplicationNameAndSpaceMutex.Unlock()
 	fake.SetApplicationDropletByApplicationNameAndSpaceStub = nil
 	if fake.setApplicationDropletByApplicationNameAndSpaceReturnsOnCall == nil {
 		fake.setApplicationDropletByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {

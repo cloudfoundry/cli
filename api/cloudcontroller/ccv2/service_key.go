@@ -51,6 +51,8 @@ type serviceKeyRequestBody struct {
 	Parameters          map[string]interface{} `json:"parameters,omitempty"`
 }
 
+// CreateServiceKey creates a new service key using the provided name and
+// parameters for the requested service instance.
 func (client *Client) CreateServiceKey(serviceInstanceGUID string, keyName string, parameters map[string]interface{}) (ServiceKey, Warnings, error) {
 	requestBody := serviceKeyRequestBody{
 		ServiceInstanceGUID: serviceInstanceGUID,

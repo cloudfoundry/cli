@@ -2,28 +2,29 @@
 package sharedfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2v3action"
-	"code.cloudfoundry.org/cli/command/v6/shared"
+	v2v3action "code.cloudfoundry.org/cli/actor/v2v3action"
+	shared "code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 type FakeApplicationSummaryActor struct {
 	CloudControllerV3APIVersionStub        func() string
 	cloudControllerV3APIVersionMutex       sync.RWMutex
-	cloudControllerV3APIVersionArgsForCall []struct{}
-	cloudControllerV3APIVersionReturns     struct {
+	cloudControllerV3APIVersionArgsForCall []struct {
+	}
+	cloudControllerV3APIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerV3APIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetApplicationSummaryByNameAndSpaceStub        func(appName string, spaceGUID string, withObfuscatedValues bool) (v2v3action.ApplicationSummary, v2v3action.Warnings, error)
+	GetApplicationSummaryByNameAndSpaceStub        func(string, string, bool) (v2v3action.ApplicationSummary, v2v3action.Warnings, error)
 	getApplicationSummaryByNameAndSpaceMutex       sync.RWMutex
 	getApplicationSummaryByNameAndSpaceArgsForCall []struct {
-		appName              string
-		spaceGUID            string
-		withObfuscatedValues bool
+		arg1 string
+		arg2 string
+		arg3 bool
 	}
 	getApplicationSummaryByNameAndSpaceReturns struct {
 		result1 v2v3action.ApplicationSummary
@@ -42,7 +43,8 @@ type FakeApplicationSummaryActor struct {
 func (fake *FakeApplicationSummaryActor) CloudControllerV3APIVersion() string {
 	fake.cloudControllerV3APIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerV3APIVersionReturnsOnCall[len(fake.cloudControllerV3APIVersionArgsForCall)]
-	fake.cloudControllerV3APIVersionArgsForCall = append(fake.cloudControllerV3APIVersionArgsForCall, struct{}{})
+	fake.cloudControllerV3APIVersionArgsForCall = append(fake.cloudControllerV3APIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerV3APIVersion", []interface{}{})
 	fake.cloudControllerV3APIVersionMutex.Unlock()
 	if fake.CloudControllerV3APIVersionStub != nil {
@@ -51,7 +53,8 @@ func (fake *FakeApplicationSummaryActor) CloudControllerV3APIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerV3APIVersionReturns.result1
+	fakeReturns := fake.cloudControllerV3APIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeApplicationSummaryActor) CloudControllerV3APIVersionCallCount() int {
@@ -60,7 +63,15 @@ func (fake *FakeApplicationSummaryActor) CloudControllerV3APIVersionCallCount() 
 	return len(fake.cloudControllerV3APIVersionArgsForCall)
 }
 
+func (fake *FakeApplicationSummaryActor) CloudControllerV3APIVersionCalls(stub func() string) {
+	fake.cloudControllerV3APIVersionMutex.Lock()
+	defer fake.cloudControllerV3APIVersionMutex.Unlock()
+	fake.CloudControllerV3APIVersionStub = stub
+}
+
 func (fake *FakeApplicationSummaryActor) CloudControllerV3APIVersionReturns(result1 string) {
+	fake.cloudControllerV3APIVersionMutex.Lock()
+	defer fake.cloudControllerV3APIVersionMutex.Unlock()
 	fake.CloudControllerV3APIVersionStub = nil
 	fake.cloudControllerV3APIVersionReturns = struct {
 		result1 string
@@ -68,6 +79,8 @@ func (fake *FakeApplicationSummaryActor) CloudControllerV3APIVersionReturns(resu
 }
 
 func (fake *FakeApplicationSummaryActor) CloudControllerV3APIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerV3APIVersionMutex.Lock()
+	defer fake.cloudControllerV3APIVersionMutex.Unlock()
 	fake.CloudControllerV3APIVersionStub = nil
 	if fake.cloudControllerV3APIVersionReturnsOnCall == nil {
 		fake.cloudControllerV3APIVersionReturnsOnCall = make(map[int]struct {
@@ -79,23 +92,24 @@ func (fake *FakeApplicationSummaryActor) CloudControllerV3APIVersionReturnsOnCal
 	}{result1}
 }
 
-func (fake *FakeApplicationSummaryActor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool) (v2v3action.ApplicationSummary, v2v3action.Warnings, error) {
+func (fake *FakeApplicationSummaryActor) GetApplicationSummaryByNameAndSpace(arg1 string, arg2 string, arg3 bool) (v2v3action.ApplicationSummary, v2v3action.Warnings, error) {
 	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationSummaryByNameAndSpaceReturnsOnCall[len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)]
 	fake.getApplicationSummaryByNameAndSpaceArgsForCall = append(fake.getApplicationSummaryByNameAndSpaceArgsForCall, struct {
-		appName              string
-		spaceGUID            string
-		withObfuscatedValues bool
-	}{appName, spaceGUID, withObfuscatedValues})
-	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{appName, spaceGUID, withObfuscatedValues})
+		arg1 string
+		arg2 string
+		arg3 bool
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetApplicationSummaryByNameAndSpace", []interface{}{arg1, arg2, arg3})
 	fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationSummaryByNameAndSpaceStub != nil {
-		return fake.GetApplicationSummaryByNameAndSpaceStub(appName, spaceGUID, withObfuscatedValues)
+		return fake.GetApplicationSummaryByNameAndSpaceStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationSummaryByNameAndSpaceReturns.result1, fake.getApplicationSummaryByNameAndSpaceReturns.result2, fake.getApplicationSummaryByNameAndSpaceReturns.result3
+	fakeReturns := fake.getApplicationSummaryByNameAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeApplicationSummaryActor) GetApplicationSummaryByNameAndSpaceCallCount() int {
@@ -104,13 +118,22 @@ func (fake *FakeApplicationSummaryActor) GetApplicationSummaryByNameAndSpaceCall
 	return len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)
 }
 
+func (fake *FakeApplicationSummaryActor) GetApplicationSummaryByNameAndSpaceCalls(stub func(string, string, bool) (v2v3action.ApplicationSummary, v2v3action.Warnings, error)) {
+	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
+	fake.GetApplicationSummaryByNameAndSpaceStub = stub
+}
+
 func (fake *FakeApplicationSummaryActor) GetApplicationSummaryByNameAndSpaceArgsForCall(i int) (string, string, bool) {
 	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
-	return fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].appName, fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].spaceGUID, fake.getApplicationSummaryByNameAndSpaceArgsForCall[i].withObfuscatedValues
+	argsForCall := fake.getApplicationSummaryByNameAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeApplicationSummaryActor) GetApplicationSummaryByNameAndSpaceReturns(result1 v2v3action.ApplicationSummary, result2 v2v3action.Warnings, result3 error) {
+	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationSummaryByNameAndSpaceStub = nil
 	fake.getApplicationSummaryByNameAndSpaceReturns = struct {
 		result1 v2v3action.ApplicationSummary
@@ -120,6 +143,8 @@ func (fake *FakeApplicationSummaryActor) GetApplicationSummaryByNameAndSpaceRetu
 }
 
 func (fake *FakeApplicationSummaryActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i int, result1 v2v3action.ApplicationSummary, result2 v2v3action.Warnings, result3 error) {
+	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
+	defer fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
 	fake.GetApplicationSummaryByNameAndSpaceStub = nil
 	if fake.getApplicationSummaryByNameAndSpaceReturnsOnCall == nil {
 		fake.getApplicationSummaryByNameAndSpaceReturnsOnCall = make(map[int]struct {

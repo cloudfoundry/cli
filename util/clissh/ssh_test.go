@@ -16,6 +16,7 @@ import (
 	"syscall"
 	"time"
 
+	. "code.cloudfoundry.org/cli/util/clissh"
 	"code.cloudfoundry.org/cli/util/clissh/clisshfakes"
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"code.cloudfoundry.org/diego-ssh/server"
@@ -27,11 +28,9 @@ import (
 	"code.cloudfoundry.org/lager/lagertest"
 	"github.com/kr/pty"
 	"github.com/moby/moby/pkg/term"
-	"golang.org/x/crypto/ssh"
-
-	. "code.cloudfoundry.org/cli/util/clissh"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"golang.org/x/crypto/ssh"
 )
 
 func BlockAcceptOnClose(fake *fake_net.FakeListener) {
@@ -260,7 +259,7 @@ var _ = Describe("CLI SSH", func() {
 
 				It("returns an error'", func() {
 					err := callback("", addr, TestHostKey.PublicKey())
-					Expect(err).To(MatchError(MatchRegexp("Host key verification failed\\.")))
+					Expect(err).To(MatchError(MatchRegexp(`Host key verification failed\.`)))
 					Expect(err).To(MatchError(MatchRegexp("The fingerprint of the received key was \".*\"")))
 				})
 			})
@@ -272,7 +271,7 @@ var _ = Describe("CLI SSH", func() {
 
 				It("returns an error'", func() {
 					err := callback("", addr, TestHostKey.PublicKey())
-					Expect(err).To(MatchError(MatchRegexp("Host key verification failed\\.")))
+					Expect(err).To(MatchError(MatchRegexp(`Host key verification failed\.`)))
 					Expect(err).To(MatchError(MatchRegexp("The fingerprint of the received key was \".*\"")))
 				})
 			})
@@ -284,7 +283,7 @@ var _ = Describe("CLI SSH", func() {
 
 				It("returns an error'", func() {
 					err := callback("", addr, TestHostKey.PublicKey())
-					Expect(err).To(MatchError(MatchRegexp("Host key verification failed\\.")))
+					Expect(err).To(MatchError(MatchRegexp(`Host key verification failed\.`)))
 					Expect(err).To(MatchError(MatchRegexp("The fingerprint of the received key was \".*\"")))
 				})
 			})
@@ -297,7 +296,7 @@ var _ = Describe("CLI SSH", func() {
 
 				It("returns an error'", func() {
 					err := callback("", addr, TestHostKey.PublicKey())
-					Expect(err).To(MatchError(MatchRegexp("Unable to verify identity of host\\.")))
+					Expect(err).To(MatchError(MatchRegexp(`Unable to verify identity of host\.`)))
 					Expect(err).To(MatchError(MatchRegexp("The fingerprint of the received key was \".*\"")))
 				})
 			})

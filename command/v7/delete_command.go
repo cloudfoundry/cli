@@ -3,7 +3,7 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -13,7 +13,7 @@ import (
 
 type DeleteActor interface {
 	CloudControllerAPIVersion() string
-	DeleteApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Warnings, error)
+	DeleteApplicationByNameAndSpace(name string, spaceGUID string) (v7action.Warnings, error)
 }
 
 type DeleteCommand struct {
@@ -38,14 +38,14 @@ func (cmd *DeleteCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
+	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
 
 	return nil
 }
 
 func (cmd DeleteCommand) Execute(args []string) error {
 	if cmd.DeleteMappedRoutes {
-		cmd.UI.DisplayWarning("-r flag not implemented - the mapped routes will not be deleted")
+		cmd.UI.DisplayWarning("-r flag not implemented - the mapped routes will not be deleted. Use `delete-orphaned-routes` instead.")
 	}
 
 	err := cmd.SharedActor.CheckTarget(true, true)

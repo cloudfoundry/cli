@@ -2,17 +2,18 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeIsolationSegmentsActor struct {
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
@@ -20,8 +21,9 @@ type FakeIsolationSegmentsActor struct {
 	}
 	GetIsolationSegmentSummariesStub        func() ([]v3action.IsolationSegmentSummary, v3action.Warnings, error)
 	getIsolationSegmentSummariesMutex       sync.RWMutex
-	getIsolationSegmentSummariesArgsForCall []struct{}
-	getIsolationSegmentSummariesReturns     struct {
+	getIsolationSegmentSummariesArgsForCall []struct {
+	}
+	getIsolationSegmentSummariesReturns struct {
 		result1 []v3action.IsolationSegmentSummary
 		result2 v3action.Warnings
 		result3 error
@@ -38,7 +40,8 @@ type FakeIsolationSegmentsActor struct {
 func (fake *FakeIsolationSegmentsActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -47,7 +50,8 @@ func (fake *FakeIsolationSegmentsActor) CloudControllerAPIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeIsolationSegmentsActor) CloudControllerAPIVersionCallCount() int {
@@ -56,7 +60,15 @@ func (fake *FakeIsolationSegmentsActor) CloudControllerAPIVersionCallCount() int
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeIsolationSegmentsActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeIsolationSegmentsActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -64,6 +76,8 @@ func (fake *FakeIsolationSegmentsActor) CloudControllerAPIVersionReturns(result1
 }
 
 func (fake *FakeIsolationSegmentsActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -78,7 +92,8 @@ func (fake *FakeIsolationSegmentsActor) CloudControllerAPIVersionReturnsOnCall(i
 func (fake *FakeIsolationSegmentsActor) GetIsolationSegmentSummaries() ([]v3action.IsolationSegmentSummary, v3action.Warnings, error) {
 	fake.getIsolationSegmentSummariesMutex.Lock()
 	ret, specificReturn := fake.getIsolationSegmentSummariesReturnsOnCall[len(fake.getIsolationSegmentSummariesArgsForCall)]
-	fake.getIsolationSegmentSummariesArgsForCall = append(fake.getIsolationSegmentSummariesArgsForCall, struct{}{})
+	fake.getIsolationSegmentSummariesArgsForCall = append(fake.getIsolationSegmentSummariesArgsForCall, struct {
+	}{})
 	fake.recordInvocation("GetIsolationSegmentSummaries", []interface{}{})
 	fake.getIsolationSegmentSummariesMutex.Unlock()
 	if fake.GetIsolationSegmentSummariesStub != nil {
@@ -87,7 +102,8 @@ func (fake *FakeIsolationSegmentsActor) GetIsolationSegmentSummaries() ([]v3acti
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getIsolationSegmentSummariesReturns.result1, fake.getIsolationSegmentSummariesReturns.result2, fake.getIsolationSegmentSummariesReturns.result3
+	fakeReturns := fake.getIsolationSegmentSummariesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeIsolationSegmentsActor) GetIsolationSegmentSummariesCallCount() int {
@@ -96,7 +112,15 @@ func (fake *FakeIsolationSegmentsActor) GetIsolationSegmentSummariesCallCount() 
 	return len(fake.getIsolationSegmentSummariesArgsForCall)
 }
 
+func (fake *FakeIsolationSegmentsActor) GetIsolationSegmentSummariesCalls(stub func() ([]v3action.IsolationSegmentSummary, v3action.Warnings, error)) {
+	fake.getIsolationSegmentSummariesMutex.Lock()
+	defer fake.getIsolationSegmentSummariesMutex.Unlock()
+	fake.GetIsolationSegmentSummariesStub = stub
+}
+
 func (fake *FakeIsolationSegmentsActor) GetIsolationSegmentSummariesReturns(result1 []v3action.IsolationSegmentSummary, result2 v3action.Warnings, result3 error) {
+	fake.getIsolationSegmentSummariesMutex.Lock()
+	defer fake.getIsolationSegmentSummariesMutex.Unlock()
 	fake.GetIsolationSegmentSummariesStub = nil
 	fake.getIsolationSegmentSummariesReturns = struct {
 		result1 []v3action.IsolationSegmentSummary
@@ -106,6 +130,8 @@ func (fake *FakeIsolationSegmentsActor) GetIsolationSegmentSummariesReturns(resu
 }
 
 func (fake *FakeIsolationSegmentsActor) GetIsolationSegmentSummariesReturnsOnCall(i int, result1 []v3action.IsolationSegmentSummary, result2 v3action.Warnings, result3 error) {
+	fake.getIsolationSegmentSummariesMutex.Lock()
+	defer fake.getIsolationSegmentSummariesMutex.Unlock()
 	fake.GetIsolationSegmentSummariesStub = nil
 	if fake.getIsolationSegmentSummariesReturnsOnCall == nil {
 		fake.getIsolationSegmentSummariesReturnsOnCall = make(map[int]struct {

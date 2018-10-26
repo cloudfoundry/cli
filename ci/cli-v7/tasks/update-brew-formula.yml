@@ -1,0 +1,88 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-package
+
+inputs:
+- name: cli
+- name: homebrew-tap
+
+outputs:
+- name: update-brew-formula-output
+
+params:
+  OUTPUT_PATH: update-brew-formula-output
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    VERSION=$(cat cli/BUILD_VERSION_V7)
+
+    mkdir cf-cli-osx-tarball cf-cli-linux-tarball
+    curl -L "https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=${VERSION}&source=github-rel" > cf-cli-osx-tarball/cf-cli_${VERSION}_osx.tgz
+    curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${VERSION}&source=github-rel" > cf-cli-linux-tarball/cf-cli_${VERSION}_linux64.tgz
+
+    pushd cf-cli-osx-tarball
+      CLI_OSX_SHA256=$(shasum -a 256 cf-cli_*_osx.tgz | cut -d ' ' -f 1)
+    popd
+
+    pushd cf-cli-linux-tarball
+      CLI_LINUX_64_SHA256=$(shasum -a 256 cf-cli_*_linux64.tgz | cut -d ' ' -f 1)
+    popd
+
+    pushd homebrew-tap
+      cat <<EOF > cf7-cli.rb
+    require 'formula'
+
+    class Cf7Cli < Formula
+      homepage 'https://code.cloudfoundry.org/cli'
+      version '${VERSION}'
+
+      if OS.mac?
+        head 'https://packages.cloudfoundry.org/edge?arch=macosx64&source=homebrew'
+        url 'https://packages.cloudfoundry.org/homebrew/cf-${VERSION}.tgz'
+        sha256 '${CLI_OSX_SHA256}'
+      elsif OS.linux?
+        head 'https://packages.cloudfoundry.org/edge?arch=linux64&source=homebrew'
+        url 'https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${VERSION}&source=homebrew'
+        sha256 '${CLI_LINUX_64_SHA256}'
+      end
+
+      depends_on :arch => :x86_64
+
+      def install
+        bin.install 'cf7'
+        (bash_completion/"cf7-cli").write <<-completion
+    $(cat ../cli/ci/installers/completion/cf7)
+        completion
+        doc.install 'LICENSE'
+        doc.install 'NOTICE'
+      end
+
+      test do
+        system "#{bin}/cf7"
+      end
+    end
+    EOF
+
+    git add cf7-cli.rb
+    if ! [ -z "$(git status --porcelain)"];
+    then
+      git config --global user.email "cf-cli-eng@pivotal.io"
+      git config --global user.name "Concourse CI"
+      git commit -m "Release ${VERSION}"
+    else
+        echo "no new version to commit"
+    fi
+    cat cf7-cli.rb
+    popd
+
+    cp -R homebrew-tap $OUTPUT_PATH
+

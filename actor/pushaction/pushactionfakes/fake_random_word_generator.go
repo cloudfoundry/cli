@@ -2,16 +2,17 @@
 package pushactionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/pushaction"
+	pushaction "code.cloudfoundry.org/cli/actor/pushaction"
 )
 
 type FakeRandomWordGenerator struct {
 	RandomAdjectiveStub        func() string
 	randomAdjectiveMutex       sync.RWMutex
-	randomAdjectiveArgsForCall []struct{}
-	randomAdjectiveReturns     struct {
+	randomAdjectiveArgsForCall []struct {
+	}
+	randomAdjectiveReturns struct {
 		result1 string
 	}
 	randomAdjectiveReturnsOnCall map[int]struct {
@@ -19,8 +20,9 @@ type FakeRandomWordGenerator struct {
 	}
 	RandomNounStub        func() string
 	randomNounMutex       sync.RWMutex
-	randomNounArgsForCall []struct{}
-	randomNounReturns     struct {
+	randomNounArgsForCall []struct {
+	}
+	randomNounReturns struct {
 		result1 string
 	}
 	randomNounReturnsOnCall map[int]struct {
@@ -33,7 +35,8 @@ type FakeRandomWordGenerator struct {
 func (fake *FakeRandomWordGenerator) RandomAdjective() string {
 	fake.randomAdjectiveMutex.Lock()
 	ret, specificReturn := fake.randomAdjectiveReturnsOnCall[len(fake.randomAdjectiveArgsForCall)]
-	fake.randomAdjectiveArgsForCall = append(fake.randomAdjectiveArgsForCall, struct{}{})
+	fake.randomAdjectiveArgsForCall = append(fake.randomAdjectiveArgsForCall, struct {
+	}{})
 	fake.recordInvocation("RandomAdjective", []interface{}{})
 	fake.randomAdjectiveMutex.Unlock()
 	if fake.RandomAdjectiveStub != nil {
@@ -42,7 +45,8 @@ func (fake *FakeRandomWordGenerator) RandomAdjective() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.randomAdjectiveReturns.result1
+	fakeReturns := fake.randomAdjectiveReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeRandomWordGenerator) RandomAdjectiveCallCount() int {
@@ -51,7 +55,15 @@ func (fake *FakeRandomWordGenerator) RandomAdjectiveCallCount() int {
 	return len(fake.randomAdjectiveArgsForCall)
 }
 
+func (fake *FakeRandomWordGenerator) RandomAdjectiveCalls(stub func() string) {
+	fake.randomAdjectiveMutex.Lock()
+	defer fake.randomAdjectiveMutex.Unlock()
+	fake.RandomAdjectiveStub = stub
+}
+
 func (fake *FakeRandomWordGenerator) RandomAdjectiveReturns(result1 string) {
+	fake.randomAdjectiveMutex.Lock()
+	defer fake.randomAdjectiveMutex.Unlock()
 	fake.RandomAdjectiveStub = nil
 	fake.randomAdjectiveReturns = struct {
 		result1 string
@@ -59,6 +71,8 @@ func (fake *FakeRandomWordGenerator) RandomAdjectiveReturns(result1 string) {
 }
 
 func (fake *FakeRandomWordGenerator) RandomAdjectiveReturnsOnCall(i int, result1 string) {
+	fake.randomAdjectiveMutex.Lock()
+	defer fake.randomAdjectiveMutex.Unlock()
 	fake.RandomAdjectiveStub = nil
 	if fake.randomAdjectiveReturnsOnCall == nil {
 		fake.randomAdjectiveReturnsOnCall = make(map[int]struct {
@@ -73,7 +87,8 @@ func (fake *FakeRandomWordGenerator) RandomAdjectiveReturnsOnCall(i int, result1
 func (fake *FakeRandomWordGenerator) RandomNoun() string {
 	fake.randomNounMutex.Lock()
 	ret, specificReturn := fake.randomNounReturnsOnCall[len(fake.randomNounArgsForCall)]
-	fake.randomNounArgsForCall = append(fake.randomNounArgsForCall, struct{}{})
+	fake.randomNounArgsForCall = append(fake.randomNounArgsForCall, struct {
+	}{})
 	fake.recordInvocation("RandomNoun", []interface{}{})
 	fake.randomNounMutex.Unlock()
 	if fake.RandomNounStub != nil {
@@ -82,7 +97,8 @@ func (fake *FakeRandomWordGenerator) RandomNoun() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.randomNounReturns.result1
+	fakeReturns := fake.randomNounReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeRandomWordGenerator) RandomNounCallCount() int {
@@ -91,7 +107,15 @@ func (fake *FakeRandomWordGenerator) RandomNounCallCount() int {
 	return len(fake.randomNounArgsForCall)
 }
 
+func (fake *FakeRandomWordGenerator) RandomNounCalls(stub func() string) {
+	fake.randomNounMutex.Lock()
+	defer fake.randomNounMutex.Unlock()
+	fake.RandomNounStub = stub
+}
+
 func (fake *FakeRandomWordGenerator) RandomNounReturns(result1 string) {
+	fake.randomNounMutex.Lock()
+	defer fake.randomNounMutex.Unlock()
 	fake.RandomNounStub = nil
 	fake.randomNounReturns = struct {
 		result1 string
@@ -99,6 +123,8 @@ func (fake *FakeRandomWordGenerator) RandomNounReturns(result1 string) {
 }
 
 func (fake *FakeRandomWordGenerator) RandomNounReturnsOnCall(i int, result1 string) {
+	fake.randomNounMutex.Lock()
+	defer fake.randomNounMutex.Unlock()
 	fake.RandomNounStub = nil
 	if fake.randomNounReturnsOnCall == nil {
 		fake.randomNounReturnsOnCall = make(map[int]struct {

@@ -2,20 +2,20 @@
 package commonfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/api/plugin"
-	"code.cloudfoundry.org/cli/command/common"
-	"code.cloudfoundry.org/cli/util/configv3"
+	pluginaction "code.cloudfoundry.org/cli/actor/pluginaction"
+	plugin "code.cloudfoundry.org/cli/api/plugin"
+	common "code.cloudfoundry.org/cli/command/common"
+	configv3 "code.cloudfoundry.org/cli/util/configv3"
 )
 
 type FakeInstallPluginActor struct {
-	CreateExecutableCopyStub        func(path string, tempPluginDir string) (string, error)
+	CreateExecutableCopyStub        func(string, string) (string, error)
 	createExecutableCopyMutex       sync.RWMutex
 	createExecutableCopyArgsForCall []struct {
-		path          string
-		tempPluginDir string
+		arg1 string
+		arg2 string
 	}
 	createExecutableCopyReturns struct {
 		result1 string
@@ -25,12 +25,12 @@ type FakeInstallPluginActor struct {
 		result1 string
 		result2 error
 	}
-	DownloadExecutableBinaryFromURLStub        func(url string, tempPluginDir string, proxyReader plugin.ProxyReader) (string, error)
+	DownloadExecutableBinaryFromURLStub        func(string, string, plugin.ProxyReader) (string, error)
 	downloadExecutableBinaryFromURLMutex       sync.RWMutex
 	downloadExecutableBinaryFromURLArgsForCall []struct {
-		url           string
-		tempPluginDir string
-		proxyReader   plugin.ProxyReader
+		arg1 string
+		arg2 string
+		arg3 plugin.ProxyReader
 	}
 	downloadExecutableBinaryFromURLReturns struct {
 		result1 string
@@ -40,10 +40,10 @@ type FakeInstallPluginActor struct {
 		result1 string
 		result2 error
 	}
-	FileExistsStub        func(path string) bool
+	FileExistsStub        func(string) bool
 	fileExistsMutex       sync.RWMutex
 	fileExistsArgsForCall []struct {
-		path string
+		arg1 string
 	}
 	fileExistsReturns struct {
 		result1 bool
@@ -51,12 +51,12 @@ type FakeInstallPluginActor struct {
 	fileExistsReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	GetAndValidatePluginStub        func(metadata pluginaction.PluginMetadata, commands pluginaction.CommandList, path string) (configv3.Plugin, error)
+	GetAndValidatePluginStub        func(pluginaction.PluginMetadata, pluginaction.CommandList, string) (configv3.Plugin, error)
 	getAndValidatePluginMutex       sync.RWMutex
 	getAndValidatePluginArgsForCall []struct {
-		metadata pluginaction.PluginMetadata
-		commands pluginaction.CommandList
-		path     string
+		arg1 pluginaction.PluginMetadata
+		arg2 pluginaction.CommandList
+		arg3 string
 	}
 	getAndValidatePluginReturns struct {
 		result1 configv3.Plugin
@@ -66,11 +66,11 @@ type FakeInstallPluginActor struct {
 		result1 configv3.Plugin
 		result2 error
 	}
-	GetPlatformStringStub        func(runtimeGOOS string, runtimeGOARCH string) string
+	GetPlatformStringStub        func(string, string) string
 	getPlatformStringMutex       sync.RWMutex
 	getPlatformStringArgsForCall []struct {
-		runtimeGOOS   string
-		runtimeGOARCH string
+		arg1 string
+		arg2 string
 	}
 	getPlatformStringReturns struct {
 		result1 string
@@ -78,12 +78,12 @@ type FakeInstallPluginActor struct {
 	getPlatformStringReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetPluginInfoFromRepositoriesForPlatformStub        func(pluginName string, pluginRepos []configv3.PluginRepository, platform string) (pluginaction.PluginInfo, []string, error)
+	GetPluginInfoFromRepositoriesForPlatformStub        func(string, []configv3.PluginRepository, string) (pluginaction.PluginInfo, []string, error)
 	getPluginInfoFromRepositoriesForPlatformMutex       sync.RWMutex
 	getPluginInfoFromRepositoriesForPlatformArgsForCall []struct {
-		pluginName  string
-		pluginRepos []configv3.PluginRepository
-		platform    string
+		arg1 string
+		arg2 []configv3.PluginRepository
+		arg3 string
 	}
 	getPluginInfoFromRepositoriesForPlatformReturns struct {
 		result1 pluginaction.PluginInfo
@@ -95,10 +95,10 @@ type FakeInstallPluginActor struct {
 		result2 []string
 		result3 error
 	}
-	GetPluginRepositoryStub        func(repositoryName string) (configv3.PluginRepository, error)
+	GetPluginRepositoryStub        func(string) (configv3.PluginRepository, error)
 	getPluginRepositoryMutex       sync.RWMutex
 	getPluginRepositoryArgsForCall []struct {
-		repositoryName string
+		arg1 string
 	}
 	getPluginRepositoryReturns struct {
 		result1 configv3.PluginRepository
@@ -108,11 +108,11 @@ type FakeInstallPluginActor struct {
 		result1 configv3.PluginRepository
 		result2 error
 	}
-	InstallPluginFromPathStub        func(path string, plugin configv3.Plugin) error
+	InstallPluginFromPathStub        func(string, configv3.Plugin) error
 	installPluginFromPathMutex       sync.RWMutex
 	installPluginFromPathArgsForCall []struct {
-		path   string
-		plugin configv3.Plugin
+		arg1 string
+		arg2 configv3.Plugin
 	}
 	installPluginFromPathReturns struct {
 		result1 error
@@ -120,11 +120,11 @@ type FakeInstallPluginActor struct {
 	installPluginFromPathReturnsOnCall map[int]struct {
 		result1 error
 	}
-	UninstallPluginStub        func(uninstaller pluginaction.PluginUninstaller, name string) error
+	UninstallPluginStub        func(pluginaction.PluginUninstaller, string) error
 	uninstallPluginMutex       sync.RWMutex
 	uninstallPluginArgsForCall []struct {
-		uninstaller pluginaction.PluginUninstaller
-		name        string
+		arg1 pluginaction.PluginUninstaller
+		arg2 string
 	}
 	uninstallPluginReturns struct {
 		result1 error
@@ -132,11 +132,11 @@ type FakeInstallPluginActor struct {
 	uninstallPluginReturnsOnCall map[int]struct {
 		result1 error
 	}
-	ValidateFileChecksumStub        func(path string, checksum string) bool
+	ValidateFileChecksumStub        func(string, string) bool
 	validateFileChecksumMutex       sync.RWMutex
 	validateFileChecksumArgsForCall []struct {
-		path     string
-		checksum string
+		arg1 string
+		arg2 string
 	}
 	validateFileChecksumReturns struct {
 		result1 bool
@@ -148,22 +148,23 @@ type FakeInstallPluginActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeInstallPluginActor) CreateExecutableCopy(path string, tempPluginDir string) (string, error) {
+func (fake *FakeInstallPluginActor) CreateExecutableCopy(arg1 string, arg2 string) (string, error) {
 	fake.createExecutableCopyMutex.Lock()
 	ret, specificReturn := fake.createExecutableCopyReturnsOnCall[len(fake.createExecutableCopyArgsForCall)]
 	fake.createExecutableCopyArgsForCall = append(fake.createExecutableCopyArgsForCall, struct {
-		path          string
-		tempPluginDir string
-	}{path, tempPluginDir})
-	fake.recordInvocation("CreateExecutableCopy", []interface{}{path, tempPluginDir})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("CreateExecutableCopy", []interface{}{arg1, arg2})
 	fake.createExecutableCopyMutex.Unlock()
 	if fake.CreateExecutableCopyStub != nil {
-		return fake.CreateExecutableCopyStub(path, tempPluginDir)
+		return fake.CreateExecutableCopyStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.createExecutableCopyReturns.result1, fake.createExecutableCopyReturns.result2
+	fakeReturns := fake.createExecutableCopyReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeInstallPluginActor) CreateExecutableCopyCallCount() int {
@@ -172,13 +173,22 @@ func (fake *FakeInstallPluginActor) CreateExecutableCopyCallCount() int {
 	return len(fake.createExecutableCopyArgsForCall)
 }
 
+func (fake *FakeInstallPluginActor) CreateExecutableCopyCalls(stub func(string, string) (string, error)) {
+	fake.createExecutableCopyMutex.Lock()
+	defer fake.createExecutableCopyMutex.Unlock()
+	fake.CreateExecutableCopyStub = stub
+}
+
 func (fake *FakeInstallPluginActor) CreateExecutableCopyArgsForCall(i int) (string, string) {
 	fake.createExecutableCopyMutex.RLock()
 	defer fake.createExecutableCopyMutex.RUnlock()
-	return fake.createExecutableCopyArgsForCall[i].path, fake.createExecutableCopyArgsForCall[i].tempPluginDir
+	argsForCall := fake.createExecutableCopyArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeInstallPluginActor) CreateExecutableCopyReturns(result1 string, result2 error) {
+	fake.createExecutableCopyMutex.Lock()
+	defer fake.createExecutableCopyMutex.Unlock()
 	fake.CreateExecutableCopyStub = nil
 	fake.createExecutableCopyReturns = struct {
 		result1 string
@@ -187,6 +197,8 @@ func (fake *FakeInstallPluginActor) CreateExecutableCopyReturns(result1 string, 
 }
 
 func (fake *FakeInstallPluginActor) CreateExecutableCopyReturnsOnCall(i int, result1 string, result2 error) {
+	fake.createExecutableCopyMutex.Lock()
+	defer fake.createExecutableCopyMutex.Unlock()
 	fake.CreateExecutableCopyStub = nil
 	if fake.createExecutableCopyReturnsOnCall == nil {
 		fake.createExecutableCopyReturnsOnCall = make(map[int]struct {
@@ -200,23 +212,24 @@ func (fake *FakeInstallPluginActor) CreateExecutableCopyReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
-func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURL(url string, tempPluginDir string, proxyReader plugin.ProxyReader) (string, error) {
+func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURL(arg1 string, arg2 string, arg3 plugin.ProxyReader) (string, error) {
 	fake.downloadExecutableBinaryFromURLMutex.Lock()
 	ret, specificReturn := fake.downloadExecutableBinaryFromURLReturnsOnCall[len(fake.downloadExecutableBinaryFromURLArgsForCall)]
 	fake.downloadExecutableBinaryFromURLArgsForCall = append(fake.downloadExecutableBinaryFromURLArgsForCall, struct {
-		url           string
-		tempPluginDir string
-		proxyReader   plugin.ProxyReader
-	}{url, tempPluginDir, proxyReader})
-	fake.recordInvocation("DownloadExecutableBinaryFromURL", []interface{}{url, tempPluginDir, proxyReader})
+		arg1 string
+		arg2 string
+		arg3 plugin.ProxyReader
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("DownloadExecutableBinaryFromURL", []interface{}{arg1, arg2, arg3})
 	fake.downloadExecutableBinaryFromURLMutex.Unlock()
 	if fake.DownloadExecutableBinaryFromURLStub != nil {
-		return fake.DownloadExecutableBinaryFromURLStub(url, tempPluginDir, proxyReader)
+		return fake.DownloadExecutableBinaryFromURLStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.downloadExecutableBinaryFromURLReturns.result1, fake.downloadExecutableBinaryFromURLReturns.result2
+	fakeReturns := fake.downloadExecutableBinaryFromURLReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLCallCount() int {
@@ -225,13 +238,22 @@ func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLCallCount() i
 	return len(fake.downloadExecutableBinaryFromURLArgsForCall)
 }
 
+func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLCalls(stub func(string, string, plugin.ProxyReader) (string, error)) {
+	fake.downloadExecutableBinaryFromURLMutex.Lock()
+	defer fake.downloadExecutableBinaryFromURLMutex.Unlock()
+	fake.DownloadExecutableBinaryFromURLStub = stub
+}
+
 func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLArgsForCall(i int) (string, string, plugin.ProxyReader) {
 	fake.downloadExecutableBinaryFromURLMutex.RLock()
 	defer fake.downloadExecutableBinaryFromURLMutex.RUnlock()
-	return fake.downloadExecutableBinaryFromURLArgsForCall[i].url, fake.downloadExecutableBinaryFromURLArgsForCall[i].tempPluginDir, fake.downloadExecutableBinaryFromURLArgsForCall[i].proxyReader
+	argsForCall := fake.downloadExecutableBinaryFromURLArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLReturns(result1 string, result2 error) {
+	fake.downloadExecutableBinaryFromURLMutex.Lock()
+	defer fake.downloadExecutableBinaryFromURLMutex.Unlock()
 	fake.DownloadExecutableBinaryFromURLStub = nil
 	fake.downloadExecutableBinaryFromURLReturns = struct {
 		result1 string
@@ -240,6 +262,8 @@ func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLReturns(resul
 }
 
 func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLReturnsOnCall(i int, result1 string, result2 error) {
+	fake.downloadExecutableBinaryFromURLMutex.Lock()
+	defer fake.downloadExecutableBinaryFromURLMutex.Unlock()
 	fake.DownloadExecutableBinaryFromURLStub = nil
 	if fake.downloadExecutableBinaryFromURLReturnsOnCall == nil {
 		fake.downloadExecutableBinaryFromURLReturnsOnCall = make(map[int]struct {
@@ -253,21 +277,22 @@ func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLReturnsOnCall
 	}{result1, result2}
 }
 
-func (fake *FakeInstallPluginActor) FileExists(path string) bool {
+func (fake *FakeInstallPluginActor) FileExists(arg1 string) bool {
 	fake.fileExistsMutex.Lock()
 	ret, specificReturn := fake.fileExistsReturnsOnCall[len(fake.fileExistsArgsForCall)]
 	fake.fileExistsArgsForCall = append(fake.fileExistsArgsForCall, struct {
-		path string
-	}{path})
-	fake.recordInvocation("FileExists", []interface{}{path})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("FileExists", []interface{}{arg1})
 	fake.fileExistsMutex.Unlock()
 	if fake.FileExistsStub != nil {
-		return fake.FileExistsStub(path)
+		return fake.FileExistsStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.fileExistsReturns.result1
+	fakeReturns := fake.fileExistsReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeInstallPluginActor) FileExistsCallCount() int {
@@ -276,13 +301,22 @@ func (fake *FakeInstallPluginActor) FileExistsCallCount() int {
 	return len(fake.fileExistsArgsForCall)
 }
 
+func (fake *FakeInstallPluginActor) FileExistsCalls(stub func(string) bool) {
+	fake.fileExistsMutex.Lock()
+	defer fake.fileExistsMutex.Unlock()
+	fake.FileExistsStub = stub
+}
+
 func (fake *FakeInstallPluginActor) FileExistsArgsForCall(i int) string {
 	fake.fileExistsMutex.RLock()
 	defer fake.fileExistsMutex.RUnlock()
-	return fake.fileExistsArgsForCall[i].path
+	argsForCall := fake.fileExistsArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeInstallPluginActor) FileExistsReturns(result1 bool) {
+	fake.fileExistsMutex.Lock()
+	defer fake.fileExistsMutex.Unlock()
 	fake.FileExistsStub = nil
 	fake.fileExistsReturns = struct {
 		result1 bool
@@ -290,6 +324,8 @@ func (fake *FakeInstallPluginActor) FileExistsReturns(result1 bool) {
 }
 
 func (fake *FakeInstallPluginActor) FileExistsReturnsOnCall(i int, result1 bool) {
+	fake.fileExistsMutex.Lock()
+	defer fake.fileExistsMutex.Unlock()
 	fake.FileExistsStub = nil
 	if fake.fileExistsReturnsOnCall == nil {
 		fake.fileExistsReturnsOnCall = make(map[int]struct {
@@ -301,23 +337,24 @@ func (fake *FakeInstallPluginActor) FileExistsReturnsOnCall(i int, result1 bool)
 	}{result1}
 }
 
-func (fake *FakeInstallPluginActor) GetAndValidatePlugin(metadata pluginaction.PluginMetadata, commands pluginaction.CommandList, path string) (configv3.Plugin, error) {
+func (fake *FakeInstallPluginActor) GetAndValidatePlugin(arg1 pluginaction.PluginMetadata, arg2 pluginaction.CommandList, arg3 string) (configv3.Plugin, error) {
 	fake.getAndValidatePluginMutex.Lock()
 	ret, specificReturn := fake.getAndValidatePluginReturnsOnCall[len(fake.getAndValidatePluginArgsForCall)]
 	fake.getAndValidatePluginArgsForCall = append(fake.getAndValidatePluginArgsForCall, struct {
-		metadata pluginaction.PluginMetadata
-		commands pluginaction.CommandList
-		path     string
-	}{metadata, commands, path})
-	fake.recordInvocation("GetAndValidatePlugin", []interface{}{metadata, commands, path})
+		arg1 pluginaction.PluginMetadata
+		arg2 pluginaction.CommandList
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("GetAndValidatePlugin", []interface{}{arg1, arg2, arg3})
 	fake.getAndValidatePluginMutex.Unlock()
 	if fake.GetAndValidatePluginStub != nil {
-		return fake.GetAndValidatePluginStub(metadata, commands, path)
+		return fake.GetAndValidatePluginStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.getAndValidatePluginReturns.result1, fake.getAndValidatePluginReturns.result2
+	fakeReturns := fake.getAndValidatePluginReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeInstallPluginActor) GetAndValidatePluginCallCount() int {
@@ -326,13 +363,22 @@ func (fake *FakeInstallPluginActor) GetAndValidatePluginCallCount() int {
 	return len(fake.getAndValidatePluginArgsForCall)
 }
 
+func (fake *FakeInstallPluginActor) GetAndValidatePluginCalls(stub func(pluginaction.PluginMetadata, pluginaction.CommandList, string) (configv3.Plugin, error)) {
+	fake.getAndValidatePluginMutex.Lock()
+	defer fake.getAndValidatePluginMutex.Unlock()
+	fake.GetAndValidatePluginStub = stub
+}
+
 func (fake *FakeInstallPluginActor) GetAndValidatePluginArgsForCall(i int) (pluginaction.PluginMetadata, pluginaction.CommandList, string) {
 	fake.getAndValidatePluginMutex.RLock()
 	defer fake.getAndValidatePluginMutex.RUnlock()
-	return fake.getAndValidatePluginArgsForCall[i].metadata, fake.getAndValidatePluginArgsForCall[i].commands, fake.getAndValidatePluginArgsForCall[i].path
+	argsForCall := fake.getAndValidatePluginArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeInstallPluginActor) GetAndValidatePluginReturns(result1 configv3.Plugin, result2 error) {
+	fake.getAndValidatePluginMutex.Lock()
+	defer fake.getAndValidatePluginMutex.Unlock()
 	fake.GetAndValidatePluginStub = nil
 	fake.getAndValidatePluginReturns = struct {
 		result1 configv3.Plugin
@@ -341,6 +387,8 @@ func (fake *FakeInstallPluginActor) GetAndValidatePluginReturns(result1 configv3
 }
 
 func (fake *FakeInstallPluginActor) GetAndValidatePluginReturnsOnCall(i int, result1 configv3.Plugin, result2 error) {
+	fake.getAndValidatePluginMutex.Lock()
+	defer fake.getAndValidatePluginMutex.Unlock()
 	fake.GetAndValidatePluginStub = nil
 	if fake.getAndValidatePluginReturnsOnCall == nil {
 		fake.getAndValidatePluginReturnsOnCall = make(map[int]struct {
@@ -354,22 +402,23 @@ func (fake *FakeInstallPluginActor) GetAndValidatePluginReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
-func (fake *FakeInstallPluginActor) GetPlatformString(runtimeGOOS string, runtimeGOARCH string) string {
+func (fake *FakeInstallPluginActor) GetPlatformString(arg1 string, arg2 string) string {
 	fake.getPlatformStringMutex.Lock()
 	ret, specificReturn := fake.getPlatformStringReturnsOnCall[len(fake.getPlatformStringArgsForCall)]
 	fake.getPlatformStringArgsForCall = append(fake.getPlatformStringArgsForCall, struct {
-		runtimeGOOS   string
-		runtimeGOARCH string
-	}{runtimeGOOS, runtimeGOARCH})
-	fake.recordInvocation("GetPlatformString", []interface{}{runtimeGOOS, runtimeGOARCH})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("GetPlatformString", []interface{}{arg1, arg2})
 	fake.getPlatformStringMutex.Unlock()
 	if fake.GetPlatformStringStub != nil {
-		return fake.GetPlatformStringStub(runtimeGOOS, runtimeGOARCH)
+		return fake.GetPlatformStringStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.getPlatformStringReturns.result1
+	fakeReturns := fake.getPlatformStringReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeInstallPluginActor) GetPlatformStringCallCount() int {
@@ -378,13 +427,22 @@ func (fake *FakeInstallPluginActor) GetPlatformStringCallCount() int {
 	return len(fake.getPlatformStringArgsForCall)
 }
 
+func (fake *FakeInstallPluginActor) GetPlatformStringCalls(stub func(string, string) string) {
+	fake.getPlatformStringMutex.Lock()
+	defer fake.getPlatformStringMutex.Unlock()
+	fake.GetPlatformStringStub = stub
+}
+
 func (fake *FakeInstallPluginActor) GetPlatformStringArgsForCall(i int) (string, string) {
 	fake.getPlatformStringMutex.RLock()
 	defer fake.getPlatformStringMutex.RUnlock()
-	return fake.getPlatformStringArgsForCall[i].runtimeGOOS, fake.getPlatformStringArgsForCall[i].runtimeGOARCH
+	argsForCall := fake.getPlatformStringArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeInstallPluginActor) GetPlatformStringReturns(result1 string) {
+	fake.getPlatformStringMutex.Lock()
+	defer fake.getPlatformStringMutex.Unlock()
 	fake.GetPlatformStringStub = nil
 	fake.getPlatformStringReturns = struct {
 		result1 string
@@ -392,6 +450,8 @@ func (fake *FakeInstallPluginActor) GetPlatformStringReturns(result1 string) {
 }
 
 func (fake *FakeInstallPluginActor) GetPlatformStringReturnsOnCall(i int, result1 string) {
+	fake.getPlatformStringMutex.Lock()
+	defer fake.getPlatformStringMutex.Unlock()
 	fake.GetPlatformStringStub = nil
 	if fake.getPlatformStringReturnsOnCall == nil {
 		fake.getPlatformStringReturnsOnCall = make(map[int]struct {
@@ -403,28 +463,29 @@ func (fake *FakeInstallPluginActor) GetPlatformStringReturnsOnCall(i int, result
 	}{result1}
 }
 
-func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatform(pluginName string, pluginRepos []configv3.PluginRepository, platform string) (pluginaction.PluginInfo, []string, error) {
-	var pluginReposCopy []configv3.PluginRepository
-	if pluginRepos != nil {
-		pluginReposCopy = make([]configv3.PluginRepository, len(pluginRepos))
-		copy(pluginReposCopy, pluginRepos)
+func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatform(arg1 string, arg2 []configv3.PluginRepository, arg3 string) (pluginaction.PluginInfo, []string, error) {
+	var arg2Copy []configv3.PluginRepository
+	if arg2 != nil {
+		arg2Copy = make([]configv3.PluginRepository, len(arg2))
+		copy(arg2Copy, arg2)
 	}
 	fake.getPluginInfoFromRepositoriesForPlatformMutex.Lock()
 	ret, specificReturn := fake.getPluginInfoFromRepositoriesForPlatformReturnsOnCall[len(fake.getPluginInfoFromRepositoriesForPlatformArgsForCall)]
 	fake.getPluginInfoFromRepositoriesForPlatformArgsForCall = append(fake.getPluginInfoFromRepositoriesForPlatformArgsForCall, struct {
-		pluginName  string
-		pluginRepos []configv3.PluginRepository
-		platform    string
-	}{pluginName, pluginReposCopy, platform})
-	fake.recordInvocation("GetPluginInfoFromRepositoriesForPlatform", []interface{}{pluginName, pluginReposCopy, platform})
+		arg1 string
+		arg2 []configv3.PluginRepository
+		arg3 string
+	}{arg1, arg2Copy, arg3})
+	fake.recordInvocation("GetPluginInfoFromRepositoriesForPlatform", []interface{}{arg1, arg2Copy, arg3})
 	fake.getPluginInfoFromRepositoriesForPlatformMutex.Unlock()
 	if fake.GetPluginInfoFromRepositoriesForPlatformStub != nil {
-		return fake.GetPluginInfoFromRepositoriesForPlatformStub(pluginName, pluginRepos, platform)
+		return fake.GetPluginInfoFromRepositoriesForPlatformStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getPluginInfoFromRepositoriesForPlatformReturns.result1, fake.getPluginInfoFromRepositoriesForPlatformReturns.result2, fake.getPluginInfoFromRepositoriesForPlatformReturns.result3
+	fakeReturns := fake.getPluginInfoFromRepositoriesForPlatformReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformCallCount() int {
@@ -433,13 +494,22 @@ func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformCall
 	return len(fake.getPluginInfoFromRepositoriesForPlatformArgsForCall)
 }
 
+func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformCalls(stub func(string, []configv3.PluginRepository, string) (pluginaction.PluginInfo, []string, error)) {
+	fake.getPluginInfoFromRepositoriesForPlatformMutex.Lock()
+	defer fake.getPluginInfoFromRepositoriesForPlatformMutex.Unlock()
+	fake.GetPluginInfoFromRepositoriesForPlatformStub = stub
+}
+
 func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformArgsForCall(i int) (string, []configv3.PluginRepository, string) {
 	fake.getPluginInfoFromRepositoriesForPlatformMutex.RLock()
 	defer fake.getPluginInfoFromRepositoriesForPlatformMutex.RUnlock()
-	return fake.getPluginInfoFromRepositoriesForPlatformArgsForCall[i].pluginName, fake.getPluginInfoFromRepositoriesForPlatformArgsForCall[i].pluginRepos, fake.getPluginInfoFromRepositoriesForPlatformArgsForCall[i].platform
+	argsForCall := fake.getPluginInfoFromRepositoriesForPlatformArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformReturns(result1 pluginaction.PluginInfo, result2 []string, result3 error) {
+	fake.getPluginInfoFromRepositoriesForPlatformMutex.Lock()
+	defer fake.getPluginInfoFromRepositoriesForPlatformMutex.Unlock()
 	fake.GetPluginInfoFromRepositoriesForPlatformStub = nil
 	fake.getPluginInfoFromRepositoriesForPlatformReturns = struct {
 		result1 pluginaction.PluginInfo
@@ -449,6 +519,8 @@ func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformRetu
 }
 
 func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformReturnsOnCall(i int, result1 pluginaction.PluginInfo, result2 []string, result3 error) {
+	fake.getPluginInfoFromRepositoriesForPlatformMutex.Lock()
+	defer fake.getPluginInfoFromRepositoriesForPlatformMutex.Unlock()
 	fake.GetPluginInfoFromRepositoriesForPlatformStub = nil
 	if fake.getPluginInfoFromRepositoriesForPlatformReturnsOnCall == nil {
 		fake.getPluginInfoFromRepositoriesForPlatformReturnsOnCall = make(map[int]struct {
@@ -464,21 +536,22 @@ func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformRetu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeInstallPluginActor) GetPluginRepository(repositoryName string) (configv3.PluginRepository, error) {
+func (fake *FakeInstallPluginActor) GetPluginRepository(arg1 string) (configv3.PluginRepository, error) {
 	fake.getPluginRepositoryMutex.Lock()
 	ret, specificReturn := fake.getPluginRepositoryReturnsOnCall[len(fake.getPluginRepositoryArgsForCall)]
 	fake.getPluginRepositoryArgsForCall = append(fake.getPluginRepositoryArgsForCall, struct {
-		repositoryName string
-	}{repositoryName})
-	fake.recordInvocation("GetPluginRepository", []interface{}{repositoryName})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetPluginRepository", []interface{}{arg1})
 	fake.getPluginRepositoryMutex.Unlock()
 	if fake.GetPluginRepositoryStub != nil {
-		return fake.GetPluginRepositoryStub(repositoryName)
+		return fake.GetPluginRepositoryStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.getPluginRepositoryReturns.result1, fake.getPluginRepositoryReturns.result2
+	fakeReturns := fake.getPluginRepositoryReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeInstallPluginActor) GetPluginRepositoryCallCount() int {
@@ -487,13 +560,22 @@ func (fake *FakeInstallPluginActor) GetPluginRepositoryCallCount() int {
 	return len(fake.getPluginRepositoryArgsForCall)
 }
 
+func (fake *FakeInstallPluginActor) GetPluginRepositoryCalls(stub func(string) (configv3.PluginRepository, error)) {
+	fake.getPluginRepositoryMutex.Lock()
+	defer fake.getPluginRepositoryMutex.Unlock()
+	fake.GetPluginRepositoryStub = stub
+}
+
 func (fake *FakeInstallPluginActor) GetPluginRepositoryArgsForCall(i int) string {
 	fake.getPluginRepositoryMutex.RLock()
 	defer fake.getPluginRepositoryMutex.RUnlock()
-	return fake.getPluginRepositoryArgsForCall[i].repositoryName
+	argsForCall := fake.getPluginRepositoryArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeInstallPluginActor) GetPluginRepositoryReturns(result1 configv3.PluginRepository, result2 error) {
+	fake.getPluginRepositoryMutex.Lock()
+	defer fake.getPluginRepositoryMutex.Unlock()
 	fake.GetPluginRepositoryStub = nil
 	fake.getPluginRepositoryReturns = struct {
 		result1 configv3.PluginRepository
@@ -502,6 +584,8 @@ func (fake *FakeInstallPluginActor) GetPluginRepositoryReturns(result1 configv3.
 }
 
 func (fake *FakeInstallPluginActor) GetPluginRepositoryReturnsOnCall(i int, result1 configv3.PluginRepository, result2 error) {
+	fake.getPluginRepositoryMutex.Lock()
+	defer fake.getPluginRepositoryMutex.Unlock()
 	fake.GetPluginRepositoryStub = nil
 	if fake.getPluginRepositoryReturnsOnCall == nil {
 		fake.getPluginRepositoryReturnsOnCall = make(map[int]struct {
@@ -515,22 +599,23 @@ func (fake *FakeInstallPluginActor) GetPluginRepositoryReturnsOnCall(i int, resu
 	}{result1, result2}
 }
 
-func (fake *FakeInstallPluginActor) InstallPluginFromPath(path string, plugin configv3.Plugin) error {
+func (fake *FakeInstallPluginActor) InstallPluginFromPath(arg1 string, arg2 configv3.Plugin) error {
 	fake.installPluginFromPathMutex.Lock()
 	ret, specificReturn := fake.installPluginFromPathReturnsOnCall[len(fake.installPluginFromPathArgsForCall)]
 	fake.installPluginFromPathArgsForCall = append(fake.installPluginFromPathArgsForCall, struct {
-		path   string
-		plugin configv3.Plugin
-	}{path, plugin})
-	fake.recordInvocation("InstallPluginFromPath", []interface{}{path, plugin})
+		arg1 string
+		arg2 configv3.Plugin
+	}{arg1, arg2})
+	fake.recordInvocation("InstallPluginFromPath", []interface{}{arg1, arg2})
 	fake.installPluginFromPathMutex.Unlock()
 	if fake.InstallPluginFromPathStub != nil {
-		return fake.InstallPluginFromPathStub(path, plugin)
+		return fake.InstallPluginFromPathStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.installPluginFromPathReturns.result1
+	fakeReturns := fake.installPluginFromPathReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeInstallPluginActor) InstallPluginFromPathCallCount() int {
@@ -539,13 +624,22 @@ func (fake *FakeInstallPluginActor) InstallPluginFromPathCallCount() int {
 	return len(fake.installPluginFromPathArgsForCall)
 }
 
+func (fake *FakeInstallPluginActor) InstallPluginFromPathCalls(stub func(string, configv3.Plugin) error) {
+	fake.installPluginFromPathMutex.Lock()
+	defer fake.installPluginFromPathMutex.Unlock()
+	fake.InstallPluginFromPathStub = stub
+}
+
 func (fake *FakeInstallPluginActor) InstallPluginFromPathArgsForCall(i int) (string, configv3.Plugin) {
 	fake.installPluginFromPathMutex.RLock()
 	defer fake.installPluginFromPathMutex.RUnlock()
-	return fake.installPluginFromPathArgsForCall[i].path, fake.installPluginFromPathArgsForCall[i].plugin
+	argsForCall := fake.installPluginFromPathArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeInstallPluginActor) InstallPluginFromPathReturns(result1 error) {
+	fake.installPluginFromPathMutex.Lock()
+	defer fake.installPluginFromPathMutex.Unlock()
 	fake.InstallPluginFromPathStub = nil
 	fake.installPluginFromPathReturns = struct {
 		result1 error
@@ -553,6 +647,8 @@ func (fake *FakeInstallPluginActor) InstallPluginFromPathReturns(result1 error) 
 }
 
 func (fake *FakeInstallPluginActor) InstallPluginFromPathReturnsOnCall(i int, result1 error) {
+	fake.installPluginFromPathMutex.Lock()
+	defer fake.installPluginFromPathMutex.Unlock()
 	fake.InstallPluginFromPathStub = nil
 	if fake.installPluginFromPathReturnsOnCall == nil {
 		fake.installPluginFromPathReturnsOnCall = make(map[int]struct {
@@ -564,22 +660,23 @@ func (fake *FakeInstallPluginActor) InstallPluginFromPathReturnsOnCall(i int, re
 	}{result1}
 }
 
-func (fake *FakeInstallPluginActor) UninstallPlugin(uninstaller pluginaction.PluginUninstaller, name string) error {
+func (fake *FakeInstallPluginActor) UninstallPlugin(arg1 pluginaction.PluginUninstaller, arg2 string) error {
 	fake.uninstallPluginMutex.Lock()
 	ret, specificReturn := fake.uninstallPluginReturnsOnCall[len(fake.uninstallPluginArgsForCall)]
 	fake.uninstallPluginArgsForCall = append(fake.uninstallPluginArgsForCall, struct {
-		uninstaller pluginaction.PluginUninstaller
-		name        string
-	}{uninstaller, name})
-	fake.recordInvocation("UninstallPlugin", []interface{}{uninstaller, name})
+		arg1 pluginaction.PluginUninstaller
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UninstallPlugin", []interface{}{arg1, arg2})
 	fake.uninstallPluginMutex.Unlock()
 	if fake.UninstallPluginStub != nil {
-		return fake.UninstallPluginStub(uninstaller, name)
+		return fake.UninstallPluginStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.uninstallPluginReturns.result1
+	fakeReturns := fake.uninstallPluginReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeInstallPluginActor) UninstallPluginCallCount() int {
@@ -588,13 +685,22 @@ func (fake *FakeInstallPluginActor) UninstallPluginCallCount() int {
 	return len(fake.uninstallPluginArgsForCall)
 }
 
+func (fake *FakeInstallPluginActor) UninstallPluginCalls(stub func(pluginaction.PluginUninstaller, string) error) {
+	fake.uninstallPluginMutex.Lock()
+	defer fake.uninstallPluginMutex.Unlock()
+	fake.UninstallPluginStub = stub
+}
+
 func (fake *FakeInstallPluginActor) UninstallPluginArgsForCall(i int) (pluginaction.PluginUninstaller, string) {
 	fake.uninstallPluginMutex.RLock()
 	defer fake.uninstallPluginMutex.RUnlock()
-	return fake.uninstallPluginArgsForCall[i].uninstaller, fake.uninstallPluginArgsForCall[i].name
+	argsForCall := fake.uninstallPluginArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeInstallPluginActor) UninstallPluginReturns(result1 error) {
+	fake.uninstallPluginMutex.Lock()
+	defer fake.uninstallPluginMutex.Unlock()
 	fake.UninstallPluginStub = nil
 	fake.uninstallPluginReturns = struct {
 		result1 error
@@ -602,6 +708,8 @@ func (fake *FakeInstallPluginActor) UninstallPluginReturns(result1 error) {
 }
 
 func (fake *FakeInstallPluginActor) UninstallPluginReturnsOnCall(i int, result1 error) {
+	fake.uninstallPluginMutex.Lock()
+	defer fake.uninstallPluginMutex.Unlock()
 	fake.UninstallPluginStub = nil
 	if fake.uninstallPluginReturnsOnCall == nil {
 		fake.uninstallPluginReturnsOnCall = make(map[int]struct {
@@ -613,22 +721,23 @@ func (fake *FakeInstallPluginActor) UninstallPluginReturnsOnCall(i int, result1 
 	}{result1}
 }
 
-func (fake *FakeInstallPluginActor) ValidateFileChecksum(path string, checksum string) bool {
+func (fake *FakeInstallPluginActor) ValidateFileChecksum(arg1 string, arg2 string) bool {
 	fake.validateFileChecksumMutex.Lock()
 	ret, specificReturn := fake.validateFileChecksumReturnsOnCall[len(fake.validateFileChecksumArgsForCall)]
 	fake.validateFileChecksumArgsForCall = append(fake.validateFileChecksumArgsForCall, struct {
-		path     string
-		checksum string
-	}{path, checksum})
-	fake.recordInvocation("ValidateFileChecksum", []interface{}{path, checksum})
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("ValidateFileChecksum", []interface{}{arg1, arg2})
 	fake.validateFileChecksumMutex.Unlock()
 	if fake.ValidateFileChecksumStub != nil {
-		return fake.ValidateFileChecksumStub(path, checksum)
+		return fake.ValidateFileChecksumStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.validateFileChecksumReturns.result1
+	fakeReturns := fake.validateFileChecksumReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeInstallPluginActor) ValidateFileChecksumCallCount() int {
@@ -637,13 +746,22 @@ func (fake *FakeInstallPluginActor) ValidateFileChecksumCallCount() int {
 	return len(fake.validateFileChecksumArgsForCall)
 }
 
+func (fake *FakeInstallPluginActor) ValidateFileChecksumCalls(stub func(string, string) bool) {
+	fake.validateFileChecksumMutex.Lock()
+	defer fake.validateFileChecksumMutex.Unlock()
+	fake.ValidateFileChecksumStub = stub
+}
+
 func (fake *FakeInstallPluginActor) ValidateFileChecksumArgsForCall(i int) (string, string) {
 	fake.validateFileChecksumMutex.RLock()
 	defer fake.validateFileChecksumMutex.RUnlock()
-	return fake.validateFileChecksumArgsForCall[i].path, fake.validateFileChecksumArgsForCall[i].checksum
+	argsForCall := fake.validateFileChecksumArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeInstallPluginActor) ValidateFileChecksumReturns(result1 bool) {
+	fake.validateFileChecksumMutex.Lock()
+	defer fake.validateFileChecksumMutex.Unlock()
 	fake.ValidateFileChecksumStub = nil
 	fake.validateFileChecksumReturns = struct {
 		result1 bool
@@ -651,6 +769,8 @@ func (fake *FakeInstallPluginActor) ValidateFileChecksumReturns(result1 bool) {
 }
 
 func (fake *FakeInstallPluginActor) ValidateFileChecksumReturnsOnCall(i int, result1 bool) {
+	fake.validateFileChecksumMutex.Lock()
+	defer fake.validateFileChecksumMutex.Unlock()
 	fake.ValidateFileChecksumStub = nil
 	if fake.validateFileChecksumReturnsOnCall == nil {
 		fake.validateFileChecksumReturnsOnCall = make(map[int]struct {

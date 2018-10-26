@@ -1,0 +1,268 @@
+resource_types:
+- name: terraform
+  type: docker-image
+  source:
+    repository: ljfranklin/terraform-resource
+    tag: beta-backend
+- name: bosh-deployment
+  type: docker-image
+  source:
+    repository: cloudfoundry/bosh-deployment-resource
+- name: cron-resource
+  type: docker-image
+  source:
+    repository: cftoolsmiths/cron-test
+
+resources:
+  - name: terraform
+    type: terraform
+    source:
+      backend_type: gcs
+      backend_config:
+        bucket: ((bosh-lite-storage-bucket))
+        prefix: terraform_state_files/
+        region: ((bosh-lite-region))
+        credentials: ((bosh-lite-gcp-json-key))
+  - name: cli
+    type: git
+    source:
+      branch: master
+      uri: git@github.com:cloudfoundry/cli.git
+      private_key: ((bosh-lite-pools-github-private-key))
+  - name: capi-ci
+    type: git
+    source:
+      branch: master
+      uri: git@github.com:cloudfoundry/capi-ci.git
+      private_key: ((bosh-lite-pools-github-private-key))
+  - name: bosh-deployment
+    type: git
+    source:
+      branch: master
+      uri: git@github.com:cloudfoundry/bosh-deployment.git
+      private_key: ((bosh-lite-pools-github-private-key))
+  - name: ready-pool
+    type: pool
+    source:
+      branch: master
+      uri: ((env-pool-repo))
+      pool: bosh-lites
+      private_key: ((bosh-lite-pools-github-private-key))
+  - name: deleting-pool
+    type: pool
+    source:
+      branch: master
+      uri: ((env-pool-repo))
+      pool: bosh-lites-to-be-deleted
+      private_key: ((bosh-lite-pools-github-private-key))
+  - name: building-pool
+    type: pool
+    source:
+      branch: master
+      uri: ((env-pool-repo))
+      pool: building-bosh-lites
+      private_key: ((bosh-lite-pools-github-private-key))
+  - name: pool-repo
+    type: git
+    source:
+      branch: master
+      uri: ((env-pool-repo))
+      private_key: ((bosh-lite-pools-github-private-key))
+  - name: create-bosh-lite-trigger
+    type: git
+    source:
+      branch: master
+      uri: ((env-pool-repo))
+      private_key: ((bosh-lite-pools-github-private-key))
+      paths:
+        - .trigger-bosh-lites-create # updated by check-pool-size
+  - name: destroy-bosh-lite-trigger
+    type: git
+    source:
+      branch: master
+      uri: ((env-pool-repo))
+      private_key: ((bosh-lite-pools-github-private-key))
+      paths:
+        - .trigger-bosh-lites-destroy # updated by unclaim_bosh_lite alias
+  - name: cf-deployment
+    type: git
+    source:
+      branch: release-candidate
+      uri: git@github.com:cloudfoundry/cf-deployment.git
+      private_key: ((bosh-lite-pools-github-private-key))
+  - name: cf-deploy
+    type: bosh-deployment
+    source:
+      skip_check: true
+  - name: 5m
+    type: time
+    source:
+      interval: 5m
+
+jobs:
+  - name: create-bosh-lite
+    plan:
+      - aggregate:
+        - get: capi-ci
+        - get: bosh-deployment
+        - get: cf-deployment
+        - get: cli
+        - get: create-bosh-lite-trigger
+          trigger: true
+      - task: generate-fake-env-for-building-pool
+        file: capi-ci/ci/bosh-lite/generate-fake-env-for-building-pool.yml
+      - put: building-pool
+        params:
+          add_claimed: fake-placeholder-env/
+      - put: terraform
+        params:
+          generate_random_name: true
+          delete_on_failure: true
+          terraform_source: capi-ci/terraform/bosh-lite/
+          vars:
+            project_id: ((bosh-lite-project-id))
+            json_key: ((bosh-lite-gcp-json-key))
+            dns_project_id: ((bosh-lite-project-id))
+            dns_json_key: ((bosh-lite-gcp-json-key))
+            system_domain_suffix: ((bosh-lite-system-domain-suffix))
+            dns_zone_name: ((bosh-lite-dns-zone-name))
+            region: ((bosh-lite-region))
+      - do:
+          - task: create-bosh-lite
+            file: capi-ci/ci/bosh-lite/create-bosh-lite.yml
+            params:
+              GCP_JSON_KEY: ((bosh-lite-gcp-json-key))
+              GCP_INSTANCE_TYPE: n1-standard-4
+          - do:
+              - task: create-env-vars-file
+                file: capi-ci/ci/bosh-lite/create-env-vars-file.yml
+              - task: upload-cf-assets
+                file: capi-ci/ci/bosh-lite/upload-cf-assets.yml
+              - task: write-bosh-target-file
+                file: capi-ci/ci/bosh-lite/write-bosh-target-file.yml
+              - put: cf-deploy
+                params:
+                  source_file: bosh-target/target.yml
+                  manifest: cf-deployment/cf-deployment.yml
+                  vars_files:
+                  - bosh-target/vars.yml
+                  ops_files:
+                  - capi-ci/cf-deployment-operations/skip-cert-verify.yml
+                  - capi-ci/cf-deployment-operations/use-latest-stemcell.yml
+                  - cf-deployment/operations/bosh-lite.yml
+                  - cf-deployment/operations/use-compiled-releases.yml
+                  - cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml
+                  - cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell-bosh-lite.yml
+                  - capi-ci/cf-deployment-operations/seed-credhub-asg.yml
+                  - cli/ci/infrastructure/operations/default-app-memory.yml
+                  - cli/ci/infrastructure/operations/add-oidc-provider.yml
+              - task: upload-to-gcs
+                file: capi-ci/ci/gcs/upload-to-gcs.yml
+                input_mapping:
+                  environment: terraform
+                  source-directory: director-state
+                params:
+                  GCP_JSON_KEY: ((bosh-lite-gcp-json-key))
+                  GCP_BUCKET: ((bosh-lite-storage-bucket))
+                  GCP_PATH: director-state
+                  USE_ENV_NAMED_SUBDIR: true
+              - put: ready-pool
+                params:
+                  add: bosh-lite-env-info/
+              - put: building-pool
+                params:
+                  remove: fake-placeholder-env/
+            on_failure:
+              task: delete-bosh-lite
+              file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
+        on_failure:
+          aggregate:
+            - put: terraform
+              params:
+                action: destroy
+                env_name_file: terraform/name
+                terraform_source: capi-ci/terraform/bosh-lite/
+                vars:
+                  project_id: ((bosh-lite-project-id))
+                  json_key: ((bosh-lite-gcp-json-key))
+                  dns_project_id: ((bosh-lite-project-id))
+                  dns_json_key: ((bosh-lite-gcp-json-key))
+                  system_domain_suffix: ((bosh-lite-system-domain-suffix))
+                  dns_zone_name: ((bosh-lite-dns-zone-name))
+                  region: ((bosh-lite-region))
+              get_params:
+                action: destroy
+
+  - name: delete-bosh-lite
+    plan:
+      - aggregate:
+        - get: destroy-bosh-lite-trigger
+          version: every
+          trigger: true
+        - get: capi-ci
+        - get: bosh-deployment
+        - put: deleting-pool
+          params:
+            acquire: true
+      - do:
+        - task: download-from-gcs
+          file: capi-ci/ci/gcs/download-from-gcs.yml
+          input_mapping:
+            environment: deleting-pool
+          output_mapping:
+            destination-directory: director-state
+          params:
+            GCP_JSON_KEY: ((bosh-lite-gcp-json-key))
+            GCP_BUCKET: ((bosh-lite-storage-bucket))
+            GCP_PATH: director-state
+            USE_ENV_NAMED_SUBDIR: true
+        - task: delete-bosh-lite
+          file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
+        - put: terraform
+          params:
+            action: destroy
+            env_name_file: deleting-pool/name
+            terraform_source: capi-ci/terraform/bosh-lite/
+            vars:
+              project_id: ((bosh-lite-project-id))
+              json_key: ((bosh-lite-gcp-json-key))
+              dns_project_id: ((bosh-lite-project-id))
+              dns_json_key: ((bosh-lite-gcp-json-key))
+              system_domain_suffix: ((bosh-lite-system-domain-suffix))
+              dns_zone_name: ((bosh-lite-dns-zone-name))
+              region: ((bosh-lite-region))
+          get_params:
+            action: destroy
+        - task: delete-from-gcs
+          file: capi-ci/ci/gcs/delete-from-gcs.yml
+          input_mapping:
+            environment: deleting-pool
+          params:
+            GCP_JSON_KEY: ((bosh-lite-gcp-json-key))
+            GCP_BUCKET: ((bosh-lite-storage-bucket))
+            GCP_PATH: director-state
+            USE_ENV_NAMED_SUBDIR: true
+        - put: deleting-pool
+          params:
+            remove: deleting-pool/
+
+  - name: check-pool-size
+    build_logs_to_retain: 100
+    plan:
+      - aggregate:
+        - get: capi-ci
+        - get: pool-repo
+        - get: 5m
+          trigger: true
+      - task: check-pool-size
+        file: capi-ci/ci/bosh-lite/check-pool-size.yml
+        input_mapping:
+          env-pool: pool-repo
+        params:
+          MIN_UNCLAIMED_COUNT: 2
+          GIT_USERNAME: ((git-username))
+          GIT_EMAIL: ((git-email))
+      - put: pool-repo
+        params:
+          repository: updated-env-pool
+          rebase: true

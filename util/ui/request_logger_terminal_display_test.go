@@ -34,7 +34,7 @@ var _ = Describe("Request Logger Terminal Display", func() {
 			err = display.Stop()
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("\\[PRIVATE DATA HIDDEN\\]"))
+			Expect(testUI.Out).To(Say(`\[PRIVATE DATA HIDDEN\]`))
 		})
 	})
 
@@ -65,7 +65,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(testUI.Out).To(Say("Connection: Upgrade"))
-			Expect(testUI.Out).To(Say("Authorization: \\[PRIVATE DATA HIDDEN\\]"))
+			Expect(testUI.Out).To(Say(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 			Expect(testUI.Out).To(Say("Origin: wss://doppler.bosh-lite.com:443"))
 		})
 	})
@@ -187,7 +187,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 			err = display.Stop()
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("banana: \\[%s\\]", regexp.QuoteMeta(passedTime.Format(time.RFC3339))))
+			Expect(testUI.Out).To(Say(`banana: \[%s\]`, regexp.QuoteMeta(passedTime.Format(time.RFC3339))))
 		})
 	})
 

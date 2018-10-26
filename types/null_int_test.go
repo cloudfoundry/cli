@@ -14,6 +14,47 @@ var _ = Describe("NullInt", func() {
 		nullInt = NullInt{}
 	})
 
+	Describe("IsValidValue", func() {
+		var (
+			input      string
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			executeErr = nullInt.IsValidValue(input)
+		})
+
+		When("the value is a positive integer", func() {
+			BeforeEach(func() {
+				input = "1"
+			})
+
+			It("does not error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+		})
+
+		When("the value is a negative integer", func() {
+			BeforeEach(func() {
+				input = "-21"
+			})
+
+			It("does not error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+		})
+
+		When("the value is a non integer", func() {
+			BeforeEach(func() {
+				input = "not-a-integer"
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(HaveOccurred())
+			})
+		})
+	})
+
 	Describe("ParseIntValue", func() {
 		When("nil is provided", func() {
 			It("sets IsSet to false", func() {

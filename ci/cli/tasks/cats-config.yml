@@ -33,7 +33,13 @@ run:
     CF_INT_USERNAME="admin"
 
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
-    CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
+
+    pushd vars-store/ci/infrastructure/$ENV
+      eval "$(bbl print-env)"
+    popd
+
+    credhub login
+    CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
 
     cat << EOF | jq -S . > cats-config/integration_config.json
     {

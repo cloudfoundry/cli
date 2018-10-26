@@ -2,26 +2,27 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeV3AppsActor struct {
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetApplicationsWithProcessesBySpaceStub        func(spaceGUID string) ([]v3action.ApplicationWithProcessSummary, v3action.Warnings, error)
+	GetApplicationsWithProcessesBySpaceStub        func(string) ([]v3action.ApplicationWithProcessSummary, v3action.Warnings, error)
 	getApplicationsWithProcessesBySpaceMutex       sync.RWMutex
 	getApplicationsWithProcessesBySpaceArgsForCall []struct {
-		spaceGUID string
+		arg1 string
 	}
 	getApplicationsWithProcessesBySpaceReturns struct {
 		result1 []v3action.ApplicationWithProcessSummary
@@ -40,7 +41,8 @@ type FakeV3AppsActor struct {
 func (fake *FakeV3AppsActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -49,7 +51,8 @@ func (fake *FakeV3AppsActor) CloudControllerAPIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeV3AppsActor) CloudControllerAPIVersionCallCount() int {
@@ -58,7 +61,15 @@ func (fake *FakeV3AppsActor) CloudControllerAPIVersionCallCount() int {
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeV3AppsActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeV3AppsActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -66,6 +77,8 @@ func (fake *FakeV3AppsActor) CloudControllerAPIVersionReturns(result1 string) {
 }
 
 func (fake *FakeV3AppsActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -77,21 +90,22 @@ func (fake *FakeV3AppsActor) CloudControllerAPIVersionReturnsOnCall(i int, resul
 	}{result1}
 }
 
-func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpace(spaceGUID string) ([]v3action.ApplicationWithProcessSummary, v3action.Warnings, error) {
+func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpace(arg1 string) ([]v3action.ApplicationWithProcessSummary, v3action.Warnings, error) {
 	fake.getApplicationsWithProcessesBySpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationsWithProcessesBySpaceReturnsOnCall[len(fake.getApplicationsWithProcessesBySpaceArgsForCall)]
 	fake.getApplicationsWithProcessesBySpaceArgsForCall = append(fake.getApplicationsWithProcessesBySpaceArgsForCall, struct {
-		spaceGUID string
-	}{spaceGUID})
-	fake.recordInvocation("GetApplicationsWithProcessesBySpace", []interface{}{spaceGUID})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetApplicationsWithProcessesBySpace", []interface{}{arg1})
 	fake.getApplicationsWithProcessesBySpaceMutex.Unlock()
 	if fake.GetApplicationsWithProcessesBySpaceStub != nil {
-		return fake.GetApplicationsWithProcessesBySpaceStub(spaceGUID)
+		return fake.GetApplicationsWithProcessesBySpaceStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationsWithProcessesBySpaceReturns.result1, fake.getApplicationsWithProcessesBySpaceReturns.result2, fake.getApplicationsWithProcessesBySpaceReturns.result3
+	fakeReturns := fake.getApplicationsWithProcessesBySpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceCallCount() int {
@@ -100,13 +114,22 @@ func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceCallCount() int 
 	return len(fake.getApplicationsWithProcessesBySpaceArgsForCall)
 }
 
+func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceCalls(stub func(string) ([]v3action.ApplicationWithProcessSummary, v3action.Warnings, error)) {
+	fake.getApplicationsWithProcessesBySpaceMutex.Lock()
+	defer fake.getApplicationsWithProcessesBySpaceMutex.Unlock()
+	fake.GetApplicationsWithProcessesBySpaceStub = stub
+}
+
 func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceArgsForCall(i int) string {
 	fake.getApplicationsWithProcessesBySpaceMutex.RLock()
 	defer fake.getApplicationsWithProcessesBySpaceMutex.RUnlock()
-	return fake.getApplicationsWithProcessesBySpaceArgsForCall[i].spaceGUID
+	argsForCall := fake.getApplicationsWithProcessesBySpaceArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceReturns(result1 []v3action.ApplicationWithProcessSummary, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationsWithProcessesBySpaceMutex.Lock()
+	defer fake.getApplicationsWithProcessesBySpaceMutex.Unlock()
 	fake.GetApplicationsWithProcessesBySpaceStub = nil
 	fake.getApplicationsWithProcessesBySpaceReturns = struct {
 		result1 []v3action.ApplicationWithProcessSummary
@@ -116,6 +139,8 @@ func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceReturns(result1 
 }
 
 func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceReturnsOnCall(i int, result1 []v3action.ApplicationWithProcessSummary, result2 v3action.Warnings, result3 error) {
+	fake.getApplicationsWithProcessesBySpaceMutex.Lock()
+	defer fake.getApplicationsWithProcessesBySpaceMutex.Unlock()
 	fake.GetApplicationsWithProcessesBySpaceStub = nil
 	if fake.getApplicationsWithProcessesBySpaceReturnsOnCall == nil {
 		fake.getApplicationsWithProcessesBySpaceReturnsOnCall = make(map[int]struct {

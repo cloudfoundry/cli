@@ -155,6 +155,8 @@ var _ = Describe("scale command", func() {
 					Consistently(session).ShouldNot(Say("Stopping"))
 					Consistently(session).ShouldNot(Say("Starting"))
 					Consistently(session).ShouldNot(Say("Waiting"))
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("requested state:\\s+started"))
 					Eventually(session).Should(Exit(0))
 
 					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
@@ -295,7 +297,8 @@ var _ = Describe("scale command", func() {
 						Consistently(session).ShouldNot(Say(`This will cause the app to restart|Stopping|Starting`))
 						Eventually(session).Should(Exit(0))
 						updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-						Expect(updatedAppTable.Processes).To(BeEmpty())
+						Expect(updatedAppTable.Processes[0].InstanceCount).To(Equal("0/0"))
+						Expect(updatedAppTable.Processes[0].Instances).To(BeEmpty())
 					})
 				})
 

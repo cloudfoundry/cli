@@ -54,7 +54,7 @@ The CF CLI requires the following development tools in order to run our test:
 - [Ginkgo](https://github.com/onsi/ginkgo)/[Gomega](https://github.com/onsi/gomega)
   - Test framework/Matchers Library.
 - [counterfeiter](https://github.com/maxbrunsfeld/counterfeiter) - Generate
-  fakes/mocks for testing.
+  fakes/mocks for testing. Currently using version `6.*`.
 - [dep](https://github.com/golang/dep) - `vendor` dependency management tool
 - [make](https://www.gnu.org/software/make/) - tool for building the CLI and
   running it's tests.

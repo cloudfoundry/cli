@@ -2,18 +2,18 @@
 package pluginfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
-	"code.cloudfoundry.org/cli/command/plugin"
+	pluginaction "code.cloudfoundry.org/cli/actor/pluginaction"
+	plugin "code.cloudfoundry.org/cli/command/plugin"
 )
 
 type FakeUninstallPluginActor struct {
-	UninstallPluginStub        func(uninstaller pluginaction.PluginUninstaller, name string) error
+	UninstallPluginStub        func(pluginaction.PluginUninstaller, string) error
 	uninstallPluginMutex       sync.RWMutex
 	uninstallPluginArgsForCall []struct {
-		uninstaller pluginaction.PluginUninstaller
-		name        string
+		arg1 pluginaction.PluginUninstaller
+		arg2 string
 	}
 	uninstallPluginReturns struct {
 		result1 error
@@ -25,22 +25,23 @@ type FakeUninstallPluginActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUninstallPluginActor) UninstallPlugin(uninstaller pluginaction.PluginUninstaller, name string) error {
+func (fake *FakeUninstallPluginActor) UninstallPlugin(arg1 pluginaction.PluginUninstaller, arg2 string) error {
 	fake.uninstallPluginMutex.Lock()
 	ret, specificReturn := fake.uninstallPluginReturnsOnCall[len(fake.uninstallPluginArgsForCall)]
 	fake.uninstallPluginArgsForCall = append(fake.uninstallPluginArgsForCall, struct {
-		uninstaller pluginaction.PluginUninstaller
-		name        string
-	}{uninstaller, name})
-	fake.recordInvocation("UninstallPlugin", []interface{}{uninstaller, name})
+		arg1 pluginaction.PluginUninstaller
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UninstallPlugin", []interface{}{arg1, arg2})
 	fake.uninstallPluginMutex.Unlock()
 	if fake.UninstallPluginStub != nil {
-		return fake.UninstallPluginStub(uninstaller, name)
+		return fake.UninstallPluginStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.uninstallPluginReturns.result1
+	fakeReturns := fake.uninstallPluginReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeUninstallPluginActor) UninstallPluginCallCount() int {
@@ -49,13 +50,22 @@ func (fake *FakeUninstallPluginActor) UninstallPluginCallCount() int {
 	return len(fake.uninstallPluginArgsForCall)
 }
 
+func (fake *FakeUninstallPluginActor) UninstallPluginCalls(stub func(pluginaction.PluginUninstaller, string) error) {
+	fake.uninstallPluginMutex.Lock()
+	defer fake.uninstallPluginMutex.Unlock()
+	fake.UninstallPluginStub = stub
+}
+
 func (fake *FakeUninstallPluginActor) UninstallPluginArgsForCall(i int) (pluginaction.PluginUninstaller, string) {
 	fake.uninstallPluginMutex.RLock()
 	defer fake.uninstallPluginMutex.RUnlock()
-	return fake.uninstallPluginArgsForCall[i].uninstaller, fake.uninstallPluginArgsForCall[i].name
+	argsForCall := fake.uninstallPluginArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeUninstallPluginActor) UninstallPluginReturns(result1 error) {
+	fake.uninstallPluginMutex.Lock()
+	defer fake.uninstallPluginMutex.Unlock()
 	fake.UninstallPluginStub = nil
 	fake.uninstallPluginReturns = struct {
 		result1 error
@@ -63,6 +73,8 @@ func (fake *FakeUninstallPluginActor) UninstallPluginReturns(result1 error) {
 }
 
 func (fake *FakeUninstallPluginActor) UninstallPluginReturnsOnCall(i int, result1 error) {
+	fake.uninstallPluginMutex.Lock()
+	defer fake.uninstallPluginMutex.Unlock()
 	fake.UninstallPluginStub = nil
 	if fake.uninstallPluginReturnsOnCall == nil {
 		fake.uninstallPluginReturnsOnCall = make(map[int]struct {

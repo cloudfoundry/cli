@@ -2,27 +2,28 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeV3CreateAppActor struct {
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct{}
-	cloudControllerAPIVersionReturns     struct {
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
 		result1 string
 	}
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	CreateApplicationInSpaceStub        func(app v3action.Application, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	CreateApplicationInSpaceStub        func(v3action.Application, string) (v3action.Application, v3action.Warnings, error)
 	createApplicationInSpaceMutex       sync.RWMutex
 	createApplicationInSpaceArgsForCall []struct {
-		app       v3action.Application
-		spaceGUID string
+		arg1 v3action.Application
+		arg2 string
 	}
 	createApplicationInSpaceReturns struct {
 		result1 v3action.Application
@@ -41,7 +42,8 @@ type FakeV3CreateAppActor struct {
 func (fake *FakeV3CreateAppActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
 	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
@@ -50,7 +52,8 @@ func (fake *FakeV3CreateAppActor) CloudControllerAPIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.cloudControllerAPIVersionReturns.result1
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeV3CreateAppActor) CloudControllerAPIVersionCallCount() int {
@@ -59,7 +62,15 @@ func (fake *FakeV3CreateAppActor) CloudControllerAPIVersionCallCount() int {
 	return len(fake.cloudControllerAPIVersionArgsForCall)
 }
 
+func (fake *FakeV3CreateAppActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
 func (fake *FakeV3CreateAppActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
 		result1 string
@@ -67,6 +78,8 @@ func (fake *FakeV3CreateAppActor) CloudControllerAPIVersionReturns(result1 strin
 }
 
 func (fake *FakeV3CreateAppActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
 	fake.CloudControllerAPIVersionStub = nil
 	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
 		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
@@ -78,22 +91,23 @@ func (fake *FakeV3CreateAppActor) CloudControllerAPIVersionReturnsOnCall(i int, 
 	}{result1}
 }
 
-func (fake *FakeV3CreateAppActor) CreateApplicationInSpace(app v3action.Application, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeV3CreateAppActor) CreateApplicationInSpace(arg1 v3action.Application, arg2 string) (v3action.Application, v3action.Warnings, error) {
 	fake.createApplicationInSpaceMutex.Lock()
 	ret, specificReturn := fake.createApplicationInSpaceReturnsOnCall[len(fake.createApplicationInSpaceArgsForCall)]
 	fake.createApplicationInSpaceArgsForCall = append(fake.createApplicationInSpaceArgsForCall, struct {
-		app       v3action.Application
-		spaceGUID string
-	}{app, spaceGUID})
-	fake.recordInvocation("CreateApplicationInSpace", []interface{}{app, spaceGUID})
+		arg1 v3action.Application
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("CreateApplicationInSpace", []interface{}{arg1, arg2})
 	fake.createApplicationInSpaceMutex.Unlock()
 	if fake.CreateApplicationInSpaceStub != nil {
-		return fake.CreateApplicationInSpaceStub(app, spaceGUID)
+		return fake.CreateApplicationInSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createApplicationInSpaceReturns.result1, fake.createApplicationInSpaceReturns.result2, fake.createApplicationInSpaceReturns.result3
+	fakeReturns := fake.createApplicationInSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
 func (fake *FakeV3CreateAppActor) CreateApplicationInSpaceCallCount() int {
@@ -102,13 +116,22 @@ func (fake *FakeV3CreateAppActor) CreateApplicationInSpaceCallCount() int {
 	return len(fake.createApplicationInSpaceArgsForCall)
 }
 
+func (fake *FakeV3CreateAppActor) CreateApplicationInSpaceCalls(stub func(v3action.Application, string) (v3action.Application, v3action.Warnings, error)) {
+	fake.createApplicationInSpaceMutex.Lock()
+	defer fake.createApplicationInSpaceMutex.Unlock()
+	fake.CreateApplicationInSpaceStub = stub
+}
+
 func (fake *FakeV3CreateAppActor) CreateApplicationInSpaceArgsForCall(i int) (v3action.Application, string) {
 	fake.createApplicationInSpaceMutex.RLock()
 	defer fake.createApplicationInSpaceMutex.RUnlock()
-	return fake.createApplicationInSpaceArgsForCall[i].app, fake.createApplicationInSpaceArgsForCall[i].spaceGUID
+	argsForCall := fake.createApplicationInSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeV3CreateAppActor) CreateApplicationInSpaceReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.createApplicationInSpaceMutex.Lock()
+	defer fake.createApplicationInSpaceMutex.Unlock()
 	fake.CreateApplicationInSpaceStub = nil
 	fake.createApplicationInSpaceReturns = struct {
 		result1 v3action.Application
@@ -118,6 +141,8 @@ func (fake *FakeV3CreateAppActor) CreateApplicationInSpaceReturns(result1 v3acti
 }
 
 func (fake *FakeV3CreateAppActor) CreateApplicationInSpaceReturnsOnCall(i int, result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.createApplicationInSpaceMutex.Lock()
+	defer fake.createApplicationInSpaceMutex.Unlock()
 	fake.CreateApplicationInSpaceStub = nil
 	if fake.createApplicationInSpaceReturnsOnCall == nil {
 		fake.createApplicationInSpaceReturnsOnCall = make(map[int]struct {

@@ -27,7 +27,7 @@ var _ = Describe("Info", func() {
 	)
 
 	JustBeforeEach(func() {
-		client = NewTestClient()
+		client, _ = NewTestClient()
 
 		server.AppendHandlers(
 			CombineHandlers(

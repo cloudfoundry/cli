@@ -2,17 +2,17 @@
 package commandfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/command"
+	command "code.cloudfoundry.org/cli/command"
 )
 
 type FakeSharedActor struct {
-	CheckTargetStub        func(targetedOrganizationRequired bool, targetedSpaceRequired bool) error
+	CheckTargetStub        func(bool, bool) error
 	checkTargetMutex       sync.RWMutex
 	checkTargetArgsForCall []struct {
-		targetedOrganizationRequired bool
-		targetedSpaceRequired        bool
+		arg1 bool
+		arg2 bool
 	}
 	checkTargetReturns struct {
 		result1 error
@@ -22,8 +22,9 @@ type FakeSharedActor struct {
 	}
 	RequireCurrentUserStub        func() (string, error)
 	requireCurrentUserMutex       sync.RWMutex
-	requireCurrentUserArgsForCall []struct{}
-	requireCurrentUserReturns     struct {
+	requireCurrentUserArgsForCall []struct {
+	}
+	requireCurrentUserReturns struct {
 		result1 string
 		result2 error
 	}
@@ -33,8 +34,9 @@ type FakeSharedActor struct {
 	}
 	RequireTargetedOrgStub        func() (string, error)
 	requireTargetedOrgMutex       sync.RWMutex
-	requireTargetedOrgArgsForCall []struct{}
-	requireTargetedOrgReturns     struct {
+	requireTargetedOrgArgsForCall []struct {
+	}
+	requireTargetedOrgReturns struct {
 		result1 string
 		result2 error
 	}
@@ -46,22 +48,23 @@ type FakeSharedActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSharedActor) CheckTarget(targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
+func (fake *FakeSharedActor) CheckTarget(arg1 bool, arg2 bool) error {
 	fake.checkTargetMutex.Lock()
 	ret, specificReturn := fake.checkTargetReturnsOnCall[len(fake.checkTargetArgsForCall)]
 	fake.checkTargetArgsForCall = append(fake.checkTargetArgsForCall, struct {
-		targetedOrganizationRequired bool
-		targetedSpaceRequired        bool
-	}{targetedOrganizationRequired, targetedSpaceRequired})
-	fake.recordInvocation("CheckTarget", []interface{}{targetedOrganizationRequired, targetedSpaceRequired})
+		arg1 bool
+		arg2 bool
+	}{arg1, arg2})
+	fake.recordInvocation("CheckTarget", []interface{}{arg1, arg2})
 	fake.checkTargetMutex.Unlock()
 	if fake.CheckTargetStub != nil {
-		return fake.CheckTargetStub(targetedOrganizationRequired, targetedSpaceRequired)
+		return fake.CheckTargetStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.checkTargetReturns.result1
+	fakeReturns := fake.checkTargetReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeSharedActor) CheckTargetCallCount() int {
@@ -70,13 +73,22 @@ func (fake *FakeSharedActor) CheckTargetCallCount() int {
 	return len(fake.checkTargetArgsForCall)
 }
 
+func (fake *FakeSharedActor) CheckTargetCalls(stub func(bool, bool) error) {
+	fake.checkTargetMutex.Lock()
+	defer fake.checkTargetMutex.Unlock()
+	fake.CheckTargetStub = stub
+}
+
 func (fake *FakeSharedActor) CheckTargetArgsForCall(i int) (bool, bool) {
 	fake.checkTargetMutex.RLock()
 	defer fake.checkTargetMutex.RUnlock()
-	return fake.checkTargetArgsForCall[i].targetedOrganizationRequired, fake.checkTargetArgsForCall[i].targetedSpaceRequired
+	argsForCall := fake.checkTargetArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeSharedActor) CheckTargetReturns(result1 error) {
+	fake.checkTargetMutex.Lock()
+	defer fake.checkTargetMutex.Unlock()
 	fake.CheckTargetStub = nil
 	fake.checkTargetReturns = struct {
 		result1 error
@@ -84,6 +96,8 @@ func (fake *FakeSharedActor) CheckTargetReturns(result1 error) {
 }
 
 func (fake *FakeSharedActor) CheckTargetReturnsOnCall(i int, result1 error) {
+	fake.checkTargetMutex.Lock()
+	defer fake.checkTargetMutex.Unlock()
 	fake.CheckTargetStub = nil
 	if fake.checkTargetReturnsOnCall == nil {
 		fake.checkTargetReturnsOnCall = make(map[int]struct {
@@ -98,7 +112,8 @@ func (fake *FakeSharedActor) CheckTargetReturnsOnCall(i int, result1 error) {
 func (fake *FakeSharedActor) RequireCurrentUser() (string, error) {
 	fake.requireCurrentUserMutex.Lock()
 	ret, specificReturn := fake.requireCurrentUserReturnsOnCall[len(fake.requireCurrentUserArgsForCall)]
-	fake.requireCurrentUserArgsForCall = append(fake.requireCurrentUserArgsForCall, struct{}{})
+	fake.requireCurrentUserArgsForCall = append(fake.requireCurrentUserArgsForCall, struct {
+	}{})
 	fake.recordInvocation("RequireCurrentUser", []interface{}{})
 	fake.requireCurrentUserMutex.Unlock()
 	if fake.RequireCurrentUserStub != nil {
@@ -107,7 +122,8 @@ func (fake *FakeSharedActor) RequireCurrentUser() (string, error) {
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.requireCurrentUserReturns.result1, fake.requireCurrentUserReturns.result2
+	fakeReturns := fake.requireCurrentUserReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeSharedActor) RequireCurrentUserCallCount() int {
@@ -116,7 +132,15 @@ func (fake *FakeSharedActor) RequireCurrentUserCallCount() int {
 	return len(fake.requireCurrentUserArgsForCall)
 }
 
+func (fake *FakeSharedActor) RequireCurrentUserCalls(stub func() (string, error)) {
+	fake.requireCurrentUserMutex.Lock()
+	defer fake.requireCurrentUserMutex.Unlock()
+	fake.RequireCurrentUserStub = stub
+}
+
 func (fake *FakeSharedActor) RequireCurrentUserReturns(result1 string, result2 error) {
+	fake.requireCurrentUserMutex.Lock()
+	defer fake.requireCurrentUserMutex.Unlock()
 	fake.RequireCurrentUserStub = nil
 	fake.requireCurrentUserReturns = struct {
 		result1 string
@@ -125,6 +149,8 @@ func (fake *FakeSharedActor) RequireCurrentUserReturns(result1 string, result2 e
 }
 
 func (fake *FakeSharedActor) RequireCurrentUserReturnsOnCall(i int, result1 string, result2 error) {
+	fake.requireCurrentUserMutex.Lock()
+	defer fake.requireCurrentUserMutex.Unlock()
 	fake.RequireCurrentUserStub = nil
 	if fake.requireCurrentUserReturnsOnCall == nil {
 		fake.requireCurrentUserReturnsOnCall = make(map[int]struct {
@@ -141,7 +167,8 @@ func (fake *FakeSharedActor) RequireCurrentUserReturnsOnCall(i int, result1 stri
 func (fake *FakeSharedActor) RequireTargetedOrg() (string, error) {
 	fake.requireTargetedOrgMutex.Lock()
 	ret, specificReturn := fake.requireTargetedOrgReturnsOnCall[len(fake.requireTargetedOrgArgsForCall)]
-	fake.requireTargetedOrgArgsForCall = append(fake.requireTargetedOrgArgsForCall, struct{}{})
+	fake.requireTargetedOrgArgsForCall = append(fake.requireTargetedOrgArgsForCall, struct {
+	}{})
 	fake.recordInvocation("RequireTargetedOrg", []interface{}{})
 	fake.requireTargetedOrgMutex.Unlock()
 	if fake.RequireTargetedOrgStub != nil {
@@ -150,7 +177,8 @@ func (fake *FakeSharedActor) RequireTargetedOrg() (string, error) {
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.requireTargetedOrgReturns.result1, fake.requireTargetedOrgReturns.result2
+	fakeReturns := fake.requireTargetedOrgReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeSharedActor) RequireTargetedOrgCallCount() int {
@@ -159,7 +187,15 @@ func (fake *FakeSharedActor) RequireTargetedOrgCallCount() int {
 	return len(fake.requireTargetedOrgArgsForCall)
 }
 
+func (fake *FakeSharedActor) RequireTargetedOrgCalls(stub func() (string, error)) {
+	fake.requireTargetedOrgMutex.Lock()
+	defer fake.requireTargetedOrgMutex.Unlock()
+	fake.RequireTargetedOrgStub = stub
+}
+
 func (fake *FakeSharedActor) RequireTargetedOrgReturns(result1 string, result2 error) {
+	fake.requireTargetedOrgMutex.Lock()
+	defer fake.requireTargetedOrgMutex.Unlock()
 	fake.RequireTargetedOrgStub = nil
 	fake.requireTargetedOrgReturns = struct {
 		result1 string
@@ -168,6 +204,8 @@ func (fake *FakeSharedActor) RequireTargetedOrgReturns(result1 string, result2 e
 }
 
 func (fake *FakeSharedActor) RequireTargetedOrgReturnsOnCall(i int, result1 string, result2 error) {
+	fake.requireTargetedOrgMutex.Lock()
+	defer fake.requireTargetedOrgMutex.Unlock()
 	fake.RequireTargetedOrgStub = nil
 	if fake.requireTargetedOrgReturnsOnCall == nil {
 		fake.requireTargetedOrgReturnsOnCall = make(map[int]struct {
