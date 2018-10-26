@@ -121,6 +121,11 @@ func (config *Config) RefreshToken() string {
 	return config.ConfigFile.RefreshToken
 }
 
+// RoutingEndpoint returns the endpoint for the router API
+func (config *Config) RoutingEndpoint() string {
+	return config.ConfigFile.RoutingEndpoint
+}
+
 // SetAccessToken sets the current access token.
 func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken

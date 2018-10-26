@@ -39,6 +39,7 @@ type Config interface {
 	RefreshToken() string
 	RemovePlugin(string)
 	RequestRetryCount() int
+	RoutingEndpoint() string
 	SetAccessToken(token string)
 	SetOrganizationInformation(guid string, name string)
 	SetRefreshToken(token string)
