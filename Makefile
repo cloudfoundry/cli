@@ -96,7 +96,7 @@ integration-plugin : build integration-cleanup
 	$(ginkgo_int) -nodes $(NODES) integration/shared/plugin
 
 integration-push : build integration-cleanup
-	$(ginkgo_int) -nodes $(NODES) integration/v6/push
+	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/push
 
 integration-tests : build integration-cleanup integration-isolated integration-push integration-global
 

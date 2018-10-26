@@ -69,5 +69,5 @@ run:
 
     go get -u github.com/onsi/ginkgo/ginkgo
 
-    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental
+    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
     ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/global integration/v7/global

@@ -21,5 +21,5 @@ popd
 go get -v -u github.com/onsi/ginkgo/ginkgo
 
 cd %GOPATH%\src\code.cloudfoundry.org\cli
-ginkgo.exe -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/isolated ./integration/v7/isolated ./integration/shared/plugin ./integration/shared/experimental ./integration/v7/experimental || exit 1
+ginkgo.exe -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/isolated ./integration/v7/isolated ./integration/shared/plugin ./integration/shared/experimental ./integration/v7/experimental ./integration/v7/push || exit 1
 ginkgo.exe -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs ./integration/shared/global ./integration/v7/global || exit 1
