@@ -150,7 +150,6 @@ var _ = Describe("set-health-check command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("get-health-check", appName)
-					Eventually(session).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`process\s+health check\s+endpoint \(for http\)\s+invocation timeout`))
 					Eventually(session).Should(Say(`web\s+port\s+1`))
 					Eventually(session).Should(Say(`console\s+http\s+/healthcheck\s+1`))
@@ -167,7 +166,6 @@ var _ = Describe("set-health-check command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("get-health-check", appName)
-					Eventually(session).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`process\s+health check\s+endpoint \(for http\)\s+invocation timeout`))
 					Eventually(session).Should(Say(`web\s+http\s+/healthcheck\s+2`))
 
@@ -184,7 +182,6 @@ var _ = Describe("set-health-check command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("get-health-check", appName)
-					Eventually(session).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`process\s+health check\s+endpoint \(for http\)\s+invocation timeout`))
 					Eventually(session).Should(Say(`web\s+http\s+/healthcheck\s+1`))
 					Eventually(session).Should(Say(`console\s+process\s+1`))
