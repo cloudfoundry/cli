@@ -158,7 +158,7 @@ var _ = Describe("v3-delete command", func() {
 
 				When("the user enters 'y'", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte(`y\n`))
+						buffer.Write([]byte("y\n"))
 					})
 
 					It("it displays the app does not exist", func() {
@@ -174,7 +174,7 @@ var _ = Describe("v3-delete command", func() {
 
 				When("the user enters 'n'", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte(`n\n`))
+						buffer.Write([]byte("n\n"))
 					})
 
 					It("does not delete the app", func() {
@@ -187,7 +187,7 @@ var _ = Describe("v3-delete command", func() {
 
 				When("the user enters the default input (hits return)", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte(`\n`))
+						buffer.Write([]byte("\n"))
 					})
 
 					It("does not delete the app", func() {
