@@ -222,6 +222,11 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.RoutePathWithTCPDomainError{},
 			RoutePathWithTCPDomainError{}),
 
+		Entry("actionerror.RouterGroupNotFoundError -> RouterGroupNotFoundError",
+			actionerror.RouterGroupNotFoundError{Name: "some-group"},
+			RouterGroupNotFoundError{Name: "some-group"},
+		),
+
 		Entry("actionerror.SecurityGroupNotFoundError -> SecurityGroupNotFoundError",
 			actionerror.SecurityGroupNotFoundError{Name: "some-security-group"},
 			SecurityGroupNotFoundError{Name: "some-security-group"}),

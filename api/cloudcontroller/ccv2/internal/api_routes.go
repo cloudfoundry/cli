@@ -83,6 +83,7 @@ const (
 	PostOrganizationRequest                              = "PostOrganization"
 	PostRouteRequest                                     = "PostRoute"
 	PostServiceBindingRequest                            = "PostServiceBinding"
+	PostSharedDomainRequest                              = "PostSharedDomain"
 	PostServiceKeyRequest                                = "PostServiceKey"
 	PostSpaceRequest                                     = "PostSpace"
 	PostUserRequest                                      = "PostUser"
@@ -177,6 +178,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/services", Method: http.MethodGet, Name: GetServicesRequest},
 	{Path: "/v2/services/:service_guid", Method: http.MethodGet, Name: GetServiceRequest},
 	{Path: "/v2/shared_domains", Method: http.MethodGet, Name: GetSharedDomainsRequest},
+	{Path: "/v2/shared_domains", Method: http.MethodPost, Name: PostSharedDomainRequest},
 	{Path: "/v2/shared_domains/:shared_domain_guid", Method: http.MethodGet, Name: GetSharedDomainRequest},
 	{Path: "/v2/organizations/:organization_guid/space_quota_definitions", Method: http.MethodGet, Name: GetOrganizationSpaceQuotasRequest},
 	{Path: "/v2/space_quota_definitions/:space_quota_guid/spaces/:space_guid", Method: http.MethodPut, Name: PutSpaceQuotaRequest},

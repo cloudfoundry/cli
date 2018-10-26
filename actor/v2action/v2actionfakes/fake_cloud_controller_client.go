@@ -153,6 +153,20 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	CreateSharedDomainStub        func(string, string) (ccv2.Warnings, error)
+	createSharedDomainMutex       sync.RWMutex
+	createSharedDomainArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	createSharedDomainReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	createSharedDomainReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	CreateSpaceStub        func(string, string) (ccv2.Space, ccv2.Warnings, error)
 	createSpaceMutex       sync.RWMutex
 	createSpaceArgsForCall []struct {
@@ -1912,6 +1926,70 @@ func (fake *FakeCloudControllerClient) CreateServiceKeyReturnsOnCall(i int, resu
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateSharedDomain(arg1 string, arg2 string) (ccv2.Warnings, error) {
+	fake.createSharedDomainMutex.Lock()
+	ret, specificReturn := fake.createSharedDomainReturnsOnCall[len(fake.createSharedDomainArgsForCall)]
+	fake.createSharedDomainArgsForCall = append(fake.createSharedDomainArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2})
+	fake.createSharedDomainMutex.Unlock()
+	if fake.CreateSharedDomainStub != nil {
+		return fake.CreateSharedDomainStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.createSharedDomainReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) CreateSharedDomainCallCount() int {
+	fake.createSharedDomainMutex.RLock()
+	defer fake.createSharedDomainMutex.RUnlock()
+	return len(fake.createSharedDomainArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateSharedDomainCalls(stub func(string, string) (ccv2.Warnings, error)) {
+	fake.createSharedDomainMutex.Lock()
+	defer fake.createSharedDomainMutex.Unlock()
+	fake.CreateSharedDomainStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateSharedDomainArgsForCall(i int) (string, string) {
+	fake.createSharedDomainMutex.RLock()
+	defer fake.createSharedDomainMutex.RUnlock()
+	argsForCall := fake.createSharedDomainArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) CreateSharedDomainReturns(result1 ccv2.Warnings, result2 error) {
+	fake.createSharedDomainMutex.Lock()
+	defer fake.createSharedDomainMutex.Unlock()
+	fake.CreateSharedDomainStub = nil
+	fake.createSharedDomainReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) CreateSharedDomainReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.createSharedDomainMutex.Lock()
+	defer fake.createSharedDomainMutex.Unlock()
+	fake.CreateSharedDomainStub = nil
+	if fake.createSharedDomainReturnsOnCall == nil {
+		fake.createSharedDomainReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.createSharedDomainReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) CreateSpace(arg1 string, arg2 string) (ccv2.Space, ccv2.Warnings, error) {
@@ -6944,6 +7022,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createServiceBindingMutex.RUnlock()
 	fake.createServiceKeyMutex.RLock()
 	defer fake.createServiceKeyMutex.RUnlock()
+	fake.createSharedDomainMutex.RLock()
+	defer fake.createSharedDomainMutex.RUnlock()
 	fake.createSpaceMutex.RLock()
 	defer fake.createSpaceMutex.RUnlock()
 	fake.createUserMutex.RLock()

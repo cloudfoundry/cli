@@ -19,6 +19,7 @@ type CloudControllerClient interface {
 	CreateServiceKey(serviceInstanceGUID string, keyName string, parameters map[string]interface{}) (ccv2.ServiceKey, ccv2.Warnings, error)
 	CreateSpace(spaceName string, orgGUID string) (ccv2.Space, ccv2.Warnings, error)
 	CreateUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
+	CreateSharedDomain(domainName string, routerGroupGUID string) (ccv2.Warnings, error)
 	DeleteOrganizationJob(orgGUID string) (ccv2.Job, ccv2.Warnings, error)
 	DeleteRoute(routeGUID string) (ccv2.Warnings, error)
 	DeleteRouteApplication(routeGUID string, appGUID string) (ccv2.Warnings, error)

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -474,4 +475,195 @@ var _ = Describe("Verbose", func() {
 			Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo", "/bar", []string{"/foo", "/bar"}),
 		)
 	})
+
+	Describe("routing", func() {
+		When("the user does not provide the -v flag, the CF_TRACE env var, or the --trace config option", func() {
+			It("should not log requests", func() {
+				tmpDir, err := ioutil.TempDir("", "")
+				defer os.RemoveAll(tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				helpers.LoginCF()
+				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
+
+				command := []string{"create-shared-domain", helpers.NewDomainName(), "--router-group", "default-tcp"}
+
+				session := helpers.CF(command...)
+
+				Consistently(session).ShouldNot(Say(`GET /routing/v1`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		DescribeTable("verbose logging to stdout",
+			func(cfTraceEnvVar string, configTraceValue string, vFlagSet bool) {
+				tmpDir, err := ioutil.TempDir("", "")
+				defer os.RemoveAll(tmpDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				helpers.LoginCF()
+				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
+
+				var envTraceFile string
+				if _, err := strconv.ParseBool(cfTraceEnvVar); err != nil && len(cfTraceEnvVar) > 0 {
+					cfTraceEnvVar = filepath.Join(tmpDir, cfTraceEnvVar)
+					envTraceFile = cfTraceEnvVar
+				}
+				envMap := map[string]string{"CF_TRACE": cfTraceEnvVar}
+
+				command := []string{"create-shared-domain", helpers.NewDomainName(), "--router-group", "default-tcp"}
+
+				if vFlagSet {
+					command = append(command, "-v")
+				}
+
+				var configTraceFile string
+				if configTraceValue != "" {
+					if _, err := strconv.ParseBool(configTraceValue); err != nil && len(configTraceValue) > 0 {
+						configTraceValue = filepath.Join(tmpDir, configTraceValue)
+						configTraceFile = configTraceValue
+					}
+					session := helpers.CF("config", "--trace", configTraceValue)
+					Eventually(session).Should(Exit(0))
+				}
+
+				session := helpers.CFWithEnv(envMap, command...)
+
+				Eventually(session).Should(Say(`GET /routing/v1/router_groups\?name=default-tcp`))
+				Eventually(session).Should(Exit(0))
+
+				if len(envTraceFile) > 0 {
+					assertLogsWrittenToFile(envTraceFile, "GET /routing/v1/router_groups?name=default-tcp")
+				}
+
+				if len(configTraceFile) > 0 {
+					assertLogsWrittenToFile(configTraceFile, "GET /routing/v1/router_groups?name=default-tcp")
+				}
+			},
+
+			Entry("CF_TRACE=true, enables verbose", "true", "", false),
+			Entry("CF_TRACE=true, config trace false: enables verbose", "true", "false", false),
+			Entry("CF_TRACE=true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
+
+			Entry("CF_TRACE=false, '-v': enables verbose", "false", "", true),
+			Entry("CF_TRACE=false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", true),
+
+			Entry("CF_TRACE unset, '-v': enables verbose", "", "", true),
+			Entry("CF_TRACE unset, config trace true: enables verbose", "", "true", false),
+			Entry("CF_TRACE unset, config trace file path, '-v': enables verbose AND logging to file", "", "/foo", true),
+
+			Entry("CF_TRACE=filepath, '-v': enables logging to file", "/foo", "", true),
+			Entry("CF_TRACE=filepath, config trace true: enables verbose AND logging to file", "/foo", "true", false),
+		)
+	})
+
+	DescribeTable("verbose logging to a file",
+		func(cfTraceEnvVar string, configTraceValue string, vFlagSet bool) {
+			tmpDir, err := ioutil.TempDir("", "")
+			defer os.RemoveAll(tmpDir)
+			Expect(err).NotTo(HaveOccurred())
+
+			helpers.LoginCF()
+			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
+
+			var envMap map[string]string
+
+			var envTraceFile string
+			if cfTraceEnvVar != "" {
+				if _, err := strconv.ParseBool(cfTraceEnvVar); err != nil {
+					cfTraceEnvVar = filepath.Join(tmpDir, cfTraceEnvVar)
+					envTraceFile = cfTraceEnvVar
+				}
+				envMap = map[string]string{"CF_TRACE": cfTraceEnvVar}
+			}
+
+			var configTraceFile string
+			if configTraceValue != "" {
+				if _, err := strconv.ParseBool(configTraceValue); err != nil {
+					configTraceValue = filepath.Join(tmpDir, configTraceValue)
+					configTraceFile = configTraceValue
+				}
+				session := helpers.CF("config", "--trace", configTraceValue)
+				Eventually(session).Should(Exit(0))
+			}
+
+			command := []string{"create-shared-domain", helpers.NewDomainName(), "--router-group", "default-tcp"}
+
+			if vFlagSet {
+				command = append(command, "-v")
+			}
+
+			session := helpers.CFWithEnv(envMap, command...)
+			Eventually(session).Should(Exit(0))
+
+			if len(envTraceFile) > 0 {
+				assertLogsWrittenToFile(envTraceFile, "GET /routing/v1/router_groups?name=default-tcp")
+			}
+
+			if len(configTraceFile) > 0 {
+				assertLogsWrittenToFile(configTraceFile, "GET /routing/v1/router_groups?name=default-tcp")
+			}
+		},
+
+		Entry("CF_TRACE=false, config trace file path: enables logging to file", "false", "/foo", false),
+		Entry("CF_TRACE unset, config trace file path: enables logging to file", "", "/foo", false),
+		Entry("CF_TRACE=filepath: enables logging to file", "/foo", "", false),
+	)
+
+	When("the values of CF_TRACE and config.trace are two different filepaths", func() {
+		var (
+			configTraceFile, envTraceFile string
+			cfEnv                         map[string]string
+		)
+
+		BeforeEach(func() {
+			helpers.LoginCF()
+			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
+
+			tmpDir, err := ioutil.TempDir("", "")
+			defer os.RemoveAll(tmpDir)
+			Expect(err).NotTo(HaveOccurred())
+
+			configTraceFile = filepath.Join(tmpDir, "/foo")
+			session := helpers.CF("config", "--trace", configTraceFile)
+			Eventually(session).Should(Exit(0))
+
+			envTraceFile = filepath.Join(tmpDir, "/bar")
+			cfEnv = map[string]string{
+				"CF_TRACE": envTraceFile,
+			}
+		})
+
+		It("logs verbose output to both files", func() {
+			command := []string{"create-shared-domain", helpers.NewDomainName(), "--router-group", "default-tcp"}
+
+			session := helpers.CFWithEnv(cfEnv, command...)
+			Eventually(session).Should(Exit(0))
+
+			assertLogsWrittenToFile(envTraceFile, "GET /routing/v1/router_groups?name=default-tcp")
+			assertLogsWrittenToFile(configTraceFile, "GET /routing/v1/router_groups?name=default-tcp")
+
+			configStat, err := os.Stat(configTraceFile)
+			Expect(err).ToNot(HaveOccurred())
+
+			envStat, err := os.Stat(envTraceFile)
+			Expect(err).ToNot(HaveOccurred())
+
+			var fileMode os.FileMode
+			if runtime.GOOS == "windows" {
+				fileMode = os.FileMode(0666)
+			} else {
+				fileMode = os.FileMode(0600)
+			}
+
+			Expect(configStat.Mode().String()).To(Equal(fileMode.String()))
+			Expect(envStat.Mode().String()).To(Equal(fileMode.String()))
+		})
+	})
 })
+
+func assertLogsWrittenToFile(filepath string, expected string) {
+	contents, err := ioutil.ReadFile(filepath)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(string(contents)).To(ContainSubstring(expected), "Logging to a file failed")
+}

@@ -110,6 +110,8 @@ func ConvertToTranslatableError(err error) error {
 		return RouteInDifferentSpaceError(e)
 	case actionerror.RoutePathWithTCPDomainError:
 		return RoutePathWithTCPDomainError(e)
+	case actionerror.RouterGroupNotFoundError:
+		return RouterGroupNotFoundError(e)
 	case actionerror.SecurityGroupNotFoundError:
 		return SecurityGroupNotFoundError(e)
 	case actionerror.ServiceInstanceNotFoundError:
