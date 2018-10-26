@@ -59,7 +59,6 @@ func (cmd GetHealthCheckCommand) Execute(args []string) error {
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
-	cmd.UI.DisplayNewline()
 
 	processHealthChecks, warnings, err := cmd.Actor.GetApplicationProcessHealthChecksByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
@@ -67,12 +66,17 @@ func (cmd GetHealthCheckCommand) Execute(args []string) error {
 		return err
 	}
 
+	cmd.UI.DisplayNewline()
+
 	if len(processHealthChecks) == 0 {
-		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("App has no processes")
 		return nil
 	}
 
+	return cmd.DisplayProcessTable(processHealthChecks)
+}
+
+func (cmd GetHealthCheckCommand) DisplayProcessTable(processHealthChecks []v7action.ProcessHealthCheck) error {
 	table := [][]string{
 		{
 			cmd.UI.TranslateText("process"),
