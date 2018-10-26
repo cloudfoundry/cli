@@ -90,15 +90,7 @@ var _ = Describe("create-shared-domain command", func() {
 			var routerGroupName string
 
 			BeforeEach(func() {
-				var response struct {
-					RoutingEndpoint string `json:"routing_endpoint"`
-				}
-				helpers.Curl(&response, "/v2/info")
-
-				// TODO: #161159794 remove this skip and check a nicer error message when available
-				if response.RoutingEndpoint == "" {
-					Skip("Test requires routing endpoint on /v2/info")
-				}
+				helpers.SkipIfNoRoutingAPI()
 			})
 
 			When("router-group exists", func() {

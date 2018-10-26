@@ -153,3 +153,15 @@ func fetchAPIVersion() ccRoot {
 	Expect(err).ToNot(HaveOccurred())
 	return cc
 }
+
+func SkipIfNoRoutingAPI() {
+	// TODO: #161159794 remove this function and check a nicer error message when available
+	var response struct {
+		RoutingEndpoint string `json:"routing_endpoint"`
+	}
+	Curl(&response, "/v2/info")
+
+	if response.RoutingEndpoint == "" {
+		Skip("Test requires routing endpoint on /v2/info")
+	}
+}

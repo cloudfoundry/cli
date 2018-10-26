@@ -477,6 +477,10 @@ var _ = Describe("Verbose", func() {
 	})
 
 	Describe("routing", func() {
+		BeforeEach(func() {
+			helpers.SkipIfNoRoutingAPI()
+		})
+
 		When("the user does not provide the -v flag, the CF_TRACE env var, or the --trace config option", func() {
 			It("should not log requests", func() {
 				tmpDir, err := ioutil.TempDir("", "")
