@@ -23,11 +23,11 @@ var _ = Describe("pushing docker images", func() {
 		It("uses the specified docker image", func() {
 			session := helpers.CF(PushCommandName, appName, "-o", PublicDockerImage)
 
-			Eventually(session).Should(Say("name:\\s+%s", appName))
-			Eventually(session).Should(Say("requested state:\\s+started"))
+			Eventually(session).Should(Say(`name:\s+%s`, appName))
+			Eventually(session).Should(Say(`requested state:\s+started`))
 			Eventually(session).Should(Say("stack:"))
 			Consistently(session).ShouldNot(Say("buildpacks:"))
-			Eventually(session).Should(Say("docker image:\\s+%s", PublicDockerImage))
+			Eventually(session).Should(Say(`docker image:\s+%s`, PublicDockerImage))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -69,11 +69,11 @@ var _ = Describe("pushing docker images", func() {
 					"--docker-image", privateDockerImage,
 				)
 
-				Eventually(session).Should(Say("name:\\s+%s", appName))
-				Eventually(session).Should(Say("requested state:\\s+started"))
+				Eventually(session).Should(Say(`name:\s+%s`, appName))
+				Eventually(session).Should(Say(`requested state:\s+started`))
 				Eventually(session).Should(Say("stack:"))
 				Consistently(session).ShouldNot(Say("buildpacks:"))
-				Eventually(session).Should(Say("docker image:\\s+%s", privateDockerImage))
+				Eventually(session).Should(Say(`docker image:\s+%s`, privateDockerImage))
 				Eventually(session).Should(Exit(0))
 			})
 		})

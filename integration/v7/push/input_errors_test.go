@@ -82,7 +82,7 @@ var _ = Describe("input errors", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					session := helpers.CF(PushCommandName, appName, "--docker-username", "some-username", "--docker-image", "some-image")
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Environment variable CF_DOCKER_PASSWORD not set\\."))
+					Eventually(session.Err).Should(Say(`Environment variable CF_DOCKER_PASSWORD not set\.`))
 					Eventually(session).Should(Exit(1))
 				})
 			})

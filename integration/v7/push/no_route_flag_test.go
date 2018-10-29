@@ -20,10 +20,10 @@ var _ = When("the --no-route flag is set", func() {
 	It("does not map any routes to the app", func() {
 		helpers.WithHelloWorldApp(func(appDir string) {
 			session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName, "--no-route")
-			Consistently(session).ShouldNot(Say("Mapping routes\\.\\.\\."))
-			Eventually(session).Should(Say("name:\\s+%s", appName))
-			Eventually(session).Should(Say("requested state:\\s+started"))
-			Eventually(session).Should(Say("routes:\\s+\n"))
+			Consistently(session).ShouldNot(Say(`Mapping routes\.\.\.`))
+			Eventually(session).Should(Say(`name:\s+%s`, appName))
+			Eventually(session).Should(Say(`requested state:\s+started`))
+			Eventually(session).Should(Say(`routes:\s+\n`))
 			Eventually(session).Should(Exit(0))
 		})
 	})

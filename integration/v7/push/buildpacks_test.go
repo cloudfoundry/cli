@@ -37,9 +37,9 @@ var _ = Describe("buildpacks", func() {
 							"-b", "default",
 						)
 
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+started"))
-						Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+started`))
+						Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -78,9 +78,9 @@ var _ = Describe("buildpacks", func() {
 								"-b", "staticfile_buildpack",
 							)
 
-							Eventually(session).Should(Say("name:\\s+%s", appName))
-							Eventually(session).Should(Say("requested state:\\s+started"))
-							Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
+							Eventually(session).Should(Say(`name:\s+%s`, appName))
+							Eventually(session).Should(Say(`requested state:\s+started`))
+							Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 							Eventually(session).Should(Exit(0))
 						})
 					})
@@ -98,9 +98,9 @@ var _ = Describe("buildpacks", func() {
 							Eventually(session).Should(Say("Ruby Buildpack"))
 							Eventually(session).Should(Say("Go Buildpack"))
 
-							Eventually(session).Should(Say("name:\\s+%s", appName))
-							Eventually(session).Should(Say("requested state:\\s+started"))
-							Eventually(session).Should(Say("buildpacks:\\s+ruby.*go"))
+							Eventually(session).Should(Say(`name:\s+%s`, appName))
+							Eventually(session).Should(Say(`requested state:\s+started`))
+							Eventually(session).Should(Say(`buildpacks:\s+ruby.*go`))
 							Eventually(session).Should(Exit(0))
 						})
 					})
@@ -115,9 +115,9 @@ var _ = Describe("buildpacks", func() {
 							"-b", "https://github.com/cloudfoundry/staticfile-buildpack",
 						)
 
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+started"))
-						Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+started`))
+						Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 						Eventually(session).Should(Exit(0))
 					})
 				})

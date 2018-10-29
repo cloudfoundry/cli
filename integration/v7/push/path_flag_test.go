@@ -28,9 +28,9 @@ var _ = When("the -p flag is provided", func() {
 			It("pushes the app from the directory", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					session := helpers.CF(PushCommandName, appName, "-p", appDir)
-					Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s\\.\\.\\.", appName, organization, space, userName))
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Eventually(session).Should(Say("requested state:\\s+started"))
+					Eventually(session).Should(Say(`Uploading and creating bits package for app %s in org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`requested state:\s+started`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -80,9 +80,9 @@ var _ = When("the -p flag is provided", func() {
 			It("pushes the app from the zip file", func() {
 				session := helpers.CF(PushCommandName, appName, "-p", archive)
 
-				Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s\\.\\.\\.", appName, organization, space, userName))
-				Eventually(session).Should(Say("name:\\s+%s", appName))
-				Eventually(session).Should(Say("requested state:\\s+started"))
+				Eventually(session).Should(Say(`Uploading and creating bits package for app %s in org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
+				Eventually(session).Should(Say(`name:\s+%s`, appName))
+				Eventually(session).Should(Say(`requested state:\s+started`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -110,9 +110,9 @@ var _ = When("the -p flag is provided", func() {
 
 				session := helpers.CF(PushCommandName, appName, "-p", symlinkPath)
 
-				Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s\\.\\.\\.", appName, organization, space, userName))
-				Eventually(session).Should(Say("name:\\s+%s", appName))
-				Eventually(session).Should(Say("requested state:\\s+started"))
+				Eventually(session).Should(Say(`Uploading and creating bits package for app %s in org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
+				Eventually(session).Should(Say(`name:\s+%s`, appName))
+				Eventually(session).Should(Say(`requested state:\s+started`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -152,9 +152,9 @@ var _ = When("the -p flag is provided", func() {
 		It("creates and uploads the package from the zip file", func() {
 			session := helpers.CF(PushCommandName, appName, "-p", symlinkPath)
 
-			Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s\\.\\.\\.", appName, organization, space, userName))
-			Eventually(session).Should(Say("name:\\s+%s", appName))
-			Eventually(session).Should(Say("requested state:\\s+started"))
+			Eventually(session).Should(Say(`Uploading and creating bits package for app %s in org %s / space %s as %s\.\.\.`, appName, organization, space, userName))
+			Eventually(session).Should(Say(`name:\s+%s`, appName))
+			Eventually(session).Should(Say(`requested state:\s+started`))
 			Eventually(session).Should(Exit(0))
 		})
 	})
