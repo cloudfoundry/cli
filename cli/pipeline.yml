@@ -15,7 +15,6 @@ resources:
     ignore_paths: &ciPaths
     - bin
     - ci
-    - integration
     - README.md
     - .github
 
@@ -31,14 +30,6 @@ resources:
     uri: https://github.com/cloudfoundry/cli
     branch: master
     paths: *ciPaths
-
-- name: cli-integration
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cli
-    branch: master
-    paths:
-    - integration
 
 - name: cf-acceptance-tests
   type: git
@@ -350,7 +341,6 @@ jobs:
       passed: [build-binaries]
       trigger: true
     - get: cli-ci
-    - get: cli-integration
     - get: vars-store
     - put: bosh-lock
       resource: gcp-bosh-pool
@@ -394,7 +384,6 @@ jobs:
       passed: [build-binaries]
       trigger: true
     - get: cli-ci
-    - get: cli-integration
     - get: vars-store
     - put: bosh-lock
       resource: gcp-bosh-pool
@@ -434,7 +423,6 @@ jobs:
       passed: [build-binaries]
       trigger: true
     - get: cli-ci
-    - get: cli-integration
     - get: vars-store
     - put: bosh-lock
       resource: gcp-bosh-pool
@@ -488,7 +476,6 @@ jobs:
       passed: [build-binaries]
       trigger: true
     - get: cli-ci
-    - get: cli-integration
     - get: vars-store
     - put: bosh-lock
       resource: legacy-gcp-bosh-pool
