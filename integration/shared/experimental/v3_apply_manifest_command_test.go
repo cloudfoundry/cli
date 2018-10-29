@@ -88,7 +88,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-apply-manifest", "-f", manifestPath)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.27\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -222,7 +222,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 					It("rescales the app", func() {
 						session := helpers.CF("app", appName)
 						userName, _ := helpers.GetCredentials()
-						Eventually(session).Should(Say("instances:\\s+%s", "1/1"))
+						Eventually(session).Should(Say(`instances:\s+%s`, "1/1"))
 						Eventually(session).Should(Exit())
 
 						session = helpers.CF("v3-apply-manifest", "-f", manifestPath)
@@ -230,7 +230,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 						Eventually(session).Should(Exit())
 
 						session = helpers.CF("app", appName)
-						Eventually(session).Should(Say("instances:\\s+%s", "\\d/3"))
+						Eventually(session).Should(Say(`instances:\s+%s`, `\d/3`))
 						Eventually(session).Should(Exit())
 					})
 				})

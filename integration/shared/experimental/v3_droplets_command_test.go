@@ -69,7 +69,7 @@ var _ = Describe("v3-droplets command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-droplets", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.27\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -95,7 +95,7 @@ var _ = Describe("v3-droplets command", func() {
 			It("displays app not found and exits 1", func() {
 				session := helpers.CF("v3-droplets", appName)
 
-				Eventually(session).Should(Say("Listing droplets of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Listing droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
 				Eventually(session).Should(Say("FAILED"))
 
@@ -111,7 +111,7 @@ var _ = Describe("v3-droplets command", func() {
 
 				It("displays empty list", func() {
 					session := helpers.CF("v3-droplets", appName)
-					Eventually(session).Should(Say("Listing droplets of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Listing droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("No droplets found"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -126,9 +126,9 @@ var _ = Describe("v3-droplets command", func() {
 
 				It("displays droplets in the list", func() {
 					session := helpers.CF("v3-droplets", appName)
-					Eventually(session).Should(Say("Listing droplets of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say("guid\\s+state\\s+created"))
-					Eventually(session).Should(Say("\\s+.*\\s+staged\\s+%s", helpers.UserFriendlyDateRegex))
+					Eventually(session).Should(Say(`Listing droplets of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`guid\s+state\s+created`))
+					Eventually(session).Should(Say(`\s+.*\s+staged\s+%s`, helpers.UserFriendlyDateRegex))
 
 					Eventually(session).Should(Exit(0))
 				})

@@ -29,7 +29,7 @@ var _ = Describe("v3-zdt-restart command", func() {
 				session := helpers.CF("v3-zdt-restart", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("v3-zdt-restart - Sequentially restart each instance of an app\\."))
+				Eventually(session).Should(Say(`v3-zdt-restart - Sequentially restart each instance of an app\.`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf v3-zdt-restart APP_NAME"))
 
@@ -69,7 +69,7 @@ var _ = Describe("v3-zdt-restart command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-zdt-restart", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.57\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.57\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -100,8 +100,8 @@ var _ = Describe("v3-zdt-restart command", func() {
 					userName, _ := helpers.GetCredentials()
 
 					session := helpers.CF("v3-zdt-restart", appName)
-					Eventually(session).Should(Say("Starting deployment for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
+					Eventually(session).Should(Say(`Starting deployment for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
 					Eventually(session).Should(Say("OK"))
 
 					Eventually(session).Should(Exit(0))
@@ -117,7 +117,7 @@ var _ = Describe("v3-zdt-restart command", func() {
 					userName, _ := helpers.GetCredentials()
 
 					session := helpers.CF("v3-zdt-restart", appName)
-					Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("OK"))
 
 					Eventually(session).Should(Exit(0))

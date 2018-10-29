@@ -69,7 +69,7 @@ var _ = Describe("v3-packages command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-packages", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.27\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -96,7 +96,7 @@ var _ = Describe("v3-packages command", func() {
 				session := helpers.CF("v3-packages", appName)
 				userName, _ = helpers.GetCredentials()
 
-				Eventually(session).Should(Say("Listing packages of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Listing packages of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
 				Eventually(session).Should(Say("FAILED"))
 
@@ -112,7 +112,7 @@ var _ = Describe("v3-packages command", func() {
 
 				It("displays empty list", func() {
 					session := helpers.CF("v3-packages", appName)
-					Eventually(session).Should(Say("Listing packages of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Listing packages of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("No packages found"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -127,9 +127,9 @@ var _ = Describe("v3-packages command", func() {
 
 				It("displays packages in the list", func() {
 					session := helpers.CF("v3-packages", appName)
-					Eventually(session).Should(Say("Listing packages of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say("guid\\s+state\\s+created"))
-					Eventually(session).Should(Say(".*\\s+ready\\s+.*"))
+					Eventually(session).Should(Say(`Listing packages of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`guid\s+state\s+created`))
+					Eventually(session).Should(Say(`.*\s+ready\s+.*`))
 
 					Eventually(session).Should(Exit(0))
 				})

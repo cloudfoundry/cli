@@ -69,7 +69,7 @@ var _ = Describe("v3-stop-application command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-stop", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.27\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -99,7 +99,7 @@ var _ = Describe("v3-stop-application command", func() {
 				userName, _ := helpers.GetCredentials()
 
 				session := helpers.CF("v3-stop", appName)
-				Eventually(session).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("OK"))
 
 				Eventually(session).Should(Exit(0))

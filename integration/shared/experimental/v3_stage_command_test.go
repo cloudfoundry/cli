@@ -84,7 +84,7 @@ var _ = Describe("v3-stage command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.27\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -125,11 +125,11 @@ var _ = Describe("v3-stage command", func() {
 				session := helpers.CF("v3-stage", appName, "--package-guid", packageGUID)
 				userName, _ := helpers.GetCredentials()
 
-				Eventually(session).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("Package staged"))
-				Eventually(session).Should(Say("droplet guid:\\s+%s", helpers.GUIDRegex))
-				Eventually(session).Should(Say("state:\\s+staged"))
-				Eventually(session).Should(Say("created:\\s+%s", helpers.UserFriendlyDateRegex))
+				Eventually(session).Should(Say(`droplet guid:\s+%s`, helpers.GUIDRegex))
+				Eventually(session).Should(Say(`state:\s+staged`))
+				Eventually(session).Should(Say(`created:\s+%s`, helpers.UserFriendlyDateRegex))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -140,7 +140,7 @@ var _ = Describe("v3-stage command", func() {
 				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				userName, _ := helpers.GetCredentials()
 
-				Eventually(session).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
 				Eventually(session).Should(Say("FAILED"))
 
@@ -157,8 +157,8 @@ var _ = Describe("v3-stage command", func() {
 				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				userName, _ := helpers.GetCredentials()
 
-				Eventually(session).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Err).Should(Say("Unable to use package\\. Ensure that the package exists and you have access to it\\."))
+				Eventually(session).Should(Say(`Staging package for %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+				Eventually(session.Err).Should(Say(`Unable to use package\. Ensure that the package exists and you have access to it\.`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
