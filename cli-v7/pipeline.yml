@@ -45,6 +45,7 @@ resources:
     uri: https://github.com/cloudfoundry/cli
     branch: master
     paths:
+    - api/cloudcontroller/ccversion
     - integration
 
 - name: cf-cli-binaries
