@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
@@ -50,6 +51,10 @@ func (cmd *CreateSharedDomainCommand) Setup(config command.Config, ui command.UI
 }
 
 func (cmd CreateSharedDomainCommand) Execute(args []string) error {
+	if !cmd.Config.Experimental() {
+		return translatableerror.UnrefactoredCommandError{}
+	}
+
 	username, err := cmd.SharedActor.RequireCurrentUser()
 	cmd.UI.DisplayTextWithFlavor("Creating shared domain {{.Domain}} as {{.User}}...",
 		map[string]interface{}{

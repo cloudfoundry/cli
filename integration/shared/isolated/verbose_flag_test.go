@@ -476,7 +476,8 @@ var _ = Describe("Verbose", func() {
 		)
 	})
 
-	Describe("routing", func() {
+	// Pending until #126256725 is done
+	XDescribe("routing", func() {
 		BeforeEach(func() {
 			helpers.SkipIfNoRoutingAPI()
 		})
