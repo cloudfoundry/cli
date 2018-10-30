@@ -25,7 +25,7 @@ var _ = Describe("enable-feature-flags command", func() {
 		Eventually(session).Should(Exit(0))
 
 		session = helpers.CF("feature-flag", "user_org_creation")
-		Eventually(session).Should(Say("user_org_creation\\s+enabled"))
+		Eventually(session).Should(Say(`user_org_creation\s+enabled`))
 		Eventually(session).Should(Exit(0))
 	})
 })

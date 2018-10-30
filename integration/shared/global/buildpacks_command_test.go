@@ -58,7 +58,7 @@ var _ = Describe("buildpacks command", func() {
 			helpers.LoginCF()
 			session := helpers.CF("buildpacks")
 			Eventually(session).Should(Say("Getting buildpacks..."))
-			Eventually(session).Should(Say("buildpack\\s+position\\s+enabled\\s+locked\\s+filename\\s+stack"))
+			Eventually(session).Should(Say(`buildpack\s+position\s+enabled\s+locked\s+filename\s+stack`))
 
 			buildpackNameRegex := `staticfile_buildpack`
 			positionRegex := `\d+`
@@ -66,7 +66,7 @@ var _ = Describe("buildpacks command", func() {
 			buildpackFileRegex := `staticfile-buildpack-\S+`
 			stackRegex := `(cflinuxfs[23]|windows.+)`
 
-			Eventually(session).Should(Say(fmt.Sprintf("%s\\s+%s\\s+%s\\s+%s\\s+%s\\s+%s", buildpackNameRegex,
+			Eventually(session).Should(Say(fmt.Sprintf(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, buildpackNameRegex,
 				positionRegex, boolRegex, boolRegex, buildpackFileRegex, stackRegex)))
 			Eventually(session).Should(Exit(0))
 		})
@@ -81,14 +81,14 @@ var _ = Describe("buildpacks command", func() {
 			helpers.LoginCF()
 			session := helpers.CF("buildpacks")
 			Eventually(session).Should(Say("Getting buildpacks..."))
-			Eventually(session).Should(Say("buildpack\\s+position\\s+enabled\\s+locked\\s+filename\\s+stack\\n"))
+			Eventually(session).Should(Say(`buildpack\s+position\s+enabled\s+locked\s+filename\s+stack\n`))
 
 			buildpackNameRegex := `staticfile_buildpack`
 			positionRegex := `\d+`
 			boolRegex := `(true|false)`
 			buildpackFileRegex := `staticfile_buildpack-\S+`
 
-			Eventually(session).Should(Say(fmt.Sprintf("%s\\s+%s\\s+%s\\s+%s\\s+%s\\n", buildpackNameRegex,
+			Eventually(session).Should(Say(fmt.Sprintf(`%s\s+%s\s+%s\s+%s\s+%s\n`, buildpackNameRegex,
 				positionRegex, boolRegex, boolRegex, buildpackFileRegex)))
 			Eventually(session).Should(Exit(0))
 		})

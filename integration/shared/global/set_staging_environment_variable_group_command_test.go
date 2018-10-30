@@ -41,8 +41,8 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 		Eventually(session).Should(Exit(0))
 
 		session = helpers.CF("staging-environment-variable-group")
-		Eventually(session).Should(Say("%s\\s+%s", key1, val1))
-		Eventually(session).Should(Say("%s\\s+%d", key2, val2))
+		Eventually(session).Should(Say(`%s\s+%s`, key1, val1))
+		Eventually(session).Should(Say(`%s\s+%d`, key2, val2))
 		Eventually(session).Should(Exit(0))
 	})
 })
