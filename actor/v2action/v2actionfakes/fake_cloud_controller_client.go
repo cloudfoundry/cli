@@ -871,6 +871,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetSpaceServicesStub        func(string, ...ccv2.Filter) ([]ccv2.Service, ccv2.Warnings, error)
+	getSpaceServicesMutex       sync.RWMutex
+	getSpaceServicesArgsForCall []struct {
+		arg1 string
+		arg2 []ccv2.Filter
+	}
+	getSpaceServicesReturns struct {
+		result1 []ccv2.Service
+		result2 ccv2.Warnings
+		result3 error
+	}
+	getSpaceServicesReturnsOnCall map[int]struct {
+		result1 []ccv2.Service
+		result2 ccv2.Warnings
+		result3 error
+	}
 	GetSpaceStagingSecurityGroupsStub        func(string, ...ccv2.Filter) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	getSpaceStagingSecurityGroupsMutex       sync.RWMutex
 	getSpaceStagingSecurityGroupsArgsForCall []struct {
@@ -5060,6 +5076,73 @@ func (fake *FakeCloudControllerClient) GetSpaceServiceInstancesReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetSpaceServices(arg1 string, arg2 ...ccv2.Filter) ([]ccv2.Service, ccv2.Warnings, error) {
+	fake.getSpaceServicesMutex.Lock()
+	ret, specificReturn := fake.getSpaceServicesReturnsOnCall[len(fake.getSpaceServicesArgsForCall)]
+	fake.getSpaceServicesArgsForCall = append(fake.getSpaceServicesArgsForCall, struct {
+		arg1 string
+		arg2 []ccv2.Filter
+	}{arg1, arg2})
+	fake.recordInvocation("GetSpaceServices", []interface{}{arg1, arg2})
+	fake.getSpaceServicesMutex.Unlock()
+	if fake.GetSpaceServicesStub != nil {
+		return fake.GetSpaceServicesStub(arg1, arg2...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getSpaceServicesReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceServicesCallCount() int {
+	fake.getSpaceServicesMutex.RLock()
+	defer fake.getSpaceServicesMutex.RUnlock()
+	return len(fake.getSpaceServicesArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceServicesCalls(stub func(string, ...ccv2.Filter) ([]ccv2.Service, ccv2.Warnings, error)) {
+	fake.getSpaceServicesMutex.Lock()
+	defer fake.getSpaceServicesMutex.Unlock()
+	fake.GetSpaceServicesStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceServicesArgsForCall(i int) (string, []ccv2.Filter) {
+	fake.getSpaceServicesMutex.RLock()
+	defer fake.getSpaceServicesMutex.RUnlock()
+	argsForCall := fake.getSpaceServicesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceServicesReturns(result1 []ccv2.Service, result2 ccv2.Warnings, result3 error) {
+	fake.getSpaceServicesMutex.Lock()
+	defer fake.getSpaceServicesMutex.Unlock()
+	fake.GetSpaceServicesStub = nil
+	fake.getSpaceServicesReturns = struct {
+		result1 []ccv2.Service
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetSpaceServicesReturnsOnCall(i int, result1 []ccv2.Service, result2 ccv2.Warnings, result3 error) {
+	fake.getSpaceServicesMutex.Lock()
+	defer fake.getSpaceServicesMutex.Unlock()
+	fake.GetSpaceServicesStub = nil
+	if fake.getSpaceServicesReturnsOnCall == nil {
+		fake.getSpaceServicesReturnsOnCall = make(map[int]struct {
+			result1 []ccv2.Service
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.getSpaceServicesReturnsOnCall[i] = struct {
+		result1 []ccv2.Service
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetSpaceStagingSecurityGroups(arg1 string, arg2 ...ccv2.Filter) ([]ccv2.SecurityGroup, ccv2.Warnings, error) {
 	fake.getSpaceStagingSecurityGroupsMutex.Lock()
 	ret, specificReturn := fake.getSpaceStagingSecurityGroupsReturnsOnCall[len(fake.getSpaceStagingSecurityGroupsArgsForCall)]
@@ -7040,6 +7123,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSpaceSecurityGroupsMutex.RUnlock()
 	fake.getSpaceServiceInstancesMutex.RLock()
 	defer fake.getSpaceServiceInstancesMutex.RUnlock()
+	fake.getSpaceServicesMutex.RLock()
+	defer fake.getSpaceServicesMutex.RUnlock()
 	fake.getSpaceStagingSecurityGroupsMutex.RLock()
 	defer fake.getSpaceStagingSecurityGroupsMutex.RUnlock()
 	fake.getSpacesMutex.RLock()

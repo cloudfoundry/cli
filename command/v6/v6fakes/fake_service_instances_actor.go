@@ -8,7 +8,7 @@ import (
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
-type FakeServicesActor struct {
+type FakeServiceInstancesActor struct {
 	GetServiceInstancesSummaryBySpaceStub        func(string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error)
 	getServiceInstancesSummaryBySpaceMutex       sync.RWMutex
 	getServiceInstancesSummaryBySpaceArgsForCall []struct {
@@ -28,7 +28,7 @@ type FakeServicesActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpace(arg1 string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error) {
+func (fake *FakeServiceInstancesActor) GetServiceInstancesSummaryBySpace(arg1 string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error) {
 	fake.getServiceInstancesSummaryBySpaceMutex.Lock()
 	ret, specificReturn := fake.getServiceInstancesSummaryBySpaceReturnsOnCall[len(fake.getServiceInstancesSummaryBySpaceArgsForCall)]
 	fake.getServiceInstancesSummaryBySpaceArgsForCall = append(fake.getServiceInstancesSummaryBySpaceArgsForCall, struct {
@@ -46,26 +46,26 @@ func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpace(arg1 string) ([
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceCallCount() int {
+func (fake *FakeServiceInstancesActor) GetServiceInstancesSummaryBySpaceCallCount() int {
 	fake.getServiceInstancesSummaryBySpaceMutex.RLock()
 	defer fake.getServiceInstancesSummaryBySpaceMutex.RUnlock()
 	return len(fake.getServiceInstancesSummaryBySpaceArgsForCall)
 }
 
-func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceCalls(stub func(string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error)) {
+func (fake *FakeServiceInstancesActor) GetServiceInstancesSummaryBySpaceCalls(stub func(string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error)) {
 	fake.getServiceInstancesSummaryBySpaceMutex.Lock()
 	defer fake.getServiceInstancesSummaryBySpaceMutex.Unlock()
 	fake.GetServiceInstancesSummaryBySpaceStub = stub
 }
 
-func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceArgsForCall(i int) string {
+func (fake *FakeServiceInstancesActor) GetServiceInstancesSummaryBySpaceArgsForCall(i int) string {
 	fake.getServiceInstancesSummaryBySpaceMutex.RLock()
 	defer fake.getServiceInstancesSummaryBySpaceMutex.RUnlock()
 	argsForCall := fake.getServiceInstancesSummaryBySpaceArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceReturns(result1 []v2action.ServiceInstanceSummary, result2 v2action.Warnings, result3 error) {
+func (fake *FakeServiceInstancesActor) GetServiceInstancesSummaryBySpaceReturns(result1 []v2action.ServiceInstanceSummary, result2 v2action.Warnings, result3 error) {
 	fake.getServiceInstancesSummaryBySpaceMutex.Lock()
 	defer fake.getServiceInstancesSummaryBySpaceMutex.Unlock()
 	fake.GetServiceInstancesSummaryBySpaceStub = nil
@@ -76,7 +76,7 @@ func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceReturns(result1 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceReturnsOnCall(i int, result1 []v2action.ServiceInstanceSummary, result2 v2action.Warnings, result3 error) {
+func (fake *FakeServiceInstancesActor) GetServiceInstancesSummaryBySpaceReturnsOnCall(i int, result1 []v2action.ServiceInstanceSummary, result2 v2action.Warnings, result3 error) {
 	fake.getServiceInstancesSummaryBySpaceMutex.Lock()
 	defer fake.getServiceInstancesSummaryBySpaceMutex.Unlock()
 	fake.GetServiceInstancesSummaryBySpaceStub = nil
@@ -94,7 +94,7 @@ func (fake *FakeServicesActor) GetServiceInstancesSummaryBySpaceReturnsOnCall(i 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeServicesActor) Invocations() map[string][][]interface{} {
+func (fake *FakeServiceInstancesActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getServiceInstancesSummaryBySpaceMutex.RLock()
@@ -106,7 +106,7 @@ func (fake *FakeServicesActor) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeServicesActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeServiceInstancesActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -118,4 +118,4 @@ func (fake *FakeServicesActor) recordInvocation(key string, args []interface{}) 
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v6.ServicesActor = new(FakeServicesActor)
+var _ v6.ServiceInstancesActor = new(FakeServiceInstancesActor)
