@@ -139,7 +139,7 @@ If you are vendoring a new dependency, please read [License and Notice Files](ht
 # Compiling for Other Operating Systems and Architectures
 
 The supported platforms for the CF CLI are Linux (32-bit and 64-bit), Windows
-(32-bit and 64-bit) and OSX. The commands that build the binaries can be seen
+(32-bit and 64-bit) and macOS. The commands that build the binaries can be seen
 in the [build binaries Concourse task](https://github.com/cloudfoundry/cli/blob/master/ci/cli/tasks/build-binaries.yml).
 
 See the [Go environment variables documentation](https://golang.org/doc/install/source#environment)
