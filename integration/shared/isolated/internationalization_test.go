@@ -15,7 +15,7 @@ var _ = Describe("internationalization", func() {
 			session := setup()
 			Eventually(session).Should(Say("push - Envoyer par commande push"))
 			Eventually(session).Should(Say("SYNTAXE :"))
-			Eventually(session).Should(Say("-i\\s+Nombre d'instances"))
+			Eventually(session).Should(Say(`-i\s+Nombre d'instances`))
 			Eventually(session).Should(Exit(0))
 		},
 

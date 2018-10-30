@@ -20,7 +20,7 @@ var _ = Describe("create-shared-domain command", func() {
 			Eventually(session).Should(Say("USAGE:\n"))
 			Eventually(session).Should(Say(regexp.QuoteMeta("cf create-shared-domain DOMAIN [--router-group ROUTER_GROUP]")))
 			Eventually(session).Should(Say("OPTIONS:\n"))
-			Eventually(session).Should(Say("--router-group\\s+Routes for this domain will be configured only on the specified router group"))
+			Eventually(session).Should(Say(`--router-group\s+Routes for this domain will be configured only on the specified router group`))
 			Eventually(session).Should(Say("SEE ALSO:\n"))
 			Eventually(session).Should(Say("create-domain, domains, router-groups"))
 			Eventually(session).Should(Exit(0))
@@ -51,7 +51,7 @@ var _ = Describe("create-shared-domain command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("domains")
-					Eventually(session).Should(Say("%s\\s+shared", domainName))
+					Eventually(session).Should(Say(`%s\s+shared`, domainName))
 				})
 			})
 
@@ -106,7 +106,7 @@ var _ = Describe("create-shared-domain command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("domains")
-					Eventually(session).Should(Say("%s\\s+shared", domainName))
+					Eventually(session).Should(Say(`%s\s+shared`, domainName))
 
 					var sharedDomainResponse struct {
 						Resources []struct {

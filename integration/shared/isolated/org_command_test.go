@@ -31,7 +31,7 @@ var _ = Describe("org command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf org ORG [--guid]"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("--guid\\s+Retrieve and display the given org's guid.  All other output for the org is suppressed."))
+				Eventually(session).Should(Say(`--guid\s+Retrieve and display the given org's guid.  All other output for the org is suppressed.`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("org-users, orgs"))
 				Eventually(session).Should(Exit(0))
@@ -54,7 +54,7 @@ var _ = Describe("org command", func() {
 			It("displays org not found and exits 1", func() {
 				session := helpers.CF("org", orgName)
 				userName, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Getting info for org %s as %s\\.\\.\\.", orgName, userName))
+				Eventually(session).Should(Say(`Getting info for org %s as %s\.\.\.`, orgName, userName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Organization '%s' not found.", orgName))
 				Eventually(session).Should(Exit(1))
@@ -73,7 +73,7 @@ var _ = Describe("org command", func() {
 			When("the --guid flag is used", func() {
 				It("displays the org guid", func() {
 					session := helpers.CF("org", "--guid", orgName)
-					Eventually(session).Should(Say("[\\da-f]{8}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{4}-[\\da-f]{12}"))
+					Eventually(session).Should(Say(`[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -104,19 +104,19 @@ var _ = Describe("org command", func() {
 				It("displays a table with org domains, quotas, spaces, space quotas and isolation segments, and exits 0", func() {
 					session := helpers.CF("org", orgName)
 					userName, _ := helpers.GetCredentials()
-					Eventually(session).Should(Say("Getting info for org %s as %s\\.\\.\\.", orgName, userName))
+					Eventually(session).Should(Say(`Getting info for org %s as %s\.\.\.`, orgName, userName))
 
-					Eventually(session).Should(Say("name:\\s+%s", orgName))
+					Eventually(session).Should(Say(`name:\s+%s`, orgName))
 
 					domainsSorted := []string{helpers.DefaultSharedDomain(), domainName}
 					sort.Strings(domainsSorted)
 					Eventually(session).Should(Say("domains:.+%s,.+%s", domainsSorted[0], domainsSorted[1]))
 
-					Eventually(session).Should(Say("quota:\\s+%s", quotaName))
+					Eventually(session).Should(Say(`quota:\s+%s`, quotaName))
 
 					spacesSorted := []string{spaceName, spaceName2}
 					sort.Strings(spacesSorted)
-					Eventually(session).Should(Say("spaces:\\s+%s,.* %s", spacesSorted[0], spacesSorted[1]))
+					Eventually(session).Should(Say(`spaces:\s+%s,.* %s`, spacesSorted[0], spacesSorted[1]))
 
 					Eventually(session).Should(Exit(0))
 				})
@@ -144,7 +144,7 @@ var _ = Describe("org command", func() {
 					It("displays isolation segment information in the org table", func() {
 						session := helpers.CF("org", orgName)
 
-						Eventually(session).Should(Say("isolation segments:\\s+.*%s \\(default\\),.* %s", isolationSegmentsSorted[0], isolationSegmentsSorted[1]))
+						Eventually(session).Should(Say(`isolation segments:\s+.*%s \(default\),.* %s`, isolationSegmentsSorted[0], isolationSegmentsSorted[1]))
 					})
 				})
 			})

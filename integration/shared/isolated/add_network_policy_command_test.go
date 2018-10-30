@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -30,8 +29,8 @@ var _ = Describe("add-network-policy command", func() {
 				Eventually(session).Should(Say("   cf add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("   --destination-app      Name of app to connect to"))
-				Eventually(session).Should(Say("   --port                 Port or range of ports for connection to destination app \\(Default: 8080\\)"))
-				Eventually(session).Should(Say("   --protocol             Protocol to connect apps with \\(Default: tcp\\)"))
+				Eventually(session).Should(Say(`   --port                 Port or range of ports for connection to destination app \(Default: 8080\)`))
+				Eventually(session).Should(Say(`   --protocol             Protocol to connect apps with \(Default: tcp\)`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("   apps, network-policies"))
 				Eventually(session).Should(Exit(0))
@@ -80,8 +79,8 @@ var _ = Describe("add-network-policy command", func() {
 				session = helpers.CF("network-policies")
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
-				Eventually(session).Should(Say("source\\s+destination\\s+protocol\\s+ports"))
-				Eventually(session).Should(Say("%s\\s+%s\\s+udp\\s+8080-8090", appName, appName))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports`))
+				Eventually(session).Should(Say(`%s\s+%s\s+udp\s+8080-8090`, appName, appName))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -97,8 +96,8 @@ var _ = Describe("add-network-policy command", func() {
 					session = helpers.CF("network-policies")
 					Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 					Consistently(session).ShouldNot(Say("OK"))
-					Eventually(session).Should(Say("source\\s+destination\\s+protocol\\s+ports"))
-					Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080[^-]", appName, appName))
+					Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports`))
+					Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080[^-]`, appName, appName))
 					Eventually(session).Should(Exit(0))
 				})
 			})

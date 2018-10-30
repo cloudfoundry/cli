@@ -64,7 +64,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("reset-space-isolation-segment", spaceName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.11\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.11\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -140,7 +140,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("space", spaceName)
-					Eventually(session).Should(Say("(?m)isolation segment:\\s*$"))
+					Eventually(session).Should(Say(`(?m)isolation segment:\s*$`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -165,7 +165,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("space", spaceName)
-					Eventually(session).Should(Say("isolation segment:\\s+%s", orgIsolationSegmentName))
+					Eventually(session).Should(Say(`isolation segment:\s+%s`, orgIsolationSegmentName))
 					Eventually(session).Should(Exit(0))
 				})
 			})

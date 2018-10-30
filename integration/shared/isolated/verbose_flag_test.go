@@ -85,11 +85,11 @@ var _ = Describe("Verbose", func() {
 				Eventually(session).Should(Say(`"token_endpoint": "http.*"`))
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("POST /Users"))
-				Eventually(session).Should(Say("User-Agent: cf/[\\w.+-]+ \\(go\\d+\\.\\d+(\\.\\d+)?; %s %s\\)", runtime.GOARCH, runtime.GOOS))
+				Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("POST /v2/users"))
-				Eventually(session).Should(Say("User-Agent: cf/[\\w.+-]+ \\(go\\d+\\.\\d+(\\.\\d+)?; %s %s\\)", runtime.GOARCH, runtime.GOOS))
+				Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Exit(0))
 			},
@@ -228,12 +228,12 @@ var _ = Describe("Verbose", func() {
 
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("GET /v3/apps"))
-				Eventually(session).Should(Say("User-Agent: cf/[\\w.+-]+ \\(go\\d+\\.\\d+(\\.\\d+)?; %s %s\\)", runtime.GOARCH, runtime.GOOS))
+				Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("POST /oauth/token"))
-				Eventually(session).Should(Say("User-Agent: cf/[\\w.+-]+ \\(go\\d+\\.\\d+(\\.\\d+)?; %s %s\\)", runtime.GOARCH, runtime.GOOS))
-				Eventually(session).Should(Say("\\[PRIVATE DATA HIDDEN\\]")) //This is required to test the previous line. If it fails, the previous matcher went too far.
+				Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
+				Eventually(session).Should(Say(`\[PRIVATE DATA HIDDEN\]`)) //This is required to test the previous line. If it fails, the previous matcher went too far.
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Exit(1))
 			},
@@ -384,9 +384,9 @@ var _ = Describe("Verbose", func() {
 
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("POST /oauth/token"))
-				Eventually(session).Should(Say("\\[PRIVATE DATA HIDDEN\\]"))
+				Eventually(session).Should(Say(`\[PRIVATE DATA HIDDEN\]`))
 				Eventually(session).Should(Say("WEBSOCKET REQUEST:"))
-				Eventually(session).Should(Say("Authorization: \\[PRIVATE DATA HIDDEN\\]"))
+				Eventually(session).Should(Say(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 				Eventually(session.Kill()).Should(Exit())
 			},
 
@@ -445,9 +445,9 @@ var _ = Describe("Verbose", func() {
 
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
 					Expect(string(contents)).To(MatchRegexp("POST /oauth/token"))
-					Expect(string(contents)).To(MatchRegexp("\\[PRIVATE DATA HIDDEN\\]"))
+					Expect(string(contents)).To(MatchRegexp(`\[PRIVATE DATA HIDDEN\]`))
 					Expect(string(contents)).To(MatchRegexp("WEBSOCKET REQUEST:"))
-					Expect(string(contents)).To(MatchRegexp("Authorization: \\[PRIVATE DATA HIDDEN\\]"))
+					Expect(string(contents)).To(MatchRegexp(`Authorization: \[PRIVATE DATA HIDDEN\]`))
 
 					stat, err := os.Stat(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())

@@ -72,7 +72,7 @@ var _ = Describe("terminate-task command", func() {
 				It("terminates the task", func() {
 					tasksSession := helpers.CF("tasks", appName)
 					Eventually(tasksSession).Should(Exit(0))
-					Expect(tasksSession).To(Say("1\\s+[a-zA-Z-0-9]+\\s+RUNNING"))
+					Expect(tasksSession).To(Say(`1\s+[a-zA-Z-0-9]+\s+RUNNING`))
 
 					session := helpers.CF("terminate-task", appName, "1")
 					userName, _ := helpers.GetCredentials()
@@ -95,7 +95,7 @@ var _ = Describe("terminate-task command", func() {
 						taskSession := helpers.CF("tasks", appName)
 						Eventually(taskSession).Should(Exit(0))
 						return taskSession.Out
-					}).Should(Say("1\\s+[a-zA-Z-0-9]+\\s+SUCCEEDED"))
+					}).Should(Say(`1\s+[a-zA-Z-0-9]+\s+SUCCEEDED`))
 
 					session := helpers.CF("terminate-task", appName, "1")
 					Eventually(session.Err).Should(Say("Task state is SUCCEEDED and therefore cannot be canceled"))
@@ -116,7 +116,7 @@ var _ = Describe("terminate-task command", func() {
 						taskSession := helpers.CF("tasks", appName)
 						Eventually(taskSession).Should(Exit(0))
 						return taskSession.Out
-					}).Should(Say("1\\s+[a-zA-Z-0-9]+\\s+FAILED"))
+					}).Should(Say(`1\s+[a-zA-Z-0-9]+\s+FAILED`))
 
 					session := helpers.CF("terminate-task", appName, "1")
 					Eventually(session.Err).Should(Say("Task state is FAILED and therefore cannot be canceled"))

@@ -13,12 +13,12 @@ var _ = Describe("delete-space command", func() {
 		It("shows usage", func() {
 			session := helpers.CF("help", "delete-space")
 			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("\\s+delete-space - Delete a space"))
+			Eventually(session).Should(Say(`\s+delete-space - Delete a space`))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("delete-space SPACE \\[-o ORG\\] \\[-f\\]"))
+			Eventually(session).Should(Say(`delete-space SPACE \[-o ORG\] \[-f\]`))
 			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say("\\s+-f\\s+Force deletion without confirmation"))
-			Eventually(session).Should(Say("\\s+-o\\s+Delete space within specified org"))
+			Eventually(session).Should(Say(`\s+-f\s+Force deletion without confirmation`))
+			Eventually(session).Should(Say(`\s+-o\s+Delete space within specified org`))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -65,7 +65,7 @@ var _ = Describe("delete-space command", func() {
 			session := helpers.CF("delete-space", "-f", "-o", orgName, "please-do-not-exist-in-real-life")
 			Eventually(session).Should(Say("Deleting space please-do-not-exist-in-real-life in org %s as %s...", orgName, username))
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say("Space 'please-do-not-exist-in-real-life' not found\\."))
+			Eventually(session.Err).Should(Say(`Space 'please-do-not-exist-in-real-life' not found\.`))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -101,7 +101,7 @@ var _ = Describe("delete-space command", func() {
 				It("deletes the space", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CFWithStdin(buffer, "delete-space", spaceName)
-					Eventually(session).Should(Say("Really delete the space %s\\? \\[yN\\]", spaceName))
+					Eventually(session).Should(Say(`Really delete the space %s\? \[yN\]`, spaceName))
 					Eventually(session).Should(Say("Deleting space %s in org %s as %s...", spaceName, orgName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
@@ -116,7 +116,7 @@ var _ = Describe("delete-space command", func() {
 
 				It("does not delete the space", func() {
 					session := helpers.CFWithStdin(buffer, "delete-space", spaceName)
-					Eventually(session).Should(Say("Really delete the space %s\\? \\[yN\\]", spaceName))
+					Eventually(session).Should(Say(`Really delete the space %s\? \[yN\]`, spaceName))
 					Eventually(session).Should(Say("Delete cancelled"))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
@@ -130,7 +130,7 @@ var _ = Describe("delete-space command", func() {
 
 				It("does not delete the org", func() {
 					session := helpers.CFWithStdin(buffer, "delete-space", spaceName)
-					Eventually(session).Should(Say("Really delete the space %s\\? \\[yN\\]", spaceName))
+					Eventually(session).Should(Say(`Really delete the space %s\? \[yN\]`, spaceName))
 					Eventually(session).Should(Say("Delete cancelled"))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
@@ -147,9 +147,9 @@ var _ = Describe("delete-space command", func() {
 
 				It("asks again", func() {
 					session := helpers.CFWithStdin(buffer, "delete-space", spaceName)
-					Eventually(session).Should(Say("Really delete the space %s\\? \\[yN\\]", spaceName))
-					Eventually(session).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
-					Eventually(session).Should(Say("Really delete the space %s\\? \\[yN\\]", spaceName))
+					Eventually(session).Should(Say(`Really delete the space %s\? \[yN\]`, spaceName))
+					Eventually(session).Should(Say(`invalid input \(not y, n, yes, or no\)`))
+					Eventually(session).Should(Say(`Really delete the space %s\? \[yN\]`, spaceName))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
 				})
@@ -160,7 +160,7 @@ var _ = Describe("delete-space command", func() {
 			It("deletes the space", func() {
 				username, _ := helpers.GetCredentials()
 				session := helpers.CF("delete-space", spaceName, "-f")
-				Eventually(session).Should(Say("Deleting space %s in org %s as %s\\.\\.\\.", spaceName, orgName, username))
+				Eventually(session).Should(Say(`Deleting space %s in org %s as %s\.\.\.`, spaceName, orgName, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 				Eventually(helpers.CF("space", spaceName)).Should(Exit(1))
@@ -174,9 +174,9 @@ var _ = Describe("delete-space command", func() {
 				It("deletes the space and clears the target", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CF("delete-space", spaceName, "-f")
-					Eventually(session).Should(Say("Deleting space %s in org %s as %s\\.\\.\\.", spaceName, orgName, username))
+					Eventually(session).Should(Say(`Deleting space %s in org %s as %s\.\.\.`, spaceName, orgName, username))
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("TIP: No space targeted, use 'cf target -s' to target a space\\."))
+					Eventually(session).Should(Say(`TIP: No space targeted, use 'cf target -s' to target a space\.`))
 					Eventually(session).Should(Exit(0))
 
 					Eventually(helpers.CF("space", spaceName)).Should(Exit(1))
@@ -198,7 +198,7 @@ var _ = Describe("delete-space command", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CF("delete-space", "-f", "-o", "please-do-not-exist-in-real-life", "please-do-not-exist-in-real-life")
 			Eventually(session).Should(Say("Deleting space please-do-not-exist-in-real-life in org please-do-not-exist-in-real-life as %s...", username))
-			Eventually(session.Err).Should(Say("Organization 'please-do-not-exist-in-real-life' not found\\."))
+			Eventually(session.Err).Should(Say(`Organization 'please-do-not-exist-in-real-life' not found\.`))
 			Eventually(session).Should(Say("FAILED"))
 			Eventually(session).Should(Exit(1))
 		})

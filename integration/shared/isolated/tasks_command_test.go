@@ -119,8 +119,8 @@ id   name   state   start time   command
 
 					It("does not display task commands", func() {
 						session := helpers.CF("tasks", appName)
-						Eventually(session).Should(Say("2\\s+[a-zA-Z-0-9 ,:]+\\[hidden\\]"))
-						Eventually(session).Should(Say("1\\s+[a-zA-Z-0-9 ,:]+\\[hidden\\]"))
+						Eventually(session).Should(Say(`2\s+[a-zA-Z-0-9 ,:]+\[hidden\]`))
+						Eventually(session).Should(Say(`1\s+[a-zA-Z-0-9 ,:]+\[hidden\]`))
 						Eventually(session).Should(Exit(0))
 					})
 				})

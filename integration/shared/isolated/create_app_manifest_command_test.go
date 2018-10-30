@@ -65,7 +65,7 @@ var _ = Describe("create-app-manifest command", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("create-app-manifest - Create an app manifest for an app that has been pushed successfully"))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("cf create-app-manifest APP_NAME \\[-p \\/path\\/to\\/<app-name>_manifest\\.yml\\]"))
+			Eventually(session).Should(Say(`cf create-app-manifest APP_NAME \[-p \/path\/to\/<app-name>_manifest\.yml\]`))
 			Eventually(session).Should(Say(""))
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say("-p      Specify a path for file creation. If path not specified, manifest file is created in current working directory."))
@@ -117,7 +117,7 @@ var _ = Describe("create-app-manifest command", func() {
 		When("the app does not exist", func() {
 			It("displays a usage error", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
-				Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
 
@@ -135,7 +135,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 				It("creates the manifest with no-route set to true", func() {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
-					Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("OK"))
 					expectedFilePath := helpers.ConvertPathToRegularExpression(fmt.Sprintf(".%s%s_manifest.yml", string(os.PathSeparator), appName))
 					Eventually(session).Should(Say("Manifest file created successfully at %s", expectedFilePath))
@@ -166,7 +166,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 				It("creates the manifest", func() {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
-					Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("OK"))
 					expectedFilePath := helpers.ConvertPathToRegularExpression(fmt.Sprintf(".%s%s_manifest.yml", string(os.PathSeparator), appName))
 					Eventually(session).Should(Say("Manifest file created successfully at %s", expectedFilePath))
@@ -192,7 +192,7 @@ var _ = Describe("create-app-manifest command", func() {
 					When("the specified file is a directory", func() {
 						It("displays a file creation error", func() {
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", tempDir)
-							Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Error creating manifest file: open %s: is a directory", helpers.ConvertPathToRegularExpression(tempDir)))
 
@@ -209,7 +209,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 						It("creates the manifest in the file", func() {
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", newFile)
-							Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say("Manifest file created successfully at %s", helpers.ConvertPathToRegularExpression(newFile)))
 
@@ -243,7 +243,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 						It("overrides the previous file with the new manifest", func() {
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", existingFile)
-							Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say("Manifest file created successfully at %s", helpers.ConvertPathToRegularExpression(existingFile)))
 
@@ -275,7 +275,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 			It("creates the manifest", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-v")
-				Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("OK"))
 				expectedFilePath := helpers.ConvertPathToRegularExpression(fmt.Sprintf(".%s%s_manifest.yml", string(os.PathSeparator), appName))
 				Eventually(session).Should(Say("Manifest file created successfully at %s", expectedFilePath))
@@ -317,7 +317,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 			It("creates the manifest", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-v")
-				Eventually(session).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("OK"))
 				expectedFilePath := helpers.ConvertPathToRegularExpression(fmt.Sprintf(".%s%s_manifest.yml", string(os.PathSeparator), appName))
 				Eventually(session).Should(Say("Manifest file created successfully at %s", expectedFilePath))

@@ -16,7 +16,7 @@ var _ = Describe("feature-flag command", func() {
 	It("displays feature flag settings", func() {
 		session := helpers.CF("feature-flag", "user_org_creation")
 		Eventually(session).Should(Say("Retrieving status of user_org_creation as"))
-		Eventually(session).Should(Say("user_org_creation\\s+(dis|en)abled"))
+		Eventually(session).Should(Say(`user_org_creation\s+(dis|en)abled`))
 		Eventually(session).Should(Exit(0))
 	})
 })

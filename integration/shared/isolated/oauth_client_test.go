@@ -7,7 +7,6 @@ import (
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -53,7 +52,7 @@ var _ = Describe("custom oauth client id", func() {
 				It("uses the custom client id and secret", func() {
 					session := helpers.CF("oauth-token")
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).To(Say("Credentials were rejected, please try again\\."))
+					Expect(session.Err).To(Say(`Credentials were rejected, please try again\.`))
 				})
 			})
 

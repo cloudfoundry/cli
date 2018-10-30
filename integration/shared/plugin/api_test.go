@@ -21,7 +21,7 @@ var _ = Describe("plugin API", func() {
 
 	Describe("AccessToken", func() {
 		It("returns the access token", func() {
-			confirmTestPluginOutput("AccessToken", "bearer [\\w\\d\\.]+")
+			confirmTestPluginOutput("AccessToken", `bearer [\w\d\.]+`)
 		})
 	})
 
@@ -33,7 +33,7 @@ var _ = Describe("plugin API", func() {
 
 	Describe("ApiVersion", func() {
 		It("returns the API version", func() {
-			confirmTestPluginOutput("ApiVersion", "2\\.\\d+\\.\\d+")
+			confirmTestPluginOutput("ApiVersion", `2\.\d+\.\d+`)
 		})
 	})
 
@@ -257,7 +257,7 @@ var _ = Describe("plugin API", func() {
 
 	Describe("UserGuid", func() {
 		It("gets the current user's GUID", func() {
-			confirmTestPluginOutput("UserGuid", "[\\w\\d]+-[\\w\\d]+-[\\w\\d]+-[\\w\\d]+-[\\w\\d]+")
+			confirmTestPluginOutput("UserGuid", `[\w\d]+-[\w\d]+-[\w\d]+-[\w\d]+-[\w\d]+`)
 		})
 	})
 

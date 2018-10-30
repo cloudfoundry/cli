@@ -30,7 +30,7 @@ var _ = Describe("help", func() {
 			Eventually(session).Should(Say("TestPluginCommandWithAlias"))
 			Eventually(session).Should(Say("This is my plugin help test. Banana."))
 			Eventually(session).Should(Say("I R Usage"))
-			Eventually(session).Should(Say("--dis-flag\\s+is a flag"))
+			Eventually(session).Should(Say(`--dis-flag\s+is a flag`))
 			Eventually(session).Should(Exit(0))
 		},
 
