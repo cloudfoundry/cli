@@ -152,7 +152,7 @@ func (b ServiceBroker) Destroy() {
 }
 
 func (b ServiceBroker) ToJSON(shareable bool) string {
-	bytes, err := ioutil.ReadFile(NewAssets().ServiceBroker + "/cats.json")
+	bytes, err := ioutil.ReadFile(NewAssets().ServiceBroker + "/broker_config.json")
 	Expect(err).To(BeNil())
 
 	planSchema, err := json.Marshal(b.SyncPlans[0].Schemas)
