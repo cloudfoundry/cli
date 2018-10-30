@@ -94,14 +94,14 @@ make test
 
 ### Running integration tests
 
-If you have a BOSH-lite CloudFoundry running as described in [the above section](https://github.com/cloudfoundry/cli/blob/master/.github/CONTRIBUTING.md#install-bosh-lite-and-deploy-cloud-foundry), all you need to do is run:
+If you have a BOSH-lite Cloud Foundry running as described in [the above section](https://github.com/cloudfoundry/cli/blob/master/.github/CONTRIBUTING.md#install-bosh-lite-and-deploy-cloud-foundry), all you need to do is run:
 ```
 cd $GOPATH/src/code.cloudfoundry.org/cli
 
 make integration-tests
 ```
 
-If you want to target a different CloudFoundry, set the following environment
+If you want to target a different Cloud Foundry, set the following environment
 variables before running tests:
 ```
 export CF_INT_API=api.my-cf-domain.com
