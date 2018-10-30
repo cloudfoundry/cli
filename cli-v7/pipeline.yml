@@ -503,6 +503,6 @@ jobs:
     - get: homebrew-tap
   - task: update-brew-formula
     file: cli-ci/ci/cli-v7/tasks/update-brew-formula.yml
-  # - put: homebrew-tap
-  #   params:
-  #     repository: update-brew-formula-output/homebrew-tap
+  - put: homebrew-tap
+    params:
+      repository: update-brew-formula-output/homebrew-tap
