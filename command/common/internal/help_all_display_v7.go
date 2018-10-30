@@ -17,7 +17,7 @@ var HelpCategoryList = []HelpCategory{
 			{"push", "scale", "delete", "rename"},
 			{"start", "stop", "restart", "restage", "restart-app-instance"},
 			{"run-task", "tasks", "terminate-task"},
-			{"events", "files", "logs"},
+			{"events", "logs"},
 			{"env", "set-env", "unset-env"},
 			{"stacks", "stack"},
 			{"copy-source", "create-app-manifest"},
@@ -103,9 +103,8 @@ var HelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "SERVICE ADMIN:",
 		CommandList: [][]string{
-			{"service-auth-tokens", "create-service-auth-token", "update-service-auth-token", "delete-service-auth-token"},
 			{"service-brokers", "create-service-broker", "update-service-broker", "delete-service-broker", "rename-service-broker"},
-			{"migrate-service-instances", "purge-service-offering", "purge-service-instance"},
+			{"purge-service-offering", "purge-service-instance"},
 			{"service-access", "enable-service-access", "disable-service-access"},
 		},
 	},

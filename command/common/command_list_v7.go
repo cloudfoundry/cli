@@ -61,7 +61,6 @@ type commandList struct {
 	CreateQuota                        v6.CreateQuotaCommand                        `command:"create-quota" description:"Define a new resource quota"`
 	CreateRoute                        v6.CreateRouteCommand                        `command:"create-route" description:"Create a url route in a space for later use"`
 	CreateSecurityGroup                v6.CreateSecurityGroupCommand                `command:"create-security-group" description:"Create a security group"`
-	CreateServiceAuthToken             v6.CreateServiceAuthTokenCommand             `command:"create-service-auth-token" description:"Create a service auth token"`
 	CreateServiceBroker                v6.CreateServiceBrokerCommand                `command:"create-service-broker" alias:"csb" description:"Create a service broker"`
 	CreateServiceKey                   v6.CreateServiceKeyCommand                   `command:"create-service-key" alias:"csk" description:"Create key for a service instance"`
 	CreateService                      v6.CreateServiceCommand                      `command:"create-service" alias:"cs" description:"Create a service instance"`
@@ -79,7 +78,6 @@ type commandList struct {
 	DeleteQuota                        v6.DeleteQuotaCommand                        `command:"delete-quota" description:"Delete a quota"`
 	DeleteRoute                        v6.DeleteRouteCommand                        `command:"delete-route" description:"Delete a route"`
 	DeleteSecurityGroup                v6.DeleteSecurityGroupCommand                `command:"delete-security-group" description:"Deletes a security group"`
-	DeleteServiceAuthToken             v6.DeleteServiceAuthTokenCommand             `command:"delete-service-auth-token" description:"Delete a service auth token"`
 	DeleteServiceBroker                v6.DeleteServiceBrokerCommand                `command:"delete-service-broker" description:"Delete a service broker"`
 	DeleteServiceKey                   v6.DeleteServiceKeyCommand                   `command:"delete-service-key" alias:"dsk" description:"Delete a service key"`
 	DeleteService                      v6.DeleteServiceCommand                      `command:"delete-service" alias:"ds" description:"Delete a service instance"`
@@ -102,7 +100,6 @@ type commandList struct {
 	Events                             v6.EventsCommand                             `command:"events" description:"Show recent app events"`
 	FeatureFlags                       v6.FeatureFlagsCommand                       `command:"feature-flags" description:"Retrieve list of feature flags with status"`
 	FeatureFlag                        v6.FeatureFlagCommand                        `command:"feature-flag" description:"Retrieve an individual feature flag with status"`
-	Files                              v6.FilesCommand                              `command:"files" alias:"f" description:"Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend"`
 	GetHealthCheck                     v7.GetHealthCheckCommand                     `command:"get-health-check" description:"Show the type of health check performed on an app"`
 	Help                               HelpCommand                                  `command:"help" alias:"h" description:"Show help"`
 	InstallPlugin                      InstallPluginCommand                         `command:"install-plugin" description:"Install CLI plugin"`
@@ -114,7 +111,6 @@ type commandList struct {
 	Logs                               v6.LogsCommand                               `command:"logs" description:"Tail or show recent logs for an app"`
 	MapRoute                           v6.MapRouteCommand                           `command:"map-route" description:"Add a url route to an app"`
 	Marketplace                        v6.MarketplaceCommand                        `command:"marketplace" alias:"m" description:"List available offerings in the marketplace"`
-	MigrateServiceInstances            v6.MigrateServiceInstancesCommand            `command:"migrate-service-instances" description:"Migrate service instances from one service plan to another"`
 	OauthToken                         v6.OauthTokenCommand                         `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
 	Orgs                               v6.OrgsCommand                               `command:"orgs" alias:"o" description:"List all orgs"`
 	OrgUsers                           v6.OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
@@ -149,7 +145,6 @@ type commandList struct {
 	SecurityGroups                     v6.SecurityGroupsCommand                     `command:"security-groups" description:"List all security groups"`
 	SecurityGroup                      v6.SecurityGroupCommand                      `command:"security-group" description:"Show a single security group"`
 	ServiceAccess                      v6.ServiceAccessCommand                      `command:"service-access" description:"List service access settings"`
-	ServiceAuthTokens                  v6.ServiceAuthTokensCommand                  `command:"service-auth-tokens" description:"List service auth tokens"`
 	ServiceBrokers                     v6.ServiceBrokersCommand                     `command:"service-brokers" description:"List service brokers"`
 	ServiceKeys                        v6.ServiceKeysCommand                        `command:"service-keys" alias:"sk" description:"List keys for a service instance"`
 	ServiceKey                         v6.ServiceKeyCommand                         `command:"service-key" description:"Show service key info"`
@@ -201,7 +196,6 @@ type commandList struct {
 	UpdateBuildpack                    v6.UpdateBuildpackCommand                    `command:"update-buildpack" description:"Update a buildpack"`
 	UpdateQuota                        v6.UpdateQuotaCommand                        `command:"update-quota" description:"Update an existing resource quota"`
 	UpdateSecurityGroup                v6.UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`
-	UpdateServiceAuthToken             v6.UpdateServiceAuthTokenCommand             `command:"update-service-auth-token" description:"Update a service auth token"`
 	UpdateServiceBroker                v6.UpdateServiceBrokerCommand                `command:"update-service-broker" description:"Update a service broker"`
 	UpdateService                      v6.UpdateServiceCommand                      `command:"update-service" description:"Update a service instance"`
 	UpdateSpaceQuota                   v6.UpdateSpaceQuotaCommand                   `command:"update-space-quota" description:"Update an existing space quota"`
