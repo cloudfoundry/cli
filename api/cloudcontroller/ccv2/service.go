@@ -57,6 +57,9 @@ func (service *Service) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		service.Extra.Shareable = extra.Shareable
+		if service.DocumentationURL == "" {
+			service.DocumentationURL = extra.DocumentationURL
+		}
 	}
 
 	return nil
