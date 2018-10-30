@@ -3,7 +3,6 @@ package push
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -39,7 +38,7 @@ var _ = Describe("pushing a docker image", func() {
 
 					It("updates the app", func() {
 						session := helpers.CF(PushCommandName, appName, "-o", PublicDockerImage)
-						Eventually(session).Should(Say("Updating app with these attributes\\.\\.\\."))
+						Eventually(session).Should(Say(`Updating app with these attributes\.\.\.`))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -217,7 +216,7 @@ var _ = Describe("pushing a docker image", func() {
 							PushCommandName,
 						)
 
-						Eventually(session.Err).Should(Say("Environment variable CF_DOCKER_PASSWORD not set\\."))
+						Eventually(session.Err).Should(Say(`Environment variable CF_DOCKER_PASSWORD not set\.`))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -276,16 +275,16 @@ func validateDockerPassword(session *Session, passwordFromPrompt bool) {
 }
 
 func validateDockerPush(session *Session, appName string, dockerImage string) {
-	Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-	Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-	Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-	Eventually(session).Should(Say("\\s+docker image:\\s+%s", dockerImage))
+	Eventually(session).Should(Say(`Getting app info\.\.\.`))
+	Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+	Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
+	Eventually(session).Should(Say(`\s+docker image:\s+%s`, dockerImage))
 	helpers.ConfirmStagingLogs(session)
-	Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
-	Eventually(session).Should(Say("requested state:\\s+started"))
+	Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+	Eventually(session).Should(Say(`requested state:\s+started`))
 	Eventually(session).Should(Exit(0))
 
 	session = helpers.CF("app", appName)
-	Eventually(session).Should(Say("name:\\s+%s", appName))
+	Eventually(session).Should(Say(`name:\s+%s`, appName))
 	Eventually(session).Should(Exit(0))
 }

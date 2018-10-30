@@ -8,7 +8,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -43,7 +42,7 @@ var _ = Describe("push with symlink path", func() {
 					Expect(os.Symlink(dir, symlinkedPath)).ToNot(HaveOccurred())
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: symlinkedPath}, PushCommandName, appName)
-					Eventually(session).Should(Say("path:\\s+(\\/private)?%s", regexp.QuoteMeta(dir)))
+					Eventually(session).Should(Say(`path:\s+(\/private)?%s`, regexp.QuoteMeta(dir)))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -55,7 +54,7 @@ var _ = Describe("push with symlink path", func() {
 					Expect(os.Symlink(dir, symlinkedPath)).ToNot(HaveOccurred())
 
 					session := helpers.CF(PushCommandName, appName, "-p", symlinkedPath)
-					Eventually(session).Should(Say("path:\\s+(\\/private)?%s", regexp.QuoteMeta(dir)))
+					Eventually(session).Should(Say(`path:\s+(\/private)?%s`, regexp.QuoteMeta(dir)))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -84,7 +83,7 @@ var _ = Describe("push with symlink path", func() {
 				Expect(os.Symlink(archive, symlinkedPath)).ToNot(HaveOccurred())
 
 				session := helpers.CF(PushCommandName, appName, "-p", symlinkedPath)
-				Eventually(session).Should(Say("path:\\s+(\\/private)?%s", regexp.QuoteMeta(archive)))
+				Eventually(session).Should(Say(`path:\s+(\/private)?%s`, regexp.QuoteMeta(archive)))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -105,7 +104,7 @@ var _ = Describe("push with symlink path", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: runningDir}, PushCommandName)
-						Eventually(session).Should(Say("path:\\s+(\\/private)?%s", regexp.QuoteMeta(dir)))
+						Eventually(session).Should(Say(`path:\s+(\/private)?%s`, regexp.QuoteMeta(dir)))
 						Eventually(session).Should(Exit(0))
 					})
 				})
