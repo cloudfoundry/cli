@@ -21,7 +21,6 @@ configure_pipeline() {
     -c $pipeline \
     -v client-secret=$() \
     -v cli-pools-github-private-key=$() \
-    -v cli-private-github-private-key=$() \
     -v dockerhub-email=$() \
     -v dockerhub-password=$() \
     -v dockerhub-private-image=$() \

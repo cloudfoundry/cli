@@ -22,17 +22,6 @@ resources:
     ignore_paths: &ciPaths
     - README.md
     - .github
-  - name: sapi-bosh-lite
-    type: bosh-lite-pool
-    source:
-      uri: git@github.com:cloudfoundry/cli-pools.git
-      private_key: {{ci_private_key}}
-
-- name: cli-i18n
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cli-i18n
-    branch: master
 
 - name: cli-ci
   type: git
@@ -40,142 +29,6 @@ resources:
     uri: https://github.com/cloudfoundry/cli
     branch: master
     paths: *ciPaths
-
-- name: cli-integration
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cli
-    branch: master
-    paths:
-    - integration
-
-- name: cf-acceptance-tests
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cf-acceptance-tests
-    branch: master
-
-- name: cf-deployment-concourse-tasks
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks
-    tag_filter: v7.*
-
-- name: cf-cli-binaries
-  type: s3
-  source:
-    bucket: ((staging-bucket-name))
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: cf-cli-binaries.tgz
-
-- name: edge-linux-binary-32
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli_edge_linux_i686.tgz
-    region_name: us-west-1
-
-- name: edge-linux-binary-64
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli_edge_linux_x86-64.tgz
-    region_name: us-west-1
-
-- name: edge-osx-binary-64
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli_edge_osx.tgz
-    region_name: us-west-1
-
-- name: edge-windows-binary-32
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli_edge_win32.zip
-    region_name: us-west-1
-
-- name: edge-windows-binary-64
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli_edge_winx64.zip
-    region_name: us-west-1
-
-- name: edge-deb-installer-32
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli-installer_edge_i686.deb
-    region_name: us-west-1
-
-- name: edge-deb-installer-64
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli-installer_edge_x86-64.deb
-    region_name: us-west-1
-
-- name: edge-redhat-installer-32
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli-installer_edge_i686.rpm
-    region_name: us-west-1
-
-- name: edge-redhat-installer-64
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli-installer_edge_x86-64.rpm
-    region_name: us-west-1
-
-- name: edge-osx-installer-64
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli-installer_edge_osx.pkg
-    region_name: us-west-1
-
-- name: edge-windows-installer-32
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli-installer_edge_win32.zip
-    region_name: us-west-1
-
-- name: edge-windows-installer-64
-  type: s3
-  source:
-    bucket: cf-cli-releases
-    access_key_id: ((cli-team-aws-s3-access-key-id))
-    secret_access_key: ((cli-team-aws-s3-secret-access-key))
-    versioned_file: master/cf-cli-installer_edge_winx64.zip
-    region_name: us-west-1
 
 - name: gcp-bosh-pool
   type: pool
@@ -219,50 +72,18 @@ resources:
     branch: master
     paths: [ci/cli-package/Dockerfile]
 
-- name: cf-cli-base-image
-  type: docker-image
-  source:
-    repository: cfcli/cli-base
-    username: ((dockerhub-username))
-    email: ((dockerhub-email))
-    password: ((dockerhub-password))
-
-- name: cf-cli-package-image
-  type: docker-image
-  source:
-    repository: cfcli/cli-package
-    username: ((dockerhub-username))
-    email: ((dockerhub-email))
-    password: ((dockerhub-password))
-
 - name: slack-alert
   type: slack-notification
   source:
     url: ((slack-webhook-url))
 
-- name: vars-store
-  type: git
-  source:
-    uri: git@github.com:cloudfoundry/cli-private
-    private_key: ((cli-private-github-private-key))
-    branch: master
-
 groups:
 - name: cli
   jobs:
   - units
-  - build-binaries
+  - claim-bosh-lite
   - integration-linux
-  - integration-windows
-  - integration-legacy
-  - cats
   - integration-experimental
-  - create-installers
-- name: images
-  jobs:
-  - create-cli-base-image
-  - create-cli-package-image
-
 jobs:
 - name: units
   serial: true
@@ -274,7 +95,7 @@ jobs:
   - aggregate:
     - task: units-linux
       file: cli-ci/ci/cli/tasks/units-linux.yml
-      on_failure:
+      on_failure: # TODO: no slack alerts on PR failures
          put: slack-alert
          params:
            channel: '#cli-eng'
@@ -283,7 +104,7 @@ jobs:
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: units-osx
       file: cli-ci/ci/cli/tasks/units-osx.yml
-      on_failure:
+      on_failure: # TODO: no slack alerts on PR failures
          put: slack-alert
          params:
            channel: '#cli-eng'
@@ -292,7 +113,7 @@ jobs:
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: units-windows
       file: cli-ci/ci/cli/tasks/units-windows.yml
-      on_failure:
+      on_failure: # TODO: no slack alerts on PR failures
          put: slack-alert
          params:
            channel: '#cli-eng'
@@ -303,7 +124,7 @@ jobs:
 - name: claim-bosh-lite # TODO: record PR number instead of usernames
   max_in_flight: 1
   plan:
-    - aggregate:
+    - aggregate: # TODO: make sure this only triggers if units passed for this commit
       - get: cli
         trigger: true
         version: every
@@ -325,7 +146,7 @@ jobs:
         params:
           text: *common-slack-text
 
-- name: integration-linux
+- name: integration-linux # TODO: clean this up
   serial: true
   plan:
   - aggregate:
@@ -335,8 +156,6 @@ jobs:
       passed: [build-binaries]
       trigger: true
     - get: cli-ci
-    - get: cli-integration
-    - get: vars-store
     - put: bosh-lock
       resource: gcp-bosh-pool
       params:
@@ -353,10 +172,6 @@ jobs:
     - task: integration
       file: cli-ci/ci/cli/tasks/integration-linux.yml
       # TODO: on_failure, tell GitHub not to block merging?
-    - task: generate-i18n-resources
-      file: cli/ci/cli/tasks/generate-i18n-resources.yml
-    - task: build-binaries
-      file: services-api-meta/tasks/cli/build-binaries.yml
       ensure:
       - put: unclaim-bosh-lite
         resource: cli-bosh-lite
@@ -375,100 +190,4 @@ jobs:
     params:
       release: bosh-lock
 
-- name: integration-experimental
-  serial: true
-  plan:
-  - aggregate:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-      trigger: true
-    - get: cli-ci
-    - get: cli-integration
-    - get: vars-store
-    - put: bosh-lock
-      resource: gcp-bosh-pool
-      params:
-        acquire: true
-  - do:
-    - task: cleanup-integration
-      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: integration-windows
-      file: cli-ci/ci/cli/tasks/integration-experimental-windows.yml
-      params:
-        <<: *integration_params
-      input_mapping:
-        cf-credentials: cleanup-integration-outputs
-      on_failure:
-        put: slack-alert
-        params:
-          channel: '#cli-eng'
-          text: |
-            Windows integration-experimental failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-      ensure:
-        task: cleanup-integration
-        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: integration-linux
-      file: cli-ci/ci/cli/tasks/integration-experimental-linux.yml
-      on_failure:
-        put: slack-alert
-        params:
-          channel: '#cli-eng'
-          text: |
-            Linux integration-experimental failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-      ensure:
-        task: cleanup-integration
-        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-      params:
-        <<: *integration_params
-  ensure:
-    put: gcp-bosh-pool
-    params:
-      release: bosh-lock
-
-- name: integration-legacy # TODO: someday, but we can't support this yet
-  serial: true
-  plan:
-  - aggregate:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-      trigger: true
-    - get: cli-ci
-    - get: cli-integration
-    - get: vars-store
-    - put: bosh-lock
-      resource: legacy-gcp-bosh-pool
-      params:
-        acquire: true
-  - do:
-    - task: cleanup-integration
-      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-      params:
-        ARGS: unbind-first
-    - task: integration
-      file: cli-ci/ci/cli/tasks/integration-linux.yml
-      params:
-        <<: *integration_params
-        CF_INT_IGNORE_API_VERSION_CHECK: false
-        NODES: 12
-      on_failure:
-        put: slack-alert
-        params:
-          channel: '#cli-eng'
-          text: |
-            Legacy integration failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-      ensure:
-        task: cleanup-integration
-        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-        params:
-          ARGS: unbind-first
-  ensure:
-    put: legacy-gcp-bosh-pool
-    params:
-      release: bosh-lock
+- name: integration-experimental # TODO: copy from integration-linux
