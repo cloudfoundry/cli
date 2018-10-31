@@ -4,6 +4,11 @@ resource_types:
   type: docker-image
   source:
     repository: jtarchie/pr
+- name: bosh-lite-pool
+  type: docker-image
+  source:
+    repository: servicesapi/bosh-lite-resource
+    tag: latest
 
 resources:
 - name: cli
@@ -15,11 +20,13 @@ resources:
     disable_forks: true # Until we're sure of the security, only build PRs on the main repo, so that only people with push access can trigger
     only_mergeable: true # Don't spend resources building PRs that can't be merged.
     ignore_paths: &ciPaths
-    - bin
-    - ci
-    - integration
     - README.md
     - .github
+  - name: sapi-bosh-lite
+    type: bosh-lite-pool
+    source:
+      uri: git@github.com:cloudfoundry/cli-pools.git
+      private_key: {{ci_private_key}}
 
 - name: cli-i18n
   type: git
@@ -293,47 +300,30 @@ jobs:
              Windows unit tests failed :(
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
 
-- name: build-binaries
-  serial: true
+- name: claim-bosh-lite # TODO: record PR number instead of usernames
+  max_in_flight: 1
   plan:
-  - aggregate:
-    - get: cli
-      trigger: true
-      passed: [units]
-    - get: cli-ci
-    - get: cli-i18n
-  - task: build-i18n
-    file: cli-ci/ci/cli/tasks/generate-i18n-resources.yml
-    on_failure:
-      put: slack-alert
-      params:
-        channel: '#cli-eng'
-        text: |
-          i18n generation failed :(
-          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - task: build
-    file: cli-ci/ci/cli/tasks/build-binaries.yml
-    on_failure:
-      put: slack-alert
-      params:
-        channel: '#cli-eng'
-        text: |
-          build binaries failed :(
-          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - task: build-osx
-    file: cli-ci/ci/cli/tasks/build-osx-binary.yml
-    on_failure:
-      put: slack-alert
-      params:
-        channel: '#cli-eng'
-        text: |
-          build OS X binaries failed :(
-          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - task: combine-binaries	
-    file: cli-ci/ci/cli/tasks/combine-binaries.yml
-  - put: cf-cli-binaries
-    params:
-      file: compiled/cf-cli-binaries.tgz
+    - aggregate:
+      - get: cli
+        trigger: true
+        version: every
+      - get: services-api-meta
+    - do:
+      - task: extract-authors-and-story-id-from-commit
+        file: services-api-meta/tasks/extract-authors-and-story-id-from-commit.yml
+        input_mapping: {repo: cli}
+      - put: sapi-bosh-lite
+        params:
+          story: commit-info/story
+          author_name: commit-info/author-name
+          author_email: commit-info/author-email
+          committer_name: commit-info/committer-name
+          committer_email: commit-info/committer-email
+          commit_message_prefix: CLI-
+      on_failure:
+        put: sapi-internal-slack-alert
+        params:
+          text: *common-slack-text
 
 - name: integration-linux
   serial: true
@@ -352,15 +342,28 @@ jobs:
       params:
         acquire: true
   - do:
-    - task: cleanup-integration
-      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - put: cli-bosh-lite
+      params:
+        story: commit-info/story
+        author_name: commit-info/author-name
+        author_email: commit-info/author-email
+        committer_name: commit-info/committer-name
+        committer_email: commit-info/committer-email
+        commit_message_prefix: CLI-
     - task: integration
       file: cli-ci/ci/cli/tasks/integration-linux.yml
       # TODO: on_failure, tell GitHub not to block merging?
+    - task: generate-i18n-resources
+      file: cli/ci/cli/tasks/generate-i18n-resources.yml
+    - task: build-binaries
+      file: services-api-meta/tasks/cli/build-binaries.yml
       ensure:
-        task: cleanup-integration
-        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-      params: &integration_params
+      - put: unclaim-bosh-lite
+        resource: cli-bosh-lite
+        params:
+          operation: unclaim
+          name: cli-bosh-lite/name
+       params: &integration_params
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ((client-secret))
         CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
@@ -426,7 +429,7 @@ jobs:
     params:
       release: bosh-lock
 
-- name: integration-legacy
+- name: integration-legacy # TODO: someday, but we can't support this yet
   serial: true
   plan:
   - aggregate:
