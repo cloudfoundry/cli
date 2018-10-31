@@ -120,7 +120,7 @@ var _ = Describe("v3-stop Command", func() {
 		It("says that the app was stopped and outputs warnings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Stopping app some-app in org some-org / space some-space as steve\.\.\.`))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
@@ -178,7 +178,7 @@ var _ = Describe("v3-stop Command", func() {
 
 		It("says that the app failed to stop", func() {
 			Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
-			Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Stopping app some-app in org some-org / space some-space as steve\.\.\.`))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
@@ -259,7 +259,7 @@ var _ = Describe("v3-stop Command", func() {
 
 		It("says that the app failed to stop", func() {
 			Expect(executeErr).To(Equal(expectedErr))
-			Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Stopping app some-app in org some-org / space some-space as steve\.\.\.`))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))

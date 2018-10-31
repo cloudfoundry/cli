@@ -106,7 +106,7 @@ var _ = Describe("CreateOrgCommand", func() {
 				It("creates the org and displays warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
-					Expect(testUI.Out).To(Say("Creating org %s as %s\\.\\.\\.", orgName, username))
+					Expect(testUI.Out).To(Say(`Creating org %s as %s\.\.\.`, orgName, username))
 					Expect(testUI.Err).To(Say("warn-1\nwarn-2\n"))
 					Expect(testUI.Out).To(Say("OK\n\n"))
 
@@ -127,7 +127,7 @@ var _ = Describe("CreateOrgCommand", func() {
 					It("displays warnings and a tip", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
-						Expect(testUI.Out).To(Say("Assigning role OrgManager to user %s in org %s\\.\\.\\.", username, orgName))
+						Expect(testUI.Out).To(Say(`Assigning role OrgManager to user %s in org %s\.\.\.`, username, orgName))
 						Expect(testUI.Err).To(Say("warn-role\n"))
 						Expect(testUI.Out).To(Say("OK\n\n"))
 						Expect(testUI.Out).To(Say(`TIP: Use 'cf target -o "%s"' to target new org`, orgName))

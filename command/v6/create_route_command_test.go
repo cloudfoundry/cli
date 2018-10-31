@@ -133,10 +133,10 @@ var _ = Describe("Create Route Command", func() {
 
 				It("creates a route with existence check", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("Creating route some-domain for org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Creating route some-domain for org some-org / space some-space as some-user\.\.\.`))
 					Expect(testUI.Err).To(Say("create-route-warning-1"))
 					Expect(testUI.Err).To(Say("create-route-warning-2"))
-					Expect(testUI.Out).To(Say("Route some-domain has been created\\."))
+					Expect(testUI.Out).To(Say(`Route some-domain has been created\.`))
 					Expect(testUI.Out).To(Say("OK"))
 
 					Expect(fakeActor.CreateRouteWithExistenceCheckCallCount()).To(Equal(1))
@@ -166,10 +166,10 @@ var _ = Describe("Create Route Command", func() {
 
 				It("creates a route with existence check", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("Creating route some-host.some-domain/some-path for org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Creating route some-host.some-domain/some-path for org some-org / space some-space as some-user\.\.\.`))
 					Expect(testUI.Err).To(Say("create-route-warning-1"))
 					Expect(testUI.Err).To(Say("create-route-warning-2"))
-					Expect(testUI.Out).To(Say("Route some-host.some-domain/some-path has been created\\."))
+					Expect(testUI.Out).To(Say(`Route some-host.some-domain/some-path has been created\.`))
 					Expect(testUI.Out).To(Say("OK"))
 
 					Expect(fakeActor.CreateRouteWithExistenceCheckCallCount()).To(Equal(1))
@@ -197,10 +197,10 @@ var _ = Describe("Create Route Command", func() {
 
 				It("creates a route with existence check", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("Creating route some-domain:42 for org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Creating route some-domain:42 for org some-org / space some-space as some-user\.\.\.`))
 					Expect(testUI.Err).To(Say("create-route-warning-1"))
 					Expect(testUI.Err).To(Say("create-route-warning-2"))
-					Expect(testUI.Out).To(Say("Route some-domain:42 has been created\\."))
+					Expect(testUI.Out).To(Say(`Route some-domain:42 has been created\.`))
 					Expect(testUI.Out).To(Say("OK"))
 
 					Expect(fakeActor.CreateRouteWithExistenceCheckCallCount()).To(Equal(1))
@@ -227,10 +227,10 @@ var _ = Describe("Create Route Command", func() {
 
 				It("creates a route with existence check", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("Creating route some-domain for org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Creating route some-domain for org some-org / space some-space as some-user\.\.\.`))
 					Expect(testUI.Err).To(Say("create-route-warning-1"))
 					Expect(testUI.Err).To(Say("create-route-warning-2"))
-					Expect(testUI.Out).To(Say("Route some-domain:1115 has been created\\."))
+					Expect(testUI.Out).To(Say(`Route some-domain:1115 has been created\.`))
 					Expect(testUI.Out).To(Say("OK"))
 
 					Expect(fakeActor.CreateRouteWithExistenceCheckCallCount()).To(Equal(1))
@@ -257,7 +257,7 @@ var _ = Describe("Create Route Command", func() {
 					Expect(executeErr).To(HaveOccurred())
 					Expect(executeErr).To(MatchError(actionerror.DomainNotFoundError{Name: "some-domain"}))
 
-					Expect(testUI.Out).To(Say("Creating route some-domain for org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Creating route some-domain for org some-org / space some-space as some-user\.\.\.`))
 					Expect(testUI.Err).To(Say("create-route-warning-1"))
 					Expect(testUI.Err).To(Say("create-route-warning-2"))
 					Expect(testUI.Out).NotTo(Say("OK"))
@@ -282,10 +282,10 @@ var _ = Describe("Create Route Command", func() {
 				It("prints warnings and returns an error", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Creating route some-host\\.some-domain for org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Creating route some-host\.some-domain for org some-org / space some-space as some-user\.\.\.`))
 					Expect(testUI.Err).To(Say("create-route-warning-1"))
 					Expect(testUI.Err).To(Say("create-route-warning-2"))
-					Expect(testUI.Err).To(Say("Route some-host\\.some-domain already exists\\."))
+					Expect(testUI.Err).To(Say(`Route some-host\.some-domain already exists\.`))
 					Expect(testUI.Out).To(Say("OK"))
 
 					Expect(fakeActor.CreateRouteWithExistenceCheckCallCount()).To(Equal(1))
@@ -303,7 +303,7 @@ var _ = Describe("Create Route Command", func() {
 					Expect(executeErr).To(HaveOccurred())
 					Expect(executeErr).To(MatchError(createRouteErr))
 
-					Expect(testUI.Out).To(Say("Creating route some-domain for org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Creating route some-domain for org some-org / space some-space as some-user\.\.\.`))
 					Expect(testUI.Err).To(Say("create-route-warning-1"))
 					Expect(testUI.Err).To(Say("create-route-warning-2"))
 					Expect(testUI.Out).NotTo(Say("OK"))

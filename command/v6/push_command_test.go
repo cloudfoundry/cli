@@ -25,7 +25,6 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifest"
 	"code.cloudfoundry.org/cli/util/ui"
-
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -366,7 +365,7 @@ var _ = Describe("push Command", func() {
 									It("outputs corresponding flavor text", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 
-										Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+										Expect(testUI.Out).To(Say(`Pushing from manifest to org some-org / space some-space as some-user\.\.\.`))
 										Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(providedPath)))
 									})
 								})
@@ -453,7 +452,7 @@ var _ = Describe("push Command", func() {
 										It("should read the manifest.yml file and outputs corresponding flavor text", func() {
 											Expect(executeErr).ToNot(HaveOccurred())
 
-											Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+											Expect(testUI.Out).To(Say(`Pushing from manifest to org some-org / space some-space as some-user\.\.\.`))
 											Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(providedPath)))
 
 											Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
@@ -473,7 +472,7 @@ var _ = Describe("push Command", func() {
 													It("should read the vars-file.yml file and replace the variables in the manifest.yml file", func() {
 														Expect(executeErr).ToNot(HaveOccurred())
 
-														Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+														Expect(testUI.Out).To(Say(`Pushing from manifest to org some-org / space some-space as some-user\.\.\.`))
 														Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(providedPath)))
 
 														Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
@@ -502,7 +501,7 @@ var _ = Describe("push Command", func() {
 													It("should read the vars-file.yml file and replace the variables in the manifest.yml file", func() {
 														Expect(executeErr).ToNot(HaveOccurred())
 
-														Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+														Expect(testUI.Out).To(Say(`Pushing from manifest to org some-org / space some-space as some-user\.\.\.`))
 														Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(providedPath)))
 
 														Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
@@ -529,7 +528,7 @@ var _ = Describe("push Command", func() {
 												It("should read the vars and pass only the vars array to ReadManifest", func() {
 													Expect(executeErr).ToNot(HaveOccurred())
 
-													Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+													Expect(testUI.Out).To(Say(`Pushing from manifest to org some-org / space some-space as some-user\.\.\.`))
 													Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(providedPath)))
 
 													Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
@@ -578,7 +577,7 @@ var _ = Describe("push Command", func() {
 										It("should read the manifest.yml file and outputs corresponding flavor text", func() {
 											Expect(executeErr).ToNot(HaveOccurred())
 
-											Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+											Expect(testUI.Out).To(Say(`Pushing from manifest to org some-org / space some-space as some-user\.\.\.`))
 											Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(ymlFile)))
 
 											Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
@@ -596,7 +595,7 @@ var _ = Describe("push Command", func() {
 										It("should read the manifest.yaml file and outputs corresponding flavor text", func() {
 											Expect(executeErr).ToNot(HaveOccurred())
 
-											Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+											Expect(testUI.Out).To(Say(`Pushing from manifest to org some-org / space some-space as some-user\.\.\.`))
 											Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(yamlFile)))
 
 											Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
@@ -618,7 +617,7 @@ var _ = Describe("push Command", func() {
 										It("should read the manifest.yml file and outputs corresponding flavor text", func() {
 											Expect(executeErr).ToNot(HaveOccurred())
 
-											Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+											Expect(testUI.Out).To(Say(`Pushing from manifest to org some-org / space some-space as some-user\.\.\.`))
 											Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(ymlFile)))
 
 											Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
@@ -665,7 +664,7 @@ var _ = Describe("push Command", func() {
 							It("outputs corresponding flavor text", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Pushing from manifest to org some-org / space some-space as some-user\.\.\.`))
 								Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(pathToManifest)))
 							})
 						})
@@ -686,7 +685,7 @@ var _ = Describe("push Command", func() {
 						It("outputs flavor text prior to generating app configuration", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(testUI.Out).To(Say("Pushing app %s to org some-org / space some-space as some-user", appName))
-							Expect(testUI.Out).To(Say("Getting app info\\.\\.\\."))
+							Expect(testUI.Out).To(Say(`Getting app info\.\.\.`))
 						})
 
 						It("applies each of the application configurations", func() {
@@ -701,9 +700,9 @@ var _ = Describe("push Command", func() {
 						It("display diff of changes", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
-							Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
-							Expect(testUI.Out).To(Say("\\s+routes:"))
+							Expect(testUI.Out).To(Say(`\s+name:\s+%s`, appName))
+							Expect(testUI.Out).To(Say(`\s+path:\s+%s`, regexp.QuoteMeta(appConfigs[0].Path)))
+							Expect(testUI.Out).To(Say(`\s+routes:`))
 							for _, route := range appConfigs[0].CurrentRoutes {
 								Expect(testUI.Out).To(Say(route.String()))
 							}
@@ -716,18 +715,18 @@ var _ = Describe("push Command", func() {
 							It("displays app events and warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Creating app with these attributes\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Unmapping routes\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Binding services\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Comparing local files to remote cache\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Creating app with these attributes\.\.\.`))
+								Expect(testUI.Out).To(Say(`Mapping routes\.\.\.`))
+								Expect(testUI.Out).To(Say(`Unmapping routes\.\.\.`))
+								Expect(testUI.Out).To(Say(`Binding services\.\.\.`))
+								Expect(testUI.Out).To(Say(`Comparing local files to remote cache\.\.\.`))
 								Expect(testUI.Out).To(Say("All files found in remote cache; nothing to upload."))
-								Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Packaging files to upload\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Uploading files\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Retrying upload due to an error\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Stopping app\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Waiting for API to complete processing files\.\.\.`))
+								Expect(testUI.Out).To(Say(`Packaging files to upload\.\.\.`))
+								Expect(testUI.Out).To(Say(`Uploading files\.\.\.`))
+								Expect(testUI.Out).To(Say(`Retrying upload due to an error\.\.\.`))
+								Expect(testUI.Out).To(Say(`Waiting for API to complete processing files\.\.\.`))
+								Expect(testUI.Out).To(Say(`Stopping app\.\.\.`))
 
 								Expect(testUI.Err).To(Say("some-config-warnings"))
 								Expect(testUI.Err).To(Say("apply-1"))
@@ -752,15 +751,15 @@ var _ = Describe("push Command", func() {
 
 								It("displays the app summary with isolation segments as well as warnings", func() {
 									Expect(executeErr).ToNot(HaveOccurred())
-									Expect(testUI.Out).To(Say("name:\\s+%s", appName))
-									Expect(testUI.Out).To(Say("requested state:\\s+started"))
-									Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
-									Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
-									Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-									Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-									Expect(testUI.Out).To(Say("stack:\\s+potatos"))
-									Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
-									Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+									Expect(testUI.Out).To(Say(`name:\s+%s`, appName))
+									Expect(testUI.Out).To(Say(`requested state:\s+started`))
+									Expect(testUI.Out).To(Say(`instances:\s+1\/3`))
+									Expect(testUI.Out).To(Say(`usage:\s+128M x 3 instances`))
+									Expect(testUI.Out).To(Say(`routes:\s+banana.fruit.com/hi, foobar.com:13`))
+									Expect(testUI.Out).To(Say(`last uploaded:\s+\w{3} [0-3]\d \w{3} [0-2]\d:[0-5]\d:[0-5]\d \w+ \d{4}`))
+									Expect(testUI.Out).To(Say(`stack:\s+potatos`))
+									Expect(testUI.Out).To(Say(`buildpack:\s+some-buildpack`))
+									Expect(testUI.Out).To(Say(`start command:\s+some start command`))
 
 									Expect(testUI.Err).To(Say("app-summary-warning"))
 								})
@@ -802,15 +801,15 @@ var _ = Describe("push Command", func() {
 								It("displays process information", func() {
 									Expect(executeErr).ToNot(HaveOccurred())
 
-									Expect(testUI.Out).To(Say("name:\\s+%s", appName))
-									Expect(testUI.Out).To(Say("type:\\s+aba"))
-									Expect(testUI.Out).To(Say("instances:\\s+0/0"))
-									Expect(testUI.Out).To(Say("memory usage:\\s+32M"))
-									Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
-									Expect(testUI.Out).To(Say("type:\\s+console"))
-									Expect(testUI.Out).To(Say("instances:\\s+0/0"))
-									Expect(testUI.Out).To(Say("memory usage:\\s+16M"))
-									Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+									Expect(testUI.Out).To(Say(`name:\s+%s`, appName))
+									Expect(testUI.Out).To(Say(`type:\s+aba`))
+									Expect(testUI.Out).To(Say(`instances:\s+0/0`))
+									Expect(testUI.Out).To(Say(`memory usage:\s+32M`))
+									Expect(testUI.Out).To(Say(`start command:\s+some-command-1`))
+									Expect(testUI.Out).To(Say(`type:\s+console`))
+									Expect(testUI.Out).To(Say(`instances:\s+0/0`))
+									Expect(testUI.Out).To(Say(`memory usage:\s+16M`))
+									Expect(testUI.Out).To(Say(`start command:\s+some-command-2`))
 
 									Expect(testUI.Err).To(Say("combo-summary-warning"))
 
@@ -864,8 +863,8 @@ var _ = Describe("push Command", func() {
 
 								It("displays the correct start command", func() {
 									Expect(executeErr).ToNot(HaveOccurred())
-									Expect(testUI.Out).To(Say("name:\\s+%s", appName))
-									Expect(testUI.Out).To(Say("start command:\\s+a-different-start-command"))
+									Expect(testUI.Out).To(Say(`name:\s+%s`, appName))
+									Expect(testUI.Out).To(Say(`start command:\s+a-different-start-command`))
 								})
 							})
 						})
@@ -913,9 +912,9 @@ var _ = Describe("push Command", func() {
 							When("the app is not running", func() {
 								It("does not start the app", func() {
 									Expect(executeErr).ToNot(HaveOccurred())
-									Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
-									Expect(testUI.Out).To(Say("name:\\s+%s", appName))
-									Expect(testUI.Out).To(Say("requested state:\\s+stopped"))
+									Expect(testUI.Out).To(Say(`Waiting for API to complete processing files\.\.\.`))
+									Expect(testUI.Out).To(Say(`name:\s+%s`, appName))
+									Expect(testUI.Out).To(Say(`requested state:\s+stopped`))
 
 									Expect(fakeRestartActor.RestartApplicationCallCount()).To(Equal(0))
 								})

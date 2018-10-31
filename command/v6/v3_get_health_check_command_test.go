@@ -128,7 +128,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 			Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
 			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-			Expect(testUI.Out).To(Say("Getting process health check types for app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Getting process health check types for app some-app in org some-org / space some-space as steve\.\.\.`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
@@ -148,7 +148,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-			Expect(testUI.Out).To(Say("Getting process health check types for app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Getting process health check types for app some-app in org some-org / space some-space as steve\.\.\.`))
 			Expect(testUI.Out).To(Say("App has no processes"))
 
 			Expect(fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceCallCount()).To(Equal(1))
@@ -173,7 +173,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-			Expect(testUI.Out).To(Say("Getting process health check types for app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Getting process health check types for app some-app in org some-org / space some-space as steve\.\.\.`))
 			Expect(testUI.Out).To(Say(`process\s+health check\s+endpoint\s+\(for http\)\s+invocation timeout\n`))
 			Expect(testUI.Out).To(Say(`web\s+http\s+/foo\s+10\n`))
 			Expect(testUI.Out).To(Say(`queue\s+port\s+1\n`))

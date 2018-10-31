@@ -188,7 +188,7 @@ var _ = Describe("app Command", func() {
 			It("returns the error and prints warnings", func() {
 				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
-				Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\."))
+				Expect(testUI.Out).To(Say(`Showing health and status for app some-app in org some-org / space some-space as steve\.\.\.`))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
@@ -237,9 +237,9 @@ var _ = Describe("app Command", func() {
 			It("prints the application summary and outputs warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\.\n\n"))
-				Expect(testUI.Out).To(Say("name:\\s+some-app"))
-				Expect(testUI.Out).To(Say("requested state:\\s+started"))
+				Expect(testUI.Out).To(Say(`(?m)Showing health and status for app some-app in org some-org / space some-space as steve\.\.\.\n\n`))
+				Expect(testUI.Out).To(Say(`name:\s+some-app`))
+				Expect(testUI.Out).To(Say(`requested state:\s+started`))
 				Expect(testUI.Out).ToNot(Say("start command:"))
 
 				Expect(testUI.Err).To(Say("warning-1"))

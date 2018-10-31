@@ -124,7 +124,7 @@ var _ = Describe("v3-packages Command", func() {
 		It("returns the error and prints warnings", func() {
 			Expect(executeErr).To(Equal(ccerror.RequestError{}))
 
-			Expect(testUI.Out).To(Say("Listing packages of app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Listing packages of app some-app in org some-org / space some-space as steve\.\.\.`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
@@ -157,15 +157,15 @@ var _ = Describe("v3-packages Command", func() {
 		It("prints the application packages and outputs warnings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("Listing packages of app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Listing packages of app some-app in org some-org / space some-space as steve\.\.\.`))
 
-			Expect(testUI.Out).To(Say("guid\\s+state\\s+created"))
+			Expect(testUI.Out).To(Say(`guid\s+state\s+created`))
 			package1UTCTime, err := time.Parse(time.RFC3339, package1UTC)
 			Expect(err).ToNot(HaveOccurred())
 			package2UTCTime, err := time.Parse(time.RFC3339, package2UTC)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Out).To(Say("some-package-guid-1\\s+ready\\s+%s", testUI.UserFriendlyDate(package1UTCTime)))
-			Expect(testUI.Out).To(Say("some-package-guid-2\\s+failed\\s+%s", testUI.UserFriendlyDate(package2UTCTime)))
+			Expect(testUI.Out).To(Say(`some-package-guid-1\s+ready\s+%s`, testUI.UserFriendlyDate(package1UTCTime)))
+			Expect(testUI.Out).To(Say(`some-package-guid-2\s+failed\s+%s`, testUI.UserFriendlyDate(package2UTCTime)))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
@@ -186,7 +186,7 @@ var _ = Describe("v3-packages Command", func() {
 		It("displays there are no packages", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("Listing packages of app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Listing packages of app some-app in org some-org / space some-space as steve\.\.\.`))
 			Expect(testUI.Out).To(Say("No packages found"))
 
 			Expect(testUI.Err).To(Say("warning-1"))

@@ -91,9 +91,9 @@ var _ = Describe("orgs Command", func() {
 				It("displays that there are no orgs", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Getting orgs as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Getting orgs as some-user\.\.\.`))
 					Expect(testUI.Out).To(Say(""))
-					Expect(testUI.Out).To(Say("No orgs found\\."))
+					Expect(testUI.Out).To(Say(`No orgs found\.`))
 
 					Expect(testUI.Err).To(Say("get-orgs-warning"))
 
@@ -115,7 +115,7 @@ var _ = Describe("orgs Command", func() {
 				It("displays all the orgs in the org", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Getting orgs as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Getting orgs as some-user\.\.\.`))
 					Expect(testUI.Out).To(Say(""))
 					Expect(testUI.Out).To(Say("name"))
 					Expect(testUI.Out).To(Say("org-1"))
@@ -138,7 +138,7 @@ var _ = Describe("orgs Command", func() {
 				It("returns a translatable error", func() {
 					Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: "not-found-org"}))
 
-					Expect(testUI.Out).To(Say("Getting orgs as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Getting orgs as some-user\.\.\.`))
 					Expect(testUI.Out).To(Say(""))
 
 					Expect(testUI.Err).To(Say("get-orgs-warning"))

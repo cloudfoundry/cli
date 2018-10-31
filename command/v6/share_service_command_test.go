@@ -126,7 +126,7 @@ var _ = Describe("share-service Command", func() {
 					It("shares the service instance with the provided space and displays all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Sharing service instance some-service-instance into org some-org / space some-space as some-user\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Sharing service instance some-service-instance into org some-org / space some-space as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 
 						Expect(testUI.Err).To(Say("share-service-warning"))
@@ -211,7 +211,7 @@ var _ = Describe("share-service Command", func() {
 					It("shares the service instance with the provided space and org and displays all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Sharing service instance some-service-instance into org some-other-org / space some-space as some-user\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Sharing service instance some-service-instance into org some-other-org / space some-space as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 
 						Expect(testUI.Err).To(Say("share-service-warning"))

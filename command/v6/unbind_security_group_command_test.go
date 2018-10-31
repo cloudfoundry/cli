@@ -108,9 +108,9 @@ var _ = Describe("unbind-security-group Command", func() {
 				It("unbinds the security group from the targeted space", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", "some-security-group", "some-org", "some-space", "some-user"))
+					Expect(testUI.Out).To(Say(`Unbinding security group %s from org %s / space %s as %s\.\.\.`, "some-security-group", "some-org", "some-space", "some-user"))
 					Expect(testUI.Out).To(Say("OK\n\n"))
-					Expect(testUI.Out).To(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
+					Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 					Expect(testUI.Err).To(Say("unbind warning"))
 
 					Expect(fakeConfig.TargetedOrganizationCallCount()).To(Equal(1))
@@ -152,7 +152,7 @@ var _ = Describe("unbind-security-group Command", func() {
 						Expect(testUI.Err).To(Say("Security group some-security-group not bound to this space for lifecycle phase 'some-lifecycle'."))
 
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).NotTo(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
+						Expect(testUI.Out).NotTo(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
 						Expect(executeErr).NotTo(HaveOccurred())
 					})
@@ -208,9 +208,9 @@ var _ = Describe("unbind-security-group Command", func() {
 				})
 
 				It("the security group is unbound from the targeted space", func() {
-					Expect(testUI.Out).To(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", "some-security-group", "some-org", "some-space", "some-user"))
+					Expect(testUI.Out).To(Say(`Unbinding security group %s from org %s / space %s as %s\.\.\.`, "some-security-group", "some-org", "some-space", "some-user"))
 					Expect(testUI.Out).To(Say("OK\n\n"))
-					Expect(testUI.Out).To(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
+					Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 					Expect(testUI.Err).To(Say("unbind warning"))
 
 					Expect(fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameCallCount()).To(Equal(1))
@@ -252,7 +252,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					Expect(testUI.Err).To(Say("Security group some-security-group not bound to this space for lifecycle phase 'some-lifecycle'."))
 
 					Expect(testUI.Out).To(Say("OK"))
-					Expect(testUI.Out).NotTo(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
+					Expect(testUI.Out).NotTo(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
 					Expect(executeErr).NotTo(HaveOccurred())
 				})

@@ -126,7 +126,7 @@ var _ = Describe("v3-apps Command", func() {
 		It("returns the error and prints warnings", func() {
 			Expect(executeErr).To(Equal(ccerror.RequestError{}))
 
-			Expect(testUI.Out).To(Say("Getting apps in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Getting apps in org some-org / space some-space as steve\.\.\.`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
@@ -156,7 +156,7 @@ var _ = Describe("v3-apps Command", func() {
 		It("returns the error and prints warnings", func() {
 			Expect(executeErr).To(Equal(ccerror.RequestError{}))
 
-			Expect(testUI.Out).To(Say("Getting apps in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Getting apps in org some-org / space some-space as steve\.\.\.`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
@@ -273,11 +273,11 @@ var _ = Describe("v3-apps Command", func() {
 			It("prints the application summary and outputs warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("Getting apps in org some-org / space some-space as steve\\.\\.\\."))
+				Expect(testUI.Out).To(Say(`Getting apps in org some-org / space some-space as steve\.\.\.`))
 
-				Expect(testUI.Out).To(Say("name\\s+requested state\\s+processes\\s+routes"))
-				Expect(testUI.Out).To(Say("some-app-1\\s+started\\s+web:2/2, console:0/0, worker:0/1\\s+some-app-1.some-other-domain, some-app-1.some-domain"))
-				Expect(testUI.Out).To(Say("some-app-2\\s+stopped\\s+web:0/2\\s+some-app-2.some-domain"))
+				Expect(testUI.Out).To(Say(`name\s+requested state\s+processes\s+routes`))
+				Expect(testUI.Out).To(Say(`some-app-1\s+started\s+web:2/2, console:0/0, worker:0/1\s+some-app-1.some-other-domain, some-app-1.some-domain`))
+				Expect(testUI.Out).To(Say(`some-app-2\s+stopped\s+web:0/2\s+some-app-2.some-domain`))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
@@ -317,10 +317,10 @@ var _ = Describe("v3-apps Command", func() {
 			It("it does not request or display routes information for app", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("Getting apps in org some-org / space some-space as steve\\.\\.\\."))
+				Expect(testUI.Out).To(Say(`Getting apps in org some-org / space some-space as steve\.\.\.`))
 
-				Expect(testUI.Out).To(Say("name\\s+requested state\\s+processes\\s+routes"))
-				Expect(testUI.Out).To(Say("some-app\\s+started\\s+$"))
+				Expect(testUI.Out).To(Say(`name\s+requested state\s+processes\s+routes`))
+				Expect(testUI.Out).To(Say(`some-app\s+started\s+$`))
 				Expect(testUI.Err).To(Say("warning"))
 
 				Expect(fakeActor.GetApplicationsWithProcessesBySpaceCallCount()).To(Equal(1))
@@ -339,7 +339,7 @@ var _ = Describe("v3-apps Command", func() {
 			It("displays there are no apps", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("Getting apps in org some-org / space some-space as steve\\.\\.\\."))
+				Expect(testUI.Out).To(Say(`Getting apps in org some-org / space some-space as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("No apps found"))
 			})
 		})

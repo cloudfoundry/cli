@@ -206,9 +206,9 @@ var _ = Describe("bind-security-group Command", func() {
 					It("binds the security group to the space and displays all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Assigning security group some-security-group to space some-space in org some-org as some-user\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
+						Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
 						Expect(testUI.Err).To(Say("get security group warning"))
 						Expect(testUI.Err).To(Say("get org warning"))
@@ -332,11 +332,11 @@ var _ = Describe("bind-security-group Command", func() {
 					It("binds the security group to each space and displays all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Assigning security group some-security-group to space some-space-1 in org some-org as some-user\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space-1 in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("Assigning security group some-security-group to space some-space-2 in org some-org as some-user\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space-2 in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
+						Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
 						Expect(testUI.Err).To(Say("get security group warning"))
 						Expect(testUI.Err).To(Say("get org warning"))
@@ -437,9 +437,9 @@ var _ = Describe("bind-security-group Command", func() {
 					It("binds the security group to the space and displays all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Assigning security group some-security-group to space some-space in org some-org as some-user\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
+						Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
 						Expect(testUI.Err).To(Say("get security group warning"))
 						Expect(testUI.Err).To(Say("get org warning"))
@@ -521,11 +521,11 @@ var _ = Describe("bind-security-group Command", func() {
 					It("binds the security group to each space and displays all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Assigning security group some-security-group to space some-space-1 in org some-org as some-user\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space-1 in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("Assigning security group some-security-group to space some-space-2 in org some-org as some-user\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Assigning security group some-security-group to space some-space-2 in org some-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
+						Expect(testUI.Out).To(Say(`TIP: Changes require an app restart \(for running\) or restage \(for staging\) to apply to existing applications\.`))
 
 						Expect(testUI.Err).To(Say("get security group warning"))
 						Expect(testUI.Err).To(Say("get org warning"))

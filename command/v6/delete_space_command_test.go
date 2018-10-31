@@ -119,7 +119,7 @@ var _ = Describe("delete-space Command", func() {
 
 						It("returns the translatable error", func() {
 							Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: "some-space"}))
-							Expect(testUI.Out).To(Say("Deleting space some-space in org some-org as some-user\\.\\.\\."))
+							Expect(testUI.Out).To(Say(`Deleting space some-space in org some-org as some-user\.\.\.`))
 
 							Expect(testUI.Err).To(Say("warning-1"))
 							Expect(testUI.Err).To(Say("warning-2"))
@@ -140,7 +140,7 @@ var _ = Describe("delete-space Command", func() {
 							It("untargets the space, displays all warnings and does not error", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Deleting space some-space in org some-org as some-user\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Deleting space some-space in org some-org as some-user\.\.\.`))
 								Expect(testUI.Out).To(Say("OK"))
 								Expect(testUI.Out).To(Say("TIP: No space targeted, use 'faceman target -s' to target a space."))
 
@@ -164,7 +164,7 @@ var _ = Describe("delete-space Command", func() {
 							It("displays all warnings and does not error", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Deleting space some-space in org some-org as some-user\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Deleting space some-space in org some-org as some-user\.\.\.`))
 								Expect(testUI.Out).To(Say("OK"))
 								Expect(testUI.Out).ToNot(Say("TIP: No space targeted, use 'faceman target -s' to target a space."))
 
@@ -193,8 +193,8 @@ var _ = Describe("delete-space Command", func() {
 						It("deletes the space", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Really delete the space some-space\\? \\[yN\\]"))
-							Expect(testUI.Out).To(Say("Deleting space some-space in org some-org as some-user\\.\\.\\."))
+							Expect(testUI.Out).To(Say(`Really delete the space some-space\? \[yN\]`))
+							Expect(testUI.Out).To(Say(`Deleting space some-space in org some-org as some-user\.\.\.`))
 							Expect(testUI.Out).To(Say("OK"))
 							Expect(testUI.Out).ToNot(Say("TIP: No space targeted, use 'faceman target -s' to target a space."))
 
@@ -240,9 +240,9 @@ var _ = Describe("delete-space Command", func() {
 						It("asks the user again", func() {
 							Expect(executeErr).NotTo(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Really delete the space some-space\\? \\[yN\\]"))
-							Expect(testUI.Out).To(Say("invalid input \\(not y, n, yes, or no\\)"))
-							Expect(testUI.Out).To(Say("Really delete the space some-space\\? \\[yN\\]"))
+							Expect(testUI.Out).To(Say(`Really delete the space some-space\? \[yN\]`))
+							Expect(testUI.Out).To(Say(`invalid input \(not y, n, yes, or no\)`))
+							Expect(testUI.Out).To(Say(`Really delete the space some-space\? \[yN\]`))
 
 							Expect(fakeActor.DeleteSpaceByNameAndOrganizationNameCallCount()).To(Equal(0))
 						})
@@ -261,9 +261,9 @@ var _ = Describe("delete-space Command", func() {
 				It("deletes the space in the targeted org", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Deleting space some-space in org some-targeted-org as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Deleting space some-space in org some-targeted-org as some-user\.\.\.`))
 					Expect(testUI.Out).To(Say("OK"))
-					Expect(testUI.Out).ToNot(Say("TIP: No space targeted, use 'faceman target -s' to target a space\\."))
+					Expect(testUI.Out).ToNot(Say(`TIP: No space targeted, use 'faceman target -s' to target a space\.`))
 
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
@@ -281,7 +281,7 @@ var _ = Describe("delete-space Command", func() {
 					It("deletes the space and untargets the org", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Deleting space some-space in org some-targeted-org as some-user\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Deleting space some-space in org some-targeted-org as some-user\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say("TIP: No space targeted, use 'faceman target -s' to target a space."))
 

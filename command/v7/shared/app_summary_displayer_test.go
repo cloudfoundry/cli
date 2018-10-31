@@ -121,7 +121,7 @@ var _ = Describe("app summary displayer", func() {
 					Expect(webProcessSummary.MemUsage).To(Equal("32M"))
 
 					Expect(webProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
-					Expect(webProcessSummary.Instances[0].Since).To(MatchRegexp("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
+					Expect(webProcessSummary.Instances[0].Since).To(MatchRegexp(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 					Expect(time.Parse(time.RFC3339, webProcessSummary.Instances[0].Since)).To(BeTemporally("~", time.Now().Add(-uptime), 2*time.Second))
 					Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
 					Expect(webProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
@@ -185,12 +185,12 @@ var _ = Describe("app summary displayer", func() {
 				})
 
 				It("lists instance stats for process types that have > 0 instances", func() {
-					Expect(testUI.Out).To(Say("type:\\s+web"))
+					Expect(testUI.Out).To(Say(`type:\s+web`))
 					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
 				})
 
 				It("does not show the instance stats table for process types with 0 instances", func() {
-					Expect(testUI.Out).To(Say("type:\\s+console"))
+					Expect(testUI.Out).To(Say(`type:\s+console`))
 					Expect(testUI.Out).To(Say("There are no running instances of this process."))
 				})
 			})
@@ -212,7 +212,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 
 				It("displays the instances table", func() {
-					Expect(testUI.Out).To(Say("type:\\s+web"))
+					Expect(testUI.Out).To(Say(`type:\s+web`))
 					Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
 				})
 			})
@@ -252,13 +252,13 @@ var _ = Describe("app summary displayer", func() {
 					})
 
 					It("displays the non-empty start command for each process", func() {
-						Expect(testUI.Out).To(Say("type:\\s+web"))
-						Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
+						Expect(testUI.Out).To(Say(`type:\s+web`))
+						Expect(testUI.Out).To(Say(`start command:\s+some-command-1`))
 
-						Expect(testUI.Out).To(Say("type:\\s+console"))
-						Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+						Expect(testUI.Out).To(Say(`type:\s+console`))
+						Expect(testUI.Out).To(Say(`start command:\s+some-command-2`))
 
-						Expect(testUI.Out).To(Say("type:\\s+random"))
+						Expect(testUI.Out).To(Say(`type:\s+random`))
 						Expect(testUI.Out).ToNot(Say("start command:"))
 					})
 				})
@@ -302,14 +302,14 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("lists information for each of the processes", func() {
-				Expect(testUI.Out).To(Say("type:\\s+web"))
-				Expect(testUI.Out).To(Say("instances:\\s+0/0"))
-				Expect(testUI.Out).To(Say("memory usage:\\s+32M"))
+				Expect(testUI.Out).To(Say(`type:\s+web`))
+				Expect(testUI.Out).To(Say(`instances:\s+0/0`))
+				Expect(testUI.Out).To(Say(`memory usage:\s+32M`))
 				Expect(testUI.Out).To(Say("There are no running instances of this process."))
 
-				Expect(testUI.Out).To(Say("type:\\s+console"))
-				Expect(testUI.Out).To(Say("instances:\\s+0/0"))
-				Expect(testUI.Out).To(Say("memory usage:\\s+16M"))
+				Expect(testUI.Out).To(Say(`type:\s+console`))
+				Expect(testUI.Out).To(Say(`instances:\s+0/0`))
+				Expect(testUI.Out).To(Say(`memory usage:\s+16M`))
 				Expect(testUI.Out).To(Say("There are no running instances of this process."))
 			})
 
@@ -341,10 +341,10 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("lists information for each of the processes", func() {
-				Expect(testUI.Out).To(Say("type:\\s+web"))
+				Expect(testUI.Out).To(Say(`type:\s+web`))
 				Expect(testUI.Out).To(Say("There are no running instances of this process."))
 
-				Expect(testUI.Out).To(Say("type:\\s+console"))
+				Expect(testUI.Out).To(Say(`type:\s+console`))
 				Expect(testUI.Out).To(Say("There are no running instances of this process."))
 			})
 
@@ -368,7 +368,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 
 				It("should output the isolation segment name", func() {
-					Expect(testUI.Out).To(Say("isolation segment:\\s+%s", isolationSegmentName))
+					Expect(testUI.Out).To(Say(`isolation segment:\s+%s`, isolationSegmentName))
 				})
 			})
 
@@ -402,7 +402,7 @@ var _ = Describe("app summary displayer", func() {
 					Expect(err).To(Not(HaveOccurred()))
 
 					time := t.Local().Format("Mon 02 Jan 15:04:05 MST 2006")
-					Expect(testUI.Out).To(Say("last uploaded:\\s+%s", time))
+					Expect(testUI.Out).To(Say(`last uploaded:\s+%s`, time))
 				})
 			})
 
@@ -412,7 +412,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 
 				It("leaves last uploaded blank", func() {
-					Expect(testUI.Out).To(Say("(?m)last uploaded:\\s*\n"))
+					Expect(testUI.Out).To(Say(`(?m)last uploaded:\s*\n`))
 				})
 			})
 		})
@@ -426,7 +426,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("displays routes", func() {
-				Expect(testUI.Out).To(Say("routes:\\s+%s, %s", "route1.example.com", "route2.example.com"))
+				Expect(testUI.Out).To(Say(`routes:\s+%s, %s`, "route1.example.com", "route2.example.com"))
 			})
 		})
 
@@ -436,7 +436,7 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("displays stack", func() {
-				Expect(testUI.Out).To(Say("stack:\\s+some-stack"))
+				Expect(testUI.Out).To(Say(`stack:\s+some-stack`))
 			})
 		})
 
@@ -456,11 +456,11 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("displays the app information", func() {
-				Expect(testUI.Out).To(Say("name:\\s+some-app"))
-				Expect(testUI.Out).To(Say("requested state:\\s+started"))
-				Expect(testUI.Out).To(Say("routes:\\s+\\n"))
-				Expect(testUI.Out).To(Say("stack:\\s+\\n"))
-				Expect(testUI.Out).To(Say("(?m)docker image:\\s+docker/some-image$\\n"))
+				Expect(testUI.Out).To(Say(`name:\s+some-app`))
+				Expect(testUI.Out).To(Say(`requested state:\s+started`))
+				Expect(testUI.Out).To(Say(`routes:\s+\n`))
+				Expect(testUI.Out).To(Say(`stack:\s+\n`))
+				Expect(testUI.Out).To(Say(`(?m)docker image:\s+docker/some-image$\n`))
 			})
 		})
 
@@ -484,8 +484,8 @@ var _ = Describe("app summary displayer", func() {
 			})
 
 			It("displays stack and buildpacks", func() {
-				Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
-				Expect(testUI.Out).To(Say("buildpacks:\\s+some-detect-output, some-buildpack"))
+				Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs2`))
+				Expect(testUI.Out).To(Say(`buildpacks:\s+some-detect-output, some-buildpack`))
 			})
 		})
 	})

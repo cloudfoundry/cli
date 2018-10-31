@@ -143,7 +143,7 @@ var _ = Describe("app summary displayer", func() {
 
 					It("should output the isolation segment name", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("isolation segment:\\s+%s", isolationSegmentName))
+						Expect(testUI.Out).To(Say(`isolation segment:\s+%s`, isolationSegmentName))
 
 						Expect(testUI.Err).To(Say("get-app-summary-warning"))
 						Expect(testUI.Err).To(Say("some-instance-stats-warning"))

@@ -498,15 +498,15 @@ var _ = Describe("Restart Command", func() {
 						It("displays process information", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("name:\\s+%s", "some-app"))
-							Expect(testUI.Out).To(Say("type:\\s+aba"))
-							Expect(testUI.Out).To(Say("instances:\\s+0/0"))
-							Expect(testUI.Out).To(Say("memory usage:\\s+32M"))
-							Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
-							Expect(testUI.Out).To(Say("type:\\s+console"))
-							Expect(testUI.Out).To(Say("instances:\\s+0/0"))
-							Expect(testUI.Out).To(Say("memory usage:\\s+16M"))
-							Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+							Expect(testUI.Out).To(Say(`name:\s+%s`, "some-app"))
+							Expect(testUI.Out).To(Say(`type:\s+aba`))
+							Expect(testUI.Out).To(Say(`instances:\s+0/0`))
+							Expect(testUI.Out).To(Say(`memory usage:\s+32M`))
+							Expect(testUI.Out).To(Say(`start command:\s+some-command-1`))
+							Expect(testUI.Out).To(Say(`type:\s+console`))
+							Expect(testUI.Out).To(Say(`instances:\s+0/0`))
+							Expect(testUI.Out).To(Say(`memory usage:\s+16M`))
+							Expect(testUI.Out).To(Say(`start command:\s+some-command-2`))
 
 							Expect(testUI.Err).To(Say("combo-summary-warning"))
 
@@ -581,23 +581,23 @@ var _ = Describe("Restart Command", func() {
 
 							It("displays the app summary with isolation segments as well as warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(testUI.Out).To(Say("name:\\s+some-app"))
-								Expect(testUI.Out).To(Say("requested state:\\s+started"))
-								Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
-								Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
-								Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
-								Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-								Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-								Expect(testUI.Out).To(Say("stack:\\s+potatos"))
-								Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
-								Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+								Expect(testUI.Out).To(Say(`name:\s+some-app`))
+								Expect(testUI.Out).To(Say(`requested state:\s+started`))
+								Expect(testUI.Out).To(Say(`instances:\s+1\/3`))
+								Expect(testUI.Out).To(Say(`isolation segment:\s+some-isolation-segment`))
+								Expect(testUI.Out).To(Say(`usage:\s+128M x 3 instances`))
+								Expect(testUI.Out).To(Say(`routes:\s+banana.fruit.com/hi, foobar.com:13`))
+								Expect(testUI.Out).To(Say(`last uploaded:\s+\w{3} [0-3]\d \w{3} [0-2]\d:[0-5]\d:[0-5]\d \w+ \d{4}`))
+								Expect(testUI.Out).To(Say(`stack:\s+potatos`))
+								Expect(testUI.Out).To(Say(`buildpack:\s+some-buildpack`))
+								Expect(testUI.Out).To(Say(`start command:\s+some start command`))
 
 								Expect(testUI.Err).To(Say("app-summary-warning"))
 							})
 
 							It("should display the instance table", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk"))
+								Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk`))
 								Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
 							})
 
@@ -611,23 +611,23 @@ var _ = Describe("Restart Command", func() {
 
 							It("displays the app summary without isolation segment as well as warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(testUI.Out).To(Say("name:\\s+some-app"))
-								Expect(testUI.Out).To(Say("requested state:\\s+started"))
-								Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
+								Expect(testUI.Out).To(Say(`name:\s+some-app`))
+								Expect(testUI.Out).To(Say(`requested state:\s+started`))
+								Expect(testUI.Out).To(Say(`instances:\s+1\/3`))
 								Expect(testUI.Out).NotTo(Say("isolation segment:"))
-								Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
-								Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-								Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-								Expect(testUI.Out).To(Say("stack:\\s+potatos"))
-								Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
-								Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+								Expect(testUI.Out).To(Say(`usage:\s+128M x 3 instances`))
+								Expect(testUI.Out).To(Say(`routes:\s+banana.fruit.com/hi, foobar.com:13`))
+								Expect(testUI.Out).To(Say(`last uploaded:\s+\w{3} [0-3]\d \w{3} [0-2]\d:[0-5]\d:[0-5]\d \w+ \d{4}`))
+								Expect(testUI.Out).To(Say(`stack:\s+potatos`))
+								Expect(testUI.Out).To(Say(`buildpack:\s+some-buildpack`))
+								Expect(testUI.Out).To(Say(`start command:\s+some start command`))
 
 								Expect(testUI.Err).To(Say("app-summary-warning"))
 							})
 
 							It("should display the instance table", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk"))
+								Expect(testUI.Out).To(Say(`state\s+since\s+cpu\s+memory\s+disk`))
 								Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
 							})
 						})

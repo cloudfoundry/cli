@@ -118,12 +118,12 @@ var _ = Describe("v3-set-env Command", func() {
 				It("sets the environment variable and value pair", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Setting env variable some-key for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Setting env variable some-key for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 					Expect(testUI.Err).To(Say("set-warning-1"))
 					Expect(testUI.Err).To(Say("set-warning-2"))
 					Expect(testUI.Out).To(Say("OK"))
-					Expect(testUI.Out).To(Say("TIP: Use 'cf v3-stage some-app' to ensure your env variable changes take effect\\."))
+					Expect(testUI.Out).To(Say(`TIP: Use 'cf v3-stage some-app' to ensure your env variable changes take effect\.`))
 
 					Expect(fakeActor.SetEnvironmentVariableByApplicationNameAndSpaceCallCount()).To(Equal(1))
 					appName, spaceGUID, envVariablePair := fakeActor.SetEnvironmentVariableByApplicationNameAndSpaceArgsForCall(0)
@@ -143,7 +143,7 @@ var _ = Describe("v3-set-env Command", func() {
 
 				It("returns the error", func() {
 					Expect(executeErr).To(Equal(expectedErr))
-					Expect(testUI.Out).To(Say("Setting env variable some-key for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Setting env variable some-key for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 					Expect(testUI.Err).To(Say("get-warning-1"))
 					Expect(testUI.Err).To(Say("get-warning-2"))

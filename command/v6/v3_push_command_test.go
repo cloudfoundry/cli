@@ -253,7 +253,7 @@ var _ = Describe("v3-push Command", func() {
 						It("generates a push state with the specified app path", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(testUI.Out).To(Say("Pushing app %s to org some-org / space some-space as some-user", appName))
-							Expect(testUI.Out).To(Say("Getting app info\\.\\.\\."))
+							Expect(testUI.Out).To(Say(`Getting app info\.\.\.`))
 							Expect(testUI.Err).To(Say("some-warning-1"))
 
 							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))

@@ -169,9 +169,9 @@ var _ = Describe("v3-stage Command", func() {
 					Expect(testUI.Out).To(Say("Staging package for %s in org some-org / space some-space as steve...", app))
 					Expect(testUI.Out).To(Say("\n\n"))
 					Expect(testUI.Out).To(Say("Package staged"))
-					Expect(testUI.Out).To(Say("droplet guid:\\s+some-droplet-guid"))
-					Expect(testUI.Out).To(Say("state:\\s+staged"))
-					Expect(testUI.Out).To(Say("created:\\s+%s", testUI.UserFriendlyDate(createdAtTimeParsed)))
+					Expect(testUI.Out).To(Say(`droplet guid:\s+some-droplet-guid`))
+					Expect(testUI.Out).To(Say(`state:\s+staged`))
+					Expect(testUI.Out).To(Say(`created:\s+%s`, testUI.UserFriendlyDate(createdAtTimeParsed)))
 
 					Expect(testUI.Err).To(Say("some-warning"))
 					Expect(testUI.Err).To(Say("some-other-warning"))

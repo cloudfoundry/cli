@@ -132,7 +132,7 @@ var _ = Describe("delete Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say("Deleting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+				Expect(testUI.Out).To(Say(`Deleting app some-app in org some-org / space some-space as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("OK"))
 				Expect(testUI.Out).NotTo(Say("App some-app does not exist"))
 			})
@@ -175,9 +175,9 @@ var _ = Describe("delete Command", func() {
 			It("asks the user again", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("Really delete the app some-app\\? \\[yN\\]"))
-				Expect(testUI.Out).To(Say("invalid input \\(not y, n, yes, or no\\)"))
-				Expect(testUI.Out).To(Say("Really delete the app some-app\\? \\[yN\\]"))
+				Expect(testUI.Out).To(Say(`Really delete the app some-app\? \[yN\]`))
+				Expect(testUI.Out).To(Say(`invalid input \(not y, n, yes, or no\)`))
+				Expect(testUI.Out).To(Say(`Really delete the app some-app\? \[yN\]`))
 
 				Expect(fakeActor.DeleteApplicationByNameAndSpaceCallCount()).To(Equal(0))
 			})
@@ -198,7 +198,7 @@ var _ = Describe("delete Command", func() {
 
 				It("displays all warnings, and returns the erorr", func() {
 					Expect(testUI.Err).To(Say("some-warning"))
-					Expect(testUI.Out).To(Say("Deleting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Deleting app some-app in org some-org / space some-space as steve\.\.\.`))
 					Expect(testUI.Out).ToNot(Say("OK"))
 					Expect(executeErr).To(MatchError("some-error"))
 				})
@@ -214,7 +214,7 @@ var _ = Describe("delete Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say("Deleting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+				Expect(testUI.Out).To(Say(`Deleting app some-app in org some-org / space some-space as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("App some-app does not exist"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
@@ -229,7 +229,7 @@ var _ = Describe("delete Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say("Deleting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+				Expect(testUI.Out).To(Say(`Deleting app some-app in org some-org / space some-space as steve\.\.\.`))
 				Expect(testUI.Out).To(Say("OK"))
 				Expect(testUI.Out).NotTo(Say("App some-app does not exist"))
 			})

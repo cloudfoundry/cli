@@ -121,7 +121,7 @@ var _ = Describe("services Command", func() {
 
 					out := testUI.Out.(*Buffer).Contents()
 					Expect(out).To(MatchRegexp("No services found"))
-					Expect(out).ToNot(MatchRegexp("name\\s+service\\s+plan\\s+bound apps\\s+last operation"))
+					Expect(out).ToNot(MatchRegexp(`name\s+service\s+plan\s+bound apps\s+last operation`))
 					Expect(testUI.Err).To(Say("get-summary-warnings"))
 				})
 			})
@@ -169,10 +169,10 @@ var _ = Describe("services Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Out).To(Say("Getting services in org %s / space %s as %s...", "some-org",
 						"some-space", fakeUser.Name))
-					Expect(testUI.Out).To(Say("name\\s+service\\s+plan\\s+bound apps\\s+last operation"))
-					Expect(testUI.Out).To(Say("instance-1\\s+some-service-1\\s+some-plan\\s+app-1, app-2\\s+some-type some-state"))
-					Expect(testUI.Out).To(Say("instance-2\\s+some-service-2\\s+"))
-					Expect(testUI.Out).To(Say("instance-3\\s+user-provided\\s+"))
+					Expect(testUI.Out).To(Say(`name\s+service\s+plan\s+bound apps\s+last operation`))
+					Expect(testUI.Out).To(Say(`instance-1\s+some-service-1\s+some-plan\s+app-1, app-2\s+some-type some-state`))
+					Expect(testUI.Out).To(Say(`instance-2\s+some-service-2\s+`))
+					Expect(testUI.Out).To(Say(`instance-3\s+user-provided\s+`))
 					Expect(testUI.Err).To(Say("get-summary-warnings"))
 				})
 			})

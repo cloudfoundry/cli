@@ -114,9 +114,9 @@ var _ = Describe("network-policies Command", func() {
 
 				Expect(testUI.Out).To(Say(`Listing network policies in org some-org / space some-space as some-user\.\.\.`))
 				Expect(testUI.Out).To(Say("\n\n"))
-				Expect(testUI.Out).To(Say("source\\s+destination\\s+protocol\\s+ports"))
-				Expect(testUI.Out).To(Say("app1\\s+app2\\s+tcp\\s+8080[^-]"))
-				Expect(testUI.Out).To(Say("app2\\s+app1\\s+udp\\s+1234-2345"))
+				Expect(testUI.Out).To(Say(`source\s+destination\s+protocol\s+ports`))
+				Expect(testUI.Out).To(Say(`app1\s+app2\s+tcp\s+8080[^-]`))
+				Expect(testUI.Out).To(Say(`app2\s+app1\s+udp\s+1234-2345`))
 
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
@@ -151,9 +151,9 @@ var _ = Describe("network-policies Command", func() {
 
 					Expect(testUI.Out).To(Say(`Listing network policies of app %s in org some-org / space some-space as some-user\.\.\.`, cmd.SourceApp))
 					Expect(testUI.Out).To(Say("\n\n"))
-					Expect(testUI.Out).To(Say("source\\s+destination\\s+protocol\\s+ports"))
-					Expect(testUI.Out).To(Say("app1\\s+app2\\s+tcp\\s+8080[^-]"))
-					Expect(testUI.Out).To(Say("app2\\s+app1\\s+udp\\s+1234-2345"))
+					Expect(testUI.Out).To(Say(`source\s+destination\s+protocol\s+ports`))
+					Expect(testUI.Out).To(Say(`app1\s+app2\s+tcp\s+8080[^-]`))
+					Expect(testUI.Out).To(Say(`app2\s+app1\s+udp\s+1234-2345`))
 
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
