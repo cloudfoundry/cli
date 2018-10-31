@@ -227,7 +227,7 @@ applications:
 				When("the app uses multiple buildpacks", func() {
 					BeforeEach(func() {
 						helpers.WithMultiBuildpackApp(func(appDir string) {
-							Eventually(helpers.CF("v3-push", appName, "-p", appDir, "-b", "ruby_buildpack", "-b", "go_buildpack")).Should(Exit(0))
+							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "ruby_buildpack", "-b", "go_buildpack")).Should(Exit(0))
 						})
 					})
 

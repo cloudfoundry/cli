@@ -87,7 +87,7 @@ var _ = Describe("set-health-check command", func() {
 		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithProcfileApp(func(appDir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 				})
 			})
 
@@ -154,7 +154,7 @@ var _ = Describe("set-health-check command", func() {
 			When("the process type does not exist", func() {
 				BeforeEach(func() {
 					helpers.WithProcfileApp(func(appDir string) {
-						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 					})
 				})
 

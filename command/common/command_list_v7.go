@@ -28,14 +28,12 @@ type commandList struct {
 	V3CreatePackage      v6.V3CreatePackageCommand       `command:"v3-create-package" description:"Uploads a V3 Package"`
 	V3Droplets           v6.V3DropletsCommand            `command:"v3-droplets" description:"List droplets of an app"`
 	V3Packages           v6.V3PackagesCommand            `command:"v3-packages" description:"List packages of an app"`
-	V3Push               v6.V3PushCommand                `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
 	V3Restart            v6.V3RestartCommand             `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	V3RestartAppInstance v6.V3RestartAppInstanceCommand  `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	V3SetDroplet         v6.V3SetDropletCommand          `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
 	V3Stage              v6.V3StageCommand               `command:"v3-stage" description:"Create a new droplet for an app"`
 	V3Start              v6.V3StartCommand               `command:"v3-start" description:"Start an app"`
 	V3Stop               v6.V3StopCommand                `command:"v3-stop" description:"Stop an app"`
-	V3ZdtPush            v6.V3ZeroDowntimePushCommand    `command:"v3-zdt-push" description:"Update an app with zero down time"`
 	V3ZdtRestart         v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
@@ -119,7 +117,7 @@ type commandList struct {
 	Plugins                            plugin.PluginsCommand                        `command:"plugins" description:"List commands of installed plugins"`
 	PurgeServiceInstance               v6.PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
 	PurgeServiceOffering               v6.PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"`
-	Push                               v6.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
+	Push                               v7.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
 	Quotas                             v6.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	Quota                              v6.QuotaCommand                              `command:"quota" description:"Show quota info"`
 	RemoveNetworkPolicy                v6.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`

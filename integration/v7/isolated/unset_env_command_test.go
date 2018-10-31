@@ -90,7 +90,7 @@ var _ = Describe("unset-env command", func() {
 		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("v3-push", appName, "-p", appDir)).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
 				})
 			})
 
