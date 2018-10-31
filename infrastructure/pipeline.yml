@@ -134,6 +134,7 @@ jobs:
       bbl-state: state
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
+      IGNORE_ERRORS: true
   ensure:
     put: gcp-bosh-pool
     params:
