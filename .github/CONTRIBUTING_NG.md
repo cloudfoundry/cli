@@ -5,7 +5,7 @@ requests](https://help.github.com/articles/about-pull-requests/).
 
 ## CLI V6 & V7
 
-The code base is undergoing rewrite to support new APIs and there may be work
+The code base is undergoing major work to support new APIs and there may be work
 already planned that would accomplish the goals of the intended PR. The CLI team
 can work with you at the start of this process to determine the best path
 forward. Please contact the CLI Team prior to starting any endeavor that might

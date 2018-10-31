@@ -3,46 +3,116 @@
 The Cloud Foundry team uses GitHub and accepts code contributions via
 [pull requests](https://help.github.com/articles/using-pull-requests).
 
-Before working on a PR to the CLI code base, please:
-  - reach out to us first via a GitHub issue or on our Slack #cli channel at cloudfoundry.slack.com. There are areas of the code base that contain a lot of complexity, and something which seems like a simple change may be more involved. In addition, the code base is undergoing re-architecture, and there may be work already planned that would accomplish the goals of the intended PR. The CLI team can work with you at the start of this process to determine the best path forward.
-  - or, look for the `contributions welcome` label on GitHub for issues we are actively looking for help on.
+## CLI v6.x & v7-beta
 
-If you're not a member of Cloud Foundry's slack team yet, you'll need to [request an invite](https://slack.cloudfoundry.org/).
+The code base is undergoing major work to support new Cloud Controller APIs.
+Most CLI users have a v6 CLI.
+Some users are trying out a beta version of v7.
+Both versions are in active development.
+If you are not sure, you probably want to modify the v6 CLI.
+The CLI team can work with you at the start of this process 
+to determine the best path forward.
+You will find the entry point for v6 commands in the _cli/command/v6_ directory.
+v7 commands are found in the _cli/command/v7_ directory.
+More details are available in the [Architecture Guide](https://github.com/cloudfoundry/cli/wiki/Architecture-Guide).
+  
+## Prerequisites
+
+Before working on a PR to the CLI code base, please:
+
+  - chat with us on our [Slack #cli channel](https://cloudfoundry.slack.com) ([request an invite](http://slack.cloudfoundry.org/)),
+  - reach out to us first via a [GitHub issue](https://github.com/cloudfoundry/cli/issues),
+  - or, look for the [contributions welcome label on GitHub](https://github.com/cloudfoundry/cli/issues?q=is%3Aopen+is%3Aissue+label%3A%22contributions+welcome%22) 
+    for issues we are actively looking for help on.
 
 After reaching out to the CLI team and the conclusion is to make a PR, please follow these steps:
-1. Ensure that you have either completed our CLA Agreement for [individuals](https://www.cloudfoundry.org/pdfs/CFF_Individual_CLA.pdf) or are a [public member](https://help.github.com/articles/publicizing-or-hiding-organization-membership/) of an organization that has signed the [corporate](https://www.cloudfoundry.org/pdfs/CFF_Corporate_CLA.pdf) CLA.
-1. Review the CF CLI [Style Guide](https://github.com/cloudfoundry/cli/wiki/CF-CLI-Style-Guide)
+
+1. Ensure that you have either 
+   * completed our [Contributor License Agreement (CLA) for individuals](https://www.cloudfoundry.org/pdfs/CFF_Individual_CLA.pdf), 
+   * or, are a [public member](https://help.github.com/articles/publicizing-or-hiding-organization-membership/) of an organization 
+   that has signed [the corporate CLA](https://www.cloudfoundry.org/pdfs/CFF_Corporate_CLA.pdf).
+1. Review the CF CLI [Style Guide](https://github.com/cloudfoundry/cli/wiki/CF-CLI-Style-Guide).
+   Feel free to peruse our
+   [Architecture Guide](https://github.com/cloudfoundry/cli/wiki/Architecture-Guide),
+   [Code Style Guide](https://github.com/cloudfoundry/cli/wiki/Code-Style-Guide),
+   [Testing Style Guide](https://github.com/cloudfoundry/cli/wiki/Testing-Style-Guide),
+   or [Internationalization Guide](https://github.com/cloudfoundry/cli/wiki/Internationalization-Guide).
 1. Fork the project repository
 1. Create a feature branch (e.g. `git checkout -b better_cli`) and make changes on this branch
-   * Follow the previous sections on this page to set up your development environment, build `cf` and run the tests.
+   * Follow the [other sections on this page](#development-environment-setup) to set up your development environment, build `cf` and run the tests.
+   * Tests are required for any changes.
 1. Push to your fork (e.g. `git push origin better_cli`) and [submit a pull request](https://help.github.com/articles/creating-a-pull-request)
 
-If you have a CLA on file, your contribution will be analyzed for product fit and engineering quality prior to merging.
 Note: All contributions must be sent using GitHub Pull Requests.
-**Your pull request is much more likely to be accepted if it is small and focused with a clear message that conveys the intent of your change. Please make sure to squash commits into meaningful chunks of work.** Tests are required for any changes.
+We prefer a small, focused pull request with a clear message 
+that conveys the intent of your change. 
+Please make sure to squash commits into meaningful chunks of work. 
 
 # Development Environment Setup
 
 ## Install Golang 1.10
 
-Documentation on installing Golang and setting the `GOROOT`, `GOPATH` and `PATH` environment variables can be found [here](https://golang.org/doc/install). While the CF CLI might be compatible with other versions, Golang 1.10 is the only version that the `cli` binary is built and tested with.
+We defer to [the official Golang documentation](https://golang.org/doc/install) for installing Golang 
+and setting the `GOROOT`, `GOPATH` and `PATH` environment variables.
+While the CF CLI might be compatible with other versions, 
+Golang 1.10 is the only version that the `cli` binary is built and tested with.
 
 > To check what Golang version a particular Linux `cf` binary was built with, use `strings cf | grep 'go1\....'` and look for the `go1.x.y` version number in the output.
 
-## Obtain the source
 
-```sh
-go get code.cloudfoundry.org/cli
+## Development tools
+
+The CF CLI requires the following development tools in order to run our test:
+- [Ginkgo](https://github.com/onsi/ginkgo)/[Gomega](https://github.com/onsi/gomega)
+  - Test framework/Matchers Library.
+- [counterfeiter](https://github.com/maxbrunsfeld/counterfeiter) - Generate
+  fakes/mocks for testing. Currently using version `6.*`.
+- [dep](https://github.com/golang/dep) - `vendor` dependency management tool
+- [make](https://www.gnu.org/software/make/) - tool for building the CLI and
+  running it's tests.
+  
+
+## Git Checkout
+
+The CF CLI should **not** be checked out under `src/github.com`, instead it
+should be checked out under `src/code.cloudfoundry.org`. While they resolve to
+the same thing on checkout, GoLang will be unable to _correctly_ resolve them at
+build time.
+
+```bash
+mkdir -p $GOPATH/src/code.cloudfoundry.org
+cd $GOPATH/src/code.cloudfoundry.org
+git clone https://github.com/cloudfoundry/cli.git
+```
+
+OR
+
+```bash
+go get -u github.com/cloudfoundry/cli
 ```
 
 ## Building the `cf` binary
 
-Build the binary and add it to the PATH:
-```
+Build the binary for the **current architecture** and adding it to the `PATH`:
+```bash
 cd $GOPATH/src/code.cloudfoundry.org/cli
 make build
-export PATH=$GOPATH/src/code.cloudfoundry.org/cli/out:$PATH
+export PATH=$GOPATH/src/code.cloudfoundry.org/cli/out:$PATH # Puts the built CLI first in your PATH
 ```
+
+### Compiling for Other Operating Systems and Architectures
+
+The supported platforms for the CF CLI are Linux (32-bit and 64-bit), Windows
+(32-bit and 64-bit) and OSX (aka Darwin). The commands that build the binaries
+can be seen in the [Makefile](/Makefile) where the target begins with the
+`out/cf-cli`.
+
+
+For general information on how to cross compile GoLang binaries, see the [Go
+environment variables
+documentation](https://golang.org/doc/install/source#environment) for details on
+how to cross compile binaries for other architectures.
+
 
 ## Install bosh-lite and deploy Cloud Foundry
 
@@ -128,6 +198,8 @@ The actor package consists of one actor that handles all the logic to process th
 
 #### API
 The API package handles the HTTP requests to the API. The functions in this package return a resource that the actor can then parse and handle. The structures returned by this package closely resemble the return bodies of the Cloud Controller API.
+
+For more information, check out our [Architecture Guide](https://github.com/cloudfoundry/cli/wiki/Architecture-Guide)
 
 # Vendoring Dependencies
 
