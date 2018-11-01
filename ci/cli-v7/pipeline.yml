@@ -356,6 +356,43 @@ jobs:
     params:
       release: bosh-lock
 
+- name: integration-temporary-push
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [build-binaries]
+    - get: cf-cli-binaries
+      passed: [build-binaries]
+      trigger: true
+    - get: cli-ci
+    - get: cli-integration
+    - get: vars-store
+    - put: bosh-lock
+      resource: gcp-bosh-pool
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+    - task: integration
+      file: cli-ci/ci/cli-v7/tasks/integration-linux.yml
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+      params:
+        CF_INT_CLIENT_ID: 'potato-face'
+        CF_INT_CLIENT_SECRET: ((client-secret))
+        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
+        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
+        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
+        CF_INT_IGNORE_API_VERSION_CHECK: false
+        TAGS: ''
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lock
+
 - name: create-installers
   serial: true
   plan:
