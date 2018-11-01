@@ -114,7 +114,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 		When("app exists", func() {
 			BeforeEach(func() {
 				helpers.WithProcfileApp(func(appDir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 				})
 			})
 

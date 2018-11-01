@@ -25,8 +25,14 @@ ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60
 
 ifndef TARGET_V7
 TARGET = v6
+TAGS=''
 else
 TARGET = v7
+ifdef RUN_V7_PUSH_TESTS
+TAGS=''
+else
+TAGS='partialPush'
+endif
 endif
 
 all : test build
@@ -71,7 +77,7 @@ integration-cleanup :
 integration-experimental : build integration-cleanup integration-experimental-shared integration-experimental-versioned
 
 integration-experimental-shared : build integration-cleanup
-	$(ginkgo_int) -nodes $(NODES) integration/shared/experimental
+	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/experimental
 
 integration-experimental-versioned : build integration-cleanup
 	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/experimental
@@ -79,24 +85,24 @@ integration-experimental-versioned : build integration-cleanup
 integration-global : build integration-cleanup integration-global-shared integration-global-versioned
 
 integration-global-shared : build integration-cleanup
-	$(ginkgo_int) integration/shared/global
+	$(ginkgo_int) -tags=$(TAGS) integration/shared/global
 
 integration-global-versioned : build integration-cleanup
-	$(ginkgo_int) integration/$(TARGET)/global
+	$(ginkgo_int) -tags=$(TAGS) integration/$(TARGET)/global
 
 integration-isolated : build integration-cleanup integration-isolated-shared integration-isolated-versioned
 
 integration-isolated-shared : build integration-cleanup
-	$(ginkgo_int) -nodes $(NODES) integration/shared/isolated
+	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/isolated
 
 integration-isolated-versioned : build integration-cleanup
-	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/isolated
+	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/$(TARGET)/isolated
 
 integration-plugin : build integration-cleanup
-	$(ginkgo_int) -nodes $(NODES) integration/shared/plugin
+	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/plugin
 
 integration-push : build integration-cleanup
-	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/push
+	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/$(TARGET)/push
 
 integration-tests : build integration-cleanup integration-isolated integration-push integration-global
 

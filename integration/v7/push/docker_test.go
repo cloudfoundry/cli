@@ -1,3 +1,5 @@
+// +build !partialPush
+
 package push
 
 import (

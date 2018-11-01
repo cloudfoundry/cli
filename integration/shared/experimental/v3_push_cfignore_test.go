@@ -1,3 +1,5 @@
+// +build !partialPush
+
 package experimental
 
 import (

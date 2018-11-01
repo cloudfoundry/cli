@@ -92,7 +92,7 @@ var _ = Describe("env command", func() {
 			BeforeEach(func() {
 				userProvidedServiceName = helpers.PrefixedRandomName("service")
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("v3-push", appName, "-p", appDir)).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
 				})
 
 				Eventually(helpers.CF("set-env", appName, "user-provided-env-name", "user-provided-env-value")).Should(Exit(0))
