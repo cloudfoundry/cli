@@ -23,7 +23,7 @@ var _ = Describe("services Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v6fakes.FakeServicesActor
+		fakeActor       *v6fakes.FakeServiceInstancesActor
 		binaryName      string
 		executeErr      error
 	)
@@ -32,7 +32,7 @@ var _ = Describe("services Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v6fakes.FakeServicesActor)
+		fakeActor = new(v6fakes.FakeServiceInstancesActor)
 
 		cmd = ServicesCommand{
 			UI:          testUI,
