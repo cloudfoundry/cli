@@ -10,29 +10,30 @@ import (
 var _ = Describe("IsOrgTargeted", func() {
 	var (
 		actor      *Actor
-		binaryName string
 		fakeConfig *sharedactionfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
-		binaryName = "faceman"
 		fakeConfig = new(sharedactionfakes.FakeConfig)
-		fakeConfig.BinaryNameReturns(binaryName)
 		actor = NewActor(fakeConfig)
 	})
 
 	When("the config has an org targeted", func() {
-		It("returns true", func() {
+		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
+		})
 
+		It("returns true", func() {
 			Expect(actor.IsOrgTargeted()).To(BeTrue())
 		})
 	})
 
 	When("the config does not have an org targeted", func() {
-		It("returns false", func() {
+		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(false)
+		})
 
+		It("returns false", func() {
 			Expect(actor.IsOrgTargeted()).To(BeFalse())
 		})
 	})

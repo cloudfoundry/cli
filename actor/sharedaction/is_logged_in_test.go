@@ -10,14 +10,11 @@ import (
 var _ = Describe("IsLoggedIn", func() {
 	var (
 		actor      *Actor
-		binaryName string
 		fakeConfig *sharedactionfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
-		binaryName = "faceman"
 		fakeConfig = new(sharedactionfakes.FakeConfig)
-		fakeConfig.BinaryNameReturns(binaryName)
 		actor = NewActor(fakeConfig)
 	})
 

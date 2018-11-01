@@ -92,8 +92,11 @@ var _ = Describe("marketplace command", func() {
 			})
 
 			When("logged in", func() {
+				var user string
+
 				BeforeEach(func() {
 					helpers.LoginCF()
+					user, _ = helpers.GetCredentials()
 				})
 
 				When("no space is targeted", func() {
@@ -106,6 +109,58 @@ var _ = Describe("marketplace command", func() {
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Cannot list marketplace services without a targeted space"))
 						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				When("a service is accessible but not in the currently targeted org", func() {
+					var (
+						broker1      helpers.ServiceBroker
+						org1, space1 string
+
+						broker2      helpers.ServiceBroker
+						org2, space2 string
+					)
+
+					BeforeEach(func() {
+						org1 = helpers.NewOrgName()
+						space1 = helpers.NewSpaceName()
+						helpers.SetupCF(org1, space1)
+						helpers.TargetOrgAndSpace(org1, space1)
+
+						domain := helpers.DefaultSharedDomain()
+
+						broker1 = createBroker(domain, "SERVICE-1", "SERVICE-PLAN-1")
+						enableServiceAccessForOrg(broker1, org1)
+
+						org2 = helpers.NewOrgName()
+						space2 = helpers.NewSpaceName()
+						helpers.CreateOrgAndSpace(org2, space2)
+						helpers.TargetOrgAndSpace(org2, space2)
+
+						broker2 = createBroker(domain, "SERVICE-2", "SERVICE-PLAN-2")
+						enableServiceAccess(broker2)
+					})
+
+					AfterEach(func() {
+						helpers.TargetOrgAndSpace(org2, space2)
+						broker2.Destroy()
+						helpers.QuickDeleteOrg(org2)
+
+						helpers.TargetOrgAndSpace(org1, space1)
+						broker1.Destroy()
+						helpers.QuickDeleteOrg(org1)
+					})
+
+					It("displays a table and tip that does not include that service", func() {
+						session := helpers.CF("marketplace")
+						Eventually(session).Should(Say("Getting services from marketplace in org %s / space %s as %s\\.\\.\\.", org2, space2, user))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Say("\n\n"))
+						Eventually(session).Should(Say("service\\s+plans\\s+description"))
+						Consistently(session).ShouldNot(Say("%s\\s+%s\\s+fake service", getServiceName(broker1), getBrokerPlanNames(broker1)))
+						Eventually(session).Should(Say("%s\\s+%s\\s+fake service", getServiceName(broker2), getBrokerPlanNames(broker2)))
+						Eventually(session).Should(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
+						Eventually(session).Should(Exit(0))
 					})
 				})
 			})
