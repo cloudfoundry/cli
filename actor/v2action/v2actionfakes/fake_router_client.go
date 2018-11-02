@@ -2,77 +2,89 @@
 package v2actionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/router"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	router "code.cloudfoundry.org/cli/api/router"
 )
 
 type FakeRouterClient struct {
-	GetRouterGroupsByNameStub        func(string) ([]router.RouterGroup, error)
-	getRouterGroupsByNameMutex       sync.RWMutex
-	getRouterGroupsByNameArgsForCall []struct {
+	GetRouterGroupByNameStub        func(string) (router.RouterGroup, error)
+	getRouterGroupByNameMutex       sync.RWMutex
+	getRouterGroupByNameArgsForCall []struct {
 		arg1 string
 	}
-	getRouterGroupsByNameReturns struct {
-		result1 []router.RouterGroup
+	getRouterGroupByNameReturns struct {
+		result1 router.RouterGroup
 		result2 error
 	}
-	getRouterGroupsByNameReturnsOnCall map[int]struct {
-		result1 []router.RouterGroup
+	getRouterGroupByNameReturnsOnCall map[int]struct {
+		result1 router.RouterGroup
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRouterClient) GetRouterGroupsByName(arg1 string) ([]router.RouterGroup, error) {
-	fake.getRouterGroupsByNameMutex.Lock()
-	ret, specificReturn := fake.getRouterGroupsByNameReturnsOnCall[len(fake.getRouterGroupsByNameArgsForCall)]
-	fake.getRouterGroupsByNameArgsForCall = append(fake.getRouterGroupsByNameArgsForCall, struct {
+func (fake *FakeRouterClient) GetRouterGroupByName(arg1 string) (router.RouterGroup, error) {
+	fake.getRouterGroupByNameMutex.Lock()
+	ret, specificReturn := fake.getRouterGroupByNameReturnsOnCall[len(fake.getRouterGroupByNameArgsForCall)]
+	fake.getRouterGroupByNameArgsForCall = append(fake.getRouterGroupByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.recordInvocation("GetRouterGroupsByName", []interface{}{arg1})
-	fake.getRouterGroupsByNameMutex.Unlock()
-	if fake.GetRouterGroupsByNameStub != nil {
-		return fake.GetRouterGroupsByNameStub(arg1)
+	fake.recordInvocation("GetRouterGroupByName", []interface{}{arg1})
+	fake.getRouterGroupByNameMutex.Unlock()
+	if fake.GetRouterGroupByNameStub != nil {
+		return fake.GetRouterGroupByNameStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.getRouterGroupsByNameReturns.result1, fake.getRouterGroupsByNameReturns.result2
+	fakeReturns := fake.getRouterGroupByNameReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeRouterClient) GetRouterGroupsByNameCallCount() int {
-	fake.getRouterGroupsByNameMutex.RLock()
-	defer fake.getRouterGroupsByNameMutex.RUnlock()
-	return len(fake.getRouterGroupsByNameArgsForCall)
+func (fake *FakeRouterClient) GetRouterGroupByNameCallCount() int {
+	fake.getRouterGroupByNameMutex.RLock()
+	defer fake.getRouterGroupByNameMutex.RUnlock()
+	return len(fake.getRouterGroupByNameArgsForCall)
 }
 
-func (fake *FakeRouterClient) GetRouterGroupsByNameArgsForCall(i int) string {
-	fake.getRouterGroupsByNameMutex.RLock()
-	defer fake.getRouterGroupsByNameMutex.RUnlock()
-	return fake.getRouterGroupsByNameArgsForCall[i].arg1
+func (fake *FakeRouterClient) GetRouterGroupByNameCalls(stub func(string) (router.RouterGroup, error)) {
+	fake.getRouterGroupByNameMutex.Lock()
+	defer fake.getRouterGroupByNameMutex.Unlock()
+	fake.GetRouterGroupByNameStub = stub
 }
 
-func (fake *FakeRouterClient) GetRouterGroupsByNameReturns(result1 []router.RouterGroup, result2 error) {
-	fake.GetRouterGroupsByNameStub = nil
-	fake.getRouterGroupsByNameReturns = struct {
-		result1 []router.RouterGroup
+func (fake *FakeRouterClient) GetRouterGroupByNameArgsForCall(i int) string {
+	fake.getRouterGroupByNameMutex.RLock()
+	defer fake.getRouterGroupByNameMutex.RUnlock()
+	argsForCall := fake.getRouterGroupByNameArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeRouterClient) GetRouterGroupByNameReturns(result1 router.RouterGroup, result2 error) {
+	fake.getRouterGroupByNameMutex.Lock()
+	defer fake.getRouterGroupByNameMutex.Unlock()
+	fake.GetRouterGroupByNameStub = nil
+	fake.getRouterGroupByNameReturns = struct {
+		result1 router.RouterGroup
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeRouterClient) GetRouterGroupsByNameReturnsOnCall(i int, result1 []router.RouterGroup, result2 error) {
-	fake.GetRouterGroupsByNameStub = nil
-	if fake.getRouterGroupsByNameReturnsOnCall == nil {
-		fake.getRouterGroupsByNameReturnsOnCall = make(map[int]struct {
-			result1 []router.RouterGroup
+func (fake *FakeRouterClient) GetRouterGroupByNameReturnsOnCall(i int, result1 router.RouterGroup, result2 error) {
+	fake.getRouterGroupByNameMutex.Lock()
+	defer fake.getRouterGroupByNameMutex.Unlock()
+	fake.GetRouterGroupByNameStub = nil
+	if fake.getRouterGroupByNameReturnsOnCall == nil {
+		fake.getRouterGroupByNameReturnsOnCall = make(map[int]struct {
+			result1 router.RouterGroup
 			result2 error
 		})
 	}
-	fake.getRouterGroupsByNameReturnsOnCall[i] = struct {
-		result1 []router.RouterGroup
+	fake.getRouterGroupByNameReturnsOnCall[i] = struct {
+		result1 router.RouterGroup
 		result2 error
 	}{result1, result2}
 }
@@ -80,8 +92,8 @@ func (fake *FakeRouterClient) GetRouterGroupsByNameReturnsOnCall(i int, result1 
 func (fake *FakeRouterClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getRouterGroupsByNameMutex.RLock()
-	defer fake.getRouterGroupsByNameMutex.RUnlock()
+	fake.getRouterGroupByNameMutex.RLock()
+	defer fake.getRouterGroupByNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

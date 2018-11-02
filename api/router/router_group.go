@@ -4,31 +4,43 @@ import (
 	"net/url"
 
 	"code.cloudfoundry.org/cli/api/router/internal"
+	"code.cloudfoundry.org/cli/api/router/routererror"
 )
 
-// RouterGroup represents router group
+// RouterGroup represents a router group.
 type RouterGroup struct {
 	GUID            string `json:"guid"`
 	Name            string `json:"name"`
-	Type            string `json:"type"`
 	ReservablePorts string `json:"reservable_ports"`
+	Type            string `json:"type"`
 }
 
-// GetRouterGroupsByName returns a list of RouterGroups
-func (client *Client) GetRouterGroupsByName(name string) ([]RouterGroup, error) {
+// GetRouterGroupByName returns a list of RouterGroups.
+func (client *Client) GetRouterGroupByName(name string) (RouterGroup, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetRouterGroups,
 		Query:       url.Values{"name": []string{name}},
 	})
 
 	if err != nil {
-		return nil, err
+		return RouterGroup{}, err
 	}
-	var fullRouterGroupList []RouterGroup
+	var routerGroups []RouterGroup
 
 	var response = Response{
-		Result: &fullRouterGroupList,
+		Result: &routerGroups,
 	}
+
 	err = client.connection.Make(request, &response)
-	return fullRouterGroupList, err
+	if err != nil {
+		return RouterGroup{}, err
+	}
+
+	for _, routerGroup := range routerGroups {
+		if routerGroup.Name == name {
+			return routerGroup, nil
+		}
+	}
+
+	return RouterGroup{}, routererror.ResourceNotFoundError{}
 }

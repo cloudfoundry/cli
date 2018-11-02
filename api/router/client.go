@@ -18,19 +18,6 @@ type Client struct {
 	connection Connection
 	router     *rata.RequestGenerator
 	userAgent  string
-	wrappers   []ConnectionWrapper
-}
-
-// SetupResources configures the client to use the bootstrapURL
-func (client *Client) SetupResources(URL string, connectionConfig ConnectionConfig) error {
-	client.router = rata.NewRequestGenerator(URL, internal.APIRoutes)
-	client.connection = NewConnection(connectionConfig)
-
-	for _, wrapper := range client.wrappers {
-		client.connection = wrapper.Wrap(client.connection)
-	}
-
-	return nil
 }
 
 // Config allows the Client to be configured
@@ -41,12 +28,18 @@ type Config struct {
 	// AppVersion is the version of the application/process using the client.
 	AppVersion string
 
+	// ConnectionConfig is the configuration for the client connection.
+	ConnectionConfig
+
+	// RoutingEndpoint is the url of the router API.
+	RoutingEndpoint string
+
 	// Wrappers that apply to the client connection.
 	Wrappers []ConnectionWrapper
 }
 
 // NewClient returns a new Router Client.
-func NewClient(config Config, wrappers []ConnectionWrapper) *Client {
+func NewClient(config Config) *Client {
 	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)",
 		config.AppName,
 		config.AppVersion,
@@ -56,12 +49,14 @@ func NewClient(config Config, wrappers []ConnectionWrapper) *Client {
 	)
 
 	client := Client{
-		userAgent: userAgent,
-		wrappers:  wrappers,
+		userAgent:  userAgent,
+		router:     rata.NewRequestGenerator(config.RoutingEndpoint, internal.APIRoutes),
+		connection: NewConnection(config.ConnectionConfig),
 	}
 
-	// TODO Wrap Connection
-	// client.WrapConnection(NewErrorWrapper())
+	for _, wrapper := range config.Wrappers {
+		client.connection = wrapper.Wrap(client.connection)
+	}
 
 	return &client
 }

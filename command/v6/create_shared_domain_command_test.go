@@ -9,7 +9,6 @@ import (
 
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -30,7 +29,6 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 		sharedDomainName string
 		username         string
 		routerGroupName  string
-		experimental     bool
 	)
 
 	BeforeEach(func() {
@@ -39,12 +37,9 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 		fakeActor = new(v6fakes.FakeCreateSharedDomainActor)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		sharedDomainName = "some-shared-domain-name"
-		experimental = true
 	})
 
 	JustBeforeEach(func() {
-		fakeConfig.ExperimentalReturns(experimental)
-
 		cmd = CreateSharedDomainCommand{
 			UI:           testUI,
 			Config:       fakeConfig,
@@ -59,16 +54,6 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 
 	It("checks for user being logged in", func() {
 		Expect(fakeSharedActor.RequireCurrentUserCallCount()).To(Equal(1))
-	})
-
-	When("The experimental flag is false", func() {
-		BeforeEach(func() {
-			experimental = false
-		})
-
-		It("returns an UnrefactoredCommandError", func() {
-			Expect(executeErr).To(MatchError(translatableerror.UnrefactoredCommandError{}))
-		})
 	})
 
 	When("user is logged in", func() {

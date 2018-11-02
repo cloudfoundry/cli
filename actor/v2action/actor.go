@@ -9,7 +9,6 @@ type Actor struct {
 	CloudControllerClient CloudControllerClient
 	Config                Config
 	UAAClient             UAAClient
-	RouterClient          RouterClient
 
 	domainCache map[string]Domain
 }

@@ -3,6 +3,7 @@ package router_test
 import (
 	"bytes"
 	"log"
+	"net/url"
 
 	"code.cloudfoundry.org/cli/api/router"
 	. "github.com/onsi/ginkgo"
@@ -44,8 +45,14 @@ func NewTestConfig() router.Config {
 }
 
 func NewTestRouterClient(config router.Config) *router.Client {
-	client := router.NewClient(config, nil)
-	err := client.SetupResources(server.URL()+"/routing", router.ConnectionConfig{SkipSSLValidation: true})
+	resource, err := url.Parse("/routing")
 	Expect(err).ToNot(HaveOccurred())
+	baseURL, err := url.Parse(server.URL())
+	Expect(err).ToNot(HaveOccurred())
+
+	config.RoutingEndpoint = baseURL.ResolveReference(resource).String()
+	config.SkipSSLValidation = true
+	client := router.NewClient(config)
+
 	return client
 }
