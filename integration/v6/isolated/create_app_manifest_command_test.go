@@ -43,7 +43,7 @@ func createManifest(appName string) (manifest.Manifest, string, error) {
 	return appsManifest, string(manifestContents), nil
 }
 
-var _ = FDescribe("create-app-manifest command", func() {
+var _ = Describe("create-app-manifest command", func() {
 	var appName string
 	var manifestFilePath string
 	var tempDir string
