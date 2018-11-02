@@ -27,6 +27,7 @@ type CloudControllerClient interface {
 	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	GetApplicationDropletCurrent(appGUID string) (ccv3.Droplet, ccv3.Warnings, error)
 	GetApplicationEnvironment(appGUID string) (ccv3.Environment, ccv3.Warnings, error)
+	GetApplicationManifest(appGUID string) ([]byte, ccv3.Warnings, error)
 	GetApplicationProcessByType(appGUID string, processType string) (ccv3.Process, ccv3.Warnings, error)
 	GetApplicationProcesses(appGUID string) ([]ccv3.Process, ccv3.Warnings, error)
 	GetApplications(query ...ccv3.Query) ([]ccv3.Application, ccv3.Warnings, error)

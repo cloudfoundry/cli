@@ -201,4 +201,108 @@ var _ = Describe("Application Manifest Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetRawApplicationManifestByNameAndSpace", func() {
+		var (
+			appName   string
+			spaceGUID string
+
+			manifestBytes []byte
+			warnings      Warnings
+			executeErr    error
+		)
+
+		BeforeEach(func() {
+			appName = "some-app-name"
+			spaceGUID = "some-space-guid"
+		})
+
+		JustBeforeEach(func() {
+			manifestBytes, warnings, executeErr = actor.GetRawApplicationManifestByNameAndSpace(appName, spaceGUID)
+		})
+
+		When("getting the application is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{Name: appName, GUID: "some-app-guid"},
+					},
+					ccv3.Warnings{"get-application-warning"},
+					nil,
+				)
+			})
+
+			It("gets the application from the Cloud Controller", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ContainElement("get-application-warning"))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{appName}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+				))
+			})
+
+			When("getting the manifest is successful", func() {
+				var rawManifest []byte
+
+				BeforeEach(func() {
+					rawManifest = []byte("---\n- potato")
+					fakeCloudControllerClient.GetApplicationManifestReturns(
+						rawManifest,
+						ccv3.Warnings{"get-manifest-warnings"},
+						nil,
+					)
+				})
+
+				It("returns the raw manifest bytes and warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get-application-warning", "get-manifest-warnings"))
+					Expect(manifestBytes).To(Equal(rawManifest))
+				})
+
+				It("gets the manifest for the application", func() {
+					Expect(fakeCloudControllerClient.GetApplicationManifestCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationManifestArgsForCall(0)).To(Equal("some-app-guid"))
+				})
+			})
+
+			When("getting the manifest returns an error", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("some error")
+					fakeCloudControllerClient.GetApplicationManifestReturns(
+						nil,
+						ccv3.Warnings{"get-manifest-warnings"},
+						expectedErr,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(executeErr).To(Equal(expectedErr))
+					Expect(warnings).To(ConsistOf("get-application-warning", "get-manifest-warnings"))
+				})
+			})
+		})
+
+		When("getting the application returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some error")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					nil,
+					ccv3.Warnings{"get-application-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("get-application-warning"))
+				_ = manifestBytes //TODO DELETE ME
+			})
+		})
+	})
 })

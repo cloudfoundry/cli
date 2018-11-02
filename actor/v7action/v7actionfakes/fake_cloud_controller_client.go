@@ -249,6 +249,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetApplicationManifestStub        func(string) ([]byte, ccv3.Warnings, error)
+	getApplicationManifestMutex       sync.RWMutex
+	getApplicationManifestArgsForCall []struct {
+		arg1 string
+	}
+	getApplicationManifestReturns struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getApplicationManifestReturnsOnCall map[int]struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetApplicationProcessByTypeStub        func(string, string) (ccv3.Process, ccv3.Warnings, error)
 	getApplicationProcessByTypeMutex       sync.RWMutex
 	getApplicationProcessByTypeArgsForCall []struct {
@@ -1836,6 +1851,72 @@ func (fake *FakeCloudControllerClient) GetApplicationEnvironmentReturnsOnCall(i 
 	}
 	fake.getApplicationEnvironmentReturnsOnCall[i] = struct {
 		result1 ccv3.Environment
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationManifest(arg1 string) ([]byte, ccv3.Warnings, error) {
+	fake.getApplicationManifestMutex.Lock()
+	ret, specificReturn := fake.getApplicationManifestReturnsOnCall[len(fake.getApplicationManifestArgsForCall)]
+	fake.getApplicationManifestArgsForCall = append(fake.getApplicationManifestArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetApplicationManifest", []interface{}{arg1})
+	fake.getApplicationManifestMutex.Unlock()
+	if fake.GetApplicationManifestStub != nil {
+		return fake.GetApplicationManifestStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationManifestReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationManifestCallCount() int {
+	fake.getApplicationManifestMutex.RLock()
+	defer fake.getApplicationManifestMutex.RUnlock()
+	return len(fake.getApplicationManifestArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationManifestCalls(stub func(string) ([]byte, ccv3.Warnings, error)) {
+	fake.getApplicationManifestMutex.Lock()
+	defer fake.getApplicationManifestMutex.Unlock()
+	fake.GetApplicationManifestStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationManifestArgsForCall(i int) string {
+	fake.getApplicationManifestMutex.RLock()
+	defer fake.getApplicationManifestMutex.RUnlock()
+	argsForCall := fake.getApplicationManifestArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationManifestReturns(result1 []byte, result2 ccv3.Warnings, result3 error) {
+	fake.getApplicationManifestMutex.Lock()
+	defer fake.getApplicationManifestMutex.Unlock()
+	fake.GetApplicationManifestStub = nil
+	fake.getApplicationManifestReturns = struct {
+		result1 []byte
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationManifestReturnsOnCall(i int, result1 []byte, result2 ccv3.Warnings, result3 error) {
+	fake.getApplicationManifestMutex.Lock()
+	defer fake.getApplicationManifestMutex.Unlock()
+	fake.GetApplicationManifestStub = nil
+	if fake.getApplicationManifestReturnsOnCall == nil {
+		fake.getApplicationManifestReturnsOnCall = make(map[int]struct {
+			result1 []byte
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationManifestReturnsOnCall[i] = struct {
+		result1 []byte
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -4083,6 +4164,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getApplicationDropletCurrentMutex.RUnlock()
 	fake.getApplicationEnvironmentMutex.RLock()
 	defer fake.getApplicationEnvironmentMutex.RUnlock()
+	fake.getApplicationManifestMutex.RLock()
+	defer fake.getApplicationManifestMutex.RUnlock()
 	fake.getApplicationProcessByTypeMutex.RLock()
 	defer fake.getApplicationProcessByTypeMutex.RUnlock()
 	fake.getApplicationProcessesMutex.RLock()

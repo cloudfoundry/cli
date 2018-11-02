@@ -48,3 +48,13 @@ func (actor Actor) ApplyApplicationManifest(parser ManifestParser, spaceGUID str
 
 	return allWarnings, nil
 }
+
+func (actor Actor) GetRawApplicationManifestByNameAndSpace(appName string, spaceGUID string) ([]byte, Warnings, error) {
+	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return nil, warnings, err
+	}
+
+	rawManifest, manifestWarnings, err := actor.CloudControllerClient.GetApplicationManifest(app.GUID)
+	return rawManifest, append(warnings, manifestWarnings...), err
+}

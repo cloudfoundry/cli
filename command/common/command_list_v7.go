@@ -51,7 +51,7 @@ type commandList struct {
 	CheckRoute                         v6.CheckRouteCommand                         `command:"check-route" description:"Perform a simple check to determine whether a route currently exists or not"`
 	Config                             v6.ConfigCommand                             `command:"config" description:"Write default values to the config"`
 	CopySource                         v6.CopySourceCommand                         `command:"copy-source" description:"Copies the source code of an application to another existing application (and restarts that application)"`
-	CreateAppManifest                  v6.CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
+	CreateAppManifest                  v7.CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
 	CreateBuildpack                    v6.CreateBuildpackCommand                    `command:"create-buildpack" description:"Create a buildpack"`
 	CreateDomain                       v6.CreateDomainCommand                       `command:"create-domain" description:"Create a domain in an org for later use"`
 	CreateIsolationSegment             v6.CreateIsolationSegmentCommand             `command:"create-isolation-segment" description:"Create an isolation segment"`
