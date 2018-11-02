@@ -108,7 +108,7 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, process Proc
 
 	var responseProcess Process
 	response := cloudcontroller.Response{
-		Result: &responseProcess,
+		DecodeJSONResponseInto: &responseProcess,
 	}
 	err = client.connection.Make(request, &response)
 	return responseProcess, response.Warnings, err
@@ -128,7 +128,7 @@ func (client *Client) GetApplicationProcessByType(appGUID string, processType st
 	}
 	var process Process
 	response := cloudcontroller.Response{
-		Result: &process,
+		DecodeJSONResponseInto: &process,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -184,7 +184,7 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 
 	var responseProcess Process
 	response := cloudcontroller.Response{
-		Result: &responseProcess,
+		DecodeJSONResponseInto: &responseProcess,
 	}
 	err = client.connection.Make(request, &response)
 	return responseProcess, response.Warnings, err

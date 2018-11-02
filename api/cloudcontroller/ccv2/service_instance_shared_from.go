@@ -34,7 +34,7 @@ func (client *Client) GetServiceInstanceSharedFrom(serviceInstanceGUID string) (
 
 	var serviceInstanceSharedFrom ServiceInstanceSharedFrom
 	response := cloudcontroller.Response{
-		Result: &serviceInstanceSharedFrom,
+		DecodeJSONResponseInto: &serviceInstanceSharedFrom,
 	}
 
 	err = client.connection.Make(request, &response)

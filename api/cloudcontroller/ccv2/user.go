@@ -52,7 +52,7 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 
 	var user User
 	response := cloudcontroller.Response{
-		Result: &user,
+		DecodeJSONResponseInto: &user,
 	}
 
 	err = client.connection.Make(request, &response)

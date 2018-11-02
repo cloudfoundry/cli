@@ -52,7 +52,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				It("unmarshals the data into a struct", func() {
 					var body DummyResponse
 					response := Response{
-						Result: &body,
+						DecodeJSONResponseInto: &body,
 					}
 
 					err := connection.Make(request, &response)
@@ -65,7 +65,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				It("keeps numbers unmarshalled to interfaces as interfaces", func() {
 					var body DummyResponse
 					response := Response{
-						Result: &body,
+						DecodeJSONResponseInto: &body,
 					}
 
 					err := connection.Make(request, &response)
@@ -79,7 +79,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 					var response Response
 					err := connection.Make(request, &response)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(response.Result).To(BeNil())
+					Expect(response.DecodeJSONResponseInto).To(BeNil())
 				})
 			})
 		})

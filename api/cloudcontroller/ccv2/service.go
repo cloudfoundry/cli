@@ -77,7 +77,7 @@ func (client *Client) GetService(serviceGUID string) (Service, Warnings, error) 
 
 	var service Service
 	response := cloudcontroller.Response{
-		Result: &service,
+		DecodeJSONResponseInto: &service,
 	}
 
 	err = client.connection.Make(request, &response)

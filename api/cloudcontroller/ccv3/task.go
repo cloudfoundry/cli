@@ -53,7 +53,7 @@ func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Wa
 
 	var responseTask Task
 	response := cloudcontroller.Response{
-		Result: &responseTask,
+		DecodeJSONResponseInto: &responseTask,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -104,7 +104,7 @@ func (client *Client) UpdateTaskCancel(taskGUID string) (Task, Warnings, error) 
 
 	var task Task
 	response := cloudcontroller.Response{
-		Result: &task,
+		DecodeJSONResponseInto: &task,
 	}
 
 	err = client.connection.Make(request, &response)

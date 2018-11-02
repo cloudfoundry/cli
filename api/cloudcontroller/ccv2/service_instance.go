@@ -98,7 +98,7 @@ func (client *Client) GetServiceInstance(serviceInstanceGUID string) (ServiceIns
 
 	var serviceInstance ServiceInstance
 	response := cloudcontroller.Response{
-		Result: &serviceInstance,
+		DecodeJSONResponseInto: &serviceInstance,
 	}
 
 	err = client.connection.Make(request, &response)

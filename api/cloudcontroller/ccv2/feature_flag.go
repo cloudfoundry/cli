@@ -28,7 +28,7 @@ func (client Client) GetConfigFeatureFlags() ([]FeatureFlag, Warnings, error) {
 
 	var featureFlags []FeatureFlag
 	response := cloudcontroller.Response{
-		Result: &featureFlags,
+		DecodeJSONResponseInto: &featureFlags,
 	}
 
 	err = client.connection.Make(request, &response)

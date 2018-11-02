@@ -125,7 +125,7 @@ func (client *Client) GetPrivateDomain(domainGUID string) (Domain, Warnings, err
 
 	var domain Domain
 	response := cloudcontroller.Response{
-		Result: &domain,
+		DecodeJSONResponseInto: &domain,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -177,7 +177,7 @@ func (client *Client) GetSharedDomain(domainGUID string) (Domain, Warnings, erro
 
 	var domain Domain
 	response := cloudcontroller.Response{
-		Result: &domain,
+		DecodeJSONResponseInto: &domain,
 	}
 
 	err = client.connection.Make(request, &response)

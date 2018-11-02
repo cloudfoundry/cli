@@ -88,7 +88,7 @@ func (client *Client) CreateBuild(build Build) (Build, Warnings, error) {
 
 	var responseBuild Build
 	response := cloudcontroller.Response{
-		Result: &responseBuild,
+		DecodeJSONResponseInto: &responseBuild,
 	}
 	err = client.connection.Make(request, &response)
 
@@ -107,7 +107,7 @@ func (client *Client) GetBuild(guid string) (Build, Warnings, error) {
 
 	var responseBuild Build
 	response := cloudcontroller.Response{
-		Result: &responseBuild,
+		DecodeJSONResponseInto: &responseBuild,
 	}
 	err = client.connection.Make(request, &response)
 

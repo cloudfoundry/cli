@@ -67,7 +67,7 @@ func (client *Client) GetServicePlan(servicePlanGUID string) (ServicePlan, Warni
 
 	var servicePlan ServicePlan
 	response := cloudcontroller.Response{
-		Result: &servicePlan,
+		DecodeJSONResponseInto: &servicePlan,
 	}
 
 	err = client.connection.Make(request, &response)

@@ -64,7 +64,7 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 
 	var relationships RelationshipList
 	response := cloudcontroller.Response{
-		Result: &relationships,
+		DecodeJSONResponseInto: &relationships,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -91,7 +91,7 @@ func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, s
 
 	var relationships RelationshipList
 	response := cloudcontroller.Response{
-		Result: &relationships,
+		DecodeJSONResponseInto: &relationships,
 	}
 
 	err = client.connection.Make(request, &response)

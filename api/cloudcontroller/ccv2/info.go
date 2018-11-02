@@ -74,7 +74,7 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 
 	var info APIInformation
 	response := cloudcontroller.Response{
-		Result: &info,
+		DecodeJSONResponseInto: &info,
 	}
 
 	err = client.connection.Make(request, &response)

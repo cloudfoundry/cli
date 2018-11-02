@@ -58,7 +58,7 @@ func (client *Client) GetApplicationApplicationInstances(guid string) (map[int]A
 
 	var instances map[string]ApplicationInstance
 	response := cloudcontroller.Response{
-		Result: &instances,
+		DecodeJSONResponseInto: &instances,
 	}
 
 	err = client.connection.Make(request, &response)

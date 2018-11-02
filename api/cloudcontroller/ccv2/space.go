@@ -80,7 +80,7 @@ func (client *Client) CreateSpace(spaceName string, orgGUID string) (Space, Warn
 
 	var space Space
 	response := cloudcontroller.Response{
-		Result: &space,
+		DecodeJSONResponseInto: &space,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -106,7 +106,7 @@ func (client *Client) DeleteSpace(guid string) (Job, Warnings, error) {
 
 	var job Job
 	response := cloudcontroller.Response{
-		Result: &job,
+		DecodeJSONResponseInto: &job,
 	}
 
 	err = client.connection.Make(request, &response)

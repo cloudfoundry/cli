@@ -4,9 +4,9 @@ import "net/http"
 
 // Response represents a Cloud Controller response object.
 type Response struct {
-	// Result represents the resource entity type that is expected in the
-	// response JSON.
-	Result interface{}
+	// DecodeJSONResponseInto represents the resource entity type that is
+	// expected in the response JSON.
+	DecodeJSONResponseInto interface{}
 
 	// RawResponse represents the response body.
 	RawResponse []byte
