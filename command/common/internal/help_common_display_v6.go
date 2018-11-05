@@ -17,7 +17,7 @@ var CommonHelpCategoryList = []HelpCategory{
 			{"apps", "run-task", "events"},
 			{"push", "logs", "set-env"},
 			{"start", "ssh", "create-app-manifest"},
-			{"stop", "app", ""},
+			{"stop", "app", "delete"},
 			{"restart", "env", ""},
 			{"restage", "scale", ""},
 		},
