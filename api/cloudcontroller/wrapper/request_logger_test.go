@@ -182,47 +182,90 @@ var _ = Describe("Request Logger", func() {
 		})
 
 		When("the request is successful", func() {
-			BeforeEach(func() {
-				response = &cloudcontroller.Response{
-					RawResponse: []byte("some-response-body"),
-					HTTPResponse: &http.Response{
-						Proto:  "HTTP/1.1",
-						Status: "200 OK",
-						Header: http.Header{
-							"BBBBB": {"second"},
-							"AAAAA": {"first"},
-							"CCCCC": {"third"},
+			When("the response body is not YAML", func() {
+				BeforeEach(func() {
+					response = &cloudcontroller.Response{
+						RawResponse: []byte("some-response-body"),
+						HTTPResponse: &http.Response{
+							Proto:  "HTTP/1.1",
+							Status: "200 OK",
+							Header: http.Header{
+								"BBBBB": {"second"},
+								"AAAAA": {"first"},
+								"CCCCC": {"third"},
+							},
 						},
-					},
-				}
+					}
+				})
+
+				It("outputs the response", func() {
+					Expect(makeErr).NotTo(HaveOccurred())
+
+					Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
+					name, date := fakeOutput.DisplayTypeArgsForCall(1)
+					Expect(name).To(Equal("RESPONSE"))
+					Expect(date).To(BeTemporally("~", time.Now(), time.Second))
+
+					Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(1))
+					protocol, status := fakeOutput.DisplayResponseHeaderArgsForCall(0)
+					Expect(protocol).To(Equal("HTTP/1.1"))
+					Expect(status).To(Equal("200 OK"))
+
+					Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 6))
+					name, value := fakeOutput.DisplayHeaderArgsForCall(3)
+					Expect(name).To(Equal("AAAAA"))
+					Expect(value).To(Equal("first"))
+					name, value = fakeOutput.DisplayHeaderArgsForCall(4)
+					Expect(name).To(Equal("BBBBB"))
+					Expect(value).To(Equal("second"))
+					name, value = fakeOutput.DisplayHeaderArgsForCall(5)
+					Expect(name).To(Equal("CCCCC"))
+					Expect(value).To(Equal("third"))
+
+					Expect(fakeOutput.DisplayMessageCallCount()).To(BeNumerically("==", 0))
+
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
+					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("some-response-body")))
+				})
 			})
 
-			It("outputs the response", func() {
-				Expect(makeErr).NotTo(HaveOccurred())
+			When("the response body is YAML", func() {
+				BeforeEach(func() {
+					response = &cloudcontroller.Response{
+						RawResponse: []byte(`---\n- some-response-body`),
+						HTTPResponse: &http.Response{
+							Proto:  "HTTP/1.1",
+							Status: "200 OK",
+							Header: http.Header{
+								"Content-Type": {"application/x-yaml; charset=utf-16"},
+							},
+						},
+					}
+				})
 
-				Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
-				name, date := fakeOutput.DisplayTypeArgsForCall(1)
-				Expect(name).To(Equal("RESPONSE"))
-				Expect(date).To(BeTemporally("~", time.Now(), time.Second))
+				It("redacts the body to prevent leaking manifest credentials", func() {
+					Expect(makeErr).NotTo(HaveOccurred())
 
-				Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(1))
-				protocol, status := fakeOutput.DisplayResponseHeaderArgsForCall(0)
-				Expect(protocol).To(Equal("HTTP/1.1"))
-				Expect(status).To(Equal("200 OK"))
+					Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
+					name, date := fakeOutput.DisplayTypeArgsForCall(1)
+					Expect(name).To(Equal("RESPONSE"))
+					Expect(date).To(BeTemporally("~", time.Now(), time.Second))
 
-				Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 6))
-				name, value := fakeOutput.DisplayHeaderArgsForCall(3)
-				Expect(name).To(Equal("AAAAA"))
-				Expect(value).To(Equal("first"))
-				name, value = fakeOutput.DisplayHeaderArgsForCall(4)
-				Expect(name).To(Equal("BBBBB"))
-				Expect(value).To(Equal("second"))
-				name, value = fakeOutput.DisplayHeaderArgsForCall(5)
-				Expect(name).To(Equal("CCCCC"))
-				Expect(value).To(Equal("third"))
+					Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(1))
+					protocol, status := fakeOutput.DisplayResponseHeaderArgsForCall(0)
+					Expect(protocol).To(Equal("HTTP/1.1"))
+					Expect(status).To(Equal("200 OK"))
 
-				Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
-				Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("some-response-body")))
+					Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 4))
+					name, value := fakeOutput.DisplayHeaderArgsForCall(3)
+					Expect(name).To(Equal("Content-Type"))
+					Expect(value).To(Equal("application/x-yaml; charset=utf-16"))
+
+					Expect(fakeOutput.DisplayMessageCallCount()).To(BeNumerically(">=", 1))
+					Expect(fakeOutput.DisplayMessageArgsForCall(0)).To(Equal("[application/x-yaml Content Hidden]"))
+
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically("==", 0))
+				})
 			})
 		})
 
