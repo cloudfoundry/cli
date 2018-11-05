@@ -69,6 +69,19 @@ var _ = Describe("Error Wrapper", func() {
 				})
 			})
 
+			When("the error is a unauthorized message", func() {
+				BeforeEach(func() {
+					fakeConnectionErr.RawResponse = []byte(`{"name":"UnauthorizedError","message":"You are not authorized to perform the requested action"}`)
+					fakeConnection.MakeReturns(fakeConnectionErr)
+				})
+
+				It("returns an InvalidAuthTokenError", func() {
+					Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+
+					Expect(makeErr).To(MatchError(routererror.UnauthorizedError{Message: "You are not authorized to perform the requested action"}))
+				})
+			})
+
 			When("the error is a generic 401", func() {
 				BeforeEach(func() {
 					fakeConnectionErr.RawResponse = []byte(`{"name":"UnauthorizedError","message":"no you can't"}`)

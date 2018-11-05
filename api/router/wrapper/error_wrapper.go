@@ -9,6 +9,7 @@ import (
 )
 
 const expiredTokenMessage = "Token is expired"
+const unauthorizedMessage = "You are not authorized to perform the requested action"
 
 // ErrorWrapper is the wrapper that converts responses with 4xx and 5xx status
 // codes to an error.
@@ -35,6 +36,9 @@ func (e *ErrorWrapper) Make(request *router.Request, passedResponse *router.Resp
 			_ = json.Unmarshal(rawHTTPStatusErr.RawResponse, &routingAPIErrorBody)
 			if routingAPIErrorBody.Message == expiredTokenMessage {
 				return routererror.InvalidAuthTokenError{Message: "Token is expired"}
+			}
+			if routingAPIErrorBody.Message == unauthorizedMessage {
+				return routererror.UnauthorizedError{Message: routingAPIErrorBody.Message}
 			}
 		}
 	}

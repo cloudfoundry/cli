@@ -149,8 +149,9 @@ var _ = Describe("create-shared-domain command", func() {
 
 	When("user is not logged in as admin", func() {
 		var (
-			username string
-			password string
+			username        string
+			password        string
+			routerGroupName string
 		)
 
 		BeforeEach(func() {
@@ -166,5 +167,36 @@ var _ = Describe("create-shared-domain command", func() {
 			Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
 			Eventually(session).Should(Exit(1))
 		})
+
+		When("With router-group flag", func() {
+			When("router-group exists", func() {
+				BeforeEach(func() {
+					routerGroupName = helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode())
+				})
+
+				It("should fail and return an unauthorized message", func() {
+					session := helpers.CF("create-shared-domain", domainName, "--router-group", routerGroupName)
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).ShouldNot(Say("Error Code: 401"))
+					Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("router-group does not exists", func() {
+				BeforeEach(func() {
+					routerGroupName = "invalid-router-group"
+				})
+
+				It("should fail and return an unauthorized message", func() {
+					session := helpers.CF("create-shared-domain", domainName, "--router-group", routerGroupName)
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).ShouldNot(Say("Error Code: 401"))
+					Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
 	})
 })
