@@ -13,6 +13,7 @@ import (
 type Application struct {
 	Name                string
 	GUID                string
+	StackName           string
 	State               constant.ApplicationState
 	LifecycleType       constant.AppLifecycleType
 	LifecycleBuildpacks []string
@@ -20,6 +21,10 @@ type Application struct {
 
 func (app Application) Started() bool {
 	return app.State == constant.ApplicationStarted
+}
+
+func (app Application) Stopped() bool {
+	return app.State == constant.ApplicationStopped
 }
 
 func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string) (Warnings, error) {
@@ -84,6 +89,7 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 		ccv3.Application{
 			LifecycleType:       app.LifecycleType,
 			LifecycleBuildpacks: app.LifecycleBuildpacks,
+			StackName:           app.StackName,
 			Name:                app.Name,
 			Relationships: ccv3.Relationships{
 				constant.RelationshipTypeSpace: ccv3.Relationship{GUID: spaceGUID},
@@ -158,6 +164,7 @@ func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) er
 func (actor Actor) UpdateApplication(app Application) (Application, Warnings, error) {
 	ccApp := ccv3.Application{
 		GUID:                app.GUID,
+		StackName:           app.StackName,
 		LifecycleType:       app.LifecycleType,
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 	}
@@ -173,6 +180,7 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 	return Application{
 		GUID:                app.GUID,
+		StackName:           app.StackName,
 		LifecycleType:       app.LifecycleType,
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 		Name:                app.Name,

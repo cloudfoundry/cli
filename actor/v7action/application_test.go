@@ -53,12 +53,7 @@ var _ = Describe("Application Actions", func() {
 
 		When("looking up the app guid succeeds", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{ccv3.Application{Name: "some-app", GUID: "abc123"}}, ccv3.Warnings{"some-get-app-warning"}, nil)
-			})
-
-			It("Delegates to the GetApplicationActor", func() {
-				actualAppGUID := fakeCloudControllerClient.DeleteApplicationArgsForCall(0)
-				Expect(actualAppGUID).To(Equal("abc123"))
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", GUID: "abc123"}}, ccv3.Warnings{"some-get-app-warning"}, nil)
 			})
 
 			When("sending the delete fails", func() {
@@ -75,12 +70,6 @@ var _ = Describe("Application Actions", func() {
 			When("sending the delete succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.DeleteApplicationReturns("/some-job-url", ccv3.Warnings{"some-delete-app-warning"}, nil)
-				})
-
-				It("Delegates polling the app to the CC client", func() {
-					actualJobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
-
-					Expect(actualJobURL).To(Equal(ccv3.JobURL("/some-job-url")))
 				})
 
 				When("polling fails", func() {
@@ -322,27 +311,33 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("UpdateApplication", func() {
 		var (
-			application Application
-			warnings    Warnings
-			err         error
+			submitApp, resultApp Application
+			warnings             Warnings
+			err                  error
 		)
 
 		JustBeforeEach(func() {
-			application, warnings, err = actor.UpdateApplication(Application{
+			submitApp = Application{
 				GUID:                "some-app-guid",
+				StackName:           "some-stack-name",
 				LifecycleType:       constant.AppLifecycleTypeBuildpack,
 				LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
-			})
+			}
+			resultApp, warnings, err = actor.UpdateApplication(submitApp)
 		})
 
 		When("the app successfully gets updated", func() {
+			var apiResponseApp ccv3.Application
+
 			BeforeEach(func() {
+				apiResponseApp = ccv3.Application{
+					GUID:                "response-app-guid",
+					StackName:           "response-stack-name",
+					LifecycleType:       constant.AppLifecycleTypeBuildpack,
+					LifecycleBuildpacks: []string{"response-buildpack-1", "response-buildpack-2"},
+				}
 				fakeCloudControllerClient.UpdateApplicationReturns(
-					ccv3.Application{
-						GUID:                "some-app-guid",
-						LifecycleType:       constant.AppLifecycleTypeBuildpack,
-						LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
-					},
+					apiResponseApp,
 					ccv3.Warnings{"some-warning"},
 					nil,
 				)
@@ -350,18 +345,20 @@ var _ = Describe("Application Actions", func() {
 
 			It("creates and returns the application and warnings", func() {
 				Expect(err).ToNot(HaveOccurred())
-				Expect(application).To(Equal(Application{
-					GUID:                "some-app-guid",
-					LifecycleType:       constant.AppLifecycleTypeBuildpack,
-					LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
+				Expect(resultApp).To(Equal(Application{
+					GUID:                apiResponseApp.GUID,
+					StackName:           apiResponseApp.StackName,
+					LifecycleType:       apiResponseApp.LifecycleType,
+					LifecycleBuildpacks: apiResponseApp.LifecycleBuildpacks,
 				}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 
 				Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.UpdateApplicationArgsForCall(0)).To(Equal(ccv3.Application{
-					GUID:                "some-app-guid",
-					LifecycleType:       constant.AppLifecycleTypeBuildpack,
-					LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
+					GUID:                submitApp.GUID,
+					StackName:           submitApp.StackName,
+					LifecycleType:       submitApp.LifecycleType,
+					LifecycleBuildpacks: submitApp.LifecycleBuildpacks,
 				}))
 			})
 		})
@@ -610,9 +607,9 @@ var _ = Describe("Application Actions", func() {
 					fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
 						defer func() { processInstanceCallCount++ }()
 						if strings.HasPrefix(processGuid, "good") {
-							return []ccv3.ProcessInstance{ccv3.ProcessInstance{State: constant.ProcessInstanceRunning}}, nil, nil
+							return []ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}}, nil, nil
 						} else {
-							return []ccv3.ProcessInstance{ccv3.ProcessInstance{State: constant.ProcessInstanceStarting}}, nil, nil
+							return []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}}, nil, nil
 						}
 					}
 
