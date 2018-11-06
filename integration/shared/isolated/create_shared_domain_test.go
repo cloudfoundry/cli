@@ -169,6 +169,10 @@ var _ = Describe("create-shared-domain command", func() {
 		})
 
 		When("With router-group flag", func() {
+			BeforeEach(func() {
+				helpers.SkipIfNoRoutingAPI()
+			})
+
 			When("router-group exists", func() {
 				BeforeEach(func() {
 					routerGroupName = helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode())
