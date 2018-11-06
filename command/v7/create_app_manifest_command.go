@@ -20,10 +20,10 @@ type CreateAppManifestActor interface {
 }
 
 type CreateAppManifestCommand struct {
-	RequiredArgs flag.AppName `positional-args:"yes"`
-	// FilePath        flag.Path    `short:"p" description:"Specify a path for file creation. If path not specified, manifest file is created in current working directory."`
-	usage           interface{} `usage:"CF_NAME create-app-manifest APP_NAME [-p /path/to/<app-name>_manifest.yml]"`
-	relatedCommands interface{} `related_commands:"apps, push"`
+	RequiredArgs    flag.AppName `positional-args:"yes"`
+	FilePath        flag.Path    `short:"p" description:"Specify a path for file creation. If path not specified, manifest file is created in current working directory."`
+	usage           interface{}  `usage:"CF_NAME create-app-manifest APP_NAME [-p /path/to/<app-name>_manifest.yml]"`
+	relatedCommands interface{}  `related_commands:"apps, push"`
 
 	UI          command.UI
 	Config      command.Config
@@ -77,7 +77,13 @@ func (cmd CreateAppManifestCommand) Execute(args []string) error {
 		return err
 	}
 
-	pathToYAMLFile := filepath.Join(cmd.PWD, fmt.Sprintf("%s_manifest.yml", appName))
+	var pathToYAMLFile string
+	if len(cmd.FilePath) > 0 {
+		pathToYAMLFile = cmd.FilePath.String()
+	} else {
+		pathToYAMLFile = filepath.Join(cmd.PWD, fmt.Sprintf("%s_manifest.yml", appName))
+	}
+
 	err = ioutil.WriteFile(pathToYAMLFile, manifestBytes, 0666)
 	if err != nil {
 		return err

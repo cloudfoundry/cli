@@ -4,12 +4,13 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
-	"regexp"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -96,6 +97,8 @@ var _ = Describe("create-app-manifest Command", func() {
 		When("creating the manifest succeeds", func() {
 			var tempDir string
 			var yamlContents string
+			var pathToYAMLFile string
+
 			BeforeEach(func() {
 				var err error
 				tempDir, err = ioutil.TempDir("", "create-app-manifest-unit")
@@ -104,18 +107,14 @@ var _ = Describe("create-app-manifest Command", func() {
 
 				yamlContents = `---\n- banana`
 				fakeActor.GetRawApplicationManifestByNameAndSpaceReturns([]byte(yamlContents), v7action.Warnings{"some-warning"}, nil)
+				pathToYAMLFile = path.Join(tempDir, "some-app_manifest.yml")
 			})
 
 			AfterEach(func() {
 				Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
 			})
 
-			It("displays the file it created and returns no errors", func() {
-				pathToYAMLFile := filepath.Join(tempDir, "some-app_manifest.yml")
-				Expect(testUI.Out).To(Say("Creating an app manifest from current settings of app some-app in org some-org / space some-space as some-user..."))
-				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say("Manifest file created successfully at %s", regexp.QuoteMeta(pathToYAMLFile)))
-				Expect(testUI.Out).To(Say("OK"))
+			It("creates application manifest in current directry as <app-name>-manifest.yml", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeActor.GetRawApplicationManifestByNameAndSpaceCallCount()).To(Equal(1))
@@ -128,28 +127,39 @@ var _ = Describe("create-app-manifest Command", func() {
 				Expect(string(fileContents)).To(Equal(yamlContents))
 			})
 
-			// 	When("no filepath is provided", func() {
-			// 		BeforeEach(func() {
-			// 		})
+			It("displays the file it created and returns no errors", func() {
+				Expect(testUI.Out).To(Say("Creating an app manifest from current settings of app some-app in org some-org / space some-space as some-user..."))
+				Expect(testUI.Err).To(Say("some-warning"))
+				Expect(testUI.Out).To(Say("Manifest file created successfully at %s", path.Join(tempDir, "some-app_manifest.yml")))
+				Expect(testUI.Out).To(Say("OK"))
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
 
-			// 		It("creates application manifest in current directry as <app-name>-manifest.yml", func() {
-			// 			Expect(testUI.Out).To(Say("Creating an app manifest from current settings of app some-app in org some-org / space some-space as some-user..."))
-			// 			Expect(testUI.Err).To(Say("some-warning"))
-			// 			Expect(testUI.Out).To(Say("OK"))
-			// 			Expect(testUI.Out).To(Say(`Manifest file created successfully at .+some-app_manifest\.yml`))
-			// 			Expect(executeErr).ToNot(HaveOccurred())
+			When("a filepath is provided", func() {
+				var flagPath string
 
-			// 			Expect(fakeActor.CreateApplicationManifestByNameAndSpaceCallCount()).To(Equal(1))
-			// 			appArg, spaceArg := fakeActor.CreateApplicationManifestByNameAndSpaceArgsForCall(0)
-			// 			Expect(appArg).To(Equal("some-app"))
-			// 			Expect(spaceArg).To(Equal("some-space-guid"))
+				BeforeEach(func() {
+					flagPath = path.Join(tempDir, "my-special-manifest.yml")
+					cmd.FilePath = flag.Path(flagPath)
+				})
 
-			// 			Expect(fakeActor.WriteApplicationManifestCallCount()).To(Equal(1))
-			// 			manifestArg, pathArg := fakeActor.WriteApplicationManifestArgsForCall(0)
-			// 			Expect(pathArg).To(Equal(filepath.FromSlash("./some-app_manifest.yml")))
-			// 			Expect(manifestArg).To(Equal(manifest.Application{}))
-			// 		})
-			// 	})
+				It("creates application manifest at the specified location", func() {
+					Expect(testUI.Out).To(Say("Creating an app manifest from current settings of app some-app in org some-org / space some-space as some-user..."))
+					Expect(testUI.Err).To(Say("some-warning"))
+					Expect(testUI.Out).To(Say("Manifest file created successfully at %s", flagPath))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeActor.GetRawApplicationManifestByNameAndSpaceCallCount()).To(Equal(1))
+					appArg, spaceArg := fakeActor.GetRawApplicationManifestByNameAndSpaceArgsForCall(0)
+					Expect(appArg).To(Equal("some-app"))
+					Expect(spaceArg).To(Equal("some-space-guid"))
+
+					fileContents, err := ioutil.ReadFile(flagPath)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(fileContents)).To(Equal(yamlContents))
+				})
+			})
 		})
 
 		When("writing the file errors", func() {

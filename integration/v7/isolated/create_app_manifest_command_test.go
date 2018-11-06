@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -40,8 +39,8 @@ var _ = Describe("create-app-manifest command", func() {
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say(`cf create-app-manifest APP_NAME \[-p \/path\/to\/<app-name>_manifest\.yml\]`))
 			Eventually(session).Should(Say(""))
-			// Eventually(session).Should(Say("OPTIONS:"))
-			// Eventually(session).Should(Say("-p      Specify a path for file creation. If path not specified, manifest file is created in current working directory."))
+			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).Should(Say("-p      Specify a path for file creation. If path not specified, manifest file is created in current working directory."))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("apps, push"))
 
@@ -119,8 +118,8 @@ var _ = Describe("create-app-manifest command", func() {
 				Expect(createdFile).To(MatchRegexp("name: %s", appName))
 			})
 
-			PWhen("the -p flag is provided", func() {
-				When("the specified file is a directory", func() {
+			When("the -p flag is provided", func() {
+				PWhen("the specified file is a directory", func() {
 					It("displays a file creation error", func() {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", tempDir)
 						Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
@@ -141,24 +140,15 @@ var _ = Describe("create-app-manifest command", func() {
 					It("creates the manifest in the file", func() {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", newFile)
 						Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Say("Manifest file created successfully at %s", helpers.ConvertPathToRegularExpression(newFile)))
-
-						expectedFile := fmt.Sprintf(`applications:
-- name: %s
-  disk_quota: 1G
-  instances: 1
-  memory: 32M
-  routes:
-  - route: %s.%s
-  stack: cflinuxfs2
-`, appName, strings.ToLower(appName), domainName)
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
 
 						createdFile, err := ioutil.ReadFile(newFile)
 						Expect(err).ToNot(HaveOccurred())
-						Expect(string(createdFile)).To(Equal(expectedFile))
-
-						Eventually(session).Should(Exit(0))
+						Expect(createdFile).To(MatchRegexp("---"))
+						Expect(createdFile).To(MatchRegexp("applications:"))
+						Expect(createdFile).To(MatchRegexp("name: %s", appName))
 					})
 				})
 
@@ -175,24 +165,15 @@ var _ = Describe("create-app-manifest command", func() {
 					It("overrides the previous file with the new manifest", func() {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", existingFile)
 						Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Say("Manifest file created successfully at %s", helpers.ConvertPathToRegularExpression(existingFile)))
-
-						expectedFile := fmt.Sprintf(`applications:
-- name: %s
-  disk_quota: 1G
-  instances: 1
-  memory: 32M
-  routes:
-  - route: %s.%s
-  stack: cflinuxfs2
-`, appName, strings.ToLower(appName), domainName)
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
 
 						createdFile, err := ioutil.ReadFile(existingFile)
 						Expect(err).ToNot(HaveOccurred())
-						Expect(string(createdFile)).To(Equal(expectedFile))
-
-						Eventually(session).Should(Exit(0))
+						Expect(createdFile).To(MatchRegexp("---"))
+						Expect(createdFile).To(MatchRegexp("applications:"))
+						Expect(createdFile).To(MatchRegexp("name: %s", appName))
 					})
 				})
 			})
