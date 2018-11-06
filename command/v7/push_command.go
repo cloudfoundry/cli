@@ -8,10 +8,12 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v6/shared"
+	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/progressbar"
 
 	log "github.com/sirupsen/logrus"
@@ -32,13 +34,13 @@ type PushActor interface {
 	Conceptualize(setting pushaction.CommandLineSettings, spaceGUID string) ([]pushaction.PushState, pushaction.Warnings, error)
 }
 
-//go:generate counterfeiter . PushVersionActor
+//go:generate counterfeiter . V7ActorForPush
 
-type PushVersionActor interface {
-	CloudControllerAPIVersion() string
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
-	PollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error
-	RestartApplication(appGUID string) (v3action.Warnings, error)
+type V7ActorForPush interface {
+	AppActor
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
+	PollStart(appGUID string, warningsChannel chan<- v7action.Warnings) error
+	RestartApplication(appGUID string) (v7action.Warnings, error)
 }
 
 type PushCommand struct {
@@ -54,15 +56,14 @@ type PushCommand struct {
 	envCFStagingTimeout interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}                 `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	UI                  command.UI
-	Config              command.Config
-	NOAAClient          v3action.NOAAClient
-	Actor               PushActor
-	VersionActor        PushVersionActor
-	SharedActor         command.SharedActor
-	AppSummaryDisplayer shared.AppSummaryDisplayer
-	PackageDisplayer    shared.PackageDisplayer
-	ProgressBar         ProgressBar
+	UI           command.UI
+	Config       command.Config
+	NOAAClient   v3action.NOAAClient
+	Actor        PushActor
+	VersionActor V7ActorForPush
+	SharedActor  command.SharedActor
+	RouteActor   v7action.RouteActor
+	ProgressBar  ProgressBar
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -73,22 +74,23 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	ccClient, uaaClient, err := shared.NewV3BasedClients(config, ui, true, "")
+	ccClient, uaaClient, err := v6shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
-	v3Actor := v3action.NewActor(ccClient, config, sharedActor, uaaClient)
-	cmd.VersionActor = v3Actor
+	cmd.VersionActor = v7action.NewActor(ccClient, config, sharedActor, uaaClient)
 
-	ccClientV2, uaaClientV2, err := shared.NewClients(config, ui, true)
+	ccClientV2, uaaClientV2, err := v6shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
 
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
+	cmd.RouteActor = v2Actor
+	v3Actor := v3action.NewActor(ccClient, config, sharedActor, uaaClient)
 	cmd.Actor = pushaction.NewActor(v2Actor, v3Actor, sharedActor)
 
-	cmd.NOAAClient = shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
+	cmd.NOAAClient = v6shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
 	return nil
 }
@@ -144,7 +146,7 @@ func (cmd PushCommand) Execute(args []string) error {
 			return err
 		}
 
-		pollWarnings := make(chan v3action.Warnings)
+		pollWarnings := make(chan v7action.Warnings)
 		done := make(chan bool)
 		go func() {
 			for {
@@ -170,6 +172,15 @@ func (cmd PushCommand) Execute(args []string) error {
 
 			return err
 		}
+		summary, warnings, err := cmd.VersionActor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, true, cmd.RouteActor)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayNewline()
+		appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
+		appSummaryDisplayer.AppDisplay(summary, true)
 	}
 
 	return nil
@@ -265,7 +276,7 @@ func (cmd PushCommand) processEvent(appName string, event pushaction.Event) bool
 	return false
 }
 
-func (cmd PushCommand) getLogs(logStream <-chan *v3action.LogMessage, errStream <-chan error) {
+func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream <-chan error) {
 	for {
 		select {
 		case logMessage, open := <-logStream:

@@ -8,7 +8,9 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -62,13 +64,13 @@ func FillInValues(tuples []Step, state pushaction.PushState) func(pushaction.Pus
 }
 
 type LogEvent struct {
-	Log   *v3action.LogMessage
+	Log   *v7action.LogMessage
 	Error error
 }
 
-func ReturnLogs(logevents []LogEvent, passedWarnings v3action.Warnings, passedError error) func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
-	return func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
-		logStream := make(chan *v3action.LogMessage)
+func ReturnLogs(logevents []LogEvent, passedWarnings v7action.Warnings, passedError error) func(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error) {
+	return func(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error) {
+		logStream := make(chan *v7action.LogMessage)
 		errStream := make(chan error)
 		go func() {
 			defer close(logStream)
@@ -95,9 +97,9 @@ var _ = Describe("push Command", func() {
 		fakeConfig       *commandfakes.FakeConfig
 		fakeSharedActor  *commandfakes.FakeSharedActor
 		fakeActor        *v7fakes.FakePushActor
-		fakeVersionActor *v7fakes.FakePushVersionActor
+		fakeVersionActor *v7fakes.FakeV7ActorForPush
 		fakeProgressBar  *v6fakes.FakeProgressBar
-		fakeNOAAClient   *v3actionfakes.FakeNOAAClient
+		fakeNOAAClient   *v7actionfakes.FakeNOAAClient
 		binaryName       string
 		executeErr       error
 
@@ -112,9 +114,9 @@ var _ = Describe("push Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakePushActor)
-		fakeVersionActor = new(v7fakes.FakePushVersionActor)
+		fakeVersionActor = new(v7fakes.FakeV7ActorForPush)
 		fakeProgressBar = new(v6fakes.FakeProgressBar)
-		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
+		fakeNOAAClient = new(v7actionfakes.FakeNOAAClient)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -284,11 +286,11 @@ var _ = Describe("push Command", func() {
 						BeforeEach(func() {
 							fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
 								[]LogEvent{
-									{Log: v3action.NewLogMessage("log-message-1", 1, time.Now(), v3action.StagingLog, "source-instance")},
-									{Log: v3action.NewLogMessage("log-message-2", 1, time.Now(), v3action.StagingLog, "source-instance")},
-									{Log: v3action.NewLogMessage("log-message-3", 1, time.Now(), "potato", "source-instance")},
+									{Log: v7action.NewLogMessage("log-message-1", 1, time.Now(), v7action.StagingLog, "source-instance")},
+									{Log: v7action.NewLogMessage("log-message-2", 1, time.Now(), v7action.StagingLog, "source-instance")},
+									{Log: v7action.NewLogMessage("log-message-3", 1, time.Now(), "potato", "source-instance")},
 								},
-								v3action.Warnings{"log-warning-1", "log-warning-2"},
+								v7action.Warnings{"log-warning-1", "log-warning-2"},
 								nil,
 							)
 						})
@@ -316,9 +318,9 @@ var _ = Describe("push Command", func() {
 								[]LogEvent{
 									{Error: errors.New("some-random-err")},
 									{Error: actionerror.NOAATimeoutError{}},
-									{Log: v3action.NewLogMessage("log-message-1", 1, time.Now(), v3action.StagingLog, "source-instance")},
+									{Log: v7action.NewLogMessage("log-message-1", 1, time.Now(), v7action.StagingLog, "source-instance")},
 								},
-								v3action.Warnings{"log-warning-1", "log-warning-2"},
+								v7action.Warnings{"log-warning-1", "log-warning-2"},
 								nil,
 							)
 						})
@@ -343,12 +345,9 @@ var _ = Describe("push Command", func() {
 						}, pushaction.PushState{Application: v3action.Application{GUID: "potato"}})
 					})
 
-					// It("outputs flavor text prior to generating app configuration", func() {
-					// })
-
 					When("restarting the app succeeds", func() {
 						BeforeEach(func() {
-							fakeVersionActor.RestartApplicationReturns(v3action.Warnings{"some-restart-warning"}, nil)
+							fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, nil)
 						})
 
 						It("restarts the app and displays warnings", func() {
@@ -360,10 +359,45 @@ var _ = Describe("push Command", func() {
 
 						When("polling the restart succeeds", func() {
 							BeforeEach(func() {
-								fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
-									warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+								fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v7action.Warnings) error {
+									warnings <- v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
 									return nil
 								}
+
+								summary := v7action.ApplicationSummary{
+									Application: v7action.Application{
+										Name:  appName,
+										State: constant.ApplicationStarted,
+									},
+									CurrentDroplet: v7action.Droplet{
+										Stack: "cflinuxfs2",
+										Buildpacks: []v7action.Buildpack{
+											{
+												Name:         "ruby_buildpack",
+												DetectOutput: "some-detect-output",
+											},
+											{
+												Name:         "some-buildpack",
+												DetectOutput: "",
+											},
+										},
+									},
+									ProcessSummaries: v7action.ProcessSummaries{
+										{
+											Process: v7action.Process{
+												Type:    constant.ProcessTypeWeb,
+												Command: "some-command-1",
+											},
+										},
+										{
+											Process: v7action.Process{
+												Type:    "console",
+												Command: "some-command-2",
+											},
+										},
+									},
+								}
+								fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturns(summary, v7action.Warnings{"app-summary-warning-1", "app-summary-warning-2"}, nil)
 							})
 
 							It("displays all warnings", func() {
@@ -372,12 +406,30 @@ var _ = Describe("push Command", func() {
 
 								Expect(executeErr).ToNot(HaveOccurred())
 							})
+
+							It("displays the app summary", func() {
+								Expect(testUI.Out).To(Say(`name:\s+some-app`))
+								Expect(testUI.Out).To(Say(`requested state:\s+started`))
+								Expect(testUI.Out).To(Say("type:\\s+web"))
+								Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
+								Expect(testUI.Out).To(Say("type:\\s+console"))
+								Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+
+								Expect(testUI.Err).To(Say("warning-1"))
+								Expect(testUI.Err).To(Say("warning-2"))
+
+								Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+								appName, spaceGUID, withObfuscatedValues, _ := fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+								Expect(appName).To(Equal("some-app"))
+								Expect(spaceGUID).To(Equal("some-space-guid"))
+								Expect(withObfuscatedValues).To(BeTrue())
+							})
 						})
 
 						When("polling the start fails", func() {
 							BeforeEach(func() {
-								fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
-									warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+								fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v7action.Warnings) error {
+									warnings <- v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
 									return errors.New("some-error")
 								}
 							})
@@ -406,7 +458,7 @@ var _ = Describe("push Command", func() {
 
 					When("restarting the app fails", func() {
 						BeforeEach(func() {
-							fakeVersionActor.RestartApplicationReturns(v3action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
+							fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
 						})
 
 						It("returns an error and any warnings", func() {
