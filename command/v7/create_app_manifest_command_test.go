@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -130,7 +131,7 @@ var _ = Describe("create-app-manifest Command", func() {
 			It("displays the file it created and returns no errors", func() {
 				Expect(testUI.Out).To(Say("Creating an app manifest from current settings of app some-app in org some-org / space some-space as some-user..."))
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say("Manifest file created successfully at %s", path.Join(tempDir, "some-app_manifest.yml")))
+				Expect(testUI.Out).To(Say("Manifest file created successfully at %s", regexp.QuoteMeta(path.Join(tempDir, "some-app_manifest.yml"))))
 				Expect(testUI.Out).To(Say("OK"))
 				Expect(executeErr).ToNot(HaveOccurred())
 			})
@@ -146,7 +147,7 @@ var _ = Describe("create-app-manifest Command", func() {
 				It("creates application manifest at the specified location", func() {
 					Expect(testUI.Out).To(Say("Creating an app manifest from current settings of app some-app in org some-org / space some-space as some-user..."))
 					Expect(testUI.Err).To(Say("some-warning"))
-					Expect(testUI.Out).To(Say("Manifest file created successfully at %s", flagPath))
+					Expect(testUI.Out).To(Say("Manifest file created successfully at %s", regexp.QuoteMeta(flagPath)))
 					Expect(testUI.Out).To(Say("OK"))
 					Expect(executeErr).ToNot(HaveOccurred())
 
