@@ -171,8 +171,8 @@ var _ = Describe("create-app-manifest Command", func() {
 				fakeActor.GetRawApplicationManifestByNameAndSpaceReturns([]byte(yamlContents), v7action.Warnings{"some-warning"}, nil)
 			})
 
-			It("returns a 'Not Exists' error", func() {
-				Expect(os.IsNotExist(executeErr)).To(BeTrue())
+			It("returns a 'ManifestCreationError' error", func() {
+				Expect(executeErr.Error()).To(ContainSubstring("Error creating manifest file:"))
 			})
 		})
 	})

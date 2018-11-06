@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -69,8 +70,6 @@ var _ = Describe("create-app-manifest command", func() {
 			orgName   string
 			spaceName string
 			userName  string
-
-			domainName string
 		)
 
 		BeforeEach(func() {
@@ -79,7 +78,6 @@ var _ = Describe("create-app-manifest command", func() {
 
 			helpers.SetupCF(orgName, spaceName)
 			userName, _ = helpers.GetCredentials()
-			domainName = helpers.DefaultSharedDomain()
 		})
 
 		AfterEach(func() {
@@ -119,12 +117,12 @@ var _ = Describe("create-app-manifest command", func() {
 			})
 
 			When("the -p flag is provided", func() {
-				PWhen("the specified file is a directory", func() {
+				When("the specified file is a directory", func() {
 					It("displays a file creation error", func() {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", tempDir)
 						Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Error creating manifest file: open %s: is a directory", helpers.ConvertPathToRegularExpression(tempDir)))
+						Eventually(session.Err).Should(Say("Error creating manifest file: open %s: is a directory", regexp.QuoteMeta(tempDir)))
 
 						Eventually(session).Should(Exit(1))
 					})

@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
 
@@ -86,7 +87,7 @@ func (cmd CreateAppManifestCommand) Execute(args []string) error {
 
 	err = ioutil.WriteFile(pathToYAMLFile, manifestBytes, 0666)
 	if err != nil {
-		return err
+		return translatableerror.ManifestCreationError{Err: err}
 	}
 
 	cmd.UI.DisplayText("Manifest file created successfully at {{.FilePath}}", map[string]interface{}{
