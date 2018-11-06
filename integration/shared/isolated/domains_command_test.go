@@ -97,6 +97,7 @@ var _ = Describe("domains command", func() {
 					var sharedDomainWithType helpers.Domain
 
 					BeforeEach(func() {
+						helpers.SkipIfNoRoutingAPI()
 						sharedDomainName := helpers.NewDomainName()
 						sharedDomainWithType = helpers.NewDomain(orgName, sharedDomainName)
 						routerGroupName := helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode())
