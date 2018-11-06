@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 
@@ -108,7 +107,7 @@ var _ = Describe("create-app-manifest Command", func() {
 
 				yamlContents = `---\n- banana`
 				fakeActor.GetRawApplicationManifestByNameAndSpaceReturns([]byte(yamlContents), v7action.Warnings{"some-warning"}, nil)
-				pathToYAMLFile = path.Join(tempDir, "some-app_manifest.yml")
+				pathToYAMLFile = filepath.Join(tempDir, "some-app_manifest.yml")
 			})
 
 			AfterEach(func() {
@@ -131,7 +130,7 @@ var _ = Describe("create-app-manifest Command", func() {
 			It("displays the file it created and returns no errors", func() {
 				Expect(testUI.Out).To(Say("Creating an app manifest from current settings of app some-app in org some-org / space some-space as some-user..."))
 				Expect(testUI.Err).To(Say("some-warning"))
-				Expect(testUI.Out).To(Say("Manifest file created successfully at %s", regexp.QuoteMeta(path.Join(tempDir, "some-app_manifest.yml"))))
+				Expect(testUI.Out).To(Say("Manifest file created successfully at %s", regexp.QuoteMeta(filepath.Join(tempDir, "some-app_manifest.yml"))))
 				Expect(testUI.Out).To(Say("OK"))
 				Expect(executeErr).ToNot(HaveOccurred())
 			})
@@ -140,7 +139,7 @@ var _ = Describe("create-app-manifest Command", func() {
 				var flagPath string
 
 				BeforeEach(func() {
-					flagPath = path.Join(tempDir, "my-special-manifest.yml")
+					flagPath = filepath.Join(tempDir, "my-special-manifest.yml")
 					cmd.FilePath = flag.Path(flagPath)
 				})
 
