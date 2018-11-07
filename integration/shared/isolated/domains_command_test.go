@@ -9,7 +9,6 @@ import (
 )
 
 var _ = Describe("domains command", func() {
-
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
@@ -26,6 +25,10 @@ var _ = Describe("domains command", func() {
 	})
 
 	When("user is not logged in", func() {
+		BeforeEach(func() {
+			helpers.LogoutCF()
+		})
+
 		It("displays an error message and fails", func() {
 			session := helpers.CF("domains")
 			Eventually(session).Should(Say("FAILED"))
@@ -47,8 +50,7 @@ var _ = Describe("domains command", func() {
 		})
 	})
 
-	When("logged in as Admin", func() {
-
+	When("logged in as admin", func() {
 		When("no org is targeted", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
@@ -57,8 +59,7 @@ var _ = Describe("domains command", func() {
 			It("displays an error message and fails", func() {
 				session := helpers.CF("domains")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org.
-`))
+				Eventually(session).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -82,8 +83,8 @@ var _ = Describe("domains command", func() {
 				sharedDomain2.CreateShared()
 			})
 
-			When("the targeted org has a shared domain", func() {
-				It("displays the domains", func() {
+			When("the targeted org has shared domains", func() {
+				It("displays the shared domains and denotes that they are shared", func() {
 					session := helpers.CF("domains")
 
 					Eventually(session).Should(Say(`Getting domains in org %s as admin`, orgName))
