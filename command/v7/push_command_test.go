@@ -6,10 +6,9 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/pushaction"
-	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
+	"code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -27,16 +26,16 @@ import (
 
 type Step struct {
 	Error    error
-	Event    pushaction.Event
-	Warnings pushaction.Warnings
+	Event    v7pushaction.Event
+	Warnings v7pushaction.Warnings
 }
 
-func FillInValues(tuples []Step, state pushaction.PushState) func(pushaction.PushState, pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
-	return func(pushaction.PushState, pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
-		stateStream := make(chan pushaction.PushState)
+func FillInValues(tuples []Step, state v7pushaction.PushState) func(v7pushaction.PushState, v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
+	return func(v7pushaction.PushState, v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
+		stateStream := make(chan v7pushaction.PushState)
 
-		eventStream := make(chan pushaction.Event)
-		warningsStream := make(chan pushaction.Warnings)
+		eventStream := make(chan v7pushaction.Event)
+		warningsStream := make(chan v7pushaction.Warnings)
 		errorStream := make(chan error)
 
 		go func() {
@@ -56,7 +55,7 @@ func FillInValues(tuples []Step, state pushaction.PushState) func(pushaction.Pus
 			}
 
 			stateStream <- state
-			eventStream <- pushaction.Complete
+			eventStream <- v7pushaction.Complete
 		}()
 
 		return stateStream, eventStream, warningsStream, errorStream
@@ -195,43 +194,50 @@ var _ = Describe("push Command", func() {
 			When("getting app settings is successful", func() {
 				BeforeEach(func() {
 					fakeActor.ConceptualizeReturns(
-						[]pushaction.PushState{
+						[]v7pushaction.PushState{
 							{
-								Application: v3action.Application{Name: appName},
+								Application: v7action.Application{Name: appName},
 							},
 						},
-						pushaction.Warnings{"some-warning-1"}, nil)
+						v7pushaction.Warnings{"some-warning-1"}, nil)
 				})
 
 				Describe("actualizing non-logging events", func() {
 					BeforeEach(func() {
 						fakeActor.ActualizeStub = FillInValues([]Step{
 							{
-								Event:    pushaction.SkippingApplicationCreation,
-								Warnings: pushaction.Warnings{"skipping app creation warnings"},
+								Event:    v7pushaction.SkippingApplicationCreation,
+								Warnings: v7pushaction.Warnings{"skipping app creation warnings"},
 							},
 							{
-								Event:    pushaction.CreatedApplication,
-								Warnings: pushaction.Warnings{"app creation warnings"},
+								Event:    v7pushaction.CreatedApplication,
+								Warnings: v7pushaction.Warnings{"app creation warnings"},
 							},
 							{
-								Event: pushaction.CreatingArchive,
+								Event: v7pushaction.CreatingAndMappingRoutes,
 							},
 							{
-								Event:    pushaction.UploadingApplicationWithArchive,
-								Warnings: pushaction.Warnings{"upload app archive warning"},
+								Event:    v7pushaction.CreatedRoutes,
+								Warnings: v7pushaction.Warnings{"routes warnings"},
 							},
 							{
-								Event:    pushaction.RetryUpload,
-								Warnings: pushaction.Warnings{"retry upload warning"},
+								Event: v7pushaction.CreatingArchive,
 							},
 							{
-								Event: pushaction.UploadWithArchiveComplete,
+								Event:    v7pushaction.UploadingApplicationWithArchive,
+								Warnings: v7pushaction.Warnings{"upload app archive warning"},
 							},
 							{
-								Event: pushaction.StagingComplete,
+								Event:    v7pushaction.RetryUpload,
+								Warnings: v7pushaction.Warnings{"retry upload warning"},
 							},
-						}, pushaction.PushState{})
+							{
+								Event: v7pushaction.UploadWithArchiveComplete,
+							},
+							{
+								Event: v7pushaction.StagingComplete,
+							},
+						}, v7pushaction.PushState{})
 					})
 
 					It("generates a push state with the specified app path", func() {
@@ -241,11 +247,12 @@ var _ = Describe("push Command", func() {
 						Expect(testUI.Err).To(Say("some-warning-1"))
 
 						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-						settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
+						settings, spaceGUID, orgGUID := fakeActor.ConceptualizeArgsForCall(0)
 						Expect(settings).To(MatchFields(IgnoreExtras, Fields{
 							"Name": Equal("some-app"),
 						}))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(orgGUID).To(Equal("some-org-guid"))
 					})
 
 					It("actualizes the application and displays events/warnings", func() {
@@ -256,6 +263,9 @@ var _ = Describe("push Command", func() {
 
 						Expect(testUI.Out).To(Say("Creating app some-app..."))
 						Expect(testUI.Err).To(Say("app creation warnings"))
+
+						Expect(testUI.Out).To(Say("Mapping routes..."))
+						Expect(testUI.Err).To(Say("routes warnings"))
 
 						Expect(testUI.Out).To(Say("Packaging files to upload..."))
 
@@ -277,9 +287,9 @@ var _ = Describe("push Command", func() {
 					BeforeEach(func() {
 						fakeActor.ActualizeStub = FillInValues([]Step{
 							{
-								Event: pushaction.StartingStaging,
+								Event: v7pushaction.StartingStaging,
 							},
-						}, pushaction.PushState{})
+						}, v7pushaction.PushState{})
 					})
 
 					When("there are no logging errors", func() {
@@ -342,7 +352,7 @@ var _ = Describe("push Command", func() {
 					BeforeEach(func() {
 						fakeActor.ActualizeStub = FillInValues([]Step{
 							{},
-						}, pushaction.PushState{Application: v3action.Application{GUID: "potato"}})
+						}, v7pushaction.PushState{Application: v7action.Application{GUID: "potato"}})
 					})
 
 					When("restarting the app succeeds", func() {
@@ -474,7 +484,7 @@ var _ = Describe("push Command", func() {
 							{
 								Error: errors.New("anti avant garde naming"),
 							},
-						}, pushaction.PushState{})
+						}, v7pushaction.PushState{})
 					})
 
 					It("returns the error", func() {
@@ -488,7 +498,7 @@ var _ = Describe("push Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
-					fakeActor.ConceptualizeReturns(nil, pushaction.Warnings{"some-warning-1"}, expectedErr)
+					fakeActor.ConceptualizeReturns(nil, v7pushaction.Warnings{"some-warning-1"}, expectedErr)
 				})
 
 				It("generates a push state with the specified app path", func() {
@@ -504,12 +514,13 @@ var _ = Describe("push Command", func() {
 
 				It("generates a push state with the specified app path", func() {
 					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-					settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
+					settings, spaceGUID, orgGUID := fakeActor.ConceptualizeArgsForCall(0)
 					Expect(settings).To(MatchFields(IgnoreExtras, Fields{
 						"Name":            Equal("some-app"),
 						"ProvidedAppPath": Equal("some/app/path"),
 					}))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(orgGUID).To(Equal("some-org-guid"))
 				})
 			})
 
@@ -520,12 +531,13 @@ var _ = Describe("push Command", func() {
 
 				It("generates a push state with the specified buildpacks", func() {
 					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-					settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
+					settings, spaceGUID, orgGUID := fakeActor.ConceptualizeArgsForCall(0)
 					Expect(settings).To(MatchFields(IgnoreExtras, Fields{
 						"Name":       Equal("some-app"),
 						"Buildpacks": Equal([]string{"some-buildpack-1", "some-buildpack-2"}),
 					}))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(orgGUID).To(Equal("some-org-guid"))
 				})
 			})
 		})
@@ -534,7 +546,7 @@ var _ = Describe("push Command", func() {
 	Describe("GetCommandLineSettings", func() {
 		Context("valid flag combinations", func() {
 			var (
-				settings               pushaction.CommandLineSettings
+				settings               v7pushaction.CommandLineSettings
 				commandLineSettingsErr error
 			)
 
