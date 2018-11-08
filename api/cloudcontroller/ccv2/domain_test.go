@@ -46,7 +46,7 @@ var _ = Describe("Domain", func() {
 				domain = "some-domain-name.com"
 				routerGroupGUID = "some-guid"
 				isInternal = false
-				body := fmt.Sprintf(`{"name":"%s","router_group_guid":"%s", "internal": %t}`, domain, routerGroupGUID, isInternal)
+				body := fmt.Sprintf(`{"name":"%s","router_group_guid":"%s","internal":%t}`, domain, routerGroupGUID, isInternal)
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v2/shared_domains"),
@@ -70,7 +70,7 @@ var _ = Describe("Domain", func() {
 											"code": 10003
 										}`
 				domain = "some-domain-name.com"
-				body := fmt.Sprintf(`{"name":"%s"}`, domain)
+				body := fmt.Sprintf(`{"name":"%s","internal":false}`, domain)
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v2/shared_domains"),

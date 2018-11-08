@@ -23,6 +23,7 @@ var _ = Describe("Shared Domain Actions", func() {
 	)
 
 	BeforeEach(func() {
+		isInternal = false
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
