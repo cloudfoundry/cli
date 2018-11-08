@@ -61,12 +61,14 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 type createSharedDomainBody struct {
 	Name            string `json:"name"`
 	RouterGroupGUID string `json:"router_group_guid,omitempty"`
+	Internal        bool   `json:"internal"`
 }
 
-func (client *Client) CreateSharedDomain(domainName string, routerGroupdGUID string) (Warnings, error) {
+func (client *Client) CreateSharedDomain(domainName string, routerGroupdGUID string, isInternal bool) (Warnings, error) {
 	body := createSharedDomainBody{
 		Name:            domainName,
 		RouterGroupGUID: routerGroupdGUID,
+		Internal:        isInternal,
 	}
 	bodyBytes, err := json.Marshal(body)
 	request, err := client.newHTTPRequest(requestOptions{

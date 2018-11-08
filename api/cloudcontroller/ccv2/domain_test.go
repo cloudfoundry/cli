@@ -23,6 +23,7 @@ var _ = Describe("Domain", func() {
 		var (
 			domain          string
 			routerGroupGUID string
+			isInternal      bool
 		)
 
 		When("no errors are encountered", func() {
@@ -44,7 +45,8 @@ var _ = Describe("Domain", func() {
 										`
 				domain = "some-domain-name.com"
 				routerGroupGUID = "some-guid"
-				body := fmt.Sprintf(`{"name":"%s","router_group_guid":"%s"}`, domain, routerGroupGUID)
+				isInternal = false
+				body := fmt.Sprintf(`{"name":"%s","router_group_guid":"%s", "internal": %t}`, domain, routerGroupGUID, isInternal)
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v2/shared_domains"),
@@ -54,7 +56,7 @@ var _ = Describe("Domain", func() {
 			})
 
 			It("should call the API and return all warnings", func() {
-				warnings, err := client.CreateSharedDomain(domain, routerGroupGUID)
+				warnings, err := client.CreateSharedDomain(domain, routerGroupGUID, isInternal)
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				Expect(err).ToNot(HaveOccurred())
 			})
@@ -78,11 +80,45 @@ var _ = Describe("Domain", func() {
 			})
 
 			It("should return the error and all warnings", func() {
-				warnings, err := client.CreateSharedDomain(domain, "")
+				warnings, err := client.CreateSharedDomain(domain, "", isInternal)
 				Expect(warnings).To(ConsistOf("this is your final warning"))
 				Expect(err).To(MatchError(ccerror.ForbiddenError{Message: "You are not authorized to perform the requested action"}))
 			})
 		})
+
+		When("internal flag is set to true", func() {
+			BeforeEach(func() {
+				response := `{
+											"metadata": {
+												"guid": "43436c2d-2b4f-45c2-9f50-e530e1cedba6",
+												"url": "/v2/shared_domains/43436c2d-2b4f-45c2-9f50-e530e1cedba6",
+												"created_at": "2016-06-08T16:41:37Z",
+												"updated_at": "2016-06-08T16:41:26Z"
+											},
+											"entity": {
+												"name": "example.com",
+												"internal": true
+											}
+										}
+										`
+				domain = "some-domain-name.com"
+				isInternal = true
+				body := fmt.Sprintf(`{"name":"%s","internal":%t}`, domain, isInternal)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/shared_domains"),
+						VerifyBody([]byte(body)),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					))
+			})
+
+			It("should call the API and return all warnings", func() {
+				warnings, err := client.CreateSharedDomain(domain, routerGroupGUID, isInternal)
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
+
 	})
 
 	Describe("GetSharedDomain", func() {

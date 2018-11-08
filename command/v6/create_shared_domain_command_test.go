@@ -29,6 +29,7 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 		sharedDomainName string
 		username         string
 		routerGroupName  string
+		isInternal       bool
 	)
 
 	BeforeEach(func() {
@@ -37,6 +38,7 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 		fakeActor = new(v6fakes.FakeCreateSharedDomainActor)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		sharedDomainName = "some-shared-domain-name"
+		isInternal = false
 	})
 
 	JustBeforeEach(func() {
@@ -47,6 +49,7 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 			SharedActor:  fakeSharedActor,
 			RequiredArgs: flag.Domain{Domain: sharedDomainName},
 			RouterGroup:  routerGroupName,
+			Internal:     isInternal,
 		}
 
 		executeErr = cmd.Execute(nil)
@@ -93,7 +96,7 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 					})
 
 					It("should create the domain with the router group", func() {
-						domainName, routerGroup := fakeActor.CreateSharedDomainArgsForCall(0)
+						domainName, routerGroup, _ := fakeActor.CreateSharedDomainArgsForCall(0)
 						Expect(domainName).To(Equal(sharedDomainName))
 						Expect(routerGroup).To(Equal(v2action.RouterGroup{
 							Name: routerGroupName,
@@ -113,10 +116,24 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 				})
 
 				It("attempts to create the shared domain", func() {
-					domainNamePassed, routerGroup := fakeActor.CreateSharedDomainArgsForCall(0)
+					domainNamePassed, routerGroup, _ := fakeActor.CreateSharedDomainArgsForCall(0)
 					Expect(domainNamePassed).To(Equal(cmd.RequiredArgs.Domain))
 					Expect(routerGroup).To(Equal(v2action.RouterGroup{}))
 				})
+			})
+		})
+
+		When("--internal is passed", func() {
+			BeforeEach(func() {
+				isInternal = true
+			})
+
+			It("should set and return a translateable error", func() {
+				Expect(testUI.Out).To(Say("Creating shared domain %s as %s...", sharedDomainName, username))
+				domainNamePassed, routerGroup, isInternal := fakeActor.CreateSharedDomainArgsForCall(0)
+				Expect(domainNamePassed).To(Equal(cmd.RequiredArgs.Domain))
+				Expect(routerGroup).To(Equal(v2action.RouterGroup{}))
+				Expect(isInternal).To(BeTrue())
 			})
 		})
 

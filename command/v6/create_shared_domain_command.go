@@ -12,12 +12,13 @@ import (
 
 type CreateSharedDomainActor interface {
 	GetRouterGroupByName(string, v2action.RouterClient) (v2action.RouterGroup, error)
-	CreateSharedDomain(string, v2action.RouterGroup) (v2action.Warnings, error)
+	CreateSharedDomain(string, v2action.RouterGroup, bool) (v2action.Warnings, error)
 }
 
 type CreateSharedDomainCommand struct {
 	RequiredArgs    flag.Domain `positional-args:"yes"`
 	RouterGroup     string      `long:"router-group" description:"Routes for this domain will be configured only on the specified router group"`
+	Internal        bool        `long:"internal" description:"Applications that use internal routes communicate directly on the container network"`
 	usage           interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]"`
 	relatedCommands interface{} `related_commands:"create-domain, domains, router-groups"`
 
@@ -70,7 +71,7 @@ func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 		}
 	}
 
-	warnings, err := cmd.Actor.CreateSharedDomain(cmd.RequiredArgs.Domain, routerGroup)
+	warnings, err := cmd.Actor.CreateSharedDomain(cmd.RequiredArgs.Domain, routerGroup, cmd.Internal)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {

@@ -86,6 +86,38 @@ var _ = Describe("create-shared-domain command", func() {
 			})
 		})
 
+		When("the --internal flag is specified", func() {
+			BeforeEach(func() {
+				helpers.SkipIfNoRoutingAPI()
+			})
+
+			When("things work as expected", func() {
+				It("creates a domain with internal flag", func() {
+					session := helpers.CF("create-shared-domain", domainName, "--internal")
+
+					Eventually(session).Should(Say("Creating shared domain %s as admin...", domainName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("domains")
+
+					var sharedDomainResponse struct {
+						Resources []struct {
+							Entity struct {
+								Internal bool   `json:"internal"`
+								Name     string `json:"name"`
+							}
+						}
+					}
+
+					helpers.Curl(&sharedDomainResponse, "/v2/shared_domains?q=name:%s", domainName)
+					Expect(sharedDomainResponse.Resources).To(HaveLen(1))
+					isInternal := sharedDomainResponse.Resources[0].Entity.Internal
+					Expect(isInternal).To(BeTrue())
+				})
+			})
+		})
+
 		When("With the --router-group flag", func() {
 			var routerGroupName string
 

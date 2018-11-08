@@ -19,6 +19,7 @@ var _ = Describe("Shared Domain Actions", func() {
 		domainName                string
 		routerGroup               RouterGroup
 		warnings                  Warnings
+		isInternal                bool
 	)
 
 	BeforeEach(func() {
@@ -35,14 +36,15 @@ var _ = Describe("Shared Domain Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.CreateSharedDomain(domainName, routerGroup)
+			warnings, executeErr = actor.CreateSharedDomain(domainName, routerGroup, isInternal)
 		})
 
 		It("should call the appropriate method on the client", func() {
 			Expect(fakeCloudControllerClient.CreateSharedDomainCallCount()).To(Equal(1))
-			domain, routerGrouId := fakeCloudControllerClient.CreateSharedDomainArgsForCall(0)
+			domain, routerGrouId, isInternal := fakeCloudControllerClient.CreateSharedDomainArgsForCall(0)
 			Expect(domain).To(Equal(domainName))
 			Expect(routerGrouId).To(Equal(routerGroup.GUID))
+			Expect(isInternal).To(BeFalse())
 		})
 
 		When("the call fails", func() {
@@ -69,6 +71,19 @@ var _ = Describe("Shared Domain Actions", func() {
 					ccv2.Warnings{"some warning", "another warning"},
 					nil,
 				)
+			})
+
+			When("the internal flag is passed", func() {
+				BeforeEach(func() {
+					isInternal = true
+				})
+				It("passes the internal flag", func() {
+					Expect(fakeCloudControllerClient.CreateSharedDomainCallCount()).To(Equal(1))
+					domain, routerGrouId, isInternal := fakeCloudControllerClient.CreateSharedDomainArgsForCall(0)
+					Expect(domain).To(Equal(domainName))
+					Expect(routerGrouId).To(Equal(routerGroup.GUID))
+					Expect(isInternal).To(BeTrue())
+				})
 			})
 
 			It("returns the all warnings and no error", func() {
