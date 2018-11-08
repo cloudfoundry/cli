@@ -52,31 +52,6 @@ resources:
     repository: golang
     tag: 1.9
 
-- name: baseimage
-  type: docker-image
-  source:
-    repository: phusion/baseimage
-    tag: latest
-
-- name: cli-ci-base-dockerfile
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cli
-    branch: master
-    paths: [ci/cli-base/Dockerfile]
-
-- name: cli-ci-package-dockerfile
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cli
-    branch: master
-    paths: [ci/cli-package/Dockerfile]
-
-- name: slack-alert
-  type: slack-notification
-  source:
-    url: ((slack-webhook-url))
-
 groups:
 - name: cli
   jobs:
@@ -89,51 +64,27 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: cli
+    - get: pull-request
       trigger: true
-    - get: cli-ci
+    - get: cli-ci # TODO: consider using PR's version of ci?
   - aggregate:
-    - task: units-linux
-      file: cli-ci/ci/cli/tasks/units-linux.yml
-      on_failure: # TODO: no slack alerts on PR failures
-         put: slack-alert
-         params:
-           channel: '#cli-eng'
-           text: |
-             Linux unit tests failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-    - task: units-osx
-      file: cli-ci/ci/cli/tasks/units-osx.yml
-      on_failure: # TODO: no slack alerts on PR failures
-         put: slack-alert
-         params:
-           channel: '#cli-eng'
-           text: |
-             OS X unit tests failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-    - task: units-windows
-      file: cli-ci/ci/cli/tasks/units-windows.yml
-      on_failure: # TODO: no slack alerts on PR failures
-         put: slack-alert
-         params:
-           channel: '#cli-eng'
-           text: |
-             Windows unit tests failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+    - task: units-linux # TODO: build other operating system's units, if resources permit
+      file: cli-ci/ci/cli-pr-builder/tasks/units-linux.yml
 
 - name: claim-bosh-lite # TODO: record PR number instead of usernames
   max_in_flight: 1
   plan:
-    - aggregate: # TODO: make sure this only triggers if units passed for this commit
-      - get: cli
+    - aggregate:
+      - get: pull-request
         trigger: true
         version: every
-      - get: services-api-meta
+        passed: [units]
+      - get: gcp-bosh-pool
     - do:
-      - task: extract-authors-and-story-id-from-commit
-        file: services-api-meta/tasks/extract-authors-and-story-id-from-commit.yml
+      - task: extract-authors-and-story-id-from-commit # TODO: extract PR info instead
+        file: # TODO: write task from https://github.com/jtarchie/github-pullrequest-resource#in-clone-the-repository-at-the-given-pull-request-ref
         input_mapping: {repo: cli}
-      - put: sapi-bosh-lite
+      - put: gcp-bosh-lite
         params:
           story: commit-info/story
           author_name: commit-info/author-name
@@ -141,28 +92,22 @@ jobs:
           committer_name: commit-info/committer-name
           committer_email: commit-info/committer-email
           commit_message_prefix: CLI-
-      on_failure:
-        put: sapi-internal-slack-alert
-        params:
-          text: *common-slack-text
 
 - name: integration-linux # TODO: clean this up
   serial: true
   plan:
   - aggregate:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-cli-binaries
-      passed: [build-binaries]
+    - get: pull-request
       trigger: true
+      passed: [claim-bosh-lite]
     - get: cli-ci
     - put: bosh-lock
-      resource: gcp-bosh-pool
+      resource: gcp-bosh-pool # TODO: why doesn't this just do claim-bosh-lite? What's the difference?
       params:
         acquire: true
   - do:
     - put: cli-bosh-lite
-      params:
+      params: # TODO: change params
         story: commit-info/story
         author_name: commit-info/author-name
         author_email: commit-info/author-email
@@ -171,7 +116,7 @@ jobs:
         commit_message_prefix: CLI-
     - task: integration
       file: cli-ci/ci/cli/tasks/integration-linux.yml
-      # TODO: on_failure, tell GitHub not to block merging?
+      # TODO: on_failure, tell GitHub to block merging?
       ensure:
       - put: unclaim-bosh-lite
         resource: cli-bosh-lite
@@ -180,7 +125,7 @@ jobs:
           name: cli-bosh-lite/name
        params: &integration_params
         CF_INT_CLIENT_ID: 'potato-face'
-        CF_INT_CLIENT_SECRET: ((client-secret))
+        CF_INT_CLIENT_SECRET: ((cf-oauth-test-client-secret))
         CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
         CF_INT_DOCKER_USERNAME: ((dockerhub-username))
         CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
