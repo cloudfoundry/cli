@@ -89,6 +89,20 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	ScaleProcessByApplicationStub        func(string, v7action.Process) (v7action.Warnings, error)
+	scaleProcessByApplicationMutex       sync.RWMutex
+	scaleProcessByApplicationArgsForCall []struct {
+		arg1 string
+		arg2 v7action.Process
+	}
+	scaleProcessByApplicationReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	scaleProcessByApplicationReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	SetApplicationDropletStub        func(string, string) (v7action.Warnings, error)
 	setApplicationDropletMutex       sync.RWMutex
 	setApplicationDropletArgsForCall []struct {
@@ -473,6 +487,70 @@ func (fake *FakeV7Actor) PollPackageReturnsOnCall(i int, result1 v7action.Packag
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV7Actor) ScaleProcessByApplication(arg1 string, arg2 v7action.Process) (v7action.Warnings, error) {
+	fake.scaleProcessByApplicationMutex.Lock()
+	ret, specificReturn := fake.scaleProcessByApplicationReturnsOnCall[len(fake.scaleProcessByApplicationArgsForCall)]
+	fake.scaleProcessByApplicationArgsForCall = append(fake.scaleProcessByApplicationArgsForCall, struct {
+		arg1 string
+		arg2 v7action.Process
+	}{arg1, arg2})
+	fake.recordInvocation("ScaleProcessByApplication", []interface{}{arg1, arg2})
+	fake.scaleProcessByApplicationMutex.Unlock()
+	if fake.ScaleProcessByApplicationStub != nil {
+		return fake.ScaleProcessByApplicationStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.scaleProcessByApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeV7Actor) ScaleProcessByApplicationCallCount() int {
+	fake.scaleProcessByApplicationMutex.RLock()
+	defer fake.scaleProcessByApplicationMutex.RUnlock()
+	return len(fake.scaleProcessByApplicationArgsForCall)
+}
+
+func (fake *FakeV7Actor) ScaleProcessByApplicationCalls(stub func(string, v7action.Process) (v7action.Warnings, error)) {
+	fake.scaleProcessByApplicationMutex.Lock()
+	defer fake.scaleProcessByApplicationMutex.Unlock()
+	fake.ScaleProcessByApplicationStub = stub
+}
+
+func (fake *FakeV7Actor) ScaleProcessByApplicationArgsForCall(i int) (string, v7action.Process) {
+	fake.scaleProcessByApplicationMutex.RLock()
+	defer fake.scaleProcessByApplicationMutex.RUnlock()
+	argsForCall := fake.scaleProcessByApplicationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeV7Actor) ScaleProcessByApplicationReturns(result1 v7action.Warnings, result2 error) {
+	fake.scaleProcessByApplicationMutex.Lock()
+	defer fake.scaleProcessByApplicationMutex.Unlock()
+	fake.ScaleProcessByApplicationStub = nil
+	fake.scaleProcessByApplicationReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV7Actor) ScaleProcessByApplicationReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.scaleProcessByApplicationMutex.Lock()
+	defer fake.scaleProcessByApplicationMutex.Unlock()
+	fake.ScaleProcessByApplicationStub = nil
+	if fake.scaleProcessByApplicationReturnsOnCall == nil {
+		fake.scaleProcessByApplicationReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.scaleProcessByApplicationReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV7Actor) SetApplicationDroplet(arg1 string, arg2 string) (v7action.Warnings, error) {
 	fake.setApplicationDropletMutex.Lock()
 	ret, specificReturn := fake.setApplicationDropletReturnsOnCall[len(fake.setApplicationDropletArgsForCall)]
@@ -690,6 +768,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.pollBuildMutex.RUnlock()
 	fake.pollPackageMutex.RLock()
 	defer fake.pollPackageMutex.RUnlock()
+	fake.scaleProcessByApplicationMutex.RLock()
+	defer fake.scaleProcessByApplicationMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()
 	defer fake.setApplicationDropletMutex.RUnlock()
 	fake.stageApplicationPackageMutex.RLock()

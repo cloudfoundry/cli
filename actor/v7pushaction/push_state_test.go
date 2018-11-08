@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
+	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -30,9 +31,11 @@ var _ = Describe("Push State", func() {
 
 	Describe("Conceptualize", func() {
 		var (
-			settings  CommandLineSettings
-			spaceGUID string
-			orgGUID   string
+			appName       string
+			spaceGUID     string
+			orgGUID       string
+			currentDir    string
+			flagOverrides FlagOverrides
 
 			states     []PushState
 			warnings   Warnings
@@ -43,16 +46,16 @@ var _ = Describe("Push State", func() {
 			var err error
 			pwd, err = os.Getwd()
 			Expect(err).ToNot(HaveOccurred())
-			settings = CommandLineSettings{
-				Name:             "some-app-name",
-				CurrentDirectory: pwd,
-			}
+			appName = "some-app-name"
+			currentDir = pwd
+			flagOverrides = FlagOverrides{}
+
 			spaceGUID = "some-space-guid"
 			orgGUID = "some-org-guid"
 		})
 
 		JustBeforeEach(func() {
-			states, warnings, executeErr = actor.Conceptualize(settings, spaceGUID, orgGUID)
+			states, warnings, executeErr = actor.Conceptualize(appName, spaceGUID, orgGUID, currentDir, flagOverrides)
 		})
 
 		Describe("application", func() {
@@ -132,7 +135,7 @@ var _ = Describe("Push State", func() {
 
 			When("an app path is provided in the command line settings", func() {
 				BeforeEach(func() {
-					settings.ProvidedAppPath = "my-app-path"
+					flagOverrides.ProvidedAppPath = "my-app-path"
 				})
 
 				It("sets the bits path to the provided app path", func() {
@@ -172,6 +175,16 @@ var _ = Describe("Push State", func() {
 						Expect(executeErr).To(MatchError("kaboom"))
 					})
 				})
+			})
+		})
+
+		When("flag overrides are passed", func() {
+			BeforeEach(func() {
+				flagOverrides.Memory = types.NullUint64{IsSet: true, Value: 123456}
+			})
+
+			It("sets the all the flag overrides on the state", func() {
+				Expect(states[0].Overrides).To(Equal(flagOverrides))
 			})
 		})
 	})

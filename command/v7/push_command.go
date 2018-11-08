@@ -33,7 +33,7 @@ type PushActor interface {
 	// Actualize applies any necessary changes.
 	Actualize(state v7pushaction.PushState, progressBar v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Conceptualize figures out the state of the world.
-	Conceptualize(setting v7pushaction.CommandLineSettings, spaceGUID string, orgGUID string) ([]v7pushaction.PushState, v7pushaction.Warnings, error)
+	Conceptualize(appName string, spaceGUID string, orgGUID string, currentDir string, flagOverrides v7pushaction.FlagOverrides) ([]v7pushaction.PushState, v7pushaction.Warnings, error)
 }
 
 //go:generate counterfeiter . V7ActorForPush
@@ -50,6 +50,7 @@ type PushCommand struct {
 	Buildpacks          []string                    `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	DockerImage         flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername      string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
+	Memory              flag.Megabytes              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
 	NoStart             bool                        `long:"no-start" description:"Do not stage and start the app after pushing"`
 	AppPath             flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
@@ -66,6 +67,7 @@ type PushCommand struct {
 	SharedActor  command.SharedActor
 	RouteActor   v7action.RouteActor
 	ProgressBar  ProgressBar
+	PWD          string
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -94,6 +96,9 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 
 	cmd.NOAAClient = v6shared.NewNOAAClient(ccClient.Info.Logging(), config, uaaClient, ui)
 
+	currentDir, err := os.Getwd()
+	cmd.PWD = currentDir
+
 	return nil
 }
 
@@ -110,13 +115,13 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	cliSettings, err := cmd.GetCommandLineSettings()
+	overrides, err := cmd.GetFlagOverrides()
 	if err != nil {
 		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Pushing app {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cliSettings.Name,
+		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
@@ -125,7 +130,13 @@ func (cmd PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("Getting app info...")
 
 	log.Info("generating the app state")
-	pushState, warnings, err := cmd.Actor.Conceptualize(cliSettings, cmd.Config.TargetedSpace().GUID, cmd.Config.TargetedOrganization().GUID)
+	pushState, warnings, err := cmd.Actor.Conceptualize(
+		cmd.RequiredArgs.AppName,
+		cmd.Config.TargetedSpace().GUID,
+		cmd.Config.TargetedOrganization().GUID,
+		cmd.PWD,
+		overrides,
+	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -314,15 +325,9 @@ func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream 
 	}
 }
 
-func (cmd PushCommand) GetCommandLineSettings() (v7pushaction.CommandLineSettings, error) {
-	pwd, err := os.Getwd()
-	if err != nil {
-		return v7pushaction.CommandLineSettings{}, err
-	}
-	return v7pushaction.CommandLineSettings{
-		Buildpacks:       cmd.Buildpacks,
-		CurrentDirectory: pwd,
-		Name:             cmd.RequiredArgs.AppName,
-		ProvidedAppPath:  string(cmd.AppPath),
+func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
+	return v7pushaction.FlagOverrides{
+		Memory:          cmd.Memory.NullUint64, // -m
+		ProvidedAppPath: string(cmd.AppPath),
 	}, nil
 }

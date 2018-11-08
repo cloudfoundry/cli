@@ -4,7 +4,9 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -42,6 +44,16 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 			eventStream <- CreatedApplication
 		}
 		stateStream <- state
+
+		eventStream <- ScaleWebProcess
+		process := v7action.Process{Type: constant.ProcessTypeWeb, MemoryInMB: state.Overrides.Memory}
+		scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(state.Application.GUID, process)
+		warningsStream <- Warnings(scaleWarnings)
+		if err != nil {
+			errorStream <- err
+			return
+		}
+		eventStream <- ScaleWebProcessComplete
 
 		eventStream <- CreatingAndMappingRoutes
 		routeWarnings, routeErr := actor.CreateAndMapDefaultApplicationRoute(state.OrgGUID, state.SpaceGUID, state.Application)

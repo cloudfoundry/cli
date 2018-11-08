@@ -2,7 +2,6 @@ package v7_test
 
 import (
 	"errors"
-	"os"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -16,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -106,6 +106,7 @@ var _ = Describe("push Command", func() {
 		userName  string
 		spaceName string
 		orgName   string
+		pwd       string
 	)
 
 	BeforeEach(func() {
@@ -116,6 +117,12 @@ var _ = Describe("push Command", func() {
 		fakeVersionActor = new(v7fakes.FakeV7ActorForPush)
 		fakeProgressBar = new(v6fakes.FakeProgressBar)
 		fakeNOAAClient = new(v7actionfakes.FakeNOAAClient)
+
+		appName = "some-app"
+		userName = "some-user"
+		spaceName = "some-space"
+		orgName = "some-org"
+		pwd = "/push/cmd/test"
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -130,12 +137,8 @@ var _ = Describe("push Command", func() {
 			SharedActor:  fakeSharedActor,
 			ProgressBar:  fakeProgressBar,
 			NOAAClient:   fakeNOAAClient,
+			PWD:          pwd,
 		}
-
-		appName = "some-app"
-		userName = "some-user"
-		spaceName = "some-space"
-		orgName = "some-org"
 	})
 
 	Describe("Execute", func() {
@@ -247,12 +250,11 @@ var _ = Describe("push Command", func() {
 						Expect(testUI.Err).To(Say("some-warning-1"))
 
 						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-						settings, spaceGUID, orgGUID := fakeActor.ConceptualizeArgsForCall(0)
-						Expect(settings).To(MatchFields(IgnoreExtras, Fields{
-							"Name": Equal("some-app"),
-						}))
+						name, spaceGUID, orgGUID, currentDirectory, _ := fakeActor.ConceptualizeArgsForCall(0)
+						Expect(name).To(Equal(appName))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(currentDirectory).To(Equal(pwd))
 					})
 
 					It("actualizes the application and displays events/warnings", func() {
@@ -514,30 +516,14 @@ var _ = Describe("push Command", func() {
 
 				It("generates a push state with the specified app path", func() {
 					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-					settings, spaceGUID, orgGUID := fakeActor.ConceptualizeArgsForCall(0)
-					Expect(settings).To(MatchFields(IgnoreExtras, Fields{
-						"Name":            Equal("some-app"),
+					name, spaceGUID, orgGUID, currentDirectory, overrides := fakeActor.ConceptualizeArgsForCall(0)
+					Expect(name).To(Equal(appName))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(orgGUID).To(Equal("some-org-guid"))
+					Expect(currentDirectory).To(Equal(pwd))
+					Expect(overrides).To(MatchFields(IgnoreExtras, Fields{
 						"ProvidedAppPath": Equal("some/app/path"),
 					}))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(orgGUID).To(Equal("some-org-guid"))
-				})
-			})
-
-			When("buildpack is specified", func() {
-				BeforeEach(func() {
-					cmd.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
-				})
-
-				It("generates a push state with the specified buildpacks", func() {
-					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-					settings, spaceGUID, orgGUID := fakeActor.ConceptualizeArgsForCall(0)
-					Expect(settings).To(MatchFields(IgnoreExtras, Fields{
-						"Name":       Equal("some-app"),
-						"Buildpacks": Equal([]string{"some-buildpack-1", "some-buildpack-2"}),
-					}))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(orgGUID).To(Equal("some-org-guid"))
 				})
 			})
 		})
@@ -546,287 +532,25 @@ var _ = Describe("push Command", func() {
 	Describe("GetCommandLineSettings", func() {
 		Context("valid flag combinations", func() {
 			var (
-				settings               v7pushaction.CommandLineSettings
-				commandLineSettingsErr error
+				overrides    v7pushaction.FlagOverrides
+				overridesErr error
 			)
 
 			JustBeforeEach(func() {
-				settings, commandLineSettingsErr = cmd.GetCommandLineSettings()
-				Expect(commandLineSettingsErr).ToNot(HaveOccurred())
+				overrides, overridesErr = cmd.GetFlagOverrides()
+				Expect(overridesErr).ToNot(HaveOccurred())
 			})
 
-			// When("general app settings are given", func() {
-			// 	BeforeEach(func() {
-			// 		cmd.Buildpacks = []string{"some-buildpack"}
-			// 		cmd.Command = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "echo foo bar baz"}}
-			// 		cmd.DiskQuota = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
-			// 		cmd.HealthCheckTimeout = 14
-			// 		cmd.HealthCheckType = flag.HealthCheckType{Type: "http"}
-			// 		cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 12, IsSet: true}}
-			// 		cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
-			// 		cmd.StackName = "some-stack"
-			// 	})
-
-			// 	It("sets them on the command line settings", func() {
-			// 		Expect(commandLineSettingsErr).ToNot(HaveOccurred())
-			// 		Expect(settings.Buildpacks).To(ConsistOf("some-buildpack"))
-			// 		Expect(settings.Command).To(Equal(types.FilteredString{IsSet: true, Value: "echo foo bar baz"}))
-			// 		Expect(settings.DiskQuota).To(Equal(uint64(1024)))
-			// 		Expect(settings.HealthCheckTimeout).To(Equal(14))
-			// 		Expect(settings.HealthCheckType).To(Equal("http"))
-			// 		Expect(settings.Instances).To(Equal(types.NullInt{Value: 12, IsSet: true}))
-			// 		Expect(settings.Memory).To(Equal(uint64(100)))
-			// 		Expect(settings.StackName).To(Equal("some-stack"))
-			// 	})
-			// })
-
-			// Context("route related flags", func() {
-			// 	When("given customed route settings", func() {
-			// 		BeforeEach(func() {
-			// 			cmd.Domain = "some-domain"
-			// 		})
-
-			// 		It("sets NoHostname on the command line settings", func() {
-			// 			Expect(settings.DefaultRouteDomain).To(Equal("some-domain"))
-			// 		})
-			// 	})
-
-			// 	When("--hostname is given", func() {
-			// 		BeforeEach(func() {
-			// 			cmd.Hostname = "some-hostname"
-			// 		})
-
-			// 		It("sets DefaultRouteHostname on the command line settings", func() {
-			// 			Expect(settings.DefaultRouteHostname).To(Equal("some-hostname"))
-			// 		})
-			// 	})
-
-			// 	When("--no-hostname is given", func() {
-			// 		BeforeEach(func() {
-			// 			cmd.NoHostname = true
-			// 		})
-
-			// 		It("sets NoHostname on the command line settings", func() {
-			// 			Expect(settings.NoHostname).To(BeTrue())
-			// 		})
-			// 	})
-
-			// 	When("--random-route is given", func() {
-			// 		BeforeEach(func() {
-			// 			cmd.RandomRoute = true
-			// 		})
-
-			// 		It("sets --random-route on the command line settings", func() {
-			// 			Expect(commandLineSettingsErr).ToNot(HaveOccurred())
-			// 			Expect(settings.RandomRoute).To(BeTrue())
-			// 		})
-			// 	})
-
-			// 	When("--route-path is given", func() {
-			// 		BeforeEach(func() {
-			// 			cmd.RoutePath = flag.RoutePath{Path: "/some-path"}
-			// 		})
-
-			// 		It("sets --route-path on the command line settings", func() {
-			// 			Expect(commandLineSettingsErr).ToNot(HaveOccurred())
-			// 			Expect(settings.RoutePath).To(Equal("/some-path"))
-			// 		})
-			// 	})
-
-			// 	When("--no-route is given", func() {
-			// 		BeforeEach(func() {
-			// 			cmd.NoRoute = true
-			// 		})
-
-			// 		It("sets NoRoute on the command line settings", func() {
-			// 			Expect(settings.NoRoute).To(BeTrue())
-			// 		})
-			// 	})
-			// })
-
-			Context("app bits", func() {
-				When("-p flag is given", func() {
-					BeforeEach(func() {
-						cmd.AppPath = "some-directory-path"
-					})
-
-					It("sets ProvidedAppPath", func() {
-						Expect(settings.ProvidedAppPath).To(Equal("some-directory-path"))
-					})
+			When("general app settings are given", func() {
+				BeforeEach(func() {
+					cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
 				})
 
-				It("sets the current directory in the command config", func() {
-					pwd, err := os.Getwd()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(settings.CurrentDirectory).To(Equal(pwd))
+				It("sets them on the command line settings", func() {
+					Expect(overridesErr).ToNot(HaveOccurred())
+					Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
 				})
-
-				// When("the -o flag is given", func() {
-				// 	BeforeEach(func() {
-				// 		cmd.DockerImage.Path = "some-docker-image-path"
-				// 	})
-
-				// 	It("creates command line setting from command line arguments", func() {
-				// 		Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
-				// 	})
-
-				// 	Context("--docker-username flags is given", func() {
-				// 		BeforeEach(func() {
-				// 			cmd.DockerUsername = "some-docker-username"
-				// 		})
-
-				// 		Context("the docker password environment variable is set", func() {
-				// 			BeforeEach(func() {
-				// 				fakeConfig.DockerPasswordReturns("some-docker-password")
-				// 			})
-
-				// 			It("creates command line setting from command line arguments and config", func() {
-				// 				Expect(testUI.Out).To(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
-
-				// 				Expect(settings.Name).To(Equal(appName))
-				// 				Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
-				// 				Expect(settings.DockerUsername).To(Equal("some-docker-username"))
-				// 				Expect(settings.DockerPassword).To(Equal("some-docker-password"))
-				// 			})
-				// 		})
-
-				// 		Context("the docker password environment variable is *not* set", func() {
-				// 			BeforeEach(func() {
-				// 				input.Write([]byte("some-docker-password\n"))
-				// 			})
-
-				// 			It("prompts the user for a password", func() {
-				// 				Expect(testUI.Out).To(Say("Environment variable CF_DOCKER_PASSWORD not set."))
-				// 				Expect(testUI.Out).To(Say("Docker password"))
-
-				// 				Expect(settings.Name).To(Equal(appName))
-				// 				Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
-				// 				Expect(settings.DockerUsername).To(Equal("some-docker-username"))
-				// 				Expect(settings.DockerPassword).To(Equal("some-docker-password"))
-				// 			})
-				// 		})
-				// 	})
-				// })
 			})
 		})
-
-		// DescribeTable("validation errors when flags are passed",
-		// 	func(setup func(), expectedErr error) {
-		// 		setup()
-		// 		_, commandLineSettingsErr := cmd.GetCommandLineSettings()
-		// 		Expect(commandLineSettingsErr).To(MatchError(expectedErr))
-		// 	},
-
-		// 	Entry("--droplet and --docker-username",
-		// 		func() {
-		// 			cmd.DropletPath = "some-droplet-path"
-		// 			cmd.DockerUsername = "some-docker-username"
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--droplet", "--docker-username", "-p"}}),
-
-		// 	Entry("--droplet and --docker-image",
-		// 		func() {
-		// 			cmd.DropletPath = "some-droplet-path"
-		// 			cmd.DockerImage.Path = "some-docker-image"
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--droplet", "--docker-image", "-o"}}),
-
-		// 	Entry("--droplet and -p",
-		// 		func() {
-		// 			cmd.DropletPath = "some-droplet-path"
-		// 			cmd.AppPath = "some-directory-path"
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--droplet", "-p"}}),
-
-		// 	Entry("-o and -p",
-		// 		func() {
-		// 			cmd.DockerImage.Path = "some-docker-image"
-		// 			cmd.AppPath = "some-directory-path"
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--docker-image, -o", "-p"}}),
-
-		// 	Entry("-b and --docker-image",
-		// 		func() {
-		// 			cmd.DockerImage.Path = "some-docker-image"
-		// 			cmd.Buildpacks = []string{"some-buildpack"}
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"-b", "--docker-image, -o"}}),
-
-		// 	Entry("--docker-username (without DOCKER_PASSWORD env set)",
-		// 		func() {
-		// 			cmd.DockerUsername = "some-docker-username"
-		// 		},
-		// 		translatableerror.RequiredFlagsError{Arg1: "--docker-image, -o", Arg2: "--docker-username"}),
-
-		// 	Entry("-d and --no-route",
-		// 		func() {
-		// 			cmd.Domain = "some-domain"
-		// 			cmd.NoRoute = true
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"-d", "--no-route"}}),
-
-		// 	Entry("--hostname and --no-hostname",
-		// 		func() {
-		// 			cmd.Hostname = "po-tate-toe"
-		// 			cmd.NoHostname = true
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "-n", "--no-hostname"}}),
-
-		// 	Entry("--hostname and --no-route",
-		// 		func() {
-		// 			cmd.Hostname = "po-tate-toe"
-		// 			cmd.NoRoute = true
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "-n", "--no-route"}}),
-
-		// 	Entry("--no-hostname and --no-route",
-		// 		func() {
-		// 			cmd.NoHostname = true
-		// 			cmd.NoRoute = true
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--no-hostname", "--no-route"}}),
-
-		// 	Entry("-f and --no-manifest",
-		// 		func() {
-		// 			cmd.PathToManifest = "/some/path.yml"
-		// 			cmd.NoManifest = true
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"-f", "--no-manifest"}}),
-
-		// 	Entry("--random-route and --hostname",
-		// 		func() {
-		// 			cmd.Hostname = "po-tate-toe"
-		// 			cmd.RandomRoute = true
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "-n", "--random-route"}}),
-
-		// 	Entry("--random-route and --no-hostname",
-		// 		func() {
-		// 			cmd.RandomRoute = true
-		// 			cmd.NoHostname = true
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--no-hostname", "--random-route"}}),
-
-		// 	Entry("--random-route and --no-route",
-		// 		func() {
-		// 			cmd.RandomRoute = true
-		// 			cmd.NoRoute = true
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--no-route", "--random-route"}}),
-
-		// 	Entry("--random-route and --route-path",
-		// 		func() {
-		// 			cmd.RoutePath = flag.RoutePath{Path: "/bananas"}
-		// 			cmd.RandomRoute = true
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--random-route", "--route-path"}}),
-
-		// 	Entry("--route-path and --no-route",
-		// 		func() {
-		// 			cmd.RoutePath = flag.RoutePath{Path: "/bananas"}
-		// 			cmd.NoRoute = true
-		// 		},
-		// 		translatableerror.ArgumentCombinationError{Args: []string{"--route-path", "--no-route"}}),
-		// )
 	})
 })

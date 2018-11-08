@@ -11,6 +11,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/types"
 	log "github.com/sirupsen/logrus"
 
 	. "github.com/onsi/ginkgo"
@@ -195,6 +196,51 @@ var _ = Describe("Actualize", func() {
 					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-warnings")))
 					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 				})
+			})
+		})
+	})
+
+	Describe("scaling the web process", func() {
+		When("the scale is successful", func() {
+			var memory types.NullUint64
+
+			BeforeEach(func() {
+				memory = types.NullUint64{IsSet: true, Value: 2048}
+				fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, nil)
+
+				state.Application.GUID = "some-app-guid"
+				state.Overrides = FlagOverrides{
+					Memory: memory,
+				}
+			})
+
+			It("returns warnings and continues", func() {
+				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
+				Eventually(warningsStream).Should(Receive(ConsistOf("scaling-warnings")))
+				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcessComplete))
+
+				Expect(fakeV7Actor.ScaleProcessByApplicationCallCount()).To(Equal(1))
+				passedAppGUID, passedProcess := fakeV7Actor.ScaleProcessByApplicationArgsForCall(0)
+				Expect(passedAppGUID).To(Equal("some-app-guid"))
+				Expect(passedProcess).To(MatchFields(IgnoreExtras,
+					Fields{
+						"Type":       Equal("web"),
+						"MemoryInMB": Equal(memory),
+					}))
+			})
+		})
+
+		When("the scale errors", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("nopes")
+				fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, expectedErr)
+			})
+
+			It("returns warnings and continues", func() {
+				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
+				Eventually(warningsStream).Should(Receive(ConsistOf("scaling-warnings")))
+				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 			})
 		})
 	})
