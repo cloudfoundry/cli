@@ -70,7 +70,8 @@ var _ = Describe("Domain", func() {
 											"code": 10003
 										}`
 				domain = "some-domain-name.com"
-				body := fmt.Sprintf(`{"name":"%s","internal":false}`, domain)
+				isInternal = false
+				body := fmt.Sprintf(`{"name":"%s","internal":%t}`, domain, isInternal)
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v2/shared_domains"),
@@ -113,7 +114,7 @@ var _ = Describe("Domain", func() {
 			})
 
 			It("should call the API and return all warnings", func() {
-				warnings, err := client.CreateSharedDomain(domain, routerGroupGUID, isInternal)
+				warnings, err := client.CreateSharedDomain(domain, "", isInternal)
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				Expect(err).ToNot(HaveOccurred())
 			})
