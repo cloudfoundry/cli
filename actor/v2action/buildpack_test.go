@@ -617,17 +617,18 @@ var _ = Describe("Buildpack", func() {
 			newEnabled           types.NullBool
 			fakeProgressBar      *v2actionfakes.FakeSimpleProgressBar
 			updatedBuildpackGuid string
-			stackName            string
+			currentStack         string
+			newStack             string
 		)
 
 		JustBeforeEach(func() {
 			fakeProgressBar = new(v2actionfakes.FakeSimpleProgressBar)
-			updatedBuildpackGuid, warnings, executeErr = actor.UpdateBuildpackByNameAndStack("some-bp-name", stackName, newPosition, newLocked, newEnabled)
+			updatedBuildpackGuid, warnings, executeErr = actor.UpdateBuildpackByNameAndStack("some-bp-name", currentStack, newPosition, newLocked, newEnabled, newStack)
 		})
 
-		When("stack is an empty string", func() {
+		When("current stack is an empty string", func() {
 			BeforeEach(func() {
-				stackName = ""
+				currentStack = ""
 			})
 
 			It("gets the buildpack by name only", func() {
@@ -637,16 +638,16 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 
-		When("a non-empty stack name is passed", func() {
+		When("a non-empty current stack name is passed", func() {
 			BeforeEach(func() {
-				stackName = "some-stack"
+				currentStack = "some-stack"
 			})
 
-			It("gets the buildpack by name and stack", func() {
+			It("gets the buildpack by name and current stack", func() {
 				args := fakeCloudControllerClient.GetBuildpacksArgsForCall(0)
 				Expect(len(args)).To(Equal(2))
 				Expect(args[0].Values[0]).To(Equal("some-bp-name"))
-				Expect(args[1].Values[0]).To(Equal(stackName))
+				Expect(args[1].Values[0]).To(Equal(currentStack))
 			})
 		})
 
@@ -726,6 +727,21 @@ var _ = Describe("Buildpack", func() {
 					Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
 					passedBuildpack := fakeCloudControllerClient.UpdateBuildpackArgsForCall(0)
 					Expect(passedBuildpack.Enabled).To(Equal(newEnabled))
+				})
+			})
+
+			When("a new stack is specified", func() {
+				BeforeEach(func() {
+					newPosition = types.NullInt{}
+					newLocked = types.NullBool{}
+					newEnabled = types.NullBool{}
+					newStack = "some-new-stack"
+				})
+
+				It("makes an API call to update the stack", func() {
+					Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
+					passedBuildpack := fakeCloudControllerClient.UpdateBuildpackArgsForCall(0)
+					Expect(passedBuildpack.Stack).To(Equal(newStack))
 				})
 			})
 

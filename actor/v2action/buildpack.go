@@ -283,15 +283,15 @@ func (actor *Actor) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings, e
 	return Buildpack(updatedBuildpack), Warnings(warnings), nil
 }
 
-func (actor *Actor) UpdateBuildpackByNameAndStack(name, stack string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, Warnings, error) {
+func (actor *Actor) UpdateBuildpackByNameAndStack(name, currentStack string, position types.NullInt, locked types.NullBool, enabled types.NullBool, newStack string) (string, Warnings, error) {
 	warnings := Warnings{}
 	var (
 		buildpack    Buildpack
 		execWarnings Warnings
 		err          error
 	)
-	if len(stack) > 0 {
-		buildpack, execWarnings, err = actor.GetBuildpackByNameAndStack(name, stack)
+	if len(currentStack) > 0 {
+		buildpack, execWarnings, err = actor.GetBuildpackByNameAndStack(name, currentStack)
 	} else {
 		buildpack, execWarnings, err = actor.GetBuildpackByName(name)
 	}
@@ -300,16 +300,18 @@ func (actor *Actor) UpdateBuildpackByNameAndStack(name, stack string, position t
 		return "", warnings, err
 	}
 
-	if position != buildpack.Position || locked != buildpack.Enabled || enabled != buildpack.Enabled {
+	if position != buildpack.Position || locked != buildpack.Enabled || enabled != buildpack.Enabled || newStack != buildpack.Stack {
 		buildpack.Position = position
 		buildpack.Locked = locked
 		buildpack.Enabled = enabled
+		buildpack.Stack = newStack
+
 		_, execWarnings, err = actor.UpdateBuildpack(buildpack)
 		warnings = append(warnings, execWarnings...)
-	}
 
-	if err != nil {
-		return "", warnings, err
+		if err != nil {
+			return "", warnings, err
+		}
 	}
 
 	return buildpack.GUID, warnings, err

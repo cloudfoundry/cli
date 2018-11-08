@@ -20,7 +20,7 @@ import (
 //go:generate counterfeiter . UpdateBuildpackActor
 type UpdateBuildpackActor interface {
 	CloudControllerAPIVersion() string
-	UpdateBuildpackByNameAndStack(name, stack string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error)
+	UpdateBuildpackByNameAndStack(name, currentStack string, position types.NullInt, locked types.NullBool, enabled types.NullBool, newStack string) (string, v2action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error)
 	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
 }
@@ -33,7 +33,8 @@ type UpdateBuildpackCommand struct {
 	Lock            bool                             `long:"lock" description:"Lock the buildpack to prevent updates"`
 	Path            flag.PathWithExistenceCheckOrURL `short:"p" description:"Path to directory or zip file"`
 	Unlock          bool                             `long:"unlock" description:"Unlock the buildpack to enable updates"`
-	Stack           string                           `short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
+	CurrentStack    string                           `short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
+	NewStack        string                           `long:"assign-stack" description:"Assign a stack to a buildpack that does not have a stack association"`
 	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [-s STACK] [--enable|--disable] [--lock|--unlock]\n\nTIP:\n   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."`
 	relatedCommands interface{}                      `related_commands:"buildpacks, rename-buildpack"`
 
@@ -111,7 +112,8 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 		Value: cmd.Lock,
 	}
 
-	buildpackGUID, warnings, err := cmd.Actor.UpdateBuildpackByNameAndStack(cmd.RequiredArgs.Buildpack, cmd.Stack, cmd.Order, locked, enabled)
+	buildpackGUID, warnings, err := cmd.Actor.UpdateBuildpackByNameAndStack(cmd.RequiredArgs.Buildpack, cmd.CurrentStack, cmd.Order, locked, enabled, cmd.NewStack)
+
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -138,18 +140,26 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 }
 
 func (cmd UpdateBuildpackCommand) minAPIVersionCheck() error {
-	if cmd.Stack != "" {
+	if cmd.CurrentStack != "" {
 		return command.MinimumCCAPIVersionCheck(
 			cmd.Actor.CloudControllerAPIVersion(),
 			ccversion.MinVersionBuildpackStackAssociationV2,
 			"Option '-s'",
 		)
 	}
+
+	if cmd.NewStack != "" {
+		return command.MinimumCCAPIVersionCheck(
+			cmd.Actor.CloudControllerAPIVersion(),
+			ccversion.MinVersionBuildpackStackAssociationV2,
+			"Option '--assign-stack'",
+		)
+	}
 	return nil
 }
 
 func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
-	if cmd.Stack == "" {
+	if cmd.CurrentStack == "" {
 		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   cmd.RequiredArgs.Buildpack,
 			"CurrentUser": userName,
@@ -158,7 +168,7 @@ func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
 		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   cmd.RequiredArgs.Buildpack,
 			"CurrentUser": userName,
-			"Stack":       cmd.Stack,
+			"Stack":       cmd.CurrentStack,
 		})
 	}
 }
@@ -179,6 +189,12 @@ func (cmd UpdateBuildpackCommand) validateFlagCombinations() error {
 	if len(cmd.Path) > 0 && cmd.Unlock {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"-p", "--unlock"},
+		}
+	}
+
+	if len(cmd.Path) > 0 && len(cmd.NewStack) > 0 {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"-p", "--assign-stack"},
 		}
 	}
 

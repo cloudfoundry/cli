@@ -268,7 +268,7 @@ var _ = Describe("update-buildpack command", func() {
 					})
 				})
 
-				When("the user provides a stack", func() {
+				When("the -s flag is provided", func() {
 					var (
 						stackName string
 						session   *Session
@@ -484,7 +484,62 @@ var _ = Describe("update-buildpack command", func() {
 					})
 				})
 
-				Describe("flags", func() {
+				When("the --assign-stack flag is provided", func() {
+					var (
+						stacks []string
+					)
+
+					When("the user assigns a stack that exists on the system", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+							stacks = helpers.EnsureMinimumNumberOfStacks(2)
+						})
+
+						It("successfully assigns the stack to the buildpack", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--assign-stack", stacks[0])
+
+							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							listSession := helpers.CF("buildpacks")
+							Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+								Name: buildpackName, Stack: stacks[0]})))
+							Eventually(listSession).Should(Exit(0))
+						})
+					})
+				})
+
+				When("the --lock is provided", func() {
+					It("locks the buildpack", func() {
+						session := helpers.CF("update-buildpack", buildpackName, "--lock")
+						Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("buildpacks")
+						Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
+							Name:   buildpackName,
+							Locked: "true",
+						})))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("the --disable is provided", func() {
+					It("disables buildpack", func() {
+						session := helpers.CF("update-buildpack", buildpackName, "--disable")
+						Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("buildpacks")
+						Eventually(session).Should(Say(`%s\s+\d+\s+false`, buildpackName))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				Describe("flag combinations", func() {
 					When("specifying both enable and disable flags", func() {
 						It("returns the appropriate error", func() {
 							session := helpers.CF("update-buildpack", buildpackName, "--enable", "--disable")
@@ -500,22 +555,6 @@ var _ = Describe("update-buildpack command", func() {
 							Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --lock, --unlock"))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
-						})
-					})
-
-					When("specifying lock flag", func() {
-						It("locks the buildpack", func() {
-							session := helpers.CF("update-buildpack", buildpackName, "--lock")
-							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Exit(0))
-
-							session = helpers.CF("buildpacks")
-							Eventually(session).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{
-								Name:   buildpackName,
-								Locked: "true",
-							})))
-							Eventually(session).Should(Exit(0))
 						})
 					})
 
@@ -537,18 +576,6 @@ var _ = Describe("update-buildpack command", func() {
 						})
 					})
 
-					When("specifying disable flag", func() {
-						It("disables buildpack", func() {
-							session := helpers.CF("update-buildpack", buildpackName, "--disable")
-							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
-							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Exit(0))
-
-							session = helpers.CF("buildpacks")
-							Eventually(session).Should(Say(`%s\s+\d+\s+false`, buildpackName))
-							Eventually(session).Should(Exit(0))
-						})
-					})
 				})
 			})
 
