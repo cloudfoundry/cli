@@ -42,10 +42,10 @@ var _ = Describe("Shared Domain Actions", func() {
 
 		It("should call the appropriate method on the client", func() {
 			Expect(fakeCloudControllerClient.CreateSharedDomainCallCount()).To(Equal(1))
-			domain, routerGrouId, isInternal := fakeCloudControllerClient.CreateSharedDomainArgsForCall(0)
+			domain, routerGrouId, internal := fakeCloudControllerClient.CreateSharedDomainArgsForCall(0)
 			Expect(domain).To(Equal(domainName))
 			Expect(routerGrouId).To(Equal(routerGroup.GUID))
-			Expect(isInternal).To(BeFalse())
+			Expect(internal).To(BeFalse())
 		})
 
 		When("the call fails", func() {
