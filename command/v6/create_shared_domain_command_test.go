@@ -128,6 +128,7 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 		When("--internal is passed", func() {
 			BeforeEach(func() {
 				isInternal = true
+				routerGroupName = ""
 			})
 
 			When("the version is less than the minimum version", func() {
