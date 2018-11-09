@@ -490,9 +490,12 @@ var _ = Describe("update-buildpack command", func() {
 						stacks []string
 					)
 
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+					})
+
 					When("the user assigns a stack that exists on the system", func() {
 						BeforeEach(func() {
-							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 							stacks = helpers.EnsureMinimumNumberOfStacks(2)
 						})
 
@@ -508,6 +511,16 @@ var _ = Describe("update-buildpack command", func() {
 								Name: buildpackName, Stack: stacks[0]})))
 							Eventually(listSession).Should(Exit(0))
 						})
+					})
+
+					When("the user assigns a stack that does NOT exist on the system", func() {
+						It("displays an error that the stack isn't found", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--assign-stack", "nonexistent-stack")
+							Eventually(session.Err).Should(Say("Stack nonexistent-stack not found"))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+
 					})
 				})
 

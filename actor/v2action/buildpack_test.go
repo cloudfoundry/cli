@@ -629,6 +629,7 @@ var _ = Describe("Buildpack", func() {
 		When("current stack is an empty string", func() {
 			BeforeEach(func() {
 				currentStack = ""
+				newStack = ""
 			})
 
 			It("gets the buildpack by name only", func() {
@@ -641,6 +642,7 @@ var _ = Describe("Buildpack", func() {
 		When("a non-empty current stack name is passed", func() {
 			BeforeEach(func() {
 				currentStack = "some-stack"
+				newStack = ""
 			})
 
 			It("gets the buildpack by name and current stack", func() {
@@ -653,6 +655,7 @@ var _ = Describe("Buildpack", func() {
 
 		When("getting the buildpack fails", func() {
 			BeforeEach(func() {
+				newStack = ""
 				expectedError = errors.New("some-error")
 				fakeCloudControllerClient.GetBuildpacksReturns(nil, nil, expectedError)
 			})
@@ -664,6 +667,7 @@ var _ = Describe("Buildpack", func() {
 
 		When("getting the buildpack succeeds", func() {
 			BeforeEach(func() {
+				newStack = ""
 				fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{
 					ccv2.Buildpack{}}, ccv2.Warnings{"get warning"}, nil)
 			})
@@ -737,12 +741,33 @@ var _ = Describe("Buildpack", func() {
 					newLocked = types.NullBool{}
 					newEnabled = types.NullBool{}
 					newStack = "some-new-stack"
+					fakeCloudControllerClient.GetStacksReturns(
+						[]ccv2.Stack{{Name: newStack}},
+						nil,
+						nil,
+					)
 				})
 
 				It("makes an API call to update the stack", func() {
 					Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
 					passedBuildpack := fakeCloudControllerClient.UpdateBuildpackArgsForCall(0)
 					Expect(passedBuildpack.Stack).To(Equal(newStack))
+				})
+
+				When("new stack does not exists", func() {
+					BeforeEach(func() {
+						newStack = "some-non-existing-stack"
+						fakeCloudControllerClient.GetStacksReturns(
+							[]ccv2.Stack{},
+							ccv2.Warnings{"get-stack-warning"},
+							nil,
+						)
+					})
+
+					It("returns the error and warnings", func() {
+						Expect(executeErr).To(MatchError(actionerror.StackNotFoundError{Name: newStack}))
+						Expect(warnings).To(ConsistOf("get-stack-warning"))
+					})
 				})
 			})
 
@@ -751,6 +776,7 @@ var _ = Describe("Buildpack", func() {
 					newPosition = types.NullInt{IsSet: true, Value: 3}
 					newLocked = types.NullBool{IsSet: true, Value: true}
 					newEnabled = types.NullBool{IsSet: true, Value: true}
+					newStack = ""
 				})
 
 				When("updating the buildpack record returns an error", func() {

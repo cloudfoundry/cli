@@ -290,12 +290,22 @@ func (actor *Actor) UpdateBuildpackByNameAndStack(name, currentStack string, pos
 		execWarnings Warnings
 		err          error
 	)
+
+	if len(newStack) > 0 {
+		_, execWarnings, err = actor.GetStackByName(newStack)
+		if err != nil {
+			return "", execWarnings, err
+		}
+	}
+	warnings = append(warnings, execWarnings...)
+
 	if len(currentStack) > 0 {
 		buildpack, execWarnings, err = actor.GetBuildpackByNameAndStack(name, currentStack)
 	} else {
 		buildpack, execWarnings, err = actor.GetBuildpackByName(name)
 	}
 	warnings = append(warnings, execWarnings...)
+
 	if err != nil {
 		return "", warnings, err
 	}
