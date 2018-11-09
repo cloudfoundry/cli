@@ -4,11 +4,13 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -128,12 +130,33 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 				isInternal = true
 			})
 
-			It("should set and return a translateable error", func() {
-				Expect(testUI.Out).To(Say("Creating shared domain %s as %s...", sharedDomainName, username))
-				domainNamePassed, routerGroup, isInternal := fakeActor.CreateSharedDomainArgsForCall(0)
-				Expect(domainNamePassed).To(Equal(cmd.RequiredArgs.Domain))
-				Expect(routerGroup).To(Equal(v2action.RouterGroup{}))
-				Expect(isInternal).To(BeTrue())
+			When("the version is less than the minimum version", func() {
+				When("using the V2 API", func() {
+					BeforeEach(func() {
+						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV2ClientVersion)
+					})
+
+					It("returns an error", func() {
+						Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+							CurrentVersion: ccversion.MinV2ClientVersion,
+							MinimumVersion: ccversion.MinVersionInternalDomainV2,
+						}))
+					})
+				})
+			})
+
+			When("the version is above the minimum version", func() {
+				BeforeEach(func() {
+					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
+				})
+
+				It("should set and return a translateable error", func() {
+					Expect(testUI.Out).To(Say("Creating shared domain %s as %s...", sharedDomainName, username))
+					domainNamePassed, routerGroup, isInternal := fakeActor.CreateSharedDomainArgsForCall(0)
+					Expect(domainNamePassed).To(Equal(cmd.RequiredArgs.Domain))
+					Expect(routerGroup).To(Equal(v2action.RouterGroup{}))
+					Expect(isInternal).To(BeTrue())
+				})
 			})
 		})
 

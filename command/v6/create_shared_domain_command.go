@@ -3,6 +3,7 @@ package v6
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -13,6 +14,7 @@ import (
 type CreateSharedDomainActor interface {
 	GetRouterGroupByName(string, v2action.RouterClient) (v2action.RouterGroup, error)
 	CreateSharedDomain(string, v2action.RouterGroup, bool) (v2action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type CreateSharedDomainCommand struct {
@@ -52,15 +54,21 @@ func (cmd *CreateSharedDomainCommand) Setup(config command.Config, ui command.UI
 
 func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 	username, err := cmd.SharedActor.RequireCurrentUser()
+	if err != nil {
+		return err
+	}
+	if cmd.Internal {
+		currentVersion := cmd.Actor.CloudControllerAPIVersion()
+		err = command.MinimumCCAPIVersionCheck(currentVersion, ccversion.MinVersionInternalDomainV2)
+		if err != nil {
+			return err
+		}
+	}
 	cmd.UI.DisplayTextWithFlavor("Creating shared domain {{.Domain}} as {{.User}}...",
 		map[string]interface{}{
 			"Domain": cmd.RequiredArgs.Domain,
 			"User":   username,
 		})
-
-	if err != nil {
-		return err
-	}
 
 	var routerGroup v2action.RouterGroup
 

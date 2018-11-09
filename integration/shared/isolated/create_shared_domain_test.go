@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -88,7 +89,7 @@ var _ = Describe("create-shared-domain command", func() {
 
 		When("the --internal flag is specified", func() {
 			BeforeEach(func() {
-				helpers.SkipIfNoRoutingAPI()
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionInternalDomainV2)
 			})
 
 			When("things work as expected", func() {
