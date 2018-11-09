@@ -681,6 +681,7 @@ var _ = Describe("Buildpack", func() {
 					newPosition = types.NullInt{}
 					newLocked = types.NullBool{}
 					newEnabled = types.NullBool{}
+					newStack = ""
 				})
 
 				It("doesn't call the CC API", func() {
