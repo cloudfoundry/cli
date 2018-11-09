@@ -32,7 +32,7 @@ var _ = Describe("domains command", func() {
 		It("displays an error message and fails", func() {
 			session := helpers.CF("domains")
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+			Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -41,7 +41,7 @@ var _ = Describe("domains command", func() {
 		It("displays an error message and fails", func() {
 			session := helpers.CF("domains", "random-arg")
 			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Say("Incorrect Usage. No argument required"))
+			Eventually(session.Err).Should(Say(`Incorrect Usage: unexpected argument "random-arg"`))
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say(`\s+domains - List domains in the target org`))
 			Eventually(session).Should(Say("USAGE:"))
@@ -59,7 +59,7 @@ var _ = Describe("domains command", func() {
 			It("displays an error message and fails", func() {
 				session := helpers.CF("domains")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org.`))
+				Eventually(session.Err).Should(Say(`No org targeted, use 'cf target -o ORG' to target an org.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -87,7 +87,7 @@ var _ = Describe("domains command", func() {
 				It("displays the shared domains and denotes that they are shared", func() {
 					session := helpers.CF("domains")
 
-					Eventually(session).Should(Say(`Getting domains in org %s as admin`, orgName))
+					Eventually(session).Should(Say(`Getting domains in org %s as admin\.\.\.`, orgName))
 					Eventually(session).Should(Say(`name\s+status\s+type`))
 					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
 					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))

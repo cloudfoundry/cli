@@ -271,6 +271,109 @@ var _ = Describe("Domain Actions", func() {
 		)
 	})
 
+	Describe("GetDomains", func() {
+		var (
+			domains    []Domain
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			domains, warnings, executeErr = actor.GetDomains("some-org")
+		})
+
+		It("calls GetSharedDomains", func() {
+			Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
+		})
+
+		When("GetSharedDomains returns successfully", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSharedDomainsReturns(
+					[]ccv2.Domain{
+						{
+							Name: "some-domain.com",
+							Type: constant.SharedDomain,
+						},
+						{
+							Name: "some-other-domain.com",
+							Type: constant.SharedDomain,
+						},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil)
+			})
+
+			It("returns all shared domains and prints all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(domains).To(ConsistOf(
+					Domain{Name: "some-domain.com", Type: constant.SharedDomain},
+					Domain{Name: "some-other-domain.com", Type: constant.SharedDomain},
+				))
+			})
+
+			It("calls GetOrganizationPrivateDomains with the given org guid", func() {
+				Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)).To(Equal("some-org"))
+			})
+
+			When("GetOrganizationPrivateDomains returns successfully", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns(
+						[]ccv2.Domain{
+							{
+								Name: "some-domain.private",
+								Type: constant.PrivateDomain,
+							},
+							{
+								Name: "some-other-domain.private",
+								Type: constant.PrivateDomain,
+							},
+						},
+						ccv2.Warnings{"warning-3", "warning-4"},
+						nil)
+				})
+
+				It("returns the shared and private domains and returns all warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
+					Expect(domains).To(ConsistOf(
+						Domain{Name: "some-domain.com", Type: constant.SharedDomain},
+						Domain{Name: "some-other-domain.com", Type: constant.SharedDomain},
+						Domain{Name: "some-domain.private", Type: constant.PrivateDomain},
+						Domain{Name: "some-other-domain.private", Type: constant.PrivateDomain},
+					))
+				})
+			})
+
+			When("GetOrganizationPrivateDomains returns an error", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns(nil, ccv2.Warnings{"warning-3", "warning-4"}, errors.New("boom"))
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(executeErr).To(MatchError("boom"))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
+				})
+			})
+		})
+
+		When("GetSharedDomains returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSharedDomainsReturns(nil, ccv2.Warnings{"warning-1", "warning-2"}, errors.New("boom"))
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError("boom"))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+
+			It("does not call GetOrganizationPrivateDomains", func() {
+				Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(0))
+			})
+		})
+	})
+
 	Describe("GetDomainsByNameAndOrganization", func() {
 		var (
 			domainNames []string
