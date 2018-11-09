@@ -543,11 +543,13 @@ var _ = Describe("push Command", func() {
 
 			When("general app settings are given", func() {
 				BeforeEach(func() {
+					cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
 					cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
 				})
 
 				It("sets them on the command line settings", func() {
 					Expect(overridesErr).ToNot(HaveOccurred())
+					Expect(overrides.Buildpacks).To(ConsistOf("buildpack-1", "buildpack-2"))
 					Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
 				})
 			})

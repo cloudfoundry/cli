@@ -132,24 +132,59 @@ var _ = Describe("Actualize", func() {
 		stateStream, eventStream, warningsStream, errorStream = actor.Actualize(state, fakeProgressBar)
 	})
 
-	Describe("application creation", func() {
+	Describe("application", func() {
 		When("the application exists", func() {
 			BeforeEach(func() {
 				state.Application.GUID = "some-app-guid"
 			})
 
-			It("returns a skipped app creation event", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SkippingApplicationCreation))
+			When("updated succesfully", func() {
+				BeforeEach(func() {
+					fakeV7Actor.UpdateApplicationReturns(
+						v7action.Application{
+							Name:                "some-app",
+							GUID:                "some-app-guid",
+							LifecycleBuildpacks: []string{"some-buildpack-1"},
+						},
+						v7action.Warnings{"some-app-update-warnings"},
+						nil)
+				})
 
-				Eventually(stateStream).Should(Receive(MatchFields(IgnoreExtras,
-					Fields{
-						"Application": Equal(v7action.Application{
-							Name: "some-app",
-							GUID: "some-app-guid",
-						}),
-					})))
+				It("updates the application", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SkippingApplicationCreation))
+					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-update-warnings")))
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UpdatedApplication))
 
-				Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
+					Eventually(stateStream).Should(Receive(MatchFields(IgnoreExtras,
+						Fields{
+							"Application": Equal(v7action.Application{
+								Name:                "some-app",
+								GUID:                "some-app-guid",
+								LifecycleBuildpacks: []string{"some-buildpack-1"},
+							}),
+						})))
+
+					Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
+				})
+			})
+
+			When("updating errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("some-error")
+					fakeV7Actor.UpdateApplicationReturns(
+						v7action.Application{},
+						v7action.Warnings{"some-app-update-warnings"},
+						expectedErr)
+				})
+
+				It("returns the warnings and error", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SkippingApplicationCreation))
+					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-update-warnings")))
+					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(UpdatedApplication))
+				})
 			})
 		})
 
@@ -212,6 +247,13 @@ var _ = Describe("Actualize", func() {
 				state.Overrides = FlagOverrides{
 					Memory: memory,
 				}
+				fakeV7Actor.UpdateApplicationReturns(
+					v7action.Application{
+						Name: "some-app",
+						GUID: state.Application.GUID,
+					},
+					v7action.Warnings{"some-app-update-warnings"},
+					nil)
 			})
 
 			It("returns warnings and continues", func() {
@@ -339,6 +381,13 @@ var _ = Describe("Actualize", func() {
 			When("the archive creation is successful", func() {
 				BeforeEach(func() {
 					fakeSharedActor.ZipDirectoryResourcesReturns("/some/archive/path", nil)
+					fakeV7Actor.UpdateApplicationReturns(
+						v7action.Application{
+							Name: "some-app",
+							GUID: state.Application.GUID,
+						},
+						v7action.Warnings{"some-app-update-warnings"},
+						nil)
 				})
 
 				It("creates the package", func() {

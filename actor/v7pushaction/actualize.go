@@ -31,6 +31,15 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 		if state.Application.GUID != "" {
 			log.WithField("Name", state.Application.Name).Info("skipping app creation as it has a GUID")
 			eventStream <- SkippingApplicationCreation
+			application, warnings, err := actor.V7Actor.UpdateApplication(state.Application)
+			state.Application = application
+			warningsStream <- Warnings(warnings)
+			if err != nil {
+				errorStream <- err
+				return
+			}
+			eventStream <- UpdatedApplication
+
 		} else {
 			log.WithField("Name", state.Application.Name).Info("creating app")
 			createdApp, createWarnings, err := actor.V7Actor.CreateApplicationInSpace(state.Application, state.SpaceGUID)

@@ -132,6 +132,21 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	UpdateApplicationStub        func(v7action.Application) (v7action.Application, v7action.Warnings, error)
+	updateApplicationMutex       sync.RWMutex
+	updateApplicationArgsForCall []struct {
+		arg1 v7action.Application
+	}
+	updateApplicationReturns struct {
+		result1 v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}
+	updateApplicationReturnsOnCall map[int]struct {
+		result1 v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}
 	UploadBitsPackageStub        func(v7action.Package, []sharedaction.Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)
 	uploadBitsPackageMutex       sync.RWMutex
 	uploadBitsPackageArgsForCall []struct {
@@ -681,6 +696,72 @@ func (fake *FakeV7Actor) StageApplicationPackageReturnsOnCall(i int, result1 v7a
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV7Actor) UpdateApplication(arg1 v7action.Application) (v7action.Application, v7action.Warnings, error) {
+	fake.updateApplicationMutex.Lock()
+	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
+	fake.updateApplicationArgsForCall = append(fake.updateApplicationArgsForCall, struct {
+		arg1 v7action.Application
+	}{arg1})
+	fake.recordInvocation("UpdateApplication", []interface{}{arg1})
+	fake.updateApplicationMutex.Unlock()
+	if fake.UpdateApplicationStub != nil {
+		return fake.UpdateApplicationStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeV7Actor) UpdateApplicationCallCount() int {
+	fake.updateApplicationMutex.RLock()
+	defer fake.updateApplicationMutex.RUnlock()
+	return len(fake.updateApplicationArgsForCall)
+}
+
+func (fake *FakeV7Actor) UpdateApplicationCalls(stub func(v7action.Application) (v7action.Application, v7action.Warnings, error)) {
+	fake.updateApplicationMutex.Lock()
+	defer fake.updateApplicationMutex.Unlock()
+	fake.UpdateApplicationStub = stub
+}
+
+func (fake *FakeV7Actor) UpdateApplicationArgsForCall(i int) v7action.Application {
+	fake.updateApplicationMutex.RLock()
+	defer fake.updateApplicationMutex.RUnlock()
+	argsForCall := fake.updateApplicationArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeV7Actor) UpdateApplicationReturns(result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.updateApplicationMutex.Lock()
+	defer fake.updateApplicationMutex.Unlock()
+	fake.UpdateApplicationStub = nil
+	fake.updateApplicationReturns = struct {
+		result1 v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV7Actor) UpdateApplicationReturnsOnCall(i int, result1 v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.updateApplicationMutex.Lock()
+	defer fake.updateApplicationMutex.Unlock()
+	fake.UpdateApplicationStub = nil
+	if fake.updateApplicationReturnsOnCall == nil {
+		fake.updateApplicationReturnsOnCall = make(map[int]struct {
+			result1 v7action.Application
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.updateApplicationReturnsOnCall[i] = struct {
+		result1 v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV7Actor) UploadBitsPackage(arg1 v7action.Package, arg2 []sharedaction.Resource, arg3 io.Reader, arg4 int64) (v7action.Package, v7action.Warnings, error) {
 	var arg2Copy []sharedaction.Resource
 	if arg2 != nil {
@@ -774,6 +855,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.setApplicationDropletMutex.RUnlock()
 	fake.stageApplicationPackageMutex.RLock()
 	defer fake.stageApplicationPackageMutex.RUnlock()
+	fake.updateApplicationMutex.RLock()
+	defer fake.updateApplicationMutex.RUnlock()
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

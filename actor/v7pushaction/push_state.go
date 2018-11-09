@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
 )
 
@@ -23,8 +24,9 @@ type PushState struct {
 }
 
 type FlagOverrides struct {
-	ProvidedAppPath string
+	Buildpacks      []string
 	Memory          types.NullUint64
+	ProvidedAppPath string
 }
 
 func (state PushState) String() string {
@@ -52,6 +54,11 @@ func (actor Actor) Conceptualize(appName string, spaceGUID string, orgGUID strin
 		}
 	} else if err != nil {
 		return nil, Warnings(warnings), err
+	}
+
+	if len(flagOverrides.Buildpacks) != 0 {
+		application.LifecycleType = constant.AppLifecycleTypeBuildpack
+		application.LifecycleBuildpacks = flagOverrides.Buildpacks
 	}
 
 	bitsPath := currentDir

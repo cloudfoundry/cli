@@ -1,5 +1,3 @@
-// +build !partialPush
-
 package push
 
 import (
@@ -63,7 +61,6 @@ var _ = Describe("buildpacks", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, PushCommandName, appName, "-b", "wut")
 					Eventually(session.Err).Should(Say(`Buildpack "wut" must be an existing admin buildpack or a valid git URI`))
-					Consistently(session).ShouldNot(Say("Creating app"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})

@@ -18,5 +18,6 @@ type V7Actor interface {
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 	StageApplicationPackage(pkgGUID string) (v7action.Build, v7action.Warnings, error)
 	PollBuild(buildGUID string, appName string) (v7action.Droplet, v7action.Warnings, error)
+	UpdateApplication(app v7action.Application) (v7action.Application, v7action.Warnings, error)
 	UploadBitsPackage(v7action.Package, []sharedaction.Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)
 }

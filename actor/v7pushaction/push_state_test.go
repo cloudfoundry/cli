@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
@@ -108,6 +109,20 @@ var _ = Describe("Push State", func() {
 							"SpaceGUID": Equal(spaceGUID),
 							"OrgGUID":   Equal(orgGUID),
 						}))
+				})
+			})
+
+			Context("regardless of application existance", func() {
+				When("buildpacks are provided via flagOverrides", func() {
+					BeforeEach(func() {
+						flagOverrides.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
+					})
+
+					It("sets the buildpacks on the app", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(states[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeBuildpack))
+						Expect(states[0].Application.LifecycleBuildpacks).To(ConsistOf("some-buildpack-1", "some-buildpack-2"))
+					})
 				})
 			})
 
