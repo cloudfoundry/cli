@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
@@ -53,6 +54,12 @@ func (cmd *CreateSharedDomainCommand) Setup(config command.Config, ui command.UI
 }
 
 func (cmd CreateSharedDomainCommand) Execute(args []string) error {
+	if cmd.RouterGroup != "" && cmd.Internal {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--router-group", "--internal"},
+		}
+	}
+
 	username, err := cmd.SharedActor.RequireCurrentUser()
 	if err != nil {
 		return err

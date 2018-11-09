@@ -145,6 +145,19 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 				})
 			})
 
+			When("when --router-group is also passed", func() {
+				BeforeEach(func() {
+					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
+					routerGroupName = "my-router-group"
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+						Args: []string{"--router-group", "--internal"},
+					}))
+				})
+			})
+
 			When("the version is above the minimum version", func() {
 				BeforeEach(func() {
 					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
