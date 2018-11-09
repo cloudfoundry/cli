@@ -233,6 +233,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 			When("the --assign-stack flag is provided", func() {
 				BeforeEach(func() {
 					cmd.NewStack = "some-new-stack"
+					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionBuildpackStackAssociationV2)
 				})
 
 				It("sets the new stack on the buildpack", func() {
