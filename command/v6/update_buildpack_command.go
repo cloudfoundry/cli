@@ -199,6 +199,12 @@ func (cmd UpdateBuildpackCommand) validateFlagCombinations() error {
 		}
 	}
 
+	if len(cmd.CurrentStack) > 0 && len(cmd.NewStack) > 0 {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"-s", "--assign-stack"},
+		}
+	}
+
 	if cmd.Enable && cmd.Disable {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--enable", "--disable"},

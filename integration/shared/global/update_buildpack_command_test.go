@@ -577,6 +577,24 @@ var _ = Describe("update-buildpack command", func() {
 						})
 					})
 
+					When("specifying -s and --assign-stack", func() {
+						It("returns the an error saying that those flags cannot be used together", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "-s", "old-stack", "--assign-stack", "some-new-stack")
+							Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -s, --assign-stack"))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("specifying -p and --assign-stack", func() {
+						It("returns the an error saying that those flags cannot be used together", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "-p", "http://google.com", "--assign-stack", "some-new-stack")
+							Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -p, --assign-stack"))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
 				})
 			})
 

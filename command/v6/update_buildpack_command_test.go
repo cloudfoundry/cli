@@ -59,7 +59,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 	})
 
 	Describe("invalid flag combinations", func() {
-		When("the lock and unlock flags are provided", func() {
+		When("the --lock and --unlock flags are provided", func() {
 			BeforeEach(func() {
 				cmd.Lock = true
 				cmd.Unlock = true
@@ -72,7 +72,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 			})
 		})
 
-		When("the lock and path flags are provided", func() {
+		When("the -p and --lock flags are provided", func() {
 			BeforeEach(func() {
 				cmd.Lock = true
 				cmd.Path = "asdf"
@@ -85,7 +85,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 			})
 		})
 
-		When("the path and unlock flags are provided", func() {
+		When("the -p and --unlock flags are provided", func() {
 			BeforeEach(func() {
 				cmd.Path = "asdf"
 				cmd.Unlock = true
@@ -98,7 +98,33 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 			})
 		})
 
-		When("the enable and disable flags are provided", func() {
+		When("the -p and --assign-stack flags are provided", func() {
+			BeforeEach(func() {
+				cmd.Path = "asdf"
+				cmd.NewStack = "some-new-stack"
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"-p", "--assign-stack"},
+				}))
+			})
+		})
+
+		When("the -s and --assign-stack flags are provided", func() {
+			BeforeEach(func() {
+				cmd.CurrentStack = "current-stack"
+				cmd.NewStack = "some-new-stack"
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"-s", "--assign-stack"},
+				}))
+			})
+		})
+
+		When("the --enable and --disable flags are provided", func() {
 			BeforeEach(func() {
 				cmd.Enable = true
 				cmd.Disable = true
