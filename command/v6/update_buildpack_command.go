@@ -26,17 +26,18 @@ type UpdateBuildpackActor interface {
 }
 
 type UpdateBuildpackCommand struct {
-	RequiredArgs    flag.BuildpackName               `positional-args:"yes"`
-	Disable         bool                             `long:"disable" description:"Disable the buildpack from being used for staging"`
-	Enable          bool                             `long:"enable" description:"Enable the buildpack to be used for staging"`
-	Order           types.NullInt                    `short:"i" description:"The order in which the buildpacks are checked during buildpack auto-detection"`
-	Lock            bool                             `long:"lock" description:"Lock the buildpack to prevent updates"`
-	Path            flag.PathWithExistenceCheckOrURL `short:"p" description:"Path to directory or zip file"`
-	Unlock          bool                             `long:"unlock" description:"Unlock the buildpack to enable updates"`
-	CurrentStack    string                           `short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
-	NewStack        string                           `long:"assign-stack" description:"Assign a stack to a buildpack that does not have a stack association"`
-	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [-s STACK] [--enable|--disable] [--lock|--unlock]\n\nTIP:\n   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."`
-	relatedCommands interface{}                      `related_commands:"buildpacks, rename-buildpack"`
+	RequiredArgs flag.BuildpackName               `positional-args:"yes"`
+	Disable      bool                             `long:"disable" description:"Disable the buildpack from being used for staging"`
+	Enable       bool                             `long:"enable" description:"Enable the buildpack to be used for staging"`
+	Order        types.NullInt                    `short:"i" description:"The order in which the buildpacks are checked during buildpack auto-detection"`
+	Lock         bool                             `long:"lock" description:"Lock the buildpack to prevent updates"`
+	Path         flag.PathWithExistenceCheckOrURL `short:"p" description:"Path to directory or zip file"`
+	Unlock       bool                             `long:"unlock" description:"Unlock the buildpack to enable updates"`
+	CurrentStack string                           `short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
+	NewStack     string                           `long:"assign-stack" description:"Assign a stack to a buildpack that does not have a stack association"`
+	usage        interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [-s STACK] [--enable|--disable] [--lock|--unlock]\n\nTIP:\nPath should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\nUse '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"`
+
+	relatedCommands interface{} `related_commands:"buildpacks, rename-buildpack"`
 
 	UI          command.UI
 	SharedActor command.SharedActor
