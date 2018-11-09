@@ -160,7 +160,13 @@ func (cmd UpdateBuildpackCommand) minAPIVersionCheck() error {
 }
 
 func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
-	if cmd.CurrentStack == "" {
+	if cmd.NewStack != "" {
+		cmd.UI.DisplayTextWithFlavor("Assigning stack {{.Stack}} to {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
+			"Buildpack":   cmd.RequiredArgs.Buildpack,
+			"CurrentUser": userName,
+			"Stack":       cmd.NewStack,
+		})
+	} else if cmd.CurrentStack == "" {
 		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   cmd.RequiredArgs.Buildpack,
 			"CurrentUser": userName,

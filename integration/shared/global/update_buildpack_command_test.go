@@ -499,7 +499,7 @@ var _ = Describe("update-buildpack command", func() {
 						It("successfully assigns the stack to the buildpack", func() {
 							session := helpers.CF("update-buildpack", buildpackName, "--assign-stack", stacks[0])
 
-							Eventually(session).Should(Say("Updating buildpack %s as %s...", buildpackName, username))
+							Eventually(session).Should(Say("Assigning stack %s to %s as %s...", stacks[0], buildpackName, username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 

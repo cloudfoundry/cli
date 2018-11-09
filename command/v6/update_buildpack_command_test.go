@@ -265,6 +265,8 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 				It("sets the new stack on the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					_, _, _, _, _, newStack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					Expect(testUI.Out).ToNot(Say("Updating buildpack %s as %s...", args.Buildpack, userName))
+					Expect(testUI.Out).To(Say("Assigning stack %s to %s as %s...", cmd.NewStack, args.Buildpack, userName))
 					Expect(newStack).To(Equal("some-new-stack"))
 				})
 			})
