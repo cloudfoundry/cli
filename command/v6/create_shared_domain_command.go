@@ -22,7 +22,7 @@ type CreateSharedDomainCommand struct {
 	RequiredArgs    flag.Domain `positional-args:"yes"`
 	RouterGroup     string      `long:"router-group" description:"Routes for this domain will be configured only on the specified router group"`
 	Internal        bool        `long:"internal" description:"Applications that use internal routes communicate directly on the container network"`
-	usage           interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]"`
+	usage           interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP | --internal]"`
 	relatedCommands interface{} `related_commands:"create-domain, domains, router-groups"`
 
 	UI           command.UI
