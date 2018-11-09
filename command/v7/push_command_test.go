@@ -431,8 +431,8 @@ var _ = Describe("push Command", func() {
 								Expect(testUI.Err).To(Say("warning-2"))
 
 								Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-								appName, spaceGUID, withObfuscatedValues, _ := fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-								Expect(appName).To(Equal("some-app"))
+								name, spaceGUID, withObfuscatedValues, _ := fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+								Expect(name).To(Equal("some-app"))
 								Expect(spaceGUID).To(Equal("some-space-guid"))
 								Expect(withObfuscatedValues).To(BeTrue())
 							})
