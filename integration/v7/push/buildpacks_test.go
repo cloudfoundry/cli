@@ -29,12 +29,26 @@ var _ = Describe("buildpacks", func() {
 				})
 			})
 
-			When("resetting the buildpack to default", func() {
-				It("successfully pushes the app", func() {
+			When("resetting the buildpack to autodetection", func() {
+				It("successfully pushes the app with -b default", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
 							PushCommandName, appName,
 							"-b", "default",
+						)
+
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+started`))
+						Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				It("successfully pushes the app with -b null", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
+							PushCommandName, appName,
+							"-b", "null",
 						)
 
 						Eventually(session).Should(Say(`name:\s+%s`, appName))

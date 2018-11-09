@@ -77,7 +77,7 @@ func (a Application) hasAutodetectedBuildpack() bool {
 	if len(a.LifecycleBuildpacks) == 0 {
 		return false
 	}
-	return a.LifecycleBuildpacks[0] == "default" || a.LifecycleBuildpacks[0] == "null"
+	return a.LifecycleBuildpacks[0] == constant.AutodetectBuildpackValueDefault || a.LifecycleBuildpacks[0] == constant.AutodetectBuildpackValueNull
 }
 
 type ccLifecycle struct {
