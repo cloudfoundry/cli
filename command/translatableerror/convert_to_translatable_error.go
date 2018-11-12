@@ -125,6 +125,8 @@ func ConvertToTranslatableError(err error) error {
 		}
 	case actionerror.ServiceInstanceNotSharedToSpaceError:
 		return ServiceInstanceNotSharedToSpaceError{ServiceInstanceName: e.ServiceInstanceName}
+	case actionerror.ServicePlanNotFoundError:
+		return ServicePlanNotFoundError(e)
 	case actionerror.SharedServiceInstanceNotFoundError:
 		return SharedServiceInstanceNotFoundError(e)
 	case actionerror.SpaceNotFoundError:

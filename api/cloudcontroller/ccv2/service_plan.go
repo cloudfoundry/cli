@@ -1,6 +1,9 @@
 package ccv2
 
 import (
+	"bytes"
+	"encoding/json"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -98,4 +101,33 @@ func (client *Client) GetServicePlans(filters ...Filter) ([]ServicePlan, Warning
 	})
 
 	return fullServicePlansList, warnings, err
+}
+
+type updateServicePlanRequestBody struct {
+	Public bool `json:"public"`
+}
+
+func (client *Client) UpdateServicePlan(guid string, public bool) (Warnings, error) {
+	requestBody := updateServicePlanRequestBody{
+		Public: public,
+	}
+
+	body, err := json.Marshal(requestBody)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutServicePlanRequest,
+		Body:        bytes.NewReader(body),
+		URIParams:   Params{"service_plan_guid": guid},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
 }

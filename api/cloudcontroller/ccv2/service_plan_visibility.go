@@ -1,6 +1,9 @@
 package ccv2
 
 import (
+	"bytes"
+	"encoding/json"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -35,6 +38,54 @@ func (servicePlanVisibility *ServicePlanVisibility) UnmarshalJSON(data []byte) e
 	servicePlanVisibility.ServicePlanGUID = ccServicePlanVisibility.Entity.ServicePlanGUID
 	servicePlanVisibility.OrganizationGUID = ccServicePlanVisibility.Entity.OrganizationGUID
 	return nil
+}
+
+type createServicePlanRequestBody struct {
+	ServicePlanGUID  string `json:"service_plan_guid"`
+	OrganizationGUID string `json:"organization_guid"`
+}
+
+func (client *Client) CreateServicePlanVisibility(planGUID string, orgGUID string) (ServicePlanVisibility, Warnings, error) {
+	requestBody := createServicePlanRequestBody{
+		ServicePlanGUID:  planGUID,
+		OrganizationGUID: orgGUID,
+	}
+
+	bodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return ServicePlanVisibility{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostServicePlanVisibilityRequest,
+		Body:        bytes.NewReader(bodyBytes),
+	})
+	if err != nil {
+		return ServicePlanVisibility{}, nil, err
+	}
+
+	var servicePlanVisibility ServicePlanVisibility
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &servicePlanVisibility,
+	}
+
+	err = client.connection.Make(request, &response)
+	return servicePlanVisibility, response.Warnings, err
+}
+
+func (client *Client) DeleteServicePlanVisibility(servicePlanVisibilityGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteServicePlanVisibilityRequest,
+		URIParams:   Params{"service_plan_visibility_guid": servicePlanVisibilityGUID},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
 }
 
 // GetServicePlanVisibilities returns back a list of Service Plan Visibilities

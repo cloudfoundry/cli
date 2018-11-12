@@ -21,6 +21,7 @@ const (
 	DeleteSecurityGroupSpaceRequest                      = "DeleteSecurityGroupSpace"
 	DeleteSecurityGroupStagingSpaceRequest               = "DeleteSecurityGroupStagingSpace"
 	DeleteServiceBindingRequest                          = "DeleteServiceBinding"
+	DeleteServicePlanVisibilityRequest                   = "DeleteServicePlanVisibility"
 	DeleteSpaceRequest                                   = "DeleteSpace"
 	GetAppInstancesRequest                               = "GetAppInstances"
 	GetAppRequest                                        = "GetApp"
@@ -87,6 +88,7 @@ const (
 	PostSharedDomainRequest                              = "PostSharedDomain"
 	PostServiceBrokerRequest                             = "PostServiceBroker"
 	PostServiceKeyRequest                                = "PostServiceKey"
+	PostServicePlanVisibilityRequest                     = "PostServicePlanVisibility"
 	PostSpaceRequest                                     = "PostSpace"
 	PostUserRequest                                      = "PostUser"
 	PutAppBitsRequest                                    = "PutAppBits"
@@ -100,6 +102,7 @@ const (
 	PutOrganizationUserByUsernameRequest                 = "PutOrganizationUserByUsername"
 	PutResourceMatchRequest                              = "PutResourceMatch"
 	PutRouteAppRequest                                   = "PutRouteApp"
+	PutServicePlanRequest                                = "PutServicePlan"
 	PutSpaceQuotaRequest                                 = "PutSpaceQuotaRequest"
 	PutSpaceDeveloperRequest                             = "PutSpaceDeveloper"
 	PutSpaceDeveloperByUsernameRequest                   = "PutSpaceDeveloperByUsername"
@@ -176,7 +179,10 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/service_instances/:service_instance_guid/shared_to", Method: http.MethodGet, Name: GetServiceInstanceSharedToRequest},
 	{Path: "/v2/service_keys", Method: http.MethodPost, Name: PostServiceKeyRequest},
 	{Path: "/v2/service_plan_visibilities", Method: http.MethodGet, Name: GetServicePlanVisibilitiesRequest},
+	{Path: "/v2/service_plan_visibilities", Method: http.MethodPost, Name: PostServicePlanVisibilityRequest},
+	{Path: "/v2/service_plan_visibilities/:service_plan_visibility_guid", Method: http.MethodDelete, Name: DeleteServicePlanVisibilityRequest},
 	{Path: "/v2/service_plans", Method: http.MethodGet, Name: GetServicePlansRequest},
+	{Path: "/v2/service_plans/:service_plan_guid", Method: http.MethodPut, Name: PutServicePlanRequest},
 	{Path: "/v2/service_plans/:service_plan_guid", Method: http.MethodGet, Name: GetServicePlanRequest},
 	{Path: "/v2/services", Method: http.MethodGet, Name: GetServicesRequest},
 	{Path: "/v2/services/:service_guid", Method: http.MethodGet, Name: GetServiceRequest},
