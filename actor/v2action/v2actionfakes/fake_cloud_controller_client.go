@@ -153,6 +153,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	CreateServicePlanVisibilityStub        func(string, string) (ccv2.ServicePlanVisibility, ccv2.Warnings, error)
+	createServicePlanVisibilityMutex       sync.RWMutex
+	createServicePlanVisibilityArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	createServicePlanVisibilityReturns struct {
+		result1 ccv2.ServicePlanVisibility
+		result2 ccv2.Warnings
+		result3 error
+	}
+	createServicePlanVisibilityReturnsOnCall map[int]struct {
+		result1 ccv2.ServicePlanVisibility
+		result2 ccv2.Warnings
+		result3 error
+	}
 	CreateSharedDomainStub        func(string, string, bool) (ccv2.Warnings, error)
 	createSharedDomainMutex       sync.RWMutex
 	createSharedDomainArgsForCall []struct {
@@ -284,6 +300,19 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.ServiceBinding
 		result2 ccv2.Warnings
 		result3 error
+	}
+	DeleteServicePlanVisibilityStub        func(string) (ccv2.Warnings, error)
+	deleteServicePlanVisibilityMutex       sync.RWMutex
+	deleteServicePlanVisibilityArgsForCall []struct {
+		arg1 string
+	}
+	deleteServicePlanVisibilityReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	deleteServicePlanVisibilityReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
 	}
 	DeleteSpaceJobStub        func(string) (ccv2.Job, ccv2.Warnings, error)
 	deleteSpaceJobMutex       sync.RWMutex
@@ -1208,6 +1237,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
+	UpdateServicePlanStub        func(string, bool) (ccv2.Warnings, error)
+	updateServicePlanMutex       sync.RWMutex
+	updateServicePlanArgsForCall []struct {
+		arg1 string
+		arg2 bool
+	}
+	updateServicePlanReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	updateServicePlanReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	UpdateSpaceDeveloperStub        func(string, string) (ccv2.Warnings, error)
 	updateSpaceDeveloperMutex       sync.RWMutex
 	updateSpaceDeveloperArgsForCall []struct {
@@ -1945,6 +1988,73 @@ func (fake *FakeCloudControllerClient) CreateServiceKeyReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) CreateServicePlanVisibility(arg1 string, arg2 string) (ccv2.ServicePlanVisibility, ccv2.Warnings, error) {
+	fake.createServicePlanVisibilityMutex.Lock()
+	ret, specificReturn := fake.createServicePlanVisibilityReturnsOnCall[len(fake.createServicePlanVisibilityArgsForCall)]
+	fake.createServicePlanVisibilityArgsForCall = append(fake.createServicePlanVisibilityArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("CreateServicePlanVisibility", []interface{}{arg1, arg2})
+	fake.createServicePlanVisibilityMutex.Unlock()
+	if fake.CreateServicePlanVisibilityStub != nil {
+		return fake.CreateServicePlanVisibilityStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createServicePlanVisibilityReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateServicePlanVisibilityCallCount() int {
+	fake.createServicePlanVisibilityMutex.RLock()
+	defer fake.createServicePlanVisibilityMutex.RUnlock()
+	return len(fake.createServicePlanVisibilityArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateServicePlanVisibilityCalls(stub func(string, string) (ccv2.ServicePlanVisibility, ccv2.Warnings, error)) {
+	fake.createServicePlanVisibilityMutex.Lock()
+	defer fake.createServicePlanVisibilityMutex.Unlock()
+	fake.CreateServicePlanVisibilityStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateServicePlanVisibilityArgsForCall(i int) (string, string) {
+	fake.createServicePlanVisibilityMutex.RLock()
+	defer fake.createServicePlanVisibilityMutex.RUnlock()
+	argsForCall := fake.createServicePlanVisibilityArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) CreateServicePlanVisibilityReturns(result1 ccv2.ServicePlanVisibility, result2 ccv2.Warnings, result3 error) {
+	fake.createServicePlanVisibilityMutex.Lock()
+	defer fake.createServicePlanVisibilityMutex.Unlock()
+	fake.CreateServicePlanVisibilityStub = nil
+	fake.createServicePlanVisibilityReturns = struct {
+		result1 ccv2.ServicePlanVisibility
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateServicePlanVisibilityReturnsOnCall(i int, result1 ccv2.ServicePlanVisibility, result2 ccv2.Warnings, result3 error) {
+	fake.createServicePlanVisibilityMutex.Lock()
+	defer fake.createServicePlanVisibilityMutex.Unlock()
+	fake.CreateServicePlanVisibilityStub = nil
+	if fake.createServicePlanVisibilityReturnsOnCall == nil {
+		fake.createServicePlanVisibilityReturnsOnCall = make(map[int]struct {
+			result1 ccv2.ServicePlanVisibility
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.createServicePlanVisibilityReturnsOnCall[i] = struct {
+		result1 ccv2.ServicePlanVisibility
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) CreateSharedDomain(arg1 string, arg2 string, arg3 bool) (ccv2.Warnings, error) {
 	fake.createSharedDomainMutex.Lock()
 	ret, specificReturn := fake.createSharedDomainReturnsOnCall[len(fake.createSharedDomainArgsForCall)]
@@ -2529,6 +2639,69 @@ func (fake *FakeCloudControllerClient) DeleteServiceBindingReturnsOnCall(i int, 
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibility(arg1 string) (ccv2.Warnings, error) {
+	fake.deleteServicePlanVisibilityMutex.Lock()
+	ret, specificReturn := fake.deleteServicePlanVisibilityReturnsOnCall[len(fake.deleteServicePlanVisibilityArgsForCall)]
+	fake.deleteServicePlanVisibilityArgsForCall = append(fake.deleteServicePlanVisibilityArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteServicePlanVisibility", []interface{}{arg1})
+	fake.deleteServicePlanVisibilityMutex.Unlock()
+	if fake.DeleteServicePlanVisibilityStub != nil {
+		return fake.DeleteServicePlanVisibilityStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.deleteServicePlanVisibilityReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibilityCallCount() int {
+	fake.deleteServicePlanVisibilityMutex.RLock()
+	defer fake.deleteServicePlanVisibilityMutex.RUnlock()
+	return len(fake.deleteServicePlanVisibilityArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibilityCalls(stub func(string) (ccv2.Warnings, error)) {
+	fake.deleteServicePlanVisibilityMutex.Lock()
+	defer fake.deleteServicePlanVisibilityMutex.Unlock()
+	fake.DeleteServicePlanVisibilityStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibilityArgsForCall(i int) string {
+	fake.deleteServicePlanVisibilityMutex.RLock()
+	defer fake.deleteServicePlanVisibilityMutex.RUnlock()
+	argsForCall := fake.deleteServicePlanVisibilityArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibilityReturns(result1 ccv2.Warnings, result2 error) {
+	fake.deleteServicePlanVisibilityMutex.Lock()
+	defer fake.deleteServicePlanVisibilityMutex.Unlock()
+	fake.DeleteServicePlanVisibilityStub = nil
+	fake.deleteServicePlanVisibilityReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServicePlanVisibilityReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.deleteServicePlanVisibilityMutex.Lock()
+	defer fake.deleteServicePlanVisibilityMutex.Unlock()
+	fake.DeleteServicePlanVisibilityStub = nil
+	if fake.deleteServicePlanVisibilityReturnsOnCall == nil {
+		fake.deleteServicePlanVisibilityReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.deleteServicePlanVisibilityReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) DeleteSpaceJob(arg1 string) (ccv2.Job, ccv2.Warnings, error) {
@@ -6620,6 +6793,70 @@ func (fake *FakeCloudControllerClient) UpdateSecurityGroupStagingSpaceReturnsOnC
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) UpdateServicePlan(arg1 string, arg2 bool) (ccv2.Warnings, error) {
+	fake.updateServicePlanMutex.Lock()
+	ret, specificReturn := fake.updateServicePlanReturnsOnCall[len(fake.updateServicePlanArgsForCall)]
+	fake.updateServicePlanArgsForCall = append(fake.updateServicePlanArgsForCall, struct {
+		arg1 string
+		arg2 bool
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateServicePlan", []interface{}{arg1, arg2})
+	fake.updateServicePlanMutex.Unlock()
+	if fake.UpdateServicePlanStub != nil {
+		return fake.UpdateServicePlanStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateServicePlanReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UpdateServicePlanCallCount() int {
+	fake.updateServicePlanMutex.RLock()
+	defer fake.updateServicePlanMutex.RUnlock()
+	return len(fake.updateServicePlanArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateServicePlanCalls(stub func(string, bool) (ccv2.Warnings, error)) {
+	fake.updateServicePlanMutex.Lock()
+	defer fake.updateServicePlanMutex.Unlock()
+	fake.UpdateServicePlanStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateServicePlanArgsForCall(i int) (string, bool) {
+	fake.updateServicePlanMutex.RLock()
+	defer fake.updateServicePlanMutex.RUnlock()
+	argsForCall := fake.updateServicePlanArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UpdateServicePlanReturns(result1 ccv2.Warnings, result2 error) {
+	fake.updateServicePlanMutex.Lock()
+	defer fake.updateServicePlanMutex.Unlock()
+	fake.UpdateServicePlanStub = nil
+	fake.updateServicePlanReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UpdateServicePlanReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.updateServicePlanMutex.Lock()
+	defer fake.updateServicePlanMutex.Unlock()
+	fake.UpdateServicePlanStub = nil
+	if fake.updateServicePlanReturnsOnCall == nil {
+		fake.updateServicePlanReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.updateServicePlanReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UpdateSpaceDeveloper(arg1 string, arg2 string) (ccv2.Warnings, error) {
 	fake.updateSpaceDeveloperMutex.Lock()
 	ret, specificReturn := fake.updateSpaceDeveloperReturnsOnCall[len(fake.updateSpaceDeveloperArgsForCall)]
@@ -7107,6 +7344,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createServiceBindingMutex.RUnlock()
 	fake.createServiceKeyMutex.RLock()
 	defer fake.createServiceKeyMutex.RUnlock()
+	fake.createServicePlanVisibilityMutex.RLock()
+	defer fake.createServicePlanVisibilityMutex.RUnlock()
 	fake.createSharedDomainMutex.RLock()
 	defer fake.createSharedDomainMutex.RUnlock()
 	fake.createSpaceMutex.RLock()
@@ -7125,6 +7364,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteSecurityGroupStagingSpaceMutex.RUnlock()
 	fake.deleteServiceBindingMutex.RLock()
 	defer fake.deleteServiceBindingMutex.RUnlock()
+	fake.deleteServicePlanVisibilityMutex.RLock()
+	defer fake.deleteServicePlanVisibilityMutex.RUnlock()
 	fake.deleteSpaceJobMutex.RLock()
 	defer fake.deleteSpaceJobMutex.RUnlock()
 	fake.dopplerEndpointMutex.RLock()
@@ -7251,6 +7492,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateSecurityGroupSpaceMutex.RUnlock()
 	fake.updateSecurityGroupStagingSpaceMutex.RLock()
 	defer fake.updateSecurityGroupStagingSpaceMutex.RUnlock()
+	fake.updateServicePlanMutex.RLock()
+	defer fake.updateServicePlanMutex.RUnlock()
 	fake.updateSpaceDeveloperMutex.RLock()
 	defer fake.updateSpaceDeveloperMutex.RUnlock()
 	fake.updateSpaceDeveloperByUsernameMutex.RLock()

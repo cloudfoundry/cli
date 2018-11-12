@@ -217,6 +217,7 @@ var _ = Describe("Error Wrapper", func() {
 							}))
 						})
 					})
+
 				})
 
 				Context("(401) Unauthorized", func() {
