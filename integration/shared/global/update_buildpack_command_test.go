@@ -515,6 +515,20 @@ var _ = Describe("update-buildpack command", func() {
 								Name: buildpackName, Stack: stacks[0]})))
 							Eventually(listSession).Should(Exit(0))
 						})
+
+						When("the buildpack already has a stack associated to it", func() {
+							BeforeEach(func() {
+								assignStackSession := helpers.CF("update-buildpack", buildpackName, "--assign-stack", stacks[0])
+								Eventually(assignStackSession).Should(Exit(0))
+							})
+
+							It("displays an error that the buildpack already has a stack association", func() {
+								session := helpers.CF("update-buildpack", buildpackName, "--assign-stack", stacks[1])
+								Eventually(session.Err).Should(Say("Buildpack %s already exists with a stack association", buildpackName))
+								Eventually(session).Should(Say("FAILED"))
+								Eventually(session).Should(Exit(1))
+							})
+						})
 					})
 
 					When("the user assigns a stack that does NOT exist on the system", func() {
@@ -524,7 +538,6 @@ var _ = Describe("update-buildpack command", func() {
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
-
 					})
 				})
 

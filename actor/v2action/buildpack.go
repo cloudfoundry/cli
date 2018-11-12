@@ -310,6 +310,12 @@ func (actor *Actor) UpdateBuildpackByNameAndStack(name, currentStack string, pos
 		return "", warnings, err
 	}
 
+	if len(buildpack.Stack) > 0 && len(newStack) > 0 {
+		return "", warnings, actionerror.BuildpackStackChangeError{
+			BuildpackName: name,
+		}
+	}
+
 	if position != buildpack.Position || locked != buildpack.Enabled || enabled != buildpack.Enabled || newStack != buildpack.Stack {
 		buildpack.Position = position
 		buildpack.Locked = locked
