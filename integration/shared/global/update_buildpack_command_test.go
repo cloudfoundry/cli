@@ -65,6 +65,10 @@ var _ = Describe("update-buildpack command", func() {
 			helpers.LoginCF()
 		})
 
+		AfterEach(func() {
+			helpers.DeleteBuildpackIfOnOldCCAPI(buildpackName)
+		})
+
 		When("the buildpack is not provided", func() {
 			It("returns a buildpack argument not provided error", func() {
 				session := helpers.CF("update-buildpack", "-p", ".")
