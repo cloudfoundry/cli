@@ -208,4 +208,87 @@ var _ = Describe("Service Plan", func() {
 			})
 		})
 	})
+
+	Describe("UpdateServicePlan", func() {
+		When("the service plan exists", func() {
+			var (
+				warnings   Warnings
+				executeErr error
+				public     bool
+			)
+
+			BeforeEach(func() {
+				public = true
+			})
+
+			JustBeforeEach(func() {
+				response := `{
+					"metadata": {
+						"guid": "some-service-plan-guid"
+					},
+					"entity": {
+						"name": "some-service-plan"
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/service_plans/some-service-plan-guid"),
+						VerifyJSONRepresenting(map[string]interface{}{
+							"public": public,
+						}),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+
+				warnings, executeErr = client.UpdateServicePlan("some-service-plan-guid", public)
+			})
+
+			It("updates the service plan and return warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+
+			When("and public is set to false", func() {
+				BeforeEach(func() {
+					public = false
+				})
+
+				It("updates the service plan and return warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
+			})
+		})
+
+		When("the server returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 10001,
+					"description": "Some Error",
+					"error_code": "CF-SomeError"
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/service_plans/some-service-plan-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1,warning-2"}}),
+					))
+			})
+
+			It("returns the error and all warnings", func() {
+				warnings, err := client.UpdateServicePlan("some-service-plan-guid", true)
+
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        10001,
+						Description: "Some Error",
+						ErrorCode:   "CF-SomeError",
+					},
+				}))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
 })
