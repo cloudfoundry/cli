@@ -44,7 +44,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 		healthCheckType = "some-health-check-type"
 
 		cmd = V3SetHealthCheckCommand{
-			RequiredArgs:      flag.SetHealthCheckArgs{AppName: app, HealthCheck: flag.HealthCheckType{Type: healthCheckType}},
+			RequiredArgs:      flag.SetHealthCheckArgs{AppName: app, HealthCheck: flag.HealthCheckTypeWithDeprecatedValue{Type: healthCheckType}},
 			HTTPEndpoint:      "some-http-endpoint",
 			ProcessType:       "some-process-type",
 			InvocationTimeout: flag.PositiveInteger{Value: 42},

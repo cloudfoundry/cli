@@ -6,15 +6,15 @@ import (
 	flags "github.com/jessevdk/go-flags"
 )
 
-type HealthCheckType struct {
+type HealthCheckTypeWithDeprecatedValue struct {
 	Type string
 }
 
-func (HealthCheckType) Complete(prefix string) []flags.Completion {
+func (HealthCheckTypeWithDeprecatedValue) Complete(prefix string) []flags.Completion {
 	return completions([]string{"http", "port", "process"}, prefix, false)
 }
 
-func (h *HealthCheckType) UnmarshalFlag(val string) error {
+func (h *HealthCheckTypeWithDeprecatedValue) UnmarshalFlag(val string) error {
 	valLower := strings.ToLower(val)
 	switch valLower {
 	case "port", "process", "http", "none":

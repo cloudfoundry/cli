@@ -213,8 +213,8 @@ type SetSpaceQuotaArgs struct {
 }
 
 type SetHealthCheckArgs struct {
-	AppName     string          `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
-	HealthCheck HealthCheckType `positional-arg-name:"HEALTH_CHECK_TYPE" required:"true" description:"Set to 'port' or 'none'"`
+	AppName     string                             `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
+	HealthCheck HealthCheckTypeWithDeprecatedValue `positional-arg-name:"HEALTH_CHECK_TYPE" required:"true" description:"Set to 'port' or 'none'"`
 }
 
 type CreateBuildpackArgs struct {

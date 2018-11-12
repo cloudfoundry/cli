@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("HealthCheckType", func() {
-	var healthCheck HealthCheckType
+var _ = Describe("HealthCheckTypeWithDeprecatedValue", func() {
+	var healthCheck HealthCheckTypeWithDeprecatedValue
 
 	Describe("Complete", func() {
 		DescribeTable("returns list of completions",
@@ -34,7 +34,7 @@ var _ = Describe("HealthCheckType", func() {
 
 	Describe("UnmarshalFlag", func() {
 		BeforeEach(func() {
-			healthCheck = HealthCheckType{}
+			healthCheck = HealthCheckTypeWithDeprecatedValue{}
 		})
 
 		DescribeTable("downcases and sets type",
