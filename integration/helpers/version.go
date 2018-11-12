@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"code.cloudfoundry.org/cli/actor/versioncheck"
 
@@ -139,19 +140,25 @@ type ccRoot struct {
 	} `json:"links"`
 }
 
-func getAPIVersionV3() string {
-	return fetchAPIVersion().Links.CloudContollerV3.Meta.Version
+var cacheLock sync.Mutex
+var CcRootCache *ccRoot
+
+func fetchAPIVersion() ccRoot {
+	cacheLock.Lock()
+	defer cacheLock.Unlock()
+	if CcRootCache == nil {
+		session := CF("curl", "/")
+		Eventually(session).Should(Exit(0))
+		var result ccRoot
+		err := json.Unmarshal(session.Out.Contents(), &result)
+		Expect(err).ToNot(HaveOccurred())
+		CcRootCache = &result
+	}
+	return *CcRootCache
 }
 
-// TODO: Look into caching this
-func fetchAPIVersion() ccRoot {
-	session := CF("curl", "/")
-	Eventually(session).Should(Exit(0))
-
-	var cc ccRoot
-	err := json.Unmarshal(session.Out.Contents(), &cc)
-	Expect(err).ToNot(HaveOccurred())
-	return cc
+func getAPIVersionV3() string {
+	return fetchAPIVersion().Links.CloudContollerV3.Meta.Version
 }
 
 func SkipIfNoRoutingAPI() {
