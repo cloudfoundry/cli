@@ -544,12 +544,12 @@ var _ = Describe("Routes", func() {
 
 			When("getting the application routes succeeds", func() {
 				// TODO: do we need this context
-				When("the route is already bound to the app", func() {
+				When("Any route is already bound to the app", func() {
 					BeforeEach(func() {
 						fakeV2Actor.GetApplicationRoutesReturns(
 							[]v2action.Route{
 								{
-									Host: "some-app",
+									Host: "some-app-sepcial",
 									Domain: v2action.Domain{
 										GUID: "some-domain-guid",
 										Name: "some-domain",

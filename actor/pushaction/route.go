@@ -130,12 +130,7 @@ func (actor Actor) CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID
 
 	boundRoutes, appRouteWarnings, err := actor.V2Actor.GetApplicationRoutes(app.GUID)
 	warnings = append(warnings, appRouteWarnings...)
-	if err != nil {
-		return warnings, err
-	}
-
-	_, routeAlreadyBound := actor.routeInListBySettings(defaultRoute, boundRoutes)
-	if routeAlreadyBound {
+	if err != nil || len(boundRoutes) > 0 {
 		return warnings, err
 	}
 
