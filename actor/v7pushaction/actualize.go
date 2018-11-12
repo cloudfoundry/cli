@@ -54,16 +54,17 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 		}
 		stateStream <- state
 
-		eventStream <- ScaleWebProcess
-		process := v7action.Process{Type: constant.ProcessTypeWeb, MemoryInMB: state.Overrides.Memory}
-		scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(state.Application.GUID, process)
-		warningsStream <- Warnings(scaleWarnings)
-		if err != nil {
-			errorStream <- err
-			return
+		if state.Overrides.Memory.IsSet {
+			eventStream <- ScaleWebProcess
+			process := v7action.Process{Type: constant.ProcessTypeWeb, MemoryInMB: state.Overrides.Memory}
+			scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(state.Application.GUID, process)
+			warningsStream <- Warnings(scaleWarnings)
+			if err != nil {
+				errorStream <- err
+				return
+			}
+			eventStream <- ScaleWebProcessComplete
 		}
-		eventStream <- ScaleWebProcessComplete
-
 		eventStream <- CreatingAndMappingRoutes
 		routeWarnings, routeErr := actor.CreateAndMapDefaultApplicationRoute(state.OrgGUID, state.SpaceGUID, state.Application)
 		warningsStream <- Warnings(routeWarnings)
