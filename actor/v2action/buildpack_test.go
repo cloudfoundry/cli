@@ -758,7 +758,7 @@ var _ = Describe("Buildpack", func() {
 					When("the buildpack already has a stack association", func() {
 						BeforeEach(func() {
 							fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{
-								ccv2.Buildpack{Stack: "some-old-stack-name"}}, ccv2.Warnings{"get warning"}, nil)
+								ccv2.Buildpack{Stack: "some-old-stack-name", Name: "some-bp-name"}}, ccv2.Warnings{"get warning"}, nil)
 						})
 
 						It("return the error and warnings", func() {
