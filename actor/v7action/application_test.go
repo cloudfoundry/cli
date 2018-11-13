@@ -119,7 +119,7 @@ var _ = Describe("Application Actions", func() {
 					Name: "some-app-name",
 					GUID: "some-app-guid",
 				}))
-				Expect(warnings).To(Equal(Warnings{"some-warning"}))
+				Expect(warnings).To(ConsistOf("some-warning"))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
@@ -684,7 +684,7 @@ var _ = Describe("Application Actions", func() {
 
 			It("returns the error and warnings", func() {
 				Expect(err).To(Equal(expectedErr))
-				Expect(warnings).To(Equal(Warnings{"some-warning"}))
+				Expect(warnings).To(ConsistOf("some-warning"))
 			})
 		})
 

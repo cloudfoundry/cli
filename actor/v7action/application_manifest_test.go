@@ -176,7 +176,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 					It("returns error and warnings", func() {
 						Expect(executeErr).To(Equal(getAppErr))
-						Expect(warnings).To(Equal(Warnings{"app-1-warning"}))
+						Expect(warnings).To(ConsistOf("app-1-warning"))
 					})
 				})
 			})

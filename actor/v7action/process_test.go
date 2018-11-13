@@ -84,7 +84,7 @@ var _ = Describe("Process Actions", func() {
 
 				It("returns a ProcessNotFoundError and all warnings", func() {
 					Expect(err).To(Equal(actionerror.ProcessNotFoundError{ProcessType: "web"}))
-					Expect(warnings).To(Equal(Warnings{"some-process-warning"}))
+					Expect(warnings).To(ConsistOf("some-process-warning"))
 				})
 			})
 
@@ -100,7 +100,7 @@ var _ = Describe("Process Actions", func() {
 
 				It("returns the error and warnings", func() {
 					Expect(err).To(Equal(expectedErr))
-					Expect(warnings).To(Equal(Warnings{"some-process-warning"}))
+					Expect(warnings).To(ConsistOf("some-process-warning"))
 				})
 			})
 		})

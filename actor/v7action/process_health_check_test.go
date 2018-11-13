@@ -76,7 +76,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 			It("returns the error and warnings", func() {
 				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: "some-app-name"}))
-				Expect(warnings).To(Equal(Warnings{"some-warning"}))
+				Expect(warnings).To(ConsistOf("some-warning"))
 			})
 		})
 
@@ -94,7 +94,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 			It("returns the error and warnings", func() {
 				Expect(executeErr).To(Equal(expectedErr))
-				Expect(warnings).To(Equal(Warnings{"some-warning"}))
+				Expect(warnings).To(ConsistOf("some-warning"))
 			})
 		})
 
@@ -231,7 +231,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 			It("returns the error and warnings", func() {
 				Expect(err).To(Equal(expectedErr))
-				Expect(warnings).To(Equal(Warnings{"some-process-warning"}))
+				Expect(warnings).To(ConsistOf("some-process-warning"))
 			})
 		})
 
