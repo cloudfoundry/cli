@@ -54,6 +54,14 @@ func (cmd *CreateSharedDomainCommand) Setup(config command.Config, ui command.UI
 }
 
 func (cmd CreateSharedDomainCommand) Execute(args []string) error {
+	if cmd.Internal {
+		currentVersion := cmd.Actor.CloudControllerAPIVersion()
+		err := command.MinimumCCAPIVersionCheck(currentVersion, ccversion.MinVersionInternalDomainV2, "Option '--internal'")
+		if err != nil {
+			return err
+		}
+	}
+
 	if cmd.RouterGroup != "" && cmd.Internal {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--router-group", "--internal"},
@@ -63,13 +71,6 @@ func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 	username, err := cmd.SharedActor.RequireCurrentUser()
 	if err != nil {
 		return err
-	}
-	if cmd.Internal {
-		currentVersion := cmd.Actor.CloudControllerAPIVersion()
-		err = command.MinimumCCAPIVersionCheck(currentVersion, ccversion.MinVersionInternalDomainV2)
-		if err != nil {
-			return err
-		}
 	}
 	cmd.UI.DisplayTextWithFlavor("Creating shared domain {{.Domain}} as {{.User}}...",
 		map[string]interface{}{
