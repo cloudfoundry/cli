@@ -26,6 +26,86 @@ var _ = Describe("Process Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil, nil)
 	})
 
+	Describe("GetProcessByTypeAndApplication", func() {
+		var (
+			processType string
+			appGUID     string
+
+			process  Process
+			warnings Warnings
+			err      error
+		)
+
+		BeforeEach(func() {
+			processType = "web"
+			appGUID = "some-app-guid"
+		})
+
+		JustBeforeEach(func() {
+			process, warnings, err = actor.GetProcessByTypeAndApplication(processType, appGUID)
+		})
+
+		When("getting the application process is succesful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
+					ccv3.Process{
+						GUID: "some-process-guid",
+					},
+					ccv3.Warnings{"some-process-warning"},
+					nil,
+				)
+			})
+
+			It("returns the process and warnings", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-process-warning"))
+				Expect(process).To(Equal(Process{
+					GUID: "some-process-guid",
+				}))
+
+				Expect(fakeCloudControllerClient.GetApplicationProcessByTypeCallCount()).To(Equal(1))
+				passedAppGUID, passedProcessType := fakeCloudControllerClient.GetApplicationProcessByTypeArgsForCall(0)
+				Expect(passedAppGUID).To(Equal(appGUID))
+				Expect(passedProcessType).To(Equal(processType))
+			})
+		})
+
+		When("getting application process by type returns an error", func() {
+			var expectedErr error
+
+			When("the api returns a ProcessNotFoundError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
+						ccv3.Process{},
+						ccv3.Warnings{"some-process-warning"},
+						ccerror.ProcessNotFoundError{},
+					)
+				})
+
+				It("returns a ProcessNotFoundError and all warnings", func() {
+					Expect(err).To(Equal(actionerror.ProcessNotFoundError{ProcessType: "web"}))
+					Expect(warnings).To(Equal(Warnings{"some-process-warning"}))
+				})
+			})
+
+			Context("generic error", func() {
+				BeforeEach(func() {
+					expectedErr = errors.New("some-error")
+					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
+						ccv3.Process{},
+						ccv3.Warnings{"some-process-warning"},
+						expectedErr,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(err).To(Equal(expectedErr))
+					Expect(warnings).To(Equal(Warnings{"some-process-warning"}))
+				})
+			})
+		})
+	})
+
 	Describe("ScaleProcessByApplication", func() {
 		var (
 			passedProcess Process

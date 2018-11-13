@@ -117,6 +117,23 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	SetProcessHealthCheckByProcessTypeAndApplicationStub        func(string, string, string, string, int) (v7action.Warnings, error)
+	setProcessHealthCheckByProcessTypeAndApplicationMutex       sync.RWMutex
+	setProcessHealthCheckByProcessTypeAndApplicationArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 int
+	}
+	setProcessHealthCheckByProcessTypeAndApplicationReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	setProcessHealthCheckByProcessTypeAndApplicationReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	StageApplicationPackageStub        func(string) (v7action.Build, v7action.Warnings, error)
 	stageApplicationPackageMutex       sync.RWMutex
 	stageApplicationPackageArgsForCall []struct {
@@ -630,6 +647,73 @@ func (fake *FakeV7Actor) SetApplicationDropletReturnsOnCall(i int, result1 v7act
 	}{result1, result2}
 }
 
+func (fake *FakeV7Actor) SetProcessHealthCheckByProcessTypeAndApplication(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int) (v7action.Warnings, error) {
+	fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.Lock()
+	ret, specificReturn := fake.setProcessHealthCheckByProcessTypeAndApplicationReturnsOnCall[len(fake.setProcessHealthCheckByProcessTypeAndApplicationArgsForCall)]
+	fake.setProcessHealthCheckByProcessTypeAndApplicationArgsForCall = append(fake.setProcessHealthCheckByProcessTypeAndApplicationArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 int
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("SetProcessHealthCheckByProcessTypeAndApplication", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.Unlock()
+	if fake.SetProcessHealthCheckByProcessTypeAndApplicationStub != nil {
+		return fake.SetProcessHealthCheckByProcessTypeAndApplicationStub(arg1, arg2, arg3, arg4, arg5)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.setProcessHealthCheckByProcessTypeAndApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeV7Actor) SetProcessHealthCheckByProcessTypeAndApplicationCallCount() int {
+	fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.RLock()
+	defer fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.RUnlock()
+	return len(fake.setProcessHealthCheckByProcessTypeAndApplicationArgsForCall)
+}
+
+func (fake *FakeV7Actor) SetProcessHealthCheckByProcessTypeAndApplicationCalls(stub func(string, string, string, string, int) (v7action.Warnings, error)) {
+	fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.Lock()
+	defer fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.Unlock()
+	fake.SetProcessHealthCheckByProcessTypeAndApplicationStub = stub
+}
+
+func (fake *FakeV7Actor) SetProcessHealthCheckByProcessTypeAndApplicationArgsForCall(i int) (string, string, string, string, int) {
+	fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.RLock()
+	defer fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.RUnlock()
+	argsForCall := fake.setProcessHealthCheckByProcessTypeAndApplicationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+}
+
+func (fake *FakeV7Actor) SetProcessHealthCheckByProcessTypeAndApplicationReturns(result1 v7action.Warnings, result2 error) {
+	fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.Lock()
+	defer fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.Unlock()
+	fake.SetProcessHealthCheckByProcessTypeAndApplicationStub = nil
+	fake.setProcessHealthCheckByProcessTypeAndApplicationReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV7Actor) SetProcessHealthCheckByProcessTypeAndApplicationReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.Lock()
+	defer fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.Unlock()
+	fake.SetProcessHealthCheckByProcessTypeAndApplicationStub = nil
+	if fake.setProcessHealthCheckByProcessTypeAndApplicationReturnsOnCall == nil {
+		fake.setProcessHealthCheckByProcessTypeAndApplicationReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.setProcessHealthCheckByProcessTypeAndApplicationReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV7Actor) StageApplicationPackage(arg1 string) (v7action.Build, v7action.Warnings, error) {
 	fake.stageApplicationPackageMutex.Lock()
 	ret, specificReturn := fake.stageApplicationPackageReturnsOnCall[len(fake.stageApplicationPackageArgsForCall)]
@@ -853,6 +937,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.scaleProcessByApplicationMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()
 	defer fake.setApplicationDropletMutex.RUnlock()
+	fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.RLock()
+	defer fake.setProcessHealthCheckByProcessTypeAndApplicationMutex.RUnlock()
 	fake.stageApplicationPackageMutex.RLock()
 	defer fake.stageApplicationPackageMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()

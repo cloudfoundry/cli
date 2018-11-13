@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
@@ -40,7 +39,7 @@ var _ = Describe("Process Health Check Actions", func() {
 				{
 					ProcessType:     constant.ProcessTypeWeb,
 					HealthCheckType: "http",
-					Endpoint:        "/",
+					Endpoint:        constant.ProcessHealthCheckEndpointDefault,
 				},
 			}
 		})
@@ -174,23 +173,36 @@ var _ = Describe("Process Health Check Actions", func() {
 		})
 	})
 
-	Describe("SetApplicationProcessHealthCheckTypeByNameAndSpace", func() {
+	Describe("SetProcessHealthCheckByProcessTypeAndApplication", func() {
 		var (
+			processType         string
+			appGUID             string
 			healthCheckType     string
 			healthCheckEndpoint string
+			invocationTimeout   int
 
 			warnings Warnings
 			err      error
-			app      Application
 		)
 
 		BeforeEach(func() {
-			healthCheckType = "port"
-			healthCheckEndpoint = "/"
+			processType = "web"
+			appGUID = "some-app-guid"
+
+			// reset every value and allow each test case to set them
+			healthCheckType = ""
+			healthCheckEndpoint = ""
+			invocationTimeout = 0
 		})
 
 		JustBeforeEach(func() {
-			app, warnings, err = actor.SetApplicationProcessHealthCheckTypeByNameAndSpace("some-app-name", "some-space-guid", healthCheckType, healthCheckEndpoint, "some-process-type", 42)
+			warnings, err = actor.SetProcessHealthCheckByProcessTypeAndApplication(
+				processType,
+				appGUID,
+				healthCheckType,
+				healthCheckEndpoint,
+				invocationTimeout,
+			)
 		})
 
 		When("the user specifies an endpoint for a non-http health check", func() {
@@ -205,171 +217,126 @@ var _ = Describe("Process Health Check Actions", func() {
 			})
 		})
 
-		When("application does not exist", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
-					ccv3.Warnings{"some-warning"},
-					nil,
-				)
-
-				healthCheckType = "http"
-				healthCheckEndpoint = "some-http-endpoint"
-			})
-
-			It("returns the error and warnings", func() {
-				Expect(err).To(Equal(actionerror.ApplicationNotFoundError{Name: "some-app-name"}))
-				Expect(warnings).To(Equal(Warnings{"some-warning"}))
-			})
-		})
-
-		When("getting application returns an error", func() {
+		When("getting application process by type returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
 				expectedErr = errors.New("some-error")
-				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{},
-					ccv3.Warnings{"some-warning"},
+				fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
+					ccv3.Process{},
+					ccv3.Warnings{"some-process-warning"},
 					expectedErr,
 				)
 			})
 
 			It("returns the error and warnings", func() {
 				Expect(err).To(Equal(expectedErr))
-				Expect(warnings).To(Equal(Warnings{"some-warning"}))
+				Expect(warnings).To(Equal(Warnings{"some-process-warning"}))
 			})
 		})
 
-		When("application exists", func() {
-			var ccv3App ccv3.Application
-
+		When("application process exists", func() {
 			BeforeEach(func() {
-				ccv3App = ccv3.Application{
-					GUID: "some-app-guid",
-				}
-
-				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv3.Application{ccv3App},
-					ccv3.Warnings{"some-warning"},
+				fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
+					ccv3.Process{
+						GUID: "some-process-guid",
+					},
+					ccv3.Warnings{"some-process-warning"},
 					nil,
 				)
 			})
 
-			When("getting application process by type returns an error", func() {
+			When("setting process health check type returns an error", func() {
 				var expectedErr error
 
-				When("the api returns a ProcessNotFoundError", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-							ccv3.Process{},
-							ccv3.Warnings{"some-process-warning"},
-							ccerror.ProcessNotFoundError{},
-						)
-					})
+				BeforeEach(func() {
+					healthCheckType = "port"
+					healthCheckEndpoint = constant.ProcessHealthCheckEndpointDefault
 
-					It("returns a ProcessNotFoundError and all warnings", func() {
-						Expect(err).To(Equal(actionerror.ProcessNotFoundError{ProcessType: "some-process-type"}))
-						Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
-					})
+					expectedErr = errors.New("some-error")
+					fakeCloudControllerClient.PatchApplicationProcessHealthCheckReturns(
+						ccv3.Process{},
+						ccv3.Warnings{"some-health-check-warning"},
+						expectedErr,
+					)
 				})
 
-				Context("generic error", func() {
-					BeforeEach(func() {
-						expectedErr = errors.New("some-error")
-						fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-							ccv3.Process{},
-							ccv3.Warnings{"some-process-warning"},
-							expectedErr,
-						)
-					})
-
-					It("returns the error and warnings", func() {
-						Expect(err).To(Equal(expectedErr))
-						Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
-					})
+				It("returns the error and warnings", func() {
+					Expect(err).To(Equal(expectedErr))
+					Expect(warnings).To(Equal(Warnings{"some-process-warning", "some-health-check-warning"}))
 				})
 			})
 
-			When("application process exists", func() {
+			When("setting process health check type succeeds", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-						ccv3.Process{
-							GUID: "some-process-guid",
-						},
-						ccv3.Warnings{"some-process-warning"},
+					fakeCloudControllerClient.PatchApplicationProcessHealthCheckReturns(
+						ccv3.Process{GUID: "some-process-guid"},
+						ccv3.Warnings{"some-health-check-warning"},
 						nil,
 					)
 				})
 
-				When("setting process health check type returns an error", func() {
-					var expectedErr error
+				It("gets the correct application process", func() {
+					Expect(err).NotTo(HaveOccurred())
 
+					Expect(fakeCloudControllerClient.GetApplicationProcessByTypeCallCount()).To(Equal(1))
+					passedAppGUID, passedProcessType := fakeCloudControllerClient.GetApplicationProcessByTypeArgsForCall(0)
+					Expect(passedAppGUID).To(Equal(appGUID))
+					Expect(passedProcessType).To(Equal(processType))
+				})
+
+				When("the health check type is http", func() {
 					BeforeEach(func() {
-						expectedErr = errors.New("some-error")
-						fakeCloudControllerClient.PatchApplicationProcessHealthCheckReturns(
-							ccv3.Process{},
-							ccv3.Warnings{"some-health-check-warning"},
-							expectedErr,
-						)
+						healthCheckType = "http"
+						healthCheckEndpoint = "some-http-endpoint"
+						invocationTimeout = 42
 					})
 
-					It("returns the error and warnings", func() {
-						Expect(err).To(Equal(expectedErr))
-						Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-health-check-warning"}))
+					It("returns the application", func() {
+						Expect(err).NotTo(HaveOccurred())
+						Expect(warnings).To(Equal(Warnings{"some-process-warning", "some-health-check-warning"}))
+
+						Expect(fakeCloudControllerClient.PatchApplicationProcessHealthCheckCallCount()).To(Equal(1))
+						processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout := fakeCloudControllerClient.PatchApplicationProcessHealthCheckArgsForCall(0)
+						Expect(processGUID).To(Equal("some-process-guid"))
+						Expect(processHealthCheckType).To(Equal("http"))
+						Expect(processHealthCheckEndpoint).To(Equal("some-http-endpoint"))
+						Expect(processInvocationTimeout).To(Equal(42))
 					})
 				})
 
-				When("setting process health check type succeeds", func() {
+				When("the health check type is not http", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.PatchApplicationProcessHealthCheckReturns(
-							ccv3.Process{GUID: "some-process-guid"},
-							ccv3.Warnings{"some-health-check-warning"},
-							nil,
-						)
+						healthCheckType = "port"
+						invocationTimeout = 42
 					})
 
-					When("the health check type is http", func() {
+					When("the endpoint is set to '/'", func() {
 						BeforeEach(func() {
-							healthCheckType = "http"
-							healthCheckEndpoint = "some-http-endpoint"
+							healthCheckEndpoint = constant.ProcessHealthCheckEndpointDefault
 						})
 
-						It("returns the application", func() {
+						It("does not send the / endpoint and returns the application", func() {
 							Expect(err).NotTo(HaveOccurred())
-							Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-health-check-warning"}))
-
-							Expect(app).To(Equal(Application{
-								GUID: ccv3App.GUID,
-							}))
-
-							Expect(fakeCloudControllerClient.GetApplicationProcessByTypeCallCount()).To(Equal(1))
-							appGUID, processType := fakeCloudControllerClient.GetApplicationProcessByTypeArgsForCall(0)
-							Expect(appGUID).To(Equal("some-app-guid"))
-							Expect(processType).To(Equal("some-process-type"))
+							Expect(warnings).To(Equal(Warnings{"some-process-warning", "some-health-check-warning"}))
 
 							Expect(fakeCloudControllerClient.PatchApplicationProcessHealthCheckCallCount()).To(Equal(1))
 							processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout := fakeCloudControllerClient.PatchApplicationProcessHealthCheckArgsForCall(0)
 							Expect(processGUID).To(Equal("some-process-guid"))
-							Expect(processHealthCheckType).To(Equal("http"))
-							Expect(processHealthCheckEndpoint).To(Equal("some-http-endpoint"))
+							Expect(processHealthCheckType).To(Equal("port"))
+							Expect(processHealthCheckEndpoint).To(BeEmpty())
 							Expect(processInvocationTimeout).To(Equal(42))
 						})
 					})
 
-					When("the health check type is not http", func() {
+					When("the endpoint is empty", func() {
+						BeforeEach(func() {
+							healthCheckEndpoint = ""
+						})
+
 						It("does not send the / endpoint and returns the application", func() {
 							Expect(err).NotTo(HaveOccurred())
-							Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-health-check-warning"}))
-
-							Expect(app).To(Equal(Application{
-								GUID: ccv3App.GUID,
-							}))
-
-							Expect(fakeCloudControllerClient.GetApplicationProcessByTypeCallCount()).To(Equal(1))
-							appGUID, processType := fakeCloudControllerClient.GetApplicationProcessByTypeArgsForCall(0)
-							Expect(appGUID).To(Equal("some-app-guid"))
-							Expect(processType).To(Equal("some-process-type"))
+							Expect(warnings).To(Equal(Warnings{"some-process-warning", "some-health-check-warning"}))
 
 							Expect(fakeCloudControllerClient.PatchApplicationProcessHealthCheckCallCount()).To(Equal(1))
 							processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout := fakeCloudControllerClient.PatchApplicationProcessHealthCheckArgsForCall(0)

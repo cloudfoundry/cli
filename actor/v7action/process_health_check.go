@@ -4,7 +4,6 @@ import (
 	"sort"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
@@ -71,47 +70,37 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 	return processHealthChecks, allWarnings, nil
 }
 
-func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
-	appName string,
-	spaceGUID string,
+func (actor Actor) SetProcessHealthCheckByProcessTypeAndApplication(
+	processType string,
+	appGUID string,
 	healthCheckType string,
 	httpEndpoint string,
-	processType string,
 	invocationTimeout int,
-) (Application, Warnings, error) {
-
+) (Warnings, error) {
 	if healthCheckType != "http" {
-		if httpEndpoint == "/" {
+		if httpEndpoint == constant.ProcessHealthCheckEndpointDefault || httpEndpoint == "" {
 			httpEndpoint = ""
 		} else {
-			return Application{}, nil, actionerror.HTTPHealthCheckInvalidError{}
+			return nil, actionerror.HTTPHealthCheckInvalidError{}
 		}
 	}
 
-	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	process, warnings, err := actor.GetProcessByTypeAndApplication(processType, appGUID)
+	allWarnings := Warnings(warnings)
 	if err != nil {
-		return Application{}, allWarnings, err
+		return allWarnings, err
 	}
 
-	process, warnings, err := actor.CloudControllerClient.GetApplicationProcessByType(app.GUID, processType)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
-	if err != nil {
-		if _, ok := err.(ccerror.ProcessNotFoundError); ok {
-			return Application{}, allWarnings, actionerror.ProcessNotFoundError{ProcessType: processType}
-		}
-		return Application{}, allWarnings, err
-	}
-
-	_, warnings, err = actor.CloudControllerClient.PatchApplicationProcessHealthCheck(
+	_, updateWarnings, err := actor.CloudControllerClient.PatchApplicationProcessHealthCheck(
 		process.GUID,
 		healthCheckType,
 		httpEndpoint,
 		invocationTimeout,
 	)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, Warnings(updateWarnings)...)
 	if err != nil {
-		return Application{}, allWarnings, err
+		return allWarnings, err
 	}
 
-	return app, allWarnings, nil
+	return allWarnings, nil
 }

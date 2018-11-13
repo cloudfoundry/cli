@@ -106,6 +106,27 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 	return actor.convertCCToActorApplication(createdApp), Warnings(warnings), nil
 }
 
+// SetApplicationProcessHealthCheckTypeByNameAndSpace sets the health check
+// information of the provided processType for an application with the given
+// name and space GUID.
+func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
+	appName string,
+	spaceGUID string,
+	healthCheckType string,
+	httpEndpoint string,
+	processType string,
+	invocationTimeout int,
+) (Application, Warnings, error) {
+
+	app, getWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return Application{}, getWarnings, err
+	}
+
+	setWarnings, err := actor.SetProcessHealthCheckByProcessTypeAndApplication(processType, app.GUID, healthCheckType, httpEndpoint, invocationTimeout)
+	return app, append(getWarnings, setWarnings...), err
+}
+
 // StopApplication stops an application.
 func (actor Actor) StopApplication(appGUID string) (Warnings, error) {
 	_, warnings, err := actor.CloudControllerClient.UpdateApplicationStop(appGUID)
