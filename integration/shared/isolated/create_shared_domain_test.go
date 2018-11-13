@@ -233,7 +233,20 @@ var _ = Describe("create-shared-domain command", func() {
 			Eventually(session).Should(Exit(1))
 		})
 
-		When("With router-group flag", func() {
+		When("with --internal flag", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionInternalDomainV2)
+			})
+
+			It("should fail and return an unauthorized message", func() {
+				session := helpers.CF("create-shared-domain", domainName, "--internal")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		When("with --router-group flag", func() {
 			BeforeEach(func() {
 				helpers.SkipIfNoRoutingAPI()
 			})
