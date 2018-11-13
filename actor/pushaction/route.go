@@ -122,15 +122,16 @@ func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID st
 
 func (actor Actor) CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID string, app v2action.Application) (Warnings, error) {
 	var warnings Warnings
-	defaultRoute, domainWarnings, err := actor.getDefaultRoute(orgGUID, spaceGUID, app.Name)
-	warnings = append(warnings, domainWarnings...)
-	if err != nil {
-		return warnings, err
-	}
 
 	boundRoutes, appRouteWarnings, err := actor.V2Actor.GetApplicationRoutes(app.GUID)
 	warnings = append(warnings, appRouteWarnings...)
 	if err != nil || len(boundRoutes) > 0 {
+		return warnings, err
+	}
+
+	defaultRoute, domainWarnings, err := actor.getDefaultRoute(orgGUID, spaceGUID, app.Name)
+	warnings = append(warnings, domainWarnings...)
+	if err != nil {
 		return warnings, err
 	}
 

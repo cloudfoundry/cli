@@ -499,88 +499,118 @@ var _ = Describe("Routes", func() {
 				v2action.Application{Name: "some-app", GUID: "some-app-guid"})
 		})
 
-		When("getting organization domains errors", func() {
+		When("getting the application routes errors", func() {
 			BeforeEach(func() {
-				fakeV2Actor.GetOrganizationDomainsReturns(
-					[]v2action.Domain{},
-					v2action.Warnings{"domain-warning"},
-					errors.New("some-error"))
+				fakeV2Actor.GetApplicationRoutesReturns(
+					[]v2action.Route{},
+					v2action.Warnings{"route-warning"},
+					errors.New("some-error"),
+				)
 			})
 
 			It("returns the error", func() {
 				Expect(executeErr).To(MatchError("some-error"))
-				Expect(warnings).To(ConsistOf("domain-warning"))
+				Expect(warnings).To(ConsistOf("route-warning"))
 			})
 		})
 
-		When("getting organization domains succeeds", func() {
-			BeforeEach(func() {
-				fakeV2Actor.GetOrganizationDomainsReturns(
-					[]v2action.Domain{
-						{
-							GUID: "some-domain-guid",
-							Name: "some-domain",
-						},
-					},
-					v2action.Warnings{"domain-warning"},
-					nil,
-				)
-			})
-
-			When("getting the application routes errors", func() {
+		When("getting the application routes succeeds", func() {
+			// TODO: do we need this context
+			When("A non default route is already bound to the app", func() {
 				BeforeEach(func() {
 					fakeV2Actor.GetApplicationRoutesReturns(
-						[]v2action.Route{},
+						[]v2action.Route{
+							{
+								Host: "some-app-sepcial",
+								Domain: v2action.Domain{
+									GUID: "some-domain-guid",
+									Name: "some-domain",
+								},
+								GUID:      "some-route-guid",
+								SpaceGUID: "some-space-guid",
+							},
+						},
 						v2action.Warnings{"route-warning"},
-						errors.New("some-error"),
+						nil,
 					)
 				})
 
-				It("returns the error", func() {
-					Expect(executeErr).To(MatchError("some-error"))
-					Expect(warnings).To(ConsistOf("domain-warning", "route-warning"))
+				It("returns any warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("route-warning"))
+
+					Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(1), "Expected GetApplicationRoutes to be called once, but it was not")
+					appGUID := fakeV2Actor.GetApplicationRoutesArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+
+					Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(0), "Expected GetOrganizationDomains to be called once, but it was not")
+					Expect(fakeV2Actor.CreateRouteCallCount()).To(Equal(0), "Expected CreateRoute to not be called but it was")
+					Expect(fakeV2Actor.MapRouteToApplicationCallCount()).To(Equal(0), "Expected MapRouteToApplication to not be called but it was")
 				})
 			})
 
-			When("getting the application routes succeeds", func() {
-				// TODO: do we need this context
-				When("Any route is already bound to the app", func() {
+			When( "The default route is already bound to the app", func() {
+				BeforeEach(func() {
+					fakeV2Actor.GetApplicationRoutesReturns(
+						[]v2action.Route{
+							{
+								Host: "some-app",
+								Domain: v2action.Domain{
+									GUID: "some-domain-guid",
+									Name: "some-domain",
+								},
+								GUID:      "some-route-guid",
+								SpaceGUID: "some-space-guid",
+							},
+						},
+						v2action.Warnings{"route-warning"},
+						nil,
+					)
+				})
+
+				It("returns any warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("route-warning"))
+
+					Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(1), "Expected GetApplicationRoutes to be called once, but it was not")
+					appGUID := fakeV2Actor.GetApplicationRoutesArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+
+					Expect(fakeV2Actor.CreateRouteCallCount()).To(Equal(0), "Expected CreateRoute to not be called but it was")
+					Expect(fakeV2Actor.MapRouteToApplicationCallCount()).To(Equal(0), "Expected MapRouteToApplication to not be called but it was")
+					Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(0), "Expected GetOrganizationDomains to be called once, but it was not")
+				})
+			})
+
+			When("A route isn't bound to the app", func() {
+				When("getting organization domains errors", func() {
 					BeforeEach(func() {
-						fakeV2Actor.GetApplicationRoutesReturns(
-							[]v2action.Route{
+						fakeV2Actor.GetOrganizationDomainsReturns(
+							[]v2action.Domain{},
+							v2action.Warnings{"domain-warning"},
+							errors.New("some-error"))
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError("some-error"))
+						Expect(warnings).To(ConsistOf("domain-warning"))
+					})
+				})
+
+				When("getting organization domains succeeds", func() {
+					BeforeEach(func() {
+						fakeV2Actor.GetOrganizationDomainsReturns(
+							[]v2action.Domain{
 								{
-									Host: "some-app-sepcial",
-									Domain: v2action.Domain{
-										GUID: "some-domain-guid",
-										Name: "some-domain",
-									},
-									GUID:      "some-route-guid",
-									SpaceGUID: "some-space-guid",
+									GUID: "some-domain-guid",
+									Name: "some-domain",
 								},
 							},
-							v2action.Warnings{"route-warning"},
+							v2action.Warnings{"domain-warning"},
 							nil,
 						)
 					})
 
-					It("returns any warnings", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(warnings).To(ConsistOf("domain-warning", "route-warning"))
-
-						Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(1), "Expected GetOrganizationDomains to be called once, but it was not")
-						orgGUID := fakeV2Actor.GetOrganizationDomainsArgsForCall(0)
-						Expect(orgGUID).To(Equal("some-org-guid"))
-
-						Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(1), "Expected GetApplicationRoutes to be called once, but it was not")
-						appGUID := fakeV2Actor.GetApplicationRoutesArgsForCall(0)
-						Expect(appGUID).To(Equal("some-app-guid"))
-
-						Expect(fakeV2Actor.CreateRouteCallCount()).To(Equal(0), "Expected CreateRoute to not be called but it was")
-						Expect(fakeV2Actor.MapRouteToApplicationCallCount()).To(Equal(0), "Expected MapRouteToApplication to not be called but it was")
-					})
-				})
-
-				When("the route isn't bound to the app", func() {
 					When("finding route in space errors", func() {
 						BeforeEach(func() {
 							fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(
