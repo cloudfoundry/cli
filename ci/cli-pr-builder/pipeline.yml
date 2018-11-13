@@ -36,7 +36,7 @@ resources:
     uri: git@github.com:cloudfoundry/cli-pools
     private_key: ((cli-pools-github-private-key))
     branch: master
-    pool: baked-potato
+    pool: bosh-lites
 
 - name: legacy-gcp-bosh-pool
   type: pool
@@ -67,7 +67,7 @@ jobs:
     - get: pull-request
       trigger: true
     - get: cli-ci # TODO: consider using PR's version of ci?
-  - aggregate:
+  - aggregate: # TODO: write task from https://github.com/jtarchie/github-pullrequest-resource#in-clone-the-repository-at-the-given-pull-request-ref
     - task: units-linux # TODO: build other operating system's units, if resources permit
       file: cli-ci/ci/cli-pr-builder/tasks/units-linux.yml
 
@@ -82,16 +82,16 @@ jobs:
       - get: gcp-bosh-pool
     - do:
       - task: extract-authors-and-story-id-from-commit # TODO: extract PR info instead
-        file: # TODO: write task from https://github.com/jtarchie/github-pullrequest-resource#in-clone-the-repository-at-the-given-pull-request-ref
+        file: ci/cli-pr-builder/tasks/extract-info-from-pr.yml
         input_mapping: {repo: cli}
       - put: gcp-bosh-lite
         params:
-          story: commit-info/story
+          story: commit-info/pr-id
           author_name: commit-info/author-name
           author_email: commit-info/author-email
           committer_name: commit-info/committer-name
           committer_email: commit-info/committer-email
-          commit_message_prefix: CLI-
+          commit_message_prefix: CLI-PR-BUILDER-
 
 - name: integration-linux # TODO: clean this up
   serial: true
