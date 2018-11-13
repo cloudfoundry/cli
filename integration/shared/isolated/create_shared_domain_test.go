@@ -139,15 +139,15 @@ var _ = Describe("create-shared-domain command", func() {
 						Expect(isInternal).To(BeTrue())
 					})
 				})
-			})
-		})
 
-		When("both --internal and --router-group flags are specified", func() {
-			It("returns an argument error", func() {
-				session := helpers.CF("create-shared-domain", domainName, "--router-group", "my-router-group", "--internal")
-				Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --router-group, --internal"))
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Exit(1))
+				When("both --internal and --router-group flags are specified", func() {
+					It("returns an argument error", func() {
+						session := helpers.CF("create-shared-domain", domainName, "--router-group", "my-router-group", "--internal")
+						Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --router-group, --internal"))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
 			})
 		})
 
