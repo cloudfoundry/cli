@@ -293,6 +293,20 @@
   version = "v1.8.1"
 
 [[projects]]
+  digest = "1:41933d387bfa3eaa6a82647914ed7044f7b8355764c24fb920892bc8c03ef0c3"
+  name = "github.com/hpcloud/tail"
+  packages = [
+    ".",
+    "ratelimiter",
+    "util",
+    "watch",
+    "winfile",
+  ]
+  pruneopts = "NUT"
+  revision = "a30252cb686a21eb2d0b98132633053ec2f7f1e5"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "cli-vendor"
   digest = "1:1ba4ae8812d32010781560a81c1ce5c4cdada40cbc563d83b63926be34545030"
   name = "github.com/jessevdk/go-flags"
@@ -372,7 +386,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0413dd101df90e8a7f0c228b0fd64cc42cd98c7c1e3ec5c0dcf3b2598507052b"
+  digest = "1:7783a63b27d2e15de3ad32aaade701bd30312305687f7abb0f49efc49956a5d4"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -396,7 +410,7 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "26d21430af911e84459ee38099f0a07e57a7f9b0"
+  revision = "0d4f08024c0112cfde4b94bc45e25777eedb4561"
 
 [[projects]]
   branch = "master"
@@ -569,6 +583,23 @@
   pruneopts = "NUT"
   revision = "007b75a044e968336a69a6c0c617251ab62ac14c"
   version = "v1.0.26"
+
+[[projects]]
+  digest = "1:1b91ae0dc69a41d4c2ed23ea5cffb721ea63f5037ca4b81e6d6771fbb8f45129"
+  name = "gopkg.in/fsnotify.v1"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
+  source = "https://github.com/fsnotify/fsnotify/archive/v1.4.7.tar.gz"
+  version = "v1.4.7"
+
+[[projects]]
+  branch = "v1"
+  digest = "1:8fb1ccb16a6cfecbfdfeb84d8ea1cc7afa8f9ef16526bc2326f72d993e32cef1"
+  name = "gopkg.in/tomb.v1"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "dd632973f1e7218eb1089048e0798ec9ae7dceb8"
 
 [[projects]]
   digest = "1:7c95b35057a0ff2e19f707173cc1a947fa43a6eb5c4d300d196ece0334046082"
