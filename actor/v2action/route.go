@@ -242,7 +242,7 @@ func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnin
 	if routeNotFoundErr, ok := err.(actionerror.RouteNotFoundError); ok {
 		// This check only works for API versions 2.55 or higher. It will return
 		// false for anything below that.
-		log.Infoln("checking route existence for: %s", route)
+		log.Infof("checking route existence for: %s\n", route)
 		exists, checkRouteWarnings, chkErr := actor.CheckRoute(route)
 		if chkErr != nil {
 			log.Errorln("check route:", err)

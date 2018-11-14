@@ -380,11 +380,11 @@ var _ = Describe("CLI SSH", func() {
 		})
 
 		When("stdin is a terminal", func() {
-			var master, slave *os.File
+			var master *os.File
 
 			BeforeEach(func() {
 				var err error
-				master, slave, err = pty.Open()
+				master, _, err = pty.Open()
 				Expect(err).NotTo(HaveOccurred())
 
 				terminalRequest = RequestTTYForce
@@ -396,7 +396,6 @@ var _ = Describe("CLI SSH", func() {
 
 			AfterEach(func() {
 				master.Close()
-				// slave.Close() // race
 			})
 
 			When("a command is not specified", func() {

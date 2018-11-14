@@ -159,8 +159,8 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 
 	for _, domain := range org.Domains {
 		d := plugin_models.GetOrg_Domains{
-			Name: domain.Name,
-			Guid: domain.GUID,
+			Name:                   domain.Name,
+			Guid:                   domain.GUID,
 			OwningOrganizationGuid: domain.OwningOrganizationGUID,
 			Shared:                 domain.Shared,
 		}

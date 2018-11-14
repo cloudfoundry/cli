@@ -467,7 +467,7 @@ var _ = Describe("Application", func() {
 					GUID:                    "some-app-guid",
 					HealthCheckType:         "some-health-check-type",
 					HealthCheckHTTPEndpoint: "/anything",
-					State: constant.ApplicationStarted,
+					State:                   constant.ApplicationStarted,
 				})
 				Expect(err).NotTo(HaveOccurred())
 
@@ -605,7 +605,7 @@ var _ = Describe("Application", func() {
 							"key3": "true",
 							"key4": "75821.521",
 						},
-						GUID: "some-app-guid",
+						GUID:                    "some-app-guid",
 						HealthCheckHTTPEndpoint: "/anything",
 						HealthCheckType:         "some-health-check-type",
 						Instances:               types.NullInt{Value: 0, IsSet: true},
@@ -633,7 +633,7 @@ var _ = Describe("Application", func() {
 							"key3": "true",
 							"key4": "75821.521",
 						},
-						GUID: "some-app-guid",
+						GUID:                    "some-app-guid",
 						HealthCheckHTTPEndpoint: "/anything",
 						HealthCheckTimeout:      120,
 						HealthCheckType:         "some-health-check-type",

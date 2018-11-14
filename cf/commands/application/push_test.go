@@ -1071,8 +1071,8 @@ var _ = Describe("Push Command", func() {
 							deps.UI = uiWithContents
 
 							expectedDomain = models.DomainFields{
-								GUID: "some-guid",
-								Name: "some-name",
+								GUID:                   "some-guid",
+								Name:                   "some-name",
 								OwningOrganizationGUID: "some-organization-guid",
 								RouterGroupGUID:        "some-router-group-guid",
 								RouterGroupType:        "tcp",

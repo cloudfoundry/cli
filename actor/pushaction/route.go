@@ -281,11 +281,11 @@ func (actor Actor) calculateDomain(manifestApp manifest.Application, orgGUID str
 		desiredDomains, getDomainWarnings, getDomainsErr := actor.V2Actor.GetDomainsByNameAndOrganization([]string{manifestApp.Domain}, orgGUID)
 		warnings = append(warnings, getDomainWarnings...)
 		if getDomainsErr != nil {
-			log.Errorln("could not find provided domains '%s':", manifestApp.Domain, getDomainsErr.Error())
+			log.Errorf("could not find provided domains '%s': %s\n", manifestApp.Domain, getDomainsErr.Error())
 			return v2action.Domain{}, warnings, getDomainsErr
 		}
 		if len(desiredDomains) == 0 {
-			log.Errorln("could not find provided domains '%s':", manifestApp.Domain)
+			log.Errorf("could not find provided domains '%s'\n", manifestApp.Domain)
 			return v2action.Domain{}, warnings, actionerror.DomainNotFoundError{Name: manifestApp.Domain}
 		}
 		// CC does not allow one to have shared/owned domains with the same domain name. so it's ok to take the first one

@@ -29,7 +29,7 @@ func (client *Client) SetupResources(bootstrapURL string) error {
 	}
 
 	resources := map[string]string{
-		"uaa": info.UAALink(),
+		"uaa":                    info.UAALink(),
 		"authorization_endpoint": bootstrapURL,
 	}
 

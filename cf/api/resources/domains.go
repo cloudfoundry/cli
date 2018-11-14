@@ -19,8 +19,8 @@ type DomainEntity struct {
 func (resource DomainResource) ToFields() models.DomainFields {
 	privateDomain := resource.Entity.SharedOrganizationsURL != "" || resource.Entity.OwningOrganizationGUID != ""
 	return models.DomainFields{
-		Name: resource.Entity.Name,
-		GUID: resource.Metadata.GUID,
+		Name:                   resource.Entity.Name,
+		GUID:                   resource.Metadata.GUID,
 		OwningOrganizationGUID: resource.Entity.OwningOrganizationGUID,
 		Shared:                 !privateDomain,
 		RouterGroupGUID:        resource.Entity.RouterGroupGUID,

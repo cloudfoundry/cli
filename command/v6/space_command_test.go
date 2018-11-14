@@ -161,7 +161,7 @@ var _ = Describe("space Command", func() {
 							Name: "some-space",
 							GUID: "some-space-guid",
 						},
-						OrgName: "some-org",
+						OrgName:                        "some-org",
 						OrgDefaultIsolationSegmentGUID: "some-org-default-isolation-segment-guid",
 						AppNames:                       []string{"app1", "app2", "app3"},
 						ServiceInstanceNames:           []string{"service1", "service2", "service3"},

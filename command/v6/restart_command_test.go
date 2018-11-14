@@ -43,10 +43,10 @@ var _ = Describe("Restart Command", func() {
 		fakeApplicationSummaryActor = new(sharedfakes.FakeApplicationSummaryActor)
 
 		cmd = RestartCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			UI:                      testUI,
+			Config:                  fakeConfig,
+			SharedActor:             fakeSharedActor,
+			Actor:                   fakeActor,
 			ApplicationSummaryActor: fakeApplicationSummaryActor,
 		}
 

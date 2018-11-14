@@ -104,11 +104,11 @@ func NewSecureShell(
 	token string,
 ) SecureShell {
 	return &secureShell{
-		secureDialer:      secureDialer,
-		terminalHelper:    terminalHelper,
-		listenerFactory:   listenerFactory,
-		keepAliveInterval: keepAliveInterval,
-		app:               app,
+		secureDialer:           secureDialer,
+		terminalHelper:         terminalHelper,
+		listenerFactory:        listenerFactory,
+		keepAliveInterval:      keepAliveInterval,
+		app:                    app,
 		sshEndpointFingerprint: sshEndpointFingerprint,
 		sshEndpoint:            sshEndpoint,
 		token:                  token,

@@ -609,21 +609,18 @@ var _ = Describe("Buildpack", func() {
 
 	Describe("UpdateBuildpackByNameAndStack", func() {
 		var (
-			expectedError        error
-			warnings             Warnings
-			executeErr           error
-			newPosition          types.NullInt
-			newLocked            types.NullBool
-			newEnabled           types.NullBool
-			fakeProgressBar      *v2actionfakes.FakeSimpleProgressBar
-			updatedBuildpackGuid string
-			currentStack         string
-			newStack             string
+			expectedError error
+			warnings      Warnings
+			executeErr    error
+			newPosition   types.NullInt
+			newLocked     types.NullBool
+			newEnabled    types.NullBool
+			currentStack  string
+			newStack      string
 		)
 
 		JustBeforeEach(func() {
-			fakeProgressBar = new(v2actionfakes.FakeSimpleProgressBar)
-			updatedBuildpackGuid, warnings, executeErr = actor.UpdateBuildpackByNameAndStack("some-bp-name", currentStack, newPosition, newLocked, newEnabled, newStack)
+			_, warnings, executeErr = actor.UpdateBuildpackByNameAndStack("some-bp-name", currentStack, newPosition, newLocked, newEnabled, newStack)
 		})
 
 		When("current stack is an empty string", func() {

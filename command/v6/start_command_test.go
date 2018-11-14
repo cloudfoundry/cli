@@ -44,10 +44,10 @@ var _ = Describe("Start Command", func() {
 		fakeApplicationSummaryActor = new(sharedfakes.FakeApplicationSummaryActor)
 
 		cmd = StartCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			UI:                      testUI,
+			Config:                  fakeConfig,
+			SharedActor:             fakeSharedActor,
+			Actor:                   fakeActor,
 			ApplicationSummaryActor: fakeApplicationSummaryActor,
 		}
 

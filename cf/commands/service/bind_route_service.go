@@ -122,10 +122,10 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name),
-			"URL":         terminal.EntityNameColor(route.URL()),
-			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+			"URL":                 terminal.EntityNameColor(route.URL()),
+			"OrgName":             terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":           terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
 	err = cmd.routeServiceBindingRepo.Bind(serviceInstance.GUID, route.GUID, serviceInstance.IsUserProvided(), parameters)
@@ -133,7 +133,7 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) error {
 		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.ServiceInstanceAlreadyBoundToSameRoute {
 			cmd.ui.Warn(T("Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
 				map[string]interface{}{
-					"URL": route.URL(),
+					"URL":                 route.URL(),
 					"ServiceInstanceName": serviceInstance.Name,
 				}))
 		} else {
