@@ -175,7 +175,7 @@ var _ = Describe("Domain Actions", func() {
 			It("returns the shared domain", func() {
 				domain, warnings, err := actor.GetDomain("shared-domain-guid")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(Equal(Warnings{"get-domain-warning"}))
+				Expect(warnings).To(ConsistOf("get-domain-warning"))
 				Expect(domain).To(Equal(Domain(expectedDomain)))
 
 				Expect(fakeCloudControllerClient.GetSharedDomainCallCount()).To(Equal(1))

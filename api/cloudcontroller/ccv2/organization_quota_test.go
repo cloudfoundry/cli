@@ -41,7 +41,7 @@ var _ = Describe("OrganizationQuota", func() {
 			It("returns the organization quota", func() {
 				orgQuota, warnings, err := client.GetOrganizationQuota("some-org-quota-guid")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(Equal(Warnings{"warning-1"}))
+				Expect(warnings).To(ConsistOf("warning-1"))
 				Expect(orgQuota).To(Equal(OrganizationQuota{
 					GUID: "some-org-quota-guid",
 					Name: "some-org-quota",
@@ -69,7 +69,7 @@ var _ = Describe("OrganizationQuota", func() {
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "Quota Definition could not be found: some-org-quota-guid",
 				}))
-				Expect(warnings).To(Equal(Warnings{"warning-1"}))
+				Expect(warnings).To(ConsistOf("warning-1"))
 			})
 		})
 
@@ -198,7 +198,7 @@ var _ = Describe("OrganizationQuota", func() {
 						ErrorCode:   "CF-SomeError",
 					},
 				}))
-				Expect(warnings).To(Equal(Warnings{"warning-1"}))
+				Expect(warnings).To(ConsistOf("warning-1"))
 			})
 		})
 	})
