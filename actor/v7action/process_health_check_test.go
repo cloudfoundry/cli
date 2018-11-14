@@ -125,7 +125,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 				It("returns the error and warnings", func() {
 					Expect(executeErr).To(Equal(expectedErr))
-					Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
+					Expect(warnings).To(ConsistOf("some-warning", "some-process-warning"))
 				})
 			})
 
@@ -154,7 +154,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 				It("returns health checks", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
+					Expect(warnings).To(ConsistOf("some-warning", "some-process-warning"))
 					Expect(processHealthChecks).To(Equal([]ProcessHealthCheck{
 						{
 							ProcessType:       "process-type-1",
@@ -263,7 +263,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 				It("returns the error and warnings", func() {
 					Expect(err).To(Equal(expectedErr))
-					Expect(warnings).To(Equal(Warnings{"some-process-warning", "some-health-check-warning"}))
+					Expect(warnings).To(ConsistOf("some-process-warning", "some-health-check-warning"))
 				})
 			})
 
@@ -294,7 +294,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 					It("returns the application", func() {
 						Expect(err).NotTo(HaveOccurred())
-						Expect(warnings).To(Equal(Warnings{"some-process-warning", "some-health-check-warning"}))
+						Expect(warnings).To(ConsistOf("some-process-warning", "some-health-check-warning"))
 
 						Expect(fakeCloudControllerClient.PatchApplicationProcessHealthCheckCallCount()).To(Equal(1))
 						processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout := fakeCloudControllerClient.PatchApplicationProcessHealthCheckArgsForCall(0)
@@ -318,7 +318,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 						It("does not send the / endpoint and returns the application", func() {
 							Expect(err).NotTo(HaveOccurred())
-							Expect(warnings).To(Equal(Warnings{"some-process-warning", "some-health-check-warning"}))
+							Expect(warnings).To(ConsistOf("some-process-warning", "some-health-check-warning"))
 
 							Expect(fakeCloudControllerClient.PatchApplicationProcessHealthCheckCallCount()).To(Equal(1))
 							processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout := fakeCloudControllerClient.PatchApplicationProcessHealthCheckArgsForCall(0)
@@ -336,7 +336,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 						It("does not send the / endpoint and returns the application", func() {
 							Expect(err).NotTo(HaveOccurred())
-							Expect(warnings).To(Equal(Warnings{"some-process-warning", "some-health-check-warning"}))
+							Expect(warnings).To(ConsistOf("some-process-warning", "some-health-check-warning"))
 
 							Expect(fakeCloudControllerClient.PatchApplicationProcessHealthCheckCallCount()).To(Equal(1))
 							processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout := fakeCloudControllerClient.PatchApplicationProcessHealthCheckArgsForCall(0)

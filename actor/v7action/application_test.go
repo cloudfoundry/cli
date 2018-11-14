@@ -717,7 +717,7 @@ var _ = Describe("Application Actions", func() {
 
 				It("returns the error and warnings", func() {
 					Expect(err).To(Equal(expectedErr))
-					Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
+					Expect(warnings).To(ConsistOf("some-warning", "some-process-warning"))
 				})
 			})
 
@@ -740,7 +740,7 @@ var _ = Describe("Application Actions", func() {
 
 				It("returns the application", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-health-check-warning"}))
+					Expect(warnings).To(ConsistOf("some-warning", "some-process-warning", "some-health-check-warning"))
 
 					Expect(app).To(Equal(Application{
 						GUID: ccv3App.GUID,
