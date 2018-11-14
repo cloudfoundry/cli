@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -121,6 +122,7 @@ var _ = Describe("domains command", func() {
 					var internalDomainName string
 
 					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionInternalDomainV2)
 						internalDomainName = helpers.NewDomainName()
 						internalDomain := helpers.NewDomain(orgName, internalDomainName)
 						internalDomain.CreateInternal()
