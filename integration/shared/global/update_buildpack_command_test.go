@@ -36,11 +36,12 @@ var _ = Describe("update-buildpack command", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("update-buildpack - Update a buildpack"))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say(`cf update-buildpack BUILDPACK \[-p PATH\] \[-i POSITION\] \[-s STACK\] \[--enable\|--disable\] \[--lock\|--unlock\]`))
+			Eventually(session).Should(Say(regexp.QuoteMeta(`cf update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--enable|--disable] [--lock|--unlock]`)))
 			Eventually(session).Should(Say("TIP:"))
 			Eventually(session).Should(Say("Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\n"))
 			Eventually(session).Should(Say("Use '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"))
 			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).Should(Say(`--assign-stack\s+Assign a stack to a buildpack that does not have a stack association`))
 			Eventually(session).Should(Say(`--disable\s+Disable the buildpack from being used for staging`))
 			Eventually(session).Should(Say(`--enable\s+Enable the buildpack to be used for staging`))
 			Eventually(session).Should(Say(`-i\s+The order in which the buildpacks are checked during buildpack auto-detection`))
@@ -49,7 +50,7 @@ var _ = Describe("update-buildpack command", func() {
 			Eventually(session).Should(Say(`--unlock\s+Unlock the buildpack to enable updates`))
 			Eventually(session).Should(Say(`-s\s+Specify stack to disambiguate buildpacks with the same name`))
 			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("buildpacks, rename-buildpack"))
+			Eventually(session).Should(Say("buildpacks, create-buildpack, delete-buildpack, rename-buildpack"))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -63,6 +64,10 @@ var _ = Describe("update-buildpack command", func() {
 	When("the user is logged in", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
+		})
+
+		AfterEach(func() {
+			helpers.DeleteBuildpackIfOnOldCCAPI(buildpackName)
 		})
 
 		When("the buildpack is not provided", func() {
@@ -511,6 +516,20 @@ var _ = Describe("update-buildpack command", func() {
 								Name: buildpackName, Stack: stacks[0]})))
 							Eventually(listSession).Should(Exit(0))
 						})
+
+						When("the buildpack already has a stack associated to it", func() {
+							BeforeEach(func() {
+								assignStackSession := helpers.CF("update-buildpack", buildpackName, "--assign-stack", stacks[0])
+								Eventually(assignStackSession).Should(Exit(0))
+							})
+
+							It("displays an error that the buildpack already has a stack association", func() {
+								session := helpers.CF("update-buildpack", buildpackName, "--assign-stack", stacks[1])
+								Eventually(session.Err).Should(Say("Buildpack %s already exists with a stack association", buildpackName))
+								Eventually(session).Should(Say("FAILED"))
+								Eventually(session).Should(Exit(1))
+							})
+						})
 					})
 
 					When("the user assigns a stack that does NOT exist on the system", func() {
@@ -520,7 +539,6 @@ var _ = Describe("update-buildpack command", func() {
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
-
 					})
 				})
 

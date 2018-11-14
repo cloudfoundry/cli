@@ -55,6 +55,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.BuildpackNotFoundError{},
 			BuildpackNotFoundError{}),
 
+		Entry("actionerror.BuildpackStackChangeError-> BuildpackStackChangeError",
+			actionerror.BuildpackStackChangeError{},
+			BuildpackStackChangeError{}),
+
 		Entry("actionerror.CommandLineOptionsWithMultipleAppsError -> CommandLineArgsWithMultipleAppsError",
 			actionerror.CommandLineOptionsWithMultipleAppsError{},
 			CommandLineArgsWithMultipleAppsError{}),

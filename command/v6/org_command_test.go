@@ -145,8 +145,8 @@ var _ = Describe("org Command", func() {
 				fakeActor.GetOrganizationSummaryByNameReturns(
 					v2action.OrganizationSummary{
 						Organization: v2action.Organization{
-							Name: "some-org",
-							GUID: "some-org-guid",
+							Name:                        "some-org",
+							GUID:                        "some-org-guid",
 							DefaultIsolationSegmentGUID: "default-isolation-segment-guid",
 						},
 						DomainNames: []string{

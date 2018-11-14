@@ -327,7 +327,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 			It("returns the error", func() {
 				Expect(executeErr).To(Equal(expectedErr))
-				Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
+				Expect(warnings).To(ConsistOf("some-warning", "some-process-warning"))
 			})
 		})
 	})

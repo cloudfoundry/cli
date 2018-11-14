@@ -74,7 +74,7 @@ var _ = Describe("Service Instance Actions", func() {
 					GUID: "service-instance-guid",
 					Name: "some-service-instance",
 				}))
-				Expect(warnings).To(Equal(Warnings{"service-instance-warnings"}))
+				Expect(warnings).To(ConsistOf("service-instance-warnings"))
 
 				Expect(fakeCloudControllerClient.GetServiceInstanceCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetServiceInstanceArgsForCall(0)).To(Equal(serviceInstanceGUID))
@@ -129,7 +129,7 @@ var _ = Describe("Service Instance Actions", func() {
 					GUID: "some-service-instance-guid",
 					Name: "some-service-instance",
 				}))
-				Expect(warnings).To(Equal(Warnings{"foo"}))
+				Expect(warnings).To(ConsistOf("foo"))
 
 				Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
 

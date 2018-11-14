@@ -50,7 +50,7 @@ var _ = Describe("Policy", func() {
 		})
 
 		It("creates policies", func() {
-			Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
+			Expect(warnings).To(ConsistOf("v3ActorWarningA", "v3ActorWarningB"))
 			Expect(executeErr).NotTo(HaveOccurred())
 
 			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(2))
@@ -85,7 +85,7 @@ var _ = Describe("Policy", func() {
 				fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
 			})
 			It("returns a sensible error", func() {
-				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA"})))
+				Expect(warnings).To(ConsistOf("v3ActorWarningA"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -100,7 +100,7 @@ var _ = Describe("Policy", func() {
 				}
 			})
 			It("returns a sensible error", func() {
-				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
+				Expect(warnings).To(ConsistOf("v3ActorWarningA", "v3ActorWarningB"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -198,7 +198,7 @@ var _ = Describe("Policy", func() {
 			})
 
 			It("passes through the source app argument", func() {
-				Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning", "v3ActorWarningA"})))
+				Expect(warnings).To(ConsistOf("GetApplicationsBySpaceWarning", "v3ActorWarningA"))
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
@@ -218,7 +218,7 @@ var _ = Describe("Policy", func() {
 
 			It("returns a sensible error", func() {
 				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning"})))
+				Expect(warnings).To(ConsistOf("GetApplicationsBySpaceWarning"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -237,7 +237,7 @@ var _ = Describe("Policy", func() {
 
 			It("returns a sensible error", func() {
 				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning", "v3ActorWarningA"})))
+				Expect(warnings).To(ConsistOf("GetApplicationsBySpaceWarning", "v3ActorWarningA"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -332,7 +332,7 @@ var _ = Describe("Policy", func() {
 					EndPort:         8080,
 				}},
 			))
-			Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning"})))
+			Expect(warnings).To(ConsistOf("GetApplicationsBySpaceWarning"))
 			Expect(executeErr).NotTo(HaveOccurred())
 
 			Expect(fakeV3Actor.GetApplicationsBySpaceCallCount()).To(Equal(1))
@@ -349,7 +349,7 @@ var _ = Describe("Policy", func() {
 
 			It("returns a sensible error", func() {
 				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning"})))
+				Expect(warnings).To(ConsistOf("GetApplicationsBySpaceWarning"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -393,7 +393,7 @@ var _ = Describe("Policy", func() {
 			warnings, executeErr = actor.RemoveNetworkPolicy(spaceGuid, srcApp, destApp, protocol, startPort, endPort)
 		})
 		It("removes policies", func() {
-			Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
+			Expect(warnings).To(ConsistOf("v3ActorWarningA", "v3ActorWarningB"))
 			Expect(executeErr).NotTo(HaveOccurred())
 
 			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(2))
@@ -431,7 +431,7 @@ var _ = Describe("Policy", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
+				Expect(warnings).To(ConsistOf("v3ActorWarningA", "v3ActorWarningB"))
 				Expect(executeErr).To(MatchError(actionerror.PolicyDoesNotExistError{}))
 			})
 		})
@@ -441,7 +441,7 @@ var _ = Describe("Policy", func() {
 				fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
 			})
 			It("returns a sensible error", func() {
-				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA"})))
+				Expect(warnings).To(ConsistOf("v3ActorWarningA"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -453,7 +453,7 @@ var _ = Describe("Policy", func() {
 			})
 
 			It("returns a sensible error", func() {
-				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
+				Expect(warnings).To(ConsistOf("v3ActorWarningA", "v3ActorWarningB"))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})

@@ -18,7 +18,7 @@ import (
 
 func TestV3Action(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "V3 Actions Suite")
+	RunSpecs(t, "V7 Actions Suite")
 }
 
 var _ = BeforeEach(func() {

@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("create-shared-domain command", func() {
@@ -54,6 +55,7 @@ var _ = Describe("create-shared-domain command", func() {
 
 					session = helpers.CF("domains")
 					Eventually(session).Should(Say(`%s\s+shared`, domainName))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
@@ -89,43 +91,64 @@ var _ = Describe("create-shared-domain command", func() {
 		})
 
 		When("the --internal flag is specified", func() {
-			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionInternalDomainV2)
-			})
+			When("the CC API version is less than the minimum version specified", func() {
+				var server *Server
 
-			When("things work as expected", func() {
-				It("creates a domain with internal flag", func() {
-					session := helpers.CF("create-shared-domain", domainName, "--internal")
+				BeforeEach(func() {
+					server = helpers.StartAndTargetServerWithAPIVersions(ccversion.MinV2ClientVersion, ccversion.MinV3ClientVersion)
+				})
 
-					Eventually(session).Should(Say("Creating shared domain %s as admin...", domainName))
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Exit(0))
+				AfterEach(func() {
+					server.Close()
+				})
 
-					session = helpers.CF("domains")
-
-					var sharedDomainResponse struct {
-						Resources []struct {
-							Entity struct {
-								Internal bool   `json:"internal"`
-								Name     string `json:"name"`
-							}
-						}
-					}
-
-					helpers.Curl(&sharedDomainResponse, "/v2/shared_domains?q=name:%s", domainName)
-					Expect(sharedDomainResponse.Resources).To(HaveLen(1))
-					isInternal := sharedDomainResponse.Resources[0].Entity.Internal
-					Expect(isInternal).To(BeTrue())
+				It("fails with error message that the minimum version is not met", func() {
+					session := helpers.CF("create-shared-domain", domainName, "--internal", "-v")
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say(`Option '--internal' requires CF API version 2\.115\.0 or higher\. Your target is %s`, ccversion.MinV2ClientVersion))
+					Eventually(session).Should(Exit(1))
 				})
 			})
-		})
 
-		When("both --internal and --router-group flags are specified", func() {
-			It("returns an argument error", func() {
-				session := helpers.CF("create-shared-domain", domainName, "--router-group", "my-router-group", "--internal")
-				Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --router-group, --internal"))
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Exit(1))
+			When("the CC API version meets the minimum version requirement", func() {
+				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionInternalDomainV2)
+				})
+
+				When("things work as expected", func() {
+					It("creates a domain with internal flag", func() {
+						session := helpers.CF("create-shared-domain", domainName, "--internal")
+
+						Eventually(session).Should(Say("Creating shared domain %s as admin...", domainName))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("domains")
+
+						var sharedDomainResponse struct {
+							Resources []struct {
+								Entity struct {
+									Internal bool   `json:"internal"`
+									Name     string `json:"name"`
+								}
+							}
+						}
+
+						helpers.Curl(&sharedDomainResponse, "/v2/shared_domains?q=name:%s", domainName)
+						Expect(sharedDomainResponse.Resources).To(HaveLen(1))
+						isInternal := sharedDomainResponse.Resources[0].Entity.Internal
+						Expect(isInternal).To(BeTrue())
+					})
+				})
+
+				When("both --internal and --router-group flags are specified", func() {
+					It("returns an argument error", func() {
+						session := helpers.CF("create-shared-domain", domainName, "--router-group", "my-router-group", "--internal")
+						Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --router-group, --internal"))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
 			})
 		})
 
@@ -211,7 +234,20 @@ var _ = Describe("create-shared-domain command", func() {
 			Eventually(session).Should(Exit(1))
 		})
 
-		When("With router-group flag", func() {
+		When("with --internal flag", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionInternalDomainV2)
+			})
+
+			It("should fail and return an unauthorized message", func() {
+				session := helpers.CF("create-shared-domain", domainName, "--internal")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		When("with --router-group flag", func() {
 			BeforeEach(func() {
 				helpers.SkipIfNoRoutingAPI()
 			})

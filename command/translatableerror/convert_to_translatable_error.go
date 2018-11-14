@@ -32,6 +32,8 @@ func ConvertToTranslatableError(err error) error {
 		return AssignDropletError(e)
 	case actionerror.BuildpackNotFoundError:
 		return BuildpackNotFoundError(e)
+	case actionerror.BuildpackStackChangeError:
+		return BuildpackStackChangeError(e)
 	case actionerror.CommandLineOptionsWithMultipleAppsError:
 		return CommandLineArgsWithMultipleAppsError{}
 	case actionerror.DockerPasswordNotSetError:

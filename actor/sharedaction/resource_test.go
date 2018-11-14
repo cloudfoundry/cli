@@ -176,18 +176,20 @@ var _ = Describe("Resource Actions", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(reader.File).To(HaveLen(5))
+
 					Expect(reader.File[0].Name).To(Equal("/"))
+
 					Expect(reader.File[1].Name).To(Equal("/level1/"))
+
 					Expect(reader.File[2].Name).To(Equal("/level1/level2/"))
+
 					Expect(reader.File[3].Name).To(Equal("/level1/level2/tmpFile1"))
-					Expect(reader.File[4].Name).To(Equal("/tmpFile2"))
-
+					Expect(reader.File[3].Method).To(Equal(zip.Deflate))
 					expectFileContentsToEqual(reader.File[3], "why hello")
-					expectFileContentsToEqual(reader.File[4], "Hello, Binky")
 
-					for _, file := range reader.File {
-						Expect(file.Method).To(Equal(zip.Deflate))
-					}
+					Expect(reader.File[4].Name).To(Equal("/tmpFile2"))
+					Expect(reader.File[4].Method).To(Equal(zip.Deflate))
+					expectFileContentsToEqual(reader.File[4], "Hello, Binky")
 				})
 			})
 
@@ -296,18 +298,20 @@ var _ = Describe("Resource Actions", func() {
 
 					Expect(reader.File).To(HaveLen(5))
 					Expect(reader.File[0].Name).To(Equal("level1/"))
+
 					Expect(reader.File[1].Name).To(Equal("level1/level2/"))
+
 					Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
-					Expect(reader.File[3].Name).To(Equal("tmpFile2"))
-					Expect(reader.File[4].Name).To(Equal("tmpFile3"))
-
+					Expect(reader.File[2].Method).To(Equal(zip.Deflate))
 					expectFileContentsToEqual(reader.File[2], "why hello")
-					expectFileContentsToEqual(reader.File[3], "Hello, Binky")
-					expectFileContentsToEqual(reader.File[4], "Bananarama")
 
-					for _, file := range reader.File {
-						Expect(file.Method).To(Equal(zip.Deflate))
-					}
+					Expect(reader.File[3].Name).To(Equal("tmpFile2"))
+					Expect(reader.File[3].Method).To(Equal(zip.Deflate))
+					expectFileContentsToEqual(reader.File[3], "Hello, Binky")
+
+					Expect(reader.File[4].Name).To(Equal("tmpFile3"))
+					Expect(reader.File[4].Method).To(Equal(zip.Deflate))
+					expectFileContentsToEqual(reader.File[4], "Bananarama")
 				})
 			})
 
@@ -337,16 +341,19 @@ var _ = Describe("Resource Actions", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(reader.File).To(HaveLen(5))
-					Expect(reader.File[0].Name).To(Equal("level1/"))
-					Expect(reader.File[1].Name).To(Equal("level1/level2/"))
-					Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
-					Expect(reader.File[3].Name).To(Equal("symlink1"))
-					Expect(reader.File[4].Name).To(Equal("level1/level2/symlink2"))
 
+					Expect(reader.File[0].Name).To(Equal("level1/"))
+
+					Expect(reader.File[1].Name).To(Equal("level1/level2/"))
+
+					Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
 					expectFileContentsToEqual(reader.File[2], "why hello")
+
+					Expect(reader.File[3].Name).To(Equal("symlink1"))
 					Expect(reader.File[3].Mode() & os.ModeSymlink).To(Equal(os.ModeSymlink))
 					expectFileContentsToEqual(reader.File[3], filepath.FromSlash("level1/level2/tmpFile1"))
 
+					Expect(reader.File[4].Name).To(Equal("level1/level2/symlink2"))
 					Expect(reader.File[4].Mode() & os.ModeSymlink).To(Equal(os.ModeSymlink))
 					expectFileContentsToEqual(reader.File[4], filepath.FromSlash("../../tmpfile2"))
 				})

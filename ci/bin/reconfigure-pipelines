@@ -68,7 +68,8 @@ configure_bosh_lite_pool_pipeline() {
     -v bosh-lite-system-domain-suffix=lite.cli.fun \
     -v git-email=cf-cli-eng@pivotal.io \
     -v git-username=cf-cli-eng \
-    -v env-pool-repo=git@github.com:cloudfoundry/cli-pools.git
+    -v env-pool-repo=git@github.com:cloudfoundry/cli-pools.git \
+    -v slack-webhook-url="$(lpass show Shared-CLI/Concourse/Concourse\ Credentials --notes | grep -F slack-webhook-url: | cut -d '"' -f2)"
 }
 
 check_installed lpass

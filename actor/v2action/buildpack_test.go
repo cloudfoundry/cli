@@ -609,21 +609,18 @@ var _ = Describe("Buildpack", func() {
 
 	Describe("UpdateBuildpackByNameAndStack", func() {
 		var (
-			expectedError        error
-			warnings             Warnings
-			executeErr           error
-			newPosition          types.NullInt
-			newLocked            types.NullBool
-			newEnabled           types.NullBool
-			fakeProgressBar      *v2actionfakes.FakeSimpleProgressBar
-			updatedBuildpackGuid string
-			currentStack         string
-			newStack             string
+			expectedError error
+			warnings      Warnings
+			executeErr    error
+			newPosition   types.NullInt
+			newLocked     types.NullBool
+			newEnabled    types.NullBool
+			currentStack  string
+			newStack      string
 		)
 
 		JustBeforeEach(func() {
-			fakeProgressBar = new(v2actionfakes.FakeSimpleProgressBar)
-			updatedBuildpackGuid, warnings, executeErr = actor.UpdateBuildpackByNameAndStack("some-bp-name", currentStack, newPosition, newLocked, newEnabled, newStack)
+			_, warnings, executeErr = actor.UpdateBuildpackByNameAndStack("some-bp-name", currentStack, newPosition, newLocked, newEnabled, newStack)
 		})
 
 		When("current stack is an empty string", func() {
@@ -748,10 +745,24 @@ var _ = Describe("Buildpack", func() {
 					)
 				})
 
-				It("makes an API call to update the stack", func() {
-					Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
-					passedBuildpack := fakeCloudControllerClient.UpdateBuildpackArgsForCall(0)
-					Expect(passedBuildpack.Stack).To(Equal(newStack))
+				When("new stack exists", func() {
+					It("makes an API call to update the stack", func() {
+						Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
+						passedBuildpack := fakeCloudControllerClient.UpdateBuildpackArgsForCall(0)
+						Expect(passedBuildpack.Stack).To(Equal(newStack))
+					})
+
+					When("the buildpack already has a stack association", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{
+								ccv2.Buildpack{Stack: "some-old-stack-name", Name: "some-bp-name"}}, ccv2.Warnings{"get warning"}, nil)
+						})
+
+						It("return the error and warnings", func() {
+							Expect(executeErr).To(MatchError(actionerror.BuildpackStackChangeError{BuildpackName: "some-bp-name"}))
+							Expect(warnings).To(ConsistOf("get warning"))
+						})
+					})
 				})
 
 				When("new stack does not exists", func() {

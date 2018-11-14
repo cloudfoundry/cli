@@ -194,8 +194,8 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 
 	for _, domain := range space.Domains {
 		d := plugin_models.GetSpace_Domains{
-			Name: domain.Name,
-			Guid: domain.GUID,
+			Name:                   domain.Name,
+			Guid:                   domain.GUID,
 			OwningOrganizationGuid: domain.OwningOrganizationGUID,
 			Shared:                 domain.Shared,
 		}

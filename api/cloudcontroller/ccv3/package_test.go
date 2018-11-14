@@ -452,11 +452,12 @@ var _ = Describe("Package", func() {
 		When("the upload is successful", func() {
 			var (
 				resources  []Resource
-				reader     io.Reader
 				readerBody []byte
 			)
 
 			When("the upload has application bits to upload", func() {
+				var reader io.Reader
+
 				BeforeEach(func() {
 					resources = []Resource{
 						{Filename: "foo"},
@@ -626,7 +627,7 @@ var _ = Describe("Package", func() {
 				fakeReader.ReadReturns(0, expectedErr)
 
 				server.AppendHandlers(
-					VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid/bits", "async=true"),
+					VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
 				)
 			})
 

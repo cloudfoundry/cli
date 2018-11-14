@@ -25,6 +25,7 @@ type PushState struct {
 
 type FlagOverrides struct {
 	Buildpacks      []string
+	HealthCheckType string
 	Memory          types.NullUint64
 	ProvidedAppPath string
 }

@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -88,7 +89,7 @@ var _ = Describe("domains command", func() {
 					session := helpers.CF("domains")
 
 					Eventually(session).Should(Say(`Getting domains in org %s as admin\.\.\.`, orgName))
-					Eventually(session).Should(Say(`name\s+status\s+type`))
+					Eventually(session).Should(Say(`name\s+status\s+type\s+details`))
 					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
 					Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
 					Eventually(session).Should(Exit(0))
@@ -109,7 +110,7 @@ var _ = Describe("domains command", func() {
 						session := helpers.CF("domains")
 
 						Eventually(session).Should(Say(`Getting domains in org %s as admin`, orgName))
-						Eventually(session).Should(Say(`name\s+status\s+type`))
+						Eventually(session).Should(Say(`name\s+status\s+type\s+details`))
 						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
 						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
 						Eventually(session).Should(Say(`%s\s+shared\s+tcp`, sharedDomainWithType.Name))
@@ -117,6 +118,25 @@ var _ = Describe("domains command", func() {
 					})
 				})
 
+				When("the shared domain is internal", func() {
+					var internalDomainName string
+
+					BeforeEach(func() {
+						helpers.SkipIfVersionLessThan(ccversion.MinVersionInternalDomainV2)
+						internalDomainName = helpers.NewDomainName()
+						internalDomain := helpers.NewDomain(orgName, internalDomainName)
+						internalDomain.CreateInternal()
+					})
+
+					It("displays the internal flag on the shared domain", func() {
+						session := helpers.CF("domains")
+
+						Eventually(session).Should(Say(`Getting domains in org %s as admin`, orgName))
+						Eventually(session).Should(Say(`name\s+status\s+type\s+details`))
+						Eventually(session).Should(Say(`%s\s+shared\s+internal`, internalDomainName))
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 
 			When("the targeted org has a private domain", func() {
@@ -134,7 +154,7 @@ var _ = Describe("domains command", func() {
 					session := helpers.CF("domains")
 
 					Eventually(session).Should(Say(`Getting domains in org %s as admin`, orgName))
-					Eventually(session).Should(Say(`name\s+status\s+type`))
+					Eventually(session).Should(Say(`name\s+status\s+type\s+details`))
 					Eventually(session).Should(Say(`%s\s+owned\s+`, privateDomain1.Name))
 					Eventually(session).Should(Say(`%s\s+owned\s+`, privateDomain2.Name))
 					Eventually(session).Should(Exit(0))
@@ -159,7 +179,7 @@ var _ = Describe("domains command", func() {
 						session := helpers.CF("domains")
 
 						Eventually(session).Should(Say(`Getting domains in org %s as admin`, newOrgName))
-						Eventually(session).Should(Say(`name\s+status\s+type`))
+						Eventually(session).Should(Say(`name\s+status\s+type\s+details`))
 
 						Consistently(session).ShouldNot(Say(`%s`, privateDomain1.Name))
 						Consistently(session).ShouldNot(Say(`%s`, privateDomain2.Name))
@@ -183,7 +203,7 @@ var _ = Describe("domains command", func() {
 						session := helpers.CF("domains")
 
 						Eventually(session).Should(Say(`Getting domains in org %s as %s`, orgName, username))
-						Eventually(session).Should(Say(`name\s+status\s+type`))
+						Eventually(session).Should(Say(`name\s+status\s+type\s+details`))
 						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain1.Name))
 						Eventually(session).Should(Say(`%s\s+shared\s+`, sharedDomain2.Name))
 

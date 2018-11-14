@@ -44,10 +44,10 @@ var _ = Describe("Restage Command", func() {
 		fakeApplicationSummaryActor = new(sharedfakes.FakeApplicationSummaryActor)
 
 		cmd = RestageCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			UI:                      testUI,
+			Config:                  fakeConfig,
+			SharedActor:             fakeSharedActor,
+			Actor:                   fakeActor,
 			ApplicationSummaryActor: fakeApplicationSummaryActor,
 		}
 

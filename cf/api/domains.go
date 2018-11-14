@@ -112,7 +112,7 @@ func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (
 
 func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGUID string) (createdDomain models.DomainFields, err error) {
 	data, err := json.Marshal(resources.DomainEntity{
-		Name: domainName,
+		Name:                   domainName,
 		OwningOrganizationGUID: owningOrgGUID,
 		Wildcard:               true,
 	})

@@ -44,8 +44,8 @@ var _ = Describe("Space Summary Actions", func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv2.Space{
 							{
-								GUID: "some-space-guid",
-								Name: "some-space",
+								GUID:                     "some-space-guid",
+								Name:                     "some-space",
 								SpaceQuotaDefinitionGUID: "some-space-quota-guid",
 							},
 						},
@@ -189,8 +189,8 @@ var _ = Describe("Space Summary Actions", func() {
 
 					Expect(spaceSummary).To(Equal(SpaceSummary{
 						Space: Space{
-							Name: "some-space",
-							GUID: "some-space-guid",
+							Name:                     "some-space",
+							GUID:                     "some-space-guid",
 							SpaceQuotaDefinitionGUID: "some-space-quota-guid",
 						},
 						OrgName:                   "some-org",
@@ -399,8 +399,8 @@ var _ = Describe("Space Summary Actions", func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv2.Space{
 							{
-								GUID: "some-space-guid",
-								Name: "some-space",
+								GUID:                     "some-space-guid",
+								Name:                     "some-space",
 								SpaceQuotaDefinitionGUID: "some-space-quota-guid",
 							},
 						},
@@ -436,8 +436,8 @@ var _ = Describe("Space Summary Actions", func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv2.Space{
 							{
-								GUID: "some-space-guid",
-								Name: "some-space",
+								GUID:                     "some-space-guid",
+								Name:                     "some-space",
 								SpaceQuotaDefinitionGUID: "some-space-quota-guid",
 							},
 						},
@@ -485,8 +485,8 @@ var _ = Describe("Space Summary Actions", func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv2.Space{
 							{
-								GUID: "some-space-guid",
-								Name: "some-space",
+								GUID:                     "some-space-guid",
+								Name:                     "some-space",
 								SpaceQuotaDefinitionGUID: "some-space-quota-guid",
 							},
 						},
@@ -548,8 +548,8 @@ var _ = Describe("Space Summary Actions", func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv2.Space{
 							{
-								GUID: "some-space-guid",
-								Name: "some-space",
+								GUID:                     "some-space-guid",
+								Name:                     "some-space",
 								SpaceQuotaDefinitionGUID: "some-space-quota-guid",
 							},
 						},
@@ -619,8 +619,8 @@ var _ = Describe("Space Summary Actions", func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv2.Space{
 							{
-								GUID: "some-space-guid",
-								Name: "some-space",
+								GUID:                     "some-space-guid",
+								Name:                     "some-space",
 								SpaceQuotaDefinitionGUID: "some-space-quota-guid",
 							},
 						},

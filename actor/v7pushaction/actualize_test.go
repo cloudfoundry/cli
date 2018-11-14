@@ -11,6 +11,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
 	log "github.com/sirupsen/logrus"
 
@@ -236,53 +237,130 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("scaling the web process", func() {
-		When("the scale is successful", func() {
-			var memory types.NullUint64
+		When("a scale override is passed", func() {
+			When("the scale is successful", func() {
+				var memory types.NullUint64
 
-			BeforeEach(func() {
-				memory = types.NullUint64{IsSet: true, Value: 2048}
-				fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, nil)
+				BeforeEach(func() {
+					memory = types.NullUint64{IsSet: true, Value: 2048}
+					fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, nil)
 
-				state.Application.GUID = "some-app-guid"
-				state.Overrides = FlagOverrides{
-					Memory: memory,
-				}
-				fakeV7Actor.UpdateApplicationReturns(
-					v7action.Application{
-						Name: "some-app",
-						GUID: state.Application.GUID,
-					},
-					v7action.Warnings{"some-app-update-warnings"},
-					nil)
+					state.Application.GUID = "some-app-guid"
+					state.Overrides = FlagOverrides{
+						Memory: memory,
+					}
+					fakeV7Actor.UpdateApplicationReturns(
+						v7action.Application{
+							Name: "some-app",
+							GUID: state.Application.GUID,
+						},
+						v7action.Warnings{"some-app-update-warnings"},
+						nil)
+				})
+
+				It("returns warnings and continues", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
+					Eventually(warningsStream).Should(Receive(ConsistOf("scaling-warnings")))
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcessComplete))
+
+					Expect(fakeV7Actor.ScaleProcessByApplicationCallCount()).To(Equal(1))
+					passedAppGUID, passedProcess := fakeV7Actor.ScaleProcessByApplicationArgsForCall(0)
+					Expect(passedAppGUID).To(Equal("some-app-guid"))
+					Expect(passedProcess).To(MatchFields(IgnoreExtras,
+						Fields{
+							"Type":       Equal("web"),
+							"MemoryInMB": Equal(memory),
+						}))
+				})
 			})
 
-			It("returns warnings and continues", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
-				Eventually(warningsStream).Should(Receive(ConsistOf("scaling-warnings")))
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcessComplete))
+			When("the scale errors", func() {
+				var expectedErr error
+				BeforeEach(func() {
+					state.Overrides = FlagOverrides{
+						Memory: types.NullUint64{IsSet: true},
+					}
+					expectedErr = errors.New("nopes")
+					fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, expectedErr)
+				})
 
-				Expect(fakeV7Actor.ScaleProcessByApplicationCallCount()).To(Equal(1))
-				passedAppGUID, passedProcess := fakeV7Actor.ScaleProcessByApplicationArgsForCall(0)
-				Expect(passedAppGUID).To(Equal("some-app-guid"))
-				Expect(passedProcess).To(MatchFields(IgnoreExtras,
-					Fields{
-						"Type":       Equal("web"),
-						"MemoryInMB": Equal(memory),
-					}))
+				It("returns warnings and an error", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
+					Eventually(warningsStream).Should(Receive(ConsistOf("scaling-warnings")))
+					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(ScaleWebProcessComplete))
+				})
 			})
 		})
 
-		When("the scale errors", func() {
-			var expectedErr error
+		When("a scale override is not provided", func() {
+			It("should not scale the application", func() {
+				Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(ScaleWebProcess))
+				Consistently(fakeV7Actor.ScaleProcessByApplicationCallCount).Should(Equal(0))
+			})
+		})
+	})
+
+	Describe("setting the process health check type", func() {
+		When("a health check override is passed", func() {
+			var healthCheckType string
+
 			BeforeEach(func() {
-				expectedErr = errors.New("nopes")
-				fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, expectedErr)
+				healthCheckType = "port"
+				state.Overrides = FlagOverrides{
+					HealthCheckType: healthCheckType,
+				}
 			})
 
-			It("returns warnings and continues", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
-				Eventually(warningsStream).Should(Receive(ConsistOf("scaling-warnings")))
-				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+			When("the update is successful", func() {
+				BeforeEach(func() {
+					state.Application.GUID = "some-app-guid"
+
+					fakeV7Actor.UpdateApplicationReturns(
+						v7action.Application{
+							Name: "some-app",
+							GUID: state.Application.GUID,
+						},
+						v7action.Warnings{"some-app-update-warnings"},
+						nil)
+					fakeV7Actor.SetProcessHealthCheckByProcessTypeAndApplicationReturns(v7action.Warnings{"health-check-warnings"}, nil)
+				})
+
+				It("returns warnings and continues", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetHealthCheck))
+					Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetHealthCheckComplete))
+
+					Expect(fakeV7Actor.SetProcessHealthCheckByProcessTypeAndApplicationCallCount()).To(Equal(1))
+					passedProcessType, passedAppGUID, passedHealthCheckType, passedHTTPEndpoint, passedInvocationTimeout := fakeV7Actor.SetProcessHealthCheckByProcessTypeAndApplicationArgsForCall(0)
+					Expect(passedProcessType).To(Equal(constant.ProcessTypeWeb))
+					Expect(passedAppGUID).To(Equal("some-app-guid"))
+					Expect(passedHealthCheckType).To(Equal(healthCheckType))
+					Expect(passedHTTPEndpoint).To(Equal(constant.ProcessHealthCheckEndpointDefault))
+					Expect(passedInvocationTimeout).To(BeZero())
+				})
+			})
+
+			When("the update errors", func() {
+				var expectedErr error
+				BeforeEach(func() {
+					expectedErr = errors.New("nopes")
+					fakeV7Actor.SetProcessHealthCheckByProcessTypeAndApplicationReturns(v7action.Warnings{"health-check-warnings"}, expectedErr)
+				})
+
+				It("returns warnings and an error", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetHealthCheck))
+					Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
+					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(SetHealthCheckComplete))
+				})
+			})
+		})
+
+		When("a health check override is not provided", func() {
+			It("should not set the health check", func() {
+				Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(SetHealthCheck))
+				Consistently(fakeV7Actor.SetProcessHealthCheckByProcessTypeAndApplicationCallCount).Should(Equal(0))
 			})
 		})
 	})

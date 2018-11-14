@@ -479,10 +479,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 					})
 
 					Describe("a Forbidden error", func() {
-						var expectedErr error
-
 						BeforeEach(func() {
-							expectedErr = errors.New("get-service-plan-error")
 							fakeCloudControllerClient.GetServicePlanReturns(
 								ccv2.ServicePlan{},
 								ccv2.Warnings{"get-service-plan-warning"},

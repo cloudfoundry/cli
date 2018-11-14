@@ -83,7 +83,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 							It("uploads the app manifest", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(warnings).To(Equal(Warnings{"app-1-warning", "apply-manifest-1-warning", "poll-1-warning"}))
+								Expect(warnings).To(ConsistOf("app-1-warning", "apply-manifest-1-warning", "poll-1-warning"))
 
 								Expect(fakeParser.RawManifestCallCount()).To(Equal(1))
 								appName := fakeParser.RawManifestArgsForCall(0)
@@ -120,7 +120,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 							It("reports a polling error", func() {
 								Expect(executeErr).To(Equal(expectedErr))
-								Expect(warnings).To(Equal(Warnings{"app-1-warning", "apply-manifest-1-warning", "poll-1-warning"}))
+								Expect(warnings).To(ConsistOf("app-1-warning", "apply-manifest-1-warning", "poll-1-warning"))
 							})
 						})
 
@@ -137,7 +137,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 							It("reports a polling error", func() {
 								Expect(executeErr).To(Equal(actionerror.ApplicationManifestError{Message: "some-job-failed"}))
-								Expect(warnings).To(Equal(Warnings{"app-1-warning", "apply-manifest-1-warning", "poll-1-warning"}))
+								Expect(warnings).To(ConsistOf("app-1-warning", "apply-manifest-1-warning", "poll-1-warning"))
 							})
 						})
 					})
@@ -156,7 +156,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 						It("reports a error trying to apply the manifest", func() {
 							Expect(executeErr).To(Equal(applyErr))
-							Expect(warnings).To(Equal(Warnings{"app-1-warning", "apply-manifest-1-warning"}))
+							Expect(warnings).To(ConsistOf("app-1-warning", "apply-manifest-1-warning"))
 						})
 					})
 				})
@@ -176,7 +176,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 					It("returns error and warnings", func() {
 						Expect(executeErr).To(Equal(getAppErr))
-						Expect(warnings).To(Equal(Warnings{"app-1-warning"}))
+						Expect(warnings).To(ConsistOf("app-1-warning"))
 					})
 				})
 			})

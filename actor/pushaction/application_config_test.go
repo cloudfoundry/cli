@@ -499,7 +499,7 @@ var _ = Describe("Application Config", func() {
 							"env2": "2",
 							"env3": "9",
 						},
-						GUID: "some-app-guid",
+						GUID:                    "some-app-guid",
 						HealthCheckHTTPEndpoint: "/some-endpoint",
 						HealthCheckTimeout:      5,
 						HealthCheckType:         "port",

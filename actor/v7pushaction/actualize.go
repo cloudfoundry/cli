@@ -54,15 +54,35 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 		}
 		stateStream <- state
 
-		eventStream <- ScaleWebProcess
-		process := v7action.Process{Type: constant.ProcessTypeWeb, MemoryInMB: state.Overrides.Memory}
-		scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(state.Application.GUID, process)
-		warningsStream <- Warnings(scaleWarnings)
-		if err != nil {
-			errorStream <- err
-			return
+		if state.Overrides.Memory.IsSet {
+			log.Info("Scaling Web Process")
+			eventStream <- ScaleWebProcess
+			process := v7action.Process{Type: constant.ProcessTypeWeb, MemoryInMB: state.Overrides.Memory}
+			scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(state.Application.GUID, process)
+			warningsStream <- Warnings(scaleWarnings)
+			if err != nil {
+				errorStream <- err
+				return
+			}
+			eventStream <- ScaleWebProcessComplete
 		}
-		eventStream <- ScaleWebProcessComplete
+
+		if state.Overrides.HealthCheckType != "" {
+			log.WithField("health_check_type", state.Overrides.HealthCheckType).Info("Setting Web Process's Health Check Type")
+			eventStream <- SetHealthCheck
+			warnings, err := actor.V7Actor.SetProcessHealthCheckByProcessTypeAndApplication(
+				constant.ProcessTypeWeb,
+				state.Application.GUID,
+				state.Overrides.HealthCheckType,
+				constant.ProcessHealthCheckEndpointDefault,
+				0)
+			warningsStream <- Warnings(warnings)
+			if err != nil {
+				errorStream <- err
+				return
+			}
+			eventStream <- SetHealthCheckComplete
+		}
 
 		eventStream <- CreatingAndMappingRoutes
 		routeWarnings, routeErr := actor.CreateAndMapDefaultApplicationRoute(state.OrgGUID, state.SpaceGUID, state.Application)

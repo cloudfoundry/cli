@@ -147,6 +147,7 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 
 					It("returns an error", func() {
 						Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+							Command:        "Option '--internal'",
 							CurrentVersion: ccversion.MinV2ClientVersion,
 							MinimumVersion: ccversion.MinVersionInternalDomainV2,
 						}))

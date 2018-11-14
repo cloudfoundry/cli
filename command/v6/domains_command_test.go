@@ -103,52 +103,83 @@ var _ = Describe("Domains Command", func() {
 				Expect(testUI.Out).To(Say(`Getting domains in org some-org as some-user\.\.\.`))
 			})
 
-			When("getting the shared domains", func() {
-				When("GetDomains returns an error", func() {
-					BeforeEach(func() {
-						fakeActor.GetDomainsReturns([]v2action.Domain{}, v2action.Warnings{"warning-1", "warning-2"}, actionerror.OrganizationNotFoundError{Name: targetedOrg.Name})
-					})
-
-					It("fails and returns an error", func() {
-						Expect(testUI.Out).To(Say(`Getting domains in org some-org as some-user\.\.\.`))
-						Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: targetedOrg.Name}))
-						Expect(fakeActor.GetDomainsCallCount()).To(Equal(1))
-						actualOrgGUID := fakeActor.GetDomainsArgsForCall(0)
-						Expect(actualOrgGUID).To(Equal(targetedOrg.GUID))
-					})
-
-					It("displays all warnings", func() {
-						Expect(testUI.Err).To(Say(`warning-1`))
-						Expect(testUI.Err).To(Say(`warning-2`))
-					})
+			When("GetDomains returns a domain", func() {
+				BeforeEach(func() {
+					domain := v2action.Domain{
+						Name: "domain.name",
+						Type: "some-domain-type-1",
+					}
+					fakeActor.GetDomainsReturns([]v2action.Domain{domain}, v2action.Warnings{"warning-1", "warning-2"}, nil)
 				})
 
-				When("GetDomains returns more than one domain", func() {
-					BeforeEach(func() {
-						privateDomain := v2action.Domain{
-							Name:            "private.domain",
-							Type:            "some-domain-type-1",
-							RouterGroupType: "zombo",
-						}
+				It("displays the domain", func() {
+					Expect(testUI.Out).To(Say(`name\s+status\s+type\s+details`))
+					Expect(testUI.Out).To(Say(`domain.name\s+some-domain-type-1\s+$`))
+				})
 
-						sharedDomain := v2action.Domain{
-							Name:            "shared.domain",
-							Type:            "some-domain-type-2",
-							RouterGroupType: "tcp",
-						}
-						fakeActor.GetDomainsReturns([]v2action.Domain{privateDomain, sharedDomain}, v2action.Warnings{"warning-1", "warning-2"}, nil)
-					})
+				It("displays all warnings", func() {
+					Expect(testUI.Err).To(Say(`warning-1`))
+					Expect(testUI.Err).To(Say(`warning-2`))
+				})
+			})
 
-					It("displays all domains", func() {
-						Expect(testUI.Out).To(Say(`name\s+status\s+type`))
-						Expect(testUI.Out).To(Say(`private.domain\s+some-domain-type-1\s+zombo`))
-						Expect(testUI.Out).To(Say(`shared.domain\s+some-domain-type-2\s+tcp`))
-					})
+			When("GetDomains returns an internal domain", func() {
+				BeforeEach(func() {
+					sharedDomain := v2action.Domain{
+						Name:            "shared.domain",
+						Type:            "some-domain-type-2",
+						RouterGroupType: "tcp",
+						Internal:        true,
+					}
+					fakeActor.GetDomainsReturns([]v2action.Domain{sharedDomain}, v2action.Warnings{}, nil)
+				})
 
-					It("displays all warnings", func() {
-						Expect(testUI.Err).To(Say(`warning-1`))
-						Expect(testUI.Err).To(Say(`warning-2`))
-					})
+				It("displays internal in the details", func() {
+					Expect(testUI.Out).To(Say(`name\s+status\s+type\s+details`))
+					Expect(testUI.Out).To(Say(`shared.domain\s+some-domain-type-2\s+tcp\s+internal`))
+				})
+			})
+
+			When("GetDomains returns more than one domain", func() {
+				BeforeEach(func() {
+					privateDomain := v2action.Domain{
+						Name:            "private.domain",
+						Type:            "some-domain-type-1",
+						RouterGroupType: "zombo",
+					}
+
+					sharedDomain := v2action.Domain{
+						Name:            "shared.domain",
+						Type:            "some-domain-type-2",
+						RouterGroupType: "tcp",
+						Internal:        true,
+					}
+					fakeActor.GetDomainsReturns([]v2action.Domain{privateDomain, sharedDomain}, v2action.Warnings{}, nil)
+				})
+
+				It("displays all domains", func() {
+					Expect(testUI.Out).To(Say(`name\s+status\s+type\s+details`))
+					Expect(testUI.Out).To(Say(`private.domain\s+some-domain-type-1\s+zombo`))
+					Expect(testUI.Out).To(Say(`shared.domain\s+some-domain-type-2\s+tcp`))
+				})
+			})
+
+			When("GetDomains returns an error", func() {
+				BeforeEach(func() {
+					fakeActor.GetDomainsReturns([]v2action.Domain{}, v2action.Warnings{"warning-1", "warning-2"}, actionerror.OrganizationNotFoundError{Name: targetedOrg.Name})
+				})
+
+				It("fails and returns an error", func() {
+					Expect(testUI.Out).To(Say(`Getting domains in org some-org as some-user\.\.\.`))
+					Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: targetedOrg.Name}))
+					Expect(fakeActor.GetDomainsCallCount()).To(Equal(1))
+					actualOrgGUID := fakeActor.GetDomainsArgsForCall(0)
+					Expect(actualOrgGUID).To(Equal(targetedOrg.GUID))
+				})
+
+				It("displays all warnings", func() {
+					Expect(testUI.Err).To(Say(`warning-1`))
+					Expect(testUI.Err).To(Say(`warning-2`))
 				})
 			})
 		})

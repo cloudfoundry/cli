@@ -44,7 +44,7 @@ var _ = Describe("OrganizationQuota Actions", func() {
 					GUID: "some-org-quota-guid",
 					Name: "some-org-quota",
 				}))
-				Expect(warnings).To(Equal(Warnings{"warning-1"}))
+				Expect(warnings).To(ConsistOf("warning-1"))
 
 				Expect(fakeCloudControllerClient.GetOrganizationQuotaCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationQuotaArgsForCall(0)).To(Equal(

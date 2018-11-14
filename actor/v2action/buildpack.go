@@ -291,20 +291,21 @@ func (actor *Actor) UpdateBuildpackByNameAndStack(name, currentStack string, pos
 		err          error
 	)
 
-	if len(newStack) > 0 {
-		_, execWarnings, err = actor.GetStackByName(newStack)
-		if err != nil {
-			return "", execWarnings, err
-		}
-	}
+	execWarnings, err = actor.checkIfNewStackExists(newStack)
 	warnings = append(warnings, execWarnings...)
 
-	if len(currentStack) > 0 {
-		buildpack, execWarnings, err = actor.GetBuildpackByNameAndStack(name, currentStack)
-	} else {
-		buildpack, execWarnings, err = actor.GetBuildpackByName(name)
+	if err != nil {
+		return "", warnings, err
 	}
+
+	buildpack, execWarnings, err = actor.getBuildpack(name, currentStack)
 	warnings = append(warnings, execWarnings...)
+
+	if err != nil {
+		return "", warnings, err
+	}
+
+	err = validateStackChange(buildpack, newStack)
 
 	if err != nil {
 		return "", warnings, err
@@ -325,6 +326,32 @@ func (actor *Actor) UpdateBuildpackByNameAndStack(name, currentStack string, pos
 	}
 
 	return buildpack.GUID, warnings, err
+}
+
+func validateStackChange(buildpack Buildpack, newStack string) error {
+	if len(buildpack.Stack) > 0 && len(newStack) > 0 {
+		return actionerror.BuildpackStackChangeError{
+			BuildpackName: buildpack.Name,
+		}
+	}
+	return nil
+}
+
+func (actor *Actor) checkIfNewStackExists(newStack string) (Warnings, error) {
+	if len(newStack) > 0 {
+		_, execWarnings, err := actor.GetStackByName(newStack)
+		if err != nil {
+			return execWarnings, err
+		}
+	}
+	return nil, nil
+}
+
+func (actor *Actor) getBuildpack(name, currentStack string) (Buildpack, Warnings, error) {
+	if len(currentStack) > 0 {
+		return actor.GetBuildpackByNameAndStack(name, currentStack)
+	}
+	return actor.GetBuildpackByName(name)
 }
 
 // Zipit zips the source into a .zip file in the target dir
