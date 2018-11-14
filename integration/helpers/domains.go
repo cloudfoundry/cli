@@ -60,6 +60,10 @@ func (d Domain) CreateWithRouterGroup(routerGroup string) {
 	Eventually(CF("create-shared-domain", d.Name, "--router-group", routerGroup)).Should(Exit(0))
 }
 
+func (d Domain) CreateInternal() {
+	Eventually(CF("create-shared-domain", d.Name, "--internal")).Should(Exit(0))
+}
+
 func (d Domain) Share() {
 	Eventually(CF("share-private-domain", d.Org, d.Name)).Should(Exit(0))
 }

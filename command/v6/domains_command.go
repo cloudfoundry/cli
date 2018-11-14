@@ -73,16 +73,22 @@ func (cmd DomainsCommand) Execute(args []string) error {
 			cmd.UI.TranslateText("name"),
 			cmd.UI.TranslateText("status"),
 			cmd.UI.TranslateText("type"),
+			cmd.UI.TranslateText("details"),
 		},
 	}
 
 	for _, domain := range domains {
+		internalMark := ""
+		if domain.Internal {
+			internalMark = "internal"
+		}
 		table = append(
 			table,
 			[]string{
 				domain.Name,
 				string(domain.Type),
 				string(domain.RouterGroupType),
+				internalMark,
 			},
 		)
 	}
