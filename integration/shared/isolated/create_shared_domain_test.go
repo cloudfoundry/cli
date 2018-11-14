@@ -55,6 +55,7 @@ var _ = Describe("create-shared-domain command", func() {
 
 					session = helpers.CF("domains")
 					Eventually(session).Should(Say(`%s\s+shared`, domainName))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
