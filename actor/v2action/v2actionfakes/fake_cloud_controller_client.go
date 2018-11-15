@@ -136,6 +136,25 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	CreateServiceBrokerStub        func(string, string, string, string, string) (ccv2.ServiceBroker, ccv2.Warnings, error)
+	createServiceBrokerMutex       sync.RWMutex
+	createServiceBrokerArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+	}
+	createServiceBrokerReturns struct {
+		result1 ccv2.ServiceBroker
+		result2 ccv2.Warnings
+		result3 error
+	}
+	createServiceBrokerReturnsOnCall map[int]struct {
+		result1 ccv2.ServiceBroker
+		result2 ccv2.Warnings
+		result3 error
+	}
 	CreateServiceKeyStub        func(string, string, map[string]interface{}) (ccv2.ServiceKey, ccv2.Warnings, error)
 	createServiceKeyMutex       sync.RWMutex
 	createServiceKeyArgsForCall []struct {
@@ -1872,6 +1891,76 @@ func (fake *FakeCloudControllerClient) CreateServiceBindingReturnsOnCall(i int, 
 	}
 	fake.createServiceBindingReturnsOnCall[i] = struct {
 		result1 ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBroker(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) (ccv2.ServiceBroker, ccv2.Warnings, error) {
+	fake.createServiceBrokerMutex.Lock()
+	ret, specificReturn := fake.createServiceBrokerReturnsOnCall[len(fake.createServiceBrokerArgsForCall)]
+	fake.createServiceBrokerArgsForCall = append(fake.createServiceBrokerArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("CreateServiceBroker", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.createServiceBrokerMutex.Unlock()
+	if fake.CreateServiceBrokerStub != nil {
+		return fake.CreateServiceBrokerStub(arg1, arg2, arg3, arg4, arg5)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createServiceBrokerReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBrokerCallCount() int {
+	fake.createServiceBrokerMutex.RLock()
+	defer fake.createServiceBrokerMutex.RUnlock()
+	return len(fake.createServiceBrokerArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBrokerCalls(stub func(string, string, string, string, string) (ccv2.ServiceBroker, ccv2.Warnings, error)) {
+	fake.createServiceBrokerMutex.Lock()
+	defer fake.createServiceBrokerMutex.Unlock()
+	fake.CreateServiceBrokerStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBrokerArgsForCall(i int) (string, string, string, string, string) {
+	fake.createServiceBrokerMutex.RLock()
+	defer fake.createServiceBrokerMutex.RUnlock()
+	argsForCall := fake.createServiceBrokerArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBrokerReturns(result1 ccv2.ServiceBroker, result2 ccv2.Warnings, result3 error) {
+	fake.createServiceBrokerMutex.Lock()
+	defer fake.createServiceBrokerMutex.Unlock()
+	fake.CreateServiceBrokerStub = nil
+	fake.createServiceBrokerReturns = struct {
+		result1 ccv2.ServiceBroker
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBrokerReturnsOnCall(i int, result1 ccv2.ServiceBroker, result2 ccv2.Warnings, result3 error) {
+	fake.createServiceBrokerMutex.Lock()
+	defer fake.createServiceBrokerMutex.Unlock()
+	fake.CreateServiceBrokerStub = nil
+	if fake.createServiceBrokerReturnsOnCall == nil {
+		fake.createServiceBrokerReturnsOnCall = make(map[int]struct {
+			result1 ccv2.ServiceBroker
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.createServiceBrokerReturnsOnCall[i] = struct {
+		result1 ccv2.ServiceBroker
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -7105,6 +7194,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createRouteMutex.RUnlock()
 	fake.createServiceBindingMutex.RLock()
 	defer fake.createServiceBindingMutex.RUnlock()
+	fake.createServiceBrokerMutex.RLock()
+	defer fake.createServiceBrokerMutex.RUnlock()
 	fake.createServiceKeyMutex.RLock()
 	defer fake.createServiceKeyMutex.RUnlock()
 	fake.createSharedDomainMutex.RLock()
