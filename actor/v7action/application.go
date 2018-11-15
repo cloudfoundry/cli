@@ -123,7 +123,14 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 		return Application{}, getWarnings, err
 	}
 
-	setWarnings, err := actor.SetProcessHealthCheckByProcessTypeAndApplication(processType, app.GUID, healthCheckType, httpEndpoint, invocationTimeout)
+	setWarnings, err := actor.UpdateProcessByTypeAndApplication(
+		processType,
+		app.GUID,
+		Process{
+			HealthCheckType:              healthCheckType,
+			HealthCheckEndpoint:          httpEndpoint,
+			HealthCheckInvocationTimeout: invocationTimeout,
+		})
 	return app, append(getWarnings, setWarnings...), err
 }
 

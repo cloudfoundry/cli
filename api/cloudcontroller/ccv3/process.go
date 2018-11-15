@@ -12,16 +12,16 @@ import (
 )
 
 type Process struct {
-	GUID string `json:"guid"`
-	Type string `json:"type"`
+	GUID string
+	Type string
 	// Command is the process start command. Note: This value will be obfuscated when obtained from listing.
-	Command                      string           `json:"command,omitempty"`
-	HealthCheckType              string           `json:"-"`
-	HealthCheckEndpoint          string           `json:"-"`
-	HealthCheckInvocationTimeout int              `json:"-"`
-	Instances                    types.NullInt    `json:"instances,omitempty"`
-	MemoryInMB                   types.NullUint64 `json:"memory_in_mb,omitempty"`
-	DiskInMB                     types.NullUint64 `json:"disk_in_mb,omitempty"`
+	Command                      string
+	HealthCheckType              string
+	HealthCheckEndpoint          string
+	HealthCheckInvocationTimeout int
+	Instances                    types.NullInt
+	MemoryInMB                   types.NullUint64
+	DiskInMB                     types.NullUint64
 }
 
 func (p Process) MarshalJSON() ([]byte, error) {
@@ -34,6 +34,7 @@ func (p Process) MarshalJSON() ([]byte, error) {
 	}
 
 	var ccProcess struct {
+		Command    string      `json:"command,omitempty"`
 		Instances  json.Number `json:"instances,omitempty"`
 		MemoryInMB json.Number `json:"memory_in_mb,omitempty"`
 		DiskInMB   json.Number `json:"disk_in_mb,omitempty"`
@@ -41,6 +42,7 @@ func (p Process) MarshalJSON() ([]byte, error) {
 		HealthCheck *healthCheck `json:"health_check,omitempty"`
 	}
 
+	ccProcess.Command = p.Command
 	if p.Instances.IsSet {
 		ccProcess.Instances = json.Number(fmt.Sprint(p.Instances.Value))
 	}
@@ -64,9 +66,13 @@ func (p Process) MarshalJSON() ([]byte, error) {
 }
 
 func (p *Process) UnmarshalJSON(data []byte) error {
-	type rawProcess Process
 	var ccProcess struct {
-		*rawProcess
+		Command    string           `json:"command"`
+		DiskInMB   types.NullUint64 `json:"disk_in_mb"`
+		GUID       string           `json:"guid"`
+		Instances  types.NullInt    `json:"instances"`
+		MemoryInMB types.NullUint64 `json:"memory_in_mb"`
+		Type       string           `json:"type"`
 
 		HealthCheck struct {
 			Type string `json:"type"`
@@ -77,15 +83,20 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 		} `json:"health_check"`
 	}
 
-	ccProcess.rawProcess = (*rawProcess)(p)
 	err := cloudcontroller.DecodeJSON(data, &ccProcess)
 	if err != nil {
 		return err
 	}
 
+	p.Command = ccProcess.Command
+	p.DiskInMB = ccProcess.DiskInMB
+	p.GUID = ccProcess.GUID
 	p.HealthCheckEndpoint = ccProcess.HealthCheck.Data.Endpoint
-	p.HealthCheckType = ccProcess.HealthCheck.Type
 	p.HealthCheckInvocationTimeout = ccProcess.HealthCheck.Data.InvocationTimeout
+	p.HealthCheckType = ccProcess.HealthCheck.Type
+	p.Instances = ccProcess.Instances
+	p.MemoryInMB = ccProcess.MemoryInMB
+	p.Type = ccProcess.Type
 
 	return nil
 }
@@ -162,12 +173,15 @@ func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnin
 	return fullProcessesList, warnings, err
 }
 
-// PatchApplicationProcessHealthCheck updates application health check type
-func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, processHealthCheckInvocationTimeout int) (Process, Warnings, error) {
+// UpdateProcess updates the process's health check settings. GUID is always
+// required; HealthCheckType is only required when updating health check
+// settings.
+func (client *Client) UpdateProcess(process Process) (Process, Warnings, error) {
 	body, err := json.Marshal(Process{
-		HealthCheckType:              processHealthCheckType,
-		HealthCheckEndpoint:          processHealthCheckEndpoint,
-		HealthCheckInvocationTimeout: processHealthCheckInvocationTimeout,
+		Command:                      process.Command,
+		HealthCheckType:              process.HealthCheckType,
+		HealthCheckEndpoint:          process.HealthCheckEndpoint,
+		HealthCheckInvocationTimeout: process.HealthCheckInvocationTimeout,
 	})
 	if err != nil {
 		return Process{}, nil, err
@@ -176,7 +190,7 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PatchProcessRequest,
 		Body:        bytes.NewReader(body),
-		URIParams:   internal.Params{"process_guid": processGUID},
+		URIParams:   internal.Params{"process_guid": process.GUID},
 	})
 	if err != nil {
 		return Process{}, nil, err

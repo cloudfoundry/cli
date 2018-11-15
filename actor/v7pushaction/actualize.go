@@ -67,21 +67,27 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 			eventStream <- ScaleWebProcessComplete
 		}
 
-		if state.Overrides.HealthCheckType != "" {
-			log.WithField("health_check_type", state.Overrides.HealthCheckType).Info("Setting Web Process's Health Check Type")
-			eventStream <- SetHealthCheck
-			warnings, err := actor.V7Actor.SetProcessHealthCheckByProcessTypeAndApplication(
-				constant.ProcessTypeWeb,
-				state.Application.GUID,
-				state.Overrides.HealthCheckType,
-				constant.ProcessHealthCheckEndpointDefault,
-				0)
+		if state.Overrides.StartCommand.IsSet || state.Overrides.HealthCheckType != "" {
+			log.Info("Setting Web Process's Configuration")
+			eventStream <- SetProcessConfiguration
+
+			var process v7action.Process
+			if state.Overrides.StartCommand.IsSet {
+				process.Command = state.Overrides.StartCommand.Value
+			}
+			if state.Overrides.HealthCheckType != "" {
+				process.HealthCheckType = state.Overrides.HealthCheckType
+				process.HealthCheckEndpoint = constant.ProcessHealthCheckEndpointDefault
+			}
+
+			log.WithField("Process", process).Debug("Update process")
+			warnings, err := actor.V7Actor.UpdateProcessByTypeAndApplication(constant.ProcessTypeWeb, state.Application.GUID, process)
 			warningsStream <- Warnings(warnings)
 			if err != nil {
 				errorStream <- err
 				return
 			}
-			eventStream <- SetHealthCheckComplete
+			eventStream <- SetProcessConfigurationComplete
 		}
 
 		eventStream <- CreatingAndMappingRoutes

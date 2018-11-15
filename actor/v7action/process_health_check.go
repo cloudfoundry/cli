@@ -3,7 +3,6 @@ package v7action
 import (
 	"sort"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
@@ -68,39 +67,4 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 	processHealthChecks.Sort()
 
 	return processHealthChecks, allWarnings, nil
-}
-
-func (actor Actor) SetProcessHealthCheckByProcessTypeAndApplication(
-	processType string,
-	appGUID string,
-	healthCheckType string,
-	httpEndpoint string,
-	invocationTimeout int,
-) (Warnings, error) {
-	if healthCheckType != "http" {
-		if httpEndpoint == constant.ProcessHealthCheckEndpointDefault || httpEndpoint == "" {
-			httpEndpoint = ""
-		} else {
-			return nil, actionerror.HTTPHealthCheckInvalidError{}
-		}
-	}
-
-	process, warnings, err := actor.GetProcessByTypeAndApplication(processType, appGUID)
-	allWarnings := Warnings(warnings)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	_, updateWarnings, err := actor.CloudControllerClient.PatchApplicationProcessHealthCheck(
-		process.GUID,
-		healthCheckType,
-		httpEndpoint,
-		invocationTimeout,
-	)
-	allWarnings = append(allWarnings, Warnings(updateWarnings)...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	return allWarnings, nil
 }

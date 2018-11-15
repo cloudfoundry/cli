@@ -28,6 +28,7 @@ type FlagOverrides struct {
 	HealthCheckType string
 	Memory          types.NullUint64
 	ProvidedAppPath string
+	StartCommand    types.FilteredString
 }
 
 func (state PushState) String() string {

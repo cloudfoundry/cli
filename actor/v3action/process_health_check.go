@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
@@ -102,13 +103,12 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 		return Application{}, allWarnings, err
 	}
 
-	_, warnings, err = actor.CloudControllerClient.PatchApplicationProcessHealthCheck(
-		process.GUID,
-		healthCheckType,
-		httpEndpoint,
-		invocationTimeout,
-	)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	process.HealthCheckType = healthCheckType
+	process.HealthCheckEndpoint = httpEndpoint
+	process.HealthCheckInvocationTimeout = invocationTimeout
+
+	_, updateWarnings, err := actor.CloudControllerClient.UpdateProcess(ccv3.Process(process))
+	allWarnings = append(allWarnings, Warnings(updateWarnings)...)
 	if err != nil {
 		return Application{}, allWarnings, err
 	}

@@ -530,29 +530,29 @@ var _ = Describe("push Command", func() {
 	})
 
 	Describe("GetFlagOverrides", func() {
-		Context("valid flag combinations", func() {
-			var (
-				overrides    v7pushaction.FlagOverrides
-				overridesErr error
-			)
+		var (
+			overrides    v7pushaction.FlagOverrides
+			overridesErr error
+		)
 
-			BeforeEach(func() {
-				cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
-				cmd.HealthCheckType = flag.HealthCheckType{Type: "port"}
-				cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
-			})
+		BeforeEach(func() {
+			cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
+			cmd.HealthCheckType = flag.HealthCheckType{Type: "port"}
+			cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
+			cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "some-start-command"}}
+		})
 
-			JustBeforeEach(func() {
-				overrides, overridesErr = cmd.GetFlagOverrides()
-				Expect(overridesErr).ToNot(HaveOccurred())
-			})
+		JustBeforeEach(func() {
+			overrides, overridesErr = cmd.GetFlagOverrides()
+			Expect(overridesErr).ToNot(HaveOccurred())
+		})
 
-			It("sets them on the command line settings", func() {
-				Expect(overridesErr).ToNot(HaveOccurred())
-				Expect(overrides.Buildpacks).To(ConsistOf("buildpack-1", "buildpack-2"))
-				Expect(overrides.HealthCheckType).To(Equal("port"))
-				Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
-			})
+		It("sets them on the command line settings", func() {
+			Expect(overridesErr).ToNot(HaveOccurred())
+			Expect(overrides.Buildpacks).To(ConsistOf("buildpack-1", "buildpack-2"))
+			Expect(overrides.HealthCheckType).To(Equal("port"))
+			Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
+			Expect(overrides.StartCommand).To(Equal(types.FilteredString{IsSet: true, Value: "some-start-command"}))
 		})
 	})
 })

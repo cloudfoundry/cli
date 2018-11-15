@@ -55,6 +55,7 @@ type PushCommand struct {
 	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
 	NoStart             bool                        `long:"no-start" description:"Do not stage and start the app after pushing"`
 	AppPath             flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	StartCommand        flag.Command                `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
 	dockerPassword      interface{}                 `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
 	usage               interface{}                 `usage:"CF_NAME push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route] [--no-start]\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start]"`
 	envCFStagingTimeout interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
@@ -330,7 +331,8 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 	return v7pushaction.FlagOverrides{
 		Buildpacks:      cmd.Buildpacks,
 		HealthCheckType: cmd.HealthCheckType.Type,
-		Memory:          cmd.Memory.NullUint64, // -m
+		Memory:          cmd.Memory.NullUint64,
 		ProvidedAppPath: string(cmd.AppPath),
+		StartCommand:    cmd.StartCommand.FilteredString,
 	}, nil
 }

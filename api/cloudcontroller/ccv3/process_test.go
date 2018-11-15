@@ -579,25 +579,60 @@ var _ = Describe("Process", func() {
 		})
 	})
 
-	Describe("PatchApplicationProcessHealthCheck", func() {
+	Describe("UpdateProcess", func() {
 		var (
-			endpoint          string
-			invocationTimeout int
+			inputProcess Process
 
 			process  Process
 			warnings []string
 			err      error
 		)
 
+		BeforeEach(func() {
+			inputProcess = Process{
+				GUID: "some-process-guid",
+			}
+		})
+
 		JustBeforeEach(func() {
-			process, warnings, err = client.PatchApplicationProcessHealthCheck("some-process-guid", "some-type", endpoint, invocationTimeout)
+			process, warnings, err = client.UpdateProcess(inputProcess)
 		})
 
 		When("patching the process succeeds", func() {
+			Context("and the command is set", func() {
+				BeforeEach(func() {
+					inputProcess.Command = "some-command"
+
+					expectedBody := `{
+						"command": "some-command"
+					}`
+
+					expectedResponse := `{
+						"command": "some-command"
+					}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
+							VerifyJSON(expectedBody),
+							RespondWith(http.StatusOK, expectedResponse, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("patches this process's command", func() {
+					Expect(process).To(MatchFields(IgnoreExtras, Fields{
+						"Command": Equal("some-command"),
+					}))
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+
 			Context("and the endpoint is set", func() {
 				BeforeEach(func() {
-					endpoint = "some-endpoint"
-					invocationTimeout = 0
+					inputProcess.HealthCheckEndpoint = "some-endpoint"
+					inputProcess.HealthCheckType = "some-type"
 
 					expectedBody := `{
 					"health_check": {
@@ -637,8 +672,8 @@ var _ = Describe("Process", func() {
 
 			Context("and invocation timeout is set", func() {
 				BeforeEach(func() {
-					endpoint = ""
-					invocationTimeout = 42
+					inputProcess.HealthCheckInvocationTimeout = 42
+					inputProcess.HealthCheckType = "some-type"
 
 					expectedBody := `{
 					"health_check": {
@@ -680,8 +715,7 @@ var _ = Describe("Process", func() {
 
 			Context("and the endpoint and timeout are not set", func() {
 				BeforeEach(func() {
-					endpoint = ""
-					invocationTimeout = 0
+					inputProcess.HealthCheckType = "some-type"
 
 					expectedBody := `{
 					"health_check": {
@@ -711,7 +745,7 @@ var _ = Describe("Process", func() {
 				It("patches this process's health check", func() {
 					Expect(process).To(MatchFields(IgnoreExtras, Fields{
 						"HealthCheckType":     Equal("some-type"),
-						"HealthCheckEndpoint": Equal(""),
+						"HealthCheckEndpoint": BeEmpty(),
 					}))
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
@@ -721,7 +755,6 @@ var _ = Describe("Process", func() {
 
 		When("the process does not exist", func() {
 			BeforeEach(func() {
-				endpoint = "some-endpoint"
 				response := `{
 					"errors": [
 						{
@@ -748,7 +781,6 @@ var _ = Describe("Process", func() {
 
 		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
-				endpoint = "some-endpoint"
 				response := `{
 						"errors": [
 							{

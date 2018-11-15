@@ -731,7 +731,7 @@ var _ = Describe("Application Actions", func() {
 						nil,
 					)
 
-					fakeCloudControllerClient.PatchApplicationProcessHealthCheckReturns(
+					fakeCloudControllerClient.UpdateProcessReturns(
 						ccv3.Process{GUID: "some-process-guid"},
 						ccv3.Warnings{"some-health-check-warning"},
 						nil,
@@ -751,12 +751,12 @@ var _ = Describe("Application Actions", func() {
 					Expect(appGUID).To(Equal("some-app-guid"))
 					Expect(processType).To(Equal("some-process-type"))
 
-					Expect(fakeCloudControllerClient.PatchApplicationProcessHealthCheckCallCount()).To(Equal(1))
-					processGUID, processHealthCheckType, processHealthCheckEndpoint, processInvocationTimeout := fakeCloudControllerClient.PatchApplicationProcessHealthCheckArgsForCall(0)
-					Expect(processGUID).To(Equal("some-process-guid"))
-					Expect(processHealthCheckType).To(Equal("http"))
-					Expect(processHealthCheckEndpoint).To(Equal("some-http-endpoint"))
-					Expect(processInvocationTimeout).To(Equal(42))
+					Expect(fakeCloudControllerClient.UpdateProcessCallCount()).To(Equal(1))
+					process := fakeCloudControllerClient.UpdateProcessArgsForCall(0)
+					Expect(process.GUID).To(Equal("some-process-guid"))
+					Expect(process.HealthCheckType).To(Equal("http"))
+					Expect(process.HealthCheckEndpoint).To(Equal("some-http-endpoint"))
+					Expect(process.HealthCheckInvocationTimeout).To(Equal(42))
 				})
 			})
 		})
