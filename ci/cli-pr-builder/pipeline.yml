@@ -30,8 +30,8 @@ resources:
     branch: master
     paths: *ciPaths
 
-- name: gcp-bosh-pool
-  type: pool
+- name: bosh-lite
+  type: bosh-lite-pool
   source:
     uri: git@github.com:cloudfoundry/cli-pools
     private_key: ((cli-pools-github-private-key))
@@ -64,27 +64,24 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: pull-request
+    - get: cli
       trigger: true
-    - get: cli-ci # TODO: consider using PR's version of ci?
-  - aggregate: # TODO: write task from https://github.com/jtarchie/github-pullrequest-resource#in-clone-the-repository-at-the-given-pull-request-ref
-    - task: units-linux # TODO: build other operating system's units, if resources permit
-      file: cli-ci/ci/cli-pr-builder/tasks/units-linux.yml
+  - aggregate:
+    - task: units-linux
+      file: ci/ci/cli/tasks/units-linux.yml
 
 - name: claim-bosh-lite # TODO: record PR number instead of usernames
-  max_in_flight: 1
+  serial: true
   plan:
     - aggregate:
-      - get: pull-request
+      - get: cli
         trigger: true
         version: every
         passed: [units]
-      - get: gcp-bosh-pool
     - do:
-      - task: extract-authors-and-story-id-from-commit # TODO: extract PR info instead
+      - task: get-pr-info
         file: ci/cli-pr-builder/tasks/extract-info-from-pr.yml
-        input_mapping: {repo: cli}
-      - put: gcp-bosh-lite
+      - put: bosh-lite
         params:
           story: commit-info/pr-id
           author_name: commit-info/author-name
@@ -97,42 +94,26 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: pull-request
+    - get: cli
       trigger: true
       passed: [claim-bosh-lite]
-    - get: cli-ci
-    - put: bosh-lock
-      resource: gcp-bosh-pool # TODO: why doesn't this just do claim-bosh-lite? What's the difference?
-      params:
-        acquire: true
+      version: every
+    - get: bosh-lite
+      passed: [claim-bosh-lite]
+      version: every
   - do:
-    - put: cli-bosh-lite
-      params: # TODO: change params
-        story: commit-info/story
-        author_name: commit-info/author-name
-        author_email: commit-info/author-email
-        committer_name: commit-info/committer-name
-        committer_email: commit-info/committer-email
-        commit_message_prefix: CLI-
     - task: integration
-      file: cli-ci/ci/cli/tasks/integration-linux.yml
+      file: cli-ci/ci/cli-pr-builder/tasks/integration-linux.yml
+      params: &integration_params
+        CF_INT_CLIENT_ID: 'potato-face'
+        CF_INT_CLIENT_SECRET: ((cf-oauth-test-client-secret))
+        CF_INT_IGNORE_API_VERSION_CHECK: false
       # TODO: on_failure, tell GitHub to block merging?
       ensure:
       - put: unclaim-bosh-lite
-        resource: cli-bosh-lite
+        resource: bosh-lite
         params:
           operation: unclaim
-          name: cli-bosh-lite/name
-       params: &integration_params
-        CF_INT_CLIENT_ID: 'potato-face'
-        CF_INT_CLIENT_SECRET: ((cf-oauth-test-client-secret))
-        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
-        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
-        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
-        CF_INT_IGNORE_API_VERSION_CHECK: false
-  ensure:
-    put: gcp-bosh-pool
-    params:
-      release: bosh-lock
+          name: bosh-lite/name
 
-- name: integration-experimental # TODO: copy from integration-linux
+# - name: integration-experimental # TODO: copy from integration-linux

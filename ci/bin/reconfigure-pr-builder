@@ -19,12 +19,7 @@ configure_pipeline() {
   fly -t ci set-pipeline \
     -p $name \
     -c $pipeline \
-    -v cf-oauth-test-client-secret=$() \
     -v cli-pools-github-private-key=$() \
-    -v dockerhub-email="" \
-    -v dockerhub-password="" \
-    -v dockerhub-private-image="" \
-    -v dockerhub-username="" \
     -v github-access-token=$()
 }
 
