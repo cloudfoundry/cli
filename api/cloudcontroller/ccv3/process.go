@@ -173,9 +173,9 @@ func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnin
 	return fullProcessesList, warnings, err
 }
 
-// UpdateProcess updates the process's health check settings. GUID is always
-// required; HealthCheckType is only required when updating health check
-// settings.
+// UpdateProcess updates the process's command or health check settings. GUID
+// is always required; HealthCheckType is only required when updating health
+// check settings.
 func (client *Client) UpdateProcess(process Process) (Process, Warnings, error) {
 	body, err := json.Marshal(Process{
 		Command:                      process.Command,
