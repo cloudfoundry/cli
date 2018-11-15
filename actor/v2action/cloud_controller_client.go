@@ -16,6 +16,7 @@ type CloudControllerClient interface {
 	CreateOrganization(orgName string, quotaGUID string) (ccv2.Organization, ccv2.Warnings, error)
 	CreateRoute(route ccv2.Route, generatePort bool) (ccv2.Route, ccv2.Warnings, error)
 	CreateServiceBinding(appGUID string, serviceBindingGUID string, bindingName string, acceptsIncomplete bool, parameters map[string]interface{}) (ccv2.ServiceBinding, ccv2.Warnings, error)
+	CreateServiceBroker(serviceBroker, username, password, URL, spaceGUID string) (ccv2.ServiceBroker, ccv2.Warnings, error)
 	CreateServiceKey(serviceInstanceGUID string, keyName string, parameters map[string]interface{}) (ccv2.ServiceKey, ccv2.Warnings, error)
 	CreateSpace(spaceName string, orgGUID string) (ccv2.Space, ccv2.Warnings, error)
 	CreateUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
