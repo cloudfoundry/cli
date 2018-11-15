@@ -549,7 +549,7 @@ var _ = Describe("Routes", func() {
 				})
 			})
 
-			When( "The default route is already bound to the app", func() {
+			When("The default route is already bound to the app", func() {
 				BeforeEach(func() {
 					fakeV2Actor.GetApplicationRoutesReturns(
 						[]v2action.Route{
