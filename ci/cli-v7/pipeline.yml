@@ -221,6 +221,7 @@ jobs:
              OS X unit tests failed :(
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: units-windows
+      tags: [vat-windows]
       file: cli-ci/ci/cli-v7/tasks/units-windows.yml
       on_failure:
          put: slack-alert
