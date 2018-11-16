@@ -347,12 +347,12 @@ var _ = Describe("Actualize", func() {
 				})
 
 				When("start command is provided", func() {
-					var command string
+					var command types.FilteredString
 
 					BeforeEach(func() {
-						command = "some-command"
+						command = *types.NewFilteredString("some-command")
 						state.Overrides = FlagOverrides{
-							StartCommand: types.FilteredString{IsSet: true, Value: command},
+							StartCommand: command,
 						}
 					})
 
@@ -373,16 +373,16 @@ var _ = Describe("Actualize", func() {
 				})
 
 				When("start command and health check are provided", func() {
-					var command string
+					var command types.FilteredString
 					var healthCheckType string
 
 					BeforeEach(func() {
-						command = "some-command"
+						command = *types.NewFilteredString("some-command")
 						healthCheckType = "port"
 
 						state.Overrides = FlagOverrides{
 							HealthCheckType: healthCheckType,
-							StartCommand:    types.FilteredString{IsSet: true, Value: command},
+							StartCommand:    command,
 						}
 					})
 

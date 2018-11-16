@@ -366,7 +366,7 @@ var _ = Describe("Process", func() {
 				Expect(process).To(MatchAllFields(Fields{
 					"GUID":                         Equal("process-1-guid"),
 					"Type":                         Equal("some-type"),
-					"Command":                      Equal("start-command-1"),
+					"Command":                      Equal(types.FilteredString{IsSet: true, Value: "start-command-1"}),
 					"Instances":                    Equal(types.NullInt{Value: 22, IsSet: true}),
 					"MemoryInMB":                   Equal(types.NullUint64{Value: 32, IsSet: true}),
 					"DiskInMB":                     Equal(types.NullUint64{Value: 1024, IsSet: true}),
@@ -529,14 +529,14 @@ var _ = Describe("Process", func() {
 					Process{
 						GUID:            "process-1-guid",
 						Type:            constant.ProcessTypeWeb,
-						Command:         "[PRIVATE DATA HIDDEN IN LISTS]",
+						Command:         types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:      types.NullUint64{Value: 32, IsSet: true},
 						HealthCheckType: "port",
 					},
 					Process{
 						GUID:                "process-2-guid",
 						Type:                "worker",
-						Command:             "[PRIVATE DATA HIDDEN IN LISTS]",
+						Command:             types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:          types.NullUint64{Value: 64, IsSet: true},
 						HealthCheckType:     "http",
 						HealthCheckEndpoint: "/health",
@@ -544,7 +544,7 @@ var _ = Describe("Process", func() {
 					Process{
 						GUID:            "process-3-guid",
 						Type:            "console",
-						Command:         "[PRIVATE DATA HIDDEN IN LISTS]",
+						Command:         types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:      types.NullUint64{Value: 128, IsSet: true},
 						HealthCheckType: "process",
 					},
@@ -599,37 +599,69 @@ var _ = Describe("Process", func() {
 		})
 
 		When("patching the process succeeds", func() {
-			Context("and the command is set", func() {
-				BeforeEach(func() {
-					inputProcess.Command = "some-command"
+			When("the command is set", func() {
+				When("the start command is an arbitrary command", func() {
+					BeforeEach(func() {
+						inputProcess.Command = types.FilteredString{IsSet: true, Value: "some-command"}
 
-					expectedBody := `{
-						"command": "some-command"
-					}`
+						expectedBody := `{
+							"command": "some-command"
+						}`
 
-					expectedResponse := `{
-						"command": "some-command"
-					}`
+						expectedResponse := `{
+							"command": "some-command"
+						}`
 
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
-							VerifyJSON(expectedBody),
-							RespondWith(http.StatusOK, expectedResponse, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-						),
-					)
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
+								VerifyJSON(expectedBody),
+								RespondWith(http.StatusOK, expectedResponse, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+							),
+						)
+					})
+
+					It("patches this process's command with the provided command", func() {
+						Expect(err).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("this is a warning"))
+						Expect(process).To(MatchFields(IgnoreExtras, Fields{
+							"Command": Equal(types.FilteredString{IsSet: true, Value: "some-command"}),
+						}))
+					})
 				})
 
-				It("patches this process's command", func() {
-					Expect(process).To(MatchFields(IgnoreExtras, Fields{
-						"Command": Equal("some-command"),
-					}))
-					Expect(err).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("this is a warning"))
+				When("the start command reset", func() {
+					BeforeEach(func() {
+						inputProcess.Command = types.FilteredString{IsSet: true}
+
+						expectedBody := `{
+							"command": null
+						}`
+
+						expectedResponse := `{
+							"command": "some-default-command"
+						}`
+
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
+								VerifyJSON(expectedBody),
+								RespondWith(http.StatusOK, expectedResponse, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+							),
+						)
+					})
+
+					It("patches this process's command with 'null' and returns the default command", func() {
+						Expect(err).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("this is a warning"))
+						Expect(process).To(MatchFields(IgnoreExtras, Fields{
+							"Command": Equal(types.FilteredString{IsSet: true, Value: "some-default-command"}),
+						}))
+					})
 				})
 			})
 
-			Context("and the endpoint is set", func() {
+			When("the endpoint is set", func() {
 				BeforeEach(func() {
 					inputProcess.HealthCheckEndpoint = "some-endpoint"
 					inputProcess.HealthCheckType = "some-type"
@@ -661,16 +693,16 @@ var _ = Describe("Process", func() {
 				})
 
 				It("patches this process's health check", func() {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
 					Expect(process).To(MatchFields(IgnoreExtras, Fields{
 						"HealthCheckType":     Equal("some-type"),
 						"HealthCheckEndpoint": Equal("some-endpoint"),
 					}))
-					Expect(err).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
 			})
 
-			Context("and invocation timeout is set", func() {
+			When("the invocation timeout is set", func() {
 				BeforeEach(func() {
 					inputProcess.HealthCheckInvocationTimeout = 42
 					inputProcess.HealthCheckType = "some-type"
@@ -703,17 +735,17 @@ var _ = Describe("Process", func() {
 				})
 
 				It("patches this process's health check", func() {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
 					Expect(process).To(Equal(Process{
 						HealthCheckType:              "some-type",
 						HealthCheckEndpoint:          "",
 						HealthCheckInvocationTimeout: 42,
 					}))
-					Expect(err).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
 			})
 
-			Context("and the endpoint and timeout are not set", func() {
+			When("the endpoint and timeout are not set", func() {
 				BeforeEach(func() {
 					inputProcess.HealthCheckType = "some-type"
 
@@ -743,12 +775,12 @@ var _ = Describe("Process", func() {
 				})
 
 				It("patches this process's health check", func() {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
 					Expect(process).To(MatchFields(IgnoreExtras, Fields{
 						"HealthCheckType":     Equal("some-type"),
 						"HealthCheckEndpoint": BeEmpty(),
 					}))
-					Expect(err).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
 			})
 		})

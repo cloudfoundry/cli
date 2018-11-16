@@ -109,13 +109,13 @@ var _ = Describe("Application Summary Actions", func() {
 							{
 								GUID:       "some-process-guid",
 								Type:       "some-type",
-								Command:    "[Redacted Value]",
+								Command:    *types.NewFilteredString("[Redacted Value]"),
 								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 							},
 							{
 								GUID:       "some-process-web-guid",
 								Type:       "web",
-								Command:    "[Redacted Value]",
+								Command:    *types.NewFilteredString("[Redacted Value]"),
 								MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 							},
 						}
@@ -126,7 +126,7 @@ var _ = Describe("Application Summary Actions", func() {
 						)
 
 						explicitlyCalledProcess := listedProcesses[0]
-						explicitlyCalledProcess.Command = "some-start-command"
+						explicitlyCalledProcess.Command = *types.NewFilteredString("some-start-command")
 						fakeCloudControllerClient.GetApplicationProcessByTypeReturnsOnCall(
 							0,
 							explicitlyCalledProcess,
@@ -197,7 +197,7 @@ var _ = Describe("Application Summary Actions", func() {
 										Process: Process{
 											GUID:       "some-process-web-guid",
 											Type:       "web",
-											Command:    "[Redacted Value]",
+											Command:    *types.NewFilteredString("[Redacted Value]"),
 											MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 										},
 										InstanceDetails: []ProcessInstance{
@@ -217,7 +217,7 @@ var _ = Describe("Application Summary Actions", func() {
 											GUID:       "some-process-guid",
 											MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 											Type:       "some-type",
-											Command:    "some-start-command",
+											Command:    *types.NewFilteredString("some-start-command"),
 										},
 										InstanceDetails: []ProcessInstance{
 											{
@@ -297,7 +297,7 @@ var _ = Describe("Application Summary Actions", func() {
 										Process: Process{
 											GUID:       "some-process-web-guid",
 											Type:       "web",
-											Command:    "[Redacted Value]",
+											Command:    *types.NewFilteredString("[Redacted Value]"),
 											MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 										},
 										InstanceDetails: []ProcessInstance{
@@ -317,7 +317,7 @@ var _ = Describe("Application Summary Actions", func() {
 											GUID:       "some-process-guid",
 											MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 											Type:       "some-type",
-											Command:    "some-start-command",
+											Command:    *types.NewFilteredString("some-start-command"),
 										},
 										InstanceDetails: []ProcessInstance{
 											{

@@ -1,6 +1,7 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/types"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -225,13 +226,13 @@ var _ = Describe("app Command", func() {
 							{
 								Process: v3action.Process{
 									Type:    constant.ProcessTypeWeb,
-									Command: "some-command-1",
+									Command: *types.NewFilteredString("some-command-1"),
 								},
 							},
 							{
 								Process: v3action.Process{
 									Type:    "console",
-									Command: "some-command-2",
+									Command: *types.NewFilteredString("some-command-2"),
 								},
 							},
 						},

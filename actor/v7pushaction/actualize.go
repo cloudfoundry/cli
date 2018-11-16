@@ -73,7 +73,7 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 
 			var process v7action.Process
 			if state.Overrides.StartCommand.IsSet {
-				process.Command = state.Overrides.StartCommand.Value
+				process.Command = state.Overrides.StartCommand
 			}
 			if state.Overrides.HealthCheckType != "" {
 				process.HealthCheckType = state.Overrides.HealthCheckType

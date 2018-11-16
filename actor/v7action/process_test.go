@@ -285,8 +285,10 @@ var _ = Describe("Process Actions", func() {
 				})
 
 				When("updating the command is successful", func() {
+					var command types.FilteredString
 					BeforeEach(func() {
-						inputProcess.Command = "some-command"
+						command = *types.NewFilteredString("some-command")
+						inputProcess.Command = command
 					})
 
 					It("returns the application", func() {
@@ -298,7 +300,7 @@ var _ = Describe("Process Actions", func() {
 						Expect(process).To(MatchFields(IgnoreExtras,
 							Fields{
 								"GUID":    Equal("some-process-guid"),
-								"Command": Equal("some-command"),
+								"Command": Equal(command),
 							}))
 					})
 				})

@@ -25,6 +25,18 @@ var _ = Describe("FilteredString", func() {
 		}),
 	)
 
+	DescribeTable("IsDefault",
+		func(input string, expected bool) {
+			nullString.ParseValue(input)
+			Expect(nullString.IsDefault()).To(Equal(expected))
+		},
+
+		Entry("empty string returns false", "", false),
+		Entry("default returns true", "default", true),
+		Entry("null returns true", "null", true),
+		Entry("some other string returns false", "literally-anything-else", false),
+	)
+
 	Describe("UnmarshalJSON", func() {
 		When("a string value is provided", func() {
 			It("parses a out a valid FilteredString", func() {
@@ -62,11 +74,11 @@ var _ = Describe("FilteredString", func() {
 		})
 
 		When("a FilteredString is set to an empty string", func() {
-			It("returns an empty string", func() {
+			It("returns null", func() {
 				nullString = FilteredString{Value: "", IsSet: true}
 				marshalled, err := nullString.MarshalJSON()
 				Expect(err).ToNot(HaveOccurred())
-				Expect(marshalled).To(Equal([]byte(`""`)))
+				Expect(marshalled).To(Equal([]byte("null")))
 			})
 		})
 

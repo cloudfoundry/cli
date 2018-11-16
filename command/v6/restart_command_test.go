@@ -475,7 +475,7 @@ var _ = Describe("Restart Command", func() {
 											{
 												Process: v3action.Process{
 													Type:       "aba",
-													Command:    "some-command-1",
+													Command:    *types.NewFilteredString("some-command-1"),
 													MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 													DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 												},
@@ -483,7 +483,7 @@ var _ = Describe("Restart Command", func() {
 											{
 												Process: v3action.Process{
 													Type:       "console",
-													Command:    "some-command-2",
+													Command:    *types.NewFilteredString("some-command-2"),
 													MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 													DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 												},
