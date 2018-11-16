@@ -340,6 +340,7 @@ var _ = Describe("update-buildpack command", func() {
 									Eventually(session).Should(Exit(1))
 								})
 							})
+
 							When("uploading from a directory", func() {
 								BeforeEach(func() {
 									var err error
@@ -626,6 +627,17 @@ var _ = Describe("update-buildpack command", func() {
 						})
 					})
 
+					When("specifying -i and --assign-stack", func() {
+						It("displays text that the stack is being assigned and the buildpack is being updated", func() {
+							stacks := helpers.EnsureMinimumNumberOfStacks(1)
+							newStack := stacks[0]
+							session := helpers.CF("update-buildpack", buildpackName, "-i", "99", "--assign-stack", newStack)
+							Eventually(session).Should(Say("Assigning stack %s to %s as %s...", newStack, buildpackName, username))
+							Eventually(session).Should(Say("Updating buildpack %s with stack %s...", buildpackName, newStack))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
 				})
 			})
 

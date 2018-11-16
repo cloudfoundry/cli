@@ -166,6 +166,13 @@ func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
 			"CurrentUser": userName,
 			"Stack":       cmd.NewStack,
 		})
+		if cmd.Order.IsSet || cmd.Lock || cmd.Unlock || cmd.Enable || cmd.Disable {
+			cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
+				"Buildpack":   cmd.RequiredArgs.Buildpack,
+				"CurrentUser": userName,
+				"Stack":       cmd.NewStack,
+			})
+		}
 	} else if cmd.CurrentStack == "" {
 		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   cmd.RequiredArgs.Buildpack,
