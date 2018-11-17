@@ -337,6 +337,7 @@ jobs:
     - task: cleanup-integration
       file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
     - task: integration
+      tags: [vat-windows]
       file: cli-ci/ci/cli-v7/tasks/integration-windows.yml
       params:
         <<: *integration_params
