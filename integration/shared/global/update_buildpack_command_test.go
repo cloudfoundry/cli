@@ -628,6 +628,10 @@ var _ = Describe("update-buildpack command", func() {
 					})
 
 					When("specifying -i and --assign-stack", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
+						})
+
 						It("displays text that the stack is being assigned and the buildpack is being updated", func() {
 							stacks := helpers.EnsureMinimumNumberOfStacks(1)
 							newStack := stacks[0]
