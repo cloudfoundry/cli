@@ -19,6 +19,16 @@ type FakeConfig struct {
 	accessTokenReturnsOnCall map[int]struct {
 		result1 string
 	}
+	BinaryNameStub        func() string
+	binaryNameMutex       sync.RWMutex
+	binaryNameArgsForCall []struct {
+	}
+	binaryNameReturns struct {
+		result1 string
+	}
+	binaryNameReturnsOnCall map[int]struct {
+		result1 string
+	}
 	DialTimeoutStub        func() time.Duration
 	dialTimeoutMutex       sync.RWMutex
 	dialTimeoutArgsForCall []struct {
@@ -220,6 +230,58 @@ func (fake *FakeConfig) AccessTokenReturnsOnCall(i int, result1 string) {
 		})
 	}
 	fake.accessTokenReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) BinaryName() string {
+	fake.binaryNameMutex.Lock()
+	ret, specificReturn := fake.binaryNameReturnsOnCall[len(fake.binaryNameArgsForCall)]
+	fake.binaryNameArgsForCall = append(fake.binaryNameArgsForCall, struct {
+	}{})
+	fake.recordInvocation("BinaryName", []interface{}{})
+	fake.binaryNameMutex.Unlock()
+	if fake.BinaryNameStub != nil {
+		return fake.BinaryNameStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.binaryNameReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) BinaryNameCallCount() int {
+	fake.binaryNameMutex.RLock()
+	defer fake.binaryNameMutex.RUnlock()
+	return len(fake.binaryNameArgsForCall)
+}
+
+func (fake *FakeConfig) BinaryNameCalls(stub func() string) {
+	fake.binaryNameMutex.Lock()
+	defer fake.binaryNameMutex.Unlock()
+	fake.BinaryNameStub = stub
+}
+
+func (fake *FakeConfig) BinaryNameReturns(result1 string) {
+	fake.binaryNameMutex.Lock()
+	defer fake.binaryNameMutex.Unlock()
+	fake.BinaryNameStub = nil
+	fake.binaryNameReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) BinaryNameReturnsOnCall(i int, result1 string) {
+	fake.binaryNameMutex.Lock()
+	defer fake.binaryNameMutex.Unlock()
+	fake.BinaryNameStub = nil
+	if fake.binaryNameReturnsOnCall == nil {
+		fake.binaryNameReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.binaryNameReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -993,6 +1055,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
+	fake.binaryNameMutex.RLock()
+	defer fake.binaryNameMutex.RUnlock()
 	fake.dialTimeoutMutex.RLock()
 	defer fake.dialTimeoutMutex.RUnlock()
 	fake.pollingIntervalMutex.RLock()

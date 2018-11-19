@@ -6,6 +6,7 @@ import "time"
 
 type Config interface {
 	AccessToken() string
+	BinaryName() string
 	DialTimeout() time.Duration
 	PollingInterval() time.Duration
 	RefreshToken() string

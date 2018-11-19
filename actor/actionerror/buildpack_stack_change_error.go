@@ -4,6 +4,7 @@ import "fmt"
 
 type BuildpackStackChangeError struct {
 	BuildpackName string
+	BinaryName    string
 }
 
 func (e BuildpackStackChangeError) Error() string {

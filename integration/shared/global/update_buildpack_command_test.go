@@ -171,10 +171,21 @@ var _ = Describe("update-buildpack command", func() {
 					})
 
 					When("no stack association is specified", func() {
-						It("reports that it couldn't find the buildpack", func() {
+						It("displays an error saying that multiple buildpacks were found", func() {
 							session := helpers.CF("update-buildpack", buildpackName)
 
 							Eventually(session.Err).Should(Say(`Multiple buildpacks named %s found\. Specify a stack name by using a '-s' flag\.`, buildpackName))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					When("--assign-stack is given", func() {
+						It("displays an error and exits", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--assign-stack", stacks[0])
+
+							Eventually(session.Err).Should(Say(`Buildpack %s already exists with a stack association`, buildpackName))
+							Eventually(session.Err).Should(Say(`TIP: Use 'cf buildpacks' to view buildpack and stack associations`))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})

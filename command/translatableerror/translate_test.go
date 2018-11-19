@@ -45,6 +45,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("AssignDropletError", AssignDropletError{}),
 		Entry("BadCredentialsError", UnauthorizedError{}),
 		Entry("BuildpackNotFoundError", BuildpackNotFoundError{}),
+		Entry("BuildpackStackChangeError", BuildpackStackChangeError{}),
 		Entry("CFNetworkingEndpointNotFoundError", CFNetworkingEndpointNotFoundError{}),
 		Entry("CommandLineArgsWithMultipleAppsError", CommandLineArgsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsAndManifestConflictError", CommandLineOptionsAndManifestConflictError{}),

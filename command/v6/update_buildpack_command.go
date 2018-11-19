@@ -18,6 +18,7 @@ import (
 )
 
 //go:generate counterfeiter . UpdateBuildpackActor
+
 type UpdateBuildpackActor interface {
 	CloudControllerAPIVersion() string
 	UpdateBuildpackByNameAndStack(name, currentStack string, position types.NullInt, locked types.NullBool, enabled types.NullBool, newStack string) (string, v2action.Warnings, error)
