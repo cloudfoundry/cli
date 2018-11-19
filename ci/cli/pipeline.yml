@@ -280,6 +280,7 @@ jobs:
              OS X unit tests failed :(
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: units-windows
+      tags: ["cli-windows"]
       file: cli-ci/ci/cli/tasks/units-windows.yml
       on_failure:
          put: slack-alert
@@ -393,6 +394,7 @@ jobs:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
     - task: integration
+      tags: ["cli-windows"]
       file: cli-ci/ci/cli/tasks/integration-windows.yml
       params:
         <<: *integration_params
@@ -432,6 +434,7 @@ jobs:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
     - task: integration-windows
+      tags: ["cli-windows"]
       file: cli-ci/ci/cli/tasks/integration-experimental-windows.yml
       params:
         <<: *integration_params
@@ -536,6 +539,7 @@ jobs:
            channel: '#cli-eng'
            text: "create unix installers failed :("
     - task: windows
+      tags: ["cli-windows"]
       file: cli-ci/ci/cli/tasks/create-installers-windows.yml
       on_failure:
          put: slack-alert
