@@ -194,11 +194,7 @@ type marshalProcess struct {
 
 func marshalCommand(p Process, ccProcess *marshalProcess) {
 	if p.Command.IsSet {
-		if p.Command.IsDefault() {
-			ccProcess.Command = new(json.RawMessage)
-		} else {
-			ccProcess.Command = &p.Command.Value
-		}
+		ccProcess.Command = &p.Command
 	}
 }
 
