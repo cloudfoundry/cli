@@ -3,6 +3,7 @@ package v6_test
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -22,11 +23,14 @@ var _ = Describe("add-network-policy Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v6fakes.FakeAddNetworkPolicyActor
+		fakeV3Actor     *v6fakes.FakeGetOrganizationAndSpaceByNameActor
 		binaryName      string
 		executeErr      error
 		srcApp          string
 		destApp         string
 		protocol        string
+		org             string
+		space           string
 	)
 
 	BeforeEach(func() {
@@ -34,18 +38,24 @@ var _ = Describe("add-network-policy Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v6fakes.FakeAddNetworkPolicyActor)
+		fakeV3Actor = new(v6fakes.FakeGetOrganizationAndSpaceByNameActor)
 
 		srcApp = "some-app"
 		destApp = "some-other-app"
 		protocol = "tcp"
+		org = ""
+		space = ""
 
 		cmd = AddNetworkPolicyCommand{
-			UI:             testUI,
-			Config:         fakeConfig,
-			SharedActor:    fakeSharedActor,
-			Actor:          fakeActor,
-			RequiredArgs:   flag.AddNetworkPolicyArgs{SourceApp: srcApp},
-			DestinationApp: destApp,
+			UI:               testUI,
+			Config:           fakeConfig,
+			SharedActor:      fakeSharedActor,
+			Actor:            fakeActor,
+			V3Actor:          fakeV3Actor,
+			RequiredArgs:     flag.AddNetworkPolicyArgs{SourceApp: srcApp},
+			DestinationApp:   destApp,
+			DestinationSpace: space,
+			DestinationOrg:   org,
 		}
 
 		binaryName = "faceman"
@@ -113,10 +123,13 @@ var _ = Describe("add-network-policy Command", func() {
 
 				It("displays OK when no error occurs", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeV3Actor.GetOrganizationByNameCallCount()).To(Equal(0))
+					Expect(fakeV3Actor.GetSpaceByNameAndOrganizationCallCount()).To(Equal(0))
 					Expect(fakeActor.AddNetworkPolicyCallCount()).To(Equal(1))
-					passedSpaceGuid, passedSrcAppName, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.AddNetworkPolicyArgsForCall(0)
-					Expect(passedSpaceGuid).To(Equal("some-space-guid"))
+					passedSrcSpaceGuid, passedSrcAppName, passedDestSpaceGuid, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.AddNetworkPolicyArgsForCall(0)
+					Expect(passedSrcSpaceGuid).To(Equal("some-space-guid"))
 					Expect(passedSrcAppName).To(Equal("some-app"))
+					Expect(passedDestSpaceGuid).To(Equal("some-space-guid"))
 					Expect(passedDestAppName).To(Equal("some-other-app"))
 					Expect(passedProtocol).To(Equal("tcp"))
 					Expect(passedStartPort).To(Equal(8080))
@@ -150,10 +163,98 @@ var _ = Describe("add-network-policy Command", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeActor.AddNetworkPolicyCallCount()).To(Equal(1))
-				_, _, _, passedProtocol, passedStartPort, passedEndPort := fakeActor.AddNetworkPolicyArgsForCall(0)
+				_, _, _, _, passedProtocol, passedStartPort, passedEndPort := fakeActor.AddNetworkPolicyArgsForCall(0)
 				Expect(passedProtocol).To(Equal("tcp"))
 				Expect(passedStartPort).To(Equal(8080))
 				Expect(passedEndPort).To(Equal(8080))
+			})
+		})
+
+		When("org is specified and space is not", func() {
+			BeforeEach(func() {
+				cmd.DestinationOrg = "bananarama"
+				cmd.DestinationSpace = ""
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.NetworkPolicyDestinationOrgWithoutSpaceError{}))
+				Expect(testUI.Out).NotTo(Say(`Adding network policy`))
+			})
+		})
+
+		When("invalid org is specified", func() {
+			BeforeEach(func() {
+				cmd.DestinationOrg = "bananarama"
+				cmd.DestinationSpace = "hamdinger"
+				fakeV3Actor.GetOrganizationByNameReturns(v3action.Organization{}, v3action.Warnings{}, actionerror.OrganizationNotFoundError{Name: "bananarama"})
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: "bananarama"}))
+				Expect(testUI.Out).NotTo(Say(`Adding network policy`))
+			})
+		})
+
+		When("a valid org but invalid space is specified", func() {
+			BeforeEach(func() {
+				cmd.DestinationOrg = "bananarama"
+				cmd.DestinationSpace = "hamdinger"
+				fakeV3Actor.GetOrganizationByNameReturns(v3action.Organization{GUID: "some-org-guid"}, v3action.Warnings{}, nil)
+				fakeV3Actor.GetSpaceByNameAndOrganizationReturns(v3action.Space{}, v3action.Warnings{}, actionerror.SpaceNotFoundError{Name: "bananarama"})
+			})
+
+			It("returns an error", func() {
+				passedSpaceName, passedOrgGuid := fakeV3Actor.GetSpaceByNameAndOrganizationArgsForCall(0)
+				Expect(passedSpaceName).To(Equal("hamdinger"))
+				Expect(passedOrgGuid).To(Equal("some-org-guid"))
+				Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: "bananarama"}))
+				Expect(testUI.Out).NotTo(Say(`Adding network policy`))
+			})
+		})
+
+		When("a no org and valid space for targeted org is specified for destination app", func() {
+			BeforeEach(func() {
+				cmd.DestinationSpace = "hamdinger"
+				fakeV3Actor.GetSpaceByNameAndOrganizationReturns(v3action.Space{GUID: "some-other-space-guid"}, v3action.Warnings{}, nil)
+			})
+
+			It("displays OK when no error occurs", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeV3Actor.GetOrganizationByNameCallCount()).To(Equal(0))
+				Expect(fakeActor.AddNetworkPolicyCallCount()).To(Equal(1))
+				passedSrcSpaceGuid, _, passedDestSpaceGuid, _, _, _, _ := fakeActor.AddNetworkPolicyArgsForCall(0)
+				Expect(passedSrcSpaceGuid).To(Equal("some-space-guid"))
+				Expect(passedDestSpaceGuid).To(Equal("some-other-space-guid"))
+
+				Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+
+		When("a valid org and space is specified for destination app", func() {
+			BeforeEach(func() {
+				cmd.DestinationOrg = "bananarama"
+				cmd.DestinationSpace = "hamdinger"
+				fakeV3Actor.GetOrganizationByNameReturns(v3action.Organization{GUID: "some-org-guid"}, v3action.Warnings{"some-org-warning-1", "some-org-warning-2"}, nil)
+				fakeV3Actor.GetSpaceByNameAndOrganizationReturns(v3action.Space{GUID: "some-other-space-guid"}, v3action.Warnings{"some-space-warning-1", "some-space-warning-2"}, nil)
+				fakeActor.AddNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-add-warning-1", "some-add-warning-2"}, nil)
+			})
+
+			It("displays OK when no error occurs", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.AddNetworkPolicyCallCount()).To(Equal(1))
+				passedSrcSpaceGuid, _, passedDestSpaceGuid, _, _, _, _ := fakeActor.AddNetworkPolicyArgsForCall(0)
+				Expect(passedSrcSpaceGuid).To(Equal("some-space-guid"))
+				Expect(passedDestSpaceGuid).To(Equal("some-other-space-guid"))
+
+				Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+				Expect(testUI.Err).To(Say("some-org-warning-1"))
+				Expect(testUI.Err).To(Say("some-org-warning-2"))
+				Expect(testUI.Err).To(Say("some-space-warning-1"))
+				Expect(testUI.Err).To(Say("some-space-warning-2"))
+				Expect(testUI.Err).To(Say("some-add-warning-1"))
+				Expect(testUI.Err).To(Say("some-add-warning-2"))
+				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
 	})

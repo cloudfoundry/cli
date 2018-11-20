@@ -40,13 +40,14 @@ var _ = Describe("Policy", func() {
 
 	Describe("AddNetworkPolicy", func() {
 		JustBeforeEach(func() {
-			spaceGuid := "space"
+			srcSpaceGuid := "src-space"
 			srcApp := "appA"
+			destSpaceGuid := "dst-space"
 			destApp := "appB"
 			protocol := "tcp"
 			startPort := 8080
 			endPort := 8090
-			warnings, executeErr = actor.AddNetworkPolicy(spaceGuid, srcApp, destApp, protocol, startPort, endPort)
+			warnings, executeErr = actor.AddNetworkPolicy(srcSpaceGuid, srcApp, destSpaceGuid, destApp, protocol, startPort, endPort)
 		})
 
 		It("creates policies", func() {
@@ -54,13 +55,13 @@ var _ = Describe("Policy", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
 
 			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(2))
-			sourceAppName, spaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(0)
+			sourceAppName, srcSpaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(0)
 			Expect(sourceAppName).To(Equal("appA"))
-			Expect(spaceGUID).To(Equal("space"))
+			Expect(srcSpaceGUID).To(Equal("src-space"))
 
-			destAppName, spaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(1)
+			destAppName, destSpaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(1)
 			Expect(destAppName).To(Equal("appB"))
-			Expect(spaceGUID).To(Equal("space"))
+			Expect(destSpaceGUID).To(Equal("dst-space"))
 
 			Expect(fakeNetworkingClient.CreatePoliciesCallCount()).To(Equal(1))
 			Expect(fakeNetworkingClient.CreatePoliciesArgsForCall(0)).To(Equal([]cfnetv1.Policy{
@@ -176,8 +177,8 @@ var _ = Describe("Policy", func() {
 		})
 
 		JustBeforeEach(func() {
-			spaceGuid := "space"
-			policies, warnings, executeErr = actor.NetworkPoliciesBySpaceAndAppName(spaceGuid, srcApp)
+			srcSpaceGuid := "space"
+			policies, warnings, executeErr = actor.NetworkPoliciesBySpaceAndAppName(srcSpaceGuid, srcApp)
 		})
 
 		When("listing policies based on a source app", func() {

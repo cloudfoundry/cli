@@ -23,16 +23,18 @@ var _ = Describe("add-network-policy command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("add-network-policy - Create policy to allow direct network traffic from one app to another"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(regexp.QuoteMeta("cf add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]")))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf add-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] [--protocol (tcp | udp) --port RANGE]")))
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say("   cf add-network-policy frontend --destination-app backend --protocol tcp --port 8081"))
-				Eventually(session).Should(Say("   cf add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"))
+				Eventually(session).Should(Say("   cf add-network-policy frontend --destination-app backend -o backend-org -s backend-space --protocol tcp --port 8080-8090"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("   --destination-app      Name of app to connect to"))
 				Eventually(session).Should(Say(`   --port                 Port or range of ports for connection to destination app \(Default: 8080\)`))
 				Eventually(session).Should(Say(`   --protocol             Protocol to connect apps with \(Default: tcp\)`))
+				Eventually(session).Should(Say(`   -o                     The org in which the destination space resides \(Default: targeted org\)`))
+				Eventually(session).Should(Say(`   -s                     The destination space \(Default: targeted space\)`))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("   apps, network-policies"))
+				Eventually(session).Should(Say("   apps, network-policies, remove-network-policy"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -82,6 +84,42 @@ var _ = Describe("add-network-policy command", func() {
 				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports`))
 				Eventually(session).Should(Say(`%s\s+%s\s+udp\s+8080-8090`, appName, appName))
 				Eventually(session).Should(Exit(0))
+			})
+
+			When("destination space and org are specified", func() {
+				var (
+					sourceOrg   string
+					sourceSpace string
+					sourceApp   string
+				)
+
+				BeforeEach(func() {
+					sourceOrg = helpers.NewOrgName()
+					sourceSpace = helpers.NewSpaceName()
+					sourceApp = helpers.PrefixedRandomName("sourceapp")
+
+					helpers.SetupCF(sourceOrg, sourceSpace)
+
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", sourceApp, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+					})
+				})
+
+				It("creates a policy", func() {
+					session := helpers.CF("add-network-policy", sourceApp, "--destination-app", appName, "-o", orgName, "-s", spaceName)
+					username, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say(`Adding network policy to app %s in org %s / space %s as %s\.\.\.`, sourceApp, sourceOrg, sourceSpace, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					// TODO use helpers.CF("network-policies") after that's updated
+					// session = helpers.CF("network-policies")
+					// Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, sourceOrg, sourceSpace, username))
+					// Consistently(session).ShouldNot(Say("OK"))
+					// Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports`))
+					// Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080[^-]`, sourceApp, appName))
+					// Eventually(session).Should(Exit(0))
+				})
 			})
 
 			When("port and protocol are not specified", func() {
@@ -146,6 +184,19 @@ var _ = Describe("add-network-policy command", func() {
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		When("policy to another space is specified", func() {
+			When("org is specified but space is not", func() {
+				It("returns an error", func() {
+					session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "-o", "myorg")
+
+					Eventually(session.Err).Should(Say("Incorrect Usage: space must be provided with org, the required flag '-s' was not specified"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Say("NAME:"))
+					Eventually(session).Should(Exit(1))
+				})
 			})
 		})
 	})
