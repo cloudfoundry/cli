@@ -7,23 +7,28 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 //go:generate counterfeiter . RemoveNetworkPolicyActor
 
 type RemoveNetworkPolicyActor interface {
-	RemoveNetworkPolicy(spaceGUID string, srcAppName string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
+	RemoveNetworkPolicy(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
+	GetOrganizationByName(name string) (v3action.Organization, v3action.Warnings, error)
+	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error)
 }
 
 type RemoveNetworkPolicyCommand struct {
-	RequiredArgs   flag.RemoveNetworkPolicyArgs `positional-args:"yes"`
-	DestinationApp string                       `long:"destination-app" required:"true" description:"Name of app to connect to"`
-	Port           flag.NetworkPort             `long:"port" required:"true" description:"Port or range of ports that destination app is connected with"`
-	Protocol       flag.NetworkProtocol         `long:"protocol" required:"true" description:"Protocol that apps are connected with"`
+	RequiredArgs     flag.RemoveNetworkPolicyArgs `positional-args:"yes"`
+	DestinationApp   string                       `long:"destination-app" required:"true" description:"Name of app to connect to"`
+	Port             flag.NetworkPort             `long:"port" required:"true" description:"Port or range of ports that destination app is connected with"`
+	Protocol         flag.NetworkProtocol         `long:"protocol" required:"true" description:"Protocol that apps are connected with"`
+	DestinationOrg   string                       `short:"o" description:"The org of the destination app (Default: targeted org)"`
+	DestinationSpace string                       `short:"s" description:"The space of the destination app (Default: targeted space)"`
 
-	usage           interface{} `usage:"CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\n\nEXAMPLES:\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"`
-	relatedCommands interface{} `related_commands:"apps, network-policies"`
+	usage           interface{} `usage:"CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] --protocol (tcp | udp) --port RANGE\n\nEXAMPLES:\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-policy frontend --destination-app backend -o backend-org -s backend-space --protocol tcp --port 8080-8090"`
+	relatedCommands interface{} `related_commands:"apps, network-policies, add-network-policy"`
 
 	UI          command.UI
 	Config      command.Config
@@ -42,6 +47,7 @@ func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.U
 	}
 
 	v3Actor := v3action.NewActor(client, config, nil, nil)
+
 	networkingClient, err := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
 	if err != nil {
 		return err
@@ -52,9 +58,36 @@ func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.U
 }
 
 func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
+	switch {
+	case cmd.DestinationOrg != "" && cmd.DestinationSpace == "":
+		return translatableerror.NetworkPolicyDestinationOrgWithoutSpaceError{}
+	}
+
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
+	}
+
+	destOrgGUID := cmd.Config.TargetedOrganization().GUID
+	if cmd.DestinationOrg != "" {
+		destOrg, warnings, err := cmd.Actor.GetOrganizationByName(cmd.DestinationOrg)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+
+		destOrgGUID = destOrg.GUID
+	}
+
+	destSpaceGUID := cmd.Config.TargetedSpace().GUID
+	if cmd.DestinationSpace != "" {
+		destSpace, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destOrgGUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
+		}
+
+		destSpaceGUID = destSpace.GUID
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -68,8 +101,8 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 		"User":       user.Name,
 	})
 
-	warnings, err := cmd.Actor.RemoveNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
-	cmd.UI.DisplayWarnings(warnings)
+	removeWarnings, err := cmd.Actor.RemoveNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, destSpaceGUID, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
+	cmd.UI.DisplayWarnings(removeWarnings)
 	if err != nil {
 		switch err.(type) {
 		case actionerror.PolicyDoesNotExistError:

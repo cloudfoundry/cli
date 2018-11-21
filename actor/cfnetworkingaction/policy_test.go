@@ -385,13 +385,14 @@ var _ = Describe("Policy", func() {
 		})
 
 		JustBeforeEach(func() {
-			spaceGuid := "space"
+			srcSpaceGuid := "spaceA"
 			srcApp := "appA"
+			destSpaceGuid := "spaceB"
 			destApp := "appB"
 			protocol := "udp"
 			startPort := 123
 			endPort := 345
-			warnings, executeErr = actor.RemoveNetworkPolicy(spaceGuid, srcApp, destApp, protocol, startPort, endPort)
+			warnings, executeErr = actor.RemoveNetworkPolicy(srcSpaceGuid, srcApp, destSpaceGuid, destApp, protocol, startPort, endPort)
 		})
 		It("removes policies", func() {
 			Expect(warnings).To(ConsistOf("v3ActorWarningA", "v3ActorWarningB"))
@@ -400,11 +401,11 @@ var _ = Describe("Policy", func() {
 			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(2))
 			sourceAppName, spaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(0)
 			Expect(sourceAppName).To(Equal("appA"))
-			Expect(spaceGUID).To(Equal("space"))
+			Expect(spaceGUID).To(Equal("spaceA"))
 
 			destAppName, spaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(1)
 			Expect(destAppName).To(Equal("appB"))
-			Expect(spaceGUID).To(Equal("space"))
+			Expect(spaceGUID).To(Equal("spaceB"))
 
 			Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
 

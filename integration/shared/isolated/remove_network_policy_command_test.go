@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"fmt"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -23,16 +24,18 @@ var _ = Describe("remove-network-policy command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("remove-network-policy - Remove network traffic policy of an app"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(regexp.QuoteMeta("cf remove-network-policy SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE")))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf remove-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] --protocol (tcp | udp) --port RANGE")))
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say("   cf remove-network-policy frontend --destination-app backend --protocol tcp --port 8081"))
-				Eventually(session).Should(Say("   cf remove-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"))
+				Eventually(session).Should(Say("   cf remove-network-policy frontend --destination-app backend -o backend-org -s backend-space --protocol tcp --port 8080-8090"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("   --destination-app      Name of app to connect to"))
 				Eventually(session).Should(Say("   --port                 Port or range of ports that destination app is connected with"))
 				Eventually(session).Should(Say("   --protocol             Protocol that apps are connected with"))
+				Eventually(session).Should(Say(`   -o                     The org of the destination app \(Default: targeted org\)`))
+				Eventually(session).Should(Say(`   -s                     The space of the destination app \(Default: targeted space\)`))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("   apps, network-policies"))
+				Eventually(session).Should(Say("   add-network-policy, apps, network-policies"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -49,6 +52,7 @@ var _ = Describe("remove-network-policy command", func() {
 			orgName   string
 			spaceName string
 			appName   string
+			appGUID   string
 		)
 
 		BeforeEach(func() {
@@ -61,6 +65,8 @@ var _ = Describe("remove-network-policy command", func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
 				Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
 			})
+
+			appGUID = helpers.AppGUID(appName)
 		})
 
 		AfterEach(func() {
@@ -98,6 +104,58 @@ var _ = Describe("remove-network-policy command", func() {
 				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports`))
 				Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080[^-]`, appName, appName))
 				Eventually(session).Should(Exit(0))
+			})
+
+			When("an org and space is provided for destination app", func() {
+				var (
+					sourceOrg     string
+					sourceSpace   string
+					sourceApp     string
+					sourceAppGUID string
+				)
+
+				BeforeEach(func() {
+					sourceOrg = helpers.NewOrgName()
+					sourceSpace = helpers.NewSpaceName()
+					sourceApp = helpers.PrefixedRandomName("sourceapp")
+
+					helpers.SetupCF(sourceOrg, sourceSpace)
+
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", sourceApp, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+					})
+
+					sourceAppGUID = helpers.AppGUID(sourceApp)
+
+					session := helpers.CF("add-network-policy", sourceApp, "--destination-app", appName, "-o", orgName, "-s", spaceName)
+					username, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say(`Adding network policy to app %s in org %s / space %s as %s\.\.\.`, sourceApp, sourceOrg, sourceSpace, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("curl", fmt.Sprintf("/networking/v1/external/policies?source_id=%s&dest_id=%s", sourceAppGUID, appGUID))
+					Eventually(session).Should(Exit(0))
+					Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(`{
+						"total_policies": 1,
+						"policies": [{
+							"source": { "id": %q },
+							"destination": { "id": %q, "protocol": "tcp", "ports": { "start": 8080, "end": 8080 } }
+						}]
+					}`, sourceAppGUID, appGUID)))
+				})
+
+				It("can remove a policy", func() {
+					session := helpers.CF("remove-network-policy", sourceApp, "--destination-app", appName, "-o", orgName, "-s", spaceName, "--port", "8080", "--protocol", "tcp")
+
+					username, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say(`Removing network policy for app %s in org %s / space %s as %s\.\.\.`, sourceApp, sourceOrg, sourceSpace, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("curl", fmt.Sprintf("/networking/v1/external/policies?source_id=%s&dest_id=%s", sourceAppGUID, appGUID))
+					Eventually(session).Should(Exit(0))
+					Expect(string(session.Out.Contents())).To(MatchJSON(`{ "total_policies": 0, "policies": [] }`))
+				})
 			})
 
 			When("the protocol is not provided", func() {

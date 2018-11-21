@@ -2,22 +2,24 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	cfnetworkingaction "code.cloudfoundry.org/cli/actor/cfnetworkingaction"
-	v6 "code.cloudfoundry.org/cli/command/v6"
+	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeRemoveNetworkPolicyActor struct {
-	RemoveNetworkPolicyStub        func(string, string, string, string, int, int) (cfnetworkingaction.Warnings, error)
+	RemoveNetworkPolicyStub        func(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
 	removeNetworkPolicyMutex       sync.RWMutex
 	removeNetworkPolicyArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 int
-		arg6 int
+		srcSpaceGUID  string
+		srcAppName    string
+		destSpaceGUID string
+		destAppName   string
+		protocol      string
+		startPort     int
+		endPort       int
 	}
 	removeNetworkPolicyReturns struct {
 		result1 cfnetworkingaction.Warnings
@@ -27,31 +29,62 @@ type FakeRemoveNetworkPolicyActor struct {
 		result1 cfnetworkingaction.Warnings
 		result2 error
 	}
+	GetOrganizationByNameStub        func(name string) (v3action.Organization, v3action.Warnings, error)
+	getOrganizationByNameMutex       sync.RWMutex
+	getOrganizationByNameArgsForCall []struct {
+		name string
+	}
+	getOrganizationByNameReturns struct {
+		result1 v3action.Organization
+		result2 v3action.Warnings
+		result3 error
+	}
+	getOrganizationByNameReturnsOnCall map[int]struct {
+		result1 v3action.Organization
+		result2 v3action.Warnings
+		result3 error
+	}
+	GetSpaceByNameAndOrganizationStub        func(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error)
+	getSpaceByNameAndOrganizationMutex       sync.RWMutex
+	getSpaceByNameAndOrganizationArgsForCall []struct {
+		spaceName string
+		orgGUID   string
+	}
+	getSpaceByNameAndOrganizationReturns struct {
+		result1 v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}
+	getSpaceByNameAndOrganizationReturnsOnCall map[int]struct {
+		result1 v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicy(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int, arg6 int) (cfnetworkingaction.Warnings, error) {
+func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicy(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error) {
 	fake.removeNetworkPolicyMutex.Lock()
 	ret, specificReturn := fake.removeNetworkPolicyReturnsOnCall[len(fake.removeNetworkPolicyArgsForCall)]
 	fake.removeNetworkPolicyArgsForCall = append(fake.removeNetworkPolicyArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 int
-		arg6 int
-	}{arg1, arg2, arg3, arg4, arg5, arg6})
-	fake.recordInvocation("RemoveNetworkPolicy", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
+		srcSpaceGUID  string
+		srcAppName    string
+		destSpaceGUID string
+		destAppName   string
+		protocol      string
+		startPort     int
+		endPort       int
+	}{srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol, startPort, endPort})
+	fake.recordInvocation("RemoveNetworkPolicy", []interface{}{srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol, startPort, endPort})
 	fake.removeNetworkPolicyMutex.Unlock()
 	if fake.RemoveNetworkPolicyStub != nil {
-		return fake.RemoveNetworkPolicyStub(arg1, arg2, arg3, arg4, arg5, arg6)
+		return fake.RemoveNetworkPolicyStub(srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol, startPort, endPort)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.removeNetworkPolicyReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.removeNetworkPolicyReturns.result1, fake.removeNetworkPolicyReturns.result2
 }
 
 func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyCallCount() int {
@@ -60,22 +93,13 @@ func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyCallCount() int {
 	return len(fake.removeNetworkPolicyArgsForCall)
 }
 
-func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyCalls(stub func(string, string, string, string, int, int) (cfnetworkingaction.Warnings, error)) {
-	fake.removeNetworkPolicyMutex.Lock()
-	defer fake.removeNetworkPolicyMutex.Unlock()
-	fake.RemoveNetworkPolicyStub = stub
-}
-
-func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyArgsForCall(i int) (string, string, string, string, int, int) {
+func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyArgsForCall(i int) (string, string, string, string, string, int, int) {
 	fake.removeNetworkPolicyMutex.RLock()
 	defer fake.removeNetworkPolicyMutex.RUnlock()
-	argsForCall := fake.removeNetworkPolicyArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
+	return fake.removeNetworkPolicyArgsForCall[i].srcSpaceGUID, fake.removeNetworkPolicyArgsForCall[i].srcAppName, fake.removeNetworkPolicyArgsForCall[i].destSpaceGUID, fake.removeNetworkPolicyArgsForCall[i].destAppName, fake.removeNetworkPolicyArgsForCall[i].protocol, fake.removeNetworkPolicyArgsForCall[i].startPort, fake.removeNetworkPolicyArgsForCall[i].endPort
 }
 
 func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyReturns(result1 cfnetworkingaction.Warnings, result2 error) {
-	fake.removeNetworkPolicyMutex.Lock()
-	defer fake.removeNetworkPolicyMutex.Unlock()
 	fake.RemoveNetworkPolicyStub = nil
 	fake.removeNetworkPolicyReturns = struct {
 		result1 cfnetworkingaction.Warnings
@@ -84,8 +108,6 @@ func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyReturns(result1 cfn
 }
 
 func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyReturnsOnCall(i int, result1 cfnetworkingaction.Warnings, result2 error) {
-	fake.removeNetworkPolicyMutex.Lock()
-	defer fake.removeNetworkPolicyMutex.Unlock()
 	fake.RemoveNetworkPolicyStub = nil
 	if fake.removeNetworkPolicyReturnsOnCall == nil {
 		fake.removeNetworkPolicyReturnsOnCall = make(map[int]struct {
@@ -99,16 +121,125 @@ func (fake *FakeRemoveNetworkPolicyActor) RemoveNetworkPolicyReturnsOnCall(i int
 	}{result1, result2}
 }
 
+func (fake *FakeRemoveNetworkPolicyActor) GetOrganizationByName(name string) (v3action.Organization, v3action.Warnings, error) {
+	fake.getOrganizationByNameMutex.Lock()
+	ret, specificReturn := fake.getOrganizationByNameReturnsOnCall[len(fake.getOrganizationByNameArgsForCall)]
+	fake.getOrganizationByNameArgsForCall = append(fake.getOrganizationByNameArgsForCall, struct {
+		name string
+	}{name})
+	fake.recordInvocation("GetOrganizationByName", []interface{}{name})
+	fake.getOrganizationByNameMutex.Unlock()
+	if fake.GetOrganizationByNameStub != nil {
+		return fake.GetOrganizationByNameStub(name)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getOrganizationByNameReturns.result1, fake.getOrganizationByNameReturns.result2, fake.getOrganizationByNameReturns.result3
+}
+
+func (fake *FakeRemoveNetworkPolicyActor) GetOrganizationByNameCallCount() int {
+	fake.getOrganizationByNameMutex.RLock()
+	defer fake.getOrganizationByNameMutex.RUnlock()
+	return len(fake.getOrganizationByNameArgsForCall)
+}
+
+func (fake *FakeRemoveNetworkPolicyActor) GetOrganizationByNameArgsForCall(i int) string {
+	fake.getOrganizationByNameMutex.RLock()
+	defer fake.getOrganizationByNameMutex.RUnlock()
+	return fake.getOrganizationByNameArgsForCall[i].name
+}
+
+func (fake *FakeRemoveNetworkPolicyActor) GetOrganizationByNameReturns(result1 v3action.Organization, result2 v3action.Warnings, result3 error) {
+	fake.GetOrganizationByNameStub = nil
+	fake.getOrganizationByNameReturns = struct {
+		result1 v3action.Organization
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeRemoveNetworkPolicyActor) GetOrganizationByNameReturnsOnCall(i int, result1 v3action.Organization, result2 v3action.Warnings, result3 error) {
+	fake.GetOrganizationByNameStub = nil
+	if fake.getOrganizationByNameReturnsOnCall == nil {
+		fake.getOrganizationByNameReturnsOnCall = make(map[int]struct {
+			result1 v3action.Organization
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.getOrganizationByNameReturnsOnCall[i] = struct {
+		result1 v3action.Organization
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeRemoveNetworkPolicyActor) GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error) {
+	fake.getSpaceByNameAndOrganizationMutex.Lock()
+	ret, specificReturn := fake.getSpaceByNameAndOrganizationReturnsOnCall[len(fake.getSpaceByNameAndOrganizationArgsForCall)]
+	fake.getSpaceByNameAndOrganizationArgsForCall = append(fake.getSpaceByNameAndOrganizationArgsForCall, struct {
+		spaceName string
+		orgGUID   string
+	}{spaceName, orgGUID})
+	fake.recordInvocation("GetSpaceByNameAndOrganization", []interface{}{spaceName, orgGUID})
+	fake.getSpaceByNameAndOrganizationMutex.Unlock()
+	if fake.GetSpaceByNameAndOrganizationStub != nil {
+		return fake.GetSpaceByNameAndOrganizationStub(spaceName, orgGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getSpaceByNameAndOrganizationReturns.result1, fake.getSpaceByNameAndOrganizationReturns.result2, fake.getSpaceByNameAndOrganizationReturns.result3
+}
+
+func (fake *FakeRemoveNetworkPolicyActor) GetSpaceByNameAndOrganizationCallCount() int {
+	fake.getSpaceByNameAndOrganizationMutex.RLock()
+	defer fake.getSpaceByNameAndOrganizationMutex.RUnlock()
+	return len(fake.getSpaceByNameAndOrganizationArgsForCall)
+}
+
+func (fake *FakeRemoveNetworkPolicyActor) GetSpaceByNameAndOrganizationArgsForCall(i int) (string, string) {
+	fake.getSpaceByNameAndOrganizationMutex.RLock()
+	defer fake.getSpaceByNameAndOrganizationMutex.RUnlock()
+	return fake.getSpaceByNameAndOrganizationArgsForCall[i].spaceName, fake.getSpaceByNameAndOrganizationArgsForCall[i].orgGUID
+}
+
+func (fake *FakeRemoveNetworkPolicyActor) GetSpaceByNameAndOrganizationReturns(result1 v3action.Space, result2 v3action.Warnings, result3 error) {
+	fake.GetSpaceByNameAndOrganizationStub = nil
+	fake.getSpaceByNameAndOrganizationReturns = struct {
+		result1 v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeRemoveNetworkPolicyActor) GetSpaceByNameAndOrganizationReturnsOnCall(i int, result1 v3action.Space, result2 v3action.Warnings, result3 error) {
+	fake.GetSpaceByNameAndOrganizationStub = nil
+	if fake.getSpaceByNameAndOrganizationReturnsOnCall == nil {
+		fake.getSpaceByNameAndOrganizationReturnsOnCall = make(map[int]struct {
+			result1 v3action.Space
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.getSpaceByNameAndOrganizationReturnsOnCall[i] = struct {
+		result1 v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeRemoveNetworkPolicyActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.removeNetworkPolicyMutex.RLock()
 	defer fake.removeNetworkPolicyMutex.RUnlock()
-	copiedInvocations := map[string][][]interface{}{}
-	for key, value := range fake.invocations {
-		copiedInvocations[key] = value
-	}
-	return copiedInvocations
+	fake.getOrganizationByNameMutex.RLock()
+	defer fake.getOrganizationByNameMutex.RUnlock()
+	fake.getSpaceByNameAndOrganizationMutex.RLock()
+	defer fake.getSpaceByNameAndOrganizationMutex.RUnlock()
+	return fake.invocations
 }
 
 func (fake *FakeRemoveNetworkPolicyActor) recordInvocation(key string, args []interface{}) {
