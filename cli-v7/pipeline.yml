@@ -184,6 +184,15 @@ resources:
     private_key: ((cli-private-github-private-key))
     branch: master
 
+- name: bump-v7-version
+  type: semver
+  source:
+    driver: git
+    uri: git@github.com:cloudfoundry/cli
+    branch: master
+    file: BUILD_VERSION_V7
+    private_key: ((vat-bump-version-github-private-key))
+
 # values for this already exist in last pass, blocked on
 # blocked on https://github.com/concourse/concourse/issues/1407
 # - name: cf-cli-tracker
@@ -546,3 +555,13 @@ jobs:
   - put: homebrew-tap
     params:
       repository: update-brew-formula-output/homebrew-tap
+
+- name: bump-cli-v7-version
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [create-beta-release]
+      trigger: true
+    - put: bump-v7-version
+      params: {pre: beta}
