@@ -1,10 +1,6 @@
-// +build !partialPush
-
 package push
 
 import (
-	"os"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -51,16 +47,10 @@ var _ = Describe("pushing docker images", func() {
 		)
 
 		BeforeEach(func() {
-			privateDockerImage = os.Getenv("CF_INT_DOCKER_IMAGE")
-			privateDockerUsername = os.Getenv("CF_INT_DOCKER_USERNAME")
-			privateDockerPassword = os.Getenv("CF_INT_DOCKER_PASSWORD")
-
-			if privateDockerImage == "" || privateDockerUsername == "" || privateDockerPassword == "" {
-				Skip("CF_INT_DOCKER_IMAGE, CF_INT_DOCKER_USERNAME, or CF_INT_DOCKER_PASSWORD is not set")
-			}
+			privateDockerImage, privateDockerUsername, privateDockerPassword = helpers.SkipIfPrivateDockerInfoNotSet()
 		})
 
-		When("the docker passwored is provided via environment variable", func() {
+		PWhen("the docker passwored is provided via environment variable", func() {
 			It("uses the specified private docker image", func() {
 				session := helpers.CustomCF(
 					helpers.CFEnv{
@@ -71,6 +61,7 @@ var _ = Describe("pushing docker images", func() {
 					"--docker-image", privateDockerImage,
 				)
 
+				Consistently(session).ShouldNot(Say("Docker password"))
 				Eventually(session).Should(Say(`name:\s+%s`, appName))
 				Eventually(session).Should(Say(`requested state:\s+started`))
 				Eventually(session).Should(Say("stack:"))
@@ -81,16 +72,30 @@ var _ = Describe("pushing docker images", func() {
 		})
 
 		When("the docker passwored is not provided", func() {
-			It("returns an error", func() {
-				session := helpers.CF(
-					PushCommandName, appName,
+			var buffer *Buffer
+
+			BeforeEach(func() {
+				buffer = NewBuffer()
+				_, err := buffer.Write([]byte(privateDockerPassword + "\n"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("prompts for the docker password", func() {
+				session := helpers.CFWithStdin(buffer,
+					PushCommandName,
+					appName,
 					"--docker-username", privateDockerUsername,
 					"--docker-image", privateDockerImage,
 				)
 
-				Eventually(session.Err).Should(Say("Environment variable CF_DOCKER_PASSWORD not set."))
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Exit(1))
+				// Eventually(session).Should(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+				Eventually(session).Should(Say("Docker password"))
+				Eventually(session).Should(Say(`name:\s+%s`, appName))
+				Eventually(session).Should(Say(`requested state:\s+started`))
+				Eventually(session).Should(Say("stack:"))
+				Consistently(session).ShouldNot(Say("buildpacks:"))
+				Eventually(session).Should(Say(`docker image:\s+%s`, privateDockerImage))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})

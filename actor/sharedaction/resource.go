@@ -472,6 +472,7 @@ func (Actor) ReadArchive(archivePath string) (io.ReadCloser, int64, error) {
 
 	archiveInfo, err := archive.Stat()
 	if err != nil {
+		archive.Close()
 		log.WithField("archivePath", archivePath).Errorln("stat temp archive:", err)
 		return nil, -1, err
 	}

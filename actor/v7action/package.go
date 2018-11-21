@@ -25,26 +25,27 @@ type DockerImageCredentials struct {
 	Password string
 }
 
-func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials DockerImageCredentials) (Package, Warnings, error) {
-	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
-	if err != nil {
-		return Package{}, allWarnings, err
-	}
+func (actor Actor) CreateDockerPackageByApplication(appGUID string, dockerImageCredentials DockerImageCredentials) (Package, Warnings, error) {
 	inputPackage := ccv3.Package{
 		Type: constant.PackageTypeDocker,
 		Relationships: ccv3.Relationships{
-			constant.RelationshipTypeApplication: ccv3.Relationship{GUID: app.GUID},
+			constant.RelationshipTypeApplication: ccv3.Relationship{GUID: appGUID},
 		},
 		DockerImage:    dockerImageCredentials.Path,
 		DockerUsername: dockerImageCredentials.Username,
 		DockerPassword: dockerImageCredentials.Password,
 	}
 	pkg, warnings, err := actor.CloudControllerClient.CreatePackage(inputPackage)
-	allWarnings = append(allWarnings, warnings...)
+	return Package(pkg), Warnings(warnings), err
+}
+
+func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials DockerImageCredentials) (Package, Warnings, error) {
+	app, getWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
-		return Package{}, allWarnings, err
+		return Package{}, getWarnings, err
 	}
-	return Package(pkg), allWarnings, err
+	pkg, warnings, err := actor.CreateDockerPackageByApplication(app.GUID, dockerImageCredentials)
+	return pkg, append(getWarnings, warnings...), err
 }
 
 func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (Package, Warnings, error) {

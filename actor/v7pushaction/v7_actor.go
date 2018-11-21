@@ -12,6 +12,7 @@ import (
 type V7Actor interface {
 	CreateApplicationInSpace(app v7action.Application, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	CreateBitsPackageByApplication(appGUID string) (v7action.Package, v7action.Warnings, error)
+	CreateDockerPackageByApplication(appGUID string, dockerImageCredentials v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	PollBuild(buildGUID string, appName string) (v7action.Droplet, v7action.Warnings, error)
 	PollPackage(pkg v7action.Package) (v7action.Package, v7action.Warnings, error)

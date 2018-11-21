@@ -92,6 +92,7 @@ func ReturnLogs(logevents []LogEvent, passedWarnings v7action.Warnings, passedEr
 var _ = Describe("push Command", func() {
 	var (
 		cmd              PushCommand
+		input            *Buffer
 		testUI           *ui.UI
 		fakeConfig       *commandfakes.FakeConfig
 		fakeSharedActor  *commandfakes.FakeSharedActor
@@ -110,7 +111,8 @@ var _ = Describe("push Command", func() {
 	)
 
 	BeforeEach(func() {
-		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+		input = NewBuffer()
+		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakePushActor)
@@ -213,7 +215,7 @@ var _ = Describe("push Command", func() {
 								Warnings: v7pushaction.Warnings{"skipping app creation warnings"},
 							},
 							{
-								Event:    v7pushaction.CreatedApplication,
+								Event:    v7pushaction.CreatingApplication,
 								Warnings: v7pushaction.Warnings{"app creation warnings"},
 							},
 							{
@@ -547,12 +549,44 @@ var _ = Describe("push Command", func() {
 			Expect(overridesErr).ToNot(HaveOccurred())
 		})
 
-		It("sets them on the command line settings", func() {
+		It("sets them on the flag overrides", func() {
 			Expect(overridesErr).ToNot(HaveOccurred())
 			Expect(overrides.Buildpacks).To(ConsistOf("buildpack-1", "buildpack-2"))
 			Expect(overrides.HealthCheckType).To(Equal("port"))
 			Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
 			Expect(overrides.StartCommand).To(Equal(types.FilteredString{IsSet: true, Value: "some-start-command"}))
+		})
+
+		When("a docker image is provided", func() {
+			BeforeEach(func() {
+				cmd.DockerImage = flag.DockerImage{Path: "some-docker-image"}
+			})
+
+			It("sets docker image on the flag overrides", func() {
+				Expect(overridesErr).ToNot(HaveOccurred())
+				Expect(overrides.DockerImage).To(Equal("some-docker-image"))
+			})
+
+			When("docker username is provided", func() {
+				When("a password is provided via environment variable", func() {})
+
+				When("no password is provided", func() {
+					BeforeEach(func() {
+						cmd.DockerUsername = "some-docker-username"
+						input.Write([]byte("some-docker-password\n"))
+					})
+
+					It("prompts for a password", func() {
+						Expect(overridesErr).ToNot(HaveOccurred())
+
+						// Expect(testUI.Out).To(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+						Expect(testUI.Out).To(Say("Docker password"))
+
+						Expect(overrides.DockerUsername).To(Equal("some-docker-username"))
+						Expect(overrides.DockerPassword).To(Equal("some-docker-password"))
+					})
+				})
+			})
 		})
 	})
 })

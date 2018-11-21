@@ -270,7 +270,7 @@ func (cmd PushCommand) processEvent(appName string, event v7pushaction.Event) bo
 		cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}}...", map[string]interface{}{
 			"AppName": appName,
 		})
-	case v7pushaction.CreatedApplication:
+	case v7pushaction.CreatingApplication:
 		cmd.UI.DisplayTextWithFlavor("Creating app {{.AppName}}...", map[string]interface{}{
 			"AppName": appName,
 		})
@@ -328,8 +328,20 @@ func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream 
 }
 
 func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
+	var dockerPassword string
+	if cmd.DockerUsername != "" {
+		var err error
+		dockerPassword, err = cmd.UI.DisplayPasswordPrompt("Docker password")
+		if err != nil {
+			return v7pushaction.FlagOverrides{}, err
+		}
+	}
+
 	return v7pushaction.FlagOverrides{
 		Buildpacks:      cmd.Buildpacks,
+		DockerImage:     cmd.DockerImage.Path,
+		DockerUsername:  cmd.DockerUsername,
+		DockerPassword:  dockerPassword,
 		HealthCheckType: cmd.HealthCheckType.Type,
 		Memory:          cmd.Memory.NullUint64,
 		ProvidedAppPath: string(cmd.AppPath),

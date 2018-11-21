@@ -203,6 +203,7 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("returns an app created event, warnings, and updated state", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
 					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-warnings")))
 					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatedApplication))
 					Eventually(stateStream).Should(Receive(MatchFields(IgnoreExtras,
@@ -212,6 +213,7 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("creates the application", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
 					Eventually(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(1))
 					passedApp, passedSpaceGUID := fakeV7Actor.CreateApplicationInSpaceArgsForCall(0)
 					Expect(passedApp).To(Equal(state.Application))
@@ -229,6 +231,7 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("returns warnings and error", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
 					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-warnings")))
 					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 				})
@@ -496,7 +499,80 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("package upload", func() {
-		When("app bits are provided", func() {
+		When("docker image is provided", func() {
+			BeforeEach(func() {
+				state.Application.LifecycleType = constant.AppLifecycleTypeDocker
+				state.Overrides.DockerImage = "some-docker-image"
+				state.Overrides.DockerPassword = "some-docker-password"
+				state.Overrides.DockerUsername = "some-docker-username"
+
+				fakeV7Actor.CreateApplicationInSpaceReturns(
+					v7action.Application{
+						GUID:          "some-app-guid",
+						Name:          state.Application.Name,
+						LifecycleType: constant.AppLifecycleTypeDocker,
+					},
+					v7action.Warnings{"some-app-warnings"},
+					nil)
+			})
+
+			When("creating the package is successful", func() {
+				BeforeEach(func() {
+					fakeV7Actor.CreateDockerPackageByApplicationReturns(
+						v7action.Package{GUID: "some-package-guid"},
+						v7action.Warnings{"some-package-warnings"},
+						nil)
+				})
+
+				It("sets the docker image", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetDockerImage))
+					Eventually(fakeV7Actor.CreateDockerPackageByApplicationCallCount).Should(Equal(1))
+					Eventually(warningsStream).Should(Receive(ConsistOf("some-package-warnings")))
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetDockerImageComplete))
+
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
+					Eventually(fakeV7Actor.StageApplicationPackageCallCount).Should(Equal(1))
+
+					appGUID, dockerCredentials := fakeV7Actor.CreateDockerPackageByApplicationArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(dockerCredentials).To(MatchFields(IgnoreExtras,
+						Fields{
+							"Path":     Equal("some-docker-image"),
+							"Username": Equal("some-docker-username"),
+							"Password": Equal("some-docker-password"),
+						}))
+
+					Expect(fakeV7Actor.PollPackageArgsForCall(0)).To(MatchFields(IgnoreExtras,
+						Fields{
+							"GUID": Equal("some-package-guid"),
+						}))
+				})
+
+				It("does not create/upload archive", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(Complete))
+					Expect(fakeSharedActor.ZipDirectoryResourcesCallCount()).To(Equal(0))
+					Expect(fakeV7Actor.CreateBitsPackageByApplicationCallCount()).To(Equal(0))
+				})
+			})
+
+			When("creating the package errors", func() {
+				var someErr error
+
+				BeforeEach(func() {
+					someErr = errors.New("I AM A BANANA")
+					fakeV7Actor.CreateDockerPackageByApplicationReturns(v7action.Package{}, v7action.Warnings{"some-package-warnings"}, someErr)
+				})
+
+				It("returns errors and warnings", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetDockerImage))
+					Eventually(warningsStream).Should(Receive(ConsistOf("some-package-warnings")))
+					Eventually(errorStream).Should(Receive(MatchError(someErr)))
+					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(SetDockerImageComplete))
+				})
+			})
+		})
+
+		When("uploading application bits", func() {
 			BeforeEach(func() {
 				state = PushState{
 					Application: v7action.Application{

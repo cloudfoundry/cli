@@ -124,6 +124,20 @@ var _ = Describe("Push State", func() {
 						Expect(states[0].Application.LifecycleBuildpacks).To(ConsistOf("some-buildpack-1", "some-buildpack-2"))
 					})
 				})
+
+				When("docker image information is provided", func() {
+					BeforeEach(func() {
+						flagOverrides.DockerImage = "some-docker-image"
+						flagOverrides.DockerPassword = "some-docker-password"
+						flagOverrides.DockerUsername = "some-docker-username"
+					})
+
+					It("sets the buildpacks on the app", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(states[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeDocker))
+						Expect(states[0].Application.LifecycleBuildpacks).To(BeEmpty())
+					})
+				})
 			})
 
 			When("the application lookup errors", func() {

@@ -42,6 +42,22 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	CreateDockerPackageByApplicationStub        func(string, v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error)
+	createDockerPackageByApplicationMutex       sync.RWMutex
+	createDockerPackageByApplicationArgsForCall []struct {
+		arg1 string
+		arg2 v7action.DockerImageCredentials
+	}
+	createDockerPackageByApplicationReturns struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}
+	createDockerPackageByApplicationReturnsOnCall map[int]struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}
 	GetApplicationByNameAndSpaceStub        func(string, string) (v7action.Application, v7action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
@@ -311,6 +327,73 @@ func (fake *FakeV7Actor) CreateBitsPackageByApplicationReturnsOnCall(i int, resu
 		})
 	}
 	fake.createBitsPackageByApplicationReturnsOnCall[i] = struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV7Actor) CreateDockerPackageByApplication(arg1 string, arg2 v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error) {
+	fake.createDockerPackageByApplicationMutex.Lock()
+	ret, specificReturn := fake.createDockerPackageByApplicationReturnsOnCall[len(fake.createDockerPackageByApplicationArgsForCall)]
+	fake.createDockerPackageByApplicationArgsForCall = append(fake.createDockerPackageByApplicationArgsForCall, struct {
+		arg1 string
+		arg2 v7action.DockerImageCredentials
+	}{arg1, arg2})
+	fake.recordInvocation("CreateDockerPackageByApplication", []interface{}{arg1, arg2})
+	fake.createDockerPackageByApplicationMutex.Unlock()
+	if fake.CreateDockerPackageByApplicationStub != nil {
+		return fake.CreateDockerPackageByApplicationStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createDockerPackageByApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeV7Actor) CreateDockerPackageByApplicationCallCount() int {
+	fake.createDockerPackageByApplicationMutex.RLock()
+	defer fake.createDockerPackageByApplicationMutex.RUnlock()
+	return len(fake.createDockerPackageByApplicationArgsForCall)
+}
+
+func (fake *FakeV7Actor) CreateDockerPackageByApplicationCalls(stub func(string, v7action.DockerImageCredentials) (v7action.Package, v7action.Warnings, error)) {
+	fake.createDockerPackageByApplicationMutex.Lock()
+	defer fake.createDockerPackageByApplicationMutex.Unlock()
+	fake.CreateDockerPackageByApplicationStub = stub
+}
+
+func (fake *FakeV7Actor) CreateDockerPackageByApplicationArgsForCall(i int) (string, v7action.DockerImageCredentials) {
+	fake.createDockerPackageByApplicationMutex.RLock()
+	defer fake.createDockerPackageByApplicationMutex.RUnlock()
+	argsForCall := fake.createDockerPackageByApplicationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeV7Actor) CreateDockerPackageByApplicationReturns(result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+	fake.createDockerPackageByApplicationMutex.Lock()
+	defer fake.createDockerPackageByApplicationMutex.Unlock()
+	fake.CreateDockerPackageByApplicationStub = nil
+	fake.createDockerPackageByApplicationReturns = struct {
+		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV7Actor) CreateDockerPackageByApplicationReturnsOnCall(i int, result1 v7action.Package, result2 v7action.Warnings, result3 error) {
+	fake.createDockerPackageByApplicationMutex.Lock()
+	defer fake.createDockerPackageByApplicationMutex.Unlock()
+	fake.CreateDockerPackageByApplicationStub = nil
+	if fake.createDockerPackageByApplicationReturnsOnCall == nil {
+		fake.createDockerPackageByApplicationReturnsOnCall = make(map[int]struct {
+			result1 v7action.Package
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.createDockerPackageByApplicationReturnsOnCall[i] = struct {
 		result1 v7action.Package
 		result2 v7action.Warnings
 		result3 error
@@ -923,6 +1006,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.createApplicationInSpaceMutex.RUnlock()
 	fake.createBitsPackageByApplicationMutex.RLock()
 	defer fake.createBitsPackageByApplicationMutex.RUnlock()
+	fake.createDockerPackageByApplicationMutex.RLock()
+	defer fake.createDockerPackageByApplicationMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.pollBuildMutex.RLock()

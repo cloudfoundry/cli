@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
+	log "github.com/sirupsen/logrus"
 )
 
 type PushState struct {
@@ -25,6 +26,9 @@ type PushState struct {
 
 type FlagOverrides struct {
 	Buildpacks      []string
+	DockerImage     string
+	DockerPassword  string
+	DockerUsername  string
 	HealthCheckType string
 	Memory          types.NullUint64
 	ProvidedAppPath string
@@ -49,18 +53,25 @@ func (actor Actor) Conceptualize(appName string, spaceGUID string, orgGUID strin
 		err         error
 	)
 
+	log.WithFields(log.Fields{"appName": appName, "spaceGUID": spaceGUID}).Info("Application Look Up")
 	application, warnings, err = actor.V7Actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if _, ok := err.(actionerror.ApplicationNotFoundError); ok {
+		log.Debug("App not found")
 		application = v7action.Application{
 			Name: appName,
 		}
 	} else if err != nil {
+		log.Errorln("Looking up application:", err)
 		return nil, Warnings(warnings), err
 	}
 
 	if len(flagOverrides.Buildpacks) != 0 {
 		application.LifecycleType = constant.AppLifecycleTypeBuildpack
 		application.LifecycleBuildpacks = flagOverrides.Buildpacks
+	}
+
+	if len(flagOverrides.DockerImage) != 0 {
+		application.LifecycleType = constant.AppLifecycleTypeDocker
 	}
 
 	bitsPath := currentDir
