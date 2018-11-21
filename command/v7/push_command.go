@@ -330,10 +330,16 @@ func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream 
 func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 	var dockerPassword string
 	if cmd.DockerUsername != "" {
-		var err error
-		dockerPassword, err = cmd.UI.DisplayPasswordPrompt("Docker password")
-		if err != nil {
-			return v7pushaction.FlagOverrides{}, err
+		if cmd.Config.DockerPassword() == "" {
+			var err error
+			cmd.UI.DisplayText("Environment variable CF_DOCKER_PASSWORD not set.")
+			dockerPassword, err = cmd.UI.DisplayPasswordPrompt("Docker password")
+			if err != nil {
+				return v7pushaction.FlagOverrides{}, err
+			}
+		} else {
+			cmd.UI.DisplayText("Using docker repository password from environment variable CF_DOCKER_PASSWORD.")
+			dockerPassword = cmd.Config.DockerPassword()
 		}
 	}
 

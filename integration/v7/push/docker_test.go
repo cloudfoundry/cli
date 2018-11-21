@@ -50,7 +50,7 @@ var _ = Describe("pushing docker images", func() {
 			privateDockerImage, privateDockerUsername, privateDockerPassword = helpers.SkipIfPrivateDockerInfoNotSet()
 		})
 
-		PWhen("the docker passwored is provided via environment variable", func() {
+		When("the docker passwored is provided via environment variable", func() {
 			It("uses the specified private docker image", func() {
 				session := helpers.CustomCF(
 					helpers.CFEnv{
@@ -61,6 +61,7 @@ var _ = Describe("pushing docker images", func() {
 					"--docker-image", privateDockerImage,
 				)
 
+				Eventually(session).Should(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
 				Consistently(session).ShouldNot(Say("Docker password"))
 				Eventually(session).Should(Say(`name:\s+%s`, appName))
 				Eventually(session).Should(Say(`requested state:\s+started`))
@@ -88,7 +89,7 @@ var _ = Describe("pushing docker images", func() {
 					"--docker-image", privateDockerImage,
 				)
 
-				// Eventually(session).Should(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+				Eventually(session).Should(Say("Environment variable CF_DOCKER_PASSWORD not set."))
 				Eventually(session).Should(Say("Docker password"))
 				Eventually(session).Should(Say(`name:\s+%s`, appName))
 				Eventually(session).Should(Say(`requested state:\s+started`))
