@@ -31,15 +31,15 @@ var _ = Describe("Process Health Check Actions", func() {
 			healthchecks = ProcessHealthChecks{
 				{
 					ProcessType:     "worker",
-					HealthCheckType: "process",
+					HealthCheckType: constant.Process,
 				},
 				{
 					ProcessType:     "console",
-					HealthCheckType: "process",
+					HealthCheckType: constant.Process,
 				},
 				{
 					ProcessType:     constant.ProcessTypeWeb,
-					HealthCheckType: "http",
+					HealthCheckType: constant.HTTP,
 					Endpoint:        "/",
 				},
 			}
@@ -176,7 +176,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 	Describe("SetApplicationProcessHealthCheckTypeByNameAndSpace", func() {
 		var (
-			healthCheckType     string
+			healthCheckType     constant.HealthCheckType
 			healthCheckEndpoint string
 
 			warnings Warnings
@@ -185,17 +185,24 @@ var _ = Describe("Process Health Check Actions", func() {
 		)
 
 		BeforeEach(func() {
-			healthCheckType = "port"
+			healthCheckType = constant.Port
 			healthCheckEndpoint = "/"
 		})
 
 		JustBeforeEach(func() {
-			app, warnings, err = actor.SetApplicationProcessHealthCheckTypeByNameAndSpace("some-app-name", "some-space-guid", healthCheckType, healthCheckEndpoint, "some-process-type", 42)
+			app, warnings, err = actor.SetApplicationProcessHealthCheckTypeByNameAndSpace(
+				"some-app-name",
+				"some-space-guid",
+				healthCheckType,
+				healthCheckEndpoint,
+				"some-process-type",
+				42,
+			)
 		})
 
 		When("the user specifies an endpoint for a non-http health check", func() {
 			BeforeEach(func() {
-				healthCheckType = "port"
+				healthCheckType = constant.Port
 				healthCheckEndpoint = "some-http-endpoint"
 			})
 
@@ -213,7 +220,7 @@ var _ = Describe("Process Health Check Actions", func() {
 					nil,
 				)
 
-				healthCheckType = "http"
+				healthCheckType = constant.HTTP
 				healthCheckEndpoint = "some-http-endpoint"
 			})
 
@@ -331,7 +338,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 					When("the health check type is http", func() {
 						BeforeEach(func() {
-							healthCheckType = "http"
+							healthCheckType = constant.HTTP
 							healthCheckEndpoint = "some-http-endpoint"
 						})
 
@@ -351,7 +358,7 @@ var _ = Describe("Process Health Check Actions", func() {
 							Expect(fakeCloudControllerClient.UpdateProcessCallCount()).To(Equal(1))
 							process := fakeCloudControllerClient.UpdateProcessArgsForCall(0)
 							Expect(process.GUID).To(Equal("some-process-guid"))
-							Expect(process.HealthCheckType).To(Equal("http"))
+							Expect(process.HealthCheckType).To(Equal(constant.HTTP))
 							Expect(process.HealthCheckEndpoint).To(Equal("some-http-endpoint"))
 							Expect(process.HealthCheckInvocationTimeout).To(Equal(42))
 						})
@@ -374,7 +381,7 @@ var _ = Describe("Process Health Check Actions", func() {
 							Expect(fakeCloudControllerClient.UpdateProcessCallCount()).To(Equal(1))
 							process := fakeCloudControllerClient.UpdateProcessArgsForCall(0)
 							Expect(process.GUID).To(Equal("some-process-guid"))
-							Expect(process.HealthCheckType).To(Equal("port"))
+							Expect(process.HealthCheckType).To(Equal(constant.Port))
 							Expect(process.HealthCheckEndpoint).To(BeEmpty())
 							Expect(process.HealthCheckInvocationTimeout).To(Equal(42))
 						})

@@ -3,6 +3,7 @@ package ccv3
 import (
 	"bytes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"encoding/json"
 	"fmt"
@@ -16,7 +17,7 @@ type Process struct {
 	Type string
 	// Command is the process start command. Note: This value will be obfuscated when obtained from listing.
 	Command                      types.FilteredString
-	HealthCheckType              string
+	HealthCheckType              constant.HealthCheckType
 	HealthCheckEndpoint          string
 	HealthCheckInvocationTimeout int
 	Instances                    types.NullInt
@@ -46,7 +47,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 		Type       string               `json:"type"`
 
 		HealthCheck struct {
-			Type string `json:"type"`
+			Type constant.HealthCheckType `json:"type"`
 			Data struct {
 				Endpoint          string `json:"endpoint"`
 				InvocationTimeout int    `json:"invocation_timeout"`
@@ -176,7 +177,7 @@ func (client *Client) UpdateProcess(process Process) (Process, Warnings, error) 
 }
 
 type healthCheck struct {
-	Type string `json:"type"`
+	Type constant.HealthCheckType `json:"type"`
 	Data struct {
 		Endpoint          interface{} `json:"endpoint"`
 		InvocationTimeout int         `json:"invocation_timeout,omitempty"`

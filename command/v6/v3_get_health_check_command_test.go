@@ -162,9 +162,9 @@ var _ = Describe("v3-get-health-check Command", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			appProcessHealthChecks := []v3action.ProcessHealthCheck{
-				{ProcessType: constant.ProcessTypeWeb, HealthCheckType: "http", Endpoint: "/foo", InvocationTimeout: 10},
-				{ProcessType: "queue", HealthCheckType: "port", Endpoint: "", InvocationTimeout: 0},
-				{ProcessType: "timer", HealthCheckType: "process", Endpoint: "", InvocationTimeout: 5},
+				{ProcessType: constant.ProcessTypeWeb, HealthCheckType: constant.HTTP, Endpoint: "/foo", InvocationTimeout: 10},
+				{ProcessType: "queue", HealthCheckType: constant.Port, Endpoint: "", InvocationTimeout: 0},
+				{ProcessType: "timer", HealthCheckType: constant.Process, Endpoint: "", InvocationTimeout: 5},
 			}
 			fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceReturns(appProcessHealthChecks, v3action.Warnings{"warning-1", "warning-2"}, nil)
 		})

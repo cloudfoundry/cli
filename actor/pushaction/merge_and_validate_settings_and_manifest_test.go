@@ -8,7 +8,6 @@ import (
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"

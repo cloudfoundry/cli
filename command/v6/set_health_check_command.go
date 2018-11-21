@@ -17,9 +17,9 @@ type SetHealthCheckActor interface {
 }
 
 type SetHealthCheckCommand struct {
-	RequiredArgs flag.SetHealthCheckArgs `positional-args:"yes"`
-	HTTPEndpoint string                  `long:"endpoint" default:"/" description:"Path on the app"`
-	usage        interface{}             `usage:"CF_NAME set-health-check APP_NAME (process | port | http [--endpoint PATH])\n\nTIP: 'none' has been deprecated but is accepted for 'process'.\n\nEXAMPLES:\n   cf set-health-check worker-app process\n   cf set-health-check my-web-app http --endpoint /foo"`
+	RequiredArgs flag.V6SetHealthCheckArgs `positional-args:"yes"`
+	HTTPEndpoint string                    `long:"endpoint" default:"/" description:"Path on the app"`
+	usage        interface{}               `usage:"CF_NAME set-health-check APP_NAME (process | port | http [--endpoint PATH])\n\nTIP: 'none' has been deprecated but is accepted for 'process'.\n\nEXAMPLES:\n   cf set-health-check worker-app process\n   cf set-health-check my-web-app http --endpoint /foo"`
 
 	UI          command.UI
 	Config      command.Config

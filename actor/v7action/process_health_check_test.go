@@ -30,15 +30,15 @@ var _ = Describe("Process Health Check Actions", func() {
 			healthchecks = ProcessHealthChecks{
 				{
 					ProcessType:     "worker",
-					HealthCheckType: "process",
+					HealthCheckType: constant.Process,
 				},
 				{
 					ProcessType:     "console",
-					HealthCheckType: "process",
+					HealthCheckType: constant.Process,
 				},
 				{
 					ProcessType:     constant.ProcessTypeWeb,
-					HealthCheckType: "http",
+					HealthCheckType: constant.HTTP,
 					Endpoint:        constant.ProcessHealthCheckEndpointDefault,
 				},
 			}

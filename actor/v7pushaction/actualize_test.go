@@ -322,10 +322,10 @@ var _ = Describe("Actualize", func() {
 				})
 
 				When("health check information is provided", func() {
-					var healthCheckType string
+					var healthCheckType constant.HealthCheckType
 
 					BeforeEach(func() {
-						healthCheckType = "port"
+						healthCheckType = constant.Port
 						state.Overrides = FlagOverrides{
 							HealthCheckType: healthCheckType,
 						}
@@ -377,11 +377,11 @@ var _ = Describe("Actualize", func() {
 
 				When("start command and health check are provided", func() {
 					var command types.FilteredString
-					var healthCheckType string
+					var healthCheckType constant.HealthCheckType
 
 					BeforeEach(func() {
 						command = *types.NewFilteredString("some-command")
-						healthCheckType = "port"
+						healthCheckType = constant.Port
 
 						state.Overrides = FlagOverrides{
 							HealthCheckType: healthCheckType,

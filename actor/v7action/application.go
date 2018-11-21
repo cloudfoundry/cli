@@ -112,7 +112,7 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 	appName string,
 	spaceGUID string,
-	healthCheckType string,
+	healthCheckType constant.HealthCheckType,
 	httpEndpoint string,
 	processType string,
 	invocationTimeout int,

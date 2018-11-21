@@ -3,6 +3,7 @@ package v7
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -12,7 +13,7 @@ import (
 
 type SetHealthCheckActor interface {
 	CloudControllerAPIVersion() string
-	SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType string, httpEndpoint string, processType string, invocationTimeout int) (v7action.Application, v7action.Warnings, error)
+	SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType constant.HealthCheckType, httpEndpoint string, processType string, invocationTimeout int) (v7action.Application, v7action.Warnings, error)
 }
 
 type SetHealthCheckCommand struct {

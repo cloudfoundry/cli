@@ -11,7 +11,7 @@ import (
 
 type ProcessHealthCheck struct {
 	ProcessType       string
-	HealthCheckType   string
+	HealthCheckType   constant.HealthCheckType
 	Endpoint          string
 	InvocationTimeout int
 }
@@ -75,13 +75,13 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 	appName string,
 	spaceGUID string,
-	healthCheckType string,
+	healthCheckType constant.HealthCheckType,
 	httpEndpoint string,
 	processType string,
 	invocationTimeout int,
 ) (Application, Warnings, error) {
 
-	if healthCheckType != "http" {
+	if healthCheckType != constant.HTTP {
 		if httpEndpoint == "/" {
 			httpEndpoint = ""
 		} else {

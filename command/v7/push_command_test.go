@@ -539,7 +539,7 @@ var _ = Describe("push Command", func() {
 
 		BeforeEach(func() {
 			cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
-			cmd.HealthCheckType = flag.HealthCheckType{Type: "port"}
+			cmd.HealthCheckType = flag.HealthCheckType{Type: constant.Port}
 			cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
 			cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "some-start-command"}}
 		})
@@ -552,7 +552,7 @@ var _ = Describe("push Command", func() {
 		It("sets them on the flag overrides", func() {
 			Expect(overridesErr).ToNot(HaveOccurred())
 			Expect(overrides.Buildpacks).To(ConsistOf("buildpack-1", "buildpack-2"))
-			Expect(overrides.HealthCheckType).To(Equal("port"))
+			Expect(overrides.HealthCheckType).To(Equal(constant.Port))
 			Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
 			Expect(overrides.StartCommand).To(Equal(types.FilteredString{IsSet: true, Value: "some-start-command"}))
 		})

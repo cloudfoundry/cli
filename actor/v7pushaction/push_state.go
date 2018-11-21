@@ -29,7 +29,7 @@ type FlagOverrides struct {
 	DockerImage     string
 	DockerPassword  string
 	DockerUsername  string
-	HealthCheckType string
+	HealthCheckType constant.HealthCheckType
 	Memory          types.NullUint64
 	ProvidedAppPath string
 	StartCommand    types.FilteredString

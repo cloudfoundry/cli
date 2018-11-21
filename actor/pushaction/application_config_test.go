@@ -16,7 +16,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -502,7 +501,7 @@ var _ = Describe("Application Config", func() {
 						GUID:                    "some-app-guid",
 						HealthCheckHTTPEndpoint: "/some-endpoint",
 						HealthCheckTimeout:      5,
-						HealthCheckType:         "port",
+						HealthCheckType:         constant.ApplicationHealthCheckPort,
 						Instances:               types.NullInt{Value: 3, IsSet: true},
 						Memory:                  types.NullByteSizeInMb{IsSet: true, Value: 3},
 						Name:                    appName,

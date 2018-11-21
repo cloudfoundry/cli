@@ -3,6 +3,7 @@ package v6
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -13,7 +14,7 @@ import (
 
 type V3SetHealthCheckActor interface {
 	CloudControllerAPIVersion() string
-	SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType string, httpEndpoint string, processType string, invocationTimeout int) (v3action.Application, v3action.Warnings, error)
+	SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType constant.HealthCheckType, httpEndpoint string, processType string, invocationTimeout int) (v3action.Application, v3action.Warnings, error)
 }
 
 type V3SetHealthCheckCommand struct {

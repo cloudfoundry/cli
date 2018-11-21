@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -206,7 +205,7 @@ var _ = Describe("Process Actions", func() {
 
 		When("the user specifies an endpoint for a non-http health check", func() {
 			BeforeEach(func() {
-				inputProcess.HealthCheckType = "port"
+				inputProcess.HealthCheckType = constant.Port
 				inputProcess.HealthCheckEndpoint = "some-http-endpoint"
 			})
 
@@ -249,7 +248,7 @@ var _ = Describe("Process Actions", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					inputProcess.HealthCheckType = "port"
+					inputProcess.HealthCheckType = constant.Port
 					inputProcess.HealthCheckEndpoint = constant.ProcessHealthCheckEndpointDefault
 
 					expectedErr = errors.New("some-error")
@@ -307,7 +306,7 @@ var _ = Describe("Process Actions", func() {
 
 				When("the health check type is http", func() {
 					BeforeEach(func() {
-						inputProcess.HealthCheckType = "http"
+						inputProcess.HealthCheckType = constant.HTTP
 						inputProcess.HealthCheckEndpoint = "some-http-endpoint"
 						inputProcess.HealthCheckInvocationTimeout = 42
 					})
@@ -321,7 +320,7 @@ var _ = Describe("Process Actions", func() {
 						Expect(process).To(MatchFields(IgnoreExtras,
 							Fields{
 								"GUID":                         Equal("some-process-guid"),
-								"HealthCheckType":              Equal("http"),
+								"HealthCheckType":              Equal(constant.HTTP),
 								"HealthCheckEndpoint":          Equal("some-http-endpoint"),
 								"HealthCheckInvocationTimeout": Equal(42),
 							}))
@@ -330,7 +329,7 @@ var _ = Describe("Process Actions", func() {
 
 				When("the health check type is not http", func() {
 					BeforeEach(func() {
-						inputProcess.HealthCheckType = "port"
+						inputProcess.HealthCheckType = constant.Port
 						inputProcess.HealthCheckInvocationTimeout = 42
 					})
 
@@ -348,7 +347,7 @@ var _ = Describe("Process Actions", func() {
 							Expect(process).To(MatchFields(IgnoreExtras,
 								Fields{
 									"GUID":                         Equal("some-process-guid"),
-									"HealthCheckType":              Equal("port"),
+									"HealthCheckType":              Equal(constant.Port),
 									"HealthCheckEndpoint":          BeEmpty(),
 									"HealthCheckInvocationTimeout": Equal(42),
 								}))
@@ -365,7 +364,7 @@ var _ = Describe("Process Actions", func() {
 							Expect(process).To(MatchFields(IgnoreExtras,
 								Fields{
 									"GUID":                         Equal("some-process-guid"),
-									"HealthCheckType":              Equal("port"),
+									"HealthCheckType":              Equal(constant.Port),
 									"HealthCheckEndpoint":          BeEmpty(),
 									"HealthCheckInvocationTimeout": Equal(42),
 								}))

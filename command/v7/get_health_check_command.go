@@ -94,7 +94,7 @@ func (cmd GetHealthCheckCommand) DisplayProcessTable(processHealthChecks []v7act
 
 		table = append(table, []string{
 			healthCheck.ProcessType,
-			healthCheck.HealthCheckType,
+			string(healthCheck.HealthCheckType),
 			healthCheck.Endpoint,
 			fmt.Sprint(invocationTimeout),
 		})

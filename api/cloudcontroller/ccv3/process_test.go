@@ -78,7 +78,7 @@ var _ = Describe("Process", func() {
 			When("health check type http is provided", func() {
 				BeforeEach(func() {
 					process = Process{
-						HealthCheckType:     "http",
+						HealthCheckType:     constant.HTTP,
 						HealthCheckEndpoint: "some-endpoint",
 					}
 				})
@@ -91,7 +91,7 @@ var _ = Describe("Process", func() {
 			When("health check type port is provided", func() {
 				BeforeEach(func() {
 					process = Process{
-						HealthCheckType: "port",
+						HealthCheckType: constant.Port,
 					}
 				})
 
@@ -103,7 +103,7 @@ var _ = Describe("Process", func() {
 			When("health check type process is provided", func() {
 				BeforeEach(func() {
 					process = Process{
-						HealthCheckType: "process",
+						HealthCheckType: constant.Process,
 					}
 				})
 
@@ -144,7 +144,7 @@ var _ = Describe("Process", func() {
 
 				It("sets the health check type to http and has an endpoint", func() {
 					Expect(process).To(MatchFields(IgnoreExtras, Fields{
-						"HealthCheckType":     Equal("http"),
+						"HealthCheckType":     Equal(constant.HTTP),
 						"HealthCheckEndpoint": Equal("some-endpoint"),
 					}))
 				})
@@ -157,7 +157,7 @@ var _ = Describe("Process", func() {
 
 				It("sets the health check type to port", func() {
 					Expect(process).To(MatchFields(IgnoreExtras, Fields{
-						"HealthCheckType": Equal("port"),
+						"HealthCheckType": Equal(constant.Port),
 					}))
 				})
 			})
@@ -169,7 +169,7 @@ var _ = Describe("Process", func() {
 
 				It("sets the health check type to process", func() {
 					Expect(process).To(MatchFields(IgnoreExtras, Fields{
-						"HealthCheckType": Equal("process"),
+						"HealthCheckType": Equal(constant.Process),
 					}))
 				})
 			})
@@ -370,7 +370,7 @@ var _ = Describe("Process", func() {
 					"Instances":                    Equal(types.NullInt{Value: 22, IsSet: true}),
 					"MemoryInMB":                   Equal(types.NullUint64{Value: 32, IsSet: true}),
 					"DiskInMB":                     Equal(types.NullUint64{Value: 1024, IsSet: true}),
-					"HealthCheckType":              Equal("http"),
+					"HealthCheckType":              Equal(constant.HTTP),
 					"HealthCheckEndpoint":          Equal("/health"),
 					"HealthCheckInvocationTimeout": Equal(42),
 				}))
@@ -531,14 +531,14 @@ var _ = Describe("Process", func() {
 						Type:            constant.ProcessTypeWeb,
 						Command:         types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:      types.NullUint64{Value: 32, IsSet: true},
-						HealthCheckType: "port",
+						HealthCheckType: constant.Port,
 					},
 					Process{
 						GUID:                "process-2-guid",
 						Type:                "worker",
 						Command:             types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:          types.NullUint64{Value: 64, IsSet: true},
-						HealthCheckType:     "http",
+						HealthCheckType:     constant.HTTP,
 						HealthCheckEndpoint: "/health",
 					},
 					Process{
@@ -546,7 +546,7 @@ var _ = Describe("Process", func() {
 						Type:            "console",
 						Command:         types.FilteredString{IsSet: true, Value: "[PRIVATE DATA HIDDEN IN LISTS]"},
 						MemoryInMB:      types.NullUint64{Value: 128, IsSet: true},
-						HealthCheckType: "process",
+						HealthCheckType: constant.Process,
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -696,7 +696,7 @@ var _ = Describe("Process", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 					Expect(process).To(MatchFields(IgnoreExtras, Fields{
-						"HealthCheckType":     Equal("some-type"),
+						"HealthCheckType":     Equal(constant.HealthCheckType("some-type")),
 						"HealthCheckEndpoint": Equal("some-endpoint"),
 					}))
 				})
@@ -778,7 +778,7 @@ var _ = Describe("Process", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 					Expect(process).To(MatchFields(IgnoreExtras, Fields{
-						"HealthCheckType":     Equal("some-type"),
+						"HealthCheckType":     Equal(constant.HealthCheckType("some-type")),
 						"HealthCheckEndpoint": BeEmpty(),
 					}))
 				})

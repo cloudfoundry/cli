@@ -34,7 +34,7 @@ func (actor Actor) ScaleProcessByApplication(appGUID string, process Process) (W
 }
 
 func (actor Actor) UpdateProcessByTypeAndApplication(processType string, appGUID string, updatedProcess Process) (Warnings, error) {
-	if updatedProcess.HealthCheckType != "http" {
+	if updatedProcess.HealthCheckType != constant.HTTP {
 		if updatedProcess.HealthCheckEndpoint == constant.ProcessHealthCheckEndpointDefault || updatedProcess.HealthCheckEndpoint == "" {
 			updatedProcess.HealthCheckEndpoint = ""
 		} else {

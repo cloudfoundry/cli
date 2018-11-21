@@ -29,7 +29,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 		binaryName      string
 		executeErr      error
 		app             string
-		healthCheckType string
+		healthCheckType constant.HealthCheckType
 	)
 
 	BeforeEach(func() {
@@ -44,7 +44,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 		healthCheckType = "some-health-check-type"
 
 		cmd = V3SetHealthCheckCommand{
-			RequiredArgs:      flag.SetHealthCheckArgs{AppName: app, HealthCheck: flag.HealthCheckTypeWithDeprecatedValue{Type: healthCheckType}},
+			RequiredArgs:      flag.SetHealthCheckArgs{AppName: app, HealthCheck: flag.HealthCheckType{Type: healthCheckType}},
 			HTTPEndpoint:      "some-http-endpoint",
 			ProcessType:       "some-process-type",
 			InvocationTimeout: flag.PositiveInteger{Value: 42},
@@ -162,7 +162,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 			appName, spaceGUID, healthCheckType, httpEndpoint, processType, invocationTimeout := fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall(0)
 			Expect(appName).To(Equal("some-app"))
 			Expect(spaceGUID).To(Equal("some-space-guid"))
-			Expect(healthCheckType).To(Equal("some-health-check-type"))
+			Expect(healthCheckType).To(Equal(constant.HealthCheckType("some-health-check-type")))
 			Expect(httpEndpoint).To(Equal("some-http-endpoint"))
 			Expect(processType).To(Equal("some-process-type"))
 			Expect(invocationTimeout).To(Equal(42))

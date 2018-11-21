@@ -653,7 +653,7 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("SetApplicationProcessHealthCheckTypeByNameAndSpace", func() {
 		var (
-			healthCheckType     string
+			healthCheckType     constant.HealthCheckType
 			healthCheckEndpoint string
 
 			warnings Warnings
@@ -662,12 +662,19 @@ var _ = Describe("Application Actions", func() {
 		)
 
 		BeforeEach(func() {
-			healthCheckType = "http"
+			healthCheckType = constant.HTTP
 			healthCheckEndpoint = "some-http-endpoint"
 		})
 
 		JustBeforeEach(func() {
-			app, warnings, err = actor.SetApplicationProcessHealthCheckTypeByNameAndSpace("some-app-name", "some-space-guid", healthCheckType, healthCheckEndpoint, "some-process-type", 42)
+			app, warnings, err = actor.SetApplicationProcessHealthCheckTypeByNameAndSpace(
+				"some-app-name",
+				"some-space-guid",
+				healthCheckType,
+				healthCheckEndpoint,
+				"some-process-type",
+				42,
+			)
 		})
 
 		When("getting application returns an error", func() {
@@ -754,7 +761,7 @@ var _ = Describe("Application Actions", func() {
 					Expect(fakeCloudControllerClient.UpdateProcessCallCount()).To(Equal(1))
 					process := fakeCloudControllerClient.UpdateProcessArgsForCall(0)
 					Expect(process.GUID).To(Equal("some-process-guid"))
-					Expect(process.HealthCheckType).To(Equal("http"))
+					Expect(process.HealthCheckType).To(Equal(constant.HTTP))
 					Expect(process.HealthCheckEndpoint).To(Equal("some-http-endpoint"))
 					Expect(process.HealthCheckInvocationTimeout).To(Equal(42))
 				})

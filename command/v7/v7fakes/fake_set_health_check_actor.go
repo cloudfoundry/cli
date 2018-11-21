@@ -5,6 +5,7 @@ import (
 	sync "sync"
 
 	v7action "code.cloudfoundry.org/cli/actor/v7action"
+	constant "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
@@ -19,12 +20,12 @@ type FakeSetHealthCheckActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	SetApplicationProcessHealthCheckTypeByNameAndSpaceStub        func(string, string, string, string, string, int) (v7action.Application, v7action.Warnings, error)
+	SetApplicationProcessHealthCheckTypeByNameAndSpaceStub        func(string, string, constant.HealthCheckType, string, string, int) (v7action.Application, v7action.Warnings, error)
 	setApplicationProcessHealthCheckTypeByNameAndSpaceMutex       sync.RWMutex
 	setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall []struct {
 		arg1 string
 		arg2 string
-		arg3 string
+		arg3 constant.HealthCheckType
 		arg4 string
 		arg5 string
 		arg6 int
@@ -95,13 +96,13 @@ func (fake *FakeSetHealthCheckActor) CloudControllerAPIVersionReturnsOnCall(i in
 	}{result1}
 }
 
-func (fake *FakeSetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpace(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string, arg6 int) (v7action.Application, v7action.Warnings, error) {
+func (fake *FakeSetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpace(arg1 string, arg2 string, arg3 constant.HealthCheckType, arg4 string, arg5 string, arg6 int) (v7action.Application, v7action.Warnings, error) {
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.setApplicationProcessHealthCheckTypeByNameAndSpaceReturnsOnCall[len(fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall)]
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall = append(fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall, struct {
 		arg1 string
 		arg2 string
-		arg3 string
+		arg3 constant.HealthCheckType
 		arg4 string
 		arg5 string
 		arg6 int
@@ -124,13 +125,13 @@ func (fake *FakeSetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameA
 	return len(fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeSetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceCalls(stub func(string, string, string, string, string, int) (v7action.Application, v7action.Warnings, error)) {
+func (fake *FakeSetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceCalls(stub func(string, string, constant.HealthCheckType, string, string, int) (v7action.Application, v7action.Warnings, error)) {
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.Lock()
 	defer fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.Unlock()
 	fake.SetApplicationProcessHealthCheckTypeByNameAndSpaceStub = stub
 }
 
-func (fake *FakeSetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, string, string, string, int) {
+func (fake *FakeSetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, constant.HealthCheckType, string, string, int) {
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.RLock()
 	defer fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.RUnlock()
 	argsForCall := fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i]

@@ -8,7 +8,7 @@ import (
 
 type ProcessHealthCheck struct {
 	ProcessType       string
-	HealthCheckType   string
+	HealthCheckType   constant.HealthCheckType
 	Endpoint          string
 	InvocationTimeout int
 }
