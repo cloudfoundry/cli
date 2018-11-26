@@ -1,5 +1,3 @@
-// +build !partialPush
-
 package isolated
 
 import (
@@ -17,7 +15,7 @@ var _ = Describe("internationalization", func() {
 			session := setup()
 			Eventually(session).Should(Say("push - Envoyer par commande push"))
 			Eventually(session).Should(Say("SYNTAXE :"))
-			Eventually(session).Should(Say(`-i\s+Nombre d'instances`))
+			Eventually(session).Should(Say(`-p\s+Chemin d'accès au répertoire de l'application ou à un fichier zip du contenu du répertoire de l'application`))
 			Eventually(session).Should(Exit(0))
 		},
 

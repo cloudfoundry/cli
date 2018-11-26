@@ -8,6 +8,10 @@
       "translation": "SYNTAXE :"
    },
    {
+      "id": "Path to app directory or to a zip file of the contents of the app directory",
+      "translation": "Chemin d'accès au répertoire de l'application ou à un fichier zip du contenu du répertoire de l'application"
+   },
+   {
       "id": "Number of instances",
       "translation": "Nombre d'instances"
    },
