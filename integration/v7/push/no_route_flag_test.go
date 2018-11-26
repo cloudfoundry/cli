@@ -1,5 +1,3 @@
-// +build !partialPush
-
 package push
 
 import (
@@ -25,7 +23,7 @@ var _ = When("the --no-route flag is set", func() {
 			Consistently(session).ShouldNot(Say(`Mapping routes\.\.\.`))
 			Eventually(session).Should(Say(`name:\s+%s`, appName))
 			Eventually(session).Should(Say(`requested state:\s+started`))
-			Eventually(session).Should(Say(`routes:\s+\n`))
+			Eventually(session).Should(Say(`(?m)routes:\s+\n`))
 			Eventually(session).Should(Exit(0))
 		})
 	})

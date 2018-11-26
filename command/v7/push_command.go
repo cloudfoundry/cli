@@ -344,13 +344,14 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 	}
 
 	return v7pushaction.FlagOverrides{
-		Buildpacks:      cmd.Buildpacks,
-		DockerImage:     cmd.DockerImage.Path,
-		DockerUsername:  cmd.DockerUsername,
-		DockerPassword:  dockerPassword,
-		HealthCheckType: cmd.HealthCheckType.Type,
-		Memory:          cmd.Memory.NullUint64,
-		ProvidedAppPath: string(cmd.AppPath),
-		StartCommand:    cmd.StartCommand.FilteredString,
+		Buildpacks:        cmd.Buildpacks,
+		DockerImage:       cmd.DockerImage.Path,
+		DockerPassword:    dockerPassword,
+		DockerUsername:    cmd.DockerUsername,
+		HealthCheckType:   cmd.HealthCheckType.Type,
+		Memory:            cmd.Memory.NullUint64,
+		ProvidedAppPath:   string(cmd.AppPath),
+		SkipRouteCreation: cmd.NoRoute,
+		StartCommand:      cmd.StartCommand.FilteredString,
 	}, nil
 }

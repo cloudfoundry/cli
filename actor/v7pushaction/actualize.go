@@ -49,14 +49,16 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 			return
 		}
 
-		eventStream <- CreatingAndMappingRoutes
-		routeWarnings, routeErr := actor.CreateAndMapDefaultApplicationRoute(state.OrgGUID, state.SpaceGUID, state.Application)
-		warningsStream <- Warnings(routeWarnings)
-		if routeErr != nil {
-			errorStream <- routeErr
-			return
+		if !state.Overrides.SkipRouteCreation {
+			eventStream <- CreatingAndMappingRoutes
+			routeWarnings, routeErr := actor.CreateAndMapDefaultApplicationRoute(state.OrgGUID, state.SpaceGUID, state.Application)
+			warningsStream <- Warnings(routeWarnings)
+			if routeErr != nil {
+				errorStream <- routeErr
+				return
+			}
+			eventStream <- CreatedRoutes
 		}
-		eventStream <- CreatedRoutes
 
 		pkg, err := actor.CreatePackage(state, progressBar, warningsStream, eventStream)
 		if err != nil {

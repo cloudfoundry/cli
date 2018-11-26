@@ -438,63 +438,83 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("default route creation", func() {
-		When("route creation and mapping is successful", func() {
+		When("creating a default route", func() {
 			BeforeEach(func() {
-				fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(
-					v2action.Route{},
-					v2action.Warnings{"route-warning"},
-					actionerror.RouteNotFoundError{},
-				)
-
-				fakeV2Actor.CreateRouteReturns(
-					v2action.Route{
-						GUID: "some-route-guid",
-						Host: "some-app",
-						Domain: v2action.Domain{
-							Name: "some-domain",
-							GUID: "some-domain-guid",
-						},
-						SpaceGUID: "some-space-guid",
-					},
-					v2action.Warnings{"route-create-warning"},
-					nil,
-				)
-
-				fakeV2Actor.MapRouteToApplicationReturns(
-					v2action.Warnings{"map-warning"},
-					nil,
-				)
+				state.Overrides.SkipRouteCreation = false
 			})
 
-			It("creates the route, maps it to the app, and returns any warnings", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingAndMappingRoutes))
-				Eventually(warningsStream).Should(Receive(ConsistOf("domain-warning", "route-warning", "route-create-warning", "map-warning")))
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatedRoutes))
+			When("route creation and mapping is successful", func() {
+				BeforeEach(func() {
+					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(
+						v2action.Route{},
+						v2action.Warnings{"route-warning"},
+						actionerror.RouteNotFoundError{},
+					)
+
+					fakeV2Actor.CreateRouteReturns(
+						v2action.Route{
+							GUID: "some-route-guid",
+							Host: "some-app",
+							Domain: v2action.Domain{
+								Name: "some-domain",
+								GUID: "some-domain-guid",
+							},
+							SpaceGUID: "some-space-guid",
+						},
+						v2action.Warnings{"route-create-warning"},
+						nil,
+					)
+
+					fakeV2Actor.MapRouteToApplicationReturns(
+						v2action.Warnings{"map-warning"},
+						nil,
+					)
+				})
+
+				It("creates the route, maps it to the app, and returns any warnings", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingAndMappingRoutes))
+					Eventually(warningsStream).Should(Receive(ConsistOf("domain-warning", "route-warning", "route-create-warning", "map-warning")))
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatedRoutes))
+				})
+			})
+
+			When("route creation and mapping errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("some route error")
+					fakeV2Actor.GetOrganizationDomainsReturns(
+						[]v2action.Domain{
+							{
+								GUID: "some-domain-guid",
+								Name: "some-domain",
+							},
+						},
+						v2action.Warnings{"domain-warning"},
+						expectedErr,
+					)
+				})
+
+				It("returns errors and warnings", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingAndMappingRoutes))
+					Eventually(warningsStream).Should(Receive(ConsistOf("domain-warning")))
+					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(CreatedRoutes))
+				})
 			})
 		})
 
-		When("route creation and mapping errors", func() {
-			var expectedErr error
-
+		When("skipping default route creation", func() {
 			BeforeEach(func() {
-				expectedErr = errors.New("some route error")
-				fakeV2Actor.GetOrganizationDomainsReturns(
-					[]v2action.Domain{
-						{
-							GUID: "some-domain-guid",
-							Name: "some-domain",
-						},
-					},
-					v2action.Warnings{"domain-warning"},
-					expectedErr,
-				)
+				state.Overrides.SkipRouteCreation = true
 			})
 
-			It("returns errors and warnings", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingAndMappingRoutes))
-				Eventually(warningsStream).Should(Receive(ConsistOf("domain-warning")))
-				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+			It("never attempts to create a route", func() {
+				Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Or(Equal(CreatingAndMappingRoutes), Equal(CreatedRoutes)))
+				Consistently(fakeV2Actor.GetApplicationRoutesCallCount).Should(BeZero())
+				Consistently(fakeV2Actor.CreateRouteCallCount).Should(BeZero())
 			})
+
 		})
 	})
 
