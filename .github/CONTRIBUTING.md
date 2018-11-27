@@ -13,6 +13,18 @@ You will find the entry point for v6 commands in the _cli/command/v6_ directory.
 v7 commands are found in the _cli/command/v7_ directory.
 More details are available in the [Architecture Guide](https://github.com/cloudfoundry/cli/wiki/Architecture-Guide).
 
+**Note**: The CLI can currently be compiled to use V6 or V7 code paths.
+Depending on the nature of the intended changes, you may be contributing to V6
+code, V7 code, and/or shared code. The rest of this guide assumes that
+your changes are to V6 code or shared code. If your changes are in V7 code, refer to the
+[V7-specific contributing information](https://github.com/cloudfoundry/cli/wiki/Contributing-V7.md) for more information.
+If your changes are to shared code, please also run V7 tests before submitting a
+pull request.
+
+The `make` commands in this file can be used with V6 or V7 code. To run the V7
+version of tests or build the V7 version of the binary, set `TARGET_V7=1` in the
+environment. If `TARGET_V7` is unset, `make` commands will target V6.
+
 ## Prerequisites
 
 Before working on a PR to the CLI code base, please:
