@@ -17,8 +17,11 @@ run:
   - -c
   - |
     set -ex
-    echo "temp - pr builder claim" > commit-info/story
-    echo "temp - pr builder claim" > commit-info/author-email
-    echo "temp - pr builder claim" > commit-info/committer-name
-    echo "temp - pr builder claim" > commit-info/committer-email
-    echo "done"
+    pushd cli
+      git config --get pullrequest.userlogin > ../commit-info/author-name
+      echo "temp - pr builder claim" >../commit-info/story
+      echo "temp - pr builder claim" >../commit-info/author-email
+      echo "temp - pr builder claim" >../commit-info/committer-name
+      echo "temp - pr builder claim" >../commit-info/committer-email
+      echo "done"
+    popd
