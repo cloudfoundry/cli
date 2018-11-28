@@ -23,13 +23,6 @@ resources:
     - README.md
     - .github
 
-- name: cli-ci
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cli
-    branch: master
-    paths: *ciPaths
-
 - name: bosh-lite
   type: bosh-lite-pool
   source:
@@ -38,19 +31,19 @@ resources:
     branch: master
     pool: bosh-lites
 
-- name: legacy-gcp-bosh-pool
-  type: pool
-  source:
-    uri: git@github.com:cloudfoundry/cli-pools
-    private_key: ((cli-pools-github-private-key))
-    branch: master
-    pool: moldy-gnocchi
+# - name: legacy-gcp-bosh-pool
+#   type: pool
+#   source:
+#     uri: git@github.com:cloudfoundry/cli-pools
+#     private_key: ((cli-pools-github-private-key))
+#     branch: master
+#     pool: moldy-gnocchi
 
-- name: golang
-  type: docker-image
-  source:
-    repository: golang
-    tag: 1.9
+# - name: golang
+#   type: docker-image
+#   source:
+#     repository: golang
+#     tag: 1.11
 
 groups:
 - name: cli
@@ -58,7 +51,7 @@ groups:
   - units
   - claim-bosh-lite
   - integration-linux
-  - integration-experimental
+
 jobs:
 - name: units
   serial: true
@@ -68,27 +61,27 @@ jobs:
       trigger: true
   - aggregate:
     - task: units-linux
-      file: ci/ci/cli/tasks/units-linux.yml
+      file: cli/ci/cli/tasks/units-linux.yml
 
 - name: claim-bosh-lite # TODO: record PR number instead of usernames
   serial: true
   plan:
-    - aggregate:
-      - get: cli
-        trigger: true
-        version: every
-        passed: [units]
-    - do:
-      - task: get-pr-info
-        file: ci/cli-pr-builder/tasks/extract-info-from-pr.yml
-      - put: bosh-lite
-        params:
-          story: commit-info/pr-id
-          author_name: commit-info/author-name
-          author_email: commit-info/author-email
-          committer_name: commit-info/committer-name
-          committer_email: commit-info/committer-email
-          commit_message_prefix: CLI-PR-BUILDER-
+  - aggregate:
+    - get: cli
+      trigger: true
+      version: every
+      passed: [units]
+  - do:
+    - task: get-pr-info
+      file: cli/ci/cli-pr-builder/tasks/extract-info-from-pr.yml
+    - put: bosh-lite
+      params:
+        story: commit-info/pr-id
+        author_name: commit-info/author-name
+        author_email: commit-info/author-email
+        committer_name: commit-info/committer-name
+        committer_email: commit-info/committer-email
+        commit_message_prefix: CLI-PR-BUILDER-
 
 - name: integration-linux # TODO: clean this up
   serial: true
@@ -103,17 +96,12 @@ jobs:
       version: every
   - do:
     - task: integration
-      file: cli-ci/ci/cli-pr-builder/tasks/integration-linux.yml
-      params: &integration_params
-        CF_INT_CLIENT_ID: 'potato-face'
-        CF_INT_CLIENT_SECRET: ((cf-oauth-test-client-secret))
+      file: cli/ci/cli-pr-builder/tasks/integration-linux.yml
+      params:
         CF_INT_IGNORE_API_VERSION_CHECK: false
-      # TODO: on_failure, tell GitHub to block merging?
       ensure:
-      - put: unclaim-bosh-lite
+        put: unclaim-bosh-lite
         resource: bosh-lite
         params:
           operation: unclaim
           name: bosh-lite/name
-
-# - name: integration-experimental # TODO: copy from integration-linux

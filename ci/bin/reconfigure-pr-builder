@@ -19,18 +19,16 @@ configure_pipeline() {
   fly -t ci set-pipeline \
     -p $name \
     -c $pipeline \
-    -v cli-pools-github-private-key=$() \
-    -v github-access-token=$()
+    -v cli-pools-github-private-key="$(lpass show Shared-CLI/Concourse/pr-builder-bosh-lite-bool-private-key --notes)" \
+    -v github-access-token="$(lpass show Shared-CLI/Concourse/pr-builder-access-token --notes)"
+
 }
 
 check_installed lpass
 check_installed fly
 
-# Make sure we're up to date and that we're logged in.
-lpass sync
-
 pipelines_path=$(cd $(dirname $0)/.. && pwd)
 
-configure_pipeline cli-pr-builder $pipelines_path/cli/pipeline.yml
+configure_pipeline cli-pr-builder $pipelines_path/cli-pr-builder/pipeline.yml
 
 
