@@ -17,7 +17,6 @@ run:
   - -c
   - |
     set -ex
-    git config --get pullrequest.userlogin > commit-info/author-name
     echo "temp - pr builder claim" > commit-info/story
     echo "temp - pr builder claim" > commit-info/author-email
     echo "temp - pr builder claim" > commit-info/committer-name
