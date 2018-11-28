@@ -23,21 +23,15 @@ func TestCloudcontrollerv2(t *testing.T) {
 
 var server *Server
 
-var _ = SynchronizedBeforeSuite(func() []byte {
-	return []byte{}
-}, func(data []byte) {
+var _ = BeforeEach(func() {
 	server = NewTLSServer()
 
 	// Suppresses ginkgo server logs
 	server.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 })
 
-var _ = SynchronizedAfterSuite(func() {
+var _ = AfterEach(func() {
 	server.Close()
-}, func() {})
-
-var _ = BeforeEach(func() {
-	server.Reset()
 })
 
 func NewTestClient(passed ...Config) *Client {
