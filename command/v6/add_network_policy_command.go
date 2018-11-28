@@ -14,11 +14,6 @@ import (
 
 type AddNetworkPolicyActor interface {
 	AddNetworkPolicy(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
-}
-
-//go:generate counterfeiter . GetOrganizationAndSpaceByNameActor
-
-type GetOrganizationAndSpaceByNameActor interface {
 	GetOrganizationByName(name string) (v3action.Organization, v3action.Warnings, error)
 	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error)
 }
@@ -29,8 +24,8 @@ type AddNetworkPolicyCommand struct {
 	Port           flag.NetworkPort          `long:"port" description:"Port or range of ports for connection to destination app (Default: 8080)"`
 	Protocol       flag.NetworkProtocol      `long:"protocol" description:"Protocol to connect apps with (Default: tcp)"`
 
-	DestinationOrg   string `short:"o" description:"The org in which the destination space resides (Default: targeted org)"`
-	DestinationSpace string `short:"s" description:"The destination space (Default: targeted space)"`
+	DestinationOrg   string `short:"o" description:"The org of the destination app (Default: targeted org)"`
+	DestinationSpace string `short:"s" description:"The space of the destination app (Default: targeted space)"`
 
 	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] [--protocol (tcp | udp) --port RANGE]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend --destination-app backend -o backend-org -s backend-space --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, network-policies, remove-network-policy"`
@@ -39,7 +34,6 @@ type AddNetworkPolicyCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       AddNetworkPolicyActor
-	V3Actor     GetOrganizationAndSpaceByNameActor
 }
 
 func (cmd *AddNetworkPolicyCommand) Setup(config command.Config, ui command.UI) error {
@@ -53,7 +47,6 @@ func (cmd *AddNetworkPolicyCommand) Setup(config command.Config, ui command.UI) 
 	}
 
 	v3Actor := v3action.NewActor(client, config, nil, nil)
-	cmd.V3Actor = v3Actor
 
 	networkingClient, err := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
 	if err != nil {
@@ -86,7 +79,7 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 	destOrgGUID := cmd.Config.TargetedOrganization().GUID
 
 	if cmd.DestinationOrg != "" {
-		destOrg, warnings, err := cmd.V3Actor.GetOrganizationByName(cmd.DestinationOrg)
+		destOrg, warnings, err := cmd.Actor.GetOrganizationByName(cmd.DestinationOrg)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
@@ -98,7 +91,7 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 	destSpaceGUID := cmd.Config.TargetedSpace().GUID
 
 	if cmd.DestinationSpace != "" {
-		destSpace, warnings, err := cmd.V3Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destOrgGUID)
+		destSpace, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destOrgGUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err

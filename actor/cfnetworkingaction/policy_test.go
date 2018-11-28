@@ -477,4 +477,61 @@ var _ = Describe("Policy", func() {
 			})
 		})
 	})
+
+	Describe("GetOrganizationByName", func() {
+		var (
+			expectedOrganization v3action.Organization
+			expectedWarnings     v3action.Warnings
+			expectedError        error
+		)
+
+		BeforeEach(func() {
+			expectedOrganization = v3action.Organization{GUID: "some-org-guid"}
+			expectedWarnings = v3action.Warnings{"some-warning"}
+			expectedError = errors.New("some-error")
+			fakeV3Actor.GetOrganizationByNameReturns(expectedOrganization, expectedWarnings, expectedError)
+		})
+
+		It("wraps v3 actor GetOrganizationByName", func() {
+			organization, warnings, err := actor.GetOrganizationByName("some-org-name")
+
+			Expect(fakeV3Actor.GetOrganizationByNameCallCount()).To(Equal(1))
+
+			passedName := fakeV3Actor.GetOrganizationByNameArgsForCall(0)
+			Expect(passedName).To(Equal("some-org-name"))
+
+			Expect(organization).To(Equal(expectedOrganization))
+			Expect(warnings).To(Equal(expectedWarnings))
+			Expect(err).To(Equal(expectedError))
+		})
+	})
+
+	Describe("GetSpaceByNameAndOrganization", func() {
+		var (
+			expectedSpace    v3action.Space
+			expectedWarnings v3action.Warnings
+			expectedError    error
+		)
+
+		BeforeEach(func() {
+			expectedSpace = v3action.Space{GUID: "some-space-guid"}
+			expectedWarnings = v3action.Warnings{"some-warning"}
+			expectedError = errors.New("some-error")
+			fakeV3Actor.GetSpaceByNameAndOrganizationReturns(expectedSpace, expectedWarnings, expectedError)
+		})
+
+		It("wraps v3 actor GetSpaceByNameAndOrganization", func() {
+			space, warnings, err := actor.GetSpaceByNameAndOrganization("some-space-name", "some-org-guid")
+
+			Expect(fakeV3Actor.GetSpaceByNameAndOrganizationCallCount()).To(Equal(1))
+
+			passedName, passedOrgGUID := fakeV3Actor.GetSpaceByNameAndOrganizationArgsForCall(0)
+			Expect(passedName).To(Equal("some-space-name"))
+			Expect(passedOrgGUID).To(Equal("some-org-guid"))
+
+			Expect(space).To(Equal(expectedSpace))
+			Expect(warnings).To(Equal(expectedWarnings))
+			Expect(err).To(Equal(expectedError))
+		})
+	})
 })

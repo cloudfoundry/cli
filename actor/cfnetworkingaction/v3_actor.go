@@ -6,4 +6,6 @@ import "code.cloudfoundry.org/cli/actor/v3action"
 type V3Actor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationsBySpace(spaceGUID string) ([]v3action.Application, v3action.Warnings, error)
+	GetOrganizationByName(name string) (v3action.Organization, v3action.Warnings, error)
+	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error)
 }

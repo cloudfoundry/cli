@@ -31,8 +31,8 @@ var _ = Describe("add-network-policy command", func() {
 				Eventually(session).Should(Say("   --destination-app      Name of app to connect to"))
 				Eventually(session).Should(Say(`   --port                 Port or range of ports for connection to destination app \(Default: 8080\)`))
 				Eventually(session).Should(Say(`   --protocol             Protocol to connect apps with \(Default: tcp\)`))
-				Eventually(session).Should(Say(`   -o                     The org in which the destination space resides \(Default: targeted org\)`))
-				Eventually(session).Should(Say(`   -s                     The destination space \(Default: targeted space\)`))
+				Eventually(session).Should(Say(`   -o                     The org of the destination app \(Default: targeted org\)`))
+				Eventually(session).Should(Say(`   -s                     The space of the destination app \(Default: targeted space\)`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("   apps, network-policies, remove-network-policy"))
 				Eventually(session).Should(Exit(0))
@@ -171,7 +171,7 @@ var _ = Describe("add-network-policy command", func() {
 
 				Eventually(session.Err).Should(Say("Incorrect Usage: --protocol and --port flags must be specified together"))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -182,7 +182,7 @@ var _ = Describe("add-network-policy command", func() {
 
 				Eventually(session.Err).Should(Say("Incorrect Usage: --protocol and --port flags must be specified together"))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -192,9 +192,9 @@ var _ = Describe("add-network-policy command", func() {
 				It("returns an error", func() {
 					session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "-o", "myorg")
 
-					Eventually(session.Err).Should(Say("Incorrect Usage: space must be provided with org, the required flag '-s' was not specified"))
+					Eventually(session.Err).Should(Say("Incorrect Usage: A space must be provided when an org is provided, but the '-s' flag was not specified."))
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Say("NAME:"))
+					Eventually(session).Should(Say("USAGE:"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
