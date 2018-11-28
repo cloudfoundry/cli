@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 )
@@ -49,6 +50,12 @@ func (cmd *MarketplaceCommand) Setup(config command.Config, ui command.UI) error
 }
 
 func (cmd *MarketplaceCommand) Execute(args []string) error {
+	if len(args) > 0 {
+		return translatableerror.TooManyArgumentsError{
+			ExtraArgument: args[0],
+		}
+	}
+
 	if !cmd.SharedActor.IsLoggedIn() {
 		return cmd.publicMarketplace()
 	}

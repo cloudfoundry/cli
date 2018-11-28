@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -23,6 +24,7 @@ var _ = Describe("marketplace Command", func() {
 		fakeActor       *v6fakes.FakeServicesSummariesActor
 		binaryName      string
 		executeErr      error
+		extraArgs       []string
 	)
 
 	BeforeEach(func() {
@@ -40,10 +42,23 @@ var _ = Describe("marketplace Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
+		extraArgs = nil
 	})
 
 	JustBeforeEach(func() {
-		executeErr = cmd.Execute(nil)
+		executeErr = cmd.Execute(extraArgs)
+	})
+
+	When("too many arguments are provided", func() {
+		BeforeEach(func() {
+			extraArgs = []string{"extra"}
+		})
+
+		It("returns a TooManyArgumentsError", func() {
+			Expect(executeErr).To(MatchError(translatableerror.TooManyArgumentsError{
+				ExtraArgument: "extra",
+			}))
+		})
 	})
 
 	When("the user is not logged in", func() {

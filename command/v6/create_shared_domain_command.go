@@ -54,6 +54,12 @@ func (cmd *CreateSharedDomainCommand) Setup(config command.Config, ui command.UI
 }
 
 func (cmd CreateSharedDomainCommand) Execute(args []string) error {
+	if len(args) > 0 {
+		return translatableerror.TooManyArgumentsError{
+			ExtraArgument: args[0],
+		}
+	}
+
 	if cmd.Internal {
 		currentVersion := cmd.Actor.CloudControllerAPIVersion()
 		err := command.MinimumCCAPIVersionCheck(currentVersion, ccversion.MinVersionInternalDomainV2, "Option '--internal'")

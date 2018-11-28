@@ -21,15 +21,16 @@ import (
 
 var _ = Describe("CreateSharedDomainCommand", func() {
 	var (
-		fakeConfig      *commandfakes.FakeConfig
-		fakeActor       *v6fakes.FakeCreateSharedDomainActor
-		fakeSharedActor *commandfakes.FakeSharedActor
-		testUI          *ui.UI
-		cmd             CreateSharedDomainCommand
-
-		executeErr       error
+		testUI           *ui.UI
+		fakeConfig       *commandfakes.FakeConfig
+		fakeActor        *v6fakes.FakeCreateSharedDomainActor
+		fakeSharedActor  *commandfakes.FakeSharedActor
 		sharedDomainName string
 		username         string
+		extraArgs        []string
+		cmd              CreateSharedDomainCommand
+
+		executeErr error
 	)
 
 	BeforeEach(func() {
@@ -38,6 +39,8 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 		fakeActor = new(v6fakes.FakeCreateSharedDomainActor)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		sharedDomainName = "some-shared-domain-name"
+		username = ""
+		extraArgs = nil
 
 		cmd = CreateSharedDomainCommand{
 			UI:           testUI,
@@ -49,11 +52,23 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 	})
 
 	JustBeforeEach(func() {
-		executeErr = cmd.Execute(nil)
+		executeErr = cmd.Execute(extraArgs)
 	})
 
 	It("checks for user being logged in", func() {
 		Expect(fakeSharedActor.RequireCurrentUserCallCount()).To(Equal(1))
+	})
+
+	When("too many arguments are provided", func() {
+		BeforeEach(func() {
+			extraArgs = []string{"extra"}
+		})
+
+		It("returns a TooManyArgumentsError", func() {
+			Expect(executeErr).To(MatchError(translatableerror.TooManyArgumentsError{
+				ExtraArgument: "extra",
+			}))
+		})
 	})
 
 	When("user is logged in", func() {
