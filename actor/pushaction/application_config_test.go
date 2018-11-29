@@ -2,6 +2,7 @@ package pushaction_test
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -137,8 +138,8 @@ var _ = Describe("Application Config", func() {
 
 			BeforeEach(func() {
 				parentDir := filepath.Dir(filesPath)
-				target = filepath.Join(parentDir, "i-r-symlink")
-				Expect(os.Symlink(filesPath, target)).ToNot(HaveOccurred())
+				target = filepath.Join(parentDir, fmt.Sprintf("i-r-symlink%d", GinkgoParallelNode()))
+				Expect(os.Symlink(filesPath, target)).To(Succeed())
 				manifestApps[0].Path = target
 			})
 
