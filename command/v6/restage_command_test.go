@@ -129,6 +129,7 @@ var _ = Describe("Restage Command", func() {
 		})
 
 		It("displays flavor text", func() {
+			Expect(testUI.Err).To(Say("This action will cause app downtime\\."))
 			Expect(testUI.Out).To(Say("Restaging app some-app in org some-org / space some-space as some-user..."))
 		})
 

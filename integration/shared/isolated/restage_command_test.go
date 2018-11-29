@@ -23,7 +23,7 @@ var _ = Describe("restage command", func() {
 				session := helpers.CF("restage", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`restage - Recreate the app's executable artifact using the latest pushed app files and the latest environment \(variables, service bindings, buildpack, stack, etc\.\)`))
+				Eventually(session).Should(Say(`restage - Recreate the app's executable artifact using the latest pushed app files and the latest environment \(variables, service bindings, buildpack, stack, etc\.\). This action will cause app downtime.`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf restage APP_NAME"))
 				Eventually(session).Should(Say("ALIAS:"))
@@ -153,6 +153,7 @@ applications:
 						It("uses the multiprocess display", func() {
 							userName, _ := helpers.GetCredentials()
 							session := helpers.CF("restage", appName)
+							Eventually(session.Err).Should(Say(`This action will cause app downtime\.`))
 							Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
 							helpers.ConfirmStagingLogs(session)
@@ -181,6 +182,7 @@ applications:
 						It("displays the app logs and information with instances table", func() {
 							userName, _ := helpers.GetCredentials()
 							session := helpers.CF("restage", appName)
+							Eventually(session.Err).Should(Say(`This action will cause app downtime\.`))
 							Eventually(session).Should(Say(`Restaging app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
 							helpers.ConfirmStagingLogs(session)
