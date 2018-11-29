@@ -16,7 +16,7 @@ var _ = Describe("Error Wrapper", func() {
 	var (
 		serverResponse     string
 		serverResponseCode int
-		executeErr error
+		executeErr         error
 
 		client *Client
 	)
