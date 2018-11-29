@@ -79,7 +79,9 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 	destOrgGUID := cmd.Config.TargetedOrganization().GUID
 
 	if cmd.DestinationOrg != "" {
-		destOrg, warnings, err := cmd.Actor.GetOrganizationByName(cmd.DestinationOrg)
+		var destOrg v3action.Organization
+		var warnings v3action.Warnings
+		destOrg, warnings, err = cmd.Actor.GetOrganizationByName(cmd.DestinationOrg)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
@@ -91,7 +93,9 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 	destSpaceGUID := cmd.Config.TargetedSpace().GUID
 
 	if cmd.DestinationSpace != "" {
-		destSpace, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destOrgGUID)
+		var destSpace v3action.Space
+		var warnings v3action.Warnings
+		destSpace, warnings, err = cmd.Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destOrgGUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
