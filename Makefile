@@ -1,5 +1,5 @@
 CF_DIAL_TIMEOUT ?= 15
-NODES ?= 4
+NODES ?= 10
 PACKAGES ?= api actor command types util version integration/helpers
 LC_ALL = "en_US.UTF-8"
 
@@ -197,7 +197,7 @@ rsrc.syso :
 test : units
 
 units : format vet lint build
-	ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites \
+	ginkgo -r -p -randomizeAllSpecs -randomizeSuites \
 		$(PACKAGES)
 	@echo "\nSWEET SUITE SUCCESS"
 
@@ -207,9 +207,9 @@ units-plugin :
 units-non-plugin :
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
-	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites \
+	CF_HOME=$(PWD)/fixtures ginkgo -r -p -randomizeAllSpecs -randomizeSuites \
 		-skipPackage integration,cf/ssh,plugin,cf/actors/plugin,cf/commands/plugin,cf/actors/plugin
-	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites -flakeAttempts 3 cf/ssh
+	CF_HOME=$(PWD)/fixtures ginkgo -r -p -randomizeAllSpecs -randomizeSuites -flakeAttempts 3 cf/ssh
 
 units-full: format vet lint build units-plugin units-non-plugin
 	@echo "\nSWEET SUITE SUCCESS"
