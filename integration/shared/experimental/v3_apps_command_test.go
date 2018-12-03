@@ -115,8 +115,8 @@ var _ = Describe("v3-apps command", func() {
 				session := helpers.CF("v3-apps")
 				Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
 				Eventually(session).Should(Say(`name\s+requested state\s+processes\s+routes`))
-				Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0, rake:0/0\s+%s\.%s`, appName1, appName1, domainName))
-				Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0, rake:0/0\s+%s\.%s`, appName2, appName2, domainName))
+				Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0\s+%s\.%s`, appName1, appName1, domainName))
+				Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0\s+%s\.%s`, appName2, appName2, domainName))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -130,8 +130,8 @@ var _ = Describe("v3-apps command", func() {
 					session := helpers.CF("v3-apps")
 					Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
 					Eventually(session).Should(Say(`name\s+requested state\s+processes\s+routes`))
-					Eventually(session).Should(Say(`%s\s+stopped\s+web:0/1, console:0/0, rake:0/0\s+%s\.%s`, appName1, appName1, domainName))
-					Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0, rake:0/0\s+%s\.%s`, appName2, appName2, domainName))
+					Eventually(session).Should(Say(`%s\s+stopped\s+web:0/1, console:0/0\s+%s\.%s`, appName1, appName1, domainName))
+					Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0\s+%s\.%s`, appName2, appName2, domainName))
 
 					Eventually(session).Should(Exit(0))
 				})
