@@ -15,8 +15,6 @@ import (
 
 type RemoveNetworkPolicyActor interface {
 	RemoveNetworkPolicy(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
-	GetOrganizationByName(name string) (v3action.Organization, v3action.Warnings, error)
-	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error)
 }
 
 type RemoveNetworkPolicyCommand struct {
@@ -30,10 +28,11 @@ type RemoveNetworkPolicyCommand struct {
 	usage           interface{} `usage:"CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] --protocol (tcp | udp) --port RANGE\n\nEXAMPLES:\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-policy frontend --destination-app backend -o backend-org -s backend-space --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, network-policies, add-network-policy"`
 
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       RemoveNetworkPolicyActor
+	UI                 command.UI
+	Config             command.Config
+	SharedActor        command.SharedActor
+	NetworkPolicyActor RemoveNetworkPolicyActor
+	MembershipActor    MembershipActor
 }
 
 func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.UI) error {
@@ -52,14 +51,14 @@ func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.U
 	if err != nil {
 		return err
 	}
-	cmd.Actor = cfnetworkingaction.NewActor(networkingClient, v3Actor)
+	cmd.NetworkPolicyActor = cfnetworkingaction.NewActor(networkingClient, v3Actor)
+	cmd.MembershipActor = v3Actor
 
 	return nil
 }
 
 func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
-	switch {
-	case cmd.DestinationOrg != "" && cmd.DestinationSpace == "":
+	if cmd.DestinationOrg != "" && cmd.DestinationSpace == "" {
 		return translatableerror.NetworkPolicyDestinationOrgWithoutSpaceError{}
 	}
 
@@ -72,7 +71,7 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 	if cmd.DestinationOrg != "" {
 		var destOrg v3action.Organization
 		var warnings v3action.Warnings
-		destOrg, warnings, err = cmd.Actor.GetOrganizationByName(cmd.DestinationOrg)
+		destOrg, warnings, err = cmd.MembershipActor.GetOrganizationByName(cmd.DestinationOrg)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
@@ -85,7 +84,7 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 	if cmd.DestinationSpace != "" {
 		var destSpace v3action.Space
 		var warnings v3action.Warnings
-		destSpace, warnings, err = cmd.Actor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destOrgGUID)
+		destSpace, warnings, err = cmd.MembershipActor.GetSpaceByNameAndOrganization(cmd.DestinationSpace, destOrgGUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
@@ -105,7 +104,7 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 		"User":       user.Name,
 	})
 
-	removeWarnings, err := cmd.Actor.RemoveNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, destSpaceGUID, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
+	removeWarnings, err := cmd.NetworkPolicyActor.RemoveNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, destSpaceGUID, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
 	cmd.UI.DisplayWarnings(removeWarnings)
 	if err != nil {
 		switch err.(type) {

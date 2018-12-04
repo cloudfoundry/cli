@@ -3,7 +3,6 @@ package cfnetworkingaction
 import (
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v3action"
 )
 
 type Policy struct {
@@ -178,12 +177,4 @@ func (Actor) transformPolicy(appNameByGuid map[string]string, v1Policy cfnetv1.P
 		}
 	}
 	return Policy{}
-}
-
-func (a Actor) GetOrganizationByName(name string) (v3action.Organization, v3action.Warnings, error) {
-	return a.V3Actor.GetOrganizationByName(name)
-}
-
-func (a Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error) {
-	return a.V3Actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
 }

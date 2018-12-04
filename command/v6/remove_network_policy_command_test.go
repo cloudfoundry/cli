@@ -18,37 +18,40 @@ import (
 
 var _ = Describe("remove-network-policy Command", func() {
 	var (
-		cmd             RemoveNetworkPolicyCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v6fakes.FakeRemoveNetworkPolicyActor
-		binaryName      string
-		executeErr      error
-		srcApp          string
-		destApp         string
-		protocol        string
+		cmd                    RemoveNetworkPolicyCommand
+		testUI                 *ui.UI
+		fakeConfig             *commandfakes.FakeConfig
+		fakeSharedActor        *commandfakes.FakeSharedActor
+		fakeNetworkPolicyActor *v6fakes.FakeRemoveNetworkPolicyActor
+		fakeMembershipActor    *v6fakes.FakeMembershipActor
+		binaryName             string
+		executeErr             error
+		srcApp                 string
+		destApp                string
+		protocol               string
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v6fakes.FakeRemoveNetworkPolicyActor)
+		fakeNetworkPolicyActor = new(v6fakes.FakeRemoveNetworkPolicyActor)
+		fakeMembershipActor = new(v6fakes.FakeMembershipActor)
 
 		srcApp = "some-app"
 		destApp = "some-other-app"
 		protocol = "tcp"
 
 		cmd = RemoveNetworkPolicyCommand{
-			UI:             testUI,
-			Config:         fakeConfig,
-			SharedActor:    fakeSharedActor,
-			Actor:          fakeActor,
-			RequiredArgs:   flag.RemoveNetworkPolicyArgs{SourceApp: srcApp},
-			DestinationApp: destApp,
-			Protocol:       flag.NetworkProtocol{Protocol: protocol},
-			Port:           flag.NetworkPort{StartPort: 8080, EndPort: 8081},
+			UI:                 testUI,
+			Config:             fakeConfig,
+			SharedActor:        fakeSharedActor,
+			NetworkPolicyActor: fakeNetworkPolicyActor,
+			MembershipActor:    fakeMembershipActor,
+			RequiredArgs:       flag.RemoveNetworkPolicyArgs{SourceApp: srcApp},
+			DestinationApp:     destApp,
+			Protocol:           flag.NetworkProtocol{Protocol: protocol},
+			Port:               flag.NetworkPort{StartPort: 8080, EndPort: 8081},
 		}
 
 		binaryName = "faceman"
@@ -87,15 +90,15 @@ var _ = Describe("remove-network-policy Command", func() {
 
 		When("the policy deletion is successful", func() {
 			BeforeEach(func() {
-				fakeActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
+				fakeNetworkPolicyActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
 			})
 
 			It("displays OK", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.GetOrganizationByNameCallCount()).To(Equal(0))
-				Expect(fakeActor.GetSpaceByNameAndOrganizationCallCount()).To(Equal(0))
-				Expect(fakeActor.RemoveNetworkPolicyCallCount()).To(Equal(1))
-				passedSrcSpaceGuid, passedSrcAppName, passedDestSpaceGuid, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.RemoveNetworkPolicyArgsForCall(0)
+				Expect(fakeMembershipActor.GetOrganizationByNameCallCount()).To(Equal(0))
+				Expect(fakeMembershipActor.GetSpaceByNameAndOrganizationCallCount()).To(Equal(0))
+				Expect(fakeNetworkPolicyActor.RemoveNetworkPolicyCallCount()).To(Equal(1))
+				passedSrcSpaceGuid, passedSrcAppName, passedDestSpaceGuid, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeNetworkPolicyActor.RemoveNetworkPolicyArgsForCall(0)
 				Expect(passedSrcSpaceGuid).To(Equal("some-space-guid"))
 				Expect(passedSrcAppName).To(Equal("some-app"))
 				Expect(passedDestSpaceGuid).To(Equal("some-space-guid"))
@@ -115,14 +118,14 @@ var _ = Describe("remove-network-policy Command", func() {
 			BeforeEach(func() {
 				cmd.DestinationOrg = "dest-org"
 				cmd.DestinationSpace = "dest-space"
-				fakeActor.GetOrganizationByNameReturns(v3action.Organization{GUID: "some-org-guid"}, v3action.Warnings{"some-warning-1"}, nil)
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v3action.Space{GUID: "some-dest-guid"}, v3action.Warnings{"some-warning-2"}, nil)
+				fakeMembershipActor.GetOrganizationByNameReturns(v3action.Organization{GUID: "some-org-guid"}, v3action.Warnings{"some-warning-1"}, nil)
+				fakeMembershipActor.GetSpaceByNameAndOrganizationReturns(v3action.Space{GUID: "some-dest-guid"}, v3action.Warnings{"some-warning-2"}, nil)
 			})
 
 			It("displays OK", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.RemoveNetworkPolicyCallCount()).To(Equal(1))
-				passedSrcSpaceGuid, passedSrcAppName, passedDestSpaceGuid, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.RemoveNetworkPolicyArgsForCall(0)
+				Expect(fakeNetworkPolicyActor.RemoveNetworkPolicyCallCount()).To(Equal(1))
+				passedSrcSpaceGuid, passedSrcAppName, passedDestSpaceGuid, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeNetworkPolicyActor.RemoveNetworkPolicyArgsForCall(0)
 				Expect(passedSrcSpaceGuid).To(Equal("some-space-guid"))
 				Expect(passedSrcAppName).To(Equal("some-app"))
 				Expect(passedDestSpaceGuid).To(Equal("some-dest-guid"))
@@ -141,14 +144,14 @@ var _ = Describe("remove-network-policy Command", func() {
 		When("a destination space but no destination org is specified", func() {
 			BeforeEach(func() {
 				cmd.DestinationSpace = "dest-space"
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v3action.Space{GUID: "some-dest-guid"}, v3action.Warnings{}, nil)
+				fakeMembershipActor.GetSpaceByNameAndOrganizationReturns(v3action.Space{GUID: "some-dest-guid"}, v3action.Warnings{}, nil)
 			})
 
 			It("displays OK when no error occurs", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.RemoveNetworkPolicyCallCount()).To(Equal(1))
-				Expect(fakeActor.GetOrganizationByNameCallCount()).To(Equal(0))
-				passedSrcSpaceGuid, passedSrcAppName, passedDestSpaceGuid, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.RemoveNetworkPolicyArgsForCall(0)
+				Expect(fakeNetworkPolicyActor.RemoveNetworkPolicyCallCount()).To(Equal(1))
+				Expect(fakeMembershipActor.GetOrganizationByNameCallCount()).To(Equal(0))
+				passedSrcSpaceGuid, passedSrcAppName, passedDestSpaceGuid, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeNetworkPolicyActor.RemoveNetworkPolicyArgsForCall(0)
 				Expect(passedSrcSpaceGuid).To(Equal("some-space-guid"))
 				Expect(passedSrcAppName).To(Equal("some-app"))
 				Expect(passedDestSpaceGuid).To(Equal("some-dest-guid"))
@@ -176,13 +179,19 @@ var _ = Describe("remove-network-policy Command", func() {
 			BeforeEach(func() {
 				cmd.DestinationOrg = "coolorg"
 				cmd.DestinationSpace = "coolspace"
-				fakeActor.GetOrganizationByNameReturns(v3action.Organization{}, v3action.Warnings{}, actionerror.OrganizationNotFoundError{Name: "coolorg"})
+				warnings := v3action.Warnings{"some-org-warning-1", "some-org-warning-2"}
+				fakeMembershipActor.GetOrganizationByNameReturns(v3action.Organization{}, warnings, actionerror.OrganizationNotFoundError{Name: "coolorg"})
 			})
 
 			It("responds with an error", func() {
-				passedOrgName := fakeActor.GetOrganizationByNameArgsForCall(0)
+				passedOrgName := fakeMembershipActor.GetOrganizationByNameArgsForCall(0)
 				Expect(passedOrgName).To(Equal("coolorg"))
 				Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: "coolorg"}))
+			})
+
+			It("prints the warnings", func() {
+				Expect(testUI.Err).To(Say("some-org-warning-1"))
+				Expect(testUI.Err).To(Say("some-org-warning-2"))
 			})
 		})
 
@@ -190,27 +199,33 @@ var _ = Describe("remove-network-policy Command", func() {
 			BeforeEach(func() {
 				cmd.DestinationOrg = "coolorg"
 				cmd.DestinationSpace = "coolspace"
-				fakeActor.GetOrganizationByNameReturns(v3action.Organization{GUID: "some-org-guid"}, v3action.Warnings{}, nil)
-				fakeActor.GetSpaceByNameAndOrganizationReturns(v3action.Space{}, v3action.Warnings{}, actionerror.SpaceNotFoundError{Name: "coolspace"})
+				warnings := v3action.Warnings{"some-space-warning-1", "some-space-warning-2"}
+				fakeMembershipActor.GetOrganizationByNameReturns(v3action.Organization{GUID: "some-org-guid"}, v3action.Warnings{}, nil)
+				fakeMembershipActor.GetSpaceByNameAndOrganizationReturns(v3action.Space{}, warnings, actionerror.SpaceNotFoundError{Name: "coolspace"})
 			})
 
 			It("responds with an error", func() {
-				passedSpaceName, passedOrgGUID := fakeActor.GetSpaceByNameAndOrganizationArgsForCall(0)
+				passedSpaceName, passedOrgGUID := fakeMembershipActor.GetSpaceByNameAndOrganizationArgsForCall(0)
 				Expect(passedSpaceName).To(Equal("coolspace"))
 				Expect(passedOrgGUID).To(Equal("some-org-guid"))
 				Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: "coolspace"}))
+			})
+
+			It("prints the warnings", func() {
+				Expect(testUI.Err).To(Say("some-space-warning-1"))
+				Expect(testUI.Err).To(Say("some-space-warning-2"))
 			})
 		})
 
 		When("the policy does not exist", func() {
 			BeforeEach(func() {
-				fakeActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.PolicyDoesNotExistError{})
+				fakeNetworkPolicyActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.PolicyDoesNotExistError{})
 			})
 
 			It("displays OK", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.RemoveNetworkPolicyCallCount()).To(Equal(1))
-				passedSrcSpaceGuid, passedSrcAppName, passedDestSpaceGuid, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.RemoveNetworkPolicyArgsForCall(0)
+				Expect(fakeNetworkPolicyActor.RemoveNetworkPolicyCallCount()).To(Equal(1))
+				passedSrcSpaceGuid, passedSrcAppName, passedDestSpaceGuid, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeNetworkPolicyActor.RemoveNetworkPolicyArgsForCall(0)
 				Expect(passedSrcSpaceGuid).To(Equal("some-space-guid"))
 				Expect(passedSrcAppName).To(Equal("some-app"))
 				Expect(passedDestSpaceGuid).To(Equal("some-space-guid"))
@@ -229,7 +244,7 @@ var _ = Describe("remove-network-policy Command", func() {
 
 		When("the policy deletion is not successful", func() {
 			BeforeEach(func() {
-				fakeActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.ApplicationNotFoundError{Name: srcApp})
+				fakeNetworkPolicyActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, actionerror.ApplicationNotFoundError{Name: srcApp})
 			})
 
 			It("does not display OK", func() {
