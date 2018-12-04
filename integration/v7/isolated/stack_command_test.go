@@ -123,7 +123,7 @@ var _ = FDescribe("stack command", func() {
 					Consistently(session).ShouldNot(Say(`Getting stack %s in org %s / space %s as %s\.\.\.`, stackName, orgName, spaceName, username))
 					Consistently(session).ShouldNot(Say(`name:\s+%s`, stackName))
 					Consistently(session).ShouldNot(Say(`description:\s+%s`, stackDescription))
-					// ADD ASSERTION FOR GUID STRUCTURE: ^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$
+					Eventually(session).Should(Say(`^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
