@@ -32,7 +32,7 @@ type AddNetworkPolicyCommand struct {
 	DestinationOrg   string `short:"o" description:"The org of the destination app (Default: targeted org)"`
 	DestinationSpace string `short:"s" description:"The space of the destination app (Default: targeted space)"`
 
-	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] [--protocol (tcp | udp) --port RANGE]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend --destination-app backend -o backend-org -s backend-space --protocol tcp --port 8080-8090"`
+	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] [--protocol (tcp | udp) --port RANGE]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend --destination-app backend -s backend-space -o backend-org --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, network-policies, remove-network-policy"`
 
 	UI                 command.UI

@@ -27,7 +27,7 @@ var _ = Describe("add-network-policy command", func() {
 				Eventually(session).Should(Say(regexp.QuoteMeta("cf add-network-policy SOURCE_APP --destination-app DESTINATION_APP [-s DESTINATION_SPACE_NAME [-o DESTINATION_ORG_NAME]] [--protocol (tcp | udp) --port RANGE]")))
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say("   cf add-network-policy frontend --destination-app backend --protocol tcp --port 8081"))
-				Eventually(session).Should(Say("   cf add-network-policy frontend --destination-app backend -o backend-org -s backend-space --protocol tcp --port 8080-8090"))
+				Eventually(session).Should(Say("   cf add-network-policy frontend --destination-app backend -s backend-space -o backend-org --protocol tcp --port 8080-8090"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("   --destination-app      Name of app to connect to"))
 				Eventually(session).Should(Say(`   --port                 Port or range of ports for connection to destination app \(Default: 8080\)`))
