@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("stack command", func() {
+var _ = Describe("stack command", func() {
 	var (
 		orgName          string
 		spaceName        string
