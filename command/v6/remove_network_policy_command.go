@@ -68,6 +68,7 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 	}
 
 	destOrgGUID := cmd.Config.TargetedOrganization().GUID
+	displayDestinationOrg := cmd.Config.TargetedOrganization().Name
 	if cmd.DestinationOrg != "" {
 		var destOrg v3action.Organization
 		var warnings v3action.Warnings
@@ -78,6 +79,7 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 		}
 
 		destOrgGUID = destOrg.GUID
+		displayDestinationOrg = cmd.DestinationOrg
 	}
 
 	destSpaceGUID := cmd.Config.TargetedSpace().GUID
@@ -97,12 +99,25 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayTextWithFlavor("Removing network policy for app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
-		"SrcAppName": cmd.RequiredArgs.SourceApp,
-		"Org":        cmd.Config.TargetedOrganization().Name,
-		"Space":      cmd.Config.TargetedSpace().Name,
-		"User":       user.Name,
-	})
+	if cmd.DestinationSpace != "" {
+		cmd.UI.DisplayTextWithFlavor("Removing network policy from app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} to app {{.DstAppName}} in org {{.DstOrg}} / space {{.DstSpace}} as {{.User}}...", map[string]interface{}{
+			"SrcAppName": cmd.RequiredArgs.SourceApp,
+			"Org":        cmd.Config.TargetedOrganization().Name,
+			"Space":      cmd.Config.TargetedSpace().Name,
+			"DstAppName": cmd.DestinationApp,
+			"DstOrg":     displayDestinationOrg,
+			"DstSpace":   cmd.DestinationSpace,
+			"User":       user.Name,
+		})
+	} else {
+		cmd.UI.DisplayTextWithFlavor("Removing network policy from app {{.SrcAppName}} to app {{.DstAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
+			"SrcAppName": cmd.RequiredArgs.SourceApp,
+			"Org":        cmd.Config.TargetedOrganization().Name,
+			"Space":      cmd.Config.TargetedSpace().Name,
+			"DstAppName": cmd.DestinationApp,
+			"User":       user.Name,
+		})
+	}
 
 	removeWarnings, err := cmd.NetworkPolicyActor.RemoveNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, destSpaceGUID, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
 	cmd.UI.DisplayWarnings(removeWarnings)

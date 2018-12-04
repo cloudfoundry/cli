@@ -135,7 +135,7 @@ var _ = Describe("add-network-policy Command", func() {
 					Expect(passedStartPort).To(Equal(8080))
 					Expect(passedEndPort).To(Equal(8081))
 
-					Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+					Expect(testUI.Out).To(Say(`Adding network policy from app %s to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp, destApp))
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
 					Expect(testUI.Out).To(Say("OK"))
@@ -150,7 +150,7 @@ var _ = Describe("add-network-policy Command", func() {
 				It("does not display OK when an error occurs", func() {
 					Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{Name: srcApp}))
 
-					Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+					Expect(testUI.Out).To(Say(`Adding network policy from app %s to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp, destApp))
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
 					Expect(testUI.Out).ToNot(Say("OK"))
@@ -240,7 +240,7 @@ var _ = Describe("add-network-policy Command", func() {
 				Expect(passedSrcSpaceGuid).To(Equal("some-space-guid"))
 				Expect(passedDestSpaceGuid).To(Equal("some-other-space-guid"))
 
-				Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+				Expect(testUI.Out).To(Say(`Adding network policy from app %s in org some-org / space some-space to app %s in org some-org / space hamdinger as some-user\.\.\.`, srcApp, destApp))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 
@@ -266,7 +266,7 @@ var _ = Describe("add-network-policy Command", func() {
 				Expect(passedSrcSpaceGuid).To(Equal("some-space-guid"))
 				Expect(passedDestSpaceGuid).To(Equal("some-other-space-guid"))
 
-				Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+				Expect(testUI.Out).To(Say(`Adding network policy from app %s in org some-org / space some-space to app %s in org bananarama / space hamdinger as some-user\.\.\.`, srcApp, destApp))
 				Expect(testUI.Err).To(Say("some-org-warning-1"))
 				Expect(testUI.Err).To(Say("some-org-warning-2"))
 				Expect(testUI.Err).To(Say("some-space-warning-1"))

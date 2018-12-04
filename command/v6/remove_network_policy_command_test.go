@@ -85,7 +85,7 @@ var _ = Describe("remove-network-policy Command", func() {
 		})
 
 		It("outputs flavor text", func() {
-			Expect(testUI.Out).To(Say(`Removing network policy for app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+			Expect(testUI.Out).To(Say(`Removing network policy from app %s to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp, destApp))
 		})
 
 		When("the policy deletion is successful", func() {
@@ -107,7 +107,7 @@ var _ = Describe("remove-network-policy Command", func() {
 				Expect(passedStartPort).To(Equal(8080))
 				Expect(passedEndPort).To(Equal(8081))
 
-				Expect(testUI.Out).To(Say(`Removing network policy for app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+				Expect(testUI.Out).To(Say(`Removing network policy from app %s to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp, destApp))
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 				Expect(testUI.Out).To(Say("OK"))
@@ -134,7 +134,7 @@ var _ = Describe("remove-network-policy Command", func() {
 				Expect(passedStartPort).To(Equal(8080))
 				Expect(passedEndPort).To(Equal(8081))
 
-				Expect(testUI.Out).To(Say(`Removing network policy for app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+				Expect(testUI.Out).To(Say(`Removing network policy from app %s in org some-org / space some-space to app %s in org dest-org / space dest-space as some-user\.\.\.`, srcApp, destApp))
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 				Expect(testUI.Out).To(Say("OK"))
@@ -160,7 +160,7 @@ var _ = Describe("remove-network-policy Command", func() {
 				Expect(passedStartPort).To(Equal(8080))
 				Expect(passedEndPort).To(Equal(8081))
 
-				Expect(testUI.Out).To(Say(`Removing network policy for app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+				Expect(testUI.Out).To(Say(`Removing network policy from app %s in org some-org / space some-space to app %s in org some-org / space dest-space as some-user\.\.\.`, srcApp, destApp))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
@@ -234,7 +234,7 @@ var _ = Describe("remove-network-policy Command", func() {
 				Expect(passedStartPort).To(Equal(8080))
 				Expect(passedEndPort).To(Equal(8081))
 
-				Expect(testUI.Out).To(Say(`Removing network policy for app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+				Expect(testUI.Out).To(Say(`Removing network policy from app %s to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp, destApp))
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 				Expect(testUI.Out).To(Say("Policy does not exist."))
@@ -250,7 +250,7 @@ var _ = Describe("remove-network-policy Command", func() {
 			It("does not display OK", func() {
 				Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{Name: srcApp}))
 
-				Expect(testUI.Out).To(Say(`Removing network policy for app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+				Expect(testUI.Out).To(Say(`Removing network policy from app %s to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp, destApp))
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 				Expect(testUI.Out).ToNot(Say("OK"))
