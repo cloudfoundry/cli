@@ -128,6 +128,9 @@ func SetupV3Response() {
 			},
 			"deployments": {
 				"href": "SERVER_URL/v3/deployments"
+			},
+			"stacks": {
+				"href": "SERVER_URL/v3/stacks"
 			}
 		}
 	}`, "SERVER_URL", serverURL, -1)

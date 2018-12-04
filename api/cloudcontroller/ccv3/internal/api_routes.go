@@ -37,6 +37,7 @@ const (
 	GetServiceInstancesRequest                                  = "GetServiceInstances"
 	GetSpaceRelationshipIsolationSegmentRequest                 = "GetSpaceRelationshipIsolationSegment"
 	GetSpacesRequest                                            = "GetSpaces"
+	GetStacksRequest                                            = "GetStacks"
 	PatchApplicationCurrentDropletRequest                       = "PatchApplicationCurrentDroplet"
 	PatchApplicationEnvironmentVariablesRequest                 = "PatchApplicationEnvironmentVariables"
 	PatchApplicationRequest                                     = "PatchApplication"
@@ -110,5 +111,6 @@ var APIRoutes = []Route{
 	{Resource: SpacesResource, Path: "/", Method: http.MethodGet, Name: GetSpacesRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest},
 	{Resource: SpacesResource, Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest},
+	{Resource: StacksResource, Path: "/", Method: http.MethodGet, Name: GetStacksRequest},
 	{Resource: TasksResource, Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest},
 }

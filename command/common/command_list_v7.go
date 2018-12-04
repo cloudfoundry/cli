@@ -170,7 +170,7 @@ type commandList struct {
 	SSHEnabled                         v6.SSHEnabledCommand                         `command:"ssh-enabled" description:"Reports whether SSH is enabled on an application container instance"`
 	SSH                                v7.SSHCommand                                `command:"ssh" description:"SSH to an application container instance"`
 	Stacks                             v6.StacksCommand                             `command:"stacks" description:"List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"`
-	Stack                              v6.StackCommand                              `command:"stack" description:"Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"`
+	Stack                              v7.StackCommand                              `command:"stack" description:"Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	StagingEnvironmentVariableGroup    v6.StagingEnvironmentVariableGroupCommand    `command:"staging-environment-variable-group" alias:"sevg" description:"Retrieve the contents of the staging environment variable group"`
 	StagingSecurityGroups              v6.StagingSecurityGroupsCommand              `command:"staging-security-groups" description:"List security groups in the staging set for applications"`
 	Start                              v6.StartCommand                              `command:"start" alias:"st" description:"Start an app"`

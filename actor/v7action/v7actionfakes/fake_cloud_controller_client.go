@@ -536,6 +536,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetStacksStub        func(...ccv3.Query) ([]ccv3.Stack, ccv3.Warnings, error)
+	getStacksMutex       sync.RWMutex
+	getStacksArgsForCall []struct {
+		arg1 []ccv3.Query
+	}
+	getStacksReturns struct {
+		result1 []ccv3.Stack
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getStacksReturnsOnCall map[int]struct {
+		result1 []ccv3.Stack
+		result2 ccv3.Warnings
+		result3 error
+	}
 	PollJobStub        func(ccv3.JobURL) (ccv3.Warnings, error)
 	pollJobMutex       sync.RWMutex
 	pollJobArgsForCall []struct {
@@ -3109,6 +3124,72 @@ func (fake *FakeCloudControllerClient) GetSpacesReturnsOnCall(i int, result1 []c
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetStacks(arg1 ...ccv3.Query) ([]ccv3.Stack, ccv3.Warnings, error) {
+	fake.getStacksMutex.Lock()
+	ret, specificReturn := fake.getStacksReturnsOnCall[len(fake.getStacksArgsForCall)]
+	fake.getStacksArgsForCall = append(fake.getStacksArgsForCall, struct {
+		arg1 []ccv3.Query
+	}{arg1})
+	fake.recordInvocation("GetStacks", []interface{}{arg1})
+	fake.getStacksMutex.Unlock()
+	if fake.GetStacksStub != nil {
+		return fake.GetStacksStub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getStacksReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetStacksCallCount() int {
+	fake.getStacksMutex.RLock()
+	defer fake.getStacksMutex.RUnlock()
+	return len(fake.getStacksArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetStacksCalls(stub func(...ccv3.Query) ([]ccv3.Stack, ccv3.Warnings, error)) {
+	fake.getStacksMutex.Lock()
+	defer fake.getStacksMutex.Unlock()
+	fake.GetStacksStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetStacksArgsForCall(i int) []ccv3.Query {
+	fake.getStacksMutex.RLock()
+	defer fake.getStacksMutex.RUnlock()
+	argsForCall := fake.getStacksArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetStacksReturns(result1 []ccv3.Stack, result2 ccv3.Warnings, result3 error) {
+	fake.getStacksMutex.Lock()
+	defer fake.getStacksMutex.Unlock()
+	fake.GetStacksStub = nil
+	fake.getStacksReturns = struct {
+		result1 []ccv3.Stack
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetStacksReturnsOnCall(i int, result1 []ccv3.Stack, result2 ccv3.Warnings, result3 error) {
+	fake.getStacksMutex.Lock()
+	defer fake.getStacksMutex.Unlock()
+	fake.GetStacksStub = nil
+	if fake.getStacksReturnsOnCall == nil {
+		fake.getStacksReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Stack
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getStacksReturnsOnCall[i] = struct {
+		result1 []ccv3.Stack
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) PollJob(arg1 ccv3.JobURL) (ccv3.Warnings, error) {
 	fake.pollJobMutex.Lock()
 	ret, specificReturn := fake.pollJobReturnsOnCall[len(fake.pollJobArgsForCall)]
@@ -4196,6 +4277,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSpaceIsolationSegmentMutex.RUnlock()
 	fake.getSpacesMutex.RLock()
 	defer fake.getSpacesMutex.RUnlock()
+	fake.getStacksMutex.RLock()
+	defer fake.getStacksMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()

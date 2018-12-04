@@ -12,4 +12,5 @@ const (
 	ServiceInstancesResource  = "service_instances"
 	SpacesResource            = "spaces"
 	TasksResource             = "tasks"
+	StacksResource            = "stacks"
 )
