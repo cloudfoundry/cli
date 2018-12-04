@@ -9,13 +9,25 @@ import (
 )
 
 var _ = Describe("stacks command", func() {
-	It("lists the stacks", func() {
-		session := helpers.CF("stacks")
+	var (
+		orgName   string
+		spaceName string
+	)
+	BeforeEach(func() {
+		orgName = helpers.NewOrgName()
+		spaceName = helpers.NewSpaceName()
+	})
+	When("environment is set up correctly", func() {
+		BeforeEach(func() {
+			helpers.SetupCF(orgName, spaceName)
+		})
+		It("lists the stacks", func() {
+			session := helpers.CF("stacks")
 
-		Eventually(session).Should(Say(`name\s+description`))
-		Eventually(session).Should(Say(`cflinuxfs\d+\s+Cloud Foundry Linux`))
-
-		Eventually(session).Should(Exit(0))
+			Eventually(session).Should(Say(`name\s+description`))
+			Eventually(session).Should(Say(`cflinuxfs\d+\s+Cloud Foundry Linux`))
+			Eventually(session).Should(Exit(0))
+		})
 	})
 
 	When("--help flag is set", func() {
@@ -33,7 +45,7 @@ var _ = Describe("stacks command", func() {
 		})
 	})
 
-	When("environment is not set up", func() {
+	When("environment is not set up correctly", func() {
 		It("displays an error and exits 1", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "stacks")
 		})

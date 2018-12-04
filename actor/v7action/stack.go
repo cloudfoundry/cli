@@ -21,5 +21,17 @@ func (actor *Actor) GetStackByName(stackName string) (Stack, Warnings, error) {
 	}
 
 	return Stack(stacks[0]), Warnings(warnings), nil
+}
 
+func (actor Actor) GetStacks() ([]Stack, Warnings, error) {
+	ccv3Stacks, warnings, err := actor.CloudControllerClient.GetStacks()
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
+
+	var stacks []Stack
+	for _, stack := range ccv3Stacks {
+		stacks = append(stacks, Stack(stack))
+	}
+	return stacks, Warnings(warnings), nil
 }

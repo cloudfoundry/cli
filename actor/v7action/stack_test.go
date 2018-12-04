@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Stack Actions", func() {
+var _ = Describe("Stack", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
@@ -18,7 +18,8 @@ var _ = Describe("Stack Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v7actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil, nil)
+		fakeConfig := new(v7actionfakes.FakeConfig)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, nil, nil)
 	})
 
 	Describe("Get stack by name", func() {
@@ -97,6 +98,78 @@ var _ = Describe("Stack Actions", func() {
 				})
 			})
 		})
+	})
 
+	Describe("GetStacks", func() {
+		var (
+			ccv3Stacks []ccv3.Stack
+			stacks     []Stack
+
+			stack1Name        string
+			stack1Description string
+			stack2Name        string
+			stack2Description string
+
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			ccv3Stacks = []ccv3.Stack{
+				{Name: stack1Name, Description: stack1Description},
+				{Name: stack2Name, Description: stack2Description},
+			}
+		})
+
+		JustBeforeEach(func() {
+			stacks, warnings, executeErr = actor.GetStacks()
+		})
+
+		When("getting stacks returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some error")
+				fakeCloudControllerClient.GetStacksReturns(
+					[]ccv3.Stack{},
+					ccv3.Warnings{"warning-1", "warning-2"}, expectedErr)
+			})
+
+			It("returns warnings and the error", func() {
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(executeErr).To(MatchError(expectedErr))
+			})
+		})
+
+		When("the GetStacks call is successful", func() {
+			When("the cloud controller returns back stacks", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetStacksReturns(
+						ccv3Stacks,
+						ccv3.Warnings{"some-stack-warning"}, nil)
+				})
+
+				It("returns back the stacks and warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(stacks).To(ConsistOf(Stack{Name: stack1Name, Description: stack1Description}, Stack{Name: stack2Name, Description: stack2Description}))
+					Expect(warnings).To(ConsistOf("some-stack-warning"))
+					Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
+				})
+			})
+
+			When("the GetStacks call is unsuccessful", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetStacksReturns(
+						nil,
+						ccv3.Warnings{"some-stack-warning"},
+						errors.New("some-error"))
+				})
+
+				It("returns an error and warnings", func() {
+					Expect(executeErr).To(MatchError("some-error"))
+					Expect(warnings).To(ConsistOf("some-stack-warning"))
+				})
+			})
+		})
 	})
 })
