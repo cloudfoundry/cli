@@ -64,6 +64,7 @@ var _ = Describe("curl command", func() {
 			It("Displays command usage to the output", func() {
 				session := helpers.CF("curl", "--help")
 				ExpectHelpText(session)
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
@@ -149,8 +150,10 @@ var _ = Describe("curl command", func() {
 					Eventually(session).Should(Exit(0))
 
 					ExpectReponseHeaders(session)
-					contents := strings.Split(string(session.Out.Contents()), "\n")[8:]
-					actualJSON := strings.Join(contents, "\n")
+					contents := string(session.Out.Contents())
+					jsonStartsAt := strings.Index(contents, "{")
+
+					actualJSON := contents[jsonStartsAt:]
 					Expect(actualJSON).To(MatchJSON(expectedJSON))
 				})
 			})
@@ -163,8 +166,10 @@ var _ = Describe("curl command", func() {
 					ExpectRequestHeaders(session)
 					ExpectReponseHeaders(session)
 
-					contents := strings.Split(string(session.Out.Contents()), "\n")[20:]
-					actualJSON := strings.Join(contents, "\n")
+					contents := string(session.Out.Contents())
+					jsonStartsAt := strings.Index(contents, "{")
+
+					actualJSON := contents[jsonStartsAt:]
 					Expect(actualJSON).To(MatchJSON(expectedJSON))
 				})
 			})
