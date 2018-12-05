@@ -102,11 +102,22 @@ var _ = Describe("stack command", func() {
 		})
 
 		When("the stack exists", func() {
+			var stackGuid string
+
 			BeforeEach(func() {
 				jsonBody := fmt.Sprintf(`{"name": "%s", "description": "%s"}`, stackName, stackDescription)
 				session := helpers.CF("curl", "-d", jsonBody, "-X", "POST", "/v3/stacks")
 				Eventually(session).Should(Exit(0))
+
+				r, _ := regexp.Compile(`[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`)
+				stackGuid = string(r.Find(session.Out.Contents()))
 			})
+
+			AfterEach(func() {
+				session := helpers.CF("curl", "-X", "DELETE", "/v3/stacks/" + stackGuid)
+				Eventually(session).Should(Exit(0))
+			})
+
 			It("Shows the details for the stack", func() {
 				session := helpers.CF("stack", stackName)
 
