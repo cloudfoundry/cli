@@ -169,7 +169,7 @@ var _ = Describe("auth Command", func() {
 
 		BeforeEach(func() {
 			apiVersion = "1.2.3"
-			fakeConfig.APIVersionReturns(apiVersion)
+			fakeActor.CloudControllerAPIVersionReturns(apiVersion)
 			minCLIVersion = "1.0.0"
 			fakeConfig.MinCLIVersionReturns(minCLIVersion)
 
