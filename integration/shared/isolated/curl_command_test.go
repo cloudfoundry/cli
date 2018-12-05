@@ -1,6 +1,10 @@
 package isolated
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -115,12 +119,15 @@ var _ = Describe("curl command", func() {
 	})
 
 	When("the user is logged in", func() {
+		var orgName string
+
 		BeforeEach(func() {
-			orgName := helpers.NewOrgName()
+			orgName = helpers.NewOrgName()
 			spaceName := helpers.NewSpaceName()
 
 			helpers.SetupCF(orgName, spaceName)
 			helpers.SwitchToOrgRole(orgName, "OrgManager")
+			helpers.TargetOrg(orgName)
 		})
 
 		When("PATH is valid", func() {
@@ -171,6 +178,112 @@ var _ = Describe("curl command", func() {
 
 					actualJSON := contents[jsonStartsAt:]
 					Expect(actualJSON).To(MatchJSON(expectedJSON))
+				})
+			})
+
+			When("-H is passed with a custom header", func() {
+				When("the custom header is valid", func() {
+					It("add the custom header to the request", func() {
+						session := helpers.CF("curl", "/v2/apps", "-H", "X-Foo: bar", "-v")
+						Eventually(session).Should(Exit(0))
+
+						Expect(session).To(Say("REQUEST:"))
+						Expect(session).To(Say("X-Foo: bar"))
+						Expect(session).To(Say("RESPONSE:"))
+					})
+
+					When("multiple headers are provided", func() {
+						It("should add all the custom headers to the request", func() {
+							session := helpers.CF("curl", "/v2/apps", "-H", "X-Bar: bar", "-H", "X-Foo: foo", "-v")
+							Eventually(session).Should(Exit(0))
+
+							Expect(session).To(Say("REQUEST:"))
+							Expect(session).To(Say("X-Bar: bar"))
+							Expect(session).To(Say("X-Foo: foo"))
+							Expect(session).To(Say("RESPONSE:"))
+						})
+					})
+
+					When("-H is provided with a default header", func() {
+						It("overrides the value of the header", func() {
+							session := helpers.CF("curl", "/v2/apps", "-H", "User-Agent: smith", "-v")
+							Eventually(session).Should(Exit(0))
+
+							Expect(session).To(Say("REQUEST:"))
+							Expect(session).To(Say("User-Agent: smith"))
+							Expect(session).To(Say("RESPONSE:"))
+						})
+					})
+				})
+
+				When("the custom header is not valid", func() {
+					It("tells the user that the header is not valid", func() {
+						session := helpers.CF("curl", "/v2/apps", "-H", "not-a-valid-header", "-v")
+						Eventually(session).Should(Exit(1))
+
+						Expect(session).Should(Say("FAILED"))
+						Expect(session).Should(Say("Error creating request:"))
+						Expect(session).Should(Say("Error parsing headers: malformed MIME header line: not-a-valid-header"))
+					})
+				})
+			})
+
+			When("-X is passed with the HTTP method", func() {
+				var spaceGUID, spaceName string
+
+				BeforeEach(func() {
+					spaceName = helpers.NewSpaceName()
+					helpers.CreateSpace(spaceName)
+					spaceGUID = helpers.GetSpaceGUID(spaceName)
+				})
+
+				It("should change the HTTP method of the request", func() {
+					path := fmt.Sprintf("/v2/spaces/%s", spaceGUID)
+					session := helpers.CF("curl", path, "-X", "DELETE", "-v")
+					Eventually(session).Should(Exit(0))
+
+					Eventually(helpers.CF("space", spaceName)).Should(Exit(1))
+				})
+			})
+
+			When("-d is passed with a request body", func() {
+				When("the request body is passed as a string", func() {
+					It("sets the method to POST and sends the body", func() {
+						orgGUID := helpers.GetOrgGUID(orgName)
+						spaceName := helpers.NewSpaceName()
+						jsonBody := fmt.Sprintf(`{"name":"%s", "organization_guid":"%s"}`, spaceName, orgGUID)
+						session := helpers.CF("curl", "/v2/spaces", "-d", jsonBody)
+						Eventually(session).Should(Exit(0))
+						Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
+					})
+				})
+			})
+
+			When("the request body is passed as a file", func() {
+				var spaceName, filePath, dir string
+
+				BeforeEach(func() {
+					var err error
+					dir, err = ioutil.TempDir("", "curl-command")
+					Expect(err).ToNot(HaveOccurred())
+
+					filePath = filepath.Join(dir, "request_body.json")
+					orgGUID := helpers.GetOrgGUID(orgName)
+					spaceName = helpers.NewSpaceName()
+
+					jsonBody := fmt.Sprintf(`{"name":"%s", "organization_guid":"%s"}`, spaceName, orgGUID)
+					err = ioutil.WriteFile(filePath, []byte(jsonBody), 0666)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				AfterEach(func() {
+					os.RemoveAll(dir)
+				})
+
+				It("sets the method to POST and sends the body", func() {
+					session := helpers.CF("curl", "/v2/spaces", "-d", "@"+filePath)
+					Eventually(session).Should(Exit(0))
+					Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
 				})
 			})
 		})
