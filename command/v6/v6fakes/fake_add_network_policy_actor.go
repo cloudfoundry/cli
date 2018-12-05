@@ -2,22 +2,23 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	cfnetworkingaction "code.cloudfoundry.org/cli/actor/cfnetworkingaction"
-	v6 "code.cloudfoundry.org/cli/command/v6"
+	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeAddNetworkPolicyActor struct {
-	AddNetworkPolicyStub        func(string, string, string, string, int, int) (cfnetworkingaction.Warnings, error)
+	AddNetworkPolicyStub        func(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
 	addNetworkPolicyMutex       sync.RWMutex
 	addNetworkPolicyArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 int
-		arg6 int
+		srcSpaceGUID  string
+		srcAppName    string
+		destSpaceGUID string
+		destAppName   string
+		protocol      string
+		startPort     int
+		endPort       int
 	}
 	addNetworkPolicyReturns struct {
 		result1 cfnetworkingaction.Warnings
@@ -31,27 +32,27 @@ type FakeAddNetworkPolicyActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAddNetworkPolicyActor) AddNetworkPolicy(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int, arg6 int) (cfnetworkingaction.Warnings, error) {
+func (fake *FakeAddNetworkPolicyActor) AddNetworkPolicy(srcSpaceGUID string, srcAppName string, destSpaceGUID string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error) {
 	fake.addNetworkPolicyMutex.Lock()
 	ret, specificReturn := fake.addNetworkPolicyReturnsOnCall[len(fake.addNetworkPolicyArgsForCall)]
 	fake.addNetworkPolicyArgsForCall = append(fake.addNetworkPolicyArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 int
-		arg6 int
-	}{arg1, arg2, arg3, arg4, arg5, arg6})
-	fake.recordInvocation("AddNetworkPolicy", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
+		srcSpaceGUID  string
+		srcAppName    string
+		destSpaceGUID string
+		destAppName   string
+		protocol      string
+		startPort     int
+		endPort       int
+	}{srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol, startPort, endPort})
+	fake.recordInvocation("AddNetworkPolicy", []interface{}{srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol, startPort, endPort})
 	fake.addNetworkPolicyMutex.Unlock()
 	if fake.AddNetworkPolicyStub != nil {
-		return fake.AddNetworkPolicyStub(arg1, arg2, arg3, arg4, arg5, arg6)
+		return fake.AddNetworkPolicyStub(srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol, startPort, endPort)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.addNetworkPolicyReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.addNetworkPolicyReturns.result1, fake.addNetworkPolicyReturns.result2
 }
 
 func (fake *FakeAddNetworkPolicyActor) AddNetworkPolicyCallCount() int {
@@ -60,22 +61,13 @@ func (fake *FakeAddNetworkPolicyActor) AddNetworkPolicyCallCount() int {
 	return len(fake.addNetworkPolicyArgsForCall)
 }
 
-func (fake *FakeAddNetworkPolicyActor) AddNetworkPolicyCalls(stub func(string, string, string, string, int, int) (cfnetworkingaction.Warnings, error)) {
-	fake.addNetworkPolicyMutex.Lock()
-	defer fake.addNetworkPolicyMutex.Unlock()
-	fake.AddNetworkPolicyStub = stub
-}
-
-func (fake *FakeAddNetworkPolicyActor) AddNetworkPolicyArgsForCall(i int) (string, string, string, string, int, int) {
+func (fake *FakeAddNetworkPolicyActor) AddNetworkPolicyArgsForCall(i int) (string, string, string, string, string, int, int) {
 	fake.addNetworkPolicyMutex.RLock()
 	defer fake.addNetworkPolicyMutex.RUnlock()
-	argsForCall := fake.addNetworkPolicyArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
+	return fake.addNetworkPolicyArgsForCall[i].srcSpaceGUID, fake.addNetworkPolicyArgsForCall[i].srcAppName, fake.addNetworkPolicyArgsForCall[i].destSpaceGUID, fake.addNetworkPolicyArgsForCall[i].destAppName, fake.addNetworkPolicyArgsForCall[i].protocol, fake.addNetworkPolicyArgsForCall[i].startPort, fake.addNetworkPolicyArgsForCall[i].endPort
 }
 
 func (fake *FakeAddNetworkPolicyActor) AddNetworkPolicyReturns(result1 cfnetworkingaction.Warnings, result2 error) {
-	fake.addNetworkPolicyMutex.Lock()
-	defer fake.addNetworkPolicyMutex.Unlock()
 	fake.AddNetworkPolicyStub = nil
 	fake.addNetworkPolicyReturns = struct {
 		result1 cfnetworkingaction.Warnings
@@ -84,8 +76,6 @@ func (fake *FakeAddNetworkPolicyActor) AddNetworkPolicyReturns(result1 cfnetwork
 }
 
 func (fake *FakeAddNetworkPolicyActor) AddNetworkPolicyReturnsOnCall(i int, result1 cfnetworkingaction.Warnings, result2 error) {
-	fake.addNetworkPolicyMutex.Lock()
-	defer fake.addNetworkPolicyMutex.Unlock()
 	fake.AddNetworkPolicyStub = nil
 	if fake.addNetworkPolicyReturnsOnCall == nil {
 		fake.addNetworkPolicyReturnsOnCall = make(map[int]struct {
@@ -104,11 +94,7 @@ func (fake *FakeAddNetworkPolicyActor) Invocations() map[string][][]interface{} 
 	defer fake.invocationsMutex.RUnlock()
 	fake.addNetworkPolicyMutex.RLock()
 	defer fake.addNetworkPolicyMutex.RUnlock()
-	copiedInvocations := map[string][][]interface{}{}
-	for key, value := range fake.invocations {
-		copiedInvocations[key] = value
-	}
-	return copiedInvocations
+	return fake.invocations
 }
 
 func (fake *FakeAddNetworkPolicyActor) recordInvocation(key string, args []interface{}) {
