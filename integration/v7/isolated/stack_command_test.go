@@ -2,11 +2,11 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"regexp"
 )
 
 var _ = Describe("stack command", func() {
@@ -103,12 +103,12 @@ var _ = Describe("stack command", func() {
 
 		When("the stack exists", func() {
 			BeforeEach(func() {
-				stackName = "cflinuxfs3"
-				stackDescription = regexp.QuoteMeta("Cloud Foundry Linux-based filesystem (Ubuntu 18.04)")
+				jsonBody := fmt.Sprintf(`{"name": "%s", "description": "%s"}`, stackName, stackDescription)
+				session := helpers.CF("curl", "-d", jsonBody, "-X", "POST", "/v3/stacks")
+				Eventually(session).Should(Exit(0))
 			})
-
 			It("Shows the details for the stack", func() {
-				session := helpers.CF("stack", "cflinuxfs3")
+				session := helpers.CF("stack", stackName)
 
 				Eventually(session).Should(Say(`Getting stack %s in org %s / space %s as %s\.\.\.`, stackName, orgName, spaceName, username))
 				Eventually(session).Should(Say(`name:\s+%s`, stackName))
