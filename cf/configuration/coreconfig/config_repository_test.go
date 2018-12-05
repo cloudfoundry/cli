@@ -216,7 +216,8 @@ var _ = Describe("Configuration Repository", func() {
 			var tmpDir string
 
 			BeforeEach(func() {
-				tmpDir, err := ioutil.TempDir("", "test-config")
+				var err error
+				tmpDir, err = ioutil.TempDir("", "test-config")
 				if err != nil {
 					Fail("Couldn't create tmp file")
 				}
@@ -225,9 +226,7 @@ var _ = Describe("Configuration Repository", func() {
 			})
 
 			AfterEach(func() {
-				if tmpDir != "" {
-					os.RemoveAll(tmpDir)
-				}
+				Expect(os.RemoveAll(tmpDir)).ToNot(HaveOccurred())
 			})
 
 			It("has sane defaults when there is no config to read", func() {

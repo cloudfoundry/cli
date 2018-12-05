@@ -218,6 +218,11 @@ var _ = Describe("Buildpack", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
+			AfterEach(func() {
+				Expect(os.RemoveAll(inPath)).ToNot(HaveOccurred())
+				Expect(os.RemoveAll(tmpDirPath)).ToNot(HaveOccurred())
+			})
+
 			It("returns an error", func() {
 				Expect(executeErr).To(MatchError(actionerror.EmptyBuildpackDirectoryError{Path: inPath}))
 			})
