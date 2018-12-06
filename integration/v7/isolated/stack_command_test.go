@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"regexp"
 )
 
 var _ = Describe("stack command", func() {
@@ -114,7 +115,7 @@ var _ = Describe("stack command", func() {
 			})
 
 			AfterEach(func() {
-				session := helpers.CF("curl", "-X", "DELETE", "/v3/stacks/" + stackGuid)
+				session := helpers.CF("curl", "-X", "DELETE", fmt.Sprintf("/v3/stacks/%s", stackGuid))
 				Eventually(session).Should(Exit(0))
 			})
 
