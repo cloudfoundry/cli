@@ -565,3 +565,13 @@ jobs:
       trigger: true
     - put: bump-v7-version
       params: {pre: beta}
+
+- name: create-release-marker
+  serial: true
+  plan:
+    - aggregate:
+      - get: bump-v7-version
+        passed: [bump-cli-v7-version]
+      - get: cli-ci
+    - task: create-release-marker
+      file: cli-ci/ci/cli-v7/tasks/create-release-marker.yml

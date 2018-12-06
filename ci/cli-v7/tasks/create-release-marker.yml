@@ -1,0 +1,19 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
+
+inputs:
+  - name: bump-v7-version
+  - name: cli-ci
+
+params:
+  TRACKER_PROJECT_ID:
+  TRACKER_API_KEY:
+
+
+run:
+  path: cli-ci/ci/cli-v7/tasks/create-release-marker.sh
