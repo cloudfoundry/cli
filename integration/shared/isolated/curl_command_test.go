@@ -44,7 +44,7 @@ var _ = Describe("curl command", func() {
 
 	var ExpectRequestHeaders = func(session *Session) {
 		Eventually(session).Should(Say(`REQUEST: .*\n`))
-		Eventually(session).Should(Say(`GET /v2/apps HTTP/1.1`))
+		Eventually(session).Should(Say(`[GET|POST|PUT|DELETE] /v2/apps HTTP/1.1`))
 		Eventually(session).Should(Say(`Host: .*\n`))
 		Eventually(session).Should(Say(`Accept: .*\n`))
 		Eventually(session).Should(Say(`Authorization:\s+\[PRIVATE DATA HIDDEN\]`))
@@ -52,7 +52,7 @@ var _ = Describe("curl command", func() {
 		Eventually(session).Should(Say(`User-Agent: .*\n`))
 	}
 
-	var ExpectReponseHeaders = func(session *Session) {
+	var ExpectResponseHeaders = func(session *Session) {
 		Eventually(session).Should(Say("HTTP/1.1 200 OK"))
 		Eventually(session).Should(Say(`Connection:`))
 		Eventually(session).Should(Say(`Content-Length:`))
@@ -83,10 +83,10 @@ var _ = Describe("curl command", func() {
 			})
 		})
 
-		When("unkown flag is specified", func() {
+		When("unknown flag is specified", func() {
 			It("fails and displays the help text", func() {
 				session := helpers.CF("curl", "--test")
-				// TODO Legacy cf uses a weird quote arount test. This test needs be fixed for refactored command
+				// TODO Legacy cf uses a weird quote around test. This test needs be fixed for refactored command
 				Eventually(session.Err).Should(Say("Incorrect Usage: unknown flag `test'"))
 				ExpectHelpText(session)
 				Eventually(session).Should(Exit(1))
@@ -106,7 +106,7 @@ var _ = Describe("curl command", func() {
 	})
 
 	When("the user is not logged in", func() {
-		It("makes the request and recieves an unauthenticated error", func() {
+		It("makes the request and receives an unauthenticated error", func() {
 			session := helpers.CF("curl", "/v2/apps")
 			expectedJSON := `{
 				 "description": "Authentication error",
@@ -156,7 +156,7 @@ var _ = Describe("curl command", func() {
 					session := helpers.CF("curl", "/v2/apps", "-i")
 					Eventually(session).Should(Exit(0))
 
-					ExpectReponseHeaders(session)
+					ExpectResponseHeaders(session)
 					contents := string(session.Out.Contents())
 					jsonStartsAt := strings.Index(contents, "{")
 
@@ -171,7 +171,7 @@ var _ = Describe("curl command", func() {
 					Eventually(session).Should(Exit(0))
 
 					ExpectRequestHeaders(session)
-					ExpectReponseHeaders(session)
+					ExpectResponseHeaders(session)
 
 					contents := string(session.Out.Contents())
 					jsonStartsAt := strings.Index(contents, "{")
@@ -228,6 +228,47 @@ var _ = Describe("curl command", func() {
 				})
 			})
 
+			When("-d is passed with a request body", func() {
+				When("the request body is passed as a string", func() {
+					It("sets the method to POST and sends the body", func() {
+						orgGUID := helpers.GetOrgGUID(orgName)
+						spaceName := helpers.NewSpaceName()
+						jsonBody := fmt.Sprintf(`{"name":"%s", "organization_guid":"%s"}`, spaceName, orgGUID)
+						session := helpers.CF("curl", "/v2/spaces", "-d", jsonBody)
+						Eventually(session).Should(Exit(0))
+						Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
+					})
+				})
+
+				When("the request body is passed as a file", func() {
+					var spaceName, filePath, dir string
+
+					BeforeEach(func() {
+						var err error
+						dir, err = ioutil.TempDir("", "curl-command")
+						Expect(err).ToNot(HaveOccurred())
+
+						filePath = filepath.Join(dir, "request_body.json")
+						orgGUID := helpers.GetOrgGUID(orgName)
+						spaceName = helpers.NewSpaceName()
+
+						jsonBody := fmt.Sprintf(`{"name":"%s", "organization_guid":"%s"}`, spaceName, orgGUID)
+						err = ioutil.WriteFile(filePath, []byte(jsonBody), 0666)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					AfterEach(func() {
+						os.RemoveAll(dir)
+					})
+
+					It("sets the method to POST and sends the body", func() {
+						session := helpers.CF("curl", "/v2/spaces", "-d", "@"+filePath)
+						Eventually(session).Should(Exit(0))
+						Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
+					})
+				})
+			})
+
 			When("-X is passed with the HTTP method", func() {
 				var spaceGUID, spaceName string
 
@@ -246,44 +287,79 @@ var _ = Describe("curl command", func() {
 				})
 			})
 
-			When("-d is passed with a request body", func() {
-				When("the request body is passed as a string", func() {
-					It("sets the method to POST and sends the body", func() {
-						orgGUID := helpers.GetOrgGUID(orgName)
-						spaceName := helpers.NewSpaceName()
-						jsonBody := fmt.Sprintf(`{"name":"%s", "organization_guid":"%s"}`, spaceName, orgGUID)
-						session := helpers.CF("curl", "/v2/spaces", "-d", jsonBody)
-						Eventually(session).Should(Exit(0))
-						Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
-					})
+			When("--output is passed with a file name", func() {
+				It("should write the response body to the file", func() {
+					outFile, err := ioutil.TempFile("", "output*.json")
+					Expect(err).ToNot(HaveOccurred())
+					session := helpers.CF("curl", "/v2/apps", "-i", "--output", outFile.Name())
+					Eventually(session).Should(Exit(0))
+					ExpectResponseHeaders(session)
+					body, err := ioutil.ReadFile(outFile.Name())
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(body)).To(MatchJSON(expectedJSON))
 				})
 			})
 
-			When("the request body is passed as a file", func() {
-				var spaceName, filePath, dir string
+			Context("Flag combinations", func() {
+				When("-i and -v flags are set", func() {
+					It("should print both the request and response headers", func() {
+						session := helpers.CF("curl", "/v2/apps", "-v", "-i")
+						Eventually(session).Should(Exit(0))
 
-				BeforeEach(func() {
-					var err error
-					dir, err = ioutil.TempDir("", "curl-command")
-					Expect(err).ToNot(HaveOccurred())
+						ExpectRequestHeaders(session)
+						ExpectResponseHeaders(session)
 
-					filePath = filepath.Join(dir, "request_body.json")
-					orgGUID := helpers.GetOrgGUID(orgName)
-					spaceName = helpers.NewSpaceName()
+						contents := string(session.Out.Contents())
+						jsonStartsAt := strings.Index(contents, "{")
 
-					jsonBody := fmt.Sprintf(`{"name":"%s", "organization_guid":"%s"}`, spaceName, orgGUID)
-					err = ioutil.WriteFile(filePath, []byte(jsonBody), 0666)
-					Expect(err).ToNot(HaveOccurred())
+						actualJSON := contents[jsonStartsAt:]
+						Expect(actualJSON).To(MatchJSON(expectedJSON))
+					})
 				})
 
-				AfterEach(func() {
-					os.RemoveAll(dir)
+				XWhen("-v and --output flags are passed", func() {
+					It("should print the headers to the terminal and the response to the file", func() {
+						// TODO This is a bug in the legacy CLI. Please write the test and fix the bug after refactor
+					})
 				})
 
-				It("sets the method to POST and sends the body", func() {
-					session := helpers.CF("curl", "/v2/spaces", "-d", "@"+filePath)
-					Eventually(session).Should(Exit(0))
-					Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
+				When("-X, -H and -d flags are passed", func() {
+					var spaceName, filePath, dir, jsonBody string
+
+					BeforeEach(func() {
+						var err error
+						dir, err = ioutil.TempDir("", "curl-command")
+						Expect(err).ToNot(HaveOccurred())
+
+						filePath = filepath.Join(dir, "request_body.json")
+						orgGUID := helpers.GetOrgGUID(orgName)
+						spaceName = helpers.NewSpaceName()
+
+						jsonBody = fmt.Sprintf(`{"name":"%s", "organization_guid":"%s"}`, spaceName, orgGUID)
+						err = ioutil.WriteFile(filePath, []byte(jsonBody), 0666)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					AfterEach(func() {
+						os.RemoveAll(dir)
+					})
+
+					It("should set the custom header and use the request body from -d", func() {
+						session := helpers.CF("curl", "/v2/spaces", "-X", "POST", "-H", "X-Foo: foo", "-H", "X-Bar: bar", "-d", "@"+filePath, "-v")
+						Eventually(session).Should(Exit(0))
+
+						Expect(session).Should(Say("REQUEST:"))
+						Expect(session).Should(Say("POST"))
+
+						Expect(session).Should(Say("X-Bar: bar"))
+						Expect(session).Should(Say("X-Foo: foo"))
+
+						Expect(session).Should(Say(jsonBody))
+
+						Expect(session).Should(Say("RESPONSE:"))
+
+						Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
+					})
 				})
 			})
 		})
