@@ -43,24 +43,24 @@ var _ = Describe("curl command", func() {
 	}
 
 	var ExpectRequestHeaders = func(session *Session) {
-		Eventually(session).Should(Say(`REQUEST: .*\n`))
-		Eventually(session).Should(Say(`[GET|POST|PUT|DELETE] /v2/apps HTTP/1.1`))
-		Eventually(session).Should(Say(`Host: .*\n`))
-		Eventually(session).Should(Say(`Accept: .*\n`))
+		Eventually(session).Should(Say(`REQUEST: .+`))
+		Eventually(session).Should(Say(`(GET|POST|PUT|DELETE) /v2/apps HTTP/1.1`))
+		Eventually(session).Should(Say(`Host: .+`))
+		Eventually(session).Should(Say(`Accept: .+`))
 		Eventually(session).Should(Say(`Authorization:\s+\[PRIVATE DATA HIDDEN\]`))
-		Eventually(session).Should(Say(`Content-Type: .*\n`))
-		Eventually(session).Should(Say(`User-Agent: .*\n`))
+		Eventually(session).Should(Say(`Content-Type: .+`))
+		Eventually(session).Should(Say(`User-Agent: .+`))
 	}
 
 	var ExpectResponseHeaders = func(session *Session) {
 		Eventually(session).Should(Say("HTTP/1.1 200 OK"))
-		Eventually(session).Should(Say(`Connection:`))
-		Eventually(session).Should(Say(`Content-Length:`))
-		Eventually(session).Should(Say(`Content-Type:`))
-		Eventually(session).Should(Say(`Date:`))
-		Eventually(session).Should(Say(`Server:`))
-		Eventually(session).Should(Say(`X-Content-Type-Options:`))
-		Eventually(session).Should(Say(`X-Vcap-Request-Id:`))
+		Eventually(session).Should(Say(`Connection: .+`))
+		Eventually(session).Should(Say(`Content-Length: .+`))
+		Eventually(session).Should(Say(`Content-Type: .+`))
+		Eventually(session).Should(Say(`Date: .+`))
+		Eventually(session).Should(Say(`Server: .+`))
+		Eventually(session).Should(Say(`X-Content-Type-Options: .+`))
+		Eventually(session).Should(Say(`X-Vcap-Request-Id: .+`))
 	}
 
 	Describe("Help Text", func() {
@@ -117,6 +117,17 @@ var _ = Describe("curl command", func() {
 			Expect(session.Out.Contents()).To(MatchJSON(expectedJSON))
 		})
 	})
+	Context("User Agent", func() {
+		It("sets the User-Agent Header to match the CLI version", func() {
+			session := helpers.CF("curl", "/v2/info", "-v")
+			Eventually(session).Should(Exit(0))
+
+			//TODO The user agent is different in refactored commands, so this should when
+			// we refactor cf curl
+			versionPattern := `\d{1,}\.\d{2,}\.\d+\+[a-f0-9]+\.\d{4}-\d{2}-\d{2} / \w`
+			Expect(session).To(Say(`User-Agent: go-cli %s`, versionPattern))
+		})
+	})
 
 	When("the user is logged in", func() {
 		var orgName string
@@ -130,7 +141,7 @@ var _ = Describe("curl command", func() {
 			helpers.TargetOrg(orgName)
 		})
 
-		When("PATH is valid", func() {
+		When("the path is valid", func() {
 			var expectedJSON string
 
 			BeforeEach(func() {
@@ -141,6 +152,24 @@ var _ = Describe("curl command", func() {
             "next_url": null,
             "resources": []
 				}`
+			})
+
+			When("the path has multiple initial slashes", func() {
+				It("changes the path to use only one slash", func() {
+					session := helpers.CF("curl", "////v2/apps", "-v")
+					Eventually(session).Should(Exit(0))
+
+					Eventually(session).Should(Say(`GET /v2/apps HTTP/1.1`))
+				})
+			})
+
+			When("the path has no initial slashes", func() {
+				It("prepends a slash to the path", func() {
+					session := helpers.CF("curl", "v2/apps", "-v")
+					Eventually(session).Should(Exit(0))
+
+					Eventually(session).Should(Say(`GET /v2/apps HTTP/1.1`))
+				})
 			})
 
 			When("no flag is set", func() {
@@ -193,7 +222,7 @@ var _ = Describe("curl command", func() {
 					})
 
 					When("multiple headers are provided", func() {
-						It("should add all the custom headers to the request", func() {
+						It("adds all the custom headers to the request", func() {
 							session := helpers.CF("curl", "/v2/apps", "-H", "X-Bar: bar", "-H", "X-Foo: foo", "-v")
 							Eventually(session).Should(Exit(0))
 
@@ -202,15 +231,52 @@ var _ = Describe("curl command", func() {
 							Expect(session).To(Say("X-Foo: foo"))
 							Expect(session).To(Say("RESPONSE:"))
 						})
+
+						When("the same header field is passed", func() {
+							It("adds the same header field twice", func() {
+								session := helpers.CF("curl", "/v2/apps", "-H", "X-Foo: bar", "-H", "X-Foo: foo", "-v")
+								Eventually(session).Should(Exit(0))
+
+								Expect(session).To(Say("REQUEST:"))
+								Expect(session).To(Say("X-Foo: bar"))
+								Expect(session).To(Say("X-Foo: foo"))
+								Expect(session).To(Say("RESPONSE:"))
+							})
+						})
 					})
 
 					When("-H is provided with a default header", func() {
-						It("overrides the value of the header", func() {
+						It("overrides the value of User-Agent header", func() {
 							session := helpers.CF("curl", "/v2/apps", "-H", "User-Agent: smith", "-v")
 							Eventually(session).Should(Exit(0))
 
 							Expect(session).To(Say("REQUEST:"))
 							Expect(session).To(Say("User-Agent: smith"))
+							Expect(session).To(Say("RESPONSE:"))
+						})
+
+						It("does not override the Host header", func() {
+							session := helpers.CF("curl", "/v2/apps", "-H", "Host: example.com", "-v")
+							Eventually(session).Should(Exit(0))
+
+							Expect(session).ToNot(Say("Host: example.com"))
+						})
+
+						It("overrides the value of Accept header", func() {
+							session := helpers.CF("curl", "/v2/apps", "-H", "Accept: application/xml", "-v")
+							Eventually(session).Should(Exit(0))
+
+							Expect(session).To(Say("REQUEST:"))
+							Expect(session).To(Say("Accept: application/xml"))
+							Expect(session).To(Say("RESPONSE:"))
+						})
+
+						It("overrides the value of Content-Type header", func() {
+							session := helpers.CF("curl", "/v2/apps", "-H", "Content-Type: application/xml", "-v")
+							Eventually(session).Should(Exit(0))
+
+							Expect(session).To(Say("REQUEST:"))
+							Expect(session).To(Say("Content-Type: application/xml"))
 							Expect(session).To(Say("RESPONSE:"))
 						})
 					})
@@ -266,6 +332,27 @@ var _ = Describe("curl command", func() {
 						Eventually(session).Should(Exit(0))
 						Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
 					})
+
+					When("the file does not exist", func() {
+						It("fails and displays an error message", func() {
+							_, err := os.Stat("this-file-does-not-exist")
+							Expect(os.IsExist(err)).To(BeFalse())
+
+							session := helpers.CF("curl", "/v2/spaces", "-d", "@this-file-does-not-exist")
+							Eventually(session).Should(Exit(1))
+							Expect(session).To(Say("no such file or directory"))
+						})
+					})
+
+					When("the file is a symlink", func() {
+						It("follows the symlink", func() {
+							linkPath := filepath.Join(dir, "link-name.json")
+							Expect(os.Symlink(filePath, linkPath)).To(Succeed())
+							session := helpers.CF("curl", "-d", "@"+linkPath, "/v2/spaces")
+							Eventually(session).Should(Exit(0))
+							Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
+						})
+					})
 				})
 			})
 
@@ -278,7 +365,7 @@ var _ = Describe("curl command", func() {
 					spaceGUID = helpers.GetSpaceGUID(spaceName)
 				})
 
-				It("should change the HTTP method of the request", func() {
+				It("changes the HTTP method of the request", func() {
 					path := fmt.Sprintf("/v2/spaces/%s", spaceGUID)
 					session := helpers.CF("curl", path, "-X", "DELETE", "-v")
 					Eventually(session).Should(Exit(0))
@@ -288,7 +375,7 @@ var _ = Describe("curl command", func() {
 			})
 
 			When("--output is passed with a file name", func() {
-				It("should write the response body to the file", func() {
+				It("writes the response body to the file", func() {
 					outFile, err := ioutil.TempFile("", "output*.json")
 					Expect(err).ToNot(HaveOccurred())
 					session := helpers.CF("curl", "/v2/apps", "-i", "--output", outFile.Name())
@@ -302,7 +389,7 @@ var _ = Describe("curl command", func() {
 
 			Context("Flag combinations", func() {
 				When("-i and -v flags are set", func() {
-					It("should print both the request and response headers", func() {
+					It("prints both the request and response headers", func() {
 						session := helpers.CF("curl", "/v2/apps", "-v", "-i")
 						Eventually(session).Should(Exit(0))
 
@@ -318,8 +405,8 @@ var _ = Describe("curl command", func() {
 				})
 
 				XWhen("-v and --output flags are passed", func() {
-					It("should print the headers to the terminal and the response to the file", func() {
-						// TODO This is a bug in the legacy CLI. Please write the test and fix the bug after refactor
+					It("prints the headers to the terminal and the response to the file", func() {
+						// TODO This is a bug in the legacy CLI. Please write the test and fix the bug after refactor [#162432878]
 					})
 				})
 
@@ -344,7 +431,7 @@ var _ = Describe("curl command", func() {
 						os.RemoveAll(dir)
 					})
 
-					It("should set the custom header and use the request body from -d", func() {
+					It("sets the custom header and use the request body from -d", func() {
 						session := helpers.CF("curl", "/v2/spaces", "-X", "POST", "-H", "X-Foo: foo", "-H", "X-Bar: bar", "-d", "@"+filePath, "-v")
 						Eventually(session).Should(Exit(0))
 
@@ -359,6 +446,28 @@ var _ = Describe("curl command", func() {
 						Expect(session).Should(Say("RESPONSE:"))
 
 						Eventually(helpers.CF("space", spaceName)).Should(Exit(0))
+					})
+				})
+			})
+
+			Context("Refresh Token", func() {
+				When("the auth token is invalid", func() {
+					var spaceGUID, spaceName string
+
+					BeforeEach(func() {
+						spaceName = helpers.NewSpaceName()
+						helpers.CreateSpace(spaceName)
+						spaceGUID = helpers.GetSpaceGUID(spaceName)
+					})
+
+					It("generates a new auth token by using the refresh token", func() {
+						path := fmt.Sprintf("/v2/spaces/%s", spaceGUID)
+						session := helpers.CF("curl", path, "-H", "Authorization: bearer some-token", "-X", "DELETE", "-v")
+						Eventually(session).Should(Exit(0))
+
+						Expect(session).To(Say("POST /oauth/token"))
+
+						Eventually(helpers.CF("space", spaceName)).Should(Exit(1))
 					})
 				})
 			})
