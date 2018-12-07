@@ -340,7 +340,7 @@ var _ = Describe("curl command", func() {
 
 							session := helpers.CF("curl", "/v2/spaces", "-d", "@this-file-does-not-exist")
 							Eventually(session).Should(Exit(1))
-							Expect(session).To(Say("no such file or directory"))
+							Expect(session).To(Say("FAILED"))
 						})
 					})
 
