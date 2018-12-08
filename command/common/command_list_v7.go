@@ -175,7 +175,7 @@ type commandList struct {
 	StagingSecurityGroups              v6.StagingSecurityGroupsCommand              `command:"staging-security-groups" description:"List security groups in the staging set for applications"`
 	Start                              v6.StartCommand                              `command:"start" alias:"st" description:"Start an app"`
 	Stop                               v6.StopCommand                               `command:"stop" alias:"sp" description:"Stop an app"`
-	Target                             v6.TargetCommand                             `command:"target" alias:"t" description:"Set or view the targeted org or space"`
+	Target                             v7.TargetCommand                             `command:"target" alias:"t" description:"Set or view the targeted org or space"`
 	Tasks                              v6.TasksCommand                              `command:"tasks" description:"List tasks of an app"`
 	TerminateTask                      v6.TerminateTaskCommand                      `command:"terminate-task" description:"Terminate a running task of an app"`
 	UnbindRouteService                 v6.UnbindRouteServiceCommand                 `command:"unbind-route-service" alias:"urs" description:"Unbind a service instance from an HTTP route"`
