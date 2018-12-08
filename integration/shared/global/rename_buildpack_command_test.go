@@ -19,7 +19,7 @@ var _ = Describe("rename buildpack command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("rename-buildpack - Rename a buildpack"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"))
+				Eventually(session).Should(Say(`cf rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME \[-s STACK\]`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("update-buildpack"))
 				Eventually(session).Should(Exit(0))
