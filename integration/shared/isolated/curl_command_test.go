@@ -124,7 +124,7 @@ var _ = Describe("curl command", func() {
 
 			//TODO The user agent is different in refactored commands, so this should when
 			// we refactor cf curl
-			versionPattern := `\d{1,}\.\d{2,}\.\d+\+[a-f0-9]+\.\d{4}-\d{2}-\d{2} / \w`
+			versionPattern := `\d{1,}\.\d{1,}\.\d+(-beta.\d)?\+[a-f0-9]+\.\d{4}-\d{2}-\d{2} / \w`
 			Expect(session).To(Say(`User-Agent: go-cli %s`, versionPattern))
 		})
 	})
