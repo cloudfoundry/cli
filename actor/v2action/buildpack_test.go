@@ -254,6 +254,7 @@ var _ = Describe("Buildpack", func() {
 		BeforeEach(func() {
 			oldName = "some-old-name"
 			newName = "some-new-name"
+			stackName = ""
 		})
 
 		JustBeforeEach(func() {
@@ -333,7 +334,6 @@ var _ = Describe("Buildpack", func() {
 					})
 				})
 			})
-
 		})
 
 		When("lookup is based on name and stack name of buildpack", func() {
