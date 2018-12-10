@@ -22,6 +22,7 @@ params:
   CF_INT_DOCKER_USERNAME:
   CF_INT_DOCKER_PASSWORD:
   CF_INT_IGNORE_API_VERSION_CHECK:
+  FLAKE_ATTEMPTS: 2
   TAGS: 'partialPush'
   NODES: 16
 
@@ -70,5 +71,5 @@ run:
 
     go get -u github.com/onsi/ginkgo/ginkgo
 
-    ginkgo -r -nodes=$NODES -tags=$TAGS -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
-    ginkgo -r -tags=$TAGS -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/global integration/v7/global
+    ginkgo -r -nodes=$NODES -tags=$TAGS -flakeAttempts=$FLAKE_ATTEMPTS -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated integration/v7/isolated integration/shared/plugin integration/shared/experimental integration/v7/experimental integration/v7/push
+    ginkgo -r -tags=$TAGS -flakeAttempts=$FLAKE_ATTEMPTS -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/global integration/v7/global
