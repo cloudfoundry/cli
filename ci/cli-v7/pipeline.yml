@@ -398,6 +398,7 @@ jobs:
         CF_INT_DOCKER_USERNAME: ((dockerhub-username))
         CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
         CF_INT_IGNORE_API_VERSION_CHECK: false
+        FLAKE_ATTEMPTS: 1
         TAGS: ''
   ensure:
     put: gcp-bosh-pool
