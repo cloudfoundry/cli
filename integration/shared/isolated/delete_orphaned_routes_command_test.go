@@ -83,7 +83,6 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 				})
-				Eventually(helpers.CF("apps")).Should(And(Exit(0), Say(fmt.Sprintf(`%s\s+stopped\s+0/1`, appName))))
 
 				boundRoute = helpers.NewRoute(spaceName, domainName, "bound-1", "path-3")
 				boundRoute.Create()
