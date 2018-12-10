@@ -1,5 +1,3 @@
-// +build !partialPush
-
 package isolated
 
 import (
@@ -190,11 +188,9 @@ var _ = Describe("help command", func() {
 					session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 					Expect(err).NotTo(HaveOccurred())
 
-					Eventually(session).Should(Say(`
-ENVIRONMENT:
-   CF_STAGING_TIMEOUT=15        Max wait time for buildpack staging, in minutes
-   CF_STARTUP_TIMEOUT=5         Max wait time for app instance startup, in minutes
-`))
+					Eventually(session).Should(Say("ENVIRONMENT:"))
+					Eventually(session).Should(Say("CF_STAGING_TIMEOUT=15\\s+Max wait time for buildpack staging, in minutes"))
+					Eventually(session).Should(Say("CF_STARTUP_TIMEOUT=5\\s+Max wait time for app instance startup, in minutes"))
 					Eventually(session).Should(Exit(exitCode))
 				},
 
