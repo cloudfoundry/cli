@@ -195,12 +195,12 @@ resources:
 
 # values for this already exist in last pass, blocked on
 # blocked on https://github.com/concourse/concourse/issues/1407
-# - name: cf-cli-tracker
-#   type: tracker
-#   source:
-#     token: ((cf-cli-public-tracker-token))
-#     project_id: ((vat-public-tracker-project-id))
-#     tracker_url: https://www.pivotaltracker.com
+- name: cf-cli-tracker
+  type: tracker
+  source:
+    token: ((cf-cli-public-tracker-token))
+    project_id: '2196383'
+    tracker_url: https://www.pivotaltracker.com
 
 jobs:
 - name: units
@@ -566,6 +566,19 @@ jobs:
     - put: bump-v7-version
       params: {pre: beta}
 
+- name: deliver-stories
+  serial: true
+  plan:
+  - get: cli
+    passed:
+    - integration-linux
+    - integration-windows
+    trigger: true
+  - put: cf-cli-tracker
+    params:
+      repos:
+      - cli
+
 - name: create-release-marker
   serial: true
   plan:
@@ -575,3 +588,6 @@ jobs:
       - get: cli-ci
     - task: create-release-marker
       file: cli-ci/ci/cli-v7/tasks/create-release-marker.yml
+      params:
+        TRACKER_API_KEY: ((cf-cli-public-tracker-token))
+        TRACKER_PROJECT_ID: ((vat-public-tracker-project-id))
