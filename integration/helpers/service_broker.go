@@ -110,7 +110,14 @@ func (b ServiceBroker) Push() {
 		"--no-start",
 		"-m", DefaultMemoryLimit,
 		"-p", b.Path,
-		"-d", b.AppsDomain,
+		"--no-route",
+	)).Should(Exit(0))
+
+	Eventually(CF(
+		"map-route",
+		b.Name,
+		b.AppsDomain,
+		"--hostname", b.Name,
 	)).Should(Exit(0))
 
 	Eventually(CF("start", b.Name)).Should(Exit(0))
