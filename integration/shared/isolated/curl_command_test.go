@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -117,15 +118,20 @@ var _ = Describe("curl command", func() {
 			Expect(session.Out.Contents()).To(MatchJSON(expectedJSON))
 		})
 	})
-	Context("User Agent", func() {
-		It("sets the User-Agent Header to match the CLI version", func() {
+
+	Describe("User Agent", func() {
+		It("sets the User-Agent Header to contain the CLI version", func() {
+			getVersionNumber := func() string {
+				versionSession := helpers.CF("version")
+				Eventually(versionSession).Should(Exit(0))
+				versionPattern := regexp.MustCompile("cf version (.+)")
+				version := versionPattern.FindStringSubmatch(string(versionSession.Out.Contents()))
+				return regexp.QuoteMeta(version[1])
+			}
 			session := helpers.CF("curl", "/v2/info", "-v")
 			Eventually(session).Should(Exit(0))
 
-			//TODO The user agent is different in refactored commands, so this should when
-			// we refactor cf curl
-			versionPattern := `\d{1,}\.\d{1,}\.\d+(-beta.\d)?\+[a-f0-9]+\.\d{4}-\d{2}-\d{2} / \w`
-			Expect(session).To(Say(`User-Agent: go-cli %s`, versionPattern))
+			Expect(session).To(Say(`User-Agent: go-cli %s`, getVersionNumber()))
 		})
 	})
 
@@ -256,10 +262,19 @@ var _ = Describe("curl command", func() {
 						})
 
 						It("does not override the Host header", func() {
+							getHost := func() string {
+								apiSession := helpers.CF("api")
+								Eventually(apiSession).Should(Exit(0))
+								output := string(apiSession.Out.Contents())
+								lines := strings.Split(output, "\n")
+								Expect(len(lines)).To(BeNumerically(">=", 1))
+								parts := strings.Split(lines[0], "//")
+								Expect(len(parts)).To(BeNumerically(">=", 2))
+								return parts[1]
+							}
 							session := helpers.CF("curl", "/v2/apps", "-H", "Host: example.com", "-v")
 							Eventually(session).Should(Exit(0))
-
-							Expect(session).ToNot(Say("Host: example.com"))
+							Expect(session).To(Say("Host: " + getHost()))
 						})
 
 						It("overrides the value of Accept header", func() {
@@ -375,7 +390,7 @@ var _ = Describe("curl command", func() {
 			})
 
 			When("--output is passed with a file name", func() {
-				It("writes the response body to the file", func() {
+				It("writes the response body to the file but the other output to stdout", func() {
 					outFile, err := ioutil.TempFile("", "output*.json")
 					Expect(err).ToNot(HaveOccurred())
 					session := helpers.CF("curl", "/v2/apps", "-i", "--output", outFile.Name())
@@ -385,9 +400,37 @@ var _ = Describe("curl command", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(body)).To(MatchJSON(expectedJSON))
 				})
+
+				When("--output is passed and CF_TRACE is set to a file", func() {
+					var tempDir, traceFile, outFile string
+					BeforeEach(func() {
+						var err error
+						tempDir, err = ioutil.TempDir("", "")
+						Expect(err).ToNot(HaveOccurred())
+						traceFile = filepath.Join(tempDir, "trace.log")
+						outFile = filepath.Join(tempDir, "output")
+					})
+
+					AfterEach(func() {
+						Expect(os.RemoveAll(tempDir)).To(Succeed())
+					})
+
+					It("writes the response body to the --output file and everything to the trace file", func() {
+						session := helpers.CFWithEnv(map[string]string{"CF_TRACE": traceFile}, "curl", "/v2/apps", "--output", outFile)
+						Eventually(session).Should(Exit(0))
+
+						outBytes, err := ioutil.ReadFile(outFile)
+						Expect(err).ToNot(HaveOccurred())
+						Expect(string(outBytes)).To(MatchJSON(expectedJSON))
+
+						traceBytes, err := ioutil.ReadFile(traceFile)
+						Expect(traceBytes).To(ContainSubstring("REQUEST: "))
+						Expect(traceBytes).To(ContainSubstring("HTTP/1.1 200 OK"))
+					})
+				})
 			})
 
-			Context("Flag combinations", func() {
+			Describe("Flag combinations", func() {
 				When("-i and -v flags are set", func() {
 					It("prints both the request and response headers", func() {
 						session := helpers.CF("curl", "/v2/apps", "-v", "-i")
@@ -450,30 +493,28 @@ var _ = Describe("curl command", func() {
 				})
 			})
 
-			Context("Refresh Token", func() {
-				When("the auth token is invalid", func() {
-					var spaceGUID, spaceName string
+			When("the auth token is invalid", func() {
+				var spaceGUID, spaceName string
 
-					BeforeEach(func() {
-						spaceName = helpers.NewSpaceName()
-						helpers.CreateSpace(spaceName)
-						spaceGUID = helpers.GetSpaceGUID(spaceName)
-					})
+				BeforeEach(func() {
+					spaceName = helpers.NewSpaceName()
+					helpers.CreateSpace(spaceName)
+					spaceGUID = helpers.GetSpaceGUID(spaceName)
+				})
 
-					It("generates a new auth token by using the refresh token", func() {
-						path := fmt.Sprintf("/v2/spaces/%s", spaceGUID)
-						session := helpers.CF("curl", path, "-H", "Authorization: bearer some-token", "-X", "DELETE", "-v")
-						Eventually(session).Should(Exit(0))
+				It("generates a new auth token by using the refresh token", func() {
+					path := fmt.Sprintf("/v2/spaces/%s", spaceGUID)
+					session := helpers.CF("curl", path, "-H", "Authorization: bearer some-token", "-X", "DELETE", "-v")
+					Eventually(session).Should(Exit(0))
 
-						Expect(session).To(Say("POST /oauth/token"))
+					Expect(session).To(Say("POST /oauth/token"))
 
-						Eventually(helpers.CF("space", spaceName)).Should(Exit(1))
-					})
+					Eventually(helpers.CF("space", spaceName)).Should(Exit(1))
 				})
 			})
 		})
 
-		When("PATH is invalid", func() {
+		When("the path is invalid", func() {
 			It("makes the request and displays the unknown request json", func() {
 				expectedJSON := `{
 				 "description": "Unknown request",
