@@ -586,6 +586,7 @@ jobs:
     - aggregate:
       - get: bump-v7-version
         passed: [bump-cli-v7-version]
+        trigger: true
       - get: cli-ci
     - task: create-release-marker
       file: cli-ci/ci/cli-v7/tasks/create-release-marker.yml
