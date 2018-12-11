@@ -20,7 +20,7 @@ type ScaleActor interface {
 	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
 	StopApplication(appGUID string) (v7action.Warnings, error)
 	StartApplication(appGUID string) (v7action.Application, v7action.Warnings, error)
-	PollStart(appGUID string, warnings chan<- v7action.Warnings) error
+	PollStart(appGUID string) (v7action.Warnings, error)
 }
 
 type ScaleCommand struct {
@@ -91,23 +91,8 @@ func (cmd ScaleCommand) Execute(args []string) error {
 		return nil
 	}
 
-	pollWarnings := make(chan v7action.Warnings)
-	done := make(chan bool)
-	go func() {
-		defer close(done)
-		for {
-			select {
-			case message := <-pollWarnings:
-				cmd.UI.DisplayWarnings(message)
-			case <-done:
-				return
-			}
-		}
-	}()
-
-	err = cmd.Actor.PollStart(app.GUID, pollWarnings)
-	done <- true
-
+	warnings, err = cmd.Actor.PollStart(app.GUID)
+	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, ok := err.(actionerror.StartupTimeoutError); ok {
 			return translatableerror.StartupTimeoutError{

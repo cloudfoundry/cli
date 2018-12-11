@@ -158,20 +158,22 @@ func (actor Actor) RestartApplication(appGUID string) (Warnings, error) {
 	return Warnings(warnings), err
 }
 
-func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) error {
+func (actor Actor) PollStart(appGUID string) (Warnings, error) {
+	var allWarnings Warnings
 	processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
-	warningsChannel <- Warnings(warnings)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return err
+		return allWarnings, err
 	}
 
 	timeout := time.Now().Add(actor.Config.StartupTimeout())
 	for time.Now().Before(timeout) {
 		readyProcs := 0
 		for _, process := range processes {
-			ready, err := actor.processStatus(process, warningsChannel)
+			ready, warnings, err := actor.processStatus(process)
+			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
-				return err
+				return allWarnings, err
 			}
 
 			if ready {
@@ -180,12 +182,12 @@ func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) er
 		}
 
 		if readyProcs == len(processes) {
-			return nil
+			return allWarnings, nil
 		}
 		time.Sleep(actor.Config.PollingInterval())
 	}
 
-	return actionerror.StartupTimeoutError{}
+	return allWarnings, actionerror.StartupTimeoutError{}
 }
 
 // UpdateApplication updates the buildpacks on an application
@@ -216,28 +218,27 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 	}
 }
 
-func (actor Actor) processStatus(process ccv3.Process, warningsChannel chan<- Warnings) (bool, error) {
+func (actor Actor) processStatus(process ccv3.Process) (bool, Warnings, error) {
 	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
-	warningsChannel <- Warnings(warnings)
 	if err != nil {
-		return false, err
+		return false, Warnings(warnings), err
 	}
 	if len(instances) == 0 {
-		return true, nil
+		return true, Warnings(warnings), nil
 	}
 
 	for _, instance := range instances {
 		if instance.State == constant.ProcessInstanceRunning {
-			return true, nil
+			return true, Warnings(warnings), nil
 		}
 	}
 
 	for _, instance := range instances {
 		if instance.State != constant.ProcessInstanceCrashed {
-			return false, nil
+			return false, Warnings(warnings), nil
 		}
 	}
 
 	// all of the instances are crashed at this point
-	return true, nil
+	return true, Warnings(warnings), nil
 }

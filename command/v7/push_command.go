@@ -41,7 +41,7 @@ type PushActor interface {
 type V7ActorForPush interface {
 	AppActor
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
-	PollStart(appGUID string, warningsChannel chan<- v7action.Warnings) error
+	PollStart(appGUID string) (v7action.Warnings, error)
 	RestartApplication(appGUID string) (v7action.Warnings, error)
 }
 
@@ -161,23 +161,8 @@ func (cmd PushCommand) Execute(args []string) error {
 			return err
 		}
 
-		pollWarnings := make(chan v7action.Warnings)
-		done := make(chan bool)
-		go func() {
-			for {
-				select {
-				case message := <-pollWarnings:
-					cmd.UI.DisplayWarnings(message)
-				case <-done:
-					return
-				}
-			}
-		}()
-
-		err = cmd.VersionActor.PollStart(updatedState.Application.GUID, pollWarnings)
-		log.Debug("blocking on 'done'")
-		done <- true
-
+		warnings, err = cmd.VersionActor.PollStart(updatedState.Application.GUID)
+		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			if _, ok := err.(actionerror.StartupTimeoutError); ok {
 				return translatableerror.StartupTimeoutError{

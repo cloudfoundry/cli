@@ -383,24 +383,19 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("PollStart", func() {
-		var warningsChannel chan Warnings
-		var allWarnings Warnings
-		var funcDone chan interface{}
+		var (
+			appGUID string
+
+			warnings   Warnings
+			executeErr error
+		)
 
 		BeforeEach(func() {
-			warningsChannel = make(chan Warnings)
-			funcDone = make(chan interface{})
-			allWarnings = Warnings{}
-			go func() {
-				for {
-					select {
-					case warnings := <-warningsChannel:
-						allWarnings = append(allWarnings, warnings...)
-					case <-funcDone:
-						return
-					}
-				}
-			}()
+			appGUID = "some-guid"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.PollStart(appGUID)
 		})
 
 		When("getting the application processes fails", func() {
@@ -409,10 +404,8 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				err := actor.PollStart("some-guid", warningsChannel)
-				funcDone <- nil
-				Expect(allWarnings).To(ConsistOf("get-app-warning-1", "get-app-warning-2"))
-				Expect(err).To(MatchError(errors.New("some-error")))
+				Expect(executeErr).To(MatchError(errors.New("some-error")))
+				Expect(warnings).To(ConsistOf("get-app-warning-1", "get-app-warning-2"))
 			})
 		})
 
@@ -424,15 +417,12 @@ var _ = Describe("Application Actions", func() {
 				fakeConfig.PollingIntervalReturns(0)
 			})
 
-			JustBeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationProcessesReturns(
-					processes,
-					ccv3.Warnings{"get-app-warning-1"}, nil)
-			})
-
 			When("there is a single process", func() {
 				BeforeEach(func() {
 					processes = []ccv3.Process{{GUID: "abc123"}}
+					fakeCloudControllerClient.GetApplicationProcessesReturns(
+						processes,
+						ccv3.Warnings{"get-app-warning-1"}, nil)
 				})
 
 				When("the polling times out", func() {
@@ -447,17 +437,11 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("returns the timeout error", func() {
-						err := actor.PollStart("some-guid", warningsChannel)
-						funcDone <- nil
-
-						Expect(allWarnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
-						Expect(err).To(MatchError(actionerror.StartupTimeoutError{}))
+						Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
+						Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
 					})
 
 					It("gets polling and timeout values from the config", func() {
-						actor.PollStart("some-guid", warningsChannel)
-						funcDone <- nil
-
 						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 					})
@@ -473,11 +457,8 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("returns the error", func() {
-						err := actor.PollStart("some-guid", warningsChannel)
-						funcDone <- nil
-
-						Expect(allWarnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
-						Expect(err).To(MatchError("some-error"))
+						Expect(executeErr).To(MatchError("some-error"))
+						Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
 					})
 				})
 
@@ -485,15 +466,12 @@ var _ = Describe("Application Actions", func() {
 					var (
 						initialInstanceStates    []ccv3.ProcessInstance
 						eventualInstanceStates   []ccv3.ProcessInstance
-						pollStartErr             error
 						processInstanceCallCount int
 					)
 
 					BeforeEach(func() {
 						processInstanceCallCount = 0
-					})
 
-					JustBeforeEach(func() {
 						fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
 							defer func() { processInstanceCallCount++ }()
 							if processInstanceCallCount == 0 {
@@ -506,9 +484,6 @@ var _ = Describe("Application Actions", func() {
 									nil
 							}
 						}
-
-						pollStartErr = actor.PollStart("some-guid", warningsChannel)
-						funcDone <- nil
 					})
 
 					When("there are no process instances", func() {
@@ -518,7 +493,7 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("should not return an error", func() {
-							Expect(pollStartErr).NotTo(HaveOccurred())
+							Expect(executeErr).NotTo(HaveOccurred())
 						})
 
 						It("should only call GetProcessInstances once before exiting", func() {
@@ -526,7 +501,7 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("should return correct warnings", func() {
-							Expect(allWarnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
+							Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
 						})
 					})
 
@@ -537,7 +512,7 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("should not return an error", func() {
-							Expect(pollStartErr).NotTo(HaveOccurred())
+							Expect(executeErr).NotTo(HaveOccurred())
 						})
 
 						It("should call GetProcessInstances twice", func() {
@@ -545,7 +520,7 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("should return correct warnings", func() {
-							Expect(allWarnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
+							Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
 						})
 					})
 
@@ -556,7 +531,7 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("should not return an error", func() {
-							Expect(pollStartErr).NotTo(HaveOccurred())
+							Expect(executeErr).NotTo(HaveOccurred())
 						})
 
 						It("should call GetProcessInstances twice", func() {
@@ -564,8 +539,7 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("should return correct warnings", func() {
-							Expect(len(allWarnings)).To(Equal(4))
-							Expect(allWarnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
+							Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
 						})
 					})
 
@@ -576,7 +550,7 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("should not return an error", func() {
-							Expect(pollStartErr).NotTo(HaveOccurred())
+							Expect(executeErr).NotTo(HaveOccurred())
 						})
 
 						It("should call GetProcessInstances twice", func() {
@@ -584,8 +558,7 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("should return correct warnings", func() {
-							Expect(len(allWarnings)).To(Equal(4))
-							Expect(allWarnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
+							Expect(warnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
 						})
 					})
 				})
@@ -593,7 +566,6 @@ var _ = Describe("Application Actions", func() {
 
 			Context("where there are multiple processes", func() {
 				var (
-					pollStartErr             error
 					processInstanceCallCount int
 				)
 
@@ -601,9 +573,7 @@ var _ = Describe("Application Actions", func() {
 					processInstanceCallCount = 0
 					fakeConfig.StartupTimeoutReturns(time.Millisecond)
 					fakeConfig.PollingIntervalReturns(time.Millisecond * 2)
-				})
 
-				JustBeforeEach(func() {
 					fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
 						defer func() { processInstanceCallCount++ }()
 						if strings.HasPrefix(processGuid, "good") {
@@ -612,39 +582,44 @@ var _ = Describe("Application Actions", func() {
 							return []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}}, nil, nil
 						}
 					}
-
-					pollStartErr = actor.PollStart("some-guid", warningsChannel)
-					funcDone <- nil
 				})
 
 				When("none of the processes are ready", func() {
 					BeforeEach(func() {
 						processes = []ccv3.Process{{GUID: "bad-1"}, {GUID: "bad-2"}}
+						fakeCloudControllerClient.GetApplicationProcessesReturns(
+							processes,
+							ccv3.Warnings{"get-app-warning-1"}, nil)
 					})
 
 					It("returns the timeout error", func() {
-						Expect(pollStartErr).To(MatchError(actionerror.StartupTimeoutError{}))
+						Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
 					})
-
 				})
 
 				When("some of the processes are ready", func() {
 					BeforeEach(func() {
 						processes = []ccv3.Process{{GUID: "bad-1"}, {GUID: "good-1"}}
+						fakeCloudControllerClient.GetApplicationProcessesReturns(
+							processes,
+							ccv3.Warnings{"get-app-warning-1"}, nil)
 					})
 
 					It("returns the timeout error", func() {
-						Expect(pollStartErr).To(MatchError(actionerror.StartupTimeoutError{}))
+						Expect(executeErr).To(MatchError(actionerror.StartupTimeoutError{}))
 					})
 				})
 
 				When("all of the processes are ready", func() {
 					BeforeEach(func() {
 						processes = []ccv3.Process{{GUID: "good-1"}, {GUID: "good-2"}}
+						fakeCloudControllerClient.GetApplicationProcessesReturns(
+							processes,
+							ccv3.Warnings{"get-app-warning-1"}, nil)
 					})
 
 					It("returns nil", func() {
-						Expect(pollStartErr).ToNot(HaveOccurred())
+						Expect(executeErr).ToNot(HaveOccurred())
 					})
 				})
 			})
@@ -902,5 +877,4 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 	})
-
 })

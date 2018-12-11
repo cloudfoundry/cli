@@ -341,15 +341,11 @@ var _ = Describe("scale Command", func() {
 
 						When("polling succeeds", func() {
 							BeforeEach(func() {
-								fakeActor.PollStartStub = func(appGUID string, warnings chan<- v7action.Warnings) error {
-									warnings <- v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
-									return nil
-								}
+								fakeActor.PollStartReturns(v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}, nil)
 							})
 
 							It("delegates the right appGUID", func() {
-								actualGUID, _ := fakeActor.PollStartArgsForCall(0)
-								Expect(actualGUID).To(Equal("some-app-guid"))
+								Expect(fakeActor.PollStartArgsForCall(0)).To(Equal("some-app-guid"))
 							})
 
 							When("Restarting the app fails to stop the app", func() {
@@ -452,15 +448,11 @@ var _ = Describe("scale Command", func() {
 
 						When("polling the start fails", func() {
 							BeforeEach(func() {
-								fakeActor.PollStartStub = func(appGUID string, warnings chan<- v7action.Warnings) error {
-									warnings <- v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
-									return errors.New("some-error")
-								}
+								fakeActor.PollStartReturns(v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}, errors.New("some-error"))
 							})
 
 							It("delegates the right appGUID", func() {
-								actualGUID, _ := fakeActor.PollStartArgsForCall(0)
-								Expect(actualGUID).To(Equal("some-app-guid"))
+								Expect(fakeActor.PollStartArgsForCall(0)).To(Equal("some-app-guid"))
 							})
 
 							It("displays all warnings and fails", func() {
@@ -473,12 +465,11 @@ var _ = Describe("scale Command", func() {
 
 						When("polling times out", func() {
 							BeforeEach(func() {
-								fakeActor.PollStartReturns(actionerror.StartupTimeoutError{})
+								fakeActor.PollStartReturns(nil, actionerror.StartupTimeoutError{})
 							})
 
 							It("delegates the right appGUID", func() {
-								actualGUID, _ := fakeActor.PollStartArgsForCall(0)
-								Expect(actualGUID).To(Equal("some-app-guid"))
+								Expect(fakeActor.PollStartArgsForCall(0)).To(Equal("some-app-guid"))
 							})
 
 							It("returns the StartupTimeoutError", func() {

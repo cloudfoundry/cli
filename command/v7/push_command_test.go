@@ -373,10 +373,7 @@ var _ = Describe("push Command", func() {
 
 						When("polling the restart succeeds", func() {
 							BeforeEach(func() {
-								fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v7action.Warnings) error {
-									warnings <- v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
-									return nil
-								}
+								fakeVersionActor.PollStartReturns(v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}, nil)
 
 								summary := v7action.ApplicationSummary{
 									Application: v7action.Application{
@@ -442,10 +439,7 @@ var _ = Describe("push Command", func() {
 
 						When("polling the start fails", func() {
 							BeforeEach(func() {
-								fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v7action.Warnings) error {
-									warnings <- v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
-									return errors.New("some-error")
-								}
+								fakeVersionActor.PollStartReturns(v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}, errors.New("some-error"))
 							})
 
 							It("displays all warnings and fails", func() {
@@ -458,7 +452,7 @@ var _ = Describe("push Command", func() {
 
 						When("polling times out", func() {
 							BeforeEach(func() {
-								fakeVersionActor.PollStartReturns(actionerror.StartupTimeoutError{})
+								fakeVersionActor.PollStartReturns(nil, actionerror.StartupTimeoutError{})
 							})
 
 							It("returns the StartupTimeoutError", func() {
