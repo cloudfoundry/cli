@@ -41,7 +41,6 @@ type PushActor interface {
 type V7ActorForPush interface {
 	AppActor
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
-	PollStart(appGUID string) (v7action.Warnings, error)
 	RestartApplication(appGUID string) (v7action.Warnings, error)
 }
 
@@ -156,12 +155,6 @@ func (cmd PushCommand) Execute(args []string) error {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Waiting for app to start...")
 		warnings, err := cmd.VersionActor.RestartApplication(updatedState.Application.GUID)
-		cmd.UI.DisplayWarnings(warnings)
-		if err != nil {
-			return err
-		}
-
-		warnings, err = cmd.VersionActor.PollStart(updatedState.Application.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			if _, ok := err.(actionerror.StartupTimeoutError); ok {

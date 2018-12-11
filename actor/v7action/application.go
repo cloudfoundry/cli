@@ -151,11 +151,18 @@ func (actor Actor) StartApplication(appGUID string) (Application, Warnings, erro
 	return actor.convertCCToActorApplication(updatedApp), Warnings(warnings), nil
 }
 
-// RestartApplication restarts an application.
+// RestartApplication restarts an application and waits for it to start.
 func (actor Actor) RestartApplication(appGUID string) (Warnings, error) {
+	var allWarnings Warnings
 	_, warnings, err := actor.CloudControllerClient.UpdateApplicationRestart(appGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
 
-	return Warnings(warnings), err
+	pollingWarnings, err := actor.PollStart(appGUID)
+	allWarnings = append(allWarnings, pollingWarnings...)
+	return allWarnings, err
 }
 
 func (actor Actor) PollStart(appGUID string) (Warnings, error) {

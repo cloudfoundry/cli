@@ -362,97 +362,87 @@ var _ = Describe("push Command", func() {
 					When("restarting the app succeeds", func() {
 						BeforeEach(func() {
 							fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, nil)
+
+							summary := v7action.ApplicationSummary{
+								Application: v7action.Application{
+									Name:  appName,
+									State: constant.ApplicationStarted,
+								},
+								CurrentDroplet: v7action.Droplet{
+									Stack: "cflinuxfs2",
+									Buildpacks: []v7action.Buildpack{
+										{
+											Name:         "ruby_buildpack",
+											DetectOutput: "some-detect-output",
+										},
+										{
+											Name:         "some-buildpack",
+											DetectOutput: "",
+										},
+									},
+								},
+								ProcessSummaries: v7action.ProcessSummaries{
+									{
+										Process: v7action.Process{
+											Type:    constant.ProcessTypeWeb,
+											Command: *types.NewFilteredString("some-command-1"),
+										},
+									},
+									{
+										Process: v7action.Process{
+											Type:    "console",
+											Command: *types.NewFilteredString("some-command-2"),
+										},
+									},
+								},
+							}
+							fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturns(summary, v7action.Warnings{"app-summary-warning-1", "app-summary-warning-2"}, nil)
 						})
 
 						It("restarts the app and displays warnings", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Err).To(Say("some-restart-warning"))
+
 							Expect(fakeVersionActor.RestartApplicationCallCount()).To(Equal(1))
 							Expect(fakeVersionActor.RestartApplicationArgsForCall(0)).To(Equal("potato"))
-							Expect(testUI.Err).To(Say("some-restart-warning"))
 						})
 
-						When("polling the restart succeeds", func() {
+						It("displays the app summary", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say(`name:\s+some-app`))
+							Expect(testUI.Out).To(Say(`requested state:\s+started`))
+							Expect(testUI.Out).To(Say("type:\\s+web"))
+							Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
+							Expect(testUI.Out).To(Say("type:\\s+console"))
+							Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+
+							Expect(testUI.Err).To(Say("warning-1"))
+							Expect(testUI.Err).To(Say("warning-2"))
+
+							Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+							name, spaceGUID, withObfuscatedValues, _ := fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+							Expect(name).To(Equal("some-app"))
+							Expect(spaceGUID).To(Equal("some-space-guid"))
+							Expect(withObfuscatedValues).To(BeTrue())
+						})
+					})
+
+					When("restarting the app fails", func() {
+						When("restarting fails in a generic way", func() {
 							BeforeEach(func() {
-								fakeVersionActor.PollStartReturns(v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}, nil)
-
-								summary := v7action.ApplicationSummary{
-									Application: v7action.Application{
-										Name:  appName,
-										State: constant.ApplicationStarted,
-									},
-									CurrentDroplet: v7action.Droplet{
-										Stack: "cflinuxfs2",
-										Buildpacks: []v7action.Buildpack{
-											{
-												Name:         "ruby_buildpack",
-												DetectOutput: "some-detect-output",
-											},
-											{
-												Name:         "some-buildpack",
-												DetectOutput: "",
-											},
-										},
-									},
-									ProcessSummaries: v7action.ProcessSummaries{
-										{
-											Process: v7action.Process{
-												Type:    constant.ProcessTypeWeb,
-												Command: *types.NewFilteredString("some-command-1"),
-											},
-										},
-										{
-											Process: v7action.Process{
-												Type:    "console",
-												Command: *types.NewFilteredString("some-command-2"),
-											},
-										},
-									},
-								}
-								fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturns(summary, v7action.Warnings{"app-summary-warning-1", "app-summary-warning-2"}, nil)
+								fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
 							})
 
-							It("displays all warnings", func() {
-								Expect(testUI.Err).To(Say("some-poll-warning-1"))
-								Expect(testUI.Err).To(Say("some-poll-warning-2"))
-
-								Expect(executeErr).ToNot(HaveOccurred())
-							})
-
-							It("displays the app summary", func() {
-								Expect(testUI.Out).To(Say(`name:\s+some-app`))
-								Expect(testUI.Out).To(Say(`requested state:\s+started`))
-								Expect(testUI.Out).To(Say("type:\\s+web"))
-								Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
-								Expect(testUI.Out).To(Say("type:\\s+console"))
-								Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
-
-								Expect(testUI.Err).To(Say("warning-1"))
-								Expect(testUI.Err).To(Say("warning-2"))
-
-								Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-								name, spaceGUID, withObfuscatedValues, _ := fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-								Expect(name).To(Equal("some-app"))
-								Expect(spaceGUID).To(Equal("some-space-guid"))
-								Expect(withObfuscatedValues).To(BeTrue())
+							It("returns an error and any warnings", func() {
+								Expect(executeErr).To(MatchError("restart failure"))
+								Expect(testUI.Err).To(Say("some-restart-warning"))
 							})
 						})
 
-						When("polling the start fails", func() {
+						When("restart times out", func() {
 							BeforeEach(func() {
-								fakeVersionActor.PollStartReturns(v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}, errors.New("some-error"))
-							})
-
-							It("displays all warnings and fails", func() {
-								Expect(testUI.Err).To(Say("some-poll-warning-1"))
-								Expect(testUI.Err).To(Say("some-poll-warning-2"))
-
-								Expect(executeErr).To(MatchError("some-error"))
-							})
-						})
-
-						When("polling times out", func() {
-							BeforeEach(func() {
-								fakeVersionActor.PollStartReturns(nil, actionerror.StartupTimeoutError{})
+								fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, actionerror.StartupTimeoutError{})
 							})
 
 							It("returns the StartupTimeoutError", func() {
@@ -461,17 +451,6 @@ var _ = Describe("push Command", func() {
 									BinaryName: binaryName,
 								}))
 							})
-						})
-					})
-
-					When("restarting the app fails", func() {
-						BeforeEach(func() {
-							fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
-						})
-
-						It("returns an error and any warnings", func() {
-							Expect(executeErr).To(MatchError("restart failure"))
-							Expect(testUI.Err).To(Say("some-restart-warning"))
 						})
 					})
 				})
