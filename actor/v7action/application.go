@@ -230,7 +230,7 @@ func (actor Actor) shouldContinuePollingProcessStatus(process ccv3.Process) (boo
 	if instances.Empty() || instances.AnyRunning() {
 		return false, warnings, nil
 	} else if instances.AllCrashed() {
-		return false, warnings, actionerror.AllInstancesCrashedError{}
+		return false, warnings, nil
 	}
 
 	return true, warnings, nil
