@@ -168,20 +168,21 @@ func (actor Actor) PollStart(appGUID string) (Warnings, error) {
 
 	timeout := time.Now().Add(actor.Config.StartupTimeout())
 	for time.Now().Before(timeout) {
-		readyProcs := 0
+		allProcessesDone := true
 		for _, process := range processes {
-			ready, warnings, err := actor.shouldStopPollingProcessStatus(process)
+			shouldContinuePolling, warnings, err := actor.shouldContinuePollingProcessStatus(process)
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
 				return allWarnings, err
 			}
 
-			if ready {
-				readyProcs++
+			if shouldContinuePolling {
+				allProcessesDone = false
+				break
 			}
 		}
 
-		if readyProcs == len(processes) {
+		if allProcessesDone {
 			return allWarnings, nil
 		}
 		time.Sleep(actor.Config.PollingInterval())
@@ -218,19 +219,19 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 	}
 }
 
-func (actor Actor) shouldStopPollingProcessStatus(process ccv3.Process) (bool, Warnings, error) {
+func (actor Actor) shouldContinuePollingProcessStatus(process ccv3.Process) (bool, Warnings, error) {
 	ccInstances, ccWarnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
 	instances := ProcessInstances(ccInstances)
 	warnings := Warnings(ccWarnings)
 	if err != nil {
-		return false, warnings, err
+		return true, warnings, err
 	}
 
 	if instances.Empty() || instances.AnyRunning() {
-		return true, warnings, nil
+		return false, warnings, nil
 	} else if instances.AllCrashed() {
-		return true, warnings, actionerror.AllInstancesCrashedError{}
+		return false, warnings, actionerror.AllInstancesCrashedError{}
 	}
 
-	return false, warnings, nil
+	return true, warnings, nil
 }
