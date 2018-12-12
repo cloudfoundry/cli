@@ -1,10 +1,10 @@
 package v7action
 
 import (
-	"time"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"time"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
@@ -21,6 +21,30 @@ func (instance *ProcessInstance) StartTime() time.Time {
 	uptimeDuration := time.Duration(instance.Uptime) * time.Second
 
 	return time.Now().Add(-uptimeDuration)
+}
+
+type ProcessInstances []ccv3.ProcessInstance
+
+func (pi ProcessInstances) AllCrashed() bool {
+	for _, instance := range pi {
+		if instance.State != constant.ProcessInstanceCrashed {
+			return false
+		}
+	}
+	return true
+}
+
+func (pi ProcessInstances) AnyRunning() bool {
+	for _, instance := range pi {
+		if instance.State == constant.ProcessInstanceRunning {
+			return true
+		}
+	}
+	return false
+}
+
+func (pi ProcessInstances) Empty() bool {
+	return len(pi) == 0
 }
 
 func (actor Actor) DeleteInstanceByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, instanceIndex int) (Warnings, error) {
