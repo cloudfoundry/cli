@@ -196,7 +196,7 @@ var _ = Describe("push Command", func() {
 				Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 			})
 
-			When("getting app settings is successful", func() {
+			When("there are no flag overrides", func() {
 				BeforeEach(func() {
 					fakeActor.ConceptualizeReturns(
 						[]v7pushaction.PushState{
@@ -207,156 +207,156 @@ var _ = Describe("push Command", func() {
 						v7pushaction.Warnings{"some-warning-1"}, nil)
 				})
 
-				Describe("actualizing non-logging events", func() {
-					BeforeEach(func() {
-						fakeActor.ActualizeStub = FillInValues([]Step{
-							{
-								Event:    v7pushaction.SkippingApplicationCreation,
-								Warnings: v7pushaction.Warnings{"skipping app creation warnings"},
-							},
-							{
-								Event:    v7pushaction.CreatingApplication,
-								Warnings: v7pushaction.Warnings{"app creation warnings"},
-							},
-							{
-								Event: v7pushaction.CreatingAndMappingRoutes,
-							},
-							{
-								Event:    v7pushaction.CreatedRoutes,
-								Warnings: v7pushaction.Warnings{"routes warnings"},
-							},
-							{
-								Event: v7pushaction.CreatingArchive,
-							},
-							{
-								Event:    v7pushaction.UploadingApplicationWithArchive,
-								Warnings: v7pushaction.Warnings{"upload app archive warning"},
-							},
-							{
-								Event:    v7pushaction.RetryUpload,
-								Warnings: v7pushaction.Warnings{"retry upload warning"},
-							},
-							{
-								Event: v7pushaction.UploadWithArchiveComplete,
-							},
-							{
-								Event: v7pushaction.StagingComplete,
-							},
-						}, v7pushaction.PushState{})
-					})
-
-					It("generates a push state with the specified app path", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("Pushing app %s to org some-org / space some-space as some-user", appName))
-						Expect(testUI.Out).To(Say(`Getting app info\.\.\.`))
-						Expect(testUI.Err).To(Say("some-warning-1"))
-
-						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-						name, spaceGUID, orgGUID, currentDirectory, _ := fakeActor.ConceptualizeArgsForCall(0)
-						Expect(name).To(Equal(appName))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
-						Expect(orgGUID).To(Equal("some-org-guid"))
-						Expect(currentDirectory).To(Equal(pwd))
-					})
-
-					It("actualizes the application and displays events/warnings", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).To(Say("Updating app some-app..."))
-						Expect(testUI.Err).To(Say("skipping app creation warnings"))
-
-						Expect(testUI.Out).To(Say("Creating app some-app..."))
-						Expect(testUI.Err).To(Say("app creation warnings"))
-
-						Expect(testUI.Out).To(Say("Mapping routes..."))
-						Expect(testUI.Err).To(Say("routes warnings"))
-
-						Expect(testUI.Out).To(Say("Packaging files to upload..."))
-
-						Expect(testUI.Out).To(Say("Uploading files..."))
-						Expect(testUI.Err).To(Say("upload app archive warning"))
-						Expect(fakeProgressBar.ReadyCallCount()).Should(Equal(1))
-
-						Expect(testUI.Out).To(Say("Retrying upload due to an error..."))
-						Expect(testUI.Err).To(Say("retry upload warning"))
-
-						Expect(testUI.Out).To(Say("Waiting for API to complete processing files..."))
-
-						Expect(testUI.Out).To(Say("Waiting for app to start..."))
-						Expect(fakeProgressBar.CompleteCallCount()).Should(Equal(1))
-					})
-				})
-
-				Describe("actualizing logging events", func() {
-					BeforeEach(func() {
-						fakeActor.ActualizeStub = FillInValues([]Step{
-							{
-								Event: v7pushaction.StartingStaging,
-							},
-						}, v7pushaction.PushState{})
-					})
-
-					When("there are no logging errors", func() {
-						BeforeEach(func() {
-							fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
-								[]LogEvent{
-									{Log: v7action.NewLogMessage("log-message-1", 1, time.Now(), v7action.StagingLog, "source-instance")},
-									{Log: v7action.NewLogMessage("log-message-2", 1, time.Now(), v7action.StagingLog, "source-instance")},
-									{Log: v7action.NewLogMessage("log-message-3", 1, time.Now(), "potato", "source-instance")},
-								},
-								v7action.Warnings{"log-warning-1", "log-warning-2"},
-								nil,
-							)
-						})
-
-						It("displays the staging logs and warnings", func() {
-							Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
-
-							Expect(testUI.Err).To(Say("log-warning-1"))
-							Expect(testUI.Err).To(Say("log-warning-2"))
-
-							Eventually(testUI.Out).Should(Say("log-message-1"))
-							Eventually(testUI.Out).Should(Say("log-message-2"))
-							Eventually(testUI.Out).ShouldNot(Say("log-message-3"))
-
-							Expect(fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
-							passedAppName, spaceGUID, _ := fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
-							Expect(passedAppName).To(Equal(appName))
-							Expect(spaceGUID).To(Equal("some-space-guid"))
-						})
-					})
-
-					When("there are logging errors", func() {
-						BeforeEach(func() {
-							fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
-								[]LogEvent{
-									{Error: errors.New("some-random-err")},
-									{Error: actionerror.NOAATimeoutError{}},
-									{Log: v7action.NewLogMessage("log-message-1", 1, time.Now(), v7action.StagingLog, "source-instance")},
-								},
-								v7action.Warnings{"log-warning-1", "log-warning-2"},
-								nil,
-							)
-						})
-
-						It("displays the errors as warnings", func() {
-							Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
-
-							Expect(testUI.Err).To(Say("log-warning-1"))
-							Expect(testUI.Err).To(Say("log-warning-2"))
-							Eventually(testUI.Err).Should(Say("some-random-err"))
-							Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
-
-							Eventually(testUI.Out).Should(Say("log-message-1"))
-						})
-					})
-				})
-
 				When("the app is successfully actualized", func() {
 					BeforeEach(func() {
 						fakeActor.ActualizeStub = FillInValues([]Step{
 							{},
 						}, v7pushaction.PushState{Application: v7action.Application{GUID: "potato"}})
+					})
+
+					Describe("actualize events", func() {
+						BeforeEach(func() {
+							fakeActor.ActualizeStub = FillInValues([]Step{
+								{
+									Event:    v7pushaction.SkippingApplicationCreation,
+									Warnings: v7pushaction.Warnings{"skipping app creation warnings"},
+								},
+								{
+									Event:    v7pushaction.CreatingApplication,
+									Warnings: v7pushaction.Warnings{"app creation warnings"},
+								},
+								{
+									Event: v7pushaction.CreatingAndMappingRoutes,
+								},
+								{
+									Event:    v7pushaction.CreatedRoutes,
+									Warnings: v7pushaction.Warnings{"routes warnings"},
+								},
+								{
+									Event: v7pushaction.CreatingArchive,
+								},
+								{
+									Event:    v7pushaction.UploadingApplicationWithArchive,
+									Warnings: v7pushaction.Warnings{"upload app archive warning"},
+								},
+								{
+									Event:    v7pushaction.RetryUpload,
+									Warnings: v7pushaction.Warnings{"retry upload warning"},
+								},
+								{
+									Event: v7pushaction.UploadWithArchiveComplete,
+								},
+								{
+									Event: v7pushaction.StagingComplete,
+								},
+							}, v7pushaction.PushState{})
+						})
+
+						It("generates a push state with the specified app path", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say("Pushing app %s to org some-org / space some-space as some-user", appName))
+							Expect(testUI.Out).To(Say(`Getting app info\.\.\.`))
+							Expect(testUI.Err).To(Say("some-warning-1"))
+
+							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+							name, spaceGUID, orgGUID, currentDirectory, _ := fakeActor.ConceptualizeArgsForCall(0)
+							Expect(name).To(Equal(appName))
+							Expect(spaceGUID).To(Equal("some-space-guid"))
+							Expect(orgGUID).To(Equal("some-org-guid"))
+							Expect(currentDirectory).To(Equal(pwd))
+						})
+
+						It("actualizes the application and displays events/warnings", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("Updating app some-app..."))
+							Expect(testUI.Err).To(Say("skipping app creation warnings"))
+
+							Expect(testUI.Out).To(Say("Creating app some-app..."))
+							Expect(testUI.Err).To(Say("app creation warnings"))
+
+							Expect(testUI.Out).To(Say("Mapping routes..."))
+							Expect(testUI.Err).To(Say("routes warnings"))
+
+							Expect(testUI.Out).To(Say("Packaging files to upload..."))
+
+							Expect(testUI.Out).To(Say("Uploading files..."))
+							Expect(testUI.Err).To(Say("upload app archive warning"))
+							Expect(fakeProgressBar.ReadyCallCount()).Should(Equal(1))
+
+							Expect(testUI.Out).To(Say("Retrying upload due to an error..."))
+							Expect(testUI.Err).To(Say("retry upload warning"))
+
+							Expect(testUI.Out).To(Say("Waiting for API to complete processing files..."))
+
+							Expect(testUI.Out).To(Say("Waiting for app to start..."))
+							Expect(fakeProgressBar.CompleteCallCount()).Should(Equal(1))
+						})
+					})
+
+					Describe("staging logs", func() {
+						BeforeEach(func() {
+							fakeActor.ActualizeStub = FillInValues([]Step{
+								{
+									Event: v7pushaction.StartingStaging,
+								},
+							}, v7pushaction.PushState{})
+						})
+
+						When("there are no logging errors", func() {
+							BeforeEach(func() {
+								fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
+									[]LogEvent{
+										{Log: v7action.NewLogMessage("log-message-1", 1, time.Now(), v7action.StagingLog, "source-instance")},
+										{Log: v7action.NewLogMessage("log-message-2", 1, time.Now(), v7action.StagingLog, "source-instance")},
+										{Log: v7action.NewLogMessage("log-message-3", 1, time.Now(), "potato", "source-instance")},
+									},
+									v7action.Warnings{"log-warning-1", "log-warning-2"},
+									nil,
+								)
+							})
+
+							It("displays the staging logs and warnings", func() {
+								Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
+
+								Expect(testUI.Err).To(Say("log-warning-1"))
+								Expect(testUI.Err).To(Say("log-warning-2"))
+
+								Eventually(testUI.Out).Should(Say("log-message-1"))
+								Eventually(testUI.Out).Should(Say("log-message-2"))
+								Eventually(testUI.Out).ShouldNot(Say("log-message-3"))
+
+								Expect(fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
+								passedAppName, spaceGUID, _ := fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
+								Expect(passedAppName).To(Equal(appName))
+								Expect(spaceGUID).To(Equal("some-space-guid"))
+							})
+						})
+
+						When("there are logging errors", func() {
+							BeforeEach(func() {
+								fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
+									[]LogEvent{
+										{Error: errors.New("some-random-err")},
+										{Error: actionerror.NOAATimeoutError{}},
+										{Log: v7action.NewLogMessage("log-message-1", 1, time.Now(), v7action.StagingLog, "source-instance")},
+									},
+									v7action.Warnings{"log-warning-1", "log-warning-2"},
+									nil,
+								)
+							})
+
+							It("displays the errors as warnings", func() {
+								Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
+
+								Expect(testUI.Err).To(Say("log-warning-1"))
+								Expect(testUI.Err).To(Say("log-warning-2"))
+								Eventually(testUI.Err).Should(Say("some-random-err"))
+								Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
+
+								Eventually(testUI.Out).Should(Say("log-message-1"))
+							})
+						})
 					})
 
 					When("restarting the app succeeds", func() {
@@ -470,7 +470,21 @@ var _ = Describe("push Command", func() {
 				})
 			})
 
-			When("getting app settings returns an error", func() {
+			When("flag overrides are specified", func() {
+				BeforeEach(func() {
+					cmd.AppPath = "some/app/path"
+				})
+
+				It("generates a push state with the specified flag overrides", func() {
+					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+					_, _, _, _, overrides := fakeActor.ConceptualizeArgsForCall(0)
+					Expect(overrides).To(MatchFields(IgnoreExtras, Fields{
+						"ProvidedAppPath": Equal("some/app/path"),
+					}))
+				})
+			})
+
+			When("conceptualize returns an error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -481,24 +495,6 @@ var _ = Describe("push Command", func() {
 				It("generates a push state with the specified app path", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(testUI.Err).To(Say("some-warning-1"))
-				})
-			})
-
-			When("app path is specified", func() {
-				BeforeEach(func() {
-					cmd.AppPath = "some/app/path"
-				})
-
-				It("generates a push state with the specified app path", func() {
-					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-					name, spaceGUID, orgGUID, currentDirectory, overrides := fakeActor.ConceptualizeArgsForCall(0)
-					Expect(name).To(Equal(appName))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(orgGUID).To(Equal("some-org-guid"))
-					Expect(currentDirectory).To(Equal(pwd))
-					Expect(overrides).To(MatchFields(IgnoreExtras, Fields{
-						"ProvidedAppPath": Equal("some/app/path"),
-					}))
 				})
 			})
 		})
