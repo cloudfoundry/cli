@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -206,37 +207,73 @@ var _ = Describe("push Command", func() {
 					var err error
 					tempDir, err = ioutil.TempDir("", "manifest-push-unit")
 					Expect(err).ToNot(HaveOccurred())
-					cmd.PWD = tempDir
-
 				})
 
 				AfterEach(func() {
 					Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
 				})
 
-				When("there is a manifest file in the current dir", func() {
-					var yamlContents []byte
+				When("No path is provided", func() {
 					BeforeEach(func() {
-						yamlContents = []byte(`---\n- banana`)
-						pathToYAMLFile := filepath.Join(tempDir, "manifest.yml")
-						err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
-						Expect(err).ToNot(HaveOccurred())
+						cmd.PWD = tempDir
 					})
 
-					It("reads the manifest and passes through to conceptualize", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-						_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
-						Expect(manifest).To(Equal(yamlContents))
+					When("there is a manifest file in the current dir", func() {
+						var yamlContents []byte
+
+						BeforeEach(func() {
+							yamlContents = []byte(`---\n- banana`)
+							pathToYAMLFile := filepath.Join(tempDir, "manifest.yml")
+							err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
+							Expect(err).ToNot(HaveOccurred())
+						})
+
+						It("reads the manifest and passes through to conceptualize", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+							_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
+							Expect(manifest).To(Equal(yamlContents))
+						})
+					})
+
+					When("there is not a manifest in the current dir", func() {
+						It("does not pass a manifest to conceptualize", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+							_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
+							Expect(manifest).To(BeNil())
+						})
 					})
 				})
 
-				When("there is not a manifest in the current dir", func() {
-					It("does not pass a manifest to conceptualize", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-						_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
-						Expect(manifest).To(BeNil())
+				When("The -f flag is specified", func() {
+					When("The manifest exists at the path", func() {
+						var yamlContents []byte
+
+						BeforeEach(func() {
+							yamlContents = []byte(`---\n- banana`)
+							pathToYAMLFile := filepath.Join(tempDir, "manifest.yml")
+							err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
+							Expect(err).ToNot(HaveOccurred())
+							cmd.PathToManifest = flag.PathWithExistenceCheck(pathToYAMLFile)
+						})
+
+						It("reads the manifest and passes through to conceptualize", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+							_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
+							Expect(manifest).To(Equal(yamlContents))
+						})
+					})
+
+					When("The manifest does not exist at the path", func() {
+						BeforeEach(func() {
+							cmd.PathToManifest = "/some/non-existant/path.yml"
+						})
+
+						It("throws an error", func() {
+							Expect(os.IsNotExist(executeErr)).To(BeTrue(), fmt.Sprintf("expected to get an 'is not exists' error but got %#v", executeErr))
+						})
 					})
 				})
 			})

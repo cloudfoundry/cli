@@ -52,6 +52,7 @@ type PushCommand struct {
 	DockerImage         flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername      string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	HealthCheckType     flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type: 'port' (default), 'process', 'http' (implies endpoint '/')"`
+	PathToManifest      flag.PathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
 	Memory              flag.Megabytes              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
 	NoStart             bool                        `long:"no-start" description:"Do not stage and start the app after pushing"`
@@ -315,6 +316,11 @@ func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream 
 
 func (cmd PushCommand) readManifest() ([]byte, error) {
 	log.Info("reading manifest if exists")
+
+	if len(cmd.PathToManifest) != 0 {
+		log.WithField("manifestPath", cmd.PathToManifest).Debug("reading '-f' provided manifest")
+		return ioutil.ReadFile(string(cmd.PathToManifest))
+	}
 
 	manifestPath := filepath.Join(cmd.PWD, "manifest.yml")
 	log.WithField("manifestPath", manifestPath).Debug("path to manifest")
