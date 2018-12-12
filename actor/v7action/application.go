@@ -219,19 +219,18 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 }
 
 func (actor Actor) shouldStopPollingProcessStatus(process ccv3.Process) (bool, Warnings, error) {
-	ccInstances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
+	ccInstances, ccWarnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
 	instances := ProcessInstances(ccInstances)
+	warnings := Warnings(ccWarnings)
 	if err != nil {
-		return false, Warnings(warnings), err
+		return false, warnings, err
 	}
 
-	if instances.Empty() {
-		return true, Warnings(warnings), nil
-	} else if instances.AnyRunning() {
-		return true, Warnings(warnings), nil
+	if instances.Empty() || instances.AnyRunning() {
+		return true, warnings, nil
 	} else if instances.AllCrashed() {
-		return true, Warnings(warnings), actionerror.AllInstancesCrashedError{}
+		return true, warnings, actionerror.AllInstancesCrashedError{}
 	}
 
-	return false, Warnings(warnings), nil
+	return false, warnings, nil
 }
