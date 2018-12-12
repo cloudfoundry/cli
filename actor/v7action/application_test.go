@@ -549,8 +549,8 @@ var _ = Describe("Application Actions", func() {
 							eventualInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}}
 						})
 
-						It("should not return an error", func() {
-							Expect(executeErr).NotTo(HaveOccurred())
+						It("should return an AllInstancesCrashedError", func() {
+							Expect(executeErr).To(MatchError(actionerror.AllInstancesCrashedError{}))
 						})
 
 						It("should call GetProcessInstances twice", func() {

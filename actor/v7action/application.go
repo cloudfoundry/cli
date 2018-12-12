@@ -230,7 +230,7 @@ func (actor Actor) shouldStopPollingProcessStatus(process ccv3.Process) (bool, W
 	} else if instances.AnyRunning() {
 		return true, Warnings(warnings), nil
 	} else if instances.AllCrashed() {
-		return true, Warnings(warnings), nil
+		return true, Warnings(warnings), actionerror.AllInstancesCrashedError{}
 	}
 
 	return false, Warnings(warnings), nil
