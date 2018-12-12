@@ -37,6 +37,7 @@ var _ = Describe("Push State", func() {
 			orgGUID       string
 			currentDir    string
 			flagOverrides FlagOverrides
+			manifest      []byte
 
 			states     []PushState
 			warnings   Warnings
@@ -50,13 +51,14 @@ var _ = Describe("Push State", func() {
 			appName = "some-app-name"
 			currentDir = pwd
 			flagOverrides = FlagOverrides{}
+			manifest = []byte("some yaml")
 
 			spaceGUID = "some-space-guid"
 			orgGUID = "some-org-guid"
 		})
 
 		JustBeforeEach(func() {
-			states, warnings, executeErr = actor.Conceptualize(appName, spaceGUID, orgGUID, currentDir, flagOverrides)
+			states, warnings, executeErr = actor.Conceptualize(appName, spaceGUID, orgGUID, currentDir, flagOverrides, manifest)
 		})
 
 		Describe("application", func() {
@@ -204,6 +206,16 @@ var _ = Describe("Push State", func() {
 						Expect(executeErr).To(MatchError("kaboom"))
 					})
 				})
+			})
+		})
+
+		Describe("manifest", func() {
+			It("attaches manifest to pushState", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(states[0]).To(MatchFields(IgnoreExtras,
+					Fields{
+						"Manifest": Equal(manifest),
+					}))
 			})
 		})
 

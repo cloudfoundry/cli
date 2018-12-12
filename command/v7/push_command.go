@@ -1,7 +1,9 @@
 package v7
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -33,7 +35,7 @@ type PushActor interface {
 	// Actualize applies any necessary changes.
 	Actualize(state v7pushaction.PushState, progressBar v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Conceptualize figures out the state of the world.
-	Conceptualize(appName string, spaceGUID string, orgGUID string, currentDir string, flagOverrides v7pushaction.FlagOverrides) ([]v7pushaction.PushState, v7pushaction.Warnings, error)
+	Conceptualize(appName string, spaceGUID string, orgGUID string, currentDir string, flagOverrides v7pushaction.FlagOverrides, manifest []byte) ([]v7pushaction.PushState, v7pushaction.Warnings, error)
 }
 
 //go:generate counterfeiter . V7ActorForPush
@@ -130,6 +132,11 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayText("Getting app info...")
 
+	manifest, err := cmd.readManifest()
+	if err != nil {
+		return err
+	}
+
 	log.Info("generating the app state")
 	pushState, warnings, err := cmd.Actor.Conceptualize(
 		cmd.RequiredArgs.AppName,
@@ -137,6 +144,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		cmd.Config.TargetedOrganization().GUID,
 		cmd.PWD,
 		overrides,
+		manifest,
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -303,6 +311,22 @@ func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream 
 			cmd.UI.DisplayWarning(err.Error())
 		}
 	}
+}
+
+func (cmd PushCommand) readManifest() ([]byte, error) {
+	log.Info("reading manifest if exists")
+
+	manifestPath := filepath.Join(cmd.PWD, "manifest.yml")
+	log.WithField("manifestPath", manifestPath).Debug("path to manifest")
+
+	manifest, err := ioutil.ReadFile(manifestPath)
+	if err != nil && !os.IsNotExist(err) {
+		log.Errorln("reading manifest:", err)
+		return nil, err
+	} else if os.IsNotExist(err) {
+		log.Debug("no manifest exists")
+	}
+	return manifest, nil
 }
 
 func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {

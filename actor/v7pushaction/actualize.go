@@ -37,6 +37,12 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 		}
 		stateStream <- state
 
+		err = actor.ApplyManifest(state, warningsStream, eventStream)
+		if err != nil {
+			errorStream <- err
+			return
+		}
+
 		err = actor.ScaleProcess(state, warningsStream, eventStream)
 		if err != nil {
 			errorStream <- err
@@ -107,6 +113,21 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 		eventStream <- Complete
 	}()
 	return stateStream, eventStream, warningsStream, errorStream
+}
+
+func (actor Actor) ApplyManifest(state PushState, warningsStream chan Warnings, eventStream chan Event) error {
+	if len(state.Manifest) == 0 {
+		return nil
+	}
+	eventStream <- ApplyManifest
+	warnings, err := actor.V7Actor.SetApplicationManifest(state.Application.GUID, state.Manifest)
+	warningsStream <- Warnings(warnings)
+	if err != nil {
+		return err
+	}
+	eventStream <- ApplyManifestComplete
+
+	return nil
 }
 
 func (actor Actor) CreateAndUploadApplicationBits(state PushState, progressBar ProgressBar, warningsStream chan Warnings, eventStream chan Event) (v7action.Package, error) {

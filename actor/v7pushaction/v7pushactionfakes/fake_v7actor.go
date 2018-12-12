@@ -133,6 +133,20 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	SetApplicationManifestStub        func(string, []byte) (v7action.Warnings, error)
+	setApplicationManifestMutex       sync.RWMutex
+	setApplicationManifestArgsForCall []struct {
+		arg1 string
+		arg2 []byte
+	}
+	setApplicationManifestReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	setApplicationManifestReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	StageApplicationPackageStub        func(string) (v7action.Build, v7action.Warnings, error)
 	stageApplicationPackageMutex       sync.RWMutex
 	stageApplicationPackageArgsForCall []struct {
@@ -728,6 +742,75 @@ func (fake *FakeV7Actor) SetApplicationDropletReturnsOnCall(i int, result1 v7act
 	}{result1, result2}
 }
 
+func (fake *FakeV7Actor) SetApplicationManifest(arg1 string, arg2 []byte) (v7action.Warnings, error) {
+	var arg2Copy []byte
+	if arg2 != nil {
+		arg2Copy = make([]byte, len(arg2))
+		copy(arg2Copy, arg2)
+	}
+	fake.setApplicationManifestMutex.Lock()
+	ret, specificReturn := fake.setApplicationManifestReturnsOnCall[len(fake.setApplicationManifestArgsForCall)]
+	fake.setApplicationManifestArgsForCall = append(fake.setApplicationManifestArgsForCall, struct {
+		arg1 string
+		arg2 []byte
+	}{arg1, arg2Copy})
+	fake.recordInvocation("SetApplicationManifest", []interface{}{arg1, arg2Copy})
+	fake.setApplicationManifestMutex.Unlock()
+	if fake.SetApplicationManifestStub != nil {
+		return fake.SetApplicationManifestStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.setApplicationManifestReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeV7Actor) SetApplicationManifestCallCount() int {
+	fake.setApplicationManifestMutex.RLock()
+	defer fake.setApplicationManifestMutex.RUnlock()
+	return len(fake.setApplicationManifestArgsForCall)
+}
+
+func (fake *FakeV7Actor) SetApplicationManifestCalls(stub func(string, []byte) (v7action.Warnings, error)) {
+	fake.setApplicationManifestMutex.Lock()
+	defer fake.setApplicationManifestMutex.Unlock()
+	fake.SetApplicationManifestStub = stub
+}
+
+func (fake *FakeV7Actor) SetApplicationManifestArgsForCall(i int) (string, []byte) {
+	fake.setApplicationManifestMutex.RLock()
+	defer fake.setApplicationManifestMutex.RUnlock()
+	argsForCall := fake.setApplicationManifestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeV7Actor) SetApplicationManifestReturns(result1 v7action.Warnings, result2 error) {
+	fake.setApplicationManifestMutex.Lock()
+	defer fake.setApplicationManifestMutex.Unlock()
+	fake.SetApplicationManifestStub = nil
+	fake.setApplicationManifestReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV7Actor) SetApplicationManifestReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.setApplicationManifestMutex.Lock()
+	defer fake.setApplicationManifestMutex.Unlock()
+	fake.SetApplicationManifestStub = nil
+	if fake.setApplicationManifestReturnsOnCall == nil {
+		fake.setApplicationManifestReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.setApplicationManifestReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV7Actor) StageApplicationPackage(arg1 string) (v7action.Build, v7action.Warnings, error) {
 	fake.stageApplicationPackageMutex.Lock()
 	ret, specificReturn := fake.stageApplicationPackageReturnsOnCall[len(fake.stageApplicationPackageArgsForCall)]
@@ -1018,6 +1101,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.scaleProcessByApplicationMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()
 	defer fake.setApplicationDropletMutex.RUnlock()
+	fake.setApplicationManifestMutex.RLock()
+	defer fake.setApplicationManifestMutex.RUnlock()
 	fake.stageApplicationPackageMutex.RLock()
 	defer fake.stageApplicationPackageMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()

@@ -3,6 +3,8 @@ package v7pushaction
 type Event string
 
 const (
+	ApplyManifest                   Event = "Applying manifest"
+	ApplyManifestComplete           Event = "Applying manifest Complete"
 	BoundRoutes                     Event = "bound routes"
 	BoundServices                   Event = "bound services"
 	ConfiguringServices             Event = "configuring services"

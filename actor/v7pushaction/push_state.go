@@ -16,6 +16,7 @@ type PushState struct {
 	SpaceGUID   string
 	OrgGUID     string
 	Overrides   FlagOverrides
+	Manifest    []byte
 
 	Archive            bool
 	BitsPath           string
@@ -47,7 +48,7 @@ func (state PushState) String() string {
 	)
 }
 
-func (actor Actor) Conceptualize(appName string, spaceGUID string, orgGUID string, currentDir string, flagOverrides FlagOverrides) ([]PushState, Warnings, error) {
+func (actor Actor) Conceptualize(appName string, spaceGUID string, orgGUID string, currentDir string, flagOverrides FlagOverrides, manifest []byte) ([]PushState, Warnings, error) {
 	var (
 		application v7action.Application
 		warnings    v7action.Warnings
@@ -88,6 +89,7 @@ func (actor Actor) Conceptualize(appName string, spaceGUID string, orgGUID strin
 			SpaceGUID:   spaceGUID,
 			OrgGUID:     orgGUID,
 			Overrides:   flagOverrides,
+			Manifest:    manifest,
 
 			BitsPath:     bitsPath,
 			AllResources: resources,

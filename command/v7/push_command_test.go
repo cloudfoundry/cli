@@ -2,6 +2,9 @@ package v7_test
 
 import (
 	"errors"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -196,6 +199,48 @@ var _ = Describe("push Command", func() {
 				Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 			})
 
+			Describe("manifest", func() {
+				var tempDir string
+
+				BeforeEach(func() {
+					var err error
+					tempDir, err = ioutil.TempDir("", "manifest-push-unit")
+					Expect(err).ToNot(HaveOccurred())
+					cmd.PWD = tempDir
+
+				})
+
+				AfterEach(func() {
+					Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
+				})
+
+				When("there is a manifest file in the current dir", func() {
+					var yamlContents []byte
+					BeforeEach(func() {
+						yamlContents = []byte(`---\n- banana`)
+						pathToYAMLFile := filepath.Join(tempDir, "manifest.yml")
+						err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("reads the manifest and passes through to conceptualize", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+						_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
+						Expect(manifest).To(Equal(yamlContents))
+					})
+				})
+
+				When("there is not a manifest in the current dir", func() {
+					It("does not pass a manifest to conceptualize", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+						_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
+						Expect(manifest).To(BeNil())
+					})
+				})
+			})
+
 			When("there are no flag overrides", func() {
 				BeforeEach(func() {
 					fakeActor.ConceptualizeReturns(
@@ -259,7 +304,7 @@ var _ = Describe("push Command", func() {
 							Expect(testUI.Err).To(Say("some-warning-1"))
 
 							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-							name, spaceGUID, orgGUID, currentDirectory, _ := fakeActor.ConceptualizeArgsForCall(0)
+							name, spaceGUID, orgGUID, currentDirectory, _, _ := fakeActor.ConceptualizeArgsForCall(0)
 							Expect(name).To(Equal(appName))
 							Expect(spaceGUID).To(Equal("some-space-guid"))
 							Expect(orgGUID).To(Equal("some-org-guid"))
@@ -477,7 +522,7 @@ var _ = Describe("push Command", func() {
 
 				It("generates a push state with the specified flag overrides", func() {
 					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-					_, _, _, _, overrides := fakeActor.ConceptualizeArgsForCall(0)
+					_, _, _, _, overrides, _ := fakeActor.ConceptualizeArgsForCall(0)
 					Expect(overrides).To(MatchFields(IgnoreExtras, Fields{
 						"ProvidedAppPath": Equal("some/app/path"),
 					}))

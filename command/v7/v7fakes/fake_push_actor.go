@@ -27,7 +27,7 @@ type FakePushActor struct {
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
 	}
-	ConceptualizeStub        func(string, string, string, string, v7pushaction.FlagOverrides) ([]v7pushaction.PushState, v7pushaction.Warnings, error)
+	ConceptualizeStub        func(string, string, string, string, v7pushaction.FlagOverrides, []byte) ([]v7pushaction.PushState, v7pushaction.Warnings, error)
 	conceptualizeMutex       sync.RWMutex
 	conceptualizeArgsForCall []struct {
 		arg1 string
@@ -35,6 +35,7 @@ type FakePushActor struct {
 		arg3 string
 		arg4 string
 		arg5 v7pushaction.FlagOverrides
+		arg6 []byte
 	}
 	conceptualizeReturns struct {
 		result1 []v7pushaction.PushState
@@ -120,7 +121,12 @@ func (fake *FakePushActor) ActualizeReturnsOnCall(i int, result1 <-chan v7pushac
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakePushActor) Conceptualize(arg1 string, arg2 string, arg3 string, arg4 string, arg5 v7pushaction.FlagOverrides) ([]v7pushaction.PushState, v7pushaction.Warnings, error) {
+func (fake *FakePushActor) Conceptualize(arg1 string, arg2 string, arg3 string, arg4 string, arg5 v7pushaction.FlagOverrides, arg6 []byte) ([]v7pushaction.PushState, v7pushaction.Warnings, error) {
+	var arg6Copy []byte
+	if arg6 != nil {
+		arg6Copy = make([]byte, len(arg6))
+		copy(arg6Copy, arg6)
+	}
 	fake.conceptualizeMutex.Lock()
 	ret, specificReturn := fake.conceptualizeReturnsOnCall[len(fake.conceptualizeArgsForCall)]
 	fake.conceptualizeArgsForCall = append(fake.conceptualizeArgsForCall, struct {
@@ -129,11 +135,12 @@ func (fake *FakePushActor) Conceptualize(arg1 string, arg2 string, arg3 string, 
 		arg3 string
 		arg4 string
 		arg5 v7pushaction.FlagOverrides
-	}{arg1, arg2, arg3, arg4, arg5})
-	fake.recordInvocation("Conceptualize", []interface{}{arg1, arg2, arg3, arg4, arg5})
+		arg6 []byte
+	}{arg1, arg2, arg3, arg4, arg5, arg6Copy})
+	fake.recordInvocation("Conceptualize", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6Copy})
 	fake.conceptualizeMutex.Unlock()
 	if fake.ConceptualizeStub != nil {
-		return fake.ConceptualizeStub(arg1, arg2, arg3, arg4, arg5)
+		return fake.ConceptualizeStub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -148,17 +155,17 @@ func (fake *FakePushActor) ConceptualizeCallCount() int {
 	return len(fake.conceptualizeArgsForCall)
 }
 
-func (fake *FakePushActor) ConceptualizeCalls(stub func(string, string, string, string, v7pushaction.FlagOverrides) ([]v7pushaction.PushState, v7pushaction.Warnings, error)) {
+func (fake *FakePushActor) ConceptualizeCalls(stub func(string, string, string, string, v7pushaction.FlagOverrides, []byte) ([]v7pushaction.PushState, v7pushaction.Warnings, error)) {
 	fake.conceptualizeMutex.Lock()
 	defer fake.conceptualizeMutex.Unlock()
 	fake.ConceptualizeStub = stub
 }
 
-func (fake *FakePushActor) ConceptualizeArgsForCall(i int) (string, string, string, string, v7pushaction.FlagOverrides) {
+func (fake *FakePushActor) ConceptualizeArgsForCall(i int) (string, string, string, string, v7pushaction.FlagOverrides, []byte) {
 	fake.conceptualizeMutex.RLock()
 	defer fake.conceptualizeMutex.RUnlock()
 	argsForCall := fake.conceptualizeArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
 }
 
 func (fake *FakePushActor) ConceptualizeReturns(result1 []v7pushaction.PushState, result2 v7pushaction.Warnings, result3 error) {
