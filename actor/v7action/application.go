@@ -170,7 +170,7 @@ func (actor Actor) PollStart(appGUID string) (Warnings, error) {
 	for time.Now().Before(timeout) {
 		readyProcs := 0
 		for _, process := range processes {
-			ready, warnings, err := actor.processStatus(process)
+			ready, warnings, err := actor.shouldStopPollingProcessStatus(process)
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
 				return allWarnings, err
@@ -218,7 +218,7 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 	}
 }
 
-func (actor Actor) processStatus(process ccv3.Process) (bool, Warnings, error) {
+func (actor Actor) shouldStopPollingProcessStatus(process ccv3.Process) (bool, Warnings, error) {
 	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
 	if err != nil {
 		return false, Warnings(warnings), err
