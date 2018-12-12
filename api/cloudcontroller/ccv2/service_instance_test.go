@@ -138,6 +138,7 @@ var _ = Describe("Service Instance", func() {
 						"tag-2"
 					],
 					"dashboard_url": "some-dashboard-url",
+					"route_service_url": "some-route-service-url",
 					"last_operation": {
 						"type": "create",
 						"state": "succeeded",
@@ -170,6 +171,7 @@ var _ = Describe("Service Instance", func() {
 					Type:            constant.ServiceInstanceTypeManagedService,
 					Tags:            []string{"tag-1", "tag-2"},
 					DashboardURL:    "some-dashboard-url",
+					RouteServiceURL: "some-route-service-url",
 					LastOperation: LastOperation{
 						Type:        "create",
 						State:       "succeeded",
@@ -195,7 +197,7 @@ var _ = Describe("Service Instance", func() {
 						"entity": {
 							"name": "some-service-name-1",
 							"space_guid": "some-space-guid",
-					"service_guid": "some-service-guid",
+							"service_guid": "some-service-guid",
 							"type": "managed_service_instance"
 						}
 					},
@@ -495,6 +497,7 @@ var _ = Describe("Service Instance", func() {
 						},
 						"entity": {
 							"name": "some-service-name-1",
+							"route_service_url": "some-route-service-url",
 							"space_guid": "some-space-guid",
 							"type": "user_provided_service_instance"
 						}
@@ -505,6 +508,7 @@ var _ = Describe("Service Instance", func() {
 						},
 						"entity": {
 							"name": "some-service-name-2",
+							"route_service_url": "some-route-service-url",
 							"space_guid": "some-space-guid",
 							"type": "user_provided_service_instance"
 						}
@@ -521,6 +525,7 @@ var _ = Describe("Service Instance", func() {
 						},
 						"entity": {
 							"name": "some-service-name-3",
+							"route_service_url": "some-route-service-url",
 							"space_guid": "some-space-guid",
 							"type": "user_provided_service_instance"
 						}
@@ -531,6 +536,7 @@ var _ = Describe("Service Instance", func() {
 						},
 						"entity": {
 							"name": "some-service-name-4",
+							"route_service_url": "some-route-service-url",
 							"space_guid": "some-space-guid",
 							"type": "user_provided_service_instance"
 						}
@@ -558,28 +564,32 @@ var _ = Describe("Service Instance", func() {
 
 				Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
 					{
-						Name:      "some-service-name-1",
-						GUID:      "some-service-guid-1",
-						SpaceGUID: "some-space-guid",
-						Type:      constant.ServiceInstanceTypeUserProvidedService,
+						Name:            "some-service-name-1",
+						GUID:            "some-service-guid-1",
+						SpaceGUID:       "some-space-guid",
+						RouteServiceURL: "some-route-service-url",
+						Type:            constant.ServiceInstanceTypeUserProvidedService,
 					},
 					{
-						Name:      "some-service-name-2",
-						GUID:      "some-service-guid-2",
-						SpaceGUID: "some-space-guid",
-						Type:      constant.ServiceInstanceTypeUserProvidedService,
+						Name:            "some-service-name-2",
+						GUID:            "some-service-guid-2",
+						SpaceGUID:       "some-space-guid",
+						RouteServiceURL: "some-route-service-url",
+						Type:            constant.ServiceInstanceTypeUserProvidedService,
 					},
 					{
-						Name:      "some-service-name-3",
-						GUID:      "some-service-guid-3",
-						SpaceGUID: "some-space-guid",
-						Type:      constant.ServiceInstanceTypeUserProvidedService,
+						Name:            "some-service-name-3",
+						GUID:            "some-service-guid-3",
+						SpaceGUID:       "some-space-guid",
+						RouteServiceURL: "some-route-service-url",
+						Type:            constant.ServiceInstanceTypeUserProvidedService,
 					},
 					{
-						Name:      "some-service-name-4",
-						GUID:      "some-service-guid-4",
-						SpaceGUID: "some-space-guid",
-						Type:      constant.ServiceInstanceTypeUserProvidedService,
+						Name:            "some-service-name-4",
+						GUID:            "some-service-guid-4",
+						SpaceGUID:       "some-space-guid",
+						RouteServiceURL: "some-route-service-url",
+						Type:            constant.ServiceInstanceTypeUserProvidedService,
 					},
 				}))
 

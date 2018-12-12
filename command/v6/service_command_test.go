@@ -873,6 +873,28 @@ var _ = Describe("service Command", func() {
 								Expect(testUI.Out).To(Say(`tags:\s+tag-1, tag-2, tag-3`))
 							})
 						})
+
+						When("the service instance has route service url", func() {
+							BeforeEach(func() {
+								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+									v2action.ServiceInstanceSummary{
+										ServiceInstance: v2action.ServiceInstance{
+											Name:            "some-service-instance",
+											Type:            constant.ServiceInstanceTypeUserProvidedService,
+											RouteServiceURL: "some-route-service-url",
+										},
+									},
+									v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+									nil,
+								)
+							})
+
+							It("displays the route service url", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say(`route service url:\s+some-route-service-url`))
+							})
+						})
 					})
 				})
 			})
