@@ -7,6 +7,9 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 var _ = Describe("pushing a docker image", func() {
@@ -107,7 +110,7 @@ var _ = Describe("pushing a docker image", func() {
 		})
 
 		It("uses the docker image when pushing", func() {
-			helpers.WithManifest(appManifest, func(manifestDir string) {
+			withManifest(appManifest, func(manifestDir string) {
 				session := helpers.CustomCF(
 					helpers.CFEnv{WorkingDirectory: manifestDir},
 					PushCommandName,
@@ -133,7 +136,7 @@ var _ = Describe("pushing a docker image", func() {
 			})
 
 			It("returns an error", func() {
-				helpers.WithManifest(appManifest, func(manifestDir string) {
+				withManifest(appManifest, func(manifestDir string) {
 					session := helpers.CustomCF(
 						helpers.CFEnv{WorkingDirectory: manifestDir},
 						PushCommandName,
@@ -161,7 +164,7 @@ var _ = Describe("pushing a docker image", func() {
 			})
 
 			It("returns an error", func() {
-				helpers.WithManifest(appManifest, func(manifestDir string) {
+				withManifest(appManifest, func(manifestDir string) {
 					session := helpers.CustomCF(
 						helpers.CFEnv{WorkingDirectory: manifestDir},
 						PushCommandName,
@@ -193,7 +196,7 @@ var _ = Describe("pushing a docker image", func() {
 
 			When("password is provided in the enviornment", func() {
 				It("uses the docker image and credentials when pushing", func() {
-					helpers.WithManifest(appManifest, func(manifestDir string) {
+					withManifest(appManifest, func(manifestDir string) {
 						session := helpers.CustomCF(
 							helpers.CFEnv{
 								WorkingDirectory: manifestDir,
@@ -210,7 +213,7 @@ var _ = Describe("pushing a docker image", func() {
 
 			When("password is not provided in the enviornment", func() {
 				It("errors out", func() {
-					helpers.WithManifest(appManifest, func(manifestDir string) {
+					withManifest(appManifest, func(manifestDir string) {
 						session := helpers.CustomCF(
 							helpers.CFEnv{WorkingDirectory: manifestDir},
 							PushCommandName,
@@ -246,7 +249,7 @@ var _ = Describe("pushing a docker image", func() {
 			})
 
 			It("command line takes precidence", func() {
-				helpers.WithManifest(appManifest, func(manifestDir string) {
+				withManifest(appManifest, func(manifestDir string) {
 					session := helpers.CustomCF(
 						helpers.CFEnv{
 							WorkingDirectory: manifestDir,
@@ -287,4 +290,13 @@ func validateDockerPush(session *Session, appName string, dockerImage string) {
 	session = helpers.CF("app", appName)
 	Eventually(session).Should(Say(`name:\s+%s`, appName))
 	Eventually(session).Should(Exit(0))
+}
+
+func withManifest(manifest map[string]interface{}, f func(manifestDir string)) {
+	dir, err := ioutil.TempDir("", "simple-app")
+	Expect(err).ToNot(HaveOccurred())
+	defer os.RemoveAll(dir)
+
+	helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
+	f(dir)
 }
