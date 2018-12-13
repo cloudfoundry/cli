@@ -74,25 +74,25 @@ fly-windows-units:
 integration-cleanup:
 	$(PWD)/bin/cleanup-integration
 
-integration-experimental: build integration-cleanup integration-experimental-shared integration-experimental-versioned
+integration-experimental: build integration-cleanup integration-shared-experimental integration-experimental-versioned
 
-integration-experimental-shared: build integration-cleanup
+integration-shared-experimental: build integration-cleanup
 	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/experimental
 
 integration-experimental-versioned: build integration-cleanup
 	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/experimental
 
-integration-global: build integration-cleanup integration-global-shared integration-global-versioned
+integration-global: build integration-cleanup integration-shared-global integration-global-versioned
 
-integration-global-shared: build integration-cleanup
+integration-shared-global: build integration-cleanup
 	$(ginkgo_int) -tags=$(TAGS) integration/shared/global
 
 integration-global-versioned: build integration-cleanup
 	$(ginkgo_int) -tags=$(TAGS) integration/$(TARGET)/global
 
-integration-isolated: build integration-cleanup integration-isolated-shared integration-isolated-versioned
+integration-isolated: build integration-cleanup integration-shared-isolated integration-isolated-versioned
 
-integration-isolated-shared: build integration-cleanup
+integration-shared-isolated: build integration-cleanup
 	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/isolated
 
 integration-isolated-versioned: build integration-cleanup
