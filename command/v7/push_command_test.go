@@ -1,6 +1,7 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -15,7 +16,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
@@ -519,7 +519,22 @@ var _ = Describe("push Command", func() {
 							It("returns an error and any warnings", func() {
 								Expect(executeErr).To(MatchError("restart failure"))
 								Expect(testUI.Err).To(Say("some-restart-warning"))
+
 							})
+						})
+
+						When("the error is an AllInstancesCrashedError", func() {
+							BeforeEach(func() {
+								fakeVersionActor.RestartApplicationReturns(nil, actionerror.AllInstancesCrashedError{})
+							})
+
+							It("returns the ApplicationUnableToStartError", func() {
+								Expect(executeErr).To(MatchError(translatableerror.ApplicationUnableToStartError{
+									AppName:    "some-app",
+									BinaryName: binaryName,
+								}))
+							})
+
 						})
 
 						When("restart times out", func() {
@@ -527,11 +542,13 @@ var _ = Describe("push Command", func() {
 								fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, actionerror.StartupTimeoutError{})
 							})
 
-							It("returns the StartupTimeoutError", func() {
+							It("returns the StartupTimeoutError and prints warnings", func() {
 								Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{
 									AppName:    "some-app",
 									BinaryName: binaryName,
 								}))
+
+								Expect(testUI.Err).To(Say("some-restart-warning"))
 							})
 						})
 					})

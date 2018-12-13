@@ -550,7 +550,7 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("should not return an error", func() {
-							Expect(executeErr).NotTo(HaveOccurred())
+							Expect(executeErr).To(MatchError(actionerror.AllInstancesCrashedError{}))
 						})
 
 						It("should call GetProcessInstances twice", func() {

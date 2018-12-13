@@ -165,15 +165,19 @@ func (cmd PushCommand) Execute(args []string) error {
 		cmd.UI.DisplayText("Waiting for app to start...")
 		warnings, err := cmd.VersionActor.RestartApplication(updatedState.Application.GUID)
 		cmd.UI.DisplayWarnings(warnings)
+
+		anyProcessCrashed := false
 		if err != nil {
 			if _, ok := err.(actionerror.StartupTimeoutError); ok {
 				return translatableerror.StartupTimeoutError{
 					AppName:    cmd.RequiredArgs.AppName,
 					BinaryName: cmd.Config.BinaryName(),
 				}
+			} else if _, ok := err.(actionerror.AllInstancesCrashedError); ok {
+				anyProcessCrashed = true
+			} else {
+				return err
 			}
-
-			return err
 		}
 
 		log.Info("getting application summary info")
@@ -186,6 +190,13 @@ func (cmd PushCommand) Execute(args []string) error {
 		cmd.UI.DisplayNewline()
 		appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
 		appSummaryDisplayer.AppDisplay(summary, true)
+
+		if anyProcessCrashed {
+			return translatableerror.ApplicationUnableToStartError{
+				AppName:    cmd.RequiredArgs.AppName,
+				BinaryName: cmd.Config.BinaryName(),
+			}
+		}
 	}
 
 	return nil
