@@ -278,7 +278,8 @@ var _ = Describe("Service", func() {
 								"guid": "some-service-guid-1"
 							},
 							"entity": {
-								"label": "some-service"
+								"label": "some-service",
+								"service_broker_name": "broker-1"
 							}
 						},
 						{
@@ -286,7 +287,8 @@ var _ = Describe("Service", func() {
 								"guid": "some-service-guid-2"
 							},
 							"entity": {
-								"label": "other-service"
+								"label": "other-service",
+								"service_broker_name": "broker-2"
 							}
 						}
 					]
@@ -300,7 +302,8 @@ var _ = Describe("Service", func() {
 								"guid": "some-service-guid-3"
 							},
 							"entity": {
-								"label": "some-service"
+								"label": "some-service",
+								"service_broker_name": "broker-3"
 							}
 						},
 						{
@@ -308,7 +311,8 @@ var _ = Describe("Service", func() {
 								"guid": "some-service-guid-4"
 							},
 							"entity": {
-								"label": "other-service"
+								"label": "other-service",
+								"service_broker_name": "broker-4"
 							}
 						}
 					]
@@ -331,10 +335,10 @@ var _ = Describe("Service", func() {
 			It("returns all the queried services", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(services).To(ConsistOf([]Service{
-					{GUID: "some-service-guid-1", Label: "some-service"},
-					{GUID: "some-service-guid-2", Label: "other-service"},
-					{GUID: "some-service-guid-3", Label: "some-service"},
-					{GUID: "some-service-guid-4", Label: "other-service"},
+					{GUID: "some-service-guid-1", Label: "some-service", ServiceBrokerName: "broker-1"},
+					{GUID: "some-service-guid-2", Label: "other-service", ServiceBrokerName: "broker-2"},
+					{GUID: "some-service-guid-3", Label: "some-service", ServiceBrokerName: "broker-3"},
+					{GUID: "some-service-guid-4", Label: "other-service", ServiceBrokerName: "broker-4"},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 			})
