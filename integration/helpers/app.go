@@ -3,6 +3,7 @@ package helpers
 import (
 	"archive/zip"
 	"fmt"
+	"github.com/onsi/gomega/gbytes"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -11,7 +12,6 @@ import (
 	"strings"
 
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	"gopkg.in/yaml.v2"
 )
@@ -52,6 +52,7 @@ func WithNoResourceMatchedApp(f func(dir string)) {
 	f(dir)
 }
 
+// WithMultiBuildpackApp creates a multi-buildpack application to use with the CF push command.
 func WithMultiBuildpackApp(f func(dir string)) {
 	f("../../assets/go_calls_ruby")
 }
@@ -89,6 +90,8 @@ BUNDLED WITH
 	f(dir)
 }
 
+// WithCrashingApp creates an application to use with your CLI command
+// that will not successfully start its `web` process
 func WithCrashingApp(f func(dir string)) {
 	dir, err := ioutil.TempDir("", "crashing-ruby-app")
 	Expect(err).ToNot(HaveOccurred())
@@ -145,15 +148,12 @@ func AppGUID(appName string) string {
 	return strings.TrimSpace(string(session.Out.Contents()))
 }
 
+// WriteManifest will write out a YAML manifest file at the specified path.
 func WriteManifest(path string, manifest map[string]interface{}) {
 	body, err := yaml.Marshal(manifest)
 	Expect(err).ToNot(HaveOccurred())
 	err = ioutil.WriteFile(path, body, 0666)
 	Expect(err).ToNot(HaveOccurred())
-}
-
-func ConfirmStagingLogs(session *Session) {
-	Eventually(session).Should(Say(`(?i)Creating container|Successfully created container|Staging\.\.\.|Staging process started \.\.\.|Staging Complete|Exit status 0|Uploading droplet\.\.\.|Uploading complete`))
 }
 
 // Zipit zips the source into a .zip file in the target dir
@@ -225,4 +225,8 @@ func Zipit(source, target, prefix string) error {
 	})
 
 	return err
+}
+
+func ConfirmStagingLogs(session *Session) {
+	Eventually(session).Should(gbytes.Say(`(?i)Creating container|Successfully created container|Staging\.\.\.|Staging process started \.\.\.|Staging Complete|Exit status 0|Uploading droplet\.\.\.|Uploading complete`))
 }
