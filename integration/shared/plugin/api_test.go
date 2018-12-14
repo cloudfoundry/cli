@@ -152,10 +152,8 @@ var _ = Describe("plugin API", func() {
 			servicePlan := helpers.PrefixedRandomName("SERVICE-PLAN")
 			serviceInstance1 = helpers.PrefixedRandomName("SI1")
 			serviceInstance2 = helpers.PrefixedRandomName("SI2")
-			broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-			broker.Push()
-			broker.Configure(true)
-			broker.Create()
+
+			broker = helpers.CreateBroker(domain, service, servicePlan)
 
 			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 			Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance1)).Should(Exit(0))

@@ -189,6 +189,17 @@ func (b ServiceBroker) ToJSON(shareable bool) string {
 	return replacer.Replace(string(bytes))
 }
 
+func CreateBroker(domain, serviceName, planName string) ServiceBroker {
+	service := serviceName
+	servicePlan := planName
+	broker := NewServiceBroker(NewServiceBrokerName(), NewAssets().ServiceBroker, domain, service, servicePlan)
+	broker.Push()
+	broker.Configure(true)
+	broker.Create()
+
+	return broker
+}
+
 type Assets struct {
 	ServiceBroker string
 }

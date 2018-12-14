@@ -63,9 +63,9 @@ var _ = Describe("marketplace command", func() {
 
 						domain := helpers.DefaultSharedDomain()
 
-						broker1 = createBroker(domain, "SERVICE-1", "SERVICE-PLAN-1")
+						broker1 = helpers.CreateBroker(domain, helpers.PrefixedRandomName("SERVICE-1"), "SERVICE-PLAN-1")
 						enableServiceAccess(broker1)
-						broker2 = createBroker(domain, "SERVICE-2", "SERVICE-PLAN-2")
+						broker2 = helpers.CreateBroker(domain, helpers.PrefixedRandomName("SERVICE-2"), "SERVICE-PLAN-2")
 						enableServiceAccess(broker2)
 
 						helpers.LogoutCF()
@@ -130,7 +130,7 @@ var _ = Describe("marketplace command", func() {
 
 						domain := helpers.DefaultSharedDomain()
 
-						broker1 = createBroker(domain, "SERVICE-1", "SERVICE-PLAN-1")
+						broker1 = helpers.CreateBroker(domain, helpers.PrefixedRandomName("SERVICE-1"), "SERVICE-PLAN-1")
 						enableServiceAccessForOrg(broker1, org1)
 
 						org2 = helpers.NewOrgName()
@@ -138,7 +138,7 @@ var _ = Describe("marketplace command", func() {
 						helpers.CreateOrgAndSpace(org2, space2)
 						helpers.TargetOrgAndSpace(org2, space2)
 
-						broker2 = createBroker(domain, "SERVICE-2", "SERVICE-PLAN-2")
+						broker2 = helpers.CreateBroker(domain, helpers.PrefixedRandomName("SERVICE-2"), "SERVICE-PLAN-2")
 						enableServiceAccess(broker2)
 					})
 
@@ -239,7 +239,7 @@ var _ = Describe("marketplace command", func() {
 
 							domain := helpers.DefaultSharedDomain()
 
-							broker = createBroker(domain, "SERVICE", "SERVICE-PLAN")
+							broker = helpers.CreateBroker(domain, helpers.PrefixedRandomName("SERVICE"), "SERVICE-PLAN")
 							enableServiceAccess(broker)
 
 							helpers.LogoutCF()
@@ -316,7 +316,7 @@ var _ = Describe("marketplace command", func() {
 
 								domain := helpers.DefaultSharedDomain()
 
-								broker = createBroker(domain, "SERVICE", "SERVICE-PLAN")
+								broker = helpers.CreateBroker(domain, helpers.PrefixedRandomName("SERVICE"), "SERVICE-PLAN")
 								enableServiceAccess(broker)
 							})
 
@@ -352,7 +352,7 @@ var _ = Describe("marketplace command", func() {
 
 								domain := helpers.DefaultSharedDomain()
 
-								broker = createBroker(domain, "SERVICE", "SERVICE-PLAN")
+								broker = helpers.CreateBroker(domain, helpers.PrefixedRandomName("SERVICE"), "SERVICE-PLAN")
 								enableServiceAccessForOrg(broker, org)
 
 								helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
@@ -378,17 +378,6 @@ var _ = Describe("marketplace command", func() {
 		})
 	})
 })
-
-func createBroker(domain, serviceName, planName string) helpers.ServiceBroker {
-	service := helpers.PrefixedRandomName(serviceName)
-	servicePlan := helpers.PrefixedRandomName(planName)
-	broker := helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-	broker.Push()
-	broker.Configure(true)
-	broker.Create()
-
-	return broker
-}
 
 func enableServiceAccess(broker helpers.ServiceBroker) {
 	Eventually(helpers.CF("enable-service-access", getServiceName(broker))).Should(Exit(0))

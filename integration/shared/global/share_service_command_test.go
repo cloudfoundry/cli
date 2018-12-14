@@ -124,10 +124,7 @@ var _ = Describe("share-service command", func() {
 			var broker helpers.ServiceBroker
 
 			BeforeEach(func() {
-				broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-				broker.Push()
-				broker.Configure(true)
-				broker.Create()
+				broker = helpers.CreateBroker(domain, service, servicePlan)
 
 				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
 				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))

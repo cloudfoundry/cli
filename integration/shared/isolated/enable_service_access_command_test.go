@@ -141,10 +141,7 @@ var _ = Describe("enable service access command", func() {
 				service = helpers.PrefixedRandomName("SERVICE")
 				servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
-				broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-				broker.Push()
-				broker.Configure(true)
-				broker.Create()
+				broker = helpers.CreateBroker(domain, service, servicePlan)
 			})
 
 			AfterEach(func() {
