@@ -74,39 +74,39 @@ fly-windows-units:
 integration-cleanup:
 	$(PWD)/bin/cleanup-integration
 
-integration-experimental: build integration-cleanup integration-shared-experimental integration-experimental-versioned
+integration-experimental: build integration-cleanup integration-shared-experimental integration-experimental-versioned ## Run all experimental integration tests, both versioned and shared across versions
 
-integration-shared-experimental: build integration-cleanup
+integration-shared-experimental: build integration-cleanup ## Run experimental integration tests that are shared between v6 and v7
 	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/experimental
 
-integration-experimental-versioned: build integration-cleanup
+integration-experimental-versioned: build integration-cleanup ## Run experimental integration tests that are specific to your CLI version
 	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/experimental
 
-integration-global: build integration-cleanup integration-shared-global integration-global-versioned
+integration-global: build integration-cleanup integration-shared-global integration-global-versioned ## Run all unparallelizable integration tests that make cross-cutting changes to their test CF foundation
 
-integration-shared-global: build integration-cleanup
+integration-shared-global: build integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are shared between v6 and v7
 	$(ginkgo_int) -tags=$(TAGS) integration/shared/global
 
-integration-global-versioned: build integration-cleanup
+integration-global-versioned: build integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are specific to your CLI version
 	$(ginkgo_int) -tags=$(TAGS) integration/$(TARGET)/global
 
-integration-isolated: build integration-cleanup integration-shared-isolated integration-isolated-versioned
+integration-isolated: build integration-cleanup integration-shared-isolated integration-isolated-versioned ## Run all parallel-enabled integration tests, both versioned and shared across versions
 
-integration-shared-isolated: build integration-cleanup
+integration-shared-isolated: build integration-cleanup ## Run all parallel-enabled integration tests that are shared between v6 and v7
 	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/isolated
 
-integration-isolated-versioned: build integration-cleanup
+integration-isolated-versioned: build integration-cleanup ## Run all parallel-enabled integration tests, both versioned and shared across versions
 	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/$(TARGET)/isolated
 
-integration-plugin: build integration-cleanup
+integration-plugin: build integration-cleanup ## Run all plugin-related integration tests
 	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/plugin
 
-integration-push: build integration-cleanup
+integration-push: build integration-cleanup  ## Run all push-related integration tests
 	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/$(TARGET)/push
 
-integration-tests: build integration-cleanup integration-isolated integration-push integration-global
+integration-tests: build integration-cleanup integration-isolated integration-push integration-global ## Run all isolated, push, and global integration tests
 
-integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global
+integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global  ## Run all isolated, push, experimental, plugin, and global integration tests
 
 lint:
 	@echo "style linting files:" # this list will grow as we cleanup all the code
