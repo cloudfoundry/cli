@@ -17,6 +17,7 @@ type Application struct {
 	State               constant.ApplicationState
 	LifecycleType       constant.AppLifecycleType
 	LifecycleBuildpacks []string
+	SpaceGUID           string
 }
 
 func (app Application) Started() bool {
@@ -69,6 +70,22 @@ func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string
 func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warnings, error) {
 	ccApps, warnings, err := actor.CloudControllerClient.GetApplications(
 		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+	)
+
+	if err != nil {
+		return []Application{}, Warnings(warnings), err
+	}
+
+	var apps []Application
+	for _, ccApp := range ccApps {
+		apps = append(apps, actor.convertCCToActorApplication(ccApp))
+	}
+	return apps, Warnings(warnings), nil
+}
+
+func (actor Actor) GetApplicationsByGUIDs(appGUIDs ...string) ([]Application, Warnings, error) {
+	ccApps, warnings, err := actor.CloudControllerClient.GetApplications(
+		ccv3.Query{Key: ccv3.GUIDFilter, Values: appGUIDs},
 	)
 
 	if err != nil {
@@ -185,6 +202,7 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 		Name:                app.Name,
 		State:               app.State,
+		SpaceGUID:           app.Relationships[constant.RelationshipTypeSpace].GUID,
 	}
 }
 

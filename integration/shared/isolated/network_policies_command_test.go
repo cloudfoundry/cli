@@ -72,8 +72,47 @@ var _ = Describe("network-policies command", func() {
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
-				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports`))
-				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080[^-]`, appName, appName))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
+				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, appName, spaceName))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("policy has a destination in another space", func() {
+			var (
+				destOrg   string
+				destSpace string
+				destApp   string
+			)
+
+			BeforeEach(func() {
+				destOrg = helpers.NewOrgName()
+				destSpace = helpers.NewSpaceName()
+				destApp = helpers.PrefixedRandomName("destapp")
+
+				helpers.SetupCF(destOrg, destSpace)
+
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CF("push", destApp, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+				})
+
+				helpers.SetupCF(orgName, spaceName)
+
+				session := helpers.CF("add-network-policy", appName, "--destination-app", destApp, "-o", destOrg, "-s", destSpace)
+				username, _ := helpers.GetCredentials()
+				Eventually(session).Should(Say(`Adding network policy from app %s in org %s / space %s to app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, destApp, destOrg, destSpace, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("lists the policy", func() {
+				session := helpers.CF("network-policies")
+
+				username, _ := helpers.GetCredentials()
+				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
+				Consistently(session).ShouldNot(Say("OK"))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
+				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, destApp, destSpace))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -95,10 +134,50 @@ var _ = Describe("network-policies command", func() {
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Listing network policies of app %s in org %s / space %s as %s\.\.\.`, srcAppName, orgName, spaceName, username))
-				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports`))
-				Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080[^-]`, appName, appName))
-				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080[^-]`, srcAppName, appName))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
+				Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, appName, spaceName))
+				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, srcAppName, appName, spaceName))
 				Eventually(session).Should(Exit(0))
+			})
+
+			When("policy has a destination in another space", func() {
+				var (
+					destOrg   string
+					destSpace string
+					destApp   string
+				)
+
+				BeforeEach(func() {
+					destOrg = helpers.NewOrgName()
+					destSpace = helpers.NewSpaceName()
+					destApp = helpers.PrefixedRandomName("destapp")
+
+					helpers.SetupCF(destOrg, destSpace)
+
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", destApp, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+					})
+
+					helpers.SetupCF(orgName, spaceName)
+
+					session := helpers.CF("add-network-policy", appName, "--destination-app", destApp, "-o", destOrg, "-s", destSpace)
+					username, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say(`Adding network policy from app %s in org %s / space %s to app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, destApp, destOrg, destSpace, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("lists only policies for which the app is a source", func() {
+					session := helpers.CF("network-policies", "--source", appName)
+
+					username, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say(`Listing network policies of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
+					Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
+					Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, appName, spaceName))
+					Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, destApp, destSpace))
+					Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, srcAppName, appName, spaceName))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 

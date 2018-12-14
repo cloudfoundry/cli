@@ -220,4 +220,56 @@ var _ = Describe("Space", func() {
 		})
 
 	})
+
+	Describe("GetSpacesByGUIDs", func() {
+		When("the GetSpace call is successful", func() {
+			When("the cloud controller returns back multiple spaces", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpacesReturns(
+						[]ccv3.Space{
+							{GUID: "space-guid-1", Name: "space-1"},
+							{GUID: "space-guid-2", Name: "space-2"},
+						},
+						ccv3.Warnings{"space-warning-1", "space-warning-2"}, nil)
+				})
+
+				It("returns back the first space and warnings", func() {
+					spaces, warnings, executeErr := actor.GetSpacesByGUIDs("space-guid-1", "space-guid-2")
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(spaces).To(ConsistOf(
+						Space{
+							GUID: "space-guid-1",
+							Name: "space-1",
+						},
+						Space{
+							GUID: "space-guid-2",
+							Name: "space-2",
+						},
+					))
+					Expect(warnings).To(ConsistOf("space-warning-1", "space-warning-2"))
+
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"space-guid-1", "space-guid-2"}},
+					))
+				})
+			})
+		})
+
+		When("the GetSpace call is unsuccessful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpacesReturns(
+					nil,
+					ccv3.Warnings{"space-warning-1", "space-warning-2"},
+					errors.New("cannot get space"))
+			})
+
+			It("returns an error and warnings", func() {
+				_, warnings, executeErr := actor.GetSpacesByGUIDs("space-guid-1", "space-guid-2")
+				Expect(executeErr).To(MatchError("cannot get space"))
+				Expect(warnings).To(ConsistOf("space-warning-1", "space-warning-2"))
+			})
+		})
+	})
 })

@@ -55,3 +55,20 @@ func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID strin
 
 	return Space(spaces[0]), Warnings(warnings), nil
 }
+
+func (actor Actor) GetSpacesByGUIDs(guids ...string) ([]Space, Warnings, error) {
+	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
+		ccv3.Query{Key: ccv3.GUIDFilter, Values: guids},
+	)
+
+	if err != nil {
+		return []Space{}, Warnings(warnings), err
+	}
+
+	var v3Spaces []Space
+	for _, ccSpace := range spaces {
+		v3Spaces = append(v3Spaces, Space(ccSpace))
+	}
+
+	return v3Spaces, Warnings(warnings), nil
+}

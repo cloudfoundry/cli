@@ -95,6 +95,7 @@ func (cmd NetworkPoliciesCommand) Execute(args []string) error {
 			cmd.UI.TranslateText("destination"),
 			cmd.UI.TranslateText("protocol"),
 			cmd.UI.TranslateText("ports"),
+			cmd.UI.TranslateText("destination space"),
 		},
 	}
 
@@ -110,6 +111,7 @@ func (cmd NetworkPoliciesCommand) Execute(args []string) error {
 			policy.DestinationName,
 			policy.Protocol,
 			portEntry,
+			policy.DestinationSpaceName,
 		})
 	}
 
