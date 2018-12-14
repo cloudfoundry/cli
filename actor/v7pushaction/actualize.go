@@ -37,10 +37,21 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 		}
 		stateStream <- state
 
-		err = actor.ApplyManifest(state, warningsStream, eventStream)
-		if err != nil {
-			errorStream <- err
-			return
+		if len(state.Manifest) > 0 {
+			err = actor.ApplyManifest(state, warningsStream, eventStream)
+			if err != nil {
+				errorStream <- err
+				return
+			}
+		} else if !state.Overrides.SkipRouteCreation {
+			eventStream <- CreatingAndMappingRoutes
+			routeWarnings, routeErr := actor.CreateAndMapDefaultApplicationRoute(state.OrgGUID, state.SpaceGUID, state.Application)
+			warningsStream <- Warnings(routeWarnings)
+			if routeErr != nil {
+				errorStream <- routeErr
+				return
+			}
+			eventStream <- CreatedRoutes
 		}
 
 		err = actor.ScaleProcess(state, warningsStream, eventStream)
@@ -53,17 +64,6 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 		if err != nil {
 			errorStream <- err
 			return
-		}
-
-		if !state.Overrides.SkipRouteCreation {
-			eventStream <- CreatingAndMappingRoutes
-			routeWarnings, routeErr := actor.CreateAndMapDefaultApplicationRoute(state.OrgGUID, state.SpaceGUID, state.Application)
-			warningsStream <- Warnings(routeWarnings)
-			if routeErr != nil {
-				errorStream <- routeErr
-				return
-			}
-			eventStream <- CreatedRoutes
 		}
 
 		pkg, err := actor.CreatePackage(state, progressBar, warningsStream, eventStream)
@@ -116,9 +116,6 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 }
 
 func (actor Actor) ApplyManifest(state PushState, warningsStream chan Warnings, eventStream chan Event) error {
-	if len(state.Manifest) == 0 {
-		return nil
-	}
 	eventStream <- ApplyManifest
 	warnings, err := actor.V7Actor.SetApplicationManifest(state.Application.GUID, state.Manifest)
 	warningsStream <- Warnings(warnings)
