@@ -73,6 +73,66 @@ var _ = Describe("Organization Actions", func() {
 		})
 	})
 
+	Describe("GetOrganizationsByGUIDs", func() {
+		When("the orgs exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{
+						{
+							Name: "some-org-name",
+							GUID: "some-org-guid",
+						},
+						{
+							Name: "another-org-name",
+							GUID: "another-org-guid",
+						},
+					},
+					ccv3.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("returns the organizations and warnings", func() {
+				orgs, warnings, err := actor.GetOrganizationsByGUIDs("some-org-guid", "another-org-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(orgs).To(ConsistOf(
+					Organization{
+						Name: "some-org-name",
+						GUID: "some-org-guid",
+					},
+					Organization{
+						Name: "another-org-name",
+						GUID: "another-org-guid",
+					},
+				))
+				Expect(warnings).To(ConsistOf("some-warning"))
+
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"some-org-guid", "another-org-guid"}},
+				))
+			})
+		})
+
+		When("the cloud controller client returns an error", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{},
+					ccv3.Warnings{"some-warning"},
+					expectedError)
+			})
+
+			It("returns the warnings and the error", func() {
+				_, warnings, err := actor.GetOrganizationsByGUIDs("some-org-guid")
+				Expect(warnings).To(ConsistOf("some-warning"))
+				Expect(err).To(MatchError(expectedError))
+			})
+		})
+	})
+
 	When("the org does not exist", func() {
 		BeforeEach(func() {
 			fakeCloudControllerClient.GetOrganizationsReturns(

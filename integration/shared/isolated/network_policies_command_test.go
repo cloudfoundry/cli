@@ -72,13 +72,13 @@ var _ = Describe("network-policies command", func() {
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
-				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
-				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, appName, spaceName))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, appName, appName, spaceName, orgName))
 				Eventually(session).Should(Exit(0))
 			})
 		})
 
-		When("policy has a destination in another space", func() {
+		When("policy has a destination in another org and space", func() {
 			var (
 				destOrg   string
 				destSpace string
@@ -111,8 +111,8 @@ var _ = Describe("network-policies command", func() {
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
-				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
-				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, destApp, destSpace))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, appName, destApp, destSpace, destOrg))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -134,9 +134,9 @@ var _ = Describe("network-policies command", func() {
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Listing network policies of app %s in org %s / space %s as %s\.\.\.`, srcAppName, orgName, spaceName, username))
-				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
-				Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, appName, spaceName))
-				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, srcAppName, appName, spaceName))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+				Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, appName, appName, spaceName, orgName))
+				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, srcAppName, appName, spaceName, orgName))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -172,10 +172,10 @@ var _ = Describe("network-policies command", func() {
 
 					username, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say(`Listing network policies of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
-					Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
-					Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, appName, spaceName))
-					Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, destApp, destSpace))
-					Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, srcAppName, appName, spaceName))
+					Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+					Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, appName, appName, spaceName, orgName))
+					Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, appName, destApp, destSpace, destOrg))
+					Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, srcAppName, appName, spaceName, orgName))
 					Eventually(session).Should(Exit(0))
 				})
 			})

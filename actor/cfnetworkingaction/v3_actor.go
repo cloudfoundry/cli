@@ -10,4 +10,5 @@ type V3Actor interface {
 	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error)
 	GetApplicationsByGUIDs(appGUIDs ...string) ([]v3action.Application, v3action.Warnings, error)
 	GetSpacesByGUIDs(spaceGUIDs ...string) ([]v3action.Space, v3action.Warnings, error)
+	GetOrganizationsByGUIDs(orgGUIDs ...string) ([]v3action.Organization, v3action.Warnings, error)
 }

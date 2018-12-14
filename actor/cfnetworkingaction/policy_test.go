@@ -170,14 +170,27 @@ var _ = Describe("Policy", func() {
 
 			fakeV3Actor.GetSpacesByGUIDsReturns([]v3action.Space{
 				{
-					Name: "spaceA",
-					GUID: "spaceAGUID",
+					Name:             "spaceA",
+					GUID:             "spaceAGUID",
+					OrganizationGUID: "orgAGUID",
 				},
 				{
-					Name: "spaceC",
-					GUID: "spaceCGUID",
+					Name:             "spaceC",
+					GUID:             "spaceCGUID",
+					OrganizationGUID: "orgCGUID",
 				},
 			}, []string{"GetSpacesByGUIDsWarning"}, nil)
+
+			fakeV3Actor.GetOrganizationsByGUIDsReturns([]v3action.Organization{
+				{
+					Name: "orgA",
+					GUID: "orgAGUID",
+				},
+				{
+					Name: "orgC",
+					GUID: "orgCGUID",
+				},
+			}, []string{"GetOrganizationsByGUIDsWarning"}, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -199,6 +212,7 @@ var _ = Describe("Policy", func() {
 						StartPort:            8080,
 						EndPort:              8080,
 						DestinationSpaceName: "spaceA",
+						DestinationOrgName:   "orgA",
 					},
 					{
 						SourceName:           "appA",
@@ -207,13 +221,19 @@ var _ = Describe("Policy", func() {
 						StartPort:            8080,
 						EndPort:              8080,
 						DestinationSpaceName: "spaceC",
+						DestinationOrgName:   "orgC",
 					},
 				},
 				))
 			})
 
 			It("passes through the source app argument", func() {
-				Expect(warnings).To(ConsistOf("GetApplicationByNameAndSpaceWarning", "GetApplicationsByGUIDsWarning", "GetSpacesByGUIDsWarning"))
+				Expect(warnings).To(ConsistOf(
+					"GetApplicationByNameAndSpaceWarning",
+					"GetApplicationsByGUIDsWarning",
+					"GetSpacesByGUIDsWarning",
+					"GetOrganizationsByGUIDsWarning",
+				))
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
@@ -355,14 +375,27 @@ var _ = Describe("Policy", func() {
 
 			fakeV3Actor.GetSpacesByGUIDsReturns([]v3action.Space{
 				{
-					GUID: "spaceAGUID",
-					Name: "spaceA",
+					GUID:             "spaceAGUID",
+					Name:             "spaceA",
+					OrganizationGUID: "orgAGUID",
 				},
 				{
-					GUID: "spaceCGUID",
-					Name: "spaceC",
+					GUID:             "spaceCGUID",
+					Name:             "spaceC",
+					OrganizationGUID: "orgCGUID",
 				},
 			}, []string{"GetSpaceByGUIDsWarning"}, nil)
+
+			fakeV3Actor.GetOrganizationsByGUIDsReturns([]v3action.Organization{
+				{
+					GUID: "orgAGUID",
+					Name: "orgA",
+				},
+				{
+					GUID: "orgCGUID",
+					Name: "orgC",
+				},
+			}, []string{"GetOrganizationsByGUIDsWarning"}, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -379,6 +412,7 @@ var _ = Describe("Policy", func() {
 					StartPort:            8080,
 					EndPort:              8080,
 					DestinationSpaceName: "spaceA",
+					DestinationOrgName:   "orgA",
 				}, {
 					SourceName:           "appB",
 					DestinationName:      "appB",
@@ -386,6 +420,7 @@ var _ = Describe("Policy", func() {
 					StartPort:            8080,
 					EndPort:              8080,
 					DestinationSpaceName: "spaceA",
+					DestinationOrgName:   "orgA",
 				}, {
 					SourceName:           "appA",
 					DestinationName:      "appC",
@@ -393,9 +428,15 @@ var _ = Describe("Policy", func() {
 					StartPort:            8080,
 					EndPort:              8080,
 					DestinationSpaceName: "spaceC",
+					DestinationOrgName:   "orgC",
 				}},
 			))
-			Expect(warnings).To(ConsistOf("GetApplicationsBySpaceWarning", "GetApplicationsByGUIDsWarning", "GetSpaceByGUIDsWarning"))
+			Expect(warnings).To(ConsistOf(
+				"GetApplicationsBySpaceWarning",
+				"GetApplicationsByGUIDsWarning",
+				"GetSpaceByGUIDsWarning",
+				"GetOrganizationsByGUIDsWarning",
+			))
 			Expect(executeErr).NotTo(HaveOccurred())
 
 			Expect(fakeV3Actor.GetApplicationsBySpaceCallCount()).To(Equal(1))
@@ -409,6 +450,9 @@ var _ = Describe("Policy", func() {
 
 			Expect(fakeV3Actor.GetSpacesByGUIDsCallCount()).To(Equal(1))
 			Expect(fakeV3Actor.GetSpacesByGUIDsArgsForCall(0)).To(ConsistOf("spaceAGUID", "spaceCGUID"))
+
+			Expect(fakeV3Actor.GetOrganizationsByGUIDsCallCount()).To(Equal(1))
+			Expect(fakeV3Actor.GetOrganizationsByGUIDsArgsForCall(0)).To(ConsistOf("orgAGUID", "orgCGUID"))
 		})
 
 		// policy server returns policies that match the give app guid in the source or destination

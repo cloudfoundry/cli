@@ -23,3 +23,25 @@ func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, e
 
 	return Organization(orgs[0]), Warnings(warnings), nil
 }
+
+func (actor Actor) GetOrganizationsByGUIDs(guids ...string) ([]Organization, Warnings, error) {
+	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(
+		ccv3.Query{Key: ccv3.GUIDFilter, Values: guids},
+	)
+	if err != nil {
+		return []Organization{}, Warnings(warnings), err
+	}
+
+	return actor.convertCCToActorOrganizations(orgs), Warnings(warnings), nil
+}
+
+func (actor Actor) convertCCToActorOrganizations(v3orgs []ccv3.Organization) []Organization {
+	orgs := make([]Organization, len(v3orgs))
+	for i := range v3orgs {
+		orgs[i] = Organization{
+			GUID: v3orgs[i].GUID,
+			Name: v3orgs[i].Name,
+		}
+	}
+	return orgs
+}

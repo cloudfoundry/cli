@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -227,8 +228,20 @@ var _ = Describe("Space", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
 						[]ccv3.Space{
-							{GUID: "space-guid-1", Name: "space-1"},
-							{GUID: "space-guid-2", Name: "space-2"},
+							{
+								GUID: "space-guid-1",
+								Name: "space-1",
+								Relationships: ccv3.Relationships{
+									constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-1"},
+								},
+							},
+							{
+								GUID: "space-guid-2",
+								Name: "space-2",
+								Relationships: ccv3.Relationships{
+									constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-2"},
+								},
+							},
 						},
 						ccv3.Warnings{"space-warning-1", "space-warning-2"}, nil)
 				})
@@ -239,12 +252,14 @@ var _ = Describe("Space", func() {
 
 					Expect(spaces).To(ConsistOf(
 						Space{
-							GUID: "space-guid-1",
-							Name: "space-1",
+							GUID:             "space-guid-1",
+							Name:             "space-1",
+							OrganizationGUID: "org-guid-1",
 						},
 						Space{
-							GUID: "space-guid-2",
-							Name: "space-2",
+							GUID:             "space-guid-2",
+							Name:             "space-2",
+							OrganizationGUID: "org-guid-2",
 						},
 					))
 					Expect(warnings).To(ConsistOf("space-warning-1", "space-warning-2"))

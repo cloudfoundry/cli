@@ -11,6 +11,7 @@ type Policy struct {
 	DestinationName      string
 	Protocol             string
 	DestinationSpaceName string
+	DestinationOrgName   string
 	StartPort            int
 	EndPort              int
 }
@@ -92,6 +93,24 @@ func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings,
 		spaceNamesByGUID[destSpace.GUID] = destSpace.Name
 	}
 
+	orgGUIDs := uniqueOrgGUIDs(spaces)
+
+	orgs, warnings, err := actor.V3Actor.GetOrganizationsByGUIDs(orgGUIDs...)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+	if err != nil {
+		return []Policy{}, allWarnings, err
+	}
+
+	orgNamesByGUID := make(map[string]string, len(orgs))
+	for _, org := range orgs {
+		orgNamesByGUID[org.GUID] = org.Name
+	}
+
+	orgNamesBySpaceGUID := make(map[string]string, len(spaces))
+	for _, space := range spaces {
+		orgNamesBySpaceGUID[space.GUID] = orgNamesByGUID[space.OrganizationGUID]
+	}
+
 	appByGUID := map[string]v3action.Application{}
 	for _, app := range applications {
 		appByGUID[app.GUID] = app
@@ -99,7 +118,7 @@ func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings,
 
 	var policies []Policy
 	for _, v1Policy := range v1Policies {
-		policies = append(policies, actor.transformPolicy(appByGUID, spaceNamesByGUID, v1Policy))
+		policies = append(policies, actor.transformPolicy(appByGUID, spaceNamesByGUID, orgNamesBySpaceGUID, v1Policy))
 	}
 
 	return policies, allWarnings, nil
@@ -131,6 +150,18 @@ func uniqueSpaceGUIDs(applications []v3action.Application) []string {
 		}
 	}
 	return spaceGUIDs
+}
+
+func uniqueOrgGUIDs(spaces []v3action.Space) []string {
+	var orgGUIDs []string
+	occurances := map[string]struct{}{}
+	for _, space := range spaces {
+		if _, ok := occurances[space.OrganizationGUID]; !ok {
+			orgGUIDs = append(orgGUIDs, space.OrganizationGUID)
+			occurances[space.OrganizationGUID] = struct{}{}
+		}
+	}
+	return orgGUIDs
 }
 
 func uniqueDestGUIDs(policies []cfnetv1.Policy) []string {
@@ -184,6 +215,28 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 		spaceNamesByGUID[destSpace.GUID] = destSpace.Name
 	}
 
+	for _, destSpace := range spaces {
+		spaceNamesByGUID[destSpace.GUID] = destSpace.Name
+	}
+
+	orgGUIDs := uniqueOrgGUIDs(spaces)
+
+	orgs, warnings, err := actor.V3Actor.GetOrganizationsByGUIDs(orgGUIDs...)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+	if err != nil {
+		return []Policy{}, allWarnings, err
+	}
+
+	orgNamesByGUID := make(map[string]string, len(orgs))
+	for _, org := range orgs {
+		orgNamesByGUID[org.GUID] = org.Name
+	}
+
+	orgNamesBySpaceGUID := make(map[string]string, len(spaces))
+	for _, space := range spaces {
+		orgNamesBySpaceGUID[space.GUID] = orgNamesByGUID[space.OrganizationGUID]
+	}
+
 	appByGUID := map[string]v3action.Application{}
 	for _, app := range applications {
 		appByGUID[app.GUID] = app
@@ -191,7 +244,7 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 
 	var policies []Policy
 	for _, v1Policy := range v1Policies {
-		policies = append(policies, actor.transformPolicy(appByGUID, spaceNamesByGUID, v1Policy))
+		policies = append(policies, actor.transformPolicy(appByGUID, spaceNamesByGUID, orgNamesBySpaceGUID, v1Policy))
 	}
 
 	return policies, allWarnings, nil
@@ -240,7 +293,7 @@ func (actor Actor) RemoveNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, 
 	return allWarnings, actionerror.PolicyDoesNotExistError{}
 }
 
-func (Actor) transformPolicy(appByGuid map[string]v3action.Application, spaceNamesByGUID map[string]string, v1Policy cfnetv1.Policy) Policy {
+func (Actor) transformPolicy(appByGuid map[string]v3action.Application, spaceNamesByGUID, orgNamesBySpaceGUID map[string]string, v1Policy cfnetv1.Policy) Policy {
 	dst := appByGuid[v1Policy.Destination.ID]
 	return Policy{
 		SourceName:           appByGuid[v1Policy.Source.ID].Name,
@@ -249,5 +302,6 @@ func (Actor) transformPolicy(appByGuid map[string]v3action.Application, spaceNam
 		StartPort:            v1Policy.Destination.Ports.Start,
 		EndPort:              v1Policy.Destination.Ports.End,
 		DestinationSpaceName: spaceNamesByGUID[dst.SpaceGUID],
+		DestinationOrgName:   orgNamesBySpaceGUID[dst.SpaceGUID],
 	}
 }

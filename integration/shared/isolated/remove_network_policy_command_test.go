@@ -85,8 +85,8 @@ var _ = Describe("remove-network-policy command", func() {
 				session = helpers.CF("network-policies")
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
-				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
-				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, appName, spaceName))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, appName, appName, spaceName, orgName))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -101,8 +101,8 @@ var _ = Describe("remove-network-policy command", func() {
 				session = helpers.CF("network-policies")
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
-				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
-				Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, appName, appName, spaceName))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+				Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, appName, appName, spaceName, orgName))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -136,8 +136,8 @@ var _ = Describe("remove-network-policy command", func() {
 					session = helpers.CF("network-policies")
 					Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, sourceOrg, sourceSpace, username))
 					Consistently(session).ShouldNot(Say("OK"))
-					Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
-					Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s`, sourceApp, appName, spaceName))
+					Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+					Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, sourceApp, appName, spaceName, orgName))
 					Eventually(session).Should(Exit(0))
 				})
 

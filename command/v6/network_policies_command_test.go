@@ -97,6 +97,7 @@ var _ = Describe("network-policies Command", func() {
 						StartPort:            8080,
 						EndPort:              8080,
 						DestinationSpaceName: "some-space",
+						DestinationOrgName:   "some-org",
 					}, {
 						SourceName:           "app2",
 						DestinationName:      "app1",
@@ -104,6 +105,7 @@ var _ = Describe("network-policies Command", func() {
 						StartPort:            1234,
 						EndPort:              2345,
 						DestinationSpaceName: "some-space",
+						DestinationOrgName:   "some-org",
 					},
 				}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
 			})
@@ -116,9 +118,9 @@ var _ = Describe("network-policies Command", func() {
 
 				Expect(testUI.Out).To(Say(`Listing network policies in org some-org / space some-space as some-user\.\.\.`))
 				Expect(testUI.Out).To(Say("\n\n"))
-				Expect(testUI.Out).To(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
-				Expect(testUI.Out).To(Say(`app1\s+app2\s+tcp\s+8080\s+some-space`))
-				Expect(testUI.Out).To(Say(`app2\s+app1\s+udp\s+1234-2345\s+some-space`))
+				Expect(testUI.Out).To(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+				Expect(testUI.Out).To(Say(`app1\s+app2\s+tcp\s+8080\s+some-space\s+some-org`))
+				Expect(testUI.Out).To(Say(`app2\s+app1\s+udp\s+1234-2345\s+some-space\s+some-org`))
 
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
@@ -135,6 +137,7 @@ var _ = Describe("network-policies Command", func() {
 							StartPort:            8080,
 							EndPort:              8080,
 							DestinationSpaceName: "some-space",
+							DestinationOrgName:   "some-org",
 						}, {
 							SourceName:           "app2",
 							DestinationName:      "app1",
@@ -142,6 +145,7 @@ var _ = Describe("network-policies Command", func() {
 							StartPort:            1234,
 							EndPort:              2345,
 							DestinationSpaceName: "some-space",
+							DestinationOrgName:   "some-org",
 						},
 					}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
 				})
@@ -155,9 +159,9 @@ var _ = Describe("network-policies Command", func() {
 
 					Expect(testUI.Out).To(Say(`Listing network policies of app %s in org some-org / space some-space as some-user\.\.\.`, cmd.SourceApp))
 					Expect(testUI.Out).To(Say("\n\n"))
-					Expect(testUI.Out).To(Say(`source\s+destination\s+protocol\s+ports\s+destination space`))
-					Expect(testUI.Out).To(Say(`app1\s+app2\s+tcp\s+8080\s+some-space`))
-					Expect(testUI.Out).To(Say(`app2\s+app1\s+udp\s+1234-2345\s+some-space`))
+					Expect(testUI.Out).To(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+					Expect(testUI.Out).To(Say(`app1\s+app2\s+tcp\s+8080\s+some-space\s+some-org`))
+					Expect(testUI.Out).To(Say(`app2\s+app1\s+udp\s+1234-2345\s+some-space\s+some-org`))
 
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
