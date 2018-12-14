@@ -37,7 +37,7 @@ endif
 
 all: test build
 
-build: out/cf
+build: out/cf ## Compile and build a new `cf` binary
 
 check-target-env:
 ifndef CF_INT_API
@@ -47,10 +47,10 @@ ifndef CF_INT_PASSWORD
 	$(error CF_INT_PASSWORD is undefined)
 endif
 
-clean:
+clean: ## Remove all files from the `out` directory
 	rm -f $(wildcard out/cf*)
 
-format:
+format: ## Run go fmt
 	go fmt ./...
 
 fly-windows-experimental: check-target-env
@@ -108,7 +108,7 @@ integration-tests: build integration-cleanup integration-isolated integration-pu
 
 integration-tests-full: build integration-cleanup integration-isolated integration-push integration-experimental integration-plugin integration-global  ## Run all isolated, push, experimental, plugin, and global integration tests
 
-lint:
+lint: ## Run our custom linters
 	@echo "style linting files:" # this list will grow as we cleanup all the code
 	@bash -c "go run bin/style/main.go api util/{configv3,manifest,randomword,sorting,ui}"
 	@echo "No lint errors!"
@@ -196,7 +196,7 @@ rsrc.syso:
 
 test: units ## Runs everything that can run locally
 
-units: format vet lint build
+units: format vet lint build ## Ensure the code looks good, compiles, and passes unit tests
 	ginkgo -r -p -randomizeAllSpecs -randomizeSuites \
 		$(PACKAGES)
 	@echo "\nSWEET SUITE SUCCESS"
@@ -217,7 +217,7 @@ units-full: format vet lint build units-plugin units-non-plugin
 version: ## Print the version number of what would be built
 	@echo $(CF_BUILD_VERSION)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
 
-vet:
+vet: ## Run go vet
 	@echo  "Vetting packages for potential issues..."
 	go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
 	@echo
