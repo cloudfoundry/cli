@@ -860,7 +860,7 @@ var _ = Describe("Actualize", func() {
 
 		It("stages the application using the package guid", func() {
 			Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
-			Eventually(fakeV7Actor.StageApplicationPackageCallCount).Should(Equal(1))
+			Eventually(fakeV7Actor.StageApplicationPackageCallCount()).Should(Equal(1))
 			Expect(fakeV7Actor.StageApplicationPackageArgsForCall(0)).To(Equal("some-pkg-guid"))
 		})
 
@@ -885,6 +885,66 @@ var _ = Describe("Actualize", func() {
 				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
 				Eventually(warningsStream).Should(Receive(ConsistOf("some-staging-warning")))
 				Eventually(errorStream).Should(Receive(MatchError("ahhh, i failed")))
+			})
+		})
+	})
+
+	Describe("no start", func() {
+		When("The no start flag is provided", func() {
+			BeforeEach(func() {
+				state.Overrides.NoStart = true
+			})
+
+			When("The app is stopped", func() {
+				It("Uploads a package and exits", func() {
+					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
+					Expect(fakeV7Actor.StageApplicationPackageCallCount()).To(BeZero())
+				})
+			})
+
+			When("The app is running", func() {
+				BeforeEach(func() {
+					fakeV7Actor.StopApplicationReturns(v7action.Warnings{"some-stopping-warning"}, nil)
+					fakeV7Actor.CreateApplicationInSpaceReturns(v7action.Application{
+						GUID:  "some-app-guid",
+						Name:  "some-app",
+						State: constant.ApplicationStarted,
+					}, nil, nil)
+				})
+
+				When("Stopping the app succeeds", func() {
+					It("Uploads a package and exits", func() {
+						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StoppingApplication))
+						Eventually(warningsStream).Should(Receive(ConsistOf("some-stopping-warning")))
+						Eventually(eventStream).Should(Receive(Equal(StoppingApplicationComplete)))
+						Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
+
+						Expect(fakeV7Actor.StopApplicationCallCount()).To(Equal(1))
+						actualGUID := fakeV7Actor.StopApplicationArgsForCall(0)
+						Expect(actualGUID).To(Equal("some-app-guid"))
+						Expect(fakeV7Actor.StageApplicationPackageCallCount()).To(BeZero())
+					})
+				})
+
+				When("Stopping the app fails", func() {
+					BeforeEach(func() {
+						fakeV7Actor.StopApplicationReturns(v7action.Warnings{"some-stopping-warning"}, errors.New("bummer"))
+					})
+
+					It("returns errors and warnings", func() {
+						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StoppingApplication))
+						Eventually(warningsStream).Should(Receive(ConsistOf("some-stopping-warning")))
+						Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
+						Eventually(errorStream).Should(Receive(MatchError("bummer")))
+					})
+				})
+			})
+		})
+
+		When("The no start flag is not provided", func() {
+			It("stages the application using the package guid", func() {
+				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
+				Eventually(fakeV7Actor.StageApplicationPackageCallCount()).Should(Equal(1))
 			})
 		})
 	})

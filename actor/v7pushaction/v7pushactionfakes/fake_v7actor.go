@@ -162,6 +162,19 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	StopApplicationStub        func(string) (v7action.Warnings, error)
+	stopApplicationMutex       sync.RWMutex
+	stopApplicationArgsForCall []struct {
+		arg1 string
+	}
+	stopApplicationReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	stopApplicationReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	UpdateApplicationStub        func(v7action.Application) (v7action.Application, v7action.Warnings, error)
 	updateApplicationMutex       sync.RWMutex
 	updateApplicationArgsForCall []struct {
@@ -877,6 +890,69 @@ func (fake *FakeV7Actor) StageApplicationPackageReturnsOnCall(i int, result1 v7a
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV7Actor) StopApplication(arg1 string) (v7action.Warnings, error) {
+	fake.stopApplicationMutex.Lock()
+	ret, specificReturn := fake.stopApplicationReturnsOnCall[len(fake.stopApplicationArgsForCall)]
+	fake.stopApplicationArgsForCall = append(fake.stopApplicationArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("StopApplication", []interface{}{arg1})
+	fake.stopApplicationMutex.Unlock()
+	if fake.StopApplicationStub != nil {
+		return fake.StopApplicationStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.stopApplicationReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeV7Actor) StopApplicationCallCount() int {
+	fake.stopApplicationMutex.RLock()
+	defer fake.stopApplicationMutex.RUnlock()
+	return len(fake.stopApplicationArgsForCall)
+}
+
+func (fake *FakeV7Actor) StopApplicationCalls(stub func(string) (v7action.Warnings, error)) {
+	fake.stopApplicationMutex.Lock()
+	defer fake.stopApplicationMutex.Unlock()
+	fake.StopApplicationStub = stub
+}
+
+func (fake *FakeV7Actor) StopApplicationArgsForCall(i int) string {
+	fake.stopApplicationMutex.RLock()
+	defer fake.stopApplicationMutex.RUnlock()
+	argsForCall := fake.stopApplicationArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeV7Actor) StopApplicationReturns(result1 v7action.Warnings, result2 error) {
+	fake.stopApplicationMutex.Lock()
+	defer fake.stopApplicationMutex.Unlock()
+	fake.StopApplicationStub = nil
+	fake.stopApplicationReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV7Actor) StopApplicationReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.stopApplicationMutex.Lock()
+	defer fake.stopApplicationMutex.Unlock()
+	fake.StopApplicationStub = nil
+	if fake.stopApplicationReturnsOnCall == nil {
+		fake.stopApplicationReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.stopApplicationReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV7Actor) UpdateApplication(arg1 v7action.Application) (v7action.Application, v7action.Warnings, error) {
 	fake.updateApplicationMutex.Lock()
 	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
@@ -1105,6 +1181,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.setApplicationManifestMutex.RUnlock()
 	fake.stageApplicationPackageMutex.RLock()
 	defer fake.stageApplicationPackageMutex.RUnlock()
+	fake.stopApplicationMutex.RLock()
+	defer fake.stopApplicationMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.updateProcessByTypeAndApplicationMutex.RLock()

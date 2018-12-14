@@ -1,13 +1,14 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
+
+	"code.cloudfoundry.org/cli/command/translatableerror"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -611,6 +612,7 @@ var _ = Describe("push Command", func() {
 			cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
 			cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "some-start-command"}}
 			cmd.NoRoute = true
+			cmd.NoStart = true
 		})
 
 		JustBeforeEach(func() {
@@ -625,6 +627,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
 			Expect(overrides.StartCommand).To(Equal(types.FilteredString{IsSet: true, Value: "some-start-command"}))
 			Expect(overrides.SkipRouteCreation).To(BeTrue())
+			Expect(overrides.NoStart).To(BeTrue())
 		})
 
 		When("a docker image is provided", func() {

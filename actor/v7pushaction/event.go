@@ -30,6 +30,8 @@ const (
 	SkippingApplicationCreation     Event = "skipping creation"
 	StagingComplete                 Event = "staging complete"
 	StartingStaging                 Event = "starting staging"
+	StoppingApplication             Event = "stopping application"
+	StoppingApplicationComplete     Event = "stopping application complete"
 	UnmappingRoutes                 Event = "unmapping routes"
 	UpdatedApplication              Event = "updated application"
 	UploadDropletComplete           Event = "upload droplet complete"

@@ -161,25 +161,26 @@ func (cmd PushCommand) Execute(args []string) error {
 			return err
 		}
 
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("Waiting for app to start...")
-		warnings, err := cmd.VersionActor.RestartApplication(updatedState.Application.GUID)
-		cmd.UI.DisplayWarnings(warnings)
-
 		anyProcessCrashed := false
-		if err != nil {
-			if _, ok := err.(actionerror.StartupTimeoutError); ok {
-				return translatableerror.StartupTimeoutError{
-					AppName:    cmd.RequiredArgs.AppName,
-					BinaryName: cmd.Config.BinaryName(),
+		if !cmd.NoStart {
+			cmd.UI.DisplayNewline()
+			cmd.UI.DisplayText("Waiting for app to start...")
+			warnings, restartErr := cmd.VersionActor.RestartApplication(updatedState.Application.GUID)
+			cmd.UI.DisplayWarnings(warnings)
+
+			if restartErr != nil {
+				if _, ok := restartErr.(actionerror.StartupTimeoutError); ok {
+					return translatableerror.StartupTimeoutError{
+						AppName:    cmd.RequiredArgs.AppName,
+						BinaryName: cmd.Config.BinaryName(),
+					}
+				} else if _, ok := restartErr.(actionerror.AllInstancesCrashedError); ok {
+					anyProcessCrashed = true
+				} else {
+					return restartErr
 				}
-			} else if _, ok := err.(actionerror.AllInstancesCrashedError); ok {
-				anyProcessCrashed = true
-			} else {
-				return err
 			}
 		}
-
 		log.Info("getting application summary info")
 		summary, warnings, err := cmd.VersionActor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, true, cmd.RouteActor)
 		cmd.UI.DisplayWarnings(warnings)
@@ -286,6 +287,10 @@ func (cmd PushCommand) processEvent(appName string, event v7pushaction.Event) bo
 		cmd.ProgressBar.Complete()
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Waiting for API to complete processing files...")
+	case v7pushaction.StoppingApplication:
+		cmd.UI.DisplayText("Stopping Application...")
+	case v7pushaction.StoppingApplicationComplete:
+		cmd.UI.DisplayText("Application Stopped")
 	case v7pushaction.StartingStaging:
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Staging app and tracing logs...")
@@ -372,5 +377,6 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		ProvidedAppPath:   string(cmd.AppPath),
 		SkipRouteCreation: cmd.NoRoute,
 		StartCommand:      cmd.StartCommand.FilteredString,
+		NoStart:           cmd.NoStart,
 	}, nil
 }

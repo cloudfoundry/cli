@@ -79,6 +79,20 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 			return
 		}
 
+		if state.Overrides.NoStart == true {
+			if state.Application.State == constant.ApplicationStarted {
+				eventStream <- StoppingApplication
+				warnings, err = actor.V7Actor.StopApplication(state.Application.GUID)
+				warningsStream <- Warnings(warnings)
+				if err != nil {
+					errorStream <- err
+				}
+				eventStream <- StoppingApplicationComplete
+			}
+			eventStream <- Complete
+			return
+		}
+
 		eventStream <- StartingStaging
 
 		build, warnings, err := actor.V7Actor.StageApplicationPackage(polledPackage.GUID)
