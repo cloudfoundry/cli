@@ -9,7 +9,7 @@ image_resource:
 inputs:
 - name: cli
   path: go/src/code.cloudfoundry.org/cli
-- name: bosh-lock
+- name: bosh-lite
 
 params:
   CF_CLI_EXPERIMENTAL: false
@@ -20,20 +20,26 @@ run:
   args:
   - -c
   - |
+
     set -e
 
-    ENV=$(cat bosh-lock/name | cut -d "." -f 1)
-    set -x
+    source bosh-lite/env
+    credhub login --skip-tls-validation
+    export CF_INT_PASSWORD=$(credhub get --name '/bosh-lite/cf/cf_admin_password' | bosh interpolate --path /value -)
 
-    domain=$(cat bosh-lock/name)
+    set -x
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
+
+    export CF_INT_API="https://api.${BOSH_LITE_DOMAIN}"
 
     export GOPATH=$PWD/go
     export PATH=$GOPATH/bin:$PATH
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
     make build
+    export PATH=$PWD/out:$PATH
+
     go get -u github.com/onsi/ginkgo/ginkgo
 
     ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated integration/v6/isolated integration/shared/plugin integration/v6/push
