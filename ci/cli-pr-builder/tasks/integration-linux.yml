@@ -27,6 +27,9 @@ run:
     credhub login --skip-tls-validation
     export CF_INT_PASSWORD=$(credhub get --name '/bosh-lite/cf/cf_admin_password' | bosh interpolate --path /value -)
 
+
+    export CF_INT_OIDC_USERNAME="admin-oidc"
+    export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
     set -x
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
