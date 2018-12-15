@@ -198,7 +198,7 @@ var _ = Describe("set-health-check command", func() {
 			When("None is passed in", func() {
 				It("returns an error", func() {
 					session := helpers.CF("set-health-check", appName, "none")
-					Eventually(session.Err).Should(Say(`Health check type must be "port", "process", or "http"`))
+					Eventually(session.Err).Should(Say(`Incorrect Usage: HEALTH_CHECK_TYPE must be "port", "process", or "http"`))
 					Eventually(session).Should(Exit(1))
 				})
 			})

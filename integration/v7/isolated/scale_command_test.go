@@ -111,7 +111,7 @@ var _ = Describe("scale command", func() {
 					Eventually(session).Should(Exit(0))
 
 					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-					Expect(len(appTable.Processes)).To(Equal(3))
+					Expect(len(appTable.Processes)).To(Equal(2))
 
 					processSummary := appTable.Processes[0]
 					Expect(processSummary.Type).To(Equal("web"))
@@ -123,9 +123,6 @@ var _ = Describe("scale command", func() {
 
 					Expect(appTable.Processes[1].Type).To(Equal("console"))
 					Expect(appTable.Processes[1].InstanceCount).To(Equal("0/0"))
-
-					Expect(appTable.Processes[2].Type).To(Equal("rake"))
-					Expect(appTable.Processes[2].InstanceCount).To(Equal("0/0"))
 				})
 			})
 
@@ -135,8 +132,10 @@ var _ = Describe("scale command", func() {
 						By("Verifying we start with one instance")
 						session := helpers.CF("scale", appName)
 						Eventually(session).Should(Exit(0))
+
 						appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-						Expect(appTable.Processes).To(HaveLen(3))
+						Expect(appTable.Processes).To(HaveLen(2))
+
 						processSummary := appTable.Processes[0]
 						Expect(processSummary.Type).To(Equal("web"))
 						Expect(processSummary.InstanceCount).To(Equal("1/1"))
@@ -148,8 +147,10 @@ var _ = Describe("scale command", func() {
 						Consistently(session).ShouldNot(Say("Stopping"))
 						Consistently(session).ShouldNot(Say("Starting"))
 						Eventually(session).Should(Exit(0))
+
 						updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-						Expect(updatedAppTable.Processes).To(HaveLen(3))
+						Expect(updatedAppTable.Processes).To(HaveLen(2))
+
 						processSummary = updatedAppTable.Processes[0]
 						instanceSummary := processSummary.Instances[0]
 						Expect(processSummary.Type).To(Equal("web"))
@@ -171,7 +172,7 @@ var _ = Describe("scale command", func() {
 						Eventually(session).Should(Exit(0))
 
 						updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-						Expect(updatedAppTable.Processes).To(HaveLen(3))
+						Expect(updatedAppTable.Processes).To(HaveLen(2))
 
 						processSummary := updatedAppTable.Processes[0]
 						instanceSummary := processSummary.Instances[0]
@@ -188,7 +189,7 @@ var _ = Describe("scale command", func() {
 							Eventually(session).Should(Exit(0))
 
 							updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-							Expect(updatedAppTable.Processes).To(HaveLen(3))
+							Expect(updatedAppTable.Processes).To(HaveLen(2))
 
 							processSummary := updatedAppTable.Processes[0]
 							instanceSummary := processSummary.Instances[0]
@@ -212,7 +213,7 @@ var _ = Describe("scale command", func() {
 						Eventually(session).Should(Exit(0))
 
 						updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-						Expect(updatedAppTable.Processes).To(HaveLen(3))
+						Expect(updatedAppTable.Processes).To(HaveLen(2))
 
 						processSummary := updatedAppTable.Processes[0]
 						instanceSummary := processSummary.Instances[0]
@@ -229,7 +230,7 @@ var _ = Describe("scale command", func() {
 							Eventually(session).Should(Exit(0))
 
 							updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-							Expect(updatedAppTable.Processes).To(HaveLen(3))
+							Expect(updatedAppTable.Processes).To(HaveLen(2))
 
 							processSummary := updatedAppTable.Processes[0]
 							instanceSummary := processSummary.Instances[0]
@@ -284,7 +285,7 @@ var _ = Describe("scale command", func() {
 						Eventually(session).Should(Exit(0))
 
 						appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-						Expect(appTable.Processes).To(HaveLen(3))
+						Expect(appTable.Processes).To(HaveLen(2))
 
 						processSummary := appTable.Processes[0]
 						instanceSummary := processSummary.Instances[0]
@@ -308,7 +309,7 @@ var _ = Describe("scale command", func() {
 						Eventually(session).Should(Exit(0))
 
 						appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-						Expect(appTable.Processes).To(HaveLen(3))
+						Expect(appTable.Processes).To(HaveLen(2))
 
 						processSummary := appTable.Processes[0]
 						instanceSummary := processSummary.Instances[0]
@@ -368,7 +369,7 @@ var _ = Describe("scale command", func() {
 					Eventually(session).Should(Exit(0))
 
 					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
-					Expect(appTable.Processes).To(HaveLen(3))
+					Expect(appTable.Processes).To(HaveLen(2))
 
 					processSummary := appTable.Processes[1]
 					instanceSummary := processSummary.Instances[0]

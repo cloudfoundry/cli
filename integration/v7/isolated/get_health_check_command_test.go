@@ -185,7 +185,6 @@ var _ = Describe("get-health-check command", func() {
 					Eventually(session).Should(Say("\n\n"))
 					Eventually(session).Should(Say(`web\s+process\s+\d+`))
 					Eventually(session).Should(Say(`console\s+process\s+\d+`))
-					Eventually(session).Should(Say(`rake\s+process\s+\d+`))
 
 					Eventually(session).Should(Exit(0))
 				})
