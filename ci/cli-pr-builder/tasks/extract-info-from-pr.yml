@@ -23,5 +23,6 @@ run:
       echo "temp - pr builder claim" >../commit-info/author-email
       echo "temp - pr builder claim" >../commit-info/committer-name
       echo "temp - pr builder claim" >../commit-info/committer-email
+      echo "temp - pr builder claim" >../commit-info/pr-id
       echo "done"
     popd
