@@ -13,8 +13,6 @@ inputs:
 
 params:
   CF_CLI_EXPERIMENTAL: false
-  CF_INT_CLIENT_ID:
-  CF_INT_IGNORE_API_VERSION_CHECK:
   NODES: 16
 
 run:
