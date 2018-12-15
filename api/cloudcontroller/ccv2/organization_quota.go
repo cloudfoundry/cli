@@ -48,7 +48,7 @@ func (client *Client) GetOrganizationQuota(guid string) (OrganizationQuota, Warn
 
 	var orgQuota OrganizationQuota
 	response := cloudcontroller.Response{
-		Result: &orgQuota,
+		DecodeJSONResponseInto: &orgQuota,
 	}
 
 	err = client.connection.Make(request, &response)

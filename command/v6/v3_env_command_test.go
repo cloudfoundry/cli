@@ -123,12 +123,12 @@ var _ = Describe("v3-env Command", func() {
 				It("displays the environment variable and value pair", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Getting env variables for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Getting env variables for app some-app in org some-org / space some-space as banana\.\.\.`))
 					Expect(testUI.Out).To(Say("System-Provided:"))
 					Expect(testUI.Out).To(Say("system-name: {"))
 					Expect(testUI.Out).To(Say(`"mysql": \[`))
 					Expect(testUI.Out).To(Say(`"system-value"`))
-					Expect(testUI.Out).To(Say("\\]"))
+					Expect(testUI.Out).To(Say(`\]`))
 					Expect(testUI.Out).To(Say("}"))
 					Expect(testUI.Out).To(Say(`application-name: "application-value"`))
 
@@ -166,7 +166,7 @@ var _ = Describe("v3-env Command", func() {
 				It("displays helpful messages", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Getting env variables for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Getting env variables for app some-app in org some-org / space some-space as banana\.\.\.`))
 					Expect(testUI.Out).To(Say("No system-provided env variables have been set"))
 
 					Expect(testUI.Out).To(Say("No user-provided env variables have been set"))
@@ -194,7 +194,7 @@ var _ = Describe("v3-env Command", func() {
 
 				It("returns the error", func() {
 					Expect(executeErr).To(Equal(expectedErr))
-					Expect(testUI.Out).To(Say("Getting env variables for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Getting env variables for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 					Expect(testUI.Err).To(Say("get-warning-1"))
 					Expect(testUI.Err).To(Say("get-warning-2"))

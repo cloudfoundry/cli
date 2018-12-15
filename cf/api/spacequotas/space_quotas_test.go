@@ -465,8 +465,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 		It("updates an existing quota", func() {
 			quota := models.SpaceQuota{
-				GUID: "my-quota-guid",
-				Name: "amazing-quota",
+				GUID:                    "my-quota-guid",
+				Name:                    "amazing-quota",
 				NonBasicServicesAllowed: false,
 				ServicesLimit:           1,
 				RoutesLimit:             12,

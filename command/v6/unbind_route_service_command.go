@@ -11,7 +11,7 @@ type UnbindRouteServiceCommand struct {
 	Force           bool                  `short:"f" description:"Force unbinding without confirmation"`
 	Hostname        string                `long:"hostname" short:"n" description:"Hostname used in combination with DOMAIN to specify the route to unbind"`
 	Path            string                `long:"path" description:"Path used in combination with HOSTNAME and DOMAIN to specify the route to unbind"`
-	usage           interface{}           `usage:"CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]\n\nEXAMPLES:\n   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp --path foo"`
+	usage           interface{}           `usage:"CF_NAME unbind-route-service DOMAIN [--hostname HOSTNAME] [--path PATH] SERVICE_INSTANCE [-f]\n\nEXAMPLES:\n   CF_NAME unbind-route-service example.com --hostname myapp --path foo myratelimiter"`
 	relatedCommands interface{}           `related_commands:"delete-service, routes, services"`
 }
 

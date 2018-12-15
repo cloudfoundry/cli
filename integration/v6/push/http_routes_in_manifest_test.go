@@ -5,7 +5,6 @@ import (
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -57,20 +56,20 @@ var _ = Describe("HTTP routes in manifest", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-						Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+						Eventually(session).Should(Say(`Getting app info\.\.\.`))
 
-						Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-						Eventually(session).Should(Say("\\+\\s+name:\\s+%s", app))
-						Eventually(session).Should(Say("\\s+routes:"))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s", regexp.QuoteMeta(routeStar.String())))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s", route1))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s", route2))
+						Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+						Eventually(session).Should(Say(`\+\s+name:\s+%s`, app))
+						Eventually(session).Should(Say(`\s+routes:`))
+						Eventually(session).Should(Say(`(?i)\+\s+%s`, regexp.QuoteMeta(routeStar.String())))
+						Eventually(session).Should(Say(`(?i)\+\s+%s`, route1))
+						Eventually(session).Should(Say(`(?i)\+\s+%s`, route2))
 						Eventually(session).Should(Exit(0))
 					})
 
 					session := helpers.CF("app", app)
-					Eventually(session).Should(Say("name:\\s+%s", app))
-					Eventually(session).Should(Say("routes:\\s+(%s, %s)|(%s, %s)", route1, route2, route2, route1))
+					Eventually(session).Should(Say(`name:\s+%s`, app))
+					Eventually(session).Should(Say(`routes:\s+(%s, %s)|(%s, %s)`, route1, route2, route2, route1))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -91,19 +90,19 @@ var _ = Describe("HTTP routes in manifest", func() {
 							})
 
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+							Eventually(session).Should(Say(`Getting app info\.\.\.`))
 
-							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", app))
-							Eventually(session).Should(Say("\\s+routes:"))
-							Eventually(session).Should(Say("(?i)\\+\\s+%s", route1))
-							Eventually(session).Should(Say("(?i)\\+\\s+%s", route2))
+							Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+							Eventually(session).Should(Say(`\+\s+name:\s+%s`, app))
+							Eventually(session).Should(Say(`\s+routes:`))
+							Eventually(session).Should(Say(`(?i)\+\s+%s`, route1))
+							Eventually(session).Should(Say(`(?i)\+\s+%s`, route2))
 							Eventually(session).Should(Exit(0))
 						})
 
 						session := helpers.CF("app", app)
-						Eventually(session).Should(Say("name:\\s+%s", app))
-						Eventually(session).Should(Say("routes:\\s+(%s, %s)|(%s, %s)", route1, route2, route2, route1))
+						Eventually(session).Should(Say(`name:\s+%s`, app))
+						Eventually(session).Should(Say(`routes:\s+(%s, %s)|(%s, %s)`, route1, route2, route2, route1))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -130,19 +129,19 @@ var _ = Describe("HTTP routes in manifest", func() {
 							})
 
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+							Eventually(session).Should(Say(`Getting app info\.\.\.`))
 
-							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", app))
-							Eventually(session).Should(Say("\\s+routes:"))
-							Eventually(session).Should(Say("(?i)\\+\\s+%s", route1))
-							Eventually(session).Should(Say("(?i)\\+\\s+%s", route2))
+							Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+							Eventually(session).Should(Say(`\+\s+name:\s+%s`, app))
+							Eventually(session).Should(Say(`\s+routes:`))
+							Eventually(session).Should(Say(`(?i)\+\s+%s`, route1))
+							Eventually(session).Should(Say(`(?i)\+\s+%s`, route2))
 							Eventually(session).Should(Exit(0))
 						})
 
 						session := helpers.CF("app", app)
-						Eventually(session).Should(Say("name:\\s+%s", app))
-						Eventually(session).Should(Say("routes:\\s+(%s, %s)|(%s, %s)", route1, route2, route2, route1))
+						Eventually(session).Should(Say(`name:\s+%s`, app))
+						Eventually(session).Should(Say(`routes:\s+(%s, %s)|(%s, %s)`, route1, route2, route2, route1))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -170,7 +169,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 							})
 
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+							Eventually(session).Should(Say(`Getting app info\.\.\.`))
 							Eventually(session.Err).Should(Say("The app cannot be mapped to route %s because the route exists in a different space.", route2))
 							Eventually(session).Should(Exit(1))
 						})
@@ -198,7 +197,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-						Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+						Eventually(session).Should(Say(`Getting app info\.\.\.`))
 						Eventually(session.Err).Should(Say("Port not allowed in HTTP domain %s", domain.Name))
 						Eventually(session).Should(Exit(1))
 					})
@@ -222,18 +221,18 @@ var _ = Describe("HTTP routes in manifest", func() {
 							},
 						})
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-						Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+						Eventually(session).Should(Say(`Getting app info\.\.\.`))
 
-						Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-						Eventually(session).Should(Say("\\+\\s+name:\\s+%s", app))
-						Eventually(session).Should(Say("\\s+routes:"))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s", routeWithPath))
+						Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+						Eventually(session).Should(Say(`\+\s+name:\s+%s`, app))
+						Eventually(session).Should(Say(`\s+routes:`))
+						Eventually(session).Should(Say(`(?i)\+\s+%s`, routeWithPath))
 						Eventually(session).Should(Exit(0))
 					})
 
 					session := helpers.CF("app", app)
-					Eventually(session).Should(Say("name:\\s+%s", app))
-					Eventually(session).Should(Say("routes:\\s+%s", routeWithPath))
+					Eventually(session).Should(Say(`name:\s+%s`, app))
+					Eventually(session).Should(Say(`routes:\s+%s`, routeWithPath))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -261,18 +260,18 @@ var _ = Describe("HTTP routes in manifest", func() {
 								},
 							})
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+							Eventually(session).Should(Say(`Getting app info\.\.\.`))
 
-							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", app))
-							Eventually(session).Should(Say("\\s+routes:"))
-							Eventually(session).Should(Say("(?i)\\+\\s+%s", routeWithPath))
+							Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+							Eventually(session).Should(Say(`\+\s+name:\s+%s`, app))
+							Eventually(session).Should(Say(`\s+routes:`))
+							Eventually(session).Should(Say(`(?i)\+\s+%s`, routeWithPath))
 							Eventually(session).Should(Exit(0))
 						})
 
 						session := helpers.CF("app", app)
-						Eventually(session).Should(Say("name:\\s+%s", app))
-						Eventually(session).Should(Say("routes:\\s+%s", routeWithPath))
+						Eventually(session).Should(Say(`name:\s+%s`, app))
+						Eventually(session).Should(Say(`routes:\s+%s`, routeWithPath))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -298,18 +297,18 @@ var _ = Describe("HTTP routes in manifest", func() {
 							})
 
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+							Eventually(session).Should(Say(`Getting app info\.\.\.`))
 
-							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", app))
-							Eventually(session).Should(Say("\\s+routes:"))
-							Eventually(session).Should(Say("(?i)\\+\\s+%s", routeWithPath))
+							Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+							Eventually(session).Should(Say(`\+\s+name:\s+%s`, app))
+							Eventually(session).Should(Say(`\s+routes:`))
+							Eventually(session).Should(Say(`(?i)\+\s+%s`, routeWithPath))
 							Eventually(session).Should(Exit(0))
 						})
 
 						session := helpers.CF("app", app)
-						Eventually(session).Should(Say("name:\\s+%s", app))
-						Eventually(session).Should(Say("routes:\\s+%s", routeWithPath))
+						Eventually(session).Should(Say(`name:\s+%s`, app))
+						Eventually(session).Should(Say(`routes:\s+%s`, routeWithPath))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -336,7 +335,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 							})
 
 							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+							Eventually(session).Should(Say(`Getting app info\.\.\.`))
 							Eventually(session.Err).Should(Say("The app cannot be mapped to route %s because the route exists in a different space.", routeWithPath))
 							Eventually(session).Should(Exit(1))
 						})
@@ -362,7 +361,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+				Eventually(session).Should(Say(`Getting app info\.\.\.`))
 				Eventually(session.Err).Should(Say("The route %s did not match any existing domains.", route1))
 				Eventually(session).Should(Exit(1))
 			})

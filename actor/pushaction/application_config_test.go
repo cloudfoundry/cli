@@ -2,6 +2,7 @@ package pushaction_test
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -16,7 +17,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -138,8 +138,8 @@ var _ = Describe("Application Config", func() {
 
 			BeforeEach(func() {
 				parentDir := filepath.Dir(filesPath)
-				target = filepath.Join(parentDir, "i-r-symlink")
-				Expect(os.Symlink(filesPath, target)).ToNot(HaveOccurred())
+				target = filepath.Join(parentDir, fmt.Sprintf("i-r-symlink%d", GinkgoParallelNode()))
+				Expect(os.Symlink(filesPath, target)).To(Succeed())
 				manifestApps[0].Path = target
 			})
 
@@ -499,10 +499,10 @@ var _ = Describe("Application Config", func() {
 							"env2": "2",
 							"env3": "9",
 						},
-						GUID: "some-app-guid",
+						GUID:                    "some-app-guid",
 						HealthCheckHTTPEndpoint: "/some-endpoint",
 						HealthCheckTimeout:      5,
-						HealthCheckType:         "port",
+						HealthCheckType:         constant.ApplicationHealthCheckPort,
 						Instances:               types.NullInt{Value: 3, IsSet: true},
 						Memory:                  types.NullByteSizeInMb{IsSet: true, Value: 3},
 						Name:                    appName,

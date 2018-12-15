@@ -44,10 +44,10 @@ var _ = Describe("Start Command", func() {
 		fakeApplicationSummaryActor = new(sharedfakes.FakeApplicationSummaryActor)
 
 		cmd = StartCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			UI:                      testUI,
+			Config:                  fakeConfig,
+			SharedActor:             fakeSharedActor,
+			Actor:                   fakeActor,
 			ApplicationSummaryActor: fakeApplicationSummaryActor,
 		}
 
@@ -305,7 +305,7 @@ var _ = Describe("Start Command", func() {
 							Expect(testUI.Out).To(Say("message 2"))
 							Expect(testUI.Out).To(Say("message 3"))
 							Expect(testUI.Err).To(Say("timeout connecting to log server, no log will be shown"))
-							Expect(testUI.Out).To(Say("name:\\s+%s", appName))
+							Expect(testUI.Out).To(Say(`name:\s+%s`, appName))
 						})
 					})
 
@@ -511,7 +511,7 @@ var _ = Describe("Start Command", func() {
 										{
 											Process: v3action.Process{
 												Type:       "aba",
-												Command:    "some-command-1",
+												Command:    *types.NewFilteredString("some-command-1"),
 												MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 												DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 											},
@@ -519,7 +519,7 @@ var _ = Describe("Start Command", func() {
 										{
 											Process: v3action.Process{
 												Type:       "console",
-												Command:    "some-command-2",
+												Command:    *types.NewFilteredString("some-command-2"),
 												MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 												DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 											},
@@ -546,15 +546,15 @@ var _ = Describe("Start Command", func() {
 								Expect(spaceGUID).To(Equal("some-space-guid"))
 								Expect(withObfuscatedValues).To(BeTrue())
 
-								Expect(testUI.Out).To(Say("name:\\s+%s", appName))
-								Expect(testUI.Out).To(Say("type:\\s+aba"))
-								Expect(testUI.Out).To(Say("instances:\\s+0/0"))
-								Expect(testUI.Out).To(Say("memory usage:\\s+32M"))
-								Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
-								Expect(testUI.Out).To(Say("type:\\s+console"))
-								Expect(testUI.Out).To(Say("instances:\\s+0/0"))
-								Expect(testUI.Out).To(Say("memory usage:\\s+16M"))
-								Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+								Expect(testUI.Out).To(Say(`name:\s+%s`, appName))
+								Expect(testUI.Out).To(Say(`type:\s+aba`))
+								Expect(testUI.Out).To(Say(`instances:\s+0/0`))
+								Expect(testUI.Out).To(Say(`memory usage:\s+32M`))
+								Expect(testUI.Out).To(Say(`start command:\s+some-command-1`))
+								Expect(testUI.Out).To(Say(`type:\s+console`))
+								Expect(testUI.Out).To(Say(`instances:\s+0/0`))
+								Expect(testUI.Out).To(Say(`memory usage:\s+16M`))
+								Expect(testUI.Out).To(Say(`start command:\s+some-command-2`))
 
 								Expect(testUI.Err).To(Say("combo-summary-warning"))
 							})
@@ -619,15 +619,15 @@ var _ = Describe("Start Command", func() {
 
 							It("uses the v2 display", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(testUI.Out).To(Say("name:\\s+some-app"))
-								Expect(testUI.Out).To(Say("requested state:\\s+started"))
-								Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
-								Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
-								Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-								Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-								Expect(testUI.Out).To(Say("stack:\\s+potatos"))
-								Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
-								Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+								Expect(testUI.Out).To(Say(`name:\s+some-app`))
+								Expect(testUI.Out).To(Say(`requested state:\s+started`))
+								Expect(testUI.Out).To(Say(`instances:\s+1\/3`))
+								Expect(testUI.Out).To(Say(`usage:\s+128M x 3 instances`))
+								Expect(testUI.Out).To(Say(`routes:\s+banana.fruit.com/hi, foobar.com:13`))
+								Expect(testUI.Out).To(Say(`last uploaded:\s+\w{3} [0-3]\d \w{3} [0-2]\d:[0-5]\d:[0-5]\d \w+ \d{4}`))
+								Expect(testUI.Out).To(Say(`stack:\s+potatos`))
+								Expect(testUI.Out).To(Say(`buildpack:\s+some-buildpack`))
+								Expect(testUI.Out).To(Say(`start command:\s+some start command`))
 
 								Expect(testUI.Err).To(Say("app-summary-warning"))
 							})
@@ -651,8 +651,8 @@ var _ = Describe("Start Command", func() {
 
 						It("displays the app summary with isolation segments as well as warnings", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).To(Say("name:\\s+some-app"))
-							Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
+							Expect(testUI.Out).To(Say(`name:\s+some-app`))
+							Expect(testUI.Out).To(Say(`isolation segment:\s+some-isolation-segment`))
 
 							Expect(testUI.Err).To(Say("app-summary-warning"))
 						})
@@ -675,7 +675,7 @@ var _ = Describe("Start Command", func() {
 
 						It("displays the app summary without isolation segment as well as warnings", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).To(Say("name:\\s+some-app"))
+							Expect(testUI.Out).To(Say(`name:\s+some-app`))
 							Expect(testUI.Out).NotTo(Say("isolation segment:"))
 
 							Expect(testUI.Err).To(Say("app-summary-warning"))

@@ -26,7 +26,7 @@ func (s *SSHPortForwarding) UnmarshalFlag(val string) error {
 		}
 	}
 
-	re := regexp.MustCompile("^\\d+$")
+	re := regexp.MustCompile(`^\d+$`)
 	switch {
 	case len(splitHosts) == 3 && re.MatchString(splitHosts[0]) && re.MatchString(splitHosts[2]):
 		s.LocalAddress = fmt.Sprintf("%s:%s", DefaultLocalAddress, splitHosts[0])

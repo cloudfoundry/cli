@@ -8,7 +8,6 @@ import (
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -717,9 +716,9 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				HealthCheckType: "port",
 			},
 			[]manifest.Application{{
-				Name: "some-name-1",
+				Name:                    "some-name-1",
 				HealthCheckHTTPEndpoint: "/some/endpoint",
-				Path: RealPath,
+				Path:                    RealPath,
 			}},
 			actionerror.HTTPHealthCheckInvalidError{}),
 		Entry("HTTPHealthCheckInvalidError",
@@ -728,7 +727,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				Name:                    "some-name-1",
 				HealthCheckType:         "port",
 				HealthCheckHTTPEndpoint: "/some/endpoint",
-				Path: RealPath,
+				Path:                    RealPath,
 			}},
 			actionerror.HTTPHealthCheckInvalidError{}),
 		Entry("HTTPHealthCheckInvalidError",
@@ -736,9 +735,9 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				HealthCheckType: "process",
 			},
 			[]manifest.Application{{
-				Name: "some-name-1",
+				Name:                    "some-name-1",
 				HealthCheckHTTPEndpoint: "/some/endpoint",
-				Path: RealPath,
+				Path:                    RealPath,
 			}},
 			actionerror.HTTPHealthCheckInvalidError{}),
 		Entry("HTTPHealthCheckInvalidError",
@@ -747,15 +746,15 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				Name:                    "some-name-1",
 				HealthCheckType:         "process",
 				HealthCheckHTTPEndpoint: "/some/endpoint",
-				Path: RealPath,
+				Path:                    RealPath,
 			}},
 			actionerror.HTTPHealthCheckInvalidError{}),
 		Entry("HTTPHealthCheckInvalidError",
 			CommandLineSettings{},
 			[]manifest.Application{{
-				Name: "some-name-1",
+				Name:                    "some-name-1",
 				HealthCheckHTTPEndpoint: "/some/endpoint",
-				Path: RealPath,
+				Path:                    RealPath,
 			}},
 			actionerror.HTTPHealthCheckInvalidError{}),
 		Entry("InvalidBuildpacksError",

@@ -109,7 +109,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 					It("does not prompt for user confirmation", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).ToNot(Say("Really delete orphaned routes\\? \\[yN\\]:"))
+						Expect(testUI.Out).ToNot(Say(`Really delete orphaned routes\? \[yN\]:`))
 					})
 				})
 
@@ -123,7 +123,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 						It("displays the interactive prompt", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Really delete orphaned routes\\? \\[yN\\]:"))
+							Expect(testUI.Out).To(Say(`Really delete orphaned routes\? \[yN\]:`))
 						})
 					})
 

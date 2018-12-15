@@ -13,16 +13,16 @@ type Policy struct {
 	EndPort         int
 }
 
-func (actor Actor) AddNetworkPolicy(spaceGUID, srcAppName, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
+func (actor Actor) AddNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
 	var allWarnings Warnings
 
-	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, spaceGUID)
+	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, srcSpaceGUID)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
 		return allWarnings, err
 	}
 
-	destApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(destAppName, spaceGUID)
+	destApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(destAppName, destSpaceGUID)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
 		return allWarnings, err
@@ -121,16 +121,16 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 	return policies, allWarnings, nil
 }
 
-func (actor Actor) RemoveNetworkPolicy(spaceGUID, srcAppName, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
+func (actor Actor) RemoveNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
 	var allWarnings Warnings
 
-	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, spaceGUID)
+	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, srcSpaceGUID)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
 		return allWarnings, err
 	}
 
-	destApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(destAppName, spaceGUID)
+	destApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(destAppName, destSpaceGUID)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
 		return allWarnings, err

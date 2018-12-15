@@ -111,9 +111,9 @@ var _ = Describe("feature flags Command", func() {
 				It("displays an empty list and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Retrieving status of all flagged features as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Retrieving status of all flagged features as some-user\.\.\.`))
 					Expect(testUI.Out).To(Say(""))
-					Expect(testUI.Out).To(Say("features\\s+state"))
+					Expect(testUI.Out).To(Say(`features\s+state`))
 
 					Expect(testUI.Err).To(Say("get-flags-warning"))
 
@@ -141,11 +141,11 @@ var _ = Describe("feature flags Command", func() {
 				It("displays a list of feature flags with state and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Retrieving status of all flagged features as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Retrieving status of all flagged features as some-user\.\.\.`))
 					Expect(testUI.Out).To(Say(""))
-					Expect(testUI.Out).To(Say("features\\s+state"))
-					Expect(testUI.Out).To(Say("feature-flag-1\\s+enabled"))
-					Expect(testUI.Out).To(Say("feature-flag-2\\s+disabled"))
+					Expect(testUI.Out).To(Say(`features\s+state`))
+					Expect(testUI.Out).To(Say(`feature-flag-1\s+enabled`))
+					Expect(testUI.Out).To(Say(`feature-flag-2\s+disabled`))
 
 					Expect(testUI.Err).To(Say("get-flags-warning"))
 

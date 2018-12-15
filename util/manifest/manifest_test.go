@@ -10,7 +10,6 @@ import (
 
 	"code.cloudfoundry.org/cli/types"
 	. "code.cloudfoundry.org/cli/util/manifest"
-
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

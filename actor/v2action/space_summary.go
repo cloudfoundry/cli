@@ -123,8 +123,8 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 	})
 
 	spaceSummary := SpaceSummary{
-		Space:   space,
-		OrgName: org.Name,
+		Space:                          space,
+		OrgName:                        org.Name,
 		OrgDefaultIsolationSegmentGUID: org.DefaultIsolationSegmentGUID,
 		AppNames:                       appNames,
 		ServiceInstanceNames:           serviceInstanceNames,

@@ -11,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
-
 	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -96,7 +95,7 @@ var _ = Describe("Application Actions", func() {
 		Describe("CalculatedHealthCheckEndpoint", func() {
 			When("the health check type is http", func() {
 				BeforeEach(func() {
-					app.HealthCheckType = "http"
+					app.HealthCheckType = constant.ApplicationHealthCheckHTTP
 					app.HealthCheckHTTPEndpoint = "/some-endpoint"
 				})
 
@@ -108,7 +107,7 @@ var _ = Describe("Application Actions", func() {
 
 			When("the health check type is not http", func() {
 				BeforeEach(func() {
-					app.HealthCheckType = "process"
+					app.HealthCheckType = constant.ApplicationHealthCheckProcess
 					app.HealthCheckHTTPEndpoint = "/some-endpoint"
 				})
 
@@ -283,7 +282,7 @@ var _ = Describe("Application Actions", func() {
 					GUID: "some-app-guid",
 					Name: "some-app",
 				}))
-				Expect(warnings).To(Equal(Warnings{"foo"}))
+				Expect(warnings).To(ConsistOf("foo"))
 
 				Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetApplicationArgsForCall(0)).To(Equal("some-app-guid"))
@@ -324,7 +323,7 @@ var _ = Describe("Application Actions", func() {
 					GUID: "some-app-guid",
 					Name: "some-app",
 				}))
-				Expect(warnings).To(Equal(Warnings{"foo"}))
+				Expect(warnings).To(ConsistOf("foo"))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.Filter{
@@ -499,7 +498,7 @@ var _ = Describe("Application Actions", func() {
 					fakeCloudControllerClient.UpdateApplicationReturns(
 						ccv2.Application{
 							GUID:            "some-app-guid",
-							HealthCheckType: "process",
+							HealthCheckType: constant.ApplicationHealthCheckProcess,
 						},
 						ccv2.Warnings{"update warnings"},
 						nil,
@@ -514,14 +513,14 @@ var _ = Describe("Application Actions", func() {
 
 					Expect(returnedApp).To(Equal(Application{
 						GUID:            "some-app-guid",
-						HealthCheckType: "process",
+						HealthCheckType: constant.ApplicationHealthCheckProcess,
 					}))
 
 					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
 					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
 					Expect(app).To(Equal(ccv2.Application{
 						GUID:            "some-app-guid",
-						HealthCheckType: "process",
+						HealthCheckType: constant.ApplicationHealthCheckProcess,
 					}))
 				})
 			})
@@ -531,7 +530,7 @@ var _ = Describe("Application Actions", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationsReturns(
 							[]ccv2.Application{
-								{GUID: "some-app-guid", HealthCheckType: "http", HealthCheckHTTPEndpoint: "/"},
+								{GUID: "some-app-guid", HealthCheckType: constant.ApplicationHealthCheckHTTP, HealthCheckHTTPEndpoint: "/"},
 							},
 							ccv2.Warnings{"get application warning"},
 							nil,
@@ -552,7 +551,7 @@ var _ = Describe("Application Actions", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationsReturns(
 							[]ccv2.Application{
-								{GUID: "some-app-guid", HealthCheckType: "http", HealthCheckHTTPEndpoint: "/"},
+								{GUID: "some-app-guid", HealthCheckType: constant.ApplicationHealthCheckHTTP, HealthCheckHTTPEndpoint: "/"},
 							},
 							ccv2.Warnings{"get application warning"},
 							nil,
@@ -573,7 +572,7 @@ var _ = Describe("Application Actions", func() {
 						app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
 						Expect(app).To(Equal(ccv2.Application{
 							GUID:                    "some-app-guid",
-							HealthCheckType:         "http",
+							HealthCheckType:         constant.ApplicationHealthCheckHTTP,
 							HealthCheckHTTPEndpoint: "/v2/anything",
 						}))
 
@@ -588,7 +587,7 @@ var _ = Describe("Application Actions", func() {
 						[]ccv2.Application{
 							{
 								GUID:            "some-app-guid",
-								HealthCheckType: "process",
+								HealthCheckType: constant.ApplicationHealthCheckProcess,
 							},
 						},
 						ccv2.Warnings{"get application warning"},
@@ -603,7 +602,7 @@ var _ = Describe("Application Actions", func() {
 					Expect(warnings).To(ConsistOf("get application warning"))
 					Expect(returnedApp).To(Equal(Application{
 						GUID:            "some-app-guid",
-						HealthCheckType: "process",
+						HealthCheckType: constant.ApplicationHealthCheckProcess,
 					}))
 
 					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(0))

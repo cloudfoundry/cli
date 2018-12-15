@@ -28,7 +28,9 @@ var _ = Describe("Service Plan", func() {
 					"entity": {
 						"name": "some-service-plan",
 						"public": true,
-						"service_guid": "some-service-guid"
+						"service_guid": "some-service-guid",
+						"description": "some-description",
+						"free": true
 					}
 				}`
 
@@ -49,6 +51,8 @@ var _ = Describe("Service Plan", func() {
 					Name:        "some-service-plan",
 					Public:      true,
 					ServiceGUID: "some-service-guid",
+					Description: "some-description",
+					Free:        true,
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
@@ -76,6 +80,7 @@ var _ = Describe("Service Plan", func() {
 			})
 		})
 	})
+
 	Describe("GetServicePlans", func() {
 		var (
 			services   []ServicePlan
@@ -102,7 +107,9 @@ var _ = Describe("Service Plan", func() {
 							},
 							"entity": {
 								"name": "some-service-plan",
-								"service_guid": "some-service-guid"
+								"service_guid": "some-service-guid",
+								"free": false,
+								"description": "some-description"
 							}
 						},
 						{
@@ -111,7 +118,9 @@ var _ = Describe("Service Plan", func() {
 							},
 							"entity": {
 								"name": "other-service-plan",
-								"service_guid": "some-service-guid"
+								"service_guid": "some-service-guid",
+								"free": true,
+								"description": "other-description"
 							}
 						}
 					]
@@ -126,7 +135,9 @@ var _ = Describe("Service Plan", func() {
 							},
 							"entity": {
 								"name": "some-service-plan",
-								"service_guid": "some-service-guid"
+								"service_guid": "some-service-guid",
+								"free": false,
+								"description": "some-description"
 							}
 						},
 						{
@@ -135,7 +146,9 @@ var _ = Describe("Service Plan", func() {
 							},
 							"entity": {
 								"name": "other-service-plan",
-								"service_guid": "some-service-guid"
+								"service_guid": "some-service-guid",
+								"free": true,
+								"description": "other-description"
 							}
 						}
 					]
@@ -158,10 +171,10 @@ var _ = Describe("Service Plan", func() {
 			It("returns all the queried services", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(services).To(ConsistOf([]ServicePlan{
-					{GUID: "some-service-plan-guid-1", ServiceGUID: "some-service-guid", Name: "some-service-plan"},
-					{GUID: "some-service-plan-guid-2", ServiceGUID: "some-service-guid", Name: "other-service-plan"},
-					{GUID: "some-service-plan-guid-3", ServiceGUID: "some-service-guid", Name: "some-service-plan"},
-					{GUID: "some-service-plan-guid-4", ServiceGUID: "some-service-guid", Name: "other-service-plan"},
+					{GUID: "some-service-plan-guid-1", ServiceGUID: "some-service-guid", Free: false, Description: "some-description", Name: "some-service-plan"},
+					{GUID: "some-service-plan-guid-2", ServiceGUID: "some-service-guid", Free: true, Description: "other-description", Name: "other-service-plan"},
+					{GUID: "some-service-plan-guid-3", ServiceGUID: "some-service-guid", Free: false, Description: "some-description", Name: "some-service-plan"},
+					{GUID: "some-service-plan-guid-4", ServiceGUID: "some-service-guid", Free: true, Description: "other-description", Name: "other-service-plan"},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 			})
@@ -192,6 +205,89 @@ var _ = Describe("Service Plan", func() {
 					ResponseCode: http.StatusTeapot,
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("UpdateServicePlan", func() {
+		When("the service plan exists", func() {
+			var (
+				warnings   Warnings
+				executeErr error
+				public     bool
+			)
+
+			BeforeEach(func() {
+				public = true
+			})
+
+			JustBeforeEach(func() {
+				response := `{
+					"metadata": {
+						"guid": "some-service-plan-guid"
+					},
+					"entity": {
+						"name": "some-service-plan"
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/service_plans/some-service-plan-guid"),
+						VerifyJSONRepresenting(map[string]interface{}{
+							"public": public,
+						}),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+
+				warnings, executeErr = client.UpdateServicePlan("some-service-plan-guid", public)
+			})
+
+			It("updates the service plan and return warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+
+			When("and public is set to false", func() {
+				BeforeEach(func() {
+					public = false
+				})
+
+				It("updates the service plan and return warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
+			})
+		})
+
+		When("the server returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 10001,
+					"description": "Some Error",
+					"error_code": "CF-SomeError"
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/service_plans/some-service-plan-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1,warning-2"}}),
+					))
+			})
+
+			It("returns the error and all warnings", func() {
+				warnings, err := client.UpdateServicePlan("some-service-plan-guid", true)
+
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        10001,
+						Description: "Some Error",
+						ErrorCode:   "CF-SomeError",
+					},
+				}))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})
 		})
 	})

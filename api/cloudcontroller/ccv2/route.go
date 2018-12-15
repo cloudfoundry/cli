@@ -120,7 +120,7 @@ func (client *Client) CreateRoute(route Route, generatePort bool) (Route, Warnin
 
 	var updatedRoute Route
 	response := cloudcontroller.Response{
-		Result: &updatedRoute,
+		DecodeJSONResponseInto: &updatedRoute,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -200,7 +200,7 @@ func (client *Client) GetRoute(guid string) (Route, Warnings, error) {
 
 	var route Route
 	response := cloudcontroller.Response{
-		Result: &route,
+		DecodeJSONResponseInto: &route,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -276,7 +276,7 @@ func (client *Client) UpdateRouteApplication(routeGUID string, appGUID string) (
 
 	var route Route
 	response := cloudcontroller.Response{
-		Result: &route,
+		DecodeJSONResponseInto: &route,
 	}
 	err = client.connection.Make(request, &response)
 

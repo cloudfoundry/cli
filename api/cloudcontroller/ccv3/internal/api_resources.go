@@ -11,5 +11,6 @@ const (
 	ProcessesResource         = "processes"
 	ServiceInstancesResource  = "service_instances"
 	SpacesResource            = "spaces"
+	StacksResource            = "stacks"
 	TasksResource             = "tasks"
 )

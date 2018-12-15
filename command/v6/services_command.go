@@ -11,9 +11,9 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . ServicesActor
+//go:generate counterfeiter . ServiceInstancesActor
 
-type ServicesActor interface {
+type ServiceInstancesActor interface {
 	GetServiceInstancesSummaryBySpace(spaceGUID string) ([]v2action.ServiceInstanceSummary, v2action.Warnings, error)
 }
 
@@ -24,7 +24,7 @@ type ServicesCommand struct {
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
-	Actor       ServicesActor
+	Actor       ServiceInstancesActor
 }
 
 func (cmd *ServicesCommand) Setup(config command.Config, ui command.UI) error {

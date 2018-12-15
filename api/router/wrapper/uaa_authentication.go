@@ -63,9 +63,6 @@ func (t *UAAAuthentication) Make(request *router.Request, passedResponse *router
 		if request.Body != nil {
 			err = request.ResetBody()
 			if err != nil {
-				if _, ok := err.(routererror.PipeSeekError); ok {
-					return routererror.PipeSeekError{Err: requestErr}
-				}
 				return err
 			}
 		}

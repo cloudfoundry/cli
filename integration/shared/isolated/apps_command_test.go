@@ -62,7 +62,7 @@ var _ = XDescribe("apps command", func() {
 		Context("with no apps", func() {
 			It("displays empty list", func() {
 				session := helpers.CF("apps")
-				Eventually(session).Should(Say("Getting apps in org %s / space %s as %s\\.\\.\\.", orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
 				Eventually(session).Should(Say("No apps found"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -82,10 +82,10 @@ var _ = XDescribe("apps command", func() {
 
 			It("displays apps in the list", func() {
 				session := helpers.CF("apps")
-				Eventually(session).Should(Say("Getting apps in org %s / space %s as %s\\.\\.\\.", orgName, spaceName, userName))
-				Eventually(session).Should(Say("name\\s+requested state\\s+instances\\s+memory\\s+disk\\s+urls"))
-				Eventually(session).Should(Say("%s\\s+started\\s+1/1\\s+8M\\s+8M\\s+%s\\.%s", appName1, appName1, domainName))
-				Eventually(session).Should(Say("%s\\s+started\\s+1/1\\s+8M\\s+8M\\s+%s\\.%s", appName2, appName2, domainName))
+				Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`name\s+requested state\s+instances\s+memory\s+disk\s+urls`))
+				Eventually(session).Should(Say(`%s\s+started\s+1/1\s+8M\s+8M\s+%s\.%s`, appName1, appName1, domainName))
+				Eventually(session).Should(Say(`%s\s+started\s+1/1\s+8M\s+8M\s+%s\.%s`, appName2, appName2, domainName))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -97,10 +97,10 @@ var _ = XDescribe("apps command", func() {
 
 				It("displays app as stopped", func() {
 					session := helpers.CF("apps")
-					Eventually(session).Should(Say("Getting apps in org %s / space %s as %s\\.\\.\\.", orgName, spaceName, userName))
-					Eventually(session).Should(Say("name\\s+requested state\\s+instances\\s+memory\\s+disk\\s+urls"))
-					Eventually(session).Should(Say("%s\\s+stopped\\s+1/1\\s+8M\\s+8M\\s+%s\\.%s", appName1, appName1, domainName))
-					Eventually(session).Should(Say("%s\\s+started\\s+1/1\\s+8M\\s+8M\\s+%s\\.%s", appName2, appName2, domainName))
+					Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`name\s+requested state\s+instances\s+memory\s+disk\s+urls`))
+					Eventually(session).Should(Say(`%s\s+stopped\s+1/1\s+8M\s+8M\s+%s\.%s`, appName1, appName1, domainName))
+					Eventually(session).Should(Say(`%s\s+started\s+1/1\s+8M\s+8M\s+%s\.%s`, appName2, appName2, domainName))
 
 					Eventually(session).Should(Exit(0))
 				})

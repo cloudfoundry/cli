@@ -12,7 +12,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -27,8 +26,8 @@ var _ = Describe("api command", func() {
 				It("outputs the current api", func() {
 					session := helpers.CF("api")
 
-					Eventually(session).Should(Say("api endpoint:\\s+%s", apiURL))
-					Eventually(session).Should(Say("api version:\\s+\\d+\\.\\d+\\.\\d+"))
+					Eventually(session).Should(Say(`api endpoint:\s+%s`, apiURL))
+					Eventually(session).Should(Say(`api version:\s+\d+\.\d+\.\d+`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -61,8 +60,8 @@ var _ = Describe("api command", func() {
 
 				It("outputs the user's target information", func() {
 					session := helpers.CF("api")
-					Eventually(session).Should(Say("api endpoint:\\s+%s", target))
-					Eventually(session).Should(Say("api version:\\s+%s", apiVersion))
+					Eventually(session).Should(Say(`api endpoint:\s+%s`, target))
+					Eventually(session).Should(Say(`api version:\s+%s`, apiVersion))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -154,8 +153,8 @@ var _ = Describe("api command", func() {
 				session := helpers.CF("api", apiURL, "--skip-ssl-validation")
 				Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("api endpoint:\\s+%s", apiURL))
-				Eventually(session).Should(Say("api version:\\s+\\d+\\.\\d+\\.\\d+"))
+				Eventually(session).Should(Say(`api endpoint:\s+%s`, apiURL))
+				Eventually(session).Should(Say(`api version:\s+\d+\.\d+\.\d+`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -288,7 +287,7 @@ var _ = Describe("api command", func() {
 
 		Expect(configFile.ConfigVersion).To(Equal(3))
 		Expect(configFile.Target).To(Equal(apiURL))
-		Expect(configFile.APIVersion).To(MatchRegexp("\\d+\\.\\d+\\.\\d+"))
+		Expect(configFile.APIVersion).To(MatchRegexp(`\d+\.\d+\.\d+`))
 		Expect(configFile.AuthorizationEndpoint).ToNot(BeEmpty())
 		Expect(configFile.DopplerEndpoint).To(MatchRegexp("^wss://"))
 		Expect(configFile.UAAEndpoint).To(BeEmpty())

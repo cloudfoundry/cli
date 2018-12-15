@@ -26,6 +26,11 @@ var _ = Describe("Info", func() {
 		executeErr error
 	)
 
+	BeforeEach(func() {
+		rootRespondWith = nil
+		v3RespondWith = nil
+	})
+
 	JustBeforeEach(func() {
 		client, _ = NewTestClient()
 

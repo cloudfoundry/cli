@@ -3,8 +3,10 @@ package v6
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
@@ -12,13 +14,15 @@ import (
 
 type CreateSharedDomainActor interface {
 	GetRouterGroupByName(string, v2action.RouterClient) (v2action.RouterGroup, error)
-	CreateSharedDomain(string, v2action.RouterGroup) (v2action.Warnings, error)
+	CreateSharedDomain(string, v2action.RouterGroup, bool) (v2action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type CreateSharedDomainCommand struct {
 	RequiredArgs    flag.Domain `positional-args:"yes"`
 	RouterGroup     string      `long:"router-group" description:"Routes for this domain will be configured only on the specified router group"`
-	usage           interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]"`
+	Internal        bool        `long:"internal" description:"Applications that use internal routes communicate directly on the container network"`
+	usage           interface{} `usage:"CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP | --internal]"`
 	relatedCommands interface{} `related_commands:"create-domain, domains, router-groups"`
 
 	UI           command.UI
@@ -50,16 +54,35 @@ func (cmd *CreateSharedDomainCommand) Setup(config command.Config, ui command.UI
 }
 
 func (cmd CreateSharedDomainCommand) Execute(args []string) error {
+	if len(args) > 0 {
+		return translatableerror.TooManyArgumentsError{
+			ExtraArgument: args[0],
+		}
+	}
+
+	if cmd.Internal {
+		currentVersion := cmd.Actor.CloudControllerAPIVersion()
+		err := command.MinimumCCAPIVersionCheck(currentVersion, ccversion.MinVersionInternalDomainV2, "Option '--internal'")
+		if err != nil {
+			return err
+		}
+	}
+
+	if cmd.RouterGroup != "" && cmd.Internal {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--router-group", "--internal"},
+		}
+	}
+
 	username, err := cmd.SharedActor.RequireCurrentUser()
+	if err != nil {
+		return err
+	}
 	cmd.UI.DisplayTextWithFlavor("Creating shared domain {{.Domain}} as {{.User}}...",
 		map[string]interface{}{
 			"Domain": cmd.RequiredArgs.Domain,
 			"User":   username,
 		})
-
-	if err != nil {
-		return err
-	}
 
 	var routerGroup v2action.RouterGroup
 
@@ -70,7 +93,7 @@ func (cmd CreateSharedDomainCommand) Execute(args []string) error {
 		}
 	}
 
-	warnings, err := cmd.Actor.CreateSharedDomain(cmd.RequiredArgs.Domain, routerGroup)
+	warnings, err := cmd.Actor.CreateSharedDomain(cmd.RequiredArgs.Domain, routerGroup, cmd.Internal)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {

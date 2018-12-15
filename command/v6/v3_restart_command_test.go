@@ -137,12 +137,12 @@ var _ = Describe("v3-restart Command", func() {
 							Expect(testUI.Err).To(Say("get-warning-1"))
 							Expect(testUI.Err).To(Say("get-warning-2"))
 
-							Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as steve\\.\\.\\."))
+							Expect(testUI.Out).To(Say(`Stopping app some-app in org some-org / space some-space as steve\.\.\.`))
 							Expect(testUI.Err).To(Say("stop-warning-1"))
 							Expect(testUI.Err).To(Say("stop-warning-2"))
 							Expect(testUI.Out).To(Say("OK"))
 
-							Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+							Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as steve\.\.\.`))
 							Expect(testUI.Err).To(Say("start-warning-1"))
 							Expect(testUI.Err).To(Say("start-warning-2"))
 							Expect(testUI.Out).To(Say("OK"))
@@ -176,7 +176,7 @@ var _ = Describe("v3-restart Command", func() {
 							Expect(testUI.Out).ToNot(Say("Stopping"))
 							Expect(testUI.Err).ToNot(Say("stop-warning"))
 
-							Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+							Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as steve\.\.\.`))
 							Expect(testUI.Err).To(Say("start-warning-1"))
 							Expect(testUI.Err).To(Say("start-warning-2"))
 							Expect(testUI.Out).To(Say("OK"))
@@ -252,7 +252,7 @@ var _ = Describe("v3-restart Command", func() {
 
 					It("says that the app failed to start", func() {
 						Expect(executeErr).To(Equal(expectedErr))
-						Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as steve\.\.\.`))
 
 						Expect(testUI.Err).To(Say("get-warning-1"))
 						Expect(testUI.Err).To(Say("get-warning-2"))
@@ -268,7 +268,7 @@ var _ = Describe("v3-restart Command", func() {
 
 					It("says that the app failed to start", func() {
 						Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
-						Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as steve\.\.\.`))
 
 						Expect(testUI.Err).To(Say("get-warning-1"))
 						Expect(testUI.Err).To(Say("get-warning-2"))
@@ -294,7 +294,7 @@ var _ = Describe("v3-restart Command", func() {
 
 				It("says that the app failed to start", func() {
 					Expect(executeErr).To(Equal(expectedErr))
-					Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as steve\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Stopping app some-app in org some-org / space some-space as steve\.\.\.`))
 
 					Expect(testUI.Err).To(Say("get-warning-1"))
 					Expect(testUI.Err).To(Say("get-warning-2"))
@@ -312,7 +312,7 @@ var _ = Describe("v3-restart Command", func() {
 
 				It("says that the app failed to start", func() {
 					Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
-					Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as steve\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Stopping app some-app in org some-org / space some-space as steve\.\.\.`))
 
 					Expect(testUI.Err).To(Say("get-warning-1"))
 					Expect(testUI.Err).To(Say("get-warning-2"))

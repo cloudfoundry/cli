@@ -259,7 +259,7 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(testUI.Out).ToNot(Say("Stopping"))
 					Expect(testUI.Out).ToNot(Say("Starting"))
 					Expect(testUI.Out).ToNot(Say("Waiting"))
-					Expect(testUI.Out).To(Say("Showing current scale of app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Showing current scale of app some-app in org some-org / space some-space as some-user\.\.\.`))
 
 					firstAppTable := helpers.ParseV3AppProcessTable(output.Contents())
 					Expect(len(firstAppTable.Processes)).To(Equal(2))
@@ -343,8 +343,8 @@ var _ = Describe("v3-scale Command", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
 							Expect(testUI.Out).ToNot(Say("Showing"))
-							Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-							Expect(testUI.Out).To(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
+							Expect(testUI.Out).To(Say(`Scaling app some-app in org some-org / space some-space as some-user\.\.\.`))
+							Expect(testUI.Out).To(Say(`This will cause the app to restart\. Are you sure you want to scale some-app\? \[yN\]:`))
 							Expect(testUI.Out).To(Say("Scaling cancelled"))
 							Expect(testUI.Out).ToNot(Say("Stopping"))
 							Expect(testUI.Out).ToNot(Say("Starting"))
@@ -364,8 +364,8 @@ var _ = Describe("v3-scale Command", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
 							Expect(testUI.Out).ToNot(Say("Showing"))
-							Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-							Expect(testUI.Out).To(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
+							Expect(testUI.Out).To(Say(`Scaling app some-app in org some-org / space some-space as some-user\.\.\.`))
+							Expect(testUI.Out).To(Say(`This will cause the app to restart\. Are you sure you want to scale some-app\? \[yN\]:`))
 							Expect(testUI.Out).To(Say("Scaling cancelled"))
 							Expect(testUI.Out).ToNot(Say("Stopping"))
 							Expect(testUI.Out).ToNot(Say("Starting"))
@@ -392,10 +392,10 @@ var _ = Describe("v3-scale Command", func() {
 							It("scales, restarts, and displays scale properties", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-								Expect(testUI.Out).To(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
-								Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Scaling app some-app in org some-org / space some-space as some-user\.\.\.`))
+								Expect(testUI.Out).To(Say(`This will cause the app to restart\. Are you sure you want to scale some-app\? \[yN\]:`))
+								Expect(testUI.Out).To(Say(`Stopping app some-app in org some-org / space some-space as some-user\.\.\.`))
+								Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as some-user\.\.\.`))
 
 								// Note that this does test that the disk quota was scaled to 96M,
 								// it is tested below when we check the arguments
@@ -497,10 +497,10 @@ var _ = Describe("v3-scale Command", func() {
 					It("does not prompt user to confirm app restart", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-						Expect(testUI.Out).NotTo(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
-						Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Scaling app some-app in org some-org / space some-space as some-user\.\.\.`))
+						Expect(testUI.Out).NotTo(Say(`This will cause the app to restart\. Are you sure you want to scale some-app\? \[yN\]:`))
+						Expect(testUI.Out).To(Say(`Stopping app some-app in org some-org / space some-space as some-user\.\.\.`))
+						Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as some-user\.\.\.`))
 
 						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 						Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))

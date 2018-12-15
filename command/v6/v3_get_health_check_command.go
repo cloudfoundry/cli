@@ -98,7 +98,7 @@ func (cmd V3GetHealthCheckCommand) Execute(args []string) error {
 
 		table = append(table, []string{
 			healthCheck.ProcessType,
-			healthCheck.HealthCheckType,
+			string(healthCheck.HealthCheckType),
 			healthCheck.Endpoint,
 			fmt.Sprint(invocationTimeout),
 		})

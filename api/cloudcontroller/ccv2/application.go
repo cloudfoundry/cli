@@ -240,7 +240,7 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 
 	var updatedApp Application
 	response := cloudcontroller.Response{
-		Result: &updatedApp,
+		DecodeJSONResponseInto: &updatedApp,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -259,7 +259,7 @@ func (client *Client) GetApplication(guid string) (Application, Warnings, error)
 
 	var app Application
 	response := cloudcontroller.Response{
-		Result: &app,
+		DecodeJSONResponseInto: &app,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -333,7 +333,7 @@ func (client *Client) RestageApplication(app Application) (Application, Warnings
 
 	var restagedApp Application
 	response := cloudcontroller.Response{
-		Result: &restagedApp,
+		DecodeJSONResponseInto: &restagedApp,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -359,7 +359,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 
 	var updatedApp Application
 	response := cloudcontroller.Response{
-		Result: &updatedApp,
+		DecodeJSONResponseInto: &updatedApp,
 	}
 
 	err = client.connection.Make(request, &response)

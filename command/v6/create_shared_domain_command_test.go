@@ -4,11 +4,13 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -19,16 +21,16 @@ import (
 
 var _ = Describe("CreateSharedDomainCommand", func() {
 	var (
-		fakeConfig      *commandfakes.FakeConfig
-		fakeActor       *v6fakes.FakeCreateSharedDomainActor
-		fakeSharedActor *commandfakes.FakeSharedActor
-		testUI          *ui.UI
-		cmd             CreateSharedDomainCommand
-
-		executeErr       error
+		testUI           *ui.UI
+		fakeConfig       *commandfakes.FakeConfig
+		fakeActor        *v6fakes.FakeCreateSharedDomainActor
+		fakeSharedActor  *commandfakes.FakeSharedActor
 		sharedDomainName string
 		username         string
-		routerGroupName  string
+		extraArgs        []string
+		cmd              CreateSharedDomainCommand
+
+		executeErr error
 	)
 
 	BeforeEach(func() {
@@ -37,23 +39,36 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 		fakeActor = new(v6fakes.FakeCreateSharedDomainActor)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		sharedDomainName = "some-shared-domain-name"
-	})
+		username = ""
+		extraArgs = nil
 
-	JustBeforeEach(func() {
 		cmd = CreateSharedDomainCommand{
 			UI:           testUI,
 			Config:       fakeConfig,
 			Actor:        fakeActor,
 			SharedActor:  fakeSharedActor,
 			RequiredArgs: flag.Domain{Domain: sharedDomainName},
-			RouterGroup:  routerGroupName,
 		}
+	})
 
-		executeErr = cmd.Execute(nil)
+	JustBeforeEach(func() {
+		executeErr = cmd.Execute(extraArgs)
 	})
 
 	It("checks for user being logged in", func() {
 		Expect(fakeSharedActor.RequireCurrentUserCallCount()).To(Equal(1))
+	})
+
+	When("too many arguments are provided", func() {
+		BeforeEach(func() {
+			extraArgs = []string{"extra"}
+		})
+
+		It("returns a TooManyArgumentsError", func() {
+			Expect(executeErr).To(MatchError(translatableerror.TooManyArgumentsError{
+				ExtraArgument: "extra",
+			}))
+		})
 	})
 
 	When("user is logged in", func() {
@@ -67,15 +82,15 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 				When("the router group does not exists", func() {
 					var actorError error
 					BeforeEach(func() {
-						routerGroupName = "some-router-group"
-						actorError = actionerror.RouterGroupNotFoundError{Name: routerGroupName}
+						cmd.RouterGroup = "some-router-group"
+						actorError = actionerror.RouterGroupNotFoundError{Name: cmd.RouterGroup}
 						fakeActor.GetRouterGroupByNameReturns(v2action.RouterGroup{}, actorError)
 					})
 
 					It("should fail and return a translateable error", func() {
 						Expect(testUI.Out).To(Say("Creating shared domain %s as %s...", sharedDomainName, username))
 						namePassed, _ := fakeActor.GetRouterGroupByNameArgsForCall(0)
-						Expect(namePassed).To(Equal(routerGroupName))
+						Expect(namePassed).To(Equal(cmd.RouterGroup))
 						Expect(executeErr).To(MatchError(actorError))
 					})
 				})
@@ -84,19 +99,19 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 					var routerGroupGUID string
 
 					BeforeEach(func() {
-						routerGroupName = "some-router-group"
+						cmd.RouterGroup = "some-router-group"
 						routerGroupGUID = "some-guid"
 						fakeActor.GetRouterGroupByNameReturns(v2action.RouterGroup{
-							Name: routerGroupName,
+							Name: cmd.RouterGroup,
 							GUID: routerGroupGUID,
 						}, nil)
 					})
 
 					It("should create the domain with the router group", func() {
-						domainName, routerGroup := fakeActor.CreateSharedDomainArgsForCall(0)
+						domainName, routerGroup, _ := fakeActor.CreateSharedDomainArgsForCall(0)
 						Expect(domainName).To(Equal(sharedDomainName))
 						Expect(routerGroup).To(Equal(v2action.RouterGroup{
-							Name: routerGroupName,
+							Name: cmd.RouterGroup,
 							GUID: routerGroupGUID,
 						}))
 					})
@@ -105,7 +120,7 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 
 			When("--router-group is not passed", func() {
 				BeforeEach(func() {
-					routerGroupName = ""
+					cmd.RouterGroup = ""
 				})
 
 				It("does not call fetch the router group", func() {
@@ -113,9 +128,60 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 				})
 
 				It("attempts to create the shared domain", func() {
-					domainNamePassed, routerGroup := fakeActor.CreateSharedDomainArgsForCall(0)
+					domainNamePassed, routerGroup, _ := fakeActor.CreateSharedDomainArgsForCall(0)
 					Expect(domainNamePassed).To(Equal(cmd.RequiredArgs.Domain))
 					Expect(routerGroup).To(Equal(v2action.RouterGroup{}))
+				})
+			})
+		})
+
+		When("--internal and --router-group are passed", func() {
+			BeforeEach(func() {
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
+				cmd.RouterGroup = "my-router-group"
+				cmd.Internal = true
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"--router-group", "--internal"},
+				}))
+			})
+		})
+
+		When("--internal is passed", func() {
+			BeforeEach(func() {
+				cmd.Internal = true
+			})
+
+			When("the version is less than the minimum version", func() {
+				When("using the V2 API", func() {
+					BeforeEach(func() {
+						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV2ClientVersion)
+					})
+
+					It("returns an error", func() {
+						Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
+							Command:        "Option '--internal'",
+							CurrentVersion: ccversion.MinV2ClientVersion,
+							MinimumVersion: ccversion.MinVersionInternalDomainV2,
+						}))
+					})
+				})
+			})
+
+			When("the version is above the minimum version", func() {
+				BeforeEach(func() {
+					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
+				})
+
+				It("should create a shared internal domain", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Out).To(Say("Creating shared domain %s as %s...", sharedDomainName, username))
+					domainNamePassed, routerGroup, isInternal := fakeActor.CreateSharedDomainArgsForCall(0)
+					Expect(domainNamePassed).To(Equal(cmd.RequiredArgs.Domain))
+					Expect(routerGroup).To(Equal(v2action.RouterGroup{}))
+					Expect(isInternal).To(BeTrue())
 				})
 			})
 		})
@@ -146,5 +212,4 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 			Expect(executeErr).To(MatchError(expectedErr))
 		})
 	})
-
 })

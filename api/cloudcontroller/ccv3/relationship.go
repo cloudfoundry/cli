@@ -94,7 +94,7 @@ func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Re
 
 	var relationship Relationship
 	response := cloudcontroller.Response{
-		Result: &relationship,
+		DecodeJSONResponseInto: &relationship,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -114,7 +114,7 @@ func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, 
 
 	var relationship Relationship
 	response := cloudcontroller.Response{
-		Result: &relationship,
+		DecodeJSONResponseInto: &relationship,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -140,7 +140,7 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 
 	var responseRelationship Relationship
 	response := cloudcontroller.Response{
-		Result: &responseRelationship,
+		DecodeJSONResponseInto: &responseRelationship,
 	}
 	err = client.connection.Make(request, &response)
 
@@ -167,7 +167,7 @@ func (client *Client) UpdateOrganizationDefaultIsolationSegmentRelationship(orgG
 
 	var relationship Relationship
 	response := cloudcontroller.Response{
-		Result: &relationship,
+		DecodeJSONResponseInto: &relationship,
 	}
 	err = client.connection.Make(request, &response)
 	return relationship, response.Warnings, err
@@ -192,7 +192,7 @@ func (client *Client) UpdateSpaceIsolationSegmentRelationship(spaceGUID string, 
 
 	var relationship Relationship
 	response := cloudcontroller.Response{
-		Result: &relationship,
+		DecodeJSONResponseInto: &relationship,
 	}
 
 	err = client.connection.Make(request, &response)

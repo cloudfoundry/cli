@@ -20,6 +20,7 @@ configure_pipeline() {
     -p $name \
     -c $pipeline \
     -l <(lpass show "Concourse Credentials" --notes) \
+    -l <(lpass show "Shared-CLI/Concourse/Concourse Credentials" --notes) \
     -l <(lpass show "VAT Concourse Credentials" --notes)
 }
 

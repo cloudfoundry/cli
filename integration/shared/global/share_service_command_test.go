@@ -1,3 +1,5 @@
+// +build !partialPush
+
 package global
 
 import (
@@ -42,10 +44,10 @@ var _ = Describe("share-service command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("share-service - Share a service instance with another space"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf share-service SERVICE_INSTANCE -s OTHER_SPACE \\[-o OTHER_ORG\\]"))
+				Eventually(session).Should(Say(`cf share-service SERVICE_INSTANCE -s OTHER_SPACE \[-o OTHER_ORG\]`))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("-o\\s+Org of the other space \\(Default: targeted org\\)"))
-				Eventually(session).Should(Say("-s\\s+Space to share the service instance into"))
+				Eventually(session).Should(Say(`-o\s+Org of the other space \(Default: targeted org\)`))
+				Eventually(session).Should(Say(`-s\s+Space to share the service instance into`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("bind-service, service, services, unshare-service"))
 				Eventually(session).Should(Exit(0))
@@ -92,7 +94,7 @@ var _ = Describe("share-service command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.36\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.36\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -145,7 +147,7 @@ var _ = Describe("share-service command", func() {
 				It("shares the service instance from my targeted space with the share-to org/space", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
-					Eventually(session.Out).Should(Say("Sharing service instance %s into org %s / space %s as %s\\.\\.\\.", serviceInstance, sharedToOrgName, sharedToSpaceName, username))
+					Eventually(session.Out).Should(Say(`Sharing service instance %s into org %s / space %s as %s\.\.\.`, serviceInstance, sharedToOrgName, sharedToSpaceName, username))
 					Eventually(session.Out).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -158,7 +160,7 @@ var _ = Describe("share-service command", func() {
 					It("displays a warning and exits 0", func() {
 						session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
 						Consistently(session.Out).ShouldNot(Say("FAILED"))
-						Eventually(session.Out).Should(Say("Service instance %s is already shared with that space\\.", serviceInstance))
+						Eventually(session.Out).Should(Say(`Service instance %s is already shared with that space\.`, serviceInstance))
 						Eventually(session.Out).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -177,7 +179,7 @@ var _ = Describe("share-service command", func() {
 				It("shares the service instance from my targeted space with the share-to space", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName)
-					Eventually(session.Out).Should(Say("Sharing service instance %s into org %s / space %s as %s\\.\\.\\.", serviceInstance, sourceOrgName, sharedToSpaceName, username))
+					Eventually(session.Out).Should(Say(`Sharing service instance %s into org %s / space %s as %s\.\.\.`, serviceInstance, sourceOrgName, sharedToSpaceName, username))
 					Eventually(session.Out).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -190,7 +192,7 @@ var _ = Describe("share-service command", func() {
 					It("displays a warning and exits 0", func() {
 						session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName)
 						Consistently(session.Out).ShouldNot(Say("FAILED"))
-						Eventually(session.Out).Should(Say("Service instance %s is already shared with that space\\.", serviceInstance))
+						Eventually(session.Out).Should(Say(`Service instance %s is already shared with that space\.`, serviceInstance))
 						Eventually(session.Out).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -240,7 +242,7 @@ var _ = Describe("share-service command", func() {
 				It("fails with an unauthorized error", func() {
 					session := helpers.CF("share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Unable to share service instance %s with spaces \\['%s'\\].", serviceInstance, sharedToSpaceGUID))
+					Eventually(session.Err).Should(Say(`Unable to share service instance %s with spaces \['%s'\].`, serviceInstance, sharedToSpaceGUID))
 					Eventually(session.Err).Should(Say("Write permission is required in order to share a service instance with a space"))
 					Eventually(session).Should(Exit(1))
 				})

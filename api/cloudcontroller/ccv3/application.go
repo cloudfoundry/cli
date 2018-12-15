@@ -77,7 +77,7 @@ func (a Application) hasAutodetectedBuildpack() bool {
 	if len(a.LifecycleBuildpacks) == 0 {
 		return false
 	}
-	return a.LifecycleBuildpacks[0] == "default" || a.LifecycleBuildpacks[0] == "null"
+	return a.LifecycleBuildpacks[0] == constant.AutodetectBuildpackValueDefault || a.LifecycleBuildpacks[0] == constant.AutodetectBuildpackValueNull
 }
 
 type ccLifecycle struct {
@@ -140,7 +140,7 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 
 	var responseApp Application
 	response := cloudcontroller.Response{
-		Result: &responseApp,
+		DecodeJSONResponseInto: &responseApp,
 	}
 	err = client.connection.Make(request, &response)
 
@@ -191,7 +191,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 
 	var responseApp Application
 	response := cloudcontroller.Response{
-		Result: &responseApp,
+		DecodeJSONResponseInto: &responseApp,
 	}
 	err = client.connection.Make(request, &response)
 
@@ -210,7 +210,7 @@ func (client *Client) UpdateApplicationRestart(appGUID string) (Application, War
 
 	var responseApp Application
 	response := cloudcontroller.Response{
-		Result: &responseApp,
+		DecodeJSONResponseInto: &responseApp,
 	}
 	err = client.connection.Make(request, &response)
 
@@ -229,7 +229,7 @@ func (client *Client) UpdateApplicationStart(appGUID string) (Application, Warni
 
 	var responseApp Application
 	response := cloudcontroller.Response{
-		Result: &responseApp,
+		DecodeJSONResponseInto: &responseApp,
 	}
 	err = client.connection.Make(request, &response)
 
@@ -248,7 +248,7 @@ func (client *Client) UpdateApplicationStop(appGUID string) (Application, Warnin
 
 	var responseApp Application
 	response := cloudcontroller.Response{
-		Result: &responseApp,
+		DecodeJSONResponseInto: &responseApp,
 	}
 	err = client.connection.Make(request, &response)
 

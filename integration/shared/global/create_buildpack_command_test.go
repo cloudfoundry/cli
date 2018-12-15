@@ -10,7 +10,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -35,12 +34,12 @@ var _ = Describe("create buildpack command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("create-buildpack - Create a buildpack"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf create-buildpack BUILDPACK PATH POSITION \\[--enable|--disable\\]"))
+				Eventually(session).Should(Say(`cf create-buildpack BUILDPACK PATH POSITION \[--enable|--disable\]`))
 				Eventually(session).Should(Say("TIP:"))
 				Eventually(session).Should(Say("Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("--disable\\s+Disable the buildpack from being used for staging"))
-				Eventually(session).Should(Say("--enable\\s+Enable the buildpack to be used for staging"))
+				Eventually(session).Should(Say(`--disable\s+Disable the buildpack from being used for staging`))
+				Eventually(session).Should(Say(`--enable\s+Enable the buildpack to be used for staging`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("buildpacks, push"))
 				Eventually(session).Should(Exit(0))
@@ -96,9 +95,9 @@ var _ = Describe("create buildpack command", func() {
 
 				It("successfully uploads a buildpack", func() {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackDir, "1")
-					Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+					Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("Uploading buildpack %s as %s\\.\\.\\.", buildpackName, username))
+					Eventually(session).Should(Say(`Uploading buildpack %s as %s\.\.\.`, buildpackName, username))
 					Eventually(session).Should(Say("Done uploading"))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
@@ -114,7 +113,7 @@ var _ = Describe("create buildpack command", func() {
 
 				It("fails and reports that the directory is empty", func() {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackDir, "1")
-					Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+					Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 					Eventually(session.Err).Should(Say("The specified path '%s' cannot be an empty directory.", regexp.QuoteMeta(buildpackDir)))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -135,9 +134,9 @@ var _ = Describe("create buildpack command", func() {
 						It("successfully uploads a buildpack", func() {
 							helpers.BuildpackWithoutStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-								Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+								Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 								Eventually(session).Should(Say("OK"))
-								Eventually(session).Should(Say("Uploading buildpack %s as %s\\.\\.\\.", buildpackName, username))
+								Eventually(session).Should(Say(`Uploading buildpack %s as %s\.\.\.`, buildpackName, username))
 								Eventually(session).Should(Say("Done uploading"))
 								Eventually(session).Should(Say("OK"))
 								Eventually(session).Should(Exit(0))
@@ -158,9 +157,9 @@ var _ = Describe("create buildpack command", func() {
 						It("successfully uploads a buildpack", func() {
 							helpers.BuildpackWithStack(func(buildpackPath string) {
 								session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-								Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+								Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 								Eventually(session).Should(Say("OK"))
-								Eventually(session).Should(Say("Uploading buildpack %s as %s\\.\\.\\.", buildpackName, username))
+								Eventually(session).Should(Say(`Uploading buildpack %s as %s\.\.\.`, buildpackName, username))
 								Eventually(session).Should(Say("Done uploading"))
 								Eventually(session).Should(Say("OK"))
 								Eventually(session).Should(Exit(0))
@@ -183,10 +182,10 @@ var _ = Describe("create buildpack command", func() {
 					It("returns the appropriate error", func() {
 						helpers.BuildpackWithStack(func(buildpackPath string) {
 							session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-							Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+							Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 							Eventually(session).Should(Say("OK"))
-							Eventually(session).Should(Say("Uploading buildpack %s as %s\\.\\.\\.", buildpackName, username))
-							Eventually(session.Err).Should(Say("Uploaded buildpack stack \\(fake-stack\\) does not exist"))
+							Eventually(session).Should(Say(`Uploading buildpack %s as %s\.\.\.`, buildpackName, username))
+							Eventually(session.Err).Should(Say(`Uploaded buildpack stack \(fake-stack\) does not exist`))
 							Eventually(session).Should(Exit(1))
 						}, "fake-stack")
 					})
@@ -217,9 +216,9 @@ var _ = Describe("create buildpack command", func() {
 							It("successfully uploads a buildpack", func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-									Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+									Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 									Eventually(session).Should(Say("OK"))
-									Eventually(session).Should(Say("Uploading buildpack %s as %s\\.\\.\\.", buildpackName, username))
+									Eventually(session).Should(Say(`Uploading buildpack %s as %s\.\.\.`, buildpackName, username))
 									Eventually(session).Should(Exit(0))
 								}, stacks[0])
 
@@ -243,7 +242,7 @@ var _ = Describe("create buildpack command", func() {
 							It("prints a warning but exits 0", func() {
 								helpers.BuildpackWithoutStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-									Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+									Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 									Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", buildpackName))
 									Eventually(session).Should(Exit(0))
 								})
@@ -271,9 +270,9 @@ var _ = Describe("create buildpack command", func() {
 							It("successfully uploads a buildpack", func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-									Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+									Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 									Eventually(session).Should(Say("OK"))
-									Eventually(session).Should(Say("Uploading buildpack %s as %s\\.\\.\\.", buildpackName, username))
+									Eventually(session).Should(Say(`Uploading buildpack %s as %s\.\.\.`, buildpackName, username))
 									Eventually(session).Should(Say("Done uploading"))
 									Eventually(session).Should(Say("OK"))
 									Eventually(session).Should(Exit(0))
@@ -299,7 +298,7 @@ var _ = Describe("create buildpack command", func() {
 							It("prints a warning and tip but exits 0", func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-									Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+									Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 									Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", buildpackName))
 									Eventually(session).Should(Say("TIP: use 'cf buildpacks' and 'cf delete-buildpack' to delete buildpack %s without a stack", buildpackName))
 									Eventually(session).Should(Exit(0))
@@ -318,7 +317,7 @@ var _ = Describe("create buildpack command", func() {
 							It("prints a warning but doesn't exit 1", func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
-									Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+									Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 									Eventually(session.Err).Should(Say("The buildpack name %s is already in use for the stack %s", buildpackName, stacks[0]))
 									Eventually(session).Should(Say("TIP: use 'cf update-buildpack' to update this buildpack"))
 									Eventually(session).Should(Exit(0))
@@ -370,9 +369,9 @@ var _ = Describe("create buildpack command", func() {
 
 				It("successfully uploads a buildpack", func() {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackURL, "1")
-					Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+					Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("Uploading buildpack %s as %s\\.\\.\\.", buildpackName, username))
+					Eventually(session).Should(Say(`Uploading buildpack %s as %s\.\.\.`, buildpackName, username))
 					Eventually(session).Should(Say("Done uploading"))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
@@ -400,9 +399,9 @@ var _ = Describe("create buildpack command", func() {
 
 				It("displays an appropriate error", func() {
 					session := helpers.CF("create-buildpack", buildpackName, server.URL(), "10")
-					Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+					Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 					Eventually(session.Err).Should(Say("Download attempt failed; server returned 404 Not Found"))
-					Eventually(session.Err).Should(Say("Unable to install; buildpack is not available from the given URL\\."))
+					Eventually(session.Err).Should(Say(`Unable to install; buildpack is not available from the given URL\.`))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
@@ -415,7 +414,7 @@ var _ = Describe("create buildpack command", func() {
 
 				It("returns the appropriate error", func() {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackURL, "1")
-					Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+					Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 					Eventually(session.Err).Should(Say("Get %s: dial tcp: lookup", buildpackURL))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -428,9 +427,9 @@ var _ = Describe("create buildpack command", func() {
 				It("successfully uploads buildpack in correct position", func() {
 					helpers.BuildpackWithoutStack(func(buildpackPath string) {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "3")
-						Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+						Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say("Uploading buildpack %s as %s\\.\\.\\.", buildpackName, username))
+						Eventually(session).Should(Say(`Uploading buildpack %s as %s\.\.\.`, buildpackName, username))
 						Eventually(session).Should(Say("Done uploading"))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
@@ -448,9 +447,9 @@ var _ = Describe("create buildpack command", func() {
 				It("disables buildpack", func() {
 					helpers.BuildpackWithoutStack(func(buildpackPath string) {
 						session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1", "--disable")
-						Eventually(session).Should(Say("Creating buildpack %s as %s\\.\\.\\.", buildpackName, username))
+						Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say("Uploading buildpack %s as %s\\.\\.\\.", buildpackName, username))
+						Eventually(session).Should(Say(`Uploading buildpack %s as %s\.\.\.`, buildpackName, username))
 						Eventually(session).Should(Say("Done uploading"))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))

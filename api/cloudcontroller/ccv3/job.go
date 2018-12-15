@@ -47,7 +47,7 @@ func (client *Client) GetJob(jobURL JobURL) (Job, Warnings, error) {
 
 	var job Job
 	response := cloudcontroller.Response{
-		Result: &job,
+		DecodeJSONResponseInto: &job,
 	}
 
 	err = client.connection.Make(request, &response)

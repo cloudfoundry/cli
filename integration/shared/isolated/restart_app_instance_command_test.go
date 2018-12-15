@@ -2,7 +2,6 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -71,7 +70,7 @@ var _ = XDescribe("restart command", func() {
 
 				It("restarts app instance", func() {
 					session := helpers.CF("restart", appName)
-					Eventually(session).Should(Say("Restarting instance %d of the app %s in org %s / space %s as %s\\.\\.\\.", 10, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Restarting instance %d of the app %s in org %s / space %s as %s\.\.\.`, 10, appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})

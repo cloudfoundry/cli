@@ -132,14 +132,14 @@ var _ = Describe("org command", func() {
 				},
 				Domains: []models.DomainFields{
 					models.DomainFields{
-						Name: "cfapps.io",
-						GUID: "1111",
+						Name:                   "cfapps.io",
+						GUID:                   "1111",
 						OwningOrganizationGUID: "my-org-guid",
 						Shared:                 true,
 					},
 					models.DomainFields{
-						Name: "cf-app.com",
-						GUID: "2222",
+						Name:                   "cf-app.com",
+						GUID:                   "2222",
 						OwningOrganizationGUID: "my-org-guid",
 						Shared:                 false,
 					},

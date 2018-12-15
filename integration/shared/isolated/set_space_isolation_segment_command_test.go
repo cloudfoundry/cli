@@ -57,7 +57,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.11\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.11\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -80,7 +80,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 		When("the space does not exist", func() {
 			It("fails with space not found message", func() {
 				session := helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)
-				Eventually(session).Should(Say("Updating isolation segment of space %s in org %s as %s\\.\\.\\.", spaceName, organizationName, userName))
+				Eventually(session).Should(Say(`Updating isolation segment of space %s in org %s as %s\.\.\.`, spaceName, organizationName, userName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Space '%s' not found.", spaceName))
 				Eventually(session).Should(Exit(1))
@@ -95,7 +95,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 			When("the isolation segment does not exist", func() {
 				It("fails with isolation segment not found message", func() {
 					session := helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)
-					Eventually(session).Should(Say("Updating isolation segment of space %s in org %s as %s\\.\\.\\.", spaceName, organizationName, userName))
+					Eventually(session).Should(Say(`Updating isolation segment of space %s in org %s as %s\.\.\.`, spaceName, organizationName, userName))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Isolation segment '%s' not found.", isolationSegmentName))
 					Eventually(session).Should(Exit(1))
@@ -114,7 +114,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 
 					It("displays OK", func() {
 						session := helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)
-						Eventually(session).Should(Say("Updating isolation segment of space %s in org %s as %s\\.\\.\\.", spaceName, organizationName, userName))
+						Eventually(session).Should(Say(`Updating isolation segment of space %s in org %s as %s\.\.\.`, spaceName, organizationName, userName))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Say("In order to move running applications to this isolation segment, they must be restarted."))
 						Eventually(session).Should(Exit(0))
@@ -127,7 +127,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 
 						It("displays OK", func() {
 							session := helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)
-							Eventually(session).Should(Say("Updating isolation segment of space %s in org %s as %s\\.\\.\\.", spaceName, organizationName, userName))
+							Eventually(session).Should(Say(`Updating isolation segment of space %s in org %s as %s\.\.\.`, spaceName, organizationName, userName))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say("In order to move running applications to this isolation segment, they must be restarted."))
 							Eventually(session).Should(Exit(0))

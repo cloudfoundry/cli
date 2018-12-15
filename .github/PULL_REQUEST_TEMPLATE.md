@@ -1,4 +1,10 @@
 <!--
+If you haven't yet, please review our contributing guidelines: https://github.com/cloudfoundry/cli/blob/master/.github/CONTRIBUTING.md
+Please reach out to us on slack or via a Github Issue before making a PR. (Info on where to reach us in the link ^)
+Check out our contributions welcome label on GitHub for issues we are actively looking for help on.
+-->
+
+<!--
 ## Requirements
 
 * Your contribution will be analyzed for product fit and engineering quality prior to merging.
@@ -7,6 +13,11 @@ If your contribution includes a change that is exposed to cf CLI users (e.g. int
 If your contribution falls under a company CLA but your membership is not public, expect delays while we confirm.
 * All new code requires tests to protect against regressions.
 -->
+
+## Does this PR modify CLI v6 or v7?
+
+<!-- Or perhaps both? Neither?
+If you aren't sure what this is referring to, please check out our Architecture Guide: https://github.com/cloudfoundry/cli/wiki/Architecture-Guide -->
 
 ## What Need Does It Address?
 

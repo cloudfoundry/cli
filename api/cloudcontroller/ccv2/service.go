@@ -57,6 +57,9 @@ func (service *Service) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		service.Extra.Shareable = extra.Shareable
+		if service.DocumentationURL == "" {
+			service.DocumentationURL = extra.DocumentationURL
+		}
 	}
 
 	return nil
@@ -74,7 +77,7 @@ func (client *Client) GetService(serviceGUID string) (Service, Warnings, error) 
 
 	var service Service
 	response := cloudcontroller.Response{
-		Result: &service,
+		DecodeJSONResponseInto: &service,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -83,10 +86,26 @@ func (client *Client) GetService(serviceGUID string) (Service, Warnings, error) 
 
 // GetServices returns a list of Services given the provided filters.
 func (client *Client) GetServices(filters ...Filter) ([]Service, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
+	opts := requestOptions{
 		RequestName: internal.GetServicesRequest,
 		Query:       ConvertFilterParameters(filters),
-	})
+	}
+
+	return client.makeServicesRequest(opts)
+}
+
+func (client *Client) GetSpaceServices(spaceGUID string, filters ...Filter) ([]Service, Warnings, error) {
+	opts := requestOptions{
+		RequestName: internal.GetSpaceServicesRequest,
+		Query:       ConvertFilterParameters(filters),
+		URIParams:   Params{"space_guid": spaceGUID},
+	}
+
+	return client.makeServicesRequest(opts)
+}
+
+func (client *Client) makeServicesRequest(opts requestOptions) ([]Service, Warnings, error) {
+	request, err := client.newHTTPRequest(opts)
 
 	if err != nil {
 		return nil, nil, err

@@ -13,6 +13,7 @@ import (
 type Application struct {
 	Name                string
 	GUID                string
+	StackName           string
 	State               constant.ApplicationState
 	LifecycleType       constant.AppLifecycleType
 	LifecycleBuildpacks []string
@@ -20,6 +21,10 @@ type Application struct {
 
 func (app Application) Started() bool {
 	return app.State == constant.ApplicationStarted
+}
+
+func (app Application) Stopped() bool {
+	return app.State == constant.ApplicationStopped
 }
 
 func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string) (Warnings, error) {
@@ -84,6 +89,7 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 		ccv3.Application{
 			LifecycleType:       app.LifecycleType,
 			LifecycleBuildpacks: app.LifecycleBuildpacks,
+			StackName:           app.StackName,
 			Name:                app.Name,
 			Relationships: ccv3.Relationships{
 				constant.RelationshipTypeSpace: ccv3.Relationship{GUID: spaceGUID},
@@ -98,6 +104,34 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 	}
 
 	return actor.convertCCToActorApplication(createdApp), Warnings(warnings), nil
+}
+
+// SetApplicationProcessHealthCheckTypeByNameAndSpace sets the health check
+// information of the provided processType for an application with the given
+// name and space GUID.
+func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
+	appName string,
+	spaceGUID string,
+	healthCheckType constant.HealthCheckType,
+	httpEndpoint string,
+	processType string,
+	invocationTimeout int,
+) (Application, Warnings, error) {
+
+	app, getWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return Application{}, getWarnings, err
+	}
+
+	setWarnings, err := actor.UpdateProcessByTypeAndApplication(
+		processType,
+		app.GUID,
+		Process{
+			HealthCheckType:              healthCheckType,
+			HealthCheckEndpoint:          httpEndpoint,
+			HealthCheckInvocationTimeout: invocationTimeout,
+		})
+	return app, append(getWarnings, setWarnings...), err
 }
 
 // StopApplication stops an application.
@@ -117,47 +151,58 @@ func (actor Actor) StartApplication(appGUID string) (Application, Warnings, erro
 	return actor.convertCCToActorApplication(updatedApp), Warnings(warnings), nil
 }
 
-// RestartApplication restarts an application.
+// RestartApplication restarts an application and waits for it to start.
 func (actor Actor) RestartApplication(appGUID string) (Warnings, error) {
+	var allWarnings Warnings
 	_, warnings, err := actor.CloudControllerClient.UpdateApplicationRestart(appGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
 
-	return Warnings(warnings), err
+	pollingWarnings, err := actor.PollStart(appGUID)
+	allWarnings = append(allWarnings, pollingWarnings...)
+	return allWarnings, err
 }
 
-func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) error {
+func (actor Actor) PollStart(appGUID string) (Warnings, error) {
+	var allWarnings Warnings
 	processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
-	warningsChannel <- Warnings(warnings)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return err
+		return allWarnings, err
 	}
 
 	timeout := time.Now().Add(actor.Config.StartupTimeout())
 	for time.Now().Before(timeout) {
-		readyProcs := 0
+		allProcessesDone := true
 		for _, process := range processes {
-			ready, err := actor.processStatus(process, warningsChannel)
+			shouldContinuePolling, warnings, err := actor.shouldContinuePollingProcessStatus(process)
+			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
-				return err
+				return allWarnings, err
 			}
 
-			if ready {
-				readyProcs++
+			if shouldContinuePolling {
+				allProcessesDone = false
+				break
 			}
 		}
 
-		if readyProcs == len(processes) {
-			return nil
+		if allProcessesDone {
+			return allWarnings, nil
 		}
 		time.Sleep(actor.Config.PollingInterval())
 	}
 
-	return actionerror.StartupTimeoutError{}
+	return allWarnings, actionerror.StartupTimeoutError{}
 }
 
 // UpdateApplication updates the buildpacks on an application
 func (actor Actor) UpdateApplication(app Application) (Application, Warnings, error) {
 	ccApp := ccv3.Application{
 		GUID:                app.GUID,
+		StackName:           app.StackName,
 		LifecycleType:       app.LifecycleType,
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 	}
@@ -173,6 +218,7 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 	return Application{
 		GUID:                app.GUID,
+		StackName:           app.StackName,
 		LifecycleType:       app.LifecycleType,
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 		Name:                app.Name,
@@ -180,28 +226,19 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 	}
 }
 
-func (actor Actor) processStatus(process ccv3.Process, warningsChannel chan<- Warnings) (bool, error) {
-	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
-	warningsChannel <- Warnings(warnings)
+func (actor Actor) shouldContinuePollingProcessStatus(process ccv3.Process) (bool, Warnings, error) {
+	ccInstances, ccWarnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
+	instances := ProcessInstances(ccInstances)
+	warnings := Warnings(ccWarnings)
 	if err != nil {
-		return false, err
-	}
-	if len(instances) == 0 {
-		return true, nil
+		return true, warnings, err
 	}
 
-	for _, instance := range instances {
-		if instance.State == constant.ProcessInstanceRunning {
-			return true, nil
-		}
+	if instances.Empty() || instances.AnyRunning() {
+		return false, warnings, nil
+	} else if instances.AllCrashed() {
+		return false, warnings, actionerror.AllInstancesCrashedError{}
 	}
 
-	for _, instance := range instances {
-		if instance.State != constant.ProcessInstanceCrashed {
-			return false, nil
-		}
-	}
-
-	// all of the instances are crashed at this point
-	return true, nil
+	return true, warnings, nil
 }

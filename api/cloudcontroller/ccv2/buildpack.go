@@ -91,7 +91,7 @@ func (client *Client) CreateBuildpack(buildpack Buildpack) (Buildpack, Warnings,
 
 	var createdBuildpack Buildpack
 	response := cloudcontroller.Response{
-		Result: &createdBuildpack,
+		DecodeJSONResponseInto: &createdBuildpack,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -145,7 +145,7 @@ func (client *Client) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings,
 
 	var updatedBuildpack Buildpack
 	response := cloudcontroller.Response{
-		Result: &updatedBuildpack,
+		DecodeJSONResponseInto: &updatedBuildpack,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -243,7 +243,7 @@ func (client *Client) uploadBuildpackAsynchronously(request *cloudcontroller.Req
 
 	var buildpack Buildpack
 	response := cloudcontroller.Response{
-		Result: &buildpack,
+		DecodeJSONResponseInto: &buildpack,
 	}
 
 	httpErrors := make(chan error)

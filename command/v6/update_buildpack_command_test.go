@@ -59,7 +59,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 	})
 
 	Describe("invalid flag combinations", func() {
-		When("the lock and unlock flags are provided", func() {
+		When("the --lock and --unlock flags are provided", func() {
 			BeforeEach(func() {
 				cmd.Lock = true
 				cmd.Unlock = true
@@ -72,7 +72,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 			})
 		})
 
-		When("the lock and path flags are provided", func() {
+		When("the -p and --lock flags are provided", func() {
 			BeforeEach(func() {
 				cmd.Lock = true
 				cmd.Path = "asdf"
@@ -85,7 +85,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 			})
 		})
 
-		When("the path and unlock flags are provided", func() {
+		When("the -p and --unlock flags are provided", func() {
 			BeforeEach(func() {
 				cmd.Path = "asdf"
 				cmd.Unlock = true
@@ -98,7 +98,33 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 			})
 		})
 
-		When("the enable and disable flags are provided", func() {
+		When("the -p and --assign-stack flags are provided", func() {
+			BeforeEach(func() {
+				cmd.Path = "asdf"
+				cmd.NewStack = "some-new-stack"
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"-p", "--assign-stack"},
+				}))
+			})
+		})
+
+		When("the -s and --assign-stack flags are provided", func() {
+			BeforeEach(func() {
+				cmd.CurrentStack = "current-stack"
+				cmd.NewStack = "some-new-stack"
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"-s", "--assign-stack"},
+				}))
+			})
+		})
+
+		When("the --enable and --disable flags are provided", func() {
 			BeforeEach(func() {
 				cmd.Enable = true
 				cmd.Disable = true
@@ -185,7 +211,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the locked value to true when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, _, locked, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, locked, _, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 					Expect(locked.IsSet).To(Equal(true))
 					Expect(locked.Value).To(Equal(true))
 				})
@@ -198,7 +224,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the locked value to false when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, _, locked, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, locked, _, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 					Expect(locked.IsSet).To(Equal(true))
 					Expect(locked.Value).To(Equal(false))
 				})
@@ -211,7 +237,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the enabled value to true when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, _, _, enabled := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, _, enabled, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 					Expect(enabled.IsSet).To(Equal(true))
 					Expect(enabled.Value).To(Equal(true))
 				})
@@ -224,9 +250,102 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				It("sets the enabled value to false when updating the buildpack", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					_, _, _, _, enabled := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					_, _, _, _, enabled, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 					Expect(enabled.IsSet).To(Equal(true))
 					Expect(enabled.Value).To(Equal(false))
+				})
+			})
+
+			When("the -i flag is provided", func() {
+				BeforeEach(func() {
+					cmd.Order = types.NullInt{IsSet: true, Value: 99}
+				})
+
+				It("sets the new buildpack order when updating the buildpack", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					_, _, order, _, _, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					Expect(order.IsSet).To(Equal(true))
+					Expect(order.Value).To(Equal(99))
+				})
+			})
+
+			When("the --assign-stack flag is provided", func() {
+				BeforeEach(func() {
+					cmd.NewStack = "some-new-stack"
+					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionBuildpackStackAssociationV2)
+				})
+
+				It("sets the new stack on the buildpack", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					_, _, _, _, _, newStack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					Expect(testUI.Out).ToNot(Say("Updating buildpack %s", args.Buildpack))
+					Expect(testUI.Out).To(Say("Assigning stack %s to %s as %s...", cmd.NewStack, args.Buildpack, userName))
+					Expect(newStack).To(Equal("some-new-stack"))
+				})
+
+				Context("and the -i flag is provided", func() {
+					BeforeEach(func() {
+						cmd.Order = types.NullInt{IsSet: true, Value: 99}
+					})
+
+					It("sets the new stack and updates the priority of the buildpack", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("Assigning stack %s to %s as %s...", cmd.NewStack, args.Buildpack, userName))
+						Expect(testUI.Out).To(Say("Updating buildpack %s with stack %s...", args.Buildpack, cmd.NewStack))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				Context("and the --lock flag is provided", func() {
+					BeforeEach(func() {
+						cmd.Lock = true
+					})
+
+					It("sets the new stack and locks the buildpack", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("Assigning stack %s to %s as %s...", cmd.NewStack, args.Buildpack, userName))
+						Expect(testUI.Out).To(Say("Updating buildpack %s with stack %s...", args.Buildpack, cmd.NewStack))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				Context("and the --unlock flag is provided", func() {
+					BeforeEach(func() {
+						cmd.Unlock = true
+					})
+
+					It("sets the new stack and unlocks the buildpack", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("Assigning stack %s to %s as %s...", cmd.NewStack, args.Buildpack, userName))
+						Expect(testUI.Out).To(Say("Updating buildpack %s with stack %s...", args.Buildpack, cmd.NewStack))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				Context("and the --enable flag is provided", func() {
+					BeforeEach(func() {
+						cmd.Enable = true
+					})
+
+					It("sets the new stack and enables the buildpack", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("Assigning stack %s to %s as %s...", cmd.NewStack, args.Buildpack, userName))
+						Expect(testUI.Out).To(Say("Updating buildpack %s with stack %s...", args.Buildpack, cmd.NewStack))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
+
+				Context("and the --disable flag is provided", func() {
+					BeforeEach(func() {
+						cmd.Disable = true
+					})
+
+					It("sets the new stack and disables the buildpack", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("Assigning stack %s to %s as %s...", cmd.NewStack, args.Buildpack, userName))
+						Expect(testUI.Out).To(Say("Updating buildpack %s with stack %s...", args.Buildpack, cmd.NewStack))
+						Expect(testUI.Out).To(Say("OK"))
+					})
 				})
 			})
 
@@ -242,12 +361,13 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 				When("no arguments are specified", func() {
 					It("makes the actor call to update the buildpack", func() {
 						Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
-						name, stack, order, locked, enabled := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+						name, currentStack, order, locked, enabled, newStack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 						Expect(name).To(Equal(args.Buildpack))
-						Expect(stack).To(Equal(""))
+						Expect(currentStack).To(Equal(""))
 						Expect(order.IsSet).To(BeFalse())
 						Expect(locked.IsSet).To(BeFalse())
 						Expect(enabled.IsSet).To(BeFalse())
+						Expect(newStack).To(Equal(""))
 
 						Expect(testUI.Err).To(Say("update-bp-warning1"))
 						Expect(testUI.Err).To(Say("update-bp-warning2"))
@@ -258,7 +378,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 				When("a stack association is specified", func() {
 					BeforeEach(func() {
-						cmd.Stack = "some-stack"
+						cmd.CurrentStack = "some-stack"
 					})
 
 					When("The API does not support stack associations", func() {
@@ -286,7 +406,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 							Expect(testUI.Err).To(Say("update-bp-warning1"))
 							Expect(testUI.Err).To(Say("update-bp-warning2"))
-							Expect(testUI.Out).To(Say("Updating buildpack %s with stack %s as %s...", args.Buildpack, cmd.Stack, userName))
+							Expect(testUI.Out).To(Say("Updating buildpack %s with stack %s as %s...", args.Buildpack, cmd.CurrentStack, userName))
 							Expect(testUI.Out).To(Say("OK"))
 						})
 					})
@@ -299,7 +419,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 					It("makes the actor call to update the buildpack", func() {
 						Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
-						name, _, _, _, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+						name, _, _, _, _, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 						Expect(name).To(Equal(args.Buildpack))
 
 						Expect(testUI.Err).To(Say("update-bp-warning1"))
@@ -366,7 +486,7 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 					It("makes the actor call to update the buildpack", func() {
 						Expect(fakeActor.UpdateBuildpackByNameAndStackCallCount()).To(Equal(1))
-						name, _, order, _, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+						name, _, order, _, _, _ := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
 						Expect(name).To(Equal(args.Buildpack))
 						Expect(order.IsSet).To(BeTrue())
 						Expect(order.Value).To(Equal(3))

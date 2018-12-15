@@ -37,6 +37,10 @@ type ServiceInstance struct {
 	// features of the service instance.
 	DashboardURL string
 
+	// RouteServiceURL is the URL of the user-provided service to which requests
+	// for bound routes will be forwarded.
+	RouteServiceURL string
+
 	// LastOperation is the status of the last operation requested on the service
 	// instance.
 	LastOperation LastOperation
@@ -59,6 +63,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 			Type            string        `json:"type"`
 			Tags            []string      `json:"tags"`
 			DashboardURL    string        `json:"dashboard_url"`
+			RouteServiceURL string        `json:"route_service_url"`
 			LastOperation   LastOperation `json:"last_operation"`
 		}
 	}
@@ -75,6 +80,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	serviceInstance.Type = constant.ServiceInstanceType(ccServiceInstance.Entity.Type)
 	serviceInstance.Tags = ccServiceInstance.Entity.Tags
 	serviceInstance.DashboardURL = ccServiceInstance.Entity.DashboardURL
+	serviceInstance.RouteServiceURL = ccServiceInstance.Entity.RouteServiceURL
 	serviceInstance.LastOperation = ccServiceInstance.Entity.LastOperation
 	return nil
 }
@@ -98,7 +104,7 @@ func (client *Client) GetServiceInstance(serviceInstanceGUID string) (ServiceIns
 
 	var serviceInstance ServiceInstance
 	response := cloudcontroller.Response{
-		Result: &serviceInstance,
+		DecodeJSONResponseInto: &serviceInstance,
 	}
 
 	err = client.connection.Make(request, &response)

@@ -18,24 +18,27 @@ import (
 )
 
 //go:generate counterfeiter . UpdateBuildpackActor
+
 type UpdateBuildpackActor interface {
 	CloudControllerAPIVersion() string
-	UpdateBuildpackByNameAndStack(name, stack string, position types.NullInt, locked types.NullBool, enabled types.NullBool) (string, v2action.Warnings, error)
+	UpdateBuildpackByNameAndStack(name, currentStack string, position types.NullInt, locked types.NullBool, enabled types.NullBool, newStack string) (string, v2action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v2action.Downloader) (string, error)
 	UploadBuildpack(GUID string, path string, progBar v2action.SimpleProgressBar) (v2action.Warnings, error)
 }
 
 type UpdateBuildpackCommand struct {
-	RequiredArgs    flag.BuildpackName               `positional-args:"yes"`
-	Disable         bool                             `long:"disable" description:"Disable the buildpack from being used for staging"`
-	Enable          bool                             `long:"enable" description:"Enable the buildpack to be used for staging"`
-	Order           types.NullInt                    `short:"i" description:"The order in which the buildpacks are checked during buildpack auto-detection"`
-	Lock            bool                             `long:"lock" description:"Lock the buildpack to prevent updates"`
-	Path            flag.PathWithExistenceCheckOrURL `short:"p" description:"Path to directory or zip file"`
-	Unlock          bool                             `long:"unlock" description:"Unlock the buildpack to enable updates"`
-	Stack           string                           `short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
-	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [-s STACK] [--enable|--disable] [--lock|--unlock]\n\nTIP:\n   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."`
-	relatedCommands interface{}                      `related_commands:"buildpacks, rename-buildpack"`
+	RequiredArgs flag.BuildpackName               `positional-args:"yes"`
+	NewStack     string                           `long:"assign-stack" description:"Assign a stack to a buildpack that does not have a stack association"`
+	Disable      bool                             `long:"disable" description:"Disable the buildpack from being used for staging"`
+	Enable       bool                             `long:"enable" description:"Enable the buildpack to be used for staging"`
+	Order        types.NullInt                    `short:"i" description:"The order in which the buildpacks are checked during buildpack auto-detection"`
+	Lock         bool                             `long:"lock" description:"Lock the buildpack to prevent updates"`
+	Path         flag.PathWithExistenceCheckOrURL `short:"p" description:"Path to directory or zip file"`
+	Unlock       bool                             `long:"unlock" description:"Unlock the buildpack to enable updates"`
+	CurrentStack string                           `short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
+	usage        interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--enable|--disable] [--lock|--unlock]\n\nTIP:\nPath should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\nUse '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"`
+
+	relatedCommands interface{} `related_commands:"buildpacks, rename-buildpack, create-buildpack, delete-buildpack"`
 
 	UI          command.UI
 	SharedActor command.SharedActor
@@ -111,7 +114,8 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 		Value: cmd.Lock,
 	}
 
-	buildpackGUID, warnings, err := cmd.Actor.UpdateBuildpackByNameAndStack(cmd.RequiredArgs.Buildpack, cmd.Stack, cmd.Order, locked, enabled)
+	buildpackGUID, warnings, err := cmd.Actor.UpdateBuildpackByNameAndStack(cmd.RequiredArgs.Buildpack, cmd.CurrentStack, cmd.Order, locked, enabled, cmd.NewStack)
+
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -138,18 +142,39 @@ func (cmd UpdateBuildpackCommand) Execute(args []string) error {
 }
 
 func (cmd UpdateBuildpackCommand) minAPIVersionCheck() error {
-	if cmd.Stack != "" {
+	if cmd.CurrentStack != "" {
 		return command.MinimumCCAPIVersionCheck(
 			cmd.Actor.CloudControllerAPIVersion(),
 			ccversion.MinVersionBuildpackStackAssociationV2,
 			"Option '-s'",
 		)
 	}
+
+	if cmd.NewStack != "" {
+		return command.MinimumCCAPIVersionCheck(
+			cmd.Actor.CloudControllerAPIVersion(),
+			ccversion.MinVersionBuildpackStackAssociationV2,
+			"Option '--assign-stack'",
+		)
+	}
 	return nil
 }
 
 func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
-	if cmd.Stack == "" {
+	if cmd.NewStack != "" {
+		cmd.UI.DisplayTextWithFlavor("Assigning stack {{.Stack}} to {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
+			"Buildpack":   cmd.RequiredArgs.Buildpack,
+			"CurrentUser": userName,
+			"Stack":       cmd.NewStack,
+		})
+		if cmd.Order.IsSet || cmd.Lock || cmd.Unlock || cmd.Enable || cmd.Disable {
+			cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
+				"Buildpack":   cmd.RequiredArgs.Buildpack,
+				"CurrentUser": userName,
+				"Stack":       cmd.NewStack,
+			})
+		}
+	} else if cmd.CurrentStack == "" {
 		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   cmd.RequiredArgs.Buildpack,
 			"CurrentUser": userName,
@@ -158,7 +183,7 @@ func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
 		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   cmd.RequiredArgs.Buildpack,
 			"CurrentUser": userName,
-			"Stack":       cmd.Stack,
+			"Stack":       cmd.CurrentStack,
 		})
 	}
 }
@@ -179,6 +204,18 @@ func (cmd UpdateBuildpackCommand) validateFlagCombinations() error {
 	if len(cmd.Path) > 0 && cmd.Unlock {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"-p", "--unlock"},
+		}
+	}
+
+	if len(cmd.Path) > 0 && len(cmd.NewStack) > 0 {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"-p", "--assign-stack"},
+		}
+	}
+
+	if len(cmd.CurrentStack) > 0 && len(cmd.NewStack) > 0 {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"-s", "--assign-stack"},
 		}
 	}
 

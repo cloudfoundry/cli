@@ -115,7 +115,7 @@ var _ = Describe("get-health-check Command", func() {
 				Expect(testUI.Out).To(Say("Getting health check type for app some-app in org some-org / space some-space as some-user..."))
 				Expect(testUI.Out).To(Say("\n\n"))
 				Expect(testUI.Out).To(Say("health check type:          some-health-check-type"))
-				Expect(testUI.Out).To(Say("endpoint \\(for http type\\):   \n"))
+				Expect(testUI.Out).To(Say(`endpoint \(for http type\):   \n`))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 
@@ -150,7 +150,7 @@ var _ = Describe("get-health-check Command", func() {
 				Expect(testUI.Out).To(Say("Getting health check type for app some-app in org some-org / space some-space as some-user..."))
 				Expect(testUI.Out).To(Say("\n\n"))
 				Expect(testUI.Out).To(Say("health check type:          http"))
-				Expect(testUI.Out).To(Say("endpoint \\(for http type\\):   /some-endpoint"))
+				Expect(testUI.Out).To(Say(`endpoint \(for http type\):   /some-endpoint`))
 			})
 		})
 	})

@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -80,13 +79,13 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", manifestPath, "--vars-file", firstVarsFilePath, "--vars-file", secondVarsFilePath)
-					Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-					Eventually(session).Should(Say("\\+\\s+instances:\\s+%d", instances))
-					Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
-					Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
-					Eventually(session).Should(Say("requested state:\\s+started"))
+					Eventually(session).Should(Say(`Getting app info\.\.\.`))
+					Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+					Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
+					Eventually(session).Should(Say(`\+\s+instances:\s+%d`, instances))
+					Eventually(session).Should(Say(`Mapping routes\.\.\.`))
+					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+					Eventually(session).Should(Say(`requested state:\s+started`))
 					Eventually(session).Should(Exit(0))
 				})
 				session := helpers.CF("app", appName)
@@ -135,13 +134,13 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 			It("pushes the app using the values from the latter vars-file interpolated in the manifest", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", manifestPath, "--vars-file", firstVarsFilePath, "--vars-file", secondVarsFilePath)
-					Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-					Eventually(session).Should(Say("\\+\\s+instances:\\s+%d", instances))
-					Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
-					Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
-					Eventually(session).Should(Say("requested state:\\s+started"))
+					Eventually(session).Should(Say(`Getting app info\.\.\.`))
+					Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+					Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
+					Eventually(session).Should(Say(`\+\s+instances:\s+%d`, instances))
+					Eventually(session).Should(Say(`Mapping routes\.\.\.`))
+					Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+					Eventually(session).Should(Say(`requested state:\s+started`))
 					Eventually(session).Should(Exit(0))
 				})
 				session := helpers.CF("app", appName)
@@ -154,13 +153,13 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 		It("replaces the variables with the provided values", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", manifestPath, "--var", fmt.Sprintf("vars1=%s", appName), "--var", fmt.Sprintf("vars2=%d", instances))
-				Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-				Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-				Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-				Eventually(session).Should(Say("\\+\\s+instances:\\s+%d", instances))
-				Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
-				Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
-				Eventually(session).Should(Say("requested state:\\s+started"))
+				Eventually(session).Should(Say(`Getting app info\.\.\.`))
+				Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+				Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
+				Eventually(session).Should(Say(`\+\s+instances:\s+%d`, instances))
+				Eventually(session).Should(Say(`Mapping routes\.\.\.`))
+				Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+				Eventually(session).Should(Say(`requested state:\s+started`))
 				Eventually(session).Should(Exit(0))
 			})
 			session := helpers.CF("app", appName)
@@ -187,13 +186,13 @@ var _ = Describe("Push with manifest variable interpolation", func() {
 		It("overwrites the vars-file with the provided var key value pair", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", manifestPath, "--var", fmt.Sprintf("vars1=%s", appName), "--vars-file", varsFilePath)
-				Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-				Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-				Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-				Eventually(session).Should(Say("\\+\\s+instances:\\s+%d", instances))
-				Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
-				Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
-				Eventually(session).Should(Say("requested state:\\s+started"))
+				Eventually(session).Should(Say(`Getting app info\.\.\.`))
+				Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+				Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
+				Eventually(session).Should(Say(`\+\s+instances:\s+%d`, instances))
+				Eventually(session).Should(Say(`Mapping routes\.\.\.`))
+				Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+				Eventually(session).Should(Say(`requested state:\s+started`))
 				Eventually(session).Should(Exit(0))
 			})
 			session := helpers.CF("app", appName)

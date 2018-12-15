@@ -36,7 +36,7 @@ func (client *Client) CreateIsolationSegment(isolationSegment IsolationSegment) 
 
 	var responseIsolationSegment IsolationSegment
 	response := cloudcontroller.Response{
-		Result: &responseIsolationSegment,
+		DecodeJSONResponseInto: &responseIsolationSegment,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -72,7 +72,7 @@ func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnin
 	}
 	var isolationSegment IsolationSegment
 	response := cloudcontroller.Response{
-		Result: &isolationSegment,
+		DecodeJSONResponseInto: &isolationSegment,
 	}
 
 	err = client.connection.Make(request, &response)

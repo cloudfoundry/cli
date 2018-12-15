@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -74,6 +75,81 @@ var _ = Describe("Service Plan Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetServicePlanCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetServicePlanArgsForCall(0)).To(Equal("some-service-plan-guid"))
+			})
+		})
+	})
+
+	Describe("GetServicePlansForService", func() {
+		var (
+			servicePlans        []ServicePlan
+			servicePlanWarnings Warnings
+			servicePlanErr      error
+		)
+
+		JustBeforeEach(func() {
+			servicePlans, servicePlanWarnings, servicePlanErr = actor.GetServicePlansForService("some-service")
+		})
+
+		When("there is a service with plans", func() {
+			BeforeEach(func() {
+				services := []ccv2.Service{
+					{
+						GUID:        "some-service-guid",
+						Label:       "some-service",
+						Description: "service-description",
+					},
+				}
+
+				plans := []ccv2.ServicePlan{
+					{Name: "plan-a"},
+					{Name: "plan-b"},
+				}
+
+				fakeCloudControllerClient.GetServicesReturns(services, ccv2.Warnings{"get-services-warning"}, nil)
+				fakeCloudControllerClient.GetServicePlansReturns(plans, ccv2.Warnings{"get-plans-warning"}, nil)
+			})
+
+			It("returns all plans and warnings", func() {
+				Expect(servicePlanErr).NotTo(HaveOccurred())
+				Expect(servicePlans).To(Equal([]ServicePlan{
+					{
+						Name: "plan-a",
+					},
+					{
+						Name: "plan-b",
+					},
+				},
+				))
+				Expect(servicePlanWarnings).To(ConsistOf("get-services-warning", "get-plans-warning"))
+				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(Equal([]ccv2.Filter{{
+					Type:     constant.ServiceGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-service-guid"},
+				}}))
+			})
+		})
+
+		When("GetServices returns an error and warnings", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns(nil, ccv2.Warnings{"get-service-warning"}, errors.New("service-error"))
+			})
+
+			It("propagates the error and all warnings", func() {
+				Expect(servicePlanErr).To(MatchError(errors.New("service-error")))
+				Expect(servicePlanWarnings).To(ConsistOf("get-service-warning"))
+			})
+		})
+
+		When("GetServicePlans returns an error and warnings", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns([]ccv2.Service{{}}, ccv2.Warnings{"get-service-warning"}, nil)
+				fakeCloudControllerClient.GetServicePlansReturns(nil, ccv2.Warnings{"get-plans-warning"}, errors.New("plans-error"))
+			})
+
+			It("propagates the error and all warnings", func() {
+				Expect(servicePlanErr).To(MatchError(errors.New("plans-error")))
+				Expect(servicePlanWarnings).To(ConsistOf("get-service-warning", "get-plans-warning"))
 			})
 		})
 	})

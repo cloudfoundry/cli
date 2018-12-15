@@ -53,7 +53,7 @@ var _ = Describe("delete-isolation-segment command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("delete-isolation-segment", isolationSegmentName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.11\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.11\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -93,7 +93,7 @@ var _ = Describe("delete-isolation-segment command", func() {
 
 					It("deletes the isolation segment", func() {
 						session := helpers.CFWithStdin(buffer, "delete-isolation-segment", isolationSegmentName)
-						Eventually(session).Should(Say("Really delete the isolation segment %s\\?", isolationSegmentName))
+						Eventually(session).Should(Say(`Really delete the isolation segment %s\?`, isolationSegmentName))
 
 						userName, _ := helpers.GetCredentials()
 						Eventually(session).Should(Say("Deleting isolation segment %s as %s...", isolationSegmentName, userName))
@@ -109,7 +109,7 @@ var _ = Describe("delete-isolation-segment command", func() {
 
 					It("cancels the deletion", func() {
 						session := helpers.CFWithStdin(buffer, "delete-isolation-segment", isolationSegmentName)
-						Eventually(session).Should(Say("Really delete the isolation segment %s\\?", isolationSegmentName))
+						Eventually(session).Should(Say(`Really delete the isolation segment %s\?`, isolationSegmentName))
 						Eventually(session).Should(Say("Delete cancelled"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -122,7 +122,7 @@ var _ = Describe("delete-isolation-segment command", func() {
 
 					It("cancels the deletion", func() {
 						session := helpers.CFWithStdin(buffer, "delete-isolation-segment", isolationSegmentName)
-						Eventually(session).Should(Say("Really delete the isolation segment %s\\?", isolationSegmentName))
+						Eventually(session).Should(Say(`Really delete the isolation segment %s\?`, isolationSegmentName))
 						Eventually(session).Should(Say("Delete cancelled"))
 						Eventually(session).Should(Exit(0))
 					})

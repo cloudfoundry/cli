@@ -1,3 +1,5 @@
+// +build !partialPush
+
 package isolated
 
 import (
@@ -45,61 +47,7 @@ var _ = Describe("app command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "app", "some-app")
-		})
-
-		When("no API endpoint is set", func() {
-			BeforeEach(func() {
-				helpers.UnsetAPI()
-			})
-
-			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("app", appName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-		When("not logged in", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-			})
-
-			It("fails with not logged in message", func() {
-				session := helpers.CF("app", appName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("there is no org set", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-				helpers.LoginCF()
-			})
-
-			It("fails with no org targeted error message", func() {
-				session := helpers.CF("app", appName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("there is no space set", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-				helpers.LoginCF()
-				helpers.TargetOrg(ReadOnlyOrg)
-			})
-
-			It("fails with no space targeted error message", func() {
-				session := helpers.CF("app", appName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
-				Eventually(session).Should(Exit(1))
-			})
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "app", appName)
 		})
 	})
 
@@ -125,12 +73,12 @@ var _ = Describe("app command", func() {
 
 					It("displays blank fields for unpopulated fields", func() {
 						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+stopped"))
-						Eventually(session).Should(Say("routes:\\s+\n"))
-						Eventually(session).Should(Say("last uploaded:\\s+\n"))
-						Eventually(session).Should(Say("stack:\\s+\n"))
-						Eventually(session).Should(Say("buildpacks:\\s+\n"))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+stopped`))
+						Eventually(session).Should(Say(`routes:\s+\n`))
+						Eventually(session).Should(Say(`last uploaded:\s+\n`))
+						Eventually(session).Should(Say(`stack:\s+\n`))
+						Eventually(session).Should(Say(`buildpacks:\s+\n`))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -170,20 +118,20 @@ applications:
 
 							session := helpers.CF("app", appName)
 
-							Eventually(session).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
 							Eventually(session).ShouldNot(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-							Eventually(session).Should(Say("name:\\s+%s", appName))
-							Eventually(session).Should(Say("requested state:\\s+started"))
-							Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
-							Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
-							Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-							Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
-							Eventually(session).Should(Say("type:\\s+web"))
-							Eventually(session).Should(Say("instances:\\s+\\d/2"))
-							Eventually(session).Should(Say("memory usage:\\s+128M"))
-							Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
-							Eventually(session).Should(Say("#0\\s+(starting|running)\\s+\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
+							Eventually(session).Should(Say(`name:\s+%s`, appName))
+							Eventually(session).Should(Say(`requested state:\s+started`))
+							Eventually(session).Should(Say(`routes:\s+%s\.%s`, appName, domainName))
+							Eventually(session).Should(Say(`last uploaded:\s+\w{3} \d{1,2} \w{3} \d{2}:\d{2}:\d{2} \w{3} \d{4}`))
+							Eventually(session).Should(Say(`stack:\s+cflinuxfs2`))
+							Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
+							Eventually(session).Should(Say(`type:\s+web`))
+							Eventually(session).Should(Say(`instances:\s+\d/2`))
+							Eventually(session).Should(Say(`memory usage:\s+128M`))
+							Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk\s+details`))
+							Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
 							Eventually(session).Should(Exit(0))
 						})
@@ -202,10 +150,33 @@ applications:
 
 						userName, _ := helpers.GetCredentials()
 						Eventually(session).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+stopped`))
+						Eventually(session).Should(Say(`type:\s+web`))
+						Eventually(session).Should(Say("#0\\s+down\\s+\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("all instances of the app are down", func() {
+					BeforeEach(func() {
+						infiniteMemQuota := helpers.QuotaName()
+						Eventually(helpers.CF("create-quota", infiniteMemQuota, "-i", "-1", "-r", "-1", "-m", "2000G")).Should(Exit(0))
+						Eventually(helpers.CF("set-quota", orgName, infiniteMemQuota)).Should(Exit(0))
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "-p", appDir)).Should(Exit(0))
+						})
+						Eventually(helpers.CFWithEnv(map[string]string{"CF_STAGING_TIMEOUT": "0.1", "CF_STARTUP_TIMEOUT": "0.1"}, "scale", appName, "-m", "1000G", "-f")).Should(Exit(1))
+					})
+
+					It("displays the down app instances", func() {
+						session := helpers.CF("app", appName)
+						userName, _ := helpers.GetCredentials()
+						Eventually(session).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+stopped"))
+						Eventually(session).Should(Say("requested state:\\s+started"))
 						Eventually(session).Should(Say("type:\\s+web"))
-						Eventually(session).Should(Say("There are no running instances of this process"))
+						Eventually(session).Should(Say("#0\\s+down\\s+\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -222,9 +193,9 @@ applications:
 						userName, _ := helpers.GetCredentials()
 
 						Eventually(session).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+started"))
-						Eventually(session).Should(Say("type:\\s+web"))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+started`))
+						Eventually(session).Should(Say(`type:\s+web`))
 						Eventually(session).Should(Say("There are no running instances of this process"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -258,13 +229,13 @@ applications:
 				When("the app uses multiple buildpacks", func() {
 					BeforeEach(func() {
 						helpers.WithMultiBuildpackApp(func(appDir string) {
-							Eventually(helpers.CF("v3-push", appName, "-p", appDir, "-b", "ruby_buildpack", "-b", "go_buildpack")).Should(Exit(0))
+							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "ruby_buildpack", "-b", "go_buildpack")).Should(Exit(0))
 						})
 					})
 
 					It("displays the app buildpacks", func() {
 						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say("buildpacks:\\s+ruby_buildpack,\\s+go"))
+						Eventually(session).Should(Say(`buildpacks:\s+ruby_buildpack,\s+go`))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -306,18 +277,18 @@ applications:
 
 						It("runs the v6 command", func() {
 							session := helpers.CF("app", appName)
-							Eventually(session).Should(Say("name:\\s+%s", appName))
-							Eventually(session).Should(Say("requested state:\\s+started"))
-							Eventually(session).Should(Say("instances:\\s+2/2"))
-							Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-							Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s", domainName))
-							Eventually(session).Should(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-							Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-							Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+							Eventually(session).Should(Say(`name:\s+%s`, appName))
+							Eventually(session).Should(Say(`requested state:\s+started`))
+							Eventually(session).Should(Say(`instances:\s+2/2`))
+							Eventually(session).Should(Say(`usage:\s+128M x 2 instances`))
+							Eventually(session).Should(Say(`routes:\s+[\w\d-]+\.%s`, domainName))
+							Eventually(session).Should(Say(`last uploaded:\s+\w{3} [0-3]\d \w{3} [0-2]\d:[0-5]\d:[0-5]\d \w+ \d{4}`))
+							Eventually(session).Should(Say(`stack:\s+cflinuxfs2`))
+							Eventually(session).Should(Say(`buildpack:\s+staticfile_buildpack`))
 							Eventually(session).Should(Say(""))
-							Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
-							Eventually(session).Should(Say("#0\\s+(running|starting)\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
-							Eventually(session).Should(Say("#1\\s+(running|starting)\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
+							Eventually(session).Should(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
+							Eventually(session).Should(Say(`#0\s+(running|starting)\s+\d{4}-[01]\d-[0-3]\dT[0-2][0-9]:[0-5]\d:[0-5]\dZ\s+\d+\.\d+%.*of 128M.*of 128M`))
+							Eventually(session).Should(Say(`#1\s+(running|starting)\s+\d{4}-[01]\d-[0-3]\dT[0-2][0-9]:[0-5]\d:[0-5]\dZ\s+\d+\.\d+%.*of 128M.*of 128M`))
 							Eventually(session).Should(Exit(0))
 						})
 					})
@@ -335,9 +306,9 @@ applications:
 
 						userName, _ := helpers.GetCredentials()
 						Eventually(session).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+stopped"))
-						Eventually(session).Should(Say("usage:\\s+\\d+M x 1 instances"))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+stopped`))
+						Eventually(session).Should(Say(`usage:\s+\d+M x 1 instances`))
 						Eventually(session).Should(Say("There are no running instances of this app."))
 						Eventually(session).Should(Exit(0))
 					})
@@ -356,9 +327,9 @@ applications:
 						userName, _ := helpers.GetCredentials()
 
 						Eventually(session).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("requested state:\\s+started"))
-						Eventually(session).Should(Say("usage:\\s+\\d+M x 0 instances"))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`requested state:\s+started`))
+						Eventually(session).Should(Say(`usage:\s+\d+M x 0 instances`))
 						Eventually(session).Should(Say("There are no running instances of this app."))
 						Eventually(session).Should(Exit(0))
 					})
@@ -442,7 +413,7 @@ applications:
 					It("displays the app isolation segment information", func() {
 						session := helpers.CF("app", appName)
 
-						Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
+						Eventually(session).Should(Say(`isolation segment:\s+%s`, RealIsolationSegment))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -469,8 +440,8 @@ applications:
 
 					It("displays the docker image", func() {
 						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Say("docker image:\\s+%s", DockerImage))
+						Eventually(session).Should(Say(`name:\s+%s`, appName))
+						Eventually(session).Should(Say(`docker image:\s+%s`, DockerImage))
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -507,7 +478,7 @@ applications:
 
 						It("displays the app information", func() {
 							session := helpers.CF("app", appName)
-							Eventually(session).Should(Say("routes:\\s+[\\w\\d-]+\\.%s", tcpDomain))
+							Eventually(session).Should(Say(`routes:\s+[\w\d-]+\.%s`, tcpDomain))
 							Eventually(session).Should(Exit(0))
 						})
 					})

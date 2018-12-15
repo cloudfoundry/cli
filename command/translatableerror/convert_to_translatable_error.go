@@ -32,6 +32,8 @@ func ConvertToTranslatableError(err error) error {
 		return AssignDropletError(e)
 	case actionerror.BuildpackNotFoundError:
 		return BuildpackNotFoundError(e)
+	case actionerror.BuildpackStackChangeError:
+		return BuildpackStackChangeError(e)
 	case actionerror.CommandLineOptionsWithMultipleAppsError:
 		return CommandLineArgsWithMultipleAppsError{}
 	case actionerror.DockerPasswordNotSetError:
@@ -123,6 +125,8 @@ func ConvertToTranslatableError(err error) error {
 		}
 	case actionerror.ServiceInstanceNotSharedToSpaceError:
 		return ServiceInstanceNotSharedToSpaceError{ServiceInstanceName: e.ServiceInstanceName}
+	case actionerror.ServicePlanNotFoundError:
+		return ServicePlanNotFoundError(e)
 	case actionerror.SharedServiceInstanceNotFoundError:
 		return SharedServiceInstanceNotFoundError(e)
 	case actionerror.SpaceNotFoundError:

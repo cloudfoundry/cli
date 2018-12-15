@@ -77,7 +77,7 @@ func (client *Client) CreateOrganization(orgName string, quotaGUID string) (Orga
 
 	var org Organization
 	response := cloudcontroller.Response{
-		Result: &org,
+		DecodeJSONResponseInto: &org,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -102,7 +102,7 @@ func (client *Client) DeleteOrganization(guid string) (Job, Warnings, error) {
 
 	var job Job
 	response := cloudcontroller.Response{
-		Result: &job,
+		DecodeJSONResponseInto: &job,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -121,7 +121,7 @@ func (client *Client) GetOrganization(guid string) (Organization, Warnings, erro
 
 	var org Organization
 	response := cloudcontroller.Response{
-		Result: &org,
+		DecodeJSONResponseInto: &org,
 	}
 
 	err = client.connection.Make(request, &response)

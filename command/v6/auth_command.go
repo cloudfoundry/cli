@@ -16,6 +16,7 @@ import (
 
 type AuthActor interface {
 	Authenticate(ID string, secret string, origin string, grantType constant.GrantType) error
+	CloudControllerAPIVersion() string
 	UAAAPIVersion() string
 }
 
@@ -63,7 +64,7 @@ func (cmd AuthCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.UI)
+	err = command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.Actor.CloudControllerAPIVersion(), cmd.UI)
 	if err != nil {
 		return err
 	}

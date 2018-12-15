@@ -47,7 +47,7 @@ func (client *Client) GetSpaceQuotaDefinition(guid string) (SpaceQuota, Warnings
 
 	var spaceQuota SpaceQuota
 	response := cloudcontroller.Response{
-		Result: &spaceQuota,
+		DecodeJSONResponseInto: &spaceQuota,
 	}
 
 	err = client.connection.Make(request, &response)

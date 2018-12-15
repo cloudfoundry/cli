@@ -170,7 +170,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 			It("returns the error", func() {
 				_, warnings, err := actor.GetApplicationsWithProcessesBySpace("some-space-guid")
 				Expect(err).To(Equal(expectedErr))
-				Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
+				Expect(warnings).To(ConsistOf("some-warning", "some-process-warning"))
 			})
 		})
 
@@ -212,7 +212,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 			It("returns the error", func() {
 				_, warnings, err := actor.GetApplicationsWithProcessesBySpace("some-space-guid")
 				Expect(err).To(Equal(expectedErr))
-				Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-process-stats-warning"}))
+				Expect(warnings).To(ConsistOf("some-warning", "some-process-warning", "some-process-stats-warning"))
 			})
 		})
 	})

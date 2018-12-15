@@ -2,74 +2,52 @@ package ccv3
 
 import (
 	"bytes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"encoding/json"
 	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/types"
 )
 
 type Process struct {
-	GUID string `json:"guid"`
-	Type string `json:"type"`
+	GUID string
+	Type string
 	// Command is the process start command. Note: This value will be obfuscated when obtained from listing.
-	Command                      string           `json:"command,omitempty"`
-	HealthCheckType              string           `json:"-"`
-	HealthCheckEndpoint          string           `json:"-"`
-	HealthCheckInvocationTimeout int              `json:"-"`
-	Instances                    types.NullInt    `json:"instances,omitempty"`
-	MemoryInMB                   types.NullUint64 `json:"memory_in_mb,omitempty"`
-	DiskInMB                     types.NullUint64 `json:"disk_in_mb,omitempty"`
+	Command                      types.FilteredString
+	HealthCheckType              constant.HealthCheckType
+	HealthCheckEndpoint          string
+	HealthCheckInvocationTimeout int
+	Instances                    types.NullInt
+	MemoryInMB                   types.NullUint64
+	DiskInMB                     types.NullUint64
 }
 
 func (p Process) MarshalJSON() ([]byte, error) {
-	type healthCheck struct {
-		Type string `json:"type"`
-		Data struct {
-			Endpoint          interface{} `json:"endpoint"`
-			InvocationTimeout int         `json:"invocation_timeout,omitempty"`
-		} `json:"data"`
-	}
+	var ccProcess marshalProcess
 
-	var ccProcess struct {
-		Instances  json.Number `json:"instances,omitempty"`
-		MemoryInMB json.Number `json:"memory_in_mb,omitempty"`
-		DiskInMB   json.Number `json:"disk_in_mb,omitempty"`
-
-		HealthCheck *healthCheck `json:"health_check,omitempty"`
-	}
-
-	if p.Instances.IsSet {
-		ccProcess.Instances = json.Number(fmt.Sprint(p.Instances.Value))
-	}
-	if p.MemoryInMB.IsSet {
-		ccProcess.MemoryInMB = json.Number(fmt.Sprint(p.MemoryInMB.Value))
-	}
-	if p.DiskInMB.IsSet {
-		ccProcess.DiskInMB = json.Number(fmt.Sprint(p.DiskInMB.Value))
-	}
-
-	if p.HealthCheckType != "" || p.HealthCheckEndpoint != "" || p.HealthCheckInvocationTimeout != 0 {
-		ccProcess.HealthCheck = new(healthCheck)
-		ccProcess.HealthCheck.Type = p.HealthCheckType
-		ccProcess.HealthCheck.Data.InvocationTimeout = p.HealthCheckInvocationTimeout
-		if p.HealthCheckEndpoint != "" {
-			ccProcess.HealthCheck.Data.Endpoint = p.HealthCheckEndpoint
-		}
-	}
+	marshalCommand(p, &ccProcess)
+	marshalInstances(p, &ccProcess)
+	marshalMemory(p, &ccProcess)
+	marshalDisk(p, &ccProcess)
+	marshalHealthCheck(p, &ccProcess)
 
 	return json.Marshal(ccProcess)
 }
 
 func (p *Process) UnmarshalJSON(data []byte) error {
-	type rawProcess Process
 	var ccProcess struct {
-		*rawProcess
+		Command    types.FilteredString `json:"command"`
+		DiskInMB   types.NullUint64     `json:"disk_in_mb"`
+		GUID       string               `json:"guid"`
+		Instances  types.NullInt        `json:"instances"`
+		MemoryInMB types.NullUint64     `json:"memory_in_mb"`
+		Type       string               `json:"type"`
 
 		HealthCheck struct {
-			Type string `json:"type"`
+			Type constant.HealthCheckType `json:"type"`
 			Data struct {
 				Endpoint          string `json:"endpoint"`
 				InvocationTimeout int    `json:"invocation_timeout"`
@@ -77,15 +55,20 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 		} `json:"health_check"`
 	}
 
-	ccProcess.rawProcess = (*rawProcess)(p)
 	err := cloudcontroller.DecodeJSON(data, &ccProcess)
 	if err != nil {
 		return err
 	}
 
+	p.Command = ccProcess.Command
+	p.DiskInMB = ccProcess.DiskInMB
+	p.GUID = ccProcess.GUID
 	p.HealthCheckEndpoint = ccProcess.HealthCheck.Data.Endpoint
-	p.HealthCheckType = ccProcess.HealthCheck.Type
 	p.HealthCheckInvocationTimeout = ccProcess.HealthCheck.Data.InvocationTimeout
+	p.HealthCheckType = ccProcess.HealthCheck.Type
+	p.Instances = ccProcess.Instances
+	p.MemoryInMB = ccProcess.MemoryInMB
+	p.Type = ccProcess.Type
 
 	return nil
 }
@@ -108,7 +91,7 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, process Proc
 
 	var responseProcess Process
 	response := cloudcontroller.Response{
-		Result: &responseProcess,
+		DecodeJSONResponseInto: &responseProcess,
 	}
 	err = client.connection.Make(request, &response)
 	return responseProcess, response.Warnings, err
@@ -128,7 +111,7 @@ func (client *Client) GetApplicationProcessByType(appGUID string, processType st
 	}
 	var process Process
 	response := cloudcontroller.Response{
-		Result: &process,
+		DecodeJSONResponseInto: &process,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -162,12 +145,15 @@ func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnin
 	return fullProcessesList, warnings, err
 }
 
-// PatchApplicationProcessHealthCheck updates application health check type
-func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string, processHealthCheckInvocationTimeout int) (Process, Warnings, error) {
+// UpdateProcess updates the process's command or health check settings. GUID
+// is always required; HealthCheckType is only required when updating health
+// check settings.
+func (client *Client) UpdateProcess(process Process) (Process, Warnings, error) {
 	body, err := json.Marshal(Process{
-		HealthCheckType:              processHealthCheckType,
-		HealthCheckEndpoint:          processHealthCheckEndpoint,
-		HealthCheckInvocationTimeout: processHealthCheckInvocationTimeout,
+		Command:                      process.Command,
+		HealthCheckType:              process.HealthCheckType,
+		HealthCheckEndpoint:          process.HealthCheckEndpoint,
+		HealthCheckInvocationTimeout: process.HealthCheckInvocationTimeout,
 	})
 	if err != nil {
 		return Process{}, nil, err
@@ -176,7 +162,7 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PatchProcessRequest,
 		Body:        bytes.NewReader(body),
-		URIParams:   internal.Params{"process_guid": processGUID},
+		URIParams:   internal.Params{"process_guid": process.GUID},
 	})
 	if err != nil {
 		return Process{}, nil, err
@@ -184,8 +170,60 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 
 	var responseProcess Process
 	response := cloudcontroller.Response{
-		Result: &responseProcess,
+		DecodeJSONResponseInto: &responseProcess,
 	}
 	err = client.connection.Make(request, &response)
 	return responseProcess, response.Warnings, err
+}
+
+type healthCheck struct {
+	Type constant.HealthCheckType `json:"type"`
+	Data struct {
+		Endpoint          interface{} `json:"endpoint"`
+		InvocationTimeout int         `json:"invocation_timeout,omitempty"`
+	} `json:"data"`
+}
+
+type marshalProcess struct {
+	Command    interface{} `json:"command,omitempty"`
+	Instances  json.Number `json:"instances,omitempty"`
+	MemoryInMB json.Number `json:"memory_in_mb,omitempty"`
+	DiskInMB   json.Number `json:"disk_in_mb,omitempty"`
+
+	HealthCheck *healthCheck `json:"health_check,omitempty"`
+}
+
+func marshalCommand(p Process, ccProcess *marshalProcess) {
+	if p.Command.IsSet {
+		ccProcess.Command = &p.Command
+	}
+}
+
+func marshalDisk(p Process, ccProcess *marshalProcess) {
+	if p.DiskInMB.IsSet {
+		ccProcess.DiskInMB = json.Number(fmt.Sprint(p.DiskInMB.Value))
+	}
+}
+
+func marshalHealthCheck(p Process, ccProcess *marshalProcess) {
+	if p.HealthCheckType != "" || p.HealthCheckEndpoint != "" || p.HealthCheckInvocationTimeout != 0 {
+		ccProcess.HealthCheck = new(healthCheck)
+		ccProcess.HealthCheck.Type = p.HealthCheckType
+		ccProcess.HealthCheck.Data.InvocationTimeout = p.HealthCheckInvocationTimeout
+		if p.HealthCheckEndpoint != "" {
+			ccProcess.HealthCheck.Data.Endpoint = p.HealthCheckEndpoint
+		}
+	}
+}
+
+func marshalInstances(p Process, ccProcess *marshalProcess) {
+	if p.Instances.IsSet {
+		ccProcess.Instances = json.Number(fmt.Sprint(p.Instances.Value))
+	}
+}
+
+func marshalMemory(p Process, ccProcess *marshalProcess) {
+	if p.MemoryInMB.IsSet {
+		ccProcess.MemoryInMB = json.Number(fmt.Sprint(p.MemoryInMB.Value))
+	}
 }

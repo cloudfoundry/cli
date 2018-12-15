@@ -75,6 +75,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 		return err
 	}
 
+	cmd.UI.DisplayWarning("This action will cause app downtime.")
 	cmd.UI.DisplayTextWithFlavor("Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"AppName":     cmd.RequiredArgs.AppName,

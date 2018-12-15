@@ -53,7 +53,7 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("reset-org-default-isolation-segment", orgName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.11\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.11\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -78,9 +78,9 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 		When("the org does not exist", func() {
 			It("fails with org not found message", func() {
 				session := helpers.CF("reset-org-default-isolation-segment", orgName)
-				Eventually(session).Should(Say("Resetting default isolation segment of org %s as %s\\.\\.\\.", orgName, userName))
+				Eventually(session).Should(Say(`Resetting default isolation segment of org %s as %s\.\.\.`, orgName, userName))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Organization '%s' not found\\.", orgName))
+				Eventually(session.Err).Should(Say(`Organization '%s' not found\.`, orgName))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -104,10 +104,10 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 
 				It("displays OK", func() {
 					session := helpers.CF("reset-org-default-isolation-segment", orgName)
-					Eventually(session).Should(Say("Resetting default isolation segment of org %s as %s\\.\\.\\.", orgName, userName))
+					Eventually(session).Should(Say(`Resetting default isolation segment of org %s as %s\.\.\.`, orgName, userName))
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("Applications in spaces of this org that have no isolation segment assigned will be placed in the platform default isolation segment\\."))
-					Eventually(session).Should(Say("Running applications need a restart to be moved there\\."))
+					Eventually(session).Should(Say(`Applications in spaces of this org that have no isolation segment assigned will be placed in the platform default isolation segment\.`))
+					Eventually(session).Should(Say(`Running applications need a restart to be moved there\.`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -115,10 +115,10 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 			When("the org has no default isolation segment", func() {
 				It("displays OK", func() {
 					session := helpers.CF("reset-org-default-isolation-segment", orgName)
-					Eventually(session).Should(Say("Resetting default isolation segment of org %s as %s\\.\\.\\.", orgName, userName))
+					Eventually(session).Should(Say(`Resetting default isolation segment of org %s as %s\.\.\.`, orgName, userName))
 					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("Applications in spaces of this org that have no isolation segment assigned will be placed in the platform default isolation segment\\."))
-					Eventually(session).Should(Say("Running applications need a restart to be moved there\\."))
+					Eventually(session).Should(Say(`Applications in spaces of this org that have no isolation segment assigned will be placed in the platform default isolation segment\.`))
+					Eventually(session).Should(Say(`Running applications need a restart to be moved there\.`))
 					Eventually(session).Should(Exit(0))
 				})
 			})

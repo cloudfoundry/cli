@@ -64,14 +64,14 @@ func generateBrokers(numberOfBrokers int) []v2action.ServiceBrokerSummary {
 
 func rowMatcher(brokers []v2action.ServiceBrokerSummary, b int, s int, p int, access string) string {
 	row := fmt.Sprintf(
-		"\\s+%s\\s+%s\\s+%s",
+		`\s+%s\s+%s\s+%s`,
 		brokers[b].Services[s].Label,
 		brokers[b].Services[s].Plans[p].Name,
 		access,
 	)
 
 	if len(brokers[b].Services[s].Plans[p].VisibleTo) > 0 && access != "all" {
-		row = fmt.Sprintf("%s\\s+%s", row, strings.Join(brokers[b].Services[s].Plans[p].VisibleTo, ","))
+		row = fmt.Sprintf(`%s\s+%s`, row, strings.Join(brokers[b].Services[s].Plans[p].VisibleTo, ","))
 	}
 
 	return row
@@ -184,14 +184,14 @@ var _ = Describe("service-access Command", func() {
 				It("displays each service broker, service, plan and access with org in the correct position", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					tableHeaders := "service\\s+plan\\s+access\\s+orgs"
-					Expect(testUI.Out).To(Say("broker:\\s+%s", brokers[0].Name))
+					tableHeaders := `service\s+plan\s+access\s+orgs`
+					Expect(testUI.Out).To(Say(`broker:\s+%s`, brokers[0].Name))
 					Expect(testUI.Out).To(Say(tableHeaders))
 					Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 1, 1, "all")))
 					Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 1, 0, "none")))
 					Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 0, 1, "all")))
 					Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 0, 0, "limited")))
-					Expect(testUI.Out).To(Say("broker:\\s+%s", brokers[1].Name))
+					Expect(testUI.Out).To(Say(`broker:\s+%s`, brokers[1].Name))
 					Expect(testUI.Out).To(Say(tableHeaders))
 					Expect(testUI.Out).To(Say(rowMatcher(brokers, 1, 1, 1, "all")))
 					Expect(testUI.Out).To(Say(rowMatcher(brokers, 1, 1, 0, "none")))

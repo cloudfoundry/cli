@@ -5,12 +5,13 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type ProcessHealthCheck struct {
 	ProcessType       string
-	HealthCheckType   string
+	HealthCheckType   constant.HealthCheckType
 	Endpoint          string
 	InvocationTimeout int
 }
@@ -74,13 +75,13 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 	appName string,
 	spaceGUID string,
-	healthCheckType string,
+	healthCheckType constant.HealthCheckType,
 	httpEndpoint string,
 	processType string,
 	invocationTimeout int,
 ) (Application, Warnings, error) {
 
-	if healthCheckType != "http" {
+	if healthCheckType != constant.HTTP {
 		if httpEndpoint == "/" {
 			httpEndpoint = ""
 		} else {
@@ -102,13 +103,12 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 		return Application{}, allWarnings, err
 	}
 
-	_, warnings, err = actor.CloudControllerClient.PatchApplicationProcessHealthCheck(
-		process.GUID,
-		healthCheckType,
-		httpEndpoint,
-		invocationTimeout,
-	)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	process.HealthCheckType = healthCheckType
+	process.HealthCheckEndpoint = httpEndpoint
+	process.HealthCheckInvocationTimeout = invocationTimeout
+
+	_, updateWarnings, err := actor.CloudControllerClient.UpdateProcess(ccv3.Process(process))
+	allWarnings = append(allWarnings, Warnings(updateWarnings)...)
 	if err != nil {
 		return Application{}, allWarnings, err
 	}

@@ -538,7 +538,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 
 								It("returns the error", func() {
 									Expect(executeErr).To(MatchError("some-error"))
-									Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
+									Expect(testUI.Out).To(Say(`Mapping routes\.\.\.`))
 									Expect(testUI.Err).To(Say("route-warning"))
 
 									Expect(fakeZdtActor.RestartApplicationCallCount()).To(Equal(0))
@@ -552,7 +552,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 								})
 
 								It("displays the header and OK", func() {
-									Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
+									Expect(testUI.Out).To(Say(`Mapping routes\.\.\.`))
 									Expect(testUI.Out).To(Say("OK"))
 
 									Expect(testUI.Err).To(Say("route-warning"))
@@ -578,12 +578,12 @@ var _ = Describe("v3-zdt-push Command", func() {
 
 									It("says that the app failed to start", func() {
 										Expect(executeErr).To(Equal(errors.New("some-error")))
-										Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as banana\\.\\.\\."))
+										Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as banana\.\.\.`))
 
 										Expect(testUI.Err).To(Say("start-warning-1"))
 										Expect(testUI.Err).To(Say("start-warning-2"))
 
-										Expect(testUI.Out).ToNot(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+										Expect(testUI.Out).ToNot(Say(`Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.`))
 									})
 								})
 
@@ -593,7 +593,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 									})
 
 									It("says that the app was started and outputs warnings", func() {
-										Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as banana\\.\\.\\."))
+										Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as banana\.\.\.`))
 
 										Expect(testUI.Err).To(Say("start-warning-1"))
 										Expect(testUI.Err).To(Say("start-warning-2"))
@@ -616,7 +616,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 										})
 
 										It("displays all warnings and fails", func() {
-											Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+											Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 
 											Expect(testUI.Err).To(Say("some-poll-warning-1"))
 											Expect(testUI.Err).To(Say("some-poll-warning-2"))
@@ -647,7 +647,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 										})
 
 										It("displays all warnings", func() {
-											Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+											Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 
 											Expect(testUI.Err).To(Say("some-poll-warning-1"))
 											Expect(testUI.Err).To(Say("some-poll-warning-2"))
@@ -665,12 +665,12 @@ var _ = Describe("v3-zdt-push Command", func() {
 											It("returns the error and prints warnings", func() {
 												Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
-												Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+												Expect(testUI.Out).To(Say(`Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 												Expect(testUI.Err).To(Say("display-warning-1"))
 												Expect(testUI.Err).To(Say("display-warning-2"))
 
-												Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+												Expect(testUI.Out).ToNot(Say(`name:\s+some-app`))
 											})
 										})
 
@@ -724,14 +724,14 @@ var _ = Describe("v3-zdt-push Command", func() {
 												It("displays all warnings and returns the error", func() {
 													Expect(executeErr).To(MatchError("some-error"))
 
-													Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+													Expect(testUI.Out).To(Say(`Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 													Expect(testUI.Err).To(Say("display-warning-1"))
 													Expect(testUI.Err).To(Say("display-warning-2"))
 													Expect(testUI.Err).To(Say("route-warning-1"))
 													Expect(testUI.Err).To(Say("route-warning-2"))
 
-													Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+													Expect(testUI.Out).ToNot(Say(`name:\s+some-app`))
 												})
 											})
 
@@ -746,18 +746,18 @@ var _ = Describe("v3-zdt-push Command", func() {
 												It("prints the application summary and outputs warnings", func() {
 													Expect(executeErr).ToNot(HaveOccurred())
 
-													Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
-													Expect(testUI.Out).To(Say("name:\\s+some-app"))
-													Expect(testUI.Out).To(Say("requested state:\\s+started"))
-													Expect(testUI.Out).To(Say("routes:\\s+some-other-domain, some-domain"))
-													Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
-													Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output\n\n"))
+													Expect(testUI.Out).To(Say(`(?m)Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.\n\n`))
+													Expect(testUI.Out).To(Say(`name:\s+some-app`))
+													Expect(testUI.Out).To(Say(`requested state:\s+started`))
+													Expect(testUI.Out).To(Say(`routes:\s+some-other-domain, some-domain`))
+													Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs2`))
+													Expect(testUI.Out).To(Say(`(?m)buildpacks:\s+some-detect-output\n\n`))
 
-													Expect(testUI.Out).To(Say("type:\\s+worker"))
-													Expect(testUI.Out).To(Say("instances:\\s+1/1"))
-													Expect(testUI.Out).To(Say("memory usage:\\s+64M"))
-													Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-													Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
+													Expect(testUI.Out).To(Say(`type:\s+worker`))
+													Expect(testUI.Out).To(Say(`instances:\s+1/1`))
+													Expect(testUI.Out).To(Say(`memory usage:\s+64M`))
+													Expect(testUI.Out).To(Say(`\s+state\s+since\s+cpu\s+memory\s+disk`))
+													Expect(testUI.Out).To(Say(`#0\s+running\s+2013-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [AP]M\s+0.0%\s+3.8M of 64M\s+3.8M of 7.6M`))
 
 													Expect(testUI.Err).To(Say("display-warning-1"))
 													Expect(testUI.Err).To(Say("display-warning-2"))
@@ -951,7 +951,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 							})
 
 							It("displays all warnings and fails", func() {
-								Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 
 								Expect(testUI.Err).To(Say("some-poll-warning-1"))
 								Expect(testUI.Err).To(Say("some-poll-warning-2"))
@@ -982,7 +982,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 							})
 
 							It("displays all warnings", func() {
-								Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 
 								Expect(testUI.Err).To(Say("some-poll-warning-1"))
 								Expect(testUI.Err).To(Say("some-poll-warning-2"))
@@ -1000,12 +1000,12 @@ var _ = Describe("v3-zdt-push Command", func() {
 								It("returns the error and prints warnings", func() {
 									Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
-									Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+									Expect(testUI.Out).To(Say(`Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 									Expect(testUI.Err).To(Say("display-warning-1"))
 									Expect(testUI.Err).To(Say("display-warning-2"))
 
-									Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+									Expect(testUI.Out).ToNot(Say(`name:\s+some-app`))
 								})
 							})
 
@@ -1059,14 +1059,14 @@ var _ = Describe("v3-zdt-push Command", func() {
 									It("displays all warnings and returns the error", func() {
 										Expect(executeErr).To(MatchError("some-error"))
 
-										Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+										Expect(testUI.Out).To(Say(`Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 										Expect(testUI.Err).To(Say("display-warning-1"))
 										Expect(testUI.Err).To(Say("display-warning-2"))
 										Expect(testUI.Err).To(Say("route-warning-1"))
 										Expect(testUI.Err).To(Say("route-warning-2"))
 
-										Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+										Expect(testUI.Out).ToNot(Say(`name:\s+some-app`))
 									})
 								})
 
@@ -1081,18 +1081,18 @@ var _ = Describe("v3-zdt-push Command", func() {
 									It("prints the application summary and outputs warnings", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 
-										Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
-										Expect(testUI.Out).To(Say("name:\\s+some-app"))
-										Expect(testUI.Out).To(Say("requested state:\\s+started"))
-										Expect(testUI.Out).To(Say("routes:\\s+some-other-domain, some-domain"))
-										Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
-										Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output\n\n"))
+										Expect(testUI.Out).To(Say(`(?m)Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.\n\n`))
+										Expect(testUI.Out).To(Say(`name:\s+some-app`))
+										Expect(testUI.Out).To(Say(`requested state:\s+started`))
+										Expect(testUI.Out).To(Say(`routes:\s+some-other-domain, some-domain`))
+										Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs2`))
+										Expect(testUI.Out).To(Say(`(?m)buildpacks:\s+some-detect-output\n\n`))
 
-										Expect(testUI.Out).To(Say("type:\\s+worker"))
-										Expect(testUI.Out).To(Say("instances:\\s+1/1"))
-										Expect(testUI.Out).To(Say("memory usage:\\s+64M"))
-										Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-										Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
+										Expect(testUI.Out).To(Say(`type:\s+worker`))
+										Expect(testUI.Out).To(Say(`instances:\s+1/1`))
+										Expect(testUI.Out).To(Say(`memory usage:\s+64M`))
+										Expect(testUI.Out).To(Say(`\s+state\s+since\s+cpu\s+memory\s+disk`))
+										Expect(testUI.Out).To(Say(`#0\s+running\s+2013-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [AP]M\s+0.0%\s+3.8M of 64M\s+3.8M of 7.6M`))
 
 										Expect(testUI.Err).To(Say("display-warning-1"))
 										Expect(testUI.Err).To(Say("display-warning-2"))
@@ -1137,7 +1137,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 							})
 
 							It("displays all warnings and fails", func() {
-								Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 
 								Expect(testUI.Err).To(Say("some-poll-warning-1"))
 								Expect(testUI.Err).To(Say("some-poll-warning-2"))
@@ -1168,7 +1168,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 							})
 
 							It("displays all warnings", func() {
-								Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 
 								Expect(testUI.Err).To(Say("some-poll-warning-1"))
 								Expect(testUI.Err).To(Say("some-poll-warning-2"))
@@ -1186,12 +1186,12 @@ var _ = Describe("v3-zdt-push Command", func() {
 								It("returns the error and prints warnings", func() {
 									Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
-									Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+									Expect(testUI.Out).To(Say(`Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 									Expect(testUI.Err).To(Say("display-warning-1"))
 									Expect(testUI.Err).To(Say("display-warning-2"))
 
-									Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+									Expect(testUI.Out).ToNot(Say(`name:\s+some-app`))
 								})
 							})
 
@@ -1245,14 +1245,14 @@ var _ = Describe("v3-zdt-push Command", func() {
 									It("displays all warnings and returns the error", func() {
 										Expect(executeErr).To(MatchError("some-error"))
 
-										Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+										Expect(testUI.Out).To(Say(`Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 										Expect(testUI.Err).To(Say("display-warning-1"))
 										Expect(testUI.Err).To(Say("display-warning-2"))
 										Expect(testUI.Err).To(Say("route-warning-1"))
 										Expect(testUI.Err).To(Say("route-warning-2"))
 
-										Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+										Expect(testUI.Out).ToNot(Say(`name:\s+some-app`))
 									})
 								})
 
@@ -1267,18 +1267,18 @@ var _ = Describe("v3-zdt-push Command", func() {
 									It("prints the application summary and outputs warnings", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 
-										Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
-										Expect(testUI.Out).To(Say("name:\\s+some-app"))
-										Expect(testUI.Out).To(Say("requested state:\\s+started"))
-										Expect(testUI.Out).To(Say("routes:\\s+some-other-domain, some-domain"))
-										Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
-										Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output\n\n"))
+										Expect(testUI.Out).To(Say(`(?m)Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.\n\n`))
+										Expect(testUI.Out).To(Say(`name:\s+some-app`))
+										Expect(testUI.Out).To(Say(`requested state:\s+started`))
+										Expect(testUI.Out).To(Say(`routes:\s+some-other-domain, some-domain`))
+										Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs2`))
+										Expect(testUI.Out).To(Say(`(?m)buildpacks:\s+some-detect-output\n\n`))
 
-										Expect(testUI.Out).To(Say("type:\\s+worker"))
-										Expect(testUI.Out).To(Say("instances:\\s+1/1"))
-										Expect(testUI.Out).To(Say("memory usage:\\s+64M"))
-										Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-										Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
+										Expect(testUI.Out).To(Say(`type:\s+worker`))
+										Expect(testUI.Out).To(Say(`instances:\s+1/1`))
+										Expect(testUI.Out).To(Say(`memory usage:\s+64M`))
+										Expect(testUI.Out).To(Say(`\s+state\s+since\s+cpu\s+memory\s+disk`))
+										Expect(testUI.Out).To(Say(`#0\s+running\s+2013-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [AP]M\s+0.0%\s+3.8M of 64M\s+3.8M of 7.6M`))
 
 										Expect(testUI.Err).To(Say("display-warning-1"))
 										Expect(testUI.Err).To(Say("display-warning-2"))
@@ -1313,7 +1313,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 							})
 
 							It("Displays all warnings and fails", func() {
-								Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 
 								Expect(testUI.Err).To(Say("some-poll-warning-1"))
 								Expect(testUI.Err).To(Say("some-poll-warning-2"))
@@ -1344,7 +1344,7 @@ var _ = Describe("v3-zdt-push Command", func() {
 							})
 
 							It("displays all warnings", func() {
-								Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Waiting for app to start\.\.\.`))
 
 								Expect(testUI.Err).To(Say("some-poll-warning-1"))
 								Expect(testUI.Err).To(Say("some-poll-warning-2"))
@@ -1362,12 +1362,12 @@ var _ = Describe("v3-zdt-push Command", func() {
 								It("returns the error and prints warnings", func() {
 									Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
-									Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+									Expect(testUI.Out).To(Say(`Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 									Expect(testUI.Err).To(Say("display-warning-1"))
 									Expect(testUI.Err).To(Say("display-warning-2"))
 
-									Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+									Expect(testUI.Out).ToNot(Say(`name:\s+some-app`))
 								})
 							})
 
@@ -1421,14 +1421,14 @@ var _ = Describe("v3-zdt-push Command", func() {
 									It("displays all warnings and returns the error", func() {
 										Expect(executeErr).To(MatchError("some-error"))
 
-										Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+										Expect(testUI.Out).To(Say(`Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.`))
 
 										Expect(testUI.Err).To(Say("display-warning-1"))
 										Expect(testUI.Err).To(Say("display-warning-2"))
 										Expect(testUI.Err).To(Say("route-warning-1"))
 										Expect(testUI.Err).To(Say("route-warning-2"))
 
-										Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+										Expect(testUI.Out).ToNot(Say(`name:\s+some-app`))
 									})
 								})
 
@@ -1443,18 +1443,18 @@ var _ = Describe("v3-zdt-push Command", func() {
 									It("prints the application summary and outputs warnings", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 
-										Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
-										Expect(testUI.Out).To(Say("name:\\s+some-app"))
-										Expect(testUI.Out).To(Say("requested state:\\s+started"))
-										Expect(testUI.Out).To(Say("routes:\\s+some-other-domain, some-domain"))
-										Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
-										Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output\n\n"))
+										Expect(testUI.Out).To(Say(`(?m)Showing health and status for app some-app in org some-org / space some-space as banana\.\.\.\n\n`))
+										Expect(testUI.Out).To(Say(`name:\s+some-app`))
+										Expect(testUI.Out).To(Say(`requested state:\s+started`))
+										Expect(testUI.Out).To(Say(`routes:\s+some-other-domain, some-domain`))
+										Expect(testUI.Out).To(Say(`stack:\s+cflinuxfs2`))
+										Expect(testUI.Out).To(Say(`(?m)buildpacks:\s+some-detect-output\n\n`))
 
-										Expect(testUI.Out).To(Say("type:\\s+worker"))
-										Expect(testUI.Out).To(Say("instances:\\s+1/1"))
-										Expect(testUI.Out).To(Say("memory usage:\\s+64M"))
-										Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-										Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
+										Expect(testUI.Out).To(Say(`type:\s+worker`))
+										Expect(testUI.Out).To(Say(`instances:\s+1/1`))
+										Expect(testUI.Out).To(Say(`memory usage:\s+64M`))
+										Expect(testUI.Out).To(Say(`\s+state\s+since\s+cpu\s+memory\s+disk`))
+										Expect(testUI.Out).To(Say(`#0\s+running\s+2013-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [AP]M\s+0.0%\s+3.8M of 64M\s+3.8M of 7.6M`))
 
 										Expect(testUI.Err).To(Say("display-warning-1"))
 										Expect(testUI.Err).To(Say("display-warning-2"))

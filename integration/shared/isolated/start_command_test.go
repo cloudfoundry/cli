@@ -1,3 +1,5 @@
+// +build !partialPush
+
 package isolated
 
 import (
@@ -8,7 +10,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -27,8 +28,8 @@ var _ = Describe("start command", func() {
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("st"))
 				Eventually(session).Should(Say("ENVIRONMENT:"))
-				Eventually(session).Should(Say("CF_STAGING_TIMEOUT=15\\s+Max wait time for buildpack staging, in minutes"))
-				Eventually(session).Should(Say("CF_STARTUP_TIMEOUT=5\\s+Max wait time for app instance startup, in minutes"))
+				Eventually(session).Should(Say(`CF_STAGING_TIMEOUT=15\s+Max wait time for buildpack staging, in minutes`))
+				Eventually(session).Should(Say(`CF_STARTUP_TIMEOUT=5\s+Max wait time for app instance startup, in minutes`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("apps, logs, restart, run-task, scale, ssh, stop"))
 				Eventually(session).Should(Exit(0))
@@ -130,19 +131,19 @@ applications:
 
 								session := helpers.CF("start", appName)
 
-								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+								Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
-								Eventually(session).Should(Say("name:\\s+%s", appName))
-								Eventually(session).Should(Say("requested state:\\s+started"))
-								Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
-								Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
-								Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-								Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
-								Eventually(session).Should(Say("type:\\s+web"))
-								Eventually(session).Should(Say("instances:\\s+\\d/2"))
-								Eventually(session).Should(Say("memory usage:\\s+128M"))
-								Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-								Eventually(session).Should(Say("#0\\s+(starting|running)\\s+\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
+								Eventually(session).Should(Say(`name:\s+%s`, appName))
+								Eventually(session).Should(Say(`requested state:\s+started`))
+								Eventually(session).Should(Say(`routes:\s+%s\.%s`, appName, domainName))
+								Eventually(session).Should(Say(`last uploaded:\s+\w{3} \d{1,2} \w{3} \d{2}:\d{2}:\d{2} \w{3} \d{4}`))
+								Eventually(session).Should(Say(`stack:\s+cflinuxfs2`))
+								Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
+								Eventually(session).Should(Say(`type:\s+web`))
+								Eventually(session).Should(Say(`instances:\s+\d/2`))
+								Eventually(session).Should(Say(`memory usage:\s+128M`))
+								Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk`))
+								Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
 								Eventually(session).Should(Exit(0))
 							})
@@ -157,24 +158,24 @@ applications:
 							It("displays the app logs and information with instances table", func() {
 								userName, _ := helpers.GetCredentials()
 								session := helpers.CF("start", appName)
-								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-								Consistently(session).ShouldNot(Say("Staging app and tracing logs\\.\\.\\."))
+								Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+								Consistently(session).ShouldNot(Say(`Staging app and tracing logs\.\.\.`))
 
-								Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
+								Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
 
-								Eventually(session).Should(Say("name:\\s+%s", appName))
-								Eventually(session).Should(Say("requested state:\\s+started"))
-								Eventually(session).Should(Say("instances:\\s+2/2"))
-								Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-								Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
+								Eventually(session).Should(Say(`name:\s+%s`, appName))
+								Eventually(session).Should(Say(`requested state:\s+started`))
+								Eventually(session).Should(Say(`instances:\s+2/2`))
+								Eventually(session).Should(Say(`usage:\s+128M x 2 instances`))
+								Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, domainName))
 								Eventually(session).Should(Say("last uploaded:"))
-								Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-								Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+								Eventually(session).Should(Say(`stack:\s+cflinuxfs2`))
+								Eventually(session).Should(Say(`buildpack:\s+staticfile_buildpack`))
 								Eventually(session).Should(Say("start command:"))
 
-								Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
-								Eventually(session).Should(Say("#0\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
-								Eventually(session).Should(Say("#1\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
+								Eventually(session).Should(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
+								Eventually(session).Should(Say(`#0\s+(running|starting)\s+.*\d+\.\d+%.*of 128M.*of 128M`))
+								Eventually(session).Should(Say(`#1\s+(running|starting)\s+.*\d+\.\d+%.*of 128M.*of 128M`))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -196,7 +197,7 @@ applications:
 						It("fails and displays the staging failure message", func() {
 							userName, _ := helpers.GetCredentials()
 							session := helpers.CF("start", appName)
-							Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
 							// The staticfile_buildback does compile an index.html file. However, it requires a "Staticfile" during buildpack detection.
 							Eventually(session.Err).Should(Say("Error staging application: An app was not successfully detected by any available buildpack"))
@@ -217,9 +218,9 @@ applications:
 							It("fails and displays the start failure message", func() {
 								userName, _ := helpers.GetCredentials()
 								session := helpers.CF("start", appName)
-								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+								Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
-								Eventually(session).Should(Say("Staging app and tracing logs\\.\\.\\."))
+								Eventually(session).Should(Say(`Staging app and tracing logs\.\.\.`))
 
 								Eventually(session.Err).Should(Say("Start unsuccessful"))
 								Eventually(session.Err).Should(Say("TIP: use 'cf logs .* --recent' for more information"))
@@ -261,19 +262,19 @@ applications:
 
 										session := helpers.CF("start", appName)
 
-										Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+										Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
-										Eventually(session).Should(Say("name:\\s+%s", appName))
-										Eventually(session).Should(Say("requested state:\\s+started"))
-										Eventually(session).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
-										Eventually(session).Should(Say("last uploaded:\\s+\\w{3} \\d{1,2} \\w{3} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}"))
-										Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-										Eventually(session).Should(Say("buildpacks:\\s+staticfile"))
-										Eventually(session).Should(Say("type:\\s+web"))
-										Eventually(session).Should(Say("instances:\\s+\\d/2"))
-										Eventually(session).Should(Say("memory usage:\\s+128M"))
-										Eventually(session).Should(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-										Eventually(session).Should(Say("#0\\s+(starting|running)\\s+\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"))
+										Eventually(session).Should(Say(`name:\s+%s`, appName))
+										Eventually(session).Should(Say(`requested state:\s+started`))
+										Eventually(session).Should(Say(`routes:\s+%s\.%s`, appName, domainName))
+										Eventually(session).Should(Say(`last uploaded:\s+\w{3} \d{1,2} \w{3} \d{2}:\d{2}:\d{2} \w{3} \d{4}`))
+										Eventually(session).Should(Say(`stack:\s+cflinuxfs2`))
+										Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
+										Eventually(session).Should(Say(`type:\s+web`))
+										Eventually(session).Should(Say(`instances:\s+\d/2`))
+										Eventually(session).Should(Say(`memory usage:\s+128M`))
+										Eventually(session).Should(Say(`\s+state\s+since\s+cpu\s+memory\s+disk`))
+										Eventually(session).Should(Say(`#0\s+(starting|running)\s+\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
 
 										Eventually(session).Should(Exit(0))
 									})
@@ -288,24 +289,24 @@ applications:
 									It("displays the app logs and information with instances table", func() {
 										userName, _ := helpers.GetCredentials()
 										session := helpers.CF("start", appName)
-										Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+										Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 
 										helpers.ConfirmStagingLogs(session)
 
-										Eventually(session).Should(Say("name:\\s+%s", appName))
-										Eventually(session).Should(Say("requested state:\\s+started"))
-										Eventually(session).Should(Say("instances:\\s+2/2"))
-										Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-										Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
+										Eventually(session).Should(Say(`name:\s+%s`, appName))
+										Eventually(session).Should(Say(`requested state:\s+started`))
+										Eventually(session).Should(Say(`instances:\s+2/2`))
+										Eventually(session).Should(Say(`usage:\s+128M x 2 instances`))
+										Eventually(session).Should(Say(`routes:\s+%s.%s`, appName, domainName))
 										Eventually(session).Should(Say("last uploaded:"))
-										Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
-										Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+										Eventually(session).Should(Say(`stack:\s+cflinuxfs2`))
+										Eventually(session).Should(Say(`buildpack:\s+staticfile_buildpack`))
 										Eventually(session).Should(Say("start command:"))
 
-										Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
+										Eventually(session).Should(Say(`state\s+since\s+cpu\s+memory\s+disk\s+details`))
 
-										Eventually(session).Should(Say("#0\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
-										Eventually(session).Should(Say("#1\\s+(running|starting)\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
+										Eventually(session).Should(Say(`#0\s+(running|starting)\s+.*\d+\.\d+%.*of 128M.*of 128M`))
+										Eventually(session).Should(Say(`#1\s+(running|starting)\s+.*\d+\.\d+%.*of 128M.*of 128M`))
 										Eventually(session).Should(Exit(0))
 									})
 								})
@@ -326,7 +327,7 @@ applications:
 								It("displays the app logs and information with instances table", func() {
 									session := helpers.CF("start", appName)
 
-									Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
+									Eventually(session).Should(Say(`isolation segment:\s+%s`, RealIsolationSegment))
 								})
 							})
 						})

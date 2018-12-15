@@ -38,7 +38,7 @@ func (client *Client) GetApplicationEnvironment(appGUID string) (Environment, Wa
 
 	var responseEnvVars Environment
 	response := cloudcontroller.Response{
-		Result: &responseEnvVars,
+		DecodeJSONResponseInto: &responseEnvVars,
 	}
 	err = client.connection.Make(request, &response)
 	return responseEnvVars, response.Warnings, err

@@ -137,6 +137,10 @@ func (logger *RequestLogger) displayResponse(passedResponse *cloudcontroller.Res
 	if err != nil {
 		return err
 	}
+	contentType := passedResponse.HTTPResponse.Header["Content-Type"]
+	if len(contentType) > 0 && strings.Contains(contentType[0], "application/x-yaml") {
+		return logger.output.DisplayMessage("[application/x-yaml Content Hidden]")
+	}
 	return logger.output.DisplayJSONBody(passedResponse.RawResponse)
 }
 

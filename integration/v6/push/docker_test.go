@@ -3,11 +3,13 @@ package push
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 var _ = Describe("pushing a docker image", func() {
@@ -39,7 +41,7 @@ var _ = Describe("pushing a docker image", func() {
 
 					It("updates the app", func() {
 						session := helpers.CF(PushCommandName, appName, "-o", PublicDockerImage)
-						Eventually(session).Should(Say("Updating app with these attributes\\.\\.\\."))
+						Eventually(session).Should(Say(`Updating app with these attributes\.\.\.`))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -108,7 +110,7 @@ var _ = Describe("pushing a docker image", func() {
 		})
 
 		It("uses the docker image when pushing", func() {
-			helpers.WithManifest(appManifest, func(manifestDir string) {
+			withManifest(appManifest, func(manifestDir string) {
 				session := helpers.CustomCF(
 					helpers.CFEnv{WorkingDirectory: manifestDir},
 					PushCommandName,
@@ -134,7 +136,7 @@ var _ = Describe("pushing a docker image", func() {
 			})
 
 			It("returns an error", func() {
-				helpers.WithManifest(appManifest, func(manifestDir string) {
+				withManifest(appManifest, func(manifestDir string) {
 					session := helpers.CustomCF(
 						helpers.CFEnv{WorkingDirectory: manifestDir},
 						PushCommandName,
@@ -162,7 +164,7 @@ var _ = Describe("pushing a docker image", func() {
 			})
 
 			It("returns an error", func() {
-				helpers.WithManifest(appManifest, func(manifestDir string) {
+				withManifest(appManifest, func(manifestDir string) {
 					session := helpers.CustomCF(
 						helpers.CFEnv{WorkingDirectory: manifestDir},
 						PushCommandName,
@@ -194,7 +196,7 @@ var _ = Describe("pushing a docker image", func() {
 
 			When("password is provided in the enviornment", func() {
 				It("uses the docker image and credentials when pushing", func() {
-					helpers.WithManifest(appManifest, func(manifestDir string) {
+					withManifest(appManifest, func(manifestDir string) {
 						session := helpers.CustomCF(
 							helpers.CFEnv{
 								WorkingDirectory: manifestDir,
@@ -211,13 +213,13 @@ var _ = Describe("pushing a docker image", func() {
 
 			When("password is not provided in the enviornment", func() {
 				It("errors out", func() {
-					helpers.WithManifest(appManifest, func(manifestDir string) {
+					withManifest(appManifest, func(manifestDir string) {
 						session := helpers.CustomCF(
 							helpers.CFEnv{WorkingDirectory: manifestDir},
 							PushCommandName,
 						)
 
-						Eventually(session.Err).Should(Say("Environment variable CF_DOCKER_PASSWORD not set\\."))
+						Eventually(session.Err).Should(Say(`Environment variable CF_DOCKER_PASSWORD not set\.`))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -247,7 +249,7 @@ var _ = Describe("pushing a docker image", func() {
 			})
 
 			It("command line takes precidence", func() {
-				helpers.WithManifest(appManifest, func(manifestDir string) {
+				withManifest(appManifest, func(manifestDir string) {
 					session := helpers.CustomCF(
 						helpers.CFEnv{
 							WorkingDirectory: manifestDir,
@@ -276,16 +278,25 @@ func validateDockerPassword(session *Session, passwordFromPrompt bool) {
 }
 
 func validateDockerPush(session *Session, appName string, dockerImage string) {
-	Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-	Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-	Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-	Eventually(session).Should(Say("\\s+docker image:\\s+%s", dockerImage))
+	Eventually(session).Should(Say(`Getting app info\.\.\.`))
+	Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
+	Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
+	Eventually(session).Should(Say(`\s+docker image:\s+%s`, dockerImage))
 	helpers.ConfirmStagingLogs(session)
-	Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
-	Eventually(session).Should(Say("requested state:\\s+started"))
+	Eventually(session).Should(Say(`Waiting for app to start\.\.\.`))
+	Eventually(session).Should(Say(`requested state:\s+started`))
 	Eventually(session).Should(Exit(0))
 
 	session = helpers.CF("app", appName)
-	Eventually(session).Should(Say("name:\\s+%s", appName))
+	Eventually(session).Should(Say(`name:\s+%s`, appName))
 	Eventually(session).Should(Exit(0))
+}
+
+func withManifest(manifest map[string]interface{}, f func(manifestDir string)) {
+	dir, err := ioutil.TempDir("", "simple-app")
+	Expect(err).ToNot(HaveOccurred())
+	defer os.RemoveAll(dir)
+
+	helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
+	f(dir)
 }

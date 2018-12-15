@@ -67,8 +67,8 @@ var _ = Describe("api Command", func() {
 
 			It("outputs target information", func() {
 				Expect(err).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say("api endpoint:\\s+some-api-target"))
-				Expect(testUI.Out).To(Say("api version:\\s+100.200.300"))
+				Expect(testUI.Out).To(Say(`api endpoint:\s+some-api-target`))
+				Expect(testUI.Out).To(Say(`api version:\s+100.200.300`))
 			})
 		})
 
@@ -149,7 +149,7 @@ api version:    100.200.300`,
 
 						It("returns an error with a --skip-ssl-validation tip", func() {
 							Expect(err).To(MatchError(ccerror.UnverifiedServerError{URL: CCAPI}))
-							Expect(testUI.Out).ToNot(Say("api endpoint:\\s+some-api-target"))
+							Expect(testUI.Out).ToNot(Say(`api endpoint:\s+some-api-target`))
 						})
 					})
 				})

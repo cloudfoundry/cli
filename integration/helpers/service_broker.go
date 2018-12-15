@@ -110,7 +110,14 @@ func (b ServiceBroker) Push() {
 		"--no-start",
 		"-m", DefaultMemoryLimit,
 		"-p", b.Path,
-		"-d", b.AppsDomain,
+		"--no-route",
+	)).Should(Exit(0))
+
+	Eventually(CF(
+		"map-route",
+		b.Name,
+		b.AppsDomain,
+		"--hostname", b.Name,
 	)).Should(Exit(0))
 
 	Eventually(CF("start", b.Name)).Should(Exit(0))
@@ -152,7 +159,7 @@ func (b ServiceBroker) Destroy() {
 }
 
 func (b ServiceBroker) ToJSON(shareable bool) string {
-	bytes, err := ioutil.ReadFile(NewAssets().ServiceBroker + "/cats.json")
+	bytes, err := ioutil.ReadFile(NewAssets().ServiceBroker + "/broker_config.json")
 	Expect(err).To(BeNil())
 
 	planSchema, err := json.Marshal(b.SyncPlans[0].Schemas)

@@ -169,7 +169,7 @@ var _ = Describe("auth Command", func() {
 
 		BeforeEach(func() {
 			apiVersion = "1.2.3"
-			fakeConfig.APIVersionReturns(apiVersion)
+			fakeActor.CloudControllerAPIVersionReturns(apiVersion)
 			minCLIVersion = "1.0.0"
 			fakeConfig.MinCLIVersionReturns(minCLIVersion)
 
@@ -237,7 +237,7 @@ var _ = Describe("auth Command", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
-				Expect(testUI.Out).To(Say("Authenticating\\.\\.\\."))
+				Expect(testUI.Out).To(Say(`Authenticating\.\.\.`))
 				Expect(testUI.Out).To(Say("OK"))
 				Expect(testUI.Out).To(Say("Use '%s target' to view or set your target org and space", binaryName))
 
@@ -261,7 +261,7 @@ var _ = Describe("auth Command", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).To(Say("API endpoint: %s", fakeConfig.Target()))
-					Expect(testUI.Out).To(Say("Authenticating\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Authenticating\.\.\.`))
 					Expect(testUI.Out).To(Say("OK"))
 					Expect(testUI.Out).To(Say("Use '%s target' to view or set your target org and space", binaryName))
 

@@ -32,7 +32,7 @@ var _ = Describe("logout command", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CF("logout")
 
-			Eventually(session).Should(Say("Logging out %s\\.\\.\\.", username))
+			Eventually(session).Should(Say(`Logging out %s\.\.\.`, username))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 

@@ -88,8 +88,8 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Applicat
 		display.UI.DisplayNewline()
 
 		var startCommandRow []string
-		if displayStartCommand && len(process.Command) > 0 {
-			startCommandRow = append(startCommandRow, display.UI.TranslateText("start command:"), process.Command)
+		if displayStartCommand && len(process.Command.Value) > 0 {
+			startCommandRow = append(startCommandRow, display.UI.TranslateText("start command:"), process.Command.Value)
 		}
 
 		keyValueTable := [][]string{
@@ -101,7 +101,7 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Applicat
 
 		display.UI.DisplayKeyValueTable("", keyValueTable, 3)
 
-		if !display.processHasAnInstanceUp(&process) || len(process.InstanceDetails) == 0 {
+		if len(process.InstanceDetails) == 0 {
 			display.UI.DisplayNewline()
 			display.UI.DisplayText("There are no running instances of this process.")
 			continue

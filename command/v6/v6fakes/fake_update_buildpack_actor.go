@@ -35,7 +35,7 @@ type FakeUpdateBuildpackActor struct {
 		result1 string
 		result2 error
 	}
-	UpdateBuildpackByNameAndStackStub        func(string, string, types.NullInt, types.NullBool, types.NullBool) (string, v2action.Warnings, error)
+	UpdateBuildpackByNameAndStackStub        func(string, string, types.NullInt, types.NullBool, types.NullBool, string) (string, v2action.Warnings, error)
 	updateBuildpackByNameAndStackMutex       sync.RWMutex
 	updateBuildpackByNameAndStackArgsForCall []struct {
 		arg1 string
@@ -43,6 +43,7 @@ type FakeUpdateBuildpackActor struct {
 		arg3 types.NullInt
 		arg4 types.NullBool
 		arg5 types.NullBool
+		arg6 string
 	}
 	updateBuildpackByNameAndStackReturns struct {
 		result1 string
@@ -190,7 +191,7 @@ func (fake *FakeUpdateBuildpackActor) PrepareBuildpackBitsReturnsOnCall(i int, r
 	}{result1, result2}
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStack(arg1 string, arg2 string, arg3 types.NullInt, arg4 types.NullBool, arg5 types.NullBool) (string, v2action.Warnings, error) {
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStack(arg1 string, arg2 string, arg3 types.NullInt, arg4 types.NullBool, arg5 types.NullBool, arg6 string) (string, v2action.Warnings, error) {
 	fake.updateBuildpackByNameAndStackMutex.Lock()
 	ret, specificReturn := fake.updateBuildpackByNameAndStackReturnsOnCall[len(fake.updateBuildpackByNameAndStackArgsForCall)]
 	fake.updateBuildpackByNameAndStackArgsForCall = append(fake.updateBuildpackByNameAndStackArgsForCall, struct {
@@ -199,11 +200,12 @@ func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStack(arg1 string,
 		arg3 types.NullInt
 		arg4 types.NullBool
 		arg5 types.NullBool
-	}{arg1, arg2, arg3, arg4, arg5})
-	fake.recordInvocation("UpdateBuildpackByNameAndStack", []interface{}{arg1, arg2, arg3, arg4, arg5})
+		arg6 string
+	}{arg1, arg2, arg3, arg4, arg5, arg6})
+	fake.recordInvocation("UpdateBuildpackByNameAndStack", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.updateBuildpackByNameAndStackMutex.Unlock()
 	if fake.UpdateBuildpackByNameAndStackStub != nil {
-		return fake.UpdateBuildpackByNameAndStackStub(arg1, arg2, arg3, arg4, arg5)
+		return fake.UpdateBuildpackByNameAndStackStub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -218,17 +220,17 @@ func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackCallCount() i
 	return len(fake.updateBuildpackByNameAndStackArgsForCall)
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackCalls(stub func(string, string, types.NullInt, types.NullBool, types.NullBool) (string, v2action.Warnings, error)) {
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackCalls(stub func(string, string, types.NullInt, types.NullBool, types.NullBool, string) (string, v2action.Warnings, error)) {
 	fake.updateBuildpackByNameAndStackMutex.Lock()
 	defer fake.updateBuildpackByNameAndStackMutex.Unlock()
 	fake.UpdateBuildpackByNameAndStackStub = stub
 }
 
-func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackArgsForCall(i int) (string, string, types.NullInt, types.NullBool, types.NullBool) {
+func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackArgsForCall(i int) (string, string, types.NullInt, types.NullBool, types.NullBool, string) {
 	fake.updateBuildpackByNameAndStackMutex.RLock()
 	defer fake.updateBuildpackByNameAndStackMutex.RUnlock()
 	argsForCall := fake.updateBuildpackByNameAndStackArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
 }
 
 func (fake *FakeUpdateBuildpackActor) UpdateBuildpackByNameAndStackReturns(result1 string, result2 v2action.Warnings, result3 error) {

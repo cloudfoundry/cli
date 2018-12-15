@@ -104,7 +104,7 @@ var _ = Describe("delete-org Command", func() {
 						It("does not prompt for user confirmation, displays warnings, and deletes the org", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).ToNot(Say("Really delete the org some-org, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers\\? \\[yN\\]:"))
+							Expect(testUI.Out).ToNot(Say(`Really delete the org some-org, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers\? \[yN\]:`))
 							Expect(testUI.Out).To(Say("Deleting org some-org as some-user..."))
 
 							Expect(fakeActor.DeleteOrganizationCallCount()).To(Equal(1))
@@ -207,7 +207,7 @@ var _ = Describe("delete-org Command", func() {
 						It("deletes the org", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Really delete the org some-org, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers\\? \\[yN\\]:"))
+							Expect(testUI.Out).To(Say(`Really delete the org some-org, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers\? \[yN\]:`))
 							Expect(testUI.Out).To(Say("Deleting org some-org as some-user..."))
 
 							Expect(fakeActor.DeleteOrganizationCallCount()).To(Equal(1))
@@ -226,9 +226,9 @@ var _ = Describe("delete-org Command", func() {
 						It("asks the user again", func() {
 							Expect(executeErr).NotTo(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Really delete the org some-org, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers\\? \\[yN\\]:"))
-							Expect(testUI.Out).To(Say("invalid input \\(not y, n, yes, or no\\)"))
-							Expect(testUI.Out).To(Say("Really delete the org some-org, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers\\? \\[yN\\]:"))
+							Expect(testUI.Out).To(Say(`Really delete the org some-org, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers\? \[yN\]:`))
+							Expect(testUI.Out).To(Say(`invalid input \(not y, n, yes, or no\)`))
+							Expect(testUI.Out).To(Say(`Really delete the org some-org, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers\? \[yN\]:`))
 
 							Expect(fakeActor.DeleteOrganizationCallCount()).To(Equal(0))
 						})

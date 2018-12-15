@@ -100,7 +100,7 @@ func (client *Client) CreateApplicationDeployment(appGUID string, dropletGUID st
 
 	var responseDeployment Deployment
 	response := cloudcontroller.Response{
-		Result: &responseDeployment,
+		DecodeJSONResponseInto: &responseDeployment,
 	}
 	err = client.connection.Make(request, &response)
 
@@ -118,7 +118,7 @@ func (client *Client) GetDeployment(deploymentGUID string) (Deployment, Warnings
 
 	var responseDeployment Deployment
 	response := cloudcontroller.Response{
-		Result: &responseDeployment,
+		DecodeJSONResponseInto: &responseDeployment,
 	}
 	err = client.connection.Make(request, &response)
 

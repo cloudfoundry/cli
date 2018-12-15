@@ -168,28 +168,6 @@ var _ = Describe("UAA Authentication", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(inMemoryCache.RefreshToken()).To(Equal("bananananananana"))
 			})
-
-			When("a PipeSeekError is returned from ResetBody", func() {
-				BeforeEach(func() {
-					body, writer := router.NewPipeBomb()
-					req, err := http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", body)
-					Expect(err).NotTo(HaveOccurred())
-					request = router.NewRequest(req, body)
-
-					go func() {
-						defer GinkgoRecover()
-
-						_, err := writer.Write([]byte(expectedBody))
-						Expect(err).NotTo(HaveOccurred())
-						err = writer.Close()
-						Expect(err).NotTo(HaveOccurred())
-					}()
-				})
-
-				It("set the err on PipeSeekError", func() {
-					Expect(executeErr).To(MatchError(routererror.PipeSeekError{Err: routererror.InvalidAuthTokenError{}}))
-				})
-			})
 		})
 	})
 })

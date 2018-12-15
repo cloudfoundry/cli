@@ -61,9 +61,9 @@ var _ = Describe("Space", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(space).To(Equal(
 					Space{
-						GUID:             "some-space-guid",
-						OrganizationGUID: "some-org-guid",
-						Name:             "some-space",
+						GUID:                     "some-space-guid",
+						OrganizationGUID:         "some-org-guid",
+						Name:                     "some-space",
 						SpaceQuotaDefinitionGUID: "some-quota-guid",
 						AllowSSH:                 true,
 					},

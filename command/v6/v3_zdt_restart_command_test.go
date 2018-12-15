@@ -150,7 +150,7 @@ var _ = Describe("v3-zdt-restart Command", func() {
 				})
 
 				It("starts the app", func() {
-					Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+					Expect(testUI.Out).To(Say(`Starting app some-app in org some-org / space some-space as steve\.\.\.`))
 					Expect(testUI.Err).To(Say("start-warning-1"))
 					Expect(testUI.Err).To(Say("start-warning-2"))
 					Expect(testUI.Out).To(Say("OK"))

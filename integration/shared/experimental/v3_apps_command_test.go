@@ -1,3 +1,5 @@
+// +build !partialPush
+
 package experimental
 
 import (
@@ -52,19 +54,6 @@ var _ = Describe("v3-apps command", func() {
 	})
 
 	When("the environment is not setup correctly", func() {
-		When("no API endpoint is set", func() {
-			BeforeEach(func() {
-				helpers.UnsetAPI()
-			})
-
-			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("v3-apps")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
 		When("the v3 api version is lower than the minimum version", func() {
 			var server *Server
 
@@ -79,51 +68,13 @@ var _ = Describe("v3-apps command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-apps")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.27\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
 
-		When("not logged in", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-			})
-
-			It("fails with not logged in message", func() {
-				session := helpers.CF("v3-apps")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("there is no org set", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-				helpers.LoginCF()
-			})
-
-			It("fails with no org targeted error message", func() {
-				session := helpers.CF("v3-apps")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("there is no space set", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-				helpers.LoginCF()
-				helpers.TargetOrg(ReadOnlyOrg)
-			})
-
-			It("fails with no space targeted error message", func() {
-				session := helpers.CF("v3-apps")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
-				Eventually(session).Should(Exit(1))
-			})
+		It("fails with the appropriate errors", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "v3-apps")
 		})
 	})
 
@@ -142,7 +93,7 @@ var _ = Describe("v3-apps command", func() {
 		Context("with no apps", func() {
 			It("displays empty list", func() {
 				session := helpers.CF("v3-apps")
-				Eventually(session).Should(Say("Getting apps in org %s / space %s as %s\\.\\.\\.", orgName, spaceName, userName))
+				Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
 				Eventually(session).Should(Say("No apps found"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -162,10 +113,10 @@ var _ = Describe("v3-apps command", func() {
 
 			It("displays apps in the list", func() {
 				session := helpers.CF("v3-apps")
-				Eventually(session).Should(Say("Getting apps in org %s / space %s as %s\\.\\.\\.", orgName, spaceName, userName))
-				Eventually(session).Should(Say("name\\s+requested state\\s+processes\\s+routes"))
-				Eventually(session).Should(Say("%s\\s+started\\s+web:1/1, console:0/0, rake:0/0\\s+%s\\.%s", appName1, appName1, domainName))
-				Eventually(session).Should(Say("%s\\s+started\\s+web:1/1, console:0/0, rake:0/0\\s+%s\\.%s", appName2, appName2, domainName))
+				Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
+				Eventually(session).Should(Say(`name\s+requested state\s+processes\s+routes`))
+				Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0\s+%s\.%s`, appName1, appName1, domainName))
+				Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0\s+%s\.%s`, appName2, appName2, domainName))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -177,10 +128,10 @@ var _ = Describe("v3-apps command", func() {
 
 				It("displays app as stopped", func() {
 					session := helpers.CF("v3-apps")
-					Eventually(session).Should(Say("Getting apps in org %s / space %s as %s\\.\\.\\.", orgName, spaceName, userName))
-					Eventually(session).Should(Say("name\\s+requested state\\s+processes\\s+routes"))
-					Eventually(session).Should(Say("%s\\s+stopped\\s+web:0/1, console:0/0, rake:0/0\\s+%s\\.%s", appName1, appName1, domainName))
-					Eventually(session).Should(Say("%s\\s+started\\s+web:1/1, console:0/0, rake:0/0\\s+%s\\.%s", appName2, appName2, domainName))
+					Eventually(session).Should(Say(`Getting apps in org %s / space %s as %s\.\.\.`, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`name\s+requested state\s+processes\s+routes`))
+					Eventually(session).Should(Say(`%s\s+stopped\s+web:0/1, console:0/0\s+%s\.%s`, appName1, appName1, domainName))
+					Eventually(session).Should(Say(`%s\s+started\s+web:1/1, console:0/0\s+%s\.%s`, appName2, appName2, domainName))
 
 					Eventually(session).Should(Exit(0))
 				})

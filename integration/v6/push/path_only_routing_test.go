@@ -6,7 +6,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -37,13 +36,13 @@ var _ = Describe("push with route path", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--route-path", routePath, "--no-start")
 						Eventually(session).Should(Say("routes:"))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s", route))
+						Eventually(session).Should(Say(`(?i)\+\s+%s`, route))
 						Eventually(session).Should(Exit(0))
 					})
 
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`routes:\s+%s`, route))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -57,13 +56,13 @@ var _ = Describe("push with route path", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--route-path", routePath, "--no-start")
 						Eventually(session).Should(Say("routes:"))
-						Eventually(session).Should(Say("(?i)\\+\\s+%s", route))
+						Eventually(session).Should(Say(`(?i)\+\s+%s`, route))
 						Eventually(session).Should(Exit(0))
 					})
 
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`routes:\s+%s`, route))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -79,13 +78,13 @@ var _ = Describe("push with route path", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--route-path", routePath, "--no-start")
 						Eventually(session).Should(Say("routes:"))
-						Eventually(session).Should(Say("(?i)\\s+%s", route))
+						Eventually(session).Should(Say(`(?i)\s+%s`, route))
 						Eventually(session).Should(Exit(0))
 					})
 
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:\\s+%s", appName))
-					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Say(`name:\s+%s`, appName))
+					Eventually(session).Should(Say(`routes:\s+%s`, route))
 					Eventually(session).Should(Exit(0))
 				})
 			})

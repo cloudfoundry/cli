@@ -33,14 +33,13 @@ var _ = Describe("version checks", func() {
 		})
 
 		JustBeforeEach(func() {
-			executeErr = WarnIfCLIVersionBelowAPIDefinedMinimum(fakeConfig, testUI)
+			executeErr = WarnIfCLIVersionBelowAPIDefinedMinimum(fakeConfig, apiVersion, testUI)
 		})
 
 		When("checking the cloud controller minimum version warning", func() {
 			When("the CLI version is less than the recommended minimum", func() {
 				BeforeEach(func() {
 					apiVersion = ccversion.MinV2ClientVersion
-					fakeConfig.APIVersionReturns(apiVersion)
 					minCLIVersion = "1.0.0"
 					fakeConfig.MinCLIVersionReturns(minCLIVersion)
 					binaryVersion = "0.0.0"
@@ -57,7 +56,6 @@ var _ = Describe("version checks", func() {
 		When("the CLI version is greater or equal to the recommended minimum", func() {
 			BeforeEach(func() {
 				apiVersion = "100.200.3"
-				fakeConfig.APIVersionReturns(apiVersion)
 				minCLIVersion = "1.0.0"
 				fakeConfig.MinCLIVersionReturns(minCLIVersion)
 				binaryVersion = "1.0.0"
@@ -73,7 +71,6 @@ var _ = Describe("version checks", func() {
 		When("an error is encountered while parsing the semver versions", func() {
 			BeforeEach(func() {
 				apiVersion = "100.200.3"
-				fakeConfig.APIVersionReturns(apiVersion)
 				minCLIVersion = "1.0.0"
 				fakeConfig.MinCLIVersionReturns(minCLIVersion)
 				fakeConfig.BinaryVersionReturns("&#%")
@@ -88,7 +85,6 @@ var _ = Describe("version checks", func() {
 		Context("version contains string", func() {
 			BeforeEach(func() {
 				apiVersion = "100.200.3"
-				fakeConfig.APIVersionReturns(apiVersion)
 				minCLIVersion = "1.0.0"
 				fakeConfig.MinCLIVersionReturns(minCLIVersion)
 				binaryVersion = "1.0.0-alpha.5"
@@ -104,7 +100,6 @@ var _ = Describe("version checks", func() {
 		Context("minimum version is empty", func() {
 			BeforeEach(func() {
 				apiVersion = "100.200.3"
-				fakeConfig.APIVersionReturns(apiVersion)
 				minCLIVersion = ""
 				fakeConfig.MinCLIVersionReturns(minCLIVersion)
 				binaryVersion = "1.0.0"
@@ -119,7 +114,6 @@ var _ = Describe("version checks", func() {
 		When("comparing the default versions", func() {
 			BeforeEach(func() {
 				apiVersion = "100.200.3"
-				fakeConfig.APIVersionReturns(apiVersion)
 				minCLIVersion = "1.2.3"
 				fakeConfig.MinCLIVersionReturns(minCLIVersion)
 				binaryVersion = version.DefaultVersion

@@ -131,7 +131,7 @@ func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 
 	var responsePackage Package
 	response := cloudcontroller.Response{
-		Result: &responsePackage,
+		DecodeJSONResponseInto: &responsePackage,
 	}
 	err = client.connection.Make(request, &response)
 
@@ -150,7 +150,7 @@ func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) 
 
 	var responsePackage Package
 	response := cloudcontroller.Response{
-		Result: &responsePackage,
+		DecodeJSONResponseInto: &responsePackage,
 	}
 	err = client.connection.Make(request, &response)
 
@@ -235,7 +235,7 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 
 	var responsePackage Package
 	response := cloudcontroller.Response{
-		Result: &responsePackage,
+		DecodeJSONResponseInto: &responsePackage,
 	}
 	err = client.connection.Make(request, &response)
 
@@ -337,7 +337,7 @@ func (*Client) createUploadStream(path string, paramName string) (io.ReadSeeker,
 func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Package, Warnings, error) {
 	var pkg Package
 	response := cloudcontroller.Response{
-		Result: &pkg,
+		DecodeJSONResponseInto: &pkg,
 	}
 
 	httpErrors := make(chan error)
@@ -418,7 +418,7 @@ func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, existingRe
 
 	var pkg Package
 	response := cloudcontroller.Response{
-		Result: &pkg,
+		DecodeJSONResponseInto: &pkg,
 	}
 
 	err = client.connection.Make(request, &response)

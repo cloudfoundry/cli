@@ -114,6 +114,33 @@ func (actor Actor) GetDomainsByNameAndOrganization(domainNames []string, orgGUID
 	return domains, allWarnings, err
 }
 
+func (actor Actor) GetDomains(orgGUID string) ([]Domain, Warnings, error) {
+	var (
+		allDomains  []Domain
+		allWarnings Warnings
+	)
+
+	sharedDomains, warnings, err := actor.CloudControllerClient.GetSharedDomains()
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+	for _, domain := range sharedDomains {
+		allDomains = append(allDomains, Domain(domain))
+	}
+
+	privateDomains, warnings, err := actor.CloudControllerClient.GetOrganizationPrivateDomains(orgGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	for _, domain := range privateDomains {
+		allDomains = append(allDomains, Domain(domain))
+	}
+	return allDomains, allWarnings, err
+}
+
 // GetSharedDomain returns the shared domain associated with the provided
 // Domain GUID.
 func (actor Actor) GetSharedDomain(domainGUID string) (Domain, Warnings, error) {

@@ -93,7 +93,7 @@ func (client *Client) DeleteOrganizationJob(guid string) (Job, Warnings, error) 
 
 	var job Job
 	response := cloudcontroller.Response{
-		Result: &job,
+		DecodeJSONResponseInto: &job,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -117,7 +117,7 @@ func (client *Client) DeleteSpaceJob(guid string) (Job, Warnings, error) {
 
 	var job Job
 	response := cloudcontroller.Response{
-		Result: &job,
+		DecodeJSONResponseInto: &job,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -136,7 +136,7 @@ func (client *Client) GetJob(jobGUID string) (Job, Warnings, error) {
 
 	var job Job
 	response := cloudcontroller.Response{
-		Result: &job,
+		DecodeJSONResponseInto: &job,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -349,7 +349,7 @@ func (*Client) createMultipartBodyAndHeaderForDroplet(droplet io.Reader) (string
 func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Job, Warnings, error) {
 	var job Job
 	response := cloudcontroller.Response{
-		Result: &job,
+		DecodeJSONResponseInto: &job,
 	}
 
 	httpErrors := make(chan error)
@@ -433,7 +433,7 @@ func (client *Client) uploadExistingResourcesOnly(appGUID string, existingResour
 
 	var job Job
 	response := cloudcontroller.Response{
-		Result: &job,
+		DecodeJSONResponseInto: &job,
 	}
 
 	err = client.connection.Make(request, &response)

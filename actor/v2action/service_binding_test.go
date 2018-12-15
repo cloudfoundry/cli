@@ -217,7 +217,7 @@ var _ = Describe("Service Binding Actions", func() {
 				Expect(serviceBinding).To(Equal(ServiceBinding{
 					GUID: "some-service-binding-guid",
 				}))
-				Expect(warnings).To(Equal(Warnings{"foo"}))
+				Expect(warnings).To(ConsistOf("foo"))
 
 				Expect(fakeCloudControllerClient.GetServiceBindingsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetServiceBindingsArgsForCall(0)).To(ConsistOf([]ccv2.Filter{

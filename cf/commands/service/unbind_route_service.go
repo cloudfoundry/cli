@@ -102,7 +102,7 @@ func (cmd *UnbindRouteService) Execute(c flags.FlagContext) error {
 	if !confirmed {
 		confirmed = cmd.ui.Confirm(T("Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed?",
 			map[string]interface{}{
-				"URL": route.URL(),
+				"URL":                 route.URL(),
 				"ServiceInstanceName": serviceInstance.Name,
 			}))
 
@@ -115,10 +115,10 @@ func (cmd *UnbindRouteService) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name),
-			"URL":         terminal.EntityNameColor(route.URL()),
-			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-			"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+			"URL":                 terminal.EntityNameColor(route.URL()),
+			"OrgName":             terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"SpaceName":           terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
 	err = cmd.UnbindRoute(route, serviceInstance)

@@ -1,6 +1,9 @@
 package ccv2
 
 import (
+	"bytes"
+	"encoding/json"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -21,6 +24,12 @@ type ServicePlan struct {
 
 	// Public is true if plan is accessible to all organizations.
 	Public bool
+
+	// Description of the plan
+	Description string
+
+	// Free is true if plan is free
+	Free bool
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service Plan response.
@@ -31,6 +40,8 @@ func (servicePlan *ServicePlan) UnmarshalJSON(data []byte) error {
 			Name        string `json:"name"`
 			ServiceGUID string `json:"service_guid"`
 			Public      bool   `json:"public"`
+			Description string `json:"description"`
+			Free        bool   `json:"free"`
 		}
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccServicePlan)
@@ -42,6 +53,8 @@ func (servicePlan *ServicePlan) UnmarshalJSON(data []byte) error {
 	servicePlan.Name = ccServicePlan.Entity.Name
 	servicePlan.ServiceGUID = ccServicePlan.Entity.ServiceGUID
 	servicePlan.Public = ccServicePlan.Entity.Public
+	servicePlan.Description = ccServicePlan.Entity.Description
+	servicePlan.Free = ccServicePlan.Entity.Free
 	return nil
 }
 
@@ -57,7 +70,7 @@ func (client *Client) GetServicePlan(servicePlanGUID string) (ServicePlan, Warni
 
 	var servicePlan ServicePlan
 	response := cloudcontroller.Response{
-		Result: &servicePlan,
+		DecodeJSONResponseInto: &servicePlan,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -88,4 +101,33 @@ func (client *Client) GetServicePlans(filters ...Filter) ([]ServicePlan, Warning
 	})
 
 	return fullServicePlansList, warnings, err
+}
+
+type updateServicePlanRequestBody struct {
+	Public bool `json:"public"`
+}
+
+func (client *Client) UpdateServicePlan(guid string, public bool) (Warnings, error) {
+	requestBody := updateServicePlanRequestBody{
+		Public: public,
+	}
+
+	body, err := json.Marshal(requestBody)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutServicePlanRequest,
+		Body:        bytes.NewReader(body),
+		URIParams:   Params{"service_plan_guid": guid},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
 }

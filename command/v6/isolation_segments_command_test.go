@@ -112,10 +112,10 @@ var _ = Describe("isolation-segments Command", func() {
 
 					Expect(testUI.Out).To(Say("Getting isolation segments as banana..."))
 					Expect(testUI.Out).To(Say("OK\n\n"))
-					Expect(testUI.Out).To(Say("name\\s+orgs"))
+					Expect(testUI.Out).To(Say(`name\s+orgs`))
 					Expect(testUI.Out).To(Say("some-iso-1"))
-					Expect(testUI.Out).To(Say("some-iso-2\\s+some-org-1"))
-					Expect(testUI.Out).To(Say("some-iso-3\\s+some-org-1, some-org-2"))
+					Expect(testUI.Out).To(Say(`some-iso-2\s+some-org-1`))
+					Expect(testUI.Out).To(Say(`some-iso-3\s+some-org-1, some-org-2`))
 
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
@@ -136,7 +136,7 @@ var _ = Describe("isolation-segments Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Out).To(Say("Getting isolation segments as banana..."))
 					Expect(testUI.Out).To(Say("OK\n\n"))
-					Expect(testUI.Out).To(Say("name\\s+orgs"))
+					Expect(testUI.Out).To(Say(`name\s+orgs`))
 					Expect(testUI.Out).NotTo(Say("[a-zA-Z]+"))
 
 					Expect(fakeActor.GetIsolationSegmentSummariesCallCount()).To(Equal(1))

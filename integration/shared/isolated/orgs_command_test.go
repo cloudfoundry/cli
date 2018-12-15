@@ -14,11 +14,11 @@ var _ = Describe("orgs command", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("orgs", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("\\s+orgs - List all orgs"))
+				Eventually(session).Should(Say(`\s+orgs - List all orgs`))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("\\s+cf orgs"))
+				Eventually(session).Should(Say(`\s+cf orgs`))
 				Eventually(session).Should(Say("ALIAS:"))
-				Eventually(session).Should(Say("\\s+o"))
+				Eventually(session).Should(Say(`\s+o`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -63,7 +63,7 @@ var _ = Describe("orgs command", func() {
 
 			It("displays a list of all orgs", func() {
 				session := helpers.CF("orgs")
-				Eventually(session).Should(Say("Getting orgs as %s\\.\\.\\.", username))
+				Eventually(session).Should(Say(`Getting orgs as %s\.\.\.`, username))
 				Eventually(session).Should(Say(""))
 				Eventually(session).Should(Say("name"))
 				Eventually(session).Should(Say("%s", orgName4))

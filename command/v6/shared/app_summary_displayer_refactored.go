@@ -89,8 +89,8 @@ func (display AppSummaryDisplayer2) displayProcessTable(summary v3action.Applica
 		display.UI.DisplayNewline()
 
 		var startCommandRow []string
-		if displayStartCommand && len(process.Command) > 0 {
-			startCommandRow = append(startCommandRow, display.UI.TranslateText("start command:"), process.Command)
+		if displayStartCommand && len(process.Command.Value) > 0 {
+			startCommandRow = append(startCommandRow, display.UI.TranslateText("start command:"), process.Command.Value)
 		}
 
 		keyValueTable := [][]string{

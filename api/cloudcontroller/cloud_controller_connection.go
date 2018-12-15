@@ -123,11 +123,8 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 		return err
 	}
 
-	// TODO: only unmarshal on 'application/json', skip otherwise - Fixing this
-	// todo will require changing ALL the API tests to include the content-type
-	// in their tests.
-	if passedResponse.Result != nil {
-		err = DecodeJSON(passedResponse.RawResponse, passedResponse.Result)
+	if passedResponse.DecodeJSONResponseInto != nil {
+		err = DecodeJSON(passedResponse.RawResponse, passedResponse.DecodeJSONResponseInto)
 		if err != nil {
 			return err
 		}

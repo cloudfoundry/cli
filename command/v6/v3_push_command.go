@@ -43,7 +43,7 @@ type V3PushCommand struct {
 	DockerUsername string           `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	// DropletPath flag.PathWithExistenceCheck
 	// PathToManifest flag.PathWithExistenceCheck
-	// HealthCheckType flag.HealthCheckType
+	// HealthCheckType flag.HealthCheckTypeWithDeprecatedValue
 	// Hostname string
 	// Instances flag.Instances
 	// DiskQuota           flag.Megabytes

@@ -48,10 +48,10 @@ var _ = Describe("create-org", func() {
 			orgName := helpers.NewOrgName()
 			session := helpers.CF("create-org", orgName)
 
-			Eventually(session.Out).Should(Say("Creating org %s as %s\\.\\.\\.", orgName, client))
-			Eventually(session.Out).Should(Say("OK\\n\\n"))
-			Eventually(session.Out).Should(Say("Assigning role OrgManager to user %s in org %s\\.\\.\\.", client, orgName))
-			Eventually(session.Out).Should(Say("OK\\n\\n"))
+			Eventually(session.Out).Should(Say(`Creating org %s as %s\.\.\.`, orgName, client))
+			Eventually(session.Out).Should(Say(`OK\n\n`))
+			Eventually(session.Out).Should(Say(`Assigning role OrgManager to user %s in org %s\.\.\.`, client, orgName))
+			Eventually(session.Out).Should(Say(`OK\n\n`))
 			Eventually(session.Out).Should(Say(`TIP: Use 'cf target -o "%s"' to target new org`, orgName))
 			Eventually(session).Should(Exit(0))
 		})
@@ -69,10 +69,10 @@ var _ = Describe("create-org", func() {
 				orgName := helpers.NewOrgName()
 				session := helpers.CF("create-org", orgName)
 
-				Eventually(session.Out).Should(Say("Creating org %s as %s\\.\\.\\.", orgName, user))
-				Eventually(session.Out).Should(Say("OK\\n\\n"))
-				Eventually(session.Out).Should(Say("Assigning role OrgManager to user %s in org %s\\.\\.\\.", user, orgName))
-				Eventually(session.Out).Should(Say("OK\\n\\n"))
+				Eventually(session.Out).Should(Say(`Creating org %s as %s\.\.\.`, orgName, user))
+				Eventually(session.Out).Should(Say(`OK\n\n`))
+				Eventually(session.Out).Should(Say(`Assigning role OrgManager to user %s in org %s\.\.\.`, user, orgName))
+				Eventually(session.Out).Should(Say(`OK\n\n`))
 				Eventually(session.Out).Should(Say(`TIP: Use 'cf target -o "%s"' to target new org`, orgName))
 				Eventually(session).Should(Exit(0))
 			})
@@ -84,7 +84,7 @@ var _ = Describe("create-org", func() {
 
 				session = helpers.CF("org-users", orgName)
 				Eventually(session).Should(Exit(0))
-				Expect(session.Out).To(Say("ORG MANAGER\\n\\s+%s", user))
+				Expect(session.Out).To(Say(`ORG MANAGER\n\s+%s`, user))
 			})
 
 			When("an existing quota is provided", func() {
@@ -103,7 +103,7 @@ var _ = Describe("create-org", func() {
 
 					session = helpers.CF("org", orgName)
 					Eventually(session).Should(Exit(0))
-					Expect(session.Out).To(Say("quota:\\s+%s", quotaName))
+					Expect(session.Out).To(Say(`quota:\s+%s`, quotaName))
 				})
 			})
 
@@ -112,7 +112,7 @@ var _ = Describe("create-org", func() {
 					orgName := helpers.NewOrgName()
 					session := helpers.CF("create-org", orgName, "-q", "no-such-quota")
 					Eventually(session.Err).Should(Say("Quota no-such-quota not found"))
-					Eventually(session).Should(Say("FAILED\\n"))
+					Eventually(session).Should(Say(`FAILED\n`))
 					Eventually(session).Should(Exit(1))
 
 					Eventually(helpers.CF("org", orgName)).Should(Exit(1))
@@ -131,8 +131,8 @@ var _ = Describe("create-org", func() {
 
 			It("warns the user that the org already exists", func() {
 				session := helpers.CF("create-org", orgName)
-				Eventually(session.Out).Should(Say("Creating org %s as %s\\.\\.\\.", orgName, user))
-				Eventually(session.Out).Should(Say("OK\\n"))
+				Eventually(session.Out).Should(Say(`Creating org %s as %s\.\.\.`, orgName, user))
+				Eventually(session.Out).Should(Say(`OK\n`))
 				Eventually(session.Err).Should(Say("Org %s already exists", orgName))
 				Eventually(session).Should(Exit(0))
 			})

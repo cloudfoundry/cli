@@ -89,7 +89,7 @@ func (client *Client) UpdateResourceMatch(resourcesToMatch []Resource) ([]Resour
 
 	var matchedResources []Resource
 	response := cloudcontroller.Response{
-		Result: &matchedResources,
+		DecodeJSONResponseInto: &matchedResources,
 	}
 
 	err = client.connection.Make(request, &response)

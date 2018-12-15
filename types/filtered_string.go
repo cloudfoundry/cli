@@ -15,6 +15,14 @@ type FilteredString struct {
 
 type FilteredStrings []FilteredString
 
+func NewFilteredString(val string) *FilteredString {
+	var result FilteredString
+
+	result.ParseValue(val)
+
+	return &result
+}
+
 // ParseValue is used to parse a user provided flag argument.
 func (n *FilteredString) ParseValue(val string) {
 	if val == "" {
@@ -31,6 +39,10 @@ func (n *FilteredString) ParseValue(val string) {
 	default:
 		n.Value = val
 	}
+}
+
+func (n FilteredString) IsDefault() bool {
+	return n.IsSet && n.Value == ""
 }
 
 func (n *FilteredString) UnmarshalJSON(rawJSON []byte) error {
@@ -51,14 +63,14 @@ func (n *FilteredString) UnmarshalJSON(rawJSON []byte) error {
 	return nil
 }
 
-// MarshalJSON marshals the value field if IsSet is true, otherwise returns an
+// MarshalJSON marshals the value field if it's not empty, otherwise returns an
 // null.
 func (n FilteredString) MarshalJSON() ([]byte, error) {
-	if n.IsSet {
+	if n.Value != "" {
 		return json.Marshal(n.Value)
 	}
 
-	return json.Marshal(nil)
+	return json.Marshal(new(json.RawMessage))
 }
 
 func (n FilteredString) String() string {

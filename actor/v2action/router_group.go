@@ -10,20 +10,13 @@ import (
 type RouterGroup router.RouterGroup
 
 func (actor Actor) GetRouterGroupByName(routerGroupName string, client RouterClient) (RouterGroup, error) {
-	routerGroups, err := client.GetRouterGroupsByName(routerGroupName)
+	routerGroup, err := client.GetRouterGroupByName(routerGroupName)
 	if err != nil {
-		if rErr, ok := err.(routererror.ErrorResponse); ok {
-			if rErr.Name == "ResourceNotFoundError" {
-				return RouterGroup{}, actionerror.RouterGroupNotFoundError{Name: routerGroupName}
-			}
+		if _, ok := err.(routererror.ResourceNotFoundError); ok {
+			return RouterGroup{}, actionerror.RouterGroupNotFoundError{Name: routerGroupName}
 		}
 		return RouterGroup{}, err
 	}
 
-	for _, routerGroup := range routerGroups {
-		if routerGroup.Name == routerGroupName {
-			return RouterGroup(routerGroup), nil
-		}
-	}
-	return RouterGroup{}, actionerror.RouterGroupNotFoundError{Name: routerGroupName}
+	return RouterGroup(routerGroup), nil
 }

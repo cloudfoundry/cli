@@ -26,7 +26,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf add-plugin-repo REPO_NAME URL"))
 				Eventually(session).Should(Say("EXAMPLES"))
-				Eventually(session).Should(Say("cf add-plugin-repo ExampleRepo https://example\\.com/repo"))
+				Eventually(session).Should(Say(`cf add-plugin-repo ExampleRepo https://example\.com/repo`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("install-plugin, list-plugin-repos"))
 				Eventually(session).Should(Exit(0))
@@ -60,7 +60,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		It("defaults to 'https://'", func() {
 			session := helpers.CF("add-plugin-repo", "some-repo", "example.com/repo", "-k")
 
-			Eventually(session.Err).Should(Say("Could not add repository 'some-repo' from https://example\\.com/repo:"))
+			Eventually(session.Err).Should(Say(`Could not add repository 'some-repo' from https://example\.com/repo:`))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -122,7 +122,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				It("errors and says the repo name is taken", func() {
 					session := helpers.CF("add-plugin-repo", "repo1", "some-other-url", "-k")
 
-					Eventually(session.Err).Should(Say("Plugin repo named 'repo1' already exists, please use another name\\."))
+					Eventually(session.Err).Should(Say(`Plugin repo named 'repo1' already exists, please use another name\.`))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -206,7 +206,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("reports an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", "ftp://example.com/repo", "-k")
 
-				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from ftp://example\\.com/repo: Get ftp://example\\.com/repo/list: unsupported protocol scheme \"ftp\""))
+				Eventually(session.Err).Should(Say(`Could not add repository 'repo1' from ftp://example\.com/repo: Get ftp://example\.com/repo/list: unsupported protocol scheme \"ftp\"`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
@@ -216,7 +216,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("reports an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", "cfpluginrepothatdoesnotexist.cf-app.com", "-k")
 
-				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from https://cfpluginrepothatdoesnotexist\\.cf-app\\.com: Get https://cfpluginrepothatdoesnotexist\\.cf-app\\.com/list: dial tcp: lookup cfpluginrepothatdoesnotexist\\.cf-app\\.com.*: no such host"))
+				Eventually(session.Err).Should(Say(`Could not add repository 'repo1' from https://cfpluginrepothatdoesnotexist\.cf-app\.com: Get https://cfpluginrepothatdoesnotexist\.cf-app\.com/list: dial tcp: lookup cfpluginrepothatdoesnotexist\.cf-app\.com.*: no such host`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
@@ -232,7 +232,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("returns an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", server.URL(), "-k")
 
-				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from https://127\\.0\\.0\\.1:\\d{1,5}"))
+				Eventually(session.Err).Should(Say(`Could not add repository 'repo1' from https://127\.0\.0\.1:\d{1,5}`))
 				Eventually(session.Err).Should(Say("HTTP Response: 404"))
 				Eventually(session.Err).Should(Say("HTTP Response Body: foobar"))
 				Eventually(session).Should(Say("FAILED"))
@@ -248,7 +248,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("returns an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", server.URL(), "-k")
 
-				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from https://127\\.0\\.0\\.1:\\d{1,5}: invalid character '}' looking for beginning of value"))
+				Eventually(session.Err).Should(Say(`Could not add repository 'repo1' from https://127\.0\.0\.1:\d{1,5}: invalid character '}' looking for beginning of value`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

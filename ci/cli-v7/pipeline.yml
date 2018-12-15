@@ -45,6 +45,7 @@ resources:
     uri: https://github.com/cloudfoundry/cli
     branch: master
     paths:
+    - api/cloudcontroller/ccversion
     - integration
 
 - name: cf-cli-binaries
@@ -183,14 +184,23 @@ resources:
     private_key: ((cli-private-github-private-key))
     branch: master
 
+- name: bump-v7-version
+  type: semver
+  source:
+    driver: git
+    uri: git@github.com:cloudfoundry/cli
+    branch: master
+    file: BUILD_VERSION_V7
+    private_key: ((vat-bump-version-github-private-key))
+
 # values for this already exist in last pass, blocked on
 # blocked on https://github.com/concourse/concourse/issues/1407
-# - name: cf-cli-tracker
-#   type: tracker
-#   source:
-#     token: ((cf-cli-public-tracker-token))
-#     project_id: ((vat-public-tracker-project-id))
-#     tracker_url: https://www.pivotaltracker.com
+- name: cf-cli-tracker
+  type: tracker
+  source:
+    token: ((cf-cli-public-tracker-token))
+    project_id: '2196383'
+    tracker_url: https://www.pivotaltracker.com
 
 jobs:
 - name: units
@@ -220,6 +230,7 @@ jobs:
              OS X unit tests failed :(
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: units-windows
+      tags: [vat-windows]
       file: cli-ci/ci/cli-v7/tasks/units-windows.yml
       on_failure:
          put: slack-alert
@@ -335,6 +346,7 @@ jobs:
     - task: cleanup-integration
       file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
     - task: integration
+      tags: [vat-windows]
       file: cli-ci/ci/cli-v7/tasks/integration-windows.yml
       params:
         <<: *integration_params
@@ -350,6 +362,44 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lock
+
+- name: integration-temporary-push
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [integration-linux, integration-windows]
+    - get: cf-cli-binaries
+      passed: [integration-linux, integration-windows]
+      trigger: true
+    - get: cli-ci
+    - get: cli-integration
+    - get: vars-store
+    - put: bosh-lock
+      resource: gcp-bosh-pool
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+    - task: integration
+      file: cli-ci/ci/cli-v7/tasks/integration-linux.yml
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli-v7/tasks/cleanup-integration.yml
+      params:
+        CF_INT_CLIENT_ID: 'potato-face'
+        CF_INT_CLIENT_SECRET: ((client-secret))
+        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
+        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
+        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
+        CF_INT_IGNORE_API_VERSION_CHECK: false
+        FLAKE_ATTEMPTS: 1
+        TAGS: ''
   ensure:
     put: gcp-bosh-pool
     params:
@@ -385,6 +435,7 @@ jobs:
              :ubuntu: create unix installers failed :redhat:
              $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: windows
+      tags: [vat-windows]
       file: cli-ci/ci/cli-v7/tasks/create-installers-windows.yml
       on_failure:
          put: slack-alert
@@ -502,6 +553,43 @@ jobs:
     - get: homebrew-tap
   - task: update-brew-formula
     file: cli-ci/ci/cli-v7/tasks/update-brew-formula.yml
-  # - put: homebrew-tap
-  #   params:
-  #     repository: update-brew-formula-output/homebrew-tap
+  - put: homebrew-tap
+    params:
+      repository: update-brew-formula-output/homebrew-tap
+
+- name: bump-cli-v7-version
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [create-beta-release]
+      trigger: true
+    - put: bump-v7-version
+      params: {pre: beta}
+
+- name: deliver-stories
+  serial: true
+  plan:
+  - get: cli
+    passed:
+    - integration-linux
+    - integration-windows
+    trigger: true
+  - put: cf-cli-tracker
+    params:
+      repos:
+      - cli
+
+- name: create-release-marker
+  serial: true
+  plan:
+    - aggregate:
+      - get: bump-v7-version
+        passed: [bump-cli-v7-version]
+        trigger: true
+      - get: cli-ci
+    - task: create-release-marker
+      file: cli-ci/ci/cli-v7/tasks/create-release-marker.yml
+      params:
+        TRACKER_API_KEY: ((cf-cli-public-tracker-token))
+        TRACKER_PROJECT_ID: ((vat-public-tracker-project-id))

@@ -253,7 +253,7 @@ var _ = Describe("v3-push Command", func() {
 						It("generates a push state with the specified app path", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(testUI.Out).To(Say("Pushing app %s to org some-org / space some-space as some-user", appName))
-							Expect(testUI.Out).To(Say("Getting app info\\.\\.\\."))
+							Expect(testUI.Out).To(Say(`Getting app info\.\.\.`))
 							Expect(testUI.Err).To(Say("some-warning-1"))
 
 							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
@@ -516,7 +516,7 @@ var _ = Describe("v3-push Command", func() {
 			// 		cmd.Command = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "echo foo bar baz"}}
 			// 		cmd.DiskQuota = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
 			// 		cmd.HealthCheckTimeout = 14
-			// 		cmd.HealthCheckType = flag.HealthCheckType{Type: "http"}
+			// 		cmd.HealthCheckType = flag.HealthCheckTypeWithDeprecatedValue{Type: constant.HTTP}
 			// 		cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 12, IsSet: true}}
 			// 		cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
 			// 		cmd.StackName = "some-stack"
@@ -528,7 +528,7 @@ var _ = Describe("v3-push Command", func() {
 			// 		Expect(settings.Command).To(Equal(types.FilteredString{IsSet: true, Value: "echo foo bar baz"}))
 			// 		Expect(settings.DiskQuota).To(Equal(uint64(1024)))
 			// 		Expect(settings.HealthCheckTimeout).To(Equal(14))
-			// 		Expect(settings.HealthCheckType).To(Equal("http"))
+			// 		Expect(settings.HealthCheckType).To(Equal(constant.HTTP))
 			// 		Expect(settings.Instances).To(Equal(types.NullInt{Value: 12, IsSet: true}))
 			// 		Expect(settings.Memory).To(Equal(uint64(100)))
 			// 		Expect(settings.StackName).To(Equal("some-stack"))

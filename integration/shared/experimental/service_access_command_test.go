@@ -1,3 +1,5 @@
+// +build !partialPush
+
 package experimental
 
 import (
@@ -54,8 +56,8 @@ var _ = Describe("service-access command", func() {
 			It("displays the correct state for the visibility", func() {
 				By("having nothing enabled")
 				session := helpers.CF("service-access", "-e", serviceBroker1.Service.Name)
-				Eventually(session).Should(Say("broker:\\s+%s", serviceBroker1.Name))
-				Eventually(session).Should(Say("%s\\s+%s\\s+none",
+				Eventually(session).Should(Say(`broker:\s+%s`, serviceBroker1.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+none`,
 					serviceBroker1.Service.Name,
 					servicePlanName1,
 				))
@@ -69,8 +71,8 @@ var _ = Describe("service-access command", func() {
 						"-p", servicePlanName1)).Should(Exit(0))
 
 				session = helpers.CF("service-access", "-e", serviceBroker1.Service.Name)
-				Eventually(session).Should(Say("broker:\\s+%s", serviceBroker1.Name))
-				Eventually(session).Should(Say("%s\\s+%s\\s+limited\\s+%s",
+				Eventually(session).Should(Say(`broker:\s+%s`, serviceBroker1.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+limited\s+%s`,
 					serviceBroker1.Service.Name,
 					servicePlanName1,
 					orgName1))
@@ -80,8 +82,8 @@ var _ = Describe("service-access command", func() {
 				Eventually(helpers.CF("enable-service-access", serviceBroker1.Service.Name)).Should(Exit(0))
 
 				session = helpers.CF("service-access", "-e", serviceBroker1.Service.Name)
-				Eventually(session).Should(Say("broker:\\s+%s", serviceBroker1.Name))
-				Eventually(session).Should(Say("%s\\s+%s\\s+all",
+				Eventually(session).Should(Say(`broker:\s+%s`, serviceBroker1.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+all`,
 					serviceBroker1.Service.Name,
 					servicePlanName1,
 				))
@@ -137,23 +139,23 @@ var _ = Describe("service-access command", func() {
 			It("only shows broker/service information based on the flags provided", func() {
 				By("by showing the brokers and plans in alphabetical order when no flags are provided")
 				session := helpers.CF("service-access")
-				Eventually(session).Should(Say("broker:\\s+%s", serviceBroker2.Name))
-				Eventually(session).Should(Say("%s\\s+%s\\s+all",
+				Eventually(session).Should(Say(`broker:\s+%s`, serviceBroker2.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+all`,
 					serviceBroker2.Service.Name,
 					serviceBroker2.SyncPlans[1].Name,
 				))
-				Eventually(session).Should(Say("%s\\s+%s\\s+all",
+				Eventually(session).Should(Say(`%s\s+%s\s+all`,
 					serviceBroker2.Service.Name,
 					serviceBroker2.SyncPlans[0].Name,
 				))
-				Eventually(session).Should(Say("broker:\\s+%s", serviceBroker1.Name))
-				Eventually(session).Should(Say("%s\\s+%s\\s+limited\\s+%s,%s",
+				Eventually(session).Should(Say(`broker:\s+%s`, serviceBroker1.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+limited\s+%s,%s`,
 					serviceBroker1.Service.Name,
 					serviceBroker1.SyncPlans[0].Name,
 					orgName2,
 					orgName1,
 				))
-				Eventually(session).Should(Say("%s\\s+%s\\s+none",
+				Eventually(session).Should(Say(`%s\s+%s\s+none`,
 					serviceBroker1.Service.Name,
 					serviceBroker1.SyncPlans[1].Name,
 				))
@@ -161,16 +163,16 @@ var _ = Describe("service-access command", func() {
 
 				By("by showing the specified broker and it's plans in alphabetical order when the -b flag is provided")
 				session = helpers.CF("service-access", "-b", serviceBroker2.Name)
-				Eventually(session).Should(Say("broker:\\s+%s", serviceBroker2.Name))
-				Eventually(session).Should(Say("%s\\s+%s\\s+all",
+				Eventually(session).Should(Say(`broker:\s+%s`, serviceBroker2.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+all`,
 					serviceBroker2.Service.Name,
 					serviceBroker2.SyncPlans[1].Name,
 				))
-				Eventually(session).Should(Say("%s\\s+%s\\s+all",
+				Eventually(session).Should(Say(`%s\s+%s\s+all`,
 					serviceBroker2.Service.Name,
 					serviceBroker2.SyncPlans[0].Name,
 				))
-				Consistently(session).ShouldNot(Say("broker:\\s+%s", serviceBroker1.Name))
+				Consistently(session).ShouldNot(Say(`broker:\s+%s`, serviceBroker1.Name))
 				Eventually(session).Should(Exit(0))
 			})
 		})

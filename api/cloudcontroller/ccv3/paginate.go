@@ -12,7 +12,7 @@ func (client Client) paginate(request *cloudcontroller.Request, obj interface{},
 	for {
 		wrapper := NewPaginatedResources(obj)
 		response := cloudcontroller.Response{
-			Result: &wrapper,
+			DecodeJSONResponseInto: &wrapper,
 		}
 
 		err := client.connection.Make(request, &response)

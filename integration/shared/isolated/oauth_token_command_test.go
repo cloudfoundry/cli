@@ -3,7 +3,6 @@ package isolated
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -47,7 +46,7 @@ var _ = Describe("oauth-token command", func() {
 				session := helpers.CF("oauth-token")
 
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("The token expired, was revoked, or the token ID is incorrect\\. Please log back in to re-authenticate\\."))
+				Eventually(session.Err).Should(Say(`The token expired, was revoked, or the token ID is incorrect\. Please log back in to re-authenticate\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -64,7 +63,7 @@ var _ = Describe("oauth-token command", func() {
 				session := helpers.CF("oauth-token")
 
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
+				Eventually(session.Err).Should(Say(`Credentials were rejected, please try again\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -96,7 +95,7 @@ var _ = Describe("oauth-token command", func() {
 				session := helpers.CF("oauth-token")
 
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
+				Eventually(session.Err).Should(Say(`Credentials were rejected, please try again\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})

@@ -3,14 +3,12 @@ package v7action
 import (
 	"sort"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type ProcessHealthCheck struct {
 	ProcessType       string
-	HealthCheckType   string
+	HealthCheckType   constant.HealthCheckType
 	Endpoint          string
 	InvocationTimeout int
 }
@@ -69,49 +67,4 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 	processHealthChecks.Sort()
 
 	return processHealthChecks, allWarnings, nil
-}
-
-func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
-	appName string,
-	spaceGUID string,
-	healthCheckType string,
-	httpEndpoint string,
-	processType string,
-	invocationTimeout int,
-) (Application, Warnings, error) {
-
-	if healthCheckType != "http" {
-		if httpEndpoint == "/" {
-			httpEndpoint = ""
-		} else {
-			return Application{}, nil, actionerror.HTTPHealthCheckInvalidError{}
-		}
-	}
-
-	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
-	if err != nil {
-		return Application{}, allWarnings, err
-	}
-
-	process, warnings, err := actor.CloudControllerClient.GetApplicationProcessByType(app.GUID, processType)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
-	if err != nil {
-		if _, ok := err.(ccerror.ProcessNotFoundError); ok {
-			return Application{}, allWarnings, actionerror.ProcessNotFoundError{ProcessType: processType}
-		}
-		return Application{}, allWarnings, err
-	}
-
-	_, warnings, err = actor.CloudControllerClient.PatchApplicationProcessHealthCheck(
-		process.GUID,
-		healthCheckType,
-		httpEndpoint,
-		invocationTimeout,
-	)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
-	if err != nil {
-		return Application{}, allWarnings, err
-	}
-
-	return app, allWarnings, nil
 }

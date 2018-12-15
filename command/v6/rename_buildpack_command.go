@@ -19,7 +19,7 @@ type RenameBuildpackActor interface {
 type RenameBuildpackCommand struct {
 	RequiredArgs    flag.RenameBuildpackArgs `positional-args:"yes"`
 	Stack           string                   `short:"s" description:"Specify which buildpack to rename by stack"`
-	usage           interface{}              `usage:"CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"`
+	usage           interface{}              `usage:"CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME [-s STACK]"`
 	relatedCommands interface{}              `related_commands:"update-buildpack"`
 
 	UI          command.UI

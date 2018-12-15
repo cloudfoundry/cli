@@ -1,6 +1,7 @@
 package v6_test
 
 import (
+	"code.cloudfoundry.org/cli/types"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -192,7 +193,7 @@ var _ = Describe("app Command", func() {
 			It("returns the error and prints warnings", func() {
 				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
-				Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\."))
+				Expect(testUI.Out).To(Say(`Showing health and status for app some-app in org some-org / space some-space as steve\.\.\.`))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
@@ -225,13 +226,13 @@ var _ = Describe("app Command", func() {
 							{
 								Process: v3action.Process{
 									Type:    constant.ProcessTypeWeb,
-									Command: "some-command-1",
+									Command: *types.NewFilteredString("some-command-1"),
 								},
 							},
 							{
 								Process: v3action.Process{
 									Type:    "console",
-									Command: "some-command-2",
+									Command: *types.NewFilteredString("some-command-2"),
 								},
 							},
 						},
@@ -243,9 +244,9 @@ var _ = Describe("app Command", func() {
 			It("prints the application summary and outputs warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\.\n\n"))
-				Expect(testUI.Out).To(Say("name:\\s+some-app"))
-				Expect(testUI.Out).To(Say("requested state:\\s+started"))
+				Expect(testUI.Out).To(Say(`(?m)Showing health and status for app some-app in org some-org / space some-space as steve\.\.\.\n\n`))
+				Expect(testUI.Out).To(Say(`name:\s+some-app`))
+				Expect(testUI.Out).To(Say(`requested state:\s+started`))
 				Expect(testUI.Out).ToNot(Say("start command:"))
 
 				Expect(testUI.Err).To(Say("warning-1"))

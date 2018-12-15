@@ -9,7 +9,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -35,7 +34,7 @@ var _ = Describe("push with different buildpack values", func() {
 						"--no-start",
 					)
 
-					Eventually(session).Should(Say("(?m)\\s+buildpacks:\\s+\\+\\s+binary_buildpack"))
+					Eventually(session).Should(Say(`(?m)\s+buildpacks:\s+\+\s+binary_buildpack`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -221,7 +220,7 @@ var _ = Describe("push with different buildpack values", func() {
 					},
 				})
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "no-start")
-				Eventually(session).Should(Say("(?m)\\s+buildpacks:\\s+\\+\\s+staticfile_buildpack"))
+				Eventually(session).Should(Say(`(?m)\s+buildpacks:\s+\+\s+staticfile_buildpack`))
 				Eventually(session.Err).Should(Say(`Deprecation warning: Use of 'buildpack'`))
 				Eventually(session).Should(Exit(0))
 			})

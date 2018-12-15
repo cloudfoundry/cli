@@ -109,7 +109,7 @@ func (client *Client) GetInfo() (Info, ResourceLinks, Warnings, error) {
 
 	info := ResourceLinks{} // Explicitly initializing
 	response := cloudcontroller.Response{
-		Result: &info,
+		DecodeJSONResponseInto: &info,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -134,7 +134,7 @@ func (client *Client) rootResponse() (Info, Warnings, error) {
 
 	var rootResponse Info
 	response := cloudcontroller.Response{
-		Result: &rootResponse,
+		DecodeJSONResponseInto: &rootResponse,
 	}
 
 	err = client.connection.Make(request, &response)

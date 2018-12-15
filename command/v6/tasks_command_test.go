@@ -155,10 +155,10 @@ var _ = Describe("tasks Command", func() {
 					Expect(testUI.Out).To(Say("Getting tasks for app some-app-name in org some-org / space some-space as some-user..."))
 					Expect(testUI.Out).To(Say("OK"))
 
-					Expect(testUI.Out).To(Say("id\\s+name\\s+state\\s+start time\\s+command"))
-					Expect(testUI.Out).To(Say("3\\s+task-3\\s+RUNNING\\s+Tue, 08 Nov 2016 22:26:02 UTC\\s+some-command"))
-					Expect(testUI.Out).To(Say("2\\s+task-2\\s+FAILED\\s+Tue, 08 Nov 2016 22:26:02 UTC\\s+some-command"))
-					Expect(testUI.Out).To(Say("1\\s+task-1\\s+SUCCEEDED\\s+Tue, 08 Nov 2016 22:26:02 UTC\\s+some-command"))
+					Expect(testUI.Out).To(Say(`id\s+name\s+state\s+start time\s+command`))
+					Expect(testUI.Out).To(Say(`3\s+task-3\s+RUNNING\s+Tue, 08 Nov 2016 22:26:02 UTC\s+some-command`))
+					Expect(testUI.Out).To(Say(`2\s+task-2\s+FAILED\s+Tue, 08 Nov 2016 22:26:02 UTC\s+some-command`))
+					Expect(testUI.Out).To(Say(`1\s+task-1\s+SUCCEEDED\s+Tue, 08 Nov 2016 22:26:02 UTC\s+some-command`))
 					Expect(testUI.Err).To(Say("get-application-warning-1"))
 					Expect(testUI.Err).To(Say("get-application-warning-2"))
 					Expect(testUI.Err).To(Say("get-tasks-warning-1"))
@@ -192,8 +192,8 @@ var _ = Describe("tasks Command", func() {
 					It("outputs [hidden] for the tasks' commands", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("2\\s+task-2\\s+FAILED\\s+Tue, 08 Nov 2016 22:26:02 UTC\\s+\\[hidden\\]"))
-						Expect(testUI.Out).To(Say("1\\s+task-1\\s+SUCCEEDED\\s+Tue, 08 Nov 2016 22:26:02 UTC\\s+\\[hidden\\]"))
+						Expect(testUI.Out).To(Say(`2\s+task-2\s+FAILED\s+Tue, 08 Nov 2016 22:26:02 UTC\s+\[hidden\]`))
+						Expect(testUI.Out).To(Say(`1\s+task-1\s+SUCCEEDED\s+Tue, 08 Nov 2016 22:26:02 UTC\s+\[hidden\]`))
 					})
 				})
 
@@ -205,7 +205,7 @@ var _ = Describe("tasks Command", func() {
 					It("outputs an empty table", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("id\\s+name\\s+state\\s+start time\\s+command"))
+						Expect(testUI.Out).To(Say(`id\s+name\s+state\s+start time\s+command`))
 						Expect(testUI.Out).NotTo(Say("1"))
 					})
 				})

@@ -161,7 +161,7 @@ var _ = Describe("space Command", func() {
 							Name: "some-space",
 							GUID: "some-space-guid",
 						},
-						OrgName: "some-org",
+						OrgName:                        "some-org",
 						OrgDefaultIsolationSegmentGUID: "some-org-default-isolation-segment-guid",
 						AppNames:                       []string{"app1", "app2", "app3"},
 						ServiceInstanceNames:           []string{"service1", "service2", "service3"},
@@ -224,15 +224,15 @@ var _ = Describe("space Command", func() {
 						It("displays warnings and a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
 							Expect(executeErr).To(BeNil())
 
-							Expect(testUI.Out).To(Say("Getting info for space some-space in org some-org as some-user\\.\\.\\."))
-							Expect(testUI.Out).To(Say("name:\\s+some-space"))
-							Expect(testUI.Out).To(Say("org:\\s+some-org"))
-							Expect(testUI.Out).To(Say("apps:\\s+app1, app2, app3"))
-							Expect(testUI.Out).To(Say("services:\\s+service1, service2, service3"))
-							Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
-							Expect(testUI.Out).To(Say("space quota:\\s+some-space-quota"))
-							Expect(testUI.Out).To(Say("running security groups:\\s+public_networks, dns, load_balancer"))
-							Expect(testUI.Out).To(Say("staging security groups:\\s+staging-sec-1, staging-sec-2"))
+							Expect(testUI.Out).To(Say(`Getting info for space some-space in org some-org as some-user\.\.\.`))
+							Expect(testUI.Out).To(Say(`name:\s+some-space`))
+							Expect(testUI.Out).To(Say(`org:\s+some-org`))
+							Expect(testUI.Out).To(Say(`apps:\s+app1, app2, app3`))
+							Expect(testUI.Out).To(Say(`services:\s+service1, service2, service3`))
+							Expect(testUI.Out).To(Say(`isolation segment:\s+some-isolation-segment`))
+							Expect(testUI.Out).To(Say(`space quota:\s+some-space-quota`))
+							Expect(testUI.Out).To(Say(`running security groups:\s+public_networks, dns, load_balancer`))
+							Expect(testUI.Out).To(Say(`staging security groups:\s+staging-sec-1, staging-sec-2`))
 
 							Expect(testUI.Err).To(Say("warning-1"))
 							Expect(testUI.Err).To(Say("warning-2"))
@@ -281,7 +281,7 @@ var _ = Describe("space Command", func() {
 
 							It("does not fill in the isolation segment", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(testUI.Out).To(Say("(?m)isolation segment:\\s*$"))
+								Expect(testUI.Out).To(Say(`(?m)isolation segment:\s*$`))
 							})
 						})
 					})
@@ -418,14 +418,14 @@ var _ = Describe("space Command", func() {
 			Expect(orgGUID).To(Equal("some-org-guid"))
 			Expect(spaceName).To(Equal("some-space"))
 
-			Expect(testUI.Out).To(Say("name:\\s+some-space"))
-			Expect(testUI.Out).To(Say("running security groups:\\s+public_networks, dns, load_balancer"))
-			Expect(testUI.Out).To(Say("staging security groups:\\s+staging-sec-1, staging-sec-2"))
-			Expect(testUI.Out).To(Say("(?m)^\n^\\s+security group\\s+destination\\s+ports\\s+protocol\\s+lifecycle\\s+description$"))
-			Expect(testUI.Out).To(Say("#0\\s+public_networks\\s+0.0.0.0-9.255.255.255\\s+12345\\s+tcp\\s+staging\\s+Public networks"))
-			Expect(testUI.Out).To(Say("(?m)^\\s+public_networks\\s+0.0.0.0-9.255.255.255\\s+12345\\s+tcp\\s+running\\s+Public networks"))
-			Expect(testUI.Out).To(Say("#1\\s+more_public_networks\\s+11.0.0.0-169.253.255.255\\s+54321\\s+udp\\s+staging\\s+More public networks"))
-			Expect(testUI.Out).To(Say("(?m)\\s+more_public_networks\\s+11.0.0.0-169.253.255.255\\s+54321\\s+udp\\s+running\\s+More public networks"))
+			Expect(testUI.Out).To(Say(`name:\s+some-space`))
+			Expect(testUI.Out).To(Say(`running security groups:\s+public_networks, dns, load_balancer`))
+			Expect(testUI.Out).To(Say(`staging security groups:\s+staging-sec-1, staging-sec-2`))
+			Expect(testUI.Out).To(Say(`(?m)^\n^\s+security group\s+destination\s+ports\s+protocol\s+lifecycle\s+description$`))
+			Expect(testUI.Out).To(Say(`#0\s+public_networks\s+0.0.0.0-9.255.255.255\s+12345\s+tcp\s+staging\s+Public networks`))
+			Expect(testUI.Out).To(Say(`(?m)^\s+public_networks\s+0.0.0.0-9.255.255.255\s+12345\s+tcp\s+running\s+Public networks`))
+			Expect(testUI.Out).To(Say(`#1\s+more_public_networks\s+11.0.0.0-169.253.255.255\s+54321\s+udp\s+staging\s+More public networks`))
+			Expect(testUI.Out).To(Say(`(?m)\s+more_public_networks\s+11.0.0.0-169.253.255.255\s+54321\s+udp\s+running\s+More public networks`))
 		})
 	})
 })

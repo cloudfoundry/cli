@@ -51,7 +51,7 @@ func (client *Client) GetRouteMapping(guid string) (RouteMapping, Warnings, erro
 
 	var routeMapping RouteMapping
 	response := cloudcontroller.Response{
-		Result: &routeMapping,
+		DecodeJSONResponseInto: &routeMapping,
 	}
 
 	err = client.connection.Make(request, &response)

@@ -190,7 +190,6 @@ dance:
 				outgoingErrStream <- err
 			}
 		case <-ticker.C:
-			log.Debug("processing logsToBeSorted")
 			logsToBeSorted = actor.flushLogs(logsToBeSorted, outgoingLogStream)
 			if eventClosed && errClosed {
 				log.Debug("stopping log processing")

@@ -1,4 +1,10 @@
 resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+    tag: latest
+
 - name: terraform
   type: docker-image
   source:
@@ -87,9 +93,9 @@ resources:
   - name: cf-deployment
     type: git
     source:
-      branch: release-candidate
       uri: git@github.com:cloudfoundry/cf-deployment.git
       private_key: ((bosh-lite-pools-github-private-key))
+      tag_filter: v6.*
   - name: cf-deploy
     type: bosh-deployment
     source:
@@ -98,6 +104,10 @@ resources:
     type: time
     source:
       interval: 5m
+  - name: slack-alert
+    type: slack-notification
+    source:
+      url: ((slack-webhook-url))
 
 jobs:
   - name: create-bosh-lite
@@ -173,8 +183,22 @@ jobs:
                 params:
                   remove: fake-placeholder-env/
             on_failure:
-              task: delete-bosh-lite
-              file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
+              aggregate:
+                - task: delete-bosh-lite
+                  file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
+                - put: slack-alert
+                  params:
+                     channel: '#cli-eng'
+                     text: |
+                       Creating a bosh-lite failed :(
+                       ```
+                       Do the following tasks:
+                       1.Make sure the bosh-lite is deleted and resources are cleaned up.
+                       2.Remove the corresponding sha file from building-bosh-lites pool.
+                       3.Retrigger the create-bosh-lite task in the pipeline.
+                       Link: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+                       https://bit.ly/2S5aIov
+                       ```
         on_failure:
           aggregate:
             - put: terraform
@@ -259,7 +283,7 @@ jobs:
         input_mapping:
           env-pool: pool-repo
         params:
-          MIN_UNCLAIMED_COUNT: 2
+          MIN_UNCLAIMED_COUNT: 3
           GIT_USERNAME: ((git-username))
           GIT_EMAIL: ((git-email))
       - put: pool-repo

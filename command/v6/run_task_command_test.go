@@ -140,8 +140,8 @@ var _ = Describe("run-task Command", func() {
 						Expect(testUI.Out).To(Say("OK"))
 
 						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
-						Expect(testUI.Out).To(Say("task name:\\s+31337ddd"))
-						Expect(testUI.Out).To(Say("task id:\\s+3"))
+						Expect(testUI.Out).To(Say(`task name:\s+31337ddd`))
+						Expect(testUI.Out).To(Say(`task id:\s+3`))
 
 						Expect(testUI.Err).To(Say("get-application-warning-1"))
 						Expect(testUI.Err).To(Say("get-application-warning-2"))
@@ -185,8 +185,8 @@ var _ = Describe("run-task Command", func() {
 						Expect(testUI.Out).To(Say("OK"))
 
 						Expect(testUI.Out).To(Say("Task has been submitted successfully for execution."))
-						Expect(testUI.Out).To(Say("task name:\\s+some-task-name"))
-						Expect(testUI.Out).To(Say("task id:\\s+3"))
+						Expect(testUI.Out).To(Say(`task name:\s+some-task-name`))
+						Expect(testUI.Out).To(Say(`task id:\s+3`))
 
 						Expect(testUI.Err).To(Say("get-application-warning-1"))
 						Expect(testUI.Err).To(Say("get-application-warning-2"))

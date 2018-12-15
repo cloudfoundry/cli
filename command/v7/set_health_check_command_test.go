@@ -27,7 +27,7 @@ var _ = Describe("set-health-check Command", func() {
 		binaryName      string
 		executeErr      error
 		app             string
-		healthCheckType string
+		healthCheckType constant.HealthCheckType
 	)
 
 	BeforeEach(func() {
@@ -108,7 +108,7 @@ var _ = Describe("set-health-check Command", func() {
 		It("returns the error and prints warnings", func() {
 			Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
-			Expect(testUI.Out).To(Say("Updating health check type for app some-app process some-process-type in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Updating health check type for app some-app process some-process-type in org some-org / space some-space as steve\.\.\.`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
@@ -128,14 +128,14 @@ var _ = Describe("set-health-check Command", func() {
 		It("displays a message to restart application", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("Updating health check type for app some-app process some-process-type in org some-org / space some-space as steve\\.\\.\\."))
-			Expect(testUI.Out).To(Say("TIP: An app restart is required for the change to take effect\\."))
+			Expect(testUI.Out).To(Say(`Updating health check type for app some-app process some-process-type in org some-org / space some-space as steve\.\.\.`))
+			Expect(testUI.Out).To(Say(`TIP: An app restart is required for the change to take effect\.`))
 
 			Expect(fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceCallCount()).To(Equal(1))
 			appName, spaceGUID, healthCheckType, httpEndpoint, processType, invocationTimeout := fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall(0)
 			Expect(appName).To(Equal("some-app"))
 			Expect(spaceGUID).To(Equal("some-space-guid"))
-			Expect(healthCheckType).To(Equal("some-health-check-type"))
+			Expect(healthCheckType).To(Equal(constant.HealthCheckType("some-health-check-type")))
 			Expect(httpEndpoint).To(Equal("some-http-endpoint"))
 			Expect(processType).To(Equal("some-process-type"))
 			Expect(invocationTimeout).To(Equal(42))
@@ -157,8 +157,8 @@ var _ = Describe("set-health-check Command", func() {
 
 		It("does not display a message to restart application", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
-			Expect(testUI.Out).To(Say("Updating health check type for app some-app process some-process-type in org some-org / space some-space as steve\\.\\.\\."))
-			Expect(testUI.Out).NotTo(Say("TIP: An app restart is required for the change to take effect\\."))
+			Expect(testUI.Out).To(Say(`Updating health check type for app some-app process some-process-type in org some-org / space some-space as steve\.\.\.`))
+			Expect(testUI.Out).NotTo(Say(`TIP: An app restart is required for the change to take effect\.`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))

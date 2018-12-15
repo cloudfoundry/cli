@@ -145,8 +145,7 @@ func (config *Config) SetRefreshToken(refreshToken string) {
 
 // SetSpaceInformation sets the currently targeted space.
 func (config *Config) SetSpaceInformation(guid string, name string, allowSSH bool) {
-	config.ConfigFile.TargetedSpace.GUID = guid
-	config.ConfigFile.TargetedSpace.Name = name
+	config.V7SetSpaceInformation(guid, name)
 	config.ConfigFile.TargetedSpace.AllowSSH = allowSSH
 }
 
@@ -258,6 +257,12 @@ func (config *Config) UnsetUserInformation() {
 
 	config.UnsetOrganizationAndSpaceInformation()
 
+}
+
+// SetSpaceInformation sets the currently targeted space.
+func (config *Config) V7SetSpaceInformation(guid string, name string) {
+	config.ConfigFile.TargetedSpace.GUID = guid
+	config.ConfigFile.TargetedSpace.Name = name
 }
 
 func decodeUserFromJWT(accessToken string) (User, error) {

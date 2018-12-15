@@ -2,13 +2,38 @@
 package v6fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command/v6"
+	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeCreateSharedDomainActor struct {
+	CloudControllerAPIVersionStub        func() string
+	cloudControllerAPIVersionMutex       sync.RWMutex
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
+		result1 string
+	}
+	cloudControllerAPIVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
+	CreateSharedDomainStub        func(string, v2action.RouterGroup, bool) (v2action.Warnings, error)
+	createSharedDomainMutex       sync.RWMutex
+	createSharedDomainArgsForCall []struct {
+		arg1 string
+		arg2 v2action.RouterGroup
+		arg3 bool
+	}
+	createSharedDomainReturns struct {
+		result1 v2action.Warnings
+		result2 error
+	}
+	createSharedDomainReturnsOnCall map[int]struct {
+		result1 v2action.Warnings
+		result2 error
+	}
 	GetRouterGroupByNameStub        func(string, v2action.RouterClient) (v2action.RouterGroup, error)
 	getRouterGroupByNameMutex       sync.RWMutex
 	getRouterGroupByNameArgsForCall []struct {
@@ -23,22 +48,125 @@ type FakeCreateSharedDomainActor struct {
 		result1 v2action.RouterGroup
 		result2 error
 	}
-	CreateSharedDomainStub        func(string, v2action.RouterGroup) (v2action.Warnings, error)
-	createSharedDomainMutex       sync.RWMutex
-	createSharedDomainArgsForCall []struct {
-		arg1 string
-		arg2 v2action.RouterGroup
-	}
-	createSharedDomainReturns struct {
-		result1 v2action.Warnings
-		result2 error
-	}
-	createSharedDomainReturnsOnCall map[int]struct {
-		result1 v2action.Warnings
-		result2 error
-	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeCreateSharedDomainActor) CloudControllerAPIVersion() string {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
+	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
+	fake.cloudControllerAPIVersionMutex.Unlock()
+	if fake.CloudControllerAPIVersionStub != nil {
+		return fake.CloudControllerAPIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeCreateSharedDomainActor) CloudControllerAPIVersionCallCount() int {
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	return len(fake.cloudControllerAPIVersionArgsForCall)
+}
+
+func (fake *FakeCreateSharedDomainActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
+func (fake *FakeCreateSharedDomainActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = nil
+	fake.cloudControllerAPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCreateSharedDomainActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = nil
+	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
+		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCreateSharedDomainActor) CreateSharedDomain(arg1 string, arg2 v2action.RouterGroup, arg3 bool) (v2action.Warnings, error) {
+	fake.createSharedDomainMutex.Lock()
+	ret, specificReturn := fake.createSharedDomainReturnsOnCall[len(fake.createSharedDomainArgsForCall)]
+	fake.createSharedDomainArgsForCall = append(fake.createSharedDomainArgsForCall, struct {
+		arg1 string
+		arg2 v2action.RouterGroup
+		arg3 bool
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2, arg3})
+	fake.createSharedDomainMutex.Unlock()
+	if fake.CreateSharedDomainStub != nil {
+		return fake.CreateSharedDomainStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.createSharedDomainReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCreateSharedDomainActor) CreateSharedDomainCallCount() int {
+	fake.createSharedDomainMutex.RLock()
+	defer fake.createSharedDomainMutex.RUnlock()
+	return len(fake.createSharedDomainArgsForCall)
+}
+
+func (fake *FakeCreateSharedDomainActor) CreateSharedDomainCalls(stub func(string, v2action.RouterGroup, bool) (v2action.Warnings, error)) {
+	fake.createSharedDomainMutex.Lock()
+	defer fake.createSharedDomainMutex.Unlock()
+	fake.CreateSharedDomainStub = stub
+}
+
+func (fake *FakeCreateSharedDomainActor) CreateSharedDomainArgsForCall(i int) (string, v2action.RouterGroup, bool) {
+	fake.createSharedDomainMutex.RLock()
+	defer fake.createSharedDomainMutex.RUnlock()
+	argsForCall := fake.createSharedDomainArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeCreateSharedDomainActor) CreateSharedDomainReturns(result1 v2action.Warnings, result2 error) {
+	fake.createSharedDomainMutex.Lock()
+	defer fake.createSharedDomainMutex.Unlock()
+	fake.CreateSharedDomainStub = nil
+	fake.createSharedDomainReturns = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCreateSharedDomainActor) CreateSharedDomainReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.createSharedDomainMutex.Lock()
+	defer fake.createSharedDomainMutex.Unlock()
+	fake.CreateSharedDomainStub = nil
+	if fake.createSharedDomainReturnsOnCall == nil {
+		fake.createSharedDomainReturnsOnCall = make(map[int]struct {
+			result1 v2action.Warnings
+			result2 error
+		})
+	}
+	fake.createSharedDomainReturnsOnCall[i] = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCreateSharedDomainActor) GetRouterGroupByName(arg1 string, arg2 v2action.RouterClient) (v2action.RouterGroup, error) {
@@ -56,7 +184,8 @@ func (fake *FakeCreateSharedDomainActor) GetRouterGroupByName(arg1 string, arg2 
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.getRouterGroupByNameReturns.result1, fake.getRouterGroupByNameReturns.result2
+	fakeReturns := fake.getRouterGroupByNameReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeCreateSharedDomainActor) GetRouterGroupByNameCallCount() int {
@@ -65,13 +194,22 @@ func (fake *FakeCreateSharedDomainActor) GetRouterGroupByNameCallCount() int {
 	return len(fake.getRouterGroupByNameArgsForCall)
 }
 
+func (fake *FakeCreateSharedDomainActor) GetRouterGroupByNameCalls(stub func(string, v2action.RouterClient) (v2action.RouterGroup, error)) {
+	fake.getRouterGroupByNameMutex.Lock()
+	defer fake.getRouterGroupByNameMutex.Unlock()
+	fake.GetRouterGroupByNameStub = stub
+}
+
 func (fake *FakeCreateSharedDomainActor) GetRouterGroupByNameArgsForCall(i int) (string, v2action.RouterClient) {
 	fake.getRouterGroupByNameMutex.RLock()
 	defer fake.getRouterGroupByNameMutex.RUnlock()
-	return fake.getRouterGroupByNameArgsForCall[i].arg1, fake.getRouterGroupByNameArgsForCall[i].arg2
+	argsForCall := fake.getRouterGroupByNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeCreateSharedDomainActor) GetRouterGroupByNameReturns(result1 v2action.RouterGroup, result2 error) {
+	fake.getRouterGroupByNameMutex.Lock()
+	defer fake.getRouterGroupByNameMutex.Unlock()
 	fake.GetRouterGroupByNameStub = nil
 	fake.getRouterGroupByNameReturns = struct {
 		result1 v2action.RouterGroup
@@ -80,6 +218,8 @@ func (fake *FakeCreateSharedDomainActor) GetRouterGroupByNameReturns(result1 v2a
 }
 
 func (fake *FakeCreateSharedDomainActor) GetRouterGroupByNameReturnsOnCall(i int, result1 v2action.RouterGroup, result2 error) {
+	fake.getRouterGroupByNameMutex.Lock()
+	defer fake.getRouterGroupByNameMutex.Unlock()
 	fake.GetRouterGroupByNameStub = nil
 	if fake.getRouterGroupByNameReturnsOnCall == nil {
 		fake.getRouterGroupByNameReturnsOnCall = make(map[int]struct {
@@ -93,65 +233,15 @@ func (fake *FakeCreateSharedDomainActor) GetRouterGroupByNameReturnsOnCall(i int
 	}{result1, result2}
 }
 
-func (fake *FakeCreateSharedDomainActor) CreateSharedDomain(arg1 string, arg2 v2action.RouterGroup) (v2action.Warnings, error) {
-	fake.createSharedDomainMutex.Lock()
-	ret, specificReturn := fake.createSharedDomainReturnsOnCall[len(fake.createSharedDomainArgsForCall)]
-	fake.createSharedDomainArgsForCall = append(fake.createSharedDomainArgsForCall, struct {
-		arg1 string
-		arg2 v2action.RouterGroup
-	}{arg1, arg2})
-	fake.recordInvocation("CreateSharedDomain", []interface{}{arg1, arg2})
-	fake.createSharedDomainMutex.Unlock()
-	if fake.CreateSharedDomainStub != nil {
-		return fake.CreateSharedDomainStub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fake.createSharedDomainReturns.result1, fake.createSharedDomainReturns.result2
-}
-
-func (fake *FakeCreateSharedDomainActor) CreateSharedDomainCallCount() int {
-	fake.createSharedDomainMutex.RLock()
-	defer fake.createSharedDomainMutex.RUnlock()
-	return len(fake.createSharedDomainArgsForCall)
-}
-
-func (fake *FakeCreateSharedDomainActor) CreateSharedDomainArgsForCall(i int) (string, v2action.RouterGroup) {
-	fake.createSharedDomainMutex.RLock()
-	defer fake.createSharedDomainMutex.RUnlock()
-	return fake.createSharedDomainArgsForCall[i].arg1, fake.createSharedDomainArgsForCall[i].arg2
-}
-
-func (fake *FakeCreateSharedDomainActor) CreateSharedDomainReturns(result1 v2action.Warnings, result2 error) {
-	fake.CreateSharedDomainStub = nil
-	fake.createSharedDomainReturns = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeCreateSharedDomainActor) CreateSharedDomainReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
-	fake.CreateSharedDomainStub = nil
-	if fake.createSharedDomainReturnsOnCall == nil {
-		fake.createSharedDomainReturnsOnCall = make(map[int]struct {
-			result1 v2action.Warnings
-			result2 error
-		})
-	}
-	fake.createSharedDomainReturnsOnCall[i] = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
 func (fake *FakeCreateSharedDomainActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getRouterGroupByNameMutex.RLock()
-	defer fake.getRouterGroupByNameMutex.RUnlock()
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.createSharedDomainMutex.RLock()
 	defer fake.createSharedDomainMutex.RUnlock()
+	fake.getRouterGroupByNameMutex.RLock()
+	defer fake.getRouterGroupByNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

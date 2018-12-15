@@ -83,9 +83,9 @@ func (actor Actor) getProcessSummariesForApp(appGUID string, withObfuscatedValue
 
 	var processSummaries ProcessSummaries
 	for _, ccv3Process := range ccv3Processes {
-		process := ccv3Process
+		process := Process(ccv3Process)
 		if withObfuscatedValues {
-			fullProcess, warnings, err := actor.CloudControllerClient.GetApplicationProcessByType(appGUID, ccv3Process.Type)
+			fullProcess, warnings, err := actor.GetProcessByTypeAndApplication(ccv3Process.Type, appGUID)
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
 				return nil, allWarnings, err
@@ -93,7 +93,7 @@ func (actor Actor) getProcessSummariesForApp(appGUID string, withObfuscatedValue
 			process = fullProcess
 		}
 
-		processSummary, warnings, err := actor.getProcessSummary(Process(process))
+		processSummary, warnings, err := actor.getProcessSummary(process)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
 			return nil, allWarnings, err

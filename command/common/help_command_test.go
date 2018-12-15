@@ -1,6 +1,8 @@
 package common_test
 
 import (
+	"regexp"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -376,35 +378,50 @@ var _ = Describe("help Command", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(testUI.Out).To(Say("faceman version face2.0-yesterday, Cloud Foundry command line tool"))
-			Expect(testUI.Out).To(Say(`Usage: faceman \[global options\] command \[arguments...\] \[command options\]`))
+			Expect(testUI.Out).To(Say(regexp.QuoteMeta("Usage: faceman [global options] command [arguments...] [command options]")))
 
 			Expect(testUI.Out).To(Say("Before getting started:"))
-			Expect(testUI.Out).To(Say("  help,h    logout,lo"))
+			Expect(testUI.Out).To(Say(`  config\s+login,l\s+target,t`))
+			Expect(testUI.Out).To(Say(`  help,h\s+logout,lo`))
 
 			Expect(testUI.Out).To(Say("Application lifecycle:"))
 			Expect(testUI.Out).To(Say(`  apps,a\s+run-task,rt\s+events`))
+			Expect(testUI.Out).To(Say(`  push,p\s+logs\s+set-env,se`))
+			Expect(testUI.Out).To(Say(`  start,st\s+ssh\s+create-app-manifest`))
+			Expect(testUI.Out).To(Say(`  stop,sp\s+app\s+delete,d`))
+			Expect(testUI.Out).To(Say(`  restart,rs\s+env,e`))
 			Expect(testUI.Out).To(Say(`  restage,rg\s+scale`))
 
 			Expect(testUI.Out).To(Say("Services integration:"))
 			Expect(testUI.Out).To(Say(`  marketplace,m\s+create-user-provided-service,cups`))
 			Expect(testUI.Out).To(Say(`  services,s\s+update-user-provided-service,uups`))
+			Expect(testUI.Out).To(Say(`  create-service,cs\s+create-service-key,csk`))
+			Expect(testUI.Out).To(Say(`  update-service\s+delete-service-key,dsk`))
+			Expect(testUI.Out).To(Say(`  delete-service,ds\s+service-keys,sk`))
+			Expect(testUI.Out).To(Say(`  service\s+service-key`))
+			Expect(testUI.Out).To(Say(`  bind-service,bs\s+bind-route-service,brs`))
+			Expect(testUI.Out).To(Say(`  unbind-service,us\s+unbind-route-service,urs`))
 
 			Expect(testUI.Out).To(Say("Route and domain management:"))
 			Expect(testUI.Out).To(Say(`  routes,r\s+delete-route\s+create-domain`))
 			Expect(testUI.Out).To(Say(`  domains\s+map-route`))
+			Expect(testUI.Out).To(Say(`  create-route\s+unmap-route`))
 
 			Expect(testUI.Out).To(Say("Space management:"))
 			Expect(testUI.Out).To(Say(`  spaces\s+create-space\s+set-space-role`))
+			Expect(testUI.Out).To(Say(`  space-users\s+delete-space\s+unset-space-role`))
 
 			Expect(testUI.Out).To(Say("Org management:"))
 			Expect(testUI.Out).To(Say(`  orgs,o\s+set-org-role`))
+			Expect(testUI.Out).To(Say(`  org-users\s+unset-org-role`))
 
 			Expect(testUI.Out).To(Say("CLI plugin management:"))
-			Expect(testUI.Out).To(Say("  install-plugin    list-plugin-repos"))
+			Expect(testUI.Out).To(Say(`  plugins\s+add-plugin-repo\s+repo-plugins`))
+			Expect(testUI.Out).To(Say(`  install-plugin\s+list-plugin-repos`))
 
 			Expect(testUI.Out).To(Say("Global options:"))
-			Expect(testUI.Out).To(Say("  --help, -h                         Show help"))
-			Expect(testUI.Out).To(Say("  -v                                 Print API request diagnostics to stdout"))
+			Expect(testUI.Out).To(Say(`  --help, -h\s+Show help`))
+			Expect(testUI.Out).To(Say(`  -v\s+Print API request diagnostics to stdout`))
 
 			Expect(testUI.Out).To(Say(`Use 'cf help -a' to see all commands\.`))
 		})

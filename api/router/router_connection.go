@@ -54,7 +54,6 @@ func (connection *RouterConnection) Make(request *Request, responseToPopulate *R
 	httpResponse, err := connection.HTTPClient.Do(request.Request)
 	if err != nil {
 		// request could not be made, e.g., ssl handshake or tcp dial timeout
-		// TODO: check on this
 		return connection.processRequestErrors(request.Request, err)
 	}
 
@@ -63,19 +62,11 @@ func (connection *RouterConnection) Make(request *Request, responseToPopulate *R
 
 func (*RouterConnection) handleStatusCodes(httpResponse *http.Response, responseToPopulate *Response) error {
 	if httpResponse.StatusCode >= 400 {
-		var errorResponse routererror.ErrorResponse
-		err := json.Unmarshal(responseToPopulate.RawResponse, &errorResponse)
-		if err != nil {
-			return routererror.RawHTTPStatusError{
-				StatusCode:  httpResponse.StatusCode,
-				RawResponse: responseToPopulate.RawResponse,
-			}
+		return routererror.RawHTTPStatusError{
+			StatusCode:  httpResponse.StatusCode,
+			RawResponse: responseToPopulate.RawResponse,
 		}
-		errorResponse.StatusCode = httpResponse.StatusCode
-
-		return errorResponse
 	}
-
 	return nil
 }
 
@@ -91,7 +82,7 @@ func (connection *RouterConnection) populateResponse(httpResponse *http.Response
 
 	err = connection.handleStatusCodes(httpResponse, responseToPopulate)
 	if err != nil {
-		return err // TODO errConfig
+		return err
 	}
 
 	if responseToPopulate.Result != nil {

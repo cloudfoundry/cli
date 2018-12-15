@@ -124,7 +124,7 @@ var _ = Describe("v3-droplets Command", func() {
 		It("returns the error and prints warnings", func() {
 			Expect(executeErr).To(Equal(ccerror.RequestError{}))
 
-			Expect(testUI.Out).To(Say("Listing droplets of app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Listing droplets of app some-app in org some-org / space some-space as steve\.\.\.`))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
@@ -155,7 +155,7 @@ var _ = Describe("v3-droplets Command", func() {
 		It("prints the application droplets and outputs warnings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("Listing droplets of app some-app in org some-org / space some-space as steve\\.\\.\\.\n"))
+			Expect(testUI.Out).To(Say(`Listing droplets of app some-app in org some-org / space some-space as steve\.\.\.\n`))
 			Expect(testUI.Out).To(Say("\n"))
 
 			createdAtOneParsed, err := time.Parse(time.RFC3339, createdAtOne)
@@ -163,9 +163,9 @@ var _ = Describe("v3-droplets Command", func() {
 			createdAtTwoParsed, err := time.Parse(time.RFC3339, createdAtTwo)
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("guid\\s+state\\s+created\n"))
-			Expect(testUI.Out).To(Say("some-droplet-guid-1\\s+staged\\s+%s\n", testUI.UserFriendlyDate(createdAtOneParsed)))
-			Expect(testUI.Out).To(Say("some-droplet-guid-2\\s+failed\\s+%s\n", testUI.UserFriendlyDate(createdAtTwoParsed)))
+			Expect(testUI.Out).To(Say(`guid\s+state\s+created\n`))
+			Expect(testUI.Out).To(Say(`some-droplet-guid-1\s+staged\s+%s\n`, testUI.UserFriendlyDate(createdAtOneParsed)))
+			Expect(testUI.Out).To(Say(`some-droplet-guid-2\s+failed\s+%s\n`, testUI.UserFriendlyDate(createdAtTwoParsed)))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
@@ -186,7 +186,7 @@ var _ = Describe("v3-droplets Command", func() {
 		It("displays there are no droplets", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("Listing droplets of app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say(`Listing droplets of app some-app in org some-org / space some-space as steve\.\.\.`))
 			Expect(testUI.Out).To(Say("No droplets found"))
 
 			Expect(testUI.Err).To(Say("warning-1"))

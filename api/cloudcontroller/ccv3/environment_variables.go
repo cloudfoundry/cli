@@ -54,7 +54,7 @@ func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envV
 
 	var responseEnvVars EnvironmentVariables
 	response := cloudcontroller.Response{
-		Result: &responseEnvVars,
+		DecodeJSONResponseInto: &responseEnvVars,
 	}
 	err = client.connection.Make(request, &response)
 	return responseEnvVars, response.Warnings, err

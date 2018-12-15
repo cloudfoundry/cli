@@ -1,9 +1,10 @@
+// +build !partialPush
+
 package global
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -18,7 +19,7 @@ var _ = Describe("rename buildpack command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("rename-buildpack - Rename a buildpack"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"))
+				Eventually(session).Should(Say(`cf rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME \[-s STACK\]`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("update-buildpack"))
 				Eventually(session).Should(Exit(0))
@@ -56,7 +57,7 @@ var _ = Describe("rename buildpack command", func() {
 
 			It("should report that the version of CAPI is too low", func() {
 				session := helpers.CF("rename-buildpack", oldBuildpackName, newBuildpackName, "-s", stacks[0])
-				Eventually(session.Err).Should(Say("Option '-s' requires CF API version %s or higher. Your target is 2\\.\\d+\\.\\d+", ccversion.MinVersionBuildpackStackAssociationV2))
+				Eventually(session.Err).Should(Say(`Option '-s' requires CF API version %s or higher. Your target is 2\.\d+\.\d+`, ccversion.MinVersionBuildpackStackAssociationV2))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -74,7 +75,7 @@ var _ = Describe("rename buildpack command", func() {
 			When("no buildpack with the name/stack combo is found", func() {
 				When("no buildpacks with the same name exist", func() {
 					It("returns a buildpack not found error", func() {
-						Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+						Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", oldBuildpackName, stacks[0]))
 						Eventually(session).Should(Exit(1))
@@ -87,7 +88,7 @@ var _ = Describe("rename buildpack command", func() {
 					})
 
 					It("returns a buildpack not found error", func() {
-						Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+						Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Buildpack %s with stack %s not found", oldBuildpackName, stacks[0]))
 						Eventually(session).Should(Exit(1))
@@ -104,7 +105,7 @@ var _ = Describe("rename buildpack command", func() {
 
 					When("renaming to unique name", func() {
 						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 						})
@@ -117,7 +118,7 @@ var _ = Describe("rename buildpack command", func() {
 							})
 
 							It("returns an error", func() {
-								Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+								Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 								Eventually(session).Should(Say("FAILED"))
 								Eventually(session.Err).Should(Say("%s is already in use", newBuildpackName))
 								Eventually(session).Should(Exit(1))
@@ -130,7 +131,7 @@ var _ = Describe("rename buildpack command", func() {
 							})
 
 							It("successfully renames the buildpack", func() {
-								Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+								Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 								Eventually(session).Should(Say("OK"))
 								Eventually(session).Should(Exit(0))
 							})
@@ -142,7 +143,7 @@ var _ = Describe("rename buildpack command", func() {
 							})
 
 							It("successfully renames the buildpack", func() {
-								Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+								Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 								Eventually(session).Should(Say("OK"))
 								Eventually(session).Should(Exit(0))
 							})
@@ -158,7 +159,7 @@ var _ = Describe("rename buildpack command", func() {
 
 					When("renaming to unique name", func() {
 						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 						})
@@ -173,7 +174,7 @@ var _ = Describe("rename buildpack command", func() {
 
 				When("renaming to unique name", func() {
 					It("successfully renames the buildpack", func() {
-						Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+						Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -186,7 +187,7 @@ var _ = Describe("rename buildpack command", func() {
 						})
 
 						It("returns a buildpack name/stack taken error", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("%s is already in use", newBuildpackName))
 							Eventually(session).Should(Exit(1))
@@ -199,7 +200,7 @@ var _ = Describe("rename buildpack command", func() {
 						})
 
 						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 						})
@@ -211,7 +212,7 @@ var _ = Describe("rename buildpack command", func() {
 						})
 
 						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s with stack %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, stacks[0], username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s with stack %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, stacks[0], username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 						})
@@ -230,7 +231,7 @@ var _ = Describe("rename buildpack command", func() {
 
 			When("no buildpacks with the old name exist", func() {
 				It("returns a buildpack not found error", func() {
-					Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+					Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Buildpack %s not found", oldBuildpackName))
 					Eventually(session).Should(Exit(1))
@@ -244,7 +245,7 @@ var _ = Describe("rename buildpack command", func() {
 
 				When("renaming to unique name", func() {
 					It("successfully renames the buildpack", func() {
-						Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+						Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -261,7 +262,7 @@ var _ = Describe("rename buildpack command", func() {
 						})
 
 						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 						})
@@ -274,7 +275,7 @@ var _ = Describe("rename buildpack command", func() {
 						})
 
 						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 						})
@@ -287,7 +288,7 @@ var _ = Describe("rename buildpack command", func() {
 						})
 
 						It("returns a buildpack name/stack taken error", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("The buildpack name %s is already in use for the stack %s", newBuildpackName, stacks[0]))
 							Eventually(session).Should(Exit(1))
@@ -306,7 +307,7 @@ var _ = Describe("rename buildpack command", func() {
 						})
 
 						It("returns a buildpack name taken error", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("The buildpack name is already in use: %s", newBuildpackName))
 							Eventually(session).Should(Exit(1))
@@ -320,7 +321,7 @@ var _ = Describe("rename buildpack command", func() {
 						})
 
 						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("The buildpack name is already in use: %s", newBuildpackName))
 							Eventually(session).Should(Exit(1))
@@ -334,7 +335,7 @@ var _ = Describe("rename buildpack command", func() {
 						})
 
 						It("returns a buildpack name/stack taken error", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("The buildpack name is already in use: %s", newBuildpackName))
 							Eventually(session).Should(Exit(1))
@@ -355,9 +356,9 @@ var _ = Describe("rename buildpack command", func() {
 					})
 
 					It("returns a buildpack not found error", func() {
-						Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+						Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Multiple buildpacks named %s found\\. Specify a stack name by using a '-s' flag\\.", oldBuildpackName))
+						Eventually(session.Err).Should(Say(`Multiple buildpacks named %s found\. Specify a stack name by using a '-s' flag\.`, oldBuildpackName))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -370,7 +371,7 @@ var _ = Describe("rename buildpack command", func() {
 
 					When("renaming to unique name", func() {
 						It("successfully renames the buildpack", func() {
-							Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+							Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 						})
@@ -383,7 +384,7 @@ var _ = Describe("rename buildpack command", func() {
 							})
 
 							It("successfully renames the buildpack", func() {
-								Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+								Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 								Eventually(session).Should(Say("OK"))
 								Eventually(session).Should(Exit(0))
 							})
@@ -395,7 +396,7 @@ var _ = Describe("rename buildpack command", func() {
 							})
 
 							It("returns a buildpack name/stack taken error", func() {
-								Eventually(session).Should(Say("Renaming buildpack %s to %s as %s\\.\\.\\.", oldBuildpackName, newBuildpackName, username))
+								Eventually(session).Should(Say(`Renaming buildpack %s to %s as %s\.\.\.`, oldBuildpackName, newBuildpackName, username))
 								Eventually(session).Should(Say("FAILED"))
 								Eventually(session.Err).Should(Say("Buildpack %s already exists without a stack", newBuildpackName))
 								Eventually(session).Should(Exit(1))

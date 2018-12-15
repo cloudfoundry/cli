@@ -75,7 +75,7 @@ func (client *Client) CreateServiceKey(serviceInstanceGUID string, keyName strin
 
 	var serviceKey ServiceKey
 	response := cloudcontroller.Response{
-		Result: &serviceKey,
+		DecodeJSONResponseInto: &serviceKey,
 	}
 	err = client.connection.Make(request, &response)
 

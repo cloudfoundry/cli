@@ -39,8 +39,8 @@ var _ = Describe("running-environment-variable-group command", func() {
 
 	It("gets running environment variables", func() {
 		session := helpers.CF("running-environment-variable-group")
-		Eventually(session).Should(Say("%s\\s+%s", key1, val1))
-		Eventually(session).Should(Say("%s\\s+%d", key2, val2))
+		Eventually(session).Should(Say(`%s\s+%s`, key1, val1))
+		Eventually(session).Should(Say(`%s\s+%d`, key2, val2))
 		Eventually(session).Should(Exit(0))
 	})
 })

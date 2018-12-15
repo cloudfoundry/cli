@@ -46,7 +46,7 @@ func (client *Client) GetApplicationDropletCurrent(appGUID string) (Droplet, War
 
 	var responseDroplet Droplet
 	response := cloudcontroller.Response{
-		Result: &responseDroplet,
+		DecodeJSONResponseInto: &responseDroplet,
 	}
 	err = client.connection.Make(request, &response)
 	return responseDroplet, response.Warnings, err
@@ -64,7 +64,7 @@ func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) 
 
 	var responseDroplet Droplet
 	response := cloudcontroller.Response{
-		Result: &responseDroplet,
+		DecodeJSONResponseInto: &responseDroplet,
 	}
 	err = client.connection.Make(request, &response)
 

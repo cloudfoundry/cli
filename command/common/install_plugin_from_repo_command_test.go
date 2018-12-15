@@ -223,12 +223,12 @@ var _ = Describe("install-plugin command", func() {
 							It("returns the error", func() {
 								Expect(executeErr).To(MatchError(expectedErr))
 
-								Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+								Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 								Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-								Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\.", pluginName))
-								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-								Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
+								Expect(testUI.Out).To(Say(`Plugin %s 1\.2\.2 is already installed\.`, pluginName))
+								Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+								Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+								Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repoName))
 
 								Expect(testUI.Out).ToNot(Say("downloaded"))
 								Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(0))
@@ -271,12 +271,12 @@ var _ = Describe("install-plugin command", func() {
 								It("returns the checksum error", func() {
 									Expect(executeErr).To(MatchError(translatableerror.InvalidChecksumError{}))
 
-									Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+									Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 									Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-									Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\.", pluginName))
-									Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-									Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-									Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
+									Expect(testUI.Out).To(Say(`Plugin %s 1\.2\.2 is already installed\.`, pluginName))
+									Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+									Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+									Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repoName))
 									Expect(testUI.Out).ToNot(Say("Installing plugin"))
 
 									Expect(fakeActor.ValidateFileChecksumCallCount()).To(Equal(1))
@@ -339,7 +339,7 @@ var _ = Describe("install-plugin command", func() {
 											minor := rand.Int()
 											build := rand.Int()
 											pluginVersion = configv3.PluginVersion{Major: major, Minor: minor, Build: build}
-											pluginVersionRegex = fmt.Sprintf("%d\\.%d\\.%d", major, minor, build)
+											pluginVersionRegex = fmt.Sprintf(`%d\.%d\.%d`, major, minor, build)
 
 											fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
 												Name:    pluginName,
@@ -356,8 +356,8 @@ var _ = Describe("install-plugin command", func() {
 											It("returns the error", func() {
 												Expect(executeErr).To(MatchError(expectedErr))
 
-												Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
-												Expect(testUI.Out).ToNot(Say("Plugin %s successfully uninstalled\\.", pluginName))
+												Expect(testUI.Out).To(Say(`Uninstalling existing plugin\.\.\.`))
+												Expect(testUI.Out).ToNot(Say(`Plugin %s successfully uninstalled\.`, pluginName))
 
 												Expect(fakeActor.UninstallPluginCallCount()).To(Equal(1))
 												_, pluginNameArg := fakeActor.UninstallPluginArgsForCall(0)
@@ -375,8 +375,8 @@ var _ = Describe("install-plugin command", func() {
 												It("returns the error", func() {
 													Expect(executeErr).To(MatchError(expectedErr))
 
-													Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
-													Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
+													Expect(testUI.Out).To(Say(`Plugin %s successfully uninstalled\.`, pluginName))
+													Expect(testUI.Out).To(Say(`Installing plugin %s\.\.\.`, pluginName))
 													Expect(testUI.Out).ToNot(Say("successfully installed"))
 
 													Expect(fakeActor.InstallPluginFromPathCallCount()).To(Equal(1))
@@ -393,18 +393,18 @@ var _ = Describe("install-plugin command", func() {
 												It("uninstalls the existing plugin and installs the new one", func() {
 													Expect(executeErr).ToNot(HaveOccurred())
 
-													Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+													Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 													Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-													Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\.", pluginName))
-													Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-													Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-													Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-													Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
+													Expect(testUI.Out).To(Say(`Plugin %s 1\.2\.2 is already installed\.`, pluginName))
+													Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+													Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+													Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repoName))
+													Expect(testUI.Out).To(Say(`Uninstalling existing plugin\.\.\.`))
 													Expect(testUI.Out).To(Say("OK"))
-													Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
-													Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
+													Expect(testUI.Out).To(Say(`Plugin %s successfully uninstalled\.`, pluginName))
+													Expect(testUI.Out).To(Say(`Installing plugin %s\.\.\.`, pluginName))
 													Expect(testUI.Out).To(Say("OK"))
-													Expect(testUI.Out).To(Say("%s %s successfully installed\\.", pluginName, pluginVersionRegex))
+													Expect(testUI.Out).To(Say(`%s %s successfully installed\.`, pluginName, pluginVersionRegex))
 												})
 											})
 										})
@@ -424,11 +424,11 @@ var _ = Describe("install-plugin command", func() {
 							It("returns the error", func() {
 								Expect(executeErr).To(MatchError(expectedErr))
 
-								Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+								Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 								Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-								Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
+								Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+								Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+								Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repoName))
 
 								Expect(testUI.Out).ToNot(Say("downloaded"))
 								Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(0))
@@ -448,11 +448,11 @@ var _ = Describe("install-plugin command", func() {
 								It("returns the checksum error", func() {
 									Expect(executeErr).To(MatchError(translatableerror.InvalidChecksumError{}))
 
-									Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+									Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 									Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-									Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-									Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-									Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
+									Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+									Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+									Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repoName))
 									Expect(testUI.Out).ToNot(Say("Installing plugin"))
 								})
 							})
@@ -506,7 +506,7 @@ var _ = Describe("install-plugin command", func() {
 											It("returns the error", func() {
 												Expect(executeErr).To(MatchError(expectedErr))
 
-												Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
+												Expect(testUI.Out).To(Say(`Installing plugin %s\.\.\.`, pluginName))
 												Expect(testUI.Out).ToNot(Say("successfully installed"))
 											})
 										})
@@ -515,14 +515,14 @@ var _ = Describe("install-plugin command", func() {
 											It("uninstalls the existing plugin and installs the new one", func() {
 												Expect(executeErr).ToNot(HaveOccurred())
 
-												Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+												Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 												Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-												Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-												Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-												Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-												Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
+												Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+												Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+												Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repoName))
+												Expect(testUI.Out).To(Say(`Installing plugin %s\.\.\.`, pluginName))
 												Expect(testUI.Out).To(Say("OK"))
-												Expect(testUI.Out).To(Say("%s 1\\.2\\.3 successfully installed", pluginName))
+												Expect(testUI.Out).To(Say(`%s 1\.2\.3 successfully installed`, pluginName))
 											})
 										})
 									})
@@ -555,13 +555,13 @@ var _ = Describe("install-plugin command", func() {
 							It("cancels plugin installation", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+								Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 								Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-								Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\.", pluginName))
-								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-								Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
-								Expect(testUI.Out).To(Say("Plugin installation cancelled\\."))
+								Expect(testUI.Out).To(Say(`Plugin %s 1\.2\.2 is already installed\.`, pluginName))
+								Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+								Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+								Expect(testUI.Out).To(Say(`Do you want to uninstall the existing plugin and install %s %s\? \[yN\]`, pluginName, downloadedVersionString))
+								Expect(testUI.Out).To(Say(`Plugin installation cancelled\.`))
 							})
 						})
 
@@ -573,8 +573,8 @@ var _ = Describe("install-plugin command", func() {
 							It("cancels plugin installation", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
-								Expect(testUI.Out).To(Say("Plugin installation cancelled\\."))
+								Expect(testUI.Out).To(Say(`Do you want to uninstall the existing plugin and install %s %s\? \[yN\]`, pluginName, downloadedVersionString))
+								Expect(testUI.Out).To(Say(`Plugin installation cancelled\.`))
 							})
 						})
 
@@ -586,8 +586,8 @@ var _ = Describe("install-plugin command", func() {
 							It("returns an error", func() {
 								Expect(executeErr).To(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
-								Expect(testUI.Out).ToNot(Say("Plugin installation cancelled\\."))
+								Expect(testUI.Out).To(Say(`Do you want to uninstall the existing plugin and install %s %s\? \[yN\]`, pluginName, downloadedVersionString))
+								Expect(testUI.Out).ToNot(Say(`Plugin installation cancelled\.`))
 								Expect(testUI.Out).ToNot(Say("Installing plugin"))
 							})
 						})
@@ -604,19 +604,19 @@ var _ = Describe("install-plugin command", func() {
 							})
 
 							It("installs the plugin", func() {
-								Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+								Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 								Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-								Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\.", pluginName))
-								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-								Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
-								Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-								Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
+								Expect(testUI.Out).To(Say(`Plugin %s 1\.2\.2 is already installed\.`, pluginName))
+								Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+								Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+								Expect(testUI.Out).To(Say(`Do you want to uninstall the existing plugin and install %s %s\? \[yN\]`, pluginName, downloadedVersionString))
+								Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repoName))
+								Expect(testUI.Out).To(Say(`Uninstalling existing plugin\.\.\.`))
 								Expect(testUI.Out).To(Say("OK"))
-								Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
-								Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
+								Expect(testUI.Out).To(Say(`Plugin %s successfully uninstalled\.`, pluginName))
+								Expect(testUI.Out).To(Say(`Installing plugin %s\.\.\.`, pluginName))
 								Expect(testUI.Out).To(Say("OK"))
-								Expect(testUI.Out).To(Say("%s 1\\.2\\.3 successfully installed", pluginName))
+								Expect(testUI.Out).To(Say(`%s 1\.2\.3 successfully installed`, pluginName))
 							})
 						})
 					})
@@ -630,12 +630,12 @@ var _ = Describe("install-plugin command", func() {
 							It("cancels plugin installation", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+								Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 								Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-								Expect(testUI.Out).To(Say("Do you want to install the plugin %s\\? \\[yN\\]", pluginName))
-								Expect(testUI.Out).To(Say("Plugin installation cancelled\\."))
+								Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+								Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+								Expect(testUI.Out).To(Say(`Do you want to install the plugin %s\? \[yN\]`, pluginName))
+								Expect(testUI.Out).To(Say(`Plugin installation cancelled\.`))
 							})
 						})
 
@@ -647,8 +647,8 @@ var _ = Describe("install-plugin command", func() {
 							It("cancels plugin installation", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Do you want to install the plugin %s\\? \\[yN\\]", pluginName))
-								Expect(testUI.Out).To(Say("Plugin installation cancelled\\."))
+								Expect(testUI.Out).To(Say(`Do you want to install the plugin %s\? \[yN\]`, pluginName))
+								Expect(testUI.Out).To(Say(`Plugin installation cancelled\.`))
 							})
 						})
 
@@ -660,8 +660,8 @@ var _ = Describe("install-plugin command", func() {
 							It("returns an error", func() {
 								Expect(executeErr).To(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Do you want to install the plugin %s\\? \\[yN\\]", pluginName))
-								Expect(testUI.Out).ToNot(Say("Plugin installation cancelled\\."))
+								Expect(testUI.Out).To(Say(`Do you want to install the plugin %s\? \[yN\]`, pluginName))
+								Expect(testUI.Out).ToNot(Say(`Plugin installation cancelled\.`))
 								Expect(testUI.Out).ToNot(Say("Installing plugin"))
 							})
 						})
@@ -683,15 +683,15 @@ var _ = Describe("install-plugin command", func() {
 							It("installs the plugin", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+								Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 								Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-								Expect(testUI.Out).To(Say("Do you want to install the plugin %s\\? \\[yN\\]", pluginName))
-								Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-								Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
+								Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+								Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+								Expect(testUI.Out).To(Say(`Do you want to install the plugin %s\? \[yN\]`, pluginName))
+								Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repoName))
+								Expect(testUI.Out).To(Say(`Installing plugin %s\.\.\.`, pluginName))
 								Expect(testUI.Out).To(Say("OK"))
-								Expect(testUI.Out).To(Say("%s 1\\.2\\.3 successfully installed", pluginName))
+								Expect(testUI.Out).To(Say(`%s 1\.2\.3 successfully installed`, pluginName))
 							})
 						})
 					})
@@ -802,7 +802,7 @@ var _ = Describe("install-plugin command", func() {
 						minor := rand.Int()
 						build := rand.Int()
 						pluginVersion = configv3.PluginVersion{Major: major, Minor: minor, Build: build}
-						pluginVersionRegex = fmt.Sprintf("%d\\.%d\\.%d", major, minor, build)
+						pluginVersionRegex = fmt.Sprintf(`%d\.%d\.%d`, major, minor, build)
 
 						fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
 							Name:    pluginName,
@@ -813,18 +813,18 @@ var _ = Describe("install-plugin command", func() {
 					It("uninstalls the existing plugin and installs the new one", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+						Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 						Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-						Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\.", pluginName))
-						Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-						Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-						Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Plugin %s 1\.2\.2 is already installed\.`, pluginName))
+						Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+						Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+						Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repoName))
+						Expect(testUI.Out).To(Say(`Uninstalling existing plugin\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
-						Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
+						Expect(testUI.Out).To(Say(`Plugin %s successfully uninstalled\.`, pluginName))
+						Expect(testUI.Out).To(Say(`Installing plugin %s\.\.\.`, pluginName))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("%s %s successfully installed\\.", pluginName, pluginVersionRegex))
+						Expect(testUI.Out).To(Say(`%s %s successfully installed\.`, pluginName, pluginVersionRegex))
 					})
 				})
 
@@ -843,13 +843,13 @@ var _ = Describe("install-plugin command", func() {
 						It("returns the checksum error", func() {
 							Expect(executeErr).To(MatchError(translatableerror.InvalidChecksumError{}))
 
-							Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
+							Expect(testUI.Out).To(Say(`Searching %s for plugin %s\.\.\.`, repoName, pluginName))
 							Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
-							Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\.", pluginName))
-							Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-							Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-							Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
-							Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
+							Expect(testUI.Out).To(Say(`Plugin %s 1\.2\.2 is already installed\.`, pluginName))
+							Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+							Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+							Expect(testUI.Out).To(Say(`Do you want to uninstall the existing plugin and install %s %s\? \[yN\]`, pluginName, downloadedVersionString))
+							Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repoName))
 						})
 					})
 				})
@@ -967,7 +967,7 @@ var _ = Describe("install-plugin command", func() {
 					It("uninstalls the existing plugin and installs the new one", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Searching %s, %s, %s for plugin %s\\.\\.\\.", repoName, repo2Name, repo3Name, pluginName))
+						Expect(testUI.Out).To(Say(`Searching %s, %s, %s for plugin %s\.\.\.`, repoName, repo2Name, repo3Name, pluginName))
 						Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repo2Name))
 					})
 				})
@@ -983,13 +983,13 @@ var _ = Describe("install-plugin command", func() {
 					It("returns the checksum error", func() {
 						Expect(executeErr).To(MatchError(errors.New("some-error")))
 
-						Expect(testUI.Out).To(Say("Searching %s, %s, %s for plugin %s\\.\\.\\.", repoName, repo2Name, repo3Name, pluginName))
+						Expect(testUI.Out).To(Say(`Searching %s, %s, %s for plugin %s\.\.\.`, repoName, repo2Name, repo3Name, pluginName))
 						Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repo2Name))
-						Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\.", pluginName))
-						Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-						Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
-						Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repo2Name))
+						Expect(testUI.Out).To(Say(`Plugin %s 1\.2\.2 is already installed\.`, pluginName))
+						Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+						Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+						Expect(testUI.Out).To(Say(`Do you want to uninstall the existing plugin and install %s %s\? \[yN\]`, pluginName, downloadedVersionString))
+						Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repo2Name))
 					})
 				})
 			})
@@ -1035,7 +1035,7 @@ var _ = Describe("install-plugin command", func() {
 						minor := rand.Int()
 						build := rand.Int()
 						pluginVersion = configv3.PluginVersion{Major: major, Minor: minor, Build: build}
-						pluginVersionRegex = fmt.Sprintf("%d\\.%d\\.%d", major, minor, build)
+						pluginVersionRegex = fmt.Sprintf(`%d\.%d\.%d`, major, minor, build)
 
 						fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
 							Name:    pluginName,
@@ -1046,18 +1046,18 @@ var _ = Describe("install-plugin command", func() {
 					It("uninstalls the existing plugin and installs the new one", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Searching %s, %s, %s for plugin %s\\.\\.\\.", repoName, repo2Name, repo3Name, pluginName))
+						Expect(testUI.Out).To(Say(`Searching %s, %s, %s for plugin %s\.\.\.`, repoName, repo2Name, repo3Name, pluginName))
 						Expect(testUI.Out).To(Say("Plugin %s %s found in: %s, %s", pluginName, downloadedVersionString, repo2Name, repo3Name))
-						Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\.", pluginName))
-						Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-						Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repo2Name))
-						Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
+						Expect(testUI.Out).To(Say(`Plugin %s 1\.2\.2 is already installed\.`, pluginName))
+						Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+						Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+						Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repo2Name))
+						Expect(testUI.Out).To(Say(`Uninstalling existing plugin\.\.\.`))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
-						Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
+						Expect(testUI.Out).To(Say(`Plugin %s successfully uninstalled\.`, pluginName))
+						Expect(testUI.Out).To(Say(`Installing plugin %s\.\.\.`, pluginName))
 						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("%s %s successfully installed\\.", pluginName, pluginVersionRegex))
+						Expect(testUI.Out).To(Say(`%s %s successfully installed\.`, pluginName, pluginVersionRegex))
 					})
 				})
 
@@ -1075,13 +1075,13 @@ var _ = Describe("install-plugin command", func() {
 					It("returns the error", func() {
 						Expect(executeErr).To(MatchError(errors.New("some-error")))
 
-						Expect(testUI.Out).To(Say("Searching %s, %s, %s for plugin %s\\.\\.\\.", repoName, repo2Name, repo3Name, pluginName))
+						Expect(testUI.Out).To(Say(`Searching %s, %s, %s for plugin %s\.\.\.`, repoName, repo2Name, repo3Name, pluginName))
 						Expect(testUI.Out).To(Say("Plugin %s %s found in: %s, %s", pluginName, downloadedVersionString, repo2Name, repo3Name))
-						Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\.", pluginName))
-						Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
-						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-						Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
-						Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repo2Name))
+						Expect(testUI.Out).To(Say(`Plugin %s 1\.2\.2 is already installed\.`, pluginName))
+						Expect(testUI.Out).To(Say(`Attention: Plugins are binaries written by potentially untrusted authors\.`))
+						Expect(testUI.Out).To(Say(`Install and use plugins at your own risk\.`))
+						Expect(testUI.Out).To(Say(`Do you want to uninstall the existing plugin and install %s %s\? \[yN\]`, pluginName, downloadedVersionString))
+						Expect(testUI.Out).To(Say(`Starting download of plugin binary from repository %s\.\.\.`, repo2Name))
 					})
 				})
 			})

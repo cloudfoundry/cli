@@ -1,3 +1,5 @@
+// +build !partialPush
+
 package isolated
 
 import (
@@ -67,59 +69,8 @@ var _ = Describe("set-health-check command", func() {
 	})
 
 	When("the environment is not setup correctly", func() {
-		When("no API endpoint is set", func() {
-			BeforeEach(func() {
-				helpers.UnsetAPI()
-			})
-
-			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("set-health-check", appName, "port")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("not logged in", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-			})
-
-			It("fails with not logged in message", func() {
-				session := helpers.CF("set-health-check", appName, "port")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("there is no org set", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-				helpers.LoginCF()
-			})
-
-			It("fails with no org targeted error message", func() {
-				session := helpers.CF("set-health-check", appName, "port")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("there is no space set", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-				helpers.LoginCF()
-				helpers.TargetOrg(ReadOnlyOrg)
-			})
-
-			It("fails with no space targeted error message", func() {
-				session := helpers.CF("set-health-check", appName, "port")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
-				Eventually(session).Should(Exit(1))
-			})
+		It("fails with the appropriate errors", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "set-health-check", appName, "port")
 		})
 	})
 
@@ -138,15 +89,15 @@ var _ = Describe("set-health-check command", func() {
 		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithProcfileApp(func(appDir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 				})
 			})
 
 			When("the process type is set", func() {
 				It("displays the health check types for each process", func() {
 					session := helpers.CF("set-health-check", appName, "http", "--endpoint", "/healthcheck", "--process", "console")
-					Eventually(session).Should(Say("Updating health check type for app %s process console in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say("TIP: An app restart is required for the change to take effect\\."))
+					Eventually(session).Should(Say(`Updating health check type for app %s process console in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`TIP: An app restart is required for the change to take effect\.`))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("get-health-check", appName)
@@ -161,8 +112,8 @@ var _ = Describe("set-health-check command", func() {
 			When("the invocation timeout is set", func() {
 				It("displays the health check types for each process", func() {
 					session := helpers.CF("set-health-check", appName, "http", "--endpoint", "/healthcheck", "--invocation-timeout", "2")
-					Eventually(session).Should(Say("Updating health check type for app %s process web in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say("TIP: An app restart is required for the change to take effect\\."))
+					Eventually(session).Should(Say(`Updating health check type for app %s process web in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`TIP: An app restart is required for the change to take effect\.`))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("get-health-check", appName)
@@ -177,8 +128,8 @@ var _ = Describe("set-health-check command", func() {
 			When("process type and invocation timeout are not set", func() {
 				It("displays the health check types for each process", func() {
 					session := helpers.CF("set-health-check", appName, "http", "--endpoint", "/healthcheck")
-					Eventually(session).Should(Say("Updating health check type for app %s process web in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say("TIP: An app restart is required for the change to take effect\\."))
+					Eventually(session).Should(Say(`Updating health check type for app %s process web in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`TIP: An app restart is required for the change to take effect\.`))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("get-health-check", appName)
@@ -197,7 +148,7 @@ var _ = Describe("set-health-check command", func() {
 
 				It("sets the http health check endpoint to /", func() {
 					session := helpers.CF("get-health-check", appName)
-					Eventually(session).Should(Say("web\\s+http\\s+/"))
+					Eventually(session).Should(Say(`web\s+http\s+/`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -205,13 +156,13 @@ var _ = Describe("set-health-check command", func() {
 			When("the process type does not exist", func() {
 				BeforeEach(func() {
 					helpers.WithProcfileApp(func(appDir string) {
-						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 					})
 				})
 
 				It("returns a process not found error", func() {
 					session := helpers.CF("set-health-check", appName, "http", "--endpoint", "/healthcheck", "--process", "nonexistent-type")
-					Eventually(session).Should(Say("Updating health check type for app %s process nonexistent-type in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say(`Updating health check type for app %s process nonexistent-type in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session.Err).Should(Say("Process nonexistent-type not found"))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -221,7 +172,7 @@ var _ = Describe("set-health-check command", func() {
 			When("health check type is not 'http' and endpoint is set", func() {
 				It("returns an error", func() {
 					session := helpers.CF("set-health-check", appName, "port", "--endpoint", "oh-no", "--process", "console")
-					Eventually(session.Out).Should(Say("Updating health check type for app %s process console in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say(`Updating health check type for app %s process console in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Eventually(session.Err).Should(Say("Health check type must be 'http' to set a health check HTTP endpoint."))
 					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -258,7 +209,7 @@ var _ = Describe("set-health-check command", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("set-health-check", invalidAppName, "port")
 
-				Eventually(session.Out).Should(Say("Updating health check type for app %s process web in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say(`Updating health check type for app %s process web in org %s / space %s as %s\.\.\.`, invalidAppName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
 				Eventually(session.Out).Should(Say("FAILED"))
 

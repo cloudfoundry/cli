@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"code.cloudfoundry.org/cli/actor/versioncheck"
 
@@ -139,17 +140,35 @@ type ccRoot struct {
 	} `json:"links"`
 }
 
+var cacheLock sync.Mutex
+var CcRootCache *ccRoot
+
+func fetchAPIVersion() ccRoot {
+	cacheLock.Lock()
+	defer cacheLock.Unlock()
+	if CcRootCache == nil {
+		session := CF("curl", "/")
+		Eventually(session).Should(Exit(0))
+		var result ccRoot
+		err := json.Unmarshal(session.Out.Contents(), &result)
+		Expect(err).ToNot(HaveOccurred())
+		CcRootCache = &result
+	}
+	return *CcRootCache
+}
+
 func getAPIVersionV3() string {
 	return fetchAPIVersion().Links.CloudContollerV3.Meta.Version
 }
 
-// TODO: Look into caching this
-func fetchAPIVersion() ccRoot {
-	session := CF("curl", "/")
-	Eventually(session).Should(Exit(0))
+func SkipIfNoRoutingAPI() {
+	// TODO: #161159794 remove this function and check a nicer error message when available
+	var response struct {
+		RoutingEndpoint string `json:"routing_endpoint"`
+	}
+	Curl(&response, "/v2/info")
 
-	var cc ccRoot
-	err := json.Unmarshal(session.Out.Contents(), &cc)
-	Expect(err).ToNot(HaveOccurred())
-	return cc
+	if response.RoutingEndpoint == "" {
+		Skip("Test requires routing endpoint on /v2/info")
+	}
 }

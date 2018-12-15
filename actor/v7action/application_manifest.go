@@ -30,21 +30,41 @@ func (actor Actor) ApplyApplicationManifest(parser ManifestParser, spaceGUID str
 			return allWarnings, err
 		}
 
-		jobURL, applyManifestWarnings, err := actor.CloudControllerClient.UpdateApplicationApplyManifest(app.GUID, rawManifest)
+		applyManifestWarnings, err := actor.SetApplicationManifest(app.GUID, rawManifest)
 		allWarnings = append(allWarnings, applyManifestWarnings...)
 		if err != nil {
-			return allWarnings, err
-		}
-
-		pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
-		allWarnings = append(allWarnings, pollWarnings...)
-		if err != nil {
-			if newErr, ok := err.(ccerror.JobFailedError); ok {
-				return allWarnings, actionerror.ApplicationManifestError{Message: newErr.Message}
-			}
 			return allWarnings, err
 		}
 	}
 
 	return allWarnings, nil
+}
+
+func (actor Actor) SetApplicationManifest(appGUID string, rawManifest []byte) (Warnings, error) {
+	var allWarnings Warnings
+	jobURL, applyManifestWarnings, err := actor.CloudControllerClient.UpdateApplicationApplyManifest(appGUID, rawManifest)
+	allWarnings = append(allWarnings, applyManifestWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, pollWarnings...)
+	if err != nil {
+		if newErr, ok := err.(ccerror.JobFailedError); ok {
+			return allWarnings, actionerror.ApplicationManifestError{Message: newErr.Message}
+		}
+		return allWarnings, err
+	}
+	return allWarnings, nil
+}
+
+func (actor Actor) GetRawApplicationManifestByNameAndSpace(appName string, spaceGUID string) ([]byte, Warnings, error) {
+	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return nil, warnings, err
+	}
+
+	rawManifest, manifestWarnings, err := actor.CloudControllerClient.GetApplicationManifest(app.GUID)
+	return rawManifest, append(warnings, manifestWarnings...), err
 }

@@ -66,7 +66,7 @@ var _ = Describe("Application Summary Actions", func() {
 					listedProcess := ccv3.Process{
 						GUID:       "some-process-guid",
 						Type:       "some-type",
-						Command:    "[Redacted Value]",
+						Command:    *types.NewFilteredString("[Redacted Value]"),
 						MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 					}
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
@@ -76,7 +76,7 @@ var _ = Describe("Application Summary Actions", func() {
 					)
 
 					explicitlyCalledProcess := listedProcess
-					explicitlyCalledProcess.Command = "some-start-command"
+					explicitlyCalledProcess.Command = *types.NewFilteredString("some-start-command")
 					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
 						explicitlyCalledProcess,
 						ccv3.Warnings{"get-process-by-type-warning"},
@@ -141,7 +141,7 @@ var _ = Describe("Application Summary Actions", func() {
 										GUID:       "some-process-guid",
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										Type:       "some-type",
-										Command:    "some-start-command",
+										Command:    *types.NewFilteredString("some-start-command"),
 									},
 									InstanceDetails: []ProcessInstance{
 										{
@@ -223,7 +223,7 @@ var _ = Describe("Application Summary Actions", func() {
 										GUID:       "some-process-guid",
 										MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 										Type:       "some-type",
-										Command:    "some-start-command",
+										Command:    *types.NewFilteredString("some-start-command"),
 									},
 									InstanceDetails: []ProcessInstance{
 										{
@@ -327,7 +327,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 			It("returns the error", func() {
 				Expect(executeErr).To(Equal(expectedErr))
-				Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
+				Expect(warnings).To(ConsistOf("some-warning", "some-process-warning"))
 			})
 		})
 	})

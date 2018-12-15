@@ -54,7 +54,7 @@ var _ = Describe("list-apps command", func() {
 					Name:                   "cfapps.io",
 					Shared:                 true,
 					OwningOrganizationGUID: "org-123",
-					GUID: "domain-guid",
+					GUID:                   "domain-guid",
 				},
 			},
 			{

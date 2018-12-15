@@ -291,7 +291,7 @@ var _ = Describe("Actualize", func() {
 										Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
 
 										Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
-										Eventually(fakeV3Actor.UploadBitsPackageCallCount()).Should(Equal(3))
+										Eventually(fakeV3Actor.UploadBitsPackageCallCount).Should(Equal(3))
 										Expect(errorStream).To(Receive(MatchError(actionerror.UploadFailedError{Err: someErr})))
 									})
 
@@ -389,7 +389,7 @@ var _ = Describe("Actualize", func() {
 
 		It("stages the application using the package guid", func() {
 			Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
-			Eventually(fakeV3Actor.StageApplicationPackageCallCount()).Should(Equal(1))
+			Eventually(fakeV3Actor.StageApplicationPackageCallCount).Should(Equal(1))
 			Expect(fakeV3Actor.StageApplicationPackageArgsForCall(0)).To(Equal("some-pkg-guid"))
 		})
 

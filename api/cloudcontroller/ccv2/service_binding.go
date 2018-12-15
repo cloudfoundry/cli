@@ -82,7 +82,7 @@ func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID s
 
 	var serviceBinding ServiceBinding
 	response := cloudcontroller.Response{
-		Result: &serviceBinding,
+		DecodeJSONResponseInto: &serviceBinding,
 	}
 
 	err = client.connection.Make(request, &response)
@@ -109,7 +109,7 @@ func (client *Client) DeleteServiceBinding(serviceBindingGUID string, acceptsInc
 	var serviceBinding ServiceBinding
 	if acceptsIncomplete {
 		response = cloudcontroller.Response{
-			Result: &serviceBinding,
+			DecodeJSONResponseInto: &serviceBinding,
 		}
 	}
 
@@ -129,7 +129,7 @@ func (client *Client) GetServiceBinding(guid string) (ServiceBinding, Warnings, 
 
 	var serviceBinding ServiceBinding
 	response := cloudcontroller.Response{
-		Result: &serviceBinding,
+		DecodeJSONResponseInto: &serviceBinding,
 	}
 
 	err = client.connection.Make(request, &response)

@@ -50,7 +50,7 @@ func (client *Client) GetStack(guid string) (Stack, Warnings, error) {
 
 	var stack Stack
 	response := cloudcontroller.Response{
-		Result: &stack,
+		DecodeJSONResponseInto: &stack,
 	}
 
 	err = client.connection.Make(request, &response)

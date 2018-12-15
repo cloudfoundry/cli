@@ -26,7 +26,7 @@ var _ = Describe("push/update an app using health check type", func() {
 		BeforeEach(func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "http", "--no-start")
-				Eventually(session).Should(Say("Pushing app %s to org %s / space %s as %s\\.\\.\\.", appName, organization, space, username))
+				Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, username))
 				Eventually(session).Should(Exit(0))
 
 				Eventually(helpers.CF("set-health-check", appName, "http", "--endpoint", "/some-endpoint")).Should(Exit(0))
@@ -37,9 +37,9 @@ var _ = Describe("push/update an app using health check type", func() {
 			It("should keep the health check http endpoint", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "http", "--no-start")
-					Eventually(session).Should(Say("Pushing app %s to org %s / space %s as %s\\.\\.\\.", appName, organization, space, username))
-					Eventually(session).ShouldNot(Say("\\-\\s+health check http endpoint:\\s+/some-endpoint"))
-					Eventually(session).ShouldNot(Say("\\+\\s+health check http endpoint:\\s+/"))
+					Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, username))
+					Eventually(session).ShouldNot(Say(`\-\s+health check http endpoint:\s+/some-endpoint`))
+					Eventually(session).ShouldNot(Say(`\+\s+health check http endpoint:\s+/`))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -53,10 +53,10 @@ var _ = Describe("push/update an app using health check type", func() {
 			It("should reset the health check http endpoint", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "port", "--no-start")
-					Eventually(session).Should(Say("Pushing app %s to org %s / space %s as %s\\.\\.\\.", appName, organization, space, username))
-					Eventually(session).Should(Say("\\-\\s+health check http endpoint:\\s+/some-endpoint"))
-					Eventually(session).Should(Say("\\-\\s+health check type:\\s+http"))
-					Eventually(session).Should(Say("\\+\\s+health check type:\\s+port"))
+					Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, username))
+					Eventually(session).Should(Say(`\-\s+health check http endpoint:\s+/some-endpoint`))
+					Eventually(session).Should(Say(`\-\s+health check type:\s+http`))
+					Eventually(session).Should(Say(`\+\s+health check type:\s+port`))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -70,10 +70,10 @@ var _ = Describe("push/update an app using health check type", func() {
 			It("should reset the health check http endpoint", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "process", "--no-start")
-					Eventually(session).Should(Say("Pushing app %s to org %s / space %s as %s\\.\\.\\.", appName, organization, space, username))
-					Eventually(session).Should(Say("\\-\\s+health check http endpoint:\\s+/some-endpoint"))
-					Eventually(session).Should(Say("\\-\\s+health check type:\\s+http"))
-					Eventually(session).Should(Say("\\+\\s+health check type:\\s+process"))
+					Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, username))
+					Eventually(session).Should(Say(`\-\s+health check http endpoint:\s+/some-endpoint`))
+					Eventually(session).Should(Say(`\-\s+health check type:\s+http`))
+					Eventually(session).Should(Say(`\+\s+health check type:\s+process`))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -90,9 +90,9 @@ var _ = Describe("push/update an app using health check type", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "http", "--no-start")
 
-					Eventually(session).Should(Say("Pushing app %s to org %s / space %s as %s\\.\\.\\.", appName, organization, space, username))
-					Eventually(session).Should(Say("\\+\\s+health check http endpoint:\\s+/"))
-					Eventually(session).Should(Say("\\+\\s+health check type:\\s+http"))
+					Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, username))
+					Eventually(session).Should(Say(`\+\s+health check http endpoint:\s+/`))
+					Eventually(session).Should(Say(`\+\s+health check type:\s+http`))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -115,9 +115,9 @@ var _ = Describe("push/update an app using health check type", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-						Eventually(session).Should(Say("Pushing from manifest to org %s / space %s as %s\\.\\.\\.", organization, space, username))
-						Eventually(session).Should(Say("\\s+health check http endpoint:\\s+/some-endpoint"))
-						Eventually(session).Should(Say("\\s+health check type:\\s+http"))
+						Eventually(session).Should(Say(`Pushing from manifest to org %s / space %s as %s\.\.\.`, organization, space, username))
+						Eventually(session).Should(Say(`\s+health check http endpoint:\s+/some-endpoint`))
+						Eventually(session).Should(Say(`\s+health check type:\s+http`))
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -133,8 +133,8 @@ var _ = Describe("push/update an app using health check type", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "port", "--no-start")
 
-					Eventually(session).Should(Say("Pushing app %s to org %s / space %s as %s\\.\\.\\.", appName, organization, space, username))
-					Eventually(session).Should(Say("\\+\\s+health check type:\\s+port"))
+					Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, username))
+					Eventually(session).Should(Say(`\+\s+health check type:\s+port`))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -157,7 +157,7 @@ var _ = Describe("push/update an app using health check type", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-						Eventually(session).Should(Say("Pushing from manifest to org %s / space %s as %s\\.\\.\\.", organization, space, username))
+						Eventually(session).Should(Say(`Pushing from manifest to org %s / space %s as %s\.\.\.`, organization, space, username))
 						Eventually(session.Err).Should(Say("Health check type must be 'http' to set a health check HTTP endpoint."))
 
 						Eventually(session).Should(Exit(1))
@@ -171,8 +171,8 @@ var _ = Describe("push/update an app using health check type", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-u", "process", "--no-start")
 
-					Eventually(session).Should(Say("Pushing app %s to org %s / space %s as %s\\.\\.\\.", appName, organization, space, username))
-					Eventually(session).Should(Say("\\+\\s+health check type:\\s+process"))
+					Eventually(session).Should(Say(`Pushing app %s to org %s / space %s as %s\.\.\.`, appName, organization, space, username))
+					Eventually(session).Should(Say(`\+\s+health check type:\s+process`))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -195,7 +195,7 @@ var _ = Describe("push/update an app using health check type", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-						Eventually(session).Should(Say("Pushing from manifest to org %s / space %s as %s\\.\\.\\.", organization, space, username))
+						Eventually(session).Should(Say(`Pushing from manifest to org %s / space %s as %s\.\.\.`, organization, space, username))
 						Eventually(session.Err).Should(Say("Health check type must be 'http' to set a health check HTTP endpoint."))
 
 						Eventually(session).Should(Exit(1))

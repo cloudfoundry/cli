@@ -2,7 +2,6 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -73,7 +72,7 @@ var _ = Describe("login command", func() {
 				session := helpers.CF("login", "-u", username, "p", password)
 
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Say("Service account currently logged in\\. Use 'cf logout' to log out service account and try again\\."))
+				Eventually(session).Should(Say(`Service account currently logged in\. Use 'cf logout' to log out service account and try again\.`))
 				Eventually(session).Should(Exit(1))
 			})
 		})

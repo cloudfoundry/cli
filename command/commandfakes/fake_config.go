@@ -495,6 +495,12 @@ type FakeConfig struct {
 	unsetUserInformationMutex       sync.RWMutex
 	unsetUserInformationArgsForCall []struct {
 	}
+	V7SetSpaceInformationStub        func(string, string)
+	v7SetSpaceInformationMutex       sync.RWMutex
+	v7SetSpaceInformationArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
 	VerboseStub        func() (bool, []string)
 	verboseMutex       sync.RWMutex
 	verboseArgsForCall []struct {
@@ -3031,6 +3037,38 @@ func (fake *FakeConfig) UnsetUserInformationCalls(stub func()) {
 	fake.UnsetUserInformationStub = stub
 }
 
+func (fake *FakeConfig) V7SetSpaceInformation(arg1 string, arg2 string) {
+	fake.v7SetSpaceInformationMutex.Lock()
+	fake.v7SetSpaceInformationArgsForCall = append(fake.v7SetSpaceInformationArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("V7SetSpaceInformation", []interface{}{arg1, arg2})
+	fake.v7SetSpaceInformationMutex.Unlock()
+	if fake.V7SetSpaceInformationStub != nil {
+		fake.V7SetSpaceInformationStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeConfig) V7SetSpaceInformationCallCount() int {
+	fake.v7SetSpaceInformationMutex.RLock()
+	defer fake.v7SetSpaceInformationMutex.RUnlock()
+	return len(fake.v7SetSpaceInformationArgsForCall)
+}
+
+func (fake *FakeConfig) V7SetSpaceInformationCalls(stub func(string, string)) {
+	fake.v7SetSpaceInformationMutex.Lock()
+	defer fake.v7SetSpaceInformationMutex.Unlock()
+	fake.V7SetSpaceInformationStub = stub
+}
+
+func (fake *FakeConfig) V7SetSpaceInformationArgsForCall(i int) (string, string) {
+	fake.v7SetSpaceInformationMutex.RLock()
+	defer fake.v7SetSpaceInformationMutex.RUnlock()
+	argsForCall := fake.v7SetSpaceInformationArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
 func (fake *FakeConfig) Verbose() (bool, []string) {
 	fake.verboseMutex.Lock()
 	ret, specificReturn := fake.verboseReturnsOnCall[len(fake.verboseArgsForCall)]
@@ -3249,6 +3287,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.unsetSpaceInformationMutex.RUnlock()
 	fake.unsetUserInformationMutex.RLock()
 	defer fake.unsetUserInformationMutex.RUnlock()
+	fake.v7SetSpaceInformationMutex.RLock()
+	defer fake.v7SetSpaceInformationMutex.RUnlock()
 	fake.verboseMutex.RLock()
 	defer fake.verboseMutex.RUnlock()
 	fake.writePluginConfigMutex.RLock()

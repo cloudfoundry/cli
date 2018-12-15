@@ -16,6 +16,7 @@ type TargetActor interface {
 	GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error)
 	GetOrganizationSpaces(orgGUID string) ([]v2action.Space, v2action.Warnings, error)
 	GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type TargetCommand struct {
@@ -45,7 +46,7 @@ func (cmd *TargetCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *TargetCommand) Execute(args []string) error {
-	err := command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.UI)
+	err := command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.Actor.CloudControllerAPIVersion(), cmd.UI)
 	if err != nil {
 		return err
 	}
@@ -187,7 +188,7 @@ func (cmd *TargetCommand) setSpace() error {
 func (cmd *TargetCommand) displayTargetTable(user configv3.User) {
 	table := [][]string{
 		{cmd.UI.TranslateText("api endpoint:"), cmd.Config.Target()},
-		{cmd.UI.TranslateText("api version:"), cmd.Config.APIVersion()},
+		{cmd.UI.TranslateText("api version:"), cmd.Actor.CloudControllerAPIVersion()},
 		{cmd.UI.TranslateText("user:"), user.Name},
 	}
 

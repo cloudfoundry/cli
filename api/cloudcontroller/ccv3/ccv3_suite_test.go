@@ -22,21 +22,15 @@ func TestCcv3(t *testing.T) {
 
 var server *Server
 
-var _ = SynchronizedBeforeSuite(func() []byte {
-	return []byte{}
-}, func(data []byte) {
+var _ = BeforeEach(func() {
 	server = NewTLSServer()
 
 	// Suppresses ginkgo server logs
 	server.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 })
 
-var _ = SynchronizedAfterSuite(func() {
+var _ = AfterEach(func() {
 	server.Close()
-}, func() {})
-
-var _ = BeforeEach(func() {
-	server.Reset()
 })
 
 func NewTestClient(config ...Config) (*Client, *ccv3fakes.FakeClock) {
@@ -128,6 +122,9 @@ func SetupV3Response() {
 			},
 			"deployments": {
 				"href": "SERVER_URL/v3/deployments"
+			},
+			"stacks": {
+				"href": "SERVER_URL/v3/stacks"
 			}
 		}
 	}`, "SERVER_URL", serverURL, -1)

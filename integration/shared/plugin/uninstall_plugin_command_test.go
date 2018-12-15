@@ -31,7 +31,7 @@ var _ = Describe("uninstall-plugin command", func() {
 	When("the plugin is not installed", func() {
 		It("informs the user that no such plugin is present and exits 1", func() {
 			session := helpers.CF("uninstall-plugin", "bananarama")
-			Eventually(session.Err).Should(Say("Plugin bananarama does not exist\\."))
+			Eventually(session.Err).Should(Say(`Plugin bananarama does not exist\.`))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -49,11 +49,11 @@ var _ = Describe("uninstall-plugin command", func() {
 		When("no errors are encountered", func() {
 			It("does not list the plugin after it is uninstalled", func() {
 				session := helpers.CF("uninstall-plugin", "banana-plugin-name-1")
-				Eventually(session).Should(Say("Uninstalling plugin banana-plugin-name-1\\.\\.\\."))
+				Eventually(session).Should(Say(`Uninstalling plugin banana-plugin-name-1\.\.\.`))
 				// Test that RPC works
 				Eventually(session).Should(Say("[0-9]{1,5} CLI-MESSAGE-UNINSTALL"))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Plugin banana-plugin-name-1 2\\.0\\.1 successfully uninstalled\\."))
+				Eventually(session).Should(Say(`Plugin banana-plugin-name-1 2\.0\.1 successfully uninstalled\.`))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("plugins")
@@ -64,9 +64,9 @@ var _ = Describe("uninstall-plugin command", func() {
 
 			It("matches the plugin name case insensitive", func() {
 				session := helpers.CF("uninstall-plugin", "BaNaNa-PlUgIn-NaMe-1")
-				Eventually(session).Should(Say("Uninstalling plugin banana-plugin-name-1\\.\\.\\."))
+				Eventually(session).Should(Say(`Uninstalling plugin banana-plugin-name-1\.\.\.`))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Plugin banana-plugin-name-1 2\\.0\\.1 successfully uninstalled\\."))
+				Eventually(session).Should(Say(`Plugin banana-plugin-name-1 2\.0\.1 successfully uninstalled\.`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -80,11 +80,11 @@ var _ = Describe("uninstall-plugin command", func() {
 
 			It("exits with an error but still uninstalls the plugin", func() {
 				session := helpers.CF("uninstall-plugin", "failing-plugin")
-				Eventually(session).Should(Say("Uninstalling plugin failing-plugin\\.\\.\\."))
+				Eventually(session).Should(Say(`Uninstalling plugin failing-plugin\.\.\.`))
 				Eventually(session.Err).Should(Say("I'm failing...I'm failing..."))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("The plugin's uninstall method returned an unexpected error\\."))
-				Eventually(session.Err).Should(Say("The plugin uninstall will proceed\\. Contact the plugin author if you need help\\."))
+				Eventually(session.Err).Should(Say(`The plugin's uninstall method returned an unexpected error\.`))
+				Eventually(session.Err).Should(Say(`The plugin uninstall will proceed\. Contact the plugin author if you need help\.`))
 				Eventually(session.Err).Should(Say("exit status 1"))
 				Eventually(session).Should(Exit(1))
 

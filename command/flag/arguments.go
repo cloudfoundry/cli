@@ -212,9 +212,14 @@ type SetSpaceQuotaArgs struct {
 	SpaceQuota string `positional-arg-name:"SPACE_QUOTA" required:"true" description:"The space quota"`
 }
 
+type V6SetHealthCheckArgs struct {
+	AppName     string                             `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
+	HealthCheck HealthCheckTypeWithDeprecatedValue `positional-arg-name:"HEALTH_CHECK_TYPE" required:"true" description:"Set to 'port' or 'none'"`
+}
+
 type SetHealthCheckArgs struct {
 	AppName     string          `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
-	HealthCheck HealthCheckType `positional-arg-name:"HEALTH_CHECK_TYPE" required:"true" description:"Set to 'port' or 'none'"`
+	HealthCheck HealthCheckType `positional-arg-name:"HEALTH_CHECK_TYPE" required:"true" description:"Set to 'port'"`
 }
 
 type CreateBuildpackArgs struct {
