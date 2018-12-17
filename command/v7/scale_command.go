@@ -80,7 +80,7 @@ func (cmd ScaleCommand) Execute(args []string) error {
 	}
 
 	if !cmd.Instances.IsSet && !cmd.DiskLimit.IsSet && !cmd.MemoryLimit.IsSet {
-		return cmd.showCurrentScale(user.Name)
+		return cmd.showCurrentScale(user.Name, err)
 	}
 
 	scaled, err := cmd.scaleProcess(app.GUID, user.Name)
@@ -93,17 +93,29 @@ func (cmd ScaleCommand) Execute(args []string) error {
 
 	warnings, err = cmd.Actor.PollStart(app.GUID)
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		if _, ok := err.(actionerror.StartupTimeoutError); ok {
-			return translatableerror.StartupTimeoutError{
-				AppName:    cmd.RequiredArgs.AppName,
-				BinaryName: cmd.Config.BinaryName(),
-			}
-		}
-		return err
+
+	showErr := cmd.showCurrentScale(user.Name, err)
+	if showErr != nil {
+		return showErr
 	}
 
-	return cmd.showCurrentScale(user.Name)
+	return cmd.translateErrors(err)
+}
+
+func (cmd ScaleCommand) translateErrors(err error) error {
+	if _, ok := err.(actionerror.StartupTimeoutError); ok {
+		return translatableerror.StartupTimeoutError{
+			AppName:    cmd.RequiredArgs.AppName,
+			BinaryName: cmd.Config.BinaryName(),
+		}
+	} else if _, ok := err.(actionerror.AllInstancesCrashedError); ok {
+		return translatableerror.ApplicationUnableToStartError{
+			AppName:    cmd.RequiredArgs.AppName,
+			BinaryName: cmd.Config.BinaryName(),
+		}
+	}
+
+	return err
 }
 
 func (cmd ScaleCommand) scaleProcess(appGUID string, username string) (bool, error) {
@@ -185,7 +197,11 @@ func (cmd ScaleCommand) restartApplication(appGUID string, username string) erro
 	return nil
 }
 
-func (cmd ScaleCommand) showCurrentScale(userName string) error {
+func (cmd ScaleCommand) showCurrentScale(userName string, runningErr error) error {
+	if !shouldShowCurrentScale(runningErr) {
+		return nil
+	}
+
 	cmd.UI.DisplayTextWithFlavor("Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
@@ -202,4 +218,16 @@ func (cmd ScaleCommand) showCurrentScale(userName string) error {
 	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
 	appSummaryDisplayer.AppDisplay(summary, false)
 	return nil
+}
+
+func shouldShowCurrentScale(err error) bool {
+	if err == nil {
+		return true
+	}
+
+	if _, ok := err.(actionerror.AllInstancesCrashedError); ok {
+		return true
+	}
+
+	return false
 }

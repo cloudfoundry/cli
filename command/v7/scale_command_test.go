@@ -339,7 +339,7 @@ var _ = Describe("scale Command", func() {
 							Expect(err).ToNot(HaveOccurred())
 						})
 
-						When("polling succeeds", func() {
+						When("polling succeeds and the app has running instances", func() {
 							BeforeEach(func() {
 								fakeActor.PollStartReturns(v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}, nil)
 							})
@@ -443,6 +443,30 @@ var _ = Describe("scale Command", func() {
 
 								Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
 								Expect(fakeActor.StartApplicationArgsForCall(0)).To(Equal("some-app-guid"))
+							})
+						})
+
+						When("polling succeeds but all the app's instances have crashed", func() {
+							BeforeEach(func() {
+								fakeActor.PollStartReturns(v7action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}, actionerror.AllInstancesCrashedError{})
+							})
+
+							It("delegates the right appGUID", func() {
+								Expect(fakeActor.PollStartArgsForCall(0)).To(Equal("some-app-guid"))
+							})
+
+							It("displays the process table", func () {
+								Expect(testUI.Out).To(Say("Showing current scale of app " + appName))
+							})
+
+							It("displays all warnings and fails", func() {
+								Expect(testUI.Err).To(Say("some-poll-warning-1"))
+								Expect(testUI.Err).To(Say("some-poll-warning-2"))
+
+								Expect(executeErr).To(MatchError(translatableerror.ApplicationUnableToStartError{
+									AppName: appName,
+									BinaryName: binaryName,
+								}))
 							})
 						})
 

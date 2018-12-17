@@ -306,7 +306,7 @@ var _ = Describe("scale command", func() {
 						Eventually(session).Should(Say(`This will cause the app to restart\. Are you sure you want to scale %s\? \[yN\]:`, appName))
 						Eventually(session).Should(Say(`Stopping app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say(`Starting app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-						Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Exit(1))
 
 						appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(appTable.Processes).To(HaveLen(2))
