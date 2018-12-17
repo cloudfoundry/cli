@@ -455,7 +455,7 @@ var _ = Describe("scale Command", func() {
 								Expect(fakeActor.PollStartArgsForCall(0)).To(Equal("some-app-guid"))
 							})
 
-							It("displays the process table", func () {
+							It("displays the process table", func() {
 								Expect(testUI.Out).To(Say("Showing current scale of app " + appName))
 							})
 
@@ -464,7 +464,7 @@ var _ = Describe("scale Command", func() {
 								Expect(testUI.Err).To(Say("some-poll-warning-2"))
 
 								Expect(executeErr).To(MatchError(translatableerror.ApplicationUnableToStartError{
-									AppName: appName,
+									AppName:    appName,
 									BinaryName: binaryName,
 								}))
 							})
