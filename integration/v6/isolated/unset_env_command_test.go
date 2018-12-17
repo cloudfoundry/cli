@@ -11,20 +11,6 @@ import (
 )
 
 var _ = Describe("unset-env command", func() {
-	var (
-		orgName    string
-		spaceName  string
-		appName    string
-		envVarName string
-	)
-
-	BeforeEach(func() {
-		orgName = helpers.NewOrgName()
-		spaceName = helpers.NewSpaceName()
-		appName = helpers.PrefixedRandomName("app")
-		envVarName = "SOME_ENV_VAR"
-	})
-
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
