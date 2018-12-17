@@ -153,4 +153,163 @@ var _ = Describe("Service Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetServicesWithPlansForBroker", func() {
+		When("the broker has no services", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns([]ccv2.Service{}, nil, nil)
+			})
+
+			It("returns no services", func() {
+				servicesWithPlans, _, err := actor.GetServicesWithPlansForBroker("some-broker-guid")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(servicesWithPlans).To(HaveLen(0))
+			})
+		})
+
+		When("there is a service with no plans", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns(
+					[]ccv2.Service{
+						{
+							GUID:  "some-service-guid-1",
+							Label: "some-service-label-1",
+						},
+					},
+					nil, nil)
+
+				fakeCloudControllerClient.GetServicePlansReturns([]ccv2.ServicePlan{}, nil, nil)
+			})
+
+			It("returns a service with no plans", func() {
+				servicesWithPlans, _, err := actor.GetServicesWithPlansForBroker("some-broker-guid")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(servicesWithPlans).To(HaveLen(1))
+				Expect(servicesWithPlans).To(HaveKeyWithValue(
+					Service{GUID: "some-service-guid-1", Label: "some-service-label-1"},
+					[]ServicePlan{},
+				))
+			})
+		})
+
+		When("there are services with plans", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns(
+					[]ccv2.Service{
+						{
+							GUID:  "some-service-guid-1",
+							Label: "some-service-label-1",
+						},
+						{
+							GUID:  "some-service-guid-2",
+							Label: "some-service-label-2",
+						},
+					},
+					ccv2.Warnings{"get-service-warning"}, nil)
+
+				fakeCloudControllerClient.GetServicePlansReturnsOnCall(0,
+					[]ccv2.ServicePlan{
+						{
+							GUID: "some-plan-guid-1",
+							Name: "some-plan-name-1",
+						},
+						{
+							GUID: "some-plan-guid-2",
+							Name: "some-plan-name-2",
+						},
+					},
+					ccv2.Warnings{"get-plan-warning"}, nil)
+				fakeCloudControllerClient.GetServicePlansReturnsOnCall(1,
+					[]ccv2.ServicePlan{
+						{
+							GUID: "some-plan-guid-3",
+							Name: "some-plan-name-3",
+						},
+						{
+							GUID: "some-plan-guid-4",
+							Name: "some-plan-name-4",
+						},
+					},
+					nil, nil)
+			})
+
+			It("returns a single service with associated plans and warnings", func() {
+				servicesWithPlans, warnings, err := actor.GetServicesWithPlansForBroker("some-broker-guid")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(servicesWithPlans).To(HaveLen(2))
+				Expect(servicesWithPlans).To(HaveKeyWithValue(
+					Service{GUID: "some-service-guid-1", Label: "some-service-label-1"},
+					[]ServicePlan{
+						{GUID: "some-plan-guid-1", Name: "some-plan-name-1"},
+						{GUID: "some-plan-guid-2", Name: "some-plan-name-2"},
+					},
+				))
+				Expect(servicesWithPlans).To(HaveKeyWithValue(
+					Service{GUID: "some-service-guid-2", Label: "some-service-label-2"},
+					[]ServicePlan{
+						{GUID: "some-plan-guid-3", Name: "some-plan-name-3"},
+						{GUID: "some-plan-guid-4", Name: "some-plan-name-4"},
+					},
+				))
+				Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicesArgsForCall(0)).To(ConsistOf(ccv2.Filter{
+					Type:     constant.ServiceBrokerGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-broker-guid"},
+				}))
+
+				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(2))
+				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(0)).To(ConsistOf(ccv2.Filter{
+					Type:     constant.ServiceGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-service-guid-1"},
+				}))
+				Expect(fakeCloudControllerClient.GetServicePlansArgsForCall(1)).To(ConsistOf(ccv2.Filter{
+					Type:     constant.ServiceGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-service-guid-2"},
+				}))
+
+				Expect(warnings).To(ConsistOf("get-service-warning", "get-plan-warning"))
+			})
+		})
+
+		When("fetching services returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns([]ccv2.Service{}, ccv2.Warnings{"get-service-warning"}, errors.New("EXPLODE"))
+			})
+
+			It("propagates the error and warnings", func() {
+				_, warnings, err := actor.GetServicesWithPlansForBroker("some-broker-guid")
+				Expect(err).To(MatchError("EXPLODE"))
+
+				Expect(warnings).To(ConsistOf("get-service-warning"))
+			})
+		})
+
+		When("fetching plans for a service returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns(
+					[]ccv2.Service{
+						{
+							GUID:  "some-service-guid-1",
+							Label: "some-service-label-1",
+						},
+					},
+					ccv2.Warnings{"get-service-warning"}, nil)
+
+				fakeCloudControllerClient.GetServicePlansReturns([]ccv2.ServicePlan{}, ccv2.Warnings{"get-plan-warning"}, errors.New("EXPLODE"))
+			})
+
+			It("propagates the error and warnings", func() {
+				_, warnings, err := actor.GetServicesWithPlansForBroker("some-broker-guid")
+				Expect(err).To(MatchError("EXPLODE"))
+
+				Expect(warnings).To(ConsistOf("get-service-warning", "get-plan-warning"))
+			})
+		})
+	})
 })
