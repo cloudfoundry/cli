@@ -417,6 +417,7 @@ func (Actor) generateArchiveCFIgnoreMatcher(files []*zip.File) (*ignore.GitIgnor
 
 func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.GitIgnore, error) {
 	pathToCFIgnore := filepath.Join(sourceDir, ".cfignore")
+	log.WithField("pathToCFIgnore", pathToCFIgnore).Debug("using ignore file")
 
 	additionalIgnoreLines := DefaultIgnoreLines
 
