@@ -31,7 +31,7 @@ type ScaleCommand struct {
 	MemoryLimit         flag.Megabytes `short:"m" required:"false" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	ProcessType         string         `long:"process" default:"web" description:"App process to scale"`
 	usage               interface{}    `usage:"CF_NAME scale APP_NAME [--process PROCESS] [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"`
-	relatedCommands     interface{}    `related_commands:"v3-push"`
+	relatedCommands     interface{}    `related_commands:"push"`
 	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
 	UI          command.UI

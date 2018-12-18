@@ -118,6 +118,7 @@ type commandList struct {
 	PurgeServiceInstance               v6.PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
 	PurgeServiceOffering               v6.PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"`
 	Push                               v7.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
+	V3Push                             v7.PushCommand                               `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
 	Quotas                             v6.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	Quota                              v6.QuotaCommand                              `command:"quota" description:"Show quota info"`
 	RemoveNetworkPolicy                v6.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`
