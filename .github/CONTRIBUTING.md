@@ -37,8 +37,8 @@ Before working on a PR to the CLI code base, please:
 After reaching out to the CLI team and the conclusion is to make a PR, please follow these steps:
 
 1. Ensure that you have either:
-   * completed our [Contributor License Agreement (CLA) for individuals](https://www.cloudfoundry.org/pdfs/CFF_Individual_CLA.pdf), 
-   * or, are a [public member](https://help.github.com/articles/publicizing-or-hiding-organization-membership/) of an organization 
+   * completed our [Contributor License Agreement (CLA) for individuals](https://www.cloudfoundry.org/pdfs/CFF_Individual_CLA.pdf),
+   * or, are a [public member](https://help.github.com/articles/publicizing-or-hiding-organization-membership/) of an organization
    that has signed [the corporate CLA](https://www.cloudfoundry.org/pdfs/CFF_Corporate_CLA.pdf).
 1. Review the CF CLI [Style Guide](https://github.com/cloudfoundry/cli/wiki/CF-CLI-Style-Guide),
    [Architecture Guide](https://github.com/cloudfoundry/cli/wiki/Architecture-Guide),

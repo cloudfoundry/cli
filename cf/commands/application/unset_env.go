@@ -35,7 +35,8 @@ func (cmd *UnsetEnv) SetDependency(deps commandregistry.Dependency, pluginCall b
 func (cmd *UnsetEnv) MetaData() commandregistry.CommandMetadata {
 	return commandregistry.CommandMetadata{
 		Name:        "unset-env",
-		Description: T("Remove an env variable"),
+		ShortName:   "ue",
+		Description: T("Remove an env variable from an app"),
 		Usage: []string{
 			T("CF_NAME unset-env APP_NAME ENV_VAR_NAME"),
 		},

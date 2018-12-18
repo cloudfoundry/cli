@@ -185,7 +185,7 @@ type commandList struct {
 	UnbindStagingSecurityGroup         v6.UnbindStagingSecurityGroupCommand         `command:"unbind-staging-security-group" description:"Unbind a security group from the set of security groups for staging applications"`
 	UninstallPlugin                    plugin.UninstallPluginCommand                `command:"uninstall-plugin" description:"Uninstall CLI plugin"`
 	UnmapRoute                         v6.UnmapRouteCommand                         `command:"unmap-route" description:"Remove a url route from an app"`
-	UnsetEnv                           v7.UnsetEnvCommand                           `command:"unset-env" description:"Remove an env variable from an app"`
+	UnsetEnv                           v7.UnsetEnvCommand                           `command:"unset-env" alias:"ue" description:"Remove an env variable from an app"`
 	UnsetOrgRole                       v6.UnsetOrgRoleCommand                       `command:"unset-org-role" description:"Remove an org role from a user"`
 	UnsetSpaceQuota                    v6.UnsetSpaceQuotaCommand                    `command:"unset-space-quota" description:"Unassign a quota from a space"`
 	UnsetSpaceRole                     v6.UnsetSpaceRoleCommand                     `command:"unset-space-role" description:"Remove a space role from a user"`
