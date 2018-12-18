@@ -1,8 +1,6 @@
 package isolated
 
 import (
-	"fmt"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -23,7 +21,7 @@ var _ = Describe("unset-env command", func() {
 				Eventually(session).Should(Say("ALIAS:"))
 				Eventually(session).Should(Say("ue"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("env, set-env, v3-apps, v3-restart, v3-stage"))
+				Eventually(session).Should(Say("apps, env, restart, set-running-environment-variable-group, set-staging-environment-variable-group"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
