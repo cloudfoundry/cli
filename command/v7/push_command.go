@@ -52,6 +52,7 @@ type PushCommand struct {
 	DockerImage         flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername      string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	HealthCheckType     flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type: 'port' (default), 'process', 'http' (implies endpoint '/')"`
+	Instances           flag.Instances              `long:"instances" short:"i" description:"Number of instances"`
 	PathToManifest      flag.PathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
 	Memory              flag.Megabytes              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
@@ -373,6 +374,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		DockerPassword:    dockerPassword,
 		DockerUsername:    cmd.DockerUsername,
 		HealthCheckType:   cmd.HealthCheckType.Type,
+		Instances:         cmd.Instances.NullInt,
 		Memory:            cmd.Memory.NullUint64,
 		ProvidedAppPath:   string(cmd.AppPath),
 		SkipRouteCreation: cmd.NoRoute,

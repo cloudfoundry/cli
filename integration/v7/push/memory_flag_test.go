@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("push with flags and no manifest", func() {
+var _ = Describe("push with memory flag", func() {
 	var (
 		appName string
 	)

@@ -31,6 +31,7 @@ type FlagOverrides struct {
 	DockerPassword    string
 	DockerUsername    string
 	HealthCheckType   constant.HealthCheckType
+	Instances         types.NullInt
 	Memory            types.NullUint64
 	ProvidedAppPath   string
 	SkipRouteCreation bool

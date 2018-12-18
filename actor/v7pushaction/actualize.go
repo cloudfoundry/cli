@@ -242,13 +242,14 @@ func (actor Actor) CreatePackage(state PushState, progressBar ProgressBar, warni
 }
 
 func (actor Actor) ScaleProcess(state PushState, warningsStream chan Warnings, eventStream chan Event) error {
-	if state.Overrides.Memory.IsSet {
+	if shouldScaleProcess(state) {
 		log.Info("Scaling Web Process")
 		eventStream <- ScaleWebProcess
 
 		process := v7action.Process{
 			Type:       constant.ProcessTypeWeb,
 			MemoryInMB: state.Overrides.Memory,
+			Instances:  state.Overrides.Instances,
 		}
 		scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(state.Application.GUID, process)
 		warningsStream <- Warnings(scaleWarnings)
@@ -259,6 +260,10 @@ func (actor Actor) ScaleProcess(state PushState, warningsStream chan Warnings, e
 	}
 
 	return nil
+}
+
+func shouldScaleProcess(state PushState) bool {
+	return state.Overrides.Memory.IsSet || state.Overrides.Instances.IsSet
 }
 
 func (actor Actor) UpdateProcess(state PushState, warningsStream chan Warnings, eventStream chan Event) error {
