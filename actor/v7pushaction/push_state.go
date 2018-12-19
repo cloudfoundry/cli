@@ -2,6 +2,7 @@ package v7pushaction
 
 import (
 	"fmt"
+	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -83,7 +84,22 @@ func (actor Actor) Conceptualize(appName string, spaceGUID string, orgGUID strin
 		bitsPath = flagOverrides.ProvidedAppPath
 	}
 
-	resources, err := actor.SharedActor.GatherDirectoryResources(bitsPath)
+	info, err := os.Stat(bitsPath)
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
+
+	var archive bool
+	var resources []sharedaction.Resource
+	if info.IsDir() {
+		resources, err = actor.SharedActor.GatherDirectoryResources(bitsPath)
+	} else {
+		archive = true
+		resources, err = actor.SharedActor.GatherArchiveResources(bitsPath)
+	}
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
 
 	desiredState := []PushState{
 		{
@@ -93,6 +109,7 @@ func (actor Actor) Conceptualize(appName string, spaceGUID string, orgGUID strin
 			Overrides:   flagOverrides,
 			Manifest:    manifest,
 
+			Archive:      archive,
 			BitsPath:     bitsPath,
 			AllResources: resources,
 		},

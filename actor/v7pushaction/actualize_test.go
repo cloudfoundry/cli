@@ -672,16 +672,36 @@ var _ = Describe("Actualize", func() {
 				}
 			})
 
-			It("creates the archive", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+			When("the bits path is an archive", func() {
+				BeforeEach(func() {
+					state.Archive = true
+				})
 
-				Eventually(fakeSharedActor.ZipDirectoryResourcesCallCount).Should(Equal(1))
-				bitsPath, resources := fakeSharedActor.ZipDirectoryResourcesArgsForCall(0)
-				Expect(bitsPath).To(Equal("/some-bits-path"))
-				Expect(resources).To(ConsistOf(sharedaction.Resource{
-					Filename: "some-filename",
-					Size:     6,
-				}))
+				It("creates the archive", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+
+					Eventually(fakeSharedActor.ZipArchiveResourcesCallCount).Should(Equal(1))
+					bitsPath, resources := fakeSharedActor.ZipArchiveResourcesArgsForCall(0)
+					Expect(bitsPath).To(Equal("/some-bits-path"))
+					Expect(resources).To(ConsistOf(sharedaction.Resource{
+						Filename: "some-filename",
+						Size:     6,
+					}))
+				})
+			})
+
+			When("The bits path is a directory", func() {
+				It("creates the archive", func() {
+					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+
+					Eventually(fakeSharedActor.ZipDirectoryResourcesCallCount).Should(Equal(1))
+					bitsPath, resources := fakeSharedActor.ZipDirectoryResourcesArgsForCall(0)
+					Expect(bitsPath).To(Equal("/some-bits-path"))
+					Expect(resources).To(ConsistOf(sharedaction.Resource{
+						Filename: "some-filename",
+						Size:     6,
+					}))
+				})
 			})
 
 			When("the archive creation is successful", func() {

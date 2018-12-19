@@ -145,7 +145,7 @@ func (actor Actor) CreateAndUploadApplicationBits(state PushState, progressBar P
 	log.WithField("Path", state.BitsPath).Info(string(CreatingArchive))
 
 	eventStream <- CreatingArchive
-	archivePath, err := actor.SharedActor.ZipDirectoryResources(state.BitsPath, state.AllResources)
+	archivePath, err := actor.GetArchivePath(state)
 	if err != nil {
 		return v7action.Package{}, err
 	}
@@ -239,6 +239,13 @@ func (actor Actor) CreatePackage(state PushState, progressBar ProgressBar, warni
 	}
 
 	return actor.CreateAndUploadApplicationBits(state, progressBar, warningsStream, eventStream)
+}
+
+func (actor Actor) GetArchivePath(state PushState) (string, error) {
+	if state.Archive {
+		return actor.SharedActor.ZipArchiveResources(state.BitsPath, state.AllResources)
+	}
+	return actor.SharedActor.ZipDirectoryResources(state.BitsPath, state.AllResources)
 }
 
 func (actor Actor) ScaleProcess(state PushState, warningsStream chan Warnings, eventStream chan Event) error {

@@ -2,6 +2,7 @@ package v7pushaction_test
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -165,21 +166,28 @@ var _ = Describe("Push State", func() {
 			})
 
 			When("an app path is provided in the command line settings", func() {
+				var providedPath string
+
 				BeforeEach(func() {
-					flagOverrides.ProvidedAppPath = "my-app-path"
+					archive, err := ioutil.TempFile("", "push-state-provided-path")
+					Expect(err).ToNot(HaveOccurred())
+					defer archive.Close()
+
+					providedPath = archive.Name()
+					flagOverrides.ProvidedAppPath = providedPath
 				})
 
 				It("sets the bits path to the provided app path", func() {
-					Expect(states[0].BitsPath).To(Equal("my-app-path"))
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(states[0].BitsPath).To(Equal(providedPath))
 				})
 			})
 		})
 
-		Describe("all resources", func() {
+		Describe("all resources/archive", func() {
 			When("the app resources are given as a directory", func() {
-				var resources []sharedaction.Resource
-
 				When("gathering the resources is successful", func() {
+					var resources []sharedaction.Resource
 
 					BeforeEach(func() {
 						resources = []sharedaction.Resource{
@@ -191,15 +199,73 @@ var _ = Describe("Push State", func() {
 					})
 
 					It("adds the gathered resources to the push state", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(1))
 						Expect(fakeSharedActor.GatherDirectoryResourcesArgsForCall(0)).To(Equal(pwd))
 						Expect(states[0].AllResources).To(Equal(resources))
+					})
+
+					It("sets Archive to false", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(states[0].Archive).To(BeFalse())
 					})
 				})
 
 				When("gathering the resources errors", func() {
 					BeforeEach(func() {
 						fakeSharedActor.GatherDirectoryResourcesReturns(nil, errors.New("kaboom"))
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError("kaboom"))
+					})
+				})
+			})
+
+			When("the app resources are given as an archive", func() {
+				var archivePath string
+
+				BeforeEach(func() {
+					archive, err := ioutil.TempFile("", "push-state-archive")
+					Expect(err).ToNot(HaveOccurred())
+					defer archive.Close()
+
+					archivePath = archive.Name()
+					flagOverrides.ProvidedAppPath = archivePath
+				})
+
+				AfterEach(func() {
+					Expect(os.RemoveAll(archivePath)).ToNot(HaveOccurred())
+				})
+
+				When("gathering the resources is successful", func() {
+					var resources []sharedaction.Resource
+
+					BeforeEach(func() {
+						resources = []sharedaction.Resource{
+							{
+								Filename: "fake-app-file",
+							},
+						}
+						fakeSharedActor.GatherArchiveResourcesReturns(resources, nil)
+					})
+
+					It("adds the gathered resources to the push state", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeSharedActor.GatherArchiveResourcesCallCount()).To(Equal(1))
+						Expect(fakeSharedActor.GatherArchiveResourcesArgsForCall(0)).To(Equal(archivePath))
+						Expect(states[0].AllResources).To(Equal(resources))
+					})
+
+					It("sets Archive to true", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(states[0].Archive).To(BeTrue())
+					})
+				})
+
+				When("gathering the resources errors", func() {
+					BeforeEach(func() {
+						fakeSharedActor.GatherArchiveResourcesReturns(nil, errors.New("kaboom"))
 					})
 
 					It("returns the error", func() {
