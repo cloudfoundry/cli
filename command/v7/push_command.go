@@ -115,12 +115,17 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	err = cmd.ValidateFlags()
 	if err != nil {
 		return err
 	}
 
 	overrides, err := cmd.GetFlagOverrides()
+	if err != nil {
+		return err
+	}
+
+	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
 	}
@@ -381,4 +386,31 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		StartCommand:      cmd.StartCommand.FilteredString,
 		NoStart:           cmd.NoStart,
 	}, nil
+}
+
+func (cmd PushCommand) ValidateFlags() error {
+	switch {
+	case cmd.DockerUsername != "" && cmd.DockerImage.Path == "":
+		return translatableerror.RequiredFlagsError{
+			Arg1: "--docker-image, -o",
+			Arg2: "--docker-username",
+		}
+
+	case cmd.DockerImage.Path != "" && cmd.Buildpacks != nil:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--buildpack, -b",
+				"--docker-image, -o",
+			},
+		}
+
+	case cmd.DockerImage.Path != "" && cmd.AppPath != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--docker-image, -o",
+				"--path, -p",
+			},
+		}
+	}
+	return nil
 }

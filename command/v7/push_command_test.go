@@ -24,6 +24,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gstruct"
@@ -199,6 +200,16 @@ var _ = Describe("push Command", func() {
 
 			It("displays the experimental warning", func() {
 				Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+			})
+
+			When("invalid flags are passed", func() {
+				BeforeEach(func() {
+					cmd.DockerUsername = "some-docker-username"
+				})
+
+				It("returns a validation error", func() {
+					Expect(executeErr).To(MatchError(translatableerror.RequiredFlagsError{Arg1: "--docker-image, -o", Arg2: "--docker-username"}))
+				})
 			})
 
 			Describe("manifest", func() {
@@ -681,4 +692,33 @@ var _ = Describe("push Command", func() {
 			})
 		})
 	})
+
+	DescribeTable("ValidateFlags returns an error",
+		func(setup func(), expectedErr error) {
+			setup()
+			err := cmd.ValidateFlags()
+			Expect(err).To(MatchError(expectedErr))
+		},
+
+		Entry("when docker username flag is passed *without* docker flag",
+			func() {
+				cmd.DockerUsername = "some-docker-username"
+			},
+			translatableerror.RequiredFlagsError{Arg1: "--docker-image, -o", Arg2: "--docker-username"}),
+
+		Entry("when docker and buildpacks flags are passed",
+			func() {
+				cmd.DockerImage.Path = "some-docker-image"
+				cmd.Buildpacks = []string{"some-buildpack"}
+			},
+			translatableerror.ArgumentCombinationError{Args: []string{"--buildpack, -b", "--docker-image, -o"}}),
+
+		Entry("when docker and path flags are passed",
+			func() {
+				cmd.DockerImage.Path = "some-docker-image"
+				cmd.AppPath = "some-directory-path"
+			},
+			translatableerror.ArgumentCombinationError{Args: []string{"--docker-image, -o", "--path, -p"}}),
+	)
+
 })
