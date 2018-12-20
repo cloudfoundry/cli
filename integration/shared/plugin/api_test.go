@@ -1,5 +1,3 @@
-// +build !partialPush
-
 package plugin
 
 import (
