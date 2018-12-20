@@ -25,14 +25,8 @@ ginkgo_int = ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60
 
 ifndef TARGET_V7
 TARGET = v6
-TAGS=''
 else
 TARGET = v7
-ifdef RUN_V7_PUSH_TESTS
-TAGS=''
-else
-TAGS='partialPush'
-endif
 endif
 
 all: test build
@@ -78,7 +72,7 @@ integration-experimental: build integration-cleanup integration-shared-experimen
 
 integration-experimental-shared: integration-shared-experimental
 integration-shared-experimental: build integration-cleanup ## Run experimental integration tests that are shared between v6 and v7
-	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/experimental
+	$(ginkgo_int) -nodes $(NODES) integration/shared/experimental
 
 integration-experimental-versioned: integration-versioned-experimental
 integration-versioned-experimental: build integration-cleanup ## Run experimental integration tests that are specific to your CLI version
@@ -88,27 +82,27 @@ integration-global: build integration-cleanup integration-shared-global integrat
 
 integration-global-shared: integration-shared-global
 integration-shared-global: build integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are shared between v6 and v7
-	$(ginkgo_int) -tags=$(TAGS) integration/shared/global
+	$(ginkgo_int) integration/shared/global
 
 integration-global-versioned: integration-versioned-global
 integration-versioned-global: build integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are specific to your CLI version
-	$(ginkgo_int) -tags=$(TAGS) integration/$(TARGET)/global
+	$(ginkgo_int) integration/$(TARGET)/global
 
 integration-isolated: build integration-cleanup integration-shared-isolated integration-isolated-versioned ## Run all parallel-enabled integration tests, both versioned and shared across versions
 
 integration-isolated-shared: integration-shared-isolated
 integration-shared-isolated: build integration-cleanup ## Run all parallel-enabled integration tests that are shared between v6 and v7
-	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/isolated
+	$(ginkgo_int) -nodes $(NODES) integration/shared/isolated
 
 integration-isolated-versioned: integration-versioned-isolated
 integration-versioned-isolated: build integration-cleanup ## Run all parallel-enabled integration tests, both versioned and shared across versions
-	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/$(TARGET)/isolated
+	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/isolated
 
 integration-plugin: build integration-cleanup ## Run all plugin-related integration tests
-	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/shared/plugin
+	$(ginkgo_int) -nodes $(NODES) integration/shared/plugin
 
 integration-push: build integration-cleanup  ## Run all push-related integration tests
-	$(ginkgo_int) -nodes $(NODES) -tags=$(TAGS) integration/$(TARGET)/push
+	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/push
 
 integration-tests: build integration-cleanup integration-isolated integration-push integration-global ## Run all isolated, push, and global integration tests
 
