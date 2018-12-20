@@ -4,6 +4,7 @@ package configv3_test
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -71,25 +72,63 @@ var _ = Describe("Verbose", func() {
 		Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo/bar", "/baz", true, true, []string{"/foo/bar", "/baz"}),
 	)
 
-	Context("relative paths (cannot be tested in DescribeTable)", func() {
-		It("resolves relative paths into absolute paths", func() {
-			configTrace := "foo/bar"
+	Context("paths that cannot be tested in DescribeTable", func() {
+		Describe("relative paths", func() {
+			It("resolves relative paths into absolute paths", func() {
+				configTrace := "foo/bar"
 
-			rawConfig := fmt.Sprintf(`{ "Trace":"%s" }`, configTrace)
-			setConfig(homeDir, rawConfig)
+				rawConfig := fmt.Sprintf(`{ "Trace":"%s" }`, configTrace)
+				setConfig(homeDir, rawConfig)
 
-			cfTrace := "foo2/bar2"
-			Expect(os.Setenv("CF_TRACE", cfTrace)).ToNot(HaveOccurred())
-			defer os.Unsetenv("CF_TRACE")
+				cfTrace := "foo2/bar2"
+				Expect(os.Setenv("CF_TRACE", cfTrace)).ToNot(HaveOccurred())
+				defer os.Unsetenv("CF_TRACE")
 
-			config, err := LoadConfig(FlagOverride{})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(config).ToNot(BeNil())
+				config, err := LoadConfig(FlagOverride{})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
 
-			cwd, err := os.Getwd()
-			Expect(err).ToNot(HaveOccurred())
-			_, parsedLocation := config.Verbose()
-			Expect(parsedLocation).To(Equal([]string{filepath.Join(cwd, cfTrace), filepath.Join(cwd, configTrace)}))
+				cwd, err := os.Getwd()
+				Expect(err).ToNot(HaveOccurred())
+				_, parsedLocation := config.Verbose()
+				Expect(parsedLocation).To(Equal([]string{filepath.Join(cwd, cfTrace), filepath.Join(cwd, configTrace)}))
+			})
+		})
+
+		Describe("symlinks", func() {
+			var tempDir, ogLogPath, symlinkLogPath string
+
+			BeforeEach(func() {
+				var err error
+				tempDir, err = ioutil.TempDir("", "config-trace")
+				Expect(err).ToNot(HaveOccurred())
+
+				tempDirAbs, err := filepath.EvalSymlinks(tempDir)
+				Expect(err).ToNot(HaveOccurred())
+				ogLogPath = filepath.Join(tempDirAbs, "og.log")
+				err = ioutil.WriteFile(ogLogPath, nil, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				symlinkLogPath = filepath.Join(tempDirAbs, "sym.log")
+				err = os.Symlink(ogLogPath, symlinkLogPath)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
+			})
+
+			It("resolves symlinks into absolute paths", func() {
+				rawConfig := fmt.Sprintf(`{ "Trace":"%s" }`, symlinkLogPath)
+				setConfig(homeDir, rawConfig)
+
+				config, err := LoadConfig(FlagOverride{})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+
+				_, parsedLocation := config.Verbose()
+				Expect(parsedLocation).To(ConsistOf(ogLogPath))
+			})
 		})
 	})
 })

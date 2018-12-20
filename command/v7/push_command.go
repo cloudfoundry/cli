@@ -104,7 +104,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	currentDir, err := os.Getwd()
 	cmd.PWD = currentDir
 
-	return nil
+	return err
 }
 
 func (cmd PushCommand) Execute(args []string) error {

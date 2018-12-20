@@ -417,7 +417,10 @@ func (Actor) generateArchiveCFIgnoreMatcher(files []*zip.File) (*ignore.GitIgnor
 
 func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.GitIgnore, error) {
 	pathToCFIgnore := filepath.Join(sourceDir, ".cfignore")
-	log.WithField("pathToCFIgnore", pathToCFIgnore).Debug("using ignore file")
+	log.WithFields(log.Fields{
+		"pathToCFIgnore": pathToCFIgnore,
+		"sourceDir":      sourceDir,
+	}).Debug("using ignore file")
 
 	additionalIgnoreLines := DefaultIgnoreLines
 
@@ -429,11 +432,12 @@ func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.G
 		}
 	}
 
+	log.Debugf("ignore rules: %v", additionalIgnoreLines)
+
 	if _, err := os.Stat(pathToCFIgnore); !os.IsNotExist(err) {
 		return ignore.CompileIgnoreFileAndLines(pathToCFIgnore, additionalIgnoreLines...)
-	} else {
-		return ignore.CompileIgnoreLines(additionalIgnoreLines...)
 	}
+	return ignore.CompileIgnoreLines(additionalIgnoreLines...)
 }
 
 func (Actor) findInResources(path string, filesToInclude []Resource) (Resource, bool) {

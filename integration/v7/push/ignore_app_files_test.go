@@ -2,7 +2,6 @@ package push
 
 import (
 	"io/ioutil"
-	"os"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -96,25 +95,20 @@ var _ = Describe("ignoring files while gathering resources", func() {
 	})
 
 	When("the CF_TRACE file is in the app source directory", func() {
-		var previousEnv string
-
-		AfterEach(func() {
-			err := os.Setenv("CF_TRACE", previousEnv)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
 		It("does not push it", func() {
-			Skip("fixed in #162741432")
 			helpers.WithHelloWorldApp(func(dir string) {
 				traceFilePath := filepath.Join(dir, "i-am-trace.txt")
 				err := ioutil.WriteFile(traceFilePath, nil, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
-				previousEnv = os.Getenv("CF_TRACE")
-				err = os.Setenv("CF_TRACE", traceFilePath)
-				Expect(err).ToNot(HaveOccurred())
-
-				session := helpers.DebugCustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp, "--no-start")
+				session := helpers.DebugCustomCF(helpers.CFEnv{
+					WorkingDirectory: dir,
+					EnvVars: map[string]string{
+						"CF_TRACE": traceFilePath,
+					},
+				},
+					PushCommandName, firstApp, "--no-start",
+				)
 
 				Eventually(session.Err).Should(Say("zipped_file_count=2"))
 				Eventually(session).Should(Exit(0))

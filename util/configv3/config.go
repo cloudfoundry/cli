@@ -53,8 +53,8 @@ func (config *Config) TerminalWidth() int {
 }
 
 // Verbose returns true if verbose should be displayed to terminal, in addition
-// a slice of full paths in which verbose text will appear. This is based off
-// of:
+// a slice of absolute paths in which verbose text will appear. This is based
+// off of:
 //   - The config file's trace value (true/false/file path)
 //   - The $CF_TRACE enviroment variable if set (true/false/file path)
 //   - The '-v/--verbose' global flag
@@ -88,6 +88,10 @@ func (config *Config) Verbose() (bool, []string) {
 	for i, path := range filePath {
 		if !filepath.IsAbs(path) {
 			filePath[i] = filepath.Join(config.detectedSettings.currentDirectory, path)
+		}
+		resolvedPath, err := filepath.EvalSymlinks(filePath[i])
+		if err == nil {
+			filePath[i] = resolvedPath
 		}
 	}
 
