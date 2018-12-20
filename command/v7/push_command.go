@@ -57,7 +57,7 @@ type PushCommand struct {
 	Memory              flag.Megabytes              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
 	NoStart             bool                        `long:"no-start" description:"Do not stage and start the app after pushing"`
-	AppPath             flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	AppPath             flag.PathWithExistenceCheck `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	StartCommand        flag.Command                `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
 	dockerPassword      interface{}                 `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
 	usage               interface{}                 `usage:"CF_NAME push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route] [--no-start]\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start]"`
