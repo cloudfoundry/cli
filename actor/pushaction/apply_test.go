@@ -587,7 +587,7 @@ var _ = Describe("Apply", func() {
 						Expect(nextEvent()).To(Equal(RetryUpload))
 
 						Consistently(nextEvent).ShouldNot(EqualEither(RetryUpload, UploadDropletComplete, Complete))
-						Eventually(fakeV2Actor.UploadDropletCallCount()).Should(Equal(3))
+						Eventually(fakeV2Actor.UploadDropletCallCount).Should(Equal(3))
 						Expect(errorStream).To(Receive(MatchError(actionerror.UploadFailedError{Err: someErr})))
 					})
 				})
@@ -684,7 +684,7 @@ var _ = Describe("Apply", func() {
 								Expect(nextEvent()).To(Equal(RetryUpload))
 
 								Consistently(nextEvent).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
-								Eventually(fakeV2Actor.UploadApplicationPackageCallCount()).Should(Equal(3))
+								Eventually(fakeV2Actor.UploadApplicationPackageCallCount).Should(Equal(3))
 								Expect(errorStream).To(Receive(MatchError(actionerror.UploadFailedError{Err: someErr})))
 							})
 
