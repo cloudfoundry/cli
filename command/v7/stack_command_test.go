@@ -1,8 +1,9 @@
 package v7_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/v7action"
 	"errors"
+
+	"code.cloudfoundry.org/cli/actor/v7action"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -63,8 +64,8 @@ var _ = Describe("Stack Command", func() {
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(0))
-				Expect(checkTargetedOrg).To(BeTrue())
-				Expect(checkTargetedSpace).To(BeTrue())
+				Expect(checkTargetedOrg).To(BeFalse())
+				Expect(checkTargetedSpace).To(BeFalse())
 			})
 		})
 

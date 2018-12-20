@@ -41,7 +41,7 @@ func (cmd *StackCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *StackCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}
@@ -58,10 +58,8 @@ func (cmd *StackCommand) Execute(args []string) error {
 		}
 		cmd.UI.DisplayText(stack.GUID)
 	} else {
-		cmd.UI.DisplayTextWithFlavor("Getting stack {{.StackName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("Getting stack {{.StackName}} as {{.Username}}...", map[string]interface{}{
 			"StackName": cmd.RequiredArgs.StackName,
-			"OrgName":   cmd.Config.TargetedOrganization().Name,
-			"SpaceName": cmd.Config.TargetedSpace().Name,
 			"Username":  user.Name,
 		})
 		cmd.UI.DisplayNewline()
