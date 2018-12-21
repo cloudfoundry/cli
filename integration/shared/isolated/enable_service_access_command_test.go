@@ -168,7 +168,7 @@ var _ = Describe("enable service access command", func() {
 					))
 				})
 
-				When("service is already enabled for an org", func() {
+				When("service is already enabled for an org for a plan", func() {
 					BeforeEach(func() {
 						session := helpers.CF("enable-service-access", service, "-p", servicePlan, "-o", orgName)
 						Eventually(session).Should(Say("OK"))
@@ -189,6 +189,23 @@ var _ = Describe("enable service access command", func() {
 							servicePlan,
 						))
 
+					})
+
+					When("enabling access globally", func() {
+						It("should disbale org level access first", func() {
+							session := helpers.CF("enable-service-access", service)
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							session = helpers.CF("service-access", "-e", service)
+							Eventually(session).Should(Exit(0))
+							Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+							Eventually(session).Should(Say("%s\\s+%s\\s+all",
+								service,
+								servicePlan,
+							))
+							Consistently(session).ShouldNot(Say(orgName))
+						})
 					})
 				})
 			})
@@ -295,7 +312,42 @@ var _ = Describe("enable service access command", func() {
 
 			Context("when access is already globally enabled", func() {
 				BeforeEach(func() {
-					helpers.CF("enable-service-access", service)
+					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+				})
+
+				When("when we try to enable access for an org", func() {
+					It("should still be enabled only globally", func() {
+						session := helpers.CF("enable-service-access", service, "-o", orgName)
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("service-access", "-e", service)
+						Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+						Eventually(session).Should(Say("%s\\s+%s\\s+all",
+							service,
+							servicePlan,
+						))
+						Consistently(session).ShouldNot(Say(orgName))
+
+					})
+				})
+
+				When("when we try to enable access for an org for a plan", func() {
+					It("should still be enabled only globally", func() {
+						session := helpers.CF("enable-service-access", service, "-o", orgName, "-p", servicePlan)
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("service-access", "-e", service)
+						Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+						Eventually(session).Should(Say("%s\\s+%s\\s+all",
+							service,
+							servicePlan,
+						))
+						Consistently(session).ShouldNot(Say(orgName))
+					})
 				})
 
 				When("the service already has access globally enabled", func() {

@@ -306,6 +306,24 @@ var _ = Describe("Service Access", func() {
 				Expect(enablePlanErr).NotTo(HaveOccurred())
 			})
 
+			When("the plan is already globally enabled", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns(
+						[]ccv2.ServicePlan{
+							{Name: "plan-2", GUID: "service-plan-guid-2", Public: true},
+						},
+						nil, nil)
+				})
+
+				It("should not create org visibility", func() {
+					Expect(enablePlanErr).ToNot(HaveOccurred())
+					Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
+
+					Expect(fakeCloudControllerClient.CreateServicePlanVisibilityCallCount()).To(Equal(0))
+				})
+			})
+
 			When("warnings are raised", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.CreateServicePlanVisibilityReturns(ccv2.ServicePlanVisibility{}, []string{"foo", "bar"}, nil)
@@ -495,6 +513,29 @@ var _ = Describe("Service Access", func() {
 				Expect(orgGUID2).To(Equal("org-guid-1"))
 				Expect([]string{planGUID1, planGUID2}).To(ConsistOf([]string{"service-plan-guid-1", "service-plan-guid-2"}))
 			})
+
+			When("service is already enabled for all orgs for a plan", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServicePlansReturns(
+						[]ccv2.ServicePlan{
+							{Name: "plan-1", GUID: "service-plan-guid-1", Public: true},
+							{Name: "plan-2", GUID: "service-plan-guid-2", Public: false},
+						},
+						nil,
+						nil)
+				})
+
+				It("does not create service plan visibility for the org", func() {
+					Expect(enableServiceForOrgErr).NotTo(HaveOccurred())
+					Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
+
+					Expect(fakeCloudControllerClient.CreateServicePlanVisibilityCallCount()).To(Equal(1))
+					planGUID1, orgGUID1 := fakeCloudControllerClient.CreateServicePlanVisibilityArgsForCall(0)
+					Expect(orgGUID1).To(Equal("org-guid-1"))
+					Expect(planGUID1).To(Equal("service-plan-guid-2"))
+				})
+			})
 		})
 
 		When("getting services fails", func() {
@@ -623,6 +664,42 @@ var _ = Describe("Service Access", func() {
 			planGuid, public = fakeCloudControllerClient.UpdateServicePlanArgsForCall(1)
 			Expect(planGuid).To(Equal("service-plan-guid-2"))
 			Expect(public).To(BeTrue())
+		})
+
+		When("the service is already enabled for orgs individually", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicePlanVisibilitiesReturns(
+					[]ccv2.ServicePlanVisibility{
+						{GUID: "service-visibility-guid-1"},
+					},
+					nil, nil)
+			})
+
+			It("first disables the plan in both orgs", func() {
+				Expect(fakeCloudControllerClient.GetServicePlanVisibilitiesCallCount()).To(Equal(2))
+
+				filters := fakeCloudControllerClient.GetServicePlanVisibilitiesArgsForCall(0)
+				Expect(filters[0].Type).To(Equal(constant.ServicePlanGUIDFilter))
+				Expect(filters[0].Operator).To(Equal(constant.EqualOperator))
+				Expect(filters[0].Values).To(Equal([]string{"service-plan-guid-1"}))
+
+				Expect(fakeCloudControllerClient.DeleteServicePlanVisibilityCallCount()).To(Equal(2))
+			})
+
+			When("deleting service plan visibilities fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteServicePlanVisibilityReturns(
+						[]string{"visibility-warning"}, errors.New("delete-visibility-error"))
+				})
+
+				It("propagates the error", func() {
+					Expect(enableServiceErr).To(MatchError(errors.New("delete-visibility-error")))
+				})
+
+				It("returns the warnings", func() {
+					Expect(enableServiceWarnings).To(Equal(Warnings{"visibility-warning"}))
+				})
+			})
 		})
 
 		When("the service does not exist", func() {
