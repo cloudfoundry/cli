@@ -51,7 +51,7 @@ cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 
 cf delete-org -f temp-org
 
-for stack in $(cf stacks | tail -n +5 | awk '{print $1}'); do
+for stack in $(cf stacks | tail -n +4 | grep -v name | awk '{print $1}'); do
   cf buildpacks | \
     grep -i ^integration-buildpack | \
     grep -i -e \\s${stack} | \
