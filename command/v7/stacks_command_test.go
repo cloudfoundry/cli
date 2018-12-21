@@ -110,8 +110,8 @@ var _ = Describe("stacks Command", func() {
 		When("everything is perfect", func() {
 			BeforeEach(func() {
 				stacks := []v7action.Stack{
+					{Name: "Stack2", Description: "desc2"},
 					{Name: "stack1", Description: "desc1"},
-					{Name: "stack2", Description: "desc2"},
 				}
 				fakeActor.GetStacksReturns(stacks, v7action.Warnings{"warning-1", "warning-2"}, nil)
 			})
@@ -125,10 +125,10 @@ var _ = Describe("stacks Command", func() {
 				Expect(testUI.Err).To(Say(`warning-2`))
 			})
 
-			It("prints the list of stacks", func() {
+			It("prints the list of stacks in alphabetical order", func() {
 				Expect(testUI.Out).To(Say(tableHeaders))
 				Expect(testUI.Out).To(Say(`stack1\s+desc1`))
-				Expect(testUI.Out).To(Say(`stack2\s+desc2`))
+				Expect(testUI.Out).To(Say(`Stack2\s+desc2`))
 			})
 
 			It("prints the flavor text", func() {

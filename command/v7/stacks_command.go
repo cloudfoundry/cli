@@ -1,11 +1,14 @@
 package v7
 
 import (
+	"sort"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/util/sorting"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -67,6 +70,8 @@ func (cmd StacksCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+
+	sort.Slice(stacks, func(i, j int) bool { return sorting.LessIgnoreCase(stacks[i].Name, stacks[j].Name) })
 
 	displayTable(stacks, cmd.UI)
 
