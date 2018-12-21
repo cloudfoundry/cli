@@ -69,7 +69,7 @@ var _ = Describe("Stack Command", func() {
 			})
 		})
 
-		When("the user is not logged in", func() {
+		When("retrieving user information errors", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -78,7 +78,6 @@ var _ = Describe("Stack Command", func() {
 			})
 
 			It("return an error", func() {
-				Expect(fakeActor.GetStackByNameCallCount()).To(Equal(0))
 				Expect(executeErr).To(Equal(expectedErr))
 			})
 		})

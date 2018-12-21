@@ -46,40 +46,44 @@ func (cmd *StackCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	stack, err := cmd.getStack(cmd.RequiredArgs.StackName)
 	if err != nil {
 		return err
 	}
 
 	if cmd.GUID {
-		stack, err := cmd.getStack(cmd.RequiredArgs.StackName)
-		if err != nil {
-			return err
-		}
-		cmd.UI.DisplayText(stack.GUID)
-	} else {
-		cmd.UI.DisplayTextWithFlavor("Getting stack {{.StackName}} as {{.Username}}...", map[string]interface{}{
-			"StackName": cmd.RequiredArgs.StackName,
-			"Username":  user.Name,
-		})
-		cmd.UI.DisplayNewline()
-
-		stack, err := cmd.getStack(cmd.RequiredArgs.StackName)
-		if err != nil {
-			return err
-		}
-
-		cmd.UI.DisplayKeyValueTable("", [][]string{
-			{cmd.UI.TranslateText("name:"), stack.Name},
-			{cmd.UI.TranslateText("description:"), stack.Description},
-		}, 3)
+		return cmd.displayStackGUID(stack)
 	}
 
-	return nil
+	return cmd.displayStackInfo(stack)
 }
 
 func (cmd *StackCommand) getStack(stackName string) (v7action.Stack, error) {
 	stack, warnings, err := cmd.Actor.GetStackByName(cmd.RequiredArgs.StackName)
 	cmd.UI.DisplayWarnings(warnings)
 	return stack, err
+}
+
+func (cmd *StackCommand) displayStackGUID(stack v7action.Stack) error {
+	cmd.UI.DisplayText(stack.GUID)
+	return nil
+}
+
+func (cmd *StackCommand) displayStackInfo(stack v7action.Stack) error {
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Getting stack {{.StackName}} as {{.Username}}...", map[string]interface{}{
+		"StackName": cmd.RequiredArgs.StackName,
+		"Username":  user.Name,
+	})
+	cmd.UI.DisplayNewline()
+
+	cmd.UI.DisplayKeyValueTable("", [][]string{
+		{cmd.UI.TranslateText("name:"), stack.Name},
+		{cmd.UI.TranslateText("description:"), stack.Description},
+	}, 3)
+	return nil
 }
