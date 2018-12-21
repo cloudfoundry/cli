@@ -6,7 +6,7 @@ import (
 
 type AlphabetSorter func([]string) func(i, j int) bool
 
-// LessIgnoreCase returns true if first
+// LessIgnoreCase returns true if first is alphabetically less than second.
 func LessIgnoreCase(first string, second string) bool {
 	iRunes := []rune(first)
 	jRunes := []rune(second)
@@ -23,14 +23,11 @@ func LessIgnoreCase(first string, second string) bool {
 		lir := unicode.ToLower(ir)
 		ljr := unicode.ToLower(jr)
 
-		if lir != ljr {
-			return lir < ljr
+		if lir == ljr {
+			continue
 		}
 
-		// the lowercase runes are the same, so compare the original
-		if ir != jr {
-			return ir < jr
-		}
+		return lir < ljr
 	}
 
 	return false
