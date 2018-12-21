@@ -38,6 +38,20 @@ configure_infrastructure_pipeline() {
     -v pool-name=$potato
 }
 
+configure_lola_pipeline() {
+  local name=$1
+  local creds=$2
+  local potato=$3
+
+  printf "configuring the $name pipeline...\n"
+
+  fly -t ci set-pipeline \
+    -p $name \
+    -c $pipelines_path/infrastructure/lola-pipeline.yml \
+    -l <(lpass show "Concourse Credentials" --notes) \
+    -l <(lpass show "$creds" --notes)
+}
+
 configure_legacy_infrastructure_pipeline() {
   local name=$1
   local creds=$2
@@ -87,6 +101,8 @@ configure_infrastructure_pipeline inf-hardknox hardknox-pipeline baked-potato
 configure_infrastructure_pipeline inf-lovingcup lovingcup-pipeline baked-potato
 configure_infrastructure_pipeline inf-tartine tartine-pipeline baked-potato
 configure_infrastructure_pipeline inf-arsicault arsicault-pipeline deep-fried-potato
+
+configure_lola_pipeline inf-lola lola-pipeline
 
 configure_legacy_infrastructure_pipeline inf-homeroom homeroom-pipeline moldy-gnocchi
 

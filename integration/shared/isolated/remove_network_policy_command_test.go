@@ -133,7 +133,7 @@ var _ = Describe("remove-network-policy command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("curl", fmt.Sprintf("/networking/v1/external/policies?source_id=%s&dest_id=%s", sourceAppGUID, appGUID))
+					session = helpers.CF("curl", fmt.Sprintf("/networking/v1/external/policies?id=%s", sourceAppGUID))
 					Eventually(session).Should(Exit(0))
 					Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(`{
 						"total_policies": 1,
@@ -152,7 +152,7 @@ var _ = Describe("remove-network-policy command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("curl", fmt.Sprintf("/networking/v1/external/policies?source_id=%s&dest_id=%s", sourceAppGUID, appGUID))
+					session = helpers.CF("curl", fmt.Sprintf("/networking/v1/external/policies?id=%s", sourceAppGUID))
 					Eventually(session).Should(Exit(0))
 					Expect(string(session.Out.Contents())).To(MatchJSON(`{ "total_policies": 0, "policies": [] }`))
 				})

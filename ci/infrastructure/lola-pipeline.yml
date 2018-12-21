@@ -1,0 +1,182 @@
+---
+groups:
+- name: create
+  jobs:
+  - deploy
+- name: delete
+  jobs:
+  - delete-cf
+  - delete-infrastructure
+
+resources:
+- name: cf-deployment-concourse-tasks
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks
+    tag_filter: v5.3
+- name: cli-ci
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    path: ci
+- name: cf-deployment
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-deployment
+    tag_filter: v1.7.0
+- name: bosh-deployment
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/bosh-deployment
+    version:
+      ref: 52e46d73007b363dcd68b428951a0337608ce057
+- name: state
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-private
+    private_key: ((cli-private-github-private-key))
+    branch: master
+    paths:
+    - ci/infrastructure/((stack-name))/bbl-state.json
+# - name: gcp-bosh-pool
+#   type: pool
+#   source:
+#     uri: git@github.com:cloudfoundry/cli-pools
+#     private_key: ((cli-pools-github-private-key))
+#     branch: master
+#     pool: ((pool-name))
+
+jobs:
+- name: deploy
+  serial_groups: [((stack-name))]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment
+    - get: cf-deployment-concourse-tasks
+    - get: state
+    # - put: gcp-bosh-pool
+    #   params:
+    #     claim: ((stack-name)).cli.fun
+    - get: cli-ci
+    - get: bosh-deployment
+  - task: setup-infrastructure
+    file: cf-deployment-concourse-tasks/bbl-up/task.yml
+    input_mapping:
+      env-repo: state
+      ops-files: state
+    params:
+      BBL_IAAS: gcp
+      BBL_GCP_SERVICE_ACCOUNT_KEY: ((google-account-creds))
+      BBL_GCP_PROJECT_ID: ((gcp-project))
+      BBL_GCP_REGION: us-central1
+      BBL_GCP_ZONE: us-central1-a #TODO param it
+      BBL_LB_CERT: ((ssl-cert))
+      BBL_LB_KEY: ((ssl-cert-private-key))
+      LB_DOMAIN: ((stack-name)).cli.fun
+      BBL_ENV_NAME: ((stack-name))
+      BBL_STATE_DIR: ci/infrastructure/((stack-name))
+  - task: upload-stemcell
+    file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
+    input_mapping:
+      env-repo: state
+    params:
+      INFRASTRUCTURE: google
+      BBL_STATE_DIR: ci/infrastructure/((stack-name))
+  - task: create-vars-file
+    file: cli-ci/ci/infrastructure/tasks/create-vars-file.yml
+    params:
+      CLIENT_SECRET: ((client-secret))
+  - task: copy-ops-files
+    file: cli-ci/ci/infrastructure/tasks/combine-inputs.yml
+    input_mapping:
+      input1: cf-deployment
+      input2: cli-ci
+    params:
+      COPY_PATHS: "input1/operations/scale-to-one-az.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input1/operations/use-compiled-releases.yml input2/ci/infrastructure/operations/default-app-memory.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml input2/ci/infrastructure/operations/uaa-vm_type-override.yml input2/ci/infrastructure/operations/add-uaa-client-credentials.yml input2/ci/infrastructure/operations/add-dummy-windows-stack.yml input2/ci/infrastructure/operations/reduce-async-service-polling.yml input2/ci/infrastructure/operations/add-oidc-provider.yml input2/ci/infrastructure/operations/adjust-user-retry-attempts.yml"
+  - task: deploy-cf
+    file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
+    input_mapping:
+      env-repo: state
+      vars-files: vars_path
+      vars-store: state # actually, we are using credhub but this param is required
+      ops-files: combine_inputs_output
+    params:
+      SYSTEM_DOMAIN: ((stack-name)).cli.fun
+      OPS_FILES: "add-persistent-isolation-segment-diego-cell.yml use-compiled-releases.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml uaa-vm_type-override.yml add-uaa-client-credentials.yml add-dummy-windows-stack.yml reduce-async-service-polling.yml adjust-user-retry-attempts.yml"
+      USE_VARS_STORE: false
+      VARS_FILES: vars.yml
+      BBL_STATE_DIR: ci/infrastructure/((stack-name))
+  - task: bosh-cleanup
+    file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
+    input_mapping:
+      env-repo: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/((stack-name))
+      CLEAN_ALL: true
+  ensure:
+    aggregate:
+      - put: state
+        params:
+          repository: updated-env-repo
+          rebase: true
+      # - put: gcp-bosh-pool
+      #   params:
+      #     release: gcp-bosh-pool
+
+- name: delete-cf
+  serial_groups: [((stack-name))]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+    # - put: gcp-bosh-pool
+    #   params:
+    #     claim: ((stack-name)).cli.fun
+  - task: delete-cf-deployment
+    file: cf-deployment-concourse-tasks/bosh-delete-deployment/task.yml
+    input_mapping:
+      env-repo: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/((stack-name))
+      IGNORE_ERRORS: true
+  # ensure:
+  #   put: gcp-bosh-pool
+  #   params:
+  #     release: gcp-bosh-pool
+
+- name: delete-infrastructure
+  serial_groups: [((stack-name))]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+    # - put: gcp-bosh-pool
+    #   params:
+    #     claim: ((stack-name)).cli.fun
+  - task: bosh-cleanup
+    file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
+    input_mapping:
+      env-repo: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/((stack-name))
+      CLEAN_ALL: true
+  - task: destroy-infrastructure
+    file: cf-deployment-concourse-tasks/bbl-destroy/task.yml
+    input_mapping:
+      env-repo: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/((stack-name))
+      BBL_GCP_SERVICE_ACCOUNT_KEY: ((google-account-creds))
+  ensure:
+    aggregate:
+    - put: state
+      params:
+        repository: updated-env-repo
+        rebase: true
+    # - put: gcp-bosh-pool
+    #   params:
+    #     release: gcp-bosh-pool

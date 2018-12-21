@@ -63,7 +63,7 @@ var _ = Describe("buildpacks command", func() {
 			buildpackNameRegex := `staticfile_buildpack`
 			positionRegex := `\d+`
 			boolRegex := `(true|false)`
-			buildpackFileRegex := `staticfile-buildpack-\S+`
+			buildpackFileRegex := `staticfile[-_]buildpack-\S+`
 			stackRegex := `(cflinuxfs[23]|windows.+)`
 
 			Eventually(session).Should(Say(fmt.Sprintf(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, buildpackNameRegex,
@@ -86,7 +86,7 @@ var _ = Describe("buildpacks command", func() {
 			buildpackNameRegex := `staticfile_buildpack`
 			positionRegex := `\d+`
 			boolRegex := `(true|false)`
-			buildpackFileRegex := `staticfile_buildpack-\S+`
+			buildpackFileRegex := `staticfile[-_]buildpack-\S+`
 
 			Eventually(session).Should(Say(fmt.Sprintf(`%s\s+%s\s+%s\s+%s\s+%s\n`, buildpackNameRegex,
 				positionRegex, boolRegex, boolRegex, buildpackFileRegex)))
