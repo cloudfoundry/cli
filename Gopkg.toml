@@ -88,9 +88,8 @@ required = ["github.com/gorilla/websocket"]
   name = "github.com/google/go-querystring"
 
 [[constraint]]
-  branch = "cli-vendor"
+  branch = "master"
   name = "github.com/jessevdk/go-flags"
-  source = "github.com/XenoPhex/go-flags"
 
 [[constraint]]
   name = "github.com/kr/pty"

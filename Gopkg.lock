@@ -307,13 +307,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "cli-vendor"
-  digest = "1:1ba4ae8812d32010781560a81c1ce5c4cdada40cbc563d83b63926be34545030"
+  branch = "master"
+  digest = "1:55a63f420e0ef5af8380d646d9d695182e7d4bd2a096321414dfd27c98d5da70"
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "dac4e0ac4cd75079a03e408685a6140ef57a6aa3"
-  source = "github.com/XenoPhex/go-flags"
+  revision = "c0795c8afcf41dd1d786bebce68636c199b3bb45"
 
 [[projects]]
   digest = "1:ad12bc5658839e7c9ffb20bd84624c4d3fc2264f212c00188fc10cc6aba3c42b"
