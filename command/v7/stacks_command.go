@@ -52,6 +52,16 @@ func (cmd StacksCommand) Execute(args []string) error {
 		return err
 	}
 
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Getting stacks as {{.Username}}...", map[string]interface{}{
+		"Username": user.Name,
+	})
+	cmd.UI.DisplayNewline()
+
 	stacks, warnings, err := cmd.Actor.GetStacks()
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
