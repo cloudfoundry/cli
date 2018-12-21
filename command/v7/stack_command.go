@@ -46,16 +46,11 @@ func (cmd *StackCommand) Execute(args []string) error {
 		return err
 	}
 
-	stack, err := cmd.getStack(cmd.RequiredArgs.StackName)
-	if err != nil {
-		return err
-	}
-
 	if cmd.GUID {
-		return cmd.displayStackGUID(stack)
+		return cmd.displayStackGUID()
 	}
 
-	return cmd.displayStackInfo(stack)
+	return cmd.displayStackInfo()
 }
 
 func (cmd *StackCommand) getStack(stackName string) (v7action.Stack, error) {
@@ -64,12 +59,17 @@ func (cmd *StackCommand) getStack(stackName string) (v7action.Stack, error) {
 	return stack, err
 }
 
-func (cmd *StackCommand) displayStackGUID(stack v7action.Stack) error {
+func (cmd *StackCommand) displayStackGUID() error {
+	stack, err := cmd.getStack(cmd.RequiredArgs.StackName)
+	if err != nil {
+		return err
+	}
+
 	cmd.UI.DisplayText(stack.GUID)
 	return nil
 }
 
-func (cmd *StackCommand) displayStackInfo(stack v7action.Stack) error {
+func (cmd *StackCommand) displayStackInfo() error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
@@ -80,6 +80,11 @@ func (cmd *StackCommand) displayStackInfo(stack v7action.Stack) error {
 		"Username":  user.Name,
 	})
 	cmd.UI.DisplayNewline()
+
+	stack, err := cmd.getStack(cmd.RequiredArgs.StackName)
+	if err != nil {
+		return err
+	}
 
 	cmd.UI.DisplayKeyValueTable("", [][]string{
 		{cmd.UI.TranslateText("name:"), stack.Name},
