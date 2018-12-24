@@ -24,3 +24,6 @@ RUN curl -L https://github.com/cloudfoundry-incubator/credhub-cli/releases/downl
 
 # install bbl
 RUN curl -L https://github.com/cloudfoundry/bosh-bootloader/releases/download/v6.9.16/bbl-v6.9.16_linux_x86-64 --output /usr/local/bin/bbl && chmod 0755 /usr/local/bin/bbl
+
+# install bbl v5.6.11 for legacy environment
+RUN curl -L https://github.com/cloudfoundry/bosh-bootloader/releases/download/v5.11.6/bbl-v5.11.6_linux_x86-64 --output /usr/local/bin/bbl5 && chmod 0755 /usr/local/bin/bbl5
