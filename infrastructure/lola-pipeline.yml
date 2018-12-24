@@ -39,13 +39,13 @@ resources:
     branch: master
     paths:
     - ci/infrastructure/((stack-name))/bbl-state.json
-# - name: gcp-bosh-pool
-#   type: pool
-#   source:
-#     uri: git@github.com:cloudfoundry/cli-pools
-#     private_key: ((cli-pools-github-private-key))
-#     branch: master
-#     pool: ((pool-name))
+- name: gcp-bosh-pool
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/cli-pools
+    private_key: ((cli-pools-github-private-key))
+    branch: master
+    pool: ((pool-name))
 
 jobs:
 - name: deploy
@@ -56,9 +56,9 @@ jobs:
     - get: cf-deployment
     - get: cf-deployment-concourse-tasks
     - get: state
-    # - put: gcp-bosh-pool
-    #   params:
-    #     claim: ((stack-name)).cli.fun
+    - put: gcp-bosh-pool
+      params:
+        claim: ((stack-name)).cli.fun
     - get: cli-ci
     - get: bosh-deployment
   - task: setup-infrastructure
@@ -121,9 +121,9 @@ jobs:
         params:
           repository: updated-env-repo
           rebase: true
-      # - put: gcp-bosh-pool
-      #   params:
-      #     release: gcp-bosh-pool
+      - put: gcp-bosh-pool
+        params:
+          release: gcp-bosh-pool
 
 - name: delete-cf
   serial_groups: [((stack-name))]
@@ -132,9 +132,9 @@ jobs:
   - aggregate:
     - get: cf-deployment-concourse-tasks
     - get: state
-    # - put: gcp-bosh-pool
-    #   params:
-    #     claim: ((stack-name)).cli.fun
+    - put: gcp-bosh-pool
+      params:
+        claim: ((stack-name)).cli.fun
   - task: delete-cf-deployment
     file: cf-deployment-concourse-tasks/bosh-delete-deployment/task.yml
     input_mapping:
@@ -142,10 +142,10 @@ jobs:
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
       IGNORE_ERRORS: true
-  # ensure:
-  #   put: gcp-bosh-pool
-  #   params:
-  #     release: gcp-bosh-pool
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: gcp-bosh-pool
 
 - name: delete-infrastructure
   serial_groups: [((stack-name))]
@@ -154,9 +154,9 @@ jobs:
   - aggregate:
     - get: cf-deployment-concourse-tasks
     - get: state
-    # - put: gcp-bosh-pool
-    #   params:
-    #     claim: ((stack-name)).cli.fun
+    - put: gcp-bosh-pool
+      params:
+        claim: ((stack-name)).cli.fun
   - task: bosh-cleanup
     file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
     input_mapping:
@@ -177,6 +177,6 @@ jobs:
       params:
         repository: updated-env-repo
         rebase: true
-    # - put: gcp-bosh-pool
-    #   params:
-    #     release: gcp-bosh-pool
+    - put: gcp-bosh-pool
+      params:
+        release: gcp-bosh-pool
