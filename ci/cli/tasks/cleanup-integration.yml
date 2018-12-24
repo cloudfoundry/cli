@@ -33,17 +33,18 @@ run:
       pushd vars-store/ci/infrastructure/$ENV
         if [[ "$(cat bbl-state.json | jq -r '.bblVersion')" =~ v5 ]]; then
           eval "$(bbl5 print-env)"
-          credhub login --username=credhub-cli --password="$CREDHUB_PASSWORD" --server="$CREDHUB_SERVER"
+          export HTTPS_PROXY="$BOSH_ALL_PROXY"
+          credhub1 login --username=credhub-cli --password="$CREDHUB_PASSWORD" --server="$CREDHUB_SERVER"
+
+          export CF_INT_PASSWORD=$(credhub1 get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
         else
           eval "$(bbl print-env)"
           credhub login
 
-          # TODO: move this to common code once OIDC is added to lola
           export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+          export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
         fi
       popd
-
-      export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
     fi
 
     set -x
