@@ -49,7 +49,8 @@ configure_lola_pipeline() {
     -p $name \
     -c $pipelines_path/infrastructure/lola-pipeline.yml \
     -l <(lpass show "Concourse Credentials" --notes) \
-    -l <(lpass show "$creds" --notes)
+    -l <(lpass show "$creds" --notes) \
+    -v pool-name=$potato
 }
 
 configure_legacy_infrastructure_pipeline() {
@@ -102,7 +103,7 @@ configure_infrastructure_pipeline inf-lovingcup lovingcup-pipeline baked-potato
 configure_infrastructure_pipeline inf-tartine tartine-pipeline baked-potato
 configure_infrastructure_pipeline inf-arsicault arsicault-pipeline deep-fried-potato
 
-configure_lola_pipeline inf-lola lola-pipeline
+configure_lola_pipeline inf-lola lola-pipeline kloesse
 
 configure_legacy_infrastructure_pipeline inf-homeroom homeroom-pipeline moldy-gnocchi
 
