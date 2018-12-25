@@ -32,8 +32,9 @@ run:
     else
       pushd vars-store/ci/infrastructure/$ENV
         if [[ "$(cat bbl-state.json | jq -r '.bblVersion')" =~ v5 ]]; then
-          eval "$(bbl5 print-env)"
-          export HTTPS_PROXY="$BOSH_ALL_PROXY"
+          eval "$(bbl5 print-env | grep -v '^ssh')"
+          export JUMPBOX_IP=$(bosh int vars/jumpbox-vars-file.yml --path /external_ip)
+          export CREDHUB_PROXY="ssh+socks5://jumpbox@${JUMPBOX_IP}:22?private-key=$JUMPBOX_PRIVATE_KEY"
           credhub1 login --username=credhub-cli --password="$CREDHUB_PASSWORD" --server="$CREDHUB_SERVER"
 
           export CF_INT_PASSWORD=$(credhub1 get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)

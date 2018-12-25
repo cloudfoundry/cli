@@ -173,14 +173,6 @@ resources:
     uri: git@github.com:cloudfoundry/cli-pools
     private_key: ((cli-pools-github-private-key))
     branch: master
-    pool: moldy-gnocchi
-
-- name: new-legacy-gcp-bosh-pool
-  type: pool
-  source:
-    uri: git@github.com:cloudfoundry/cli-pools
-    private_key: ((cli-pools-github-private-key))
-    branch: master
     pool: kloesse
 
 - name: cf-cli-tracker
@@ -252,7 +244,6 @@ groups:
   - integration-linux
   - integration-windows
   - integration-legacy
-  - integration-new-legacy
   - cats
   - integration-experimental
   - create-installers
@@ -478,46 +469,6 @@ jobs:
     params:
       release: bosh-lock
 
-- name: integration-new-legacy
-  serial: true
-  plan:
-  - aggregate:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-      trigger: true
-    - get: cli-ci
-    - get: vars-store
-    - put: bosh-lock
-      resource: new-legacy-gcp-bosh-pool
-      params:
-        acquire: true
-  - do:
-    - task: cleanup-integration
-      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: integration
-      file: cli-ci/ci/cli/tasks/integration-linux.yml
-      params:
-        <<: *integration_params
-        NODES: 12
-        CF_INT_CLIENT_ID: ~ # TODO add OIDC
-        CF_INT_CLIENT_SECRET: ~
-      on_failure:
-        put: slack-alert
-        params:
-          channel: '#cli-eng'
-          text: |
-            Legacy integration failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-      ensure:
-        task: cleanup-integration
-        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-  ensure:
-    put: new-legacy-gcp-bosh-pool
-    params:
-      release: bosh-lock
-
 - name: integration-legacy
   serial: true
   plan:
@@ -536,15 +487,11 @@ jobs:
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-      params:
-        ARGS: unbind-first
     - task: integration
       file: cli-ci/ci/cli/tasks/integration-linux.yml
       params:
         <<: *integration_params
-        CF_INT_IGNORE_API_VERSION_CHECK: false
         NODES: 12
-        HONEYCOMB_DATASET: "Integration Legacy"
       on_failure:
         put: slack-alert
         params:
@@ -555,8 +502,6 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-        params:
-          ARGS: unbind-first
   ensure:
     put: legacy-gcp-bosh-pool
     params:

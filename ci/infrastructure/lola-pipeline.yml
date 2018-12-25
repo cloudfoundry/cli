@@ -71,7 +71,7 @@ jobs:
       BBL_GCP_SERVICE_ACCOUNT_KEY: ((google-account-creds))
       BBL_GCP_PROJECT_ID: ((gcp-project))
       BBL_GCP_REGION: us-central1
-      BBL_GCP_ZONE: us-central1-a #TODO param it
+      BBL_GCP_ZONE: us-central1-a
       BBL_LB_CERT: ((ssl-cert))
       BBL_LB_KEY: ((ssl-cert-private-key))
       LB_DOMAIN: ((stack-name)).cli.fun
