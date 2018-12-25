@@ -23,7 +23,7 @@ RUN curl -L https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-5.2.2-linux-amd
 RUN curl -L https://github.com/cloudfoundry-incubator/credhub-cli/releases/download/2.0.0/credhub-linux-2.0.0.tgz --output /tmp/credhub.tgz && tar -xzf /tmp/credhub.tgz -C /usr/local/bin && chmod 0755 /usr/local/bin/credhub
 
 # install credhub v1.5.3 for legacy environment
-RUN curl -L https://github.com/cloudfoundry-incubator/credhub-cli/releases/download/1.5.3/credhub-linux-1.5.3.tgz --output /tmp/credhub.tgz && tar -xzf /tmp/credhub.tgz && mv credhub /usr/local/bin/credhub1 && chmod 0755 /usr/local/bin/credhub1
+RUN curl -L https://github.com/cloudfoundry-incubator/credhub-cli/releases/download/1.6.0/credhub-linux-1.6.0.tgz --output /tmp/credhub.tgz && tar -xzf /tmp/credhub.tgz && mv credhub /usr/local/bin/credhub1 && chmod 0755 /usr/local/bin/credhub1
 
 # install bbl
 RUN curl -L https://github.com/cloudfoundry/bosh-bootloader/releases/download/v6.9.16/bbl-v6.9.16_linux_x86-64 --output /usr/local/bin/bbl && chmod 0755 /usr/local/bin/bbl
