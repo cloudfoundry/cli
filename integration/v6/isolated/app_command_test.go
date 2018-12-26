@@ -289,7 +289,7 @@ applications:
 				When("the app uses multiple buildpacks", func() {
 					BeforeEach(func() {
 						// Until version 3.43, droplets did not list all buildpacks they were built with (#150068339).
-						helpers.SkipIfVersionLessThan("3.43")
+						helpers.SkipIfVersionLessThan("3.43.0")
 
 						helpers.WithMultiBuildpackApp(func(appDir string) {
 							Eventually(helpers.CF("v3-push", appName, "-p", appDir, "-b", "ruby_buildpack", "-b", "go_buildpack")).Should(Exit(0))
