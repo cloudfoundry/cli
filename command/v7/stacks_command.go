@@ -87,6 +87,6 @@ func displayTable(stacks []v7action.Stack, display command.UI) {
 			keyValueTable = append(keyValueTable, []string{stack.Name, stack.Description})
 		}
 
-		display.DisplayKeyValueTable("", keyValueTable, ui.DefaultTableSpacePadding)
+		display.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
 	}
 }
