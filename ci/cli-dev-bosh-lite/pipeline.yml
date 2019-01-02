@@ -283,7 +283,7 @@ jobs:
         input_mapping:
           env-pool: pool-repo
         params:
-          MIN_UNCLAIMED_COUNT: 1
+          MIN_UNCLAIMED_COUNT: 3
           GIT_USERNAME: ((git-username))
           GIT_EMAIL: ((git-email))
       - put: pool-repo
