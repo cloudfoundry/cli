@@ -608,6 +608,27 @@ var _ = Describe("Service Instance Summary Actions", func() {
 								Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsCallCount()).To(Equal(1))
 								Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
 							})
+
+							When("a ResourceNotFoundError is encountered getting the service bindings", func() {
+								var expectedErr error
+
+								BeforeEach(func() {
+									expectedErr = ccerror.ResourceNotFoundError{}
+									fakeCloudControllerClient.GetServiceInstanceServiceBindingsReturns(
+										[]ccv2.ServiceBinding{},
+										ccv2.Warnings{"get-service-bindings-warning"},
+										expectedErr)
+								})
+
+								It("returns no error", func() {
+									Expect(summaryErr).ToNot(HaveOccurred())
+									Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-plan-warning", "get-service-warning", "get-service-bindings-warning"))
+
+									Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsCallCount()).To(Equal(1))
+									Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
+								})
+							})
+
 						})
 
 						When("no errors are encountered getting the service bindings", func() {
@@ -739,6 +760,21 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 					It("should return the error and return all warnings", func() {
 						Expect(summaryErr).To(MatchError("some-get-user-provided-si-bindings-error"))
+						Expect(summaryWarnings).To(ConsistOf("some-get-user-provided-si-bindings-warnings",
+							"get-space-service-instance-warning"))
+					})
+				})
+
+				Context("getting the service bindings errors with ResourceNotFoundError", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsReturns(
+							nil,
+							ccv2.Warnings{"some-get-user-provided-si-bindings-warnings"},
+							ccerror.ResourceNotFoundError{})
+					})
+
+					It("should return the error and return all warnings", func() {
+						Expect(summaryErr).ToNot(HaveOccurred())
 						Expect(summaryWarnings).To(ConsistOf("some-get-user-provided-si-bindings-warnings",
 							"get-space-service-instance-warning"))
 					})

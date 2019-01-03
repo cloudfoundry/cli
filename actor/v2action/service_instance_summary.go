@@ -208,7 +208,9 @@ func (actor Actor) getSummaryInfoCompositeForInstance(spaceGUID string, serviceI
 		allWarnings = append(allWarnings, bindingsWarnings...)
 		if err != nil {
 			log.WithField("GUID", serviceInstance.GUID).Errorln("looking up service binding:", err)
-			return serviceInstanceSummary, allWarnings, err
+			if _, ok := err.(ccerror.ResourceNotFoundError); !ok {
+				return serviceInstanceSummary, allWarnings, err
+			}
 		}
 	} else {
 		log.Debug("service is user provided")
@@ -218,7 +220,9 @@ func (actor Actor) getSummaryInfoCompositeForInstance(spaceGUID string, serviceI
 		allWarnings = append(allWarnings, bindingsWarnings...)
 		if err != nil {
 			log.WithField("service_instance_guid", serviceInstance.GUID).Errorln("looking up service bindings:", err)
-			return serviceInstanceSummary, allWarnings, err
+			if _, ok := err.(ccerror.ResourceNotFoundError); !ok {
+				return serviceInstanceSummary, allWarnings, err
+			}
 		}
 	}
 
