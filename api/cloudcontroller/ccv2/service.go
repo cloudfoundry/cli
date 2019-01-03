@@ -19,6 +19,8 @@ type Service struct {
 	// DocumentationURL is a url that points to a documentation page for the
 	// service.
 	DocumentationURL string
+	// ServiceBrokerName is the name of the broker providing this service.
+	ServiceBrokerName string
 	// Extra is a field with extra data pertaining to the service.
 	Extra ServiceExtra
 }
@@ -28,10 +30,11 @@ func (service *Service) UnmarshalJSON(data []byte) error {
 	var ccService struct {
 		Metadata internal.Metadata
 		Entity   struct {
-			Label            string `json:"label"`
-			Description      string `json:"description"`
-			DocumentationURL string `json:"documentation_url"`
-			Extra            string `json:"extra"`
+			Label             string `json:"label"`
+			Description       string `json:"description"`
+			DocumentationURL  string `json:"documentation_url"`
+			ServiceBrokerName string `json:"service_broker_name"`
+			Extra             string `json:"extra"`
 		}
 	}
 
@@ -44,6 +47,7 @@ func (service *Service) UnmarshalJSON(data []byte) error {
 	service.Label = ccService.Entity.Label
 	service.Description = ccService.Entity.Description
 	service.DocumentationURL = ccService.Entity.DocumentationURL
+	service.ServiceBrokerName = ccService.Entity.ServiceBrokerName
 
 	// We explicitly unmarshal the Extra field to type string because CC returns
 	// a stringified JSON object ONLY for the 'extra' key (see test stub JSON

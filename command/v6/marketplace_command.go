@@ -150,13 +150,14 @@ func (cmd *MarketplaceCommand) displayServiceSummaries(serviceSummaries []v2acti
 	if len(serviceSummaries) == 0 {
 		cmd.UI.DisplayText("No service offerings found")
 	} else {
-		tableHeaders := []string{"service", "plans", "description"}
+		tableHeaders := []string{"service", "plans", "description", "broker"}
 		table := [][]string{tableHeaders}
 		for _, serviceSummary := range serviceSummaries {
 			table = append(table, []string{
 				serviceSummary.Label,
 				planNames(serviceSummary),
 				serviceSummary.Description,
+				serviceSummary.ServiceBrokerName,
 			})
 		}
 

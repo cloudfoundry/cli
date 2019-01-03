@@ -3,6 +3,7 @@ package isolated
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
@@ -151,16 +152,43 @@ var _ = Describe("marketplace command", func() {
 						helpers.QuickDeleteOrg(org1)
 					})
 
-					It("displays a table and tip that does not include that service", func() {
-						session := helpers.CF("marketplace")
-						Eventually(session).Should(Say("Getting services from marketplace in org %s / space %s as %s\\.\\.\\.", org2, space2, user))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Say("\n\n"))
-						Eventually(session).Should(Say("service\\s+plans\\s+description"))
-						Consistently(session).ShouldNot(Say("%s\\s+%s\\s+fake service", getServiceName(broker1), getBrokerPlanNames(broker1)))
-						Eventually(session).Should(Say("%s\\s+%s\\s+fake service", getServiceName(broker2), getBrokerPlanNames(broker2)))
-						Eventually(session).Should(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
-						Eventually(session).Should(Exit(0))
+					When("cc api version < 2.125.0", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionServiceBrokerNameV2)
+						})
+
+						It("displays a table and tip that does not include that service", func() {
+							session := helpers.CF("marketplace")
+							Eventually(session).Should(Say("Getting services from marketplace in org %s / space %s as %s\\.\\.\\.", org2, space2, user))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Say("\n\n"))
+							Eventually(session).Should(Say("service\\s+plans\\s+description\\s+broker"))
+							Consistently(session).ShouldNot(Say(getServiceName(broker1)))
+							Consistently(session).ShouldNot(Say(getBrokerPlanNames(broker1)))
+							Eventually(session).Should(Say("%s\\s+%s\\s+fake service\\s*", getServiceName(broker2), getBrokerPlanNames(broker2)))
+							Eventually(session).Should(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					When("cc api version >= 2.125.0", func() {
+						BeforeEach(func() {
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionServiceBrokerNameV2)
+						})
+
+						It("displays a table with broker name", func() {
+							session := helpers.CF("marketplace")
+							Eventually(session).Should(Say("Getting services from marketplace in org %s / space %s as %s\\.\\.\\.", org2, space2, user))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Say("\n\n"))
+							Eventually(session).Should(Say("service\\s+plans\\s+description\\s+broker"))
+							Consistently(session).ShouldNot(Say(getServiceName(broker1)))
+							Consistently(session).ShouldNot(Say(getBrokerPlanNames(broker1)))
+							Consistently(session).ShouldNot(Say(broker1.Name))
+							Eventually(session).Should(Say("%s\\s+%s\\s+fake service\\s+%s", getServiceName(broker2), getBrokerPlanNames(broker2), broker2.Name))
+							Eventually(session).Should(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
+							Eventually(session).Should(Exit(0))
+						})
 					})
 				})
 			})

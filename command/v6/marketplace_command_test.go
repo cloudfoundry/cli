@@ -158,8 +158,9 @@ var _ = Describe("marketplace Command", func() {
 					servicesSummaries := []v2action.ServiceSummary{
 						{
 							Service: v2action.Service{
-								Label:       "service-a",
-								Description: "fake service-a",
+								Label:             "service-a",
+								Description:       "fake service-a",
+								ServiceBrokerName: "broker-a",
 							},
 							Plans: []v2action.ServicePlanSummary{
 								{
@@ -172,8 +173,9 @@ var _ = Describe("marketplace Command", func() {
 						},
 						{
 							Service: v2action.Service{
-								Label:       "service-b",
-								Description: "fake service-b",
+								Label:             "service-b",
+								Description:       "fake service-b",
+								ServiceBrokerName: "broker-b",
 							},
 							Plans: []v2action.ServicePlanSummary{
 								{
@@ -195,9 +197,9 @@ var _ = Describe("marketplace Command", func() {
 				})
 
 				It("outputs available services and plans", func() {
-					Expect(testUI.Out).Should(Say("service\\s+plans\\s+description\n" +
-						"service-a\\s+plan-a, plan-b\\s+fake service-a\n" +
-						"service-b\\s+plan-c\\s+fake service-b"))
+					Expect(testUI.Out).Should(Say("service\\s+plans\\s+description\\s+broker\n" +
+						"service-a\\s+plan-a, plan-b\\s+fake service-a\\s+broker-a\n" +
+						"service-b\\s+plan-c\\s+fake service-b\\s+broker-b"))
 				})
 
 				It("outputs a tip to use the -s flag", func() {
@@ -393,8 +395,9 @@ var _ = Describe("marketplace Command", func() {
 						servicesSummaries := []v2action.ServiceSummary{
 							{
 								Service: v2action.Service{
-									Label:       "service-a",
-									Description: "fake service-a",
+									Label:             "service-a",
+									Description:       "fake service-a",
+									ServiceBrokerName: "broker-a",
 								},
 								Plans: []v2action.ServicePlanSummary{
 									{
@@ -407,8 +410,9 @@ var _ = Describe("marketplace Command", func() {
 							},
 							{
 								Service: v2action.Service{
-									Label:       "service-b",
-									Description: "fake service-b",
+									Label:             "service-b",
+									Description:       "fake service-b",
+									ServiceBrokerName: "broker-b",
 								},
 								Plans: []v2action.ServicePlanSummary{
 									{
@@ -434,9 +438,9 @@ var _ = Describe("marketplace Command", func() {
 					})
 
 					It("outputs available services and plans", func() {
-						Expect(testUI.Out).Should(Say("service\\s+plans\\s+description\n" +
-							"service-a\\s+plan-a, plan-b\\s+fake service-a\n" +
-							"service-b\\s+plan-c\\s+fake service-b"))
+						Expect(testUI.Out).Should(Say("service\\s+plans\\s+description\\s+broker\n" +
+							"service-a\\s+plan-a, plan-b\\s+fake service-a\\s+broker-a\n" +
+							"service-b\\s+plan-c\\s+fake service-b\\s+broker-b"))
 					})
 
 					It("outputs a tip to use the -s flag", func() {

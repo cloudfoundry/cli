@@ -13,6 +13,7 @@ const (
 	MinVersionUserProvidedServiceTagsV2      = "2.104.0"
 	MinVersionZeroAppInstancesV2             = "2.70.0"
 	MinVersionInternalDomainV2               = "2.115.0"
+	MinVersionServiceBrokerNameV2            = "2.125.0"
 
 	MinVersionApplicationFlowV3    = "3.27.0"
 	MinVersionIsolationSegmentV3   = "3.11.0"
