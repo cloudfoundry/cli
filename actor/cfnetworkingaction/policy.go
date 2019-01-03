@@ -20,13 +20,13 @@ func (actor Actor) AddNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, des
 	var allWarnings Warnings
 
 	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, srcSpaceGUID)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
 	}
 
 	destApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(destAppName, destSpaceGUID)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
 	}
@@ -53,7 +53,7 @@ func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings,
 	var allWarnings Warnings
 
 	currentSpaceApps, warnings, err := actor.V3Actor.GetApplicationsBySpace(spaceGUID)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
@@ -74,7 +74,7 @@ func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings,
 	destAppGUIDs := uniqueDestGUIDs(v1Policies)
 
 	destApplications, warnings, err := actor.V3Actor.GetApplicationsByGUIDs(destAppGUIDs...)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
@@ -83,7 +83,7 @@ func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings,
 	spaceGUIDs := uniqueSpaceGUIDs(applications)
 
 	spaces, warnings, err := actor.V3Actor.GetSpacesByGUIDs(spaceGUIDs...)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
@@ -96,7 +96,7 @@ func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings,
 	orgGUIDs := uniqueOrgGUIDs(spaces)
 
 	orgs, warnings, err := actor.V3Actor.GetOrganizationsByGUIDs(orgGUIDs...)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
@@ -180,7 +180,7 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 	var allWarnings Warnings
 
 	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, spaceGUID)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
@@ -196,7 +196,7 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 	destAppGUIDs := uniqueDestGUIDs(v1Policies)
 
 	destApplications, warnings, err := actor.V3Actor.GetApplicationsByGUIDs(destAppGUIDs...)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
@@ -205,7 +205,7 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 	spaceGUIDs := uniqueSpaceGUIDs(applications)
 
 	spaces, warnings, err := actor.V3Actor.GetSpacesByGUIDs(spaceGUIDs...)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
@@ -222,7 +222,7 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 	orgGUIDs := uniqueOrgGUIDs(spaces)
 
 	orgs, warnings, err := actor.V3Actor.GetOrganizationsByGUIDs(orgGUIDs...)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
@@ -254,13 +254,13 @@ func (actor Actor) RemoveNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, 
 	var allWarnings Warnings
 
 	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, srcSpaceGUID)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
 	}
 
 	destApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(destAppName, destSpaceGUID)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err
 	}

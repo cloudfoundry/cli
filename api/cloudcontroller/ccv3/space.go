@@ -11,7 +11,7 @@ type Space struct {
 	GUID string `json:"guid"`
 	// Name is the name of the space.
 	Name string `json:"name"`
-	// Relationships list the relationships to the application.
+	// Relationships list the relationships to the space.
 	Relationships Relationships `json:"relationships"`
 }
 
