@@ -83,6 +83,7 @@ func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warn
 	return apps, Warnings(warnings), nil
 }
 
+// GetApplicationByGUIDs returns all applications with the provided GUIDs.
 func (actor Actor) GetApplicationsByGUIDs(appGUIDs ...string) ([]Application, Warnings, error) {
 	ccApps, warnings, err := actor.CloudControllerClient.GetApplications(
 		ccv3.Query{Key: ccv3.GUIDFilter, Values: appGUIDs},

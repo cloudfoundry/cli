@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:cc8d07b869fd98dbabae128b6b373c6a4ff7bb800526dd995f388260ce3df7b3"
+  digest = "1:989a27bc67b3ecb550336b1c215052e3243b397091cbdd1a169aff957e4ef5b8"
   name = "code.cloudfoundry.org/cfnetworking-cli-api"
   packages = [
     "cfnetworking",
@@ -21,7 +21,7 @@
     "cfnetworking/wrapper",
   ]
   pruneopts = "NUT"
-  revision = "d500decdb202cc7669da28f388aa0fe6627e0281"
+  revision = "93331d9f11539cdedc45fc4f3fe530145b63e898"
 
 [[projects]]
   digest = "1:286c64923387f8c88d79d737547f3dbc70e9d7e1343e9769c84e4647aac31aaa"

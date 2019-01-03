@@ -18,8 +18,9 @@ const (
 )
 
 type PolicyList struct {
-	TotalPolicies int      `json:"total_policies,omitempty"`
-	Policies      []Policy `json:"policies"`
+	TotalPolicies  int            `json:"total_policies,omitempty"`
+	Policies       []Policy       `json:"policies,omitempty"`
+	EgressPolicies []EgressPolicy `json:"egress_policies,omitempty"`
 }
 
 type Policy struct {
@@ -37,9 +38,30 @@ type PolicyDestination struct {
 	Ports    Ports          `json:"ports"`
 }
 
+type EgressPolicy struct {
+	Source      EgressPolicySource      `json:"source"`
+	Destination EgressPolicyDestination `json:"destination"`
+}
+
+type EgressPolicySource struct {
+	ID   string `json:"id"`
+	Type string `json:"type,omitempty"`
+}
+
+type EgressPolicyDestination struct {
+	IPs      []IP           `json:"ips"`
+	Protocol PolicyProtocol `json:"protocol"`
+	Ports    []Ports        `json:"ports"`
+}
+
+type IP struct {
+	Start string `json:"start"`
+	End   string `json:"end"`
+}
+
 // CreatePolicies will create the network policy with the given parameters.
-func (client Client) CreatePolicies(policies []Policy) error {
-	rawJSON, err := json.Marshal(PolicyList{Policies: policies})
+func (client Client) CreatePolicies(policies PolicyList) error {
+	rawJSON, err := json.Marshal(policies)
 	if err != nil {
 		return err
 	}
@@ -55,8 +77,8 @@ func (client Client) CreatePolicies(policies []Policy) error {
 	return client.connection.Make(request, &cfnetworking.Response{})
 }
 
-// ListPolicies will list the policies
-func (client Client) ListPolicies(appGUIDs ...string) ([]Policy, error) {
+// ListPolicies will list the policies with the app guids in either the source or destination.
+func (client Client) ListPolicies(appGUIDs ...string) (PolicyList, error) {
 	var request *cfnetworking.Request
 	var err error
 	if len(appGUIDs) == 0 {
@@ -72,7 +94,7 @@ func (client Client) ListPolicies(appGUIDs ...string) ([]Policy, error) {
 		})
 	}
 	if err != nil {
-		return []Policy{}, err
+		return PolicyList{}, err
 	}
 
 	policies := PolicyList{}
@@ -80,15 +102,15 @@ func (client Client) ListPolicies(appGUIDs ...string) ([]Policy, error) {
 
 	err = client.connection.Make(request, response)
 	if err != nil {
-		return []Policy{}, err
+		return PolicyList{}, err
 	}
 
 	err = json.Unmarshal(response.RawResponse, &policies)
 	if err != nil {
-		return []Policy{}, err
+		return PolicyList{}, err
 	}
 
-	return policies.Policies, nil
+	return policies, nil
 }
 
 // RemovePolicies will remove the network policy with the given parameters.

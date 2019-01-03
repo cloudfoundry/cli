@@ -52,76 +52,80 @@ func (actor Actor) AddNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, des
 func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings, error) {
 	var allWarnings Warnings
 
-	currentSpaceApps, warnings, err := actor.V3Actor.GetApplicationsBySpace(spaceGUID)
+	applications, warnings, err := actor.V3Actor.GetApplicationsBySpace(spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
 
-	var srcAppGUIDs []string
-	for _, app := range currentSpaceApps {
-		srcAppGUIDs = append(srcAppGUIDs, app.GUID)
-	}
-
-	var v1Policies []cfnetv1.Policy
-	v1Policies, err = actor.NetworkingClient.ListPolicies(srcAppGUIDs...)
-	if err != nil {
-		return []Policy{}, allWarnings, err
-	}
-
-	v1Policies = filterPoliciesWithoutMatchingSourceGUIDs(v1Policies, srcAppGUIDs)
-
-	destAppGUIDs := uniqueDestGUIDs(v1Policies)
-
-	destApplications, warnings, err := actor.V3Actor.GetApplicationsByGUIDs(destAppGUIDs...)
+	policies, warnings, err := actor.getPoliciesForApplications(applications)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
-	}
-
-	applications := append(currentSpaceApps, destApplications...)
-	spaceGUIDs := uniqueSpaceGUIDs(applications)
-
-	spaces, warnings, err := actor.V3Actor.GetSpacesByGUIDs(spaceGUIDs...)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return []Policy{}, allWarnings, err
-	}
-
-	spaceNamesByGUID := make(map[string]string, len(spaces))
-	for _, destSpace := range spaces {
-		spaceNamesByGUID[destSpace.GUID] = destSpace.Name
-	}
-
-	orgGUIDs := uniqueOrgGUIDs(spaces)
-
-	orgs, warnings, err := actor.V3Actor.GetOrganizationsByGUIDs(orgGUIDs...)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return []Policy{}, allWarnings, err
-	}
-
-	orgNamesByGUID := make(map[string]string, len(orgs))
-	for _, org := range orgs {
-		orgNamesByGUID[org.GUID] = org.Name
-	}
-
-	orgNamesBySpaceGUID := make(map[string]string, len(spaces))
-	for _, space := range spaces {
-		orgNamesBySpaceGUID[space.GUID] = orgNamesByGUID[space.OrganizationGUID]
-	}
-
-	appByGUID := map[string]v3action.Application{}
-	for _, app := range applications {
-		appByGUID[app.GUID] = app
-	}
-
-	var policies []Policy
-	for _, v1Policy := range v1Policies {
-		policies = append(policies, actor.transformPolicy(appByGUID, spaceNamesByGUID, orgNamesBySpaceGUID, v1Policy))
 	}
 
 	return policies, allWarnings, nil
+}
+
+func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName string) ([]Policy, Warnings, error) {
+	var allWarnings Warnings
+
+	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return []Policy{}, allWarnings, err
+	}
+
+	policies, warnings, err := actor.getPoliciesForApplications([]v3action.Application{srcApp})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return []Policy{}, allWarnings, err
+	}
+
+	return policies, allWarnings, nil
+}
+
+func (actor Actor) RemoveNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
+	var allWarnings Warnings
+
+	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, srcSpaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	destApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(destAppName, destSpaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	policyToRemove := cfnetv1.Policy{
+		Source: cfnetv1.PolicySource{
+			ID: srcApp.GUID,
+		},
+		Destination: cfnetv1.PolicyDestination{
+			ID:       destApp.GUID,
+			Protocol: cfnetv1.PolicyProtocol(protocol),
+			Ports: cfnetv1.Ports{
+				Start: startPort,
+				End:   endPort,
+			},
+		},
+	}
+
+	v1Policies, err := actor.NetworkingClient.ListPolicies(srcApp.GUID)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	for _, v1Policy := range v1Policies {
+		if v1Policy == policyToRemove {
+			return allWarnings, actor.NetworkingClient.RemovePolicies([]cfnetv1.Policy{policyToRemove})
+		}
+	}
+
+	return allWarnings, actionerror.PolicyDoesNotExistError{}
 }
 
 func filterPoliciesWithoutMatchingSourceGUIDs(v1Policies []cfnetv1.Policy, srcAppGUIDs []string) []cfnetv1.Policy {
@@ -176,22 +180,43 @@ func uniqueDestGUIDs(policies []cfnetv1.Policy) []string {
 	return destAppGUIDs
 }
 
-func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName string) ([]Policy, Warnings, error) {
-	var allWarnings Warnings
+func (actor Actor) orgNamesBySpaceGUID(spaces []v3action.Space) (map[string]string, v3action.Warnings, error) {
+	orgGUIDs := uniqueOrgGUIDs(spaces)
 
-	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, spaceGUID)
-	allWarnings = append(allWarnings, warnings...)
+	orgs, warnings, err := actor.V3Actor.GetOrganizationsByGUIDs(orgGUIDs...)
+	if err != nil {
+		return nil, warnings, err
+	}
+
+	orgNamesByGUID := make(map[string]string, len(orgs))
+	for _, org := range orgs {
+		orgNamesByGUID[org.GUID] = org.Name
+	}
+
+	orgNamesBySpaceGUID := make(map[string]string, len(spaces))
+	for _, space := range spaces {
+		orgNamesBySpaceGUID[space.GUID] = orgNamesByGUID[space.OrganizationGUID]
+	}
+
+	return orgNamesBySpaceGUID, warnings, nil
+}
+
+func (actor Actor) getPoliciesForApplications(applications []v3action.Application) ([]Policy, v3action.Warnings, error) {
+	var allWarnings v3action.Warnings
+
+	var srcAppGUIDs []string
+	for _, app := range applications {
+		srcAppGUIDs = append(srcAppGUIDs, app.GUID)
+	}
+
+	v1Policies, err := actor.NetworkingClient.ListPolicies(srcAppGUIDs...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
 	}
 
-	var v1Policies []cfnetv1.Policy
-	v1Policies, err = actor.NetworkingClient.ListPolicies(srcApp.GUID)
-	if err != nil {
-		return []Policy{}, allWarnings, err
-	}
-
-	v1Policies = filterPoliciesWithoutMatchingSourceGUIDs(v1Policies, []string{srcApp.GUID})
+	// ListPolicies will return policies with the app guids in either the source or destination.
+	// It needs to be further filtered to only get policies with the app guids in the source.
+	v1Policies = filterPoliciesWithoutMatchingSourceGUIDs(v1Policies, srcAppGUIDs)
 
 	destAppGUIDs := uniqueDestGUIDs(v1Policies)
 
@@ -201,7 +226,7 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 		return []Policy{}, allWarnings, err
 	}
 
-	applications := append(destApplications, srcApp)
+	applications = append(applications, destApplications...)
 	spaceGUIDs := uniqueSpaceGUIDs(applications)
 
 	spaces, warnings, err := actor.V3Actor.GetSpacesByGUIDs(spaceGUIDs...)
@@ -215,26 +240,10 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 		spaceNamesByGUID[destSpace.GUID] = destSpace.Name
 	}
 
-	for _, destSpace := range spaces {
-		spaceNamesByGUID[destSpace.GUID] = destSpace.Name
-	}
-
-	orgGUIDs := uniqueOrgGUIDs(spaces)
-
-	orgs, warnings, err := actor.V3Actor.GetOrganizationsByGUIDs(orgGUIDs...)
+	orgNamesBySpaceGUID, warnings, err := actor.orgNamesBySpaceGUID(spaces)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
-	}
-
-	orgNamesByGUID := make(map[string]string, len(orgs))
-	for _, org := range orgs {
-		orgNamesByGUID[org.GUID] = org.Name
-	}
-
-	orgNamesBySpaceGUID := make(map[string]string, len(spaces))
-	for _, space := range spaces {
-		orgNamesBySpaceGUID[space.GUID] = orgNamesByGUID[space.OrganizationGUID]
 	}
 
 	appByGUID := map[string]v3action.Application{}
@@ -244,64 +253,17 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 
 	var policies []Policy
 	for _, v1Policy := range v1Policies {
-		policies = append(policies, actor.transformPolicy(appByGUID, spaceNamesByGUID, orgNamesBySpaceGUID, v1Policy))
+		destination := appByGUID[v1Policy.Destination.ID]
+		policies = append(policies, Policy{
+			SourceName:           appByGUID[v1Policy.Source.ID].Name,
+			DestinationName:      destination.Name,
+			Protocol:             string(v1Policy.Destination.Protocol),
+			StartPort:            v1Policy.Destination.Ports.Start,
+			EndPort:              v1Policy.Destination.Ports.End,
+			DestinationSpaceName: spaceNamesByGUID[destination.SpaceGUID],
+			DestinationOrgName:   orgNamesBySpaceGUID[destination.SpaceGUID],
+		})
 	}
 
 	return policies, allWarnings, nil
-}
-
-func (actor Actor) RemoveNetworkPolicy(srcSpaceGUID, srcAppName, destSpaceGUID, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
-	var allWarnings Warnings
-
-	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, srcSpaceGUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	destApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(destAppName, destSpaceGUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	policyToRemove := cfnetv1.Policy{
-		Source: cfnetv1.PolicySource{
-			ID: srcApp.GUID,
-		},
-		Destination: cfnetv1.PolicyDestination{
-			ID:       destApp.GUID,
-			Protocol: cfnetv1.PolicyProtocol(protocol),
-			Ports: cfnetv1.Ports{
-				Start: startPort,
-				End:   endPort,
-			},
-		},
-	}
-
-	v1Policies, err := actor.NetworkingClient.ListPolicies(srcApp.GUID)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	for _, v1Policy := range v1Policies {
-		if v1Policy == policyToRemove {
-			return allWarnings, actor.NetworkingClient.RemovePolicies([]cfnetv1.Policy{policyToRemove})
-		}
-	}
-
-	return allWarnings, actionerror.PolicyDoesNotExistError{}
-}
-
-func (Actor) transformPolicy(appByGuid map[string]v3action.Application, spaceNamesByGUID, orgNamesBySpaceGUID map[string]string, v1Policy cfnetv1.Policy) Policy {
-	dst := appByGuid[v1Policy.Destination.ID]
-	return Policy{
-		SourceName:           appByGuid[v1Policy.Source.ID].Name,
-		DestinationName:      dst.Name,
-		Protocol:             string(v1Policy.Destination.Protocol),
-		StartPort:            v1Policy.Destination.Ports.Start,
-		EndPort:              v1Policy.Destination.Ports.End,
-		DestinationSpaceName: spaceNamesByGUID[dst.SpaceGUID],
-		DestinationOrgName:   orgNamesBySpaceGUID[dst.SpaceGUID],
-	}
 }
