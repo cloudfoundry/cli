@@ -1,4 +1,0 @@
----
-- type: replace
-  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/quota_definitions/default/total_reserved_route_ports?
-  value: 100
