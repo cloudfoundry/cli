@@ -24,6 +24,15 @@ var _ = Describe("Organization Actions", func() {
 	})
 
 	Describe("GetOrganizationByName", func() {
+		var (
+			executeErr error
+			warnings   Warnings
+			org        Organization
+		)
+		JustBeforeEach(func() {
+			org, warnings, executeErr = actor.GetOrganizationByName("some-org-name")
+		})
+
 		When("the org exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
@@ -39,8 +48,7 @@ var _ = Describe("Organization Actions", func() {
 			})
 
 			It("returns the organization and warnings", func() {
-				org, warnings, err := actor.GetOrganizationByName("some-org-name")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(org).To(Equal(Organization{
 					Name: "some-org-name",
 					GUID: "some-org-guid",
@@ -66,15 +74,34 @@ var _ = Describe("Organization Actions", func() {
 			})
 
 			It("returns the warnings and the error", func() {
-				_, warnings, err := actor.GetOrganizationByName("some-org-name")
 				Expect(warnings).To(ConsistOf("some-warning"))
-				Expect(err).To(MatchError(expectedError))
+				Expect(executeErr).To(MatchError(expectedError))
+			})
+		})
+
+		When("the org does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{},
+					ccv3.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("returns an OrganizationNotFoundError and the warnings", func() {
+				Expect(warnings).To(ConsistOf("some-warning"))
+				Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org-name"}))
 			})
 		})
 	})
 
 	Describe("GetOrganizationsByGUIDs", func() {
 		When("the orgs exists", func() {
+			var (
+				executeErr error
+				warnings   Warnings
+				orgs       []Organization
+			)
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv3.Organization{
@@ -92,9 +119,12 @@ var _ = Describe("Organization Actions", func() {
 				)
 			})
 
+			JustBeforeEach(func() {
+				orgs, warnings, executeErr = actor.GetOrganizationsByGUIDs("some-org-guid", "another-org-guid")
+			})
+
 			It("returns the organizations and warnings", func() {
-				orgs, warnings, err := actor.GetOrganizationsByGUIDs("some-org-guid", "another-org-guid")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(orgs).To(ConsistOf(
 					Organization{
 						Name: "some-org-name",
@@ -112,40 +142,24 @@ var _ = Describe("Organization Actions", func() {
 					ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"some-org-guid", "another-org-guid"}},
 				))
 			})
-		})
 
-		When("the cloud controller client returns an error", func() {
-			var expectedError error
+			When("the cloud controller client returns an error", func() {
+				var expectedError error
 
-			BeforeEach(func() {
-				expectedError = errors.New("I am a CloudControllerClient Error")
-				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv3.Organization{},
-					ccv3.Warnings{"some-warning"},
-					expectedError)
-			})
+				BeforeEach(func() {
+					expectedError = errors.New("I am a CloudControllerClient Error")
+					fakeCloudControllerClient.GetOrganizationsReturns(
+						[]ccv3.Organization{},
+						ccv3.Warnings{"some-warning"},
+						expectedError)
+				})
 
-			It("returns the warnings and the error", func() {
-				_, warnings, err := actor.GetOrganizationsByGUIDs("some-org-guid")
-				Expect(warnings).To(ConsistOf("some-warning"))
-				Expect(err).To(MatchError(expectedError))
+				It("returns the warnings and the error", func() {
+					Expect(warnings).To(ConsistOf("some-warning"))
+					Expect(executeErr).To(MatchError(expectedError))
+				})
 			})
 		})
 	})
 
-	When("the org does not exist", func() {
-		BeforeEach(func() {
-			fakeCloudControllerClient.GetOrganizationsReturns(
-				[]ccv3.Organization{},
-				ccv3.Warnings{"some-warning"},
-				nil,
-			)
-		})
-
-		It("returns an OrganizationNotFoundError and the warnings", func() {
-			_, warnings, err := actor.GetOrganizationByName("some-org-name")
-			Expect(warnings).To(ConsistOf("some-warning"))
-			Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org-name"}))
-		})
-	})
 })

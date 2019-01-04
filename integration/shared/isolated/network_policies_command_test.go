@@ -110,7 +110,6 @@ var _ = Describe("network-policies command", func() {
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
-				Consistently(session).ShouldNot(Say("OK"))
 				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
 				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, appName, destApp, destSpace, destOrg))
 				Eventually(session).Should(Exit(0))

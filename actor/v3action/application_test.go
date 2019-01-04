@@ -99,6 +99,12 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("GetApplicationByNameAndSpace", func() {
 		When("the app exists", func() {
+			var (
+				warnings   Warnings
+				executeErr error
+				app        Application
+			)
+
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv3.Application{
@@ -115,9 +121,12 @@ var _ = Describe("Application Actions", func() {
 				)
 			})
 
+			JustBeforeEach(func() {
+				app, warnings, executeErr = actor.GetApplicationByNameAndSpace("some-app-name", "some-space-guid")
+			})
+
 			It("returns the application and warnings", func() {
-				app, warnings, err := actor.GetApplicationByNameAndSpace("some-app-name", "some-space-guid")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(app).To(Equal(Application{
 					Name:      "some-app-name",
 					GUID:      "some-app-guid",
