@@ -11,7 +11,7 @@ resource_types:
     tag: latest
 
 resources:
-- name: cli
+- name: cli-pr
   type: pull-request
   check_every: 1m
   source:
@@ -58,24 +58,24 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: cli
+    - get: cli-pr
       trigger: true
   - aggregate:
     - task: units-linux
       timeout: 30m
-      file: cli/ci/cli/tasks/units-linux.yml
+      file: cli-pr/ci/cli/tasks/units-linux.yml
 
 - name: claim-bosh-lite # TODO: record PR number instead of usernames
   serial: true
   plan:
   - aggregate:
-    - get: cli
+    - get: cli-pr
       trigger: true
       version: every
       passed: [units]
   - do:
     - task: get-pr-info
-      file: cli/ci/cli-pr-builder/tasks/extract-info-from-pr.yml
+      file: cli-pr/ci/cli-pr-builder/tasks/extract-info-from-pr.yml
     - put: bosh-lite
       params:
         story: commit-info/pr-id
@@ -89,7 +89,7 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: cli
+    - get: cli-pr
       trigger: true
       passed: [claim-bosh-lite]
       version: every
@@ -98,7 +98,7 @@ jobs:
       version: every
   - do:
     - task: integration
-      file: cli/ci/cli-pr-builder/tasks/integration-linux.yml
+      file: cli-pr/ci/cli-pr-builder/tasks/integration-linux.yml
       timeout: 1h30m
       params:
         CF_INT_IGNORE_API_VERSION_CHECK: false
