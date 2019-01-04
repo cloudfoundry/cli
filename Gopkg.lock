@@ -151,17 +151,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7a85d380cd2d3c93c4b13569a689856c9224155a7c230fd3db2bfe2650684170"
-  name = "github.com/cloudfoundry/custom-cats-reporters"
-  packages = [
-    "honeycomb",
-    "honeycomb/client",
-  ]
-  pruneopts = "NUT"
-  revision = "75213ee799079f9e56f345093207fdf43b1a4e51"
-
-[[projects]]
-  branch = "master"
   digest = "1:815a621dbf3d3201e3969cc8a1f0b9ae88861e328643378bf1e18956bde50ea0"
   name = "github.com/cloudfoundry/noaa"
   packages = [
@@ -218,30 +207,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b29ac3fe6b4601f89b589337c584ab7204a5c72932465e5f4a16772b5560b4a7"
-  name = "github.com/facebookgo/clock"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "600d898af40aa09a7a93ecb9265d87b0504b6f03"
-
-[[projects]]
-  branch = "master"
-  digest = "1:2d7ffd1545caa3eb15e6b4058880f9913dbfef79aac0a1c3c5491f5f85d5341b"
-  name = "github.com/facebookgo/limitgroup"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "6abd8d71ec01451d7f1929eacaa263bbe2935d05"
-
-[[projects]]
-  branch = "master"
-  digest = "1:762c38cd6b7137f9a5c38a0301d4271686d23c076b45e7d45564381f104dac7b"
-  name = "github.com/facebookgo/muster"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "fd3d7953fd52354a74b9f6b3d70d0c9650c4ec2a"
-
-[[projects]]
-  branch = "master"
   digest = "1:7c4b5e23bb01e5945b0df8a5f181efa2d90abd19e368be7c7bd55a5737db0739"
   name = "github.com/fatih/color"
   packages = ["."]
@@ -283,14 +248,6 @@
   packages = ["."]
   pruneopts = "NUT"
   revision = "b89020ee79b89a7f932c5617d218fc06db382f53"
-
-[[projects]]
-  digest = "1:8b1130bfcf13b1e02c1958b7f2038e2e1ee2c083e53cde25176c2452eae1df9f"
-  name = "github.com/honeycombio/libhoney-go"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "86ceb69a9b89f381631caac96f24df15b88bedad"
-  version = "v1.8.1"
 
 [[projects]]
   digest = "1:41933d387bfa3eaa6a82647914ed7044f7b8355764c24fb920892bc8c03ef0c3"
@@ -568,14 +525,6 @@
   revision = "17bcc049122f272a32787ba38073ee47433023e9"
 
 [[projects]]
-  digest = "1:d6613cccd218e927314d7f6a7a6e8169473b07db7e07810341cacd3bdca920ba"
-  name = "gopkg.in/alexcesaro/statsd.v2"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "7fea3f0d2fab1ad973e641e51dba45443a311a90"
-  version = "v2.0.0"
-
-[[projects]]
   digest = "1:4fd1f40eda0f84905370fd2bcd92c7f169c2d2936ed9bcf75206e6884153593f"
   name = "gopkg.in/cheggaaa/pb.v1"
   packages = ["."]
@@ -628,8 +577,6 @@
     "github.com/blang/semver",
     "github.com/cloudfoundry/bosh-cli/director/template",
     "github.com/cloudfoundry/cli-plugin-repo/web",
-    "github.com/cloudfoundry/custom-cats-reporters/honeycomb",
-    "github.com/cloudfoundry/custom-cats-reporters/honeycomb/client",
     "github.com/cloudfoundry/noaa",
     "github.com/cloudfoundry/noaa/consumer",
     "github.com/cloudfoundry/noaa/errors",
@@ -640,7 +587,6 @@
     "github.com/gogo/protobuf/proto",
     "github.com/google/go-querystring/query",
     "github.com/gorilla/websocket",
-    "github.com/honeycombio/libhoney-go",
     "github.com/jessevdk/go-flags",
     "github.com/kr/pty",
     "github.com/lunixbochs/vtclean",

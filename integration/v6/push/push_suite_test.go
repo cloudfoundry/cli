@@ -33,15 +33,7 @@ var (
 
 func TestPush(t *testing.T) {
 	RegisterFailHandler(Fail)
-	reporters := []Reporter{}
-
-	honeyCombReporter := helpers.GetHoneyCombReporter("Push Integration Suite")
-
-	if honeyCombReporter != nil {
-		reporters = append(reporters, honeyCombReporter)
-	}
-
-	RunSpecsWithDefaultAndCustomReporters(t, "Push Integration Suite", reporters)
+	RunSpecs(t, "Push Integration Suite")
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {

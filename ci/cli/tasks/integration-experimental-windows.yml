@@ -15,8 +15,6 @@ params:
   CF_INT_DOCKER_IMAGE:
   CF_INT_DOCKER_USERNAME:
   CF_INT_DOCKER_PASSWORD:
-  HONEYCOMB_WRITE_KEY:
-  HONEYCOMB_DATASET: "Integration Windows"
 
 run:
   path: cli-ci/ci/cli/tasks/integration-experimental-windows.bat

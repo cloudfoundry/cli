@@ -19,8 +19,6 @@ params:
   CF_INT_DOCKER_IMAGE:
   CF_INT_DOCKER_USERNAME:
   CF_INT_DOCKER_PASSWORD:
-  HONEYCOMB_WRITE_KEY:
-  HONEYCOMB_DATASET: "Integration Linux"
 
 run:
   path: bash

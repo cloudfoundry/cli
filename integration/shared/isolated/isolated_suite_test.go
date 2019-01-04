@@ -31,15 +31,8 @@ var (
 
 func TestIsolated(t *testing.T) {
 	RegisterFailHandler(Fail)
-	reporters := []Reporter{}
 
-	honeyCombReporter := helpers.GetHoneyCombReporter("Isolated Test Suite")
-
-	if honeyCombReporter != nil {
-		reporters = append(reporters, honeyCombReporter)
-	}
-
-	RunSpecsWithDefaultAndCustomReporters(t, "Isolated Integration Suite", reporters)
+	RunSpecs(t, "Isolated Integration Suite")
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
