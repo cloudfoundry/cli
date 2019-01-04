@@ -73,12 +73,12 @@ func (cmd StacksCommand) Execute(args []string) error {
 
 	sort.Slice(stacks, func(i, j int) bool { return sorting.LessIgnoreCase(stacks[i].Name, stacks[j].Name) })
 
-	displayTable(stacks, cmd.UI)
+	cmd.displayTable(stacks)
 
 	return nil
 }
 
-func displayTable(stacks []v7action.Stack, display command.UI) {
+func (cmd StacksCommand) displayTable(stacks []v7action.Stack) {
 	if len(stacks) > 0 {
 		var keyValueTable = [][]string{
 			{"name", "description"},
@@ -87,6 +87,6 @@ func displayTable(stacks []v7action.Stack, display command.UI) {
 			keyValueTable = append(keyValueTable, []string{stack.Name, stack.Description})
 		}
 
-		display.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
+		cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
 	}
 }

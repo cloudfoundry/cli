@@ -469,7 +469,7 @@ var _ = Describe("app summary displayer", func() {
 				summary = v7action.ApplicationSummary{
 					CurrentDroplet: v7action.Droplet{
 						Stack: "cflinuxfs2",
-						Buildpacks: []v7action.Buildpack{
+						Buildpacks: []v7action.DropletBuildpack{
 							{
 								Name:         "ruby_buildpack",
 								DetectOutput: "some-detect-output",

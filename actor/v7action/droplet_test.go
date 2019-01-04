@@ -240,7 +240,7 @@ var _ = Describe("Droplet Actions", func() {
 						GUID:      "some-droplet-guid-1",
 						State:     constant.DropletStaged,
 						CreatedAt: "2017-08-14T21:16:42Z",
-						Buildpacks: []Buildpack{
+						Buildpacks: []DropletBuildpack{
 							{Name: "ruby"},
 							{Name: "nodejs"},
 						},
@@ -251,7 +251,7 @@ var _ = Describe("Droplet Actions", func() {
 						GUID:      "some-droplet-guid-2",
 						State:     constant.DropletFailed,
 						CreatedAt: "2017-08-16T00:18:24Z",
-						Buildpacks: []Buildpack{
+						Buildpacks: []DropletBuildpack{
 							{Name: "java"},
 						},
 						Stack: "windows",

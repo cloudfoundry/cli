@@ -186,7 +186,7 @@ var _ = Describe("Application Summary Actions", func() {
 								CurrentDroplet: Droplet{
 									Stack: "some-stack",
 									Image: "docker/some-image",
-									Buildpacks: []Buildpack{
+									Buildpacks: []DropletBuildpack{
 										{
 											Name: "some-buildpack",
 										},

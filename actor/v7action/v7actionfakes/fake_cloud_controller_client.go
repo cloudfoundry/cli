@@ -341,6 +341,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetBuildpacksStub        func(...ccv3.Query) ([]ccv3.Buildpack, ccv3.Warnings, error)
+	getBuildpacksMutex       sync.RWMutex
+	getBuildpacksArgsForCall []struct {
+		arg1 []ccv3.Query
+	}
+	getBuildpacksReturns struct {
+		result1 []ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getBuildpacksReturnsOnCall map[int]struct {
+		result1 []ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetDropletStub        func(string) (ccv3.Droplet, ccv3.Warnings, error)
 	getDropletMutex       sync.RWMutex
 	getDropletArgsForCall []struct {
@@ -2261,6 +2276,72 @@ func (fake *FakeCloudControllerClient) GetBuildReturnsOnCall(i int, result1 ccv3
 	}
 	fake.getBuildReturnsOnCall[i] = struct {
 		result1 ccv3.Build
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetBuildpacks(arg1 ...ccv3.Query) ([]ccv3.Buildpack, ccv3.Warnings, error) {
+	fake.getBuildpacksMutex.Lock()
+	ret, specificReturn := fake.getBuildpacksReturnsOnCall[len(fake.getBuildpacksArgsForCall)]
+	fake.getBuildpacksArgsForCall = append(fake.getBuildpacksArgsForCall, struct {
+		arg1 []ccv3.Query
+	}{arg1})
+	fake.recordInvocation("GetBuildpacks", []interface{}{arg1})
+	fake.getBuildpacksMutex.Unlock()
+	if fake.GetBuildpacksStub != nil {
+		return fake.GetBuildpacksStub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getBuildpacksReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetBuildpacksCallCount() int {
+	fake.getBuildpacksMutex.RLock()
+	defer fake.getBuildpacksMutex.RUnlock()
+	return len(fake.getBuildpacksArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetBuildpacksCalls(stub func(...ccv3.Query) ([]ccv3.Buildpack, ccv3.Warnings, error)) {
+	fake.getBuildpacksMutex.Lock()
+	defer fake.getBuildpacksMutex.Unlock()
+	fake.GetBuildpacksStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetBuildpacksArgsForCall(i int) []ccv3.Query {
+	fake.getBuildpacksMutex.RLock()
+	defer fake.getBuildpacksMutex.RUnlock()
+	argsForCall := fake.getBuildpacksArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetBuildpacksReturns(result1 []ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+	fake.getBuildpacksMutex.Lock()
+	defer fake.getBuildpacksMutex.Unlock()
+	fake.GetBuildpacksStub = nil
+	fake.getBuildpacksReturns = struct {
+		result1 []ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetBuildpacksReturnsOnCall(i int, result1 []ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+	fake.getBuildpacksMutex.Lock()
+	defer fake.getBuildpacksMutex.Unlock()
+	fake.GetBuildpacksStub = nil
+	if fake.getBuildpacksReturnsOnCall == nil {
+		fake.getBuildpacksReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Buildpack
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getBuildpacksReturnsOnCall[i] = struct {
+		result1 []ccv3.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -4251,6 +4332,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getApplicationsMutex.RUnlock()
 	fake.getBuildMutex.RLock()
 	defer fake.getBuildMutex.RUnlock()
+	fake.getBuildpacksMutex.RLock()
+	defer fake.getBuildpacksMutex.RUnlock()
 	fake.getDropletMutex.RLock()
 	defer fake.getDropletMutex.RUnlock()
 	fake.getDropletsMutex.RLock()

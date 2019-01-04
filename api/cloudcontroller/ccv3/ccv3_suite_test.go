@@ -125,6 +125,9 @@ func SetupV3Response() {
 			},
 			"stacks": {
 				"href": "SERVER_URL/v3/stacks"
+			},
+			"buildpacks": {
+				"href": "SERVER_URL/v3/buildpacks"
 			}
 		}
 	}`, "SERVER_URL", serverURL, -1)

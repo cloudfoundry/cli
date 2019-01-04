@@ -30,6 +30,10 @@ const (
 	// NameOrder is a query value for ordering by name. This value is used in
 	// conjunction with the OrderBy QueryKey.
 	NameOrder = "name"
+
+	// PositionOrder is a query value for ordering by posiiton. This value is
+	// used in conjuction with the OrderBy QueryKey.
+	PositionOrder = "position"
 )
 
 // Query is additional settings that can be passed to some requests that can

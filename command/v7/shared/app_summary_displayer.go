@@ -130,7 +130,7 @@ func (AppSummaryDisplayer) usageSummary(processSummaries v7action.ProcessSummari
 	return strings.Join(usageStrings, ", ")
 }
 
-func (AppSummaryDisplayer) buildpackNames(buildpacks []v7action.Buildpack) string {
+func (AppSummaryDisplayer) buildpackNames(buildpacks []v7action.DropletBuildpack) string {
 	var names []string
 	for _, buildpack := range buildpacks {
 		if buildpack.DetectOutput != "" {

@@ -14,10 +14,10 @@ type Droplet struct {
 	CreatedAt  string
 	Stack      string
 	Image      string
-	Buildpacks []Buildpack
+	Buildpacks []DropletBuildpack
 }
 
-type Buildpack ccv3.DropletBuildpack
+type DropletBuildpack ccv3.DropletBuildpack
 
 // SetApplicationDropletByApplicationNameAndSpace sets the droplet for an application.
 func (actor Actor) SetApplicationDropletByApplicationNameAndSpace(appName string, spaceGUID string, dropletGUID string) (Warnings, error) {
@@ -86,9 +86,9 @@ func (actor Actor) GetCurrentDropletByApplication(appGUID string) (Droplet, Warn
 }
 
 func (actor Actor) convertCCToActorDroplet(ccDroplet ccv3.Droplet) Droplet {
-	var buildpacks []Buildpack
+	var buildpacks []DropletBuildpack
 	for _, ccBuildpack := range ccDroplet.Buildpacks {
-		buildpacks = append(buildpacks, Buildpack(ccBuildpack))
+		buildpacks = append(buildpacks, DropletBuildpack(ccBuildpack))
 	}
 
 	return Droplet{
