@@ -46,5 +46,6 @@ run:
 
     go get -u github.com/onsi/ginkgo/ginkgo
 
-    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated integration/v6/isolated integration/shared/plugin integration/v6/push
-    ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/global integration/v6/global
+    # TODO uncomment slow integration tests when the rest of the PR builder is working
+    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated # integration/v6/isolated integration/shared/plugin integration/v6/push
+    # ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/global integration/v6/global
