@@ -102,9 +102,18 @@ jobs:
       timeout: 1h30m
       params:
         CF_INT_IGNORE_API_VERSION_CHECK: false
+      on_failure:
+        put: cli
+        params:
+          path: cli
+          status: failure
       ensure:
         put: unclaim-bosh-lite
         resource: bosh-lite
         params:
           operation: unclaim
           name: bosh-lite/name
+    - put: cli
+      params:
+        path: cli
+        status: success
