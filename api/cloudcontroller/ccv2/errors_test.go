@@ -226,6 +226,22 @@ var _ = Describe("Error Wrapper", func() {
 							}))
 						})
 					})
+
+					When("creating a service instance fails because the name is taken", func() {
+						BeforeEach(func() {
+							serverResponse = `{
+								"code": 40002,
+								"description": "Service instance name is taken: potato",
+								"error_code": "CF-ServiceInstanceNameTaken"
+							  }`
+						})
+
+						It("returns a ServiceInstanceNameTakenError", func() {
+							Expect(executeErr).To(MatchError(ccerror.ServiceInstanceNameTakenError{
+								Message: "Service instance name is taken: potato",
+							}))
+						})
+					})
 				})
 
 				Context("(401) Unauthorized", func() {
@@ -350,6 +366,43 @@ var _ = Describe("Error Wrapper", func() {
 						It("returns a ServiceBrokerCatalogInvalidError", func() {
 							Expect(executeErr).To(MatchError(ccerror.ServiceBrokerCatalogInvalidError{
 								Message: "Service broker catalog is invalid: \nService overview-service\n  Service dashboard client id must be unique\n",
+							}))
+						})
+					})
+
+					When("the service broker rejected the request", func() {
+						BeforeEach(func() {
+							serverResponse = `{
+								"description": "The service broker rejected the request to https://broker.example.com/v2/service_instances/1a3794e9-7ddf-4cae-b66a-6a0453c85a3e?accepts_incomplete=true. Status Code: 400 Bad Request, Body: instance requires property \"name\"",
+								"error_code": "CF-ServiceBrokerRequestRejected",
+								"code": 10001
+							}`
+						})
+
+						It("returns a ServiceBrokerRequestRejectedError", func() {
+							Expect(executeErr).To(MatchError(ccerror.ServiceBrokerRequestRejectedError{
+								Message: `The service broker rejected the request to https://broker.example.com/v2/service_instances/1a3794e9-7ddf-4cae-b66a-6a0453c85a3e?accepts_incomplete=true. Status Code: 400 Bad Request, Body: instance requires property "name"`,
+							}))
+						})
+					})
+
+					When("the service broker responded with bad response", func() {
+						BeforeEach(func() {
+							serverResponse = `{
+								"description": "Service broker error",
+									"error_code": "CF-ServiceBrokerBadResponse",
+									"code": 10001,
+									"http": {
+										"uri": "https://broker.url/v2/service_instances/593fe03a-3eda-4a53-93ed-aa30f309b120?accepts_incomplete=true",
+										"method": "PUT",
+										"status": 500
+									}
+								}`
+						})
+
+						It("returns a ServiceBrokerBadResponseError", func() {
+							Expect(executeErr).To(MatchError(ccerror.ServiceBrokerBadResponseError{
+								Message: `Service broker error`,
 							}))
 						})
 					})

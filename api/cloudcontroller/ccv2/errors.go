@@ -82,10 +82,16 @@ func convert500(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 }
 
 func handleBadGateway(errorResponse ccerror.V2ErrorResponse, rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
-	if errorResponse.ErrorCode == "CF-ServiceBrokerCatalogInvalid" {
+	switch errorResponse.ErrorCode {
+	case "CF-ServiceBrokerCatalogInvalid":
 		return ccerror.ServiceBrokerCatalogInvalidError{Message: errorResponse.Description}
+	case "CF-ServiceBrokerRequestRejected":
+		return ccerror.ServiceBrokerRequestRejectedError{Message: errorResponse.Description}
+	case "CF-ServiceBrokerBadResponse":
+		return ccerror.ServiceBrokerBadResponseError{Message: errorResponse.Description}
+	default:
+		return v2UnexpectedResponseError(rawHTTPStatusErr)
 	}
-	return v2UnexpectedResponseError(rawHTTPStatusErr)
 }
 
 func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
@@ -110,6 +116,8 @@ func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
 		return ccerror.OrganizationNameTakenError{Message: errorResponse.Description}
 	case "CF-SpaceNameTaken":
 		return ccerror.SpaceNameTakenError{Message: errorResponse.Description}
+	case "CF-ServiceInstanceNameTaken":
+		return ccerror.ServiceInstanceNameTakenError{Message: errorResponse.Description}
 	default:
 		return ccerror.BadRequestError{Message: errorResponse.Description}
 	}

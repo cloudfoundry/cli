@@ -1,6 +1,10 @@
 package ccv2
 
 import (
+	"bytes"
+	"encoding/json"
+	"net/url"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
@@ -89,6 +93,48 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 // service.
 func (serviceInstance ServiceInstance) UserProvided() bool {
 	return serviceInstance.Type == constant.ServiceInstanceTypeUserProvidedService
+}
+
+type createServiceInstanceRequestBody struct {
+	Name            string                 `json:"name"`
+	ServicePlanGUID string                 `json:"service_plan_guid"`
+	SpaceGUID       string                 `json:"space_guid"`
+	Parameters      map[string]interface{} `json:"parameters,omitempty"`
+	Tags            []string               `json:"tags,omitempty"`
+}
+
+// CreateServiceInstance posts a service instance resource with the provided
+// attributes to the api and returns the result.
+func (client *Client) CreateServiceInstance(spaceGUID, servicePlanGUID, serviceInstance string, parameters map[string]interface{}, tags []string) (ServiceInstance, Warnings, error) {
+	requestBody := createServiceInstanceRequestBody{
+		Name:            serviceInstance,
+		ServicePlanGUID: servicePlanGUID,
+		SpaceGUID:       spaceGUID,
+		Parameters:      parameters,
+		Tags:            tags,
+	}
+
+	bodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return ServiceInstance{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostServiceInstancesRequest,
+		Body:        bytes.NewReader(bodyBytes),
+		Query:       url.Values{"accepts_incomplete": {"true"}},
+	})
+	if err != nil {
+		return ServiceInstance{}, nil, err
+	}
+
+	var instance ServiceInstance
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &instance,
+	}
+
+	err = client.connection.Make(request, &response)
+	return instance, response.Warnings, err
 }
 
 // GetServiceInstance returns the service instance with the given GUID. This
