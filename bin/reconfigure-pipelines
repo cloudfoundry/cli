@@ -19,8 +19,7 @@ configure_pipeline() {
   fly -t ci set-pipeline \
     -p $name \
     -c $pipeline \
-    -l <(lpass show "Concourse Credentials" --notes) \
-    -v honeycomb-writer-key="$(lpass show Shared-CLI/Honeycomb --notes)"
+    -l <(lpass show "Concourse Credentials" --notes)
 }
 
 configure_infrastructure_pipeline() {
