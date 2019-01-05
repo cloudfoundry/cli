@@ -7,5 +7,5 @@ type EmptyDirectoryError struct {
 }
 
 func (e EmptyDirectoryError) Error() string {
-	return fmt.Sprint(e.Path, "is empty")
+	return fmt.Sprint(e.Path, "is an empty directory")
 }

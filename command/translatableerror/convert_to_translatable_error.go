@@ -42,6 +42,8 @@ func ConvertToTranslatableError(err error) error {
 		return DomainNotFoundError(e)
 	case manifest.EmptyBuildpacksError:
 		return EmptyBuildpacksError(e)
+	case actionerror.EmptyArchiveError:
+		return EmptyArchiveError(e)
 	case actionerror.EmptyDirectoryError:
 		return EmptyDirectoryError(e)
 	case actionerror.EmptyBuildpackDirectoryError:

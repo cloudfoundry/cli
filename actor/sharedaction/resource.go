@@ -97,6 +97,9 @@ func (actor Actor) GatherArchiveResources(archivePath string) ([]Resource, error
 
 		resources = append(resources, resource)
 	}
+	if len(resources) <= 1 {
+		return nil, actionerror.EmptyArchiveError{Path: archivePath}
+	}
 	return resources, nil
 }
 

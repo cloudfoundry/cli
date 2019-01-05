@@ -80,6 +80,23 @@ var _ = Describe("Resource Actions", func() {
 				Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
 			})
 
+			When("archive is empty", func() {
+				BeforeEach(func() {
+					var err error
+					srcDir, err = ioutil.TempDir("", "v2-resource-actions-empty")
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				AfterEach(func() {
+					Expect(os.RemoveAll(srcDir)).ToNot(HaveOccurred())
+				})
+
+				It("returns an EmptyArchiveError", func() {
+					_, err := actor.GatherArchiveResources(archive)
+					Expect(err).To(MatchError(actionerror.EmptyArchiveError{Path: archive}))
+				})
+			})
+
 			When("the file is a symlink to an archive", func() {
 				var symlinkToArchive string
 
