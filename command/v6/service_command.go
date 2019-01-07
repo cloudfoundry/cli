@@ -122,6 +122,7 @@ func (cmd ServiceCommand) displayManagedServiceInstanceSummary(serviceInstanceSu
 		{cmd.UI.TranslateText("description:"), serviceInstanceSummary.Service.Description},
 		{cmd.UI.TranslateText("documentation:"), serviceInstanceSummary.Service.DocumentationURL},
 		{cmd.UI.TranslateText("dashboard:"), serviceInstanceSummary.DashboardURL},
+		{cmd.UI.TranslateText("service broker:"), serviceInstanceSummary.Service.ServiceBrokerName},
 	}...)
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)

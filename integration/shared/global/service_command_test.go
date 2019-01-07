@@ -296,6 +296,7 @@ var _ = Describe("service command", func() {
 							Eventually(session).Should(Say(`description:\s+fake service`))
 							Eventually(session).Should(Say(`documentation:\s+http://documentation\.url`))
 							Eventually(session).Should(Say(`dashboard:\s+http://example\.com`))
+							Eventually(session).Should(Say(`service broker:\s+%s`, broker.Name))
 							Eventually(session).Should(Say("\n\n"))
 							Consistently(session).ShouldNot(Say("shared with spaces:"))
 							Eventually(session).Should(Say(`Showing status of last operation from service %s\.\.\.`, serviceInstanceName))
