@@ -51,20 +51,37 @@ cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 
 cf delete-org -f temp-org
 
-for stack in $(cf stacks | tail -n +4 | grep -v name | awk '{print $1}'); do
-  cf buildpacks | \
-    grep -i ^integration-buildpack | \
-    grep -i -e \\s${stack} | \
-    awk '{print $1}' | \
-    xargs_func cf delete-buildpack -f -s $stack
+if [[ $(cf version) == *"version 6"* ]]; then
+  for stack in $(cf stacks | tail -n +5 | awk '{print $1}'); do
+    cf buildpacks | \
+      grep -i ^integration-buildpack | \
+      grep -i -e \\s${stack} | \
+      awk '{print $1}' | \
+      xargs_func cf delete-buildpack -f -s $stack
 
-  # Delete stack if stack happens to be integration stack
-  if [[ $stack == INTEGRATION-STACK* ]]; then
-    echo Deleting $stack
-    cf curl -X DELETE /v2/stacks/$(cf stack --guid $stack)
-  fi
-done
-cf buildpacks | grep -i -e ^integration-buildpack | awk '{print $1}' | xargs_func cf delete-buildpack -f
+    # Delete stack if stack happens to be integration stack
+    if [[ $stack == INTEGRATION-STACK* ]]; then
+      echo Deleting $stack
+      cf curl -X DELETE /v2/stacks/$(cf stack --guid $stack)
+    fi
+  done
+  cf buildpacks | grep -i -e ^integration-buildpack | awk '{print $1}' | xargs_func cf delete-buildpack -f
+else
+  for stack in $(cf stacks | tail -n +4 | awk '{print $1}'); do
+    cf buildpacks | \
+      grep -i integration-buildpack | \
+      grep -i -e \\s${stack} | \
+      awk '{print $2}' | \
+      xargs_func cf delete-buildpack -f -s $stack
+
+    # Delete stack if stack happens to be integration stack
+    if [[ $stack == INTEGRATION-STACK* ]]; then
+      echo Deleting $stack
+      cf curl -X DELETE /v2/stacks/$(cf stack --guid $stack)
+    fi
+  done
+  cf buildpacks | grep -i -e integration-buildpack | awk '{print $2}' | xargs_func cf delete-buildpack -f
+fi
 
 CF_USERS=$(cf curl /v2/users | grep total_results | grep -o '[0-9]\+')
 USER_PAGES=$(( $CF_USERS / 50 + 1))
