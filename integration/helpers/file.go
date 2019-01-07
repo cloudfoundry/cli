@@ -2,6 +2,8 @@ package helpers
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -19,4 +21,15 @@ func OSAgnosticPath(baseDir string, template string, args ...interface{}) string
 	theRealPath, err := filepath.EvalSymlinks(baseDir)
 	Expect(err).ToNot(HaveOccurred())
 	return regexp.QuoteMeta(filepath.Join(theRealPath, fmt.Sprintf(template, args...)))
+}
+
+func TempFileWithContent(contents string) *os.File {
+	tempFile, err := ioutil.TempFile("", "*")
+	Expect(err).NotTo(HaveOccurred())
+
+	bytes := []byte(contents)
+	_, err = tempFile.Write(bytes)
+	Expect(err).NotTo(HaveOccurred())
+
+	return tempFile
 }

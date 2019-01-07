@@ -140,7 +140,7 @@
       },
       "<fake-async-plan-3-guid>": {
         "sleep_seconds": 0,
-        "status": 200,
+        "status": 202,
         "body": {
         }
       },

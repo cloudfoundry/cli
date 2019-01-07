@@ -87,6 +87,109 @@ var _ = Describe("Service Instance", func() {
 		})
 	})
 
+	Describe("CreateServiceInstance", func() {
+		When("creating service instance succeeds", func() {
+			var (
+				spaceGUID       string
+				servicePlanGUID string
+				serviceInstance string
+				parameters      map[string]interface{}
+				tags            []string
+			)
+
+			BeforeEach(func() {
+				response := `{
+					"metadata": {
+						"guid": "service-instance-guid"
+					},
+					"entity": {
+						"name": "my-service-instance",
+						"service_plan_guid": "service-plan-guid",
+						"space_guid": "space-guid",
+						"dashboard_url": "http://dashboard.url",
+						"type": "managed_service_instance",
+						"last_operation": {
+							"type": "create",
+							"state": "in progress",
+							"description": "",
+							"updated_at": "2016-06-08T16:41:26Z",
+							"created_at": "2016-06-08T16:41:29Z"
+						},
+						"tags": ["a-tag", "another-tag"]
+					}
+				}`
+				spaceGUID = "some-space-guid"
+				servicePlanGUID = "some-plan-guid"
+				serviceInstance = "service-instance-name"
+				parameters = map[string]interface{}{
+					"param1": "some-value",
+					"param2": "another-value",
+				}
+				tags = []string{"a-tag, another-tag"}
+				requestBody := map[string]interface{}{
+					"name":              serviceInstance,
+					"service_plan_guid": servicePlanGUID,
+					"space_guid":        spaceGUID,
+					"parameters":        parameters,
+					"tags":              tags,
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/service_instances", "accepts_incomplete=true"),
+						VerifyJSONRepresenting(requestBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1,warning-2"}}),
+					),
+				)
+			})
+
+			It("returns the service instance and all warnings", func() {
+				serviceInstance, warnings, err := client.CreateServiceInstance(spaceGUID, servicePlanGUID, serviceInstance, parameters, tags)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+				Expect(serviceInstance).To(Equal(ServiceInstance{
+					GUID:            "service-instance-guid",
+					Name:            "my-service-instance",
+					SpaceGUID:       "space-guid",
+					ServicePlanGUID: "service-plan-guid",
+					ServiceGUID:     "",
+					Type:            "managed_service_instance",
+					Tags:            []string{"a-tag", "another-tag"},
+					DashboardURL:    "http://dashboard.url",
+					LastOperation: LastOperation{
+						Type:        "create",
+						State:       "in progress",
+						Description: "",
+						UpdatedAt:   "2016-06-08T16:41:26Z",
+						CreatedAt:   "2016-06-08T16:41:29Z",
+					},
+				}))
+			})
+		})
+
+		When("the endpoint returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+								"code": 10003,
+								"description": "You are not authorized to perform the requested action"
+							}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/service_instances"),
+						RespondWith(http.StatusForbidden, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					))
+			})
+
+			It("returns all warnings and propagates the error", func() {
+				_, warnings, err := client.CreateServiceInstance("space-GUID", "service-plan-GUID", "service-instance", map[string]interface{}{}, []string{})
+				Expect(err).To(MatchError(ccerror.ForbiddenError{
+					Message: "You are not authorized to perform the requested action",
+				}))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
 	Describe("ServiceInstance", func() {
 		Describe("Managed", func() {
 			When("type is MANAGED_SERVICE", func() {
