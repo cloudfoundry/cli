@@ -124,18 +124,18 @@ var _ = Describe("create-service command", func() {
 				})
 
 				When("the provided file contains invalid json", func() {
-					var tempFile *os.File
+					var tempFilePath string
 
 					BeforeEach(func() {
-						tempFile = helpers.TempFileWithContent(`{"invalid"}`)
+						tempFilePath = helpers.TempFileWithContent(`{"invalid"}`)
 					})
 
 					AfterEach(func() {
-						Expect(os.Remove(tempFile.Name())).To(Succeed())
+						Expect(os.Remove(tempFilePath)).To(Succeed())
 					})
 
 					It("displays an informative message and exits 1", func() {
-						session := helpers.CF("create-service", "foo", "bar", "my-service", "-c", tempFile.Name())
+						session := helpers.CF("create-service", "foo", "bar", "my-service", "-c", tempFilePath)
 						Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object\\."))
 						Eventually(session).Should(Exit(1))
 					})
@@ -248,18 +248,18 @@ var _ = Describe("create-service command", func() {
 				})
 
 				When("creating with valid params json in a file", func() {
-					var tempFile *os.File
+					var tempFilePath string
 
 					BeforeEach(func() {
-						tempFile = helpers.TempFileWithContent(`{"valid":"json"}`)
+						tempFilePath = helpers.TempFileWithContent(`{"valid":"json"}`)
 					})
 
 					AfterEach(func() {
-						Expect(os.Remove(tempFile.Name())).To(Succeed())
+						Expect(os.Remove(tempFilePath)).To(Succeed())
 					})
 
 					It("displays an informative success message, exits 0", func() {
-						session := helpers.CF("create-service", service, servicePlan, "my-service", "-c", tempFile.Name())
+						session := helpers.CF("create-service", service, servicePlan, "my-service", "-c", tempFilePath)
 						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
 							"my-service", org, space, username))
 						Eventually(session).Should(Say("OK"))
