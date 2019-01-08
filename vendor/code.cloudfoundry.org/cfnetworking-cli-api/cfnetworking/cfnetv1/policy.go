@@ -55,7 +55,7 @@ func (client Client) CreatePolicies(policies []Policy) error {
 	return client.connection.Make(request, &cfnetworking.Response{})
 }
 
-// ListPolicies will list the policies
+// ListPolicies will list the policies with the app guids in either the source or destination.
 func (client Client) ListPolicies(appGUIDs ...string) ([]Policy, error) {
 	var request *cfnetworking.Request
 	var err error

@@ -71,6 +71,51 @@ type FakeV3Actor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
+	GetApplicationsByGUIDsStub        func(appGUIDs ...string) ([]v3action.Application, v3action.Warnings, error)
+	getApplicationsByGUIDsMutex       sync.RWMutex
+	getApplicationsByGUIDsArgsForCall []struct {
+		appGUIDs []string
+	}
+	getApplicationsByGUIDsReturns struct {
+		result1 []v3action.Application
+		result2 v3action.Warnings
+		result3 error
+	}
+	getApplicationsByGUIDsReturnsOnCall map[int]struct {
+		result1 []v3action.Application
+		result2 v3action.Warnings
+		result3 error
+	}
+	GetSpacesByGUIDsStub        func(spaceGUIDs ...string) ([]v3action.Space, v3action.Warnings, error)
+	getSpacesByGUIDsMutex       sync.RWMutex
+	getSpacesByGUIDsArgsForCall []struct {
+		spaceGUIDs []string
+	}
+	getSpacesByGUIDsReturns struct {
+		result1 []v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}
+	getSpacesByGUIDsReturnsOnCall map[int]struct {
+		result1 []v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}
+	GetOrganizationsByGUIDsStub        func(orgGUIDs ...string) ([]v3action.Organization, v3action.Warnings, error)
+	getOrganizationsByGUIDsMutex       sync.RWMutex
+	getOrganizationsByGUIDsArgsForCall []struct {
+		orgGUIDs []string
+	}
+	getOrganizationsByGUIDsReturns struct {
+		result1 []v3action.Organization
+		result2 v3action.Warnings
+		result3 error
+	}
+	getOrganizationsByGUIDsReturnsOnCall map[int]struct {
+		result1 []v3action.Organization
+		result2 v3action.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -293,6 +338,168 @@ func (fake *FakeV3Actor) GetSpaceByNameAndOrganizationReturnsOnCall(i int, resul
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV3Actor) GetApplicationsByGUIDs(appGUIDs ...string) ([]v3action.Application, v3action.Warnings, error) {
+	fake.getApplicationsByGUIDsMutex.Lock()
+	ret, specificReturn := fake.getApplicationsByGUIDsReturnsOnCall[len(fake.getApplicationsByGUIDsArgsForCall)]
+	fake.getApplicationsByGUIDsArgsForCall = append(fake.getApplicationsByGUIDsArgsForCall, struct {
+		appGUIDs []string
+	}{appGUIDs})
+	fake.recordInvocation("GetApplicationsByGUIDs", []interface{}{appGUIDs})
+	fake.getApplicationsByGUIDsMutex.Unlock()
+	if fake.GetApplicationsByGUIDsStub != nil {
+		return fake.GetApplicationsByGUIDsStub(appGUIDs...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getApplicationsByGUIDsReturns.result1, fake.getApplicationsByGUIDsReturns.result2, fake.getApplicationsByGUIDsReturns.result3
+}
+
+func (fake *FakeV3Actor) GetApplicationsByGUIDsCallCount() int {
+	fake.getApplicationsByGUIDsMutex.RLock()
+	defer fake.getApplicationsByGUIDsMutex.RUnlock()
+	return len(fake.getApplicationsByGUIDsArgsForCall)
+}
+
+func (fake *FakeV3Actor) GetApplicationsByGUIDsArgsForCall(i int) []string {
+	fake.getApplicationsByGUIDsMutex.RLock()
+	defer fake.getApplicationsByGUIDsMutex.RUnlock()
+	return fake.getApplicationsByGUIDsArgsForCall[i].appGUIDs
+}
+
+func (fake *FakeV3Actor) GetApplicationsByGUIDsReturns(result1 []v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.GetApplicationsByGUIDsStub = nil
+	fake.getApplicationsByGUIDsReturns = struct {
+		result1 []v3action.Application
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3Actor) GetApplicationsByGUIDsReturnsOnCall(i int, result1 []v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.GetApplicationsByGUIDsStub = nil
+	if fake.getApplicationsByGUIDsReturnsOnCall == nil {
+		fake.getApplicationsByGUIDsReturnsOnCall = make(map[int]struct {
+			result1 []v3action.Application
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationsByGUIDsReturnsOnCall[i] = struct {
+		result1 []v3action.Application
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3Actor) GetSpacesByGUIDs(spaceGUIDs ...string) ([]v3action.Space, v3action.Warnings, error) {
+	fake.getSpacesByGUIDsMutex.Lock()
+	ret, specificReturn := fake.getSpacesByGUIDsReturnsOnCall[len(fake.getSpacesByGUIDsArgsForCall)]
+	fake.getSpacesByGUIDsArgsForCall = append(fake.getSpacesByGUIDsArgsForCall, struct {
+		spaceGUIDs []string
+	}{spaceGUIDs})
+	fake.recordInvocation("GetSpacesByGUIDs", []interface{}{spaceGUIDs})
+	fake.getSpacesByGUIDsMutex.Unlock()
+	if fake.GetSpacesByGUIDsStub != nil {
+		return fake.GetSpacesByGUIDsStub(spaceGUIDs...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getSpacesByGUIDsReturns.result1, fake.getSpacesByGUIDsReturns.result2, fake.getSpacesByGUIDsReturns.result3
+}
+
+func (fake *FakeV3Actor) GetSpacesByGUIDsCallCount() int {
+	fake.getSpacesByGUIDsMutex.RLock()
+	defer fake.getSpacesByGUIDsMutex.RUnlock()
+	return len(fake.getSpacesByGUIDsArgsForCall)
+}
+
+func (fake *FakeV3Actor) GetSpacesByGUIDsArgsForCall(i int) []string {
+	fake.getSpacesByGUIDsMutex.RLock()
+	defer fake.getSpacesByGUIDsMutex.RUnlock()
+	return fake.getSpacesByGUIDsArgsForCall[i].spaceGUIDs
+}
+
+func (fake *FakeV3Actor) GetSpacesByGUIDsReturns(result1 []v3action.Space, result2 v3action.Warnings, result3 error) {
+	fake.GetSpacesByGUIDsStub = nil
+	fake.getSpacesByGUIDsReturns = struct {
+		result1 []v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3Actor) GetSpacesByGUIDsReturnsOnCall(i int, result1 []v3action.Space, result2 v3action.Warnings, result3 error) {
+	fake.GetSpacesByGUIDsStub = nil
+	if fake.getSpacesByGUIDsReturnsOnCall == nil {
+		fake.getSpacesByGUIDsReturnsOnCall = make(map[int]struct {
+			result1 []v3action.Space
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.getSpacesByGUIDsReturnsOnCall[i] = struct {
+		result1 []v3action.Space
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3Actor) GetOrganizationsByGUIDs(orgGUIDs ...string) ([]v3action.Organization, v3action.Warnings, error) {
+	fake.getOrganizationsByGUIDsMutex.Lock()
+	ret, specificReturn := fake.getOrganizationsByGUIDsReturnsOnCall[len(fake.getOrganizationsByGUIDsArgsForCall)]
+	fake.getOrganizationsByGUIDsArgsForCall = append(fake.getOrganizationsByGUIDsArgsForCall, struct {
+		orgGUIDs []string
+	}{orgGUIDs})
+	fake.recordInvocation("GetOrganizationsByGUIDs", []interface{}{orgGUIDs})
+	fake.getOrganizationsByGUIDsMutex.Unlock()
+	if fake.GetOrganizationsByGUIDsStub != nil {
+		return fake.GetOrganizationsByGUIDsStub(orgGUIDs...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getOrganizationsByGUIDsReturns.result1, fake.getOrganizationsByGUIDsReturns.result2, fake.getOrganizationsByGUIDsReturns.result3
+}
+
+func (fake *FakeV3Actor) GetOrganizationsByGUIDsCallCount() int {
+	fake.getOrganizationsByGUIDsMutex.RLock()
+	defer fake.getOrganizationsByGUIDsMutex.RUnlock()
+	return len(fake.getOrganizationsByGUIDsArgsForCall)
+}
+
+func (fake *FakeV3Actor) GetOrganizationsByGUIDsArgsForCall(i int) []string {
+	fake.getOrganizationsByGUIDsMutex.RLock()
+	defer fake.getOrganizationsByGUIDsMutex.RUnlock()
+	return fake.getOrganizationsByGUIDsArgsForCall[i].orgGUIDs
+}
+
+func (fake *FakeV3Actor) GetOrganizationsByGUIDsReturns(result1 []v3action.Organization, result2 v3action.Warnings, result3 error) {
+	fake.GetOrganizationsByGUIDsStub = nil
+	fake.getOrganizationsByGUIDsReturns = struct {
+		result1 []v3action.Organization
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3Actor) GetOrganizationsByGUIDsReturnsOnCall(i int, result1 []v3action.Organization, result2 v3action.Warnings, result3 error) {
+	fake.GetOrganizationsByGUIDsStub = nil
+	if fake.getOrganizationsByGUIDsReturnsOnCall == nil {
+		fake.getOrganizationsByGUIDsReturnsOnCall = make(map[int]struct {
+			result1 []v3action.Organization
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.getOrganizationsByGUIDsReturnsOnCall[i] = struct {
+		result1 []v3action.Organization
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV3Actor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -304,6 +511,12 @@ func (fake *FakeV3Actor) Invocations() map[string][][]interface{} {
 	defer fake.getOrganizationByNameMutex.RUnlock()
 	fake.getSpaceByNameAndOrganizationMutex.RLock()
 	defer fake.getSpaceByNameAndOrganizationMutex.RUnlock()
+	fake.getApplicationsByGUIDsMutex.RLock()
+	defer fake.getApplicationsByGUIDsMutex.RUnlock()
+	fake.getSpacesByGUIDsMutex.RLock()
+	defer fake.getSpacesByGUIDsMutex.RUnlock()
+	fake.getOrganizationsByGUIDsMutex.RLock()
+	defer fake.getOrganizationsByGUIDsMutex.RUnlock()
 	return fake.invocations
 }
 

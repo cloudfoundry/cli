@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -42,24 +43,39 @@ var _ = Describe("Spaces", func() {
   "resources": [
     {
       "name": "space-name-1",
-      "guid": "space-guid-1"
+      "guid": "space-guid-1",
+      "relationships": {
+        "organization": {
+          "data": { "guid": "org-guid-1" }
+        }
+      }
     },
     {
       "name": "space-name-2",
-      "guid": "space-guid-2"
+      "guid": "space-guid-2",
+      "relationships": {
+        "organization": {
+          "data": { "guid": "org-guid-2" }
+        }
+      }
     }
   ]
 }`, server.URL())
 				response2 := `{
-	"pagination": {
-		"next": null
-	},
-	"resources": [
-	  {
+  "pagination": {
+    "next": null
+  },
+  "resources": [
+    {
       "name": "space-name-3",
-		  "guid": "space-guid-3"
-		}
-	]
+      "guid": "space-guid-3",
+      "relationships": {
+        "organization": {
+          "data": { "guid": "org-guid-3" }
+        }
+      }
+    }
+  ]
 }`
 
 				server.AppendHandlers(
@@ -85,9 +101,15 @@ var _ = Describe("Spaces", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(spaces).To(ConsistOf(
-					Space{Name: "space-name-1", GUID: "space-guid-1"},
-					Space{Name: "space-name-2", GUID: "space-guid-2"},
-					Space{Name: "space-name-3", GUID: "space-guid-3"},
+					Space{Name: "space-name-1", GUID: "space-guid-1", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-1"},
+					}},
+					Space{Name: "space-name-2", GUID: "space-guid-2", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-2"},
+					}},
+					Space{Name: "space-name-3", GUID: "space-guid-3", Relationships: Relationships{
+						constant.RelationshipTypeOrganization: Relationship{GUID: "org-guid-3"},
+					}},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 			})

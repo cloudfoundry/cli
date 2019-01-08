@@ -52,7 +52,6 @@ var _ = Describe("remove-network-policy command", func() {
 			orgName   string
 			spaceName string
 			appName   string
-			appGUID   string
 		)
 
 		BeforeEach(func() {
@@ -65,8 +64,6 @@ var _ = Describe("remove-network-policy command", func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
 				Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
 			})
-
-			appGUID = helpers.AppGUID(appName)
 		})
 
 		AfterEach(func() {
@@ -85,8 +82,8 @@ var _ = Describe("remove-network-policy command", func() {
 				session = helpers.CF("network-policies")
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
-				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports`))
-				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080[^-]`, appName, appName))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+				Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, appName, appName, spaceName, orgName))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -101,8 +98,8 @@ var _ = Describe("remove-network-policy command", func() {
 				session = helpers.CF("network-policies")
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
-				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports`))
-				Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080[^-]`, appName, appName))
+				Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+				Eventually(session).ShouldNot(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, appName, appName, spaceName, orgName))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -133,15 +130,11 @@ var _ = Describe("remove-network-policy command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("curl", fmt.Sprintf("/networking/v1/external/policies?id=%s", sourceAppGUID))
+					session = helpers.CF("network-policies")
+					Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, sourceOrg, sourceSpace, username))
+					Eventually(session).Should(Say(`source\s+destination\s+protocol\s+ports\s+destination space\s+destination org`))
+					Eventually(session).Should(Say(`%s\s+%s\s+tcp\s+8080\s+%s\s+%s`, sourceApp, appName, spaceName, orgName))
 					Eventually(session).Should(Exit(0))
-					Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(`{
-						"total_policies": 1,
-						"policies": [{
-							"source": { "id": %q },
-							"destination": { "id": %q, "protocol": "tcp", "ports": { "start": 8080, "end": 8080 } }
-						}]
-					}`, sourceAppGUID, appGUID)))
 				})
 
 				It("can remove a policy", func() {

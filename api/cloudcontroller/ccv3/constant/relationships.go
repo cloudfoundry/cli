@@ -11,4 +11,7 @@ const (
 
 	// RelationshipTypeSpace is a relationship with a CloudController space.
 	RelationshipTypeSpace RelationshipType = "space"
+
+	// RelationshipTypeOrganization is a relationship with a CloudController organization.
+	RelationshipTypeOrganization RelationshipType = "organization"
 )

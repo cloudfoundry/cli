@@ -3,9 +3,14 @@ package v3action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
-type Space ccv3.Space
+type Space struct {
+	GUID             string
+	Name             string
+	OrganizationGUID string
+}
 
 // ResetSpaceIsolationSegment disassociates a space from an isolation segment.
 //
@@ -53,5 +58,30 @@ func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID strin
 		return Space{}, Warnings(warnings), actionerror.SpaceNotFoundError{Name: spaceName}
 	}
 
-	return Space(spaces[0]), Warnings(warnings), nil
+	return actor.convertCCToActorSpace(spaces[0]), Warnings(warnings), nil
+}
+
+func (actor Actor) GetSpacesByGUIDs(guids ...string) ([]Space, Warnings, error) {
+	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
+		ccv3.Query{Key: ccv3.GUIDFilter, Values: guids},
+	)
+
+	if err != nil {
+		return []Space{}, Warnings(warnings), err
+	}
+
+	var v3Spaces []Space
+	for _, ccSpace := range spaces {
+		v3Spaces = append(v3Spaces, actor.convertCCToActorSpace(ccSpace))
+	}
+
+	return v3Spaces, Warnings(warnings), nil
+}
+
+func (actor Actor) convertCCToActorSpace(space ccv3.Space) Space {
+	return Space{
+		GUID:             space.GUID,
+		Name:             space.Name,
+		OrganizationGUID: space.Relationships[constant.RelationshipTypeOrganization].GUID,
+	}
 }

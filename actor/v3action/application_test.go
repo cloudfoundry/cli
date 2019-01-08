@@ -99,12 +99,21 @@ var _ = Describe("Application Actions", func() {
 
 	Describe("GetApplicationByNameAndSpace", func() {
 		When("the app exists", func() {
+			var (
+				warnings   Warnings
+				executeErr error
+				app        Application
+			)
+
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv3.Application{
 						{
 							Name: "some-app-name",
 							GUID: "some-app-guid",
+							Relationships: ccv3.Relationships{
+								constant.RelationshipTypeSpace: ccv3.Relationship{GUID: "some-space-guid"},
+							},
 						},
 					},
 					ccv3.Warnings{"some-warning"},
@@ -112,12 +121,16 @@ var _ = Describe("Application Actions", func() {
 				)
 			})
 
+			JustBeforeEach(func() {
+				app, warnings, executeErr = actor.GetApplicationByNameAndSpace("some-app-name", "some-space-guid")
+			})
+
 			It("returns the application and warnings", func() {
-				app, warnings, err := actor.GetApplicationByNameAndSpace("some-app-name", "some-space-guid")
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(app).To(Equal(Application{
-					Name: "some-app-name",
-					GUID: "some-app-guid",
+					Name:      "some-app-name",
+					GUID:      "some-app-guid",
+					SpaceGUID: "some-space-guid",
 				}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 
@@ -165,17 +178,23 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("GetApplicationsBySpace", func() {
-		When("the there are applications in the space", func() {
+		When("there are applications in the space", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
 					[]ccv3.Application{
 						{
 							GUID: "some-app-guid-1",
 							Name: "some-app-1",
+							Relationships: ccv3.Relationships{
+								constant.RelationshipTypeSpace: ccv3.Relationship{GUID: "some-space-guid-1"},
+							},
 						},
 						{
 							GUID: "some-app-guid-2",
 							Name: "some-app-2",
+							Relationships: ccv3.Relationships{
+								constant.RelationshipTypeSpace: ccv3.Relationship{GUID: "some-space-guid-2"},
+							},
 						},
 					},
 					ccv3.Warnings{"warning-1", "warning-2"},
@@ -188,12 +207,14 @@ var _ = Describe("Application Actions", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(apps).To(ConsistOf(
 					Application{
-						GUID: "some-app-guid-1",
-						Name: "some-app-1",
+						GUID:      "some-app-guid-1",
+						Name:      "some-app-1",
+						SpaceGUID: "some-space-guid-1",
 					},
 					Application{
-						GUID: "some-app-guid-2",
-						Name: "some-app-2",
+						GUID:      "some-app-guid-2",
+						Name:      "some-app-2",
+						SpaceGUID: "some-space-guid-2",
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -224,6 +245,74 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
+	Describe("GetApplicationsByGUIDs", func() {
+		When("there are applications that match provided guids", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							GUID: "some-app-guid-1",
+							Name: "some-app-1",
+							Relationships: ccv3.Relationships{
+								constant.RelationshipTypeSpace: ccv3.Relationship{GUID: "some-space-guid-1"},
+							},
+						},
+						{
+							GUID: "some-app-guid-2",
+							Name: "some-app-2",
+							Relationships: ccv3.Relationships{
+								constant.RelationshipTypeSpace: ccv3.Relationship{GUID: "some-space-guid-2"},
+							},
+						},
+					},
+					ccv3.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns the applications and warnings", func() {
+				apps, warnings, err := actor.GetApplicationsByGUIDs("some-app-guid-1", "some-app-guid-2")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(apps).To(ConsistOf(
+					Application{
+						GUID:      "some-app-guid-1",
+						Name:      "some-app-1",
+						SpaceGUID: "some-space-guid-1",
+					},
+					Application{
+						GUID:      "some-app-guid-2",
+						Name:      "some-app-2",
+						SpaceGUID: "some-space-guid-2",
+					},
+				))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"some-app-guid-1", "some-app-guid-2"}},
+				))
+			})
+		})
+
+		When("the cloud controller client returns an error", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{},
+					ccv3.Warnings{"some-warning"},
+					expectedError)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := actor.GetApplicationsByGUIDs("some-space-guid")
+				Expect(warnings).To(ConsistOf("some-warning"))
+				Expect(err).To(MatchError(expectedError))
+			})
+		})
+	})
+
 	Describe("CreateApplicationInSpace", func() {
 		var (
 			application Application
@@ -247,6 +336,9 @@ var _ = Describe("Application Actions", func() {
 						GUID:                "some-app-guid",
 						LifecycleType:       constant.AppLifecycleTypeBuildpack,
 						LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
+						Relationships: ccv3.Relationships{
+							constant.RelationshipTypeSpace: ccv3.Relationship{GUID: "some-space-guid"},
+						},
 					},
 					ccv3.Warnings{"some-warning"},
 					nil,
@@ -260,6 +352,7 @@ var _ = Describe("Application Actions", func() {
 					GUID:                "some-app-guid",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
+					SpaceGUID:           "some-space-guid",
 				}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 
@@ -335,6 +428,9 @@ var _ = Describe("Application Actions", func() {
 					StackName:           "response-stack-name",
 					LifecycleType:       constant.AppLifecycleTypeBuildpack,
 					LifecycleBuildpacks: []string{"response-buildpack-1", "response-buildpack-2"},
+					Relationships: ccv3.Relationships{
+						constant.RelationshipTypeSpace: ccv3.Relationship{GUID: "some-space-guid"},
+					},
 				}
 				fakeCloudControllerClient.UpdateApplicationReturns(
 					apiResponseApp,
@@ -350,6 +446,7 @@ var _ = Describe("Application Actions", func() {
 					StackName:           apiResponseApp.StackName,
 					LifecycleType:       apiResponseApp.LifecycleType,
 					LifecycleBuildpacks: apiResponseApp.LifecycleBuildpacks,
+					SpaceGUID:           "some-space-guid",
 				}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 
