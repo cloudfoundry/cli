@@ -22,31 +22,22 @@ configure_pipeline() {
     -l <(lpass show "Concourse Credentials" --notes)
 }
 
+# configure_infrastructure_pipeline sets a pipeline for deploying an integration CF environment. The first three parameters, which are required, are the environment's name, the name of its env-specific Lastpass note, and the name of the environment pool it belongs to. The optional fourth parameter is the pipeline configuration to use, which defaults to the base infrastruction pipeline configuration.
 configure_infrastructure_pipeline() {
   local name=$1
   local creds=$2
   local potato=$3
+  local pipeline=$4
+
+  if [[ -z $pipeline ]]; then
+    pipeline=$pipelines_path/infrastructure/pipeline.yml
+  fi
 
   printf "configuring the $name pipeline...\n"
 
   fly -t ci set-pipeline \
     -p $name \
-    -c $pipelines_path/infrastructure/pipeline.yml \
-    -l <(lpass show "Concourse Credentials" --notes) \
-    -l <(lpass show "$creds" --notes) \
-    -v pool-name=$potato
-}
-
-configure_legacy_infrastructure_pipeline() {
-  local name=$1
-  local creds=$2
-  local potato=$3
-
-  printf "configuring the $name pipeline...\n"
-
-  fly -t ci set-pipeline \
-    -p $name \
-    -c $pipelines_path/infrastructure/lola-pipeline.yml \
+    -c $pipeline \
     -l <(lpass show "Concourse Credentials" --notes) \
     -l <(lpass show "$creds" --notes) \
     -v pool-name=$potato
@@ -85,8 +76,13 @@ configure_infrastructure_pipeline inf-beque beque-pipeline baked-potato
 configure_infrastructure_pipeline inf-hardknox hardknox-pipeline baked-potato
 configure_infrastructure_pipeline inf-lovingcup lovingcup-pipeline baked-potato
 configure_infrastructure_pipeline inf-tartine tartine-pipeline baked-potato
-configure_infrastructure_pipeline inf-arsicault arsicault-pipeline deep-fried-potato
 
-configure_legacy_infrastructure_pipeline inf-lola lola-pipeline kloesse
+# Arsicault has additional configuration to alert the PM before it rolls.
+arsicault_pipeline="bosh int $pipelines_path/infrastructure/pipeline.yml -o $pipelines_path/infrastructure/add-pm-alert-and-wait.yml"
+configure_infrastructure_pipeline inf-arsicault arsicault-pipeline deep-fried-potato <(eval $arsicault_pipeline)
+
+# Lola (legacy pipeline) uses a different base pipeline configuration than the other infrastructures.
+lola_pipeline=$pipelines_path/infrastructure/lola-pipeline.yml
+configure_infrastructure_pipeline inf-lola lola-pipeline kloesse $lola_pipeline
 
 configure_bosh_lite_pool_pipeline bosh-lites

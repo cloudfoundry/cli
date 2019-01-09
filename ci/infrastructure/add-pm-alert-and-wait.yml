@@ -1,0 +1,55 @@
+---
+# Add job to send slack alert and then wait 10 minutes
+- type: replace
+  path: /jobs/0:before
+  value:
+    name: alert-pm
+    plan:
+    - aggregate:
+      - get: cf-deployment
+        trigger: true
+    - put: slack-alert
+      params:
+        channel: '#cli-eng'
+        text: |
+          ((pm-slack-handle)) A new version of cf-deployment has been released and ((stack-name)) will be redeploying in 10 minutes! Pause the "deploy" task if you want to halt the redeploy for the time being.
+    - task: wait-10-minutes
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: busybox
+        run:
+          path: sh
+          args:
+          - -c
+          - |
+            sleep 600
+
+- type: replace
+  path: /groups/name=create/jobs/-
+  value: alert-pm
+
+# Make deploy trigger after the 10 minute wait
+- type: replace
+  path: /jobs/name=deploy/plan/0/aggregate/get=cf-deployment/passed?
+  value: [alert-pm]
+
+# Add slack notification resource
+- type: replace
+  path: /resource_types?
+  value:
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+      tag: latest
+
+- type: replace
+  path: /resources/-
+  value:
+    name: slack-alert
+    type: slack-notification
+    source:
+      url: ((slack-webhook-url))
