@@ -127,7 +127,7 @@ how wide reaching the intended changes are.**
 The [Integration test README](/integration/README.md) contains a full set of
 details on how to configure and run the integration tests. In addition to the
 configuration mentioned in the README, the CLI's `Makefile` contains the
-following support commands that will run `make build cleanup-integration` prior
+following support commands that will run `make build integration-cleanup` prior
 to running integration tests:
 
 ```bash
