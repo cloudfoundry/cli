@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/sorting"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -43,13 +42,6 @@ func (cmd *StacksCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd StacksCommand) Execute(args []string) error {
-	const MaxArgsAllowed = 0
-	if len(args) > MaxArgsAllowed {
-		return translatableerror.TooManyArgumentsError{
-			ExtraArgument: args[MaxArgsAllowed],
-		}
-	}
-
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err

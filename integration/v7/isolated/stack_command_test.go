@@ -79,17 +79,6 @@ var _ = Describe("stack command", func() {
 					Eventually(session).Should(Exit(1))
 				})
 			})
-
-			When("there too many arguments", func() {
-				It("ignores the extra arguments", func() {
-					session := helpers.CF("stack", stackName, "extra")
-
-					Eventually(session).Should(Say(`Getting stack %s as %s\.\.\.`, stackName, username))
-					Eventually(session.Err).Should(Say("Stack %s not found", stackName))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
 		})
 
 		When("the stack does not exist", func() {

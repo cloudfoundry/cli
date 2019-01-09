@@ -28,17 +28,6 @@ var _ = Describe("buildpacks command", func() {
 		})
 	})
 
-	When("too many args are passed", func() {
-		It("displays FAILED, then usage, then exits 1", func() {
-			Skip("blocked on #162975536")
-			session := helpers.CF("buildpacks", "no-further-args-allowed")
-			Eventually(session.Err).Should(Say("Incorrect Usage: unexpected argument"))
-			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Say("buildpacks - List all buildpacks"))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
 	When("the targeted API supports stack association", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()

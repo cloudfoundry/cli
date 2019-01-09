@@ -174,9 +174,14 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 		return err
 	}
 
+	err = preventExtraArgs(args)
+	if err != nil {
+		return handleError(err, commandUI)
+	}
+
 	err = cfConfig.CreatePluginHome()
 	if err != nil {
-		return err
+		return handleError(err, commandUI)
 	}
 
 	// TODO: when the line in the old code under `cf` which calls

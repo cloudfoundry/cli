@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -51,20 +50,6 @@ var _ = Describe("stacks Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-	})
-
-	When("too many args are passed", func() {
-		BeforeEach(func() {
-			args = []string{"first-extra-arg", "second-extra-arg"}
-		})
-
-		It("returns a TooManyArgumentsError", func() {
-			Expect(executeErr).To(MatchError(
-				translatableerror.TooManyArgumentsError{
-					ExtraArgument: "first-extra-arg",
-				},
-			))
-		})
 	})
 
 	Context("When the environment is not setup correctly", func() {
