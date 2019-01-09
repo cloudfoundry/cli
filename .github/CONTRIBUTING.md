@@ -144,7 +144,7 @@ If the number of parallel nodes for the non-global test suites would like to be
 adjusted, set the `NODES` environment variable:
 
 ```bash
-NODES=10 make integration-tests
+NODES=10 make integration-cleanup
 ```
 
 # Modifying the CLI codebase
