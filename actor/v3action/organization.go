@@ -3,6 +3,8 @@ package v3action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/api/cloudcontroller/ccversion"
 )
 
 // Organization represents a V3 actor organization.
@@ -25,12 +27,38 @@ func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, e
 }
 
 func (actor Actor) GetOrganizationsByGUIDs(guids ...string) ([]Organization, Warnings, error) {
+	currentV3Ver := actor.CloudControllerClient.CloudControllerAPIVersion()
+
+	minSpacesGUIDsSupportVer, _ := semver.Make(ccversion.MinVersionSpacesGUIDsParamV3)
+
+	guidsSupport := false
+	queries := []ccv3.Query{}
+	currentV3SemVer, err := semver.Make(currentV3Ver)
+	if err == nil {
+		guidsSupport = currentV3SemVer.GTE(minSpacesGUIDsSupportVer)
+	}
+
+	if guidsSupport {
+		queries = []ccv3.Query{ccv3.Query{Key: ccv3.GUIDFilter, Values: guids}}
+	}
+
 	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(
-		ccv3.Query{Key: ccv3.GUIDFilter, Values: guids},
+		queries...,
 	)
 	if err != nil {
 		return []Organization{}, Warnings(warnings), err
 	}
+
+	guidToOrg := make(map[string]ccv3.Organization)
+	for _, org := range orgs {
+		guidToOrg[org.GUID] = org
+	}
+
+	filteredOrgs := make([]ccv3.Organization, 0)
+	for _, guid := range guids {
+		filteredOrgs = append(filteredOrgs, guidToOrg[guid])
+	}
+	orgs = filteredOrgs
 
 	return actor.convertCCToActorOrganizations(orgs), Warnings(warnings), nil
 }

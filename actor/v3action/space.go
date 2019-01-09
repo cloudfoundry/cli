@@ -4,6 +4,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"github.com/blang/semver"
 )
 
 type Space struct {
@@ -62,9 +64,34 @@ func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID strin
 }
 
 func (actor Actor) GetSpacesByGUIDs(guids ...string) ([]Space, Warnings, error) {
-	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
-		ccv3.Query{Key: ccv3.GUIDFilter, Values: guids},
-	)
+
+	currentV3Ver := actor.CloudControllerClient.CloudControllerAPIVersion()
+
+	minSpacesGUIDsSupportVer, _ := semver.Make(ccversion.MinVersionSpacesGUIDsParamV3)
+
+	guidsSupport := false
+	queries := []ccv3.Query{}
+	currentV3SemVer, err := semver.Make(currentV3Ver)
+	if err == nil {
+		guidsSupport = currentV3SemVer.GTE(minSpacesGUIDsSupportVer)
+	}
+
+	if guidsSupport {
+		queries = []ccv3.Query{ccv3.Query{Key: ccv3.GUIDFilter, Values: guids}}
+	}
+
+	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(queries...)
+
+	var filteredSpaces []ccv3.Space
+	guidToSpaces := map[string]ccv3.Space{}
+	for _, space := range spaces {
+		guidToSpaces[space.GUID] = space
+	}
+
+	for _, guid := range guids {
+		filteredSpaces = append(filteredSpaces, guidToSpaces[guid])
+	}
+	spaces = filteredSpaces
 
 	if err != nil {
 		return []Space{}, Warnings(warnings), err

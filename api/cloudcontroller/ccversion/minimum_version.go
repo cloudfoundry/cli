@@ -22,4 +22,5 @@ const (
 	MinVersionRoutingV3            = "3.16.0"
 	MinVersionShareServiceV3       = "3.36.0"
 	MinVersionZeroDowntimePushV3   = "3.57.0"
+	MinVersionSpacesGUIDsParamV3   = "3.56.0"
 )
