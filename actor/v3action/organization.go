@@ -2,9 +2,9 @@ package v3action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/versioncheck"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/api/cloudcontroller/ccversion"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 )
 
 // Organization represents a V3 actor organization.
@@ -29,22 +29,17 @@ func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, e
 func (actor Actor) GetOrganizationsByGUIDs(guids ...string) ([]Organization, Warnings, error) {
 	currentV3Ver := actor.CloudControllerClient.CloudControllerAPIVersion()
 
-	minSpacesGUIDsSupportVer, _ := semver.Make(ccversion.MinVersionSpacesGUIDsParamV3)
-
-	guidsSupport := false
-	queries := []ccv3.Query{}
-	currentV3SemVer, err := semver.Make(currentV3Ver)
-	if err == nil {
-		guidsSupport = currentV3SemVer.GTE(minSpacesGUIDsSupportVer)
+	guidsSupport, err := versioncheck.IsMinimumAPIVersionMet(currentV3Ver, ccversion.MinVersionSpacesGUIDsParamV3)
+	if err != nil {
+		guidsSupport = false
 	}
 
+	queries := []ccv3.Query{}
 	if guidsSupport {
 		queries = []ccv3.Query{ccv3.Query{Key: ccv3.GUIDFilter, Values: guids}}
 	}
 
-	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(
-		queries...,
-	)
+	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(queries...)
 	if err != nil {
 		return []Organization{}, Warnings(warnings), err
 	}
