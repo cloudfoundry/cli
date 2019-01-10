@@ -12,19 +12,15 @@ import (
 
 var _ = Describe("env command", func() {
 	var (
-		orgName     string
-		spaceName   string
-		appName     string
-		envVarName  string
-		envVarValue string
+		orgName   string
+		spaceName string
+		appName   string
 	)
 
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
-		envVarName = "SOME_ENV_VAR"
-		envVarValue = "SOME_ENV_VAR_VALUE"
 	})
 
 	Describe("help", func() {
