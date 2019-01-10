@@ -55,7 +55,7 @@ var _ = Describe("env command", func() {
 
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
-			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "env", appName, envVarName, envVarValue)
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "env", appName)
 		})
 	})
 
