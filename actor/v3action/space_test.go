@@ -223,67 +223,152 @@ var _ = Describe("Space", func() {
 	})
 
 	Describe("GetSpacesByGUIDs", func() {
-		When("the GetSpace call is successful", func() {
-			When("the cloud controller returns back multiple spaces", func() {
+		Context("when the api returns a bogus semver", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CloudControllerAPIVersionReturns("bogus")
+			})
+
+			It("defaults to client side filtering", func() {
+				_, _, executeErr := actor.GetSpacesByGUIDs("space-guid-1", "space-guid-2")
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(BeEmpty())
+			})
+		})
+
+		Context("when CC API supports the 'guids' query param", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CloudControllerAPIVersionReturns("3.56.0")
+			})
+			When("the GetSpace call is successful", func() {
+				When("the cloud controller returns back multiple spaces", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetSpacesReturns(
+							[]ccv3.Space{
+								{
+									GUID: "space-guid-1",
+									Name: "space-1",
+									Relationships: ccv3.Relationships{
+										constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-1"},
+									},
+								},
+								{
+									GUID: "space-guid-2",
+									Name: "space-2",
+									Relationships: ccv3.Relationships{
+										constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-2"},
+									},
+								},
+							},
+							ccv3.Warnings{"space-warning-1", "space-warning-2"}, nil)
+					})
+
+					It("returns back the first space and warnings", func() {
+						spaces, warnings, executeErr := actor.GetSpacesByGUIDs("space-guid-1", "space-guid-2")
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(spaces).To(ConsistOf(
+							Space{
+								GUID:             "space-guid-1",
+								Name:             "space-1",
+								OrganizationGUID: "org-guid-1",
+							},
+							Space{
+								GUID:             "space-guid-2",
+								Name:             "space-2",
+								OrganizationGUID: "org-guid-2",
+							},
+						))
+						Expect(warnings).To(ConsistOf("space-warning-1", "space-warning-2"))
+
+						Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
+							ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"space-guid-1", "space-guid-2"}},
+						))
+					})
+				})
+			})
+
+			When("the GetSpace call is unsuccessful", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSpacesReturns(
-						[]ccv3.Space{
-							{
-								GUID: "space-guid-1",
-								Name: "space-1",
-								Relationships: ccv3.Relationships{
-									constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-1"},
-								},
-							},
-							{
-								GUID: "space-guid-2",
-								Name: "space-2",
-								Relationships: ccv3.Relationships{
-									constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-2"},
-								},
-							},
-						},
-						ccv3.Warnings{"space-warning-1", "space-warning-2"}, nil)
+						nil,
+						ccv3.Warnings{"space-warning-1", "space-warning-2"},
+						errors.New("cannot get space"))
 				})
 
-				It("returns back the first space and warnings", func() {
-					spaces, warnings, executeErr := actor.GetSpacesByGUIDs("space-guid-1", "space-guid-2")
-					Expect(executeErr).ToNot(HaveOccurred())
-
-					Expect(spaces).To(ConsistOf(
-						Space{
-							GUID:             "space-guid-1",
-							Name:             "space-1",
-							OrganizationGUID: "org-guid-1",
-						},
-						Space{
-							GUID:             "space-guid-2",
-							Name:             "space-2",
-							OrganizationGUID: "org-guid-2",
-						},
-					))
+				It("returns an error and warnings", func() {
+					_, warnings, executeErr := actor.GetSpacesByGUIDs("space-guid-1", "space-guid-2")
+					Expect(executeErr).To(MatchError("cannot get space"))
 					Expect(warnings).To(ConsistOf("space-warning-1", "space-warning-2"))
-
-					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
-						ccv3.Query{Key: ccv3.GUIDFilter, Values: []string{"space-guid-1", "space-guid-2"}},
-					))
 				})
 			})
 		})
 
-		When("the GetSpace call is unsuccessful", func() {
+		Context("when CC API does not support the 'guids' query param", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpacesReturns(
-					nil,
-					ccv3.Warnings{"space-warning-1", "space-warning-2"},
-					errors.New("cannot get space"))
+				fakeCloudControllerClient.CloudControllerAPIVersionReturns("3.55.0")
 			})
 
-			It("returns an error and warnings", func() {
-				_, warnings, executeErr := actor.GetSpacesByGUIDs("space-guid-1", "space-guid-2")
-				Expect(executeErr).To(MatchError("cannot get space"))
-				Expect(warnings).To(ConsistOf("space-warning-1", "space-warning-2"))
+			When("the GetSpace call is successful", func() {
+				When("the cloud controller returns back multiple spaces", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetSpacesReturns(
+							[]ccv3.Space{
+								{
+									GUID: "space-guid-1",
+									Name: "space-1",
+									Relationships: ccv3.Relationships{
+										constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-1"},
+									},
+								},
+								{
+									GUID: "space-guid-2",
+									Name: "space-2",
+									Relationships: ccv3.Relationships{
+										constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-2"},
+									},
+								},
+								{
+									GUID: "space-guid-3",
+									Name: "space-3",
+									Relationships: ccv3.Relationships{
+										constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-3"},
+									},
+								},
+								{
+									GUID: "space-guid-4",
+									Name: "space-4",
+									Relationships: ccv3.Relationships{
+										constant.RelationshipTypeOrganization: ccv3.Relationship{GUID: "org-guid-4"},
+									},
+								},
+							},
+							ccv3.Warnings{"space-warning-1", "space-warning-2"}, nil)
+					})
+
+					It("returns back the first space and warnings", func() {
+						spaces, warnings, executeErr := actor.GetSpacesByGUIDs("space-guid-1", "space-guid-2")
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(spaces).To(ConsistOf(
+							Space{
+								GUID:             "space-guid-1",
+								Name:             "space-1",
+								OrganizationGUID: "org-guid-1",
+							},
+							Space{
+								GUID:             "space-guid-2",
+								Name:             "space-2",
+								OrganizationGUID: "org-guid-2",
+							},
+						))
+						Expect(warnings).To(ConsistOf("space-warning-1", "space-warning-2"))
+
+						Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(BeEmpty())
+					})
+				})
 			})
 		})
 	})
