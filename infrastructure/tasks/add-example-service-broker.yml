@@ -18,9 +18,9 @@ run:
   args:
   - -c
   - |
-    set -eux
+    set -eu
 
-    pushd state
+    pushd state/ci/infrastructure/${FOUNDATION_NAME}
       eval "$(bbl print-env)"
     popd
 
