@@ -24,6 +24,7 @@ type SpaceRepository interface {
 	Rename(spaceGUID, newName string) (apiErr error)
 	SetAllowSSH(spaceGUID string, allow bool) (apiErr error)
 	Delete(spaceGUID string) (apiErr error)
+	DeleteUnmappedRoutes(spaceGUID string) (apiErr error)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -117,5 +118,10 @@ func (repo CloudControllerSpaceRepository) SetAllowSSH(spaceGUID string, allow b
 
 func (repo CloudControllerSpaceRepository) Delete(spaceGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/spaces/%s?recursive=true", spaceGUID)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
+}
+
+func (repo CloudControllerSpaceRepository) DeleteUnmappedRoutes(spaceGUID string) (apiErr error) {
+	path := fmt.Sprintf("/v2/spaces/%s/unmapped_routes", spaceGUID)
 	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }

@@ -23,6 +23,7 @@ const (
 	DeleteServiceBindingRequest                          = "DeleteServiceBinding"
 	DeleteServicePlanVisibilityRequest                   = "DeleteServicePlanVisibility"
 	DeleteSpaceRequest                                   = "DeleteSpace"
+	DeleteUnmappedRoutesRequest                          = "DeleteUnmappedRoutes"
 	GetAppInstancesRequest                               = "GetAppInstances"
 	GetAppRequest                                        = "GetApp"
 	GetAppRoutesRequest                                  = "GetAppRoutes"
@@ -206,6 +207,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/spaces/:space_guid/staging_security_groups", Method: http.MethodGet, Name: GetSpaceStagingSecurityGroupsRequest},
 	{Path: "/v2/spaces/:space_guid/managers", Method: http.MethodPut, Name: PutSpaceManagerByUsernameRequest},
 	{Path: "/v2/spaces/:space_guid/managers/:manager_guid", Method: http.MethodPut, Name: PutSpaceManagerRequest},
+	{Path: "/v2/spaces/:space_guid/unmapped_routes", Method: http.MethodDelete, Name: DeleteUnmappedRoutesRequest},
 	{Path: "/v2/stacks", Method: http.MethodGet, Name: GetStacksRequest},
 	{Path: "/v2/stacks/:stack_guid", Method: http.MethodGet, Name: GetStackRequest},
 	{Path: "/v2/user_provided_service_instances", Method: http.MethodGet, Name: GetUserProvidedServiceInstancesRequest},
