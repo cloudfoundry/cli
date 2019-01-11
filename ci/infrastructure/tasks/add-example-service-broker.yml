@@ -1,0 +1,48 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
+
+params:
+  FOUNDATION_NAME:
+
+inputs:
+  - name: overview-broker
+  - name: state
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -eux
+
+    pushd state
+      eval "$(bbl print-env)"
+    popd
+
+    credhub login
+    export CF_PASSWORD=$(credhub get -n /bosh-${FOUNDATION_NAME}/cf/cf_admin_password | bosh interpolate --path /value -)
+    export CF_API=https://api.${FOUNDATION_NAME}.cli.fun
+
+    wget https://s3-us-west-1.amazonaws.com/cf-cli-releases/releases/v6.41.0/cf-cli_6.41.0_linux_x86-64.tgz
+    tar zxf cf-cli_6.41.0_linux_x86-64.tgz -C /usr/local/bin
+    chmod 755 /usr/local/bin/cf
+
+    cf api $CF_API --skip-ssl-validation
+    cf auth admin $CF_PASSWORD
+
+    cf create-org broker
+    cf create-space broker -o broker
+    cf target -o broker -s broker
+
+    pushd overview-broker
+      wget https://raw.githubusercontent.com/mattmcneeney/overview-broker/master/examples/cloudfoundry/manifest.yaml
+      sed -i '/random-route/d' manifest.yaml
+      cf push
+    popd
+
+    cf create-service-broker overview-broker admin password https://overview-broker.${FOUNDATION_NAME}.cli.fun
