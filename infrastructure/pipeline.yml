@@ -40,6 +40,11 @@ resources:
     private_key: ((cli-pools-github-private-key))
     branch: master
     pool: ((pool-name))
+- name: overview-broker
+  type: git
+  source:
+    uri: https://github.com/mattmcneeney/overview-broker
+    branch: master
 
 jobs:
 - name: deploy
@@ -51,6 +56,7 @@ jobs:
       trigger: true
     - get: cf-deployment-concourse-tasks
     - get: state
+    - get: overview-broker
     - put: gcp-bosh-pool
       params:
         claim: ((stack-name)).cli.fun
@@ -108,6 +114,8 @@ jobs:
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
       CLEAN_ALL: true
+  - task: add-example-service-broker
+    file: cli-ci/ci/infrastructure/tasks/add-example-service-broker.yml
   ensure:
     aggregate:
       - put: state
