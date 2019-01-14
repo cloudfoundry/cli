@@ -45,4 +45,15 @@ run:
       cf push
     popd
 
-    cf create-service-broker overview-broker admin password https://overview-broker.${FOUNDATION_NAME}.cli.fun
+    set +e # Prevent script from failing if grep exits 1 (no matches found)
+    cf service-brokers | grep overview-broker
+    found=$?
+    set -e
+
+    if [[ $found -eq 1 ]]; then # No broker named overview-broker exists, so let's create it
+      cf create-service-broker overview-broker admin password https://overview-broker.${FOUNDATION_NAME}.cli.fun
+    elif [[ $found -eq 0 ]]; then # overview-broker already exists, so let's update it
+      cf update-service-broker overview-broker admin password https://overview-broker.${FOUNDATION_NAME}.cli.fun
+    else
+      echo "Failed checking for 'overview-broker'." && exit 1
+    fi
