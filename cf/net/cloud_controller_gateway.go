@@ -16,6 +16,16 @@ type ccErrorResponse struct {
 	Description string
 }
 
+type v3ErrorItem struct {
+	Code   int
+	Title  string
+	Detail string
+}
+
+type v3CCError struct {
+	Errors []v3ErrorItem
+}
+
 const invalidTokenCode = 1000
 
 func cloudControllerErrorHandler(statusCode int, body []byte) error {
@@ -24,6 +34,13 @@ func cloudControllerErrorHandler(statusCode int, body []byte) error {
 
 	if response.Code == invalidTokenCode {
 		return errors.NewInvalidTokenError(response.Description)
+	}
+
+	var v3response v3CCError
+	_ = json.Unmarshal(body, &v3response)
+
+	if len(v3response.Errors) > 0 && v3response.Errors[0].Code == invalidTokenCode {
+		return errors.NewInvalidTokenError(v3response.Errors[0].Detail)
 	}
 
 	return errors.NewHTTPError(statusCode, strconv.Itoa(response.Code), response.Description)

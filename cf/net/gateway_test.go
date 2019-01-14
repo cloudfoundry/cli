@@ -490,6 +490,35 @@ var _ = Describe("Gateway", func() {
 			Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
 		})
 
+		Context("v3 endpoint", func() {
+			It("refreshes the token when the CC requests fail", func() {
+				invalidTokenResponse := `{
+					"errors": [
+						{
+							"detail": "Invalid Auth Token",
+							"title": "CF-InvalidAuthToken",
+							"code": 1000
+						}
+					]
+				}`
+				apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
+					invalidTokenResponse,
+					testnet.TestResponse{Status: http.StatusOK},
+				))
+
+				defer apiServer.Close()
+				ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
+
+				config, auth := createAuthenticationRepository(apiServer, authServer)
+				ccGateway.SetTokenRefresher(auth)
+				request, apiErr := ccGateway.NewRequest("POST", config.APIEndpoint()+"/v3/foo", config.AccessToken(), strings.NewReader("expected body"))
+				_, apiErr = ccGateway.PerformRequest(request)
+
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
+				Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
+			})
+		})
 		It("returns a failure response when token refresh fails after a UAA request", func() {
 			apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
 				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
