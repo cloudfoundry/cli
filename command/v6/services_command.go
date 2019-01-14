@@ -2,6 +2,7 @@ package v6
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -9,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/util/sorting"
 )
 
 //go:generate counterfeiter . ServiceInstancesActor
@@ -70,6 +72,8 @@ func (cmd ServicesCommand) Execute(args []string) error {
 		return nil
 	}
 
+	sortServiceInstances(instanceSummaries)
+
 	table := [][]string{{
 		cmd.UI.TranslateText("name"),
 		cmd.UI.TranslateText("service"),
@@ -104,4 +108,22 @@ func (cmd ServicesCommand) Execute(args []string) error {
 	cmd.UI.DisplayTableWithHeader("", table, 3)
 
 	return nil
+}
+
+func sortServiceInstances(instanceSummaries []v2action.ServiceInstanceSummary) {
+	sort.Slice(instanceSummaries, func(i, j int) bool {
+		return sorting.LessIgnoreCase(instanceSummaries[i].Name, instanceSummaries[j].Name)
+	})
+
+	for _, instance := range instanceSummaries {
+		sortBoundApps(instance)
+	}
+}
+
+func sortBoundApps(serviceInstance v2action.ServiceInstanceSummary) {
+	sort.Slice(
+		serviceInstance.BoundApplications,
+		func(i, j int) bool {
+			return sorting.LessIgnoreCase(serviceInstance.BoundApplications[i].AppName, serviceInstance.BoundApplications[j].AppName)
+		})
 }
