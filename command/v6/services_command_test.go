@@ -145,8 +145,14 @@ var _ = Describe("services Command", func() {
 									ServiceBrokerName: "broker-1",
 								},
 								BoundApplications: []v2action.BoundApplication{
-									{AppName: "app-1"},
 									{AppName: "app-2"},
+									{AppName: "app-1"},
+								},
+							},
+							{
+								ServiceInstance: v2action.ServiceInstance{
+									Name: "instance-3",
+									Type: constant.ServiceInstanceTypeUserProvidedService,
 								},
 							},
 							{
@@ -159,19 +165,13 @@ var _ = Describe("services Command", func() {
 									ServiceBrokerName: "broker-2",
 								},
 							},
-							{
-								ServiceInstance: v2action.ServiceInstance{
-									Name: "instance-3",
-									Type: constant.ServiceInstanceTypeUserProvidedService,
-								},
-							},
 						},
 						v2action.Warnings{"get-summary-warnings"},
 						nil,
 					)
 				})
 
-				It("displays all the services in the org & space & warnings", func() {
+				It("displays all the services and apps in alphanumeric sorted order together with the org & space & warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Out).To(Say("Getting services in org %s / space %s as %s...", "some-org",
 						"some-space", fakeUser.Name))

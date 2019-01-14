@@ -70,6 +70,7 @@ type CloudControllerClient interface {
 	GetSpaceSecurityGroups(spaceGUID string, filters ...ccv2.Filter) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, filters ...ccv2.Filter) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetSpaceServices(spaceGUID string, filters ...ccv2.Filter) ([]ccv2.Service, ccv2.Warnings, error)
+	GetSpaceSummary(spaceGUID string) (ccv2.SpaceSummary, ccv2.Warnings, error)
 	GetSpaceStagingSecurityGroups(spaceGUID string, filters ...ccv2.Filter) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetSpaces(filters ...ccv2.Filter) ([]ccv2.Space, ccv2.Warnings, error)
 	GetStack(guid string) (ccv2.Stack, ccv2.Warnings, error)
