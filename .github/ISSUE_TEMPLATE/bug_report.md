@@ -31,4 +31,4 @@ Steps to reproduce the behavior; include the exact CLI commands and verbose outp
 - version of the CLI you are running
 - version of the CC API Release you are on
 
-Note: As of January 2018, we no longer support API versions older than 2.69.0/3.4.0 (CF Release: 251 / CAPI Release: 1.15.0)
+Note: As of January 2019, we no longer support API versions older than CF Release v284/CF Deployment v1.7.0 (CAPI Release: 1.46.0 (APIs 2.100.0 and 3.35.0).
