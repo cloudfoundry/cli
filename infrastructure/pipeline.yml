@@ -116,6 +116,8 @@ jobs:
       CLEAN_ALL: true
   - task: add-example-service-broker
     file: cli-ci/ci/infrastructure/tasks/add-example-service-broker.yml
+    params:
+      FOUNDATION_NAME: ((stack-name))
   ensure:
     aggregate:
       - put: state
