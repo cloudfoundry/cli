@@ -22,7 +22,7 @@ var _ = Describe("curl command", func() {
 		Eventually(session).Should(Say(`\n`))
 
 		Eventually(session).Should(Say(`USAGE:\n`))
-		Eventually(session).Should(Say(`\s+cf curl PATH \[-iv\] \[-X METHOD\] \[-H HEADER\] \[-d DATA\] \[--output FILE\]`))
+		Eventually(session).Should(Say(`\s+cf curl PATH \[-iv\] \[-X METHOD\] \[-H HEADER\]\.\.\. \[-d DATA\] \[--output FILE\]`))
 		Eventually(session).Should(Say(`\s+By default 'cf curl' will perform a GET to the specified PATH. If data`))
 		Eventually(session).Should(Say(`\s+is provided via -d, a POST will be performed instead, and the Content-Type\n`))
 		Eventually(session).Should(Say(`\s+will be set to application/json. You may override headers with -H and the\n`))
@@ -87,7 +87,6 @@ var _ = Describe("curl command", func() {
 		When("unknown flag is specified", func() {
 			It("fails and displays the help text", func() {
 				session := helpers.CF("curl", "--test")
-				// TODO Legacy cf uses a weird quote around test. This test needs be fixed for refactored command
 				Eventually(session.Err).Should(Say("Incorrect Usage: unknown flag `test'"))
 				ExpectHelpText(session)
 				Eventually(session).Should(Exit(1))
@@ -98,7 +97,6 @@ var _ = Describe("curl command", func() {
 			It("fails and displays the help text", func() {
 				session := helpers.CF("curl", "/v2/apps", "/v2/apps")
 				Eventually(session).Should(Say("FAILED\n"))
-				// TODO Legacy code uses Incorrect Usage.(dot) instead of Incorrect Usage: (colon). Fix this test after refactor
 				Eventually(session).Should(Say("Incorrect Usage. An argument is missing or not correctly enclosed."))
 				ExpectHelpText(session)
 				Eventually(session).Should(Exit(1))
