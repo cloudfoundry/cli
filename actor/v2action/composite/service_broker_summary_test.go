@@ -2,13 +2,11 @@ package composite_test
 
 import (
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	. "code.cloudfoundry.org/cli/actor/v2action/composite"
 	"code.cloudfoundry.org/cli/actor/v2action/composite/compositefakes"
-	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,20 +14,23 @@ import (
 
 var _ = Describe("Service Broker Summary Actions", func() {
 	var (
-		fakeServiceActor          *compositefakes.FakeServiceActor
-		fakeOrgActor              *compositefakes.FakeOrganizationActor
-		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
-		actor                     *ServiceBrokerSummaryCompositeActor
+		fakeServiceActor    *compositefakes.FakeServiceActor
+		fakeBrokerActor     *compositefakes.FakeBrokerActor
+		fakeOrgActor        *compositefakes.FakeOrganizationActor
+		fakeVisibilityActor *compositefakes.FakeVisibilityActor
+		actor               *ServiceBrokerSummaryCompositeActor
 	)
 
 	BeforeEach(func() {
 		fakeOrgActor = new(compositefakes.FakeOrganizationActor)
 		fakeServiceActor = new(compositefakes.FakeServiceActor)
-		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
+		fakeBrokerActor = new(compositefakes.FakeBrokerActor)
+		fakeVisibilityActor = new(compositefakes.FakeVisibilityActor)
 		actor = &ServiceBrokerSummaryCompositeActor{
-			CloudControllerClient: fakeCloudControllerClient,
-			ServiceActor:          fakeServiceActor,
-			OrgActor:              fakeOrgActor,
+			ServiceActor:    fakeServiceActor,
+			BrokerActor:     fakeBrokerActor,
+			OrgActor:        fakeOrgActor,
+			VisibilityActor: fakeVisibilityActor,
 		}
 	})
 
@@ -55,15 +56,15 @@ var _ = Describe("Service Broker Summary Actions", func() {
 					service = ""
 					organization = ""
 
-					fakeCloudControllerClient.GetServiceBrokersReturns(
-						[]ccv2.ServiceBroker{
+					fakeBrokerActor.GetServiceBrokersReturns(
+						[]v2action.ServiceBroker{
 							{Name: "broker-1", GUID: "broker-guid-1"},
 							{Name: "broker-2", GUID: "broker-guid-2"},
 						},
-						ccv2.Warnings{"get-brokers-warning"}, nil)
+						v2action.Warnings{"get-brokers-warning"}, nil)
 				})
 
-				When("there broker contains no services", func() {
+				When("the brokers contain no services", func() {
 					It("returns expected Service Brokers", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("get-brokers-warning"))
@@ -82,8 +83,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 							},
 						))
 
-						Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)).To(BeEmpty())
+						Expect(fakeBrokerActor.GetServiceBrokersCallCount()).To(Equal(1))
 					})
 				})
 
@@ -196,7 +196,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 										Expect(fakeServiceActor.GetServicesWithPlansForBrokerArgsForCall(0)).To(Equal("broker-guid-1"))
 										Expect(fakeServiceActor.GetServicesWithPlansForBrokerArgsForCall(1)).To(Equal("broker-guid-2"))
 
-										Expect(fakeCloudControllerClient.GetServicePlanVisibilitiesCallCount()).To(Equal(0))
+										Expect(fakeVisibilityActor.GetServicePlanVisibilitiesCallCount()).To(Equal(0))
 									})
 								})
 
@@ -215,19 +215,19 @@ var _ = Describe("Service Broker Summary Actions", func() {
 
 									When("fetching orgs and service plan visibilities is successful", func() {
 										BeforeEach(func() {
-											fakeCloudControllerClient.GetServicePlanVisibilitiesReturnsOnCall(0,
-												[]ccv2.ServicePlanVisibility{
+											fakeVisibilityActor.GetServicePlanVisibilitiesReturnsOnCall(0,
+												[]v2action.ServicePlanVisibility{
 													{OrganizationGUID: "org-guid-1"},
 													{OrganizationGUID: "org-guid-2"},
 												},
-												ccv2.Warnings{"service-plan-visibility-1"},
+												v2action.Warnings{"service-plan-visibility-1"},
 												nil)
-											fakeCloudControllerClient.GetServicePlanVisibilitiesReturnsOnCall(1,
-												[]ccv2.ServicePlanVisibility{
+											fakeVisibilityActor.GetServicePlanVisibilitiesReturnsOnCall(1,
+												[]v2action.ServicePlanVisibility{
 													{OrganizationGUID: "org-guid-3"},
 													{OrganizationGUID: "org-guid-4"},
 												},
-												ccv2.Warnings{"service-plan-visibility-2"},
+												v2action.Warnings{"service-plan-visibility-2"},
 												nil)
 
 											fakeOrgActor.GetOrganizationReturnsOnCall(0,
@@ -276,25 +276,17 @@ var _ = Describe("Service Broker Summary Actions", func() {
 												},
 											))
 
-											Expect(fakeCloudControllerClient.GetServicePlanVisibilitiesCallCount()).To(Equal(2))
-											Expect(fakeCloudControllerClient.GetServicePlanVisibilitiesArgsForCall(0)).To(ConsistOf(ccv2.Filter{
-												Type:     constant.ServicePlanGUIDFilter,
-												Operator: constant.EqualOperator,
-												Values:   []string{"service-plan-guid-1"},
-											}))
-											Expect(fakeCloudControllerClient.GetServicePlanVisibilitiesArgsForCall(1)).To(ConsistOf(ccv2.Filter{
-												Type:     constant.ServicePlanGUIDFilter,
-												Operator: constant.EqualOperator,
-												Values:   []string{"service-plan-guid-2"},
-											}))
+											Expect(fakeVisibilityActor.GetServicePlanVisibilitiesCallCount()).To(Equal(2))
+											Expect(fakeVisibilityActor.GetServicePlanVisibilitiesArgsForCall(0)).To(Equal("service-plan-guid-1"))
+											Expect(fakeVisibilityActor.GetServicePlanVisibilitiesArgsForCall(1)).To(Equal("service-plan-guid-2"))
 										})
 									})
 
 									When("fetching the service plan visibilities fails", func() {
 										BeforeEach(func() {
-											fakeCloudControllerClient.GetServicePlanVisibilitiesReturnsOnCall(0,
+											fakeVisibilityActor.GetServicePlanVisibilitiesReturns(
 												nil,
-												ccv2.Warnings{"service-plan-visibility-1"},
+												v2action.Warnings{"service-plan-visibility-1"},
 												errors.New("boom"))
 										})
 
@@ -311,18 +303,18 @@ var _ = Describe("Service Broker Summary Actions", func() {
 
 								When("fetching the organizations fails", func() {
 									BeforeEach(func() {
-										fakeServiceActor.GetServicesWithPlansForBrokerReturnsOnCall(0, v2action.ServicesWithPlans{
+										fakeServiceActor.GetServicesWithPlansForBrokerReturns(v2action.ServicesWithPlans{
 											v2action.Service{Label: "service-1", GUID: "service-guid-1"}: []v2action.ServicePlan{
 												{GUID: "service-plan-guid-1", Name: "service-plan-1", Public: false},
 											},
 											v2action.Service{Label: "service-2", GUID: "service-guid-2"}: nil,
 										}, v2action.Warnings{"service-warning-1"}, nil)
-										fakeCloudControllerClient.GetServicePlanVisibilitiesReturnsOnCall(0,
-											[]ccv2.ServicePlanVisibility{
+										fakeVisibilityActor.GetServicePlanVisibilitiesReturns(
+											[]v2action.ServicePlanVisibility{
 												{OrganizationGUID: "org-guid-1"},
 												{OrganizationGUID: "org-guid-2"},
 											},
-											ccv2.Warnings{"service-plan-visibility-1"},
+											v2action.Warnings{"service-plan-visibility-1"},
 											nil)
 
 										fakeOrgActor.GetOrganizationReturnsOnCall(0,
@@ -364,7 +356,7 @@ var _ = Describe("Service Broker Summary Actions", func() {
 
 			When("fetching service brokers fails", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceBrokersReturns(nil, ccv2.Warnings{"test-warning"}, errors.New("explode"))
+					fakeBrokerActor.GetServiceBrokersReturns(nil, v2action.Warnings{"test-warning"}, errors.New("explode"))
 				})
 
 				It("returns the warnings and propagates the error", func() {
@@ -380,17 +372,15 @@ var _ = Describe("Service Broker Summary Actions", func() {
 				service = ""
 				organization = ""
 
-				fakeCloudControllerClient.GetServiceBrokersReturns(
-					[]ccv2.ServiceBroker{
-						{Name: "broker-1", GUID: "broker-guid-1"},
-					},
-					ccv2.Warnings{"get-brokers-warning"},
+				fakeBrokerActor.GetServiceBrokerByNameReturns(
+					v2action.ServiceBroker{Name: "broker-1", GUID: "broker-guid-1"},
+					v2action.Warnings{"get-broker-warning"},
 					nil)
 			})
 
 			It("returns expected Service Brokers", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("get-brokers-warning"))
+				Expect(warnings).To(ConsistOf("get-broker-warning"))
 				Expect(summaries).To(ConsistOf(
 					v2action.ServiceBrokerSummary{
 						ServiceBroker: v2action.ServiceBroker{
@@ -399,12 +389,22 @@ var _ = Describe("Service Broker Summary Actions", func() {
 						},
 					}))
 
-				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)).To(ConsistOf(ccv2.Filter{
-					Type:     constant.NameFilter,
-					Operator: constant.EqualOperator,
-					Values:   []string{broker},
-				}))
+				Expect(fakeBrokerActor.GetServiceBrokerByNameCallCount()).To(Equal(1))
+				Expect(fakeBrokerActor.GetServiceBrokerByNameArgsForCall(0)).To(Equal("broker-1"))
+			})
+
+			When("fetching the service broker fails", func() {
+				BeforeEach(func() {
+					fakeBrokerActor.GetServiceBrokerByNameReturns(
+						v2action.ServiceBroker{},
+						v2action.Warnings{"get-broker-warning"},
+						fmt.Errorf("it broke"))
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(executeErr).To(MatchError("it broke"))
+					Expect(warnings).To(ConsistOf("get-broker-warning"))
+				})
 			})
 		})
 	})

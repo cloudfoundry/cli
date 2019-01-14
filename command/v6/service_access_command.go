@@ -14,6 +14,7 @@ import (
 )
 
 //go:generate counterfeiter . ServiceAccessActor
+
 type ServiceAccessActor interface {
 	GetServiceBrokerSummaries(broker string, service string, organization string) ([]v2action.ServiceBrokerSummary, v2action.Warnings, error)
 }
@@ -42,9 +43,10 @@ func (cmd *ServiceAccessCommand) Setup(config command.Config, ui command.UI) err
 	}
 	baseActor := v2action.NewActor(ccClient, uaaClient, config)
 	cmd.Actor = &composite.ServiceBrokerSummaryCompositeActor{
-		CloudControllerClient: ccClient,
-		ServiceActor:          baseActor,
-		OrgActor:              baseActor,
+		ServiceActor:    baseActor,
+		BrokerActor:     baseActor,
+		OrgActor:        baseActor,
+		VisibilityActor: baseActor,
 	}
 
 	return nil

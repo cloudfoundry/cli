@@ -5,7 +5,7 @@ import (
 	sync "sync"
 
 	v2action "code.cloudfoundry.org/cli/actor/v2action"
-	wrappers "code.cloudfoundry.org/cli/actor/v2action/composite"
+	composite "code.cloudfoundry.org/cli/actor/v2action/composite"
 )
 
 type FakeOrganizationActor struct {
@@ -118,4 +118,4 @@ func (fake *FakeOrganizationActor) recordInvocation(key string, args []interface
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ wrappers.OrganizationActor = new(FakeOrganizationActor)
+var _ composite.OrganizationActor = new(FakeOrganizationActor)
