@@ -18,7 +18,7 @@ import (
 //go:generate counterfeiter . CurlRepository
 
 type CurlRepository interface {
-	Request(method, path, header, body string) (resHeaders string, resBody string, apiErr error)
+	Request(method, path, header, body string, failOnHTTPError bool) (resHeaders string, resBody string, apiErr error)
 }
 
 type CloudControllerCurlRepository struct {
@@ -32,7 +32,7 @@ func NewCloudControllerCurlRepository(config coreconfig.Reader, gateway net.Gate
 	return
 }
 
-func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string) (resHeaders, resBody string, err error) {
+func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string, failOnHTTPError bool) (resHeaders, resBody string, err error) {
 	url := fmt.Sprintf("%s/%s", repo.config.APIEndpoint(), strings.TrimLeft(path, "/"))
 
 	if method == "" && body != "" {
@@ -52,7 +52,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 
 	res, err := repo.gateway.PerformRequest(req)
 
-	if _, ok := err.(errors.HTTPError); ok {
+	if _, ok := err.(errors.HTTPError); ok && !failOnHTTPError {
 		err = nil
 	}
 

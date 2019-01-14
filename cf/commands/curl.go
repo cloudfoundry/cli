@@ -17,6 +17,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	cfErrors "code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
@@ -40,6 +41,7 @@ func (cmd *Curl) MetaData() commandregistry.CommandMetadata {
 	fs["H"] = &flags.StringSliceFlag{ShortName: "H", Usage: T("Custom headers to include in the request, flag can be specified multiple times")}
 	fs["d"] = &flags.StringFlag{ShortName: "d", Usage: T("HTTP data to include in the request body, or '@' followed by a file name to read the data from")}
 	fs["output"] = &flags.StringFlag{Name: "output", Usage: T("Write curl body to FILE instead of stdout")}
+	fs["fail"] = &flags.BoolFlag{ShortName: "f", Name: "fail", Usage: "foo"}
 
 	return commandregistry.CommandMetadata{
 		Name:        "curl",
@@ -106,9 +108,12 @@ func (cmd *Curl) Execute(c flags.FlagContext) error {
 
 	reqHeader := strings.Join(headers, "\n")
 
-	responseHeader, responseBody, apiErr := cmd.curlRepo.Request(method, path, reqHeader, body)
-	if apiErr != nil {
-		return errors.New(T("Error creating request:\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
+	responseHeader, responseBody, err := cmd.curlRepo.Request(method, path, reqHeader, body, c.Bool("fail"))
+	if err != nil {
+		if httpErr, ok := err.(cfErrors.HTTPError); ok && c.Bool("fail") {
+			return cfErrors.NewCurlHTTPError(httpErr.StatusCode())
+		}
+		return errors.New(T("Error creating request:\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
 
 	if trace.LoggingToStdout && !cmd.pluginCall {

@@ -2,6 +2,7 @@ package api_test
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"time"
 
@@ -43,7 +44,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 			deps.config.SetAPIEndpoint(ts.URL)
 
 			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-			headers, body, apiErr = repo.Request("GET", "/v2/endpoint", "", "")
+			headers, body, apiErr = repo.Request("GET", "/v2/endpoint", "", "", false)
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -81,7 +82,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 			deps.config.SetAPIEndpoint(ts.URL)
 
 			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-			headers, body, apiErr = repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
+			headers, body, apiErr = repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`, false)
 			Expect(handler).To(HaveAllRequestsCalled())
 		})
 
@@ -90,6 +91,13 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 		})
 
 		Context("when the server returns a 400 Bad Request header", func() {
+			var (
+				deps            curlDependencies
+				handler         *testnet.TestHandler
+				ts              *httptest.Server
+				failOnHTTPError bool
+			)
+
 			BeforeEach(func() {
 				req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
@@ -100,14 +108,20 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 						Body:   expectedJSONResponse},
 				})
 
-				ts, handler := testnet.NewServer([]testnet.TestRequest{req})
-				defer ts.Close()
+				ts, handler = testnet.NewServer([]testnet.TestRequest{req})
 
-				deps := newCurlDependencies()
+				deps = newCurlDependencies()
 				deps.config.SetAPIEndpoint(ts.URL)
+				failOnHTTPError = false
+			})
 
+			AfterEach(func() {
+				ts.Close()
+			})
+
+			JustBeforeEach(func() {
 				repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-				_, body, apiErr = repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
+				_, body, apiErr = repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`, failOnHTTPError)
 				Expect(handler).To(HaveAllRequestsCalled())
 			})
 
@@ -118,13 +132,23 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 			It("does not return an error", func() {
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
+
+			When("the failOnHttpError is true", func() {
+				BeforeEach(func() {
+					failOnHTTPError = true
+				})
+
+				It("returns the error", func() {
+					Expect(apiErr).To(HaveOccurred())
+				})
+			})
 		})
 
 		Context("when provided with invalid headers", func() {
 			It("returns an error", func() {
 				deps := newCurlDependencies()
 				repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-				_, _, apiErr := repo.Request("POST", "/v2/endpoint", "not-valid", "")
+				_, _, apiErr := repo.Request("POST", "/v2/endpoint", "not-valid", "", false)
 				Expect(apiErr).To(HaveOccurred())
 				Expect(apiErr.Error()).To(ContainSubstring("headers"))
 			})
@@ -151,7 +175,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 
 				headers := "content-type: ascii/cats\nx-something-else:5"
 				repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-				_, _, apiErr := repo.Request("POST", "/v2/endpoint", headers, "")
+				_, _, apiErr := repo.Request("POST", "/v2/endpoint", headers, "", false)
 				Expect(handler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
@@ -168,7 +192,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 		deps.config.SetAPIEndpoint(ccServer.URL())
 
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-		_, _, err := repo.Request("", "/v2/endpoint", "", "body")
+		_, _, err := repo.Request("", "/v2/endpoint", "", "body", false)
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
@@ -184,7 +208,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 		deps.config.SetAPIEndpoint(ccServer.URL())
 
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-		_, _, err := repo.Request("", "/v2/endpoint", "", "")
+		_, _, err := repo.Request("", "/v2/endpoint", "", "", false)
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(ccServer.ReceivedRequests()).To(HaveLen(1))

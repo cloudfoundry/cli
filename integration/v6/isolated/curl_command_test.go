@@ -525,6 +525,13 @@ var _ = Describe("curl command", func() {
 				Eventually(session).Should(Exit(0))
 				Expect(session.Out.Contents()).To(MatchJSON(expectedJSON))
 			})
+
+			When("the -f flag is passed", func() {
+				It("should exit 22", func() {
+					session := helpers.CF("curl", "/v2/garbage-endpoint", "-f")
+					Eventually(session).Should(Exit(22))
+				})
+			})
 		})
 	})
 })
