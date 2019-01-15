@@ -52,9 +52,6 @@ run:
 
     set -x
 
-    credhub get -n /bosh-$ENV/cf/router_ssl | bosh int --path /value/certificate - > /tmp/cf_ssl.crt
-    export SSL_CERT_FILE=/tmp/cf_ssl.crt
-    export SKIP_SSL_VALIDATION=false
     domain=$(cat bosh-lock/name)
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
