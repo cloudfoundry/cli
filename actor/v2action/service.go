@@ -49,3 +49,40 @@ func (actor Actor) getServiceByNameForSpace(serviceName, spaceGUID string) (Serv
 
 	return Service(services[0]), Warnings(warnings), nil
 }
+
+type ServicesWithPlans map[Service][]ServicePlan
+
+func (actor Actor) GetServicesWithPlansForBroker(brokerGUID string) (ServicesWithPlans, Warnings, error) {
+	var allWarnings Warnings
+	services, warnings, err := actor.CloudControllerClient.GetServices(ccv2.Filter{
+		Type:     constant.ServiceBrokerGUIDFilter,
+		Operator: constant.EqualOperator,
+		Values:   []string{brokerGUID},
+	})
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	servicesWithPlans := ServicesWithPlans{}
+	for _, service := range services {
+		servicePlans, warnings, err := actor.CloudControllerClient.GetServicePlans(ccv2.Filter{
+			Type:     constant.ServiceGUIDFilter,
+			Operator: constant.EqualOperator,
+			Values:   []string{service.GUID},
+		})
+		allWarnings = append(allWarnings, Warnings(warnings)...)
+		if err != nil {
+			return nil, allWarnings, err
+		}
+
+		plansToReturn := []ServicePlan{}
+		for _, plan := range servicePlans {
+			plansToReturn = append(plansToReturn, ServicePlan(plan))
+		}
+
+		servicesWithPlans[Service(service)] = plansToReturn
+	}
+
+	return servicesWithPlans, allWarnings, nil
+}

@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2action/composite"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -40,7 +41,13 @@ func (cmd *ServiceAccessCommand) Setup(config command.Config, ui command.UI) err
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
+	baseActor := v2action.NewActor(ccClient, uaaClient, config)
+	cmd.Actor = &composite.ServiceBrokerSummaryCompositeActor{
+		ServiceActor:    baseActor,
+		BrokerActor:     baseActor,
+		OrgActor:        baseActor,
+		VisibilityActor: baseActor,
+	}
 
 	return nil
 }
