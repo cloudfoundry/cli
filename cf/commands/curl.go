@@ -41,13 +41,13 @@ func (cmd *Curl) MetaData() commandregistry.CommandMetadata {
 	fs["H"] = &flags.StringSliceFlag{ShortName: "H", Usage: T("Custom headers to include in the request, flag can be specified multiple times")}
 	fs["d"] = &flags.StringFlag{ShortName: "d", Usage: T("HTTP data to include in the request body, or '@' followed by a file name to read the data from")}
 	fs["output"] = &flags.StringFlag{Name: "output", Usage: T("Write curl body to FILE instead of stdout")}
-	fs["fail"] = &flags.BoolFlag{ShortName: "f", Name: "fail", Usage: "foo"}
+	fs["fail"] = &flags.BoolFlag{ShortName: "f", Name: "fail", Usage: "Server errors return exit code 22"}
 
 	return commandregistry.CommandMetadata{
 		Name:        "curl",
 		Description: T("Executes a request to the targeted API endpoint"),
 		Usage: []string{
-			T(`CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]
+			T(`CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER]... [-d DATA] [--output FILE]
 
    By default 'CF_NAME curl' will perform a GET to the specified PATH. If data
    is provided via -d, a POST will be performed instead, and the Content-Type

@@ -39,6 +39,7 @@ var _ = Describe("curl command", func() {
 		Eventually(session).Should(Say(`\s+-H\s+Custom headers to include in the request, flag can be specified multiple times`))
 		Eventually(session).Should(Say(`\s+-X\s+HTTP method \(GET,POST,PUT,DELETE,etc\)`))
 		Eventually(session).Should(Say(`\s+-d\s+HTTP data to include in the request body, or '@' followed by a file name to read the data from`))
+		Eventually(session).Should(Say(`\s+--fail,\s+-f\s+Server errors return exit code 22`))
 		Eventually(session).Should(Say(`\s+-i\s+Include response headers in the output`))
 		Eventually(session).Should(Say(`\s+--output\s+Write curl body to FILE instead of stdout`))
 	}
