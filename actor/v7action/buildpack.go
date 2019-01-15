@@ -12,6 +12,7 @@ import (
 )
 
 type Buildpack ccv3.Buildpack
+type JobURL ccv3.JobURL
 
 //go:generate counterfeiter . Downloader
 
@@ -183,4 +184,72 @@ func Zipit(source, target, prefix string) error {
 	})
 
 	return err
+}
+
+// Returns a buildpack with the provided name and stack.
+// If `buildpackStack` is not specified, and there are multiple buildpacks with the same name, it will return the one
+// with no stack, if present.
+func (actor Actor) GetBuildpackByNameAndStack(buildpackName string, buildpackStack string) (Buildpack, Warnings, error) {
+	var (
+		ccv3Buildpacks []ccv3.Buildpack
+		warnings       ccv3.Warnings
+		err            error
+	)
+
+	if buildpackStack == "" {
+		ccv3Buildpacks, warnings, err = actor.CloudControllerClient.GetBuildpacks(ccv3.Query{
+			Key:    ccv3.NameFilter,
+			Values: []string{buildpackName},
+		})
+	} else {
+		ccv3Buildpacks, warnings, err = actor.CloudControllerClient.GetBuildpacks(
+			ccv3.Query{
+				Key:    ccv3.NameFilter,
+				Values: []string{buildpackName},
+			},
+			ccv3.Query{
+				Key:    ccv3.StackFilter,
+				Values: []string{buildpackStack},
+			},
+		)
+	}
+
+	if err != nil {
+		return Buildpack{}, Warnings(warnings), err
+	}
+
+	if len(ccv3Buildpacks) == 0 {
+		return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, StackName: buildpackStack}
+	}
+
+	if len(ccv3Buildpacks) > 1 {
+		for _, buildpack := range ccv3Buildpacks {
+			if buildpack.Stack == "" {
+				return Buildpack(buildpack), Warnings(warnings), nil
+			}
+		}
+		return Buildpack{}, Warnings(warnings), actionerror.MultipleBuildpacksFoundError{BuildpackName: buildpackName}
+	}
+
+	return Buildpack(ccv3Buildpacks[0]), Warnings(warnings), err
+}
+
+func (actor Actor) DeleteBuildpackByNameAndStack(buildpackName string, buildpackStack string) (Warnings, error) {
+	var allWarnings Warnings
+	buildpack, getBuildpackWarnings, err := actor.GetBuildpackByNameAndStack(buildpackName, buildpackStack)
+	allWarnings = append(allWarnings, getBuildpackWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	jobURL, deleteBuildpackWarnings, err := actor.CloudControllerClient.DeleteBuildpack(buildpack.GUID)
+	allWarnings = append(allWarnings, deleteBuildpackWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, pollWarnings...)
+
+	return Warnings(allWarnings), err
 }

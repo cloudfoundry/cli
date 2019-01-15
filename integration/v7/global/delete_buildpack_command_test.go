@@ -1,13 +1,11 @@
 package global
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("delete-buildpack command", func() {
@@ -31,8 +29,8 @@ var _ = Describe("delete-buildpack command", func() {
 			Eventually(session).Should(Say(`cf delete-buildpack BUILDPACK \[-f] \[-s STACK]`))
 			Eventually(session).Should(Say("\n"))
 			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say(`-f\s+Force deletion without confirmation`))
-			Eventually(session).Should(Say(`-s\s+Specify stack to disambiguate buildpacks with the same name. Required when buildpack name is ambiguous`))
+			Eventually(session).Should(Say(`--force, -f\s+Force deletion without confirmation`))
+			Eventually(session).Should(Say(`--stack, -s\s+Specify stack to disambiguate buildpacks with the same name. Required when buildpack name is ambiguous`))
 			Eventually(session).Should(Say("\n"))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("buildpacks"))
@@ -55,14 +53,13 @@ var _ = Describe("delete-buildpack command", func() {
 				session := helpers.CF("delete-buildpack", "-f", "nonexistent-buildpack")
 				Eventually(session).Should(Say(`Deleting buildpack nonexistent-buildpack\.\.\.`))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Buildpack nonexistent-buildpack does not exist."))
+				Eventually(session.Err).Should(Say("Buildpack nonexistent-buildpack does not exist."))
 				Eventually(session).Should(Exit(0))
 			})
 		})
 
 		When("the user specifies a stack", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 				stacks = helpers.FetchStacks()
 			})
 
@@ -70,7 +67,7 @@ var _ = Describe("delete-buildpack command", func() {
 				session := helpers.CF("delete-buildpack", "-f", "nonexistent-buildpack", "-s", stacks[0])
 				Eventually(session).Should(Say(`Deleting buildpack nonexistent-buildpack with stack %s\.\.\.`, stacks[0]))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Buildpack nonexistent-buildpack with stack %s not found.", stacks[0]))
+				Eventually(session.Err).Should(Say("Buildpack nonexistent-buildpack with stack %s not found.", stacks[0]))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -79,7 +76,6 @@ var _ = Describe("delete-buildpack command", func() {
 	Context("there is exactly one buildpack with the specified name", func() {
 		When("the stack is specified", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 				stacks = helpers.FetchStacks()
 				helpers.BuildpackWithStack(func(buildpackPath string) {
 					session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
@@ -105,7 +101,6 @@ var _ = Describe("delete-buildpack command", func() {
 
 	Context("there are two buildpacks with same name", func() {
 		BeforeEach(func() {
-			helpers.SkipIfVersionLessThan(ccversion.MinVersionBuildpackStackAssociationV2)
 			stacks = helpers.EnsureMinimumNumberOfStacks(2)
 		})
 
@@ -126,7 +121,7 @@ var _ = Describe("delete-buildpack command", func() {
 				By("failing when no stack specified")
 
 				session := helpers.CF("delete-buildpack", buildpackName, "-f")
-				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Multiple buildpacks named %s found. Specify a stack name by using a '-s' flag.", buildpackName))
 				Eventually(session).Should(Exit(1))
 
 				By("succeeding with warning when the buildpack name matches but the stack does not")
@@ -134,7 +129,7 @@ var _ = Describe("delete-buildpack command", func() {
 				session = helpers.CF("delete-buildpack", buildpackName, "-s", "not-a-real-stack", "-f")
 				Eventually(session).Should(Say(`Deleting buildpack %s with stack not-a-real-stack\.\.\.`, buildpackName))
 				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say(`Buildpack %s with stack not-a-real-stack not found\.`, buildpackName))
+				Eventually(session.Err).Should(Say(`Buildpack %s with stack not-a-real-stack not found\.`, buildpackName))
 				Eventually(session).Should(Exit(0))
 
 				By("deleting the buildpack when the associated stack is specified")
@@ -165,7 +160,7 @@ var _ = Describe("delete-buildpack command", func() {
 			})
 
 			It("properly handles ambiguity", func() {
-				By("deleting nil buildpack when no stack specified")
+				By("deleting the nil stack buildpack when no stack specified")
 				session := helpers.CF("delete-buildpack", buildpackName, "-f")
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -236,33 +231,12 @@ var _ = Describe("delete-buildpack command", func() {
 		})
 	})
 
-	When("the -f flag is provided", func() {
-		It("deletes the buildpack", func() {
-			session := helpers.CF("delete-buildpack", buildpackName, "-f")
+	When("the --force flag is provided", func() {
+		It("deletes the buildpack without asking for confirmation", func() {
+			session := helpers.CF("delete-buildpack", buildpackName, "--force")
 			Eventually(session).Should(Say(`Deleting buildpack %s\.\.\.`, buildpackName))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
-		})
-	})
-
-	When("the -s flag is provided", func() {
-		When("the API is less than the minimum", func() {
-			var server *Server
-
-			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithAPIVersions(ccversion.MinV2ClientVersion, ccversion.MinV3ClientVersion)
-			})
-
-			AfterEach(func() {
-				server.Close()
-			})
-
-			It("fails with no networking api error message", func() {
-				session := helpers.CF("delete-buildpack", "potato", "-s", "ahoyhoy")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Option '-s' requires CF API version %s or higher. Your target is %s.", ccversion.MinVersionBuildpackStackAssociationV2, ccversion.MinV2ClientVersion))
-				Eventually(session).Should(Exit(1))
-			})
 		})
 	})
 })

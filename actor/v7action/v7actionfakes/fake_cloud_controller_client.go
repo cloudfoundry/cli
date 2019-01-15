@@ -177,6 +177,21 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	DeleteBuildpackStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteBuildpackMutex       sync.RWMutex
+	deleteBuildpackArgsForCall []struct {
+		arg1 string
+	}
+	deleteBuildpackReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteBuildpackReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteIsolationSegmentStub        func(string) (ccv3.Warnings, error)
 	deleteIsolationSegmentMutex       sync.RWMutex
 	deleteIsolationSegmentArgsForCall []struct {
@@ -1585,6 +1600,72 @@ func (fake *FakeCloudControllerClient) DeleteApplicationProcessInstanceReturnsOn
 		result1 ccv3.Warnings
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteBuildpack(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteBuildpackMutex.Lock()
+	ret, specificReturn := fake.deleteBuildpackReturnsOnCall[len(fake.deleteBuildpackArgsForCall)]
+	fake.deleteBuildpackArgsForCall = append(fake.deleteBuildpackArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteBuildpack", []interface{}{arg1})
+	fake.deleteBuildpackMutex.Unlock()
+	if fake.DeleteBuildpackStub != nil {
+		return fake.DeleteBuildpackStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteBuildpackReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteBuildpackCallCount() int {
+	fake.deleteBuildpackMutex.RLock()
+	defer fake.deleteBuildpackMutex.RUnlock()
+	return len(fake.deleteBuildpackArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteBuildpackCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteBuildpackMutex.Lock()
+	defer fake.deleteBuildpackMutex.Unlock()
+	fake.DeleteBuildpackStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteBuildpackArgsForCall(i int) string {
+	fake.deleteBuildpackMutex.RLock()
+	defer fake.deleteBuildpackMutex.RUnlock()
+	argsForCall := fake.deleteBuildpackArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteBuildpackReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteBuildpackMutex.Lock()
+	defer fake.deleteBuildpackMutex.Unlock()
+	fake.DeleteBuildpackStub = nil
+	fake.deleteBuildpackReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteBuildpackReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteBuildpackMutex.Lock()
+	defer fake.deleteBuildpackMutex.Unlock()
+	fake.DeleteBuildpackStub = nil
+	if fake.deleteBuildpackReturnsOnCall == nil {
+		fake.deleteBuildpackReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteBuildpackReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) DeleteIsolationSegment(arg1 string) (ccv3.Warnings, error) {
@@ -4478,6 +4559,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteApplicationMutex.RUnlock()
 	fake.deleteApplicationProcessInstanceMutex.RLock()
 	defer fake.deleteApplicationProcessInstanceMutex.RUnlock()
+	fake.deleteBuildpackMutex.RLock()
+	defer fake.deleteBuildpackMutex.RUnlock()
 	fake.deleteIsolationSegmentMutex.RLock()
 	defer fake.deleteIsolationSegmentMutex.RUnlock()
 	fake.deleteIsolationSegmentOrganizationMutex.RLock()

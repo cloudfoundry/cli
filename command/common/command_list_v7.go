@@ -68,7 +68,7 @@ type commandList struct {
 	CreateUserProvidedService          v6.CreateUserProvidedServiceCommand          `command:"create-user-provided-service" alias:"cups" description:"Make a user-provided service instance available to CF apps"`
 	CreateUser                         v6.CreateUserCommand                         `command:"create-user" description:"Create a new user"`
 	Curl                               v6.CurlCommand                               `command:"curl" description:"Executes a request to the targeted API endpoint"`
-	DeleteBuildpack                    v6.DeleteBuildpackCommand                    `command:"delete-buildpack" description:"Delete a buildpack"`
+	DeleteBuildpack                    v7.DeleteBuildpackCommand                    `command:"delete-buildpack" description:"Delete a buildpack"`
 	DeleteDomain                       v6.DeleteDomainCommand                       `command:"delete-domain" description:"Delete a domain"`
 	DeleteIsolationSegment             v6.DeleteIsolationSegmentCommand             `command:"delete-isolation-segment" description:"Delete an isolation segment"`
 	DeleteOrg                          v6.DeleteOrgCommand                          `command:"delete-org" description:"Delete an org"`

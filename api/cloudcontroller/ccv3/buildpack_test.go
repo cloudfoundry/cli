@@ -492,4 +492,80 @@ var _ = Describe("Buildpacks", func() {
 			})
 		})
 	})
+
+	Describe("DeleteBuildpacks", func() {
+		var (
+			buildpackGUID = "some-guid"
+
+			jobURL     JobURL
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			jobURL, warnings, executeErr = client.DeleteBuildpack(buildpackGUID)
+		})
+
+		When("buildpacks exist", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/buildpacks/"+buildpackGUID),
+						RespondWith(http.StatusAccepted, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}, "Location": {"some-job-url"}}),
+					),
+				)
+			})
+
+			It("returns the delete job URL and all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Expect(jobURL).To(Equal(JobURL("some-job-url")))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "buildpack not found",
+      "title": "CF-buildpackNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/buildpacks/"+buildpackGUID),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "buildpack not found",
+							Title:  "CF-buildpackNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 })
