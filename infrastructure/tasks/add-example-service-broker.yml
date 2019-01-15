@@ -21,15 +21,29 @@ run:
     set -eu
 
     pushd state/ci/infrastructure/${FOUNDATION_NAME}
-      eval "$(bbl print-env)"
+      if [[ "${FOUNDATION_NAME}" == "lola" ]]; then
+        eval "$(bbl5 print-env)"
+
+        export JUMPBOX_IP=$(jq ".jumpbox.url" -r bbl-state.json)
+        export CREDHUB_PROXY="ssh+socks5://jumpbox@$JUMPBOX_IP?private-key=$JUMPBOX_PRIVATE_KEY"
+
+        set +u
+        credhub1 login --username $CREDHUB_USER --password $CREDHUB_PASSWORD
+        set -u
+
+        export CF_PASSWORD=$(credhub1 get -n /bosh-${FOUNDATION_NAME}/cf/cf_admin_password | bosh interpolate --path /value -)
+      else
+        eval "$(bbl print-env)"
+        credhub login
+
+        export CF_PASSWORD=$(credhub get -n /bosh-${FOUNDATION_NAME}/cf/cf_admin_password | bosh interpolate --path /value -)
+      fi
     popd
 
-    credhub login
-    export CF_PASSWORD=$(credhub get -n /bosh-${FOUNDATION_NAME}/cf/cf_admin_password | bosh interpolate --path /value -)
     export CF_API=https://api.${FOUNDATION_NAME}.cli.fun
 
-    wget https://s3-us-west-1.amazonaws.com/cf-cli-releases/releases/v6.41.0/cf-cli_6.41.0_linux_x86-64.tgz
-    tar zxf cf-cli_6.41.0_linux_x86-64.tgz -C /usr/local/bin
+    wget https://s3-us-west-1.amazonaws.com/cf-cli-releases/releases/v6.42.0/cf-cli_6.42.0_linux_x86-64.tgz
+    tar zxf cf-cli_6.42.0_linux_x86-64.tgz -C /usr/local/bin
     chmod 755 /usr/local/bin/cf
 
     cf api $CF_API --skip-ssl-validation
