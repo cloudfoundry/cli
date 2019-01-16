@@ -2,15 +2,13 @@ package ccv2
 
 import (
 	"bytes"
-	"encoding/json"
-	"io"
-	"mime/multipart"
-	"path/filepath"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/buildpacks"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 	"code.cloudfoundry.org/cli/types"
+	"encoding/json"
+	"io"
 )
 
 // Buildpack represents a Cloud Controller Buildpack.
@@ -159,12 +157,12 @@ func (client *Client) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings,
 // UploadBuildpack uploads the contents of a buildpack zip to the server.
 func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (Warnings, error) {
 
-	contentLength, err := client.calculateBuildpackRequestSize(buildpackLength, buildpackPath)
+	contentLength, err := buildpacks.CalculateRequestSize(buildpackLength, buildpackPath)
 	if err != nil {
 		return nil, err
 	}
 
-	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForBuildpack(buildpack, buildpackPath)
+	contentType, body, writeErrors := buildpacks.CreateMultipartBodyAndHeader(buildpack, buildpackPath)
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutBuildpackBitsRequest,
@@ -185,58 +183,6 @@ func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string
 	}
 	return warnings, nil
 
-}
-
-func (*Client) calculateBuildpackRequestSize(buildpackSize int64, bpPath string) (int64, error) {
-	body := &bytes.Buffer{}
-	form := multipart.NewWriter(body)
-
-	bpFileName := filepath.Base(bpPath)
-
-	_, err := form.CreateFormFile("buildpack", bpFileName)
-	if err != nil {
-		return 0, err
-	}
-
-	err = form.Close()
-	if err != nil {
-		return 0, err
-	}
-
-	return int64(body.Len()) + buildpackSize, nil
-}
-
-func (*Client) createMultipartBodyAndHeaderForBuildpack(buildpack io.Reader, bpPath string) (string, io.ReadSeeker, <-chan error) {
-	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
-
-	form := multipart.NewWriter(writerInput)
-
-	writeErrors := make(chan error)
-
-	go func() {
-		defer close(writeErrors)
-		defer writerInput.Close()
-
-		bpFileName := filepath.Base(bpPath)
-		writer, err := form.CreateFormFile("buildpack", bpFileName)
-		if err != nil {
-			writeErrors <- err
-			return
-		}
-
-		_, err = io.Copy(writer, buildpack)
-		if err != nil {
-			writeErrors <- err
-			return
-		}
-
-		err = form.Close()
-		if err != nil {
-			writeErrors <- err
-		}
-	}()
-
-	return form.FormDataContentType(), writerOutput, writeErrors
 }
 
 func (client *Client) uploadBuildpackAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Buildpack, Warnings, error) {
