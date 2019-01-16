@@ -22,7 +22,7 @@ var _ = Describe("curl command", func() {
 		Eventually(session).Should(Say(`\n`))
 
 		Eventually(session).Should(Say(`USAGE:\n`))
-		Eventually(session).Should(Say(`\s+cf curl PATH \[-iv\] \[-X METHOD\] \[-H HEADER\] \[-d DATA\] \[--output FILE\]`))
+		Eventually(session).Should(Say(`\s+cf curl PATH \[-iv\] \[-X METHOD\] \[-H HEADER\]\.\.\. \[-d DATA\] \[--output FILE\]`))
 		Eventually(session).Should(Say(`\s+By default 'cf curl' will perform a GET to the specified PATH. If data`))
 		Eventually(session).Should(Say(`\s+is provided via -d, a POST will be performed instead, and the Content-Type\n`))
 		Eventually(session).Should(Say(`\s+will be set to application/json. You may override headers with -H and the\n`))
@@ -39,6 +39,7 @@ var _ = Describe("curl command", func() {
 		Eventually(session).Should(Say(`\s+-H\s+Custom headers to include in the request, flag can be specified multiple times`))
 		Eventually(session).Should(Say(`\s+-X\s+HTTP method \(GET,POST,PUT,DELETE,etc\)`))
 		Eventually(session).Should(Say(`\s+-d\s+HTTP data to include in the request body, or '@' followed by a file name to read the data from`))
+		Eventually(session).Should(Say(`\s+--fail,\s+-f\s+Server errors return exit code 22`))
 		Eventually(session).Should(Say(`\s+-i\s+Include response headers in the output`))
 		Eventually(session).Should(Say(`\s+--output\s+Write curl body to FILE instead of stdout`))
 	}
@@ -87,7 +88,6 @@ var _ = Describe("curl command", func() {
 		When("unknown flag is specified", func() {
 			It("fails and displays the help text", func() {
 				session := helpers.CF("curl", "--test")
-				// TODO Legacy cf uses a weird quote around test. This test needs be fixed for refactored command
 				Eventually(session.Err).Should(Say("Incorrect Usage: unknown flag `test'"))
 				ExpectHelpText(session)
 				Eventually(session).Should(Exit(1))
