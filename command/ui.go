@@ -11,6 +11,7 @@ import (
 type UI interface {
 	DisplayBoolPrompt(defaultResponse bool, template string, templateValues ...map[string]interface{}) (bool, error)
 	DisplayPasswordPrompt(template string, templateValues ...map[string]interface{}) (string, error)
+	DisplayTextPrompt(template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayChangesForPush(changeSet []ui.Change) error
 	DisplayError(err error)
 	DisplayHeader(text string)

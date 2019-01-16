@@ -143,4 +143,41 @@ var _ = Describe("Prompts", func() {
 			})
 		})
 	})
+
+	Describe("DisplayTextPrompt", func() {
+		BeforeEach(func() {
+			inBuffer.Write([]byte("some-input\n"))
+		})
+
+		It("displays the passed in string and returns the user input string", func() {
+			userInput, err := ui.DisplayTextPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+				"AppName": "some-app",
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(out).To(Say("App some-app does not exist."))
+			Expect(userInput).To(Equal("some-input"))
+			Expect(out).To(Say("some-input"))
+		})
+
+		When("the local is not set to English", func() {
+			BeforeEach(func() {
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+
+				ui.Out = out
+				ui.OutForInteration = out
+			})
+
+			It("translates and displays the prompt", func() {
+				_, _ = ui.DisplayTextPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+					"AppName": "some-app",
+				})
+				Expect(out).To(Say("L'application some-app n'existe pas.\n"))
+			})
+		})
+	})
 })

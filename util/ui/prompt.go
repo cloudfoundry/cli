@@ -30,3 +30,12 @@ func (ui *UI) DisplayPasswordPrompt(template string, templateValues ...map[strin
 	err := interactivePrompt.Resolve(interact.Required(&password))
 	return string(password), err
 }
+
+func (ui *UI) DisplayTextPrompt(template string, templateValues ...map[string]interface{}) (string, error) {
+	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...))
+	var value string
+	interactivePrompt.Input = ui.In
+	interactivePrompt.Output = ui.OutForInteration
+	err := interactivePrompt.Resolve(interact.Required(&value))
+	return value, err
+}
