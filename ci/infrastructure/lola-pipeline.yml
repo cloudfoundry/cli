@@ -46,6 +46,11 @@ resources:
     private_key: ((cli-pools-github-private-key))
     branch: master
     pool: ((pool-name))
+- name: overview-broker
+  type: git
+  source:
+    uri: https://github.com/mattmcneeney/overview-broker
+    branch: master
 
 jobs:
 - name: deploy
@@ -61,6 +66,7 @@ jobs:
         claim: ((stack-name)).cli.fun
     - get: cli-ci
     - get: bosh-deployment
+    - get: overview-broker
   - task: setup-infrastructure
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
     input_mapping:
