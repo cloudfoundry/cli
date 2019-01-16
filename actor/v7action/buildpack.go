@@ -17,3 +17,11 @@ func (actor Actor) GetBuildpacks() ([]Buildpack, Warnings, error) {
 
 	return buildpacks, Warnings(warnings), err
 }
+
+func (actor Actor) CreateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {
+	ccv3Buildpack, warnings, err := actor.CloudControllerClient.CreateBuildpack(
+		ccv3.Buildpack(buildpack),
+	)
+
+	return Buildpack(ccv3Buildpack), Warnings(warnings), err
+}

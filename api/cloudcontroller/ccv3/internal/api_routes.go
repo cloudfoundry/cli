@@ -55,6 +55,7 @@ const (
 	PostApplicationRequest                                      = "PostApplication"
 	PostApplicationTasksRequest                                 = "PostApplicationTasks"
 	PostBuildRequest                                            = "PostBuild"
+	PostBuildpackRequest                                        = "PostBuildpack"
 	PostIsolationSegmentRelationshipOrganizationsRequest        = "PostIsolationSegmentRelationshipOrganizations"
 	PostIsolationSegmentsRequest                                = "PostIsolationSegments"
 	PostPackageRequest                                          = "PostPackage"
@@ -84,6 +85,7 @@ var APIRoutes = []Route{
 	{Resource: AppsResource, Path: "/:app_guid/tasks", Method: http.MethodGet, Name: GetApplicationTasksRequest},
 	{Resource: AppsResource, Path: "/:app_guid/tasks", Method: http.MethodPost, Name: PostApplicationTasksRequest},
 	{Resource: BuildpacksResource, Path: "/", Method: http.MethodGet, Name: GetBuildpacksRequest},
+	{Resource: BuildpacksResource, Path: "/", Method: http.MethodPost, Name: PostBuildpackRequest},
 	{Resource: BuildsResource, Path: "/", Method: http.MethodPost, Name: PostBuildRequest},
 	{Resource: BuildsResource, Path: "/:build_guid", Method: http.MethodGet, Name: GetBuildRequest},
 	{Resource: DeploymentsResource, Path: "/", Method: http.MethodGet, Name: GetDeploymentsRequest},

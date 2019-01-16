@@ -102,6 +102,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreateBuildpackStub        func(ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)
+	createBuildpackMutex       sync.RWMutex
+	createBuildpackArgsForCall []struct {
+		arg1 ccv3.Buildpack
+	}
+	createBuildpackReturns struct {
+		result1 ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createBuildpackReturnsOnCall map[int]struct {
+		result1 ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CreateIsolationSegmentStub        func(ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	createIsolationSegmentMutex       sync.RWMutex
 	createIsolationSegmentArgsForCall []struct {
@@ -1220,6 +1235,72 @@ func (fake *FakeCloudControllerClient) CreateBuildReturnsOnCall(i int, result1 c
 	}
 	fake.createBuildReturnsOnCall[i] = struct {
 		result1 ccv3.Build
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpack(arg1 ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error) {
+	fake.createBuildpackMutex.Lock()
+	ret, specificReturn := fake.createBuildpackReturnsOnCall[len(fake.createBuildpackArgsForCall)]
+	fake.createBuildpackArgsForCall = append(fake.createBuildpackArgsForCall, struct {
+		arg1 ccv3.Buildpack
+	}{arg1})
+	fake.recordInvocation("CreateBuildpack", []interface{}{arg1})
+	fake.createBuildpackMutex.Unlock()
+	if fake.CreateBuildpackStub != nil {
+		return fake.CreateBuildpackStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.createBuildpackReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpackCallCount() int {
+	fake.createBuildpackMutex.RLock()
+	defer fake.createBuildpackMutex.RUnlock()
+	return len(fake.createBuildpackArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpackCalls(stub func(ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)) {
+	fake.createBuildpackMutex.Lock()
+	defer fake.createBuildpackMutex.Unlock()
+	fake.CreateBuildpackStub = stub
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpackArgsForCall(i int) ccv3.Buildpack {
+	fake.createBuildpackMutex.RLock()
+	defer fake.createBuildpackMutex.RUnlock()
+	argsForCall := fake.createBuildpackArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpackReturns(result1 ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+	fake.createBuildpackMutex.Lock()
+	defer fake.createBuildpackMutex.Unlock()
+	fake.CreateBuildpackStub = nil
+	fake.createBuildpackReturns = struct {
+		result1 ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildpackReturnsOnCall(i int, result1 ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+	fake.createBuildpackMutex.Lock()
+	defer fake.createBuildpackMutex.Unlock()
+	fake.CreateBuildpackStub = nil
+	if fake.createBuildpackReturnsOnCall == nil {
+		fake.createBuildpackReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Buildpack
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createBuildpackReturnsOnCall[i] = struct {
+		result1 ccv3.Buildpack
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -4300,6 +4381,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createApplicationTaskMutex.RUnlock()
 	fake.createBuildMutex.RLock()
 	defer fake.createBuildMutex.RUnlock()
+	fake.createBuildpackMutex.RLock()
+	defer fake.createBuildpackMutex.RUnlock()
 	fake.createIsolationSegmentMutex.RLock()
 	defer fake.createIsolationSegmentMutex.RUnlock()
 	fake.createPackageMutex.RLock()

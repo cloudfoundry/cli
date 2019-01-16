@@ -8,3 +8,10 @@ const (
 	// application.
 	AutodetectBuildpackValueNull = "null"
 )
+
+const (
+	// Represents the awaiting upload state of a buildpack
+	BuildpackAwaitingUpload = "AWAITING_UPLOAD"
+	// Represents the ready state of a buildpack
+	BuildpackReady = "READY"
+)

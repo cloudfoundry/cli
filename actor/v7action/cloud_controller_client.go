@@ -17,6 +17,7 @@ type CloudControllerClient interface {
 	CreateApplicationProcessScale(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
 	CreateApplicationTask(appGUID string, task ccv3.Task) (ccv3.Task, ccv3.Warnings, error)
 	CreateBuild(build ccv3.Build) (ccv3.Build, ccv3.Warnings, error)
+	CreateBuildpack(bp ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)
 	CreateIsolationSegment(isolationSegment ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	CreatePackage(pkg ccv3.Package) (ccv3.Package, ccv3.Warnings, error)
 	DeleteApplication(guid string) (ccv3.JobURL, ccv3.Warnings, error)

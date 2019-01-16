@@ -1,8 +1,11 @@
 package ccv3
 
 import (
+	"bytes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"encoding/json"
 )
 
 // Buildpack represents a Cloud Controller V3 buildpack.
@@ -25,6 +28,83 @@ type Buildpack struct {
 	Stack string
 	// State is the current state of the buildpack.
 	State string
+	// Links are links to related resources.
+	Links APILinks
+}
+
+// MarshalJSON converts a Package into a Cloud Controller Package.
+func (b Buildpack) MarshalJSON() ([]byte, error) {
+	var ccBuildpack struct {
+		Name     string `json:"name,omitempty"`
+		Stack    string `json:"stack,omitempty"`
+		Position int    `json:"position,omitempty"`
+		Enabled  bool   `json:"enabled,omitempty"`
+		Locked   bool   `json:"locked,omitempty"`
+	}
+
+	ccBuildpack.Name = b.Name
+	ccBuildpack.Stack = b.Stack
+	ccBuildpack.Position = b.Position
+	ccBuildpack.Enabled = b.Enabled
+	ccBuildpack.Locked = b.Locked
+
+	return json.Marshal(ccBuildpack)
+}
+
+func (b *Buildpack) UnmarshalJSON(data []byte) error {
+	var ccBuildpack struct {
+		Enabled  bool     `json:"enabled,omitempty"`
+		Filename string   `json:"filename,omitempty"`
+		GUID     string   `json:"guid,omitempty"`
+		Locked   bool     `json:"locked,omitempty"`
+		Name     string   `json:"name,omitempty"`
+		Position int      `json:"position,omitempty"`
+		Stack    string   `json:"stack,omitempty"`
+		State    string   `json:"state,omitempty"`
+		Links    APILinks `json:"links,omitempty"`
+	}
+
+	err := cloudcontroller.DecodeJSON(data, &ccBuildpack)
+	if err != nil {
+		return err
+	}
+
+	b.Enabled = ccBuildpack.Enabled
+	b.Filename = ccBuildpack.Filename
+	b.GUID = ccBuildpack.GUID
+	b.Locked = ccBuildpack.Locked
+	b.Name = ccBuildpack.Name
+	b.Position = ccBuildpack.Position
+	b.Stack = ccBuildpack.Stack
+	b.State = ccBuildpack.State
+	b.Links = ccBuildpack.Links
+
+	return nil
+}
+
+// CreateBuildpack creates a buildpack with the given settings, Type and the
+// ApplicationRelationship must be set.
+func (client *Client) CreateBuildpack(bp Buildpack) (Buildpack, Warnings, error) {
+	bodyBytes, err := json.Marshal(bp)
+	if err != nil {
+		return Buildpack{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostBuildpackRequest,
+		Body:        bytes.NewReader(bodyBytes),
+	})
+	if err != nil {
+		return Buildpack{}, nil, err
+	}
+
+	var responseBuildpack Buildpack
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &responseBuildpack,
+	}
+	err = client.connection.Make(request, &response)
+
+	return responseBuildpack, response.Warnings, err
 }
 
 // GetBuildpacks lists buildpacks with optional filters.

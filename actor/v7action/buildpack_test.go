@@ -74,4 +74,53 @@ var _ = Describe("Buildpack", func() {
 			})
 		})
 	})
+
+	Describe("CreateBuildpack", func() {
+		var (
+			buildpack  Buildpack
+			warnings   Warnings
+			executeErr error
+			bp         Buildpack
+		)
+
+		JustBeforeEach(func() {
+			buildpack, warnings, executeErr = actor.CreateBuildpack(bp)
+		})
+
+		When("creating a buildpack fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateBuildpackReturns(
+					ccv3.Buildpack{},
+					ccv3.Warnings{"some-warning-1", "some-warning-2"},
+					errors.New("some-error"))
+			})
+
+			It("returns warnings and error", func() {
+				Expect(executeErr).To(MatchError("some-error"))
+				Expect(warnings).To(ConsistOf("some-warning-1", "some-warning-2"))
+				Expect(buildpack).To(Equal(Buildpack{}))
+			})
+		})
+
+		When("creating a buildpack is successful", func() {
+			var returnBuildpack Buildpack
+			BeforeEach(func() {
+				bp = Buildpack{Name: "some-name", Stack: "some-stack"}
+				returnBuildpack = Buildpack{GUID: "some-guid", Name: "some-name", Stack: "some-stack"}
+				fakeCloudControllerClient.CreateBuildpackReturns(
+					ccv3.Buildpack(returnBuildpack),
+					ccv3.Warnings{"some-warning-1", "some-warning-2"},
+					nil)
+			})
+
+			It("returns the buildpacks and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-warning-1", "some-warning-2"))
+				Expect(buildpack).To(Equal(returnBuildpack))
+
+				Expect(fakeCloudControllerClient.CreateBuildpackCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.CreateBuildpackArgsForCall(0)).To(Equal(ccv3.Buildpack(bp)))
+			})
+		})
+	})
 })
