@@ -50,12 +50,14 @@ var _ = Describe("Service Broker Summary Actions", func() {
 		})
 
 		When("no broker, service, organization is specified", func() {
+			BeforeEach(func() {
+				broker = ""
+				service = ""
+				organization = ""
+			})
+
 			When("fetching the service broker is successful", func() {
 				BeforeEach(func() {
-					broker = ""
-					service = ""
-					organization = ""
-
 					fakeBrokerActor.GetServiceBrokersReturns(
 						[]v2action.ServiceBroker{
 							{Name: "broker-1", GUID: "broker-guid-1"},
