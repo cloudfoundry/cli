@@ -140,7 +140,10 @@ var _ = Describe("services Command", func() {
 									Type: constant.ServiceInstanceTypeManagedService,
 								},
 								ServicePlan: v2action.ServicePlan{Name: "some-plan"},
-								Service:     v2action.Service{Label: "some-service-1"},
+								Service: v2action.Service{
+									Label:             "some-service-1",
+									ServiceBrokerName: "broker-1",
+								},
 								BoundApplications: []v2action.BoundApplication{
 									{AppName: "app-1"},
 									{AppName: "app-2"},
@@ -151,7 +154,10 @@ var _ = Describe("services Command", func() {
 									Name: "instance-2",
 									Type: constant.ServiceInstanceTypeManagedService,
 								},
-								Service: v2action.Service{Label: "some-service-2"},
+								Service: v2action.Service{
+									Label:             "some-service-2",
+									ServiceBrokerName: "broker-2",
+								},
 							},
 							{
 								ServiceInstance: v2action.ServiceInstance{
@@ -169,9 +175,9 @@ var _ = Describe("services Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Out).To(Say("Getting services in org %s / space %s as %s...", "some-org",
 						"some-space", fakeUser.Name))
-					Expect(testUI.Out).To(Say(`name\s+service\s+plan\s+bound apps\s+last operation`))
-					Expect(testUI.Out).To(Say(`instance-1\s+some-service-1\s+some-plan\s+app-1, app-2\s+some-type some-state`))
-					Expect(testUI.Out).To(Say(`instance-2\s+some-service-2\s+`))
+					Expect(testUI.Out).To(Say(`name\s+service\s+plan\s+bound apps\s+last operation\s+broker`))
+					Expect(testUI.Out).To(Say(`instance-1\s+some-service-1\s+some-plan\s+app-1, app-2\s+some-type some-state\s+broker-1`))
+					Expect(testUI.Out).To(Say(`instance-2\s+some-service-2\s+broker-2`))
 					Expect(testUI.Out).To(Say(`instance-3\s+user-provided\s+`))
 					Expect(testUI.Err).To(Say("get-summary-warnings"))
 				})

@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -117,15 +118,38 @@ var _ = Describe("services command", func() {
 			helpers.QuickDeleteOrg(orgName)
 		})
 
-		It("displays all service information", func() {
-			session := helpers.CF("services")
-			Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))
-			Eventually(session).Should(Say(`name\s+service\s+plan\s+bound apps\s+last operation`))
-			Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s`, managedService1, service, servicePlan, appName1, "create succeeded"))
-			Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s, %s\s+%s`, managedService2, service, servicePlan, appName1, appName2, "create succeeded"))
-			Eventually(session).Should(Say(`%s\s+%s\s+%s`, userProvidedService1, "user-provided", appName1))
-			Eventually(session).Should(Say(`%s\s+%s\s+%s, %s`, userProvidedService2, "user-provided", appName1, appName2))
-			Eventually(session).Should(Exit(0))
+		When("CAPI version is < 2.125.0", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionAtLeast(ccversion.MinVersionServiceBrokerNameV2)
+			})
+
+			It("displays all service information", func() {
+				session := helpers.CF("services")
+				Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))
+				Eventually(session).Should(Say(`name\s+service\s+plan\s+bound apps\s+last operation\s+broker`))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s`, managedService1, service, servicePlan, appName1, "create succeeded"))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s`, managedService2, service, servicePlan, appName1, appName2, "create succeeded"))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s`, userProvidedService1, "user-provided", appName1))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s, %s`, userProvidedService2, "user-provided", appName1, appName2))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("CAPI version is => 2.125.0", func() {
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionServiceBrokerNameV2)
+			})
+
+			It("displays all service information", func() {
+				session := helpers.CF("services")
+				Eventually(session).Should(Say("Getting services in org %s / space %s as %s...", orgName, spaceName, userName))
+				Eventually(session).Should(Say(`name\s+service\s+plan\s+bound apps\s+last operation\s+broker`))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, managedService1, service, servicePlan, appName1, "create succeeded", broker.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s\s+%s, %s\s+%s\s+%s`, managedService2, service, servicePlan, appName1, appName2, "create succeeded", broker.Name))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s`, userProvidedService1, "user-provided", appName1))
+				Eventually(session).Should(Say(`%s\s+%s\s+%s, %s`, userProvidedService2, "user-provided", appName1, appName2))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 })

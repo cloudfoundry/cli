@@ -76,6 +76,7 @@ func (cmd ServicesCommand) Execute(args []string) error {
 		cmd.UI.TranslateText("plan"),
 		cmd.UI.TranslateText("bound apps"),
 		cmd.UI.TranslateText("last operation"),
+		cmd.UI.TranslateText("broker"),
 	}}
 
 	var boundAppNames []string
@@ -96,7 +97,8 @@ func (cmd ServicesCommand) Execute(args []string) error {
 			serviceLabel,
 			summary.ServicePlan.Name,
 			strings.Join(boundAppNames, ", "),
-			fmt.Sprintf("%s %s", summary.LastOperation.Type, summary.LastOperation.State)},
+			fmt.Sprintf("%s %s", summary.LastOperation.Type, summary.LastOperation.State),
+			summary.Service.ServiceBrokerName},
 		)
 	}
 	cmd.UI.DisplayTableWithHeader("", table, 3)
