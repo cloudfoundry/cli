@@ -275,6 +275,7 @@ var _ = Describe("service Command", func() {
 							BeforeEach(func() {
 								returnedSummary.ServiceInstanceShareType = v2action.ServiceInstanceIsNotShared
 								returnedSummary.Service.Extra.Shareable = false
+								returnedSummary.Service.ServiceBrokerName = "broker-1"
 								returnedSummary.BoundApplications = []v2action.BoundApplication{
 									{
 										AppName:            "app-1",
@@ -334,6 +335,7 @@ var _ = Describe("service Command", func() {
 								Expect(testUI.Out).To(Say(`description:\s+some-description`))
 								Expect(testUI.Out).To(Say(`documentation:\s+some-docs-url`))
 								Expect(testUI.Out).To(Say(`dashboard:\s+some-dashboard`))
+								Expect(testUI.Out).To(Say(`service broker:\s+broker-1`))
 								Expect(testUI.Out).To(Say("\n\n"))
 								Expect(testUI.Out).ToNot(Say("shared with spaces:"))
 								Expect(testUI.Out).ToNot(Say(`org\s+space\s+bindings`))
