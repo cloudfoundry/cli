@@ -29,7 +29,7 @@ type ApplicationInstanceStatus struct {
 	Memory int
 
 	// MemoryQuota is the instance's allowed memory usage in bytes.
-	MemoryQuota int
+	MemoryQuota int64
 
 	// State is the instance's state.
 	State constant.ApplicationInstanceState
@@ -50,9 +50,9 @@ func (instance *ApplicationInstanceStatus) UnmarshalJSON(data []byte) error {
 				Memory int     `json:"mem"`
 				CPU    float64 `json:"cpu"`
 			} `json:"usage"`
-			MemoryQuota int `json:"mem_quota"`
-			DiskQuota   int `json:"disk_quota"`
-			Uptime      int `json:"uptime"`
+			MemoryQuota int64 `json:"mem_quota"`
+			DiskQuota   int   `json:"disk_quota"`
+			Uptime      int   `json:"uptime"`
 		} `json:"stats"`
 	}
 	err := cloudcontroller.DecodeJSON(data, &ccInstance)

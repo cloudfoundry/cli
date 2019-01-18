@@ -34,7 +34,7 @@ type ApplicationInstanceWithStats struct {
 	Memory int
 
 	// MemoryQuota is the instance's allowed memory usage in bytes.
-	MemoryQuota int
+	MemoryQuota int64
 
 	// Since is the Unix time stamp that represents the time the instance was
 	// created.
