@@ -798,6 +798,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UploadBuildpackStub        func(string, string, io.Reader, int64) (ccv3.Warnings, error)
+	uploadBuildpackMutex       sync.RWMutex
+	uploadBuildpackArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 io.Reader
+		arg4 int64
+	}
+	uploadBuildpackReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	uploadBuildpackReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	UploadPackageStub        func(ccv3.Package, string) (ccv3.Package, ccv3.Warnings, error)
 	uploadPackageMutex       sync.RWMutex
 	uploadPackageArgsForCall []struct {
@@ -4297,6 +4313,72 @@ func (fake *FakeCloudControllerClient) UploadBitsPackageReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UploadBuildpack(arg1 string, arg2 string, arg3 io.Reader, arg4 int64) (ccv3.Warnings, error) {
+	fake.uploadBuildpackMutex.Lock()
+	ret, specificReturn := fake.uploadBuildpackReturnsOnCall[len(fake.uploadBuildpackArgsForCall)]
+	fake.uploadBuildpackArgsForCall = append(fake.uploadBuildpackArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 io.Reader
+		arg4 int64
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("UploadBuildpack", []interface{}{arg1, arg2, arg3, arg4})
+	fake.uploadBuildpackMutex.Unlock()
+	if fake.UploadBuildpackStub != nil {
+		return fake.UploadBuildpackStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.uploadBuildpackReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UploadBuildpackCallCount() int {
+	fake.uploadBuildpackMutex.RLock()
+	defer fake.uploadBuildpackMutex.RUnlock()
+	return len(fake.uploadBuildpackArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UploadBuildpackCalls(stub func(string, string, io.Reader, int64) (ccv3.Warnings, error)) {
+	fake.uploadBuildpackMutex.Lock()
+	defer fake.uploadBuildpackMutex.Unlock()
+	fake.UploadBuildpackStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UploadBuildpackArgsForCall(i int) (string, string, io.Reader, int64) {
+	fake.uploadBuildpackMutex.RLock()
+	defer fake.uploadBuildpackMutex.RUnlock()
+	argsForCall := fake.uploadBuildpackArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeCloudControllerClient) UploadBuildpackReturns(result1 ccv3.Warnings, result2 error) {
+	fake.uploadBuildpackMutex.Lock()
+	defer fake.uploadBuildpackMutex.Unlock()
+	fake.UploadBuildpackStub = nil
+	fake.uploadBuildpackReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UploadBuildpackReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.uploadBuildpackMutex.Lock()
+	defer fake.uploadBuildpackMutex.Unlock()
+	fake.UploadBuildpackStub = nil
+	if fake.uploadBuildpackReturnsOnCall == nil {
+		fake.uploadBuildpackReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.uploadBuildpackReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UploadPackage(arg1 ccv3.Package, arg2 string) (ccv3.Package, ccv3.Warnings, error) {
 	fake.uploadPackageMutex.Lock()
 	ret, specificReturn := fake.uploadPackageReturnsOnCall[len(fake.uploadPackageArgsForCall)]
@@ -4473,6 +4555,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateTaskCancelMutex.RUnlock()
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
+	fake.uploadBuildpackMutex.RLock()
+	defer fake.uploadBuildpackMutex.RUnlock()
 	fake.uploadPackageMutex.RLock()
 	defer fake.uploadPackageMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

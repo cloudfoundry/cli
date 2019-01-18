@@ -157,12 +157,12 @@ func (client *Client) UpdateBuildpack(buildpack Buildpack) (Buildpack, Warnings,
 // UploadBuildpack uploads the contents of a buildpack zip to the server.
 func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (Warnings, error) {
 
-	contentLength, err := buildpacks.CalculateRequestSize(buildpackLength, buildpackPath)
+	contentLength, err := buildpacks.CalculateRequestSize(buildpackLength, buildpackPath, "buildpack")
 	if err != nil {
 		return nil, err
 	}
 
-	contentType, body, writeErrors := buildpacks.CreateMultipartBodyAndHeader(buildpack, buildpackPath)
+	contentType, body, writeErrors := buildpacks.CreateMultipartBodyAndHeader(buildpack, buildpackPath, "buildpack")
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutBuildpackBitsRequest,
@@ -182,7 +182,6 @@ func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string
 		return warnings, err
 	}
 	return warnings, nil
-
 }
 
 func (client *Client) uploadBuildpackAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Buildpack, Warnings, error) {

@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = PDescribe("create buildpack Command", func() {
+var _ = Describe("create buildpack Command", func() {
 	var (
 		cmd             CreateBuildpackCommand
 		testUI          *ui.UI
@@ -35,7 +35,7 @@ var _ = PDescribe("create buildpack Command", func() {
 		args = nil
 
 		cmd = CreateBuildpackCommand{
-			RequiredArgs: flag.BuildpackName{Buildpack: "some-app"},
+			RequiredArgs: flag.CreateBuildpackArgs{Buildpack: "some-buildpack", Path: "/path/to/buildpack.zip", Position: 7},
 			UI:           testUI,
 			Config:       fakeConfig,
 			SharedActor:  fakeSharedActor,
@@ -67,19 +67,26 @@ var _ = PDescribe("create buildpack Command", func() {
 
 	When("the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "apple"}, nil)
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "the-user"}, nil)
 		})
 
-		It("should print text indicating its runnning", func() {
+		It("should print text indicating it is creating a buildpack", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(testUI.Out).To(Say(`Creating buildpack NAME as USER\.\.\.`))
+			Expect(testUI.Out).To(Say(`Creating buildpack some-buildpack as the-user\.\.\.`))
 		})
 
 		When("creating the buildpack fails", func() {
-			It("it errors and prints all warnings", func() {
-				Expect(executeErr).To(HaveOccurred())
+			BeforeEach(func() {
+				fakeActor.CreateBuildpackReturns(
+					v7action.Buildpack{},
+					v7action.Warnings{"warning-1"},
+					actionerror.BuildpackNameTakenError{Name: "this-error-occurred"},
+				)
 			})
-
+			It("it errors and prints all warnings", func() {
+				Expect(executeErr).To(Equal(actionerror.BuildpackNameTakenError{Name: "this-error-occurred"}))
+				Expect(testUI.Err).To(Say("warning-1"))
+			})
 		})
 
 		When("creating buildpack succeeds", func() {
@@ -88,40 +95,48 @@ var _ = PDescribe("create buildpack Command", func() {
 				fakeActor.CreateBuildpackReturns(buildpack, v7action.Warnings{"some-create-warning-1"}, nil)
 			})
 
+			It("correctly created the buildpack", func() {
+				buildpack := fakeActor.CreateBuildpackArgsForCall(0)
+				Expect(buildpack.Name).To(Equal("some-buildpack"))
+				Expect(buildpack.Position).To(Equal(7))
+			})
+
 			It("prints any warnings and uploads the bits", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(testUI.Err).To(Say("some-create-warning-1"))
-				Expect(testUI.Out).To(Say(`Uploading buildpack NAME as USER\.\.\.`))
+				Expect(testUI.Out).To(Say(`Uploading buildpack some-buildpack as the-user\.\.\.`))
 			})
 
 			When("Uploading the buildpack fails", func() {
+				BeforeEach(func() {
+					fakeActor.UploadBuildpackReturns(
+						v7action.Warnings{"warning-2"},
+						actionerror.BuildpackStackChangeError{
+							BuildpackName: "buildpack-name",
+							BinaryName:    "faceman"},
+					)
+				})
 
+				It("it errors and prints all warnings", func() {
+					Expect(executeErr).To(Equal(actionerror.BuildpackStackChangeError{
+						BuildpackName: "buildpack-name",
+						BinaryName:    "faceman",
+					}))
+					Expect(testUI.Err).To(Say("warning-2"))
+				})
 			})
 
 			When("Uploading the buildpack succeeds", func() {
 				BeforeEach(func() {
-					// set upload returns
+					fakeActor.UploadBuildpackReturns(
+						v7action.Warnings{"some-upload-warning-1"},
+						nil,
+					)
 				})
 
 				It("prints all warnings", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Err).To(Say("some-upload-warning-1"))
-				})
-
-				When("Polling the job fails", func() {
-
-				})
-
-				When("Polling the job times out", func() {
-
-				})
-
-				When("Polling the job succeeds", func() {
-					It("does not error and prints warnings", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(testUI.Err).To(Say("some-poll-warning-1"))
-						Expect(testUI.Out).To(Say(`Done uploading`))
-					})
 				})
 			})
 		})

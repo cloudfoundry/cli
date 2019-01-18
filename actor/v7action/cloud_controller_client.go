@@ -63,5 +63,6 @@ type CloudControllerClient interface {
 	UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	UpdateTaskCancel(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	UploadBitsPackage(pkg ccv3.Package, existingResources []ccv3.Resource, newResources io.Reader, newResourcesLength int64) (ccv3.Package, ccv3.Warnings, error)
+	UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (ccv3.Warnings, error)
 	UploadPackage(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error)
 }

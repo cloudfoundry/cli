@@ -15,15 +15,17 @@ import (
 
 type CreateBuildpackActor interface {
 	CreateBuildpack(buildpack v7action.Buildpack) (v7action.Buildpack, v7action.Warnings, error)
+	UploadBuildpack(guid string, pathToBuildpackBits string, progressBar v7action.SimpleProgressBar) (v7action.Warnings, error)
 }
 
 type CreateBuildpackCommand struct {
-	RequiredArgs    flag.BuildpackName `positional-args:"Yes"`
-	usage           interface{}        `usage:"CF_NAME buildpacks"`
-	relatedCommands interface{}        `related_commands:"push"`
+	RequiredArgs    flag.CreateBuildpackArgs `positional-args:"Yes"`
+	usage           interface{}              `usage:"CF_NAME create-buildpack"`
+	relatedCommands interface{}              `related_commands:"push"`
 
 	UI          command.UI
 	Config      command.Config
+	ProgressBar v7action.SimpleProgressBar
 	SharedActor command.SharedActor
 	Actor       CreateBuildpackActor
 }
@@ -39,33 +41,47 @@ func (cmd *CreateBuildpackCommand) Setup(config command.Config, ui command.UI) e
 		return err
 	}
 	cmd.Actor = v7action.NewActor(ccClient, config, sharedActor, uaaClient)
+	cmd.ProgressBar = v7action.NewProgressBar()
 
 	return nil
 }
 
 func (cmd CreateBuildpackCommand) Execute(args []string) error {
-	//err := cmd.SharedActor.CheckTarget(false, false)
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//user, err := cmd.Config.CurrentUser()
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//cmd.UI.DisplayTextWithFlavor("Creating buildpack {{.BuildpackName}} as {{.Username}}...", map[string]interface{}{
-	//	"Username": user.Name,
-	//	"BuildpackName": cmd.RequiredArgs.Buildpack,
-	//})
-	//cmd.UI.DisplayNewline()
-	//
-	//buildpack, warnings, err := cmd.Actor.CreateBuildpack(v7action.Buildpack{})
-	//cmd.UI.DisplayWarnings(warnings)
-	//if err != nil {
-	//	return err
-	//}
-	//
+	err := cmd.SharedActor.CheckTarget(false, false)
+	if err != nil {
+		return err
+	}
+
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Creating buildpack {{.BuildpackName}} as {{.Username}}...", map[string]interface{}{
+		"Username":      user.Name,
+		"BuildpackName": cmd.RequiredArgs.Buildpack,
+	})
+	cmd.UI.DisplayNewline()
+
+	createdBuildpack, warnings, err := cmd.Actor.CreateBuildpack(v7action.Buildpack{
+		Name:     cmd.RequiredArgs.Buildpack,
+		Position: cmd.RequiredArgs.Position,
+	})
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.BuildpackName}} as {{.Username}}...", map[string]interface{}{
+		"Username":      user.Name,
+		"BuildpackName": cmd.RequiredArgs.Buildpack,
+	})
+	warnings, err = cmd.Actor.UploadBuildpack(createdBuildpack.GUID, string(cmd.RequiredArgs.Path), cmd.ProgressBar)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 )
 
-func CalculateRequestSize(buildpackSize int64, bpPath string) (int64, error) {
+func CalculateRequestSize(buildpackSize int64, bpPath string, fieldName string) (int64, error) {
 	body := &bytes.Buffer{}
 	form := multipart.NewWriter(body)
 
 	bpFileName := filepath.Base(bpPath)
 
-	_, err := form.CreateFormFile("buildpack", bpFileName)
+	_, err := form.CreateFormFile(fieldName, bpFileName)
 	if err != nil {
 		return 0, err
 	}
@@ -27,7 +27,7 @@ func CalculateRequestSize(buildpackSize int64, bpPath string) (int64, error) {
 	return int64(body.Len()) + buildpackSize, nil
 }
 
-func CreateMultipartBodyAndHeader(buildpack io.Reader, bpPath string) (string, io.ReadSeeker, <-chan error) {
+func CreateMultipartBodyAndHeader(buildpack io.Reader, bpPath string, fieldName string) (string, io.ReadSeeker, <-chan error) {
 	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
 
 	form := multipart.NewWriter(writerInput)
@@ -39,7 +39,7 @@ func CreateMultipartBodyAndHeader(buildpack io.Reader, bpPath string) (string, i
 		defer writerInput.Close()
 
 		bpFileName := filepath.Base(bpPath)
-		writer, err := form.CreateFormFile("buildpack", bpFileName)
+		writer, err := form.CreateFormFile(fieldName, bpFileName)
 		if err != nil {
 			writeErrors <- err
 			return

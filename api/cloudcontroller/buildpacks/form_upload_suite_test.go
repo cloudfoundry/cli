@@ -10,9 +10,9 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-func TestBuildpacks(t *testing.T) {
+func TestFormUpload(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "API Buildpacks Suite")
+	RunSpecs(t, "API Form Upload Suite")
 }
 
 var server *Server

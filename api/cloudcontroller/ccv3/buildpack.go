@@ -3,9 +3,11 @@ package ccv3
 import (
 	"bytes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/buildpacks"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"encoding/json"
+	"io"
 )
 
 // Buildpack represents a Cloud Controller V3 buildpack.
@@ -131,4 +133,88 @@ func (client *Client) GetBuildpacks(query ...Query) ([]Buildpack, Warnings, erro
 	})
 
 	return fullBuildpacksList, warnings, err
+}
+
+// UploadBuildpack uploads the contents of a buildpack zip to the server.
+func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (Warnings, error) {
+
+	contentLength, err := buildpacks.CalculateRequestSize(buildpackLength, buildpackPath, "bits")
+	if err != nil {
+		return nil, err
+	}
+
+	contentType, body, writeErrors := buildpacks.CreateMultipartBodyAndHeader(buildpack, buildpackPath, "bits")
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostBuildpackBitsRequest,
+		URIParams:   internal.Params{"buildpack_guid": buildpackGUID},
+		Body:        body,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	request.ContentLength = contentLength
+	request.Header.Set("Content-Type", contentType)
+
+	_, warnings, err := client.uploadBuildpackAsynchronously(request, writeErrors)
+	if err != nil {
+		return warnings, err
+	}
+	return warnings, nil
+
+}
+
+func (client *Client) uploadBuildpackAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Buildpack, Warnings, error) {
+
+	var buildpack Buildpack
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &buildpack,
+	}
+
+	httpErrors := make(chan error)
+
+	go func() {
+		defer close(httpErrors)
+
+		err := client.connection.Make(request, &response)
+		if err != nil {
+			httpErrors <- err
+		}
+	}()
+
+	// The following section makes the following assumptions:
+	// 1) If an error occurs during file reading, an EOF is sent to the request
+	// object. Thus ending the request transfer.
+	// 2) If an error occurs during request transfer, an EOF is sent to the pipe.
+	// Thus ending the writing routine.
+	var firstError error
+	var writeClosed, httpClosed bool
+
+	for {
+		select {
+		case writeErr, ok := <-writeErrors:
+			if !ok {
+				writeClosed = true
+				break // for select
+			}
+			if firstError == nil {
+				firstError = writeErr
+			}
+		case httpErr, ok := <-httpErrors:
+			if !ok {
+				httpClosed = true
+				break // for select
+			}
+			if firstError == nil {
+				firstError = httpErr
+			}
+		}
+
+		if writeClosed && httpClosed {
+			break // for for
+		}
+	}
+	return buildpack, response.Warnings, firstError
 }
