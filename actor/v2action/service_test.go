@@ -81,47 +81,174 @@ var _ = Describe("Service Actions", func() {
 		})
 	})
 
-	Describe("GetServiceByName", func() {
+	Describe("GetServiceByNameAndBrokerName", func() {
 		var (
-			service         Service
-			serviceWarnings Warnings
-			serviceErr      error
+			service           Service
+			serviceWarnings   Warnings
+			serviceErr        error
+			serviceBrokerName string
 		)
 
-		JustBeforeEach(func() {
-			service, serviceWarnings, serviceErr = actor.GetServiceByName("some-service")
+		BeforeEach(func() {
+			serviceBrokerName = ""
 		})
 
-		When("services are returned from the client", func() {
-			var returnedServices []ccv2.Service
+		JustBeforeEach(func() {
+			service, serviceWarnings, serviceErr = actor.GetServiceByNameAndBrokerName("some-service", serviceBrokerName)
+		})
+
+		When("broker name is empty", func() {
+			It("should not fetch a broker", func() {
+				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(0))
+			})
+
+			When("one service is returned from the client", func() {
+				var returnedServices []ccv2.Service
+
+				BeforeEach(func() {
+					returnedServices = []ccv2.Service{
+						{
+							GUID:             "some-service-guid",
+							Label:            "some-service",
+							Description:      "some-description",
+							DocumentationURL: "some-url",
+						},
+					}
+
+					fakeCloudControllerClient.GetServicesReturns(
+						returnedServices,
+						ccv2.Warnings{"get-services-warning"},
+						nil)
+				})
+
+				It("returns the service and all warnings", func() {
+					Expect(serviceErr).ToNot(HaveOccurred())
+					Expect(service).To(Equal(Service(returnedServices[0])))
+					Expect(serviceWarnings).To(ConsistOf("get-services-warning"))
+
+					Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetServicesArgsForCall(0)).To(Equal([]ccv2.Filter{{
+						Type:     constant.LabelFilter,
+						Operator: constant.EqualOperator,
+						Values:   []string{"some-service"},
+					}}))
+				})
+			})
+
+			When("multiple services are returned from the client", func() {
+				var returnedServices []ccv2.Service
+
+				BeforeEach(func() {
+					returnedServices = []ccv2.Service{
+						{
+							GUID:             "some-service-1-guid",
+							Label:            "some-service-1",
+							Description:      "some-description",
+							DocumentationURL: "some-url",
+						},
+						{
+							GUID:             "some-service-2-guid",
+							Label:            "some-service-2",
+							Description:      "some-description",
+							DocumentationURL: "some-url",
+						},
+					}
+
+					fakeCloudControllerClient.GetServicesReturns(
+						returnedServices,
+						ccv2.Warnings{"get-services-warning"},
+						nil)
+				})
+
+				It("returns a DuplicateServiceError and all warnings", func() {
+					Expect(serviceErr).To(MatchError(actionerror.DuplicateServiceError{Name: "some-service"}))
+					Expect(serviceWarnings).To(ConsistOf("get-services-warning"))
+				})
+
+			})
+		})
+
+		When("broker name is provided", func() {
+			var returnedBrokers []ccv2.ServiceBroker
 
 			BeforeEach(func() {
-				returnedServices = []ccv2.Service{
+				serviceBrokerName = "some-broker"
+
+				returnedBrokers = []ccv2.ServiceBroker{
 					{
-						GUID:             "some-service-guid",
-						Label:            "some-service",
-						Description:      "some-description",
-						DocumentationURL: "some-url",
+						Name: "some-broker",
+						GUID: "some-broker-guid",
 					},
 				}
 
-				fakeCloudControllerClient.GetServicesReturns(
-					returnedServices,
+				fakeCloudControllerClient.GetServiceBrokersReturns(
+					returnedBrokers,
 					ccv2.Warnings{"get-services-warning"},
 					nil)
 			})
 
-			It("returns the service and all warnings", func() {
-				Expect(serviceErr).ToNot(HaveOccurred())
-				Expect(service).To(Equal(Service(returnedServices[0])))
-				Expect(serviceWarnings).To(ConsistOf("get-services-warning"))
-
-				Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServicesArgsForCall(0)).To(Equal([]ccv2.Filter{{
-					Type:     constant.LabelFilter,
+			It("fetches the the broker by name", func() {
+				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)).To(Equal([]ccv2.Filter{{
+					Type:     constant.NameFilter,
 					Operator: constant.EqualOperator,
-					Values:   []string{"some-service"},
+					Values:   []string{serviceBrokerName},
 				}}))
+			})
+
+			When("fetching the broker by name errors", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceBrokersReturns(
+						nil,
+						ccv2.Warnings{"get-services-warning"},
+						errors.New("failed-to-fetch-broker"))
+				})
+
+				It("propagates the error and all warnings", func() {
+					Expect(serviceErr).To(MatchError("failed-to-fetch-broker"))
+					Expect(serviceWarnings).To(ConsistOf("get-services-warning"))
+				})
+			})
+
+			When("one service is returned from the client", func() {
+				var returnedServices []ccv2.Service
+
+				BeforeEach(func() {
+					returnedServices = []ccv2.Service{
+						{
+							GUID:              "some-service-guid",
+							Label:             "some-service",
+							Description:       "some-description",
+							DocumentationURL:  "some-url",
+							ServiceBrokerName: "some-broker",
+						},
+					}
+
+					fakeCloudControllerClient.GetServicesReturns(
+						returnedServices,
+						ccv2.Warnings{"get-services-warning"},
+						nil)
+				})
+
+				It("returns the service filtered by label and broker guid and all warnings", func() {
+					Expect(serviceErr).ToNot(HaveOccurred())
+					Expect(service).To(Equal(Service(returnedServices[0])))
+					Expect(serviceWarnings).To(ConsistOf("get-services-warning"))
+
+					Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetServicesArgsForCall(0)).To(ConsistOf(
+						ccv2.Filter{
+							Type:     constant.LabelFilter,
+							Operator: constant.EqualOperator,
+							Values:   []string{"some-service"},
+						},
+						ccv2.Filter{
+							Type:     constant.ServiceBrokerGUIDFilter,
+							Operator: constant.EqualOperator,
+							Values:   []string{"some-broker-guid"},
+						},
+					))
+				})
 			})
 		})
 

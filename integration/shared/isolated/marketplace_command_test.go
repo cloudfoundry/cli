@@ -152,9 +152,9 @@ var _ = Describe("marketplace command", func() {
 						helpers.QuickDeleteOrg(org1)
 					})
 
-					When("cc api version < 2.125.0", func() {
+					When("CC API does not return broker names in response", func() {
 						BeforeEach(func() {
-							helpers.SkipIfVersionAtLeast(ccversion.MinVersionServiceBrokerNameV2)
+							helpers.SkipIfVersionAtLeast(ccversion.MinVersionMultiServiceRegistrationV2)
 						})
 
 						It("displays a table and tip that does not include that service", func() {
@@ -171,9 +171,9 @@ var _ = Describe("marketplace command", func() {
 						})
 					})
 
-					When("cc api version >= 2.125.0", func() {
+					When("CC API returns broker names in response", func() {
 						BeforeEach(func() {
-							helpers.SkipIfVersionLessThan(ccversion.MinVersionServiceBrokerNameV2)
+							helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
 						})
 
 						It("displays a table with broker name", func() {
