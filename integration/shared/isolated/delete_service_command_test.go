@@ -9,64 +9,88 @@ import (
 )
 
 var _ = Describe("delete-service command", func() {
-	When("an api is targeted, the user is logged in, and an org and space are targeted", func() {
-		var (
-			orgName   string
-			spaceName string
-		)
-
+	When("an api is targeted and the user is logged in", func() {
 		BeforeEach(func() {
-			orgName = helpers.NewOrgName()
-			spaceName = helpers.NewSpaceName()
-			helpers.SetupCF(orgName, spaceName)
+			helpers.LoginCF()
 		})
 
-		AfterEach(func() {
-			helpers.QuickDeleteOrg(orgName)
+		When("the environment is not setup correctly", func() {
+			It("fails with the appropriate errors", func() {
+				By("checking the org is targeted correctly")
+				session := helpers.CF("delete-service", "service-name", "-f")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Out).Should(Say("No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space"))
+				Eventually(session).Should(Exit(1))
+
+				By("checking the space is targeted correctly")
+				helpers.TargetOrg(ReadOnlyOrg)
+				session = helpers.CF("delete-service", "service-name", "-f")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Out).Should(Say(`No space targeted, use 'cf target -s' to target a space\.`))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 
-		When("there is a service instance and it is bound to an app", func() {
+		When("an org and space are targeted", func() {
 			var (
-				domain      string
-				service     string
-				servicePlan string
-				broker      helpers.ServiceBroker
-
-				serviceInstanceName string
-				appName             string
+				orgName   string
+				spaceName string
 			)
 
 			BeforeEach(func() {
-				domain = helpers.DefaultSharedDomain()
-				service = helpers.PrefixedRandomName("SERVICE")
-				servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
-
-				broker = helpers.CreateBroker(domain, service, servicePlan)
-
-				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
-
-				serviceInstanceName = helpers.PrefixedRandomName("SI")
-				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
-
-				appName = helpers.NewAppName()
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
-				})
-
-				Eventually(helpers.CF("bind-service", appName, serviceInstanceName)).Should(Exit(0))
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.CreateOrgAndSpace(orgName, spaceName)
+				helpers.TargetOrgAndSpace(orgName, spaceName)
 			})
 
 			AfterEach(func() {
-				Eventually(helpers.CF("unbind-service", appName, serviceInstanceName)).Should(Exit(0))
-				Eventually(helpers.CF("delete", appName, "-f")).Should(Exit(0))
-				Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
-				broker.Destroy()
+				helpers.QuickDeleteOrg(orgName)
 			})
 
-			It("should display an error message that the service instance's keys, bindings, and shares must first be deleted", func() {
-				session := helpers.CF("delete-service", serviceInstanceName, "-f")
-				Eventually(session).Should(Say("Cannot delete service instance. Service keys, bindings, and shares must first be deleted."))
-				Eventually(session).Should(Exit(1))
+			When("there is a service instance and it is bound to an app", func() {
+				var (
+					domain      string
+					service     string
+					servicePlan string
+					broker      helpers.ServiceBroker
+
+					serviceInstanceName string
+					appName             string
+				)
+
+				BeforeEach(func() {
+					domain = helpers.DefaultSharedDomain()
+					service = helpers.PrefixedRandomName("SERVICE")
+					servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+
+					broker = helpers.CreateBroker(domain, service, servicePlan)
+
+					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+
+					serviceInstanceName = helpers.PrefixedRandomName("SI")
+					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName)).Should(Exit(0))
+
+					appName = helpers.NewAppName()
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
+					})
+
+					Eventually(helpers.CF("bind-service", appName, serviceInstanceName)).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					Eventually(helpers.CF("unbind-service", appName, serviceInstanceName)).Should(Exit(0))
+					Eventually(helpers.CF("delete", appName, "-f")).Should(Exit(0))
+					Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
+					broker.Destroy()
+				})
+
+				It("should display an error message that the service instance's keys, bindings, and shares must first be deleted", func() {
+					session := helpers.CF("delete-service", serviceInstanceName, "-f")
+					Eventually(session).Should(Say(`Cannot delete service instance. Service keys, bindings, and shares must first be deleted\.`))
+					Eventually(session).Should(Exit(1))
+				})
 			})
 		})
 	})
