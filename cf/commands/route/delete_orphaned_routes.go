@@ -1,18 +1,21 @@
 package route
 
 import (
-	"code.cloudfoundry.org/cli/cf/api/spaces"
+	"errors"
+
+	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
 type DeleteOrphanedRoutes struct {
 	ui        terminal.UI
-	spaceRepo spaces.SpaceRepository
+	routeRepo api.RouteRepository
 	config    coreconfig.Reader
 }
 
@@ -53,7 +56,7 @@ func (cmd *DeleteOrphanedRoutes) Requirements(requirementsFactory requirements.F
 func (cmd *DeleteOrphanedRoutes) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.UI
 	cmd.config = deps.Config
-	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
 	return cmd
 }
 
@@ -68,11 +71,26 @@ func (cmd *DeleteOrphanedRoutes) Execute(c flags.FlagContext) error {
 		}
 	}
 
-	err := cmd.spaceRepo.DeleteUnmappedRoutes(cmd.config.SpaceFields().GUID)
-	if err != nil {
-		return err
-	}
+	cmd.ui.Say(T("Getting routes as {{.Username}} ...\n",
+		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
+	err := cmd.routeRepo.ListRoutes(func(route models.Route) bool {
+
+		if len(route.Apps) == 0 {
+			cmd.ui.Say(T("Deleting route {{.Route}}...",
+				map[string]interface{}{"Route": terminal.EntityNameColor(route.URL())}))
+			apiErr := cmd.routeRepo.Delete(route.GUID)
+			if apiErr != nil {
+				cmd.ui.Failed(apiErr.Error())
+				return false
+			}
+		}
+		return true
+	})
+
+	if err != nil {
+		return errors.New(T("Failed fetching routes.\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
+	}
 	cmd.ui.Ok()
 	return nil
 }
