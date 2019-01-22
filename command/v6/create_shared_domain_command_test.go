@@ -137,7 +137,7 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 
 		When("--internal and --router-group are passed", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionInternalDomainV2)
 				cmd.RouterGroup = "my-router-group"
 				cmd.Internal = true
 			})
@@ -172,7 +172,7 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 
 			When("the version is above the minimum version", func() {
 				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
+					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionInternalDomainV2)
 				})
 
 				It("should create a shared internal domain", func() {

@@ -312,7 +312,6 @@ applications:
 
 							When("using isolation segments", func() {
 								BeforeEach(func() {
-									helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
 									Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
 									Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
 									Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))

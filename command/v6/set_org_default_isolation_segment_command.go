@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -13,7 +12,6 @@ import (
 //go:generate counterfeiter . SetOrgDefaultIsolationSegmentActor
 
 type SetOrgDefaultIsolationSegmentActor interface {
-	CloudControllerAPIVersion() string
 	GetIsolationSegmentByName(isoSegName string) (v3action.IsolationSegment, v3action.Warnings, error)
 	SetOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (v3action.Warnings, error)
 }
@@ -57,12 +55,7 @@ func (cmd *SetOrgDefaultIsolationSegmentCommand) Setup(config command.Config, ui
 }
 
 func (cmd SetOrgDefaultIsolationSegmentCommand) Execute(args []string) error {
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(false, false)
+	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}

@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -27,7 +26,6 @@ type OrgActor interface {
 
 type OrgActorV3 interface {
 	GetIsolationSegmentsByOrganization(orgName string) ([]v3action.IsolationSegment, v3action.Warnings, error)
-	CloudControllerAPIVersion() string
 }
 
 type OrgCommand struct {
@@ -119,26 +117,23 @@ func (cmd OrgCommand) displayOrgSummary() error {
 	}
 
 	if cmd.ActorV3 != nil {
-		apiCheck := command.MinimumCCAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
-		if apiCheck == nil {
-			isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
-			cmd.UI.DisplayWarnings(v3Warnings)
-			if err != nil {
-				return err
-			}
-
-			isolationSegmentNames := []string{}
-			for _, iso := range isolationSegments {
-				if iso.GUID == orgSummary.DefaultIsolationSegmentGUID {
-					isolationSegmentNames = append(isolationSegmentNames, fmt.Sprintf("%s (%s)", iso.Name, cmd.UI.TranslateText("default")))
-				} else {
-					isolationSegmentNames = append(isolationSegmentNames, iso.Name)
-				}
-			}
-
-			sort.Strings(isolationSegmentNames)
-			table = append(table, []string{cmd.UI.TranslateText("isolation segments:"), strings.Join(isolationSegmentNames, ", ")})
+		isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
+		cmd.UI.DisplayWarnings(v3Warnings)
+		if err != nil {
+			return err
 		}
+
+		isolationSegmentNames := []string{}
+		for _, iso := range isolationSegments {
+			if iso.GUID == orgSummary.DefaultIsolationSegmentGUID {
+				isolationSegmentNames = append(isolationSegmentNames, fmt.Sprintf("%s (%s)", iso.Name, cmd.UI.TranslateText("default")))
+			} else {
+				isolationSegmentNames = append(isolationSegmentNames, iso.Name)
+			}
+		}
+
+		sort.Strings(isolationSegmentNames)
+		table = append(table, []string{cmd.UI.TranslateText("isolation segments:"), strings.Join(isolationSegmentNames, ", ")})
 	}
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)

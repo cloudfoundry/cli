@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -13,7 +12,6 @@ import (
 //go:generate counterfeiter . DeleteIsolationSegmentActor
 
 type DeleteIsolationSegmentActor interface {
-	CloudControllerAPIVersion() string
 	DeleteIsolationSegmentByName(name string) (v3action.Warnings, error)
 }
 
@@ -44,12 +42,7 @@ func (cmd *DeleteIsolationSegmentCommand) Setup(config command.Config, ui comman
 }
 
 func (cmd DeleteIsolationSegmentCommand) Execute(args []string) error {
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(false, false)
+	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}

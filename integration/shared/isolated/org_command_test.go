@@ -3,7 +3,6 @@ package isolated
 import (
 	"sort"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -125,8 +124,6 @@ var _ = Describe("org command", func() {
 					var isolationSegmentsSorted []string
 
 					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
-
 						isolationSegmentName1 := helpers.NewIsolationSegmentName()
 						Eventually(helpers.CF("create-isolation-segment", isolationSegmentName1)).Should(Exit(0))
 						Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName1)).Should(Exit(0))

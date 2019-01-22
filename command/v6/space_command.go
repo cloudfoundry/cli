@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -20,7 +19,6 @@ import (
 //go:generate counterfeiter . SpaceActor
 
 type SpaceActor interface {
-	CloudControllerAPIVersion() string
 	GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
 	GetSpaceSummaryByOrganizationAndName(orgGUID string, spaceName string) (v2action.SpaceSummary, v2action.Warnings, error)
 }
@@ -28,7 +26,6 @@ type SpaceActor interface {
 //go:generate counterfeiter . SpaceActorV3
 
 type SpaceActorV3 interface {
-	CloudControllerAPIVersion() string
 	GetEffectiveIsolationSegmentBySpace(spaceGUID string, orgDefaultIsolationSegmentGUID string) (v3action.IsolationSegment, v3action.Warnings, error)
 }
 
@@ -182,11 +179,6 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 
 func (cmd SpaceCommand) isolationSegmentRow(spaceSummary v2action.SpaceSummary) ([]string, error) {
 	if cmd.ActorV3 == nil {
-		return nil, nil
-	}
-
-	apiCheck := command.MinimumCCAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
-	if apiCheck != nil {
 		return nil, nil
 	}
 

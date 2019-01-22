@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
@@ -176,10 +175,6 @@ var _ = Describe("org Command", func() {
 			})
 
 			When("API version is above isolation segments minimum version", func() {
-				BeforeEach(func() {
-					fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
-				})
-
 				When("something", func() {
 					BeforeEach(func() {
 						fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
@@ -238,32 +233,6 @@ var _ = Describe("org Command", func() {
 						Expect(executeErr).To(MatchError(expectedErr))
 						Expect(testUI.Err).To(Say("get iso seg warning"))
 					})
-				})
-			})
-
-			When("api version is below isolation segments minimum version", func() {
-				BeforeEach(func() {
-					fakeActorV3.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
-				})
-
-				It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {
-					Expect(executeErr).To(BeNil())
-
-					Expect(testUI.Out).To(Say(`Getting info for org %s as some-user\.\.\.`, cmd.RequiredArgs.Organization))
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-
-					Expect(testUI.Out).To(Say(`name:\s+%s`, cmd.RequiredArgs.Organization))
-					Expect(testUI.Out).To(Say(`domains:\s+a-shared.com, b-private.com, c-shared.com, d-private.com`))
-					Expect(testUI.Out).To(Say(`quota:\s+some-quota`))
-					Expect(testUI.Out).To(Say(`spaces:\s+space1, space2`))
-					Expect(testUI.Out).ToNot(Say("isolation segments:"))
-
-					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
-
-					Expect(fakeActor.GetOrganizationSummaryByNameCallCount()).To(Equal(1))
-					orgName := fakeActor.GetOrganizationSummaryByNameArgsForCall(0)
-					Expect(orgName).To(Equal("some-org"))
 				})
 			})
 		})

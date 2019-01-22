@@ -3,7 +3,6 @@ package v6
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -12,7 +11,6 @@ import (
 //go:generate counterfeiter . EnableOrgIsolationActor
 
 type EnableOrgIsolationActor interface {
-	CloudControllerAPIVersion() string
 	EntitleIsolationSegmentToOrganizationByName(isolationSegmentName string, orgName string) (v3action.Warnings, error)
 }
 
@@ -42,12 +40,7 @@ func (cmd *EnableOrgIsolationCommand) Setup(config command.Config, ui command.UI
 }
 
 func (cmd EnableOrgIsolationCommand) Execute(args []string) error {
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(false, false)
+	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return err
 	}

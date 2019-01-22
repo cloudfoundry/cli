@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -166,8 +165,6 @@ var _ = Describe("space command", func() {
 
 					When("isolations segments are enabled", func() {
 						BeforeEach(func() {
-							helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
-
 							isolationSegmentName = helpers.NewIsolationSegmentName()
 							Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 							Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName)).Should(Exit(0))
@@ -188,7 +185,6 @@ var _ = Describe("space command", func() {
 					var orgIsolationSegmentName string
 
 					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
 						orgIsolationSegmentName = helpers.NewIsolationSegmentName()
 						Eventually(helpers.CF("create-isolation-segment", orgIsolationSegmentName)).Should(Exit(0))
 						Eventually(helpers.CF("enable-org-isolation", orgName, orgIsolationSegmentName)).Should(Exit(0))

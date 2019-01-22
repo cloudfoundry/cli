@@ -1,13 +1,11 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("set-org-default-isolation-segment command", func() {
@@ -17,8 +15,6 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
-
 		orgName = helpers.NewOrgName()
 		isolationSegmentName = helpers.NewIsolationSegmentName()
 	})
@@ -41,25 +37,6 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "set-org-default-isolation-segment", "orgname", "segment-name")
-		})
-
-		When("the v3 api version is lower than the minimum version", func() {
-			var server *Server
-
-			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, ccversion.MinV3ClientVersion)
-			})
-
-			AfterEach(func() {
-				server.Close()
-			})
-
-			It("fails with error message that the minimum version is not met", func() {
-				session := helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.11\.0 or higher\.`))
-				Eventually(session).Should(Exit(1))
-			})
 		})
 	})
 
