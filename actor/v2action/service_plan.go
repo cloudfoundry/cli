@@ -13,9 +13,9 @@ func (actor Actor) GetServicePlan(servicePlanGUID string) (ServicePlan, Warnings
 	return ServicePlan(servicePlan), Warnings(warnings), err
 }
 
-// GetServicePlansForService returns a list of plans associated with the service.
-func (actor Actor) GetServicePlansForService(serviceName string) ([]ServicePlan, Warnings, error) {
-	service, allWarnings, err := actor.GetServiceByName(serviceName)
+// GetServicePlansForService returns a list of plans associated with the service and the broker if provided
+func (actor Actor) GetServicePlansForService(serviceName, brokerName string) ([]ServicePlan, Warnings, error) {
+	service, allWarnings, err := actor.GetServiceByNameAndBrokerName(serviceName, brokerName)
 	if err != nil {
 		return []ServicePlan{}, allWarnings, err
 	}

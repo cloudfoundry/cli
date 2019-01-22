@@ -12,14 +12,15 @@ import (
 //go:generate counterfeiter . EnableServiceAccessActor
 
 type EnableServiceAccessActor interface {
-	EnablePlanForOrg(serviceName, servicePlanName, orgName string) (v2action.Warnings, error)
-	EnableServiceForOrg(serviceName, orgName string) (v2action.Warnings, error)
-	EnablePlanForAllOrgs(serviceName, servicePlanName string) (v2action.Warnings, error)
-	EnableServiceForAllOrgs(serviceName string) (v2action.Warnings, error)
+	EnablePlanForOrg(serviceName, servicePlanName, orgName, serviceBrokerName string) (v2action.Warnings, error)
+	EnableServiceForOrg(serviceName, orgName, serviceBrokerName string) (v2action.Warnings, error)
+	EnablePlanForAllOrgs(serviceName, servicePlanName, serviceBrokerName string) (v2action.Warnings, error)
+	EnableServiceForAllOrgs(serviceName, serviceBrokerName string) (v2action.Warnings, error)
 }
 
 type EnableServiceAccessCommand struct {
 	RequiredArgs    flag.Service `positional-args:"yes"`
+	ServiceBroker   string       `short:"b" hidden:"true" description:"[Experimental] Enable access to a service from a specific service broker"`
 	Organization    string       `short:"o" description:"Enable access for a specified organization"`
 	ServicePlan     string       `short:"p" description:"Enable access to a specified service plan"`
 	usage           interface{}  `usage:"CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]"`
@@ -63,46 +64,33 @@ func (cmd EnableServiceAccessCommand) Execute(args []string) error {
 		return err
 	}
 
+	serviceBrokerName := cmd.ServiceBroker
 	serviceName := cmd.RequiredArgs.Service
 	servicePlanName := cmd.ServicePlan
 	orgName := cmd.Organization
 	var warnings v2action.Warnings
 
+	cmd.UI.DisplayTextWithFlavor(messages[enableServiceAccessOptions{servicePlanName != "", orgName != "", serviceBrokerName != ""}],
+		map[string]interface{}{
+			"ServicePlan":   servicePlanName,
+			"Service":       serviceName,
+			"ServiceBroker": serviceBrokerName,
+			"Organization":  orgName,
+			"User":          user.Name,
+		})
+
 	if servicePlanName != "" && orgName != "" {
-		cmd.UI.DisplayTextWithFlavor("Enabling access to plan {{.ServicePlan}} of service {{.Service}} for org {{.Organization}} as {{.User}}...",
-			map[string]interface{}{
-				"ServicePlan":  servicePlanName,
-				"Service":      serviceName,
-				"Organization": orgName,
-				"User":         user.Name,
-			})
-		warnings, err = cmd.Actor.EnablePlanForOrg(serviceName, servicePlanName, orgName)
+		warnings, err = cmd.Actor.EnablePlanForOrg(serviceName, servicePlanName, orgName, serviceBrokerName)
 	} else if orgName != "" {
-		cmd.UI.DisplayTextWithFlavor("Enabling access to all plans of service {{.Service}} for the org {{.Organization}} as {{.User}}...",
-			map[string]interface{}{
-				"Service":      serviceName,
-				"Organization": orgName,
-				"User":         user.Name,
-			})
-		warnings, err = cmd.Actor.EnableServiceForOrg(serviceName, orgName)
+		warnings, err = cmd.Actor.EnableServiceForOrg(serviceName, orgName, serviceBrokerName)
 	} else if servicePlanName != "" {
-		cmd.UI.DisplayTextWithFlavor("Enabling access of plan {{.ServicePlan}} for service {{.Service}} as {{.User}}...",
-			map[string]interface{}{
-				"ServicePlan": servicePlanName,
-				"Service":     serviceName,
-				"User":        user.Name,
-			})
-		warnings, err = cmd.Actor.EnablePlanForAllOrgs(serviceName, servicePlanName)
+		warnings, err = cmd.Actor.EnablePlanForAllOrgs(serviceName, servicePlanName, serviceBrokerName)
 	} else {
-		cmd.UI.DisplayTextWithFlavor("Enabling access to all plans of service {{.Service}} for all orgs as {{.User}}...",
-			map[string]interface{}{
-				"Service": serviceName,
-				"User":    user.Name,
-			})
-		warnings, err = cmd.Actor.EnableServiceForAllOrgs(serviceName)
+		warnings, err = cmd.Actor.EnableServiceForAllOrgs(serviceName, serviceBrokerName)
 	}
 
 	cmd.UI.DisplayWarnings(warnings)
+
 	if err != nil {
 		return err
 	}
@@ -110,4 +98,21 @@ func (cmd EnableServiceAccessCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	return nil
+}
+
+type enableServiceAccessOptions struct {
+	Plan   bool
+	Org    bool
+	Broker bool
+}
+
+var messages = map[enableServiceAccessOptions]string{
+	{Plan: true, Org: true, Broker: false}:   "Enabling access to plan {{.ServicePlan}} of service {{.Service}} for org {{.Organization}} as {{.User}}...",
+	{Plan: false, Org: true, Broker: false}:  "Enabling access to all plans of service {{.Service}} for the org {{.Organization}} as {{.User}}...",
+	{Plan: true, Org: false, Broker: false}:  "Enabling access of plan {{.ServicePlan}} for service {{.Service}} as {{.User}}...",
+	{Plan: false, Org: false, Broker: false}: "Enabling access to all plans of service {{.Service}} for all orgs as {{.User}}...",
+	{Plan: true, Org: true, Broker: true}:    "Enabling access to plan {{.ServicePlan}} of service {{.Service}} from broker {{.ServiceBroker}} for org {{.Organization}} as {{.User}}...",
+	{Plan: false, Org: true, Broker: true}:   "Enabling access to all plans of service {{.Service}} from broker {{.ServiceBroker}} for the org {{.Organization}} as {{.User}}...",
+	{Plan: true, Org: false, Broker: true}:   "Enabling access to plan {{.ServicePlan}} for service {{.Service}} from broker {{.ServiceBroker}} for all orgs as {{.User}}...",
+	{Plan: false, Org: false, Broker: true}:  "Enabling access to all plans of service {{.Service}} from broker {{.ServiceBroker}} for all orgs as {{.User}}...",
 }

@@ -29,6 +29,7 @@ var _ = Describe("Service", func() {
 						"entity": {
 							"label": "some-service",
 							"description": "some-description",
+							"service_broker_name": "service-broker",
 							"extra": "{\"provider\":{\"name\":\"The name\"},\"listing\":{\"imageUrl\":\"http://catgifpage.com/cat.gif\",\"blurb\":\"fake broker that is fake\",\"longDescription\":\"A long time ago, in a galaxy far far away...\"},\"displayName\":\"The Fake Broker\",\"shareable\":true}"
 						}
 					}`
@@ -45,9 +46,10 @@ var _ = Describe("Service", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(service).To(Equal(Service{
-						GUID:        "some-service-guid",
-						Label:       "some-service",
-						Description: "some-description",
+						GUID:              "some-service-guid",
+						Label:             "some-service",
+						Description:       "some-description",
+						ServiceBrokerName: "service-broker",
 						Extra: ServiceExtra{
 							Shareable: true,
 						},

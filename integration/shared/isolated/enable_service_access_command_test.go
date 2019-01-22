@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,6 +19,7 @@ var _ = Describe("enable service access command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("\\s+cf enable-service-access SERVICE \\[-p PLAN\\] \\[-o ORG\\]"))
 				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).ShouldNot(Say("\\s+\\-b\\s+Enable access to a service from a specific service broker"))
 				Eventually(session).Should(Say("\\s+\\-o\\s+Enable access for a specified organization"))
 				Eventually(session).Should(Say("\\s+\\-p\\s+Enable access to a specified service plan"))
 				Eventually(session).Should(Say("SEE ALSO:"))
@@ -36,6 +38,7 @@ var _ = Describe("enable service access command", func() {
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say("\\s+cf enable-service-access SERVICE \\[-p PLAN\\] \\[-o ORG\\]"))
 			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).ShouldNot(Say("\\s+\\-b\\s+Enable access to a service from a specific service broker"))
 			Eventually(session).Should(Say("\\s+\\-o\\s+Enable access for a specified organization"))
 			Eventually(session).Should(Say("\\s+\\-p\\s+Enable access to a specified service plan"))
 			Eventually(session).Should(Say("SEE ALSO:"))
@@ -54,6 +57,7 @@ var _ = Describe("enable service access command", func() {
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say("\\s+cf enable-service-access SERVICE \\[-p PLAN\\] \\[-o ORG\\]"))
 			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).ShouldNot(Say("\\s+\\-b\\s+Enable access to a service from a specific service broker"))
 			Eventually(session).Should(Say("\\s+\\-o\\s+Enable access for a specified organization"))
 			Eventually(session).Should(Say("\\s+\\-p\\s+Enable access to a specified service plan"))
 			Eventually(session).Should(Say("SEE ALSO:"))
@@ -124,12 +128,13 @@ var _ = Describe("enable service access command", func() {
 
 		Context("a service broker is registered", func() {
 			var (
-				orgName     string
-				spaceName   string
-				domain      string
-				service     string
-				servicePlan string
-				broker      helpers.ServiceBroker
+				orgName      string
+				spaceName    string
+				domain       string
+				service      string
+				servicePlan  string
+				broker       helpers.ServiceBroker
+				secondBroker helpers.ServiceBroker
 			)
 
 			BeforeEach(func() {
@@ -173,7 +178,7 @@ var _ = Describe("enable service access command", func() {
 					})
 
 					It("disables the limited access for that org", func() {
-						session := helpers.CF("enable-service-access", service, "-p", servicePlan, "-v")
+						session := helpers.CF("enable-service-access", service, "-p", servicePlan)
 						Eventually(session).Should(Say("Enabling access of plan %s for service %s as admin...", servicePlan, service))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
@@ -186,6 +191,66 @@ var _ = Describe("enable service access command", func() {
 							servicePlan,
 						))
 
+					})
+				})
+			})
+
+			When("two services with the same name are registered", func() {
+				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
+					secondBroker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+					secondBroker.Push()
+					secondBroker.Configure(true)
+					secondBroker.Create()
+				})
+
+				AfterEach(func() {
+					secondBroker.Destroy()
+				})
+
+				When("a service name and broker name are provided", func() {
+					It("displays an informative message, exits 0, and enables access to the service", func() {
+						session := helpers.CF("enable-service-access", service, "-b", secondBroker.Name)
+						Eventually(session).Should(Say("Enabling access to all plans of service %s from broker %s for all orgs as admin...", service, secondBroker.Name))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("service-access", "-b", secondBroker.Name)
+						Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Say("broker:\\s+%s", secondBroker.Name))
+						Eventually(session).Should(Say("%s\\s+%s\\s+all",
+							service,
+							servicePlan,
+						))
+					})
+
+					When("a broker name is not provided", func() {
+						It("fails to create the service", func() {
+							session := helpers.CF("enable-service-access", service)
+							Eventually(session).Should(Say("Enabling access to all plans of service %s for all orgs as admin...", service))
+							Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+
+							session = helpers.CF("service-access", "-b", secondBroker.Name)
+							Eventually(session).Should(Exit(0))
+							Eventually(session).Should(Say("broker:\\s+%s", secondBroker.Name))
+							Eventually(session).Should(Say("%s\\s+%s\\s+none",
+								service,
+								servicePlan,
+							))
+						})
+					})
+
+					When("no broker by that name exists", func() {
+						It("displays an informative message, exits 1", func() {
+							session := helpers.CF("enable-service-access", service, "-b", "non-existent-broker")
+							Eventually(session).Should(Say("Enabling access to all plans of service %s from broker %s for all orgs as admin...", service, "non-existent-broker"))
+							Eventually(session.Err).Should(Say("Service broker 'non-existent-broker' not found"))
+							Eventually(session.Err).Should(Say("TIP: Use 'cf service-brokers' to see a list of available brokers."))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
 					})
 				})
 			})

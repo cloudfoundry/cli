@@ -9,11 +9,12 @@ import (
 )
 
 type FakeEnableServiceAccessActor struct {
-	EnablePlanForAllOrgsStub        func(string, string) (v2action.Warnings, error)
+	EnablePlanForAllOrgsStub        func(string, string, string) (v2action.Warnings, error)
 	enablePlanForAllOrgsMutex       sync.RWMutex
 	enablePlanForAllOrgsArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 string
 	}
 	enablePlanForAllOrgsReturns struct {
 		result1 v2action.Warnings
@@ -23,12 +24,13 @@ type FakeEnableServiceAccessActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
-	EnablePlanForOrgStub        func(string, string, string) (v2action.Warnings, error)
+	EnablePlanForOrgStub        func(string, string, string, string) (v2action.Warnings, error)
 	enablePlanForOrgMutex       sync.RWMutex
 	enablePlanForOrgArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
+		arg4 string
 	}
 	enablePlanForOrgReturns struct {
 		result1 v2action.Warnings
@@ -38,10 +40,11 @@ type FakeEnableServiceAccessActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
-	EnableServiceForAllOrgsStub        func(string) (v2action.Warnings, error)
+	EnableServiceForAllOrgsStub        func(string, string) (v2action.Warnings, error)
 	enableServiceForAllOrgsMutex       sync.RWMutex
 	enableServiceForAllOrgsArgsForCall []struct {
 		arg1 string
+		arg2 string
 	}
 	enableServiceForAllOrgsReturns struct {
 		result1 v2action.Warnings
@@ -51,11 +54,12 @@ type FakeEnableServiceAccessActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
-	EnableServiceForOrgStub        func(string, string) (v2action.Warnings, error)
+	EnableServiceForOrgStub        func(string, string, string) (v2action.Warnings, error)
 	enableServiceForOrgMutex       sync.RWMutex
 	enableServiceForOrgArgsForCall []struct {
 		arg1 string
 		arg2 string
+		arg3 string
 	}
 	enableServiceForOrgReturns struct {
 		result1 v2action.Warnings
@@ -69,17 +73,18 @@ type FakeEnableServiceAccessActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeEnableServiceAccessActor) EnablePlanForAllOrgs(arg1 string, arg2 string) (v2action.Warnings, error) {
+func (fake *FakeEnableServiceAccessActor) EnablePlanForAllOrgs(arg1 string, arg2 string, arg3 string) (v2action.Warnings, error) {
 	fake.enablePlanForAllOrgsMutex.Lock()
 	ret, specificReturn := fake.enablePlanForAllOrgsReturnsOnCall[len(fake.enablePlanForAllOrgsArgsForCall)]
 	fake.enablePlanForAllOrgsArgsForCall = append(fake.enablePlanForAllOrgsArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("EnablePlanForAllOrgs", []interface{}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("EnablePlanForAllOrgs", []interface{}{arg1, arg2, arg3})
 	fake.enablePlanForAllOrgsMutex.Unlock()
 	if fake.EnablePlanForAllOrgsStub != nil {
-		return fake.EnablePlanForAllOrgsStub(arg1, arg2)
+		return fake.EnablePlanForAllOrgsStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -94,17 +99,17 @@ func (fake *FakeEnableServiceAccessActor) EnablePlanForAllOrgsCallCount() int {
 	return len(fake.enablePlanForAllOrgsArgsForCall)
 }
 
-func (fake *FakeEnableServiceAccessActor) EnablePlanForAllOrgsCalls(stub func(string, string) (v2action.Warnings, error)) {
+func (fake *FakeEnableServiceAccessActor) EnablePlanForAllOrgsCalls(stub func(string, string, string) (v2action.Warnings, error)) {
 	fake.enablePlanForAllOrgsMutex.Lock()
 	defer fake.enablePlanForAllOrgsMutex.Unlock()
 	fake.EnablePlanForAllOrgsStub = stub
 }
 
-func (fake *FakeEnableServiceAccessActor) EnablePlanForAllOrgsArgsForCall(i int) (string, string) {
+func (fake *FakeEnableServiceAccessActor) EnablePlanForAllOrgsArgsForCall(i int) (string, string, string) {
 	fake.enablePlanForAllOrgsMutex.RLock()
 	defer fake.enablePlanForAllOrgsMutex.RUnlock()
 	argsForCall := fake.enablePlanForAllOrgsArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeEnableServiceAccessActor) EnablePlanForAllOrgsReturns(result1 v2action.Warnings, result2 error) {
@@ -133,18 +138,19 @@ func (fake *FakeEnableServiceAccessActor) EnablePlanForAllOrgsReturnsOnCall(i in
 	}{result1, result2}
 }
 
-func (fake *FakeEnableServiceAccessActor) EnablePlanForOrg(arg1 string, arg2 string, arg3 string) (v2action.Warnings, error) {
+func (fake *FakeEnableServiceAccessActor) EnablePlanForOrg(arg1 string, arg2 string, arg3 string, arg4 string) (v2action.Warnings, error) {
 	fake.enablePlanForOrgMutex.Lock()
 	ret, specificReturn := fake.enablePlanForOrgReturnsOnCall[len(fake.enablePlanForOrgArgsForCall)]
 	fake.enablePlanForOrgArgsForCall = append(fake.enablePlanForOrgArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("EnablePlanForOrg", []interface{}{arg1, arg2, arg3})
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("EnablePlanForOrg", []interface{}{arg1, arg2, arg3, arg4})
 	fake.enablePlanForOrgMutex.Unlock()
 	if fake.EnablePlanForOrgStub != nil {
-		return fake.EnablePlanForOrgStub(arg1, arg2, arg3)
+		return fake.EnablePlanForOrgStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -159,17 +165,17 @@ func (fake *FakeEnableServiceAccessActor) EnablePlanForOrgCallCount() int {
 	return len(fake.enablePlanForOrgArgsForCall)
 }
 
-func (fake *FakeEnableServiceAccessActor) EnablePlanForOrgCalls(stub func(string, string, string) (v2action.Warnings, error)) {
+func (fake *FakeEnableServiceAccessActor) EnablePlanForOrgCalls(stub func(string, string, string, string) (v2action.Warnings, error)) {
 	fake.enablePlanForOrgMutex.Lock()
 	defer fake.enablePlanForOrgMutex.Unlock()
 	fake.EnablePlanForOrgStub = stub
 }
 
-func (fake *FakeEnableServiceAccessActor) EnablePlanForOrgArgsForCall(i int) (string, string, string) {
+func (fake *FakeEnableServiceAccessActor) EnablePlanForOrgArgsForCall(i int) (string, string, string, string) {
 	fake.enablePlanForOrgMutex.RLock()
 	defer fake.enablePlanForOrgMutex.RUnlock()
 	argsForCall := fake.enablePlanForOrgArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeEnableServiceAccessActor) EnablePlanForOrgReturns(result1 v2action.Warnings, result2 error) {
@@ -198,16 +204,17 @@ func (fake *FakeEnableServiceAccessActor) EnablePlanForOrgReturnsOnCall(i int, r
 	}{result1, result2}
 }
 
-func (fake *FakeEnableServiceAccessActor) EnableServiceForAllOrgs(arg1 string) (v2action.Warnings, error) {
+func (fake *FakeEnableServiceAccessActor) EnableServiceForAllOrgs(arg1 string, arg2 string) (v2action.Warnings, error) {
 	fake.enableServiceForAllOrgsMutex.Lock()
 	ret, specificReturn := fake.enableServiceForAllOrgsReturnsOnCall[len(fake.enableServiceForAllOrgsArgsForCall)]
 	fake.enableServiceForAllOrgsArgsForCall = append(fake.enableServiceForAllOrgsArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("EnableServiceForAllOrgs", []interface{}{arg1})
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("EnableServiceForAllOrgs", []interface{}{arg1, arg2})
 	fake.enableServiceForAllOrgsMutex.Unlock()
 	if fake.EnableServiceForAllOrgsStub != nil {
-		return fake.EnableServiceForAllOrgsStub(arg1)
+		return fake.EnableServiceForAllOrgsStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -222,17 +229,17 @@ func (fake *FakeEnableServiceAccessActor) EnableServiceForAllOrgsCallCount() int
 	return len(fake.enableServiceForAllOrgsArgsForCall)
 }
 
-func (fake *FakeEnableServiceAccessActor) EnableServiceForAllOrgsCalls(stub func(string) (v2action.Warnings, error)) {
+func (fake *FakeEnableServiceAccessActor) EnableServiceForAllOrgsCalls(stub func(string, string) (v2action.Warnings, error)) {
 	fake.enableServiceForAllOrgsMutex.Lock()
 	defer fake.enableServiceForAllOrgsMutex.Unlock()
 	fake.EnableServiceForAllOrgsStub = stub
 }
 
-func (fake *FakeEnableServiceAccessActor) EnableServiceForAllOrgsArgsForCall(i int) string {
+func (fake *FakeEnableServiceAccessActor) EnableServiceForAllOrgsArgsForCall(i int) (string, string) {
 	fake.enableServiceForAllOrgsMutex.RLock()
 	defer fake.enableServiceForAllOrgsMutex.RUnlock()
 	argsForCall := fake.enableServiceForAllOrgsArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeEnableServiceAccessActor) EnableServiceForAllOrgsReturns(result1 v2action.Warnings, result2 error) {
@@ -261,17 +268,18 @@ func (fake *FakeEnableServiceAccessActor) EnableServiceForAllOrgsReturnsOnCall(i
 	}{result1, result2}
 }
 
-func (fake *FakeEnableServiceAccessActor) EnableServiceForOrg(arg1 string, arg2 string) (v2action.Warnings, error) {
+func (fake *FakeEnableServiceAccessActor) EnableServiceForOrg(arg1 string, arg2 string, arg3 string) (v2action.Warnings, error) {
 	fake.enableServiceForOrgMutex.Lock()
 	ret, specificReturn := fake.enableServiceForOrgReturnsOnCall[len(fake.enableServiceForOrgArgsForCall)]
 	fake.enableServiceForOrgArgsForCall = append(fake.enableServiceForOrgArgsForCall, struct {
 		arg1 string
 		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("EnableServiceForOrg", []interface{}{arg1, arg2})
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("EnableServiceForOrg", []interface{}{arg1, arg2, arg3})
 	fake.enableServiceForOrgMutex.Unlock()
 	if fake.EnableServiceForOrgStub != nil {
-		return fake.EnableServiceForOrgStub(arg1, arg2)
+		return fake.EnableServiceForOrgStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -286,17 +294,17 @@ func (fake *FakeEnableServiceAccessActor) EnableServiceForOrgCallCount() int {
 	return len(fake.enableServiceForOrgArgsForCall)
 }
 
-func (fake *FakeEnableServiceAccessActor) EnableServiceForOrgCalls(stub func(string, string) (v2action.Warnings, error)) {
+func (fake *FakeEnableServiceAccessActor) EnableServiceForOrgCalls(stub func(string, string, string) (v2action.Warnings, error)) {
 	fake.enableServiceForOrgMutex.Lock()
 	defer fake.enableServiceForOrgMutex.Unlock()
 	fake.EnableServiceForOrgStub = stub
 }
 
-func (fake *FakeEnableServiceAccessActor) EnableServiceForOrgArgsForCall(i int) (string, string) {
+func (fake *FakeEnableServiceAccessActor) EnableServiceForOrgArgsForCall(i int) (string, string, string) {
 	fake.enableServiceForOrgMutex.RLock()
 	defer fake.enableServiceForOrgMutex.RUnlock()
 	argsForCall := fake.enableServiceForOrgArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeEnableServiceAccessActor) EnableServiceForOrgReturns(result1 v2action.Warnings, result2 error) {

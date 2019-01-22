@@ -9,8 +9,8 @@ import (
 )
 
 // EnableServiceForAllOrgs enables access for the given service in all orgs.
-func (actor Actor) EnableServiceForAllOrgs(serviceName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName)
+func (actor Actor) EnableServiceForAllOrgs(serviceName, brokerName string) (Warnings, error) {
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, brokerName)
 	if err != nil {
 		return allWarnings, err
 	}
@@ -27,8 +27,8 @@ func (actor Actor) EnableServiceForAllOrgs(serviceName string) (Warnings, error)
 }
 
 // EnablePlanForAllOrgs enables access to a specific plan of the given service in all orgs.
-func (actor Actor) EnablePlanForAllOrgs(serviceName, servicePlanName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName)
+func (actor Actor) EnablePlanForAllOrgs(serviceName, servicePlanName, brokerName string) (Warnings, error) {
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, brokerName)
 	if err != nil {
 		return allWarnings, err
 	}
@@ -53,8 +53,8 @@ func (actor Actor) EnablePlanForAllOrgs(serviceName, servicePlanName string) (Wa
 }
 
 // EnableServiceForOrg enables access for the given service in a specific org.
-func (actor Actor) EnableServiceForOrg(serviceName, orgName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName)
+func (actor Actor) EnableServiceForOrg(serviceName, orgName, brokerName string) (Warnings, error) {
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, brokerName)
 	if err != nil {
 		return allWarnings, err
 	}
@@ -77,8 +77,8 @@ func (actor Actor) EnableServiceForOrg(serviceName, orgName string) (Warnings, e
 }
 
 // EnablePlanForOrg enables access to a specific plan of the given service in a specific org.
-func (actor Actor) EnablePlanForOrg(serviceName, servicePlanName, orgName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName)
+func (actor Actor) EnablePlanForOrg(serviceName, servicePlanName, orgName, brokerName string) (Warnings, error) {
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, brokerName)
 	if err != nil {
 		return allWarnings, err
 	}
@@ -102,7 +102,7 @@ func (actor Actor) EnablePlanForOrg(serviceName, servicePlanName, orgName string
 
 // DisableServiceForAllOrgs disables access for the given service in all orgs.
 func (actor Actor) DisableServiceForAllOrgs(serviceName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName)
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, "")
 	if err != nil {
 		return allWarnings, err
 	}
@@ -127,7 +127,7 @@ func (actor Actor) DisableServiceForAllOrgs(serviceName string) (Warnings, error
 
 // DisablePlanForAllOrgs disables access to a specific plan of the given service in all orgs.
 func (actor Actor) DisablePlanForAllOrgs(serviceName, servicePlanName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName)
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, "")
 	if err != nil {
 		return allWarnings, err
 	}
@@ -159,7 +159,7 @@ func (actor Actor) DisablePlanForAllOrgs(serviceName, servicePlanName string) (W
 
 // DisableServiceForOrg disables access for the given service in a specific org.
 func (actor Actor) DisableServiceForOrg(serviceName, orgName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName)
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, "")
 	if err != nil {
 		return allWarnings, err
 	}
@@ -182,7 +182,7 @@ func (actor Actor) DisableServiceForOrg(serviceName, orgName string) (Warnings, 
 
 // DisablePlanForOrg disables access to a specific plan of the given service in a specific org.
 func (actor Actor) DisablePlanForOrg(serviceName, servicePlanName, orgName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName)
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, "")
 	if err != nil {
 		return allWarnings, err
 	}

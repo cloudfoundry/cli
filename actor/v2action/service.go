@@ -13,21 +13,40 @@ func (actor Actor) GetService(serviceGUID string) (Service, Warnings, error) {
 	return Service(service), Warnings(warnings), err
 }
 
-// GetServiceByName returns a service based on the name provided.
-// If there are no services, an ServiceNotFoundError will be returned.
-// If there are multiple services, the first will be returned.
-func (actor Actor) GetServiceByName(serviceName string) (Service, Warnings, error) {
-	services, warnings, err := actor.CloudControllerClient.GetServices(ccv2.Filter{
+// GetServicesByNameAndBrokerName returns services based on the name provided.
+// If there are no services, a ServiceNotFoundError will be returned.
+func (actor Actor) GetServiceByNameAndBrokerName(serviceName, serviceBrokerName string) (Service, Warnings, error) {
+	filters := []ccv2.Filter{ccv2.Filter{
 		Type:     constant.LabelFilter,
 		Operator: constant.EqualOperator,
 		Values:   []string{serviceName},
-	})
+	}}
+
+	if serviceBrokerName != "" {
+		serviceBroker, warnings, err := actor.GetServiceBrokerByName(serviceBrokerName)
+		if err != nil {
+			return Service{}, warnings, err
+		}
+
+		brokerFilter := ccv2.Filter{
+			Type:     constant.ServiceBrokerGUIDFilter,
+			Operator: constant.EqualOperator,
+			Values:   []string{serviceBroker.GUID},
+		}
+		filters = append(filters, brokerFilter)
+	}
+
+	services, warnings, err := actor.CloudControllerClient.GetServices(filters...)
 	if err != nil {
 		return Service{}, Warnings(warnings), err
 	}
 
 	if len(services) == 0 {
 		return Service{}, Warnings(warnings), actionerror.ServiceNotFoundError{Name: serviceName}
+	}
+
+	if len(services) > 1 {
+		return Service{}, Warnings(warnings), actionerror.DuplicateServiceError{Name: serviceName}
 	}
 
 	return Service(services[0]), Warnings(warnings), nil

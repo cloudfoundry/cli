@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -109,36 +110,53 @@ var _ = Describe("Service Broker", func() {
 		)
 
 		JustBeforeEach(func() {
-			serviceBroker, warnings, executeErr = actor.GetServiceBrokerByName("my-broker")
+			serviceBroker, warnings, executeErr = actor.GetServiceBrokerByName("broker-name")
 		})
 
-		BeforeEach(func() {
-			fakeCloudControllerClient.GetServiceBrokersReturns([]ccv2.ServiceBroker{
-				{GUID: "some-broker-guid"}},
-				[]string{"a-warning", "another-warning"}, nil)
-		})
+		When("there are no errors", func() {
+			When("a service broker exists", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceBrokersReturns([]ccv2.ServiceBroker{{GUID: "some-broker-guid"}}, []string{"a-warning", "another-warning"}, nil)
+				})
 
-		It("retrieves the specified service broker", func() {
-			filters := []ccv2.Filter{
-				{Type: constant.NameFilter,
-					Operator: constant.EqualOperator,
-					Values:   []string{"my-broker"}},
-			}
+				It("gets the service broker", func() {
+					Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+					filter := fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)
+					Expect(filter).To(Equal([]ccv2.Filter{{Type: constant.NameFilter, Operator: constant.EqualOperator, Values: []string{"broker-name"}}}))
 
-			Expect(fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)).To(Equal(filters))
-			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(serviceBroker.GUID).To(Equal("some-broker-guid"))
-			Expect(warnings).To(Equal(Warnings{"a-warning", "another-warning"}))
+					Expect(warnings).To(Equal(Warnings{"a-warning", "another-warning"}))
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(serviceBroker.GUID).To(Equal("some-broker-guid"))
+				})
+			})
+
 		})
 
 		When("there is an error", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceBrokersReturns([]ccv2.ServiceBroker{}, []string{"one-warning", "two-warnings"}, errors.New("error getting brokers"))
+			When("calling the client", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceBrokersReturns([]ccv2.ServiceBroker{{GUID: "some-broker-guid"}}, []string{"one-warning", "two-warnings"}, errors.New("error creating broker"))
+				})
+
+				It("returns the errors and warnings", func() {
+					Expect(warnings).To(Equal(Warnings{"one-warning", "two-warnings"}))
+					Expect(executeErr).To(MatchError("error creating broker"))
+				})
 			})
 
-			It("returns the errors and warnings", func() {
-				Expect(warnings).To(Equal(Warnings{"one-warning", "two-warnings"}))
-				Expect(executeErr).To(MatchError("error getting brokers"))
+			When("a service broker does not exist", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetServiceBrokersReturns([]ccv2.ServiceBroker{}, []string{"a-warning", "another-warning"}, nil)
+				})
+
+				It("raises a service broker not found error", func() {
+					Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+					filter := fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)
+					Expect(filter).To(Equal([]ccv2.Filter{{Type: constant.NameFilter, Operator: constant.EqualOperator, Values: []string{"broker-name"}}}))
+
+					Expect(warnings).To(Equal(Warnings{"a-warning", "another-warning"}))
+					Expect(executeErr).To(MatchError(actionerror.ServiceBrokerNotFoundError{Name: "broker-name"}))
+				})
 			})
 		})
 	})

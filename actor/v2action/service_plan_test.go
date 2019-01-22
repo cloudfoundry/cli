@@ -20,6 +20,7 @@ var _ = Describe("Service Plan Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
+
 	})
 
 	Describe("GetServicePlan", func() {
@@ -86,8 +87,39 @@ var _ = Describe("Service Plan Actions", func() {
 			servicePlanErr      error
 		)
 
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetServiceBrokersReturns([]ccv2.ServiceBroker{{GUID: "broker-guid"}}, nil, nil)
+		})
+
 		JustBeforeEach(func() {
-			servicePlans, servicePlanWarnings, servicePlanErr = actor.GetServicePlansForService("some-service")
+			servicePlans, servicePlanWarnings, servicePlanErr = actor.GetServicePlansForService("some-service", "some-broker")
+		})
+
+		It("fetches a broker by name", func() {
+			Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)).To(Equal([]ccv2.Filter{
+				{
+					Type:     constant.NameFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-broker"},
+				},
+			}))
+		})
+
+		It("fetches services by label and the guid of the passed broker", func() {
+			Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
+			Expect(fakeCloudControllerClient.GetServicesArgsForCall(0)).To(ConsistOf(
+				ccv2.Filter{
+					Type:     constant.LabelFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-service"},
+				},
+				ccv2.Filter{
+					Type:     constant.ServiceBrokerGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"broker-guid"},
+				},
+			))
 		})
 
 		When("there is a service with plans", func() {

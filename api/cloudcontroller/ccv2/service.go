@@ -19,7 +19,7 @@ type Service struct {
 	// DocumentationURL is a url that points to a documentation page for the
 	// service.
 	DocumentationURL string
-	// ServiceBrokerName is the name of the broker providing this service.
+	// ServiceBrokerName is name of the service broker associated with the service
 	ServiceBrokerName string
 	// Extra is a field with extra data pertaining to the service.
 	Extra ServiceExtra
