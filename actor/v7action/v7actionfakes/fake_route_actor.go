@@ -2,10 +2,10 @@
 package v7actionfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v2action "code.cloudfoundry.org/cli/actor/v2action"
-	v7action "code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 )
 
 type FakeRouteActor struct {

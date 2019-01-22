@@ -2,9 +2,9 @@
 package v7actionfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v7action "code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 )
 
 type FakeManifestParser struct {

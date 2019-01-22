@@ -10,7 +10,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -205,6 +207,150 @@ var _ = Describe("Buildpack", func() {
 				Expect(path).To(Equal(bpFilePath))
 				Expect(pbReader).To(Equal(bpFile))
 				Expect(warnings).To(ConsistOf("some-create-warning"))
+			})
+		})
+	})
+
+	Describe("PrepareBuildpackBits", func() {
+		var (
+			inPath         string
+			outPath        string
+			tmpDirPath     string
+			fakeDownloader *v7actionfakes.FakeDownloader
+
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			fakeDownloader = new(v7actionfakes.FakeDownloader)
+		})
+
+		JustBeforeEach(func() {
+			outPath, executeErr = actor.PrepareBuildpackBits(inPath, tmpDirPath, fakeDownloader)
+		})
+
+		When("the buildpack path is a url", func() {
+			BeforeEach(func() {
+				inPath = "http://buildpacks.com/a.zip"
+				fakeDownloader = new(v7actionfakes.FakeDownloader)
+
+				var err error
+				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(tmpDirPath)).ToNot(HaveOccurred())
+			})
+
+			When("downloading the file succeeds", func() {
+				BeforeEach(func() {
+					fakeDownloader.DownloadReturns("/tmp/buildpackdir-100/a.zip", nil)
+				})
+
+				It("downloads the buildpack to a local file", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeDownloader.DownloadCallCount()).To(Equal(1))
+
+					inputPath, inputTmpDirPath := fakeDownloader.DownloadArgsForCall(0)
+					Expect(inputPath).To(Equal("http://buildpacks.com/a.zip"))
+					Expect(inputTmpDirPath).To(Equal(tmpDirPath))
+				})
+			})
+
+			When("downloading the file fails", func() {
+				BeforeEach(func() {
+					fakeDownloader.DownloadReturns("", errors.New("some-download-error"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("some-download-error"))
+				})
+			})
+		})
+
+		When("the buildpack path points to a directory", func() {
+			var tempFile *os.File
+			BeforeEach(func() {
+				var err error
+				inPath, err = ioutil.TempDir("", "buildpackdir-")
+				Expect(err).ToNot(HaveOccurred())
+
+				tempFile, err = ioutil.TempFile(inPath, "foo")
+				Expect(err).ToNot(HaveOccurred())
+
+				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				tempFile.Close()
+				Expect(os.RemoveAll(inPath)).ToNot(HaveOccurred())
+				Expect(os.RemoveAll(tmpDirPath)).ToNot(HaveOccurred())
+			})
+
+			It("returns a path to the zipped directory", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeDownloader.DownloadCallCount()).To(Equal(0))
+
+				Expect(filepath.Base(outPath)).To(Equal(filepath.Base(inPath) + ".zip"))
+			})
+		})
+
+		When("the buildpack path points to an empty directory", func() {
+			BeforeEach(func() {
+				var err error
+				inPath, err = ioutil.TempDir("", "some-empty-dir")
+				Expect(err).ToNot(HaveOccurred())
+
+				tmpDirPath, err = ioutil.TempDir("", "buildpackdir-")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(inPath)).ToNot(HaveOccurred())
+				Expect(os.RemoveAll(tmpDirPath)).ToNot(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(actionerror.EmptyBuildpackDirectoryError{Path: inPath}))
+			})
+		})
+
+		When("the buildpack path points to a zip file", func() {
+			BeforeEach(func() {
+				inPath = "/foo/buildpacks/a.zip"
+			})
+
+			It("returns the local filepath", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeDownloader.DownloadCallCount()).To(Equal(0))
+				Expect(outPath).To(Equal("/foo/buildpacks/a.zip"))
+			})
+		})
+	})
+
+	Describe("Zipit", func() {
+		//tested in buildpack_linux_test.go and buildpack_windows_test.go
+		var (
+			source string
+			target string
+
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			executeErr = Zipit(source, target, "testzip-")
+		})
+
+		When("the source directory does not exist", func() {
+			BeforeEach(func() {
+				source = ""
+				target = ""
+			})
+
+			It("returns an error", func() {
+				Expect(os.IsNotExist(executeErr)).To(BeTrue())
 			})
 		})
 	})

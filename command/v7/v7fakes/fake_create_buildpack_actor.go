@@ -2,9 +2,9 @@
 package v7fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v7action "code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
@@ -23,6 +23,21 @@ type FakeCreateBuildpackActor struct {
 		result1 v7action.Buildpack
 		result2 v7action.Warnings
 		result3 error
+	}
+	PrepareBuildpackBitsStub        func(string, string, v7action.Downloader) (string, error)
+	prepareBuildpackBitsMutex       sync.RWMutex
+	prepareBuildpackBitsArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 v7action.Downloader
+	}
+	prepareBuildpackBitsReturns struct {
+		result1 string
+		result2 error
+	}
+	prepareBuildpackBitsReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
 	}
 	UploadBuildpackStub        func(string, string, v7action.SimpleProgressBar) (v7action.Warnings, error)
 	uploadBuildpackMutex       sync.RWMutex
@@ -109,6 +124,71 @@ func (fake *FakeCreateBuildpackActor) CreateBuildpackReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBits(arg1 string, arg2 string, arg3 v7action.Downloader) (string, error) {
+	fake.prepareBuildpackBitsMutex.Lock()
+	ret, specificReturn := fake.prepareBuildpackBitsReturnsOnCall[len(fake.prepareBuildpackBitsArgsForCall)]
+	fake.prepareBuildpackBitsArgsForCall = append(fake.prepareBuildpackBitsArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 v7action.Downloader
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("PrepareBuildpackBits", []interface{}{arg1, arg2, arg3})
+	fake.prepareBuildpackBitsMutex.Unlock()
+	if fake.PrepareBuildpackBitsStub != nil {
+		return fake.PrepareBuildpackBitsStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.prepareBuildpackBitsReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsCallCount() int {
+	fake.prepareBuildpackBitsMutex.RLock()
+	defer fake.prepareBuildpackBitsMutex.RUnlock()
+	return len(fake.prepareBuildpackBitsArgsForCall)
+}
+
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsCalls(stub func(string, string, v7action.Downloader) (string, error)) {
+	fake.prepareBuildpackBitsMutex.Lock()
+	defer fake.prepareBuildpackBitsMutex.Unlock()
+	fake.PrepareBuildpackBitsStub = stub
+}
+
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsArgsForCall(i int) (string, string, v7action.Downloader) {
+	fake.prepareBuildpackBitsMutex.RLock()
+	defer fake.prepareBuildpackBitsMutex.RUnlock()
+	argsForCall := fake.prepareBuildpackBitsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsReturns(result1 string, result2 error) {
+	fake.prepareBuildpackBitsMutex.Lock()
+	defer fake.prepareBuildpackBitsMutex.Unlock()
+	fake.PrepareBuildpackBitsStub = nil
+	fake.prepareBuildpackBitsReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCreateBuildpackActor) PrepareBuildpackBitsReturnsOnCall(i int, result1 string, result2 error) {
+	fake.prepareBuildpackBitsMutex.Lock()
+	defer fake.prepareBuildpackBitsMutex.Unlock()
+	fake.PrepareBuildpackBitsStub = nil
+	if fake.prepareBuildpackBitsReturnsOnCall == nil {
+		fake.prepareBuildpackBitsReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.prepareBuildpackBitsReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCreateBuildpackActor) UploadBuildpack(arg1 string, arg2 string, arg3 v7action.SimpleProgressBar) (v7action.Warnings, error) {
 	fake.uploadBuildpackMutex.Lock()
 	ret, specificReturn := fake.uploadBuildpackReturnsOnCall[len(fake.uploadBuildpackArgsForCall)]
@@ -179,6 +259,8 @@ func (fake *FakeCreateBuildpackActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.createBuildpackMutex.RLock()
 	defer fake.createBuildpackMutex.RUnlock()
+	fake.prepareBuildpackBitsMutex.RLock()
+	defer fake.prepareBuildpackBitsMutex.RUnlock()
 	fake.uploadBuildpackMutex.RLock()
 	defer fake.uploadBuildpackMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

@@ -2,10 +2,10 @@
 package v7actionfakes
 
 import (
-	sync "sync"
-	time "time"
+	"sync"
+	"time"
 
-	v7action "code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/actor/v7action"
 )
 
 type FakeConfig struct {

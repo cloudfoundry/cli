@@ -2,7 +2,11 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/util/download"
+	"io/ioutil"
+	"os"
 	"strconv"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -16,6 +20,7 @@ import (
 type CreateBuildpackActor interface {
 	CreateBuildpack(buildpack v7action.Buildpack) (v7action.Buildpack, v7action.Warnings, error)
 	UploadBuildpack(guid string, pathToBuildpackBits string, progressBar v7action.SimpleProgressBar) (v7action.Warnings, error)
+	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v7action.Downloader) (string, error)
 }
 
 type CreateBuildpackCommand struct {
@@ -63,6 +68,18 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
+	downloader := download.NewDownloader(time.Second * 30)
+	tmpDirPath, err := ioutil.TempDir("", "buildpack-dir-")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tmpDirPath)
+
+	pathToBuildpackBits, err := cmd.Actor.PrepareBuildpackBits(string(cmd.RequiredArgs.Path), tmpDirPath, downloader)
+	if err != nil {
+		return err
+	}
+
 	createdBuildpack, warnings, err := cmd.Actor.CreateBuildpack(v7action.Buildpack{
 		Name:     cmd.RequiredArgs.Buildpack,
 		Position: cmd.RequiredArgs.Position,
@@ -71,16 +88,20 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.BuildpackName}} as {{.Username}}...", map[string]interface{}{
 		"Username":      user.Name,
 		"BuildpackName": cmd.RequiredArgs.Buildpack,
 	})
-	warnings, err = cmd.Actor.UploadBuildpack(createdBuildpack.GUID, string(cmd.RequiredArgs.Path), cmd.ProgressBar)
+	warnings, err = cmd.Actor.UploadBuildpack(createdBuildpack.GUID, pathToBuildpackBits, cmd.ProgressBar)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
+	cmd.UI.DisplayText("Done uploading")
+	cmd.UI.DisplayOK()
 
 	return nil
 }

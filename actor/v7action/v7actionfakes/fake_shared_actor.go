@@ -2,10 +2,10 @@
 package v7actionfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	sharedaction "code.cloudfoundry.org/cli/actor/sharedaction"
-	v7action "code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
 )
 
 type FakeSharedActor struct {

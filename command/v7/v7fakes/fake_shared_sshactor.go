@@ -2,9 +2,9 @@
 package v7fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	sharedaction "code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
