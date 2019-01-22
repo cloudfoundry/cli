@@ -20,7 +20,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v6fakes.FakeDeleteUnmappedRoutesActor
+		fakeActor       *v6fakes.FakeDeleteOrphanedRoutesActor
 		input           *Buffer
 		binaryName      string
 		executeErr      error
@@ -31,7 +31,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v6fakes.FakeDeleteUnmappedRoutesActor)
+		fakeActor = new(v6fakes.FakeDeleteOrphanedRoutesActor)
 
 		cmd = v6.DeleteOrphanedRoutesCommand{
 			UI:          testUI,
@@ -157,7 +157,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 							Expect(err).NotTo(HaveOccurred())
 						})
 
-						It("displays getting routes message", func() {
+						It("displays a message showing what user is deleting the routes", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
 							Expect(testUI.Out).To(Say("Deleting routes as some-user ...\n"))

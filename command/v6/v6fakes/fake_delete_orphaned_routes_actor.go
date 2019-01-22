@@ -8,7 +8,7 @@ import (
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
-type FakeDeleteUnmappedRoutesActor struct {
+type FakeDeleteOrphanedRoutesActor struct {
 	DeleteUnmappedRoutesStub        func(string) (v2action.Warnings, error)
 	deleteUnmappedRoutesMutex       sync.RWMutex
 	deleteUnmappedRoutesArgsForCall []struct {
@@ -26,7 +26,7 @@ type FakeDeleteUnmappedRoutesActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDeleteUnmappedRoutesActor) DeleteUnmappedRoutes(arg1 string) (v2action.Warnings, error) {
+func (fake *FakeDeleteOrphanedRoutesActor) DeleteUnmappedRoutes(arg1 string) (v2action.Warnings, error) {
 	fake.deleteUnmappedRoutesMutex.Lock()
 	ret, specificReturn := fake.deleteUnmappedRoutesReturnsOnCall[len(fake.deleteUnmappedRoutesArgsForCall)]
 	fake.deleteUnmappedRoutesArgsForCall = append(fake.deleteUnmappedRoutesArgsForCall, struct {
@@ -44,26 +44,26 @@ func (fake *FakeDeleteUnmappedRoutesActor) DeleteUnmappedRoutes(arg1 string) (v2
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeDeleteUnmappedRoutesActor) DeleteUnmappedRoutesCallCount() int {
+func (fake *FakeDeleteOrphanedRoutesActor) DeleteUnmappedRoutesCallCount() int {
 	fake.deleteUnmappedRoutesMutex.RLock()
 	defer fake.deleteUnmappedRoutesMutex.RUnlock()
 	return len(fake.deleteUnmappedRoutesArgsForCall)
 }
 
-func (fake *FakeDeleteUnmappedRoutesActor) DeleteUnmappedRoutesCalls(stub func(string) (v2action.Warnings, error)) {
+func (fake *FakeDeleteOrphanedRoutesActor) DeleteUnmappedRoutesCalls(stub func(string) (v2action.Warnings, error)) {
 	fake.deleteUnmappedRoutesMutex.Lock()
 	defer fake.deleteUnmappedRoutesMutex.Unlock()
 	fake.DeleteUnmappedRoutesStub = stub
 }
 
-func (fake *FakeDeleteUnmappedRoutesActor) DeleteUnmappedRoutesArgsForCall(i int) string {
+func (fake *FakeDeleteOrphanedRoutesActor) DeleteUnmappedRoutesArgsForCall(i int) string {
 	fake.deleteUnmappedRoutesMutex.RLock()
 	defer fake.deleteUnmappedRoutesMutex.RUnlock()
 	argsForCall := fake.deleteUnmappedRoutesArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeDeleteUnmappedRoutesActor) DeleteUnmappedRoutesReturns(result1 v2action.Warnings, result2 error) {
+func (fake *FakeDeleteOrphanedRoutesActor) DeleteUnmappedRoutesReturns(result1 v2action.Warnings, result2 error) {
 	fake.deleteUnmappedRoutesMutex.Lock()
 	defer fake.deleteUnmappedRoutesMutex.Unlock()
 	fake.DeleteUnmappedRoutesStub = nil
@@ -73,7 +73,7 @@ func (fake *FakeDeleteUnmappedRoutesActor) DeleteUnmappedRoutesReturns(result1 v
 	}{result1, result2}
 }
 
-func (fake *FakeDeleteUnmappedRoutesActor) DeleteUnmappedRoutesReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+func (fake *FakeDeleteOrphanedRoutesActor) DeleteUnmappedRoutesReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
 	fake.deleteUnmappedRoutesMutex.Lock()
 	defer fake.deleteUnmappedRoutesMutex.Unlock()
 	fake.DeleteUnmappedRoutesStub = nil
@@ -89,7 +89,7 @@ func (fake *FakeDeleteUnmappedRoutesActor) DeleteUnmappedRoutesReturnsOnCall(i i
 	}{result1, result2}
 }
 
-func (fake *FakeDeleteUnmappedRoutesActor) Invocations() map[string][][]interface{} {
+func (fake *FakeDeleteOrphanedRoutesActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.deleteUnmappedRoutesMutex.RLock()
@@ -101,7 +101,7 @@ func (fake *FakeDeleteUnmappedRoutesActor) Invocations() map[string][][]interfac
 	return copiedInvocations
 }
 
-func (fake *FakeDeleteUnmappedRoutesActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeDeleteOrphanedRoutesActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -113,4 +113,4 @@ func (fake *FakeDeleteUnmappedRoutesActor) recordInvocation(key string, args []i
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v6.DeleteUnmappedRoutesActor = new(FakeDeleteUnmappedRoutesActor)
+var _ v6.DeleteOrphanedRoutesActor = new(FakeDeleteOrphanedRoutesActor)

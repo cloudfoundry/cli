@@ -223,7 +223,7 @@ func (actor Actor) GetSpaceRoutes(spaceGUID string) ([]Route, Warnings, error) {
 
 // DeleteUnmappedRoutes deletes the unmapped routes associated with the provided Space GUID.
 func (actor Actor) DeleteUnmappedRoutes(spaceGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.DeleteUnmappedRoutes(spaceGUID)
+	warnings, err := actor.CloudControllerClient.DeleteSpaceUnmappedRoutes(spaceGUID)
 	return Warnings(warnings), err
 }
 

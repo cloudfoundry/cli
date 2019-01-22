@@ -160,9 +160,11 @@ func (client *Client) DeleteRouteApplication(routeGUID string, appGUID string) (
 	return response.Warnings, err
 }
 
-func (client *Client) DeleteUnmappedRoutes(spaceGUID string) (Warnings, error) {
+// DeleteSpaceUnmappedRoutes deletes Routes within a specified Space not mapped
+// to an Application
+func (client *Client) DeleteSpaceUnmappedRoutes(spaceGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteUnmappedRoutesRequest,
+		RequestName: internal.DeleteSpaceUnmappedRoutesRequest,
 		URIParams:   map[string]string{"space_guid": spaceGUID},
 	})
 	if err != nil {

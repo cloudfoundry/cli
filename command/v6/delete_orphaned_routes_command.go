@@ -7,9 +7,9 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . DeleteUnmappedRoutesActor
+//go:generate counterfeiter . DeleteOrphanedRoutesActor
 
-type DeleteUnmappedRoutesActor interface {
+type DeleteOrphanedRoutesActor interface {
 	DeleteUnmappedRoutes(spaceGUID string) (v2action.Warnings, error)
 }
 
@@ -19,7 +19,7 @@ type DeleteOrphanedRoutesCommand struct {
 	relatedCommands interface{} `related_commands:"delete-route, routes"`
 
 	UI          command.UI
-	Actor       DeleteUnmappedRoutesActor
+	Actor       DeleteOrphanedRoutesActor
 	SharedActor command.SharedActor
 	Config      command.Config
 }

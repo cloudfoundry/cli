@@ -57,8 +57,11 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			It("deletes all the orphaned routes", func() {
 				Eventually(helpers.CF("delete-orphaned-routes", "-f")).Should(SatisfyAll(
 					Exit(0),
+					Say("Deleting routes as"),
 					Say("OK"),
 				))
+
+				Eventually(helpers.CF("routes")).Should(Say("No routes found"))
 			})
 		})
 
@@ -87,7 +90,14 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			It("deletes only the orphaned routes", func() {
 				Eventually(helpers.CF("delete-orphaned-routes", "-f")).Should(SatisfyAll(
 					Exit(0),
+					Say("Deleting routes as"),
 					Say("OK"),
+				))
+
+				Eventually(helpers.CF("routes")).Should(SatisfyAll(
+					Say("bound-1.*path-3"),
+					Not(Say("orphan-1.*path-1")),
+					Not(Say("orphan-2.*path-2")),
 				))
 			})
 		})
@@ -103,10 +113,12 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			It("deletes all the orphaned routes", func() {
 				session := helpers.CF("delete-orphaned-routes", "-f")
 
-				for i := 0; i < 51; i++ {
-					Eventually(session).Should(Say(fmt.Sprintf("Deleting route orphan-multi-page-%d.%s...", i, domainName)))
-				}
-				Eventually(session).Should(Exit(0))
+				Eventually(session).Should(SatisfyAll(
+					Exit(0),
+					Say("OK"),
+				))
+
+				Eventually(helpers.CF("routes")).Should(Say("No routes found"))
 			})
 		})
 

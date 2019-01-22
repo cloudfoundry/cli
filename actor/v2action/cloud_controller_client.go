@@ -31,7 +31,7 @@ type CloudControllerClient interface {
 	DeleteServiceBinding(serviceBindingGUID string, acceptsIncomplete bool) (ccv2.ServiceBinding, ccv2.Warnings, error)
 	DeleteServicePlanVisibility(servicePlanVisibilityGUID string) (ccv2.Warnings, error)
 	DeleteSpaceJob(spaceGUID string) (ccv2.Job, ccv2.Warnings, error)
-	DeleteUnmappedRoutes(spaceGUID string) (ccv2.Warnings, error)
+	DeleteSpaceUnmappedRoutes(spaceGUID string) (ccv2.Warnings, error)
 	GetApplication(guid string) (ccv2.Application, ccv2.Warnings, error)
 	GetApplicationApplicationInstanceStatuses(guid string) (map[int]ccv2.ApplicationInstanceStatus, ccv2.Warnings, error)
 	GetApplicationApplicationInstances(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error)
