@@ -120,7 +120,7 @@ var _ = Describe("services command", func() {
 
 		When("CAPI version is < 2.125.0", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionAtLeast(ccversion.MinVersionServiceBrokerNameV2)
+				helpers.SkipIfVersionAtLeast(ccversion.MinVersionMultiServiceRegistrationV2)
 			})
 
 			It("displays all service information", func() {
@@ -137,7 +137,7 @@ var _ = Describe("services command", func() {
 
 		When("CAPI version is => 2.125.0", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionServiceBrokerNameV2)
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
 			})
 
 			It("displays all service information", func() {
