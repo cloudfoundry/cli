@@ -2,9 +2,9 @@
 package v7actionfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
+	v7action "code.cloudfoundry.org/cli/actor/v7action"
 )
 
 type FakeDownloader struct {

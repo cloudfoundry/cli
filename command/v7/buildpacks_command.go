@@ -77,7 +77,14 @@ func (cmd BuildpacksCommand) displayTable(buildpacks []v7action.Buildpack) {
 			{"position", "name", "stack", "enabled", "locked", "filename"},
 		}
 		for _, buildpack := range buildpacks {
-			keyValueTable = append(keyValueTable, []string{strconv.Itoa(buildpack.Position), buildpack.Name, buildpack.Stack, strconv.FormatBool(buildpack.Enabled), strconv.FormatBool(buildpack.Locked), buildpack.Filename})
+			keyValueTable = append(keyValueTable, []string{
+				strconv.Itoa(buildpack.Position.Value),
+				buildpack.Name,
+				buildpack.Stack,
+				strconv.FormatBool(buildpack.Enabled.Value),
+				strconv.FormatBool(buildpack.Locked.Value),
+				buildpack.Filename,
+			})
 		}
 
 		cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)

@@ -1,6 +1,7 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/types"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -93,8 +94,23 @@ var _ = Describe("buildpacks Command", func() {
 			When("buildpacks exist", func() {
 				BeforeEach(func() {
 					buildpacks := []v7action.Buildpack{
-						{Name: "buildpack-1", Position: 1, Enabled: true, Locked: false, Filename: "buildpack-1.file", Stack: "buildpack-1-stack"},
-						{Name: "buildpack-2", Position: 2, Enabled: false, Locked: true, Filename: "buildpack-2.file", Stack: ""},
+						{
+							Name:     "buildpack-1",
+							Position: types.NullInt{Value: 1, IsSet: true},
+							Enabled:  types.NullBool{Value: true, IsSet: true},
+							Locked:   types.NullBool{Value: false, IsSet: true},
+							Filename: "buildpack-1.file",
+							Stack:    "buildpack-1-stack",
+						},
+
+						{
+							Name:     "buildpack-2",
+							Position: types.NullInt{Value: 2, IsSet: true},
+							Enabled:  types.NullBool{Value: false, IsSet: true},
+							Locked:   types.NullBool{Value: true, IsSet: true},
+							Filename: "buildpack-2.file",
+							Stack:    "",
+						},
 					}
 					fakeActor.GetBuildpacksReturns(buildpacks, v7action.Warnings{"some-warning-1", "some-warning-2"}, nil)
 				})

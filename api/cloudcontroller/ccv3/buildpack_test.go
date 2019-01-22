@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/types"
 	"errors"
 	"fmt"
 	"io"
@@ -112,27 +113,27 @@ var _ = Describe("Buildpacks", func() {
 					Buildpack{
 						Name:     "ruby_buildpack",
 						GUID:     "guid1",
-						Position: 1,
-						Enabled:  true,
-						Locked:   false,
+						Position: types.NullInt{Value: 1, IsSet: true},
+						Enabled:  types.NullBool{Value: true, IsSet: true},
+						Locked:   types.NullBool{Value: false, IsSet: true},
 						Stack:    "windows64",
 						State:    "AWAITING_UPLOAD",
 					},
 					Buildpack{
 						Name:     "staticfile_buildpack",
 						GUID:     "guid2",
-						Position: 2,
-						Enabled:  false,
-						Locked:   true,
+						Position: types.NullInt{Value: 2, IsSet: true},
+						Enabled:  types.NullBool{Value: false, IsSet: true},
+						Locked:   types.NullBool{Value: true, IsSet: true},
 						Stack:    "cflinuxfs3",
 						State:    "AWAITING_UPLOAD",
 					},
 					Buildpack{
 						Name:     "go_buildpack",
 						GUID:     "guid3",
-						Position: 3,
-						Enabled:  true,
-						Locked:   false,
+						Position: types.NullInt{Value: 3, IsSet: true},
+						Enabled:  types.NullBool{Value: true, IsSet: true},
+						Locked:   types.NullBool{Value: false, IsSet: true},
 						Stack:    "cflinuxfs2",
 						State:    "AWAITING_UPLOAD",
 					},
@@ -248,11 +249,11 @@ var _ = Describe("Buildpacks", func() {
 					GUID:     "some-bp-guid",
 					Name:     "some-buildpack",
 					Stack:    "some-stack",
-					Enabled:  true,
+					Enabled:  types.NullBool{Value: true, IsSet: true},
 					Filename: "",
-					Locked:   false,
+					Locked:   types.NullBool{Value: false, IsSet: true},
 					State:    constant.BuildpackAwaitingUpload,
-					Position: 42,
+					Position: types.NullInt{Value: 42, IsSet: true},
 					Links: APILinks{
 						"upload": APILink{
 							Method: "POST",

@@ -79,13 +79,13 @@ func BuildpacksOutputRegex(fields BuildpackFields) string {
 		stackRegex = regexp.QuoteMeta(fields.Stack)
 	}
 
-	return fmt.Sprintf(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, nameRegex, positionRegex, enabledRegex,
-		lockedRegex, filenameRegex, stackRegex)
+	return fmt.Sprintf(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, positionRegex, nameRegex, stackRegex, enabledRegex,
+		lockedRegex, filenameRegex)
 }
 
 type BuildpackFields struct {
-	Name     string
 	Position string
+	Name     string
 	Enabled  string
 	Locked   string
 	Filename string

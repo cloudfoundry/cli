@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -25,8 +26,9 @@ type CreateBuildpackActor interface {
 
 type CreateBuildpackCommand struct {
 	RequiredArgs    flag.CreateBuildpackArgs `positional-args:"Yes"`
-	usage           interface{}              `usage:"CF_NAME create-buildpack"`
-	relatedCommands interface{}              `related_commands:"push"`
+	usage           interface{}              `usage:"CF_NAME create-buildpack BUILDPACK PATH POSITION [--disable]\n\nTIP:\n   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."`
+	relatedCommands interface{}              `related_commands:"buildpacks, push"`
+	Disable         bool                     `long:"disable" description:"Disable the buildpack from being used for staging"`
 
 	UI          command.UI
 	Config      command.Config
@@ -82,7 +84,8 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 
 	createdBuildpack, warnings, err := cmd.Actor.CreateBuildpack(v7action.Buildpack{
 		Name:     cmd.RequiredArgs.Buildpack,
-		Position: cmd.RequiredArgs.Position,
+		Position: types.NullInt{IsSet: true, Value: cmd.RequiredArgs.Position},
+		Enabled:  types.NullBool{IsSet: true, Value: !cmd.Disable},
 	})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -112,7 +115,14 @@ func (cmd CreateBuildpackCommand) displayTable(buildpacks []v7action.Buildpack) 
 			{"position", "name", "stack", "enabled", "locked", "filename"},
 		}
 		for _, buildpack := range buildpacks {
-			keyValueTable = append(keyValueTable, []string{strconv.Itoa(buildpack.Position), buildpack.Name, buildpack.Stack, strconv.FormatBool(buildpack.Enabled), strconv.FormatBool(buildpack.Locked), buildpack.Filename})
+			keyValueTable = append(keyValueTable, []string{
+				strconv.Itoa(buildpack.Position.Value),
+				buildpack.Name,
+				buildpack.Stack,
+				strconv.FormatBool(buildpack.Enabled.Value),
+				strconv.FormatBool(buildpack.Locked.Value),
+				buildpack.Filename,
+			})
 		}
 
 		cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)

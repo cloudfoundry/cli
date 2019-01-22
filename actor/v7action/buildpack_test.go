@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/types"
 	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -54,8 +55,8 @@ var _ = Describe("Buildpack", func() {
 		When("getting buildpacks is successful", func() {
 			BeforeEach(func() {
 				ccBuildpacks := []ccv3.Buildpack{
-					{Name: "buildpack-1", Position: 1},
-					{Name: "buildpack-2", Position: 2},
+					{Name: "buildpack-1", Position: types.NullInt{Value: 1, IsSet: true}},
+					{Name: "buildpack-2", Position: types.NullInt{Value: 2, IsSet: true}},
 				}
 
 				fakeCloudControllerClient.GetBuildpacksReturns(
@@ -68,8 +69,8 @@ var _ = Describe("Buildpack", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-warning-1", "some-warning-2"))
 				Expect(buildpacks).To(Equal([]Buildpack{
-					{Name: "buildpack-1", Position: 1},
-					{Name: "buildpack-2", Position: 2},
+					{Name: "buildpack-1", Position: types.NullInt{Value: 1, IsSet: true}},
+					{Name: "buildpack-2", Position: types.NullInt{Value: 2, IsSet: true}},
 				}))
 
 				Expect(fakeCloudControllerClient.GetBuildpacksCallCount()).To(Equal(1))
