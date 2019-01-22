@@ -2,14 +2,12 @@ package helpers
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"regexp"
-
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 func MakeBuildpackArchive(stackName string) string {
@@ -41,46 +39,6 @@ func BuildpackWithStack(f func(buildpackArchive string), stackName string) {
 	defer os.Remove(buildpackZip)
 
 	f(buildpackZip)
-}
-
-func BuildpacksOutputRegex(fields BuildpackFields) string {
-	anyStringRegex := `\S+`
-	optionalStringRegex := `\S*`
-	anyBoolRegex := `(true|false)`
-	anyIntRegex := `\d+`
-
-	nameRegex := anyStringRegex
-	if fields.Name != "" {
-		nameRegex = regexp.QuoteMeta(fields.Name)
-	}
-
-	positionRegex := anyIntRegex
-	if fields.Position != "" {
-		positionRegex = regexp.QuoteMeta(fields.Position)
-	}
-
-	enabledRegex := anyBoolRegex
-	if fields.Enabled != "" {
-		enabledRegex = regexp.QuoteMeta(fields.Enabled)
-	}
-
-	lockedRegex := anyBoolRegex
-	if fields.Locked != "" {
-		lockedRegex = regexp.QuoteMeta(fields.Locked)
-	}
-
-	filenameRegex := anyStringRegex
-	if fields.Filename != "" {
-		filenameRegex = regexp.QuoteMeta(fields.Filename)
-	}
-
-	stackRegex := optionalStringRegex
-	if fields.Stack != "" {
-		stackRegex = regexp.QuoteMeta(fields.Stack)
-	}
-
-	return fmt.Sprintf(`%s\s+%s\s+%s\s+%s\s+%s\s+%s`, positionRegex, nameRegex, stackRegex, enabledRegex,
-		lockedRegex, filenameRegex)
 }
 
 type BuildpackFields struct {
