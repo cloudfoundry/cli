@@ -45,7 +45,6 @@ func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
 
 func (cmd *LoginCommand) Execute(args []string) error {
 	if cmd.Config.Experimental() {
-		var err error
 		if cmd.APIEndpoint == "" {
 			apiEndpoint, err := cmd.UI.DisplayTextPrompt("API endpoint")
 			if err != nil {
@@ -65,7 +64,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 			URL:               endpoint.String(),
 			SkipSSLValidation: true,
 		}
-		_, err = cmd.Actor.SetTarget(settings)
+		_, err := cmd.Actor.SetTarget(settings)
 		if err != nil {
 			return err
 		}
