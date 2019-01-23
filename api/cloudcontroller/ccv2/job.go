@@ -164,7 +164,7 @@ func (client *Client) PollJob(job Job) (Warnings, error) {
 		}
 
 		if job.Failed() {
-			return allWarnings, ccerror.JobFailedError{
+			return allWarnings, ccerror.V2JobFailedError{
 				JobGUID: originalJobGUID,
 				Message: job.ErrorDetails.Description,
 			}

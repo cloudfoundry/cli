@@ -310,8 +310,8 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			ccerror.APINotFoundError{URL: "some-url"},
 			APINotFoundError{URL: "some-url"}),
 
-		Entry("ccerror.JobFailedError -> JobFailedError",
-			ccerror.JobFailedError{JobGUID: "some-job-guid", Message: "some-message"},
+		Entry("ccerror.V2JobFailedError -> V2JobFailedError",
+			ccerror.V2JobFailedError{JobGUID: "some-job-guid", Message: "some-message"},
 			JobFailedError{JobGUID: "some-job-guid", Message: "some-message"}),
 
 		Entry("ccerror.JobTimeoutError -> JobTimeoutError",

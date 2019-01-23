@@ -25,16 +25,16 @@ type FakeCreateBuildpackActor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
-	PollJobStub        func(ccv3.JobURL) (v7action.Warnings, error)
-	pollJobMutex       sync.RWMutex
-	pollJobArgsForCall []struct {
+	PollUploadBuildpackJobStub        func(ccv3.JobURL) (v7action.Warnings, error)
+	pollUploadBuildpackJobMutex       sync.RWMutex
+	pollUploadBuildpackJobArgsForCall []struct {
 		arg1 ccv3.JobURL
 	}
-	pollJobReturns struct {
+	pollUploadBuildpackJobReturns struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	pollJobReturnsOnCall map[int]struct {
+	pollUploadBuildpackJobReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
 	}
@@ -140,64 +140,64 @@ func (fake *FakeCreateBuildpackActor) CreateBuildpackReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCreateBuildpackActor) PollJob(arg1 ccv3.JobURL) (v7action.Warnings, error) {
-	fake.pollJobMutex.Lock()
-	ret, specificReturn := fake.pollJobReturnsOnCall[len(fake.pollJobArgsForCall)]
-	fake.pollJobArgsForCall = append(fake.pollJobArgsForCall, struct {
+func (fake *FakeCreateBuildpackActor) PollUploadBuildpackJob(arg1 ccv3.JobURL) (v7action.Warnings, error) {
+	fake.pollUploadBuildpackJobMutex.Lock()
+	ret, specificReturn := fake.pollUploadBuildpackJobReturnsOnCall[len(fake.pollUploadBuildpackJobArgsForCall)]
+	fake.pollUploadBuildpackJobArgsForCall = append(fake.pollUploadBuildpackJobArgsForCall, struct {
 		arg1 ccv3.JobURL
 	}{arg1})
-	fake.recordInvocation("PollJob", []interface{}{arg1})
-	fake.pollJobMutex.Unlock()
-	if fake.PollJobStub != nil {
-		return fake.PollJobStub(arg1)
+	fake.recordInvocation("PollUploadBuildpackJob", []interface{}{arg1})
+	fake.pollUploadBuildpackJobMutex.Unlock()
+	if fake.PollUploadBuildpackJobStub != nil {
+		return fake.PollUploadBuildpackJobStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.pollJobReturns
+	fakeReturns := fake.pollUploadBuildpackJobReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeCreateBuildpackActor) PollJobCallCount() int {
-	fake.pollJobMutex.RLock()
-	defer fake.pollJobMutex.RUnlock()
-	return len(fake.pollJobArgsForCall)
+func (fake *FakeCreateBuildpackActor) PollUploadBuildpackJobCallCount() int {
+	fake.pollUploadBuildpackJobMutex.RLock()
+	defer fake.pollUploadBuildpackJobMutex.RUnlock()
+	return len(fake.pollUploadBuildpackJobArgsForCall)
 }
 
-func (fake *FakeCreateBuildpackActor) PollJobCalls(stub func(ccv3.JobURL) (v7action.Warnings, error)) {
-	fake.pollJobMutex.Lock()
-	defer fake.pollJobMutex.Unlock()
-	fake.PollJobStub = stub
+func (fake *FakeCreateBuildpackActor) PollUploadBuildpackJobCalls(stub func(ccv3.JobURL) (v7action.Warnings, error)) {
+	fake.pollUploadBuildpackJobMutex.Lock()
+	defer fake.pollUploadBuildpackJobMutex.Unlock()
+	fake.PollUploadBuildpackJobStub = stub
 }
 
-func (fake *FakeCreateBuildpackActor) PollJobArgsForCall(i int) ccv3.JobURL {
-	fake.pollJobMutex.RLock()
-	defer fake.pollJobMutex.RUnlock()
-	argsForCall := fake.pollJobArgsForCall[i]
+func (fake *FakeCreateBuildpackActor) PollUploadBuildpackJobArgsForCall(i int) ccv3.JobURL {
+	fake.pollUploadBuildpackJobMutex.RLock()
+	defer fake.pollUploadBuildpackJobMutex.RUnlock()
+	argsForCall := fake.pollUploadBuildpackJobArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeCreateBuildpackActor) PollJobReturns(result1 v7action.Warnings, result2 error) {
-	fake.pollJobMutex.Lock()
-	defer fake.pollJobMutex.Unlock()
-	fake.PollJobStub = nil
-	fake.pollJobReturns = struct {
+func (fake *FakeCreateBuildpackActor) PollUploadBuildpackJobReturns(result1 v7action.Warnings, result2 error) {
+	fake.pollUploadBuildpackJobMutex.Lock()
+	defer fake.pollUploadBuildpackJobMutex.Unlock()
+	fake.PollUploadBuildpackJobStub = nil
+	fake.pollUploadBuildpackJobReturns = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeCreateBuildpackActor) PollJobReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
-	fake.pollJobMutex.Lock()
-	defer fake.pollJobMutex.Unlock()
-	fake.PollJobStub = nil
-	if fake.pollJobReturnsOnCall == nil {
-		fake.pollJobReturnsOnCall = make(map[int]struct {
+func (fake *FakeCreateBuildpackActor) PollUploadBuildpackJobReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.pollUploadBuildpackJobMutex.Lock()
+	defer fake.pollUploadBuildpackJobMutex.Unlock()
+	fake.PollUploadBuildpackJobStub = nil
+	if fake.pollUploadBuildpackJobReturnsOnCall == nil {
+		fake.pollUploadBuildpackJobReturnsOnCall = make(map[int]struct {
 			result1 v7action.Warnings
 			result2 error
 		})
 	}
-	fake.pollJobReturnsOnCall[i] = struct {
+	fake.pollUploadBuildpackJobReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -341,8 +341,8 @@ func (fake *FakeCreateBuildpackActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.createBuildpackMutex.RLock()
 	defer fake.createBuildpackMutex.RUnlock()
-	fake.pollJobMutex.RLock()
-	defer fake.pollJobMutex.RUnlock()
+	fake.pollUploadBuildpackJobMutex.RLock()
+	defer fake.pollUploadBuildpackJobMutex.RUnlock()
 	fake.prepareBuildpackBitsMutex.RLock()
 	defer fake.prepareBuildpackBitsMutex.RUnlock()
 	fake.uploadBuildpackMutex.RLock()

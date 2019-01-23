@@ -74,9 +74,12 @@ func (client *Client) PollJob(jobURL JobURL) (Warnings, error) {
 		}
 
 		if job.HasFailed() {
-			return allWarnings, ccerror.JobFailedError{
+			firstError := job.Errors[0]
+			return allWarnings, ccerror.V3JobFailedError{
 				JobGUID: job.GUID,
-				Message: job.Errors[0].Detail,
+				Code:    firstError.Code,
+				Detail:  firstError.Detail,
+				Title:   firstError.Title,
 			}
 		}
 

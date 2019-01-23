@@ -23,7 +23,7 @@ type CreateBuildpackActor interface {
 	CreateBuildpack(buildpack v7action.Buildpack) (v7action.Buildpack, v7action.Warnings, error)
 	UploadBuildpack(guid string, pathToBuildpackBits string, progressBar v7action.SimpleProgressBar) (ccv3.JobURL, v7action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v7action.Downloader) (string, error)
-	PollJob(jobURL ccv3.JobURL) (v7action.Warnings, error)
+	PollUploadBuildpackJob(jobURL ccv3.JobURL) (v7action.Warnings, error)
 }
 
 type CreateBuildpackCommand struct {
@@ -110,8 +110,10 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("Done uploading")
 	cmd.UI.DisplayOK()
 
-	cmd.UI.DisplayText("Processing uploaded buildpack...")
-	warnings, err = cmd.Actor.PollJob(jobURL)
+	cmd.UI.DisplayTextWithFlavor("Processing uploaded buildpack {{.BuildpackName}}...", map[string]interface{}{
+		"BuildpackName": cmd.RequiredArgs.Buildpack,
+	})
+	warnings, err = cmd.Actor.PollUploadBuildpackJob(jobURL)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {

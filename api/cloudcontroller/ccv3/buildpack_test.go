@@ -21,7 +21,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("Buildpacks", func() {
+var _ = Describe("Buildpacks", func() {
 	var client *Client
 
 	BeforeEach(func() {
@@ -375,8 +375,7 @@ var _ = FDescribe("Buildpacks", func() {
 							response,
 							http.Header{
 								"X-Cf-Warnings": {"this is a warning"},
-								"WHAT": {"YO"},
-								"Location": {"http://example.com/job-guid"},
+								"Location":      {"http://example.com/job-guid"},
 							},
 						),
 					),

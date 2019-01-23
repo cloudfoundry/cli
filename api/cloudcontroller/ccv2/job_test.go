@@ -178,9 +178,9 @@ var _ = Describe("Job", func() {
 					))
 			})
 
-			It("returns a JobFailedError", func() {
+			It("returns a V2JobFailedError", func() {
 				warnings, err := client.PollJob(Job{GUID: "some-job-guid"})
-				Expect(err).To(MatchError(ccerror.JobFailedError{
+				Expect(err).To(MatchError(ccerror.V2JobFailedError{
 					JobGUID: "some-job-guid",
 					Message: jobFailureMessage,
 				}))

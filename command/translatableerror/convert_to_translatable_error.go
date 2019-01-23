@@ -164,7 +164,7 @@ func ConvertToTranslatableError(err error) error {
 		return InvalidSSLCertError(e)
 
 	// Specific CC Errors
-	case ccerror.JobFailedError:
+	case ccerror.V2JobFailedError:
 		return JobFailedError(e)
 	case ccerror.JobTimeoutError:
 		return JobTimeoutError{JobGUID: e.JobGUID}

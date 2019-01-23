@@ -163,7 +163,7 @@ var _ = Describe("create buildpack Command", func() {
 					Expect(path).To(Equal("/path/to/buildpack.zip"))
 				})
 
-				// ENUMERATE ERRORS HERE
+				// TODO: ENUMERATE ERRORS HERE
 				When("Uploading the buildpack fails due to a name+stack collision", func() {
 					BeforeEach(func() {
 						fakeActor.UploadBuildpackReturns(
@@ -211,40 +211,57 @@ var _ = Describe("create buildpack Command", func() {
 							Expect(testUI.Out).To(Say("Done uploading"))
 							Expect(testUI.Out).To(Say("OK"))
 
-							Expect(fakeActor.PollJobCallCount()).To(Equal(1))
-							url := fakeActor.PollJobArgsForCall(0)
+							Expect(fakeActor.PollUploadBuildpackJobCallCount()).To(Equal(1))
+							url := fakeActor.PollUploadBuildpackJobArgsForCall(0)
 
 							Expect(url).To(Equal(ccv3.JobURL("http://example.com/some-job-url")))
 						})
 
 						When("polling the upload job returns completed", func() {
 							BeforeEach(func() {
-								fakeActor.PollJobReturns(v7action.Warnings{"poll-warning"}, nil)
+								fakeActor.PollUploadBuildpackJobReturns(v7action.Warnings{"poll-warning"}, nil)
 							})
 
 							It("prints all warnings and exits successfully", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
-								Expect(testUI.Out).To(Say(`Processing uploaded buildpack\.\.\.`))
+								Expect(testUI.Out).To(Say(`Processing uploaded buildpack %s\.\.\.`, "some-buildpack"))
 								Expect(testUI.Out).To(Say("OK"))
 								Expect(testUI.Err).To(Say("poll-warning"))
 							})
 						})
 
-						When("the polling job returns an error", func() {
+						When("the polling job returns a ccerror.BuildpackAlreadyExistsForStackError", func() {
 							BeforeEach(func() {
-								fakeActor.PollJobReturns(
+								fakeActor.PollUploadBuildpackJobReturns(
 									v7action.Warnings{"poll-warning"},
-									ccerror.JobTimeoutError{},
+									ccerror.BuildpackAlreadyExistsForStackError{},
 								)
 							})
 
-							It("prints all warnings and returns the error", func() {
-								Expect(executeErr).To(Equal(ccerror.JobTimeoutError{}))
-								Expect(testUI.Out).To(Say(`Processing uploaded buildpack\.\.\.`))
+							It("prints all warnings, and returns the error", func() {
+								Expect(executeErr).To(Equal(ccerror.BuildpackAlreadyExistsForStackError{}))
+								Expect(testUI.Out).To(Say(`Processing uploaded buildpack %s\.\.\.`, "some-buildpack"))
 								Expect(testUI.Err).To(Say("poll-warning"))
 								Consistently(testUI.Out).ShouldNot(Say("OK"))
 							})
 						})
+
+						When("the polling job returns a ccerror.BuildpackAlreadyExistsWithoutStackError", func() {
+							BeforeEach(func() {
+								fakeActor.PollUploadBuildpackJobReturns(
+									v7action.Warnings{"poll-warning"},
+									ccerror.BuildpackAlreadyExistsWithoutStackError{},
+								)
+							})
+
+							It("prints all warnings, and returns the error", func() {
+								Expect(executeErr).To(Equal(ccerror.BuildpackAlreadyExistsWithoutStackError{}))
+								Expect(testUI.Out).To(Say(`Processing uploaded buildpack %s\.\.\.`, "some-buildpack"))
+								Expect(testUI.Err).To(Say("poll-warning"))
+								Consistently(testUI.Out).ShouldNot(Say("OK"))
+							})
+						})
+
 					})
 				})
 			})

@@ -128,7 +128,7 @@ var _ = Describe("Application Manifest Actions", func() {
 							var expectedErr error
 
 							BeforeEach(func() {
-								expectedErr = ccerror.JobFailedError{Message: "some-job-failed"}
+								expectedErr = ccerror.V3JobFailedError{Detail: "some-job-failed"}
 								fakeCloudControllerClient.PollJobReturns(
 									ccv3.Warnings{"poll-1-warning"},
 									expectedErr,

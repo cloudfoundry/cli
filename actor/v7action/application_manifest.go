@@ -51,8 +51,8 @@ func (actor Actor) SetApplicationManifest(appGUID string, rawManifest []byte) (W
 	pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
 	allWarnings = append(allWarnings, pollWarnings...)
 	if err != nil {
-		if newErr, ok := err.(ccerror.JobFailedError); ok {
-			return allWarnings, actionerror.ApplicationManifestError{Message: newErr.Message}
+		if newErr, ok := err.(ccerror.V3JobFailedError); ok {
+			return allWarnings, actionerror.ApplicationManifestError{Message: newErr.Detail}
 		}
 		return allWarnings, err
 	}

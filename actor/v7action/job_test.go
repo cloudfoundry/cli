@@ -15,9 +15,9 @@ var _ = Describe("Job Actions", func() {
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
 
-		jobURL     ccv3.JobURL
-		warnings   Warnings
-		err error
+		jobURL   ccv3.JobURL
+		warnings Warnings
+		err      error
 	)
 
 	BeforeEach(func() {
@@ -25,14 +25,14 @@ var _ = Describe("Job Actions", func() {
 		jobURL = ccv3.JobURL("http://example.com/the-job-url")
 	})
 
-	Describe("PollJob", func() {
+	Describe("PollUploadBuildpackJob", func() {
 		When("the cc client returns success", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-warnings"}, nil)
 			})
 
 			It("returns success and warnings", func() {
-				warnings, err = actor.PollJob(jobURL)
+				warnings, err = actor.PollUploadBuildpackJob(jobURL)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-warnings"))
@@ -42,17 +42,66 @@ var _ = Describe("Job Actions", func() {
 		})
 
 		When("the cc client returns error", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-warnings"}, ccerror.JobFailedError{})
+			var detailMsg string
+
+			When("the cc client returns CF-BuildpackNameStackTaken", func() {
+				BeforeEach(func() {
+					detailMsg = "The buildpack name ruby_buildpack is already in use for the stack cflinuxfs2"
+					fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-warnings"}, ccerror.V3JobFailedError{
+						Code:   290000,
+						Detail: detailMsg,
+						Title:  "CF-BuildpackNameStackTaken",
+					})
+				})
+
+				It("returns a converted error and warnings", func() {
+					warnings, err = actor.PollUploadBuildpackJob(jobURL)
+
+					Expect(err).To(Equal(ccerror.BuildpackAlreadyExistsForStackError{Message: detailMsg}))
+					Expect(warnings).To(ConsistOf("some-warnings"))
+					actualJobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
+					Expect(actualJobURL).To(Equal(jobURL))
+				})
 			})
 
-			It("returns error and warnings", func() {
-				warnings, err = actor.PollJob(jobURL)
+			When("the cc client returns CF-BuildpackNameTaken", func() {
+				BeforeEach(func() {
+					detailMsg = "The buildpack name ruby_buildpack is already in use"
+					fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-warnings"}, ccerror.V3JobFailedError{
+						Code:   290001,
+						Detail: detailMsg,
+						Title:  "CF-BuildpackNameTaken",
+					})
+				})
 
-				Expect(err).To(Equal(ccerror.JobFailedError{}))
-				Expect(warnings).To(ConsistOf("some-warnings"))
-				actualJobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
-				Expect(actualJobURL).To(Equal(jobURL))
+				It("returns a converted error and warnings", func() {
+					warnings, err = actor.PollUploadBuildpackJob(jobURL)
+
+					Expect(err).To(Equal(ccerror.BuildpackNameTakenError{Message: detailMsg}))
+					Expect(warnings).To(ConsistOf("some-warnings"))
+					actualJobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
+					Expect(actualJobURL).To(Equal(jobURL))
+				})
+			})
+
+			When("the cc client returns CF-BuildpackInvalid", func() {
+				BeforeEach(func() {
+					detailMsg = "The buildpack name ruby_buildpack is already in use"
+					fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-warnings"}, ccerror.V3JobFailedError{
+						Code:   290003,
+						Detail: detailMsg,
+						Title:  "CF-BuildpackInvalid",
+					})
+				})
+
+				It("returns a converted error and warnings", func() {
+					warnings, err = actor.PollUploadBuildpackJob(jobURL)
+
+					Expect(err).To(Equal(ccerror.BuildpackAlreadyExistsWithoutStackError{Message: detailMsg}))
+					Expect(warnings).To(ConsistOf("some-warnings"))
+					actualJobURL := fakeCloudControllerClient.PollJobArgsForCall(0)
+					Expect(actualJobURL).To(Equal(jobURL))
+				})
 			})
 		})
 	})
