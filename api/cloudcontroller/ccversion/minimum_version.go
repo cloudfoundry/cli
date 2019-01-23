@@ -16,7 +16,6 @@ const (
 	MinVersionMultiServiceRegistrationV2     = "2.125.0"
 
 	MinVersionApplicationFlowV3    = "3.27.0"
-	MinVersionIsolationSegmentV3   = "3.11.0"
 	MinVersionManifestBuildpacksV3 = "3.25.0"
 	MinVersionNetworkingV3         = "3.19.0"
 	MinVersionRoutingV3            = "3.16.0"

@@ -1,16 +1,11 @@
 package v7
 
 import (
-	"net/http"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 )
@@ -18,7 +13,6 @@ import (
 //go:generate counterfeiter . ResetSpaceIsolationSegmentActor
 
 type ResetSpaceIsolationSegmentActor interface {
-	CloudControllerAPIVersion() string
 	ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) (string, v7action.Warnings, error)
 }
 
@@ -47,10 +41,6 @@ func (cmd *ResetSpaceIsolationSegmentCommand) Setup(config command.Config, ui co
 
 	ccClient, _, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
-		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return translatableerror.MinimumCFAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionIsolationSegmentV3}
-		}
-
 		return err
 	}
 	cmd.Actor = v7action.NewActor(ccClient, config, nil, nil)
@@ -65,12 +55,7 @@ func (cmd *ResetSpaceIsolationSegmentCommand) Setup(config command.Config, ui co
 }
 
 func (cmd ResetSpaceIsolationSegmentCommand) Execute(args []string) error {
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(true, false)
+	err := cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return err
 	}
