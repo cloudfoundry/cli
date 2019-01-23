@@ -41,25 +41,25 @@ func (actor Actor) CreateBuildpack(buildpack Buildpack) (Buildpack, Warnings, er
 	return Buildpack(ccv3Buildpack), Warnings(warnings), err
 }
 
-func (actor Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, progressBar SimpleProgressBar) (Warnings, error) {
+func (actor Actor) UploadBuildpack(guid string, pathToBuildpackBits string, progressBar SimpleProgressBar) (ccv3.JobURL, Warnings, error) {
 	wrappedReader, size, err := progressBar.Initialize(pathToBuildpackBits)
 	if err != nil {
-		return Warnings{}, err
+		return "", Warnings{}, err
 	}
 
-	warnings, err := actor.CloudControllerClient.UploadBuildpack(GUID, pathToBuildpackBits, wrappedReader, size)
+	jobURL, warnings, err := actor.CloudControllerClient.UploadBuildpack(guid, pathToBuildpackBits, wrappedReader, size)
 	if err != nil {
 		// TODO: Do we actually want to convert this error? Is this the right place?
 		if e, ok := err.(ccerror.BuildpackAlreadyExistsForStackError); ok {
-			return Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: e.Message}
+			return "", Warnings(warnings), actionerror.BuildpackAlreadyExistsForStackError{Message: e.Message}
 		}
-		return Warnings(warnings), err
+		return "", Warnings(warnings), err
 	}
 
 	// TODO: Should we defer the terminate instead?
 	progressBar.Terminate()
 
-	return Warnings(warnings), nil
+	return jobURL, Warnings(warnings), nil
 }
 
 func (actor *Actor) PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader Downloader) (string, error) {

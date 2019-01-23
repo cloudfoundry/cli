@@ -1,6 +1,7 @@
 package v7
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/util/download"
 	"io/ioutil"
@@ -20,8 +21,9 @@ import (
 
 type CreateBuildpackActor interface {
 	CreateBuildpack(buildpack v7action.Buildpack) (v7action.Buildpack, v7action.Warnings, error)
-	UploadBuildpack(guid string, pathToBuildpackBits string, progressBar v7action.SimpleProgressBar) (v7action.Warnings, error)
+	UploadBuildpack(guid string, pathToBuildpackBits string, progressBar v7action.SimpleProgressBar) (ccv3.JobURL, v7action.Warnings, error)
 	PrepareBuildpackBits(inputPath string, tmpDirPath string, downloader v7action.Downloader) (string, error)
+	PollJob(jobURL ccv3.JobURL) (v7action.Warnings, error)
 }
 
 type CreateBuildpackCommand struct {
@@ -94,18 +96,29 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 
+	// TODO: Do we need these template values? Are they redundant?
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.BuildpackName}} as {{.Username}}...", map[string]interface{}{
 		"Username":      user.Name,
 		"BuildpackName": cmd.RequiredArgs.Buildpack,
 	})
-	warnings, err = cmd.Actor.UploadBuildpack(createdBuildpack.GUID, pathToBuildpackBits, cmd.ProgressBar)
+	jobURL, warnings, err := cmd.Actor.UploadBuildpack(createdBuildpack.GUID, pathToBuildpackBits, cmd.ProgressBar)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
+	// TODO: We shouldn't say Done uploading. OK should suffice.
 	cmd.UI.DisplayText("Done uploading")
 	cmd.UI.DisplayOK()
 
+	cmd.UI.DisplayText("Processing uploaded buildpack...")
+	warnings, err = cmd.Actor.PollJob(jobURL)
+	cmd.UI.DisplayWarnings(warnings)
+
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayOK()
 	return nil
 }
 

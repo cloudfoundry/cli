@@ -137,6 +137,7 @@ var _ = Describe("Buildpack", func() {
 			bpFilePath string
 			fakePb     *v7actionfakes.FakeSimpleProgressBar
 
+			jobURL     ccv3.JobURL
 			warnings   Warnings
 			executeErr error
 		)
@@ -149,7 +150,7 @@ var _ = Describe("Buildpack", func() {
 
 		JustBeforeEach(func() {
 			bpFilePath = "tmp/buildpack.zip"
-			warnings, executeErr = actor.UploadBuildpack("some-bp-guid", bpFilePath, fakePb)
+			jobURL, warnings, executeErr = actor.UploadBuildpack("some-bp-guid", bpFilePath, fakePb)
 		})
 
 		It("tracks the progress of the upload", func() {
@@ -171,7 +172,11 @@ var _ = Describe("Buildpack", func() {
 
 		When("the upload errors", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.UploadBuildpackReturns(ccv3.Warnings{"some-upload-warning"}, errors.New("some-upload-error"))
+				fakeCloudControllerClient.UploadBuildpackReturns(
+					ccv3.JobURL(""),
+					ccv3.Warnings{"some-upload-warning"},
+					errors.New("some-upload-error"),
+				)
 			})
 
 			It("returns warnings and errors", func() {
@@ -182,7 +187,11 @@ var _ = Describe("Buildpack", func() {
 
 		When("the cc returns an error because the buildpack and stack combo already exists", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.UploadBuildpackReturns(ccv3.Warnings{"some-upload-warning"}, ccerror.BuildpackAlreadyExistsForStackError{Message: "ya blew it"})
+				fakeCloudControllerClient.UploadBuildpackReturns(
+					ccv3.JobURL(""),
+					ccv3.Warnings{"some-upload-warning"},
+					ccerror.BuildpackAlreadyExistsForStackError{Message: "ya blew it"},
+				)
 			})
 
 			It("returns warnings and a BuildpackAlreadyExistsForStackError", func() {
@@ -194,12 +203,13 @@ var _ = Describe("Buildpack", func() {
 		When("the upload is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UploadBuildpackReturns(
+					ccv3.JobURL("http://example.com/some-job-url"),
 					ccv3.Warnings{"some-create-warning"},
 					nil,
 				)
 			})
 
-			It("uploads the buildpack and returns any warnings", func() {
+			It("uploads the buildpack and returns the Job URL and any warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeCloudControllerClient.UploadBuildpackCallCount()).To(Equal(1))
 				guid, path, pbReader, size := fakeCloudControllerClient.UploadBuildpackArgsForCall(0)
@@ -207,6 +217,7 @@ var _ = Describe("Buildpack", func() {
 				Expect(size).To(Equal(int64(66)))
 				Expect(path).To(Equal(bpFilePath))
 				Expect(pbReader).To(Equal(bpFile))
+				Expect(jobURL).To(Equal(ccv3.JobURL("http://example.com/some-job-url")))
 				Expect(warnings).To(ConsistOf("some-create-warning"))
 			})
 		})

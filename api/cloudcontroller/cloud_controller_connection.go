@@ -114,6 +114,7 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 	}
 	passedResponse.Warnings = warnings
 
+
 	if resourceLocationURL := response.Header.Get("Location"); resourceLocationURL != "" {
 		passedResponse.ResourceLocationURL = resourceLocationURL
 	}

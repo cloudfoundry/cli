@@ -144,11 +144,11 @@ func (client *Client) GetBuildpacks(query ...Query) ([]Buildpack, Warnings, erro
 }
 
 // UploadBuildpack uploads the contents of a buildpack zip to the server.
-func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (Warnings, error) {
+func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string, buildpack io.Reader, buildpackLength int64) (JobURL, Warnings, error) {
 
 	contentLength, err := buildpacks.CalculateRequestSize(buildpackLength, buildpackPath, "bits")
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	contentType, body, writeErrors := buildpacks.CreateMultipartBodyAndHeader(buildpack, buildpackPath, "bits")
@@ -160,21 +160,20 @@ func (client *Client) UploadBuildpack(buildpackGUID string, buildpackPath string
 	})
 
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	request.ContentLength = contentLength
 	request.Header.Set("Content-Type", contentType)
 
-	_, warnings, err := client.uploadBuildpackAsynchronously(request, writeErrors)
+	jobURL, warnings, err := client.uploadBuildpackAsynchronously(request, writeErrors)
 	if err != nil {
-		return warnings, err
+		return "", warnings, err
 	}
-	return warnings, nil
-
+	return jobURL, warnings, nil
 }
 
-func (client *Client) uploadBuildpackAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Buildpack, Warnings, error) {
+func (client *Client) uploadBuildpackAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (JobURL, Warnings, error) {
 
 	var buildpack Buildpack
 	response := cloudcontroller.Response{
@@ -224,5 +223,5 @@ func (client *Client) uploadBuildpackAsynchronously(request *cloudcontroller.Req
 			break // for for
 		}
 	}
-	return buildpack, response.Warnings, firstError
+	return JobURL(response.ResourceLocationURL), response.Warnings, firstError
 }

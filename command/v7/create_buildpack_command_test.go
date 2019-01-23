@@ -3,6 +3,8 @@ package v7_test
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
@@ -165,6 +167,7 @@ var _ = Describe("create buildpack Command", func() {
 				When("Uploading the buildpack fails due to a name+stack collision", func() {
 					BeforeEach(func() {
 						fakeActor.UploadBuildpackReturns(
+							ccv3.JobURL(""),
 							v7action.Warnings{"warning-2"},
 							actionerror.BuildpackStackChangeError{
 								BuildpackName: "buildpack-name",
@@ -184,6 +187,7 @@ var _ = Describe("create buildpack Command", func() {
 				When("Uploading the buildpack succeeds", func() {
 					BeforeEach(func() {
 						fakeActor.UploadBuildpackReturns(
+							ccv3.JobURL("http://example.com/some-job-url"),
 							v7action.Warnings{"some-upload-warning-1"},
 							nil,
 						)
@@ -199,6 +203,48 @@ var _ = Describe("create buildpack Command", func() {
 						guid, path, _ := fakeActor.UploadBuildpackArgsForCall(0)
 						Expect(guid).To(Equal("some-guid"))
 						Expect(path).To(Equal("buildpack.zip"))
+					})
+
+					Describe("polling the upload job", func() {
+						It("polls for job completion/failure", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+							Expect(testUI.Out).To(Say("Done uploading"))
+							Expect(testUI.Out).To(Say("OK"))
+
+							Expect(fakeActor.PollJobCallCount()).To(Equal(1))
+							url := fakeActor.PollJobArgsForCall(0)
+
+							Expect(url).To(Equal(ccv3.JobURL("http://example.com/some-job-url")))
+						})
+
+						When("polling the upload job returns completed", func() {
+							BeforeEach(func() {
+								fakeActor.PollJobReturns(v7action.Warnings{"poll-warning"}, nil)
+							})
+
+							It("prints all warnings and exits successfully", func() {
+								Expect(executeErr).NotTo(HaveOccurred())
+								Expect(testUI.Out).To(Say(`Processing uploaded buildpack\.\.\.`))
+								Expect(testUI.Out).To(Say("OK"))
+								Expect(testUI.Err).To(Say("poll-warning"))
+							})
+						})
+
+						When("the polling job returns an error", func() {
+							BeforeEach(func() {
+								fakeActor.PollJobReturns(
+									v7action.Warnings{"poll-warning"},
+									ccerror.JobTimeoutError{},
+								)
+							})
+
+							It("prints all warnings and returns the error", func() {
+								Expect(executeErr).To(Equal(ccerror.JobTimeoutError{}))
+								Expect(testUI.Out).To(Say(`Processing uploaded buildpack\.\.\.`))
+								Expect(testUI.Err).To(Say("poll-warning"))
+								Consistently(testUI.Out).ShouldNot(Say("OK"))
+							})
+						})
 					})
 				})
 			})

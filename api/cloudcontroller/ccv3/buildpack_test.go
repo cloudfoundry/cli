@@ -21,7 +21,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Buildpacks", func() {
+var _ = FDescribe("Buildpacks", func() {
 	var client *Client
 
 	BeforeEach(func() {
@@ -316,6 +316,7 @@ var _ = Describe("Buildpacks", func() {
 
 	Describe("UploadBuildpack", func() {
 		var (
+			jobURL     JobURL
 			warnings   Warnings
 			executeErr error
 			bpFile     io.Reader
@@ -330,7 +331,7 @@ var _ = Describe("Buildpacks", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = client.UploadBuildpack("some-buildpack-guid", bpFilePath, bpFile, int64(len(bpContent)))
+			jobURL, warnings, executeErr = client.UploadBuildpack("some-buildpack-guid", bpFilePath, bpFile, int64(len(bpContent)))
 		})
 
 		When("the upload is successful", func() {
@@ -369,14 +370,23 @@ var _ = Describe("Buildpacks", func() {
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v3/buildpacks/some-buildpack-guid/upload"),
 						verifyHeaderAndBody,
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						RespondWith(
+							http.StatusAccepted,
+							response,
+							http.Header{
+								"X-Cf-Warnings": {"this is a warning"},
+								"WHAT": {"YO"},
+								"Location": {"http://example.com/job-guid"},
+							},
+						),
 					),
 				)
 			})
 
-			It("returns warnings", func() {
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			It("returns the processing job URL and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				Expect(jobURL).To(Equal(JobURL("http://example.com/job-guid")))
 			})
 		})
 
