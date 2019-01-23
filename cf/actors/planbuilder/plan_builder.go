@@ -145,25 +145,19 @@ func (builder Builder) containsGUID(guidSlice []string, guid string) bool {
 }
 
 func (builder Builder) buildPlanToOrgVisibilityMap(orgName string) (map[string][]string, error) {
-	// Since this map doesn't ever change, we memoize it for performance
-	orgLookup := make(map[string]string)
-
 	org, err := builder.orgRepo.FindByName(orgName)
 	if err != nil {
 		return nil, err
 	}
-	orgLookup[org.GUID] = org.Name
 
-	visibilities, err := builder.servicePlanVisibilityRepo.List()
+	visibilities, err := builder.servicePlanVisibilityRepo.Search(map[string]string{"organization_guid": org.GUID})
 	if err != nil {
 		return nil, err
 	}
 
 	visMap := make(map[string][]string)
 	for _, vis := range visibilities {
-		if _, exists := orgLookup[vis.OrganizationGUID]; exists {
-			visMap[vis.ServicePlanGUID] = append(visMap[vis.ServicePlanGUID], orgLookup[vis.OrganizationGUID])
-		}
+		visMap[vis.ServicePlanGUID] = []string{org.Name}
 	}
 
 	return visMap, nil
