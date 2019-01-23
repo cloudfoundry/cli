@@ -397,8 +397,6 @@ applications:
 			When("the app exists", func() {
 				When("isolation segments are available", func() {
 					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionIsolationSegmentV3)
-
 						Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
 						Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
 						Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
@@ -454,8 +452,6 @@ applications:
 					var tcpDomain helpers.Domain
 
 					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
-
 						tcpDomain = helpers.NewDomain(orgName, helpers.NewDomainName("tcp"))
 						tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 						helpers.WithHelloWorldApp(func(appDir string) {

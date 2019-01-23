@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
@@ -255,10 +254,6 @@ var _ = Describe("api command", func() {
 	})
 
 	When("the v3 api supports routing", func() {
-		BeforeEach(func() {
-			helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
-		})
-
 		It("sets the routing endpoing in the config file", func() {
 			session := helpers.CF("api", apiURL, skipSSLValidation)
 			Eventually(session).Should(Exit(0))

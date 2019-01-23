@@ -517,8 +517,6 @@ applications:
 					var tcpDomain helpers.Domain
 
 					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
-
 						tcpDomain = helpers.NewDomain(orgName, helpers.NewDomainName("tcp"))
 						tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 						helpers.WithHelloWorldApp(func(appDir string) {

@@ -3,7 +3,6 @@ package push
 import (
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,8 +19,6 @@ var _ = Describe("TCP routes in manifest", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.SkipIfVersionLessThan(ccversion.MinVersionRoutingV3)
-
 		app = helpers.NewAppName()
 		domain = helpers.NewDomain(organization, helpers.NewDomainName())
 		route1 = helpers.NewTCPRoute(space, domain.Name, 1024)
