@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	sharedV2 "code.cloudfoundry.org/cli/command/v6/shared"
@@ -14,7 +13,6 @@ import (
 //go:generate counterfeiter . AppActor
 
 type AppActor interface {
-	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v7action.Application, v7action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string, withObfuscatedValues bool, routeActor v7action.RouteActor) (v7action.ApplicationSummary, v7action.Warnings, error)
 }
@@ -38,7 +36,7 @@ func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
 	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
-	ccClient, _, err := shared.NewClients(config, ui, true, ccversion.MinVersionApplicationFlowV3)
+	ccClient, _, err := shared.NewClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
@@ -55,12 +53,7 @@ func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd AppCommand) Execute(args []string) error {
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}
