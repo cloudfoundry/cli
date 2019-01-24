@@ -279,9 +279,9 @@ var _ = Describe("Job", func() {
 			It("returns a JobFailedError", func() {
 				Expect(executeErr).To(MatchError(ccerror.V3JobFailedError{
 					JobGUID: "job-guid",
-					Code: 160001,
+					Code:    160001,
 					Detail:  jobFailureMessage,
-					Title: "CF-AppBitsUploadInvalid",
+					Title:   "CF-AppBitsUploadInvalid",
 				}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
 			})
