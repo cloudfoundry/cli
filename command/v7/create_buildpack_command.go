@@ -106,8 +106,6 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	// TODO: We shouldn't say Done uploading. OK should suffice.
-	cmd.UI.DisplayText("Done uploading")
 	cmd.UI.DisplayOK()
 
 	cmd.UI.DisplayTextWithFlavor("Processing uploaded buildpack {{.BuildpackName}}...", map[string]interface{}{

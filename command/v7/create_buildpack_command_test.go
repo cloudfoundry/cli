@@ -195,7 +195,7 @@ var _ = Describe("create buildpack Command", func() {
 
 					It("prints all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(testUI.Out).To(Say("Done uploading"))
+						Expect(testUI.Out).To(Say("Uploading buildpack some-buildpack"))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Err).To(Say("some-upload-warning-1"))
 
@@ -208,7 +208,7 @@ var _ = Describe("create buildpack Command", func() {
 					Describe("polling the upload job", func() {
 						It("polls for job completion/failure", func() {
 							Expect(executeErr).NotTo(HaveOccurred())
-							Expect(testUI.Out).To(Say("Done uploading"))
+							Expect(testUI.Out).To(Say("Uploading buildpack some-buildpack"))
 							Expect(testUI.Out).To(Say("OK"))
 
 							Expect(fakeActor.PollUploadBuildpackJobCallCount()).To(Equal(1))
