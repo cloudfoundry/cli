@@ -3,6 +3,7 @@ package isolated
 import (
 	"fmt"
 	"regexp"
+	"runtime"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -184,6 +185,13 @@ var _ = Describe("login command", func() {
 			})
 
 			Context("and the credentials are incorrect", func() {
+				BeforeEach(func() {
+					if runtime.GOOS == "windows" {
+						// TODO: Don't skip this test on windows.
+						Skip("Skipping on Windows until refactor of cf login.")
+					}
+				})
+
 				It("prompts twice, displays an error and fails", func() {
 					username, password := helpers.GetCredentials()
 					badPassword := password + "_wrong"
