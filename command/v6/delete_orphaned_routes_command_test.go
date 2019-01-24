@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
@@ -136,8 +135,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 						It("does not delete orphaned routes", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(fakeActor.GetOrphanedRoutesBySpaceCallCount()).To(Equal(0))
-							Expect(fakeActor.DeleteRouteCallCount()).To(Equal(0))
+							Expect(fakeActor.DeleteUnmappedRoutesCallCount()).To(Equal(0))
 						})
 					})
 
@@ -149,136 +147,45 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 
 						It("returns an error", func() {
 							Expect(executeErr).To(HaveOccurred())
-
-							Expect(fakeActor.GetOrphanedRoutesBySpaceCallCount()).To(Equal(0))
-							Expect(fakeActor.DeleteRouteCallCount()).To(Equal(0))
+							Expect(fakeActor.DeleteUnmappedRoutesCallCount()).To(Equal(0))
 						})
 					})
 
 					When("the user inputs yes", func() {
-						var routes []v2action.Route
-
 						BeforeEach(func() {
 							_, err := input.Write([]byte("y\n"))
 							Expect(err).NotTo(HaveOccurred())
-
-							routes = []v2action.Route{
-								{
-									GUID: "route-1-guid",
-									Host: "route-1",
-									Domain: v2action.Domain{
-										Name: "bosh-lite.com",
-									},
-									Path: "/path",
-								},
-								{
-									GUID: "route-2-guid",
-									Host: "route-2",
-									Domain: v2action.Domain{
-										Name: "bosh-lite.com",
-									},
-								},
-							}
-
-							fakeActor.GetOrphanedRoutesBySpaceReturns(routes, nil, nil)
 						})
 
-						It("displays getting routes message", func() {
+						It("displays a message showing what user is deleting the routes", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Getting routes as some-user ...\n"))
-						})
-
-						It("deletes the routes and displays that they are deleted", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-
-							Expect(fakeActor.GetOrphanedRoutesBySpaceCallCount()).To(Equal(1))
-							Expect(fakeActor.GetOrphanedRoutesBySpaceArgsForCall(0)).To(Equal("some-space-guid"))
-							Expect(fakeActor.DeleteRouteCallCount()).To(Equal(2))
-							Expect(fakeActor.DeleteRouteArgsForCall(0)).To(Equal(routes[0].GUID))
-							Expect(fakeActor.DeleteRouteArgsForCall(1)).To(Equal(routes[1].GUID))
-
-							Expect(testUI.Out).To(Say("Deleting route route-1.bosh-lite.com/path..."))
-							Expect(testUI.Out).To(Say("Deleting route route-2.bosh-lite.com..."))
-							Expect(testUI.Out).To(Say("OK"))
+							Expect(testUI.Out).To(Say("Deleting routes as some-user ...\n"))
 						})
 
 						When("there are warnings", func() {
 							BeforeEach(func() {
-								fakeActor.GetOrphanedRoutesBySpaceReturns(
-									[]v2action.Route{{GUID: "some-route-guid"}},
-									[]string{"foo", "bar"},
-									nil)
-								fakeActor.DeleteRouteReturns([]string{"baz"}, nil)
+								fakeActor.DeleteUnmappedRoutesReturns([]string{"foo"}, nil)
 							})
 
 							It("displays the warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
 								Expect(testUI.Err).To(Say("foo"))
-								Expect(testUI.Err).To(Say("bar"))
-								Expect(testUI.Err).To(Say("baz"))
 							})
 						})
 
-						When("getting the routes returns an error", func() {
-							var expectedErr error
-
-							When("the error is a DomainNotFoundError", func() {
-								BeforeEach(func() {
-									fakeActor.GetOrphanedRoutesBySpaceReturns(
-										nil,
-										nil,
-										actionerror.DomainNotFoundError{
-											Name: "some-domain",
-											GUID: "some-domain-guid",
-										},
-									)
-								})
-
-								It("returns translatableerror.DomainNotFoundError", func() {
-									Expect(executeErr).To(MatchError(actionerror.DomainNotFoundError{
-										Name: "some-domain",
-										GUID: "some-domain-guid",
-									}))
-								})
-							})
-
-							When("the error is an OrphanedRoutesNotFoundError", func() {
-								BeforeEach(func() {
-									expectedErr = actionerror.OrphanedRoutesNotFoundError{}
-									fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
-								})
-
-								It("should not return an error and only display 'OK'", func() {
-									Expect(executeErr).ToNot(HaveOccurred())
-
-									Expect(fakeActor.DeleteRouteCallCount()).To(Equal(0))
-								})
-							})
-
-							When("there is a generic error", func() {
-								BeforeEach(func() {
-									expectedErr = errors.New("getting orphaned routes error")
-									fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
-								})
-
-								It("returns the error", func() {
-									Expect(executeErr).To(MatchError(expectedErr))
-								})
-							})
+						It("deletes the routes", func() {
+							Expect(fakeActor.DeleteUnmappedRoutesCallCount()).To(Equal(1))
+							Expect(testUI.Out).To(Say("OK"))
 						})
 
-						When("deleting a route returns an error", func() {
+						When("deleting routes returns an error", func() {
 							var expectedErr error
 
 							BeforeEach(func() {
-								expectedErr = errors.New("deleting route error")
-								fakeActor.GetOrphanedRoutesBySpaceReturns(
-									[]v2action.Route{{GUID: "some-route-guid"}},
-									nil,
-									nil)
-								fakeActor.DeleteRouteReturns(nil, expectedErr)
+								expectedErr = errors.New("deleting unmapped routes error")
+								fakeActor.DeleteUnmappedRoutesReturns(nil, expectedErr)
 							})
 
 							It("returns the error", func() {

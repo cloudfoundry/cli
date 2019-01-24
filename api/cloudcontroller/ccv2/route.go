@@ -160,6 +160,22 @@ func (client *Client) DeleteRouteApplication(routeGUID string, appGUID string) (
 	return response.Warnings, err
 }
 
+// DeleteSpaceUnmappedRoutes deletes Routes within a specified Space not mapped
+// to an Application
+func (client *Client) DeleteSpaceUnmappedRoutes(spaceGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteSpaceUnmappedRoutesRequest,
+		URIParams:   map[string]string{"space_guid": spaceGUID},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var response cloudcontroller.Response
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}
+
 // GetApplicationRoutes returns a list of Routes associated with the provided
 // Application GUID, and filtered by the provided filters.
 func (client *Client) GetApplicationRoutes(appGUID string, filters ...Filter) ([]Route, Warnings, error) {

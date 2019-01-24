@@ -367,6 +367,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	DeleteSpaceUnmappedRoutesStub        func(string) (ccv2.Warnings, error)
+	deleteSpaceUnmappedRoutesMutex       sync.RWMutex
+	deleteSpaceUnmappedRoutesArgsForCall []struct {
+		arg1 string
+	}
+	deleteSpaceUnmappedRoutesReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	deleteSpaceUnmappedRoutesReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	DopplerEndpointStub        func() string
 	dopplerEndpointMutex       sync.RWMutex
 	dopplerEndpointArgsForCall []struct {
@@ -2951,6 +2964,69 @@ func (fake *FakeCloudControllerClient) DeleteSpaceJobReturnsOnCall(i int, result
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceUnmappedRoutes(arg1 string) (ccv2.Warnings, error) {
+	fake.deleteSpaceUnmappedRoutesMutex.Lock()
+	ret, specificReturn := fake.deleteSpaceUnmappedRoutesReturnsOnCall[len(fake.deleteSpaceUnmappedRoutesArgsForCall)]
+	fake.deleteSpaceUnmappedRoutesArgsForCall = append(fake.deleteSpaceUnmappedRoutesArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteSpaceUnmappedRoutes", []interface{}{arg1})
+	fake.deleteSpaceUnmappedRoutesMutex.Unlock()
+	if fake.DeleteSpaceUnmappedRoutesStub != nil {
+		return fake.DeleteSpaceUnmappedRoutesStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.deleteSpaceUnmappedRoutesReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceUnmappedRoutesCallCount() int {
+	fake.deleteSpaceUnmappedRoutesMutex.RLock()
+	defer fake.deleteSpaceUnmappedRoutesMutex.RUnlock()
+	return len(fake.deleteSpaceUnmappedRoutesArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceUnmappedRoutesCalls(stub func(string) (ccv2.Warnings, error)) {
+	fake.deleteSpaceUnmappedRoutesMutex.Lock()
+	defer fake.deleteSpaceUnmappedRoutesMutex.Unlock()
+	fake.DeleteSpaceUnmappedRoutesStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceUnmappedRoutesArgsForCall(i int) string {
+	fake.deleteSpaceUnmappedRoutesMutex.RLock()
+	defer fake.deleteSpaceUnmappedRoutesMutex.RUnlock()
+	argsForCall := fake.deleteSpaceUnmappedRoutesArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceUnmappedRoutesReturns(result1 ccv2.Warnings, result2 error) {
+	fake.deleteSpaceUnmappedRoutesMutex.Lock()
+	defer fake.deleteSpaceUnmappedRoutesMutex.Unlock()
+	fake.DeleteSpaceUnmappedRoutesStub = nil
+	fake.deleteSpaceUnmappedRoutesReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteSpaceUnmappedRoutesReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.deleteSpaceUnmappedRoutesMutex.Lock()
+	defer fake.deleteSpaceUnmappedRoutesMutex.Unlock()
+	fake.DeleteSpaceUnmappedRoutesStub = nil
+	if fake.deleteSpaceUnmappedRoutesReturnsOnCall == nil {
+		fake.deleteSpaceUnmappedRoutesReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.deleteSpaceUnmappedRoutesReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) DopplerEndpoint() string {
@@ -7555,6 +7631,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteServicePlanVisibilityMutex.RUnlock()
 	fake.deleteSpaceJobMutex.RLock()
 	defer fake.deleteSpaceJobMutex.RUnlock()
+	fake.deleteSpaceUnmappedRoutesMutex.RLock()
+	defer fake.deleteSpaceUnmappedRoutesMutex.RUnlock()
 	fake.dopplerEndpointMutex.RLock()
 	defer fake.dopplerEndpointMutex.RUnlock()
 	fake.getApplicationMutex.RLock()

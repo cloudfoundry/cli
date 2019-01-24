@@ -1,7 +1,6 @@
 package v6
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -11,8 +10,7 @@ import (
 //go:generate counterfeiter . DeleteOrphanedRoutesActor
 
 type DeleteOrphanedRoutesActor interface {
-	GetOrphanedRoutesBySpace(spaceGUID string) ([]v2action.Route, v2action.Warnings, error)
-	DeleteRoute(routeGUID string) (v2action.Warnings, error)
+	DeleteUnmappedRoutes(spaceGUID string) (v2action.Warnings, error)
 }
 
 type DeleteOrphanedRoutesCommand struct {
@@ -62,32 +60,15 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		}
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Getting routes as {{.CurrentUser}} ...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Deleting routes as {{.CurrentUser}} ...", map[string]interface{}{
 		"CurrentUser": user.Name,
 	})
 	cmd.UI.DisplayNewline()
 
-	routes, warnings, err := cmd.Actor.GetOrphanedRoutesBySpace(cmd.Config.TargetedSpace().GUID)
+	warnings, err := cmd.Actor.DeleteUnmappedRoutes(cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		switch err.(type) {
-		case actionerror.OrphanedRoutesNotFoundError:
-		// Do nothing to parity the existing behavior
-		default:
-			return err
-		}
-	}
-
-	for _, route := range routes {
-		cmd.UI.DisplayText("Deleting route {{.Route}} ...", map[string]interface{}{
-			"Route": route.String(),
-		})
-
-		warnings, err = cmd.Actor.DeleteRoute(route.GUID)
-		cmd.UI.DisplayWarnings(warnings)
-		if err != nil {
-			return err
-		}
+		return err
 	}
 
 	cmd.UI.DisplayOK()
