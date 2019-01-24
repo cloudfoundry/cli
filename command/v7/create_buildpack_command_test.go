@@ -163,8 +163,7 @@ var _ = Describe("create buildpack Command", func() {
 					Expect(path).To(Equal("/path/to/buildpack.zip"))
 				})
 
-				// TODO: ENUMERATE ERRORS HERE
-				When("Uploading the buildpack fails due to a name+stack collision", func() {
+				When("Uploading the buildpack fails due to an error", func() {
 					BeforeEach(func() {
 						fakeActor.UploadBuildpackReturns(
 							ccv3.JobURL(""),
