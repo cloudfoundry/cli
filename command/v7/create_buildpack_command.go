@@ -96,7 +96,6 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 
-	// TODO: Do we need these template values? Are they redundant?
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.BuildpackName}} as {{.Username}}...", map[string]interface{}{
 		"Username":      user.Name,
 		"BuildpackName": cmd.RequiredArgs.Buildpack,
