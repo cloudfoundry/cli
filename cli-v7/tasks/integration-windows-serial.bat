@@ -14,5 +14,5 @@ cd %GOPATH%\src\code.cloudfoundry.org\cli
 go build -tags="forceposix" -o cf.exe
 MOVE %CD%\cf.exe %GOPATH%\bin\cf.exe
 
-ginkgo.exe -r -randomizeAllSpecs -slowSpecThreshold 60 %CF_TEST_SUITE% || exit 1
+ginkgo.exe -r -tags=V7 -randomizeAllSpecs -slowSpecThreshold 60 %CF_TEST_SUITE% || exit 1
 
