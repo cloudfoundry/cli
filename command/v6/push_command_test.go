@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
+	v3constant "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -744,30 +745,8 @@ var _ = Describe("push Command", func() {
 								Expect(appConfig).To(Equal(updatedConfig.CurrentApplication.Application))
 							})
 
-							When("the API is below MinVersionV3", func() {
+							Context("Process Information", func() {
 								BeforeEach(func() {
-									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinV3ClientVersion)
-								})
-
-								It("displays the app summary with isolation segments as well as warnings", func() {
-									Expect(executeErr).ToNot(HaveOccurred())
-									Expect(testUI.Out).To(Say(`name:\s+%s`, appName))
-									Expect(testUI.Out).To(Say(`requested state:\s+started`))
-									Expect(testUI.Out).To(Say(`instances:\s+1\/3`))
-									Expect(testUI.Out).To(Say(`usage:\s+128M x 3 instances`))
-									Expect(testUI.Out).To(Say(`routes:\s+banana.fruit.com/hi, foobar.com:13`))
-									Expect(testUI.Out).To(Say(`last uploaded:\s+\w{3} [0-3]\d \w{3} [0-2]\d:[0-5]\d:[0-5]\d \w+ \d{4}`))
-									Expect(testUI.Out).To(Say(`stack:\s+potatos`))
-									Expect(testUI.Out).To(Say(`buildpack:\s+some-buildpack`))
-									Expect(testUI.Out).To(Say(`start command:\s+some start command`))
-
-									Expect(testUI.Err).To(Say("app-summary-warning"))
-								})
-							})
-
-							When("the api is at least MinVersionV3", func() {
-								BeforeEach(func() {
-									fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 									fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(
 										v2v3action.ApplicationSummary{
 											ApplicationSummary: v3action.ApplicationSummary{
@@ -823,42 +802,33 @@ var _ = Describe("push Command", func() {
 
 							When("the start command is explicitly set", func() {
 								BeforeEach(func() {
-									applicationSummary := v2action.ApplicationSummary{
-										Application: v2action.Application{
-											Command:              types.FilteredString{IsSet: true, Value: "a-different-start-command"},
-											DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
-											DetectedStartCommand: types.FilteredString{IsSet: true, Value: "some start command"},
-											GUID:                 "some-app-guid",
-											Instances:            types.NullInt{Value: 3, IsSet: true},
-											Memory:               types.NullByteSizeInMb{IsSet: true, Value: 128},
-											Name:                 appName,
-											PackageUpdatedAt:     time.Unix(0, 0),
-											State:                "STARTED",
+									v3ApplicationSummary := v3action.ApplicationSummary{
+										Application: v3action.Application{
+											Name: appName,
 										},
-										Stack: v2action.Stack{
-											Name: "potatos",
-										},
-										Routes: []v2action.Route{
+										ProcessSummaries: v3action.ProcessSummaries{
 											{
-												Host: "banana",
-												Domain: v2action.Domain{
-													Name: "fruit.com",
+												Process: v3action.Process{
+													Type:       "aba",
+													Command:    *types.NewFilteredString("a-different-start-command"),
+													MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+													DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 												},
-												Path: "/hi",
-											},
-											{
-												Domain: v2action.Domain{
-													Name: "foobar.com",
+												InstanceDetails: []v3action.ProcessInstance{
+													v3action.ProcessInstance{
+														State: v3constant.ProcessInstanceRunning,
+													},
 												},
-												Port: types.NullInt{IsSet: true, Value: 13},
 											},
 										},
 									}
+
 									warnings := []string{"app-summary-warning"}
+									applicationSummary := v2v3action.ApplicationSummary{
+										ApplicationSummary: v3ApplicationSummary,
+									}
 
-									applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{{State: "RUNNING"}}
-
-									fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
+									fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 								})
 
 								It("displays the correct start command", func() {
@@ -872,41 +842,30 @@ var _ = Describe("push Command", func() {
 						When("no-start is set", func() {
 							BeforeEach(func() {
 								cmd.NoStart = true
-
-								applicationSummary := v2action.ApplicationSummary{
-									Application: v2action.Application{
-										Command:              types.FilteredString{IsSet: true, Value: "a-different-start-command"},
-										DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
-										DetectedStartCommand: types.FilteredString{IsSet: true, Value: "some start command"},
-										GUID:                 "some-app-guid",
-										Instances:            types.NullInt{Value: 3, IsSet: true},
-										Memory:               types.NullByteSizeInMb{IsSet: true, Value: 128},
-										Name:                 appName,
-										PackageUpdatedAt:     time.Unix(0, 0),
-										State:                "STOPPED",
+								v3ApplicationSummary := v3action.ApplicationSummary{
+									Application: v3action.Application{
+										Name:  appName,
+										State: v3constant.ApplicationStopped,
 									},
-									Stack: v2action.Stack{
-										Name: "potatos",
-									},
-									Routes: []v2action.Route{
+									ProcessSummaries: v3action.ProcessSummaries{
 										{
-											Host: "banana",
-											Domain: v2action.Domain{
-												Name: "fruit.com",
+											Process: v3action.Process{
+												Type:       "aba",
+												Command:    *types.NewFilteredString("a-different-start-command"),
+												MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+												DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 											},
-											Path: "/hi",
-										},
-										{
-											Domain: v2action.Domain{
-												Name: "foobar.com",
-											},
-											Port: types.NullInt{IsSet: true, Value: 13},
+											InstanceDetails: []v3action.ProcessInstance{},
 										},
 									},
 								}
-								warnings := []string{"app-summary-warning"}
 
-								fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
+								warnings := []string{"app-summary-warning"}
+								applicationSummary := v2v3action.ApplicationSummary{
+									ApplicationSummary: v3ApplicationSummary,
+								}
+
+								fakeApplicationSummaryActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 							})
 
 							When("the app is not running", func() {

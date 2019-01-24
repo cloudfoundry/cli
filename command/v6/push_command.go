@@ -220,23 +220,13 @@ func (cmd PushCommand) Execute(args []string) error {
 
 		cmd.UI.DisplayNewline()
 
-		if err := command.MinimumCCAPIVersionCheck(cmd.ApplicationSummaryActor.CloudControllerV3APIVersion(), ccversion.MinVersionApplicationFlowV3); err != nil {
-			log.WithField("v3_api_version", cmd.ApplicationSummaryActor.CloudControllerV3APIVersion()).Debug("using v2 for app display")
-			appSummary, warnings, err := cmd.RestartActor.GetApplicationSummaryByNameAndSpace(appConfig.DesiredApplication.Name, cmd.Config.TargetedSpace().GUID)
-			cmd.UI.DisplayWarnings(warnings)
-			if err != nil {
-				return err
-			}
-			shared.DisplayAppSummary(cmd.UI, appSummary, true)
-		} else {
-			log.WithField("v3_api_version", cmd.ApplicationSummaryActor.CloudControllerV3APIVersion()).Debug("using v3 for app display")
-			appSummary, warnings, err := cmd.ApplicationSummaryActor.GetApplicationSummaryByNameAndSpace(appConfig.DesiredApplication.Name, cmd.Config.TargetedSpace().GUID, true)
-			cmd.UI.DisplayWarnings(warnings)
-			if err != nil {
-				return err
-			}
-			shared.NewAppSummaryDisplayer2(cmd.UI).AppDisplay(appSummary, true)
+		log.WithField("v3_api_version", cmd.ApplicationSummaryActor.CloudControllerV3APIVersion()).Debug("using v3 for app display")
+		appSummary, warnings, err := cmd.ApplicationSummaryActor.GetApplicationSummaryByNameAndSpace(appConfig.DesiredApplication.Name, cmd.Config.TargetedSpace().GUID, true)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return err
 		}
+		shared.NewAppSummaryDisplayer2(cmd.UI).AppDisplay(appSummary, true)
 
 		if appNumber+1 <= len(appConfigs) {
 			cmd.UI.DisplayNewline()

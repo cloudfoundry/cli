@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -18,7 +17,8 @@ import (
 //go:generate counterfeiter . RestageActor
 
 type RestageActor interface {
-	AppActor
+	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
+	GetApplicationSummaryByNameAndSpace(name string, spaceGUID string) (v2action.ApplicationSummary, v2action.Warnings, error)
 	RestageApplication(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
 }
 
@@ -97,24 +97,13 @@ func (cmd RestageCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayNewline()
-	if err := command.MinimumCCAPIVersionCheck(cmd.ApplicationSummaryActor.CloudControllerV3APIVersion(), ccversion.MinVersionApplicationFlowV3); err != nil {
-
-		log.WithField("v3_api_version", cmd.ApplicationSummaryActor.CloudControllerV3APIVersion()).Debug("using v2 for app display")
-		appSummary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
-		cmd.UI.DisplayWarnings(warnings)
-		if err != nil {
-			return err
-		}
-		shared.DisplayAppSummary(cmd.UI, appSummary, true)
-	} else {
-		log.WithField("v3_api_version", cmd.ApplicationSummaryActor.CloudControllerV3APIVersion()).Debug("using v3 for app display")
-		appSummary, warnings, err := cmd.ApplicationSummaryActor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, true)
-		cmd.UI.DisplayWarnings(warnings)
-		if err != nil {
-			return err
-		}
-		shared.NewAppSummaryDisplayer2(cmd.UI).AppDisplay(appSummary, true)
+	log.WithField("v3_api_version", cmd.ApplicationSummaryActor.CloudControllerV3APIVersion()).Debug("using v3 for app display")
+	appSummary, v3Warnings, err := cmd.ApplicationSummaryActor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, true)
+	cmd.UI.DisplayWarnings(v3Warnings)
+	if err != nil {
+		return err
 	}
+	shared.NewAppSummaryDisplayer2(cmd.UI).AppDisplay(appSummary, true)
 
 	return nil
 }
