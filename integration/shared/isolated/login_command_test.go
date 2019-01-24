@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"fmt"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -140,6 +141,106 @@ var _ = Describe("login command", func() {
 						Eventually(apiSession).Should(Exit(0))
 						Eventually(apiSession).Should(Say("api endpoint:   %s", apiURL))
 					})
+				})
+			})
+		})
+	})
+
+	Describe("User Credentials", func() {
+		// TODO: Figure out a way to pass in password when we don't have a tty
+		XIt("prompts the user for email and password", func() {
+			username, password := helpers.GetCredentials()
+			buffer := NewBuffer()
+			buffer.Write([]byte(fmt.Sprintf("%s\n%s\n", username, password)))
+			session := helpers.CFWithStdin(buffer, "login")
+			Eventually(session).Should(Say("Email> "))
+			Eventually(session).Should(Say("Password> "))
+			Eventually(session).Should(Exit(0))
+		})
+
+		When("the user provides the -p flag", func() {
+			It("prompts the user for their email and logs in successfully", func() {
+				username, password := helpers.GetCredentials()
+				input := NewBuffer()
+				input.Write([]byte(username + "\n"))
+				session := helpers.CFWithStdin(input, "login", "-p", password)
+				Eventually(session).Should(Say("Email> "))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("the user provides the -p and -u flags", func() {
+			Context("and the credentials are correct", func() {
+				It("logs in successfully", func() {
+					username, password := helpers.GetCredentials()
+					session := helpers.CF("login", "-p", password, "-u", username)
+					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
+					Eventually(session).Should(Say(`Authenticating\.\.\.`))
+					Eventually(session).Should(Say(`OK`))
+					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+					Eventually(session).Should(Say("User:\\s+" + username))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("and the credentials are incorrect", func() {
+				It("prompts twice, displays an error and fails", func() {
+					username, password := helpers.GetCredentials()
+					badPassword := password + "_wrong"
+					session := helpers.CF("login", "-p", badPassword, "-u", username)
+					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
+					Eventually(session).Should(Say(`Authenticating\.\.\.`))
+					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session).Should(Say(`Password>`))
+					Eventually(session).Should(Say(`Authenticating\.\.\.`))
+					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session).Should(Say(`Password>`))
+					Eventually(session).Should(Say(`Authenticating\.\.\.`))
+					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+					Eventually(session).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+					Eventually(session).Should(Say(`FAILED`))
+					Eventually(session).Should(Say(`Unable to authenticate`))
+
+					Eventually(session).Should(Exit(1))
+				})
+
+				Context("and the user was previously logged in", func() {
+					BeforeEach(func() {
+						helpers.LoginCF()
+					})
+
+					It("logs them out", func() {
+						username, password := helpers.GetCredentials()
+						badPassword := password + "_wrong"
+						session := helpers.CF("login", "-p", badPassword, "-u", username)
+						Eventually(session).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+						Eventually(session).Should(Exit())
+
+						orgsSession := helpers.CF("orgs")
+						Eventually(orgsSession.Err).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+						Eventually(orgsSession).Should(Exit())
+					})
+				})
+			})
+
+			When("already logged in with client credentials", func() {
+				BeforeEach(func() {
+					clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
+					session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("prints an error and fails", func() {
+					username, password := helpers.GetCredentials()
+					session := helpers.CF("login", "-p", password, "-u", username)
+					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
+					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+					// The following message is a bit strange in the output. Consider removing?
+					Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Say("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})
