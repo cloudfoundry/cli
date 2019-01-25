@@ -2,10 +2,10 @@
 package v7fakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	v7action "code.cloudfoundry.org/cli/actor/v7action"
+	constant "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 

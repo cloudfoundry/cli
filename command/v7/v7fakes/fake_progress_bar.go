@@ -2,8 +2,8 @@
 package v7fakes
 
 import (
-	"io"
-	"sync"
+	io "io"
+	sync "sync"
 
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
