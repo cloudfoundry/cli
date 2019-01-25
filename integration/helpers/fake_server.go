@@ -15,6 +15,21 @@ const (
 )
 
 func StartAndTargetServerWithAPIVersions(v2Version string, v3Version string) *Server {
+	server := StartServerWithAPIVersions(v2Version, v3Version)
+	Eventually(CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
+
+	return server
+}
+
+func StartServerWithMinimumCLIVersion(minCLIVersion string) *Server {
+	return startServerWithVersions(DefaultV2Version, DefaultV3Version, &minCLIVersion)
+}
+
+func StartServerWithAPIVersions(v2Version string, v3Version string) *Server {
+	return startServerWithVersions(v2Version, v3Version, nil)
+}
+
+func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersion *string) *Server {
 	server := NewTLSServer()
 
 	rootResponse := fmt.Sprintf(`{
@@ -56,15 +71,16 @@ func StartAndTargetServerWithAPIVersions(v2Version string, v3Version string) *Se
    }
  }`, server.URL(), v2Version, v3Version)
 
-	v2InfoResponse := fmt.Sprintf(`{
-		"api_version":"%[1]s",
-		"authorization_endpoint": "%[2]s"
-  }`, v2Version, server.URL())
+	v2InfoResponse := struct {
+		APIVersion            string  `json:"api_version"`
+		AuthorizationEndpoint string  `json:"authorization_endpoint"`
+		MinCLIVersion         *string `json:"min_cli_version"`
+	}{
+		APIVersion:            v2Version,
+		AuthorizationEndpoint: server.URL(),
+		MinCLIVersion:         minimumCLIVersion}
 
-	server.RouteToHandler(http.MethodGet, "/v2/info", func(res http.ResponseWriter, req *http.Request) {
-		res.WriteHeader(http.StatusOK)
-		res.Write([]byte(v2InfoResponse))
-	})
+	server.RouteToHandler(http.MethodGet, "/v2/info", RespondWithJSONEncoded(http.StatusOK, v2InfoResponse))
 	server.RouteToHandler(http.MethodGet, "/v3", func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusOK)
 		res.Write([]byte(`{"links":{}}`))
@@ -78,6 +94,5 @@ func StartAndTargetServerWithAPIVersions(v2Version string, v3Version string) *Se
 		res.Write([]byte(rootResponse))
 	})
 
-	Eventually(CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
 	return server
 }

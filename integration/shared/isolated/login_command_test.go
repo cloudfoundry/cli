@@ -2,14 +2,17 @@ package isolated
 
 import (
 	"fmt"
+	"net/http"
 	"regexp"
 	"runtime"
+	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("login command", func() {
@@ -51,6 +54,58 @@ var _ = Describe("login command", func() {
 
 				Expect(session).Should(Say("SEE ALSO:\n"))
 				Expect(session).Should(Say("api, auth, target"))
+			})
+		})
+	})
+
+	Describe("Minimum Version Check", func() {
+		When("the api version is less than the minimum supported version", func() {
+			var server *ghttp.Server
+
+			BeforeEach(func() {
+				server = helpers.StartServerWithAPIVersions("1.0.0", "")
+				server.RouteToHandler(http.MethodPost, "/oauth/token",
+					ghttp.RespondWithJSONEncoded(http.StatusOK, struct{}{}))
+				server.RouteToHandler(http.MethodGet, "/v2/organizations",
+					ghttp.RespondWith(http.StatusOK, `{
+					 "total_results": 0,
+					 "total_pages": 1,
+					 "resources": []}`))
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("displays the warning and exits successfully", func() {
+				session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
+				Eventually(session).Should(Say("Your API version is no longer supported. Upgrade to a newer version of the API."))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("the CLI version is lower than the minimum supported version by the CC", func() {
+			var server *ghttp.Server
+
+			BeforeEach(func() {
+				server = helpers.StartServerWithMinimumCLIVersion("9000.0.0")
+				server.RouteToHandler(http.MethodPost, "/oauth/token",
+					ghttp.RespondWithJSONEncoded(http.StatusOK, struct{}{}))
+				server.RouteToHandler(http.MethodGet, "/v2/organizations",
+					ghttp.RespondWith(http.StatusOK, `{
+					 "total_results": 0,
+					 "total_pages": 1,
+					 "resources": []}`))
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("displays the warning and exits successfully", func() {
+				session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
+				Eventually(session).Should(Say(`Cloud Foundry API version .+ requires CLI version .+\.  You are currently on version .+\. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads`))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
