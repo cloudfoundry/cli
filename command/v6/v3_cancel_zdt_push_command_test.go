@@ -5,10 +5,8 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -52,35 +50,20 @@ var _ = Describe("v3-cancel-deployment Command", func() {
 			CancelZdtPushActor: fakeV3CancelZdtPushActor,
 			SharedActor:        fakeSharedActor,
 		}
-		fakeV3CancelZdtPushActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is below the minimum", func() {
-		BeforeEach(func() {
-			fakeV3CancelZdtPushActor.CloudControllerAPIVersionReturns("0.0.0")
-		})
-
-		It("returns a MinimumAPIVersionNotMetError", func() {
-			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-				CurrentVersion: "0.0.0",
-				MinimumVersion: ccversion.MinVersionApplicationFlowV3,
-			}))
-		})
-
-		It("displays the experimental warning", func() {
-			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-		})
+	It("displays the experimental warning", func() {
+		Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 	})
 
 	When("the user is not logged in", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeV3CancelZdtPushActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			expectedErr = errors.New("some current user error")
 			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 		})

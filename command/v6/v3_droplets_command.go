@@ -6,7 +6,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -16,7 +15,6 @@ import (
 //go:generate counterfeiter . V3DropletsActor
 
 type V3DropletsActor interface {
-	CloudControllerAPIVersion() string
 	GetApplicationDroplets(appName string, spaceGUID string) ([]v3action.Droplet, v3action.Warnings, error)
 }
 
@@ -47,12 +45,7 @@ func (cmd *V3DropletsCommand) Setup(config command.Config, ui command.UI) error 
 func (cmd V3DropletsCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}

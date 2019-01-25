@@ -3,7 +3,6 @@ package v6
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -20,7 +19,6 @@ type SSHActor interface {
 //go:generate counterfeiter . V3SSHActor
 
 type V3SSHActor interface {
-	CloudControllerAPIVersion() string
 	GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, processIndex uint) (v3action.SSHAuthentication, v3action.Warnings, error)
 }
 
@@ -70,12 +68,7 @@ func (cmd *V3SSHCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd V3SSHCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}

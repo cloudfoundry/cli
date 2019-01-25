@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -15,7 +14,6 @@ import (
 //go:generate counterfeiter . V3AppsActor
 
 type V3AppsActor interface {
-	CloudControllerAPIVersion() string
 	GetApplicationsWithProcessesBySpace(spaceGUID string) ([]v3action.ApplicationWithProcessSummary, v3action.Warnings, error)
 }
 
@@ -53,12 +51,7 @@ func (cmd *V3AppsCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd V3AppsCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}

@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -15,7 +14,6 @@ import (
 
 type V3CancelZdtPushActor interface {
 	CancelDeploymentByAppNameAndSpace(appName string, spaceGUID string) (v3action.Warnings, error)
-	CloudControllerAPIVersion() string
 }
 
 type V3CancelZdtPushCommand struct {
@@ -51,10 +49,6 @@ func (cmd V3CancelZdtPushCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = command.MinimumCCAPIVersionCheck(cmd.CancelZdtPushActor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
-	if err != nil {
-		return err
-	}
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err

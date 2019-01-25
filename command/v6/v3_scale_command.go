@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -17,7 +16,6 @@ import (
 type V3ScaleActor interface {
 	shared.V3AppSummaryActor
 
-	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	ScaleProcessByApplication(appGUID string, process v3action.Process) (v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
@@ -74,12 +72,7 @@ func (cmd *V3ScaleCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd V3ScaleCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}

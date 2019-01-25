@@ -82,7 +82,6 @@ var _ = BeforeEach(func() {
 	homeDir = helpers.SetHomeDir()
 	apiURL, skipSSLValidation = helpers.SetAPI()
 
-	helpers.SkipIfVersionLessThan(ccversion.MinVersionApplicationFlowV3)
 	GinkgoWriter.Write([]byte("==============================End of Global Before Each=============================="))
 })
 

@@ -6,10 +6,8 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -54,26 +52,12 @@ var _ = Describe("v3-apply-manifest Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	When("the API version is below the minimum", func() {
-		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
-		})
-
-		It("returns a MinimumAPIVersionNotMetError", func() {
-			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-				CurrentVersion: ccversion.MinV3ClientVersion,
-				MinimumVersion: ccversion.MinVersionApplicationFlowV3,
-			}))
-		})
-
-		It("displays the experimental warning", func() {
-			Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-		})
+	It("displays the experimental warning", func() {
+		Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 	})
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
@@ -91,7 +75,6 @@ var _ = Describe("v3-apply-manifest Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			expectedErr = errors.New("some current user error")
 			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 		})
@@ -107,7 +90,6 @@ var _ = Describe("v3-apply-manifest Command", func() {
 		)
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
 			})

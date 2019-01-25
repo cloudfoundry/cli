@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -142,357 +141,338 @@ var _ = Describe("v3-push Command", func() {
 			executeErr = cmd.Execute(nil)
 		})
 
-		When("the API version is below the minimum", func() {
+		When("checking target fails", func() {
 			BeforeEach(func() {
-				fakeVersionActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
+				fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 			})
 
-			It("returns a MinimumAPIVersionNotMetError", func() {
-				Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-					CurrentVersion: ccversion.MinV3ClientVersion,
-					MinimumVersion: ccversion.MinVersionApplicationFlowV3,
-				}))
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: binaryName}))
+
+				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+				checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+				Expect(checkTargetedOrg).To(BeTrue())
+				Expect(checkTargetedSpace).To(BeTrue())
 			})
 		})
 
-		When("the API version is met", func() {
+		When("checking target fails because the user is not logged in", func() {
 			BeforeEach(func() {
-				fakeVersionActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
+				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 			})
 
-			When("checking target fails", func() {
-				BeforeEach(func() {
-					fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
-				})
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: binaryName}))
-
-					Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-					checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-					Expect(checkTargetedOrg).To(BeTrue())
-					Expect(checkTargetedSpace).To(BeTrue())
-				})
+				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+				checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+				Expect(checkTargetedOrg).To(BeTrue())
+				Expect(checkTargetedSpace).To(BeTrue())
 			})
+		})
 
-			When("checking target fails because the user is not logged in", func() {
-				BeforeEach(func() {
-					fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
+		When("the user is logged in, and org and space are targeted", func() {
+			BeforeEach(func() {
+				fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+					Name: orgName,
+					GUID: "some-org-guid",
 				})
-
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
-
-					Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-					checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
-					Expect(checkTargetedOrg).To(BeTrue())
-					Expect(checkTargetedSpace).To(BeTrue())
+				fakeConfig.TargetedSpaceReturns(configv3.Space{
+					Name: spaceName,
+					GUID: "some-space-guid",
 				})
 			})
 
-			When("the user is logged in, and org and space are targeted", func() {
+			It("displays the experimental warning", func() {
+				Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+			})
+
+			When("getting app settings is successful", func() {
 				BeforeEach(func() {
-					fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
-
-					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-						Name: orgName,
-						GUID: "some-org-guid",
-					})
-					fakeConfig.TargetedSpaceReturns(configv3.Space{
-						Name: spaceName,
-						GUID: "some-space-guid",
-					})
-				})
-
-				It("displays the experimental warning", func() {
-					Expect(testUI.Err).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
-				})
-
-				When("getting app settings is successful", func() {
-					BeforeEach(func() {
-						fakeActor.ConceptualizeReturns(
-							[]pushaction.PushState{
-								{
-									Application: v3action.Application{Name: appName},
-								},
+					fakeActor.ConceptualizeReturns(
+						[]pushaction.PushState{
+							{
+								Application: v3action.Application{Name: appName},
 							},
-							pushaction.Warnings{"some-warning-1"}, nil)
+						},
+						pushaction.Warnings{"some-warning-1"}, nil)
+				})
+
+				Describe("actualizing non-logging events", func() {
+					BeforeEach(func() {
+						fakeActor.ActualizeStub = FillInValues([]Step{
+							{
+								Event:    pushaction.SkippingApplicationCreation,
+								Warnings: pushaction.Warnings{"skipping app creation warnings"},
+							},
+							{
+								Event:    pushaction.CreatedApplication,
+								Warnings: pushaction.Warnings{"app creation warnings"},
+							},
+							{
+								Event: pushaction.CreatingArchive,
+							},
+							{
+								Event:    pushaction.UploadingApplicationWithArchive,
+								Warnings: pushaction.Warnings{"upload app archive warning"},
+							},
+							{
+								Event:    pushaction.RetryUpload,
+								Warnings: pushaction.Warnings{"retry upload warning"},
+							},
+							{
+								Event: pushaction.UploadWithArchiveComplete,
+							},
+							{
+								Event: pushaction.StagingComplete,
+							},
+						}, pushaction.PushState{})
 					})
 
-					Describe("actualizing non-logging events", func() {
+					It("generates a push state with the specified app path", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("Pushing app %s to org some-org / space some-space as some-user", appName))
+						Expect(testUI.Out).To(Say(`Getting app info\.\.\.`))
+						Expect(testUI.Err).To(Say("some-warning-1"))
+
+						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+						settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
+						Expect(settings).To(MatchFields(IgnoreExtras, Fields{
+							"Name": Equal("some-app"),
+						}))
+						Expect(spaceGUID).To(Equal("some-space-guid"))
+					})
+
+					It("actualizes the application and displays events/warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("Updating app some-app..."))
+						Expect(testUI.Err).To(Say("skipping app creation warnings"))
+
+						Expect(testUI.Out).To(Say("Creating app some-app..."))
+						Expect(testUI.Err).To(Say("app creation warnings"))
+
+						Expect(testUI.Out).To(Say("Packaging files to upload..."))
+
+						Expect(testUI.Out).To(Say("Uploading files..."))
+						Expect(testUI.Err).To(Say("upload app archive warning"))
+						Expect(fakeProgressBar.ReadyCallCount()).Should(Equal(1))
+
+						Expect(testUI.Out).To(Say("Retrying upload due to an error..."))
+						Expect(testUI.Err).To(Say("retry upload warning"))
+
+						Expect(testUI.Out).To(Say("Waiting for API to complete processing files..."))
+
+						Expect(testUI.Out).To(Say("Waiting for app to start..."))
+						Expect(fakeProgressBar.CompleteCallCount()).Should(Equal(1))
+					})
+				})
+
+				Describe("actualizing logging events", func() {
+					BeforeEach(func() {
+						fakeActor.ActualizeStub = FillInValues([]Step{
+							{
+								Event: pushaction.StartingStaging,
+							},
+						}, pushaction.PushState{})
+					})
+
+					When("there are no logging errors", func() {
 						BeforeEach(func() {
-							fakeActor.ActualizeStub = FillInValues([]Step{
-								{
-									Event:    pushaction.SkippingApplicationCreation,
-									Warnings: pushaction.Warnings{"skipping app creation warnings"},
+							fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
+								[]LogEvent{
+									{Log: v3action.NewLogMessage("log-message-1", 1, time.Now(), v3action.StagingLog, "source-instance")},
+									{Log: v3action.NewLogMessage("log-message-2", 1, time.Now(), v3action.StagingLog, "source-instance")},
+									{Log: v3action.NewLogMessage("log-message-3", 1, time.Now(), "potato", "source-instance")},
 								},
-								{
-									Event:    pushaction.CreatedApplication,
-									Warnings: pushaction.Warnings{"app creation warnings"},
-								},
-								{
-									Event: pushaction.CreatingArchive,
-								},
-								{
-									Event:    pushaction.UploadingApplicationWithArchive,
-									Warnings: pushaction.Warnings{"upload app archive warning"},
-								},
-								{
-									Event:    pushaction.RetryUpload,
-									Warnings: pushaction.Warnings{"retry upload warning"},
-								},
-								{
-									Event: pushaction.UploadWithArchiveComplete,
-								},
-								{
-									Event: pushaction.StagingComplete,
-								},
-							}, pushaction.PushState{})
+								v3action.Warnings{"log-warning-1", "log-warning-2"},
+								nil,
+							)
 						})
 
-						It("generates a push state with the specified app path", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(testUI.Out).To(Say("Pushing app %s to org some-org / space some-space as some-user", appName))
-							Expect(testUI.Out).To(Say(`Getting app info\.\.\.`))
-							Expect(testUI.Err).To(Say("some-warning-1"))
+						It("displays the staging logs and warnings", func() {
+							Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
 
-							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-							settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
-							Expect(settings).To(MatchFields(IgnoreExtras, Fields{
-								"Name": Equal("some-app"),
-							}))
+							Expect(testUI.Err).To(Say("log-warning-1"))
+							Expect(testUI.Err).To(Say("log-warning-2"))
+
+							Eventually(testUI.Out).Should(Say("log-message-1"))
+							Eventually(testUI.Out).Should(Say("log-message-2"))
+							Eventually(testUI.Out).ShouldNot(Say("log-message-3"))
+
+							Expect(fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
+							passedAppName, spaceGUID, _ := fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
+							Expect(passedAppName).To(Equal(appName))
 							Expect(spaceGUID).To(Equal("some-space-guid"))
 						})
+					})
 
-						It("actualizes the application and displays events/warnings", func() {
+					When("there are logging errors", func() {
+						BeforeEach(func() {
+							fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
+								[]LogEvent{
+									{Error: errors.New("some-random-err")},
+									{Error: actionerror.NOAATimeoutError{}},
+									{Log: v3action.NewLogMessage("log-message-1", 1, time.Now(), v3action.StagingLog, "source-instance")},
+								},
+								v3action.Warnings{"log-warning-1", "log-warning-2"},
+								nil,
+							)
+						})
+
+						It("displays the errors as warnings", func() {
+							Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
+
+							Expect(testUI.Err).To(Say("log-warning-1"))
+							Expect(testUI.Err).To(Say("log-warning-2"))
+							Eventually(testUI.Err).Should(Say("some-random-err"))
+							Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
+
+							Eventually(testUI.Out).Should(Say("log-message-1"))
+						})
+					})
+				})
+
+				When("the app is successfully actualized", func() {
+					BeforeEach(func() {
+						fakeActor.ActualizeStub = FillInValues([]Step{
+							{},
+						}, pushaction.PushState{Application: v3action.Application{GUID: "potato"}})
+					})
+
+					// It("outputs flavor text prior to generating app configuration", func() {
+					// })
+
+					When("restarting the app succeeds", func() {
+						BeforeEach(func() {
+							fakeVersionActor.RestartApplicationReturns(v3action.Warnings{"some-restart-warning"}, nil)
+						})
+
+						It("restarts the app and displays warnings", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-
-							Expect(testUI.Out).To(Say("Updating app some-app..."))
-							Expect(testUI.Err).To(Say("skipping app creation warnings"))
-
-							Expect(testUI.Out).To(Say("Creating app some-app..."))
-							Expect(testUI.Err).To(Say("app creation warnings"))
-
-							Expect(testUI.Out).To(Say("Packaging files to upload..."))
-
-							Expect(testUI.Out).To(Say("Uploading files..."))
-							Expect(testUI.Err).To(Say("upload app archive warning"))
-							Expect(fakeProgressBar.ReadyCallCount()).Should(Equal(1))
-
-							Expect(testUI.Out).To(Say("Retrying upload due to an error..."))
-							Expect(testUI.Err).To(Say("retry upload warning"))
-
-							Expect(testUI.Out).To(Say("Waiting for API to complete processing files..."))
-
-							Expect(testUI.Out).To(Say("Waiting for app to start..."))
-							Expect(fakeProgressBar.CompleteCallCount()).Should(Equal(1))
-						})
-					})
-
-					Describe("actualizing logging events", func() {
-						BeforeEach(func() {
-							fakeActor.ActualizeStub = FillInValues([]Step{
-								{
-									Event: pushaction.StartingStaging,
-								},
-							}, pushaction.PushState{})
+							Expect(fakeVersionActor.RestartApplicationCallCount()).To(Equal(1))
+							Expect(fakeVersionActor.RestartApplicationArgsForCall(0)).To(Equal("potato"))
+							Expect(testUI.Err).To(Say("some-restart-warning"))
 						})
 
-						When("there are no logging errors", func() {
+						When("polling the restart succeeds", func() {
 							BeforeEach(func() {
-								fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
-									[]LogEvent{
-										{Log: v3action.NewLogMessage("log-message-1", 1, time.Now(), v3action.StagingLog, "source-instance")},
-										{Log: v3action.NewLogMessage("log-message-2", 1, time.Now(), v3action.StagingLog, "source-instance")},
-										{Log: v3action.NewLogMessage("log-message-3", 1, time.Now(), "potato", "source-instance")},
-									},
-									v3action.Warnings{"log-warning-1", "log-warning-2"},
-									nil,
-								)
+								fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
+									warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+									return nil
+								}
 							})
 
-							It("displays the staging logs and warnings", func() {
-								Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
+							It("displays all warnings", func() {
+								Expect(testUI.Err).To(Say("some-poll-warning-1"))
+								Expect(testUI.Err).To(Say("some-poll-warning-2"))
 
-								Expect(testUI.Err).To(Say("log-warning-1"))
-								Expect(testUI.Err).To(Say("log-warning-2"))
-
-								Eventually(testUI.Out).Should(Say("log-message-1"))
-								Eventually(testUI.Out).Should(Say("log-message-2"))
-								Eventually(testUI.Out).ShouldNot(Say("log-message-3"))
-
-								Expect(fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
-								passedAppName, spaceGUID, _ := fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
-								Expect(passedAppName).To(Equal(appName))
-								Expect(spaceGUID).To(Equal("some-space-guid"))
-							})
-						})
-
-						When("there are logging errors", func() {
-							BeforeEach(func() {
-								fakeVersionActor.GetStreamingLogsForApplicationByNameAndSpaceStub = ReturnLogs(
-									[]LogEvent{
-										{Error: errors.New("some-random-err")},
-										{Error: actionerror.NOAATimeoutError{}},
-										{Log: v3action.NewLogMessage("log-message-1", 1, time.Now(), v3action.StagingLog, "source-instance")},
-									},
-									v3action.Warnings{"log-warning-1", "log-warning-2"},
-									nil,
-								)
-							})
-
-							It("displays the errors as warnings", func() {
-								Expect(testUI.Out).To(Say("Staging app and tracing logs..."))
-
-								Expect(testUI.Err).To(Say("log-warning-1"))
-								Expect(testUI.Err).To(Say("log-warning-2"))
-								Eventually(testUI.Err).Should(Say("some-random-err"))
-								Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
-
-								Eventually(testUI.Out).Should(Say("log-message-1"))
-							})
-						})
-					})
-
-					When("the app is successfully actualized", func() {
-						BeforeEach(func() {
-							fakeActor.ActualizeStub = FillInValues([]Step{
-								{},
-							}, pushaction.PushState{Application: v3action.Application{GUID: "potato"}})
-						})
-
-						// It("outputs flavor text prior to generating app configuration", func() {
-						// })
-
-						When("restarting the app succeeds", func() {
-							BeforeEach(func() {
-								fakeVersionActor.RestartApplicationReturns(v3action.Warnings{"some-restart-warning"}, nil)
-							})
-
-							It("restarts the app and displays warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(fakeVersionActor.RestartApplicationCallCount()).To(Equal(1))
-								Expect(fakeVersionActor.RestartApplicationArgsForCall(0)).To(Equal("potato"))
-								Expect(testUI.Err).To(Say("some-restart-warning"))
-							})
-
-							When("polling the restart succeeds", func() {
-								BeforeEach(func() {
-									fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
-										warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
-										return nil
-									}
-								})
-
-								It("displays all warnings", func() {
-									Expect(testUI.Err).To(Say("some-poll-warning-1"))
-									Expect(testUI.Err).To(Say("some-poll-warning-2"))
-
-									Expect(executeErr).ToNot(HaveOccurred())
-								})
-							})
-
-							When("polling the start fails", func() {
-								BeforeEach(func() {
-									fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
-										warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
-										return errors.New("some-error")
-									}
-								})
-
-								It("displays all warnings and fails", func() {
-									Expect(testUI.Err).To(Say("some-poll-warning-1"))
-									Expect(testUI.Err).To(Say("some-poll-warning-2"))
-
-									Expect(executeErr).To(MatchError("some-error"))
-								})
-							})
-
-							When("polling times out", func() {
-								BeforeEach(func() {
-									fakeVersionActor.PollStartReturns(actionerror.StartupTimeoutError{})
-								})
-
-								It("returns the StartupTimeoutError", func() {
-									Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{
-										AppName:    "some-app",
-										BinaryName: binaryName,
-									}))
-								})
 							})
 						})
 
-						When("restarting the app fails", func() {
+						When("polling the start fails", func() {
 							BeforeEach(func() {
-								fakeVersionActor.RestartApplicationReturns(v3action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
+								fakeVersionActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
+									warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+									return errors.New("some-error")
+								}
 							})
 
-							It("returns an error and any warnings", func() {
-								Expect(executeErr).To(MatchError("restart failure"))
-								Expect(testUI.Err).To(Say("some-restart-warning"))
+							It("displays all warnings and fails", func() {
+								Expect(testUI.Err).To(Say("some-poll-warning-1"))
+								Expect(testUI.Err).To(Say("some-poll-warning-2"))
+
+								Expect(executeErr).To(MatchError("some-error"))
+							})
+						})
+
+						When("polling times out", func() {
+							BeforeEach(func() {
+								fakeVersionActor.PollStartReturns(actionerror.StartupTimeoutError{})
+							})
+
+							It("returns the StartupTimeoutError", func() {
+								Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{
+									AppName:    "some-app",
+									BinaryName: binaryName,
+								}))
 							})
 						})
 					})
 
-					When("actualizing fails", func() {
+					When("restarting the app fails", func() {
 						BeforeEach(func() {
-							fakeActor.ActualizeStub = FillInValues([]Step{
-								{
-									Error: errors.New("anti avant garde naming"),
-								},
-							}, pushaction.PushState{})
+							fakeVersionActor.RestartApplicationReturns(v3action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
 						})
 
-						It("returns the error", func() {
-							Expect(executeErr).To(MatchError("anti avant garde naming"))
+						It("returns an error and any warnings", func() {
+							Expect(executeErr).To(MatchError("restart failure"))
+							Expect(testUI.Err).To(Say("some-restart-warning"))
 						})
 					})
 				})
 
-				When("getting app settings returns an error", func() {
-					var expectedErr error
-
+				When("actualizing fails", func() {
 					BeforeEach(func() {
-						expectedErr = errors.New("some-error")
-						fakeActor.ConceptualizeReturns(nil, pushaction.Warnings{"some-warning-1"}, expectedErr)
+						fakeActor.ActualizeStub = FillInValues([]Step{
+							{
+								Error: errors.New("anti avant garde naming"),
+							},
+						}, pushaction.PushState{})
 					})
 
-					It("generates a push state with the specified app path", func() {
-						Expect(executeErr).To(MatchError(expectedErr))
-						Expect(testUI.Err).To(Say("some-warning-1"))
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError("anti avant garde naming"))
 					})
 				})
+			})
 
-				When("app path is specified", func() {
-					BeforeEach(func() {
-						cmd.AppPath = "some/app/path"
-					})
+			When("getting app settings returns an error", func() {
+				var expectedErr error
 
-					It("generates a push state with the specified app path", func() {
-						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-						settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
-						Expect(settings).To(MatchFields(IgnoreExtras, Fields{
-							"Name":            Equal("some-app"),
-							"ProvidedAppPath": Equal("some/app/path"),
-						}))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
-					})
+				BeforeEach(func() {
+					expectedErr = errors.New("some-error")
+					fakeActor.ConceptualizeReturns(nil, pushaction.Warnings{"some-warning-1"}, expectedErr)
 				})
 
-				When("buildpack is specified", func() {
-					BeforeEach(func() {
-						cmd.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
-					})
+				It("generates a push state with the specified app path", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(testUI.Err).To(Say("some-warning-1"))
+				})
+			})
 
-					It("generates a push state with the specified buildpacks", func() {
-						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-						settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
-						Expect(settings).To(MatchFields(IgnoreExtras, Fields{
-							"Name":       Equal("some-app"),
-							"Buildpacks": Equal([]string{"some-buildpack-1", "some-buildpack-2"}),
-						}))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
-					})
+			When("app path is specified", func() {
+				BeforeEach(func() {
+					cmd.AppPath = "some/app/path"
+				})
+
+				It("generates a push state with the specified app path", func() {
+					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+					settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
+					Expect(settings).To(MatchFields(IgnoreExtras, Fields{
+						"Name":            Equal("some-app"),
+						"ProvidedAppPath": Equal("some/app/path"),
+					}))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+				})
+			})
+
+			When("buildpack is specified", func() {
+				BeforeEach(func() {
+					cmd.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
+				})
+
+				It("generates a push state with the specified buildpacks", func() {
+					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+					settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
+					Expect(settings).To(MatchFields(IgnoreExtras, Fields{
+						"Name":       Equal("some-app"),
+						"Buildpacks": Equal([]string{"some-buildpack-1", "some-buildpack-2"}),
+					}))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 			})
 		})

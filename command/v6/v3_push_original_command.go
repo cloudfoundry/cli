@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -22,7 +21,6 @@ type OriginalV2PushActor interface {
 //go:generate counterfeiter . OriginalV3PushActor
 
 type OriginalV3PushActor interface {
-	CloudControllerAPIVersion() string
 	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
 	CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
 	CreateApplicationInSpace(app v3action.Application, spaceGUID string) (v3action.Application, v3action.Warnings, error)
@@ -78,11 +76,6 @@ func (cmd V3PushCommand) OriginalExecute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
 	err := cmd.validateArgs()
-	if err != nil {
-		return err
-	}
-
-	err = command.MinimumCCAPIVersionCheck(cmd.OriginalActor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
 	if err != nil {
 		return err
 	}

@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -21,7 +20,6 @@ type V2V3AppSummaryActor interface {
 
 type V3AppActor interface {
 	shared.V3AppSummaryActor
-	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 }
 
@@ -43,7 +41,7 @@ func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor(config)
 
-	ccClient, _, err := shared.NewV3BasedClients(config, ui, true, ccversion.MinVersionApplicationFlowV3)
+	ccClient, _, err := shared.NewV3BasedClients(config, ui, true, "")
 	if err != nil {
 		return err
 	}
@@ -62,12 +60,7 @@ func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V3AppCommand) Execute(args []string) error {
-	err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
-	if err != nil {
-		return err
-	}
-
-	err = cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}

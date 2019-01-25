@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -28,7 +27,6 @@ type V3PushActor interface {
 //go:generate counterfeiter . V3PushVersionActor
 
 type V3PushVersionActor interface {
-	CloudControllerAPIVersion() string
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 	PollStart(appGUID string, warningsChannel chan<- v3action.Warnings) error
 	RestartApplication(appGUID string) (v3action.Warnings, error)
@@ -115,14 +113,9 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		return cmd.OriginalExecute(args)
 	}
 
-	err := command.MinimumCCAPIVersionCheck(cmd.VersionActor.CloudControllerAPIVersion(), ccversion.MinVersionApplicationFlowV3)
-	if err != nil {
-		return err
-	}
-
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
-	err = cmd.SharedActor.CheckTarget(true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
 	}
