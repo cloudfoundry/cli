@@ -15,7 +15,6 @@ const (
 	MinVersionInternalDomainV2               = "2.115.0"
 	MinVersionMultiServiceRegistrationV2     = "2.125.0"
 
-	MinVersionApplicationFlowV3    = "3.27.0"
 	MinVersionManifestBuildpacksV3 = "3.25.0"
 	MinVersionShareServiceV3       = "3.36.0"
 	MinVersionZeroDowntimePushV3   = "3.57.0"
