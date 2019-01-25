@@ -345,6 +345,7 @@ jobs:
     - get: vars-store
     - put: bosh-lock
       resource: gcp-bosh-pool
+      timeout: 2h
       params:
         acquire: true
   - do:
@@ -387,6 +388,7 @@ jobs:
     - get: vars-store
     - put: bosh-lock
       resource: gcp-bosh-pool
+      timeout: 2h
       params:
         acquire: true
   - do:
@@ -427,6 +429,7 @@ jobs:
     - get: vars-store
     - put: bosh-lock
       resource: gcp-bosh-pool
+      timeout: 2h
       params:
         acquire: true
   - do:
@@ -481,6 +484,7 @@ jobs:
     - get: vars-store
     - put: bosh-lock
       resource: legacy-gcp-bosh-pool
+      timeout: 2h
       params:
         acquire: true
   - do:
@@ -603,6 +607,7 @@ jobs:
     - get: vars-store
     - put: bosh-lock
       resource: gcp-bosh-pool
+      timeout: 2h
       params:
         acquire: true
   - do:
