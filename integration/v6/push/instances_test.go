@@ -56,55 +56,48 @@ var _ = Describe("push with different instances values", func() {
 				helpers.SkipIfVersionLessThan(ccversion.MinVersionZeroAppInstancesV2)
 			})
 
-			When("the API version is above 3.27.0", func() {
-				BeforeEach(func() {
-					helpers.SkipIfVersionLessThan(ccversion.MinVersionApplicationFlowV3)
-				})
+			It("pushes an app with 0 instances", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					By("pushing an app with 0 instances")
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+						PushCommandName, appName,
+						"-i", "0",
+					)
 
-				It("pushes an app with 0 instances", func() {
-					helpers.WithHelloWorldApp(func(dir string) {
-						By("pushing an app with 0 instances")
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-							PushCommandName, appName,
-							"-i", "0",
-						)
+					Eventually(session).Should(Say(`\s+instances:\s+0`))
+					Eventually(session).Should(Exit(0))
 
-						Eventually(session).Should(Say(`\s+instances:\s+0`))
-						Eventually(session).Should(Exit(0))
+					session = helpers.CF("app", appName)
+					Eventually(session).Should(Say("There are no running instances of this process."))
+					Eventually(session).Should(Exit(0))
 
-						session = helpers.CF("app", appName)
-						Eventually(session).Should(Say("There are no running instances of this process."))
-						Eventually(session).Should(Exit(0))
+					By("updating an app to 1 instance")
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+						PushCommandName, appName,
+						"-i", "1",
+					)
+					Eventually(session).Should(Say(`\-\s+instances:\s+0`))
+					Eventually(session).Should(Say(`\+\s+instances:\s+1`))
+					Eventually(session).Should(Exit(0))
 
-						By("updating an app to 1 instance")
-						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-							PushCommandName, appName,
-							"-i", "1",
-						)
-						Eventually(session).Should(Say(`\-\s+instances:\s+0`))
-						Eventually(session).Should(Say(`\+\s+instances:\s+1`))
-						Eventually(session).Should(Exit(0))
+					session = helpers.CF("app", appName)
+					Eventually(session).Should(Say(`instances:\s+\d/1`))
+					Eventually(session).Should(Exit(0))
 
-						session = helpers.CF("app", appName)
-						Eventually(session).Should(Say(`instances:\s+\d/1`))
-						Eventually(session).Should(Exit(0))
+					By("updating an app back to 0 instances")
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
+						PushCommandName, appName,
+						"-i", "0",
+					)
+					Eventually(session).Should(Say(`\-\s+instances:\s+1`))
+					Eventually(session).Should(Say(`\+\s+instances:\s+0`))
+					Eventually(session).Should(Exit(0))
 
-						By("updating an app back to 0 instances")
-						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-							PushCommandName, appName,
-							"-i", "0",
-						)
-						Eventually(session).Should(Say(`\-\s+instances:\s+1`))
-						Eventually(session).Should(Say(`\+\s+instances:\s+0`))
-						Eventually(session).Should(Exit(0))
-
-						session = helpers.CF("app", appName)
-						Eventually(session).Should(Say("There are no running instances of this process."))
-						Eventually(session).Should(Exit(0))
-					})
+					session = helpers.CF("app", appName)
+					Eventually(session).Should(Say("There are no running instances of this process."))
+					Eventually(session).Should(Exit(0))
 				})
 			})
-
 		})
 	})
 

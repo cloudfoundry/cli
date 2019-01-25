@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
@@ -490,8 +489,6 @@ var _ = Describe("Restage Command", func() {
 				)
 
 				BeforeEach(func() {
-					fakeApplicationSummaryActor.CloudControllerV3APIVersionReturns(ccversion.MinVersionApplicationFlowV3)
-
 					v3ApplicationSummary := v3action.ApplicationSummary{
 						Application: v3action.Application{
 							Name: "some-app",
