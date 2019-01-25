@@ -41,25 +41,6 @@ var _ = Describe("v3-cancel-zdt-push command", func() {
 	})
 
 	Context("when the environment is not setup correctly", func() {
-		When("the v3 api version is lower than the minimum version", func() {
-			var server *Server
-
-			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, "3.0.0")
-			})
-
-			AfterEach(func() {
-				server.Close()
-			})
-
-			It("fails with error message that the minimum version is not met", func() {
-				session := helpers.CF("v3-cancel-zdt-push", appName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say(`This command requires CF API version 3\.27\.0 or higher\.`))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "v3-cancel-zdt-push", appName)
 		})
