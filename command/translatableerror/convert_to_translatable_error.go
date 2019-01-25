@@ -166,6 +166,8 @@ func ConvertToTranslatableError(err error) error {
 	// Specific CC Errors
 	case ccerror.V2JobFailedError:
 		return JobFailedError(e)
+	case ccerror.V3JobFailedError:
+		return JobFailedError{JobGUID: e.JobGUID, Message: e.Detail}
 	case ccerror.JobTimeoutError:
 		return JobTimeoutError{JobGUID: e.JobGUID}
 	case ccerror.MultiError:

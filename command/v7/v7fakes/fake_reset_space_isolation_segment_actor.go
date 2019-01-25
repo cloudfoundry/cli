@@ -9,16 +9,6 @@ import (
 )
 
 type FakeResetSpaceIsolationSegmentActor struct {
-	CloudControllerAPIVersionStub        func() string
-	cloudControllerAPIVersionMutex       sync.RWMutex
-	cloudControllerAPIVersionArgsForCall []struct {
-	}
-	cloudControllerAPIVersionReturns struct {
-		result1 string
-	}
-	cloudControllerAPIVersionReturnsOnCall map[int]struct {
-		result1 string
-	}
 	ResetSpaceIsolationSegmentStub        func(string, string) (string, v7action.Warnings, error)
 	resetSpaceIsolationSegmentMutex       sync.RWMutex
 	resetSpaceIsolationSegmentArgsForCall []struct {
@@ -37,58 +27,6 @@ type FakeResetSpaceIsolationSegmentActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeResetSpaceIsolationSegmentActor) CloudControllerAPIVersion() string {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
-	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
-	}{})
-	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
-	fake.cloudControllerAPIVersionMutex.Unlock()
-	if fake.CloudControllerAPIVersionStub != nil {
-		return fake.CloudControllerAPIVersionStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.cloudControllerAPIVersionReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeResetSpaceIsolationSegmentActor) CloudControllerAPIVersionCallCount() int {
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	return len(fake.cloudControllerAPIVersionArgsForCall)
-}
-
-func (fake *FakeResetSpaceIsolationSegmentActor) CloudControllerAPIVersionCalls(stub func() string) {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	defer fake.cloudControllerAPIVersionMutex.Unlock()
-	fake.CloudControllerAPIVersionStub = stub
-}
-
-func (fake *FakeResetSpaceIsolationSegmentActor) CloudControllerAPIVersionReturns(result1 string) {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	defer fake.cloudControllerAPIVersionMutex.Unlock()
-	fake.CloudControllerAPIVersionStub = nil
-	fake.cloudControllerAPIVersionReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeResetSpaceIsolationSegmentActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
-	fake.cloudControllerAPIVersionMutex.Lock()
-	defer fake.cloudControllerAPIVersionMutex.Unlock()
-	fake.CloudControllerAPIVersionStub = nil
-	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
-		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
 }
 
 func (fake *FakeResetSpaceIsolationSegmentActor) ResetSpaceIsolationSegment(arg1 string, arg2 string) (string, v7action.Warnings, error) {
@@ -161,8 +99,6 @@ func (fake *FakeResetSpaceIsolationSegmentActor) ResetSpaceIsolationSegmentRetur
 func (fake *FakeResetSpaceIsolationSegmentActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.cloudControllerAPIVersionMutex.RLock()
-	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.resetSpaceIsolationSegmentMutex.RLock()
 	defer fake.resetSpaceIsolationSegmentMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

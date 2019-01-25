@@ -314,6 +314,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			ccerror.V2JobFailedError{JobGUID: "some-job-guid", Message: "some-message"},
 			JobFailedError{JobGUID: "some-job-guid", Message: "some-message"}),
 
+		Entry("ccerror.V3JobFailedError -> V3JobFailedError",
+			ccerror.V3JobFailedError{JobGUID: "some-job-guid", Detail: "some-detail"},
+			JobFailedError{JobGUID: "some-job-guid", Message: "some-detail"}),
+
 		Entry("ccerror.JobTimeoutError -> JobTimeoutError",
 			ccerror.JobTimeoutError{JobGUID: "some-job-guid"},
 			JobTimeoutError{JobGUID: "some-job-guid"}),

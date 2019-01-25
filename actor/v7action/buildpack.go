@@ -34,12 +34,80 @@ func (actor Actor) GetBuildpacks() ([]Buildpack, Warnings, error) {
 	return buildpacks, Warnings(warnings), err
 }
 
+// Returns a buildpack with the provided name and stack.
+// If `buildpackStack` is not specified, and there are multiple buildpacks with the same name, it will return the one
+// with no stack, if present.
+func (actor Actor) GetBuildpackByNameAndStack(buildpackName string, buildpackStack string) (Buildpack, Warnings, error) {
+	var (
+		ccv3Buildpacks []ccv3.Buildpack
+		warnings       ccv3.Warnings
+		err            error
+	)
+
+	if buildpackStack == "" {
+		ccv3Buildpacks, warnings, err = actor.CloudControllerClient.GetBuildpacks(ccv3.Query{
+			Key:    ccv3.NameFilter,
+			Values: []string{buildpackName},
+		})
+	} else {
+		ccv3Buildpacks, warnings, err = actor.CloudControllerClient.GetBuildpacks(
+			ccv3.Query{
+				Key:    ccv3.NameFilter,
+				Values: []string{buildpackName},
+			},
+			ccv3.Query{
+				Key:    ccv3.StackFilter,
+				Values: []string{buildpackStack},
+			},
+		)
+	}
+
+	if err != nil {
+		return Buildpack{}, Warnings(warnings), err
+	}
+
+	if len(ccv3Buildpacks) == 0 {
+		return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, StackName: buildpackStack}
+	}
+
+	if len(ccv3Buildpacks) > 1 {
+		for _, buildpack := range ccv3Buildpacks {
+			if buildpack.Stack == "" {
+				return Buildpack(buildpack), Warnings(warnings), nil
+			}
+		}
+		return Buildpack{}, Warnings(warnings), actionerror.MultipleBuildpacksFoundError{BuildpackName: buildpackName}
+	}
+
+	return Buildpack(ccv3Buildpacks[0]), Warnings(warnings), err
+}
+
 func (actor Actor) CreateBuildpack(buildpack Buildpack) (Buildpack, Warnings, error) {
 	ccv3Buildpack, warnings, err := actor.CloudControllerClient.CreateBuildpack(
 		ccv3.Buildpack(buildpack),
 	)
 
 	return Buildpack(ccv3Buildpack), Warnings(warnings), err
+}
+
+func (actor Actor) UpdateBuildpackByNameAndStack(buildpackName string, buildpackStack string, buildpack Buildpack) (Buildpack, Warnings, error) {
+	var warnings Warnings
+	foundBuildpack, getWarnings, err := actor.GetBuildpackByNameAndStack(buildpackName, buildpackStack)
+	warnings = append(warnings, getWarnings...)
+
+	if err != nil {
+		return Buildpack{}, Warnings(warnings), err
+	}
+
+	buildpack.GUID = foundBuildpack.GUID
+
+	updatedBuildpack, updateWarnings, err := actor.CloudControllerClient.UpdateBuildpack(ccv3.Buildpack(buildpack))
+	warnings = append(warnings, updateWarnings...)
+	if err != nil {
+		return Buildpack{}, Warnings(warnings), err
+	}
+
+	return Buildpack(updatedBuildpack), warnings, nil
 }
 
 func (actor Actor) UploadBuildpack(guid string, pathToBuildpackBits string, progressBar SimpleProgressBar) (ccv3.JobURL, Warnings, error) {
@@ -184,54 +252,6 @@ func Zipit(source, target, prefix string) error {
 	})
 
 	return err
-}
-
-// Returns a buildpack with the provided name and stack.
-// If `buildpackStack` is not specified, and there are multiple buildpacks with the same name, it will return the one
-// with no stack, if present.
-func (actor Actor) GetBuildpackByNameAndStack(buildpackName string, buildpackStack string) (Buildpack, Warnings, error) {
-	var (
-		ccv3Buildpacks []ccv3.Buildpack
-		warnings       ccv3.Warnings
-		err            error
-	)
-
-	if buildpackStack == "" {
-		ccv3Buildpacks, warnings, err = actor.CloudControllerClient.GetBuildpacks(ccv3.Query{
-			Key:    ccv3.NameFilter,
-			Values: []string{buildpackName},
-		})
-	} else {
-		ccv3Buildpacks, warnings, err = actor.CloudControllerClient.GetBuildpacks(
-			ccv3.Query{
-				Key:    ccv3.NameFilter,
-				Values: []string{buildpackName},
-			},
-			ccv3.Query{
-				Key:    ccv3.StackFilter,
-				Values: []string{buildpackStack},
-			},
-		)
-	}
-
-	if err != nil {
-		return Buildpack{}, Warnings(warnings), err
-	}
-
-	if len(ccv3Buildpacks) == 0 {
-		return Buildpack{}, Warnings(warnings), actionerror.BuildpackNotFoundError{BuildpackName: buildpackName, StackName: buildpackStack}
-	}
-
-	if len(ccv3Buildpacks) > 1 {
-		for _, buildpack := range ccv3Buildpacks {
-			if buildpack.Stack == "" {
-				return Buildpack(buildpack), Warnings(warnings), nil
-			}
-		}
-		return Buildpack{}, Warnings(warnings), actionerror.MultipleBuildpacksFoundError{BuildpackName: buildpackName}
-	}
-
-	return Buildpack(ccv3Buildpacks[0]), Warnings(warnings), err
 }
 
 func (actor Actor) DeleteBuildpackByNameAndStack(buildpackName string, buildpackStack string) (Warnings, error) {

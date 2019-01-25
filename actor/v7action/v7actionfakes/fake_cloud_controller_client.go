@@ -733,6 +733,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateBuildpackStub        func(ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)
+	updateBuildpackMutex       sync.RWMutex
+	updateBuildpackArgsForCall []struct {
+		arg1 ccv3.Buildpack
+	}
+	updateBuildpackReturns struct {
+		result1 ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateBuildpackReturnsOnCall map[int]struct {
+		result1 ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateOrganizationDefaultIsolationSegmentRelationshipStub        func(string, string) (ccv3.Relationship, ccv3.Warnings, error)
 	updateOrganizationDefaultIsolationSegmentRelationshipMutex       sync.RWMutex
 	updateOrganizationDefaultIsolationSegmentRelationshipArgsForCall []struct {
@@ -4056,6 +4071,72 @@ func (fake *FakeCloudControllerClient) UpdateApplicationStopReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateBuildpack(arg1 ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error) {
+	fake.updateBuildpackMutex.Lock()
+	ret, specificReturn := fake.updateBuildpackReturnsOnCall[len(fake.updateBuildpackArgsForCall)]
+	fake.updateBuildpackArgsForCall = append(fake.updateBuildpackArgsForCall, struct {
+		arg1 ccv3.Buildpack
+	}{arg1})
+	fake.recordInvocation("UpdateBuildpack", []interface{}{arg1})
+	fake.updateBuildpackMutex.Unlock()
+	if fake.UpdateBuildpackStub != nil {
+		return fake.UpdateBuildpackStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateBuildpackReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateBuildpackCallCount() int {
+	fake.updateBuildpackMutex.RLock()
+	defer fake.updateBuildpackMutex.RUnlock()
+	return len(fake.updateBuildpackArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateBuildpackCalls(stub func(ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)) {
+	fake.updateBuildpackMutex.Lock()
+	defer fake.updateBuildpackMutex.Unlock()
+	fake.UpdateBuildpackStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateBuildpackArgsForCall(i int) ccv3.Buildpack {
+	fake.updateBuildpackMutex.RLock()
+	defer fake.updateBuildpackMutex.RUnlock()
+	argsForCall := fake.updateBuildpackArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) UpdateBuildpackReturns(result1 ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+	fake.updateBuildpackMutex.Lock()
+	defer fake.updateBuildpackMutex.Unlock()
+	fake.UpdateBuildpackStub = nil
+	fake.updateBuildpackReturns = struct {
+		result1 ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateBuildpackReturnsOnCall(i int, result1 ccv3.Buildpack, result2 ccv3.Warnings, result3 error) {
+	fake.updateBuildpackMutex.Lock()
+	defer fake.updateBuildpackMutex.Unlock()
+	fake.UpdateBuildpackStub = nil
+	if fake.updateBuildpackReturnsOnCall == nil {
+		fake.updateBuildpackReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Buildpack
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateBuildpackReturnsOnCall[i] = struct {
+		result1 ccv3.Buildpack
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateOrganizationDefaultIsolationSegmentRelationship(arg1 string, arg2 string) (ccv3.Relationship, ccv3.Warnings, error) {
 	fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.Lock()
 	ret, specificReturn := fake.updateOrganizationDefaultIsolationSegmentRelationshipReturnsOnCall[len(fake.updateOrganizationDefaultIsolationSegmentRelationshipArgsForCall)]
@@ -4633,6 +4714,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateApplicationStartMutex.RUnlock()
 	fake.updateApplicationStopMutex.RLock()
 	defer fake.updateApplicationStopMutex.RUnlock()
+	fake.updateBuildpackMutex.RLock()
+	defer fake.updateBuildpackMutex.RUnlock()
 	fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RLock()
 	defer fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RUnlock()
 	fake.updateProcessMutex.RLock()

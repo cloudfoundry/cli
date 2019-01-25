@@ -295,6 +295,85 @@ var _ = Describe("Buildpack", func() {
 		})
 	})
 
+	Describe("UpdateBuildpackByNameAndStack", func() {
+		var (
+			buildpackName  = "my-buidpack"
+			buildpackStack = "my-stack"
+			buildpack      = Buildpack{
+				Stack: "new-stack",
+			}
+
+			retBuildpack Buildpack
+			warnings     Warnings
+			executeErr   error
+		)
+
+		JustBeforeEach(func() {
+			retBuildpack, warnings, executeErr = actor.UpdateBuildpackByNameAndStack(buildpackName, buildpackStack, buildpack)
+		})
+
+		When("it is successful", func() {
+			var updatedBuildpack Buildpack
+			BeforeEach(func() {
+				foundBuildpack := ccv3.Buildpack{GUID: "a guid", Stack: ""}
+				updatedBuildpack = Buildpack{GUID: "a guid", Stack: "new-stack"}
+				fakeCloudControllerClient.GetBuildpacksReturns([]ccv3.Buildpack{foundBuildpack}, ccv3.Warnings{"warning-1"}, nil)
+				fakeCloudControllerClient.UpdateBuildpackReturns(ccv3.Buildpack(updatedBuildpack), ccv3.Warnings{"warning-2"}, nil)
+			})
+
+			It("returns the updated buildpack and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(retBuildpack).To(Equal(updatedBuildpack))
+
+				queries := fakeCloudControllerClient.GetBuildpacksArgsForCall(0)
+				Expect(queries).To(ConsistOf(
+					ccv3.Query{
+						Key:    ccv3.NameFilter,
+						Values: []string{buildpackName},
+					},
+					ccv3.Query{
+						Key:    ccv3.StackFilter,
+						Values: []string{buildpackStack},
+					},
+				))
+
+				paramBuildpack := fakeCloudControllerClient.UpdateBuildpackArgsForCall(0)
+				Expect(paramBuildpack).To(Equal(ccv3.Buildpack{
+					GUID:  "a guid",
+					Stack: "new-stack",
+				}))
+			})
+		})
+
+		When("The get fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetBuildpacksReturns([]ccv3.Buildpack{}, ccv3.Warnings{"warning-1"}, errors.New("whoops"))
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1"))
+				Expect(retBuildpack).To(Equal(Buildpack{}))
+			})
+		})
+
+		When("The update fails", func() {
+			BeforeEach(func() {
+				ccBuildpack := ccv3.Buildpack{GUID: "a guid", Stack: "old-stack"}
+				fakeCloudControllerClient.GetBuildpacksReturns([]ccv3.Buildpack{ccBuildpack}, ccv3.Warnings{"warning-1"}, nil)
+				fakeCloudControllerClient.UpdateBuildpackReturns(ccv3.Buildpack{}, ccv3.Warnings{"warning-2"}, errors.New("whoops"))
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(retBuildpack).To(Equal(Buildpack{}))
+			})
+		})
+
+	})
+
 	Describe("UploadBuildpack", func() {
 		var (
 			bpFile     io.Reader

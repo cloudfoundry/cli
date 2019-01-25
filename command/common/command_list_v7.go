@@ -14,7 +14,7 @@ var Commands commandList
 var FallbackCommands V2CommandList
 
 type V2CommandList struct {
-	V2App v6.AppCommand `command:"app" description:"Display health and status for an app"`
+	V2App v6.V3AppCommand `command:"app" description:"Display health and status for an app"`
 }
 
 type commandList struct {
@@ -192,7 +192,7 @@ type commandList struct {
 	UnsetSpaceRole                     v6.UnsetSpaceRoleCommand                     `command:"unset-space-role" description:"Remove a space role from a user"`
 	UnsharePrivateDomain               v6.UnsharePrivateDomainCommand               `command:"unshare-private-domain" description:"Unshare a private domain with an org"`
 	UnshareService                     v6.UnshareServiceCommand                     `command:"unshare-service" description:"Unshare a shared service instance from a space"`
-	UpdateBuildpack                    v6.UpdateBuildpackCommand                    `command:"update-buildpack" description:"Update a buildpack"`
+	UpdateBuildpack                    v7.UpdateBuildpackCommand                    `command:"update-buildpack" description:"Update a buildpack"`
 	UpdateQuota                        v6.UpdateQuotaCommand                        `command:"update-quota" description:"Update an existing resource quota"`
 	UpdateSecurityGroup                v6.UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`
 	UpdateServiceBroker                v6.UpdateServiceBrokerCommand                `command:"update-service-broker" description:"Update a service broker"`

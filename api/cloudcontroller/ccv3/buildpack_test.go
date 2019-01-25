@@ -493,6 +493,138 @@ var _ = Describe("Buildpacks", func() {
 		})
 	})
 
+	Describe("UpdateBuildpack", func() {
+		var (
+			inputBuildpack Buildpack
+
+			bp         Buildpack
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			bp, warnings, executeErr = client.UpdateBuildpack(inputBuildpack)
+		})
+
+		When("the buildpack is successfully created", func() {
+			BeforeEach(func() {
+				inputBuildpack = Buildpack{
+					Name:   "some-buildpack",
+					GUID:   "some-bp-guid",
+					Stack:  "some-stack",
+					Locked: types.NullBool{IsSet: true, Value: true},
+				}
+				response := `{
+    				"guid": "some-bp-guid",
+    				"created_at": "2016-03-18T23:26:46Z",
+    				"updated_at": "2016-10-17T20:00:42Z",
+    				"name": "some-buildpack",
+    				"state": "AWAITING_UPLOAD",
+    				"filename": null,
+    				"stack": "some-stack",
+    				"position": 42,
+    				"enabled": true,
+    				"locked": true,
+    				"links": {
+    				  "self": {
+    				    "href": "/v3/buildpacks/some-bp-guid"
+    				  },
+						"upload": {
+							"href": "/v3/buildpacks/some-bp-guid/upload",
+							"method": "POST"
+						}
+    				}
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name":   "some-buildpack",
+					"stack":  "some-stack",
+					"locked": true,
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/buildpacks/some-bp-guid"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the created buildpack and warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				expectedBuildpack := Buildpack{
+					GUID:     "some-bp-guid",
+					Name:     "some-buildpack",
+					Stack:    "some-stack",
+					Enabled:  types.NullBool{Value: true, IsSet: true},
+					Filename: "",
+					Locked:   types.NullBool{Value: true, IsSet: true},
+					State:    constant.BuildpackAwaitingUpload,
+					Position: types.NullInt{Value: 42, IsSet: true},
+					Links: APILinks{
+						"upload": APILink{
+							Method: "POST",
+							HREF:   "/v3/buildpacks/some-bp-guid/upload",
+						},
+						"self": APILink{
+							HREF: "/v3/buildpacks/some-bp-guid",
+						},
+					},
+				}
+				Expect(bp).To(Equal(expectedBuildpack))
+			})
+		})
+
+		When("cc returns back an error or warnings", func() {
+			BeforeEach(func() {
+				inputBuildpack = Buildpack{
+					GUID: "some-bp-guid",
+				}
+				response := ` {
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "Buildpack not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/buildpacks/some-bp-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Buildpack not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("DeleteBuildpacks", func() {
 		var (
 			buildpackGUID = "some-guid"
