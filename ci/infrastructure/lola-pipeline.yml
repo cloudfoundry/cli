@@ -62,6 +62,7 @@ jobs:
     - get: cf-deployment-concourse-tasks
     - get: state
     - put: gcp-bosh-pool
+      timeout: 2h
       params:
         claim: ((stack-name)).cli.fun
     - get: cli-ci
@@ -143,6 +144,7 @@ jobs:
     - get: cf-deployment-concourse-tasks
     - get: state
     - put: gcp-bosh-pool
+      timeout: 2h
       params:
         claim: ((stack-name)).cli.fun
   - task: delete-cf-deployment
@@ -165,6 +167,7 @@ jobs:
     - get: cf-deployment-concourse-tasks
     - get: state
     - put: gcp-bosh-pool
+      timeout: 2h
       params:
         claim: ((stack-name)).cli.fun
   - task: bosh-cleanup
