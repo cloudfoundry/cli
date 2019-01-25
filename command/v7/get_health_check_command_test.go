@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
@@ -67,7 +66,6 @@ var _ = Describe("get-health-check Command", func() {
 
 	When("checking target fails", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
@@ -85,7 +83,6 @@ var _ = Describe("get-health-check Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			expectedErr = errors.New("some current user error")
 			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 		})
@@ -99,7 +96,6 @@ var _ = Describe("get-health-check Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 			fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceReturns(nil, v7action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
@@ -116,7 +112,6 @@ var _ = Describe("get-health-check Command", func() {
 
 	When("app has no processes", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceReturns(
 				[]v7action.ProcessHealthCheck{},
 				v7action.Warnings{"warning-1", "warning-2"},
@@ -138,7 +133,6 @@ var _ = Describe("get-health-check Command", func() {
 
 	When("app has processes", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionApplicationFlowV3)
 			appProcessHealthChecks := []v7action.ProcessHealthCheck{
 				{ProcessType: constant.ProcessTypeWeb, HealthCheckType: constant.HTTP, Endpoint: "/foo", InvocationTimeout: 10},
 				{ProcessType: "queue", HealthCheckType: constant.Port, Endpoint: "", InvocationTimeout: 0},
