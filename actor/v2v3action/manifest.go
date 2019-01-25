@@ -3,8 +3,6 @@ package v2v3action
 import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/actor/versioncheck"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/util/manifest"
 )
 
@@ -25,22 +23,13 @@ func (actor *Actor) CreateApplicationManifestByNameAndSpace(appName string, appS
 		return manifest.Application{}, allWarnings, err
 	}
 
-	currentVersion := actor.V3Actor.CloudControllerAPIVersion()
-	minimumVersion := ccversion.MinVersionManifestBuildpacksV3
-
-	meetsV3Version, err := versioncheck.IsMinimumAPIVersionMet(currentVersion, minimumVersion)
-	if err != nil {
-		return manifest.Application{}, allWarnings, err
+	v3App, v3warnings, v3Err := actor.V3Actor.GetApplicationByNameAndSpace(appName, appSpace)
+	allWarnings = append(allWarnings, v3warnings...)
+	if v3Err != nil {
+		return manifest.Application{}, allWarnings, v3Err
 	}
-	if meetsV3Version {
-		v3App, v3warnings, v3Err := actor.V3Actor.GetApplicationByNameAndSpace(appName, appSpace)
-		allWarnings = append(allWarnings, v3warnings...)
-		if v3Err != nil {
-			return manifest.Application{}, allWarnings, v3Err
-		}
 
-		manifestApp.Buildpacks = v3App.LifecycleBuildpacks
-	}
+	manifestApp.Buildpacks = v3App.LifecycleBuildpacks
 
 	return manifestApp, allWarnings, err
 }

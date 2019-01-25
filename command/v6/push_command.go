@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2v3action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -116,12 +115,6 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd PushCommand) Execute(args []string) error {
-	if len(cmd.Buildpacks) > 1 {
-		if err := command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "Multiple option '-b'"); err != nil {
-			return err
-		}
-	}
-
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return err
@@ -151,14 +144,6 @@ func (cmd PushCommand) Execute(args []string) error {
 	if err != nil {
 		log.Errorln("merging manifest:", err)
 		return err
-	}
-
-	for _, manifestApplication := range manifestApplications {
-		if len(manifestApplication.Buildpacks) > 0 {
-			if err = command.MinimumCCAPIVersionCheck(cmd.Actor.CloudControllerV3APIVersion(), ccversion.MinVersionManifestBuildpacksV3, "'buildpacks' in manifest"); err != nil {
-				return err
-			}
-		}
 	}
 
 	cmd.UI.DisplayText("Getting app info...")

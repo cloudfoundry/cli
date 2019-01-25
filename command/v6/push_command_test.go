@@ -15,7 +15,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	v3constant "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -86,21 +85,6 @@ var _ = Describe("push Command", func() {
 			executeErr = cmd.Execute(nil)
 		})
 
-		When("the mutiple buildpacks are provided, and the API version is below the mutiple buildpacks minimum", func() {
-			BeforeEach(func() {
-				fakeActor.CloudControllerV3APIVersionReturns("3.1.0")
-				cmd.Buildpacks = []string{"some-buildpack", "some-other-buildpack"}
-			})
-
-			It("returns a MinimumAPIVersionNotMetError", func() {
-				Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-					Command:        "Multiple option '-b'",
-					CurrentVersion: "3.1.0",
-					MinimumVersion: ccversion.MinVersionManifestBuildpacksV3,
-				}))
-			})
-		})
-
 		When("checking target fails", func() {
 			BeforeEach(func() {
 				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
@@ -136,30 +120,6 @@ var _ = Describe("push Command", func() {
 						},
 					}
 					fakeActor.MergeAndValidateSettingsAndManifestsReturns(appManifests, nil)
-				})
-
-				When("buildpacks (plural) is provided in the manifest and the API version is below the minimum", func() {
-					BeforeEach(func() {
-						appManifests = []manifest.Application{
-							{
-								Name:       appName,
-								Path:       pwd,
-								Buildpacks: []string{"ruby-buildpack", "java-buildpack"},
-							},
-						}
-
-						fakeActor.MergeAndValidateSettingsAndManifestsReturns(appManifests, nil)
-						fakeActor.CloudControllerV3APIVersionReturns("3.13.0")
-					})
-
-					It("returns a MinimumAPIVersionNotMetError", func() {
-						Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-							Command:        "'buildpacks' in manifest",
-							CurrentVersion: "3.13.0",
-							MinimumVersion: ccversion.MinVersionManifestBuildpacksV3,
-						}))
-					})
-
 				})
 
 				When("the settings can be converted to a valid config", func() {

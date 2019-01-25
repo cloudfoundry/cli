@@ -65,10 +65,6 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 
 		When("multiple instances of buildpack are provided", func() {
-			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
-			})
-
 			When("the buildpacks do not use the default stack", func() {
 				var (
 					buildpacks      []string
@@ -229,10 +225,6 @@ var _ = Describe("push with different buildpack values", func() {
 
 	When("buildpacks (plural) is provided via manifest", func() {
 		When("mutiple buildpacks are specified", func() {
-			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
-			})
-
 			It("sets all buildpacks correctly for the pushed app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -259,10 +251,6 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 
 		When("only one buildpack is specified", func() {
-			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
-			})
-
 			It("sets only one buildpack for the pushed app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -288,10 +276,6 @@ var _ = Describe("push with different buildpack values", func() {
 		})
 
 		When("empty list of buildpacks is specified", func() {
-			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
-			})
-
 			It("autodetects the buildpack", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-b", "staticfile_buildpack", "--no-start")
@@ -360,7 +344,6 @@ var _ = Describe("push with different buildpack values", func() {
 
 	When("both buildpacks and docker are provided via manfest", func() {
 		It("returns an error", func() {
-			helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
 					"applications": []map[string]interface{}{
@@ -385,7 +368,6 @@ var _ = Describe("push with different buildpack values", func() {
 
 	When("both buildpacks and docker are provided via flags", func() {
 		It("returns an error", func() {
-			helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
 					PushCommandName, appName, "-o", PublicDockerImage, "-b", "ruby_buildpack", "-b", "staticfile_buildpack",
@@ -434,7 +416,6 @@ var _ = Describe("push with different buildpack values", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {
-			helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			f, err := ioutil.TempFile("", "INT-push-buildpack-droplet-")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(f.Close()).ToNot(HaveOccurred())
@@ -497,7 +478,6 @@ var _ = Describe("push with different buildpack values", func() {
 		var tempDroplet string
 
 		BeforeEach(func() {
-			helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
 			f, err := ioutil.TempFile("", "INT-push-buildpack-droplet-")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(f.Close()).ToNot(HaveOccurred())

@@ -384,8 +384,6 @@ var _ = Describe("create-app-manifest command", func() {
 
 		When("the app has multiple buildpacks", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionManifestBuildpacksV3)
-
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start", "-b", "ruby_buildpack", "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
