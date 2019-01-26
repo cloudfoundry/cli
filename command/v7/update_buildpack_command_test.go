@@ -335,6 +335,47 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 						Expect(testUI.Out).To(Say("OK"))
 					})
 				})
+
+			})
+
+			When("the --rename flag is provided", func() {
+				BeforeEach(func() {
+					cmd.NewName = "new-buildpack-name"
+				})
+
+				It("sets the new name on the buildpack", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					_, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+					Expect(buildpack.Name).To(Equal("new-buildpack-name"))
+
+					Expect(testUI.Out).ToNot(Say("Updating buildpack %s", buildpackName))
+					Expect(testUI.Out).To(Say(
+						"Renaming buildpack %s to %s as %s...", buildpackName, cmd.NewName, userName))
+					Expect(testUI.Out).To(Say("OK"))
+				})
+
+				Context("and the --assign-stack flag is provided", func() {
+					BeforeEach(func() {
+						cmd.NewStack = "new-stack"
+					})
+
+					It("sets the new name/stack on the buildpack and refers to the new name going forward", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						_, _, buildpack := fakeActor.UpdateBuildpackByNameAndStackArgsForCall(0)
+						Expect(buildpack.Name).To(Equal("new-buildpack-name"))
+						Expect(buildpack.Stack).To(Equal("new-stack"))
+
+						Expect(testUI.Out).To(Say(
+							"Renaming buildpack %s to %s as %s...", buildpackName, cmd.NewName, userName))
+
+						Expect(testUI.Out).To(Say(
+							"Assigning stack %s to %s as %s", cmd.NewStack, cmd.NewName, userName))
+
+						Expect(testUI.Out).ToNot(Say("Updating buildpack %s", buildpackName))
+
+						Expect(testUI.Out).To(Say("OK"))
+					})
+				})
 			})
 
 			When("updating the buildpack succeeds", func() {

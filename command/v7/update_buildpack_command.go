@@ -37,6 +37,7 @@ type UpdateBuildpackCommand struct {
 	Position        types.NullInt                    `long:"position" short:"i" description:"The order in which the buildpacks are checked during buildpack auto-detection"`
 	CurrentStack    string                           `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 	Unlock          bool                             `long:"unlock" description:"Unlock the buildpack to enable updates"`
+	NewName         string                           `long:"rename" description:"Rename an existing buildpack"`
 
 	UI          command.UI
 	Config      command.Config
@@ -129,6 +130,10 @@ func (cmd UpdateBuildpackCommand) updateBuildpack() (v7action.Buildpack, error) 
 		desiredBuildpack.Stack = cmd.NewStack
 	}
 
+	if cmd.NewName != "" {
+		desiredBuildpack.Name = cmd.NewName
+	}
+
 	updatedBuildpack, warnings, err := cmd.Actor.UpdateBuildpackByNameAndStack(
 		cmd.RequiredArgs.Buildpack,
 		cmd.CurrentStack,
@@ -175,27 +180,39 @@ func (cmd UpdateBuildpackCommand) uploadBits(user configv3.User, updatedBuildpac
 }
 
 func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
+	var originalBuildpackName = cmd.RequiredArgs.Buildpack
+	var buildpackName = originalBuildpackName
+
+	if cmd.NewName != "" {
+		buildpackName = cmd.NewName
+		cmd.UI.DisplayTextWithFlavor("Renaming buildpack {{.Buildpack}} to {{.DesiredBuildpackName}} as {{.CurrentUser}}...", map[string]interface{}{
+			"Buildpack":            originalBuildpackName,
+			"CurrentUser":          userName,
+			"DesiredBuildpackName": cmd.NewName,
+		})
+	}
+
 	if cmd.NewStack != "" {
 		cmd.UI.DisplayTextWithFlavor("Assigning stack {{.Stack}} to {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
-			"Buildpack":   cmd.RequiredArgs.Buildpack,
+			"Buildpack":   buildpackName,
 			"CurrentUser": userName,
 			"Stack":       cmd.NewStack,
 		})
 		if cmd.Position.IsSet || cmd.Lock || cmd.Unlock || cmd.Enable || cmd.Disable {
 			cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
-				"Buildpack":   cmd.RequiredArgs.Buildpack,
+				"Buildpack":   buildpackName,
 				"CurrentUser": userName,
 				"Stack":       cmd.NewStack,
 			})
 		}
 	} else if cmd.CurrentStack == "" {
 		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
-			"Buildpack":   cmd.RequiredArgs.Buildpack,
+			"Buildpack":   buildpackName,
 			"CurrentUser": userName,
 		})
 	} else {
 		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
-			"Buildpack":   cmd.RequiredArgs.Buildpack,
+			"Buildpack":   buildpackName,
 			"CurrentUser": userName,
 			"Stack":       cmd.CurrentStack,
 		})

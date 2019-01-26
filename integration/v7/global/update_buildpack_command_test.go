@@ -47,6 +47,7 @@ var _ = Describe("update-buildpack command", func() {
 			Eventually(session).Should(Say(`--position, -i\s+The order in which the buildpacks are checked during buildpack auto-detection`))
 			Eventually(session).Should(Say(`--stack, -s\s+Specify stack to disambiguate buildpacks with the same name`))
 			Eventually(session).Should(Say(`--unlock\s+Unlock the buildpack to enable updates`))
+			Eventually(session).Should(Say(`--rename\s+Rename an existing buildpack`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("buildpacks, create-buildpack, delete-buildpack"))
 			Eventually(session).Should(Exit(0))
@@ -534,6 +535,50 @@ var _ = Describe("update-buildpack command", func() {
 						session = helpers.CF("buildpacks")
 						Eventually(session).Should(Say(`%s\s+false`, buildpackName))
 						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("the --rename flag is provided", func() {
+					var (
+						newBuildpackName string
+					)
+
+					BeforeEach(func() {
+						newBuildpackName = helpers.NewBuildpackName()
+					})
+
+					When("a buildpack with the new name does not already exist", func() {
+						It("renames the buildpack", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--rename", newBuildpackName)
+							Eventually(session).Should(Say("Renaming buildpack %s to %s as %s...", buildpackName, newBuildpackName, username))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							session = helpers.CF("buildpacks")
+							Eventually(session).Should(Say(`%s`, newBuildpackName))
+							Eventually(session).ShouldNot(Say(`%s`, buildpackName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					When("a buildpack with the new name already exists", func() {
+						BeforeEach(func() {
+							helpers.BuildpackWithoutStack(func(buildpackArchive string) {
+								createSession := helpers.CF("create-buildpack", newBuildpackName, buildpackArchive, "99")
+								Eventually(createSession).Should(Exit(0))
+							})
+
+							listSession := helpers.CF("buildpacks")
+							Eventually(listSession).Should(Say(helpers.BuildpacksOutputRegex(helpers.BuildpackFields{Name: newBuildpackName})))
+							Eventually(listSession).Should(Exit(0))
+						})
+
+						It("fails to rename the buildpack", func() {
+							session := helpers.CF("update-buildpack", buildpackName, "--rename", newBuildpackName)
+							Eventually(session.Err).Should(Say("The buildpack name '%s' with an unassigned stack is already in use", newBuildpackName))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
 					})
 				})
 			})
