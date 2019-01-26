@@ -11,7 +11,6 @@ import (
 //go:generate counterfeiter . V3StartActor
 
 type V3StartActor interface {
-	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
 }
