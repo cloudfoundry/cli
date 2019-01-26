@@ -12,11 +12,16 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
-    ignore_paths: &ciPaths
+    ignore_paths:
     - bin
     - ci
     - README.md
     - .github
+    - prevent_extra_args_v7.go
+    - actor/v7action
+    - actor/v7pushaction
+    - command/v7
+    - integration/v7
 
 - name: cli-i18n
   type: git
@@ -29,7 +34,9 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
-    paths: *ciPaths
+    paths:
+    - bin
+    - ci
 
 - name: cf-acceptance-tests
   type: git
@@ -326,7 +333,7 @@ jobs:
         text: |
           build OS X binaries failed :(
           $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-  - task: combine-binaries	
+  - task: combine-binaries
     file: cli-ci/ci/cli/tasks/combine-binaries.yml
   - put: cf-cli-binaries
     params:
