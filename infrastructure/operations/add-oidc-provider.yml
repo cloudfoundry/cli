@@ -97,7 +97,7 @@
       domain: bosh
 
 - type: replace
-  path: /instance_groups/name=database/jobs/name=mysql/properties/cf_mysql/mysql/seeded_databases?/-
+  path: /instance_groups/name=database/jobs/name=pxc-mysql/properties/seeded_databases?/-
   value:
     name: uaa_oidc
     username: uaa-oidc
