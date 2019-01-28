@@ -172,10 +172,6 @@ var _ = Describe("bind-service command", func() {
 				})
 
 				When("the --binding-name flag is provided and the value is a non-empty string", func() {
-					BeforeEach(func() {
-						helpers.SkipIfVersionLessThan(ccversion.MinVersionProvideNameForServiceBindingV2)
-					})
-
 					It("binds the service to the app, displays OK and TIP", func() {
 						session := helpers.CF("bind-service", appName, serviceInstance, "--binding-name", "i-am-a-binding")
 						Eventually(session.Out).Should(Say("Binding service %s to app %s with binding name %s in org %s / space %s as %s...", serviceInstance, appName, "i-am-a-binding", org, space, username))

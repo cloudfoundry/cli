@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
@@ -49,14 +48,6 @@ func (cmd *BindServiceCommand) Setup(config command.Config, ui command.UI) error
 func (cmd BindServiceCommand) Execute(args []string) error {
 	template := "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
 	if cmd.BindingName.Value != "" {
-		err := command.MinimumCCAPIVersionCheck(
-			cmd.Actor.CloudControllerAPIVersion(),
-			ccversion.MinVersionProvideNameForServiceBindingV2,
-			"Option '--name'")
-		if err != nil {
-			return err
-		}
-
 		template = "Binding service {{.ServiceName}} to app {{.AppName}} with binding name {{.BindingName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
 	}
 
