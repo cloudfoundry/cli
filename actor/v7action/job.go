@@ -14,10 +14,14 @@ func (actor Actor) PollUploadBuildpackJob(jobURL ccv3.JobURL) (Warnings, error) 
 			switch v.Code {
 			case 290000:
 				return Warnings(warnings), ccerror.BuildpackAlreadyExistsForStackError{Message: v.Detail}
-			case 290001:
-				return Warnings(warnings), ccerror.BuildpackNameTakenError{Message: v.Detail}
 			case 290003:
 				return Warnings(warnings), ccerror.BuildpackAlreadyExistsWithoutStackError{Message: v.Detail}
+			case 390011:
+				return Warnings(warnings), ccerror.BuildpackStacksDontMatchError{Message: v.Detail}
+			case 390012:
+				return Warnings(warnings), ccerror.BuildpackStackDoesNotExistError{Message: v.Detail}
+			case 390013:
+				return Warnings(warnings), ccerror.BuildpackZipInvalidError{Message: v.Detail}
 			}
 		}
 	}
