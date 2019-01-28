@@ -157,7 +157,6 @@ var _ = Describe("service command", func() {
 						)
 
 						BeforeEach(func() {
-							helpers.SkipIfVersionLessThan(ccversion.MinVersionBindingNameV2)
 							bindingName1 = helpers.PrefixedRandomName("BINDING-NAME")
 							bindingName2 = helpers.PrefixedRandomName("BINDING-NAME")
 							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
@@ -360,7 +359,6 @@ var _ = Describe("service command", func() {
 						)
 
 						BeforeEach(func() {
-							helpers.SkipIfVersionLessThan(ccversion.MinVersionBindingNameV2)
 							bindingName1 = helpers.PrefixedRandomName("BINDING-NAME")
 							bindingName2 = helpers.PrefixedRandomName("BINDING-NAME")
 							Eventually(helpers.CF("bind-service", appName1, serviceInstanceName, "--binding-name", bindingName1)).Should(Exit(0))
