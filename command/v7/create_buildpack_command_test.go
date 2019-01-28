@@ -29,6 +29,8 @@ var _ = Describe("create buildpack Command", func() {
 		executeErr      error
 		args            []string
 		binaryName      string
+		buildpackName   string
+		buildpackPath   string
 	)
 
 	BeforeEach(func() {
@@ -37,13 +39,19 @@ var _ = Describe("create buildpack Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v7fakes.FakeCreateBuildpackActor)
 		args = nil
+		buildpackName = "some-buildpack"
+		buildpackPath = "/path/to/buildpack.zip"
 
 		cmd = CreateBuildpackCommand{
-			RequiredArgs: flag.CreateBuildpackArgs{Buildpack: "some-buildpack", Path: "/path/to/buildpack.zip", Position: 7},
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
+			RequiredArgs: flag.CreateBuildpackArgs{
+				Buildpack: buildpackName,
+				Path:      flag.PathWithExistenceCheckOrURL(buildpackPath),
+				Position:  7,
+			},
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
 		binaryName = "faceman"
@@ -76,7 +84,7 @@ var _ = Describe("create buildpack Command", func() {
 
 		It("should print text indicating it is creating a buildpack", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(testUI.Out).To(Say(`Creating buildpack some-buildpack as the-user\.\.\.`))
+			Expect(testUI.Out).To(Say(`Creating buildpack %s as the-user\.\.\.`, buildpackName))
 		})
 
 		When("preparing the buildpack bits fails", func() {
@@ -114,7 +122,7 @@ var _ = Describe("create buildpack Command", func() {
 				BeforeEach(func() {
 					cmd.Disable = true
 					buildpack := v7action.Buildpack{
-						Name:    "buildpack-1",
+						Name:    buildpackName,
 						Enabled: types.NullBool{Value: false, IsSet: true},
 					}
 					fakeActor.CreateBuildpackReturns(buildpack, v7action.Warnings{"some-create-warning-1"}, nil)
@@ -122,7 +130,7 @@ var _ = Describe("create buildpack Command", func() {
 
 				It("correctly creates a disabled buildpack", func() {
 					buildpack := fakeActor.CreateBuildpackArgsForCall(0)
-					Expect(buildpack.Name).To(Equal("some-buildpack"))
+					Expect(buildpack.Name).To(Equal(buildpackName))
 					Expect(buildpack.Enabled.Value).To(BeFalse())
 				})
 			})
@@ -130,7 +138,7 @@ var _ = Describe("create buildpack Command", func() {
 			When("creating buildpack succeeds", func() {
 				BeforeEach(func() {
 					buildpack := v7action.Buildpack{
-						Name:     "buildpack-1",
+						Name:     buildpackName,
 						Position: types.NullInt{Value: 1, IsSet: true},
 						Enabled:  types.NullBool{Value: true, IsSet: true},
 						Locked:   types.NullBool{Value: false, IsSet: true},
@@ -143,7 +151,7 @@ var _ = Describe("create buildpack Command", func() {
 
 				It("correctly created the buildpack", func() {
 					buildpack := fakeActor.CreateBuildpackArgsForCall(0)
-					Expect(buildpack.Name).To(Equal("some-buildpack"))
+					Expect(buildpack.Name).To(Equal(buildpackName))
 					Expect(buildpack.Position.Value).To(Equal(7))
 				})
 
@@ -151,16 +159,16 @@ var _ = Describe("create buildpack Command", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Out).To(Say("OK"))
 					Expect(testUI.Err).To(Say("some-create-warning-1"))
-					Expect(testUI.Out).To(Say(`Uploading buildpack some-buildpack as the-user\.\.\.`))
+					Expect(testUI.Out).To(Say(`Uploading buildpack %s as the-user\.\.\.`, buildpackName))
 				})
 
 				It("Displays it is starting the upload", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("Uploading buildpack some-buildpack as the-user"))
+					Expect(testUI.Out).To(Say("Uploading buildpack %s as the-user", buildpackName))
 
 					Expect(fakeActor.PrepareBuildpackBitsCallCount()).To(Equal(1))
 					path, _, _ := fakeActor.PrepareBuildpackBitsArgsForCall(0)
-					Expect(path).To(Equal("/path/to/buildpack.zip"))
+					Expect(path).To(Equal(buildpackPath))
 				})
 
 				When("Uploading the buildpack fails due to an error", func() {
@@ -194,7 +202,7 @@ var _ = Describe("create buildpack Command", func() {
 
 					It("prints all warnings", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(testUI.Out).To(Say("Uploading buildpack some-buildpack"))
+						Expect(testUI.Out).To(Say("Uploading buildpack %s", buildpackName))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Err).To(Say("some-upload-warning-1"))
 
@@ -204,10 +212,10 @@ var _ = Describe("create buildpack Command", func() {
 						Expect(path).To(Equal("buildpack.zip"))
 					})
 
-					Describe("polling the upload job", func() {
+					Describe("polling the upload-to-blobstore job", func() {
 						It("polls for job completion/failure", func() {
 							Expect(executeErr).NotTo(HaveOccurred())
-							Expect(testUI.Out).To(Say("Uploading buildpack some-buildpack"))
+							Expect(testUI.Out).To(Say("Uploading buildpack %s", buildpackName))
 							Expect(testUI.Out).To(Say("OK"))
 
 							Expect(fakeActor.PollUploadBuildpackJobCallCount()).To(Equal(1))
@@ -216,14 +224,14 @@ var _ = Describe("create buildpack Command", func() {
 							Expect(url).To(Equal(ccv3.JobURL("http://example.com/some-job-url")))
 						})
 
-						When("polling the upload job returns completed", func() {
+						When("the job completes successfully", func() {
 							BeforeEach(func() {
 								fakeActor.PollUploadBuildpackJobReturns(v7action.Warnings{"poll-warning"}, nil)
 							})
 
 							It("prints all warnings and exits successfully", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
-								Expect(testUI.Out).To(Say(`Processing uploaded buildpack %s\.\.\.`, "some-buildpack"))
+								Expect(testUI.Out).To(Say(`Processing uploaded buildpack %s\.\.\.`, buildpackName))
 								Expect(testUI.Out).To(Say("OK"))
 								Expect(testUI.Err).To(Say("poll-warning"))
 							})
