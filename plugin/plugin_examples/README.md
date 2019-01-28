@@ -180,3 +180,5 @@ To remove a plugin, run:
 - Due to architectural limitations, calling CLI core commands is not concurrency-safe. The correct execution of concurrent commands is not guaranteed. An architecture restructuring is in the works to fix this in the near future.
 
 - Due to our legacy code, the plugin architecture does not currently work with newer CLI features. See a more verbose explanation [here](https://github.com/cloudfoundry/cli/issues/1399#issuecomment-409061226).
+
+- Due to our legacy code, when you `CF_TRACE=true`, the refresh_token in the request body is not sanitized.
