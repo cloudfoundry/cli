@@ -128,13 +128,13 @@ var _ = Describe("rename buildpack command", func() {
 
 			When("the version of CC API is less than minimum version", func() {
 				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV2ClientVersion)
+					fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV2ClientVersion)
 				})
 
 				It("should warn the user that the version of CAPI is too low and exit with an error", func() {
 					Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 						Command:        "Option '-s'",
-						CurrentVersion: fakeActor.CloudControllerAPIVersion(),
+						CurrentVersion: ccversion.MinSupportedV2ClientVersion,
 						MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
 					}))
 				})

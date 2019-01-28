@@ -250,7 +250,7 @@ var _ = Describe("delete-buildpack command", func() {
 			var server *Server
 
 			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithAPIVersions(ccversion.MinV2ClientVersion, ccversion.MinSupportedV3ClientVersion)
+				server = helpers.StartAndTargetServerWithAPIVersions(ccversion.MinSupportedV2ClientVersion, ccversion.MinSupportedV3ClientVersion)
 			})
 
 			AfterEach(func() {
@@ -260,7 +260,7 @@ var _ = Describe("delete-buildpack command", func() {
 			It("fails with no networking api error message", func() {
 				session := helpers.CF("delete-buildpack", "potato", "-s", "ahoyhoy")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Option '-s' requires CF API version %s or higher. Your target is %s.", ccversion.MinVersionBuildpackStackAssociationV2, ccversion.MinV2ClientVersion))
+				Eventually(session.Err).Should(Say("Option '-s' requires CF API version %s or higher. Your target is %s.", ccversion.MinVersionBuildpackStackAssociationV2, ccversion.MinSupportedV2ClientVersion))
 				Eventually(session).Should(Exit(1))
 			})
 		})

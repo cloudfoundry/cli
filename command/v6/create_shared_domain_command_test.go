@@ -157,13 +157,13 @@ var _ = Describe("CreateSharedDomainCommand", func() {
 			When("the version is less than the minimum version", func() {
 				When("using the V2 API", func() {
 					BeforeEach(func() {
-						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV2ClientVersion)
+						fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV2ClientVersion)
 					})
 
 					It("returns an error", func() {
 						Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 							Command:        "Option '--internal'",
-							CurrentVersion: ccversion.MinV2ClientVersion,
+							CurrentVersion: ccversion.MinSupportedV2ClientVersion,
 							MinimumVersion: ccversion.MinVersionInternalDomainV2,
 						}))
 					})

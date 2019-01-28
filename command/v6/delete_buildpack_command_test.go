@@ -51,13 +51,13 @@ var _ = Describe("DeleteBuildpackCommand", func() {
 
 		When("the api version is below minimum for stack association", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV2ClientVersion)
+				fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV2ClientVersion)
 			})
 
 			It("returns a version error", func() {
 				Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 					Command:        "Option '-s'",
-					CurrentVersion: ccversion.MinV2ClientVersion,
+					CurrentVersion: ccversion.MinSupportedV2ClientVersion,
 					MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
 				}))
 			})

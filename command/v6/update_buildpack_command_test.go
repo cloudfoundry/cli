@@ -383,13 +383,13 @@ var _ = Describe("UpdateBuildpackCommand", func() {
 
 					When("The API does not support stack associations", func() {
 						BeforeEach(func() {
-							fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV2ClientVersion)
+							fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV2ClientVersion)
 						})
 
 						It("returns an error about not supporting the stack association flag", func() {
 							Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
 								Command:        "Option '-s'",
-								CurrentVersion: ccversion.MinV2ClientVersion,
+								CurrentVersion: ccversion.MinSupportedV2ClientVersion,
 								MinimumVersion: ccversion.MinVersionBuildpackStackAssociationV2,
 							}))
 						})

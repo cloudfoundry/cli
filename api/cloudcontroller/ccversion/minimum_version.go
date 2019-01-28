@@ -1,7 +1,7 @@
 package ccversion
 
 const (
-	MinV2ClientVersion          = "2.69.0"
+	MinSupportedV2ClientVersion = "2.100.0"
 	MinSupportedV3ClientVersion = "3.35.0"
 
 	MinVersionAsyncBindingsV2             = "2.120.0"
