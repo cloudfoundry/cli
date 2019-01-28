@@ -95,7 +95,7 @@ resources:
     source:
       uri: git@github.com:cloudfoundry/cf-deployment.git
       private_key: ((bosh-lite-pools-github-private-key))
-      tag_filter: v6.*
+      tag_filter: v7.*
   - name: cf-deploy
     type: bosh-deployment
     source:
