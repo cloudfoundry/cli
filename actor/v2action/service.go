@@ -14,7 +14,7 @@ func (actor Actor) GetService(serviceGUID string) (Service, Warnings, error) {
 	return Service(service), Warnings(warnings), err
 }
 
-// GetServicesByNameAndBrokerName returns services based on the name provided.
+// GetServicesByNameAndBrokerName returns services based on the name and broker provided.
 // If there are no services, a ServiceNotFoundError will be returned.
 func (actor Actor) GetServiceByNameAndBrokerName(serviceName, serviceBrokerName string) (Service, Warnings, error) {
 	filters := []ccv2.Filter{ccv2.Filter{

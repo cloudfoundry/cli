@@ -12,14 +12,15 @@ import (
 //go:generate counterfeiter . DisableServiceAccessActor
 
 type DisableServiceAccessActor interface {
-	DisablePlanForOrg(serviceName, servicePlanName, orgName string) (v2action.Warnings, error)
-	DisableServiceForOrg(serviceName, orgName string) (v2action.Warnings, error)
-	DisablePlanForAllOrgs(serviceName, servicePlanName string) (v2action.Warnings, error)
-	DisableServiceForAllOrgs(serviceName string) (v2action.Warnings, error)
+	DisablePlanForOrg(serviceName, servicePlanName, orgName, brokerName string) (v2action.Warnings, error)
+	DisableServiceForOrg(serviceName, orgName, brokerName string) (v2action.Warnings, error)
+	DisablePlanForAllOrgs(serviceName, servicePlanName, brokerName string) (v2action.Warnings, error)
+	DisableServiceForAllOrgs(serviceName, brokerName string) (v2action.Warnings, error)
 }
 
 type DisableServiceAccessCommand struct {
 	RequiredArgs    flag.Service `positional-args:"yes"`
+	ServiceBroker   string       `short:"b" hidden:"true" description:"[Experimental] Disable access to a service from a specific service broker"`
 	Organization    string       `short:"o" description:"Disable access for a specified organization"`
 	ServicePlan     string       `short:"p" description:"Disable access to a specified service plan"`
 	usage           interface{}  `usage:"CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]"`
@@ -66,40 +67,26 @@ func (cmd DisableServiceAccessCommand) Execute(args []string) error {
 	serviceName := cmd.RequiredArgs.Service
 	servicePlanName := cmd.ServicePlan
 	orgName := cmd.Organization
+	serviceBrokerName := cmd.ServiceBroker
 	var warnings v2action.Warnings
 
+	cmd.UI.DisplayTextWithFlavor(disableMessages[disableServiceAccessOptions{servicePlanName != "", orgName != "", serviceBrokerName != ""}],
+		map[string]interface{}{
+			"ServicePlan":   servicePlanName,
+			"Service":       serviceName,
+			"ServiceBroker": serviceBrokerName,
+			"Organization":  orgName,
+			"User":          user.Name,
+		})
+
 	if servicePlanName != "" && orgName != "" {
-		cmd.UI.DisplayTextWithFlavor("Disabling access to plan {{.ServicePlan}} of service {{.Service}} for org {{.Organization}} as {{.User}}...",
-			map[string]interface{}{
-				"ServicePlan":  servicePlanName,
-				"Service":      serviceName,
-				"Organization": orgName,
-				"User":         user.Name,
-			})
-		warnings, err = cmd.Actor.DisablePlanForOrg(serviceName, servicePlanName, orgName)
+		warnings, err = cmd.Actor.DisablePlanForOrg(serviceName, servicePlanName, orgName, serviceBrokerName)
 	} else if orgName != "" {
-		cmd.UI.DisplayTextWithFlavor("Disabling access to all plans of service {{.Service}} for the org {{.Organization}} as {{.User}}...",
-			map[string]interface{}{
-				"Service":      serviceName,
-				"Organization": orgName,
-				"User":         user.Name,
-			})
-		warnings, err = cmd.Actor.DisableServiceForOrg(serviceName, orgName)
+		warnings, err = cmd.Actor.DisableServiceForOrg(serviceName, orgName, serviceBrokerName)
 	} else if servicePlanName != "" {
-		cmd.UI.DisplayTextWithFlavor("Disabling access of plan {{.ServicePlan}} for service {{.Service}} as {{.User}}...",
-			map[string]interface{}{
-				"ServicePlan": servicePlanName,
-				"Service":     serviceName,
-				"User":        user.Name,
-			})
-		warnings, err = cmd.Actor.DisablePlanForAllOrgs(serviceName, servicePlanName)
+		warnings, err = cmd.Actor.DisablePlanForAllOrgs(serviceName, servicePlanName, serviceBrokerName)
 	} else {
-		cmd.UI.DisplayTextWithFlavor("Disabling access to all plans of service {{.Service}} for all orgs as {{.User}}...",
-			map[string]interface{}{
-				"Service": serviceName,
-				"User":    user.Name,
-			})
-		warnings, err = cmd.Actor.DisableServiceForAllOrgs(serviceName)
+		warnings, err = cmd.Actor.DisableServiceForAllOrgs(serviceName, serviceBrokerName)
 	}
 
 	cmd.UI.DisplayWarnings(warnings)
@@ -110,4 +97,21 @@ func (cmd DisableServiceAccessCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	return nil
+}
+
+type disableServiceAccessOptions struct {
+	Plan   bool
+	Org    bool
+	Broker bool
+}
+
+var disableMessages = map[disableServiceAccessOptions]string{
+	{Plan: true, Org: true, Broker: false}:   "Disabling access to plan {{.ServicePlan}} of service {{.Service}} for org {{.Organization}} as {{.User}}...",
+	{Plan: false, Org: true, Broker: false}:  "Disabling access to all plans of service {{.Service}} for the org {{.Organization}} as {{.User}}...",
+	{Plan: true, Org: false, Broker: false}:  "Disabling access of plan {{.ServicePlan}} for service {{.Service}} as {{.User}}...",
+	{Plan: false, Org: false, Broker: false}: "Disabling access to all plans of service {{.Service}} for all orgs as {{.User}}...",
+	{Plan: true, Org: true, Broker: true}:    "Disabling access to plan {{.ServicePlan}} of service {{.Service}} from broker {{.ServiceBroker}} for org {{.Organization}} as {{.User}}...",
+	{Plan: false, Org: true, Broker: true}:   "Disabling access to all plans of service {{.Service}} from broker {{.ServiceBroker}} for the org {{.Organization}} as {{.User}}...",
+	{Plan: true, Org: false, Broker: true}:   "Disabling access to plan {{.ServicePlan}} of service {{.Service}} from broker {{.ServiceBroker}} for all orgs as {{.User}}...",
+	{Plan: false, Org: false, Broker: true}:  "Disabling access to all plans of service {{.Service}} from broker {{.ServiceBroker}} for all orgs as {{.User}}...",
 }
