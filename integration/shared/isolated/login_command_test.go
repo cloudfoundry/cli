@@ -3,6 +3,7 @@ package isolated
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 	"runtime"
 
@@ -197,6 +198,29 @@ var _ = Describe("login command", func() {
 						Eventually(apiSession).Should(Say("api endpoint:   %s", apiURL))
 					})
 				})
+			})
+		})
+	})
+
+	Describe("SSL Validation", func() {
+		When("the API endpoint's scheme is http", func() {
+			var httpURL string
+
+			BeforeEach(func() {
+				apiURL, err := url.Parse(helpers.GetAPI())
+				Expect(err).NotTo(HaveOccurred())
+				apiURL.Scheme = "http"
+
+				httpURL = apiURL.String()
+			})
+
+			It("shows a warning to the user", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", httpURL, "--skip-ssl-validation")
+
+				Eventually(session).Should(Say("API endpoint: %s", httpURL))
+				Eventually(session).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
