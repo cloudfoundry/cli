@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"regexp"
 	"runtime"
-	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
