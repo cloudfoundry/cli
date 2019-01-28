@@ -1,15 +1,15 @@
 package push
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 var _ = Describe("pushing a docker image", func() {
@@ -50,7 +50,6 @@ var _ = Describe("pushing a docker image", func() {
 
 		Describe("private docker image with a username", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionDockerCredentialsV2)
 				privateDockerImage, privateDockerUsername, privateDockerPassword = helpers.SkipIfPrivateDockerInfoNotSet()
 			})
 
@@ -178,7 +177,6 @@ var _ = Describe("pushing a docker image", func() {
 
 		When("user is provided in the manifest", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionDockerCredentialsV2)
 				privateDockerImage, privateDockerUsername, privateDockerPassword = helpers.SkipIfPrivateDockerInfoNotSet()
 
 				appManifest = map[string]interface{}{
@@ -232,7 +230,6 @@ var _ = Describe("pushing a docker image", func() {
 
 		When("the image and username are provided by both manifest and command line", func() {
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionDockerCredentialsV2)
 				privateDockerImage, privateDockerUsername, privateDockerPassword = helpers.SkipIfPrivateDockerInfoNotSet()
 
 				appManifest = map[string]interface{}{

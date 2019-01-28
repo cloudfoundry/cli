@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/manifest"
 	. "github.com/onsi/ginkgo"
@@ -303,8 +302,6 @@ var _ = Describe("create-app-manifest command", func() {
 			var oldDockerPassword string
 
 			BeforeEach(func() {
-				helpers.SkipIfVersionLessThan(ccversion.MinVersionDockerCredentialsV2)
-
 				oldDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
 				Expect(os.Setenv("CF_DOCKER_PASSWORD", "my-docker-password")).To(Succeed())
 

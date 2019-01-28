@@ -7,7 +7,6 @@ const (
 	MinVersionAsyncBindingsV2                = "2.120.0"
 	MinVersionBindingNameV2                  = "2.99.0"
 	MinVersionBuildpackStackAssociationV2    = "2.112.0"
-	MinVersionDockerCredentialsV2            = "2.82.0"
 	MinVersionProvideNameForServiceBindingV2 = "2.99.0"
 	MinVersionSymlinkedFilesV2               = "2.107.0"
 	MinVersionUserProvidedServiceTagsV2      = "2.104.0"
