@@ -102,6 +102,7 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	jobURL, warnings, err := cmd.Actor.UploadBuildpack(createdBuildpack.GUID, pathToBuildpackBits, cmd.ProgressBar)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
+		cmd.displayTip()
 		return err
 	}
 	cmd.UI.DisplayOK()
@@ -114,11 +115,25 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
+		cmd.displayTip()
 		return err
 	}
 
 	cmd.UI.DisplayOK()
 	return nil
+}
+
+func (cmd CreateBuildpackCommand) displayTip() {
+	cmd.UI.DisplayTextWithFlavor(
+		"TIP: A buildpack with name '{{.BuildpackName}}' and nil stack has been created. "+
+			"Use '{{.CfDeleteBuildpackCommand}}' to delete it or "+
+			"'{{.CfUpdateBuildpackCommand}}' to try again.",
+		map[string]interface{}{
+			"BuildpackName":            cmd.RequiredArgs.Buildpack,
+			"CfDeleteBuildpackCommand": cmd.Config.BinaryName() + " delete-buildpack " + cmd.RequiredArgs.Buildpack,
+			"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack " + cmd.RequiredArgs.Buildpack +
+				" --assign-stack STACK --path " + string(cmd.RequiredArgs.Path),
+		})
 }
 
 func (cmd CreateBuildpackCommand) displayTable(buildpacks []v7action.Buildpack) {

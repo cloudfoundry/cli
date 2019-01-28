@@ -3,7 +3,6 @@ package v7_test
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -112,7 +111,7 @@ var _ = Describe("create buildpack Command", func() {
 						actionerror.BuildpackNameTakenError{Name: "this-error-occurred"},
 					)
 				})
-				It("it errors and prints all warnings", func() {
+				It("errors and prints all warnings", func() {
 					Expect(executeErr).To(Equal(actionerror.BuildpackNameTakenError{Name: "this-error-occurred"}))
 					Expect(testUI.Err).To(Say("warning-1"))
 				})
@@ -176,19 +175,28 @@ var _ = Describe("create buildpack Command", func() {
 						fakeActor.UploadBuildpackReturns(
 							ccv3.JobURL(""),
 							v7action.Warnings{"warning-2"},
-							actionerror.BuildpackStackChangeError{
-								BuildpackName: "buildpack-name",
-								BinaryName:    "faceman"},
+							errors.New("some-error"),
 						)
 					})
 
-					It("it errors and prints all warnings", func() {
-						Expect(executeErr).To(Equal(actionerror.BuildpackStackChangeError{
-							BuildpackName: "buildpack-name",
-							BinaryName:    "faceman",
-						}))
+					It("errors, prints a tip and all warnings", func() {
+						Expect(executeErr).To(Equal(errors.New("some-error")))
 						Expect(testUI.Err).To(Say("warning-2"))
+						Expect(testUI.Out).To(Say("Uploading buildpack %s", buildpackName))
+						Consistently(testUI.Out).ShouldNot(Say("OK"))
+						Expect(testUI.Out).To(Say(
+							"TIP: A buildpack with name '%s' and nil stack has been created. "+
+								"Use '%s delete-buildpack %s' to delete it or "+
+								"'%s update-buildpack %s --assign-stack STACK --path %s' to try again.",
+							buildpackName,
+							binaryName,
+							buildpackName,
+							binaryName,
+							buildpackName,
+							buildpackPath,
+						))
 					})
+
 				})
 
 				When("Uploading the buildpack succeeds", func() {
@@ -237,38 +245,32 @@ var _ = Describe("create buildpack Command", func() {
 							})
 						})
 
-						When("the polling job returns a ccerror.BuildpackAlreadyExistsForStackError", func() {
+						When("the job fails with an error", func() {
 							BeforeEach(func() {
 								fakeActor.PollUploadBuildpackJobReturns(
 									v7action.Warnings{"poll-warning"},
-									ccerror.BuildpackAlreadyExistsForStackError{},
+									errors.New("some-error"),
 								)
 							})
 
-							It("prints all warnings, and returns the error", func() {
-								Expect(executeErr).To(Equal(ccerror.BuildpackAlreadyExistsForStackError{}))
-								Expect(testUI.Out).To(Say(`Processing uploaded buildpack %s\.\.\.`, "some-buildpack"))
+							It("prints all warnings and a tip, then returns the error", func() {
+								Expect(executeErr).To(MatchError("some-error"))
 								Expect(testUI.Err).To(Say("poll-warning"))
+								Expect(testUI.Out).To(Say(`Processing uploaded buildpack %s\.\.\.`, buildpackName))
 								Consistently(testUI.Out).ShouldNot(Say("OK"))
+								Expect(testUI.Out).To(Say(
+									"TIP: A buildpack with name '%s' and nil stack has been created. "+
+										"Use '%s delete-buildpack %s' to delete it or "+
+										"'%s update-buildpack %s --assign-stack STACK --path %s' to try again.",
+									buildpackName,
+									binaryName,
+									buildpackName,
+									binaryName,
+									buildpackName,
+									buildpackPath,
+								))
 							})
 						})
-
-						When("the polling job returns a ccerror.BuildpackAlreadyExistsWithoutStackError", func() {
-							BeforeEach(func() {
-								fakeActor.PollUploadBuildpackJobReturns(
-									v7action.Warnings{"poll-warning"},
-									ccerror.BuildpackAlreadyExistsWithoutStackError{},
-								)
-							})
-
-							It("prints all warnings, and returns the error", func() {
-								Expect(executeErr).To(Equal(ccerror.BuildpackAlreadyExistsWithoutStackError{}))
-								Expect(testUI.Out).To(Say(`Processing uploaded buildpack %s\.\.\.`, "some-buildpack"))
-								Expect(testUI.Err).To(Say("poll-warning"))
-								Consistently(testUI.Out).ShouldNot(Say("OK"))
-							})
-						})
-
 					})
 				})
 			})
