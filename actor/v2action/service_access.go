@@ -16,8 +16,14 @@ func (actor Actor) EnableServiceForAllOrgs(serviceName, brokerName string) (Warn
 	}
 
 	for _, plan := range servicePlans {
-		warnings, err := actor.CloudControllerClient.UpdateServicePlan(plan.GUID, true)
+		warnings, err := actor.removeOrgLevelServicePlanVisibilities(plan.GUID, "")
 		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return allWarnings, err
+		}
+
+		ccv2Warnings, err := actor.CloudControllerClient.UpdateServicePlan(plan.GUID, true)
+		allWarnings = append(allWarnings, ccv2Warnings...)
 		if err != nil {
 			return allWarnings, err
 		}
@@ -66,10 +72,12 @@ func (actor Actor) EnableServiceForOrg(serviceName, orgName, brokerName string) 
 	}
 
 	for _, plan := range servicePlans {
-		_, warnings, err := actor.CloudControllerClient.CreateServicePlanVisibility(plan.GUID, org.GUID)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return allWarnings, err
+		if plan.Public != true {
+			_, warnings, err := actor.CloudControllerClient.CreateServicePlanVisibility(plan.GUID, org.GUID)
+			allWarnings = append(allWarnings, warnings...)
+			if err != nil {
+				return allWarnings, err
+			}
 		}
 	}
 
@@ -91,6 +99,9 @@ func (actor Actor) EnablePlanForOrg(serviceName, servicePlanName, orgName, broke
 
 	for _, plan := range servicePlans {
 		if plan.Name == servicePlanName {
+			if plan.Public {
+				return allWarnings, nil
+			}
 			_, warnings, err := actor.CloudControllerClient.CreateServicePlanVisibility(plan.GUID, org.GUID)
 			allWarnings = append(allWarnings, warnings...)
 			return allWarnings, err
