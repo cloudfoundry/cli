@@ -70,7 +70,6 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 		"Username":      user.Name,
 		"BuildpackName": cmd.RequiredArgs.Buildpack,
 	})
-	cmd.UI.DisplayNewline()
 
 	downloader := download.NewDownloader(time.Second * 30)
 	tmpDirPath, err := ioutil.TempDir("", "buildpack-dir-")
@@ -106,6 +105,7 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 		return err
 	}
 	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayTextWithFlavor("Processing uploaded buildpack {{.BuildpackName}}...", map[string]interface{}{
 		"BuildpackName": cmd.RequiredArgs.Buildpack,
