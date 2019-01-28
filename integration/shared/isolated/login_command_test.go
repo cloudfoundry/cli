@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"regexp"
 	"runtime"
+	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -201,6 +202,70 @@ var _ = Describe("login command", func() {
 		})
 	})
 
+	Describe("SSO", func() {
+		When("--sso-passcode is provided", func() {
+			Context("and --sso is also passed", func() {
+				It("fails with a useful error message", func() {
+					session := helpers.CF("login", "--sso-passcode", "some-passcode", "--sso")
+					Eventually(session).Should(Say("Incorrect usage: --sso-passcode flag cannot be used with --sso"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			Context("and the provided passcode is incorrect", func() {
+				It("prompts twice, displays an error and fails", func() {
+					session := helpers.CF("login", "--sso-passcode", "some-passcode")
+					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
+					Eventually(session).Should(Say(`Authenticating\.\.\.`))
+					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+
+					// Leaving out expectation of prompt text, since it comes from UAA (and doesn't show up on Windows)
+					Eventually(session).Should(Say(`Authenticating\.\.\.`))
+					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session).Should(Say(`Authenticating\.\.\.`))
+					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+					Eventually(session).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+					Eventually(session).Should(Say(`FAILED`))
+					Eventually(session).Should(Say(`Unable to authenticate`))
+
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("a passcode isn't provided", func() {
+				It("prompts the user to try again", func() {
+					session := helpers.CF("login", "--sso-passcode")
+					Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--sso-passcode'"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		When("a user authenticates with valid client credentials", func() {
+			BeforeEach(func() {
+				clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
+				session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
+				Eventually(session).Should(Exit(0))
+			})
+
+			When("a different user logs in with valid sso passcode", func() {
+				// Following test is desired, but not current behavior.
+				XIt("should fail log in and display an error informing the user they need to log out", func() {
+					session := helpers.CF("login", "--sso-passcode", "my-fancy-sso")
+
+					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
+					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+					// The following message is a bit strange in the output. Consider removing?
+					Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Say(`Service account currently logged in\. Use 'cf logout' to log out service account and try again\.`))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+	})
+
 	Describe("User Credentials", func() {
 		// TODO: Figure out a way to pass in password when we don't have a tty
 		XIt("prompts the user for email and password", func() {
@@ -293,7 +358,7 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				It("prints an error and fails", func() {
+				It("should fail log in and display an error informing the user they need to log out", func() {
 					username, password := helpers.GetCredentials()
 					session := helpers.CF("login", "-p", password, "-u", username)
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
@@ -304,59 +369,6 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Say("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 					Eventually(session).Should(Exit(1))
 				})
-			})
-		})
-	})
-
-	When("--sso-passcode flag is given", func() {
-		When("a passcode isn't provided", func() {
-			It("prompts the user to try again", func() {
-				buffer := NewBuffer()
-				buffer.Write([]byte("\n"))
-				session := helpers.CFWithStdin(buffer, "login", "--sso-passcode")
-				Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--sso-passcode'"))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		When("the provided passcode is invalid", func() {
-			It("prompts the user to try again", func() {
-				buffer := NewBuffer()
-				buffer.Write([]byte("\n"))
-				session := helpers.CFWithStdin(buffer, "login", "--sso-passcode", "bad-passcode")
-				Eventually(session).Should(Say("Authenticating..."))
-				Eventually(session).Should(Say("Credentials were rejected, please try again."))
-				session.Interrupt()
-				Eventually(session).Should(Exit())
-			})
-		})
-	})
-
-	When("both --sso and --sso-passcode flags are provided", func() {
-		It("errors with invalid use", func() {
-			buffer := NewBuffer()
-			buffer.Write([]byte("\n"))
-			session := helpers.CFWithStdin(buffer, "login", "--sso", "--sso-passcode", "some-passcode")
-			Eventually(session).Should(Say("Incorrect usage: --sso-passcode flag cannot be used with --sso"))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
-	When("a user authenticates with valid client credentials", func() {
-		BeforeEach(func() {
-			clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
-			session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
-			Eventually(session).Should(Exit(0))
-		})
-
-		When("a different user logs in with valid password credentials", func() {
-			It("should fail log in and display an error informing the user they need to log out", func() {
-				username, password := helpers.GetCredentials()
-				session := helpers.CF("login", "-u", username, "-p", password)
-
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Say(`Service account currently logged in\. Use 'cf logout' to log out service account and try again\.`))
-				Eventually(session).Should(Exit(1))
 			})
 		})
 	})
