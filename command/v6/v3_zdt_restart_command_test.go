@@ -57,12 +57,12 @@ var _ = Describe("v3-zdt-restart Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV3ClientVersion)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-				CurrentVersion: ccversion.MinV3ClientVersion,
+				CurrentVersion: ccversion.MinSupportedV3ClientVersion,
 				MinimumVersion: ccversion.MinVersionZeroDowntimePushV3,
 			}))
 		})

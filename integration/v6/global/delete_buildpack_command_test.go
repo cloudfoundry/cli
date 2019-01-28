@@ -250,7 +250,7 @@ var _ = Describe("delete-buildpack command", func() {
 			var server *Server
 
 			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithAPIVersions(ccversion.MinV2ClientVersion, ccversion.MinV3ClientVersion)
+				server = helpers.StartAndTargetServerWithAPIVersions(ccversion.MinV2ClientVersion, ccversion.MinSupportedV3ClientVersion)
 			})
 
 			AfterEach(func() {

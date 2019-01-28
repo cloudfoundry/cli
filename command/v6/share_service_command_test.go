@@ -54,12 +54,12 @@ var _ = Describe("share-service Command", func() {
 
 	When("the API version is below the minimum", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinV3ClientVersion)
+			fakeActor.CloudControllerV3APIVersionReturns(ccversion.MinSupportedV3ClientVersion)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-				CurrentVersion: ccversion.MinV3ClientVersion,
+				CurrentVersion: ccversion.MinSupportedV3ClientVersion,
 				MinimumVersion: ccversion.MinVersionShareServiceV3,
 			}))
 		})

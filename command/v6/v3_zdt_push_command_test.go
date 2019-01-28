@@ -133,12 +133,12 @@ var _ = Describe("v3-zdt-push Command", func() {
 
 	When("the API version is the oldest supported by the CLI", func() {
 		BeforeEach(func() {
-			fakeZdtActor.CloudControllerAPIVersionReturns(ccversion.MinV3ClientVersion)
+			fakeZdtActor.CloudControllerAPIVersionReturns(ccversion.MinSupportedV3ClientVersion)
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumCFAPIVersionNotMetError{
-				CurrentVersion: ccversion.MinV3ClientVersion,
+				CurrentVersion: ccversion.MinSupportedV3ClientVersion,
 				MinimumVersion: ccversion.MinVersionZeroDowntimePushV3,
 			}))
 		})

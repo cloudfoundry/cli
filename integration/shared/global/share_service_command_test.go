@@ -82,7 +82,7 @@ var _ = Describe("share-service command", func() {
 			var server *Server
 
 			BeforeEach(func() {
-				server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, ccversion.MinV3ClientVersion)
+				server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, ccversion.MinSupportedV3ClientVersion)
 			})
 
 			AfterEach(func() {
