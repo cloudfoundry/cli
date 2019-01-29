@@ -118,6 +118,8 @@ func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
 		return ccerror.SpaceNameTakenError{Message: errorResponse.Description}
 	case "CF-ServiceInstanceNameTaken":
 		return ccerror.ServiceInstanceNameTakenError{Message: errorResponse.Description}
+	case "CF-ServicePlanVisibilityAlreadyExists":
+		return ccerror.ServicePlanVisibilityExistsError{Message: errorResponse.Description}
 	default:
 		return ccerror.BadRequestError{Message: errorResponse.Description}
 	}

@@ -242,6 +242,22 @@ var _ = Describe("Error Wrapper", func() {
 							}))
 						})
 					})
+
+					When("creating a service plan visibility fails because it already exists", func() {
+						BeforeEach(func() {
+							serverResponse = `{
+								"code": 40002,
+								"description": "Service plan visibility already exists",
+								"error_code": "CF-ServicePlanVisibilityAlreadyExists"
+							  }`
+						})
+
+						It("returns a ServicePlanVisibilityExistsError", func() {
+							Expect(executeErr).To(MatchError(ccerror.ServicePlanVisibilityExistsError{
+								Message: "Service plan visibility already exists",
+							}))
+						})
+					})
 				})
 
 				Context("(401) Unauthorized", func() {
