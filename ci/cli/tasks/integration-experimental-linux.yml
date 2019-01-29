@@ -31,6 +31,9 @@ run:
 
     pushd vars-store/ci/infrastructure/$ENV
       eval "$(bbl print-env)"
+
+      bosh int bbl-state.json --path /lb/cert > /tmp/$ENV.cert
+      export SSL_CERT_FILE=/tmp/$ENV.cert
     popd
 
     credhub login
@@ -41,6 +44,7 @@ run:
     domain=$(cat bosh-lock/name)
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
+    export SKIP_SSL_VALIDATION=false
 
     export GOPATH=$PWD/go
     export PATH=$GOPATH/bin:$PATH
