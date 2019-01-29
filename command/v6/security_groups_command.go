@@ -64,7 +64,6 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 
 	table := [][]string{
 		{

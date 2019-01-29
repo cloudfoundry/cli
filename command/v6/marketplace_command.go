@@ -86,7 +86,6 @@ func (cmd *MarketplaceCommand) marketplace() error {
 		}
 
 		cmd.UI.DisplayOK()
-		cmd.UI.DisplayNewline()
 		cmd.displayServiceSummaries(serviceSummaries)
 	} else {
 		if !cmd.SharedActor.IsOrgTargeted() || !cmd.SharedActor.IsSpaceTargeted() {
@@ -106,7 +105,6 @@ func (cmd *MarketplaceCommand) marketplace() error {
 		}
 
 		cmd.UI.DisplayOK()
-		cmd.UI.DisplayNewline()
 		cmd.displayServiceSummary(serviceSummary)
 	}
 
@@ -124,7 +122,6 @@ func (cmd *MarketplaceCommand) publicMarketplace() error {
 		}
 
 		cmd.UI.DisplayOK()
-		cmd.UI.DisplayNewline()
 		cmd.displayServiceSummaries(serviceSummaries)
 	} else {
 		cmd.UI.DisplayTextWithFlavor("Getting service plan information for service {{.ServiceName}}...",
@@ -139,7 +136,6 @@ func (cmd *MarketplaceCommand) publicMarketplace() error {
 		}
 
 		cmd.UI.DisplayOK()
-		cmd.UI.DisplayNewline()
 		cmd.displayServiceSummary(serviceSummary)
 	}
 

@@ -286,7 +286,6 @@ func (cmd V3ZeroDowntimePushCommand) createApplication(userName string) (v3actio
 	})
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return app, nil
 }
 
@@ -328,7 +327,6 @@ func (cmd V3ZeroDowntimePushCommand) updateApplication(userName string, appGUID 
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return app, nil
 }
 
@@ -341,7 +339,6 @@ func (cmd V3ZeroDowntimePushCommand) createAndMapRoutes(app v3action.Application
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return nil
 }
 
@@ -369,7 +366,6 @@ func (cmd V3ZeroDowntimePushCommand) createPackage() (v3action.Package, error) {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return pkg, nil
 }
 
@@ -394,7 +390,6 @@ func (cmd V3ZeroDowntimePushCommand) stagePackage(pkg v3action.Package, userName
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return droplet.GUID, nil
 }
 
@@ -414,7 +409,6 @@ func (cmd V3ZeroDowntimePushCommand) setApplicationDroplet(dropletGUID string, u
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return nil
 }
 
@@ -432,7 +426,6 @@ func (cmd V3ZeroDowntimePushCommand) restartApplication(appGUID string, userName
 		return err
 	}
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return nil
 }
 
@@ -450,6 +443,5 @@ func (cmd V3ZeroDowntimePushCommand) createDeployment(appGUID string, userName s
 		return "", err
 	}
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return deploymentGUID, nil
 }

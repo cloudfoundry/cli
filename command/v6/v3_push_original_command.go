@@ -237,7 +237,6 @@ func (cmd V3PushCommand) createApplication(userName string) (v3action.Applicatio
 	})
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return app, nil
 }
 
@@ -278,7 +277,6 @@ func (cmd V3PushCommand) updateApplication(userName string, appGUID string) (v3a
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return app, nil
 }
 
@@ -291,7 +289,6 @@ func (cmd V3PushCommand) createAndMapRoutes(app v3action.Application) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return nil
 }
 
@@ -319,7 +316,6 @@ func (cmd V3PushCommand) createPackage() (v3action.Package, error) {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return pkg, nil
 }
 
@@ -344,7 +340,6 @@ func (cmd V3PushCommand) stagePackage(pkg v3action.Package, userName string) (st
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return droplet.GUID, nil
 }
 
@@ -364,7 +359,6 @@ func (cmd V3PushCommand) setApplicationDroplet(dropletGUID string, userName stri
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return nil
 }
 
@@ -382,7 +376,6 @@ func (cmd V3PushCommand) startApplication(appGUID string, userName string) error
 		return err
 	}
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return nil
 }
 

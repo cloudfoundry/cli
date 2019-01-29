@@ -87,7 +87,6 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	if serviceBinding.IsInProgress() {
-		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Binding in progress. Use '{{.CFCommand}} {{.ServiceName}}' to check operation status.", map[string]interface{}{
 			"CFCommand":   fmt.Sprintf("%s service", cmd.Config.BinaryName()),
 			"ServiceName": cmd.RequiredArgs.ServiceInstanceName,

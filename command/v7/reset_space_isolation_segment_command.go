@@ -84,7 +84,6 @@ func (cmd ResetSpaceIsolationSegmentCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 
 	if newIsolationSegmentName == "" {
 		cmd.UI.DisplayText("Applications in this space will be placed in the platform default isolation segment.")

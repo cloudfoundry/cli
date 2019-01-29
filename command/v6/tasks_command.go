@@ -85,7 +85,6 @@ func (cmd TasksCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 
 	table := [][]string{
 		{

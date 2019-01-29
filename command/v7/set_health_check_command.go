@@ -80,7 +80,6 @@ func (cmd SetHealthCheckCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	if app.Started() {
-		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("TIP: An app restart is required for the change to take effect.")
 	}
 

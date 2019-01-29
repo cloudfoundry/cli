@@ -78,7 +78,6 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 
 	if serviceBinding.IsInProgress() {
-		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Unbinding in progress. Use '{{.CFCommand}} {{.ServiceName}}' to check operation status.", map[string]interface{}{
 			"CFCommand":   fmt.Sprintf("%s service", cmd.Config.BinaryName()),
 			"ServiceName": cmd.RequiredArgs.ServiceInstanceName,

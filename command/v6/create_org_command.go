@@ -76,7 +76,6 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 		}
 	}
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayTextWithFlavor("Assigning role {{.Role}} to user {{.Username}} in org {{.OrgName}}...",
 		map[string]interface{}{
@@ -92,7 +91,6 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayText(`TIP: Use 'cf target -o "{{.OrgName}}"' to target new org`,
 		map[string]interface{}{

@@ -109,7 +109,6 @@ func (cmd *ApiCommand) setAPI() error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	return nil
 }
 

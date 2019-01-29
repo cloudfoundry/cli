@@ -112,8 +112,6 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
-
 	cmd.UI.DisplayText(`TIP: Use 'cf target -o "{{.Org}}" -s "{{.Space}}"' to target new space`, map[string]interface{}{
 		"Org":   orgName,
 		"Space": spaceName,

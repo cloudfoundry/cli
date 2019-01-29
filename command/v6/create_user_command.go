@@ -88,7 +88,6 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText("TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.", map[string]interface{}{
 		"BinaryName": cmd.Config.BinaryName(),
 	})

@@ -95,7 +95,6 @@ func (cmd CreateServiceCommand) Execute(args []string) error {
 
 	if instance.LastOperation.State == constant.LastOperationInProgress {
 		cmd.UI.DisplayOK()
-		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayTextWithFlavor("Create in progress. Use 'cf services' or 'cf service {{.ServiceInstance}}' to check operation status.",
 			map[string]interface{}{
 				"ServiceInstance": cmd.RequiredArgs.ServiceInstance,

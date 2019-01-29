@@ -62,7 +62,6 @@ func (cmd IsolationSegmentsCommand) Execute(args []string) error {
 		return err
 	}
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 
 	table := [][]string{
 		{

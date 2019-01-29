@@ -62,7 +62,6 @@ func (cmd EnvCommand) Execute(_ []string) error {
 		"Username":  user.Name,
 	})
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 
 	envGroups, warnings, err := cmd.Actor.GetEnvironmentVariablesByApplicationNameAndSpace(
 		appName,

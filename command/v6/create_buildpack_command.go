@@ -100,7 +100,6 @@ func (cmd *CreateBuildpackCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayTextWithFlavor("Uploading buildpack {{.Buildpack}} as {{.Username}}...", map[string]interface{}{
 		"Buildpack": cmd.RequiredArgs.Buildpack,

@@ -84,7 +84,6 @@ func (cmd SetSpaceIsolationSegmentCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText("In order to move running applications to this isolation segment, they must be restarted.")
 
 	return nil

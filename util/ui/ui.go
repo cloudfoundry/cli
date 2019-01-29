@@ -130,7 +130,7 @@ func (ui *UI) DisplayOK() {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
-	fmt.Fprintf(ui.Out, "%s\n", ui.modifyColor(ui.TranslateText("OK"), color.New(color.FgGreen, color.Bold)))
+	fmt.Fprintf(ui.Out, "%s\n\n", ui.modifyColor(ui.TranslateText("OK"), color.New(color.FgGreen, color.Bold)))
 }
 
 // DisplayText translates the template, substitutes in templateValues, and
