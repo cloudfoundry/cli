@@ -52,7 +52,7 @@ run:
       export SSL_CERT_FILE=/tmp/$ENV.cert
     popd
 
-    SKIP_SSL_VALIDATION=false
+    export SKIP_SSL_VALIDATION=false
 
     set -x
 
