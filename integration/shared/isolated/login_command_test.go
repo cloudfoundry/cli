@@ -203,6 +203,26 @@ var _ = Describe("login command", func() {
 	})
 
 	Describe("SSL Validation", func() {
+		When("no scheme is included in the API endpoint", func() {
+			var hostname string
+
+			BeforeEach(func() {
+				apiURL, err := url.Parse(helpers.GetAPI())
+				Expect(err).NotTo(HaveOccurred())
+
+				hostname = apiURL.Hostname()
+			})
+
+			It("defaults to https", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", hostname, "--skip-ssl-validation")
+
+				Eventually(session).Should(Say("API endpoint: %s", hostname))
+				Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
 		When("the API endpoint's scheme is http", func() {
 			var httpURL string
 
