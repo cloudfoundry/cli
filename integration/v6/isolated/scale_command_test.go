@@ -150,7 +150,7 @@ var _ = XDescribe("scale command", func() {
 								Eventually(session).Should(Say("usage:\\s+256M x 1 instances"))
 								Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
 								Eventually(session).Should(Say("last uploaded:"))
-								Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+								Eventually(session).Should(Say("stack:\\s+cflinuxfs"))
 								Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
 								Eventually(session).Should(Say("start command:"))
 
@@ -207,7 +207,7 @@ var _ = XDescribe("scale command", func() {
 					Eventually(session).Should(Say("usage:\\s+128M x 1 instances"))
 					Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
 					Eventually(session).Should(Say("last uploaded:"))
-					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+					Eventually(session).Should(Say("stack:\\s+cflinuxfs"))
 					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
 					Eventually(session).Should(Say("start command:"))
 
@@ -231,7 +231,7 @@ var _ = XDescribe("scale command", func() {
 					Eventually(session).Should(Say("usage:\\s+256M x 2 instances"))
 					Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
 					Eventually(session).Should(Say("last uploaded:"))
-					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+					Eventually(session).Should(Say("stack:\\s+cflinuxfs"))
 					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
 					Eventually(session).Should(Say("start command:"))
 

@@ -145,12 +145,12 @@ var _ = Describe("create-app-manifest command", func() {
   instances: 1
   memory: 32M
   no-route: true
-  stack: cflinuxfs2
+  stack: cflinuxfs\d
 `, appName)
 
 					createdFile, err := ioutil.ReadFile(manifestFilePath)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(string(createdFile)).To(Equal(expectedFile))
+					Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 
 					Eventually(session).Should(Exit(0))
 				})
@@ -177,12 +177,12 @@ var _ = Describe("create-app-manifest command", func() {
   memory: 32M
   routes:
   - route: %s.%s
-  stack: cflinuxfs2
+  stack: cflinuxfs\d
 `, appName, strings.ToLower(appName), domainName)
 
 					createdFile, err := ioutil.ReadFile(manifestFilePath)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(string(createdFile)).To(Equal(expectedFile))
+					Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 
 					Eventually(session).Should(Exit(0))
 				})
@@ -219,12 +219,12 @@ var _ = Describe("create-app-manifest command", func() {
   memory: 32M
   routes:
   - route: %s.%s
-  stack: cflinuxfs2
+  stack: cflinuxfs\d
 `, appName, strings.ToLower(appName), domainName)
 
 							createdFile, err := ioutil.ReadFile(newFile)
 							Expect(err).ToNot(HaveOccurred())
-							Expect(string(createdFile)).To(Equal(expectedFile))
+							Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 
 							Eventually(session).Should(Exit(0))
 						})
@@ -253,12 +253,12 @@ var _ = Describe("create-app-manifest command", func() {
   memory: 32M
   routes:
   - route: %s.%s
-  stack: cflinuxfs2
+  stack: cflinuxfs\d
 `, appName, strings.ToLower(appName), domainName)
 
 							createdFile, err := ioutil.ReadFile(existingFile)
 							Expect(err).ToNot(HaveOccurred())
-							Expect(string(createdFile)).To(Equal(expectedFile))
+							Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 
 							Eventually(session).Should(Exit(0))
 						})
@@ -289,12 +289,12 @@ var _ = Describe("create-app-manifest command", func() {
   memory: 32M
   routes:
   - route: %s.%s
-  stack: cflinuxfs2
+  stack: cflinuxfs\d
 `, appName, DockerImage, strings.ToLower(appName), domainName)
 
 				createdFile, err := ioutil.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(createdFile)).To(Equal(expectedFile))
+				Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 			})
 		})
 
@@ -329,16 +329,15 @@ var _ = Describe("create-app-manifest command", func() {
   memory: 32M
   routes:
   - route: %s.%s
-  stack: cflinuxfs2
+  stack: cflinuxfs\d
 `, appName, DockerImage, strings.ToLower(appName), domainName)
 
 				createdFile, err := ioutil.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(createdFile)).To(Equal(expectedFile))
+				Expect(string(createdFile)).To(MatchRegexp(expectedFile))
 
 				Eventually(session).Should(Exit(0))
 			})
-
 		})
 
 		When("app has no hostname", func() {
