@@ -517,23 +517,20 @@ var _ = Describe("v3-zdt-push command", func() {
 					Eventually(session).Should(Say(`routes:\s+%s\.%s`, appName, domainName))
 					Eventually(session).Should(Say(`stack:\s+cflinuxfs2`))
 				})
-
 			})
 
-			PWhen("a non-default stack is specified", func() {
-				// TODO: unpend this test when we have integration foundations with stack cflinuxfs3
+			When("a non-default stack is specified", func() {
 				It("uses the specified stack", func() {
 					var session *Session
 					helpers.WithHelloWorldApp(func(appDir string) {
-						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-s", "cflinuxfs3")
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-zdt-push", appName, "-s", "cflinuxfs2")
 						Eventually(session).Should(Exit(0))
 					})
 					Eventually(session).Should(Say(`name:\s+%s`, appName))
 					Eventually(session).Should(Say(`requested state:\s+started`))
 					Eventually(session).Should(Say(`routes:\s+%s\.%s`, appName, domainName))
-					Eventually(session).Should(Say(`stack:\s+cflinuxfs3`))
+					Eventually(session).Should(Say(`stack:\s+cflinuxfs2`))
 				})
-
 			})
 
 			When("the both -s and -b are specified", func() {
