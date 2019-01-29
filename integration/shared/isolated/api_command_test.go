@@ -239,7 +239,7 @@ var _ = Describe("api command", func() {
 		})
 
 		It("sets SSL Disabled in the config file to false", func() {
-			session := helpers.CF("api", apiURL, skipSSLValidation)
+			session := helpers.CF("api", apiURL)
 			Eventually(session).Should(Exit(0))
 
 			rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
@@ -249,7 +249,7 @@ var _ = Describe("api command", func() {
 			err = json.Unmarshal(rawConfig, &configFile)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(configFile.SkipSSLValidation).To(BeTrue())
+			Expect(configFile.SkipSSLValidation).To(BeFalse())
 		})
 	})
 
