@@ -42,7 +42,7 @@ run:
     mv edge-windows-binary-64/cf7-cli_edge_winx64.zip $FINAL_DIR/cf7-cli_${VERSION}_winx64.zip
 
     mv edge-deb-installer-32/cf7-cli-installer_edge_i686.deb $FINAL_DIR/cf7-cli-installer_${VERSION}_i686.deb
-    mv edge-deb-installer-64/cf7-cli-installer_edge_x86-64.deb $FINAL_DIR/cf7-cli-installer_${VERSION}_x86-64.tgz
+    mv edge-deb-installer-64/cf7-cli-installer_edge_x86-64.deb $FINAL_DIR/cf7-cli-installer_${VERSION}_x86-64.deb
     mv edge-redhat-installer-32/cf7-cli-installer_edge_i686.rpm $FINAL_DIR/cf7-cli-installer_${VERSION}_i686.rpm
     mv edge-redhat-installer-64/cf7-cli-installer_edge_x86-64.rpm $FINAL_DIR/cf7-cli-installer_${VERSION}_x86-64.rpm
     mv edge-osx-installer-64/cf7-cli-installer_edge_osx.pkg $FINAL_DIR/cf7-cli-installer_${VERSION}_osx.pkg
@@ -86,5 +86,3 @@ run:
 
 # - name: edge-windows-installer-64
 #     versioned_file: master/cf7-cli-installer_edge_winx64.zip
-
-
