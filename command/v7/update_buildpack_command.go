@@ -185,7 +185,7 @@ func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
 
 	if cmd.NewName != "" {
 		buildpackName = cmd.NewName
-		cmd.UI.DisplayTextWithFlavor("Renaming buildpack {{.Buildpack}} to {{.DesiredBuildpackName}} as {{.CurrentUser}}...", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("Renaming buildpack {{.Buildpack}} to {{.DesiredBuildpackName}} as {{.CurrentUser}}...\n", map[string]interface{}{
 			"Buildpack":            originalBuildpackName,
 			"CurrentUser":          userName,
 			"DesiredBuildpackName": cmd.NewName,
@@ -199,7 +199,7 @@ func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
 			"Stack":       cmd.NewStack,
 		})
 		if cmd.Position.IsSet || cmd.Lock || cmd.Unlock || cmd.Enable || cmd.Disable {
-			cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
+			cmd.UI.DisplayTextWithFlavor("\nUpdating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
 				"Buildpack":   buildpackName,
 				"CurrentUser": userName,
 				"Stack":       cmd.NewStack,
