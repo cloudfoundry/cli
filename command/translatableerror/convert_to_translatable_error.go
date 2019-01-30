@@ -153,6 +153,11 @@ func ConvertToTranslatableError(err error) error {
 			CommandLineOptions: e.CommandLineOptions,
 		}
 
+	// Wrapped Errors
+	case TipDecoratorError:
+		e.BaseError = ConvertToTranslatableError(e.BaseError)
+		return e
+
 	// Generic CC Errors
 	case ccerror.APINotFoundError:
 		return APINotFoundError(e)

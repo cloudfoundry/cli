@@ -305,6 +305,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.ServiceInstanceNotSharedToSpaceError{ServiceInstanceName: "some-service-instance-name"},
 			ServiceInstanceNotSharedToSpaceError{ServiceInstanceName: "some-service-instance-name"}),
 
+		Entry("TipDecoratorError calls translates error on base error",
+			TipDecoratorError{BaseError: ccerror.APINotFoundError{URL: "some-url"}},
+			TipDecoratorError{BaseError: APINotFoundError{URL: "some-url"}}),
+
 		// CC Errors
 		Entry("ccerror.APINotFoundError -> APINotFoundError",
 			ccerror.APINotFoundError{URL: "some-url"},

@@ -1,13 +1,15 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/util/download"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"time"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/util/download"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -101,8 +103,7 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	jobURL, warnings, err := cmd.Actor.UploadBuildpack(createdBuildpack.GUID, pathToBuildpackBits, cmd.ProgressBar)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		cmd.displayTip()
-		return err
+		return cmd.wrapWithTip(err)
 	}
 	cmd.UI.DisplayOK()
 
@@ -113,25 +114,23 @@ func (cmd CreateBuildpackCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
-		cmd.displayTip()
-		return err
+		return cmd.wrapWithTip(err)
 	}
 
 	cmd.UI.DisplayOK()
 	return nil
 }
 
-func (cmd CreateBuildpackCommand) displayTip() {
-	cmd.UI.DisplayTextWithFlavor(
-		"TIP: A buildpack with name '{{.BuildpackName}}' and nil stack has been created. "+
-			"Use '{{.CfDeleteBuildpackCommand}}' to delete it or "+
-			"'{{.CfUpdateBuildpackCommand}}' to try again.",
-		map[string]interface{}{
+func (cmd CreateBuildpackCommand) wrapWithTip(err error) error {
+	return translatableerror.TipDecoratorError{
+		BaseError: err,
+		Tip:       "A buildpack with name '{{.BuildpackName}}' and nil stack has been created. Use '{{.CfDeleteBuildpackCommand}}' to delete it or '{{.CfUpdateBuildpackCommand}}' to try again.",
+		TipKeys: map[string]interface{}{
 			"BuildpackName":            cmd.RequiredArgs.Buildpack,
-			"CfDeleteBuildpackCommand": cmd.Config.BinaryName() + " delete-buildpack " + cmd.RequiredArgs.Buildpack,
-			"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack " + cmd.RequiredArgs.Buildpack +
-				" --assign-stack STACK --path " + string(cmd.RequiredArgs.Path),
-		})
+			"CfDeleteBuildpackCommand": cmd.Config.BinaryName() + " delete-buildpack",
+			"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
+		},
+	}
 }
 
 func (cmd CreateBuildpackCommand) displayTable(buildpacks []v7action.Buildpack) {

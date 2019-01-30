@@ -1,17 +1,19 @@
 package v7_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"errors"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -180,21 +182,18 @@ var _ = Describe("create buildpack Command", func() {
 					})
 
 					It("errors, prints a tip and all warnings", func() {
-						Expect(executeErr).To(Equal(errors.New("some-error")))
+						Expect(executeErr).To(MatchError(translatableerror.TipDecoratorError{
+							BaseError: errors.New("some-error"),
+							Tip:       "A buildpack with name '{{.BuildpackName}}' and nil stack has been created. Use '{{.CfDeleteBuildpackCommand}}' to delete it or '{{.CfUpdateBuildpackCommand}}' to try again.",
+							TipKeys: map[string]interface{}{
+								"BuildpackName":            cmd.RequiredArgs.Buildpack,
+								"CfDeleteBuildpackCommand": cmd.Config.BinaryName() + " delete-buildpack",
+								"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
+							},
+						}))
 						Expect(testUI.Err).To(Say("warning-2"))
 						Expect(testUI.Out).To(Say("Uploading buildpack %s", buildpackName))
 						Consistently(testUI.Out).ShouldNot(Say("OK"))
-						Expect(testUI.Out).To(Say(
-							"TIP: A buildpack with name '%s' and nil stack has been created. "+
-								"Use '%s delete-buildpack %s' to delete it or "+
-								"'%s update-buildpack %s --assign-stack STACK --path %s' to try again.",
-							buildpackName,
-							binaryName,
-							buildpackName,
-							binaryName,
-							buildpackName,
-							buildpackPath,
-						))
 					})
 
 				})
@@ -254,21 +253,18 @@ var _ = Describe("create buildpack Command", func() {
 							})
 
 							It("prints all warnings and a tip, then returns the error", func() {
-								Expect(executeErr).To(MatchError("some-error"))
+								Expect(executeErr).To(MatchError(translatableerror.TipDecoratorError{
+									BaseError: errors.New("some-error"),
+									Tip:       "A buildpack with name '{{.BuildpackName}}' and nil stack has been created. Use '{{.CfDeleteBuildpackCommand}}' to delete it or '{{.CfUpdateBuildpackCommand}}' to try again.",
+									TipKeys: map[string]interface{}{
+										"BuildpackName":            cmd.RequiredArgs.Buildpack,
+										"CfDeleteBuildpackCommand": cmd.Config.BinaryName() + " delete-buildpack",
+										"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
+									},
+								}))
 								Expect(testUI.Err).To(Say("poll-warning"))
 								Expect(testUI.Out).To(Say(`Processing uploaded buildpack %s\.\.\.`, buildpackName))
 								Consistently(testUI.Out).ShouldNot(Say("OK"))
-								Expect(testUI.Out).To(Say(
-									"TIP: A buildpack with name '%s' and nil stack has been created. "+
-										"Use '%s delete-buildpack %s' to delete it or "+
-										"'%s update-buildpack %s --assign-stack STACK --path %s' to try again.",
-									buildpackName,
-									binaryName,
-									buildpackName,
-									binaryName,
-									buildpackName,
-									buildpackPath,
-								))
 							})
 						})
 					})
