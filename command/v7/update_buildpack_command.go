@@ -27,7 +27,7 @@ type UpdateBuildpackActor interface {
 
 type UpdateBuildpackCommand struct {
 	RequiredArgs    flag.BuildpackName               `positional-args:"Yes"`
-	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--enable|--disable] [--lock|--unlock]\n\nTIP:\nPath should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\nUse '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"`
+	usage           interface{}                      `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--enable|--disable] [--lock|--unlock] [--rename]\n\nTIP:\nPath should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\nUse '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"`
 	relatedCommands interface{}                      `related_commands:"buildpacks, create-buildpack, delete-buildpack"`
 	NewStack        string                           `long:"assign-stack" description:"Assign a stack to a buildpack that does not have a stack association"`
 	Disable         bool                             `long:"disable" description:"Disable the buildpack from being used for staging"`

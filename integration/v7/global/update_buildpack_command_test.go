@@ -34,7 +34,7 @@ var _ = Describe("update-buildpack command", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("update-buildpack - Update a buildpack"))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say(regexp.QuoteMeta(`cf update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--enable|--disable] [--lock|--unlock]`)))
+			Eventually(session).Should(Say(regexp.QuoteMeta(`cf update-buildpack BUILDPACK [-p PATH | -s STACK | --assign-stack NEW_STACK] [-i POSITION] [--enable|--disable] [--lock|--unlock] [--rename]`)))
 			Eventually(session).Should(Say("TIP:"))
 			Eventually(session).Should(Say("Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.\n\n"))
 			Eventually(session).Should(Say("Use '--assign-stack' with caution. Associating a buildpack with a stack that it does not support may result in undefined behavior. Additionally, changing this association once made may require a local copy of the buildpack.\n\n"))
