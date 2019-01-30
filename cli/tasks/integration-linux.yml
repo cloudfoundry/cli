@@ -43,12 +43,16 @@ run:
       else
         eval "$(bbl print-env)"
         credhub login
-
         export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
         export CF_INT_OIDC_USERNAME="admin-oidc"
         export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
       fi
+
+      bosh int bbl-state.json --path /lb/cert > /tmp/$ENV.cert
+      export SSL_CERT_FILE=/tmp/$ENV.cert
     popd
+
+    export SKIP_SSL_VALIDATION=false
 
     set -x
 
