@@ -288,6 +288,7 @@ var _ = Describe("create buildpack command", func() {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 									Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
 									Eventually(session.Err).Should(Say("The buildpack name %s is already in use for the stack %s", buildpackName, stacks[0]))
+									Eventually(session.Err).Should(Say("TIP: A buildpack with name '%s' and nil stack has been created.", buildpackName))
 									Eventually(session).Should(Exit(1))
 								}, stacks[0])
 							})

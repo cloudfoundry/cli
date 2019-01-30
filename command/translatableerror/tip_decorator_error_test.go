@@ -1,10 +1,11 @@
 package translatableerror_test
 
 import (
-	. "code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/translatableerror/translatableerrorfakes"
 	"errors"
 	"fmt"
+
+	. "code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/command/translatableerror/translatableerrorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -24,7 +25,7 @@ func (spy *TranslateSpy) translate(s string, v ...interface{}) string {
 		keys []interface{}
 	}{text: s, keys: v})
 
-	return fmt.Sprintf("Translate Called: %s -- %v", s, v)
+	return fmt.Sprintf("Translate Called: %s", s)
 }
 
 func (spy TranslateSpy) translateArgsForCall(i int) (string, []interface{}) {
@@ -32,7 +33,6 @@ func (spy TranslateSpy) translateArgsForCall(i int) (string, []interface{}) {
 }
 
 var _ = Describe("TipDecoratorError", func() {
-
 	Describe("Translate()", func() {
 		var (
 			tip    TipDecoratorError
@@ -70,7 +70,16 @@ var _ = Describe("TipDecoratorError", func() {
 			})
 
 			It("has output", func() {
-				Expect(output).To(Equal("Translate Called: {{.BaseError}}\n\nTIP: {{.Tip}} -- [map[BaseError:some translated error Tip:Translate Called: I am a {{.Foo}} -- [map[Foo:tip]]]]"))
+				Expect(output).To(Equal("Translate Called: {{.BaseError}}\n\nTIP: {{.Tip}}"))
+			})
+
+			It("calls translate 2 times", func() {
+				Expect(spy.calls).To(HaveLen(2))
+				Expect(spy.calls[0].keys).To(ConsistOf(tip.TipKeys))
+				Expect(spy.calls[1].keys).To(ConsistOf(map[string]interface{}{
+					"BaseError": "some translated error",
+					"Tip":       "Translate Called: I am a {{.Foo}}",
+				}))
 			})
 		})
 
@@ -93,7 +102,16 @@ var _ = Describe("TipDecoratorError", func() {
 			})
 
 			It("has output", func() {
-				Expect(output).To(Equal("Translate Called: {{.BaseError}}\n\nTIP: {{.Tip}} -- [map[BaseError:I am an error Tip:Translate Called: I am a {{.Foo}} -- [map[Foo:tip]]]]"))
+				Expect(output).To(Equal("Translate Called: {{.BaseError}}\n\nTIP: {{.Tip}}"))
+			})
+
+			It("calls translate 2 times", func() {
+				Expect(spy.calls).To(HaveLen(2))
+				Expect(spy.calls[0].keys).To(ConsistOf(tip.TipKeys))
+				Expect(spy.calls[1].keys).To(ConsistOf(map[string]interface{}{
+					"BaseError": "I am an error",
+					"Tip":       "Translate Called: I am a {{.Foo}}",
+				}))
 			})
 		})
 	})
