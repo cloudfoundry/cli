@@ -1,0 +1,47 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-package
+
+params:
+  AWS_ACCESS_KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
+
+inputs:
+  - name: cli
+  - name: cli-wiki
+
+outputs:
+  - name: cli-wiki-output
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    VERSION=$(cat cli/BUILD_VERSION_V7)
+
+    pushd cli-wiki
+      mv V7-Beta-Release past_releases.tmp
+      ../cli/bin/generate-download-links > V7-Beta-Release
+      cat past_releases.tmp >> V7-Beta-Release
+      rm past_releases.tmp
+
+      git add V7-Beta-Release
+
+      # create commit in cli-wiki
+      if ! [ -z "$(git status --porcelain)"];
+      then
+        git config --global user.email "cf-cli-eng@pivotal.io"
+        git config --global user.name "Concourse CI"
+        git commit -m "Release ${VERSION}"
+      else
+          echo "no new version to commit"
+      fi
+    popd
+    cp -R cli-wiki cli-wiki-output
