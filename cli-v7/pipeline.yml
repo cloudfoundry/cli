@@ -32,6 +32,13 @@ resources:
     branch: master
     paths: *ciPaths
 
+- name: cli-wiki
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli.wiki.git
+    private_key: ((cli-wiki-github-private-key))
+    branch: master
+
 - name: homebrew-tap
   type: git
   source:
@@ -513,6 +520,17 @@ jobs:
     params:
       AWS_ACCESS_KEY_ID: ((cli-team-aws-s3-access-key-id))
       AWS_SECRET_ACCESS_KEY: ((cli-team-aws-s3-secret-access-key))
+
+- name: create-beta-release-notes
+  serial: true
+  plan:
+  - get: cli
+    passed: [create-beta-release]
+  - task: create-release-notes
+    file: cli-ci/ci/cli-v7/tasks/create-release-notes.yml
+  - put: cli-wiki
+    params:
+      repository: cli-wiki-output/cli-wiki
 
 - name: publish-beta-release
   serial: true
