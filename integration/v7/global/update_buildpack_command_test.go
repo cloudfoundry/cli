@@ -575,7 +575,7 @@ var _ = Describe("update-buildpack command", func() {
 
 						It("fails to rename the buildpack", func() {
 							session := helpers.CF("update-buildpack", buildpackName, "--rename", newBuildpackName)
-							Eventually(session.Err).Should(Say("The buildpack name '%s' with an unassigned stack is already in use", newBuildpackName))
+							Eventually(session.Err).Should(Say("Buildpack with name '%s' and an unassigned stack already exists", newBuildpackName))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})

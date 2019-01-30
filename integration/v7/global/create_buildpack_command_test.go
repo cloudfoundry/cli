@@ -222,7 +222,7 @@ var _ = Describe("create buildpack command", func() {
 								helpers.BuildpackWithoutStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 									Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
-									Eventually(session.Err).Should(Say("The buildpack name '%s' with an unassigned stack is already in use", buildpackName))
+									Eventually(session.Err).Should(Say("Buildpack with name '%s' and an unassigned stack already exists", buildpackName))
 									Eventually(session).Should(Exit(1))
 								})
 							})
@@ -269,7 +269,7 @@ var _ = Describe("create buildpack command", func() {
 								helpers.BuildpackWithStack(func(buildpackPath string) {
 									session := helpers.CF("create-buildpack", buildpackName, buildpackPath, "1")
 									Eventually(session).Should(Say(`Creating buildpack %s as %s\.\.\.`, buildpackName, username))
-									Eventually(session.Err).Should(Say("The buildpack name '%s' with an unassigned stack is already in use", buildpackName))
+									Eventually(session.Err).Should(Say("Buildpack with name '%s' and an unassigned stack already exists", buildpackName))
 									Eventually(session).Should(Exit(1))
 								}, stacks[0])
 							})
