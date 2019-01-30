@@ -35,9 +35,9 @@ type UpdateBuildpackCommand struct {
 	Lock            bool                             `long:"lock" description:"Lock the buildpack to prevent updates"`
 	Path            flag.PathWithExistenceCheckOrURL `long:"path" short:"p" description:"Path to directory or zip file"`
 	Position        types.NullInt                    `long:"position" short:"i" description:"The order in which the buildpacks are checked during buildpack auto-detection"`
+	NewName         string                           `long:"rename" description:"Rename an existing buildpack"`
 	CurrentStack    string                           `long:"stack" short:"s" description:"Specify stack to disambiguate buildpacks with the same name"`
 	Unlock          bool                             `long:"unlock" description:"Unlock the buildpack to enable updates"`
-	NewName         string                           `long:"rename" description:"Rename an existing buildpack"`
 
 	UI          command.UI
 	Config      command.Config
