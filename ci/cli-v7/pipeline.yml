@@ -524,8 +524,11 @@ jobs:
 - name: create-beta-release-notes
   serial: true
   plan:
-  - get: cli
-    passed: [create-beta-release]
+  - aggregate:
+    - get: cli
+      passed: [create-beta-release]
+    - get: cli-ci
+    - get: cli-wiki
   - task: create-release-notes
     file: cli-ci/ci/cli-v7/tasks/create-release-notes.yml
   - put: cli-wiki
