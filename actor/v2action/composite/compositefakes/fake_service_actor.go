@@ -9,18 +9,33 @@ import (
 )
 
 type FakeServiceActor struct {
-	GetServicesWithPlansForBrokerStub        func(string) (v2action.ServicesWithPlans, v2action.Warnings, error)
-	getServicesWithPlansForBrokerMutex       sync.RWMutex
-	getServicesWithPlansForBrokerArgsForCall []struct {
-		arg1 string
+	GetServicesWithPlansStub        func(...v2action.Filter) (v2action.ServicesWithPlans, v2action.Warnings, error)
+	getServicesWithPlansMutex       sync.RWMutex
+	getServicesWithPlansArgsForCall []struct {
+		arg1 []v2action.Filter
 	}
-	getServicesWithPlansForBrokerReturns struct {
+	getServicesWithPlansReturns struct {
 		result1 v2action.ServicesWithPlans
 		result2 v2action.Warnings
 		result3 error
 	}
-	getServicesWithPlansForBrokerReturnsOnCall map[int]struct {
+	getServicesWithPlansReturnsOnCall map[int]struct {
 		result1 v2action.ServicesWithPlans
+		result2 v2action.Warnings
+		result3 error
+	}
+	ServiceExistsWithNameStub        func(string) (bool, v2action.Warnings, error)
+	serviceExistsWithNameMutex       sync.RWMutex
+	serviceExistsWithNameArgsForCall []struct {
+		arg1 string
+	}
+	serviceExistsWithNameReturns struct {
+		result1 bool
+		result2 v2action.Warnings
+		result3 error
+	}
+	serviceExistsWithNameReturnsOnCall map[int]struct {
+		result1 bool
 		result2 v2action.Warnings
 		result3 error
 	}
@@ -28,67 +43,133 @@ type FakeServiceActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeServiceActor) GetServicesWithPlansForBroker(arg1 string) (v2action.ServicesWithPlans, v2action.Warnings, error) {
-	fake.getServicesWithPlansForBrokerMutex.Lock()
-	ret, specificReturn := fake.getServicesWithPlansForBrokerReturnsOnCall[len(fake.getServicesWithPlansForBrokerArgsForCall)]
-	fake.getServicesWithPlansForBrokerArgsForCall = append(fake.getServicesWithPlansForBrokerArgsForCall, struct {
-		arg1 string
+func (fake *FakeServiceActor) GetServicesWithPlans(arg1 ...v2action.Filter) (v2action.ServicesWithPlans, v2action.Warnings, error) {
+	fake.getServicesWithPlansMutex.Lock()
+	ret, specificReturn := fake.getServicesWithPlansReturnsOnCall[len(fake.getServicesWithPlansArgsForCall)]
+	fake.getServicesWithPlansArgsForCall = append(fake.getServicesWithPlansArgsForCall, struct {
+		arg1 []v2action.Filter
 	}{arg1})
-	fake.recordInvocation("GetServicesWithPlansForBroker", []interface{}{arg1})
-	fake.getServicesWithPlansForBrokerMutex.Unlock()
-	if fake.GetServicesWithPlansForBrokerStub != nil {
-		return fake.GetServicesWithPlansForBrokerStub(arg1)
+	fake.recordInvocation("GetServicesWithPlans", []interface{}{arg1})
+	fake.getServicesWithPlansMutex.Unlock()
+	if fake.GetServicesWithPlansStub != nil {
+		return fake.GetServicesWithPlansStub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getServicesWithPlansForBrokerReturns
+	fakeReturns := fake.getServicesWithPlansReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeServiceActor) GetServicesWithPlansForBrokerCallCount() int {
-	fake.getServicesWithPlansForBrokerMutex.RLock()
-	defer fake.getServicesWithPlansForBrokerMutex.RUnlock()
-	return len(fake.getServicesWithPlansForBrokerArgsForCall)
+func (fake *FakeServiceActor) GetServicesWithPlansCallCount() int {
+	fake.getServicesWithPlansMutex.RLock()
+	defer fake.getServicesWithPlansMutex.RUnlock()
+	return len(fake.getServicesWithPlansArgsForCall)
 }
 
-func (fake *FakeServiceActor) GetServicesWithPlansForBrokerCalls(stub func(string) (v2action.ServicesWithPlans, v2action.Warnings, error)) {
-	fake.getServicesWithPlansForBrokerMutex.Lock()
-	defer fake.getServicesWithPlansForBrokerMutex.Unlock()
-	fake.GetServicesWithPlansForBrokerStub = stub
+func (fake *FakeServiceActor) GetServicesWithPlansCalls(stub func(...v2action.Filter) (v2action.ServicesWithPlans, v2action.Warnings, error)) {
+	fake.getServicesWithPlansMutex.Lock()
+	defer fake.getServicesWithPlansMutex.Unlock()
+	fake.GetServicesWithPlansStub = stub
 }
 
-func (fake *FakeServiceActor) GetServicesWithPlansForBrokerArgsForCall(i int) string {
-	fake.getServicesWithPlansForBrokerMutex.RLock()
-	defer fake.getServicesWithPlansForBrokerMutex.RUnlock()
-	argsForCall := fake.getServicesWithPlansForBrokerArgsForCall[i]
+func (fake *FakeServiceActor) GetServicesWithPlansArgsForCall(i int) []v2action.Filter {
+	fake.getServicesWithPlansMutex.RLock()
+	defer fake.getServicesWithPlansMutex.RUnlock()
+	argsForCall := fake.getServicesWithPlansArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeServiceActor) GetServicesWithPlansForBrokerReturns(result1 v2action.ServicesWithPlans, result2 v2action.Warnings, result3 error) {
-	fake.getServicesWithPlansForBrokerMutex.Lock()
-	defer fake.getServicesWithPlansForBrokerMutex.Unlock()
-	fake.GetServicesWithPlansForBrokerStub = nil
-	fake.getServicesWithPlansForBrokerReturns = struct {
+func (fake *FakeServiceActor) GetServicesWithPlansReturns(result1 v2action.ServicesWithPlans, result2 v2action.Warnings, result3 error) {
+	fake.getServicesWithPlansMutex.Lock()
+	defer fake.getServicesWithPlansMutex.Unlock()
+	fake.GetServicesWithPlansStub = nil
+	fake.getServicesWithPlansReturns = struct {
 		result1 v2action.ServicesWithPlans
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeServiceActor) GetServicesWithPlansForBrokerReturnsOnCall(i int, result1 v2action.ServicesWithPlans, result2 v2action.Warnings, result3 error) {
-	fake.getServicesWithPlansForBrokerMutex.Lock()
-	defer fake.getServicesWithPlansForBrokerMutex.Unlock()
-	fake.GetServicesWithPlansForBrokerStub = nil
-	if fake.getServicesWithPlansForBrokerReturnsOnCall == nil {
-		fake.getServicesWithPlansForBrokerReturnsOnCall = make(map[int]struct {
+func (fake *FakeServiceActor) GetServicesWithPlansReturnsOnCall(i int, result1 v2action.ServicesWithPlans, result2 v2action.Warnings, result3 error) {
+	fake.getServicesWithPlansMutex.Lock()
+	defer fake.getServicesWithPlansMutex.Unlock()
+	fake.GetServicesWithPlansStub = nil
+	if fake.getServicesWithPlansReturnsOnCall == nil {
+		fake.getServicesWithPlansReturnsOnCall = make(map[int]struct {
 			result1 v2action.ServicesWithPlans
 			result2 v2action.Warnings
 			result3 error
 		})
 	}
-	fake.getServicesWithPlansForBrokerReturnsOnCall[i] = struct {
+	fake.getServicesWithPlansReturnsOnCall[i] = struct {
 		result1 v2action.ServicesWithPlans
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeServiceActor) ServiceExistsWithName(arg1 string) (bool, v2action.Warnings, error) {
+	fake.serviceExistsWithNameMutex.Lock()
+	ret, specificReturn := fake.serviceExistsWithNameReturnsOnCall[len(fake.serviceExistsWithNameArgsForCall)]
+	fake.serviceExistsWithNameArgsForCall = append(fake.serviceExistsWithNameArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("ServiceExistsWithName", []interface{}{arg1})
+	fake.serviceExistsWithNameMutex.Unlock()
+	if fake.ServiceExistsWithNameStub != nil {
+		return fake.ServiceExistsWithNameStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.serviceExistsWithNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeServiceActor) ServiceExistsWithNameCallCount() int {
+	fake.serviceExistsWithNameMutex.RLock()
+	defer fake.serviceExistsWithNameMutex.RUnlock()
+	return len(fake.serviceExistsWithNameArgsForCall)
+}
+
+func (fake *FakeServiceActor) ServiceExistsWithNameCalls(stub func(string) (bool, v2action.Warnings, error)) {
+	fake.serviceExistsWithNameMutex.Lock()
+	defer fake.serviceExistsWithNameMutex.Unlock()
+	fake.ServiceExistsWithNameStub = stub
+}
+
+func (fake *FakeServiceActor) ServiceExistsWithNameArgsForCall(i int) string {
+	fake.serviceExistsWithNameMutex.RLock()
+	defer fake.serviceExistsWithNameMutex.RUnlock()
+	argsForCall := fake.serviceExistsWithNameArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeServiceActor) ServiceExistsWithNameReturns(result1 bool, result2 v2action.Warnings, result3 error) {
+	fake.serviceExistsWithNameMutex.Lock()
+	defer fake.serviceExistsWithNameMutex.Unlock()
+	fake.ServiceExistsWithNameStub = nil
+	fake.serviceExistsWithNameReturns = struct {
+		result1 bool
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeServiceActor) ServiceExistsWithNameReturnsOnCall(i int, result1 bool, result2 v2action.Warnings, result3 error) {
+	fake.serviceExistsWithNameMutex.Lock()
+	defer fake.serviceExistsWithNameMutex.Unlock()
+	fake.ServiceExistsWithNameStub = nil
+	if fake.serviceExistsWithNameReturnsOnCall == nil {
+		fake.serviceExistsWithNameReturnsOnCall = make(map[int]struct {
+			result1 bool
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.serviceExistsWithNameReturnsOnCall[i] = struct {
+		result1 bool
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -97,8 +178,10 @@ func (fake *FakeServiceActor) GetServicesWithPlansForBrokerReturnsOnCall(i int, 
 func (fake *FakeServiceActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getServicesWithPlansForBrokerMutex.RLock()
-	defer fake.getServicesWithPlansForBrokerMutex.RUnlock()
+	fake.getServicesWithPlansMutex.RLock()
+	defer fake.getServicesWithPlansMutex.RUnlock()
+	fake.serviceExistsWithNameMutex.RLock()
+	defer fake.serviceExistsWithNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

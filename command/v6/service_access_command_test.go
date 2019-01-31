@@ -13,53 +13,49 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 )
 
-func generateBrokers(numberOfBrokers int) []v2action.ServiceBrokerSummary {
-	var brokers []v2action.ServiceBrokerSummary
-	for i := 0; i < numberOfBrokers; i++ {
-		brokers = append(brokers, v2action.ServiceBrokerSummary{
-			ServiceBroker: v2action.ServiceBroker{
-				Name: fmt.Sprintf("sb%d", i),
-			},
-			Services: []v2action.ServiceSummary{
-				{
-					Service: v2action.Service{Label: fmt.Sprintf("service%d-2", i)},
-					Plans: []v2action.ServicePlanSummary{
-						{
-							ServicePlan: v2action.ServicePlan{Name: "simple"},
-							VisibleTo:   []string{"org1", "org2"},
-						},
-						{
-							ServicePlan: v2action.ServicePlan{
-								Name:   "complex",
-								Public: true,
-							},
-						},
+func createBroker(i int) v2action.ServiceBrokerSummary {
+	return v2action.ServiceBrokerSummary{
+		ServiceBroker: v2action.ServiceBroker{
+			Name: fmt.Sprintf("sb%d", i),
+		},
+		Services: []v2action.ServiceSummary{
+			{
+				Service: v2action.Service{Label: fmt.Sprintf("service%d-2", i)},
+				Plans: []v2action.ServicePlanSummary{
+					{
+						ServicePlan: v2action.ServicePlan{Name: "simple"},
+						VisibleTo:   []string{"org1", "org2"},
 					},
-				},
-				{
-					Service: v2action.Service{Label: fmt.Sprintf("service%d-1", i)},
-					Plans: []v2action.ServicePlanSummary{
-						{
-							ServicePlan: v2action.ServicePlan{Name: "simple"},
-						},
-						{
-							ServicePlan: v2action.ServicePlan{
-								Name:   "complex",
-								Public: true,
-							},
-							VisibleTo: []string{"org3", "org4"},
+					{
+						ServicePlan: v2action.ServicePlan{
+							Name:   "complex",
+							Public: true,
 						},
 					},
 				},
 			},
-		})
+			{
+				Service: v2action.Service{Label: fmt.Sprintf("service%d-1", i)},
+				Plans: []v2action.ServicePlanSummary{
+					{
+						ServicePlan: v2action.ServicePlan{Name: "simple"},
+					},
+					{
+						ServicePlan: v2action.ServicePlan{
+							Name:   "complex",
+							Public: true,
+						},
+						VisibleTo: []string{"org3", "org4"},
+					},
+				},
+			},
+		},
 	}
-
-	return brokers
 }
 
 func rowMatcher(brokers []v2action.ServiceBrokerSummary, b int, s int, p int, access string) string {
@@ -103,12 +99,6 @@ var _ = Describe("service-access Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns("faceman")
-
-		fakeConfig.ExperimentalReturns(true)
-	})
-
-	JustBeforeEach(func() {
-		executeErr = cmd.Execute(nil)
 	})
 
 	When("a cloud controller API endpoint is set", func() {
@@ -122,6 +112,7 @@ var _ = Describe("service-access Command", func() {
 			})
 
 			It("returns an error", func() {
+				executeErr = cmd.Execute(nil)
 				Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
@@ -138,9 +129,46 @@ var _ = Describe("service-access Command", func() {
 					nil)
 			})
 
-			It("displays flavor text", func() {
-				Expect(testUI.Out).To(Say("Getting service access as some-user..."))
-				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+			DescribeTable("flavour text",
+				func(broker, service, organization, expectedOutput string) {
+					cmd.Broker = broker
+					cmd.Service = service
+					cmd.Organization = organization
+
+					executeErr = cmd.Execute(nil)
+
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(testUI.Out).To(Say(expectedOutput))
+				},
+				Entry("when no flags are passed", "", "", "",
+					"Getting service access as some-user\\.\\.\\."),
+				Entry("when the broker flag is passed", "test-broker", "", "",
+					"Getting service access for broker test-broker as some-user\\.\\.\\."),
+				Entry("when the broker and service flags are passed", "test-broker", "test-service", "",
+					"Getting service access for broker test-broker and service test-service as some-user\\.\\.\\."),
+				Entry("when the broker and org flags are passed", "test-broker", "", "test-org",
+					"Getting service access for broker test-broker and organization test-org as some-user\\.\\.\\."),
+				Entry("when the broker, service and org flags are passed", "test-broker", "test-service", "test-org",
+					"Getting service access for broker test-broker and service test-service and organization test-org as some-user\\.\\.\\."),
+				Entry("when the service flag is passed", "", "test-service", "",
+					"Getting service access for service test-service as some-user\\.\\.\\."),
+				Entry("when the service and org flags are passed", "", "test-service", "test-org",
+					"Getting service access for service test-service and organization test-org as some-user\\.\\.\\."),
+				Entry("when the org flag is passed", "", "", "test-org",
+					"Getting service access for organization test-org as some-user\\.\\.\\."),
+			)
+
+			When("there are no broker summaries returned", func() {
+				BeforeEach(func() {
+					fakeActor.GetServiceBrokerSummariesReturns([]v2action.ServiceBrokerSummary{}, nil, nil)
+				})
+
+				It("displays only the header and nothing else", func() {
+					executeErr = cmd.Execute(nil)
+					Expect(executeErr).NotTo(HaveOccurred())
+					Eventually(testUI.Out).Should(Say("Getting service access as some-user\\.\\.\\."))
+					Consistently(testUI.Out).ShouldNot(Say("[^\\s]"))
+				})
 			})
 
 			When("flags are passed", func() {
@@ -148,6 +176,10 @@ var _ = Describe("service-access Command", func() {
 					cmd.Broker = "test-broker"
 					cmd.Service = "test-service"
 					cmd.Organization = "test-organization"
+				})
+
+				JustBeforeEach(func() {
+					executeErr = cmd.Execute(nil)
 				})
 
 				It("fetches service broker summaries from the passed flags", func() {
@@ -173,30 +205,38 @@ var _ = Describe("service-access Command", func() {
 				})
 			})
 
-			Describe("table", func() {
+			Describe("tabular output", func() {
 				var brokers []v2action.ServiceBrokerSummary
-
-				BeforeEach(func() {
-					brokers = generateBrokers(2)
-					fakeActor.GetServiceBrokerSummariesReturns(generateBrokers(2), v2action.Warnings{"warning"}, nil)
+				JustBeforeEach(func() {
+					executeErr = cmd.Execute(nil)
 				})
 
-				It("displays each service broker, service, plan and access with org in the correct position", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+				When("the summaries returned are unordered", func() {
+					BeforeEach(func() {
+						brokers = []v2action.ServiceBrokerSummary{createBroker(2), createBroker(1)}
+						fakeActor.GetServiceBrokerSummariesReturns(brokers, v2action.Warnings{"warning"}, nil)
+					})
 
-					tableHeaders := `service\s+plan\s+access\s+orgs`
-					Expect(testUI.Out).To(Say(`broker:\s+%s`, brokers[0].Name))
-					Expect(testUI.Out).To(Say(tableHeaders))
-					Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 1, 1, "all")))
-					Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 1, 0, "none")))
-					Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 0, 1, "all")))
-					Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 0, 0, "limited")))
-					Expect(testUI.Out).To(Say(`broker:\s+%s`, brokers[1].Name))
-					Expect(testUI.Out).To(Say(tableHeaders))
-					Expect(testUI.Out).To(Say(rowMatcher(brokers, 1, 1, 1, "all")))
-					Expect(testUI.Out).To(Say(rowMatcher(brokers, 1, 1, 0, "none")))
-					Expect(testUI.Out).To(Say(rowMatcher(brokers, 1, 0, 1, "all")))
-					Expect(testUI.Out).To(Say(rowMatcher(brokers, 1, 0, 0, "limited")))
+					It("sorts brokers and services before displaying broker, service plan and access with org", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Err).To(Say("warning"))
+
+						// The command sorts the slices in places, so the order here is not the same as the order they were
+						// generated in and passed to GetServiceBrokerSummariesReturns.
+						tableHeaders := `service\s+plan\s+access\s+orgs`
+						Expect(testUI.Out).To(Say(`broker:\s+%s`, brokers[0].Name))
+						Expect(testUI.Out).To(Say(tableHeaders))
+						Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 0, 0, "all")))
+						Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 0, 1, "none")))
+						Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 1, 0, "all")))
+						Expect(testUI.Out).To(Say(rowMatcher(brokers, 0, 1, 1, "limited")))
+						Expect(testUI.Out).To(Say(`broker:\s+%s`, brokers[1].Name))
+						Expect(testUI.Out).To(Say(tableHeaders))
+						Expect(testUI.Out).To(Say(rowMatcher(brokers, 1, 0, 0, "all")))
+						Expect(testUI.Out).To(Say(rowMatcher(brokers, 1, 0, 1, "none")))
+						Expect(testUI.Out).To(Say(rowMatcher(brokers, 1, 1, 0, "all")))
+						Expect(testUI.Out).To(Say(rowMatcher(brokers, 1, 1, 1, "limited")))
+					})
 				})
 			})
 		})

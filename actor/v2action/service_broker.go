@@ -8,12 +8,13 @@ import (
 
 type ServiceBroker ccv2.ServiceBroker
 
-// CreateServiceBroker returns a ServiceBroker and any warnings or errors
+// CreateServiceBroker returns a ServiceBroker and any warnings or errors.
 func (actor Actor) CreateServiceBroker(serviceBrokerName, username, password, brokerURI, spaceGUID string) (ServiceBroker, Warnings, error) {
 	serviceBroker, warnings, err := actor.CloudControllerClient.CreateServiceBroker(serviceBrokerName, username, password, brokerURI, spaceGUID)
 	return ServiceBroker(serviceBroker), Warnings(warnings), err
 }
 
+// GetServiceBrokers returns all ServiceBrokers and any warnings or errors.
 func (actor Actor) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 	brokers, warnings, err := actor.CloudControllerClient.GetServiceBrokers()
 	if err != nil {
@@ -28,7 +29,7 @@ func (actor Actor) GetServiceBrokers() ([]ServiceBroker, Warnings, error) {
 	return brokersToReturn, Warnings(warnings), nil
 }
 
-// GetServiceBrokerByName returns a ServiceBroker and any warnings or errors
+// GetServiceBrokerByName returns a ServiceBroker and any warnings or errors.
 func (actor Actor) GetServiceBrokerByName(brokerName string) (ServiceBroker, Warnings, error) {
 	serviceBrokers, warnings, err := actor.CloudControllerClient.GetServiceBrokers(ccv2.Filter{
 		Type:     constant.NameFilter,

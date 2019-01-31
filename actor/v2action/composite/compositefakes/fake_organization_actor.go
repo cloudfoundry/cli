@@ -24,6 +24,21 @@ type FakeOrganizationActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	OrganizationExistsWithNameStub        func(string) (bool, v2action.Warnings, error)
+	organizationExistsWithNameMutex       sync.RWMutex
+	organizationExistsWithNameArgsForCall []struct {
+		arg1 string
+	}
+	organizationExistsWithNameReturns struct {
+		result1 bool
+		result2 v2action.Warnings
+		result3 error
+	}
+	organizationExistsWithNameReturnsOnCall map[int]struct {
+		result1 bool
+		result2 v2action.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -94,11 +109,79 @@ func (fake *FakeOrganizationActor) GetOrganizationReturnsOnCall(i int, result1 v
 	}{result1, result2, result3}
 }
 
+func (fake *FakeOrganizationActor) OrganizationExistsWithName(arg1 string) (bool, v2action.Warnings, error) {
+	fake.organizationExistsWithNameMutex.Lock()
+	ret, specificReturn := fake.organizationExistsWithNameReturnsOnCall[len(fake.organizationExistsWithNameArgsForCall)]
+	fake.organizationExistsWithNameArgsForCall = append(fake.organizationExistsWithNameArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("OrganizationExistsWithName", []interface{}{arg1})
+	fake.organizationExistsWithNameMutex.Unlock()
+	if fake.OrganizationExistsWithNameStub != nil {
+		return fake.OrganizationExistsWithNameStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.organizationExistsWithNameReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeOrganizationActor) OrganizationExistsWithNameCallCount() int {
+	fake.organizationExistsWithNameMutex.RLock()
+	defer fake.organizationExistsWithNameMutex.RUnlock()
+	return len(fake.organizationExistsWithNameArgsForCall)
+}
+
+func (fake *FakeOrganizationActor) OrganizationExistsWithNameCalls(stub func(string) (bool, v2action.Warnings, error)) {
+	fake.organizationExistsWithNameMutex.Lock()
+	defer fake.organizationExistsWithNameMutex.Unlock()
+	fake.OrganizationExistsWithNameStub = stub
+}
+
+func (fake *FakeOrganizationActor) OrganizationExistsWithNameArgsForCall(i int) string {
+	fake.organizationExistsWithNameMutex.RLock()
+	defer fake.organizationExistsWithNameMutex.RUnlock()
+	argsForCall := fake.organizationExistsWithNameArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeOrganizationActor) OrganizationExistsWithNameReturns(result1 bool, result2 v2action.Warnings, result3 error) {
+	fake.organizationExistsWithNameMutex.Lock()
+	defer fake.organizationExistsWithNameMutex.Unlock()
+	fake.OrganizationExistsWithNameStub = nil
+	fake.organizationExistsWithNameReturns = struct {
+		result1 bool
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeOrganizationActor) OrganizationExistsWithNameReturnsOnCall(i int, result1 bool, result2 v2action.Warnings, result3 error) {
+	fake.organizationExistsWithNameMutex.Lock()
+	defer fake.organizationExistsWithNameMutex.Unlock()
+	fake.OrganizationExistsWithNameStub = nil
+	if fake.organizationExistsWithNameReturnsOnCall == nil {
+		fake.organizationExistsWithNameReturnsOnCall = make(map[int]struct {
+			result1 bool
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.organizationExistsWithNameReturnsOnCall[i] = struct {
+		result1 bool
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeOrganizationActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getOrganizationMutex.RLock()
 	defer fake.getOrganizationMutex.RUnlock()
+	fake.organizationExistsWithNameMutex.RLock()
+	defer fake.organizationExistsWithNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

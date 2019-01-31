@@ -156,12 +156,12 @@ var _ = Describe("disable service access command", func() {
 						session = helpers.CF("service-access", "-e", service)
 						Eventually(session).Should(Exit(0))
 						Eventually(session).Should(Say("broker:\\s+%s", broker.Name))
+						Eventually(session).Should(Say("%s\\s+.+\\s+all",
+							service,
+						))
 						Eventually(session).Should(Say("%s\\s+%s\\s+none",
 							service,
 							servicePlan,
-						))
-						Eventually(session).Should(Say("%s\\s+.*\\s+all",
-							service,
 						))
 					})
 				})

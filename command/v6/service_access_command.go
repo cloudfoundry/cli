@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/composite"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/sorting"
 )
@@ -53,10 +52,6 @@ func (cmd *ServiceAccessCommand) Setup(config command.Config, ui command.UI) err
 }
 
 func (cmd ServiceAccessCommand) Execute(args []string) error {
-	if !cmd.Config.Experimental() {
-		return translatableerror.UnrefactoredCommandError{}
-	}
-
 	if err := cmd.SharedActor.CheckTarget(false, false); err != nil {
 		return err
 	}
@@ -66,8 +61,11 @@ func (cmd ServiceAccessCommand) Execute(args []string) error {
 		return err
 	}
 
-	template := "Getting service access as {{.CurrentUser}}..."
+	template := serviceAccessMessages[serviceAccessOptions{Broker: cmd.Broker != "", Service: cmd.Service != "", Org: cmd.Organization != ""}]
 	cmd.UI.DisplayTextWithFlavor(template, map[string]interface{}{
+		"Broker":      cmd.Broker,
+		"Service":     cmd.Service,
+		"Org":         cmd.Organization,
 		"CurrentUser": user.Name,
 	})
 
@@ -118,7 +116,7 @@ func formatAccess(plan v2action.ServicePlanSummary) string {
 }
 
 func sortBrokers(brokers []v2action.ServiceBrokerSummary) {
-	sort.SliceStable(brokers, func(i, j int) bool {
+	sort.Slice(brokers, func(i, j int) bool {
 		return sorting.LessIgnoreCase(brokers[i].Name, brokers[j].Name)
 	})
 
@@ -128,7 +126,7 @@ func sortBrokers(brokers []v2action.ServiceBrokerSummary) {
 }
 
 func sortServices(services []v2action.ServiceSummary) {
-	sort.SliceStable(services, func(i, j int) bool {
+	sort.Slice(services, func(i, j int) bool {
 		return sorting.LessIgnoreCase(services[i].Label, services[j].Label)
 	})
 
@@ -138,7 +136,7 @@ func sortServices(services []v2action.ServiceSummary) {
 }
 
 func sortPlans(plans []v2action.ServicePlanSummary) {
-	sort.SliceStable(plans, func(i, j int) bool {
+	sort.Slice(plans, func(i, j int) bool {
 		return sorting.LessIgnoreCase(plans[i].Name, plans[j].Name)
 	})
 
@@ -149,4 +147,21 @@ func sortPlans(plans []v2action.ServicePlanSummary) {
 
 func sortOrgs(orgs []string) {
 	sort.Strings(orgs)
+}
+
+type serviceAccessOptions struct {
+	Broker  bool
+	Service bool
+	Org     bool
+}
+
+var serviceAccessMessages = map[serviceAccessOptions]string{
+	{Broker: false, Service: false, Org: false}: "Getting service access as {{.CurrentUser}}...",
+	{Broker: true, Service: false, Org: false}:  "Getting service access for broker {{.Broker}} as {{.CurrentUser}}...",
+	{Broker: true, Service: true, Org: false}:   "Getting service access for broker {{.Broker}} and service {{.Service}} as {{.CurrentUser}}...",
+	{Broker: true, Service: true, Org: true}:    "Getting service access for broker {{.Broker}} and service {{.Service}} and organization {{.Org}} as {{.CurrentUser}}...",
+	{Broker: true, Service: false, Org: true}:   "Getting service access for broker {{.Broker}} and organization {{.Org}} as {{.CurrentUser}}...",
+	{Broker: false, Service: true, Org: false}:  "Getting service access for service {{.Service}} as {{.CurrentUser}}...",
+	{Broker: false, Service: true, Org: true}:   "Getting service access for service {{.Service}} and organization {{.Org}} as {{.CurrentUser}}...",
+	{Broker: false, Service: false, Org: true}:  "Getting service access for organization {{.Org}} as {{.CurrentUser}}...",
 }
