@@ -521,21 +521,6 @@ jobs:
       AWS_ACCESS_KEY_ID: ((cli-team-aws-s3-access-key-id))
       AWS_SECRET_ACCESS_KEY: ((cli-team-aws-s3-secret-access-key))
 
-- name: create-beta-release-notes
-  serial: true
-  plan:
-  - aggregate:
-    - get: cli
-      passed: [create-beta-release]
-    - get: cli-ci
-    - get: cli-wiki
-  - task: create-release-notes
-    file: cli-ci/ci/cli-v7/tasks/create-release-notes.yml
-  - put: cli-wiki
-    params:
-      repository: cli-wiki-output/cli-wiki
-      rebase: true
-
 - name: publish-beta-release
   serial: true
   plan:
@@ -544,6 +529,7 @@ jobs:
       trigger: true
       passed: [create-beta-release]
     - get: cli-ci
+    - get: cli-wiki
     - get: edge-linux-binary-64
       passed: [create-beta-release]
   - aggregate:
@@ -563,6 +549,13 @@ jobs:
         CF_PASSWORD: ((cli-pws-client-secret))
         CF_ORGANIZATION: ((oss-organization))
         CF_SPACE: ((oss-space))
+    - do:
+      - task: create-release-notes
+        file: cli-ci/ci/cli-v7/tasks/create-release-notes.yml
+      - put: cli-wiki
+        params:
+          repository: cli-wiki-output/cli-wiki
+          rebase: true
 
 - name: update-cf7-homebrew
   serial: true
