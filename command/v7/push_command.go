@@ -55,6 +55,7 @@ type PushCommand struct {
 	Instances           flag.Instances              `long:"instances" short:"i" description:"Number of instances"`
 	PathToManifest      flag.PathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
 	Memory              flag.Megabytes              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	Disk                flag.Megabytes              `long:"disk" short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
 	NoStart             bool                        `long:"no-start" description:"Do not stage and start the app after pushing"`
 	AppPath             flag.PathWithExistenceCheck `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
@@ -375,16 +376,17 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 
 	return v7pushaction.FlagOverrides{
 		Buildpacks:        cmd.Buildpacks,
+		Disk:              cmd.Disk.NullUint64,
 		DockerImage:       cmd.DockerImage.Path,
 		DockerPassword:    dockerPassword,
 		DockerUsername:    cmd.DockerUsername,
 		HealthCheckType:   cmd.HealthCheckType.Type,
 		Instances:         cmd.Instances.NullInt,
 		Memory:            cmd.Memory.NullUint64,
+		NoStart:           cmd.NoStart,
 		ProvidedAppPath:   string(cmd.AppPath),
 		SkipRouteCreation: cmd.NoRoute,
 		StartCommand:      cmd.StartCommand.FilteredString,
-		NoStart:           cmd.NoStart,
 	}, nil
 }
 

@@ -256,6 +256,7 @@ func (actor Actor) ScaleProcess(state PushState, warningsStream chan Warnings, e
 		process := v7action.Process{
 			Type:       constant.ProcessTypeWeb,
 			MemoryInMB: state.Overrides.Memory,
+			DiskInMB:   state.Overrides.Disk,
 			Instances:  state.Overrides.Instances,
 		}
 		scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(state.Application.GUID, process)
@@ -270,7 +271,7 @@ func (actor Actor) ScaleProcess(state PushState, warningsStream chan Warnings, e
 }
 
 func shouldScaleProcess(state PushState) bool {
-	return state.Overrides.Memory.IsSet || state.Overrides.Instances.IsSet
+	return state.Overrides.Memory.IsSet || state.Overrides.Instances.IsSet || state.Overrides.Disk.IsSet
 }
 
 func (actor Actor) UpdateProcess(state PushState, warningsStream chan Warnings, eventStream chan Event) error {

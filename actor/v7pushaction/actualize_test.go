@@ -302,16 +302,19 @@ var _ = Describe("Actualize", func() {
 		When("a scale override is passed", func() {
 			When("the scale is successful", func() {
 				var memory types.NullUint64
+				var disk types.NullUint64
 				var instances types.NullInt
 
 				BeforeEach(func() {
 					memory = types.NullUint64{IsSet: true, Value: 2048}
+					disk = types.NullUint64{IsSet: true, Value: 1024}
 					instances = types.NullInt{IsSet: true, Value: 1000}
 					fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, nil)
 
 					state.Application.GUID = "some-app-guid"
 					state.Overrides = FlagOverrides{
 						Memory:    memory,
+						Disk:      disk,
 						Instances: instances,
 					}
 					fakeV7Actor.UpdateApplicationReturns(
@@ -335,6 +338,7 @@ var _ = Describe("Actualize", func() {
 						Fields{
 							"Type":       Equal("web"),
 							"MemoryInMB": Equal(memory),
+							"DiskInMB":   Equal(disk),
 							"Instances":  Equal(instances),
 						}))
 				})

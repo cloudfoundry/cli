@@ -621,6 +621,7 @@ var _ = Describe("push Command", func() {
 			cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
 			cmd.HealthCheckType = flag.HealthCheckType{Type: constant.Port}
 			cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
+			cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
 			cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "some-start-command"}}
 			cmd.NoRoute = true
 			cmd.NoStart = true
@@ -637,6 +638,7 @@ var _ = Describe("push Command", func() {
 			Expect(overrides.Buildpacks).To(ConsistOf("buildpack-1", "buildpack-2"))
 			Expect(overrides.HealthCheckType).To(Equal(constant.Port))
 			Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
+			Expect(overrides.Disk).To(Equal(types.NullUint64{Value: 1024, IsSet: true}))
 			Expect(overrides.StartCommand).To(Equal(types.FilteredString{IsSet: true, Value: "some-start-command"}))
 			Expect(overrides.SkipRouteCreation).To(BeTrue())
 			Expect(overrides.NoStart).To(BeTrue())
