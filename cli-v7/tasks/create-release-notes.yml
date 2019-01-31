@@ -12,6 +12,7 @@ params:
 
 inputs:
   - name: cli
+  - name: cli-ci
   - name: cli-wiki
 
 outputs:
