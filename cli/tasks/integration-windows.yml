@@ -19,4 +19,4 @@ params:
   CF_INT_IGNORE_API_VERSION_CHECK:
 
 run:
-  path: cli-ci/ci/cli/tasks/integration-windows.bat
+  path: cli-ci/ci/cli/tasks/integration-windows.ps1

@@ -35,12 +35,16 @@ run:
         credhub1 login --username=credhub-cli --password="$CREDHUB_PASSWORD" --server="$CREDHUB_SERVER"
 
         export CF_INT_PASSWORD=$(credhub1 get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+        # get CA cert for go router
+        credhub1 get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > cleanup-integration-outputs/cert_dir/$ENV.router.ca
       else
         eval "$(bbl print-env)"
         credhub login
 
         export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
         export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+        # get CA cert for go router
+        credhub get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > cleanup-integration-outputs/cert_dir/$ENV.router.ca
       fi
     popd
 
@@ -49,6 +53,9 @@ run:
     # output password into a temp file for consumption by Windows
     echo $CF_INT_PASSWORD > cleanup-integration-outputs/cf-password
     echo $CF_INT_OIDC_PASSWORD > cleanup-integration-outputs/uaa-oidc-password
+
+    # get CA certs for load balancer and router
+    bosh interpolate vars-store/ci/infrastructure/$ENV/bbl-state.json --path /lb/cert > cleanup-integration-outputs/cert_dir/$ENV.lb.cert
 
     set -ex
 
