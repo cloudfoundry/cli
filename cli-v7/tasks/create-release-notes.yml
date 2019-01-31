@@ -37,7 +37,7 @@ run:
       git add "$NOTESFILE"
 
       # create commit in cli-wiki
-      if ! [ -z "$(git status --porcelain)"];
+      if ! [ -z "$(git status --porcelain)" ];
       then
         git config --global user.email "cf-cli-eng@pivotal.io"
         git config --global user.name "Concourse CI"
