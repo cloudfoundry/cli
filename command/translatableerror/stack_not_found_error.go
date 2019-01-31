@@ -7,10 +7,10 @@ type StackNotFoundError struct {
 
 func (e StackNotFoundError) Error() string {
 	if e.Name == "" {
-		return "Stack with GUID {{.GUID}} not found"
+		return "Stack with GUID '{{.GUID}}' not found"
 	}
 
-	return "Stack {{.Name}} not found"
+	return "Stack '{{.Name}}' not found"
 }
 
 func (e StackNotFoundError) Translate(translate func(string, ...interface{}) string) string {

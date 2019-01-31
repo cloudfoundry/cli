@@ -75,7 +75,7 @@ func (cmd *StackCommand) displayStackInfo() error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Getting stack {{.StackName}} as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Getting info for stack {{.StackName}} as {{.Username}}...", map[string]interface{}{
 		"StackName": cmd.RequiredArgs.StackName,
 		"Username":  user.Name,
 	})

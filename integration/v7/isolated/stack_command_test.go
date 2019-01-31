@@ -85,8 +85,8 @@ var _ = Describe("stack command", func() {
 			It("Fails", func() {
 				session := helpers.CF("stack", stackName)
 
-				Eventually(session).Should(Say(`Getting stack %s as %s\.\.\.`, stackName, username))
-				Eventually(session.Err).Should(Say("Stack %s not found", stackName))
+				Eventually(session).Should(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
+				Eventually(session.Err).Should(Say("Stack '%s' not found", stackName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
@@ -112,7 +112,7 @@ var _ = Describe("stack command", func() {
 			It("Shows the details for the stack", func() {
 				session := helpers.CF("stack", stackName)
 
-				Eventually(session).Should(Say(`Getting stack %s as %s\.\.\.`, stackName, username))
+				Eventually(session).Should(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
 				Eventually(session).Should(Say(`name:\s+%s`, stackName))
 				Eventually(session).Should(Say(`description:\s+%s`, stackDescription))
 				Eventually(session).Should(Exit(0))
@@ -122,7 +122,7 @@ var _ = Describe("stack command", func() {
 				It("prints nothing but the guid", func() {
 					session := helpers.CF("stack", stackName, "--guid")
 
-					Consistently(session).ShouldNot(Say(`Getting stack %s as %s\.\.\.`, stackName, username))
+					Consistently(session).ShouldNot(Say(`Getting info for stack %s as %s\.\.\.`, stackName, username))
 					Consistently(session).ShouldNot(Say(`name:\s+%s`, stackName))
 					Consistently(session).ShouldNot(Say(`description:\s+%s`, stackDescription))
 					Eventually(session).Should(Say(`^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`))
