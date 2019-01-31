@@ -8,6 +8,7 @@ import (
 
 type Service ccv2.Service
 
+// GetService fetches a service by GUID.
 func (actor Actor) GetService(serviceGUID string) (Service, Warnings, error) {
 	service, warnings, err := actor.CloudControllerClient.GetService(serviceGUID)
 	return Service(service), Warnings(warnings), err
@@ -69,15 +70,23 @@ func (actor Actor) getServiceByNameForSpace(serviceName, spaceGUID string) (Serv
 	return Service(services[0]), Warnings(warnings), nil
 }
 
+// ServicesWithPlans is an association between a Service and the plans it offers.
 type ServicesWithPlans map[Service][]ServicePlan
 
-func (actor Actor) GetServicesWithPlansForBroker(brokerGUID string) (ServicesWithPlans, Warnings, error) {
+type Filter ccv2.Filter
+
+// GetServicesWithPlansForBroker returns a map of Services to ServicePlans for a particular broker.
+// A particular service with associated plans from a broker can be fetched by additionally providing
+// a service name.
+func (actor Actor) GetServicesWithPlans(filters ...Filter) (ServicesWithPlans, Warnings, error) {
+	ccv2Filters := []ccv2.Filter{}
+	for _, f := range filters {
+		ccv2Filters = append(ccv2Filters, ccv2.Filter(f))
+	}
+
 	var allWarnings Warnings
-	services, warnings, err := actor.CloudControllerClient.GetServices(ccv2.Filter{
-		Type:     constant.ServiceBrokerGUIDFilter,
-		Operator: constant.EqualOperator,
-		Values:   []string{brokerGUID},
-	})
+
+	services, warnings, err := actor.CloudControllerClient.GetServices(ccv2Filters...)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
 		return nil, allWarnings, err
@@ -104,4 +113,23 @@ func (actor Actor) GetServicesWithPlansForBroker(brokerGUID string) (ServicesWit
 	}
 
 	return servicesWithPlans, allWarnings, nil
+}
+
+// ServiceExistsWithName returns true if there is an Organization with the
+// provided name, otherwise false.
+func (actor Actor) ServiceExistsWithName(serviceName string) (bool, Warnings, error) {
+	services, warnings, err := actor.CloudControllerClient.GetServices(ccv2.Filter{
+		Type:     constant.LabelFilter,
+		Operator: constant.EqualOperator,
+		Values:   []string{serviceName},
+	})
+	if err != nil {
+		return false, Warnings(warnings), err
+	}
+
+	if len(services) == 0 {
+		return false, Warnings(warnings), nil
+	}
+
+	return true, Warnings(warnings), nil
 }

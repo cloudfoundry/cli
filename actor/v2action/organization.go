@@ -116,6 +116,7 @@ func (actor Actor) DeleteOrganization(orgName string) (Warnings, error) {
 	return allWarnings, err
 }
 
+// GetOrganizations returns all the available organizations.
 func (actor Actor) GetOrganizations() ([]Organization, Warnings, error) {
 	var returnedOrgs []Organization
 	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations()
@@ -123,4 +124,23 @@ func (actor Actor) GetOrganizations() ([]Organization, Warnings, error) {
 		returnedOrgs = append(returnedOrgs, Organization(org))
 	}
 	return returnedOrgs, Warnings(warnings), err
+}
+
+// OrganizationExistsWithName returns true if there is an Organization with the
+// provided name, otherwise false.
+func (actor Actor) OrganizationExistsWithName(orgName string) (bool, Warnings, error) {
+	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(ccv2.Filter{
+		Type:     constant.NameFilter,
+		Operator: constant.EqualOperator,
+		Values:   []string{orgName},
+	})
+	if err != nil {
+		return false, Warnings(warnings), err
+	}
+
+	if len(orgs) == 0 {
+		return false, Warnings(warnings), nil
+	}
+
+	return true, Warnings(warnings), nil
 }

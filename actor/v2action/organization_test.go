@@ -635,4 +635,73 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 	})
+
+	Describe("OrganizationExistsWithName", func() {
+		var (
+			exists   bool
+			warnings Warnings
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			exists, warnings, err = actor.OrganizationExistsWithName("some-org")
+		})
+
+		When("the org exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv2.Organization{
+						{GUID: "some-org-guid"},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil)
+			})
+
+			It("succeeds, returning true and warnings", func() {
+				Expect(exists).To(BeTrue())
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+				filters := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
+				Expect(filters).To(Equal(
+					[]ccv2.Filter{{
+						Type:     constant.NameFilter,
+						Operator: constant.EqualOperator,
+						Values:   []string{"some-org"},
+					}}))
+			})
+		})
+
+		When("the org does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv2.Organization{},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns false and warnings", func() {
+				Expect(exists).To(BeFalse())
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		When("fetching organizations throw an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv2.Organization{},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					errors.New("boom"),
+				)
+			})
+
+			It("propagates the error and warnings", func() {
+				Expect(err).To(MatchError("boom"))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
 })

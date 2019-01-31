@@ -288,7 +288,11 @@ var _ = Describe("Service Actions", func() {
 			})
 
 			It("returns no services", func() {
-				servicesWithPlans, _, err := actor.GetServicesWithPlansForBroker("some-broker-guid")
+				servicesWithPlans, _, err := actor.GetServicesWithPlans(Filter{
+					Type:     constant.ServiceBrokerGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-broker-guid"},
+				})
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(servicesWithPlans).To(HaveLen(0))
@@ -310,7 +314,11 @@ var _ = Describe("Service Actions", func() {
 			})
 
 			It("returns a service with no plans", func() {
-				servicesWithPlans, _, err := actor.GetServicesWithPlansForBroker("some-broker-guid")
+				servicesWithPlans, _, err := actor.GetServicesWithPlans(Filter{
+					Type:     constant.ServiceBrokerGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-broker-guid"},
+				})
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(servicesWithPlans).To(HaveLen(1))
@@ -362,8 +370,13 @@ var _ = Describe("Service Actions", func() {
 					nil, nil)
 			})
 
-			It("returns a single service with associated plans and warnings", func() {
-				servicesWithPlans, warnings, err := actor.GetServicesWithPlansForBroker("some-broker-guid")
+			It("returns all services with associated plans and warnings", func() {
+				servicesWithPlans, warnings, err := actor.GetServicesWithPlans(Filter{
+					Type:     constant.ServiceBrokerGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-broker-guid"},
+				},
+				)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(servicesWithPlans).To(HaveLen(2))
@@ -402,6 +415,36 @@ var _ = Describe("Service Actions", func() {
 
 				Expect(warnings).To(ConsistOf("get-service-warning", "get-plan-warning"))
 			})
+
+			When("a service name is provided", func() {
+				It("filters by service label", func() {
+					_, _, err := actor.GetServicesWithPlans(Filter{
+						Type:     constant.ServiceBrokerGUIDFilter,
+						Operator: constant.EqualOperator,
+						Values:   []string{"some-broker-guid"},
+					},
+						Filter{
+							Type:     constant.LabelFilter,
+							Operator: constant.EqualOperator,
+							Values:   []string{"some-service-name"},
+						})
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetServicesArgsForCall(0)).To(ConsistOf(
+						ccv2.Filter{
+							Type:     constant.ServiceBrokerGUIDFilter,
+							Operator: constant.EqualOperator,
+							Values:   []string{"some-broker-guid"},
+						},
+						ccv2.Filter{
+							Type:     constant.LabelFilter,
+							Operator: constant.EqualOperator,
+							Values:   []string{"some-service-name"},
+						},
+					))
+				})
+			})
 		})
 
 		When("fetching services returns an error", func() {
@@ -410,7 +453,11 @@ var _ = Describe("Service Actions", func() {
 			})
 
 			It("propagates the error and warnings", func() {
-				_, warnings, err := actor.GetServicesWithPlansForBroker("some-broker-guid")
+				_, warnings, err := actor.GetServicesWithPlans(Filter{
+					Type:     constant.ServiceBrokerGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-broker-guid"},
+				})
 				Expect(err).To(MatchError("EXPLODE"))
 
 				Expect(warnings).To(ConsistOf("get-service-warning"))
@@ -432,10 +479,78 @@ var _ = Describe("Service Actions", func() {
 			})
 
 			It("propagates the error and warnings", func() {
-				_, warnings, err := actor.GetServicesWithPlansForBroker("some-broker-guid")
+				_, warnings, err := actor.GetServicesWithPlans(Filter{
+					Type:     constant.ServiceBrokerGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"some-broker-guid"},
+				})
+
 				Expect(err).To(MatchError("EXPLODE"))
 
 				Expect(warnings).To(ConsistOf("get-service-warning", "get-plan-warning"))
+			})
+		})
+	})
+
+	Describe("ServiceExistsWithName", func() {
+		var (
+			exists   bool
+			warnings Warnings
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			exists, warnings, err = actor.ServiceExistsWithName("some-service")
+		})
+
+		When("a service exists with that name", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns([]ccv2.Service{
+					{
+						GUID:             "some-service-guid",
+						Label:            "some-service",
+						Description:      "some-description",
+						DocumentationURL: "some-url",
+					},
+				}, ccv2.Warnings{"warning-1", "warning-2"}, nil)
+			})
+
+			It("succeeds, returning true and warnings", func() {
+				Expect(exists).To(BeTrue())
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
+				filters := fakeCloudControllerClient.GetServicesArgsForCall(0)
+				Expect(filters).To(Equal(
+					[]ccv2.Filter{{
+						Type:     constant.LabelFilter,
+						Operator: constant.EqualOperator,
+						Values:   []string{"some-service"},
+					}}))
+			})
+		})
+
+		When("no service exists with that name", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns([]ccv2.Service{}, ccv2.Warnings{"warning-1", "warning-2"}, nil)
+			})
+
+			It("returns false and warnings", func() {
+				Expect(exists).To(BeFalse())
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		When("fetching services throws an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns([]ccv2.Service{}, ccv2.Warnings{"warning-1", "warning-2"}, errors.New("boom"))
+			})
+
+			It("propagates the error and warnings", func() {
+				Expect(err).To(MatchError("boom"))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})
 		})
 	})

@@ -7,6 +7,7 @@ import (
 
 type ServicePlanVisibility ccv2.ServicePlanVisibility
 
+// GetServicePlanVisibilities fetches service plan visibilities for a plan by GUID.
 func (actor *Actor) GetServicePlanVisibilities(planGUID string) ([]ServicePlanVisibility, Warnings, error) {
 	visibilities, warnings, err := actor.CloudControllerClient.GetServicePlanVisibilities(ccv2.Filter{
 		Type:     constant.ServicePlanGUIDFilter,
