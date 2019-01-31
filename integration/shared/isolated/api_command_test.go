@@ -133,10 +133,7 @@ var _ = Describe("api command", func() {
 
 	When("Skip SSL Validation is required", func() {
 		Context("api has SSL", func() {
-			var (
-				server *ghttp.Server
-				apiURL string
-			)
+			var server *ghttp.Server
 
 			BeforeEach(func() {
 				cliVersion := "1.0.0"
