@@ -2,8 +2,7 @@
 
 set -e
 
-ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
-VERSION=$(cat $ROOT_DIR/BUILD_VERSION_V7)
+VERSION=$1
 
 cat <<-NOTES
 Package Manager Installation

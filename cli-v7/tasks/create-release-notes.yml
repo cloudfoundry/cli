@@ -31,7 +31,7 @@ run:
 
     pushd cli-wiki
       mv "$NOTESFILE" "$TMPFILE"
-      ../cli-ci/ci/cli-v7/generate-download-links > "$NOTESFILE"
+      ../cli-ci/ci/cli-v7/generate-download-links "$VERSION" > "$NOTESFILE"
       cat "$TMPFILE" >> "$NOTESFILE"
       rm "$TMPFILE"
 
