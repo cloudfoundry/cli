@@ -22,4 +22,6 @@ cat <<-NOTES
 
 ## Change Log
 - ALL THE NEW BUGS GO HERE!
+
+---
 NOTES
