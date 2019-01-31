@@ -133,20 +133,23 @@ var _ = Describe("api command", func() {
 
 	When("Skip SSL Validation is required", func() {
 		Context("api has SSL", func() {
-			var envWithNoCerts map[string]string
+			var (
+				server *ghttp.Server
+				apiURL string
+			)
 
 			BeforeEach(func() {
-				envWithNoCerts = map[string]string{
-					"SSL_CERT_FILE": "",
-					"SSL_CERT_DIR":  "",
-				}
+				cliVersion := "1.0.0"
+				server = helpers.StartServerWithMinimumCLIVersion(cliVersion)
+				apiURL = server.URL()
+			})
 
-				session := helpers.CF("api", "--unset")
-				Eventually(session).Should(Exit(0))
+			AfterEach(func() {
+				server.Close()
 			})
 
 			It("warns about skip SSL", func() {
-				session := helpers.CFWithEnv(envWithNoCerts, "api", apiURL)
+				session := helpers.CF("api", apiURL)
 				Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
 				Eventually(session.Err).Should(Say("x509: certificate has expired or is not yet valid|SSL Certificate Error x509: certificate is valid for|Invalid SSL Cert for %s", apiURL))
 				Eventually(session.Err).Should(Say("TIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"))
@@ -155,7 +158,7 @@ var _ = Describe("api command", func() {
 			})
 
 			It("sets the API endpoint", func() {
-				session := helpers.CFWithEnv(envWithNoCerts, "api", apiURL, "--skip-ssl-validation")
+				session := helpers.CF("api", apiURL, "--skip-ssl-validation")
 				Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say(`api endpoint:\s+%s`, apiURL))
