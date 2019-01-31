@@ -43,14 +43,14 @@ run:
 
         export CF_INT_PASSWORD=$(credhub1 get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
 
-        credhub1 get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/ca > $SSL_CERT_DIR/$ENV.router.ca
+        credhub1 get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > $SSL_CERT_DIR/$ENV.router.ca
       else
         eval "$(bbl print-env)"
         credhub login
         export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
         export CF_INT_OIDC_USERNAME="admin-oidc"
         export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
-        credhub get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/ca > $SSL_CERT_DIR/$ENV.router.ca
+        credhub get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > $SSL_CERT_DIR/$ENV.router.ca
       fi
 
       bosh interpolate bbl-state.json --path /lb/cert > $SSL_CERT_DIR/$ENV.lb.cert
