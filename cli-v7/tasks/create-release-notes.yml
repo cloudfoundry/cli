@@ -25,14 +25,16 @@ run:
     set -ex
 
     VERSION=$(cat cli/BUILD_VERSION_V7)
+    NOTESFILE="V7-Beta-Release.md"
+    TMPFILE="V7-Beta-Release.tmp"
 
     pushd cli-wiki
-      mv V7-Beta-Release past_releases.tmp
-      ../cli/bin/generate-download-links > V7-Beta-Release
-      cat past_releases.tmp >> V7-Beta-Release
-      rm past_releases.tmp
+      mv "$NOTESFILE" "$TMPFILE"
+      ../cli/bin/generate-download-links > "$NOTESFILE"
+      cat "$TMPFILE" >> "$NOTESFILE"
+      rm "$TMPFILE"
 
-      git add V7-Beta-Release
+      git add "$NOTESFILE"
 
       # create commit in cli-wiki
       if ! [ -z "$(git status --porcelain)"];
