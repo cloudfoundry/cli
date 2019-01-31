@@ -5,22 +5,21 @@ set -e
 VERSION=$1
 
 cat <<-NOTES
-Package Manager Installation
-----------
+# $VERSION
+
+## Package Manager Installation
 - [homebrew](https://github.com/cloudfoundry/cli#installing-using-a-package-manager) - Note: \`cf7-cli\` is the formula name for the V7 Beta.
 
-Installers
-----------
+## Installers
 - Debian [64 bit](https://packages.cloudfoundry.org/stable?release=debian64&version=$VERSION&source=github-rel) / [32 bit](https://packages.cloudfoundry.org/stable?release=debian32&version=$VERSION&source=github-rel) (deb)
 - Redhat [64 bit](https://packages.cloudfoundry.org/stable?release=redhat64&version=$VERSION&source=github-rel) / [32 bit](https://packages.cloudfoundry.org/stable?release=redhat32&version=$VERSION&source=github-rel) (rpm)
 - Mac OS X [64 bit](https://packages.cloudfoundry.org/stable?release=macosx64&version=$VERSION&source=github-rel) (pkg)
 
-Binaries
---------
+## Binaries
 - Linux [64 bit](https://packages.cloudfoundry.org/stable?release=linux64-binary&version=$VERSION&source=github-rel) / [32 bit](https://packages.cloudfoundry.org/stable?release=linux32-binary&version=$VERSION&source=github-rel) (tgz)
 - Mac OS X [64 bit](https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=$VERSION&source=github-rel) (tgz)
 - Windows [64 bit](https://packages.cloudfoundry.org/stable?release=windows64-exe&version=$VERSION&source=github-rel) / [32 bit](https://packages.cloudfoundry.org/stable?release=windows32-exe&version=$VERSION&source=github-rel) (zip)
 
-Change Log
-----------
+## Change Log
+- ALL THE NEW BUGS GO HERE!
 NOTES
