@@ -534,6 +534,7 @@ jobs:
   - put: cli-wiki
     params:
       repository: cli-wiki-output/cli-wiki
+      rebase: true
 
 - name: publish-beta-release
   serial: true
