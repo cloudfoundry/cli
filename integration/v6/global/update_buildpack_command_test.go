@@ -545,7 +545,7 @@ var _ = Describe("update-buildpack command", func() {
 					When("the user assigns a stack that does NOT exist on the system", func() {
 						It("displays an error that the stack isn't found", func() {
 							session := helpers.CF("update-buildpack", buildpackName, "--assign-stack", "nonexistent-stack")
-							Eventually(session.Err).Should(Say("Stack nonexistent-stack not found"))
+							Eventually(session.Err).Should(Say("Stack 'nonexistent-stack' not found"))
 							Eventually(session).Should(Say("FAILED"))
 							Eventually(session).Should(Exit(1))
 						})
