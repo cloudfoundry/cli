@@ -140,6 +140,9 @@ var _ = Describe("api command", func() {
 					"SSL_CERT_FILE": "",
 					"SSL_CERT_DIR":  "",
 				}
+
+				session := helpers.CF("api", "--unset")
+				Eventually(session).Should(Exit(0))
 			})
 
 			It("warns about skip SSL", func() {
