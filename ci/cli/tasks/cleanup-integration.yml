@@ -27,7 +27,7 @@ run:
 
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
     CERT_DIR=$PWD/cleanup-integration-outputs/cert_dir
-    mkdir -p CERT_DIR
+    mkdir -p $CERT_DIR
 
     pushd vars-store/ci/infrastructure/$ENV
       if [[ "$(cat bbl-state.json | jq -r '.bblVersion')" =~ v5 ]]; then
