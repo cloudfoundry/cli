@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
@@ -44,6 +45,51 @@ var _ = Describe("push with a simple manifest", func() {
 			Eventually(session).Should(Say(`key1:\s+val1`))
 			Eventually(session).Should(Say(`key4:\s+false`))
 			Eventually(session).Should(Exit(0))
+		})
+
+		When("the --no-manifest flag is provided", func() {
+			It("ignores the manifest", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name": appName,
+								"env": map[string]interface{}{
+									"key1": "val1",
+									"key4": false,
+								},
+							},
+						},
+					})
+
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start", "--no-manifest")
+					Eventually(session).Should(Exit(0))
+				})
+
+				session := helpers.CF("env", appName)
+				Consistently(session).ShouldNot(Say(`key1:\s+val1`))
+				Consistently(session).ShouldNot(Say(`key4:\s+false`))
+				Eventually(session).Should(Exit(0))
+			})
+			DescribeTable("incompatible flags",
+				func(flag string) {
+					helpers.WithHelloWorldApp(func(dir string) {
+						path := filepath.Join(dir, "file.yml")
+						helpers.WriteManifest(path, map[string]interface{}{
+							"applications": []map[string]interface{}{
+								{
+									"name": appName,
+								},
+							},
+						},
+						)
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start", "--no-manifest", flag, path)
+						Eventually(session).Should(Exit(1))
+					})
+				},
+				Entry("--vars-file flag", "--vars-file"),
+				Entry("-f flag", "-f"),
+			)
 		})
 	})
 

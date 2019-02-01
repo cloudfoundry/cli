@@ -255,6 +255,18 @@ var _ = Describe("push Command", func() {
 							_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
 							Expect(manifest).To(Equal(yamlUnmarshalMarshal(yamlContents)))
 						})
+
+						When("the --no-manifest flag is specified", func() {
+							BeforeEach(func() {
+								cmd.NoManifest = true
+							})
+							It("does not read the manifest file", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+								_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
+								Expect(manifest).To(Equal([]byte{}))
+							})
+						})
 					})
 
 					When("there is not a manifest in the current dir", func() {

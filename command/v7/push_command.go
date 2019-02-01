@@ -57,6 +57,7 @@ type PushCommand struct {
 	PathsToVarsFiles    []flag.PathWithExistenceCheck `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
 	Memory              flag.Megabytes                `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	Disk                flag.Megabytes                `long:"disk" short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
+	NoManifest          bool                          `long:"no-manifest" description:""`
 	NoRoute             bool                          `long:"no-route" description:"Do not map a route to this app"`
 	NoStart             bool                          `long:"no-start" description:"Do not stage and start the app after pushing"`
 	AppPath             flag.PathWithExistenceCheck   `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
@@ -141,9 +142,11 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayText("Getting app info...")
 
-	manifest, err := cmd.readManifest()
-	if err != nil {
-		return err
+	var manifest []byte
+	if !cmd.NoManifest {
+		if manifest, err = cmd.readManifest(); err != nil {
+			return err
+		}
 	}
 
 	log.Info("generating the app state")
@@ -418,6 +421,20 @@ func (cmd PushCommand) ValidateFlags() error {
 			Args: []string{
 				"--docker-image, -o",
 				"--path, -p",
+			},
+		}
+	case cmd.NoManifest && cmd.PathToManifest != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--no-manifest",
+				"--manifest, -f",
+			},
+		}
+	case cmd.NoManifest && len(cmd.PathsToVarsFiles) > 0:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--no-manifest",
+				"--vars-file",
 			},
 		}
 	}
