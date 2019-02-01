@@ -26,7 +26,7 @@ run:
     set -e
 
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
-    CERT_DIR=cleanup-integration-outputs/cert_dir
+    CERT_DIR=$PWD/cleanup-integration-outputs/cert_dir
     mkdir -p CERT_DIR
 
     pushd vars-store/ci/infrastructure/$ENV
