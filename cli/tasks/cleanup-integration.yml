@@ -26,6 +26,8 @@ run:
     set -e
 
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
+    CERT_DIR=cleanup-integration-outputs/cert_dir
+    mkdir -p CERT_DIR
 
     pushd vars-store/ci/infrastructure/$ENV
       if [[ "$(cat bbl-state.json | jq -r '.bblVersion')" =~ v5 ]]; then
@@ -44,7 +46,7 @@ run:
         export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
         export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
         # get CA cert for go router
-        credhub get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > cleanup-integration-outputs/cert_dir/$ENV.router.ca
+        credhub get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > $CERT_DIR/$ENV.router.ca
       fi
     popd
 
@@ -55,7 +57,7 @@ run:
     echo $CF_INT_OIDC_PASSWORD > cleanup-integration-outputs/uaa-oidc-password
 
     # get CA certs for load balancer and router
-    bosh interpolate vars-store/ci/infrastructure/$ENV/bbl-state.json --path /lb/cert > cleanup-integration-outputs/cert_dir/$ENV.lb.cert
+    bosh interpolate vars-store/ci/infrastructure/$ENV/bbl-state.json --path /lb/cert > $CERT_DIR/$ENV.lb.cert
 
     set -ex
 
