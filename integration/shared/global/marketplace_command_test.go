@@ -12,18 +12,15 @@ import (
 var _ = Describe("marketplace command", func() {
 	When("an API endpoint is set", func() {
 		When("not logged in", func() {
-			When("there are no accessible services", func() {
-				BeforeEach(func() {
-					helpers.LogoutCF()
-				})
+			BeforeEach(func() {
+				helpers.LogoutCF()
+			})
 
-				It("displays a message that no services are available", func() {
-					session := helpers.CF("marketplace")
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("\n\n"))
-					Eventually(session).Should(Say("No service offerings found"))
-					Eventually(session).Should(Exit(0))
-				})
+			It("displays an informative message and exits 0", func() {
+				session := helpers.CF("marketplace")
+				Eventually(session).Should(Say("Getting all services from marketplace"))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
