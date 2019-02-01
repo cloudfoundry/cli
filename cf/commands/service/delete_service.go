@@ -47,6 +47,7 @@ func (cmd *DeleteService) Requirements(requirementsFactory requirements.Factory,
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
 	return reqs, nil
