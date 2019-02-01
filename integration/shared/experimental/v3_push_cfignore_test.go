@@ -68,8 +68,14 @@ var _ = Describe("v3-push with .cfignore", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					manifestFile := filepath.Join(appDir, "manifest.yml")
-					err = ioutil.WriteFile(manifestFile, nil, 0666)
-					Expect(err).ToNot(HaveOccurred())
+					helpers.WriteManifest(manifestFile, map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name": appName,
+							},
+						},
+					},
+					)
 
 					svnFile := filepath.Join(appDir, ".svn")
 					err = ioutil.WriteFile(svnFile, nil, 0666)
@@ -227,8 +233,14 @@ var _ = Describe("v3-push with .cfignore", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				manifestFile := filepath.Join(appDir, "manifest.yml")
-				err = ioutil.WriteFile(manifestFile, nil, 0666)
-				Expect(err).ToNot(HaveOccurred())
+				helpers.WriteManifest(manifestFile, map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"name": appName,
+						},
+					},
+				},
+				)
 
 				svnFile := filepath.Join(appDir, ".svn")
 				err = ioutil.WriteFile(svnFile, nil, 0666)
