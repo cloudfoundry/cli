@@ -215,10 +215,7 @@ var _ = Describe("enable service access command", func() {
 			When("two services with the same name are registered", func() {
 				BeforeEach(func() {
 					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
-					secondBroker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-					secondBroker.Push()
-					secondBroker.Configure(true)
-					secondBroker.Create()
+					secondBroker = helpers.CreateBroker(domain, service, servicePlan)
 				})
 
 				AfterEach(func() {
