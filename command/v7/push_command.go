@@ -18,6 +18,7 @@ import (
 	"code.cloudfoundry.org/cli/util/manifest"
 	"code.cloudfoundry.org/cli/util/progressbar"
 
+	"github.com/cloudfoundry/bosh-cli/director/template"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -66,6 +67,7 @@ type PushCommand struct {
 	usage               interface{}                   `usage:"CF_NAME push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route] [--no-start]\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start]"`
 	envCFStagingTimeout interface{}                   `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}                   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+	Vars                []template.VarKV              `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
 
 	UI           command.UI
 	Config       command.Config
@@ -350,15 +352,13 @@ func (cmd PushCommand) readManifest() ([]byte, error) {
 
 	if len(cmd.PathToManifest) != 0 {
 		log.WithField("manifestPath", cmd.PathToManifest).Debug("reading '-f' provided manifest")
-		// Final argument to ReadAndInterpolateRawManifest is for --vars flag
-		return manifest.ReadAndInterpolateRawManifest(string(cmd.PathToManifest), pathsToVarsFiles, nil)
+		return manifest.ReadAndInterpolateRawManifest(string(cmd.PathToManifest), pathsToVarsFiles, cmd.Vars)
 	}
 
 	pathToManifest := filepath.Join(cmd.PWD, "manifest.yml")
 	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
 
-	// Final argument to ReadAndInterpolateRawManifest is for --vars flag
-	interpolatedManifest, err := manifest.ReadAndInterpolateRawManifest(pathToManifest, pathsToVarsFiles, nil)
+	interpolatedManifest, err := manifest.ReadAndInterpolateRawManifest(pathToManifest, pathsToVarsFiles, cmd.Vars)
 	if err != nil && !os.IsNotExist(err) {
 		log.Errorln("reading manifest:", err)
 		return nil, err
@@ -435,6 +435,13 @@ func (cmd PushCommand) ValidateFlags() error {
 			Args: []string{
 				"--no-manifest",
 				"--vars-file",
+			},
+		}
+	case cmd.NoManifest && len(cmd.Vars) > 0:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--no-manifest",
+				"--vars",
 			},
 		}
 	}

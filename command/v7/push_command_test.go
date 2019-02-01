@@ -8,9 +8,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	yaml "gopkg.in/yaml.v2"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
@@ -18,17 +15,20 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+	"github.com/cloudfoundry/bosh-cli/director/template"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gstruct"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type Step struct {
@@ -329,6 +329,30 @@ var _ = Describe("push Command", func() {
 						Expect(err).ToNot(HaveOccurred())
 						cmd.PathsToVarsFiles = []flag.PathWithExistenceCheck{
 							flag.PathWithExistenceCheck(pathToVarFile),
+						}
+					})
+
+					It("reads the manifest, substitutes vars, and passes through to conceptualize", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+						_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
+						Expect(manifest).To(Equal(interpolatedManifest))
+					})
+				})
+
+				When("The --var flag is provided", func() {
+					var yamlContents []byte
+					var interpolatedManifest []byte
+
+					BeforeEach(func() {
+						interpolatedManifest = yamlUnmarshalMarshal([]byte("---\n- var: turtle"))
+						yamlContents = []byte("---\n- var: ((put-var-here))")
+						pathToYAMLFile := filepath.Join(tempDir, "manifest.yml")
+						err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
+						Expect(err).ToNot(HaveOccurred())
+						cmd.PathToManifest = flag.PathWithExistenceCheck(pathToYAMLFile)
+						cmd.Vars = []template.VarKV{
+							template.VarKV{Name: "put-var-here", Value: "turtle"},
 						}
 					})
 

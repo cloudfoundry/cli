@@ -72,23 +72,30 @@ var _ = Describe("push with a simple manifest", func() {
 				Eventually(session).Should(Exit(0))
 			})
 			DescribeTable("incompatible flags",
-				func(flag string) {
+				func(flag string, needsPath bool) {
 					helpers.WithHelloWorldApp(func(dir string) {
-						path := filepath.Join(dir, "file.yml")
-						helpers.WriteManifest(path, map[string]interface{}{
-							"applications": []map[string]interface{}{
-								{
-									"name": appName,
+						var path string
+						var session *Session
+						if needsPath {
+							path = filepath.Join(dir, "file.yml")
+							helpers.WriteManifest(path, map[string]interface{}{
+								"applications": []map[string]interface{}{
+									{
+										"name": appName,
+									},
 								},
 							},
-						},
-						)
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start", "--no-manifest", flag, path)
+							)
+							session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start", "--no-manifest", flag, path)
+						} else {
+							session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start", "--no-manifest", flag)
+						}
 						Eventually(session).Should(Exit(1))
 					})
 				},
-				Entry("--vars-file flag", "--vars-file"),
-				Entry("-f flag", "-f"),
+				Entry("--vars-file flag", "--vars-file", true),
+				Entry("-f flag", "-f", true),
+				Entry("--var flag", "--var=foo=bar", false),
 			)
 		})
 	})
@@ -237,7 +244,7 @@ var _ = Describe("push with a simple manifest", func() {
 
 	})
 
-	When("A manifest contains a variable not in the vars-file", func() {
+	When("A manifest contains a variable not in the vars-file or --var", func() {
 		var (
 			tempDir         string
 			pathToManifest  string
@@ -272,6 +279,7 @@ var _ = Describe("push with a simple manifest", func() {
 					PushCommandName, appName,
 					"-f", pathToManifest,
 					"--vars-file", pathToVarsFile1,
+					"--var=not=here",
 					"--no-start")
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say(`Expected to find variables: var1`))
@@ -279,4 +287,89 @@ var _ = Describe("push with a simple manifest", func() {
 		})
 
 	})
+
+	When("A single --var is provided", func() {
+
+		var (
+			tempDir        string
+			pathToManifest string
+		)
+
+		BeforeEach(func() {
+			var err error
+			tempDir, err = ioutil.TempDir("", "simple-manifest-test")
+			Expect(err).ToNot(HaveOccurred())
+			pathToManifest = filepath.Join(tempDir, "manifest.yml")
+			helpers.WriteManifest(pathToManifest, map[string]interface{}{
+				"applications": []map[string]interface{}{
+					{
+						"name": appName,
+						"env": map[string]interface{}{
+							"key1": "((var1))",
+						},
+					},
+				},
+			})
+		})
+
+		It("uses the manifest with substituted variables", func() {
+			helpers.WithHelloWorldApp(func(dir string) {
+				session := helpers.CustomCF(
+					helpers.CFEnv{WorkingDirectory: dir},
+					PushCommandName, appName,
+					"-f", pathToManifest,
+					"--var=var1=secret-key",
+					"--no-start")
+				Eventually(session).Should(Exit(0))
+			})
+
+			session := helpers.CF("env", appName)
+			Eventually(session).Should(Say(`key1:\s+secret-key`))
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
+	When("Multiple --vars are provided", func() {
+
+		var (
+			tempDir        string
+			pathToManifest string
+		)
+
+		BeforeEach(func() {
+			var err error
+			tempDir, err = ioutil.TempDir("", "simple-manifest-test")
+			Expect(err).ToNot(HaveOccurred())
+			pathToManifest = filepath.Join(tempDir, "manifest.yml")
+			helpers.WriteManifest(pathToManifest, map[string]interface{}{
+				"applications": []map[string]interface{}{
+					{
+						"name": appName,
+						"env": map[string]interface{}{
+							"key1": "((var1))",
+							"key4": "((var2))",
+						},
+					},
+				},
+			})
+		})
+
+		It("uses the manifest with substituted variables", func() {
+			helpers.WithHelloWorldApp(func(dir string) {
+				session := helpers.CustomCF(
+					helpers.CFEnv{WorkingDirectory: dir},
+					PushCommandName, appName,
+					"-f", pathToManifest,
+					"--var=var1=secret-key", "--var=var2=foobar",
+					"--no-start")
+				Eventually(session).Should(Exit(0))
+			})
+
+			session := helpers.CF("env", appName)
+			Eventually(session).Should(Say(`key1:\s+secret-key`))
+			Eventually(session).Should(Say(`key4:\s+foobar`))
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
 })
