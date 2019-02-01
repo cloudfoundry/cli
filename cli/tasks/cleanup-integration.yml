@@ -38,7 +38,7 @@ run:
 
         export CF_INT_PASSWORD=$(credhub1 get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
         # get CA cert for go router
-        credhub1 get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > cleanup-integration-outputs/cert_dir/$ENV.router.ca
+        credhub1 get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > $CERT_DIR/$ENV.router.ca
       else
         eval "$(bbl print-env)"
         credhub login
