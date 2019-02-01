@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	yaml "gopkg.in/yaml.v2"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -225,6 +226,14 @@ var _ = Describe("push Command", func() {
 					Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
 				})
 
+				var yamlUnmarshalMarshal = func(b []byte) []byte {
+					var obj interface{}
+					yaml.Unmarshal(b, &obj)
+					postMarshal, err := yaml.Marshal(obj)
+					Expect(err).ToNot(HaveOccurred())
+					return postMarshal
+				}
+
 				When("No path is provided", func() {
 					BeforeEach(func() {
 						cmd.PWD = tempDir
@@ -244,7 +253,7 @@ var _ = Describe("push Command", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
 							_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
-							Expect(manifest).To(Equal(yamlContents))
+							Expect(manifest).To(Equal(yamlUnmarshalMarshal(yamlContents)))
 						})
 					})
 
@@ -274,7 +283,7 @@ var _ = Describe("push Command", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
 							_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
-							Expect(manifest).To(Equal(yamlContents))
+							Expect(manifest).To(Equal(yamlUnmarshalMarshal(yamlContents)))
 						})
 					})
 
@@ -286,6 +295,36 @@ var _ = Describe("push Command", func() {
 						It("throws an error", func() {
 							Expect(os.IsNotExist(executeErr)).To(BeTrue(), fmt.Sprintf("expected to get an 'is not exists' error but got %#v", executeErr))
 						})
+					})
+				})
+
+				When("--vars-files are specified", func() {
+					var yamlContents []byte
+					var varFileContents []byte
+					var interpolatedManifest []byte
+
+					BeforeEach(func() {
+						interpolatedManifest = yamlUnmarshalMarshal([]byte("---\n- var: turtle"))
+						yamlContents = []byte("---\n- var: ((put-var-here))")
+						pathToYAMLFile := filepath.Join(tempDir, "manifest.yml")
+						err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
+						Expect(err).ToNot(HaveOccurred())
+						cmd.PathToManifest = flag.PathWithExistenceCheck(pathToYAMLFile)
+
+						varFileContents = []byte("---\nput-var-here: turtle")
+						pathToVarFile := filepath.Join(tempDir, "var.yml")
+						err = ioutil.WriteFile(pathToVarFile, varFileContents, 0644)
+						Expect(err).ToNot(HaveOccurred())
+						cmd.PathsToVarsFiles = []flag.PathWithExistenceCheck{
+							flag.PathWithExistenceCheck(pathToVarFile),
+						}
+					})
+
+					It("reads the manifest, substitutes vars, and passes through to conceptualize", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
+						_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
+						Expect(manifest).To(Equal(interpolatedManifest))
 					})
 				})
 			})

@@ -1,7 +1,6 @@
 package v7
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -16,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/util/manifest"
 	"code.cloudfoundry.org/cli/util/progressbar"
 
 	log "github.com/sirupsen/logrus"
@@ -47,23 +47,24 @@ type V7ActorForPush interface {
 }
 
 type PushCommand struct {
-	RequiredArgs        flag.AppName                `positional-args:"yes"`
-	Buildpacks          []string                    `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
-	DockerImage         flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
-	DockerUsername      string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
-	HealthCheckType     flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type: 'port' (default), 'process', 'http' (implies endpoint '/')"`
-	Instances           flag.Instances              `long:"instances" short:"i" description:"Number of instances"`
-	PathToManifest      flag.PathWithExistenceCheck `long:"manifest" short:"f" description:"Path to manifest"`
-	Memory              flag.Megabytes              `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
-	Disk                flag.Megabytes              `long:"disk" short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
-	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
-	NoStart             bool                        `long:"no-start" description:"Do not stage and start the app after pushing"`
-	AppPath             flag.PathWithExistenceCheck `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
-	StartCommand        flag.Command                `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
-	dockerPassword      interface{}                 `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
-	usage               interface{}                 `usage:"CF_NAME push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route] [--no-start]\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start]"`
-	envCFStagingTimeout interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
-	envCFStartupTimeout interface{}                 `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+	RequiredArgs        flag.AppName                  `positional-args:"yes"`
+	Buildpacks          []string                      `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	DockerImage         flag.DockerImage              `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
+	DockerUsername      string                        `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
+	HealthCheckType     flag.HealthCheckType          `long:"health-check-type" short:"u" description:"Application health check type: 'port' (default), 'process', 'http' (implies endpoint '/')"`
+	Instances           flag.Instances                `long:"instances" short:"i" description:"Number of instances"`
+	PathToManifest      flag.PathWithExistenceCheck   `long:"manifest" short:"f" description:"Path to manifest"`
+	PathsToVarsFiles    []flag.PathWithExistenceCheck `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
+	Memory              flag.Megabytes                `long:"memory" short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	Disk                flag.Megabytes                `long:"disk" short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
+	NoRoute             bool                          `long:"no-route" description:"Do not map a route to this app"`
+	NoStart             bool                          `long:"no-start" description:"Do not stage and start the app after pushing"`
+	AppPath             flag.PathWithExistenceCheck   `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	StartCommand        flag.Command                  `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
+	dockerPassword      interface{}                   `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
+	usage               interface{}                   `usage:"CF_NAME push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route] [--no-start]\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start]"`
+	envCFStagingTimeout interface{}                   `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	envCFStartupTimeout interface{}                   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
 	UI           command.UI
 	Config       command.Config
@@ -339,23 +340,29 @@ func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream 
 
 func (cmd PushCommand) readManifest() ([]byte, error) {
 	log.Info("reading manifest if exists")
+	pathsToVarsFiles := []string{}
+	for _, varfilepath := range cmd.PathsToVarsFiles {
+		pathsToVarsFiles = append(pathsToVarsFiles, string(varfilepath))
+	}
 
 	if len(cmd.PathToManifest) != 0 {
 		log.WithField("manifestPath", cmd.PathToManifest).Debug("reading '-f' provided manifest")
-		return ioutil.ReadFile(string(cmd.PathToManifest))
+		// Final argument to ReadAndInterpolateRawManifest is for --vars flag
+		return manifest.ReadAndInterpolateRawManifest(string(cmd.PathToManifest), pathsToVarsFiles, nil)
 	}
 
-	manifestPath := filepath.Join(cmd.PWD, "manifest.yml")
-	log.WithField("manifestPath", manifestPath).Debug("path to manifest")
+	pathToManifest := filepath.Join(cmd.PWD, "manifest.yml")
+	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
 
-	manifest, err := ioutil.ReadFile(manifestPath)
+	// Final argument to ReadAndInterpolateRawManifest is for --vars flag
+	interpolatedManifest, err := manifest.ReadAndInterpolateRawManifest(pathToManifest, pathsToVarsFiles, nil)
 	if err != nil && !os.IsNotExist(err) {
 		log.Errorln("reading manifest:", err)
 		return nil, err
 	} else if os.IsNotExist(err) {
 		log.Debug("no manifest exists")
 	}
-	return manifest, nil
+	return interpolatedManifest, nil
 }
 
 func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {

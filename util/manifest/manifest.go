@@ -32,9 +32,33 @@ func (manifest *Manifest) UnmarshalYAML(unmarshal func(interface{}) error) error
 }
 
 // ReadAndInterpolateManifest reads the manifest at the provided paths,
-// interpolates variables if a vars file is provided, and retunrs a fully
+// interpolates variables if a vars file is provided, and returns a fully
 // merged set of applications.
 func ReadAndInterpolateManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]Application, error) {
+	rawManifest, err := ReadAndInterpolateRawManifest(pathToManifest, pathsToVarsFiles, vars)
+	if err != nil {
+		return nil, err
+	}
+
+	var manifest Manifest
+	err = yaml.Unmarshal(rawManifest, &manifest)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, app := range manifest.Applications {
+		if app.Path != "" && !filepath.IsAbs(app.Path) {
+			manifest.Applications[i].Path = filepath.Join(filepath.Dir(pathToManifest), app.Path)
+		}
+	}
+
+	return manifest.Applications, err
+}
+
+// ReadAndInterpolateRawManifest reads the manifest at the provided paths,
+// interpolates variables if a vars file is provided, and returns the
+// Unmarshalled result.
+func ReadAndInterpolateRawManifest(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) ([]byte, error) {
 	rawManifest, err := ioutil.ReadFile(pathToManifest)
 	if err != nil {
 		return nil, err
@@ -69,21 +93,7 @@ func ReadAndInterpolateManifest(pathToManifest string, pathsToVarsFiles []string
 	if err != nil {
 		return nil, InterpolationError{Err: err}
 	}
-
-	var manifest Manifest
-
-	err = yaml.Unmarshal(rawManifest, &manifest)
-	if err != nil {
-		return nil, err
-	}
-
-	for i, app := range manifest.Applications {
-		if app.Path != "" && !filepath.IsAbs(app.Path) {
-			manifest.Applications[i].Path = filepath.Join(filepath.Dir(pathToManifest), app.Path)
-		}
-	}
-
-	return manifest.Applications, err
+	return rawManifest, nil
 }
 
 // WriteApplicationManifest writes the provided application to the given
