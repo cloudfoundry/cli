@@ -12,6 +12,12 @@ $Env:CF_INT_PASSWORD=(Get-Content $pwd\cf-credentials\cf-password -Raw).trim()
 $Env:CF_INT_OIDC_PASSWORD=(Get-Content $pwd\cf-credentials\uaa-oidc-password -Raw).trim()
 $Env:CF_INT_OIDC_USERNAME="admin-oidc"
 $Env:CF_INT_API="https://api.$DOMAIN"
+$Env:SKIP_SSL_VALIDATION="false"
+
+$CF_INT_NAME = $DOMAIN.split(".")[0]
+Import-Certificate -Filepath "$pwd\cf-credentials\cert_dir\$CF_INT_NAME.lb.cert" -CertStoreLocation "cert:\LocalMachine\root"
+
+Import-Certificate -Filepath "$pwd\cf-credentials\cert_dir\$CF_INT_NAME.router.ca" -CertStoreLocation "cert:\LocalMachine\root"
 
 pushd $pwd\cf-cli-binaries
 	7z e cf-cli-binaries.tgz -y
