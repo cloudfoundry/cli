@@ -115,7 +115,7 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 	healthCheckType constant.HealthCheckType,
 	httpEndpoint string,
 	processType string,
-	invocationTimeout int,
+	invocationTimeout int64,
 ) (Application, Warnings, error) {
 
 	app, getWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)

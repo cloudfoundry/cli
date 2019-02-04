@@ -10,7 +10,7 @@ type ProcessHealthCheck struct {
 	ProcessType       string
 	HealthCheckType   constant.HealthCheckType
 	Endpoint          string
-	InvocationTimeout int
+	InvocationTimeout int64
 }
 
 type ProcessHealthChecks []ProcessHealthCheck

@@ -10,7 +10,7 @@ type V3JobFailedError struct {
 	JobGUID string
 
 	// Code is a numeric code for this error.
-	Code int `json:"code"`
+	Code int64 `json:"code"`
 	// Detail is a verbose description of the error.
 	Detail string `json:"detail"`
 	// Title is a short description of the error.

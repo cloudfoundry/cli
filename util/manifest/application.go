@@ -21,7 +21,7 @@ type Application struct {
 	// guaranteed, although CLI only ships strings).
 	EnvironmentVariables    map[string]string
 	HealthCheckHTTPEndpoint string
-	HealthCheckTimeout      int
+	HealthCheckTimeout      uint64
 	// HealthCheckType attribute defines the number of seconds that is allocated
 	// for starting an application.
 	HealthCheckType string

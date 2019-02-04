@@ -13,7 +13,7 @@ import (
 
 type SetHealthCheckActor interface {
 	CloudControllerAPIVersion() string
-	SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType constant.HealthCheckType, httpEndpoint string, processType string, invocationTimeout int) (v7action.Application, v7action.Warnings, error)
+	SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType constant.HealthCheckType, httpEndpoint string, processType string, invocationTimeout int64) (v7action.Application, v7action.Warnings, error)
 }
 
 type SetHealthCheckCommand struct {

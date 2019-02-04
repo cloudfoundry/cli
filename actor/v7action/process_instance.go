@@ -1,9 +1,10 @@
 package v7action
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -18,9 +19,7 @@ func (instance ProcessInstance) Running() bool {
 
 // StartTime returns the time that the instance started.
 func (instance *ProcessInstance) StartTime() time.Time {
-	uptimeDuration := time.Duration(instance.Uptime) * time.Second
-
-	return time.Now().Add(-uptimeDuration)
+	return time.Now().Add(-instance.Uptime)
 }
 
 type ProcessInstances []ccv3.ProcessInstance

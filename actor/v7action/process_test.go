@@ -322,7 +322,7 @@ var _ = Describe("Process Actions", func() {
 								"GUID":                         Equal("some-process-guid"),
 								"HealthCheckType":              Equal(constant.HTTP),
 								"HealthCheckEndpoint":          Equal("some-http-endpoint"),
-								"HealthCheckInvocationTimeout": Equal(42),
+								"HealthCheckInvocationTimeout": BeEquivalentTo(42),
 							}))
 					})
 				})
@@ -349,7 +349,7 @@ var _ = Describe("Process Actions", func() {
 									"GUID":                         Equal("some-process-guid"),
 									"HealthCheckType":              Equal(constant.Port),
 									"HealthCheckEndpoint":          BeEmpty(),
-									"HealthCheckInvocationTimeout": Equal(42),
+									"HealthCheckInvocationTimeout": BeEquivalentTo(42),
 								}))
 						})
 					})
@@ -366,7 +366,7 @@ var _ = Describe("Process Actions", func() {
 									"GUID":                         Equal("some-process-guid"),
 									"HealthCheckType":              Equal(constant.Port),
 									"HealthCheckEndpoint":          BeEmpty(),
-									"HealthCheckInvocationTimeout": Equal(42),
+									"HealthCheckInvocationTimeout": BeEquivalentTo(42),
 								}))
 						})
 					})

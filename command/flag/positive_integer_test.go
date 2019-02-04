@@ -22,7 +22,7 @@ var _ = Describe("Positive Integer", func() {
 			It("sets the value", func() {
 				err := posInt.UnmarshalFlag("42")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(posInt.Value).To(Equal(42))
+				Expect(posInt.Value).To(BeEquivalentTo(42))
 			})
 		})
 

@@ -27,7 +27,7 @@ type Task struct {
 	Name string `json:"name,omitempty"`
 	// SequenceID represents the user-facing id of the task. This number is
 	// unique for every task associated with a given app.
-	SequenceID int `json:"sequence_id,omitempty"`
+	SequenceID int64 `json:"sequence_id,omitempty"`
 	// State represents the task state.
 	State constant.TaskState `json:"state,omitempty"`
 }

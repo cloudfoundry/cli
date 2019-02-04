@@ -2,13 +2,14 @@ package ccv3
 
 import (
 	"bytes"
+	"encoding/json"
+	"io"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/buildpacks"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/types"
-	"encoding/json"
-	"io"
 )
 
 // Buildpack represents a Cloud Controller V3 buildpack.

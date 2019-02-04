@@ -13,7 +13,7 @@ type ProcessHealthCheck struct {
 	ProcessType       string
 	HealthCheckType   constant.HealthCheckType
 	Endpoint          string
-	InvocationTimeout int
+	InvocationTimeout int64
 }
 
 type ProcessHealthChecks []ProcessHealthCheck
@@ -78,7 +78,7 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(
 	healthCheckType constant.HealthCheckType,
 	httpEndpoint string,
 	processType string,
-	invocationTimeout int,
+	invocationTimeout int64,
 ) (Application, Warnings, error) {
 
 	if healthCheckType != constant.HTTP {

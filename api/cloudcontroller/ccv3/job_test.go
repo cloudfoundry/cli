@@ -128,7 +128,7 @@ var _ = Describe("Job", func() {
 				Expect(job.State).To(Equal(constant.JobFailed))
 				Expect(job.Errors[0].Detail).To(Equal("blah blah"))
 				Expect(job.Errors[0].Title).To(Equal("CF-JobFail"))
-				Expect(job.Errors[0].Code).To(Equal(1234))
+				Expect(job.Errors[0].Code).To(BeEquivalentTo(1234))
 			})
 		})
 	})

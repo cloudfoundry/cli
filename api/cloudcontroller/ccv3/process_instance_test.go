@@ -2,6 +2,7 @@ package ccv3_test
 
 import (
 	"net/http"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -140,7 +141,7 @@ var _ = Describe("ProcessInstance", func() {
 						MemoryUsage:      1000000,
 						State:            constant.ProcessInstanceRunning,
 						Type:             "web",
-						Uptime:           123,
+						Uptime:           time.Duration(123 * time.Second),
 					},
 					ProcessInstance{
 						CPU:              0.02,
@@ -152,7 +153,7 @@ var _ = Describe("ProcessInstance", func() {
 						MemoryUsage:      8000000,
 						State:            constant.ProcessInstanceRunning,
 						Type:             "web",
-						Uptime:           456,
+						Uptime:           time.Duration(456 * time.Second),
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1"))

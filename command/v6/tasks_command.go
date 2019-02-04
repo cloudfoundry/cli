@@ -106,7 +106,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 		}
 
 		table = append(table, []string{
-			strconv.Itoa(task.SequenceID),
+			strconv.FormatInt(task.SequenceID, 10),
 			task.Name,
 			cmd.UI.TranslateText(string(task.State)),
 			t.Format(time.RFC1123),

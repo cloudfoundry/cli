@@ -418,7 +418,7 @@ var _ = Describe("Manifest Actions", func() {
 							"env_3": "true",
 							"env_4": "1.00001",
 						}),
-						"HealthCheckTimeout": Equal(120),
+						"HealthCheckTimeout": BeEquivalentTo(120),
 						"Instances": Equal(types.NullInt{
 							Value: 10,
 							IsSet: true,

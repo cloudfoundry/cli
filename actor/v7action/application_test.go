@@ -738,7 +738,7 @@ var _ = Describe("Application Actions", func() {
 					Expect(process.GUID).To(Equal("some-process-guid"))
 					Expect(process.HealthCheckType).To(Equal(constant.HTTP))
 					Expect(process.HealthCheckEndpoint).To(Equal("some-http-endpoint"))
-					Expect(process.HealthCheckInvocationTimeout).To(Equal(42))
+					Expect(process.HealthCheckInvocationTimeout).To(BeEquivalentTo(42))
 				})
 			})
 		})

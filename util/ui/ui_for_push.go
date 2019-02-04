@@ -42,6 +42,9 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, hiddenV
 	case types.NullInt:
 		nVal := newValue.(types.NullInt)
 		ui.displayDiffForNullInt(offset, header, oVal, nVal)
+	case uint64:
+		nVal := newValue.(uint64)
+		ui.displayDiffForUint64(offset, header, oVal, nVal)
 	case string:
 		nVal := newValue.(string)
 		ui.displayDiffForString(offset, header, hiddenValue, oVal, nVal)
@@ -200,6 +203,20 @@ func (ui UI) displayDiffForStrings(offset string, header string, oldList []strin
 			formattedNew := fmt.Sprintf("+   %s", item)
 			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
 		}
+	}
+}
+
+func (ui UI) displayDiffForUint64(offset string, header string, oldValue uint64, newValue uint64) {
+	if oldValue != newValue {
+		formattedOld := fmt.Sprintf("- %s%s%d", ui.TranslateText(header), offset, oldValue)
+		formattedNew := fmt.Sprintf("+ %s%s%d", ui.TranslateText(header), offset, newValue)
+
+		if oldValue != 0 {
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
+		}
+		fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+	} else {
+		fmt.Fprintf(ui.Out, "  %s%s%d\n", ui.TranslateText(header), offset, oldValue)
 	}
 }
 

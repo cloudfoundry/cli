@@ -264,15 +264,15 @@ var _ = Describe("GetApplicationChanges", func() {
 
 		DescribeTable("non-empty values",
 			func(existingTimeout int, newTimeout int, currentValue int, newValue int) {
-				appConfig.CurrentApplication.HealthCheckTimeout = existingTimeout
-				appConfig.DesiredApplication.HealthCheckTimeout = newTimeout
+				appConfig.CurrentApplication.HealthCheckTimeout = uint64(existingTimeout)
+				appConfig.DesiredApplication.HealthCheckTimeout = uint64(newTimeout)
 
 				changes = GetApplicationChanges(appConfig)
 
 				Expect(changes[2]).To(Equal(ui.Change{
 					Header:       "health check timeout:",
-					CurrentValue: currentValue,
-					NewValue:     newValue,
+					CurrentValue: uint64(currentValue),
+					NewValue:     uint64(newValue),
 				}))
 			},
 			Entry("new app with health-check-timeout specified", 0, 200, 0, 200),

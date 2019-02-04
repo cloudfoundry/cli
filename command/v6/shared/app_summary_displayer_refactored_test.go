@@ -1,6 +1,7 @@
 package shared_test
 
 import (
+	"math"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -42,10 +43,7 @@ var _ = Describe("app summary displayer", func() {
 
 		When("the app has instances", func() {
 			When("the process instances are running", func() {
-				var uptime time.Duration
-
 				BeforeEach(func() {
-					uptime = time.Now().Sub(time.Unix(267321600, 0))
 					summary = v2v3action.ApplicationSummary{
 						ApplicationSummary: v3action.ApplicationSummary{
 							Application: v3action.Application{
@@ -67,7 +65,7 @@ var _ = Describe("app summary displayer", func() {
 											DiskUsage:   1000000,
 											MemoryQuota: 33554432,
 											DiskQuota:   2000000,
-											Uptime:      int(uptime.Seconds()),
+											Uptime:      0,
 											Details:     "Some Details 1",
 										},
 										v3action.ProcessInstance{
@@ -77,7 +75,7 @@ var _ = Describe("app summary displayer", func() {
 											DiskUsage:   2000000,
 											MemoryQuota: 33554432,
 											DiskQuota:   4000000,
-											Uptime:      int(time.Now().Sub(time.Unix(330480000, 0)).Seconds()),
+											Uptime:      1,
 											Details:     "Some Details 2",
 										},
 										v3action.ProcessInstance{
@@ -87,7 +85,7 @@ var _ = Describe("app summary displayer", func() {
 											DiskUsage:   3000000,
 											MemoryQuota: 33554432,
 											DiskQuota:   6000000,
-											Uptime:      int(time.Now().Sub(time.Unix(1277164800, 0)).Seconds()),
+											Uptime:      2,
 										},
 									},
 								},
@@ -105,7 +103,7 @@ var _ = Describe("app summary displayer", func() {
 											DiskUsage:   1000000,
 											MemoryQuota: 33554432,
 											DiskQuota:   8000000,
-											Uptime:      int(time.Now().Sub(time.Unix(167572800, 0)).Seconds()),
+											Uptime:      math.MaxInt64,
 										},
 									},
 								},
@@ -115,6 +113,7 @@ var _ = Describe("app summary displayer", func() {
 				})
 
 				It("lists information for each of the processes", func() {
+					temporalPrecision := 2 * time.Second
 					processTable := helpers.ParseV3AppProcessTable(output.Contents())
 					Expect(len(processTable.Processes)).To(Equal(2))
 
@@ -125,17 +124,21 @@ var _ = Describe("app summary displayer", func() {
 
 					Expect(webProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
 					Expect(webProcessSummary.Instances[0].Since).To(MatchRegexp(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
-					Expect(time.Parse(time.RFC3339, webProcessSummary.Instances[0].Since)).To(BeTemporally("~", time.Now().Add(-uptime), 2*time.Second))
+					Expect(time.Parse(time.RFC3339, webProcessSummary.Instances[0].Since)).To(BeTemporally("~", time.Now(), temporalPrecision))
 					Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
 					Expect(webProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
 					Expect(webProcessSummary.Instances[0].Details).To(Equal("Some Details 1"))
 
 					Expect(webProcessSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
+					Expect(webProcessSummary.Instances[1].Since).To(MatchRegexp(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+					Expect(time.Parse(time.RFC3339, webProcessSummary.Instances[1].Since)).To(BeTemporally("~", time.Now().Add(-1*time.Second), temporalPrecision))
 					Expect(webProcessSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
 					Expect(webProcessSummary.Instances[1].CPU).To(Equal("0.0%"))
 					Expect(webProcessSummary.Instances[1].Details).To(Equal("Some Details 2"))
 
 					Expect(webProcessSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
+					Expect(webProcessSummary.Instances[2].Since).To(MatchRegexp(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+					Expect(time.Parse(time.RFC3339, webProcessSummary.Instances[2].Since)).To(BeTemporally("~", time.Now().Add(-2*time.Second), temporalPrecision))
 					Expect(webProcessSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
 					Expect(webProcessSummary.Instances[2].CPU).To(Equal("0.0%"))
 
@@ -145,6 +148,8 @@ var _ = Describe("app summary displayer", func() {
 					Expect(consoleProcessSummary.MemUsage).To(Equal("16M"))
 
 					Expect(consoleProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
+					Expect(consoleProcessSummary.Instances[0].Since).To(MatchRegexp(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z`))
+					Expect(time.Parse(time.RFC3339, consoleProcessSummary.Instances[0].Since)).To(BeTemporally("~", time.Now().Add(-math.MaxInt64), temporalPrecision))
 					Expect(consoleProcessSummary.Instances[0].Disk).To(Equal("976.6K of 7.6M"))
 					Expect(consoleProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
 				})
@@ -173,7 +178,7 @@ var _ = Describe("app summary displayer", func() {
 											DiskUsage:   1000000,
 											MemoryQuota: 33554432,
 											DiskQuota:   2000000,
-											Uptime:      int(time.Now().Sub(time.Unix(267321600, 0)).Seconds()),
+											Uptime:      time.Now().Sub(time.Unix(267321600, 0)),
 										},
 									},
 								},

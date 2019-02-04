@@ -19,10 +19,10 @@ type ApplicationInstanceWithStats struct {
 	Details string
 
 	// Disk is the instance's disk usage in bytes.
-	Disk int
+	Disk int64
 
 	// DiskQuota is the instance's allowed disk usage in bytes.
-	DiskQuota int
+	DiskQuota int64
 
 	// ID is the instance ID.
 	ID int
@@ -31,7 +31,7 @@ type ApplicationInstanceWithStats struct {
 	IsolationSegment string
 
 	// Memory is the instance's memory usage in bytes.
-	Memory int
+	Memory int64
 
 	// MemoryQuota is the instance's allowed memory usage in bytes.
 	MemoryQuota int64

@@ -707,7 +707,7 @@ var _ = Describe("v3-push Command", func() {
 																	DiskUsage:   4000000,
 																	MemoryQuota: 67108864,
 																	DiskQuota:   8000000,
-																	Uptime:      int(time.Now().Sub(time.Unix(1371859200, 0)).Seconds()),
+																	Uptime:      time.Now().Sub(time.Unix(1371859200, 0)),
 																},
 															},
 														},

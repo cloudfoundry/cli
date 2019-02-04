@@ -10,7 +10,7 @@ import (
 )
 
 type FakeV3SetHealthCheckActor struct {
-	SetApplicationProcessHealthCheckTypeByNameAndSpaceStub        func(string, string, constant.HealthCheckType, string, string, int) (v3action.Application, v3action.Warnings, error)
+	SetApplicationProcessHealthCheckTypeByNameAndSpaceStub        func(string, string, constant.HealthCheckType, string, string, int64) (v3action.Application, v3action.Warnings, error)
 	setApplicationProcessHealthCheckTypeByNameAndSpaceMutex       sync.RWMutex
 	setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall []struct {
 		arg1 string
@@ -18,7 +18,7 @@ type FakeV3SetHealthCheckActor struct {
 		arg3 constant.HealthCheckType
 		arg4 string
 		arg5 string
-		arg6 int
+		arg6 int64
 	}
 	setApplicationProcessHealthCheckTypeByNameAndSpaceReturns struct {
 		result1 v3action.Application
@@ -34,7 +34,7 @@ type FakeV3SetHealthCheckActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpace(arg1 string, arg2 string, arg3 constant.HealthCheckType, arg4 string, arg5 string, arg6 int) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpace(arg1 string, arg2 string, arg3 constant.HealthCheckType, arg4 string, arg5 string, arg6 int64) (v3action.Application, v3action.Warnings, error) {
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.setApplicationProcessHealthCheckTypeByNameAndSpaceReturnsOnCall[len(fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall)]
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall = append(fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall, struct {
@@ -43,7 +43,7 @@ func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNam
 		arg3 constant.HealthCheckType
 		arg4 string
 		arg5 string
-		arg6 int
+		arg6 int64
 	}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.recordInvocation("SetApplicationProcessHealthCheckTypeByNameAndSpace", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.Unlock()
@@ -63,13 +63,13 @@ func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNam
 	return len(fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceCalls(stub func(string, string, constant.HealthCheckType, string, string, int) (v3action.Application, v3action.Warnings, error)) {
+func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceCalls(stub func(string, string, constant.HealthCheckType, string, string, int64) (v3action.Application, v3action.Warnings, error)) {
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.Lock()
 	defer fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.Unlock()
 	fake.SetApplicationProcessHealthCheckTypeByNameAndSpaceStub = stub
 }
 
-func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, constant.HealthCheckType, string, string, int) {
+func (fake *FakeV3SetHealthCheckActor) SetApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, constant.HealthCheckType, string, string, int64) {
 	fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.RLock()
 	defer fake.setApplicationProcessHealthCheckTypeByNameAndSpaceMutex.RUnlock()
 	argsForCall := fake.setApplicationProcessHealthCheckTypeByNameAndSpaceArgsForCall[i]

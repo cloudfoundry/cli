@@ -12,7 +12,7 @@ import (
 //go:generate counterfeiter . V3SetHealthCheckActor
 
 type V3SetHealthCheckActor interface {
-	SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType constant.HealthCheckType, httpEndpoint string, processType string, invocationTimeout int) (v3action.Application, v3action.Warnings, error)
+	SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType constant.HealthCheckType, httpEndpoint string, processType string, invocationTimeout int64) (v3action.Application, v3action.Warnings, error)
 }
 
 type V3SetHealthCheckCommand struct {

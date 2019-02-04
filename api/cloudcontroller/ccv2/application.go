@@ -45,7 +45,7 @@ type Application struct {
 
 	// HealthCheckTimeout is the number of seconds for health checking of an
 	// staged app when starting up.
-	HealthCheckTimeout int
+	HealthCheckTimeout uint64
 
 	// HealthCheckType is the type of health check that will be done to the app.
 	HealthCheckType constant.ApplicationHealthCheckType
@@ -95,7 +95,7 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		DockerImage             string                              `json:"docker_image,omitempty"`
 		EnvironmentVariables    map[string]string                   `json:"environment_json,omitempty"`
 		HealthCheckHTTPEndpoint *string                             `json:"health_check_http_endpoint,omitempty"`
-		HealthCheckTimeout      int                                 `json:"health_check_timeout,omitempty"`
+		HealthCheckTimeout      uint64                              `json:"health_check_timeout,omitempty"`
 		HealthCheckType         constant.ApplicationHealthCheckType `json:"health_check_type,omitempty"`
 		Instances               *int                                `json:"instances,omitempty"`
 		Memory                  *uint64                             `json:"memory,omitempty"`
@@ -164,7 +164,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 			// interface{}, but we convert to string.
 			EnvironmentVariables     map[string]interface{} `json:"environment_json"`
 			HealthCheckHTTPEndpoint  string                 `json:"health_check_http_endpoint"`
-			HealthCheckTimeout       int                    `json:"health_check_timeout"`
+			HealthCheckTimeout       uint64                 `json:"health_check_timeout"`
 			HealthCheckType          string                 `json:"health_check_type"`
 			Instances                json.Number            `json:"instances"`
 			Memory                   *uint64                `json:"memory"`

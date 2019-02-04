@@ -18,9 +18,7 @@ func (instance ProcessInstance) Running() bool {
 
 // StartTime returns the time that the instance started.
 func (instance *ProcessInstance) StartTime() time.Time {
-	uptimeDuration := time.Duration(instance.Uptime) * time.Second
-
-	return time.Now().Add(-uptimeDuration)
+	return time.Now().Add(-instance.Uptime)
 }
 
 func (actor Actor) DeleteInstanceByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, instanceIndex int) (Warnings, error) {

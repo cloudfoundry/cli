@@ -24,7 +24,7 @@ type rawManifestApplication struct {
 	Routes                  []rawManifestRoute `yaml:"routes,omitempty"`
 	Services                []string           `yaml:"services,omitempty"`
 	StackName               string             `yaml:"stack,omitempty"`
-	Timeout                 int                `yaml:"timeout,omitempty"`
+	Timeout                 uint64             `yaml:"timeout,omitempty"`
 }
 
 type rawManifestRoute struct {

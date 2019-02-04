@@ -1,7 +1,9 @@
 package ccv3
 
 import (
+	"fmt"
 	"strconv"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -21,7 +23,7 @@ type ProcessInstance struct {
 	// DiskUsage is the current disk usage of the instance.
 	DiskUsage uint64
 	// Index is the index of the instance.
-	Index int
+	Index int64
 	// Isolation segment is the current isolation segment that the instance is
 	// running on. The value is empty when the instance is not placed on a
 	// particular isolation segment.
@@ -34,8 +36,8 @@ type ProcessInstance struct {
 	State constant.ProcessInstanceState
 	// Type is the process type for the instance.
 	Type string
-	// Uptime is the uptime in seconds for the instance.
-	Uptime int
+	// Uptime is the duration that the instance has been running.
+	Uptime time.Duration
 }
 
 // UnmarshalJSON helps unmarshal a V3 Cloud Controller Instance response.
@@ -43,12 +45,12 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 	var inputInstance struct {
 		Details          string `json:"details"`
 		DiskQuota        uint64 `json:"disk_quota"`
-		Index            int    `json:"index"`
+		Index            int64  `json:"index"`
 		IsolationSegment string `json:"isolation_segment"`
 		MemQuota         uint64 `json:"mem_quota"`
 		State            string `json:"state"`
 		Type             string `json:"type"`
-		Uptime           int    `json:"uptime"`
+		Uptime           int64  `json:"uptime"`
 		Usage            struct {
 			CPU  float64 `json:"cpu"`
 			Mem  uint64  `json:"mem"`
@@ -71,7 +73,10 @@ func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 	instance.MemoryUsage = inputInstance.Usage.Mem
 	instance.State = constant.ProcessInstanceState(inputInstance.State)
 	instance.Type = inputInstance.Type
-	instance.Uptime = inputInstance.Uptime
+	instance.Uptime, err = time.ParseDuration(fmt.Sprintf("%ds", inputInstance.Uptime))
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -138,7 +138,7 @@ var _ = Describe("set-health-check Command", func() {
 			Expect(healthCheckType).To(Equal(constant.HealthCheckType("some-health-check-type")))
 			Expect(httpEndpoint).To(Equal("some-http-endpoint"))
 			Expect(processType).To(Equal("some-process-type"))
-			Expect(invocationTimeout).To(Equal(42))
+			Expect(invocationTimeout).To(BeEquivalentTo(42))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))

@@ -1,18 +1,18 @@
 package v7action_test
 
 import (
+	"fmt"
+
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Job Actions", func() {
-
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v7actionfakes.FakeCloudControllerClient
@@ -47,7 +47,7 @@ var _ = Describe("Job Actions", func() {
 			DescribeTable("extracting actual error from JobFailedError",
 				func(code int, expectedErrType error) {
 					fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-warnings"}, ccerror.V3JobFailedError{
-						Code:   code,
+						Code:   int64(code),
 						Detail: fmt.Sprintf("code %d", code),
 					})
 					warnings, err = actor.PollUploadBuildpackJob(jobURL)

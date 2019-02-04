@@ -937,7 +937,7 @@ var _ = Describe("push Command", func() {
 					Expect(settings.Buildpacks).To(ConsistOf("some-buildpack"))
 					Expect(settings.Command).To(Equal(types.FilteredString{IsSet: true, Value: "echo foo bar baz"}))
 					Expect(settings.DiskQuota).To(Equal(uint64(1024)))
-					Expect(settings.HealthCheckTimeout).To(Equal(14))
+					Expect(settings.HealthCheckTimeout).To(BeEquivalentTo(14))
 					Expect(settings.HealthCheckType).To(Equal("http"))
 					Expect(settings.Instances).To(Equal(types.NullInt{Value: 12, IsSet: true}))
 					Expect(settings.Memory).To(Equal(uint64(100)))

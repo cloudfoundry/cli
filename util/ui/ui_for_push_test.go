@@ -282,6 +282,42 @@ var _ = Describe("UI", func() {
 				})
 			})
 
+			When("passed uint64s for values", func() {
+				When("the values are not equal", func() {
+					When("the originalValue is not empty", func() {
+						It("should display the header with differences", func() {
+							err := ui.DisplayChangeForPush("val", 2, false, uint64(1), uint64(2))
+							Expect(err).ToNot(HaveOccurred())
+							Expect(out).To(Say("\x1b\\[31m\\-\\s+val  1\x1b\\[0m"))
+							Expect(out).To(Say("\x1b\\[32m\\+\\s+val  2\x1b\\[0m"))
+						})
+					})
+
+					When("the originalValue is zero", func() {
+						It("should display the header with the new value only", func() {
+							err := ui.DisplayChangeForPush("val", 2, false, uint64(0), uint64(1))
+							Expect(err).ToNot(HaveOccurred())
+							Expect(out).To(Say("\x1b\\[32m\\+\\s+val  1\x1b\\[0m"))
+						})
+					})
+				})
+
+				When("the values are the equal", func() {
+					It("should display the header without differences", func() {
+						err := ui.DisplayChangeForPush("val", 2, false, uint64(3), uint64(3))
+						Expect(err).ToNot(HaveOccurred())
+						Expect(out).To(Say(`(?m)^\s+val  3$`))
+					})
+				})
+
+				When("the values are a different type", func() {
+					It("should return an ErrValueMissmatch", func() {
+						err := ui.DisplayChangeForPush("asdf", 2, false, uint64(7), "asdf")
+						Expect(err).To(MatchError(ErrValueMissmatch))
+					})
+				})
+			})
+
 			When("passed map[string]string for values", func() {
 				It("should display the header with sorted differences", func() {
 					old := map[string]string{"key2": "2", "key3": "2", "key4": "4"}

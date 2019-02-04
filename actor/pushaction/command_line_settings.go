@@ -19,7 +19,7 @@ type CommandLineSettings struct {
 	DockerPassword       string
 	DockerUsername       string
 	DropletPath          string
-	HealthCheckTimeout   int
+	HealthCheckTimeout   uint64
 	HealthCheckType      string
 	Instances            types.NullInt
 	Memory               uint64

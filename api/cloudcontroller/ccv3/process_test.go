@@ -372,7 +372,7 @@ var _ = Describe("Process", func() {
 					"DiskInMB":                     Equal(types.NullUint64{Value: 1024, IsSet: true}),
 					"HealthCheckType":              Equal(constant.HTTP),
 					"HealthCheckEndpoint":          Equal("/health"),
-					"HealthCheckInvocationTimeout": Equal(42),
+					"HealthCheckInvocationTimeout": BeEquivalentTo(42),
 				}))
 			})
 		})

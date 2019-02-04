@@ -65,7 +65,7 @@ type PushCommand struct {
 	StackName           string                                  `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	VarsFilePaths       []flag.PathWithExistenceCheck           `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
 	Vars                []template.VarKV                        `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
-	HealthCheckTimeout  int                                     `short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
+	HealthCheckTimeout  uint64                                  `short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
 	envCFStagingTimeout interface{}                             `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}                             `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 	dockerPassword      interface{}                             `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`

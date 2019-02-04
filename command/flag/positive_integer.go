@@ -7,11 +7,11 @@ import (
 )
 
 type PositiveInteger struct {
-	Value int
+	Value int64
 }
 
 func (posInt *PositiveInteger) UnmarshalFlag(rawValue string) error {
-	value, err := strconv.Atoi(rawValue)
+	value, err := strconv.ParseInt(rawValue, 10, 0)
 	if err != nil {
 		return err
 	}

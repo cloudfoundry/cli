@@ -463,7 +463,7 @@ var _ = Describe("Application Config", func() {
 								"env1": "1",
 								"env3": "3",
 							}),
-							"HealthCheckTimeout": Equal(5),
+							"HealthCheckTimeout": BeEquivalentTo(5),
 							"Instances":          Equal(types.NullInt{Value: 1, IsSet: true}),
 							"DiskQuota":          Equal(types.NullByteSizeInMb{IsSet: true, Value: 2}),
 							"Memory":             Equal(types.NullByteSizeInMb{IsSet: true, Value: 3}),
@@ -522,7 +522,7 @@ var _ = Describe("Application Config", func() {
 						"env3": "9",
 					}))
 					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("/some-endpoint"))
-					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
+					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(BeEquivalentTo(5))
 					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(constant.ApplicationHealthCheckPort))
 					Expect(firstConfig.DesiredApplication.Instances).To(Equal(types.NullInt{Value: 3, IsSet: true}))
 					Expect(firstConfig.DesiredApplication.DiskQuota).To(Equal(types.NullByteSizeInMb{IsSet: true, Value: 2}))
