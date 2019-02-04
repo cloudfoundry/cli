@@ -506,15 +506,25 @@ jobs:
       passed: [create-installers]
     - get: cli-ci
     - get: edge-linux-binary-32
+      passed: [create-installers]
     - get: edge-linux-binary-64
+      passed: [create-installers]
     - get: edge-osx-binary-64
+      passed: [create-installers]
     - get: edge-windows-binary-32
+      passed: [create-installers]
     - get: edge-windows-binary-64
+      passed: [create-installers]
     - get: edge-deb-installer-32
+      passed: [create-installers]
     - get: edge-deb-installer-64
+      passed: [create-installers]
     - get: edge-redhat-installer-32
+      passed: [create-installers]
     - get: edge-redhat-installer-64
+      passed: [create-installers]
     - get: edge-osx-installer-64
+      passed: [create-installers]
   - task: create-release
     file: cli-ci/ci/cli-v7/tasks/create-release.yml
     params:
