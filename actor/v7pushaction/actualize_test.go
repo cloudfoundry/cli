@@ -416,6 +416,32 @@ var _ = Describe("Actualize", func() {
 					})
 				})
 
+				When("health check timeout is provided", func() {
+					var healthCheckTimeout int64
+
+					BeforeEach(func() {
+						healthCheckTimeout = 7
+						state.Overrides = FlagOverrides{
+							HealthCheckTimeout: healthCheckTimeout,
+						}
+					})
+
+					It("sets the health check timeout and returns warnings", func() {
+						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
+						Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
+						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
+
+						Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(1))
+						passedProcessType, passedAppGUID, passedProcess := fakeV7Actor.UpdateProcessByTypeAndApplicationArgsForCall(0)
+						Expect(passedProcessType).To(Equal(constant.ProcessTypeWeb))
+						Expect(passedAppGUID).To(Equal("some-app-guid"))
+						Expect(passedProcess).To(MatchFields(IgnoreExtras,
+							Fields{
+								"HealthCheckTimeout": Equal(healthCheckTimeout),
+							}))
+					})
+				})
+
 				When("start command is provided", func() {
 					var command types.FilteredString
 

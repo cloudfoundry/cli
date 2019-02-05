@@ -49,6 +49,7 @@ type V7ActorForPush interface {
 
 type PushCommand struct {
 	RequiredArgs        flag.AppName                  `positional-args:"yes"`
+	HealthCheckTimeout  flag.PositiveInteger          `long:"app-start-timeout" short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
 	Buildpacks          []string                      `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	DockerImage         flag.DockerImage              `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername      string                        `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
@@ -389,18 +390,19 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 	}
 
 	return v7pushaction.FlagOverrides{
-		Buildpacks:        cmd.Buildpacks,
-		Disk:              cmd.Disk.NullUint64,
-		DockerImage:       cmd.DockerImage.Path,
-		DockerPassword:    dockerPassword,
-		DockerUsername:    cmd.DockerUsername,
-		HealthCheckType:   cmd.HealthCheckType.Type,
-		Instances:         cmd.Instances.NullInt,
-		Memory:            cmd.Memory.NullUint64,
-		NoStart:           cmd.NoStart,
-		ProvidedAppPath:   string(cmd.AppPath),
-		SkipRouteCreation: cmd.NoRoute,
-		StartCommand:      cmd.StartCommand.FilteredString,
+		Buildpacks:         cmd.Buildpacks,
+		Disk:               cmd.Disk.NullUint64,
+		DockerImage:        cmd.DockerImage.Path,
+		DockerPassword:     dockerPassword,
+		DockerUsername:     cmd.DockerUsername,
+		HealthCheckType:    cmd.HealthCheckType.Type,
+		HealthCheckTimeout: cmd.HealthCheckTimeout.Value,
+		Instances:          cmd.Instances.NullInt,
+		Memory:             cmd.Memory.NullUint64,
+		NoStart:            cmd.NoStart,
+		ProvidedAppPath:    string(cmd.AppPath),
+		SkipRouteCreation:  cmd.NoRoute,
+		StartCommand:       cmd.StartCommand.FilteredString,
 	}, nil
 }
 

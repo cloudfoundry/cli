@@ -275,7 +275,7 @@ func shouldScaleProcess(state PushState) bool {
 }
 
 func (actor Actor) UpdateProcess(state PushState, warningsStream chan Warnings, eventStream chan Event) error {
-	if state.Overrides.StartCommand.IsSet || state.Overrides.HealthCheckType != "" {
+	if state.Overrides.StartCommand.IsSet || state.Overrides.HealthCheckType != "" || state.Overrides.HealthCheckTimeout != 0 {
 		log.Info("Setting Web Process's Configuration")
 		eventStream <- SetProcessConfiguration
 
@@ -286,6 +286,9 @@ func (actor Actor) UpdateProcess(state PushState, warningsStream chan Warnings, 
 		if state.Overrides.HealthCheckType != "" {
 			process.HealthCheckType = state.Overrides.HealthCheckType
 			process.HealthCheckEndpoint = constant.ProcessHealthCheckEndpointDefault
+		}
+		if state.Overrides.HealthCheckTimeout != 0 {
+			process.HealthCheckTimeout = state.Overrides.HealthCheckTimeout
 		}
 
 		log.WithField("Process", process).Debug("Update process")

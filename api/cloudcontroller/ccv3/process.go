@@ -21,6 +21,7 @@ type Process struct {
 	HealthCheckType              constant.HealthCheckType
 	HealthCheckEndpoint          string
 	HealthCheckInvocationTimeout int64
+	HealthCheckTimeout           int64
 	Instances                    types.NullInt
 	MemoryInMB                   types.NullUint64
 	DiskInMB                     types.NullUint64
@@ -52,6 +53,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 			Data struct {
 				Endpoint          string `json:"endpoint"`
 				InvocationTimeout int64  `json:"invocation_timeout"`
+				Timeout           int64  `json:"timeout"`
 			} `json:"data"`
 		} `json:"health_check"`
 	}
@@ -66,6 +68,7 @@ func (p *Process) UnmarshalJSON(data []byte) error {
 	p.GUID = ccProcess.GUID
 	p.HealthCheckEndpoint = ccProcess.HealthCheck.Data.Endpoint
 	p.HealthCheckInvocationTimeout = ccProcess.HealthCheck.Data.InvocationTimeout
+	p.HealthCheckTimeout = ccProcess.HealthCheck.Data.Timeout
 	p.HealthCheckType = ccProcess.HealthCheck.Type
 	p.Instances = ccProcess.Instances
 	p.MemoryInMB = ccProcess.MemoryInMB
@@ -154,6 +157,7 @@ func (client *Client) UpdateProcess(process Process) (Process, Warnings, error) 
 		Command:                      process.Command,
 		HealthCheckType:              process.HealthCheckType,
 		HealthCheckEndpoint:          process.HealthCheckEndpoint,
+		HealthCheckTimeout:           process.HealthCheckTimeout,
 		HealthCheckInvocationTimeout: process.HealthCheckInvocationTimeout,
 	})
 	if err != nil {
@@ -178,10 +182,11 @@ func (client *Client) UpdateProcess(process Process) (Process, Warnings, error) 
 }
 
 type healthCheck struct {
-	Type constant.HealthCheckType `json:"type"`
+	Type constant.HealthCheckType `json:"type,omitempty"`
 	Data struct {
-		Endpoint          interface{} `json:"endpoint"`
+		Endpoint          interface{} `json:"endpoint,omitempty"`
 		InvocationTimeout int64       `json:"invocation_timeout,omitempty"`
+		Timeout           int64       `json:"timeout,omitempty"`
 	} `json:"data"`
 }
 
@@ -207,10 +212,11 @@ func marshalDisk(p Process, ccProcess *marshalProcess) {
 }
 
 func marshalHealthCheck(p Process, ccProcess *marshalProcess) {
-	if p.HealthCheckType != "" || p.HealthCheckEndpoint != "" || p.HealthCheckInvocationTimeout != 0 {
+	if p.HealthCheckType != "" || p.HealthCheckEndpoint != "" || p.HealthCheckInvocationTimeout != 0 || p.HealthCheckTimeout != 0 {
 		ccProcess.HealthCheck = new(healthCheck)
 		ccProcess.HealthCheck.Type = p.HealthCheckType
 		ccProcess.HealthCheck.Data.InvocationTimeout = p.HealthCheckInvocationTimeout
+		ccProcess.HealthCheck.Data.Timeout = p.HealthCheckTimeout
 		if p.HealthCheckEndpoint != "" {
 			ccProcess.HealthCheck.Data.Endpoint = p.HealthCheckEndpoint
 		}
