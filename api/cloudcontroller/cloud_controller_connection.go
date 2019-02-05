@@ -1,8 +1,10 @@
 package cloudcontroller
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -51,6 +53,16 @@ func (connection *CloudControllerConnection) Make(request *Request, passedRespon
 	// be populated with a previous response. We reset in case there's an HTTP
 	// error and we don't repopulate it in populateResponse.
 	passedResponse.reset()
+
+	resolver := net.Resolver{}
+	context, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	_, err := resolver.LookupHost(context, request.Request.URL.Hostname())
+	if err != nil {
+		fmt.Println("~~~~~~")
+		fmt.Println(err)
+		return err
+	}
 
 	response, err := connection.HTTPClient.Do(request.Request)
 	if err != nil {
