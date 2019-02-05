@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
@@ -75,6 +76,9 @@ func (actor Actor) EnableServiceForOrg(serviceName, orgName, brokerName string) 
 		if plan.Public != true {
 			_, warnings, err := actor.CloudControllerClient.CreateServicePlanVisibility(plan.GUID, org.GUID)
 			allWarnings = append(allWarnings, warnings...)
+			if _, alreadyExistsError := err.(ccerror.ServicePlanVisibilityExistsError); alreadyExistsError {
+				return allWarnings, nil
+			}
 			if err != nil {
 				return allWarnings, err
 			}
@@ -104,6 +108,9 @@ func (actor Actor) EnablePlanForOrg(serviceName, servicePlanName, orgName, broke
 			}
 			_, warnings, err := actor.CloudControllerClient.CreateServicePlanVisibility(plan.GUID, org.GUID)
 			allWarnings = append(allWarnings, warnings...)
+			if _, alreadyExistsError := err.(ccerror.ServicePlanVisibilityExistsError); alreadyExistsError {
+				return allWarnings, nil
+			}
 			return allWarnings, err
 		}
 	}

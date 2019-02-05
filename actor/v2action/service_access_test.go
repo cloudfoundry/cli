@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
@@ -422,6 +423,23 @@ var _ = Describe("Service Access", func() {
 				It("returns the error", func() {
 					Expect(enablePlanErr).To(MatchError(errors.New("some error")))
 				})
+
+				Context("because the service plan visibility already exists", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.CreateServicePlanVisibilityReturns(
+							ccv2.ServicePlanVisibility{},
+							ccv2.Warnings{"qux"},
+							ccerror.ServicePlanVisibilityExistsError{Message: "sorry"})
+					})
+
+					It("does not return the error", func() {
+						Expect(enablePlanErr).NotTo(HaveOccurred())
+					})
+
+					It("returns all warnings", func() {
+						Expect(enablePlanWarnings).To(ConsistOf("foo", "bar", "qux"))
+					})
+				})
 			})
 		})
 
@@ -644,6 +662,23 @@ var _ = Describe("Service Access", func() {
 
 			It("returns all warnings", func() {
 				Expect(enableServiceForOrgWarnings).To(ConsistOf("foo", "bar", "baz", "qux"))
+			})
+
+			Context("because the service plan visibility already exists", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.CreateServicePlanVisibilityReturns(
+						ccv2.ServicePlanVisibility{},
+						ccv2.Warnings{"qux"},
+						ccerror.ServicePlanVisibilityExistsError{Message: "sorry"})
+				})
+
+				It("does not return the error", func() {
+					Expect(enableServiceForOrgErr).NotTo(HaveOccurred())
+				})
+
+				It("returns all warnings", func() {
+					Expect(enableServiceForOrgWarnings).To(ConsistOf("foo", "bar", "baz", "qux"))
+				})
 			})
 		})
 	})

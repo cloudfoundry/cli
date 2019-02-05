@@ -360,12 +360,11 @@ var _ = Describe("enable service access command", func() {
 					Eventually(session).Should(Say("OK"))
 				})
 
-				It("displays FAILED, an informative error message and exits 1", func() {
+				It("displays OK, and exits 0", func() {
 					session := helpers.CF("enable-service-access", service, "-o", orgName)
 					Eventually(session).Should(Say("Enabling access to all plans of service %s for the org %s as admin...", service, orgName))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("^This combination of ServicePlan and Organization is already taken: organization_id and service_plan_id unique"))
-					Eventually(session).Should(Exit(1))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
