@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -198,52 +197,26 @@ var _ = Describe("purge-service-offering command", func() {
 						Eventually(session).Should(Exit(0))
 					})
 				})
-
-				When("the -p flag is provided", func() {
-					When("the CF API version is above 2.46.0", func() {
-						BeforeEach(func() {
-							helpers.SkipIfVersionAtLeast(ccversion.MaxVersionServiceProviderV2)
-							buffer.Write([]byte("y\n"))
-						})
-
-						It("prints a warning and does not purge the service offering", func() {
-							session := helpers.CFWithStdin(buffer, "purge-service-offering", service, "-p", "some-provider")
-
-							Eventually(session).Should(Say("FAILED"))
-							Eventually(session.Err).Should(Say("Option '-p' only works up to CF API version 2.46.0. Your target is "))
-							Eventually(session).ShouldNot(Say("Purging service %s...", service))
-							Eventually(session).ShouldNot(Say("OK"))
-							Eventually(session).Should(Exit(1))
-						})
-					})
-				})
 			})
 
 			When("the service does not exist", func() {
-				It("prints a message the service offering does not exist and TIP information, exiting 0", func() {
+				It("prints a message the service offering does not exist, exiting 0", func() {
 					session := helpers.CF("purge-service-offering", "missing-service")
 
 					Eventually(session).Should(Say("Service offering 'missing-service' not found"))
-					Eventually(session).Should(Say(`TIP: If you are trying to purge a v1 service offering, you must set the -p flag\.`))
 					Eventually(session).Should(Exit(0))
 				})
 			})
 
 			When("the -p flag is provided", func() {
-				When("the CF API version is above 2.46.0", func() {
-					BeforeEach(func() {
-						helpers.SkipIfVersionAtLeast(ccversion.MaxVersionServiceProviderV2)
-					})
+				It("prints a warning that this flag is no longer supported", func() {
+					session := helpers.CF("purge-service-offering", "some-service", "-p", "some-provider")
 
-					It("prints a warning and does not purge the service offering", func() {
-						session := helpers.CF("purge-service-offering", "some-service", "-p", "some-provider")
-
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Option '-p' only works up to CF API version 2.46.0. Your target is %s", helpers.GetAPIVersionV2()))
-						Eventually(session).ShouldNot(Say("Purging service"))
-						Eventually(session).ShouldNot(Say("OK"))
-						Eventually(session).Should(Exit(1))
-					})
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("Flag '-p' is no longer supported"))
+					Eventually(session).ShouldNot(Say("Purging service"))
+					Eventually(session).ShouldNot(Say("OK"))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

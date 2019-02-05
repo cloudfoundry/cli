@@ -160,7 +160,6 @@ var _ = Describe("purge-service-offering command", func() {
 								Expect(brokerName).To(Equal(""))
 
 								Eventually(testUI.Out).Should(Say(`Service offering 'some-service' not found`))
-								Eventually(testUI.Out).Should(Say(`TIP: If you are trying to purge a v1 service offering, you must set the -p flag\.`))
 								Eventually(testUI.Out).Should(Say(`OK`))
 								Expect(testUI.Err).To(Say("get-service-warning"))
 							})
@@ -232,83 +231,8 @@ var _ = Describe("purge-service-offering command", func() {
 					input.Write([]byte("y\n"))
 				})
 
-				When("the CC API version is greater than 2.46.0", func() {
-					BeforeEach(func() {
-						fakeConfig.APIVersionReturns("2.47.0")
-					})
-
-					It("fails and informs the user that an older API version is required", func() {
-						Expect(executeErr).To(MatchError("Option '-p' only works up to CF API version 2.46.0. Your target is 2.47.0."))
-					})
-				})
-
-				When("the CC API version is 2.46.0 or below", func() {
-					BeforeEach(func() {
-						fakeConfig.APIVersionReturns("2.45.0")
-
-						fakePurgeServiceActor.GetServiceByNameAndProviderReturns(v2action.Service{
-							Label: "some-service",
-							GUID:  "some-service-guid",
-						}, v2action.Warnings{"get-service-warning"}, nil)
-						fakePurgeServiceActor.PurgeServiceOfferingReturns(v2action.Warnings{"warning-1"}, nil)
-					})
-
-					It("succeeds", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-					})
-
-					It("gets the v1 service offering", func() {
-						Expect(fakePurgeServiceActor.GetServiceByNameAndBrokerNameCallCount()).To(Equal(0))
-						Expect(fakePurgeServiceActor.GetServiceByNameAndProviderCallCount()).To(Equal(1))
-
-						serviceName, provider := fakePurgeServiceActor.GetServiceByNameAndProviderArgsForCall(0)
-						Expect(serviceName).To(Equal("some-service"))
-						Expect(provider).To(Equal("dave"))
-					})
-
-					It("purges the service offering", func() {
-						Expect(fakePurgeServiceActor.PurgeServiceOfferingCallCount()).To(Equal(1))
-						service := fakePurgeServiceActor.PurgeServiceOfferingArgsForCall(0)
-						Expect(service.Label).To(Equal("some-service"))
-						Expect(service.GUID).To(Equal("some-service-guid"))
-					})
-
-					It("prints OK and all warnings", func() {
-						Expect(testUI.Err).To(Say("warning-1"))
-						Expect(testUI.Out).To(Say("OK"))
-					})
-				})
-			})
-
-			When("both -p and -f flags are passed", func() {
-				BeforeEach(func() {
-					cmd.Provider = "dave"
-					cmd.Force = true
-
-					fakePurgeServiceActor.GetServiceByNameAndProviderReturns(v2action.Service{
-						Label: "some-service",
-						GUID:  "some-service-guid",
-					}, v2action.Warnings{"get-service-warning"}, nil)
-					fakePurgeServiceActor.PurgeServiceOfferingReturns(v2action.Warnings{"warning-1"}, nil)
-					fakeConfig.APIVersionReturns("2.45.0")
-				})
-
-				It("gets the v1 service offering, purges it, and and prints all warnings", func() {
-					Expect(executeErr).NotTo(HaveOccurred())
-
-					Expect(fakePurgeServiceActor.GetServiceByNameAndProviderCallCount()).To(Equal(1))
-
-					serviceName, provider := fakePurgeServiceActor.GetServiceByNameAndProviderArgsForCall(0)
-					Expect(serviceName).To(Equal("some-service"))
-					Expect(provider).To(Equal("dave"))
-
-					Expect(fakePurgeServiceActor.PurgeServiceOfferingCallCount()).To(Equal(1))
-					service := fakePurgeServiceActor.PurgeServiceOfferingArgsForCall(0)
-					Expect(service.Label).To(Equal("some-service"))
-					Expect(service.GUID).To(Equal("some-service-guid"))
-
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Out).To(Say("OK"))
+				It("returns an error that this flag is no longer supported", func() {
+					Expect(executeErr).To(MatchError(translatableerror.FlagNoLongerSupportedError{Flag: "-p"}))
 				})
 			})
 		})

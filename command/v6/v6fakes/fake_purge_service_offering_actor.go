@@ -25,22 +25,6 @@ type FakePurgeServiceOfferingActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetServiceByNameAndProviderStub        func(string, string) (v2action.Service, v2action.Warnings, error)
-	getServiceByNameAndProviderMutex       sync.RWMutex
-	getServiceByNameAndProviderArgsForCall []struct {
-		arg1 string
-		arg2 string
-	}
-	getServiceByNameAndProviderReturns struct {
-		result1 v2action.Service
-		result2 v2action.Warnings
-		result3 error
-	}
-	getServiceByNameAndProviderReturnsOnCall map[int]struct {
-		result1 v2action.Service
-		result2 v2action.Warnings
-		result3 error
-	}
 	PurgeServiceOfferingStub        func(v2action.Service) (v2action.Warnings, error)
 	purgeServiceOfferingMutex       sync.RWMutex
 	purgeServiceOfferingArgsForCall []struct {
@@ -125,73 +109,6 @@ func (fake *FakePurgeServiceOfferingActor) GetServiceByNameAndBrokerNameReturnsO
 	}{result1, result2, result3}
 }
 
-func (fake *FakePurgeServiceOfferingActor) GetServiceByNameAndProvider(arg1 string, arg2 string) (v2action.Service, v2action.Warnings, error) {
-	fake.getServiceByNameAndProviderMutex.Lock()
-	ret, specificReturn := fake.getServiceByNameAndProviderReturnsOnCall[len(fake.getServiceByNameAndProviderArgsForCall)]
-	fake.getServiceByNameAndProviderArgsForCall = append(fake.getServiceByNameAndProviderArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("GetServiceByNameAndProvider", []interface{}{arg1, arg2})
-	fake.getServiceByNameAndProviderMutex.Unlock()
-	if fake.GetServiceByNameAndProviderStub != nil {
-		return fake.GetServiceByNameAndProviderStub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.getServiceByNameAndProviderReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakePurgeServiceOfferingActor) GetServiceByNameAndProviderCallCount() int {
-	fake.getServiceByNameAndProviderMutex.RLock()
-	defer fake.getServiceByNameAndProviderMutex.RUnlock()
-	return len(fake.getServiceByNameAndProviderArgsForCall)
-}
-
-func (fake *FakePurgeServiceOfferingActor) GetServiceByNameAndProviderCalls(stub func(string, string) (v2action.Service, v2action.Warnings, error)) {
-	fake.getServiceByNameAndProviderMutex.Lock()
-	defer fake.getServiceByNameAndProviderMutex.Unlock()
-	fake.GetServiceByNameAndProviderStub = stub
-}
-
-func (fake *FakePurgeServiceOfferingActor) GetServiceByNameAndProviderArgsForCall(i int) (string, string) {
-	fake.getServiceByNameAndProviderMutex.RLock()
-	defer fake.getServiceByNameAndProviderMutex.RUnlock()
-	argsForCall := fake.getServiceByNameAndProviderArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakePurgeServiceOfferingActor) GetServiceByNameAndProviderReturns(result1 v2action.Service, result2 v2action.Warnings, result3 error) {
-	fake.getServiceByNameAndProviderMutex.Lock()
-	defer fake.getServiceByNameAndProviderMutex.Unlock()
-	fake.GetServiceByNameAndProviderStub = nil
-	fake.getServiceByNameAndProviderReturns = struct {
-		result1 v2action.Service
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakePurgeServiceOfferingActor) GetServiceByNameAndProviderReturnsOnCall(i int, result1 v2action.Service, result2 v2action.Warnings, result3 error) {
-	fake.getServiceByNameAndProviderMutex.Lock()
-	defer fake.getServiceByNameAndProviderMutex.Unlock()
-	fake.GetServiceByNameAndProviderStub = nil
-	if fake.getServiceByNameAndProviderReturnsOnCall == nil {
-		fake.getServiceByNameAndProviderReturnsOnCall = make(map[int]struct {
-			result1 v2action.Service
-			result2 v2action.Warnings
-			result3 error
-		})
-	}
-	fake.getServiceByNameAndProviderReturnsOnCall[i] = struct {
-		result1 v2action.Service
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakePurgeServiceOfferingActor) PurgeServiceOffering(arg1 v2action.Service) (v2action.Warnings, error) {
 	fake.purgeServiceOfferingMutex.Lock()
 	ret, specificReturn := fake.purgeServiceOfferingReturnsOnCall[len(fake.purgeServiceOfferingArgsForCall)]
@@ -260,8 +177,6 @@ func (fake *FakePurgeServiceOfferingActor) Invocations() map[string][][]interfac
 	defer fake.invocationsMutex.RUnlock()
 	fake.getServiceByNameAndBrokerNameMutex.RLock()
 	defer fake.getServiceByNameAndBrokerNameMutex.RUnlock()
-	fake.getServiceByNameAndProviderMutex.RLock()
-	defer fake.getServiceByNameAndProviderMutex.RUnlock()
 	fake.purgeServiceOfferingMutex.RLock()
 	defer fake.purgeServiceOfferingMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
