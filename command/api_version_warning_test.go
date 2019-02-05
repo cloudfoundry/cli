@@ -169,4 +169,27 @@ var _ = Describe("version checks", func() {
 			})
 		})
 	})
+
+	Describe("FailIfAPIVersionAboveMaxServiceProviderVersion", func() {
+		When("the API version is greater than the maximum supported version", func() {
+			It("returns an APIVersionTooHighError", func() {
+				err := FailIfAPIVersionAboveMaxServiceProviderVersion("2.49.0")
+				Expect(err).To(MatchError(APIVersionTooHighError{}))
+			})
+		})
+
+		When("the API version is lower than the maximum supported version", func() {
+			It("does not return an error", func() {
+				err := FailIfAPIVersionAboveMaxServiceProviderVersion("2.45.0")
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		When("the API version is the same as the maximum supported version", func() {
+			It("does not return an error", func() {
+				err := FailIfAPIVersionAboveMaxServiceProviderVersion("2.46.0")
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+	})
 })

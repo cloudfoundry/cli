@@ -22,6 +22,7 @@ const (
 	DeleteSecurityGroupStagingSpaceRequest               = "DeleteSecurityGroupStagingSpace"
 	DeleteServiceBindingRequest                          = "DeleteServiceBinding"
 	DeleteServicePlanVisibilityRequest                   = "DeleteServicePlanVisibility"
+	DeleteServiceRequest                                 = "DeleteService"
 	DeleteSpaceRequest                                   = "DeleteSpace"
 	DeleteSpaceUnmappedRoutesRequest                     = "DeleteUnmappedRoutes"
 	GetAppInstancesRequest                               = "GetAppInstances"
@@ -190,6 +191,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/service_plans/:service_plan_guid", Method: http.MethodGet, Name: GetServicePlanRequest},
 	{Path: "/v2/services", Method: http.MethodGet, Name: GetServicesRequest},
 	{Path: "/v2/services/:service_guid", Method: http.MethodGet, Name: GetServiceRequest},
+	{Path: "/v2/services/:service_guid", Method: http.MethodDelete, Name: DeleteServiceRequest},
 	{Path: "/v2/shared_domains", Method: http.MethodGet, Name: GetSharedDomainsRequest},
 	{Path: "/v2/shared_domains", Method: http.MethodPost, Name: PostSharedDomainRequest},
 	{Path: "/v2/shared_domains/:shared_domain_guid", Method: http.MethodGet, Name: GetSharedDomainRequest},

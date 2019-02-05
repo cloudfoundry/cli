@@ -2,6 +2,7 @@ package v2action_test
 
 import (
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
@@ -281,7 +282,87 @@ var _ = Describe("Service Actions", func() {
 		})
 	})
 
-	Describe("GetServicesWithPlansForBroker", func() {
+	Describe("GetServiceByNameAndProvider", func() {
+		var (
+			service         Service
+			serviceWarnings Warnings
+			serviceErr      error
+		)
+
+		JustBeforeEach(func() {
+			service, serviceWarnings, serviceErr = actor.GetServiceByNameAndProvider("some-service", "some-provider")
+		})
+
+		When("services are returned from the client", func() {
+			var returnedServices []ccv2.Service
+
+			BeforeEach(func() {
+				returnedServices = []ccv2.Service{
+					{
+						GUID:             "some-service-guid",
+						Label:            "some-service",
+						Description:      "some-description",
+						DocumentationURL: "some-url",
+					},
+				}
+
+				fakeCloudControllerClient.GetServicesReturns(
+					returnedServices,
+					ccv2.Warnings{"get-services-warning"},
+					nil)
+			})
+
+			It("returns the service and all warnings", func() {
+				Expect(serviceErr).ToNot(HaveOccurred())
+				Expect(service).To(Equal(Service(returnedServices[0])))
+				Expect(serviceWarnings).To(ConsistOf("get-services-warning"))
+
+				Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetServicesArgsForCall(0)).To(Equal([]ccv2.Filter{
+					{
+						Type:     constant.LabelFilter,
+						Operator: constant.EqualOperator,
+						Values:   []string{"some-service"},
+					},
+					{
+						Type:     constant.ProviderFilter,
+						Operator: constant.EqualOperator,
+						Values:   []string{"some-provider"},
+					},
+				}))
+			})
+		})
+
+		When("there are no services returned by the client", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns(
+					[]ccv2.Service{},
+					ccv2.Warnings{"get-services-warning"},
+					nil)
+			})
+
+			It("returns a ServiceNotFoundError and all warnings", func() {
+				Expect(serviceErr).To(MatchError(actionerror.ServiceNotFoundError{Name: "some-service"}))
+				Expect(serviceWarnings).To(ConsistOf("get-services-warning"))
+			})
+		})
+
+		When("the client returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetServicesReturns(
+					[]ccv2.Service{},
+					ccv2.Warnings{"get-services-warning"},
+					errors.New("client-error"))
+			})
+
+			It("propagates the error and all warnings", func() {
+				Expect(serviceErr).To(MatchError(errors.New("client-error")))
+				Expect(serviceWarnings).To(ConsistOf("get-services-warning"))
+			})
+		})
+	})
+
+	Describe("GetServicesWithPlans", func() {
 		When("the broker has no services", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServicesReturns([]ccv2.Service{}, nil, nil)
@@ -551,6 +632,54 @@ var _ = Describe("Service Actions", func() {
 			It("propagates the error and warnings", func() {
 				Expect(err).To(MatchError("boom"))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
+	Describe("PurgeServiceOffering", func() {
+		var (
+			warnings Warnings
+			purgeErr error
+		)
+
+		JustBeforeEach(func() {
+			warnings, purgeErr = actor.PurgeServiceOffering(Service{
+				Label: "some-service",
+				GUID:  "some-service-guid",
+			})
+		})
+
+		When("purging the service succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteServiceReturns(
+					ccv2.Warnings{"delete-service-warning"},
+					nil,
+				)
+			})
+
+			It("should purge the returned service instance and return any warnings", func() {
+				Expect(purgeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("delete-service-warning"))
+
+				Expect(fakeCloudControllerClient.DeleteServiceCallCount()).To(Equal(1))
+
+				serviceOfferingBeingPurged, purge := fakeCloudControllerClient.DeleteServiceArgsForCall(0)
+				Expect(serviceOfferingBeingPurged).To(Equal("some-service-guid"))
+				Expect(purge).To(BeTrue())
+			})
+		})
+
+		When("purging the service fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteServiceReturns(
+					ccv2.Warnings{"delete-service-warning"},
+					fmt.Errorf("it didn't work"),
+				)
+			})
+
+			It("should return the error and any warnings", func() {
+				Expect(purgeErr).To(MatchError(fmt.Errorf("it didn't work")))
+				Expect(warnings).To(ConsistOf("delete-service-warning"))
 			})
 		})
 	})

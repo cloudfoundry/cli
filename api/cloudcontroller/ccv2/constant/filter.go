@@ -33,6 +33,9 @@ const (
 	PathFilter FilterType = "path"
 	// PortFilter is the name of the 'port' filter.
 	PortFilter FilterType = "port"
+	// ProviderFilter is the name of the 'provider' filter.
+	// Deprecated: This is no longer supported on CF API versions above 2.46.0
+	ProviderFilter FilterType = "provider"
 	//StackFilter is the name of the 'stack' filter.
 	StackFilter FilterType = "stack"
 	// TimestampFilter is the name of the 'timestamp' filter.
