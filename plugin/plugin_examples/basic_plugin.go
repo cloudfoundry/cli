@@ -27,6 +27,41 @@ func (c *BasicPlugin) Run(cliConnection plugin.CliConnection, args []string) {
 	if args[0] == "basic-plugin-command" {
 		fmt.Println("Running the basic-plugin-command")
 	}
+	fmt.Println("Invoking new CLI command")
+	hasAPI, err := cliConnection.HasAPIEndpoint()
+	if err != nil {
+		fmt.Printf("blew up on HasAPI: %s", err.Error())
+	} else if !hasAPI {
+		println("need an api!")
+	}
+
+	hasOrg, err := cliConnection.HasOrganization()
+	if err != nil {
+		fmt.Printf("blew up on HasOrg: %s", err.Error())
+	} else if !hasOrg {
+		println("need an org!")
+	}
+
+	hasSpace, err := cliConnection.HasSpace()
+	if err != nil {
+		fmt.Printf("blew up on HasSpace: %s", err.Error())
+	} else if !hasSpace {
+		println("need a space!")
+	}
+
+	fmt.Println("Testing v7 command...")
+	out, err := cliConnection.V3CliCommand("app", "dora")
+	fmt.Println(out)
+	if err != nil {
+		fmt.Printf("running command broke: %s\n", err.Error())
+	}
+
+	fmt.Println("Testing legacy command...")
+	out, err = cliConnection.V3CliCommand("create-quota", "testing-quota", "-i", "256m")
+	fmt.Println(out)
+	if err != nil {
+		fmt.Printf("running legacy command broke: %s\n", err.Error())
+	}
 }
 
 // GetMetadata must be implemented as part of the plugin interface

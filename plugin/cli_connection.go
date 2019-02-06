@@ -73,6 +73,45 @@ func (c *cliConnection) CliCommand(args ...string) ([]string, error) {
 	return c.callCliCommand(false, args...)
 }
 
+func (c *cliConnection) V3CliCommand(args ...string) ([]string, error) {
+	return c.callV3CliCommand(false, args...)
+}
+
+func (c *cliConnection) callV3CliCommand(silently bool, args ...string) ([]string, error) {
+	var (
+		success                  bool
+		cmdOutput                []string
+		callCoreCommandErr       error
+		getOutputAndResetErr     error
+		disableTerminalOutputErr error
+	)
+
+	c.withClientDo(func(client *rpc.Client) error {
+		callCoreCommandErr = client.Call("CliRpcCmd.CallV3CoreCommand", args, &success)
+		getOutputAndResetErr = client.Call("CliRpcCmd.GetOutputAndReset", success, &cmdOutput)
+		return nil
+	})
+
+	if callCoreCommandErr != nil {
+		println("failed calling command")
+		return cmdOutput, callCoreCommandErr
+	}
+
+	if getOutputAndResetErr != nil {
+		println("Failed to get output")
+	}
+
+	if disableTerminalOutputErr != nil {
+		println("could not disable terminal output")
+	}
+
+	if !success {
+		return cmdOutput, errors.New("Error executing cli core command")
+	}
+
+	return cmdOutput, nil
+}
+
 func (c *cliConnection) callCliCommand(silently bool, args ...string) ([]string, error) {
 	var (
 		success                  bool
