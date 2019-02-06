@@ -663,6 +663,7 @@ var _ = Describe("Services Repo", func() {
 			It("renames the service", func() {
 				serviceInstance := models.ServiceInstance{}
 				serviceInstance.GUID = "my-service-instance-guid"
+				serviceInstance.Type = "user_provided_service_instance"
 
 				err := repo.RenameService(serviceInstance, "new-name")
 				Expect(testHandler).To(HaveAllRequestsCalled())

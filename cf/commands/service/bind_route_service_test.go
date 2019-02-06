@@ -369,6 +369,7 @@ var _ = Describe("BindRouteService", func() {
 				BeforeEach(func() {
 					serviceInstance := models.ServiceInstance{}
 					serviceInstance.GUID = "service-instance-guid"
+					serviceInstance.Type = "user_provided_service_instance"
 					serviceInstance.ServicePlan = models.ServicePlanFields{
 						GUID: "",
 					}

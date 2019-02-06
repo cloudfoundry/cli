@@ -173,6 +173,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 
 				Expect(fields.GUID).To(Equal("fake-guid"))
 				Expect(fields.Name).To(Equal("fake service name"))
+				Expect(fields.Type).To(Equal("managed_service_instance"))
 				Expect(fields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(fields.DashboardURL).To(Equal("https://fake/dashboard/url"))
 				Expect(fields.LastOperation.Type).To(Equal("create"))
@@ -221,6 +222,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 
 				Expect(instance.ServiceInstanceFields.GUID).To(Equal("fake-guid"))
 				Expect(instance.ServiceInstanceFields.Name).To(Equal("fake service name"))
+				Expect(instance.ServiceInstanceFields.Type).To(Equal("managed_service_instance"))
 				Expect(instance.ServiceInstanceFields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(instance.ServiceInstanceFields.DashboardURL).To(Equal("https://fake/dashboard/url"))
 				Expect(instance.ServiceInstanceFields.LastOperation.Type).To(Equal("create"))
@@ -264,6 +266,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 
 				Expect(instance.ServiceInstanceFields.GUID).To(Equal("fake-guid"))
 				Expect(instance.ServiceInstanceFields.Name).To(Equal("fake service name"))
+				Expect(instance.ServiceInstanceFields.Type).To(Equal("managed_service_instance"))
 				Expect(instance.ServiceInstanceFields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(instance.ServiceInstanceFields.DashboardURL).To(Equal("https://fake/dashboard/url"))
 
