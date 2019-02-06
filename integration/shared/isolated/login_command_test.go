@@ -243,6 +243,25 @@ var _ = Describe("login command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
+
+		When("the OS provides a valid SSL Certificate (Unix: SSL_CERT_FILE or SSL_CERT_DIR Environment variables) (Windows: Import-Certificate call)", func() {
+			BeforeEach(func() {
+				if skipSSLValidation != "" {
+					Skip("SKIP_SSL_VALIDATION is enabled and is " + skipSSLValidation)
+				}
+			})
+
+			It("trusts the cert and allows the users to log in", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", helpers.GetAPI())
+				Eventually(session).Should(Say("API endpoint: %s", apiURL))
+				Eventually(session).Should(Exit())
+
+				session = helpers.CF("api")
+				Eventually(session).Should(Exit(0))
+				Expect(session).Should(Say("api endpoint:   %s", apiURL))
+			})
+		})
 	})
 
 	Describe("SSO", func() {
