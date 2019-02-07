@@ -235,6 +235,37 @@ var _ = Describe("purge-service-offering command", func() {
 					Expect(executeErr).To(MatchError(translatableerror.FlagNoLongerSupportedError{Flag: "-p"}))
 				})
 			})
+
+			When("the -b flag is passed", func() {
+				BeforeEach(func() {
+					cmd.ServiceBroker = "some-broker"
+
+					fakePurgeServiceActor.GetServiceByNameAndBrokerNameReturns(v2action.Service{
+						Label: "some-service",
+						GUID:  "some-service-guid",
+					}, v2action.Warnings{"get-service-warning"}, nil)
+					fakePurgeServiceActor.PurgeServiceOfferingReturns(v2action.Warnings{"warning-1"}, nil)
+					input.Write([]byte("y\n"))
+				})
+
+				It("purges the service offering for the specified broker", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(testUI.Out).To(Say(`Really purge service offering some-service from broker some-broker from Cloud Foundry\? \[yN\]:`))
+					Expect(testUI.Out).To(Say(`Purging service some-service\.\.\.`))
+
+					serviceName, brokerName := fakePurgeServiceActor.GetServiceByNameAndBrokerNameArgsForCall(0)
+					Expect(serviceName).To(Equal("some-service"))
+					Expect(brokerName).To(Equal("some-broker"))
+
+					Expect(fakePurgeServiceActor.PurgeServiceOfferingCallCount()).To(Equal(1))
+					service := fakePurgeServiceActor.PurgeServiceOfferingArgsForCall(0)
+					Expect(service.Label).To(Equal("some-service"))
+					Expect(service.GUID).To(Equal("some-service-guid"))
+
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Out).To(Say("OK"))
+				})
+			})
 		})
 	})
 })
