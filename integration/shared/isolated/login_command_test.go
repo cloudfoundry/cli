@@ -204,13 +204,17 @@ var _ = Describe("login command", func() {
 
 	Describe("SSL Validation", func() {
 		When("no scheme is included in the API endpoint", func() {
-			var hostname string
+			var (
+				hostname  string
+				serverURL *url.URL
+				err       error
+			)
 
 			BeforeEach(func() {
-				apiURL, err := url.Parse(helpers.GetAPI())
+				serverURL, err = url.Parse(helpers.GetAPI())
 				Expect(err).NotTo(HaveOccurred())
 
-				hostname = apiURL.Hostname()
+				hostname = serverURL.Hostname()
 			})
 
 			It("defaults to https", func() {
@@ -260,6 +264,34 @@ var _ = Describe("login command", func() {
 				session = helpers.CF("api")
 				Eventually(session).Should(Exit(0))
 				Expect(session).Should(Say("api endpoint:   %s", apiURL))
+			})
+		})
+
+		When("the SSL Certificate is invalid", func() {
+			var (
+				server    *ghttp.Server
+				serverURL *url.URL
+				err       error
+			)
+
+			BeforeEach(func() {
+				cliVersion := "1.0.0"
+				server = helpers.StartServerWithMinimumCLIVersion(cliVersion)
+				serverURL, err = url.Parse(server.URL())
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("displays a helpful error message and exits 1", func() {
+				session := helpers.CF("login", "-a", serverURL.String())
+				Eventually(session).Should(Say("API endpoint: %s", serverURL))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Say("Invalid SSL Cert for %s:%s", serverURL.Hostname(), serverURL.Port()))
+				Eventually(session).Should(Say("TIP: Use 'cf login --skip-ssl-validation' to continue with an insecure API endpoint"))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})
