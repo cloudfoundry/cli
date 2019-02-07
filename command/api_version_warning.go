@@ -6,6 +6,12 @@ import (
 	"github.com/blang/semver"
 )
 
+type APIVersionTooHighError struct{}
+
+func (a APIVersionTooHighError) Error() string {
+	return ""
+}
+
 func WarnIfCLIVersionBelowAPIDefinedMinimum(config Config, apiVersion string, ui UI) error {
 	minVer := config.MinCLIVersion()
 	currentVer := config.BinaryVersion()
@@ -39,6 +45,37 @@ func WarnIfAPIVersionBelowSupportedMinimum(apiVersion string, ui UI) error {
 	}
 
 	return nil
+}
+
+func FailIfAPIVersionAboveMaxServiceProviderVersion(apiVersion string) error {
+	isTooNew, err := checkVersionNewerThan(apiVersion, ccversion.MaxVersionServiceProviderV2)
+	if err != nil {
+		return err
+	}
+
+	if isTooNew {
+		return APIVersionTooHighError{}
+	}
+
+	return nil
+}
+
+func checkVersionNewerThan(current, maximum string) (bool, error) {
+	currentSemver, err := semver.Make(current)
+	if err != nil {
+		return false, err
+	}
+
+	maximumSemver, err := semver.Make(maximum)
+	if err != nil {
+		return false, err
+	}
+
+	if currentSemver.Compare(maximumSemver) == 1 {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func checkVersionOutdated(current string, minimum string) (bool, error) {

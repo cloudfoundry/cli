@@ -2,6 +2,7 @@ package v2action_test
 
 import (
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
@@ -281,7 +282,7 @@ var _ = Describe("Service Actions", func() {
 		})
 	})
 
-	Describe("GetServicesWithPlansForBroker", func() {
+	Describe("GetServicesWithPlans", func() {
 		When("the broker has no services", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServicesReturns([]ccv2.Service{}, nil, nil)
@@ -551,6 +552,54 @@ var _ = Describe("Service Actions", func() {
 			It("propagates the error and warnings", func() {
 				Expect(err).To(MatchError("boom"))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
+	Describe("PurgeServiceOffering", func() {
+		var (
+			warnings Warnings
+			purgeErr error
+		)
+
+		JustBeforeEach(func() {
+			warnings, purgeErr = actor.PurgeServiceOffering(Service{
+				Label: "some-service",
+				GUID:  "some-service-guid",
+			})
+		})
+
+		When("purging the service succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteServiceReturns(
+					ccv2.Warnings{"delete-service-warning"},
+					nil,
+				)
+			})
+
+			It("should purge the returned service instance and return any warnings", func() {
+				Expect(purgeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("delete-service-warning"))
+
+				Expect(fakeCloudControllerClient.DeleteServiceCallCount()).To(Equal(1))
+
+				serviceOfferingBeingPurged, purge := fakeCloudControllerClient.DeleteServiceArgsForCall(0)
+				Expect(serviceOfferingBeingPurged).To(Equal("some-service-guid"))
+				Expect(purge).To(BeTrue())
+			})
+		})
+
+		When("purging the service fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteServiceReturns(
+					ccv2.Warnings{"delete-service-warning"},
+					fmt.Errorf("it didn't work"),
+				)
+			})
+
+			It("should return the error and any warnings", func() {
+				Expect(purgeErr).To(MatchError(fmt.Errorf("it didn't work")))
+				Expect(warnings).To(ConsistOf("delete-service-warning"))
 			})
 		})
 	})

@@ -489,4 +489,83 @@ var _ = Describe("Service", func() {
 			})
 		})
 	})
+
+	Describe("DeleteService", func() {
+		var (
+			purge bool
+
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.DeleteService("some-service-guid", purge)
+		})
+
+		When("the purge parameter is true", func() {
+			BeforeEach(func() {
+				purge = true
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v2/services/some-service-guid", "async=true&purge=true"),
+						RespondWith(http.StatusNoContent, nil, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("deletes the service asynchronously, returns no content and any warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+
+		When("the purge parameter is false", func() {
+			BeforeEach(func() {
+				purge = false
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v2/services/some-service-guid", "async=true&purge=false"),
+						RespondWith(http.StatusNoContent, nil, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("deletes the service asynchronously, returns no content and any warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+
+		When("deleting the service fails", func() {
+			BeforeEach(func() {
+				purge = false
+
+				response := `{
+					"code": 1,
+					"description": "some error description",
+					"error_code": "CF-SomeError"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v2/services/some-service-guid", "async=true&purge=false"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and any warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.V2UnexpectedResponseError{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        1,
+						Description: "some error description",
+						ErrorCode:   "CF-SomeError",
+					},
+					ResponseCode: http.StatusTeapot,
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+	})
 })

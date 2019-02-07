@@ -28,6 +28,7 @@ type CloudControllerClient interface {
 	DeleteRouteApplication(routeGUID string, appGUID string) (ccv2.Warnings, error)
 	DeleteSecurityGroupSpace(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	DeleteSecurityGroupStagingSpace(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
+	DeleteService(serviceGUID string, purge bool) (ccv2.Warnings, error)
 	DeleteServiceBinding(serviceBindingGUID string, acceptsIncomplete bool) (ccv2.ServiceBinding, ccv2.Warnings, error)
 	DeleteServicePlanVisibility(servicePlanVisibilityGUID string) (ccv2.Warnings, error)
 	DeleteSpaceJob(spaceGUID string) (ccv2.Job, ccv2.Warnings, error)

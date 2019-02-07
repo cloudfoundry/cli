@@ -323,6 +323,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
+	DeleteServiceStub        func(string, bool) (ccv2.Warnings, error)
+	deleteServiceMutex       sync.RWMutex
+	deleteServiceArgsForCall []struct {
+		arg1 string
+		arg2 bool
+	}
+	deleteServiceReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	deleteServiceReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	DeleteServiceBindingStub        func(string, bool) (ccv2.ServiceBinding, ccv2.Warnings, error)
 	deleteServiceBindingMutex       sync.RWMutex
 	deleteServiceBindingArgsForCall []struct {
@@ -2780,6 +2794,70 @@ func (fake *FakeCloudControllerClient) DeleteSecurityGroupStagingSpaceReturnsOnC
 		})
 	}
 	fake.deleteSecurityGroupStagingSpaceReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteService(arg1 string, arg2 bool) (ccv2.Warnings, error) {
+	fake.deleteServiceMutex.Lock()
+	ret, specificReturn := fake.deleteServiceReturnsOnCall[len(fake.deleteServiceArgsForCall)]
+	fake.deleteServiceArgsForCall = append(fake.deleteServiceArgsForCall, struct {
+		arg1 string
+		arg2 bool
+	}{arg1, arg2})
+	fake.recordInvocation("DeleteService", []interface{}{arg1, arg2})
+	fake.deleteServiceMutex.Unlock()
+	if fake.DeleteServiceStub != nil {
+		return fake.DeleteServiceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.deleteServiceReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceCallCount() int {
+	fake.deleteServiceMutex.RLock()
+	defer fake.deleteServiceMutex.RUnlock()
+	return len(fake.deleteServiceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceCalls(stub func(string, bool) (ccv2.Warnings, error)) {
+	fake.deleteServiceMutex.Lock()
+	defer fake.deleteServiceMutex.Unlock()
+	fake.DeleteServiceStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceArgsForCall(i int) (string, bool) {
+	fake.deleteServiceMutex.RLock()
+	defer fake.deleteServiceMutex.RUnlock()
+	argsForCall := fake.deleteServiceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceReturns(result1 ccv2.Warnings, result2 error) {
+	fake.deleteServiceMutex.Lock()
+	defer fake.deleteServiceMutex.Unlock()
+	fake.DeleteServiceStub = nil
+	fake.deleteServiceReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteServiceReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.deleteServiceMutex.Lock()
+	defer fake.deleteServiceMutex.Unlock()
+	fake.DeleteServiceStub = nil
+	if fake.deleteServiceReturnsOnCall == nil {
+		fake.deleteServiceReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.deleteServiceReturnsOnCall[i] = struct {
 		result1 ccv2.Warnings
 		result2 error
 	}{result1, result2}
@@ -7706,6 +7784,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteSecurityGroupSpaceMutex.RUnlock()
 	fake.deleteSecurityGroupStagingSpaceMutex.RLock()
 	defer fake.deleteSecurityGroupStagingSpaceMutex.RUnlock()
+	fake.deleteServiceMutex.RLock()
+	defer fake.deleteServiceMutex.RUnlock()
 	fake.deleteServiceBindingMutex.RLock()
 	defer fake.deleteServiceBindingMutex.RUnlock()
 	fake.deleteServicePlanVisibilityMutex.RLock()

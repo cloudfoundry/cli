@@ -2,6 +2,8 @@ package ccv2
 
 import (
 	"encoding/json"
+	"net/url"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -23,6 +25,27 @@ type Service struct {
 	ServiceBrokerName string
 	// Extra is a field with extra data pertaining to the service.
 	Extra ServiceExtra
+}
+
+// DeleteService deletes the service with the given GUID, and returns any errors and warnings.
+func (client *Client) DeleteService(serviceGUID string, purge bool) (Warnings, error) {
+	queryParams := url.Values{}
+	queryParams.Set("purge", strconv.FormatBool(purge))
+	queryParams.Set("async", "true")
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteServiceRequest,
+		Query:       queryParams,
+		URIParams:   Params{"service_guid": serviceGUID},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service response.

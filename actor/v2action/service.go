@@ -8,13 +8,19 @@ import (
 
 type Service ccv2.Service
 
+// ServicesWithPlans is an association between a Service and the plans it offers.
+type ServicesWithPlans map[Service][]ServicePlan
+
+type Filter ccv2.Filter
+
 // GetService fetches a service by GUID.
 func (actor Actor) GetService(serviceGUID string) (Service, Warnings, error) {
 	service, warnings, err := actor.CloudControllerClient.GetService(serviceGUID)
 	return Service(service), Warnings(warnings), err
 }
 
-// GetServicesByNameAndBrokerName returns services based on the name and broker provided.
+// GetServiceByNameAndBrokerName returns services based on the name and broker provided.
+// If a service broker name is provided, only services for that broker will be returned.
 // If there are no services, a ServiceNotFoundError will be returned.
 func (actor Actor) GetServiceByNameAndBrokerName(serviceName, serviceBrokerName string) (Service, Warnings, error) {
 	filters := []ccv2.Filter{ccv2.Filter{
@@ -71,6 +77,7 @@ func (actor Actor) getServiceByNameForSpace(serviceName, spaceGUID, brokerGUID s
 	}
 
 	services, warnings, err := actor.CloudControllerClient.GetSpaceServices(spaceGUID, filters...)
+
 	if err != nil {
 		return Service{}, Warnings(warnings), err
 	}
@@ -86,14 +93,9 @@ func (actor Actor) getServiceByNameForSpace(serviceName, spaceGUID, brokerGUID s
 	return Service(services[0]), Warnings(warnings), nil
 }
 
-// ServicesWithPlans is an association between a Service and the plans it offers.
-type ServicesWithPlans map[Service][]ServicePlan
-
-type Filter ccv2.Filter
-
-// GetServicesWithPlansForBroker returns a map of Services to ServicePlans for a particular broker.
+// GetServicesWithPlans returns a map of Services to ServicePlans for a particular broker.
 // A particular service with associated plans from a broker can be fetched by additionally providing
-// a service name.
+// a service label filter.
 func (actor Actor) GetServicesWithPlans(filters ...Filter) (ServicesWithPlans, Warnings, error) {
 	ccv2Filters := []ccv2.Filter{}
 	for _, f := range filters {
@@ -148,4 +150,13 @@ func (actor Actor) ServiceExistsWithName(serviceName string) (bool, Warnings, er
 	}
 
 	return true, Warnings(warnings), nil
+}
+
+func (actor Actor) PurgeServiceOffering(service Service) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.DeleteService(service.GUID, true)
+	if err != nil {
+		return Warnings(warnings), err
+	}
+
+	return Warnings(warnings), nil
 }
