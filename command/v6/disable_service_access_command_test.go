@@ -98,7 +98,7 @@ var _ = Describe("disable-service-access Command", func() {
 
 					It("passes on the service", func() {
 						Expect(fakeActor.DisableServiceForAllOrgsCallCount()).To(Equal(1))
-						service := fakeActor.DisableServiceForAllOrgsArgsForCall(0)
+						service, _ := fakeActor.DisableServiceForAllOrgsArgsForCall(0)
 						Expect(service).To(Equal("some-service"))
 					})
 
@@ -142,7 +142,7 @@ var _ = Describe("disable-service-access Command", func() {
 
 					It("passes on the service plan", func() {
 						Expect(fakeActor.DisablePlanForAllOrgsCallCount()).To(Equal(1))
-						service, plan := fakeActor.DisablePlanForAllOrgsArgsForCall(0)
+						service, plan, _ := fakeActor.DisablePlanForAllOrgsArgsForCall(0)
 						Expect(service).To(Equal("some-service"))
 						Expect(plan).To(Equal("some-plan"))
 					})
@@ -175,6 +175,51 @@ var _ = Describe("disable-service-access Command", func() {
 				})
 			})
 
+			When("the -b flag is passed", func() {
+				BeforeEach(func() {
+					cmd.ServiceBroker = "some-broker"
+				})
+
+				When("disabling access for the broker succeeds", func() {
+					BeforeEach(func() {
+						fakeActor.DisableServiceForAllOrgsReturns(v2action.Warnings{"warning", "second-warning"}, nil)
+					})
+
+					It("passes on the service broker", func() {
+						Expect(fakeActor.DisableServiceForAllOrgsCallCount()).To(Equal(1))
+						service, broker := fakeActor.DisableServiceForAllOrgsArgsForCall(0)
+						Expect(service).To(Equal("some-service"))
+						Expect(broker).To(Equal("some-broker"))
+					})
+
+					It("displays an informative success message", func() {
+						Expect(testUI.Out).To(Say("Disabling access to all plans of service some-service from broker some-broker for all orgs as admin\\.\\.\\."))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+
+					It("returns the warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+						Expect(testUI.Err).To(Say("second-warning"))
+					})
+				})
+
+				When("disabling access to the broker fails", func() {
+					BeforeEach(func() {
+						fakeActor.DisableServiceForAllOrgsReturns(v2action.Warnings{"warning", "second-warning"}, errors.New("oops"))
+					})
+
+					It("returns the error", func() {
+						Expect(testUI.Out).To(Say("Disabling access to all plans of service some-service from broker some-broker for all orgs as admin\\.\\.\\."))
+						Expect(executeErr).To(MatchError("oops"))
+					})
+
+					It("returns the warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+						Expect(testUI.Err).To(Say("second-warning"))
+					})
+				})
+			})
+
 			When("the -o flag is passed", func() {
 				BeforeEach(func() {
 					cmd.Organization = "some-org"
@@ -187,7 +232,7 @@ var _ = Describe("disable-service-access Command", func() {
 
 					It("passes on the organization name", func() {
 						Expect(fakeActor.DisableServiceForOrgCallCount()).To(Equal(1))
-						service, org := fakeActor.DisableServiceForOrgArgsForCall(0)
+						service, org, _ := fakeActor.DisableServiceForOrgArgsForCall(0)
 						Expect(service).To(Equal("some-service"))
 						Expect(org).To(Equal("some-org"))
 					})
@@ -233,7 +278,7 @@ var _ = Describe("disable-service-access Command", func() {
 
 					It("passes on the plan and organization name", func() {
 						Expect(fakeActor.DisablePlanForOrgCallCount()).To(Equal(1))
-						service, plan, org := fakeActor.DisablePlanForOrgArgsForCall(0)
+						service, plan, org, _ := fakeActor.DisablePlanForOrgArgsForCall(0)
 
 						Expect(service).To(Equal("some-service"))
 						Expect(plan).To(Equal("some-plan"))
@@ -258,6 +303,152 @@ var _ = Describe("disable-service-access Command", func() {
 
 					It("returns the error", func() {
 						Expect(testUI.Out).To(Say("Disabling access to plan some-plan of service some-service for org some-org as admin..."))
+						Expect(executeErr).To(MatchError("explode"))
+					})
+
+					It("returns the warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+						Expect(testUI.Err).To(Say("second-warning"))
+					})
+				})
+			})
+
+			When("the -b and -p flags are passed", func() {
+				BeforeEach(func() {
+					cmd.ServiceBroker = "some-broker"
+					cmd.ServicePlan = "some-plan"
+				})
+
+				When("disabling access to the plan from the broker succeeds", func() {
+					BeforeEach(func() {
+						fakeActor.DisablePlanForAllOrgsReturns(v2action.Warnings{"warning", "second-warning"}, nil)
+					})
+
+					It("passes on the plan, service and broker name", func() {
+						Expect(fakeActor.DisablePlanForAllOrgsCallCount()).To(Equal(1))
+						service, plan, broker := fakeActor.DisablePlanForAllOrgsArgsForCall(0)
+
+						Expect(broker).To(Equal("some-broker"))
+						Expect(service).To(Equal("some-service"))
+						Expect(plan).To(Equal("some-plan"))
+					})
+
+					It("displays an informative success message", func() {
+						Expect(testUI.Out).To(Say("Disabling access to plan some-plan of service some-service from broker some-broker for all orgs as admin..."))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+
+					It("returns the warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+						Expect(testUI.Err).To(Say("second-warning"))
+					})
+				})
+
+				When("disabling access to the plan in the org fails", func() {
+					BeforeEach(func() {
+						fakeActor.DisablePlanForAllOrgsReturns(v2action.Warnings{"warning", "second-warning"}, errors.New("explode"))
+					})
+
+					It("returns the error", func() {
+						Expect(testUI.Out).To(Say("Disabling access to plan some-plan of service some-service from broker some-broker for all orgs as admin..."))
+						Expect(executeErr).To(MatchError("explode"))
+					})
+
+					It("returns the warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+						Expect(testUI.Err).To(Say("second-warning"))
+					})
+				})
+			})
+
+			When("the -b and -o flags are passed", func() {
+				BeforeEach(func() {
+					cmd.ServiceBroker = "some-broker"
+					cmd.Organization = "some-org"
+				})
+
+				When("disabling access to the service from the broker in the org succeeds", func() {
+					BeforeEach(func() {
+						fakeActor.DisableServiceForOrgReturns(v2action.Warnings{"warning", "second-warning"}, nil)
+					})
+
+					It("passes on the service name, broker name and org name", func() {
+						Expect(fakeActor.DisableServiceForOrgCallCount()).To(Equal(1))
+						service, org, broker := fakeActor.DisableServiceForOrgArgsForCall(0)
+
+						Expect(service).To(Equal("some-service"))
+						Expect(org).To(Equal("some-org"))
+						Expect(broker).To(Equal("some-broker"))
+					})
+
+					It("displays an informative success message", func() {
+						Expect(testUI.Out).To(Say("Disabling access to all plans of service some-service from broker some-broker for the org some-org as admin..."))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+
+					It("returns the warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+						Expect(testUI.Err).To(Say("second-warning"))
+					})
+				})
+
+				When("disabling access to the service from the broker in the org fails", func() {
+					BeforeEach(func() {
+						fakeActor.DisableServiceForOrgReturns(v2action.Warnings{"warning", "second-warning"}, errors.New("explode"))
+					})
+
+					It("returns the error", func() {
+						Expect(testUI.Out).To(Say("Disabling access to all plans of service some-service from broker some-broker for the org some-org as admin..."))
+						Expect(executeErr).To(MatchError("explode"))
+					})
+
+					It("returns the warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+						Expect(testUI.Err).To(Say("second-warning"))
+					})
+				})
+			})
+
+			When("the -b, -o and -p flags are passed", func() {
+				BeforeEach(func() {
+					cmd.ServiceBroker = "some-broker"
+					cmd.Organization = "some-org"
+					cmd.ServicePlan = "some-plan"
+				})
+
+				When("disabling access to the plan of the service from the broker in the org succeeds", func() {
+					BeforeEach(func() {
+						fakeActor.DisablePlanForOrgReturns(v2action.Warnings{"warning", "second-warning"}, nil)
+					})
+
+					It("passes on the service name, plan name, broker name and org name", func() {
+						Expect(fakeActor.DisablePlanForOrgCallCount()).To(Equal(1))
+						service, plan, org, broker := fakeActor.DisablePlanForOrgArgsForCall(0)
+
+						Expect(service).To(Equal("some-service"))
+						Expect(plan).To(Equal("some-plan"))
+						Expect(org).To(Equal("some-org"))
+						Expect(broker).To(Equal("some-broker"))
+					})
+
+					It("displays an informative success message", func() {
+						Expect(testUI.Out).To(Say("Disabling access to plan some-plan of service some-service from broker some-broker for org some-org as admin..."))
+						Expect(testUI.Out).To(Say("OK"))
+					})
+
+					It("returns the warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+						Expect(testUI.Err).To(Say("second-warning"))
+					})
+				})
+
+				When("disabling access to the plan of the service from the broker in the org fails", func() {
+					BeforeEach(func() {
+						fakeActor.DisablePlanForOrgReturns(v2action.Warnings{"warning", "second-warning"}, errors.New("explode"))
+					})
+
+					It("returns the error", func() {
+						Expect(testUI.Out).To(Say("Disabling access to plan some-plan of service some-service from broker some-broker for org some-org as admin..."))
 						Expect(executeErr).To(MatchError("explode"))
 					})
 

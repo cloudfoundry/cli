@@ -119,8 +119,8 @@ func (actor Actor) EnablePlanForOrg(serviceName, servicePlanName, orgName, broke
 }
 
 // DisableServiceForAllOrgs disables access for the given service in all orgs.
-func (actor Actor) DisableServiceForAllOrgs(serviceName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, "")
+func (actor Actor) DisableServiceForAllOrgs(serviceName, brokerName string) (Warnings, error) {
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, brokerName)
 	if err != nil {
 		return allWarnings, err
 	}
@@ -143,9 +143,9 @@ func (actor Actor) DisableServiceForAllOrgs(serviceName string) (Warnings, error
 	return allWarnings, nil
 }
 
-// DisablePlanForAllOrgs disables access to a specific plan of the given service in all orgs.
-func (actor Actor) DisablePlanForAllOrgs(serviceName, servicePlanName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, "")
+// DisablePlanForAllOrgs disables access to a specific plan of the given service, from the given broker in all orgs.
+func (actor Actor) DisablePlanForAllOrgs(serviceName, servicePlanName, brokerName string) (Warnings, error) {
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, brokerName)
 	if err != nil {
 		return allWarnings, err
 	}
@@ -176,8 +176,8 @@ func (actor Actor) DisablePlanForAllOrgs(serviceName, servicePlanName string) (W
 }
 
 // DisableServiceForOrg disables access for the given service in a specific org.
-func (actor Actor) DisableServiceForOrg(serviceName, orgName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, "")
+func (actor Actor) DisableServiceForOrg(serviceName, orgName, brokerName string) (Warnings, error) {
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, brokerName)
 	if err != nil {
 		return allWarnings, err
 	}
@@ -198,9 +198,9 @@ func (actor Actor) DisableServiceForOrg(serviceName, orgName string) (Warnings, 
 	return allWarnings, nil
 }
 
-// DisablePlanForOrg disables access to a specific plan of the given service in a specific org.
-func (actor Actor) DisablePlanForOrg(serviceName, servicePlanName, orgName string) (Warnings, error) {
-	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, "")
+// DisablePlanForOrg disables access to a specific plan of the given service from the given broker in a specific org.
+func (actor Actor) DisablePlanForOrg(serviceName, servicePlanName, orgName, brokerName string) (Warnings, error) {
+	servicePlans, allWarnings, err := actor.GetServicePlansForService(serviceName, brokerName)
 	if err != nil {
 		return allWarnings, err
 	}

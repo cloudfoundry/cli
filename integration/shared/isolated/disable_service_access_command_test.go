@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -111,10 +112,7 @@ var _ = Describe("disable service access command", func() {
 				service = helpers.PrefixedRandomName("SERVICE")
 				servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
-				broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-				broker.Push()
-				broker.Configure(true)
-				broker.Create()
+				broker = helpers.CreateBroker(domain, service, servicePlan)
 			})
 
 			AfterEach(func() {
@@ -236,6 +234,161 @@ var _ = Describe("disable service access command", func() {
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("The plan plan-does-not-exist could not be found for service %s", service))
 					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("two services with the same name are enabled", func() {
+				var secondBroker helpers.ServiceBroker
+
+				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
+					secondBroker = helpers.CreateBroker(domain, service, servicePlan)
+					Eventually(helpers.CF("enable-service-access", service, "-b", broker.Name)).Should(Exit(0))
+					Eventually(helpers.CF("enable-service-access", service, "-b", secondBroker.Name)).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					secondBroker.Destroy()
+				})
+
+				When("a service name and broker name are provided", func() {
+					It("displays an informative message, exits 0, and disables access to the service", func() {
+						session := helpers.CF("disable-service-access", service, "-b", secondBroker.Name)
+						Eventually(session).Should(Say("Disabling access to all plans of service %s from broker %s for all orgs as admin...", service, secondBroker.Name))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("service-access", "-b", secondBroker.Name)
+						Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Say("broker:\\s+%s", secondBroker.Name))
+						Eventually(session).Should(Say("%s\\s+%s\\s+none",
+							service,
+							servicePlan,
+						))
+					})
+				})
+			})
+		})
+
+		Context("multiple service brokers are registered", func() {
+			var (
+				orgName     string
+				spaceName   string
+				domain      string
+				service     string
+				servicePlan string
+				broker1     helpers.ServiceBroker
+				broker2     helpers.ServiceBroker
+			)
+
+			BeforeEach(func() {
+				helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				helpers.SetupCF(orgName, spaceName)
+
+				domain = helpers.DefaultSharedDomain()
+				service = helpers.PrefixedRandomName("SERVICE")
+				servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+
+				broker1 = helpers.CreateBroker(domain, service, servicePlan)
+				broker2 = helpers.CreateBroker(domain, service, servicePlan)
+			})
+
+			AfterEach(func() {
+				helpers.TargetOrgAndSpace(orgName, spaceName)
+				broker1.Destroy()
+				broker2.Destroy()
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			When("two services have access enabled in the same org", func() {
+				BeforeEach(func() {
+					session := helpers.CF("enable-service-access", service, "-b", broker1.Name, "-o", orgName)
+					Eventually(session).Should(Exit(0))
+					session = helpers.CF("enable-service-access", service, "-b", broker2.Name, "-o", orgName)
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("fails to disable access when no broker is specified", func() {
+					session := helpers.CF("disable-service-access", service, "-o", orgName)
+					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+					Eventually(session).Should(Exit(1))
+				})
+
+				It("successfully disables access when the broker is specified", func() {
+					session := helpers.CF("disable-service-access", service, "-o", orgName, "-b", broker1.Name)
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("marketplace")
+					Consistently(session.Out).ShouldNot(Say("%s/s+%s/.+%s", service, servicePlan, broker1.Name))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("two services have access enabled in different orgs", func() {
+				var otherOrgName string
+
+				BeforeEach(func() {
+					otherOrgName = helpers.NewOrgName()
+					helpers.SetupCF(otherOrgName, spaceName)
+
+					session := helpers.CF("enable-service-access", service, "-b", broker1.Name, "-o", otherOrgName)
+					Eventually(session).Should(Exit(0))
+					session = helpers.CF("enable-service-access", service, "-b", broker2.Name, "-o", orgName)
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("fails to disable access when no broker is specified", func() {
+					session := helpers.CF("disable-service-access", service, "-o", orgName)
+					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+					Eventually(session).Should(Exit(1))
+
+					session = helpers.CF("disable-service-access", service, "-o", otherOrgName)
+					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+					Eventually(session).Should(Exit(1))
+				})
+
+				It("successfully disables access when the broker is specified", func() {
+					session := helpers.CF("disable-service-access", service, "-o", orgName, "-b", broker1.Name)
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("marketplace")
+					Consistently(session.Out).ShouldNot(Say("%s/s+%s/.+%s", service, servicePlan, broker1.Name))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("two services have plan enabeled in different orgs", func() {
+				var otherOrgName string
+
+				BeforeEach(func() {
+					otherOrgName = helpers.NewOrgName()
+					helpers.SetupCF(otherOrgName, spaceName)
+
+					session := helpers.CF("enable-service-access", service, "-b", broker1.Name, "-p", servicePlan, "-o", otherOrgName)
+					Eventually(session).Should(Exit(0))
+					session = helpers.CF("enable-service-access", service, "-b", broker2.Name, "-p", servicePlan, "-o", orgName)
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("fails to disable access when no broker is specified", func() {
+					session := helpers.CF("disable-service-access", service, "-p", servicePlan, "-o", orgName)
+					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+					Eventually(session).Should(Exit(1))
+
+					session = helpers.CF("disable-service-access", service, "-p", servicePlan, "-o", otherOrgName)
+					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+					Eventually(session).Should(Exit(1))
+				})
+
+				It("successfully disables access when the broker is specified", func() {
+					session := helpers.CF("disable-service-access", service, "-p", servicePlan, "-o", orgName, "-b", broker1.Name)
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("marketplace")
+					Consistently(session.Out).ShouldNot(Say("%s/s+%s/.+%s", service, servicePlan, broker1.Name))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})

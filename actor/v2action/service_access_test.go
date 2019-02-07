@@ -877,7 +877,24 @@ var _ = Describe("Service Access", func() {
 		})
 
 		JustBeforeEach(func() {
-			disableServiceWarnings, disableServiceErr = actor.DisableServiceForAllOrgs("service-1")
+			disableServiceWarnings, disableServiceErr = actor.DisableServiceForAllOrgs("service-1", "broker-1")
+		})
+
+		It("should call GetServices with proper filters", func() {
+			filters := fakeCloudControllerClient.GetServicesArgsForCall(0)
+			Expect(len(filters)).To(Equal(2))
+			Expect(filters).To(ConsistOf(
+				ccv2.Filter{
+					Type:     constant.LabelFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"service-1"},
+				},
+				ccv2.Filter{
+					Type:     constant.ServiceBrokerGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"broker-guid"},
+				},
+			))
 		})
 
 		It("should update all public plans to non-public", func() {
@@ -916,14 +933,6 @@ var _ = Describe("Service Access", func() {
 			It("returns service not found error", func() {
 				Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
 				Expect(disableServiceErr).To(MatchError(actionerror.ServiceNotFoundError{Name: "service-1"}))
-
-				filters := fakeCloudControllerClient.GetServicesArgsForCall(0)
-				Expect(len(filters)).To(Equal(1))
-				Expect(filters[0]).To(Equal(ccv2.Filter{
-					Type:     constant.LabelFilter,
-					Operator: constant.EqualOperator,
-					Values:   []string{"service-1"},
-				}))
 			})
 		})
 
@@ -1042,7 +1051,24 @@ var _ = Describe("Service Access", func() {
 		})
 
 		JustBeforeEach(func() {
-			disablePlanWarnings, disablePlanErr = actor.DisablePlanForAllOrgs("service-1", "plan-2")
+			disablePlanWarnings, disablePlanErr = actor.DisablePlanForAllOrgs("service-1", "plan-2", "broker-1")
+		})
+
+		It("should call GetServices with proper filters", func() {
+			filters := fakeCloudControllerClient.GetServicesArgsForCall(0)
+			Expect(len(filters)).To(Equal(2))
+			Expect(filters).To(ConsistOf(
+				ccv2.Filter{
+					Type:     constant.LabelFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"service-1"},
+				},
+				ccv2.Filter{
+					Type:     constant.ServiceBrokerGUIDFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"broker-guid"},
+				},
+			))
 		})
 
 		When("the plan is public", func() {
@@ -1279,7 +1305,7 @@ var _ = Describe("Service Access", func() {
 		var disableServiceForOrgWarnings Warnings
 
 		JustBeforeEach(func() {
-			disableServiceForOrgWarnings, disableServiceForOrgErr = actor.DisableServiceForOrg("service-1", "my-org")
+			disableServiceForOrgWarnings, disableServiceForOrgErr = actor.DisableServiceForOrg("service-1", "my-org", "broker-1")
 		})
 
 		When("the service and org exist", func() {
@@ -1313,6 +1339,14 @@ var _ = Describe("Service Access", func() {
 
 			It("deletes the service plan visibility for all plans for org", func() {
 				Expect(disableServiceForOrgErr).NotTo(HaveOccurred())
+				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+				brokerFilters := fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)
+				Expect(len(brokerFilters)).To(Equal(1))
+				Expect(brokerFilters[0]).To(Equal(ccv2.Filter{
+					Type:     constant.NameFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"broker-1"},
+				}))
 				Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
@@ -1376,12 +1410,19 @@ var _ = Describe("Service Access", func() {
 				Expect(disableServiceForOrgErr).To(MatchError(actionerror.ServiceNotFoundError{Name: "service-1"}))
 
 				filters := fakeCloudControllerClient.GetServicesArgsForCall(0)
-				Expect(len(filters)).To(Equal(1))
-				Expect(filters[0]).To(Equal(ccv2.Filter{
-					Type:     constant.LabelFilter,
-					Operator: constant.EqualOperator,
-					Values:   []string{"service-1"},
-				}))
+				Expect(len(filters)).To(Equal(2))
+				Expect(filters).To(ConsistOf(
+					ccv2.Filter{
+						Type:     constant.LabelFilter,
+						Operator: constant.EqualOperator,
+						Values:   []string{"service-1"},
+					},
+					ccv2.Filter{
+						Type:     constant.ServiceBrokerGUIDFilter,
+						Operator: constant.EqualOperator,
+						Values:   []string{"broker-guid"},
+					},
+				))
 			})
 		})
 
@@ -1471,7 +1512,7 @@ var _ = Describe("Service Access", func() {
 		var disablePlanForOrgWarnings Warnings
 
 		JustBeforeEach(func() {
-			disablePlanForOrgWarnings, disablePlanForOrgErr = actor.DisablePlanForOrg("service-1", "service-plan-1", "my-org")
+			disablePlanForOrgWarnings, disablePlanForOrgErr = actor.DisablePlanForOrg("service-1", "service-plan-1", "my-org", "broker-1")
 		})
 
 		When("the service and plan and org exist", func() {
@@ -1500,6 +1541,14 @@ var _ = Describe("Service Access", func() {
 
 			It("deletes the service plan visibility for all plans for org", func() {
 				Expect(disablePlanForOrgErr).NotTo(HaveOccurred())
+				Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
+				brokerFilters := fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)
+				Expect(len(brokerFilters)).To(Equal(1))
+				Expect(brokerFilters[0]).To(Equal(ccv2.Filter{
+					Type:     constant.NameFilter,
+					Operator: constant.EqualOperator,
+					Values:   []string{"broker-1"},
+				}))
 				Expect(fakeCloudControllerClient.GetServicesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetServicePlansCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
@@ -1550,12 +1599,18 @@ var _ = Describe("Service Access", func() {
 				Expect(disablePlanForOrgErr).To(MatchError(actionerror.ServiceNotFoundError{Name: "service-1"}))
 
 				filters := fakeCloudControllerClient.GetServicesArgsForCall(0)
-				Expect(len(filters)).To(Equal(1))
-				Expect(filters[0]).To(Equal(ccv2.Filter{
-					Type:     constant.LabelFilter,
-					Operator: constant.EqualOperator,
-					Values:   []string{"service-1"},
-				}))
+				Expect(len(filters)).To(Equal(2))
+				Expect(filters).To(ConsistOf(
+					ccv2.Filter{
+						Type:     constant.LabelFilter,
+						Operator: constant.EqualOperator,
+						Values:   []string{"service-1"},
+					},
+					ccv2.Filter{
+						Type:     constant.ServiceBrokerGUIDFilter,
+						Operator: constant.EqualOperator,
+						Values:   []string{"broker-guid"},
+					}))
 			})
 		})
 
