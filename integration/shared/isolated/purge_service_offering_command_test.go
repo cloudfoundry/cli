@@ -9,6 +9,14 @@ import (
 )
 
 var _ = Describe("purge-service-offering command", func() {
+	BeforeEach(func() {
+		helpers.TurnOnExperimental()
+	})
+
+	AfterEach(func() {
+		helpers.TurnOffExperimental()
+	})
+
 	Describe("help", func() {
 		When("the --help flag is set", func() {
 			It("displays command usage to output", func() {

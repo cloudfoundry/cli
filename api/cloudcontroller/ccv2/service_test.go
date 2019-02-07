@@ -540,6 +540,8 @@ var _ = Describe("Service", func() {
 
 		When("deleting the service fails", func() {
 			BeforeEach(func() {
+				purge = false
+
 				response := `{
 					"code": 1,
 					"description": "some error description",

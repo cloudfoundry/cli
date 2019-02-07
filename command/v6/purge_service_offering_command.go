@@ -46,6 +46,10 @@ func (cmd *PurgeServiceOfferingCommand) Setup(config command.Config, ui command.
 }
 
 func (cmd *PurgeServiceOfferingCommand) Execute(args []string) error {
+	if !cmd.Config.Experimental() {
+		return translatableerror.UnrefactoredCommandError{}
+	}
+
 	if len(args) > 0 {
 		return translatableerror.TooManyArgumentsError{
 			ExtraArgument: args[0],

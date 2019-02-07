@@ -47,6 +47,7 @@ var _ = Describe("purge-service-offering command", func() {
 				Service: "some-service",
 			},
 		}
+		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
