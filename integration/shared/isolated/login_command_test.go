@@ -361,6 +361,32 @@ var _ = Describe("login command", func() {
 	})
 
 	Describe("Target Organization", func() {
+		When("there is only one org available to the user", func() {
+			var (
+				orgName  string
+				username string
+				password string
+			)
+
+			BeforeEach(func() {
+				helpers.LoginCF()
+				orgName = helpers.NewOrgName()
+				session := helpers.CF("create-org", orgName)
+				Eventually(session).Should(Exit(0))
+				username, password = helpers.CreateUserInOrgRole(orgName, "OrgManager")
+			})
+
+			It("logs the user in and targets the organization automatically", func() {
+				apiURL := helpers.GetAPI()
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL)
+				Eventually(session).Should(Exit(0))
+
+				targetSession := helpers.CF("target")
+				Eventually(targetSession).Should(Exit(0))
+				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+			})
+		})
+
 		When("there are multiple orgs available to the user", func() {
 			var orgName string
 
