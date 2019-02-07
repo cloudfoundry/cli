@@ -103,7 +103,7 @@ var _ = Describe("create-service Command", func() {
 			It("passes the correct args when creating the service instance", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 				Expect(fakeActor.CreateServiceInstanceCallCount()).To(Equal(1))
-				spaceGUID, service, servicePlan, serviceInstance, _, _ := fakeActor.CreateServiceInstanceArgsForCall(0)
+				spaceGUID, service, servicePlan, serviceInstance, _, _, _ := fakeActor.CreateServiceInstanceArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(service).To(Equal("cool-broker"))
 				Expect(servicePlan).To(Equal("cool-plan"))
@@ -123,7 +123,7 @@ var _ = Describe("create-service Command", func() {
 				It("passes the tags as args when creating the service instance", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(fakeActor.CreateServiceInstanceCallCount()).To(Equal(1))
-					_, _, _, _, _, tags := fakeActor.CreateServiceInstanceArgsForCall(0)
+					_, _, _, _, _, _, tags := fakeActor.CreateServiceInstanceArgsForCall(0)
 					Expect(tags).To(Equal([]string{"tag-1", "tag-2"}))
 				})
 			})
@@ -138,8 +138,21 @@ var _ = Describe("create-service Command", func() {
 				It("passes the parameters as args when creating the service instance", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(fakeActor.CreateServiceInstanceCallCount()).To(Equal(1))
-					_, _, _, _, params, _ := fakeActor.CreateServiceInstanceArgsForCall(0)
+					_, _, _, _, _, params, _ := fakeActor.CreateServiceInstanceArgsForCall(0)
 					Expect(params).To(Equal(map[string]interface{}{"some-key": "some-value"}))
+				})
+			})
+
+			Context("the user passes in broker name", func() {
+				BeforeEach(func() {
+					cmd.ServiceBroker = "some-broker"
+				})
+
+				It("passes the broker name as arg when creating the service instance", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(fakeActor.CreateServiceInstanceCallCount()).To(Equal(1))
+					_, _, _, _, brokerName, _, _ := fakeActor.CreateServiceInstanceArgsForCall(0)
+					Expect(brokerName).To(Equal("some-broker"))
 				})
 			})
 

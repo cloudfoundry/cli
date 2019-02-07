@@ -38,8 +38,8 @@ func (actor Actor) GetServicePlansForService(serviceName, brokerName string) ([]
 	return plansToReturn, allWarnings, nil
 }
 
-func (actor Actor) getServicePlanForServiceInSpace(servicePlanName, serviceName, spaceGUID string) (ServicePlan, Warnings, error) {
-	service, allWarnings, err := actor.getServiceByNameForSpace(serviceName, spaceGUID)
+func (actor Actor) getServicePlanForServiceInSpace(servicePlanName, serviceName, spaceGUID, brokerGUID string) (ServicePlan, Warnings, error) {
+	service, allWarnings, err := actor.getServiceByNameForSpace(serviceName, spaceGUID, brokerGUID)
 	if err != nil {
 		return ServicePlan{}, allWarnings, err
 	}

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -319,6 +320,73 @@ var _ = Describe("create-service command", func() {
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Say("Create in progress. Use 'cf services' or 'cf service my-service' to check operation status."))
 					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("there are two services with the same name from different brokers", func() {
+				var (
+					service     string
+					servicePlan string
+					broker1     helpers.ServiceBroker
+					broker2     helpers.ServiceBroker
+				)
+
+				BeforeEach(func() {
+					helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
+					service = helpers.PrefixedRandomName("SERVICE")
+					servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+
+					broker1 = helpers.CreateBroker(domain, service, servicePlan)
+					broker2 = helpers.CreateBroker(domain, service, servicePlan)
+
+					Eventually(helpers.CF("enable-service-access", service, "-b", broker1.Name)).Should(Exit(0))
+					Eventually(helpers.CF("enable-service-access", service, "-b", broker2.Name)).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					broker1.Destroy()
+					broker2.Destroy()
+				})
+
+				When("the user does not specify which broker to use", func() {
+					It("displays an informative error message, exits 1", func() {
+						session := helpers.CF("create-service", service, servicePlan, "my-service")
+						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
+							"my-service", org, space, username))
+						Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers\\.", service))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				When("the user specifies which broker to use", func() {
+					It("displays an informative success message, exits 0", func() {
+						By("creating the service with -b flag")
+						session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", broker1.Name)
+						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
+							"my-service", org, space, username))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("services")
+						Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+create succeeded",
+							"my-service",
+							service,
+							servicePlan,
+						))
+					})
+
+					Context("the broker does not exist", func() {
+						It("displays an informative error message, exits 1", func() {
+							session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", "non-existent-broker")
+							Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
+								"my-service", org, space, username))
+							Eventually(session.Err).Should(Say("Service broker '%s' not found\\.", "non-existent-broker"))
+							Eventually(session).Should(Say("FAILED"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
 				})
 			})
 		})

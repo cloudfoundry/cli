@@ -53,18 +53,34 @@ func (actor Actor) GetServiceByNameAndBrokerName(serviceName, serviceBrokerName 
 	return Service(services[0]), Warnings(warnings), nil
 }
 
-func (actor Actor) getServiceByNameForSpace(serviceName, spaceGUID string) (Service, Warnings, error) {
-	services, warnings, err := actor.CloudControllerClient.GetSpaceServices(spaceGUID, ccv2.Filter{
+func (actor Actor) getServiceByNameForSpace(serviceName, spaceGUID, brokerGUID string) (Service, Warnings, error) {
+	var filters []ccv2.Filter
+
+	filters = append(filters, ccv2.Filter{
 		Type:     constant.LabelFilter,
 		Operator: constant.EqualOperator,
 		Values:   []string{serviceName},
 	})
+
+	if brokerGUID != "" {
+		filters = append(filters, ccv2.Filter{
+			Type:     constant.ServiceBrokerGUIDFilter,
+			Operator: constant.EqualOperator,
+			Values:   []string{brokerGUID},
+		})
+	}
+
+	services, warnings, err := actor.CloudControllerClient.GetSpaceServices(spaceGUID, filters...)
 	if err != nil {
 		return Service{}, Warnings(warnings), err
 	}
 
 	if len(services) == 0 {
 		return Service{}, Warnings(warnings), actionerror.ServiceNotFoundError{Name: serviceName}
+	}
+
+	if len(services) > 1 {
+		return Service{}, Warnings(warnings), actionerror.DuplicateServiceError{Name: serviceName}
 	}
 
 	return Service(services[0]), Warnings(warnings), nil

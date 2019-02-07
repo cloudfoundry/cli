@@ -11,8 +11,31 @@ import (
 type ServiceInstance ccv2.ServiceInstance
 
 // CreateServiceInstance creates a new service instance with the provided attributes.
-func (actor Actor) CreateServiceInstance(spaceGUID, serviceName, servicePlanName, serviceInstanceName string, params map[string]interface{}, tags []string) (ServiceInstance, Warnings, error) {
-	plan, allWarnings, err := actor.getServicePlanForServiceInSpace(servicePlanName, serviceName, spaceGUID)
+func (actor Actor) CreateServiceInstance(spaceGUID, serviceName, servicePlanName, serviceInstanceName, brokerName string, params map[string]interface{}, tags []string) (ServiceInstance, Warnings, error) {
+	var brokerGUID string
+	var allWarnings Warnings
+
+	if brokerName != "" {
+		brokers, warnings, err := actor.CloudControllerClient.GetServiceBrokers(ccv2.Filter{
+			Type:     constant.NameFilter,
+			Operator: constant.EqualOperator,
+			Values:   []string{brokerName},
+		})
+		allWarnings = Warnings(warnings)
+
+		if err != nil {
+			return ServiceInstance{}, allWarnings, err
+		}
+
+		if len(brokers) == 0 {
+			return ServiceInstance{}, allWarnings, actionerror.ServiceBrokerNotFoundError{Name: brokerName}
+		}
+
+		brokerGUID = brokers[0].GUID
+	}
+
+	plan, allWarnings, err := actor.getServicePlanForServiceInSpace(servicePlanName, serviceName, spaceGUID, brokerGUID)
+
 	if err != nil {
 		return ServiceInstance{}, allWarnings, err
 	}

@@ -9,15 +9,16 @@ import (
 )
 
 type FakeCreateServiceActor struct {
-	CreateServiceInstanceStub        func(string, string, string, string, map[string]interface{}, []string) (v2action.ServiceInstance, v2action.Warnings, error)
+	CreateServiceInstanceStub        func(string, string, string, string, string, map[string]interface{}, []string) (v2action.ServiceInstance, v2action.Warnings, error)
 	createServiceInstanceMutex       sync.RWMutex
 	createServiceInstanceArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
 		arg4 string
-		arg5 map[string]interface{}
-		arg6 []string
+		arg5 string
+		arg6 map[string]interface{}
+		arg7 []string
 	}
 	createServiceInstanceReturns struct {
 		result1 v2action.ServiceInstance
@@ -33,11 +34,11 @@ type FakeCreateServiceActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateServiceActor) CreateServiceInstance(arg1 string, arg2 string, arg3 string, arg4 string, arg5 map[string]interface{}, arg6 []string) (v2action.ServiceInstance, v2action.Warnings, error) {
-	var arg6Copy []string
-	if arg6 != nil {
-		arg6Copy = make([]string, len(arg6))
-		copy(arg6Copy, arg6)
+func (fake *FakeCreateServiceActor) CreateServiceInstance(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string, arg6 map[string]interface{}, arg7 []string) (v2action.ServiceInstance, v2action.Warnings, error) {
+	var arg7Copy []string
+	if arg7 != nil {
+		arg7Copy = make([]string, len(arg7))
+		copy(arg7Copy, arg7)
 	}
 	fake.createServiceInstanceMutex.Lock()
 	ret, specificReturn := fake.createServiceInstanceReturnsOnCall[len(fake.createServiceInstanceArgsForCall)]
@@ -46,13 +47,14 @@ func (fake *FakeCreateServiceActor) CreateServiceInstance(arg1 string, arg2 stri
 		arg2 string
 		arg3 string
 		arg4 string
-		arg5 map[string]interface{}
-		arg6 []string
-	}{arg1, arg2, arg3, arg4, arg5, arg6Copy})
-	fake.recordInvocation("CreateServiceInstance", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6Copy})
+		arg5 string
+		arg6 map[string]interface{}
+		arg7 []string
+	}{arg1, arg2, arg3, arg4, arg5, arg6, arg7Copy})
+	fake.recordInvocation("CreateServiceInstance", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6, arg7Copy})
 	fake.createServiceInstanceMutex.Unlock()
 	if fake.CreateServiceInstanceStub != nil {
-		return fake.CreateServiceInstanceStub(arg1, arg2, arg3, arg4, arg5, arg6)
+		return fake.CreateServiceInstanceStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -67,17 +69,17 @@ func (fake *FakeCreateServiceActor) CreateServiceInstanceCallCount() int {
 	return len(fake.createServiceInstanceArgsForCall)
 }
 
-func (fake *FakeCreateServiceActor) CreateServiceInstanceCalls(stub func(string, string, string, string, map[string]interface{}, []string) (v2action.ServiceInstance, v2action.Warnings, error)) {
+func (fake *FakeCreateServiceActor) CreateServiceInstanceCalls(stub func(string, string, string, string, string, map[string]interface{}, []string) (v2action.ServiceInstance, v2action.Warnings, error)) {
 	fake.createServiceInstanceMutex.Lock()
 	defer fake.createServiceInstanceMutex.Unlock()
 	fake.CreateServiceInstanceStub = stub
 }
 
-func (fake *FakeCreateServiceActor) CreateServiceInstanceArgsForCall(i int) (string, string, string, string, map[string]interface{}, []string) {
+func (fake *FakeCreateServiceActor) CreateServiceInstanceArgsForCall(i int) (string, string, string, string, string, map[string]interface{}, []string) {
 	fake.createServiceInstanceMutex.RLock()
 	defer fake.createServiceInstanceMutex.RUnlock()
 	argsForCall := fake.createServiceInstanceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6, argsForCall.arg7
 }
 
 func (fake *FakeCreateServiceActor) CreateServiceInstanceReturns(result1 v2action.ServiceInstance, result2 v2action.Warnings, result3 error) {
