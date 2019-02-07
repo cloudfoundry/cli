@@ -15,6 +15,7 @@ resources:
   type: pull-request
   check_every: 1m
   source:
+    disable_forks: true
     repository: cloudfoundry/cli
     access_token: ((github-access-token))
     # base: master # Only build PRs that want to merge to master
