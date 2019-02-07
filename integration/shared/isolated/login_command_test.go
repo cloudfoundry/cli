@@ -375,16 +375,32 @@ var _ = Describe("login command", func() {
 				helpers.QuickDeleteOrg(orgName)
 			})
 
-			It("prompt the user for org and target the selected org", func() {
-				username, password := helpers.GetCredentials()
-				input := NewBuffer()
-				input.Write([]byte("1\n"))
-				session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
-				Eventually(session).Should(Exit(0))
+			When("user selects an organization by using numbered list", func() {
+				It("prompt the user for org and target the selected org", func() {
+					username, password := helpers.GetCredentials()
+					input := NewBuffer()
+					input.Write([]byte("1\n"))
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
+					Eventually(session).Should(Exit(0))
 
-				targetSession := helpers.CF("target")
-				Eventually(targetSession).Should(Exit(0))
-				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+				})
+			})
+
+			When("user selects an organization by org name", func() {
+				It("prompt the user for org and target the selected org", func() {
+					username, password := helpers.GetCredentials()
+					input := NewBuffer()
+					input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
+					Eventually(session).Should(Exit(0))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+				})
 			})
 		})
 	})
