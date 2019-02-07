@@ -360,6 +360,35 @@ var _ = Describe("login command", func() {
 		})
 	})
 
+	Describe("Target Organization", func() {
+		When("there are multiple orgs available to the user", func() {
+			var orgName string
+
+			BeforeEach(func() {
+				helpers.LoginCF()
+				orgName = "aaaaa" + helpers.NewOrgName()
+				createOrgSession := helpers.CF("create-org", orgName)
+				Eventually(createOrgSession).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("prompt the user for org and target the selected org", func() {
+				username, password := helpers.GetCredentials()
+				input := NewBuffer()
+				input.Write([]byte("1\n"))
+				session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
+				Eventually(session).Should(Exit(0))
+
+				targetSession := helpers.CF("target")
+				Eventually(targetSession).Should(Exit(0))
+				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+			})
+		})
+	})
+
 	Describe("User Credentials", func() {
 		// TODO: Figure out a way to pass in password when we don't have a tty
 		XIt("prompts the user for email and password", func() {
