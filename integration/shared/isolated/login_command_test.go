@@ -361,23 +361,22 @@ var _ = Describe("login command", func() {
 	})
 
 	Describe("Target Organization", func() {
+		var (
+			orgName  string
+			username string
+			password string
+		)
+
+		BeforeEach(func() {
+			helpers.LoginCF()
+			orgName = helpers.NewOrgName()
+			session := helpers.CF("create-org", orgName)
+			Eventually(session).Should(Exit(0))
+			username, password = helpers.CreateUserInOrgRole(orgName, "OrgManager")
+		})
+
 		When("there is only one org available to the user", func() {
-			var (
-				orgName  string
-				username string
-				password string
-			)
-
-			BeforeEach(func() {
-				helpers.LoginCF()
-				orgName = helpers.NewOrgName()
-				session := helpers.CF("create-org", orgName)
-				Eventually(session).Should(Exit(0))
-				username, password = helpers.CreateUserInOrgRole(orgName, "OrgManager")
-			})
-
 			It("logs the user in and targets the organization automatically", func() {
-				apiURL := helpers.GetAPI()
 				session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL)
 				Eventually(session).Should(Exit(0))
 
@@ -388,24 +387,34 @@ var _ = Describe("login command", func() {
 		})
 
 		When("there are multiple orgs available to the user", func() {
-			var orgName string
-
 			BeforeEach(func() {
-				helpers.LoginCF()
-				orgName = "aaaaa" + helpers.NewOrgName()
+				orgName = helpers.NewOrgName()
 				createOrgSession := helpers.CF("create-org", orgName)
 				Eventually(createOrgSession).Should(Exit(0))
-			})
-
-			AfterEach(func() {
-				helpers.QuickDeleteOrg(orgName)
+				setOrgRoleSession := helpers.CF("set-org-role", username, orgName, "OrgManager")
+				Eventually(setOrgRoleSession).Should(Exit(0))
 			})
 
 			When("user selects an organization by using numbered list", func() {
 				It("prompt the user for org and target the selected org", func() {
-					username, password := helpers.GetCredentials()
 					input := NewBuffer()
 					input.Write([]byte("1\n"))
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
+					Eventually(session).Should(Exit(0))
+
+					re := regexp.MustCompile("1\\. (?P<OrgName>.*)\n")
+					expectedOrgName := re.FindStringSubmatch(string(session.Out.Contents()))[1]
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`org:\s+%s`, expectedOrgName))
+				})
+			})
+
+			When("user selects an organization by org name", func() {
+				It("prompt the user for org and target the selected org", func() {
+					input := NewBuffer()
+					input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
 					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
 					Eventually(session).Should(Exit(0))
 
@@ -415,17 +424,16 @@ var _ = Describe("login command", func() {
 				})
 			})
 
-			When("user selects an organization by org name", func() {
-				It("prompt the user for org and target the selected org", func() {
-					username, password := helpers.GetCredentials()
+			When("user does not select an organization", func() {
+				It("succesfully logs in but does not target any org", func() {
 					input := NewBuffer()
-					input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
+					input.Write([]byte("\n"))
 					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
 					Eventually(session).Should(Exit(0))
 
 					targetSession := helpers.CF("target")
 					Eventually(targetSession).Should(Exit(0))
-					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+					Eventually(targetSession).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
 				})
 			})
 		})
