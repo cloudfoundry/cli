@@ -243,7 +243,7 @@ var _ = Describe("push Command", func() {
 						var yamlContents []byte
 
 						BeforeEach(func() {
-							yamlContents = []byte(`---\n- banana`)
+							yamlContents = []byte("---\napplications:\n- name: banana")
 							pathToYAMLFile := filepath.Join(tempDir, "manifest.yml")
 							err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
 							Expect(err).ToNot(HaveOccurred())
@@ -284,7 +284,7 @@ var _ = Describe("push Command", func() {
 						var yamlContents []byte
 
 						BeforeEach(func() {
-							yamlContents = []byte(`---\n- banana`)
+							yamlContents = []byte("---\napplications:\n- name: banana")
 							pathToYAMLFile := filepath.Join(tempDir, "manifest.yml")
 							err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
 							Expect(err).ToNot(HaveOccurred())
@@ -313,11 +313,11 @@ var _ = Describe("push Command", func() {
 				When("--vars-files are specified", func() {
 					var yamlContents []byte
 					var varFileContents []byte
-					var interpolatedManifest []byte
+					var expectedManifest []byte
 
 					BeforeEach(func() {
-						interpolatedManifest = yamlUnmarshalMarshal([]byte("---\n- var: turtle"))
-						yamlContents = []byte("---\n- var: ((put-var-here))")
+						expectedManifest = yamlUnmarshalMarshal([]byte("---\napplications:\n- name: turtle"))
+						yamlContents = []byte("---\napplications:\n- name: ((put-var-here))")
 						pathToYAMLFile := filepath.Join(tempDir, "manifest.yml")
 						err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
 						Expect(err).ToNot(HaveOccurred())
@@ -336,17 +336,17 @@ var _ = Describe("push Command", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
 						_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
-						Expect(manifest).To(Equal(interpolatedManifest))
+						Expect(manifest).To(Equal(expectedManifest))
 					})
 				})
 
 				When("The --var flag is provided", func() {
 					var yamlContents []byte
-					var interpolatedManifest []byte
+					var expectedManifest []byte
 
 					BeforeEach(func() {
-						interpolatedManifest = yamlUnmarshalMarshal([]byte("---\n- var: turtle"))
-						yamlContents = []byte("---\n- var: ((put-var-here))")
+						expectedManifest = yamlUnmarshalMarshal([]byte("---\napplications:\n- name: turtle"))
+						yamlContents = []byte("---\napplications:\n- name: ((put-var-here))")
 						pathToYAMLFile := filepath.Join(tempDir, "manifest.yml")
 						err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
 						Expect(err).ToNot(HaveOccurred())
@@ -360,7 +360,7 @@ var _ = Describe("push Command", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
 						_, _, _, _, _, manifest := fakeActor.ConceptualizeArgsForCall(0)
-						Expect(manifest).To(Equal(interpolatedManifest))
+						Expect(manifest).To(Equal(expectedManifest))
 					})
 				})
 			})

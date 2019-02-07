@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"code.cloudfoundry.org/cli/util/download"
 	"code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -195,6 +196,12 @@ func ConvertToTranslatableError(err error) error {
 		return TriggerLegacyPushError{GlobalRelated: e.Fields}
 	case manifest.InterpolationError:
 		return InterpolationError(e)
+
+	// ManifestParser Errors
+	case manifestparser.InterpolationError:
+		return InterpolationError(e)
+	case manifestparser.InvalidYAMLError:
+		return InvalidYAMLError(e)
 
 	// Plugin Execution Errors
 	case pluginerror.RawHTTPStatusError:

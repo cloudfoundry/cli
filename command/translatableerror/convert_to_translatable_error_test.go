@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"code.cloudfoundry.org/cli/util/download"
 	"code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -393,6 +394,14 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("manifest.InterpolationError -> InterpolationError",
 			manifest.InterpolationError{Err: errors.New("an-error")},
 			InterpolationError{Err: errors.New("an-error")}),
+
+		Entry("manifestparser.InterpolationError -> InterpolationError",
+			manifestparser.InterpolationError{Err: errors.New("an-error")},
+			InterpolationError{Err: errors.New("an-error")}),
+
+		Entry("manifestparser.InvalidYAMLError -> InvalidYAMLError",
+			manifestparser.InvalidYAMLError{Err: errors.New("an-error")},
+			InvalidYAMLError{Err: errors.New("an-error")}),
 
 		// Plugin Errors
 		Entry("pluginerror.RawHTTPStatusError -> DownloadPluginHTTPError",

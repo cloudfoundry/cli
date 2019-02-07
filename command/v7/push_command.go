@@ -15,7 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/cli/util/progressbar"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
@@ -125,6 +125,13 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
+	var manifest []byte
+	if !cmd.NoManifest {
+		if manifest, err = cmd.readManifest(); err != nil {
+			return err
+		}
+	}
+
 	overrides, err := cmd.GetFlagOverrides()
 	if err != nil {
 		return err
@@ -143,13 +150,6 @@ func (cmd PushCommand) Execute(args []string) error {
 	})
 
 	cmd.UI.DisplayText("Getting app info...")
-
-	var manifest []byte
-	if !cmd.NoManifest {
-		if manifest, err = cmd.readManifest(); err != nil {
-			return err
-		}
-	}
 
 	log.Info("generating the app state")
 	pushState, warnings, err := cmd.Actor.Conceptualize(
@@ -350,22 +350,26 @@ func (cmd PushCommand) readManifest() ([]byte, error) {
 		pathsToVarsFiles = append(pathsToVarsFiles, string(varfilepath))
 	}
 
+	parser := manifestparser.NewParser()
+
 	if len(cmd.PathToManifest) != 0 {
 		log.WithField("manifestPath", cmd.PathToManifest).Debug("reading '-f' provided manifest")
-		return manifest.ReadAndInterpolateRawManifest(string(cmd.PathToManifest), pathsToVarsFiles, cmd.Vars)
+		err := parser.InterpolateAndParse(string(cmd.PathToManifest), pathsToVarsFiles, cmd.Vars)
+		return parser.FullRawManifest(), err
 	}
 
 	pathToManifest := filepath.Join(cmd.PWD, "manifest.yml")
 	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
 
-	interpolatedManifest, err := manifest.ReadAndInterpolateRawManifest(pathToManifest, pathsToVarsFiles, cmd.Vars)
+	err := parser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
 	if err != nil && !os.IsNotExist(err) {
 		log.Errorln("reading manifest:", err)
 		return nil, err
 	} else if os.IsNotExist(err) {
 		log.Debug("no manifest exists")
 	}
-	return interpolatedManifest, nil
+
+	return parser.FullRawManifest(), nil
 }
 
 func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
