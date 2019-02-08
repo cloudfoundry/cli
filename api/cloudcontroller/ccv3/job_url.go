@@ -47,3 +47,33 @@ func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest
 
 	return JobURL(response.ResourceLocationURL), response.Warnings, err
 }
+
+// UpdateSpaceApplyManifest - Is there a better name for this, since ...
+// -- The Space resource is not actually updated.
+// -- Instead what this ApplyManifest may do is to Create or Update Applications instead.
+
+// Applies the manifest to the given space. Returns back a resulting job URL to poll.
+
+// For each app specified in the manifest, the server-side handles:
+// (1) Finding or creating this app.
+// (2) Applying manifest properties to this app.
+
+func (client *Client) UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte) (JobURL, Warnings, error) {
+
+	request, requestExecuteErr := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostSpaceActionApplyManifestRequest,
+		URIParams:   map[string]string{"space_guid": spaceGUID},
+		Body:        bytes.NewReader(rawManifest),
+	})
+
+	if requestExecuteErr != nil {
+		return JobURL(""), nil, requestExecuteErr
+	}
+
+	request.Header.Set("Content-Type", "application/x-yaml")
+
+	response := cloudcontroller.Response{}
+	err := client.connection.Make(request, &response)
+
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
