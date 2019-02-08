@@ -20,4 +20,6 @@ params:
   CF_INT_IGNORE_API_VERSION_CHECK:
 
 run:
-  path: cli-ci/ci/cli-v7/tasks/integration-windows.ps1
+  path: powershell
+  args:
+  - cli-ci/ci/cli-v7/tasks/integration-windows.ps1
