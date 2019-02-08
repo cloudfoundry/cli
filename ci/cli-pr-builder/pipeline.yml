@@ -11,16 +11,13 @@ resource_types:
     tag: latest
 
 resources:
-- name: cli
+- name: cli-pr
   type: pull-request
   check_every: 1m
   source:
-    disable_forks: true
+    disable_forks: true # TODO: remove this once the PR builder is completely done
     repository: cloudfoundry/cli
     access_token: ((github-access-token))
-    # base: master # Only build PRs that want to merge to master
-    # disable_forks: true # Until we're sure of the security, only build PRs on the main repo, so that only people with push access can trigger
-    # only_mergeable: true # Don't spend resources building PRs that can't be merged.
     ignore_paths:
     - README.md
     - .github/
@@ -32,6 +29,12 @@ resources:
     private_key: ((cli-pools-github-private-key))
     branch: master
     pool: bosh-lites
+
+- name: cli-master
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
 
 # - name: legacy-gcp-bosh-pool
 #   type: pool
@@ -47,36 +50,35 @@ resources:
 #     repository: golang
 #     tag: 1.11
 
-groups:
-- name: cli
-  jobs:
-  - units
-  - claim-bosh-lite
-  - integration-linux
-
 jobs:
 - name: units
   serial: true
   plan:
   - aggregate:
-    - get: cli
+    - get: cli-pr
       trigger: true
+    - get: cli-master
   - aggregate:
     - task: units-linux
       timeout: 30m
-      file: cli/ci/cli/tasks/units-linux.yml
+      input_mapping:
+        cli: cli-pr
+      file: cli-master/ci/cli/tasks/units-linux.yml
 
 - name: claim-bosh-lite # TODO: record PR number instead of usernames
   serial: true
   plan:
   - aggregate:
-    - get: cli
+    - get: cli-pr
       trigger: true
       version: every
       passed: [units]
+    - get: cli-master
   - do:
     - task: get-pr-info
-      file: cli/ci/cli-pr-builder/tasks/extract-info-from-pr.yml
+      input_mapping:
+        cli: cli-pr
+      file: cli-master/ci/cli-pr-builder/tasks/extract-info-from-pr.yml
     - put: bosh-lite
       params:
         story: commit-info/pr-id
@@ -90,23 +92,27 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: cli
+    - get: cli-pr
       trigger: true
       passed: [claim-bosh-lite]
       version: every
+    - get: cli-master
     - get: bosh-lite
       passed: [claim-bosh-lite]
       version: every
+      trigger: true
   - do:
     - task: integration
+      input_mapping:
+        cli: cli-pr
       file: cli/ci/cli-pr-builder/tasks/integration-linux.yml
       timeout: 1h30m
       params:
         CF_INT_IGNORE_API_VERSION_CHECK: false
       on_failure:
-        put: cli
+        put: cli-pr
         params:
-          path: cli
+          path: cli-pr
           status: failure
       ensure:
         put: unclaim-bosh-lite
@@ -114,7 +120,7 @@ jobs:
         params:
           operation: unclaim
           name: bosh-lite/name
-    - put: cli
+    - put: cli-pr
       params:
-        path: cli
+        path: cli-pr
         status: success
