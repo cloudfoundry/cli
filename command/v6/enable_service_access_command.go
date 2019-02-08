@@ -20,10 +20,10 @@ type EnableServiceAccessActor interface {
 
 type EnableServiceAccessCommand struct {
 	RequiredArgs    flag.Service `positional-args:"yes"`
-	ServiceBroker   string       `short:"b" hidden:"true" description:"[Experimental] Enable access to a service from a specific service broker"`
+	ServiceBroker   string       `short:"b" description:"Enable access to a service from a particular service broker. Required when service name is ambiguous"`
 	Organization    string       `short:"o" description:"Enable access for a specified organization"`
 	ServicePlan     string       `short:"p" description:"Enable access to a specified service plan"`
-	usage           interface{}  `usage:"CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]"`
+	usage           interface{}  `usage:"CF_NAME enable-service-access SERVICE [-b BROKER] [-p PLAN] [-o ORG]"`
 	relatedCommands interface{}  `related_commands:"marketplace, service-access, service-brokers"`
 
 	UI          command.UI
