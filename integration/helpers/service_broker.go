@@ -153,7 +153,7 @@ func (b ServiceBroker) Delete() {
 }
 
 func (b ServiceBroker) Destroy() {
-	Eventually(CF("purge-service-offering", b.Service.Name, "-b", b.Name, "-f")).Should(Exit(0))
+	Eventually(CF("purge-service-offering", b.Service.Name, "-f")).Should(Exit(0))
 	b.Delete()
 	Eventually(CF("delete", b.Name, "-f", "-r")).Should(Exit(0))
 }
