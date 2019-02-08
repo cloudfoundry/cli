@@ -19,6 +19,7 @@ type PurgeServiceOfferingActor interface {
 
 type PurgeServiceOfferingCommand struct {
 	RequiredArgs    flag.Service `positional-args:"yes"`
+	ServiceBroker   string       `short:"b" hidden:"true" description:"[Experimental] Purge a service from a particular service broker. Required when service name is ambiguous"`
 	Force           bool         `short:"f" description:"Force deletion without confirmation"`
 	Provider        string       `short:"p" description:"Provider"`
 	usage           interface{}  `usage:"CF_NAME purge-service-offering SERVICE [-p PROVIDER] [-f]\n\nWARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup."`
@@ -64,7 +65,7 @@ func (cmd *PurgeServiceOfferingCommand) Execute(args []string) error {
 		return translatableerror.FlagNoLongerSupportedError{Flag: "-p"}
 	}
 
-	service, warnings, err := cmd.Actor.GetServiceByNameAndBrokerName(cmd.RequiredArgs.Service, "")
+	service, warnings, err := cmd.Actor.GetServiceByNameAndBrokerName(cmd.RequiredArgs.Service, cmd.ServiceBroker)
 	if err != nil {
 		cmd.UI.DisplayWarnings(warnings)
 
@@ -83,9 +84,17 @@ func (cmd *PurgeServiceOfferingCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.\n")
 
 	if !cmd.Force {
-		promptMessage := "Really purge service offering {{.ServiceOffering}} from Cloud Foundry?"
-		purgeServiceOffering, promptErr := cmd.UI.DisplayBoolPrompt(false, promptMessage, map[string]interface{}{"ServiceOffering": cmd.RequiredArgs.Service})
+		var promptMessage string
+		if cmd.ServiceBroker != "" {
+			promptMessage = "Really purge service offering {{.ServiceOffering}} from broker {{.ServiceBroker}} from Cloud Foundry?"
+		} else {
+			promptMessage = "Really purge service offering {{.ServiceOffering}} from Cloud Foundry?"
+		}
 
+		purgeServiceOffering, promptErr := cmd.UI.DisplayBoolPrompt(false, promptMessage, map[string]interface{}{
+			"ServiceOffering": cmd.RequiredArgs.Service,
+			"ServiceBroker":   cmd.ServiceBroker,
+		})
 		if promptErr != nil {
 			return promptErr
 		}
