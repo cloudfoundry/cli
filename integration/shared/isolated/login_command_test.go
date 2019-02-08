@@ -150,7 +150,7 @@ var _ = Describe("login command", func() {
 
 			When("the user provides the -a flag", func() {
 				It("sets the API endpoint and does not prompt the user for the API endpoint", func() {
-					session := helpers.CF("login", "-a", apiURL, "--skip-ssl-validation")
+					session := helpers.CF("login", "-a", apiURL, skipSSLValidation)
 					Eventually(session).Should(Say("API endpoint: %s", apiURL))
 					// TODO This currently because we dont have the user/password prompt implemented. Uncomment this line after we implement the other prompts
 					// Consistently(session).ShouldNot(Say("API endpoint:"))
@@ -164,7 +164,7 @@ var _ = Describe("login command", func() {
 
 				When("the provided API endpoint is unreachable", func() {
 					It("displays an error and fails", func() {
-						session := helpers.CF("login", "-a", "does.not.exist", "--skip-ssl-validation")
+						session := helpers.CF("login", "-a", "does.not.exist", skipSSLValidation)
 						Eventually(session).Should(Say("API endpoint: does.not.exist"))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Request error: "))
@@ -186,7 +186,7 @@ var _ = Describe("login command", func() {
 			When("the user provides a new API endpoint with the -a flag", func() {
 				When("the provided API endpoint is unreachable", func() {
 					It("displays an error and does not change the API endpoint", func() {
-						session := helpers.CF("login", "-a", "does.not.exist", "--skip-ssl-validation")
+						session := helpers.CF("login", "-a", "does.not.exist", skipSSLValidation)
 						Eventually(session).Should(Say("API endpoint: does.not.exist"))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Request error: "))
@@ -211,6 +211,10 @@ var _ = Describe("login command", func() {
 			)
 
 			BeforeEach(func() {
+				if skipSSLValidation != "" {
+					Skip("SKIP_SSL_VALIDATION is enabled and is " + skipSSLValidation)
+				}
+
 				serverURL, err = url.Parse(helpers.GetAPI())
 				Expect(err).NotTo(HaveOccurred())
 
@@ -219,7 +223,7 @@ var _ = Describe("login command", func() {
 
 			It("defaults to https", func() {
 				username, password := helpers.GetCredentials()
-				session := helpers.CF("login", "-u", username, "-p", password, "-a", hostname, "--skip-ssl-validation")
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", hostname)
 
 				Eventually(session).Should(Say("API endpoint: %s", hostname))
 				Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
@@ -240,7 +244,7 @@ var _ = Describe("login command", func() {
 
 			It("shows a warning to the user", func() {
 				username, password := helpers.GetCredentials()
-				session := helpers.CF("login", "-u", username, "-p", password, "-a", httpURL, "--skip-ssl-validation")
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", httpURL, skipSSLValidation)
 
 				Eventually(session).Should(Say("API endpoint: %s", httpURL))
 				Eventually(session).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
@@ -377,7 +381,7 @@ var _ = Describe("login command", func() {
 
 		When("there is only one org available to the user", func() {
 			It("logs the user in and targets the organization automatically", func() {
-				session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL)
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, skipSSLValidation)
 				Eventually(session).Should(Exit(0))
 
 				targetSession := helpers.CF("target")
@@ -399,7 +403,7 @@ var _ = Describe("login command", func() {
 				It("prompt the user for org and target the selected org", func() {
 					input := NewBuffer()
 					input.Write([]byte("1\n"))
-					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, skipSSLValidation)
 					Eventually(session).Should(Exit(0))
 
 					re := regexp.MustCompile("1\\. (?P<OrgName>.*)\n")
@@ -415,7 +419,7 @@ var _ = Describe("login command", func() {
 				It("prompt the user for org and target the selected org", func() {
 					input := NewBuffer()
 					input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
-					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, skipSSLValidation)
 					Eventually(session).Should(Exit(0))
 
 					targetSession := helpers.CF("target")
@@ -428,7 +432,7 @@ var _ = Describe("login command", func() {
 				It("succesfully logs in but does not target any org", func() {
 					input := NewBuffer()
 					input.Write([]byte("\n"))
-					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, skipSSLValidation)
 					Eventually(session).Should(Exit(0))
 
 					targetSession := helpers.CF("target")
