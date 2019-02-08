@@ -29,19 +29,25 @@ run:
     set -e
 
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
+    export SSL_CERT_DIR=/tmp/cert_dir
+    mkdir -p $SSL_CERT_DIR
 
     pushd vars-store/ci/infrastructure/$ENV
-    eval "$(bbl print-env)"
+      eval "$(bbl print-env)"
+
+      bosh int bbl-state.json --path /lb/cert > $SSL_CERT_DIR/$ENV.lb.cert
     popd
 
     credhub login
     export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
+    credhub get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > $SSL_CERT_DIR/$ENV.router.ca
 
     set -x
 
     domain=$(cat bosh-lock/name)
     export CF_INT_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
+    export SKIP_SSL_VALIDATION=false
 
     export GOPATH=$PWD/go
     export PATH=$GOPATH/bin:$PATH
