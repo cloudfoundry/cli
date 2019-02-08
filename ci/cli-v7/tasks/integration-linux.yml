@@ -34,6 +34,8 @@ run:
     set -e
 
     ENV=$(cat bosh-lock/name | cut -d "." -f 1)
+    export SSL_CERT_DIR=/tmp/cert_dir
+    mkdir -p $SSL_CERT_DIR
 
     if [[ $ENV == "homeroom" ]]; then
       export CF_INT_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
@@ -49,7 +51,11 @@ run:
 
       export CF_INT_OIDC_USERNAME="admin-oidc"
       export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+      credhub get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > $SSL_CERT_DIR/$ENV.router.ca
+      bosh interpolate bbl-state.json --path /lb/cert > $SSL_CERT_DIR/$ENV.lb.cert
     fi
+
+    export SKIP_SSL_VALIDATION=false
 
     set -x
 
