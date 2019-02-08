@@ -1,0 +1,126 @@
+---
+resource_types:
+- name: pull-request
+  type: docker-image
+  source:
+    repository: teliaoss/github-pr-resource
+- name: bosh-lite-pool
+  type: docker-image
+  source:
+    repository: cfcli/pr-pool-manager
+    tag: latest
+
+resources:
+- name: cli-pr
+  type: pull-request
+  check_every: 1m
+  source:
+    disable_forks: true # TODO: remove this once the PR builder is completely done
+    repository: cloudfoundry/cli
+    access_token: ((github-access-token))
+    ignore_paths:
+    - README.md
+    - .github/
+
+- name: bosh-lite
+  type: bosh-lite-pool
+  source:
+    uri: git@github.com:cloudfoundry/cli-pools
+    private_key: ((cli-pools-github-private-key))
+    branch: master
+    pool: bosh-lites
+
+- name: cli-master
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+
+# - name: legacy-gcp-bosh-pool
+#   type: pool
+#   source:
+#     uri: git@github.com:cloudfoundry/cli-pools
+#     private_key: ((cli-pools-github-private-key))
+#     branch: master
+#     pool: moldy-gnocchi
+
+# - name: golang
+#   type: docker-image
+#   source:
+#     repository: golang
+#     tag: 1.11
+
+jobs:
+- name: units
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli-pr
+      trigger: true
+    - get: cli-master
+  - aggregate:
+    - task: units-linux
+      timeout: 30m
+      input_mapping:
+        cli: cli-pr
+      file: cli-master/ci/cli/tasks/units-linux.yml
+
+- name: claim-bosh-lite # TODO: record PR number instead of usernames
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli-pr
+      trigger: true
+      version: every
+      passed: [units]
+    - get: cli-master
+  - do:
+    - task: get-pr-info
+      input_mapping:
+        cli: cli-pr
+      file: cli-master/ci/cli-pr-builder/tasks/extract-info-from-pr.yml
+    - put: bosh-lite
+      params:
+        story: commit-info/pr-id
+        author_name: commit-info/author-name
+        author_email: commit-info/author-email
+        committer_name: commit-info/committer-name
+        committer_email: commit-info/committer-email
+        commit_message_prefix: CLI-PR-BUILDER-
+
+- name: integration-linux # TODO: clean this up
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli-pr
+      trigger: true
+      passed: [claim-bosh-lite]
+      version: every
+    - get: cli-master
+    - get: bosh-lite
+      passed: [claim-bosh-lite]
+      version: every
+      trigger: true
+  - do:
+    - task: integration
+      input_mapping:
+        cli: cli-pr
+      file: cli/ci/cli-pr-builder/tasks/integration-linux.yml
+      timeout: 1h30m
+      params:
+        CF_INT_IGNORE_API_VERSION_CHECK: false
+      on_failure:
+        put: cli-pr
+        params:
+          path: cli-pr
+          status: failure
+      ensure:
+        put: unclaim-bosh-lite
+        resource: bosh-lite
+        params:
+          operation: unclaim
+          name: bosh-lite/name
+    - put: cli-pr
+      params:
+        path: cli-pr
+        status: success
