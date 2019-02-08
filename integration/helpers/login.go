@@ -91,7 +91,7 @@ func GetCredentials() (string, string) {
 func GetOIDCCredentials() (string, string) {
 	username := os.Getenv("CF_INT_OIDC_USERNAME")
 	if username == "" {
-		username = "admin-oidc"
+		username = "admin_oidc"
 	}
 	password := os.Getenv("CF_INT_OIDC_PASSWORD")
 	if password == "" {
