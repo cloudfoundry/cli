@@ -21,7 +21,6 @@ const (
 
 func CF(args ...string) *Session {
 	WriteCommand(nil, args)
-	args = removeEmptyArgs(args)
 	session, err := Start(
 		exec.Command("cf", args...),
 		NewPrefixedWriter(DebugOutPrefix, GinkgoWriter),
@@ -103,15 +102,4 @@ func WriteCommand(env map[string]string, args []string) {
 	display = append(display, "cf")
 	display = append(display, args...)
 	GinkgoWriter.Write([]byte(strings.Join(append(display, "\n"), " ")))
-}
-
-func removeEmptyArgs(args []string) []string {
-	returnArgs := make([]string, 0, len(args))
-
-	for _, arg := range args {
-		if arg != "" {
-			returnArgs = append(returnArgs, arg)
-		}
-	}
-	return returnArgs
 }
