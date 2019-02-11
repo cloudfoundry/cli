@@ -11,10 +11,14 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-func SetAPI() (string, string) {
+func SetAPI() (string, bool) {
 	apiURL := GetAPI()
 	skipSSLValidation := skipSSLValidation()
-	Eventually(CF("api", apiURL, skipSSLValidation)).Should(Exit(0))
+	if skipSSLValidation {
+		Eventually(CF("api", apiURL, "--skip-ssl-validation")).Should(Exit(0))
+	} else {
+		Eventually(CF("api", apiURL)).Should(Exit(0))
+	}
 	return apiURL, skipSSLValidation
 }
 
@@ -22,11 +26,11 @@ func UnsetAPI() {
 	Eventually(CF("api", "--unset")).Should(Exit(0))
 }
 
-func skipSSLValidation() string {
+func skipSSLValidation() bool {
 	if skip, err := strconv.ParseBool(os.Getenv("SKIP_SSL_VALIDATION")); err == nil && !skip {
-		return ""
+		return false
 	}
-	return "--skip-ssl-validation"
+	return true
 }
 
 func GetAPI() string {

@@ -230,7 +230,7 @@ var _ = Describe("api command", func() {
 
 	When("skip-ssl-validation is not required", func() {
 		BeforeEach(func() {
-			if skipSSLValidation != "" {
+			if skipSSLValidation {
 				Skip("SKIP_SSL_VALIDATION is enabled")
 			}
 		})
@@ -261,7 +261,13 @@ var _ = Describe("api command", func() {
 
 	When("the v3 api supports routing", func() {
 		It("sets the routing endpoing in the config file", func() {
-			session := helpers.CF("api", apiURL, skipSSLValidation)
+			var session *Session
+			if skipSSLValidation {
+				session = helpers.CF("api", apiURL, "--skip-ssl-validation")
+			} else {
+				session = helpers.CF("api", apiURL)
+			}
+
 			Eventually(session).Should(Exit(0))
 
 			rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
@@ -276,7 +282,12 @@ var _ = Describe("api command", func() {
 	})
 
 	It("sets the config file", func() {
-		session := helpers.CF("api", apiURL, skipSSLValidation)
+		var session *Session
+		if skipSSLValidation {
+			session = helpers.CF("api", apiURL, "--skip-ssl-validation")
+		} else {
+			session = helpers.CF("api", apiURL)
+		}
 		Eventually(session).Should(Exit(0))
 
 		rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
@@ -302,7 +313,14 @@ var _ = Describe("api command", func() {
 	})
 
 	It("handles API endpoints with trailing slash", func() {
-		session := helpers.CF("api", apiURL+"/", skipSSLValidation)
+		var session *Session
+
+		if skipSSLValidation {
+			session = helpers.CF("api", apiURL+"/", "--skip-ssl-validation")
+		} else {
+			session = helpers.CF("api", apiURL+"/")
+		}
+
 		Eventually(session).Should(Exit(0))
 
 		helpers.LoginCF()
