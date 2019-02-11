@@ -360,31 +360,42 @@ var _ = Describe("create-service command", func() {
 				})
 
 				When("the user specifies which broker to use", func() {
-					It("displays an informative success message, exits 0", func() {
-						By("creating the service with -b flag")
-						session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", broker1.Name)
-						Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
-							"my-service", org, space, username))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Exit(0))
+					When("the user is a space developer", func() {
+						BeforeEach(func() {
+							username = helpers.SwitchToSpaceRole(org, space, "SpaceDeveloper")
+							helpers.TargetOrgAndSpace(org, space)
+						})
 
-						session = helpers.CF("services")
-						Eventually(session).Should(Exit(0))
-						Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+create succeeded",
-							"my-service",
-							service,
-							servicePlan,
-						))
-					})
+						AfterEach(func() {
+							helpers.SetupCF(org, space)
+						})
 
-					Context("the broker does not exist", func() {
-						It("displays an informative error message, exits 1", func() {
-							session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", "non-existent-broker")
+						It("displays an informative success message, exits 0", func() {
+							By("creating the service with -b flag")
+							session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", broker1.Name)
 							Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
 								"my-service", org, space, username))
-							Eventually(session.Err).Should(Say("Service broker '%s' not found\\.", "non-existent-broker"))
-							Eventually(session).Should(Say("FAILED"))
-							Eventually(session).Should(Exit(1))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+
+							session = helpers.CF("services")
+							Eventually(session).Should(Exit(0))
+							Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+create succeeded",
+								"my-service",
+								service,
+								servicePlan,
+							))
+						})
+
+						Context("the broker is not accessible by that user", func() {
+							It("displays an informative error message, exits 1", func() {
+								session := helpers.CF("create-service", service, servicePlan, "my-service", "-b", "non-existent-broker")
+								Eventually(session).Should(Say("Creating service instance %s in org %s / space %s as %s\\.\\.\\.",
+									"my-service", org, space, username))
+								Eventually(session.Err).Should(Say("Service '%s' provided by service broker '%s' not found\\.", service, "non-existent-broker"))
+								Eventually(session).Should(Say("FAILED"))
+								Eventually(session).Should(Exit(1))
+							})
 						})
 					})
 				})
