@@ -498,6 +498,18 @@ var _ = Describe("login command", func() {
 				})
 			})
 		})
+
+		When("the -o flag is passed", func() {
+			It("targets the organization that was passed as an argument", func() {
+				session := helpers.CF("login", "-u", username, "-p", password, "-o", orgName)
+
+				Eventually(session).Should(Exit(0))
+
+				targetSession := helpers.CF("target")
+				Eventually(targetSession).Should(Exit(0))
+				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+			})
+		})
 	})
 
 	Describe("User Credentials", func() {
