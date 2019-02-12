@@ -500,14 +500,36 @@ var _ = Describe("login command", func() {
 		})
 
 		When("the -o flag is passed", func() {
-			It("targets the organization that was passed as an argument", func() {
-				session := helpers.CF("login", "-u", username, "-p", password, "-o", orgName)
+			BeforeEach(func() {
+				helpers.LogoutCF()
+			})
 
-				Eventually(session).Should(Exit(0))
+			When("the organization is valid", func() {
+				It("targets the organization that was passed as an argument", func() {
+					session := helpers.CF("login", "-u", username, "-p", password, "-o", orgName)
 
-				targetSession := helpers.CF("target")
-				Eventually(targetSession).Should(Exit(0))
-				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+					Eventually(session).Should(Exit(0))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+				})
+			})
+
+			When("the organization is invalid", func() {
+				It("logs in the user, displays an error message, and does not target any organization", func() {
+					session := helpers.CF("login", "-u", username, "-p", password, "-o", "invalid-org")
+
+					Eventually(session).Should(Exit(1))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Say("Organization %s not found", "invalid-org"))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`user:\s+%s`, username))
+					Eventually(targetSession).ShouldNot(Say(`org:\s+%s`, orgName))
+					Eventually(targetSession).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
+				})
 			})
 		})
 	})
