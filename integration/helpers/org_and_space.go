@@ -40,6 +40,26 @@ func CreateOrg(org string) {
 	Eventually(CF("create-org", org)).Should(Exit(0))
 }
 
+func CreateOrgs(N int, username string) {
+	type empty struct{}
+	sem := make(chan empty, N)
+
+	for i := 0; i < N; i++ {
+		go func() {
+			orgName := NewOrgName()
+			createOrgSession := CF("create-org", orgName)
+			Eventually(createOrgSession).Should(Exit(0))
+			setOrgRoleSession := CF("set-org-role", username, orgName, "OrgManager")
+			Eventually(setOrgRoleSession).Should(Exit(0))
+			sem <- empty{}
+		}()
+	}
+
+	for i := 0; i < N; i++ {
+		<-sem
+	}
+}
+
 func CreateSpace(space string) {
 	// TODO: remove when create-space works with CF_CLI_EXPERIMENTAL=true
 	Eventually(CFWithEnv(map[string]string{"CF_CLI_EXPERIMENTAL": "false"}, "create-space", space)).Should(Exit(0))

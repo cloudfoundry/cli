@@ -480,7 +480,7 @@ var _ = Describe("login command", func() {
 
 			When("there are more than 50 orgs", func() {
 				BeforeEach(func() {
-					createNOrgs(50, username)
+					helpers.CreateOrgs(50, username)
 				})
 
 				It("displays a message and prompt the user for the org name", func() {
@@ -607,23 +607,3 @@ var _ = Describe("login command", func() {
 		})
 	})
 })
-
-func createNOrgs(N int, username string) {
-	type empty struct{}
-	sem := make(chan empty, N)
-
-	for i := 0; i < N; i++ {
-		go func() {
-			orgN := helpers.NewOrgName()
-			createOrgSession := helpers.CF("create-org", orgN)
-			Eventually(createOrgSession).Should(Exit(0))
-			setOrgRoleSession := helpers.CF("set-org-role", username, orgN, "OrgManager")
-			Eventually(setOrgRoleSession).Should(Exit(0))
-			sem <- empty{}
-		}()
-	}
-
-	for j := 0; j < N; j++ {
-		<-sem
-	}
-}
