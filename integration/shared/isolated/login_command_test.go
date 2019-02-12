@@ -477,6 +477,26 @@ var _ = Describe("login command", func() {
 					Eventually(targetSession).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
 				})
 			})
+
+			When("there are more than 50 orgs", func() {
+				BeforeEach(func() {
+					createNOrgs(50, username)
+				})
+
+				It("displays a message and prompt the user for the org name", func() {
+					input := NewBuffer()
+					input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password)
+
+					Eventually(session).Should(Exit(0))
+					Expect(session).Should(Say("There are too many options to display, please type in the name."))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+				})
+			})
 		})
 	})
 
@@ -587,3 +607,23 @@ var _ = Describe("login command", func() {
 		})
 	})
 })
+
+func createNOrgs(N int, username string) {
+	type empty struct{}
+	sem := make(chan empty, N)
+
+	for i := 0; i < N; i++ {
+		go func() {
+			orgN := helpers.NewOrgName()
+			createOrgSession := helpers.CF("create-org", orgN)
+			Eventually(createOrgSession).Should(Exit(0))
+			setOrgRoleSession := helpers.CF("set-org-role", username, orgN, "OrgManager")
+			Eventually(setOrgRoleSession).Should(Exit(0))
+			sem <- empty{}
+		}()
+	}
+
+	for j := 0; j < N; j++ {
+		<-sem
+	}
+}
