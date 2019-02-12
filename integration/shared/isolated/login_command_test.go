@@ -437,6 +437,21 @@ var _ = Describe("login command", func() {
 						Eventually(targetSession).Should(Exit(0))
 						Eventually(targetSession).Should(Say(`org:\s+%s`, expectedOrgName))
 					})
+
+					When("the user selects a number greater than the number of orgs", func() {
+						It("prompts the user until a valid number is entered", func() {
+							input := NewBuffer()
+							input.Write([]byte("3\n"))
+
+							session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password)
+
+							Eventually(session).Should(Say(regexp.QuoteMeta("Select an org (or press enter to skip):")))
+							Eventually(session).Should(Say(regexp.QuoteMeta("Select an org (or press enter to skip):")))
+
+							session.Interrupt()
+							Eventually(session).Should(Exit())
+						})
+					})
 				})
 
 				When("user selects an organization by org name", func() {
