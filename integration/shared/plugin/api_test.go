@@ -232,7 +232,7 @@ var _ = Describe("plugin API", func() {
 
 	Describe("IsSSLDisabled", func() {
 		It("returns a true or false", func() {
-			if skipSSLValidation == "" {
+			if skipSSLValidation {
 				confirmTestPluginOutput("IsSSLDisabled", "false")
 			} else {
 				confirmTestPluginOutput("IsSSLDisabled", "true")

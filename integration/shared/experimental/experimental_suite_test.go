@@ -21,7 +21,7 @@ const (
 var (
 	// Suite Level
 	apiURL            string
-	skipSSLValidation string
+	skipSSLValidation bool
 	ReadOnlyOrg       string
 	ReadOnlySpace     string
 

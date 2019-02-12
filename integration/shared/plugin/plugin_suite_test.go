@@ -22,7 +22,7 @@ var (
 	overrideTestPluginPath string
 	panicTestPluginPath    string
 	apiURL                 string
-	skipSSLValidation      string
+	skipSSLValidation      bool
 
 	// Per Test Level
 	homeDir string
