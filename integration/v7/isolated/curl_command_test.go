@@ -473,7 +473,13 @@ var _ = Describe("curl command", func() {
 						Expect(session).Should(Say("X-Bar: bar"))
 						Expect(session).Should(Say("X-Foo: foo"))
 
-						Expect(session).Should(Say(jsonBody))
+						contents := string(session.Out.Contents())
+						outputContents := contents[strings.Index(contents, "X-Foo: foo"):]
+						jsonStartsAt := strings.Index(outputContents, "{")
+						jsonEndsAt := strings.Index(outputContents[jsonStartsAt:], "}")
+
+						actualJSON := outputContents[jsonStartsAt : jsonStartsAt+jsonEndsAt+1]
+						Expect(actualJSON).To(MatchJSON(jsonBody))
 
 						Expect(session).Should(Say("RESPONSE:"))
 
