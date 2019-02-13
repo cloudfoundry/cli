@@ -398,7 +398,7 @@ var _ = Describe("login command", func() {
 
 		When("there is only one org available to the user", func() {
 			It("logs the user in and targets the organization automatically", func() {
-				session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL)
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
 				Eventually(session).Should(Exit(0))
 
 				targetSession := helpers.CF("target")
