@@ -53,8 +53,8 @@ type PushCommand struct {
 	Buildpacks              []string                      `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	DockerImage             flag.DockerImage              `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername          string                        `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
-	HealthCheckType         flag.HealthCheckType          `long:"health-check-type" short:"u" description:"Application health check type: 'port' (default), 'process', 'http' (implies endpoint '/')"`
-	HealthCheckHTTPEndpoint string                        `long:"endpoint"  description:"Path on the app"`
+	HealthCheckType         flag.HealthCheckType          `long:"health-check-type" short:"u" description:"Application health check type. Defaults to 'port'. 'http' requires a valid endpoint, for example, '/health'."`
+	HealthCheckHTTPEndpoint string                        `long:"endpoint"  description:"Valid path on the app for an HTTP health check. Only used when specifying --health-check-type=http"`
 	Instances               flag.Instances                `long:"instances" short:"i" description:"Number of instances"`
 	PathToManifest          flag.PathWithExistenceCheck   `long:"manifest" short:"f" description:"Path to manifest"`
 	PathsToVarsFiles        []flag.PathWithExistenceCheck `long:"vars-file" description:"Path to a variable substitution file for manifest; can specify multiple times"`
@@ -66,7 +66,7 @@ type PushCommand struct {
 	AppPath                 flag.PathWithExistenceCheck   `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	StartCommand            flag.Command                  `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
 	dockerPassword          interface{}                   `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
-	usage                   interface{}                   `usage:"CF_NAME push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route] [--no-start]\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start]"`
+	usage                   interface{}                   `usage:"CF_NAME push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route] [--no-start] [-u (process | port | http --endpoint PATH)]\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start] [-u (process | port | http --endpoint PATH)]"`
 	envCFStagingTimeout     interface{}                   `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout     interface{}                   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 	Vars                    []template.VarKV              `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
@@ -391,18 +391,19 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 	}
 
 	return v7pushaction.FlagOverrides{
-		Buildpacks:        cmd.Buildpacks,
-		Disk:              cmd.Disk.NullUint64,
-		DockerImage:       cmd.DockerImage.Path,
-		DockerPassword:    dockerPassword,
-		DockerUsername:    cmd.DockerUsername,
-		HealthCheckType:   cmd.HealthCheckType.Type,
-		Instances:         cmd.Instances.NullInt,
-		Memory:            cmd.Memory.NullUint64,
-		NoStart:           cmd.NoStart,
-		ProvidedAppPath:   string(cmd.AppPath),
-		SkipRouteCreation: cmd.NoRoute,
-		StartCommand:      cmd.StartCommand.FilteredString,
+		Buildpacks:          cmd.Buildpacks,
+		Disk:                cmd.Disk.NullUint64,
+		DockerImage:         cmd.DockerImage.Path,
+		DockerPassword:      dockerPassword,
+		DockerUsername:      cmd.DockerUsername,
+		HealthCheckEndpoint: cmd.HealthCheckHTTPEndpoint,
+		HealthCheckType:     cmd.HealthCheckType.Type,
+		Instances:           cmd.Instances.NullInt,
+		Memory:              cmd.Memory.NullUint64,
+		NoStart:             cmd.NoStart,
+		ProvidedAppPath:     string(cmd.AppPath),
+		SkipRouteCreation:   cmd.NoRoute,
+		StartCommand:        cmd.StartCommand.FilteredString,
 	}, nil
 }
 

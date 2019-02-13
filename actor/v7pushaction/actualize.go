@@ -285,7 +285,7 @@ func (actor Actor) UpdateProcess(state PushState, warningsStream chan Warnings, 
 		}
 		if state.Overrides.HealthCheckType != "" {
 			process.HealthCheckType = state.Overrides.HealthCheckType
-			process.HealthCheckEndpoint = constant.ProcessHealthCheckEndpointDefault
+			process.HealthCheckEndpoint = state.Overrides.HealthCheckEndpoint
 		}
 
 		log.WithField("Process", process).Debug("Update process")

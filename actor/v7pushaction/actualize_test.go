@@ -390,11 +390,15 @@ var _ = Describe("Actualize", func() {
 
 				When("health check information is provided", func() {
 					var healthCheckType constant.HealthCheckType
+					var healthCheckEndpoint string
 
 					BeforeEach(func() {
-						healthCheckType = constant.Port
+						healthCheckType = constant.HTTP
+						healthCheckEndpoint = "/the-health-check"
+
 						state.Overrides = FlagOverrides{
-							HealthCheckType: healthCheckType,
+							HealthCheckType:     healthCheckType,
+							HealthCheckEndpoint: healthCheckEndpoint,
 						}
 					})
 
@@ -410,7 +414,7 @@ var _ = Describe("Actualize", func() {
 						Expect(passedProcess).To(MatchFields(IgnoreExtras,
 							Fields{
 								"HealthCheckType":              Equal(healthCheckType),
-								"HealthCheckEndpoint":          Equal(constant.ProcessHealthCheckEndpointDefault),
+								"HealthCheckEndpoint":          Equal(healthCheckEndpoint),
 								"HealthCheckInvocationTimeout": BeZero(),
 							}))
 					})
@@ -445,14 +449,17 @@ var _ = Describe("Actualize", func() {
 				When("start command and health check are provided", func() {
 					var command types.FilteredString
 					var healthCheckType constant.HealthCheckType
+					var healthCheckEndpoint string
 
 					BeforeEach(func() {
 						command = *types.NewFilteredString("some-command")
-						healthCheckType = constant.Port
+						healthCheckType = constant.HTTP
+						healthCheckEndpoint = "/some-health-check"
 
 						state.Overrides = FlagOverrides{
-							HealthCheckType: healthCheckType,
-							StartCommand:    command,
+							HealthCheckType:     healthCheckType,
+							HealthCheckEndpoint: healthCheckEndpoint,
+							StartCommand:        command,
 						}
 					})
 
@@ -469,7 +476,7 @@ var _ = Describe("Actualize", func() {
 							Fields{
 								"Command":                      Equal(command),
 								"HealthCheckType":              Equal(healthCheckType),
-								"HealthCheckEndpoint":          Equal(constant.ProcessHealthCheckEndpointDefault),
+								"HealthCheckEndpoint":          Equal(healthCheckEndpoint),
 								"HealthCheckInvocationTimeout": BeZero(),
 							}))
 					})

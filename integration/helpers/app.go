@@ -35,6 +35,32 @@ func WithHelloWorldApp(f func(dir string)) {
 	f(dir)
 }
 
+// WithMultiEndpointApp creates a simple application to use with your CLI command
+// (typically CF Push). It has multiple endpoints which are helpful when testing
+// http healthchecks
+func WithMultiEndpointApp(f func(dir string)) {
+	dir, err := ioutil.TempDir("", "simple-app")
+	Expect(err).ToNot(HaveOccurred())
+	defer os.RemoveAll(dir)
+
+	tempfile := filepath.Join(dir, "index.html")
+	err = ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	tempfile = filepath.Join(dir, "other_endpoint.html")
+	err = ioutil.WriteFile(tempfile, []byte("other endpoint"), 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	tempfile = filepath.Join(dir, "third_endpoint.html")
+	err = ioutil.WriteFile(tempfile, []byte("third endpoint"), 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	f(dir)
+}
+
 // WithNoResourceMatchedApp creates a simple application to use with your CLI
 // command (typically CF Push). When pushing, be aware of specifying '-b
 // staticfile_buildpack" so that your app will correctly start up with the
