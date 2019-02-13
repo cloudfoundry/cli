@@ -61,7 +61,7 @@ var _ = Describe("RequestDumper", func() {
 			)
 
 			BeforeEach(func() {
-				bodyString := `grant_type=password&password=somesecret&scope=&username=admin&refresh_token=secret-refresh-token`
+				bodyString := `grant_type=password&password=somesecret&scope=&username=admin&refresh_token=secret-refresh-token&access_token=secret-access-token`
 				request, reqErr = http.NewRequest("GET", "example.com", strings.NewReader(bodyString))
 				request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 				request.Header.Set("Authorization", "bearer: some-secret-token")
@@ -72,8 +72,8 @@ var _ = Describe("RequestDumper", func() {
 				dumper.DumpRequest(request)
 			})
 
-			It("redacts the value from keys called 'password' or 'Authorization'", func() {
-				Expect(buffer.String()).To(ContainSubstring("admin"))
+			It("redacts the value from keys called 'password'", func() {
+				Expect(buffer.String()).To(ContainSubstring("password"))
 				Expect(buffer.String()).ToNot(ContainSubstring("somesecret"))
 			})
 
@@ -82,9 +82,11 @@ var _ = Describe("RequestDumper", func() {
 				Expect(buffer.String()).ToNot(ContainSubstring("some-secret-token"))
 			})
 
-			It("redacts the refresh token", func() {
+			It("redacts fields containing 'token'", func() {
 				Expect(buffer.String()).To(ContainSubstring("refresh_token="))
 				Expect(buffer.String()).ToNot(ContainSubstring("secret-refresh-token"))
+				Expect(buffer.String()).To(ContainSubstring("access_token="))
+				Expect(buffer.String()).ToNot(ContainSubstring("secret-access-token"))
 			})
 		})
 	})

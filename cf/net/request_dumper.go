@@ -103,7 +103,7 @@ func (p RequestDumper) displaySortedHeaders(headers http.Header) {
 
 func (p RequestDumper) redactFormData(formData url.Values) url.Values {
 	for key := range formData {
-		if key == "password" || key == "Authorization" || key == "refresh_token" {
+		if key == "password" || key == "Authorization" || strings.Contains(key, "token") {
 			formData.Set(key, ui.RedactedValue)
 		}
 	}
