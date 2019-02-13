@@ -28,7 +28,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gstruct"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 type Step struct {
@@ -774,7 +774,11 @@ var _ = Describe("push Command", func() {
 		func(setup func(), expectedErr error) {
 			setup()
 			err := cmd.ValidateFlags()
-			Expect(err).To(MatchError(expectedErr))
+			if expectedErr == nil {
+				Expect(err).To(BeNil())
+			} else {
+				Expect(err).To(MatchError(expectedErr))
+			}
 		},
 
 		Entry("when docker username flag is passed *without* docker flag",
@@ -796,6 +800,39 @@ var _ = Describe("push Command", func() {
 				cmd.AppPath = "some-directory-path"
 			},
 			translatableerror.ArgumentCombinationError{Args: []string{"--docker-image, -o", "--path, -p"}}),
+
+		Entry("when -u http does not have a matching --endpoint",
+			func() {
+				cmd.HealthCheckType.Type = constant.HTTP
+			},
+			translatableerror.RequiredFlagsError{Arg1: "--endpoint", Arg2: "--health-check-type=http, -u=http"}),
+
+		Entry("when --endpoint does not have a matching -u",
+			func() {
+				cmd.HealthCheckHTTPEndpoint = "/health"
+			},
+			translatableerror.RequiredFlagsError{Arg1: "--health-check-type=http, -u=http", Arg2: "--endpoint"}),
+
+		Entry("when --endpoint has a matching -u=process instead of a -u=http",
+			func() {
+				cmd.HealthCheckHTTPEndpoint = "/health"
+				cmd.HealthCheckType.Type = constant.Process
+			},
+			translatableerror.RequiredFlagsError{Arg1: "--health-check-type=http, -u=http", Arg2: "--endpoint"}),
+
+		Entry("when --endpoint has a matching -u=port instead of a -u=http",
+			func() {
+				cmd.HealthCheckHTTPEndpoint = "/health"
+				cmd.HealthCheckType.Type = constant.Port
+			},
+			translatableerror.RequiredFlagsError{Arg1: "--health-check-type=http, -u=http", Arg2: "--endpoint"}),
+
+		Entry("when -u http does have a matching --endpoint",
+			func() {
+				cmd.HealthCheckType.Type = constant.HTTP
+				cmd.HealthCheckHTTPEndpoint = "/health"
+			},
+			nil),
 	)
 
 })
