@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
@@ -41,23 +42,21 @@ func CreateOrg(org string) {
 }
 
 func CreateOrgs(N int, username string) {
-	type empty struct{}
-	sem := make(chan empty, N)
+	wg := sync.WaitGroup{}
+	wg.Add(N)
 
 	for i := 0; i < N; i++ {
 		go func() {
+			defer wg.Done()
 			orgName := NewOrgName()
 			createOrgSession := CF("create-org", orgName)
 			Eventually(createOrgSession).Should(Exit(0))
 			setOrgRoleSession := CF("set-org-role", username, orgName, "OrgManager")
 			Eventually(setOrgRoleSession).Should(Exit(0))
-			sem <- empty{}
 		}()
 	}
 
-	for i := 0; i < N; i++ {
-		<-sem
-	}
+	wg.Wait()
 }
 
 func CreateSpace(space string) {
