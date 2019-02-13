@@ -503,7 +503,7 @@ var _ = Describe("login command", func() {
 						input := NewBuffer()
 						input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
 
-						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password)
+						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
 
 						Eventually(session).Should(Exit(0))
 						Expect(session).Should(Say("There are too many options to display, please type in the name."))
@@ -520,7 +520,7 @@ var _ = Describe("login command", func() {
 						input := NewBuffer()
 						input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
 
-						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password)
+						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
 						Eventually(session).Should(Exit(1))
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session).Should(Say("Organization %s not found", orgName))
