@@ -82,7 +82,7 @@ var _ = Describe("Logs Command", func() {
 			BeforeEach(func() {
 				appName = helpers.PrefixedRandomName("app")
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "-u", "http", "--endpoint", "/")).Should(Exit(0))
 				})
 			})
 
