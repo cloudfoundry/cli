@@ -823,6 +823,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateSpaceApplyManifestStub        func(string, []byte) (ccv3.JobURL, ccv3.Warnings, error)
+	updateSpaceApplyManifestMutex       sync.RWMutex
+	updateSpaceApplyManifestArgsForCall []struct {
+		arg1 string
+		arg2 []byte
+	}
+	updateSpaceApplyManifestReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateSpaceApplyManifestReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateSpaceIsolationSegmentRelationshipStub        func(string, string) (ccv3.Relationship, ccv3.Warnings, error)
 	updateSpaceIsolationSegmentRelationshipMutex       sync.RWMutex
 	updateSpaceIsolationSegmentRelationshipArgsForCall []struct {
@@ -4504,6 +4520,78 @@ func (fake *FakeCloudControllerClient) UpdateProcessReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifest(arg1 string, arg2 []byte) (ccv3.JobURL, ccv3.Warnings, error) {
+	var arg2Copy []byte
+	if arg2 != nil {
+		arg2Copy = make([]byte, len(arg2))
+		copy(arg2Copy, arg2)
+	}
+	fake.updateSpaceApplyManifestMutex.Lock()
+	ret, specificReturn := fake.updateSpaceApplyManifestReturnsOnCall[len(fake.updateSpaceApplyManifestArgsForCall)]
+	fake.updateSpaceApplyManifestArgsForCall = append(fake.updateSpaceApplyManifestArgsForCall, struct {
+		arg1 string
+		arg2 []byte
+	}{arg1, arg2Copy})
+	fake.recordInvocation("UpdateSpaceApplyManifest", []interface{}{arg1, arg2Copy})
+	fake.updateSpaceApplyManifestMutex.Unlock()
+	if fake.UpdateSpaceApplyManifestStub != nil {
+		return fake.UpdateSpaceApplyManifestStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateSpaceApplyManifestReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestCallCount() int {
+	fake.updateSpaceApplyManifestMutex.RLock()
+	defer fake.updateSpaceApplyManifestMutex.RUnlock()
+	return len(fake.updateSpaceApplyManifestArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestCalls(stub func(string, []byte) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.updateSpaceApplyManifestMutex.Lock()
+	defer fake.updateSpaceApplyManifestMutex.Unlock()
+	fake.UpdateSpaceApplyManifestStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestArgsForCall(i int) (string, []byte) {
+	fake.updateSpaceApplyManifestMutex.RLock()
+	defer fake.updateSpaceApplyManifestMutex.RUnlock()
+	argsForCall := fake.updateSpaceApplyManifestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.updateSpaceApplyManifestMutex.Lock()
+	defer fake.updateSpaceApplyManifestMutex.Unlock()
+	fake.UpdateSpaceApplyManifestStub = nil
+	fake.updateSpaceApplyManifestReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.updateSpaceApplyManifestMutex.Lock()
+	defer fake.updateSpaceApplyManifestMutex.Unlock()
+	fake.UpdateSpaceApplyManifestStub = nil
+	if fake.updateSpaceApplyManifestReturnsOnCall == nil {
+		fake.updateSpaceApplyManifestReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateSpaceApplyManifestReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateSpaceIsolationSegmentRelationship(arg1 string, arg2 string) (ccv3.Relationship, ccv3.Warnings, error) {
 	fake.updateSpaceIsolationSegmentRelationshipMutex.Lock()
 	ret, specificReturn := fake.updateSpaceIsolationSegmentRelationshipReturnsOnCall[len(fake.updateSpaceIsolationSegmentRelationshipArgsForCall)]
@@ -4960,6 +5048,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RUnlock()
 	fake.updateProcessMutex.RLock()
 	defer fake.updateProcessMutex.RUnlock()
+	fake.updateSpaceApplyManifestMutex.RLock()
+	defer fake.updateSpaceApplyManifestMutex.RUnlock()
 	fake.updateSpaceIsolationSegmentRelationshipMutex.RLock()
 	defer fake.updateSpaceIsolationSegmentRelationshipMutex.RUnlock()
 	fake.updateTaskCancelMutex.RLock()
