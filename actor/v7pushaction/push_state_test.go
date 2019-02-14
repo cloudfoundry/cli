@@ -128,6 +128,18 @@ var _ = Describe("Push State", func() {
 					})
 				})
 
+				When("stack is provided via flagOverrides", func() {
+					BeforeEach(func() {
+						flagOverrides.Stack = "validStack"
+					})
+
+					It("sets the stack on the app", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(states[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeBuildpack))
+						Expect(states[0].Application.StackName).To(Equal("validStack"))
+					})
+				})
+
 				When("docker image information is provided", func() {
 					BeforeEach(func() {
 						flagOverrides.DockerImage = "some-docker-image"
@@ -135,7 +147,7 @@ var _ = Describe("Push State", func() {
 						flagOverrides.DockerUsername = "some-docker-username"
 					})
 
-					It("sets the buildpacks on the app", func() {
+					It("sets the docker info on the app", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(states[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeDocker))
 						Expect(states[0].Application.LifecycleBuildpacks).To(BeEmpty())

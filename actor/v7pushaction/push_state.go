@@ -28,6 +28,7 @@ type PushState struct {
 
 type FlagOverrides struct {
 	Buildpacks          []string
+	Stack               string
 	Disk                types.NullUint64
 	DockerImage         string
 	DockerPassword      string
@@ -77,6 +78,10 @@ func (actor Actor) Conceptualize(appName string, spaceGUID string, orgGUID strin
 		application.LifecycleBuildpacks = flagOverrides.Buildpacks
 	}
 
+	if flagOverrides.Stack != "" {
+		application.LifecycleType = constant.AppLifecycleTypeBuildpack
+		application.StackName = flagOverrides.Stack
+	}
 	if len(flagOverrides.DockerImage) != 0 {
 		application.LifecycleType = constant.AppLifecycleTypeDocker
 	}

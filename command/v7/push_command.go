@@ -51,6 +51,7 @@ type V7ActorForPush interface {
 type PushCommand struct {
 	RequiredArgs            flag.AppName                  `positional-args:"yes"`
 	Buildpacks              []string                      `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	Stack                   string                        `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	DockerImage             flag.DockerImage              `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername          string                        `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	HealthCheckType         flag.HealthCheckType          `long:"health-check-type" short:"u" description:"Application health check type. Defaults to 'port'. 'http' requires a valid endpoint, for example, '/health'."`
@@ -66,7 +67,7 @@ type PushCommand struct {
 	AppPath                 flag.PathWithExistenceCheck   `long:"path" short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	StartCommand            flag.Command                  `long:"start-command" short:"c" description:"Startup command, set to null to reset to default start command"`
 	dockerPassword          interface{}                   `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
-	usage                   interface{}                   `usage:"CF_NAME push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route] [--no-start] [-u (process | port | http --endpoint PATH)]\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start] [-u (process | port | http --endpoint PATH)]"`
+	usage                   interface{}                   `usage:"CF_NAME push APP_NAME [-b BUILDPACK]... [-s STACK] [-p APP_PATH] [--no-route] [--no-start] [-u (process | port | http --endpoint PATH)]\n   CF_NAME push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start] [-u (process | port | http --endpoint PATH)]"`
 	envCFStagingTimeout     interface{}                   `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout     interface{}                   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 	Vars                    []template.VarKV              `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
@@ -392,6 +393,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 
 	return v7pushaction.FlagOverrides{
 		Buildpacks:          cmd.Buildpacks,
+		Stack:               cmd.Stack,
 		Disk:                cmd.Disk.NullUint64,
 		DockerImage:         cmd.DockerImage.Path,
 		DockerPassword:      dockerPassword,
@@ -428,6 +430,13 @@ func (cmd PushCommand) ValidateFlags() error {
 			Args: []string{
 				"--docker-image, -o",
 				"--path, -p",
+			},
+		}
+	case cmd.DockerImage.Path != "" && cmd.Stack != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{
+				"--stack, -s",
+				"--docker-image, -o",
 			},
 		}
 	case cmd.NoManifest && cmd.PathToManifest != "":

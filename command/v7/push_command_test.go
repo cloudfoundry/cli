@@ -694,6 +694,7 @@ var _ = Describe("push Command", func() {
 
 		BeforeEach(func() {
 			cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
+			cmd.Stack = "validStack"
 			cmd.HealthCheckType = flag.HealthCheckType{Type: constant.Port}
 			cmd.HealthCheckHTTPEndpoint = "/health-check-http-endpoint"
 			cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
@@ -712,6 +713,7 @@ var _ = Describe("push Command", func() {
 		It("sets them on the flag overrides", func() {
 			Expect(overridesErr).ToNot(HaveOccurred())
 			Expect(overrides.Buildpacks).To(ConsistOf("buildpack-1", "buildpack-2"))
+			Expect(overrides.Stack).To(Equal("validStack"))
 			Expect(overrides.HealthCheckType).To(Equal(constant.Port))
 			Expect(overrides.HealthCheckEndpoint).To(Equal("/health-check-http-endpoint"))
 			Expect(overrides.Memory).To(Equal(types.NullUint64{Value: 100, IsSet: true}))
@@ -795,6 +797,13 @@ var _ = Describe("push Command", func() {
 				cmd.Buildpacks = []string{"some-buildpack"}
 			},
 			translatableerror.ArgumentCombinationError{Args: []string{"--buildpack, -b", "--docker-image, -o"}}),
+
+		Entry("when docker and stack flags are passed",
+			func() {
+				cmd.DockerImage.Path = "some-docker-image"
+				cmd.Stack = "validStack"
+			},
+			translatableerror.ArgumentCombinationError{Args: []string{"--stack, -s", "--docker-image, -o"}}),
 
 		Entry("when docker and path flags are passed",
 			func() {
