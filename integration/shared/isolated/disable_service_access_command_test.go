@@ -17,8 +17,9 @@ var _ = Describe("disable service access command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("\\s+disable-service-access - Disable access to a service or service plan for one or all orgs"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("\\s+cf disable-service-access SERVICE \\[-p PLAN\\] \\[-o ORG\\]"))
+				Eventually(session).Should(Say("\\s+cf disable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
 				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("\\s+\\-b\\s+Disable access to a service from a particular service broker. Required when service name is ambiguous"))
 				Eventually(session).Should(Say("\\s+\\-o\\s+Disable access for a specified organization"))
 				Eventually(session).Should(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
 				Eventually(session).Should(Say("SEE ALSO:"))
@@ -26,40 +27,42 @@ var _ = Describe("disable service access command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
-	})
 
-	When("no service argument was provided", func() {
-		It("displays a warning, the help text, and exits 1", func() {
-			session := helpers.CF("disable-service-access")
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `SERVICE` was not provided"))
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("\\s+disable-service-access - Disable access to a service or service plan for one or all orgs"))
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("\\s+cf disable-service-access SERVICE \\[-p PLAN\\] \\[-o ORG\\]"))
-			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say("\\s+\\-o\\s+Disable access for a specified organization"))
-			Eventually(session).Should(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
-			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("\\s+marketplace, service-access, service-brokers"))
-			Eventually(session).Should(Exit(1))
+		When("no service argument was provided", func() {
+			It("displays a warning, the help text, and exits 1", func() {
+				session := helpers.CF("disable-service-access")
+				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `SERVICE` was not provided"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("\\s+disable-service-access - Disable access to a service or service plan for one or all orgs"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("\\s+cf disable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("\\s+\\-b\\s+Disable access to a service from a particular service broker. Required when service name is ambiguous"))
+				Eventually(session).Should(Say("\\s+\\-o\\s+Disable access for a specified organization"))
+				Eventually(session).Should(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("\\s+marketplace, service-access, service-brokers"))
+				Eventually(session).Should(Exit(1))
+			})
 		})
-	})
 
-	When("an extra argument is provided", func() {
-		It("displays an error, and exits 1", func() {
-			session := helpers.CF("disable-service-access", "a-service", "extra-arg")
-			Eventually(session).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say(`Incorrect Usage: unexpected argument "extra-arg"`))
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("\\s+disable-service-access - Disable access to a service or service plan for one or all orgs"))
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("\\s+cf disable-service-access SERVICE \\[-p PLAN\\] \\[-o ORG\\]"))
-			Eventually(session).Should(Say("OPTIONS:"))
-			Eventually(session).Should(Say("\\s+\\-o\\s+Disable access for a specified organization"))
-			Eventually(session).Should(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
-			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("\\s+marketplace, service-access, service-brokers"))
-			Eventually(session).Should(Exit(1))
+		When("an extra argument is provided", func() {
+			It("displays an error, and exits 1", func() {
+				session := helpers.CF("disable-service-access", "a-service", "extra-arg")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say(`Incorrect Usage: unexpected argument "extra-arg"`))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("\\s+disable-service-access - Disable access to a service or service plan for one or all orgs"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("\\s+cf disable-service-access SERVICE \\[-b BROKER\\] \\[-p PLAN\\] \\[-o ORG\\]"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("\\s+\\-b\\s+Disable access to a service from a particular service broker. Required when service name is ambiguous"))
+				Eventually(session).Should(Say("\\s+\\-o\\s+Disable access for a specified organization"))
+				Eventually(session).Should(Say("\\s+\\-p\\s+Disable access to a specified service plan"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("\\s+marketplace, service-access, service-brokers"))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 	})
 
@@ -312,7 +315,7 @@ var _ = Describe("disable service access command", func() {
 
 				It("fails to disable access when no broker is specified", func() {
 					session := helpers.CF("disable-service-access", service, "-o", orgName)
-					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers. Specify a broker by using the '-b' flag.", service))
 					Eventually(session).Should(Exit(1))
 				})
 
@@ -341,11 +344,11 @@ var _ = Describe("disable service access command", func() {
 
 				It("fails to disable access when no broker is specified", func() {
 					session := helpers.CF("disable-service-access", service, "-o", orgName)
-					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers. Specify a broker by using the '-b' flag.", service))
 					Eventually(session).Should(Exit(1))
 
 					session = helpers.CF("disable-service-access", service, "-o", otherOrgName)
-					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers. Specify a broker by using the '-b' flag.", service))
 					Eventually(session).Should(Exit(1))
 				})
 
@@ -374,11 +377,11 @@ var _ = Describe("disable service access command", func() {
 
 				It("fails to disable access when no broker is specified", func() {
 					session := helpers.CF("disable-service-access", service, "-p", servicePlan, "-o", orgName)
-					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers. Specify a broker by using the '-b' flag.", service))
 					Eventually(session).Should(Exit(1))
 
 					session = helpers.CF("disable-service-access", service, "-p", servicePlan, "-o", otherOrgName)
-					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers.", service))
+					Eventually(session.Err).Should(Say("Service '%s' is provided by multiple service brokers. Specify a broker by using the '-b' flag.", service))
 					Eventually(session).Should(Exit(1))
 				})
 
