@@ -2,12 +2,12 @@
 package v7pushactionfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	sharedaction "code.cloudfoundry.org/cli/actor/sharedaction"
-	v7action "code.cloudfoundry.org/cli/actor/v7action"
-	v7pushaction "code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/actor/v7pushaction"
 )
 
 type FakeV7Actor struct {

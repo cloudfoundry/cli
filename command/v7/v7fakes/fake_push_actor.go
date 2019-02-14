@@ -2,9 +2,9 @@
 package v7fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v7pushaction "code.cloudfoundry.org/cli/actor/v7pushaction"
+	"code.cloudfoundry.org/cli/actor/v7pushaction"
 	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 

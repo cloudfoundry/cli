@@ -2,8 +2,8 @@
 package v7pushactionfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 )
 
 type FakeReadCloser struct {
