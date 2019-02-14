@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("stack", func() {
+var _ = Describe("stack", func() {
 	var (
 		appName string
 	)
