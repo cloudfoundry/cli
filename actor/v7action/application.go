@@ -47,22 +47,40 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string
 	return allWarnings, err
 }
 
+func (actor Actor) GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]Application, Warnings, error) {
+	apps, warnings, err := actor.CloudControllerClient.GetApplications(
+		ccv3.Query{Key: ccv3.NameFilter, Values: appNames},
+		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+	)
+
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
+
+	if len(apps) < len(appNames) {
+		return nil, Warnings(warnings), actionerror.ApplicationsNotFoundError{}
+	}
+
+	actorApps := []Application{}
+	for _, a := range apps {
+		actorApps = append(actorApps, actor.convertCCToActorApplication(a))
+	}
+	return actorApps, Warnings(warnings), nil
+}
+
 // GetApplicationByNameAndSpace returns the application with the given
 // name in the given space.
 func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (Application, Warnings, error) {
-	apps, warnings, err := actor.CloudControllerClient.GetApplications(
-		ccv3.Query{Key: ccv3.NameFilter, Values: []string{appName}},
-		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
-	)
+	apps, warnings, err := actor.GetApplicationsByNamesAndSpace([]string{appName}, spaceGUID)
+
 	if err != nil {
-		return Application{}, Warnings(warnings), err
+		if _, ok := err.(actionerror.ApplicationsNotFoundError); ok {
+			return Application{}, warnings, actionerror.ApplicationNotFoundError{Name: appName}
+		}
+		return Application{}, warnings, err
 	}
 
-	if len(apps) == 0 {
-		return Application{}, Warnings(warnings), actionerror.ApplicationNotFoundError{Name: appName}
-	}
-
-	return actor.convertCCToActorApplication(apps[0]), Warnings(warnings), nil
+	return apps[0], warnings, nil
 }
 
 // GetApplicationsBySpace returns all applications in a space.
