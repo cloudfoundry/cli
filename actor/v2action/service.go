@@ -6,12 +6,14 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
+// Service is representation of a service offering.
 type Service ccv2.Service
+
+// Filter is representation of Cloud Controller request query parameters.
+type Filter ccv2.Filter
 
 // ServicesWithPlans is an association between a Service and the plans it offers.
 type ServicesWithPlans map[Service][]ServicePlan
-
-type Filter ccv2.Filter
 
 // GetService fetches a service by GUID.
 func (actor Actor) GetService(serviceGUID string) (Service, Warnings, error) {
@@ -22,6 +24,9 @@ func (actor Actor) GetService(serviceGUID string) (Service, Warnings, error) {
 // GetServiceByNameAndBrokerName returns services based on the name and broker provided.
 // If a service broker name is provided, only services for that broker will be returned.
 // If there are no services, a ServiceNotFoundError will be returned.
+//
+// NOTE: this will fail for non-admin users if the broker name is specified, as only
+// admin users are able to view the list of service brokers.
 func (actor Actor) GetServiceByNameAndBrokerName(serviceName, serviceBrokerName string) (Service, Warnings, error) {
 	filters := []ccv2.Filter{ccv2.Filter{
 		Type:     constant.LabelFilter,
@@ -59,7 +64,7 @@ func (actor Actor) GetServiceByNameAndBrokerName(serviceName, serviceBrokerName 
 	return Service(services[0]), Warnings(warnings), nil
 }
 
-func (actor Actor) getServiceByNameForSpace(serviceName, spaceGUID, brokerGUID string) (Service, Warnings, error) {
+func (actor Actor) getServicesByNameForSpace(serviceName, spaceGUID string) ([]Service, Warnings, error) {
 	var filters []ccv2.Filter
 
 	filters = append(filters, ccv2.Filter{
@@ -68,29 +73,18 @@ func (actor Actor) getServiceByNameForSpace(serviceName, spaceGUID, brokerGUID s
 		Values:   []string{serviceName},
 	})
 
-	if brokerGUID != "" {
-		filters = append(filters, ccv2.Filter{
-			Type:     constant.ServiceBrokerGUIDFilter,
-			Operator: constant.EqualOperator,
-			Values:   []string{brokerGUID},
-		})
-	}
-
 	services, warnings, err := actor.CloudControllerClient.GetSpaceServices(spaceGUID, filters...)
+	var result []Service
 
 	if err != nil {
-		return Service{}, Warnings(warnings), err
+		return result, Warnings(warnings), err
 	}
 
-	if len(services) == 0 {
-		return Service{}, Warnings(warnings), actionerror.ServiceNotFoundError{Name: serviceName}
+	for _, service := range services {
+		result = append(result, Service(service))
 	}
 
-	if len(services) > 1 {
-		return Service{}, Warnings(warnings), actionerror.DuplicateServiceError{Name: serviceName}
-	}
-
-	return Service(services[0]), Warnings(warnings), nil
+	return result, Warnings(warnings), nil
 }
 
 // GetServicesWithPlans returns a map of Services to ServicePlans for a particular broker.

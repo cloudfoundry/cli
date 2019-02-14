@@ -38,8 +38,21 @@ func (actor Actor) GetServicePlansForService(serviceName, brokerName string) ([]
 	return plansToReturn, allWarnings, nil
 }
 
-func (actor Actor) getServicePlanForServiceInSpace(servicePlanName, serviceName, spaceGUID, brokerGUID string) (ServicePlan, Warnings, error) {
-	service, allWarnings, err := actor.getServiceByNameForSpace(serviceName, spaceGUID, brokerGUID)
+func (actor Actor) getServicePlanForServiceInSpace(servicePlanName, serviceName, spaceGUID, brokerName string) (ServicePlan, Warnings, error) {
+	services, allWarnings, err := actor.getServicesByNameForSpace(serviceName, spaceGUID)
+	if err != nil {
+		return ServicePlan{}, allWarnings, err
+	}
+
+	if len(services) == 0 {
+		return ServicePlan{}, Warnings(allWarnings), actionerror.ServiceNotFoundError{Name: serviceName}
+	}
+
+	if len(services) > 1 && brokerName == "" {
+		return ServicePlan{}, Warnings(allWarnings), actionerror.DuplicateServiceError{Name: serviceName}
+	}
+
+	service, err := findServiceByBrokerName(services, serviceName, brokerName)
 	if err != nil {
 		return ServicePlan{}, allWarnings, err
 	}
@@ -49,6 +62,7 @@ func (actor Actor) getServicePlanForServiceInSpace(servicePlanName, serviceName,
 		Operator: constant.EqualOperator,
 		Values:   []string{service.GUID},
 	})
+
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return ServicePlan{}, allWarnings, err
@@ -61,4 +75,18 @@ func (actor Actor) getServicePlanForServiceInSpace(servicePlanName, serviceName,
 	}
 
 	return ServicePlan{}, allWarnings, actionerror.ServicePlanNotFoundError{PlanName: servicePlanName, ServiceName: serviceName}
+}
+
+func findServiceByBrokerName(services []Service, serviceName, brokerName string) (Service, error) {
+	if brokerName == "" && len(services) == 1 {
+		return services[0], nil
+	}
+
+	for _, s := range services {
+		if s.ServiceBrokerName == brokerName {
+			return s, nil
+		}
+	}
+
+	return Service{}, actionerror.ServiceAndBrokerCombinationNotFoundError{ServiceName: serviceName, BrokerName: brokerName}
 }

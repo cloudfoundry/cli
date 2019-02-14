@@ -55,7 +55,8 @@ var _ = Describe("Service Instance Actions", func() {
 					}
 					fakeCloudControllerClient.GetSpaceServicesReturns(
 						[]ccv2.Service{{
-							GUID: "a-service-guid",
+							GUID:              "a-service-guid",
+							ServiceBrokerName: "some-broker",
 						}},
 						nil,
 						nil,
@@ -134,6 +135,7 @@ var _ = Describe("Service Instance Actions", func() {
 						}},
 						nil,
 						nil)
+
 					fakeCloudControllerClient.CreateServiceInstanceReturns(
 						ccv2.ServiceInstance{},
 						ccv2.Warnings{"create-service-instance-warning"},
@@ -270,10 +272,12 @@ var _ = Describe("Service Instance Actions", func() {
 					fakeCloudControllerClient.GetSpaceServicesReturns(
 						[]ccv2.Service{
 							{
-								GUID: "a-service-guid",
+								GUID:              "a-service-guid",
+								ServiceBrokerName: "some-broker",
 							},
 							{
-								GUID: "another-service-guid",
+								GUID:              "another-service-guid",
+								ServiceBrokerName: "some-other-broker",
 							},
 						},
 						nil,
@@ -324,18 +328,17 @@ var _ = Describe("Service Instance Actions", func() {
 						DashboardURL:    "http://dashboard.com",
 						LastOperation:   ccv2.LastOperation{},
 					}
-					fakeCloudControllerClient.GetServiceBrokersReturns(
-						[]ccv2.ServiceBroker{{
-							Name: "some-broker",
-							GUID: "a-broker-guid",
-						}},
-						nil,
-						nil,
-					)
 					fakeCloudControllerClient.GetSpaceServicesReturns(
-						[]ccv2.Service{{
-							GUID: "a-service-guid",
-						}},
+						[]ccv2.Service{
+							{
+								GUID:              "a-service-guid",
+								ServiceBrokerName: "some-broker",
+							},
+							{
+								GUID:              "another-service-guid",
+								ServiceBrokerName: "some-other-broker",
+							},
+						},
 						nil,
 						nil,
 					)
@@ -359,20 +362,8 @@ var _ = Describe("Service Instance Actions", func() {
 				})
 
 				It("returns the service instance and warnings", func() {
-					By("getting the service broker")
-					Expect(fakeCloudControllerClient.GetServiceBrokersCallCount()).To(Equal(1))
-					brokerFilter := fakeCloudControllerClient.GetServiceBrokersArgsForCall(0)
-					Expect(brokerFilter).To(Equal([]ccv2.Filter{{
-						Type:     constant.NameFilter,
-						Operator: constant.EqualOperator,
-						Values:   []string{brokerName},
-					}},
-					))
-
-					By("getting the space services by service broker")
+					By("getting the space services")
 					Expect(createServiceErr).ToNot(HaveOccurred())
-					Expect(serviceInstance).To(Equal(ServiceInstance(returnedInstance)))
-					Expect(createServiceWarnings).To(ConsistOf("create-service-instance-warning"))
 
 					Expect(fakeCloudControllerClient.GetSpaceServicesCallCount()).To(Equal(1))
 					spaceGUID, serviceFilters := fakeCloudControllerClient.GetSpaceServicesArgsForCall(0)
@@ -383,11 +374,6 @@ var _ = Describe("Service Instance Actions", func() {
 								Type:     constant.LabelFilter,
 								Operator: constant.EqualOperator,
 								Values:   []string{"service"},
-							},
-							{
-								Type:     constant.ServiceBrokerGUIDFilter,
-								Operator: constant.EqualOperator,
-								Values:   []string{"a-broker-guid"},
 							},
 						},
 					))
@@ -412,32 +398,63 @@ var _ = Describe("Service Instance Actions", func() {
 						"some": "params",
 					}))
 					Expect(tags).To(ConsistOf("tag-1", "tag-2"))
+
+					Expect(serviceInstance).To(Equal(ServiceInstance(returnedInstance)))
+					Expect(createServiceWarnings).To(ConsistOf("create-service-instance-warning"))
 				})
 			})
 
-			When("the specified service broker does not exist", func() {
+			When("the specified service broker is not present in the list of services accessible to the user", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceBrokersReturns(
-						[]ccv2.ServiceBroker{},
-						ccv2.Warnings{"get-service-broker-warning"},
+					fakeCloudControllerClient.GetSpaceServicesReturns(
+						[]ccv2.Service{
+							{
+								GUID:              "a-service-guid",
+								ServiceBrokerName: "the-wrong-broker",
+							},
+							{
+								GUID:              "another-service-guid",
+								ServiceBrokerName: "not-this-broker-either",
+							},
+						},
+						nil,
 						nil,
 					)
 				})
 
-				It("returns the error and warnings", func() {
+				It("returns the error", func() {
 					Expect(serviceInstance).To(Equal(ServiceInstance{}))
-					Expect(createServiceErr).To(MatchError(actionerror.ServiceBrokerNotFoundError{Name: brokerName}))
-					Expect(createServiceWarnings).To(ConsistOf("get-service-broker-warning"))
+					Expect(createServiceErr).To(MatchError(actionerror.ServiceAndBrokerCombinationNotFoundError{ServiceName: "service", BrokerName: brokerName}))
 
 					Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
 				})
 			})
 
-			When("there is an error getting the specified service broker", func() {
+			When("the list of services does not include service broker names", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetServiceBrokersReturns(
-						[]ccv2.ServiceBroker{},
-						ccv2.Warnings{"get-service-broker-warning"},
+					fakeCloudControllerClient.GetSpaceServicesReturns(
+						[]ccv2.Service{
+							{GUID: "a-service-guid"},
+							{GUID: "another-service-guid"},
+						},
+						nil,
+						nil,
+					)
+				})
+
+				It("returns the appropriate error", func() {
+					Expect(serviceInstance).To(Equal(ServiceInstance{}))
+					Expect(createServiceErr).To(MatchError(actionerror.ServiceAndBrokerCombinationNotFoundError{ServiceName: "service", BrokerName: brokerName}))
+
+					Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
+				})
+			})
+
+			When("there is an error getting the list of space services", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpaceServicesReturns(
+						[]ccv2.Service{{}},
+						ccv2.Warnings{"get-space-services-warning"},
 						errors.New("oh no"),
 					)
 				})
@@ -445,7 +462,7 @@ var _ = Describe("Service Instance Actions", func() {
 				It("returns the error and warnings", func() {
 					Expect(serviceInstance).To(Equal(ServiceInstance{}))
 					Expect(createServiceErr).To(MatchError("oh no"))
-					Expect(createServiceWarnings).To(ConsistOf("get-service-broker-warning"))
+					Expect(createServiceWarnings).To(ConsistOf("get-space-services-warning"))
 
 					Expect(fakeCloudControllerClient.CreateServiceInstanceCallCount()).To(Equal(0))
 				})
