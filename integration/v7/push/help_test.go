@@ -15,7 +15,7 @@ var _ = Describe("help", func() {
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("%s - Push a new app or sync changes to an existing app", PushCommandName))
 			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say(`cf %s APP_NAME \[-b BUILDPACK\]\.\.\. \[-p APP_PATH\] \[--no-route\]`, PushCommandName))
+			Eventually(session).Should(Say(`cf %s APP_NAME \[-b BUILDPACK\]\.\.\. \[-s STACK\] \[-p APP_PATH\] \[--no-route\]`, PushCommandName))
 			Eventually(session).Should(Say(`cf %s APP_NAME --docker-image \[REGISTRY_HOST:PORT/\]IMAGE\[:TAG\] \[--docker-username USERNAME\] \[--no-route\]`, PushCommandName))
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`-b\s+Custom buildpack by name \(e\.g\. my-buildpack\) or Git URL \(e\.g\. 'https://github.com/cloudfoundry/java-buildpack.git'\) or Git URL with a branch or tag \(e\.g\. 'https://github.com/cloudfoundry/java-buildpack\.git#v3.3.0' for 'v3.3.0' tag\)\. To use built-in buildpacks only, specify 'default' or 'null'`))
