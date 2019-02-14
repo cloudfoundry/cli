@@ -3,7 +3,6 @@ package helpers
 import (
 	"fmt"
 	"strings"
-	"sync"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
@@ -39,24 +38,6 @@ func CreateOrgAndSpace(org string, space string) {
 
 func CreateOrg(org string) {
 	Eventually(CF("create-org", org)).Should(Exit(0))
-}
-
-func CreateOrgs(N int, username string) {
-	wg := sync.WaitGroup{}
-	wg.Add(N)
-
-	for i := 0; i < N; i++ {
-		go func() {
-			defer wg.Done()
-			orgName := NewOrgName()
-			createOrgSession := CF("create-org", orgName)
-			Eventually(createOrgSession).Should(Exit(0))
-			setOrgRoleSession := CF("set-org-role", username, orgName, "OrgManager")
-			Eventually(setOrgRoleSession).Should(Exit(0))
-		}()
-	}
-
-	wg.Wait()
 }
 
 func CreateSpace(space string) {

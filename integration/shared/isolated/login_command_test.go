@@ -494,26 +494,6 @@ var _ = Describe("login command", func() {
 					})
 				})
 
-				When("there are more than 50 orgs", func() {
-					BeforeEach(func() {
-						helpers.CreateOrgs(50, username)
-					})
-
-					It("displays a message and prompt the user for the org name", func() {
-						input := NewBuffer()
-						input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
-
-						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
-
-						Eventually(session).Should(Exit(0))
-						Expect(session).Should(Say("There are too many options to display, please type in the name."))
-
-						targetSession := helpers.CF("target")
-						Eventually(targetSession).Should(Exit(0))
-						Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
-					})
-				})
-
 				When("the user enters an invalid organization at the prompt", func() {
 					It("displays an error message and does not target the org", func() {
 						orgName = "invalid-org"
