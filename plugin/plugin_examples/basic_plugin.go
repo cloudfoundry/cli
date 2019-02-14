@@ -49,15 +49,11 @@ func (c *BasicPlugin) Run(cliConnection plugin.CliConnection, args []string) {
 		println("need a space!")
 	}
 
-	fmt.Println("Testing v7 command...")
-	out, err := cliConnection.V3CliCommand("app", "dora")
-	fmt.Println(out)
+	out, err := cliConnection.V3CliCommand("push", "dora", "--droplet", "/tmp/dora.droplet")
 	if err != nil {
 		fmt.Printf("running command broke: %s\n", err.Error())
 	}
 
-	fmt.Println("Testing legacy command...")
-	out, err = cliConnection.V3CliCommand("create-quota", "testing-quota", "-i", "256m")
 	fmt.Println(out)
 	if err != nil {
 		fmt.Printf("running legacy command broke: %s\n", err.Error())
