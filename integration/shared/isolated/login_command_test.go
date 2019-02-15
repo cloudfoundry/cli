@@ -428,6 +428,38 @@ var _ = Describe("login command", func() {
 
 				})
 			})
+
+			When("the only org available to the user contains multiple spaces", func() {
+				BeforeEach(func() {
+					spaceName := helpers.NewSpaceName()
+					session := helpers.CF("create-space", "-o", orgName, spaceName)
+					Eventually(session).Should(Exit(0))
+					roleSession := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceManager")
+					Eventually(roleSession).Should(Exit(0))
+
+					spaceName2 := helpers.NewSpaceName()
+					session2 := helpers.CF("create-space", "-o", orgName, spaceName2)
+					Eventually(session2).Should(Exit(0))
+					roleSession2 := helpers.CF("set-space-role", username, orgName, spaceName2, "SpaceManager")
+					Eventually(roleSession2).Should(Exit(0))
+				})
+
+				It("targets the org and then allows the user to pick their space", func() {
+					input := NewBuffer()
+					input.Write([]byte("1\n"))
+					var session *Session
+					session = helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+
+					Eventually(session).Should(Exit(0))
+
+					re := regexp.MustCompile("1\\. (?P<SpaceName>.*)\n")
+					expectedSpaceName := re.FindStringSubmatch(string(session.Out.Contents()))[1]
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, expectedSpaceName))
+				})
+			})
 		})
 
 		When("the -o flag is not passed", func() {
