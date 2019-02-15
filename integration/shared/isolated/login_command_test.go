@@ -487,6 +487,20 @@ var _ = Describe("login command", func() {
 					Eventually(targetSession).Should(Exit(0))
 					Eventually(targetSession).Should(Say(`No space targeted, use 'cf target -s SPACE'`))
 				})
+
+				When("the user passes '-s'", func() {
+					It("targets the org and the space", func() {
+						input := NewBuffer()
+
+						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+						Eventually(session).Should(Exit(0))
+
+						targetSession := helpers.CF("target")
+						Eventually(targetSession).Should(Exit(0))
+						Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+						Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
+					})
+				})
 			})
 		})
 
