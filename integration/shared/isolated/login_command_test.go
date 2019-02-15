@@ -430,26 +430,30 @@ var _ = Describe("login command", func() {
 			})
 
 			When("the only org available to the user contains multiple spaces", func() {
+				var (
+					spaceName  string
+					spaceName2 string
+				)
+
 				BeforeEach(func() {
-					spaceName := helpers.NewSpaceName()
+					spaceName = helpers.NewSpaceName()
 					session := helpers.CF("create-space", "-o", orgName, spaceName)
 					Eventually(session).Should(Exit(0))
 					roleSession := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceManager")
 					Eventually(roleSession).Should(Exit(0))
 
-					spaceName2 := helpers.NewSpaceName()
+					spaceName2 = helpers.NewSpaceName()
 					session2 := helpers.CF("create-space", "-o", orgName, spaceName2)
 					Eventually(session2).Should(Exit(0))
 					roleSession2 := helpers.CF("set-space-role", username, orgName, spaceName2, "SpaceManager")
 					Eventually(roleSession2).Should(Exit(0))
 				})
 
-				It("targets the org and then allows the user to pick their space", func() {
+				It("targets the org and then allows the user to pick their space by list position", func() {
 					input := NewBuffer()
 					input.Write([]byte("1\n"))
-					var session *Session
-					session = helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
 
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
 					Eventually(session).Should(Exit(0))
 
 					re := regexp.MustCompile("1\\. (?P<SpaceName>.*)\n")
@@ -458,6 +462,18 @@ var _ = Describe("login command", func() {
 					targetSession := helpers.CF("target")
 					Eventually(targetSession).Should(Exit(0))
 					Eventually(targetSession).Should(Say(`space:\s+%s`, expectedSpaceName))
+				})
+
+				It("targets the org and then allows the user to pick their space by name", func() {
+					input := NewBuffer()
+					input.Write([]byte(spaceName + "\n"))
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
 				})
 			})
 		})
