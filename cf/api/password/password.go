@@ -1,8 +1,9 @@
 package password
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"strings"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/errors"
@@ -33,8 +34,20 @@ func (repo CloudControllerRepository) UpdatePassword(old string, new string) err
 		return errors.New(T("UAA endpoint missing from config file"))
 	}
 
-	url := fmt.Sprintf("/Users/%s/password", repo.config.UserGUID())
-	body := fmt.Sprintf(`{"password":"%s","oldPassword":"%s"}`, new, old)
+	type passwordReq struct {
+		Old string `json:"oldPassword"`
+		New string `json:"password"`
+	}
 
-	return repo.gateway.UpdateResource(uaaEndpoint, url, strings.NewReader(body))
+	url := fmt.Sprintf("/Users/%s/password", repo.config.UserGUID())
+	reqBody := passwordReq{
+		Old: old,
+		New: new,
+	}
+	bodyBytes, err := json.Marshal(reqBody)
+	if err != nil {
+		return err
+	}
+
+	return repo.gateway.UpdateResource(uaaEndpoint, url, bytes.NewReader(bodyBytes))
 }

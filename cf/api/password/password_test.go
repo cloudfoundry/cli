@@ -34,6 +34,24 @@ var _ = Describe("CloudControllerPasswordRepository", func() {
 		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 	})
+
+	When("the inputs contains special characters", func() {
+		It("handles escaping", func() {
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "PUT",
+				Path:     "/Users/my-user-guid/password",
+				Matcher:  testnet.RequestBodyMatcher(`{"password":"more-\\-\\b\\\\-crazy","oldPassword":"crazy-\\.\\b-password"}`),
+				Response: testnet.TestResponse{Status: http.StatusOK},
+			})
+
+			passwordUpdateServer, handler, repo := createPasswordRepo(req)
+			defer passwordUpdateServer.Close()
+
+			apiErr := repo.UpdatePassword(`crazy-\.\b-password`, `more-\-\b\\-crazy`)
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+	})
 })
 
 func createPasswordRepo(req testnet.TestRequest) (passwordServer *httptest.Server, handler *testnet.TestHandler, repo Repository) {
