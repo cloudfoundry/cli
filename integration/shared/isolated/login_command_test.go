@@ -640,7 +640,7 @@ var _ = Describe("login command", func() {
 			})
 
 			When("the -s flag is not passed", func() {
-				It("targets the org and then allows the user to pick their space by list position", func() {
+				It("prompts the user to pick their space by list position", func() {
 					input := NewBuffer()
 					input.Write([]byte("1\n"))
 
@@ -655,7 +655,7 @@ var _ = Describe("login command", func() {
 					Eventually(targetSession).Should(Say(`space:\s+%s`, expectedSpaceName))
 				})
 
-				It("targets the org and then allows the user to pick their space by name", func() {
+				It("prompts the user to pick their space by name", func() {
 					input := NewBuffer()
 					input.Write([]byte(spaceName + "\n"))
 
@@ -667,7 +667,7 @@ var _ = Describe("login command", func() {
 					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
 				})
 
-				It("targets the org and then allows the user to skip picking a space", func() {
+				It("allows the user to skip picking a space", func() {
 					input := NewBuffer()
 					input.Write([]byte(" \n"))
 
@@ -677,6 +677,28 @@ var _ = Describe("login command", func() {
 					targetSession := helpers.CF("target")
 					Eventually(targetSession).Should(Exit(0))
 					Eventually(targetSession).Should(Say(`No space targeted, use 'cf target -s SPACE'`))
+				})
+
+				When("the input space name is invalid", func() {
+					BeforeEach(func() {
+						spaceName = "invalid-space-name"
+					})
+
+					It("the command fails and displays an error message. It does not target the space.", func() {
+						input := NewBuffer()
+						input.Write([]byte(spaceName + "\n"))
+
+						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+						Eventually(session).Should(Exit(1))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Say("Space %s not found", spaceName))
+
+						targetSession := helpers.CF("target")
+						Eventually(targetSession).Should(Exit(0))
+						Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+						Eventually(targetSession).ShouldNot(Say(`space:\s+%s`, spaceName))
+						Eventually(targetSession).Should(Say("No space targeted, use 'cf target -s SPACE'"))
+					})
 				})
 			})
 		})
