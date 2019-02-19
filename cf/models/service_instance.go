@@ -31,6 +31,7 @@ type ServiceInstanceFields struct {
 	ApplicationNames []string
 	Params           map[string]interface{}
 	DashboardURL     string
+	Type             string
 	Tags             []string
 }
 
@@ -43,5 +44,5 @@ type ServiceInstance struct {
 }
 
 func (inst ServiceInstance) IsUserProvided() bool {
-	return inst.ServicePlan.GUID == ""
+	return inst.Type == "user_provided_service_instance"
 }

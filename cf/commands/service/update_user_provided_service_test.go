@@ -151,6 +151,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 					ServiceInstanceFields: models.ServiceInstanceFields{
 						Name:   "service-instance",
 						Params: map[string]interface{}{},
+						Type:   "user_provided_service_instance",
 					},
 					ServicePlan: models.ServicePlanFields{
 						GUID:        "",

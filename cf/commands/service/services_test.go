@@ -136,6 +136,7 @@ var _ = Describe("services", func() {
 
 		userProvidedServiceInstance := models.ServiceInstance{}
 		userProvidedServiceInstance.Name = "my-service-provided-by-user"
+		userProvidedServiceInstance.Type = "user_provided_service_instance"
 
 		serviceInstances := []models.ServiceInstance{serviceInstance, serviceInstance2, userProvidedServiceInstance}
 
@@ -214,6 +215,7 @@ var _ = Describe("services", func() {
 			userProvidedServiceInstance := models.ServiceInstance{}
 			userProvidedServiceInstance.Name = "my-service-provided-by-user"
 			userProvidedServiceInstance.GUID = "678"
+			userProvidedServiceInstance.Type = "user_provided_service_instance"
 
 			serviceInstances := []models.ServiceInstance{serviceInstance, serviceInstance2, userProvidedServiceInstance}
 

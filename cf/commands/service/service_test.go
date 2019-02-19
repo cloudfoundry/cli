@@ -305,6 +305,7 @@ var _ = Describe("service command", func() {
 					ServiceInstanceFields: models.ServiceInstanceFields{
 						Name: "service1",
 						GUID: "service1-guid",
+						Type: "user_provided_service_instance",
 					},
 					ServiceBindings: []models.ServiceBindingFields{
 						models.ServiceBindingFields{
