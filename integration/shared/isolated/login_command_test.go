@@ -405,103 +405,6 @@ var _ = Describe("login command", func() {
 				Eventually(targetSession).Should(Exit(0))
 				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
 			})
-
-			When("the only org available to the user contains only one space", func() {
-				var spaceName string
-
-				BeforeEach(func() {
-					spaceName = helpers.NewSpaceName()
-					session := helpers.CF("create-space", "-o", orgName, spaceName)
-					Eventually(session).Should(Exit(0))
-					roleSession := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceManager")
-					Eventually(roleSession).Should(Exit(0))
-				})
-
-				It("logs the user in and targets the org and the space", func() {
-					session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
-					Eventually(session).Should(Exit(0))
-
-					targetSession := helpers.CF("target")
-					Eventually(targetSession).Should(Exit(0))
-					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
-					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
-
-				})
-			})
-
-			When("the only org available to the user contains multiple spaces", func() {
-				var (
-					spaceName  string
-					spaceName2 string
-				)
-
-				BeforeEach(func() {
-					spaceName = helpers.NewSpaceName()
-					session := helpers.CF("create-space", "-o", orgName, spaceName)
-					Eventually(session).Should(Exit(0))
-					roleSession := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceManager")
-					Eventually(roleSession).Should(Exit(0))
-
-					spaceName2 = helpers.NewSpaceName()
-					session2 := helpers.CF("create-space", "-o", orgName, spaceName2)
-					Eventually(session2).Should(Exit(0))
-					roleSession2 := helpers.CF("set-space-role", username, orgName, spaceName2, "SpaceManager")
-					Eventually(roleSession2).Should(Exit(0))
-				})
-
-				It("targets the org and then allows the user to pick their space by list position", func() {
-					input := NewBuffer()
-					input.Write([]byte("1\n"))
-
-					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
-					Eventually(session).Should(Exit(0))
-
-					re := regexp.MustCompile("1\\. (?P<SpaceName>.*)\n")
-					expectedSpaceName := re.FindStringSubmatch(string(session.Out.Contents()))[1]
-
-					targetSession := helpers.CF("target")
-					Eventually(targetSession).Should(Exit(0))
-					Eventually(targetSession).Should(Say(`space:\s+%s`, expectedSpaceName))
-				})
-
-				It("targets the org and then allows the user to pick their space by name", func() {
-					input := NewBuffer()
-					input.Write([]byte(spaceName + "\n"))
-
-					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
-					Eventually(session).Should(Exit(0))
-
-					targetSession := helpers.CF("target")
-					Eventually(targetSession).Should(Exit(0))
-					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
-				})
-
-				It("targets the org and then allows the user to skip picking a space", func() {
-					input := NewBuffer()
-					input.Write([]byte(" \n"))
-
-					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
-					Eventually(session).Should(Exit(0))
-
-					targetSession := helpers.CF("target")
-					Eventually(targetSession).Should(Exit(0))
-					Eventually(targetSession).Should(Say(`No space targeted, use 'cf target -s SPACE'`))
-				})
-
-				When("the user passes '-s'", func() {
-					It("targets the org and the space", func() {
-						input := NewBuffer()
-
-						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
-						Eventually(session).Should(Exit(0))
-
-						targetSession := helpers.CF("target")
-						Eventually(targetSession).Should(Exit(0))
-						Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
-						Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
-					})
-				})
-			})
 		})
 
 		When("the -o flag is not passed", func() {
@@ -643,6 +546,120 @@ var _ = Describe("login command", func() {
 					Eventually(targetSession).Should(Say(`user:\s+%s`, username))
 					Eventually(targetSession).ShouldNot(Say(`org:\s+%s`, orgName))
 					Eventually(targetSession).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
+				})
+			})
+		})
+	})
+
+	Describe("Target Space", func() {
+		var (
+			orgName  string
+			username string
+			password string
+		)
+
+		BeforeEach(func() {
+			helpers.LoginCF()
+			orgName = helpers.NewOrgName()
+			session := helpers.CF("create-org", orgName)
+			Eventually(session).Should(Exit(0))
+			username, password = helpers.CreateUserInOrgRole(orgName, "OrgManager")
+		})
+
+		When("only one space is available to the user", func() {
+			var spaceName string
+
+			BeforeEach(func() {
+				spaceName = helpers.NewSpaceName()
+				session := helpers.CF("create-space", "-o", orgName, spaceName)
+				Eventually(session).Should(Exit(0))
+				roleSession := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceManager")
+				Eventually(roleSession).Should(Exit(0))
+			})
+
+			It("logs the user in and targets the org and the space", func() {
+				session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+				Eventually(session).Should(Exit(0))
+
+				targetSession := helpers.CF("target")
+				Eventually(targetSession).Should(Exit(0))
+				Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+				Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
+			})
+		})
+
+		When("multiple spaces available to the user", func() {
+			var (
+				spaceName  string
+				spaceName2 string
+			)
+
+			BeforeEach(func() {
+				spaceName = helpers.NewSpaceName()
+				session := helpers.CF("create-space", "-o", orgName, spaceName)
+				Eventually(session).Should(Exit(0))
+				roleSession := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceManager")
+				Eventually(roleSession).Should(Exit(0))
+
+				spaceName2 = helpers.NewSpaceName()
+				session2 := helpers.CF("create-space", "-o", orgName, spaceName2)
+				Eventually(session2).Should(Exit(0))
+				roleSession2 := helpers.CF("set-space-role", username, orgName, spaceName2, "SpaceManager")
+				Eventually(roleSession2).Should(Exit(0))
+			})
+
+			When("the -s flag is passed", func() {
+				It("targets the org and the space", func() {
+					input := NewBuffer()
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
+				})
+			})
+
+			When("the -s flag is not passed", func() {
+				It("targets the org and then allows the user to pick their space by list position", func() {
+					input := NewBuffer()
+					input.Write([]byte("1\n"))
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+
+					re := regexp.MustCompile("1\\. (?P<SpaceName>.*)\n")
+					expectedSpaceName := re.FindStringSubmatch(string(session.Out.Contents()))[1]
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, expectedSpaceName))
+				})
+
+				It("targets the org and then allows the user to pick their space by name", func() {
+					input := NewBuffer()
+					input.Write([]byte(spaceName + "\n"))
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
+				})
+
+				It("targets the org and then allows the user to skip picking a space", func() {
+					input := NewBuffer()
+					input.Write([]byte(" \n"))
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Exit(0))
+
+					targetSession := helpers.CF("target")
+					Eventually(targetSession).Should(Exit(0))
+					Eventually(targetSession).Should(Say(`No space targeted, use 'cf target -s SPACE'`))
 				})
 			})
 		})
