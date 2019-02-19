@@ -610,9 +610,7 @@ var _ = Describe("login command", func() {
 
 			When("the -s flag is passed", func() {
 				It("targets the org and the space", func() {
-					input := NewBuffer()
-
-					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+					session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
 					Eventually(session).Should(Exit(0))
 
 					targetSession := helpers.CF("target")
