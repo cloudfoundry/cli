@@ -60,6 +60,10 @@ var _ = Describe("Plan builder", func() {
 			{ServicePlanGUID: "service-plan1-guid", OrganizationGUID: "org2-guid"},
 			{ServicePlanGUID: "service-plan2-guid", OrganizationGUID: "org1-guid"},
 		}, nil)
+		visibilityRepo.SearchReturns([]models.ServicePlanVisibilityFields{
+			{ServicePlanGUID: "service-plan1-guid", OrganizationGUID: "org1-guid"},
+			{ServicePlanGUID: "service-plan2-guid", OrganizationGUID: "org1-guid"},
+		}, nil)
 		orgRepo.GetManyOrgsByGUIDReturns([]models.Organization{org1, org2}, nil)
 	})
 
