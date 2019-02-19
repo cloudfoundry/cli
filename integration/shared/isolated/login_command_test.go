@@ -618,6 +618,25 @@ var _ = Describe("login command", func() {
 					Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
 					Eventually(targetSession).Should(Say(`space:\s+%s`, spaceName))
 				})
+
+				When("the space name is invalid", func() {
+					BeforeEach(func() {
+						spaceName = "invalid-space-name"
+					})
+
+					It("the command fails and displays an error message. It targets the org but not the space.", func() {
+						session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+						Eventually(session).Should(Exit(1))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Say("Space %s not found", spaceName))
+
+						targetSession := helpers.CF("target")
+						Eventually(targetSession).Should(Exit(0))
+						Eventually(targetSession).Should(Say(`org:\s+%s`, orgName))
+						Eventually(targetSession).ShouldNot(Say(`space:\s+%s`, spaceName))
+						Eventually(targetSession).Should(Say("No space targeted, use 'cf target -s SPACE'"))
+					})
+				})
 			})
 
 			When("the -s flag is not passed", func() {
