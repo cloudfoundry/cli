@@ -30,7 +30,7 @@ var _ = Describe("update-service command", func() {
 				servicePlan         string
 				broker              helpers.ServiceBroker
 				serviceInstanceName string
-				username	        string
+				username            string
 			)
 
 			BeforeEach(func() {
