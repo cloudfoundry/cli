@@ -655,6 +655,17 @@ var _ = Describe("login command", func() {
 					Eventually(targetSession).Should(Say(`space:\s+%s`, expectedSpaceName))
 				})
 
+				It("reprompts the user if an invalid number is entered", func() {
+					input := NewBuffer()
+					input.Write([]byte("4\n"))
+
+					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
+					Eventually(session).Should(Say(regexp.QuoteMeta("Select a space (or press enter to skip):")))
+					Eventually(session).Should(Say(regexp.QuoteMeta("Select a space (or press enter to skip):")))
+					session.Interrupt()
+					Eventually(session).Should(Exit())
+				})
+
 				It("prompts the user to pick their space by name", func() {
 					input := NewBuffer()
 					input.Write([]byte(spaceName + "\n"))
