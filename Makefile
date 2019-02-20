@@ -111,6 +111,7 @@ integration-versioned-isolated: build integration-cleanup ## Run all parallel-en
 integration-plugin: build integration-cleanup ## Run all plugin-related integration tests
 	$(ginkgo_int) -nodes $(NODES) integration/shared/plugin
 
+ip: integration-push
 integration-push: build integration-cleanup  ## Run all push-related integration tests
 	$(ginkgo_int) -nodes $(NODES) integration/$(TARGET)/push
 
