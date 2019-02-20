@@ -48,7 +48,7 @@ var _ = When("the -p flag is provided", func() {
 
 			It("returns an error", func() {
 				session := helpers.CF(PushCommandName, appName, "-p", emptyDir)
-				Eventually(session.Err).Should(Say("No app files found in '%s'", regexp.QuoteMeta(emptyDir)))
+				Eventually(session.Err).Should(Say("No app files found in '(/private)?%s'", regexp.QuoteMeta(emptyDir)))
 				Eventually(session).Should(Exit(1))
 			})
 		})
