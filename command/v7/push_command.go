@@ -274,7 +274,7 @@ func (cmd PushCommand) processStreamsFromPrepareSpace(
 				eventClosed = true
 				break
 			}
-			cmd.processEvent(event, "tktktktktktktk")
+			cmd.processEvent(event, cmd.RequiredArgs.AppName)
 		case warnings, ok := <-warningsStream:
 			if !ok {
 				if !warningsClosed {
