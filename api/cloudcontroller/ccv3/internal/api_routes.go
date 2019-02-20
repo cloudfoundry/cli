@@ -28,6 +28,7 @@ const (
 	GetDeploymentsRequest                                       = "GetDeployments"
 	GetDropletRequest                                           = "GetDroplet"
 	GetDropletsRequest                                          = "GetDroplets"
+	GetFeatureFlagsRequest                                      = "GetFeatureFlags"
 	GetIsolationSegmentOrganizationsRequest                     = "GetIsolationSegmentOrganizations"
 	GetIsolationSegmentRequest                                  = "GetIsolationSegment"
 	GetIsolationSegmentsRequest                                 = "GetIsolationSegments"
@@ -100,6 +101,7 @@ var APIRoutes = []Route{
 	{Resource: DeploymentsResource, Path: "/:deployment_guid/actions/cancel", Method: http.MethodPost, Name: PostApplicationDeploymentActionCancelRequest},
 	{Resource: DropletsResource, Path: "/", Method: http.MethodGet, Name: GetDropletsRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid", Method: http.MethodGet, Name: GetDropletRequest},
+	{Resource: FeatureFlagsResource, Path: "/", Method: http.MethodGet, Name: GetFeatureFlagsRequest},
 	{Resource: IsolationSegmentsResource, Path: "/", Method: http.MethodGet, Name: GetIsolationSegmentsRequest},
 	{Resource: IsolationSegmentsResource, Path: "/", Method: http.MethodPost, Name: PostIsolationSegmentsRequest},
 	{Resource: IsolationSegmentsResource, Path: "/:isolation_segment_guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRequest},

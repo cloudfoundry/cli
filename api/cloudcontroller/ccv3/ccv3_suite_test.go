@@ -128,6 +128,9 @@ func SetupV3Response() {
 			},
 			"buildpacks": {
 				"href": "SERVER_URL/v3/buildpacks"
+			},
+			"feature_flags": {
+				"href": "SERVER_URL/v3/feature_flags"
 			}
 		}
 	}`, "SERVER_URL", serverURL, -1)
