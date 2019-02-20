@@ -3,6 +3,7 @@ package v7pushaction
 type Event string
 
 const (
+	ApplicationAlreadyExists        Event = "App already exists"
 	ApplyManifest                   Event = "Applying manifest"
 	ApplyManifestComplete           Event = "Applying manifest Complete"
 	BoundRoutes                     Event = "bound routes"

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -19,11 +18,12 @@ type PushState struct {
 	Overrides   FlagOverrides
 	Manifest    []byte
 
-	Archive            bool
-	BitsPath           string
-	AllResources       []sharedaction.Resource
-	MatchedResources   []sharedaction.Resource
-	UnmatchedResources []sharedaction.Resource
+	Archive                bool
+	ApplicationNeedsUpdate bool
+	BitsPath               string
+	AllResources           []sharedaction.Resource
+	MatchedResources       []sharedaction.Resource
+	UnmatchedResources     []sharedaction.Resource
 }
 
 type FlagOverrides struct {
@@ -54,72 +54,92 @@ func (state PushState) String() string {
 	)
 }
 
-func (actor Actor) Conceptualize(appName string, spaceGUID string, orgGUID string, currentDir string, flagOverrides FlagOverrides, manifest []byte) ([]PushState, Warnings, error) {
-	var (
-		application v7action.Application
-		warnings    v7action.Warnings
-		err         error
-	)
-
-	log.WithFields(log.Fields{"appName": appName, "spaceGUID": spaceGUID}).Info("Application Look Up")
-	application, warnings, err = actor.V7Actor.GetApplicationByNameAndSpace(appName, spaceGUID)
-	if _, ok := err.(actionerror.ApplicationNotFoundError); ok {
-		log.Debug("App not found")
-		application = v7action.Application{
-			Name: appName,
+func sliceContains(items []string, target string) bool {
+	for _, item := range items {
+		if item == target {
+			return true
 		}
-	} else if err != nil {
-		log.Errorln("Looking up application:", err)
-		return nil, Warnings(warnings), err
 	}
+	return false
+}
 
-	if len(flagOverrides.Buildpacks) != 0 {
-		application.LifecycleType = constant.AppLifecycleTypeBuildpack
-		application.LifecycleBuildpacks = flagOverrides.Buildpacks
-	}
-
-	if flagOverrides.Stack != "" {
-		application.LifecycleType = constant.AppLifecycleTypeBuildpack
-		application.StackName = flagOverrides.Stack
-	}
-	if len(flagOverrides.DockerImage) != 0 {
-		application.LifecycleType = constant.AppLifecycleTypeDocker
-	}
-
-	bitsPath := currentDir
-	if flagOverrides.ProvidedAppPath != "" {
-		bitsPath = flagOverrides.ProvidedAppPath
-	}
-
-	info, err := os.Stat(bitsPath)
+func (actor Actor) Conceptualize(
+	appNames []string,
+	spaceGUID string,
+	orgGUID string,
+	currentDir string,
+	flagOverrides FlagOverrides,
+) ([]PushState, Warnings, error) {
+	var (
+		applications []v7action.Application
+		warnings     v7action.Warnings
+		err          error
+	)
+	// for each appName get the app
+	var getWarnings v7action.Warnings
+	applications, getWarnings, err = actor.V7Actor.GetApplicationsByNamesAndSpace(appNames, spaceGUID)
+	warnings = append(warnings, getWarnings...)
 	if err != nil {
+		log.Errorln("Looking up applications:", err)
 		return nil, Warnings(warnings), err
 	}
 
-	var archive bool
-	var resources []sharedaction.Resource
-	if info.IsDir() {
-		resources, err = actor.SharedActor.GatherDirectoryResources(bitsPath)
-	} else {
-		archive = true
-		resources, err = actor.SharedActor.GatherArchiveResources(bitsPath)
-	}
-	if err != nil {
-		return nil, Warnings(warnings), err
-	}
+	pushStates := []PushState{}
+	for _, application := range applications {
+		applicationNeedsUpdate := false
 
-	desiredState := []PushState{
-		{
+		if len(flagOverrides.Buildpacks) != 0 {
+			application.LifecycleType = constant.AppLifecycleTypeBuildpack
+			application.LifecycleBuildpacks = flagOverrides.Buildpacks
+			applicationNeedsUpdate = true
+		}
+
+		if flagOverrides.Stack != "" {
+			application.LifecycleType = constant.AppLifecycleTypeBuildpack
+			application.StackName = flagOverrides.Stack
+			applicationNeedsUpdate = true
+		}
+
+		if len(flagOverrides.DockerImage) != 0 {
+			application.LifecycleType = constant.AppLifecycleTypeDocker
+			applicationNeedsUpdate = true
+		}
+
+		bitsPath := currentDir
+		if flagOverrides.ProvidedAppPath != "" {
+			bitsPath = flagOverrides.ProvidedAppPath
+		}
+
+		var info os.FileInfo
+		info, err = os.Stat(bitsPath)
+		if err != nil {
+			return nil, Warnings(warnings), err
+		}
+
+		var archive bool
+		var resources []sharedaction.Resource
+		if info.IsDir() {
+			resources, err = actor.SharedActor.GatherDirectoryResources(bitsPath)
+		} else {
+			archive = true
+			resources, err = actor.SharedActor.GatherArchiveResources(bitsPath)
+		}
+		if err != nil {
+			return nil, Warnings(warnings), err
+		}
+
+		pushStates = append(pushStates, PushState{
 			Application: application,
 			SpaceGUID:   spaceGUID,
 			OrgGUID:     orgGUID,
 			Overrides:   flagOverrides,
-			Manifest:    manifest,
 
-			Archive:      archive,
-			BitsPath:     bitsPath,
-			AllResources: resources,
-		},
+			Archive:                archive,
+			BitsPath:               bitsPath,
+			AllResources:           resources,
+			ApplicationNeedsUpdate: applicationNeedsUpdate,
+		})
 	}
-	return desiredState, Warnings(warnings), err
+
+	return pushStates, Warnings(warnings), err
 }

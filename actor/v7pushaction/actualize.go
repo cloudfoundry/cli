@@ -30,13 +30,14 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 
 		var err error
 
-		state, err = actor.CreateOrUpdateApplication(state, warningsStream, eventStream)
+		state, err = actor.UpdateApplication(state, warningsStream, eventStream)
 		if err != nil {
 			errorStream <- err
 			return
 		}
 		stateStream <- state
 
+		// TODO Remove this
 		if len(state.Manifest) > 0 {
 			err = actor.ApplyManifest(state, warningsStream, eventStream)
 			if err != nil {
@@ -192,32 +193,22 @@ func (actor Actor) CreateAndUploadApplicationBits(state PushState, progressBar P
 	return pkg, nil
 }
 
-func (actor Actor) CreateOrUpdateApplication(state PushState, warningsStream chan Warnings, eventStream chan Event) (PushState, error) {
-	if state.Application.GUID == "" { // Create
-		log.WithField("Name", state.Application.Name).Info("creating app")
-		eventStream <- CreatingApplication
-
-		createdApp, warnings, err := actor.V7Actor.CreateApplicationInSpace(state.Application, state.SpaceGUID)
-		state.Application = createdApp
-		warningsStream <- Warnings(warnings)
-		if err != nil {
-			return state, err
-		}
-
-		eventStream <- CreatedApplication
-	} else { // Update
-		log.WithField("Name", state.Application.Name).Info("skipping app creation as it has a GUID")
-		eventStream <- SkippingApplicationCreation
-
-		application, warnings, err := actor.V7Actor.UpdateApplication(state.Application)
-		state.Application = application
-		warningsStream <- Warnings(warnings)
-		if err != nil {
-			return state, err
-		}
-
-		eventStream <- UpdatedApplication
+func (actor Actor) UpdateApplication(state PushState, warningsStream chan Warnings, eventStream chan Event) (PushState, error) {
+	if !state.ApplicationNeedsUpdate {
+		return state, nil
 	}
+
+	log.WithField("Name", state.Application.Name).Info("updating app")
+	eventStream <- SkippingApplicationCreation
+
+	application, warnings, err := actor.V7Actor.UpdateApplication(state.Application)
+	state.Application = application
+	warningsStream <- Warnings(warnings)
+	if err != nil {
+		return state, err
+	}
+
+	eventStream <- UpdatedApplication
 
 	return state, nil
 }

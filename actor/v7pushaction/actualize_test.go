@@ -73,10 +73,10 @@ func getNextEvent(c <-chan PushState, e <-chan Event, w <-chan Warnings) func() 
 					log.WithField("event", event).Debug("getNextEvent")
 					return event
 				}
-				return ""
+				return "getNextEvent closed"
 			case <-w:
 			case <-timeOut:
-				return ""
+				return "getNextEvent timedout"
 			}
 		}
 	}
@@ -109,6 +109,7 @@ var _ = Describe("Actualize", func() {
 		state = PushState{
 			Application: v7action.Application{
 				Name: "some-app",
+				GUID: "some-app-guid",
 			},
 			SpaceGUID: "some-space-guid",
 		}
@@ -134,12 +135,16 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("application", func() {
-		When("the application exists", func() {
+		BeforeEach(func() {
+			state.Application.GUID = "some-app-guid"
+		})
+
+		When("the apps needs an update", func() {
 			BeforeEach(func() {
-				state.Application.GUID = "some-app-guid"
+				state.ApplicationNeedsUpdate = true
 			})
 
-			When("updated succesfully", func() {
+			When("updating is successful", func() {
 				BeforeEach(func() {
 					fakeV7Actor.UpdateApplicationReturns(
 						v7action.Application{
@@ -151,7 +156,7 @@ var _ = Describe("Actualize", func() {
 						nil)
 				})
 
-				It("updates the application", func() {
+				It("puts the updated application in the stream", func() {
 					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SkippingApplicationCreation))
 					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-update-warnings")))
 					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UpdatedApplication))
@@ -164,8 +169,6 @@ var _ = Describe("Actualize", func() {
 								LifecycleBuildpacks: []string{"some-buildpack-1"},
 							}),
 						})))
-
-					Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
 				})
 			})
 
@@ -189,65 +192,20 @@ var _ = Describe("Actualize", func() {
 			})
 		})
 
-		When("the application does not exist", func() {
-			When("the creation is successful", func() {
-				var expectedApp v7action.Application
-
-				BeforeEach(func() {
-					expectedApp = v7action.Application{
-						GUID: "some-app-guid",
-						Name: "some-app",
-					}
-
-					fakeV7Actor.CreateApplicationInSpaceReturns(expectedApp, v7action.Warnings{"some-app-warnings"}, nil)
-				})
-
-				It("returns an app created event, warnings, and updated state", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
-					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-warnings")))
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatedApplication))
-					Eventually(stateStream).Should(Receive(MatchFields(IgnoreExtras,
-						Fields{
-							"Application": Equal(expectedApp),
-						})))
-				})
-
-				It("creates the application", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
-					Eventually(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(1))
-					passedApp, passedSpaceGUID := fakeV7Actor.CreateApplicationInSpaceArgsForCall(0)
-					Expect(passedApp).To(Equal(state.Application))
-					Expect(passedSpaceGUID).To(Equal(state.SpaceGUID))
-				})
+		When("the state does not need an app update", func() {
+			BeforeEach(func() {
+				state.ApplicationNeedsUpdate = false
 			})
 
-			When("the creation errors", func() {
-				var expectedErr error
-
-				BeforeEach(func() {
-					expectedErr = errors.New("SPICY!!")
-
-					fakeV7Actor.CreateApplicationInSpaceReturns(v7action.Application{}, v7action.Warnings{"some-app-warnings"}, expectedErr)
-				})
-
-				It("returns warnings and error", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
-					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-warnings")))
-					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-				})
+			It("does not update the application", func() {
+				Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(SkippingApplicationCreation))
+				Consistently(fakeV7Actor.UpdateApplicationCallCount).Should(Equal(0))
 			})
 		})
 	})
 
 	Describe("manifest", func() {
-		BeforeEach(func() {
-			fakeV7Actor.CreateApplicationInSpaceReturns(v7action.Application{
-				GUID: "some-app-guid",
-				Name: "some-app",
-			}, v7action.Warnings{"some-app-warnings"}, nil)
-		})
-
-		When("theres a manifest on the pushState", func() {
+		When("there is a manifest on the pushState", func() {
 			BeforeEach(func() {
 				state.Manifest = []byte("random yaml")
 			})
@@ -264,8 +222,8 @@ var _ = Describe("Actualize", func() {
 
 					Expect(fakeV7Actor.SetApplicationManifestCallCount()).To(Equal(1))
 					passedAppGUID, passedManifest := fakeV7Actor.SetApplicationManifestArgsForCall(0)
-					Expect(passedAppGUID).To(Equal("some-app-guid"))
 					Expect(passedManifest).To(Equal([]byte("random yaml")))
+					Expect(passedAppGUID).To(Equal("some-app-guid"))
 				})
 			})
 
@@ -286,7 +244,7 @@ var _ = Describe("Actualize", func() {
 			})
 		})
 
-		When("There is not manifest on the pushState", func() {
+		When("There is no manifest on the pushState", func() {
 			BeforeEach(func() {
 				state.Manifest = nil
 			})
@@ -821,26 +779,26 @@ var _ = Describe("Actualize", func() {
 
 						When("reading the archive fails", func() {
 							BeforeEach(func() {
-								fakeSharedActor.ReadArchiveReturns(nil, 0, errors.New("the bits!"))
+								fakeSharedActor.ReadArchiveReturns(nil, 0, errors.New("the bits"))
 							})
 
 							It("returns an error", func() {
 								Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
-								Eventually(errorStream).Should(Receive(MatchError("the bits!")))
+								Eventually(errorStream).Should(Receive(MatchError("the bits")))
 							})
 						})
 					})
 
 					When("the package creation errors", func() {
 						BeforeEach(func() {
-							fakeV7Actor.CreateBitsPackageByApplicationReturns(v7action.Package{}, v7action.Warnings{"package-creation-warning"}, errors.New("the bits!"))
+							fakeV7Actor.CreateBitsPackageByApplicationReturns(v7action.Package{}, v7action.Warnings{"package-creation-warning"}, errors.New("the bits"))
 						})
 
 						It("it returns errors and warnings", func() {
 							Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
 
 							Eventually(warningsStream).Should(Receive(ConsistOf("package-creation-warning")))
-							Eventually(errorStream).Should(Receive(MatchError("the bits!")))
+							Eventually(errorStream).Should(Receive(MatchError("the bits")))
 						})
 					})
 				})
@@ -931,6 +889,10 @@ var _ = Describe("Actualize", func() {
 			})
 
 			When("The app is stopped", func() {
+				BeforeEach(func() {
+					state.Application.State = constant.ApplicationStopped
+				})
+
 				It("Uploads a package and exits", func() {
 					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
 					Expect(fakeV7Actor.StageApplicationPackageCallCount()).To(BeZero())
@@ -940,11 +902,7 @@ var _ = Describe("Actualize", func() {
 			When("The app is running", func() {
 				BeforeEach(func() {
 					fakeV7Actor.StopApplicationReturns(v7action.Warnings{"some-stopping-warning"}, nil)
-					fakeV7Actor.CreateApplicationInSpaceReturns(v7action.Application{
-						GUID:  "some-app-guid",
-						Name:  "some-app",
-						State: constant.ApplicationStarted,
-					}, nil, nil)
+					state.Application.State = constant.ApplicationStarted
 				})
 
 				When("Stopping the app succeeds", func() {
@@ -985,7 +943,7 @@ var _ = Describe("Actualize", func() {
 	})
 
 	Describe("polling build", func() {
-		When("the the polling is succesful", func() {
+		When("the the polling is successful", func() {
 			BeforeEach(func() {
 				fakeV7Actor.PollBuildReturns(v7action.Droplet{}, v7action.Warnings{"some-poll-build-warning"}, nil)
 			})

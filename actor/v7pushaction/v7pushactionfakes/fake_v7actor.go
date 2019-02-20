@@ -74,6 +74,22 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	GetApplicationsByNamesAndSpaceStub        func([]string, string) ([]v7action.Application, v7action.Warnings, error)
+	getApplicationsByNamesAndSpaceMutex       sync.RWMutex
+	getApplicationsByNamesAndSpaceArgsForCall []struct {
+		arg1 []string
+		arg2 string
+	}
+	getApplicationsByNamesAndSpaceReturns struct {
+		result1 []v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}
+	getApplicationsByNamesAndSpaceReturnsOnCall map[int]struct {
+		result1 []v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}
 	PollBuildStub        func(string, string) (v7action.Droplet, v7action.Warnings, error)
 	pollBuildMutex       sync.RWMutex
 	pollBuildArgsForCall []struct {
@@ -144,6 +160,20 @@ type FakeV7Actor struct {
 		result2 error
 	}
 	setApplicationManifestReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	SetSpaceManifestStub        func(string, []byte) (v7action.Warnings, error)
+	setSpaceManifestMutex       sync.RWMutex
+	setSpaceManifestArgsForCall []struct {
+		arg1 string
+		arg2 []byte
+	}
+	setSpaceManifestReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	setSpaceManifestReturnsOnCall map[int]struct {
 		result1 v7action.Warnings
 		result2 error
 	}
@@ -494,6 +524,78 @@ func (fake *FakeV7Actor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV7Actor) GetApplicationsByNamesAndSpace(arg1 []string, arg2 string) ([]v7action.Application, v7action.Warnings, error) {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.getApplicationsByNamesAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationsByNamesAndSpaceReturnsOnCall[len(fake.getApplicationsByNamesAndSpaceArgsForCall)]
+	fake.getApplicationsByNamesAndSpaceArgsForCall = append(fake.getApplicationsByNamesAndSpaceArgsForCall, struct {
+		arg1 []string
+		arg2 string
+	}{arg1Copy, arg2})
+	fake.recordInvocation("GetApplicationsByNamesAndSpace", []interface{}{arg1Copy, arg2})
+	fake.getApplicationsByNamesAndSpaceMutex.Unlock()
+	if fake.GetApplicationsByNamesAndSpaceStub != nil {
+		return fake.GetApplicationsByNamesAndSpaceStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getApplicationsByNamesAndSpaceReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceCallCount() int {
+	fake.getApplicationsByNamesAndSpaceMutex.RLock()
+	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
+	return len(fake.getApplicationsByNamesAndSpaceArgsForCall)
+}
+
+func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceCalls(stub func([]string, string) ([]v7action.Application, v7action.Warnings, error)) {
+	fake.getApplicationsByNamesAndSpaceMutex.Lock()
+	defer fake.getApplicationsByNamesAndSpaceMutex.Unlock()
+	fake.GetApplicationsByNamesAndSpaceStub = stub
+}
+
+func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceArgsForCall(i int) ([]string, string) {
+	fake.getApplicationsByNamesAndSpaceMutex.RLock()
+	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
+	argsForCall := fake.getApplicationsByNamesAndSpaceArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceReturns(result1 []v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationsByNamesAndSpaceMutex.Lock()
+	defer fake.getApplicationsByNamesAndSpaceMutex.Unlock()
+	fake.GetApplicationsByNamesAndSpaceStub = nil
+	fake.getApplicationsByNamesAndSpaceReturns = struct {
+		result1 []v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV7Actor) GetApplicationsByNamesAndSpaceReturnsOnCall(i int, result1 []v7action.Application, result2 v7action.Warnings, result3 error) {
+	fake.getApplicationsByNamesAndSpaceMutex.Lock()
+	defer fake.getApplicationsByNamesAndSpaceMutex.Unlock()
+	fake.GetApplicationsByNamesAndSpaceStub = nil
+	if fake.getApplicationsByNamesAndSpaceReturnsOnCall == nil {
+		fake.getApplicationsByNamesAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 []v7action.Application
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationsByNamesAndSpaceReturnsOnCall[i] = struct {
+		result1 []v7action.Application
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV7Actor) PollBuild(arg1 string, arg2 string) (v7action.Droplet, v7action.Warnings, error) {
 	fake.pollBuildMutex.Lock()
 	ret, specificReturn := fake.pollBuildReturnsOnCall[len(fake.pollBuildArgsForCall)]
@@ -819,6 +921,75 @@ func (fake *FakeV7Actor) SetApplicationManifestReturnsOnCall(i int, result1 v7ac
 		})
 	}
 	fake.setApplicationManifestReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV7Actor) SetSpaceManifest(arg1 string, arg2 []byte) (v7action.Warnings, error) {
+	var arg2Copy []byte
+	if arg2 != nil {
+		arg2Copy = make([]byte, len(arg2))
+		copy(arg2Copy, arg2)
+	}
+	fake.setSpaceManifestMutex.Lock()
+	ret, specificReturn := fake.setSpaceManifestReturnsOnCall[len(fake.setSpaceManifestArgsForCall)]
+	fake.setSpaceManifestArgsForCall = append(fake.setSpaceManifestArgsForCall, struct {
+		arg1 string
+		arg2 []byte
+	}{arg1, arg2Copy})
+	fake.recordInvocation("SetSpaceManifest", []interface{}{arg1, arg2Copy})
+	fake.setSpaceManifestMutex.Unlock()
+	if fake.SetSpaceManifestStub != nil {
+		return fake.SetSpaceManifestStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.setSpaceManifestReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeV7Actor) SetSpaceManifestCallCount() int {
+	fake.setSpaceManifestMutex.RLock()
+	defer fake.setSpaceManifestMutex.RUnlock()
+	return len(fake.setSpaceManifestArgsForCall)
+}
+
+func (fake *FakeV7Actor) SetSpaceManifestCalls(stub func(string, []byte) (v7action.Warnings, error)) {
+	fake.setSpaceManifestMutex.Lock()
+	defer fake.setSpaceManifestMutex.Unlock()
+	fake.SetSpaceManifestStub = stub
+}
+
+func (fake *FakeV7Actor) SetSpaceManifestArgsForCall(i int) (string, []byte) {
+	fake.setSpaceManifestMutex.RLock()
+	defer fake.setSpaceManifestMutex.RUnlock()
+	argsForCall := fake.setSpaceManifestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeV7Actor) SetSpaceManifestReturns(result1 v7action.Warnings, result2 error) {
+	fake.setSpaceManifestMutex.Lock()
+	defer fake.setSpaceManifestMutex.Unlock()
+	fake.SetSpaceManifestStub = nil
+	fake.setSpaceManifestReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV7Actor) SetSpaceManifestReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.setSpaceManifestMutex.Lock()
+	defer fake.setSpaceManifestMutex.Unlock()
+	fake.SetSpaceManifestStub = nil
+	if fake.setSpaceManifestReturnsOnCall == nil {
+		fake.setSpaceManifestReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.setSpaceManifestReturnsOnCall[i] = struct {
 		result1 v7action.Warnings
 		result2 error
 	}{result1, result2}
@@ -1169,6 +1340,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.createDockerPackageByApplicationMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	fake.getApplicationsByNamesAndSpaceMutex.RLock()
+	defer fake.getApplicationsByNamesAndSpaceMutex.RUnlock()
 	fake.pollBuildMutex.RLock()
 	defer fake.pollBuildMutex.RUnlock()
 	fake.pollPackageMutex.RLock()
@@ -1179,6 +1352,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.setApplicationDropletMutex.RUnlock()
 	fake.setApplicationManifestMutex.RLock()
 	defer fake.setApplicationManifestMutex.RUnlock()
+	fake.setSpaceManifestMutex.RLock()
+	defer fake.setSpaceManifestMutex.RUnlock()
 	fake.stageApplicationPackageMutex.RLock()
 	defer fake.stageApplicationPackageMutex.RUnlock()
 	fake.stopApplicationMutex.RLock()

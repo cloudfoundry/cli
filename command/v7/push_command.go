@@ -1,9 +1,12 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/command/v7/shared"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -15,7 +18,6 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	v6shared "code.cloudfoundry.org/cli/command/v6/shared"
-	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 	"code.cloudfoundry.org/cli/util/progressbar"
 
@@ -34,10 +36,12 @@ type ProgressBar interface {
 //go:generate counterfeiter . PushActor
 
 type PushActor interface {
+	// Prepare the space by creating needed apps/applying the manifest
+	PrepareSpace(appName string, spaceGUID string, parser *manifestparser.Parser) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Actualize applies any necessary changes.
 	Actualize(state v7pushaction.PushState, progressBar v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Conceptualize figures out the state of the world.
-	Conceptualize(appName string, spaceGUID string, orgGUID string, currentDir string, flagOverrides v7pushaction.FlagOverrides, manifest []byte) ([]v7pushaction.PushState, v7pushaction.Warnings, error)
+	Conceptualize(appName []string, spaceGUID string, orgGUID string, currentDir string, flagOverrides v7pushaction.FlagOverrides) ([]v7pushaction.PushState, v7pushaction.Warnings, error)
 }
 
 //go:generate counterfeiter . V7ActorForPush
@@ -72,8 +76,8 @@ type PushCommand struct {
 	envCFStartupTimeout     interface{}                   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 	Vars                    []template.VarKV              `long:"var" description:"Variable key value pair for variable substitution, (e.g., name=app1); can specify multiple times"`
 
-	UI           command.UI
 	Config       command.Config
+	UI           command.UI
 	NOAAClient   v3action.NOAAClient
 	Actor        PushActor
 	VersionActor V7ActorForPush
@@ -128,11 +132,22 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	var manifest []byte
+	var manifestParser = manifestparser.NewParser()
 	if !cmd.NoManifest {
-		if manifest, err = cmd.readManifest(); err != nil {
+		if manifestParser, err = cmd.readManifest(); err != nil {
 			return err
 		}
+	}
+
+	appNamesStream, eventStream, warningsStream, errorStream := cmd.Actor.PrepareSpace(
+		cmd.RequiredArgs.AppName,
+		cmd.Config.TargetedSpace().GUID,
+		manifestParser,
+	)
+	appNames, err := cmd.processStreamsFromPrepareSpace(appNamesStream, eventStream, warningsStream, errorStream)
+
+	if err != nil {
+		return err
 	}
 
 	overrides, err := cmd.GetFlagOverrides()
@@ -145,23 +160,24 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Pushing app {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cmd.RequiredArgs.AppName,
-		"OrgName":   cmd.Config.TargetedOrganization().Name,
-		"SpaceName": cmd.Config.TargetedSpace().Name,
-		"Username":  user.Name,
-	})
+	cmd.UI.DisplayTextWithFlavor(
+		"Pushing apps {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"AppName":   strings.Join(appNames, ", "),
+			"OrgName":   cmd.Config.TargetedOrganization().Name,
+			"SpaceName": cmd.Config.TargetedSpace().Name,
+			"Username":  user.Name,
+		},
+	)
 
 	cmd.UI.DisplayText("Getting app info...")
-
 	log.Info("generating the app state")
 	pushState, warnings, err := cmd.Actor.Conceptualize(
-		cmd.RequiredArgs.AppName,
+		appNames,
 		cmd.Config.TargetedSpace().GUID,
 		cmd.Config.TargetedOrganization().GUID,
 		cmd.PWD,
 		overrides,
-		manifest,
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -178,27 +194,37 @@ func (cmd PushCommand) Execute(args []string) error {
 		}
 
 		anyProcessCrashed := false
-		if !cmd.NoStart {
-			cmd.UI.DisplayNewline()
-			cmd.UI.DisplayText("Waiting for app to start...")
-			warnings, restartErr := cmd.VersionActor.RestartApplication(updatedState.Application.GUID)
-			cmd.UI.DisplayWarnings(warnings)
+		//	if !cmd.NoStart {
+		//		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayTextWithFlavor(
+			"Waiting for app {{.AppName}} to start...",
+			map[string]interface{}{
+				"AppName": state.Application.Name,
+			},
+		)
+		warnings, restartErr := cmd.VersionActor.RestartApplication(updatedState.Application.GUID)
+		cmd.UI.DisplayWarnings(warnings)
 
-			if restartErr != nil {
-				if _, ok := restartErr.(actionerror.StartupTimeoutError); ok {
-					return translatableerror.StartupTimeoutError{
-						AppName:    cmd.RequiredArgs.AppName,
-						BinaryName: cmd.Config.BinaryName(),
-					}
-				} else if _, ok := restartErr.(actionerror.AllInstancesCrashedError); ok {
-					anyProcessCrashed = true
-				} else {
-					return restartErr
+		if restartErr != nil {
+			if _, ok := restartErr.(actionerror.StartupTimeoutError); ok {
+				return translatableerror.StartupTimeoutError{
+					AppName:    state.Application.Name,
+					BinaryName: cmd.Config.BinaryName(),
 				}
+			} else if _, ok := restartErr.(actionerror.AllInstancesCrashedError); ok {
+				anyProcessCrashed = true
+			} else {
+				return restartErr
 			}
 		}
+		//	}
 		log.Info("getting application summary info")
-		summary, warnings, err := cmd.VersionActor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, true, cmd.RouteActor)
+		summary, warnings, err := cmd.VersionActor.GetApplicationSummaryByNameAndSpace(
+			state.Application.Name,
+			cmd.Config.TargetedSpace().GUID,
+			true,
+			cmd.RouteActor,
+		)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err
@@ -210,13 +236,71 @@ func (cmd PushCommand) Execute(args []string) error {
 
 		if anyProcessCrashed {
 			return translatableerror.ApplicationUnableToStartError{
-				AppName:    cmd.RequiredArgs.AppName,
+				AppName:    state.Application.Name,
 				BinaryName: cmd.Config.BinaryName(),
 			}
 		}
 	}
 
 	return nil
+}
+
+func (cmd PushCommand) processStreamsFromPrepareSpace(
+	appNamesStream <-chan []string,
+	eventStream <-chan v7pushaction.Event,
+	warningsStream <-chan v7pushaction.Warnings,
+	errorStream <-chan error,
+) ([]string, error) {
+	var namesClosed, eventClosed, warningsClosed, errClosed bool
+	var appNames []string
+	var err error
+
+	for {
+		select {
+		case names, ok := <-appNamesStream:
+			if !ok {
+				if !namesClosed {
+					log.Debug("processing config stream closed")
+				}
+				namesClosed = true
+				break
+			}
+			appNames = names
+		case event, ok := <-eventStream:
+			if !ok {
+				if !eventClosed {
+					log.Debug("processing event stream closed")
+				}
+				eventClosed = true
+				break
+			}
+			cmd.processEvent(event, "tktktktktktktk")
+		case warnings, ok := <-warningsStream:
+			if !ok {
+				if !warningsClosed {
+					log.Debug("processing warnings stream closed")
+				}
+				warningsClosed = true
+				break
+			}
+			cmd.UI.DisplayWarnings(warnings)
+		case receivedError, ok := <-errorStream:
+			if !ok {
+				if !errClosed {
+					log.Debug("processing error stream closed")
+				}
+				errClosed = true
+				break
+			}
+			err = receivedError
+		}
+
+		if namesClosed && eventClosed && warningsClosed && errClosed {
+			break
+		}
+	}
+
+	return appNames, err
 }
 
 func (cmd PushCommand) processApplyStreams(
@@ -248,7 +332,7 @@ func (cmd PushCommand) processApplyStreams(
 				eventClosed = true
 				break
 			}
-			complete = cmd.processEvent(appName, event)
+			complete = cmd.processEvent(event, appName)
 		case warnings, ok := <-warningsStream:
 			if !ok {
 				if !warningsClosed {
@@ -277,9 +361,7 @@ func (cmd PushCommand) processApplyStreams(
 	return updateState, nil
 }
 
-func (cmd PushCommand) processEvent(appName string, event v7pushaction.Event) bool {
-	log.Infoln("received apply event:", event)
-
+func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) bool {
 	switch event {
 	case v7pushaction.SkippingApplicationCreation:
 		cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}}...", map[string]interface{}{
@@ -307,6 +389,10 @@ func (cmd PushCommand) processEvent(appName string, event v7pushaction.Event) bo
 		cmd.UI.DisplayText("Stopping Application...")
 	case v7pushaction.StoppingApplicationComplete:
 		cmd.UI.DisplayText("Application Stopped")
+	case v7pushaction.ApplyManifest:
+		cmd.UI.DisplayText("Applying manifest...")
+	case v7pushaction.ApplyManifestComplete:
+		cmd.UI.DisplayText("Manifest applied")
 	case v7pushaction.StartingStaging:
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Staging app and tracing logs...")
@@ -346,7 +432,7 @@ func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream 
 	}
 }
 
-func (cmd PushCommand) readManifest() ([]byte, error) {
+func (cmd PushCommand) readManifest() (*manifestparser.Parser, error) {
 	log.Info("reading manifest if exists")
 	pathsToVarsFiles := []string{}
 	for _, varfilepath := range cmd.PathsToVarsFiles {
@@ -358,7 +444,7 @@ func (cmd PushCommand) readManifest() ([]byte, error) {
 	if len(cmd.PathToManifest) != 0 {
 		log.WithField("manifestPath", cmd.PathToManifest).Debug("reading '-f' provided manifest")
 		err := parser.InterpolateAndParse(string(cmd.PathToManifest), pathsToVarsFiles, cmd.Vars)
-		return parser.FullRawManifest(), err
+		return parser, err
 	}
 
 	pathToManifest := filepath.Join(cmd.PWD, "manifest.yml")
@@ -367,12 +453,12 @@ func (cmd PushCommand) readManifest() ([]byte, error) {
 	err := parser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
 	if err != nil && !os.IsNotExist(err) {
 		log.Errorln("reading manifest:", err)
-		return nil, err
+		return &manifestparser.Parser{}, err
 	} else if os.IsNotExist(err) {
 		log.Debug("no manifest exists")
 	}
 
-	return parser.FullRawManifest(), nil
+	return parser, nil
 }
 
 func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
