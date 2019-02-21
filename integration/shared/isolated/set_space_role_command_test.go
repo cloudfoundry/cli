@@ -77,4 +77,26 @@ var _ = Describe("set-space-role command", func() {
 			})
 		})
 	})
+
+	When("the user does not exist", func() {
+		var (
+			orgName   string
+			spaceName string
+		)
+
+		BeforeEach(func() {
+			helpers.LoginCF()
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			helpers.CreateOrgAndSpace(orgName, spaceName)
+		})
+
+		It("prints an appropriate error and exits 1", func() {
+			session := helpers.CF("set-space-role", "not-exists", orgName, spaceName, "SpaceAuditor")
+			Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user not-exists in org %s / space %s as admin...", orgName, spaceName))
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Say("Server error, status code: 404, error code: 20003, message: The user could not be found: not-exists"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
 })
