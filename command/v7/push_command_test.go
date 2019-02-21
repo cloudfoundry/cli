@@ -626,195 +626,211 @@ var _ = Describe("push Command", func() {
 										})
 									})
 
-									When("restarting the app succeeds", func() {
+									When("user does not request --no-start", func() {
 										BeforeEach(func() {
-											fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, nil)
+											cmd.NoStart = false
 										})
 
-										It("restarts the app and displays warnings", func() {
-											Expect(executeErr).ToNot(HaveOccurred())
-
-											Expect(testUI.Err).To(Say("some-restart-warning"))
-
-											Expect(fakeVersionActor.RestartApplicationCallCount()).To(Equal(2))
-											Expect(fakeVersionActor.RestartApplicationArgsForCall(0)).To(Equal("potato"))
-											Expect(fakeVersionActor.RestartApplicationArgsForCall(1)).To(Equal("potato"))
-										})
-
-										When("when getting the application summary succeeds", func() {
+										When("restarting the app succeeds", func() {
 											BeforeEach(func() {
-												summary := v7action.ApplicationSummary{
-													Application: v7action.Application{
-														Name:  appName1,
-														State: constant.ApplicationStarted,
-													},
-													CurrentDroplet: v7action.Droplet{
-														Stack: "cflinuxfs2",
-														Buildpacks: []v7action.DropletBuildpack{
-															{
-																Name:         "ruby_buildpack",
-																DetectOutput: "some-detect-output",
-															},
-															{
-																Name:         "some-buildpack",
-																DetectOutput: "",
-															},
-														},
-													},
-													ProcessSummaries: v7action.ProcessSummaries{
-														{
-															Process: v7action.Process{
-																Type:    constant.ProcessTypeWeb,
-																Command: *types.NewFilteredString("some-command-1"),
-															},
-														},
-														{
-															Process: v7action.Process{
-																Type:    "console",
-																Command: *types.NewFilteredString("some-command-2"),
-															},
-														},
-													},
-												}
-												fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(0, summary, v7action.Warnings{"app-1-summary-warning-1", "app-1-summary-warning-2"}, nil)
-
-												summary = v7action.ApplicationSummary{
-													Application: v7action.Application{
-														Name:  appName2,
-														State: constant.ApplicationStarted,
-													},
-													CurrentDroplet: v7action.Droplet{
-														Stack: "cflinuxfs2",
-														Buildpacks: []v7action.DropletBuildpack{
-															{
-																Name:         "ruby_buildpack",
-																DetectOutput: "some-detect-output",
-															},
-															{
-																Name:         "some-buildpack",
-																DetectOutput: "",
-															},
-														},
-													},
-													ProcessSummaries: v7action.ProcessSummaries{
-														{
-															Process: v7action.Process{
-																Type:    constant.ProcessTypeWeb,
-																Command: *types.NewFilteredString("some-command-1"),
-															},
-														},
-														{
-															Process: v7action.Process{
-																Type:    "console",
-																Command: *types.NewFilteredString("some-command-2"),
-															},
-														},
-													},
-												}
-
-												fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(1, summary, v7action.Warnings{"app-2-summary-warning-1", "app-2-summary-warning-2"}, nil)
+												fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, nil)
 											})
 
-											// TODO: Don't test the shared.AppSummaryDisplayer.AppDisplay method.
-											// Use DI to pass in a new AppSummaryDisplayer to the Command instead.
-											It("displays the app summary", func() {
+											It("restarts the app and displays warnings", func() {
 												Expect(executeErr).ToNot(HaveOccurred())
-												Expect(testUI.Out).To(Say(`name:\s+first-app`))
-												Expect(testUI.Out).To(Say(`requested state:\s+started`))
-												Expect(testUI.Out).To(Say("type:\\s+web"))
-												Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
-												Expect(testUI.Out).To(Say("type:\\s+console"))
-												Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
 
-												Expect(testUI.Err).To(Say("app-1-summary-warning-1"))
-												Expect(testUI.Err).To(Say("app-1-summary-warning-2"))
+												Expect(testUI.Err).To(Say("some-restart-warning"))
 
-												Expect(testUI.Out).To(Say(`name:\s+second-app`))
-												Expect(testUI.Out).To(Say(`requested state:\s+started`))
-												Expect(testUI.Out).To(Say("type:\\s+web"))
-												Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
-												Expect(testUI.Out).To(Say("type:\\s+console"))
-												Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+												Expect(fakeVersionActor.RestartApplicationCallCount()).To(Equal(2))
+												Expect(fakeVersionActor.RestartApplicationArgsForCall(0)).To(Equal("potato"))
+												Expect(fakeVersionActor.RestartApplicationArgsForCall(1)).To(Equal("potato"))
+											})
 
-												Expect(testUI.Err).To(Say("app-2-summary-warning-1"))
-												Expect(testUI.Err).To(Say("app-2-summary-warning-2"))
+											When("when getting the application summary succeeds", func() {
+												BeforeEach(func() {
+													summary := v7action.ApplicationSummary{
+														Application: v7action.Application{
+															Name:  appName1,
+															State: constant.ApplicationStarted,
+														},
+														CurrentDroplet: v7action.Droplet{
+															Stack: "cflinuxfs2",
+															Buildpacks: []v7action.DropletBuildpack{
+																{
+																	Name:         "ruby_buildpack",
+																	DetectOutput: "some-detect-output",
+																},
+																{
+																	Name:         "some-buildpack",
+																	DetectOutput: "",
+																},
+															},
+														},
+														ProcessSummaries: v7action.ProcessSummaries{
+															{
+																Process: v7action.Process{
+																	Type:    constant.ProcessTypeWeb,
+																	Command: *types.NewFilteredString("some-command-1"),
+																},
+															},
+															{
+																Process: v7action.Process{
+																	Type:    "console",
+																	Command: *types.NewFilteredString("some-command-2"),
+																},
+															},
+														},
+													}
+													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(0, summary, v7action.Warnings{"app-1-summary-warning-1", "app-1-summary-warning-2"}, nil)
 
-												Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(2))
-												name, spaceGUID, withObfuscatedValues, _ := fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-												Expect(name).To(Equal("first-app"))
-												Expect(spaceGUID).To(Equal("some-space-guid"))
-												Expect(withObfuscatedValues).To(BeTrue())
-												name, spaceGUID, withObfuscatedValues, _ = fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(1)
-												Expect(name).To(Equal("second-app"))
-												Expect(spaceGUID).To(Equal("some-space-guid"))
-												Expect(withObfuscatedValues).To(BeTrue())
+													summary = v7action.ApplicationSummary{
+														Application: v7action.Application{
+															Name:  appName2,
+															State: constant.ApplicationStarted,
+														},
+														CurrentDroplet: v7action.Droplet{
+															Stack: "cflinuxfs2",
+															Buildpacks: []v7action.DropletBuildpack{
+																{
+																	Name:         "ruby_buildpack",
+																	DetectOutput: "some-detect-output",
+																},
+																{
+																	Name:         "some-buildpack",
+																	DetectOutput: "",
+																},
+															},
+														},
+														ProcessSummaries: v7action.ProcessSummaries{
+															{
+																Process: v7action.Process{
+																	Type:    constant.ProcessTypeWeb,
+																	Command: *types.NewFilteredString("some-command-1"),
+																},
+															},
+															{
+																Process: v7action.Process{
+																	Type:    "console",
+																	Command: *types.NewFilteredString("some-command-2"),
+																},
+															},
+														},
+													}
+
+													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(1, summary, v7action.Warnings{"app-2-summary-warning-1", "app-2-summary-warning-2"}, nil)
+												})
+
+												// TODO: Don't test the shared.AppSummaryDisplayer.AppDisplay method.
+												// Use DI to pass in a new AppSummaryDisplayer to the Command instead.
+												It("displays the app summary", func() {
+													Expect(executeErr).ToNot(HaveOccurred())
+													Expect(testUI.Out).To(Say(`name:\s+first-app`))
+													Expect(testUI.Out).To(Say(`requested state:\s+started`))
+													Expect(testUI.Out).To(Say("type:\\s+web"))
+													Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
+													Expect(testUI.Out).To(Say("type:\\s+console"))
+													Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+
+													Expect(testUI.Err).To(Say("app-1-summary-warning-1"))
+													Expect(testUI.Err).To(Say("app-1-summary-warning-2"))
+
+													Expect(testUI.Out).To(Say(`name:\s+second-app`))
+													Expect(testUI.Out).To(Say(`requested state:\s+started`))
+													Expect(testUI.Out).To(Say("type:\\s+web"))
+													Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
+													Expect(testUI.Out).To(Say("type:\\s+console"))
+													Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
+
+													Expect(testUI.Err).To(Say("app-2-summary-warning-1"))
+													Expect(testUI.Err).To(Say("app-2-summary-warning-2"))
+
+													Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(2))
+													name, spaceGUID, withObfuscatedValues, _ := fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+													Expect(name).To(Equal("first-app"))
+													Expect(spaceGUID).To(Equal("some-space-guid"))
+													Expect(withObfuscatedValues).To(BeTrue())
+													name, spaceGUID, withObfuscatedValues, _ = fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(1)
+													Expect(name).To(Equal("second-app"))
+													Expect(spaceGUID).To(Equal("some-space-guid"))
+													Expect(withObfuscatedValues).To(BeTrue())
+												})
+
+											})
+
+											When("getting the application summary fails", func() {
+												BeforeEach(func() {
+													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturns(
+														v7action.ApplicationSummary{},
+														v7action.Warnings{"get-application-summary-warnings"},
+														errors.New("get-application-summary-error"),
+													)
+												})
+
+												It("does not display the app summary", func() {
+													Expect(testUI.Out).ToNot(Say(`requested state:`))
+												})
+
+												It("returns the error from GetApplicationSummaryByNameAndSpace", func() {
+													Expect(executeErr).To(MatchError("get-application-summary-error"))
+												})
+
+												It("prints the warnings", func() {
+													Expect(testUI.Err).To(Say("get-application-summary-warnings"))
+												})
 											})
 
 										})
 
-										When("getting the application summary fails", func() {
-											BeforeEach(func() {
-												fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturns(
-													v7action.ApplicationSummary{},
-													v7action.Warnings{"get-application-summary-warnings"},
-													errors.New("get-application-summary-error"),
-												)
+										When("restarting the app fails", func() {
+											When("restarting fails in a generic way", func() {
+												BeforeEach(func() {
+													fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
+												})
+
+												It("returns an error and any warnings", func() {
+													Expect(executeErr).To(MatchError("restart failure"))
+													Expect(testUI.Err).To(Say("some-restart-warning"))
+												})
 											})
 
-											It("does not display the app summary", func() {
-												Expect(testUI.Out).ToNot(Say(`requested state:`))
+											When("the error is an AllInstancesCrashedError", func() {
+												BeforeEach(func() {
+													fakeVersionActor.RestartApplicationReturns(nil, actionerror.AllInstancesCrashedError{})
+												})
+
+												It("returns the ApplicationUnableToStartError", func() {
+													Expect(executeErr).To(MatchError(translatableerror.ApplicationUnableToStartError{
+														AppName:    "first-app",
+														BinaryName: binaryName,
+													}))
+												})
+
 											})
 
-											It("returns the error from GetApplicationSummaryByNameAndSpace", func() {
-												Expect(executeErr).To(MatchError("get-application-summary-error"))
-											})
+											When("restart times out", func() {
+												BeforeEach(func() {
+													fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, actionerror.StartupTimeoutError{})
+												})
 
-											It("prints the warnings", func() {
-												Expect(testUI.Err).To(Say("get-application-summary-warnings"))
+												It("returns the StartupTimeoutError and prints warnings", func() {
+													Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{
+														AppName:    "first-app",
+														BinaryName: binaryName,
+													}))
+
+													Expect(testUI.Err).To(Say("some-restart-warning"))
+												})
 											})
 										})
-
 									})
 
-									When("restarting the app fails", func() {
-										When("restarting fails in a generic way", func() {
-											BeforeEach(func() {
-												fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, errors.New("restart failure"))
-											})
-
-											It("returns an error and any warnings", func() {
-												Expect(executeErr).To(MatchError("restart failure"))
-												Expect(testUI.Err).To(Say("some-restart-warning"))
-											})
+									When("user requests --no-start", func() {
+										BeforeEach(func() {
+											cmd.NoStart = true
 										})
 
-										When("the error is an AllInstancesCrashedError", func() {
-											BeforeEach(func() {
-												fakeVersionActor.RestartApplicationReturns(nil, actionerror.AllInstancesCrashedError{})
-											})
-
-											It("returns the ApplicationUnableToStartError", func() {
-												Expect(executeErr).To(MatchError(translatableerror.ApplicationUnableToStartError{
-													AppName:    "first-app",
-													BinaryName: binaryName,
-												}))
-											})
-
-										})
-
-										When("restart times out", func() {
-											BeforeEach(func() {
-												fakeVersionActor.RestartApplicationReturns(v7action.Warnings{"some-restart-warning"}, actionerror.StartupTimeoutError{})
-											})
-
-											It("returns the StartupTimeoutError and prints warnings", func() {
-												Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{
-													AppName:    "first-app",
-													BinaryName: binaryName,
-												}))
-
-												Expect(testUI.Err).To(Say("some-restart-warning"))
-											})
+										It("does not attempt to restart the app", func() {
+											Expect(fakeVersionActor.RestartApplicationCallCount()).To(Equal(0))
 										})
 									})
 								})

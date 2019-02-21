@@ -194,30 +194,30 @@ func (cmd PushCommand) Execute(args []string) error {
 		}
 
 		anyProcessCrashed := false
-		//	if !cmd.NoStart {
-		//		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayTextWithFlavor(
-			"Waiting for app {{.AppName}} to start...",
-			map[string]interface{}{
-				"AppName": state.Application.Name,
-			},
-		)
-		warnings, restartErr := cmd.VersionActor.RestartApplication(updatedState.Application.GUID)
-		cmd.UI.DisplayWarnings(warnings)
+		if !cmd.NoStart {
+			cmd.UI.DisplayNewline()
+			cmd.UI.DisplayTextWithFlavor(
+				"Waiting for app {{.AppName}} to start...",
+				map[string]interface{}{
+					"AppName": state.Application.Name,
+				},
+			)
+			warnings, restartErr := cmd.VersionActor.RestartApplication(updatedState.Application.GUID)
+			cmd.UI.DisplayWarnings(warnings)
 
-		if restartErr != nil {
-			if _, ok := restartErr.(actionerror.StartupTimeoutError); ok {
-				return translatableerror.StartupTimeoutError{
-					AppName:    state.Application.Name,
-					BinaryName: cmd.Config.BinaryName(),
+			if restartErr != nil {
+				if _, ok := restartErr.(actionerror.StartupTimeoutError); ok {
+					return translatableerror.StartupTimeoutError{
+						AppName:    state.Application.Name,
+						BinaryName: cmd.Config.BinaryName(),
+					}
+				} else if _, ok := restartErr.(actionerror.AllInstancesCrashedError); ok {
+					anyProcessCrashed = true
+				} else {
+					return restartErr
 				}
-			} else if _, ok := restartErr.(actionerror.AllInstancesCrashedError); ok {
-				anyProcessCrashed = true
-			} else {
-				return restartErr
 			}
 		}
-		//	}
 		log.Info("getting application summary info")
 		summary, warnings, err := cmd.VersionActor.GetApplicationSummaryByNameAndSpace(
 			state.Application.Name,
