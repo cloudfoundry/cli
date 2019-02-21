@@ -97,13 +97,6 @@ func (ui *UI) DisplayDeprecationWarning() {
 	fmt.Fprintf(ui.Err, "Deprecation warning: This command has been deprecated. This feature will be removed in the future.\n")
 }
 
-func (ui *UI) DisplayFileDeprecationWarning() {
-	ui.terminalLock.Lock()
-	defer ui.terminalLock.Unlock()
-
-	fmt.Fprintf(ui.Err, "Deprecation warning: This command has been deprecated and will be removed in the future. For similar functionality, please use the `cf ssh` command instead.\n")
-}
-
 // DisplayError outputs the translated error message to ui.Err if the error
 // satisfies TranslatableError, otherwise it outputs the original error message
 // to ui.Err. It also outputs "FAILED" in bold red to ui.Out.
@@ -120,6 +113,13 @@ func (ui *UI) DisplayError(err error) {
 	defer ui.terminalLock.Unlock()
 
 	fmt.Fprintf(ui.Out, "%s\n", ui.modifyColor(ui.TranslateText("FAILED"), color.New(color.FgRed, color.Bold)))
+}
+
+func (ui *UI) DisplayFileDeprecationWarning() {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	fmt.Fprintf(ui.Err, "Deprecation warning: This command has been deprecated and will be removed in the future. For similar functionality, please use the `cf ssh` command instead.\n")
 }
 
 // DisplayHeader translates the header, bolds and adds the default color to the
