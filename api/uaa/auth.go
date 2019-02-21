@@ -1,7 +1,7 @@
 package uaa
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"strings"
@@ -32,10 +32,20 @@ func (client Client) Authenticate(ID string, secret string, origin string, grant
 		requestBody.Set("password", secret)
 	}
 
+	type loginHint struct {
+		Origin string `json:"origin"`
+	}
+
+	originStruct := loginHint{origin}
+	originParam, err := json.Marshal(originStruct)
+	if err != nil {
+		return "", "", err
+	}
+
 	var query url.Values
 	if origin != "" {
 		query = url.Values{
-			"login_hint": {fmt.Sprintf(`{"origin":"%s"}`, origin)},
+			"login_hint": {string(originParam)},
 		}
 	}
 
