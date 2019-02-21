@@ -49,5 +49,19 @@ var _ = Describe("set-space-role command", func() {
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 		})
+
+		When("the user already has the desired role", func() {
+			BeforeEach(func() {
+				session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
+				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("is idempotent", func() {
+				session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
+				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+				Eventually(session).Should(Exit(0))
+			})
+		})
 	})
 })
