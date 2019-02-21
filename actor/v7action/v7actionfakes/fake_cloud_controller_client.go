@@ -416,6 +416,35 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetFeatureFlagStub        func(string) (ccv3.FeatureFlag, ccv3.Warnings, error)
+	getFeatureFlagMutex       sync.RWMutex
+	getFeatureFlagArgsForCall []struct {
+		arg1 string
+	}
+	getFeatureFlagReturns struct {
+		result1 ccv3.FeatureFlag
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getFeatureFlagReturnsOnCall map[int]struct {
+		result1 ccv3.FeatureFlag
+		result2 ccv3.Warnings
+		result3 error
+	}
+	GetFeatureFlagsStub        func() ([]ccv3.FeatureFlag, ccv3.Warnings, error)
+	getFeatureFlagsMutex       sync.RWMutex
+	getFeatureFlagsArgsForCall []struct {
+	}
+	getFeatureFlagsReturns struct {
+		result1 []ccv3.FeatureFlag
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getFeatureFlagsReturnsOnCall map[int]struct {
+		result1 []ccv3.FeatureFlag
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetIsolationSegmentStub        func(string) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	getIsolationSegmentMutex       sync.RWMutex
 	getIsolationSegmentArgsForCall []struct {
@@ -2674,6 +2703,130 @@ func (fake *FakeCloudControllerClient) GetDropletsReturnsOnCall(i int, result1 [
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetFeatureFlag(arg1 string) (ccv3.FeatureFlag, ccv3.Warnings, error) {
+	fake.getFeatureFlagMutex.Lock()
+	ret, specificReturn := fake.getFeatureFlagReturnsOnCall[len(fake.getFeatureFlagArgsForCall)]
+	fake.getFeatureFlagArgsForCall = append(fake.getFeatureFlagArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetFeatureFlag", []interface{}{arg1})
+	fake.getFeatureFlagMutex.Unlock()
+	if fake.GetFeatureFlagStub != nil {
+		return fake.GetFeatureFlagStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getFeatureFlagReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetFeatureFlagCallCount() int {
+	fake.getFeatureFlagMutex.RLock()
+	defer fake.getFeatureFlagMutex.RUnlock()
+	return len(fake.getFeatureFlagArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetFeatureFlagCalls(stub func(string) (ccv3.FeatureFlag, ccv3.Warnings, error)) {
+	fake.getFeatureFlagMutex.Lock()
+	defer fake.getFeatureFlagMutex.Unlock()
+	fake.GetFeatureFlagStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetFeatureFlagArgsForCall(i int) string {
+	fake.getFeatureFlagMutex.RLock()
+	defer fake.getFeatureFlagMutex.RUnlock()
+	argsForCall := fake.getFeatureFlagArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) GetFeatureFlagReturns(result1 ccv3.FeatureFlag, result2 ccv3.Warnings, result3 error) {
+	fake.getFeatureFlagMutex.Lock()
+	defer fake.getFeatureFlagMutex.Unlock()
+	fake.GetFeatureFlagStub = nil
+	fake.getFeatureFlagReturns = struct {
+		result1 ccv3.FeatureFlag
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetFeatureFlagReturnsOnCall(i int, result1 ccv3.FeatureFlag, result2 ccv3.Warnings, result3 error) {
+	fake.getFeatureFlagMutex.Lock()
+	defer fake.getFeatureFlagMutex.Unlock()
+	fake.GetFeatureFlagStub = nil
+	if fake.getFeatureFlagReturnsOnCall == nil {
+		fake.getFeatureFlagReturnsOnCall = make(map[int]struct {
+			result1 ccv3.FeatureFlag
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getFeatureFlagReturnsOnCall[i] = struct {
+		result1 ccv3.FeatureFlag
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetFeatureFlags() ([]ccv3.FeatureFlag, ccv3.Warnings, error) {
+	fake.getFeatureFlagsMutex.Lock()
+	ret, specificReturn := fake.getFeatureFlagsReturnsOnCall[len(fake.getFeatureFlagsArgsForCall)]
+	fake.getFeatureFlagsArgsForCall = append(fake.getFeatureFlagsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetFeatureFlags", []interface{}{})
+	fake.getFeatureFlagsMutex.Unlock()
+	if fake.GetFeatureFlagsStub != nil {
+		return fake.GetFeatureFlagsStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getFeatureFlagsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetFeatureFlagsCallCount() int {
+	fake.getFeatureFlagsMutex.RLock()
+	defer fake.getFeatureFlagsMutex.RUnlock()
+	return len(fake.getFeatureFlagsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetFeatureFlagsCalls(stub func() ([]ccv3.FeatureFlag, ccv3.Warnings, error)) {
+	fake.getFeatureFlagsMutex.Lock()
+	defer fake.getFeatureFlagsMutex.Unlock()
+	fake.GetFeatureFlagsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetFeatureFlagsReturns(result1 []ccv3.FeatureFlag, result2 ccv3.Warnings, result3 error) {
+	fake.getFeatureFlagsMutex.Lock()
+	defer fake.getFeatureFlagsMutex.Unlock()
+	fake.GetFeatureFlagsStub = nil
+	fake.getFeatureFlagsReturns = struct {
+		result1 []ccv3.FeatureFlag
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetFeatureFlagsReturnsOnCall(i int, result1 []ccv3.FeatureFlag, result2 ccv3.Warnings, result3 error) {
+	fake.getFeatureFlagsMutex.Lock()
+	defer fake.getFeatureFlagsMutex.Unlock()
+	fake.GetFeatureFlagsStub = nil
+	if fake.getFeatureFlagsReturnsOnCall == nil {
+		fake.getFeatureFlagsReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.FeatureFlag
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getFeatureFlagsReturnsOnCall[i] = struct {
+		result1 []ccv3.FeatureFlag
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetIsolationSegment(arg1 string) (ccv3.IsolationSegment, ccv3.Warnings, error) {
 	fake.getIsolationSegmentMutex.Lock()
 	ret, specificReturn := fake.getIsolationSegmentReturnsOnCall[len(fake.getIsolationSegmentArgsForCall)]
@@ -4672,6 +4825,10 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getDropletMutex.RUnlock()
 	fake.getDropletsMutex.RLock()
 	defer fake.getDropletsMutex.RUnlock()
+	fake.getFeatureFlagMutex.RLock()
+	defer fake.getFeatureFlagMutex.RUnlock()
+	fake.getFeatureFlagsMutex.RLock()
+	defer fake.getFeatureFlagsMutex.RUnlock()
 	fake.getIsolationSegmentMutex.RLock()
 	defer fake.getIsolationSegmentMutex.RUnlock()
 	fake.getIsolationSegmentOrganizationsMutex.RLock()

@@ -29,12 +29,7 @@ func (client *Client) GetFeatureFlag(flagName string) (FeatureFlag, Warnings, er
 	err = client.connection.Make(request, &response)
 
 	if err != nil {
-		switch response.HTTPResponse.StatusCode {
-		case 404:
-			return FeatureFlag{}, response.Warnings, ccerror.FeatureFlagNotFoundError{}
-		default:
-			return FeatureFlag{}, response.Warnings, err
-		}
+		return FeatureFlag{}, response.Warnings, err
 	}
 	return ccFlag, response.Warnings, nil
 }

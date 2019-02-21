@@ -38,6 +38,8 @@ type CloudControllerClient interface {
 	GetBuildpacks(query ...ccv3.Query) ([]ccv3.Buildpack, ccv3.Warnings, error)
 	GetDroplet(guid string) (ccv3.Droplet, ccv3.Warnings, error)
 	GetDroplets(query ...ccv3.Query) ([]ccv3.Droplet, ccv3.Warnings, error)
+	GetFeatureFlag(featureFlagName string) (ccv3.FeatureFlag, ccv3.Warnings, error)
+	GetFeatureFlags() ([]ccv3.FeatureFlag, ccv3.Warnings, error)
 	GetIsolationSegment(guid string) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]ccv3.Organization, ccv3.Warnings, error)
 	GetIsolationSegments(query ...ccv3.Query) ([]ccv3.IsolationSegment, ccv3.Warnings, error)
