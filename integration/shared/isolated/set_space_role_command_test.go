@@ -27,4 +27,27 @@ var _ = Describe("set-space-role command", func() {
 			})
 		})
 	})
+
+	When("the org, space, and user all exist", func() {
+		var (
+			username  string
+			orgName   string
+			spaceName string
+		)
+
+		BeforeEach(func() {
+			helpers.LoginCF()
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			helpers.CreateOrgAndSpace(orgName, spaceName)
+			username, _ = helpers.CreateUser()
+		})
+
+		It("sets the space role for the user", func() {
+			session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
+			Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+			Eventually(session).Should(Say("OK"))
+			Eventually(session).Should(Exit(0))
+		})
+	})
 })
