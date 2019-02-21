@@ -39,7 +39,7 @@ var _ = Describe("UI", func() {
 	Describe("DisplayDeprecationWarning", func() {
 		It("displays the deprecation warning to ui.Err", func() {
 			ui.DisplayDeprecationWarning()
-			Expect(ui.Err).To(Say("Deprecation warning: This command has been deprecated. This feature will be removed in the future."))
+			Expect(ui.Err).To(Say("Deprecation warning: This command has been deprecated. This feature will be removed in the future.\n"))
 		})
 
 		When("the locale is not set to English", func() {
@@ -62,7 +62,7 @@ var _ = Describe("UI", func() {
 	Describe("DisplayFileDeprecationWarning", func() {
 		It("displays the `cf files` deprecation warning to ui.Err", func() {
 			ui.DisplayFileDeprecationWarning()
-			Expect(ui.Err).To(Say("Deprecation warning: This command has been deprecated and will be removed in the future. For similar functionality, please use the `cf ssh` command instead."))
+			Expect(ui.Err).To(Say("Deprecation warning: This command has been deprecated and will be removed in the future. For similar functionality, please use the `cf ssh` command instead.\n"))
 		})
 
 		When("the locale is not set to English", func() {

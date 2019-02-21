@@ -101,7 +101,7 @@ func (ui *UI) DisplayFileDeprecationWarning() {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
-	fmt.Fprintf(ui.Err, "Deprecation warning: This command has been deprecated and will be removed in the future. For similar functionality, please use the `cf ssh` command instead.")
+	fmt.Fprintf(ui.Err, "Deprecation warning: This command has been deprecated and will be removed in the future. For similar functionality, please use the `cf ssh` command instead.\n")
 }
 
 // DisplayError outputs the translated error message to ui.Err if the error
