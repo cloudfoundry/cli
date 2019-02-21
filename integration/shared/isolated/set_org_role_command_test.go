@@ -10,16 +10,18 @@ import (
 )
 
 var _ = Describe("set-org-role command", func() {
+	var orgName string
+
+	BeforeEach(func() {
+		helpers.LoginCF()
+		orgName = helpers.NewOrgName()
+		helpers.CreateOrg(orgName)
+	})
+
 	When("the org and user both exist", func() {
-		var (
-			username string
-			orgName  string
-		)
+		var username string
 
 		BeforeEach(func() {
-			helpers.LoginCF()
-			orgName = helpers.NewOrgName()
-			helpers.CreateOrg(orgName)
 			username, _ = helpers.CreateUser()
 		})
 
@@ -55,6 +57,16 @@ var _ = Describe("set-org-role command", func() {
 				Eventually(session).Should(Say("Assigning role OrgManager to user %s in org %s as admin...", username, orgName))
 				Eventually(session).Should(Exit(0))
 			})
+		})
+	})
+
+	When("the user does not exist", func() {
+		It("prints an appropriate error and exits 1", func() {
+			session := helpers.CF("set-org-role", "not-exists", orgName, "OrgAuditor")
+			Eventually(session).Should(Say("Assigning role OrgAuditor to user not-exists in org %s as admin...", orgName))
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Say("Server error, status code: 404, error code: 20003, message: The user could not be found: not-exists"))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 })
