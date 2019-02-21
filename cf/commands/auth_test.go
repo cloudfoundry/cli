@@ -43,7 +43,7 @@ var _ = Describe("auth command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		authRepo = new(authenticationfakes.FakeRepository)
-		authRepo.AuthenticateStub = func(credentials map[string]string) error {
+		authRepo.AuthenticateStub = func(credentials map[string]string, origin string) error {
 			config.SetAccessToken("my-access-token")
 			config.SetRefreshToken("my-refresh-token")
 			return nil

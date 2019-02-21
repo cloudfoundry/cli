@@ -66,7 +66,7 @@ func (cmd *Authenticate) Execute(c flags.FlagContext) error {
 		map[string]interface{}{"APIEndpoint": terminal.EntityNameColor(cmd.config.APIEndpoint())}))
 	cmd.ui.Say(T("Authenticating..."))
 
-	err := cmd.authenticator.Authenticate(map[string]string{"username": c.Args()[0], "password": c.Args()[1]})
+	err := cmd.authenticator.Authenticate(map[string]string{"username": c.Args()[0], "password": c.Args()[1]}, "")
 	if err != nil {
 		return err
 	}

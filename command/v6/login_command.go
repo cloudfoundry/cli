@@ -18,6 +18,7 @@ type LoginActor interface {
 type LoginCommand struct {
 	APIEndpoint       string      `short:"a" description:"API endpoint (e.g. https://api.example.com)"`
 	Organization      string      `short:"o" description:"Org"`
+	Origin            string      `long:"origin"`
 	Password          string      `short:"p" description:"Password"`
 	Space             string      `short:"s" description:"Space"`
 	SkipSSLValidation bool        `long:"skip-ssl-validation" description:"Skip verification of the API endpoint. Not recommended!"`

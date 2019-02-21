@@ -3,6 +3,7 @@ package authentication
 import (
 	"crypto/tls"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -27,7 +28,7 @@ type Repository interface {
 	net.RequestDumperInterface
 
 	RefreshAuthToken() (updatedToken string, apiErr error)
-	Authenticate(credentials map[string]string) (apiErr error)
+	Authenticate(credentials map[string]string, origin string) (apiErr error)
 	Authorize(token string) (string, error)
 	GetLoginPromptsAndSaveUAAServerURL() (map[string]coreconfig.AuthPrompt, error)
 }
@@ -110,13 +111,27 @@ func (uaa UAARepository) Authorize(token string) (string, error) {
 	return codes[0], nil
 }
 
-func (uaa UAARepository) Authenticate(credentials map[string]string) error {
+func (uaa UAARepository) Authenticate(credentials map[string]string, origin string) error {
 	data := url.Values{
 		"grant_type": {"password"},
 		"scope":      {""},
 	}
 	for key, val := range credentials {
 		data[key] = []string{val}
+	}
+
+	type loginHint struct {
+		Origin string `json:"origin"`
+	}
+
+	if origin != "" {
+		originStruct := loginHint{origin}
+		originParam, err := json.Marshal(originStruct)
+		if err != nil {
+			return err
+		}
+
+		data["login_hint"] = []string{string(originParam)}
 	}
 
 	err := uaa.getAuthToken(data)

@@ -51,13 +51,20 @@ var _ = Describe("AuthenticationRepository", func() {
 		}
 
 		Describe("authenticating", func() {
-			var err error
+			var (
+				err    error
+				origin string
+			)
 
 			JustBeforeEach(func() {
 				err = auth.Authenticate(map[string]string{
 					"username": "foo@example.com",
 					"password": "bar",
-				})
+				}, origin)
+			})
+
+			BeforeEach(func() {
+				origin = ""
 			})
 
 			Describe("when login succeeds", func() {
@@ -133,6 +140,18 @@ var _ = Describe("AuthenticationRepository", func() {
 					Expect(err).To(HaveOccurred())
 					Expect(err.Error()).To(ContainSubstring("I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
 					Expect(config.AccessToken()).To(BeEmpty())
+				})
+			})
+
+			When("an origin was passed", func() {
+				BeforeEach(func() {
+					origin = "some-other-identity-provider"
+					setupTestServer(successfulPasswordLoginWithOriginRequest)
+				})
+
+				It("includes a login hint in the request", func() {
+					Expect(handler).To(HaveAllRequestsCalled())
+					Expect(err).NotTo(HaveOccurred())
 				})
 			})
 		})
@@ -381,6 +400,23 @@ var successfulPasswordLoginRequest = testnet.TestRequest{
 } `},
 }
 
+var successfulPasswordLoginWithOriginRequest = testnet.TestRequest{
+	Method:  "POST",
+	Path:    "/oauth/token",
+	Header:  passwordGrantTypeAuthHeaders,
+	Matcher: successfulPasswordLoginWithOriginMatcher,
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
+{
+  "access_token": "my_access_token",
+  "token_type": "BEARER",
+  "refresh_token": "my_refresh_token",
+  "scope": "openid",
+  "expires_in": 98765
+} `},
+}
+
 var successfulClientCredentialsLoginRequest = testnet.TestRequest{
 	Method:  "POST",
 	Path:    "/oauth/token",
@@ -425,6 +461,20 @@ var successfulPasswordLoginMatcher = func(request *http.Request) {
 	Expect(request.Form.Get("password")).To(Equal("bar"))
 	Expect(request.Form.Get("grant_type")).To(Equal("password"))
 	Expect(request.Form.Get("scope")).To(Equal(""))
+}
+
+var successfulPasswordLoginWithOriginMatcher = func(request *http.Request) {
+	err := request.ParseForm()
+	if err != nil {
+		Fail(fmt.Sprintf("Failed to parse form: %s", err))
+		return
+	}
+
+	Expect(request.Form.Get("username")).To(Equal("foo@example.com"))
+	Expect(request.Form.Get("password")).To(Equal("bar"))
+	Expect(request.Form.Get("grant_type")).To(Equal("password"))
+	Expect(request.Form.Get("scope")).To(Equal(""))
+	Expect(request.Form.Get("login_hint")).To(MatchJSON(`{"origin": "some-other-identity-provider"}`))
 }
 
 var successfulClientCredentialsLoginMatcher = func(request *http.Request) {

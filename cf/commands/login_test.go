@@ -66,7 +66,7 @@ var _ = Describe("Login Command", func() {
 		Config = testconfig.NewRepository()
 		ui = &testterm.FakeUI{}
 		authRepo = new(authenticationfakes.FakeRepository)
-		authRepo.AuthenticateStub = func(credentials map[string]string) error {
+		authRepo.AuthenticateStub = func(credentials map[string]string, origin string) error {
 			Config.SetAccessToken("my_access_token")
 			Config.SetRefreshToken("my_refresh_token")
 			return nil
@@ -231,10 +231,32 @@ var _ = Describe("Login Command", func() {
 				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
 				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("api.example.com"))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
-				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+				creds, origin := authRepo.AuthenticateArgsForCall(0)
+				Expect(creds).To(Equal(map[string]string{
 					"username": "user@example.com",
 					"password": "password",
 				}))
+				Expect(origin).To(BeEmpty())
+
+				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+			})
+
+			It("sends the origin to the server", func() {
+				Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p",
+					"password", "--origin", "my-other-origin", "-o", "my-new-org", "-s", "my-space"}
+
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
+
+				Expect(Config.AccessToken()).To(Equal("my_access_token"))
+				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
+
+				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
+				creds, origin := authRepo.AuthenticateArgsForCall(0)
+				Expect(creds).To(Equal(map[string]string{
+					"username": "user@example.com",
+					"password": "password",
+				}))
+				Expect(origin).To(Equal("my-other-origin"))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
@@ -849,7 +871,7 @@ var _ = Describe("Login Command", func() {
 				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1})
 				spaceRepo.FindByNameReturns(space1, nil)
 
-				authRepo.AuthenticateStub = func(credentials map[string]string) error {
+				authRepo.AuthenticateStub = func(credentials map[string]string, origin string) error {
 					Config.SetAccessToken("new_access_token")
 					Config.SetRefreshToken("new_refresh_token")
 					return nil

@@ -44,6 +44,7 @@ func (cmd *Login) MetaData() commandregistry.CommandMetadata {
 	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Org")}
 	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Space")}
 	fs["sso"] = &flags.BoolFlag{Name: "sso", Usage: T("Prompt for a one-time passcode to login")}
+	fs["origin"] = &flags.StringFlag{Name: "origin"}
 	fs["sso-passcode"] = &flags.StringFlag{Name: "sso-passcode", Usage: T("One-time passcode")}
 	fs["skip-ssl-validation"] = &flags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Skip verification of the API endpoint. Not recommended!")}
 
@@ -184,7 +185,7 @@ func (cmd Login) authenticateSSO(c flags.FlagContext) error {
 		}
 
 		cmd.ui.Say(T("Authenticating..."))
-		err = cmd.authenticator.Authenticate(credentials)
+		err = cmd.authenticator.Authenticate(credentials, "")
 
 		if err == nil {
 			cmd.ui.Ok()
@@ -260,7 +261,7 @@ func (cmd Login) authenticate(c flags.FlagContext) error {
 		}
 
 		cmd.ui.Say(T("Authenticating..."))
-		err = cmd.authenticator.Authenticate(credentialsCopy)
+		err = cmd.authenticator.Authenticate(credentialsCopy, c.String("origin"))
 
 		if err == nil {
 			cmd.ui.Ok()
