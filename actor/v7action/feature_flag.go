@@ -26,3 +26,21 @@ func (actor Actor) GetFeatureFlagByName(featureFlagName string) (FeatureFlag, Wa
 
 	return FeatureFlag(ccv3FeatureFlag), Warnings(warnings), err
 }
+
+func (actor Actor) GetFeatureFlags() ([]FeatureFlag, Warnings, error) {
+
+	var (
+		featureFlags []FeatureFlag
+	)
+	ccv3FeatureFlags, warnings, err := actor.CloudControllerClient.GetFeatureFlags()
+
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
+
+	for _, flag := range ccv3FeatureFlags {
+		featureFlags = append(featureFlags, FeatureFlag(flag))
+	}
+
+	return featureFlags, Warnings(warnings), nil
+}
