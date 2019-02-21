@@ -13,6 +13,7 @@ type UI interface {
 	DisplayPasswordPrompt(template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayTextPrompt(template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayChangesForPush(changeSet []ui.Change) error
+	DisplayDeprecationWarning()
 	DisplayError(err error)
 	DisplayHeader(text string)
 	DisplayInstancesTableForApp(table [][]string)

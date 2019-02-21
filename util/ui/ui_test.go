@@ -36,6 +36,29 @@ var _ = Describe("UI", func() {
 		ui.Err = errBuff
 	})
 
+	Describe("DisplayDeprecationWarning", func() {
+		It("displays the deprecation warning to ui.Err", func() {
+			ui.DisplayDeprecationWarning()
+			Expect(ui.Err).To(Say("Deprecation warning: This command has been deprecated. This feature will be removed in the future."))
+		})
+
+		When("the locale is not set to English", func() {
+			BeforeEach(func() {
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+
+				ui.Err = NewBuffer()
+			})
+
+			PIt("displays the translated deprecation warning to ui.Err", func() {
+				// TODO: Test implementation awaits translated version of deprecation warning string literal #164098152.
+			})
+		})
+	})
+
 	Describe("DisplayError", func() {
 		When("passed a TranslatableError", func() {
 			var fakeTranslateErr *translatableerrorfakes.FakeTranslatableError

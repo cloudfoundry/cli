@@ -90,6 +90,13 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 	}
 }
 
+func (ui *UI) DisplayDeprecationWarning() {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	fmt.Fprintf(ui.Err, "Deprecation warning: This command has been deprecated. This feature will be removed in the future.\n")
+}
+
 // DisplayError outputs the translated error message to ui.Err if the error
 // satisfies TranslatableError, otherwise it outputs the original error message
 // to ui.Err. It also outputs "FAILED" in bold red to ui.Out.
