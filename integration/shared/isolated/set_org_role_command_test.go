@@ -29,5 +29,19 @@ var _ = Describe("set-org-role command", func() {
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 		})
+
+		When("the user already has the desired role", func() {
+			BeforeEach(func() {
+				session := helpers.CF("set-org-role", username, orgName, "OrgManager")
+				Eventually(session).Should(Say("Assigning role OrgManager to user %s in org %s as admin...", username, orgName))
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("is idempotent", func() {
+				session := helpers.CF("set-org-role", username, orgName, "OrgManager")
+				Eventually(session).Should(Say("Assigning role OrgManager to user %s in org %s as admin...", username, orgName))
+				Eventually(session).Should(Exit(0))
+			})
+		})
 	})
 })
