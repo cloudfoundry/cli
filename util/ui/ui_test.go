@@ -59,6 +59,29 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("DisplayFileDeprecationWarning", func() {
+		It("displays the `cf files` deprecation warning to ui.Err", func() {
+			ui.DisplayFileDeprecationWarning()
+			Expect(ui.Err).To(Say("Deprecation warning: This command has been deprecated and will be removed in the future. For similar functionality, please use the `cf ssh` command instead."))
+		})
+
+		When("the locale is not set to English", func() {
+			BeforeEach(func() {
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+
+				ui.Err = NewBuffer()
+			})
+
+			PIt("displays the translated deprecation warning to ui.Err", func() {
+				// TODO: Test implementation awaits translated version of deprecation warning string literal #164098103.
+			})
+		})
+	})
+
 	Describe("DisplayError", func() {
 		When("passed a TranslatableError", func() {
 			var fakeTranslateErr *translatableerrorfakes.FakeTranslatableError

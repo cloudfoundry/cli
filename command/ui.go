@@ -14,6 +14,7 @@ type UI interface {
 	DisplayTextPrompt(template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayChangesForPush(changeSet []ui.Change) error
 	DisplayDeprecationWarning()
+	DisplayFileDeprecationWarning()
 	DisplayError(err error)
 	DisplayHeader(text string)
 	DisplayInstancesTableForApp(table [][]string)
