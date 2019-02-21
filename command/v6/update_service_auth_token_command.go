@@ -9,12 +9,15 @@ import (
 type UpdateServiceAuthTokenCommand struct {
 	RequiredArgs flag.ServiceAuthTokenArgs `positional-args:"yes"`
 	usage        interface{}               `usage:"CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"`
+	UI           command.UI
 }
 
-func (UpdateServiceAuthTokenCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *UpdateServiceAuthTokenCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
 	return nil
 }
 
-func (UpdateServiceAuthTokenCommand) Execute(args []string) error {
+func (cmd *UpdateServiceAuthTokenCommand) Execute(args []string) error {
+	cmd.UI.DisplayDeprecationWarning()
 	return translatableerror.UnrefactoredCommandError{}
 }
