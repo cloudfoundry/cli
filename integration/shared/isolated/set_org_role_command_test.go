@@ -30,6 +30,19 @@ var _ = Describe("set-org-role command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
+		When("the logged in user has insufficient permissions", func() {
+			BeforeEach(func() {
+				helpers.SwitchToOrgRole(orgName, "OrgAuditor")
+			})
+
+			It("prints out the error message from CC API and exits 1", func() {
+				session := helpers.CF("set-org-role", username, orgName, "OrgAuditor")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Say("Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
 		When("the user already has the desired role", func() {
 			BeforeEach(func() {
 				session := helpers.CF("set-org-role", username, orgName, "OrgManager")
