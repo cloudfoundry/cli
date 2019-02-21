@@ -37,7 +37,7 @@ type ProgressBar interface {
 
 type PushActor interface {
 	// Prepare the space by creating needed apps/applying the manifest
-	PrepareSpace(appName string, spaceGUID string, parser *manifestparser.Parser) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
+	PrepareSpace(spaceGUID string, appName string, parser *manifestparser.Parser) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Actualize applies any necessary changes.
 	Actualize(state v7pushaction.PushState, progressBar v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Conceptualize figures out the state of the world.
@@ -140,8 +140,8 @@ func (cmd PushCommand) Execute(args []string) error {
 	}
 
 	appNamesStream, eventStream, warningsStream, errorStream := cmd.Actor.PrepareSpace(
-		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
+		cmd.RequiredArgs.AppName,
 		manifestParser,
 	)
 	appNames, err := cmd.processStreamsFromPrepareSpace(appNamesStream, eventStream, warningsStream, errorStream)
