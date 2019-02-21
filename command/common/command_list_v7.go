@@ -97,7 +97,7 @@ type commandList struct {
 	Env                                v7.EnvCommand                                `command:"env" alias:"e" description:"Show all env variables for an app"`
 	Events                             v6.EventsCommand                             `command:"events" description:"Show recent app events"`
 	FeatureFlags                       v6.FeatureFlagsCommand                       `command:"feature-flags" description:"Retrieve list of feature flags with status"`
-	FeatureFlag                        v6.FeatureFlagCommand                        `command:"feature-flag" description:"Retrieve an individual feature flag with status"`
+	FeatureFlag                        v7.FeatureFlagCommand                        `command:"feature-flag" description:"Retrieve an individual feature flag with status"`
 	GetHealthCheck                     v7.GetHealthCheckCommand                     `command:"get-health-check" description:"Show the type of health check performed on an app"`
 	Help                               HelpCommand                                  `command:"help" alias:"h" description:"Show help"`
 	InstallPlugin                      InstallPluginCommand                         `command:"install-plugin" description:"Install CLI plugin"`
