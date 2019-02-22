@@ -177,24 +177,6 @@ var _ = Describe("Push State", func() {
 					})
 				})
 
-				When("docker image information is provided", func() {
-					BeforeEach(func() {
-						flagOverrides.DockerImage = "some-docker-image"
-						flagOverrides.DockerPassword = "some-docker-password"
-						flagOverrides.DockerUsername = "some-docker-username"
-					})
-
-					It("sets the lifecycle info on the apps", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(states[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeDocker))
-						Expect(states[1].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeDocker))
-						Expect(states[0].Application.LifecycleBuildpacks).To(BeEmpty())
-					})
-
-					It("sets needsUpdate", func() {
-						Expect(states[0].ApplicationNeedsUpdate).To(Equal(true))
-					})
-				})
 			})
 
 			Describe("bits path", func() {

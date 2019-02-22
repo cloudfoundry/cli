@@ -1,6 +1,7 @@
 package v7pushaction_test
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"errors"
 	"io/ioutil"
 	"path/filepath"
@@ -86,6 +87,8 @@ var _ = Describe("PrepareSpace", func() {
 		eventStream    <-chan Event
 		warningsStream <-chan Warnings
 		errorStream    <-chan error
+
+		overrides FlagOverrides
 	)
 
 	BeforeEach(func() {
@@ -102,7 +105,7 @@ var _ = Describe("PrepareSpace", func() {
 	})
 
 	JustBeforeEach(func() {
-		appNameStream, eventStream, warningsStream, errorStream = actor.PrepareSpace(spaceGUID, appName, parser)
+		appNameStream, eventStream, warningsStream, errorStream = actor.PrepareSpace(spaceGUID, appName, parser, overrides)
 	})
 
 	var yamlUnmarshalMarshal = func(b []byte) []byte {
@@ -189,17 +192,39 @@ applications:
 			)
 		})
 
-		It("does not apply the manifest", func() {
-			Consistently(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(0))
-			Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
-			Eventually(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(1))
-			actualApp, actualSpaceGuid := fakeV7Actor.CreateApplicationInSpaceArgsForCall(0)
-			Expect(actualApp.Name).To(Equal(appName))
-			Expect(actualSpaceGuid).To(Equal(spaceGUID))
-			Eventually(warningsStream).Should(Receive(Equal(Warnings{"create-app-warning"})))
-			Eventually(errorStream).Should(Receive(Succeed()))
-			Eventually(appNameStream).Should(Receive(ConsistOf("some-app-name")))
-			Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(CreatedApplication))
+		When("The applications uses default lifecycle settings", func() {
+			It("does not apply the manifest", func() {
+				Consistently(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(0))
+				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
+				Eventually(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(1))
+				actualApp, actualSpaceGuid := fakeV7Actor.CreateApplicationInSpaceArgsForCall(0)
+				Expect(actualApp.Name).To(Equal(appName))
+				Expect(actualSpaceGuid).To(Equal(spaceGUID))
+				Eventually(warningsStream).Should(Receive(Equal(Warnings{"create-app-warning"})))
+				Eventually(errorStream).Should(Receive(Succeed()))
+				Eventually(appNameStream).Should(Receive(ConsistOf("some-app-name")))
+				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(CreatedApplication))
+			})
+		})
+
+		When("The applications uses explicit lifecycle settings", func() {
+			BeforeEach(func() {
+				//  set some options
+				overrides.DockerImage = "cf/stuff"
+			})
+			It("does not apply the manifest", func() {
+				Consistently(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(0))
+				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
+				Eventually(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(1))
+				actualApp, actualSpaceGuid := fakeV7Actor.CreateApplicationInSpaceArgsForCall(0)
+				Expect(actualApp.Name).To(Equal(appName))
+				Expect(actualApp.LifecycleType).To(Equal(constant.AppLifecycleTypeDocker))
+				Expect(actualSpaceGuid).To(Equal(spaceGUID))
+				Eventually(warningsStream).Should(Receive(Equal(Warnings{"create-app-warning"})))
+				Eventually(errorStream).Should(Receive(Succeed()))
+				Eventually(appNameStream).Should(Receive(ConsistOf("some-app-name")))
+				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(CreatedApplication))
+			})
 		})
 	})
 

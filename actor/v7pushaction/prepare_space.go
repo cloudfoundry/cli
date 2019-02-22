@@ -3,15 +3,12 @@ package v7pushaction
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/util/manifestparser"
 	log "github.com/sirupsen/logrus"
 )
 
-func (actor Actor) PrepareSpace(
-	spaceGUID string,
-	appName string,
-	manifestParser *manifestparser.Parser,
-) (<-chan []string, <-chan Event, <-chan Warnings, <-chan error) {
+func (actor Actor) PrepareSpace(spaceGUID string, appName string, manifestParser *manifestparser.Parser, overrides FlagOverrides) (<-chan []string, <-chan Event, <-chan Warnings, <-chan error) {
 	log.Debugln("Starting to Actualize Space:", spaceGUID)
 	appNameStream := make(chan []string)
 	eventStream := make(chan Event)
@@ -36,7 +33,11 @@ func (actor Actor) PrepareSpace(
 			successEvent = ApplyManifestComplete
 			appNames = manifestParser.AppNames()
 		} else {
-			_, warnings, err = actor.V7Actor.CreateApplicationInSpace(v7action.Application{Name: appName}, spaceGUID)
+			app := v7action.Application{Name: appName}
+			if overrides.DockerImage != "" {
+				app.LifecycleType = constant.AppLifecycleTypeDocker
+			}
+			_, warnings, err = actor.V7Actor.CreateApplicationInSpace(app, spaceGUID)
 			if _, ok := err.(actionerror.ApplicationAlreadyExistsError); ok {
 				eventStream <- SkippingApplicationCreation
 				successEvent = ApplicationAlreadyExists

@@ -100,11 +100,6 @@ func (actor Actor) Conceptualize(
 			applicationNeedsUpdate = true
 		}
 
-		if len(flagOverrides.DockerImage) != 0 {
-			application.LifecycleType = constant.AppLifecycleTypeDocker
-			applicationNeedsUpdate = true
-		}
-
 		bitsPath := currentDir
 		if flagOverrides.ProvidedAppPath != "" {
 			bitsPath = flagOverrides.ProvidedAppPath

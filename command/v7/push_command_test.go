@@ -302,7 +302,7 @@ var _ = Describe("push Command", func() {
 						It("creates a parser and passes through to PrepareSpace", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-							_, _, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
+							_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 							Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(yamlContents)))
 							Expect(manifestParser.PathToManifest).To(Equal(pathToYAMLFile))
 							Expect(manifestParser.AppNames()).To(ConsistOf("banana"))
@@ -315,7 +315,7 @@ var _ = Describe("push Command", func() {
 							It("passes an empty manifest to PrepareSpace", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 								Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-								_, _, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
+								_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 								Expect(manifestParser).To(Equal(manifestparser.NewParser()))
 							})
 						})
@@ -325,7 +325,7 @@ var _ = Describe("push Command", func() {
 						It("does not pass a manifest to PrepareSpace", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-							_, _, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
+							_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 							Expect(manifestParser).To(Equal(manifestparser.NewParser()))
 						})
 					})
@@ -347,7 +347,7 @@ var _ = Describe("push Command", func() {
 						It("reads the manifest and passes through to PrepareSpace", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-							_, _, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
+							_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 							Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(yamlContents)))
 							Expect(manifestParser.PathToManifest).To(Equal(pathToYAMLFile))
 							Expect(manifestParser.AppNames()).To(ConsistOf("banana"))
@@ -391,7 +391,7 @@ var _ = Describe("push Command", func() {
 					It("reads the manifest, substitutes vars, and passes through to PrepareSpace", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-						_, _, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
+						_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 						Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(expectedManifest)))
 						Expect(manifestParser.PathToManifest).To(Equal(pathToYAMLFile))
 						Expect(manifestParser.AppNames()).To(ConsistOf("turtle"))
@@ -418,7 +418,7 @@ var _ = Describe("push Command", func() {
 					It("reads the manifest, substitutes vars, and passes through to PrepareSpace", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-						_, _, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
+						_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 						Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(expectedManifest)))
 						Expect(manifestParser.PathToManifest).To(Equal(pathToYAMLFile))
 						Expect(manifestParser.AppNames()).To(ConsistOf("turtle"))
@@ -428,7 +428,7 @@ var _ = Describe("push Command", func() {
 
 			Describe("delegating to Actor.PrepareSpace", func() {
 				It("delegates to PrepareSpace", func() {
-					expectedSpaceGUID, expectedAppName, expectedParser := fakeActor.PrepareSpaceArgsForCall(0)
+					expectedSpaceGUID, expectedAppName, expectedParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 					Expect(expectedSpaceGUID).To(Equal("some-space-guid"))
 					Expect(expectedAppName).To(Equal("passed-as-command-arg"))
 					Expect(expectedParser).To(Equal(manifestparser.NewParser()))
