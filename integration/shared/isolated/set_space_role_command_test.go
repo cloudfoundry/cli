@@ -110,4 +110,21 @@ var _ = Describe("set-space-role command", func() {
 			})
 		})
 	})
+
+	When("the role does not exit", func() {
+		It("prints a useful error, prints help text, and exits 1", func() {
+			session := helpers.CF("set-space-role", "some-user", "some-org", "some-space", "NotARealRole")
+			Eventually(session.Err).Should(Say(`Incorrect Usage: ROLE must be "SpaceManager", "SpaceDeveloper" and "SpaceAuditor"`))
+			Eventually(session).Should(Say(`NAME:`))
+			Eventually(session).Should(Say(`\s+set-space-role - Assign a space role to a user`))
+			Eventually(session).Should(Say(`USAGE:`))
+			Eventually(session).Should(Say(`\s+cf set-space-role USERNAME ORG SPACE ROLE`))
+			Eventually(session).Should(Say(`ROLES:`))
+			Eventually(session).Should(Say(`\s+'SpaceManager' - Invite and manage users, and enable features for a given space`))
+			Eventually(session).Should(Say(`\s+'SpaceDeveloper' - Create and manage apps and services, and see logs and reports`))
+			Eventually(session).Should(Say(`\s+'SpaceAuditor' - View logs, reports, and settings on this space`))
+			Eventually(session).Should(Say(`SEE ALSO:`))
+			Eventually(session).Should(Say(`\s+space-users`))
+		})
+	})
 })
