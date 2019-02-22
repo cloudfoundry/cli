@@ -28,7 +28,7 @@ var _ = Describe("set-space-role command", func() {
 		})
 	})
 
-	When("the org and space exist", func() {
+	When("logged in as admin", func() {
 		var (
 			orgName   string
 			spaceName string
@@ -36,9 +36,8 @@ var _ = Describe("set-space-role command", func() {
 
 		BeforeEach(func() {
 			helpers.LoginCF()
-			orgName = helpers.NewOrgName()
-			spaceName = helpers.NewSpaceName()
-			helpers.CreateOrgAndSpace(orgName, spaceName)
+			orgName = ReadOnlyOrg
+			spaceName = ReadOnlySpace
 		})
 
 		When("the user exists", func() {
@@ -79,6 +78,24 @@ var _ = Describe("set-space-role command", func() {
 					session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceDeveloper")
 					Eventually(session).Should(Say("Assigning role RoleSpaceDeveloper to user %s in org %s / space %s as admin...", username, orgName, spaceName))
 					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			When("the org does not exist", func() {
+				It("prints an appropriate error and exits 1", func() {
+					session := helpers.CF("set-space-role", username, "invalid-org", spaceName, "SpaceAuditor")
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Say("Organization invalid-org not found"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the space does not exist", func() {
+				It("prints an appropriate error and exits 1", func() {
+					session := helpers.CF("set-space-role", username, orgName, "invalid-space", "SpaceAuditor")
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Say("Space invalid-space not found"))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})
