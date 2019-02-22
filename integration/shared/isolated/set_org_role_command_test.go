@@ -62,7 +62,8 @@ var _ = Describe("set-org-role command", func() {
 			})
 		})
 	})
-	When("all required arguments are given", func() {
+
+	When("the user is logged in", func() {
 		var orgName string
 		var username string
 
@@ -143,6 +144,19 @@ var _ = Describe("set-org-role command", func() {
 				Eventually(session).Should(Say("Server error, status code: 404, error code: 20003, message: The user could not be found: not-exists"))
 				Eventually(session).Should(Exit(1))
 			})
+		})
+	})
+
+	When("the user is not logged in", func() {
+		BeforeEach(func() {
+			helpers.LogoutCF()
+		})
+
+		It("reports that the user is not logged in", func() {
+			session := helpers.CF("set-org-role", "some-user", "some-org", "BillingManager")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 })
