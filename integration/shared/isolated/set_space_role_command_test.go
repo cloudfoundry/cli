@@ -28,9 +28,8 @@ var _ = Describe("set-space-role command", func() {
 		})
 	})
 
-	When("the org, space, and user all exist", func() {
+	When("the org and space exist", func() {
 		var (
-			username  string
 			orgName   string
 			spaceName string
 		)
@@ -40,63 +39,58 @@ var _ = Describe("set-space-role command", func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
 			helpers.CreateOrgAndSpace(orgName, spaceName)
-			username, _ = helpers.CreateUser()
 		})
 
-		It("sets the space role for the user", func() {
-			session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
-			Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", username, orgName, spaceName))
-			Eventually(session).Should(Say("OK"))
-			Eventually(session).Should(Exit(0))
-		})
+		When("the user exists", func() {
+			var username string
 
-		When("the logged in user has insufficient permissions", func() {
 			BeforeEach(func() {
-				helpers.SwitchToSpaceRole(orgName, spaceName, "SpaceAuditor")
+				username, _ = helpers.CreateUser()
 			})
 
-			It("prints out the error message from CC API and exits 1", func() {
+			It("sets the space role for the user", func() {
 				session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
+				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+			})
+
+			When("the logged in user has insufficient permissions", func() {
+				BeforeEach(func() {
+					helpers.SwitchToSpaceRole(orgName, spaceName, "SpaceAuditor")
+				})
+
+				It("prints out the error message from CC API and exits 1", func() {
+					session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Say("Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the user already has the desired role", func() {
+				BeforeEach(func() {
+					session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceDeveloper")
+					Eventually(session).Should(Say("Assigning role RoleSpaceDeveloper to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("is idempotent", func() {
+					session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceDeveloper")
+					Eventually(session).Should(Say("Assigning role RoleSpaceDeveloper to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
+
+		When("the user does not exist", func() {
+			It("prints an appropriate error and exits 1", func() {
+				session := helpers.CF("set-space-role", "not-exists", orgName, spaceName, "SpaceAuditor")
+				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user not-exists in org %s / space %s as admin...", orgName, spaceName))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Say("Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action"))
+				Eventually(session).Should(Say("Server error, status code: 404, error code: 20003, message: The user could not be found: not-exists"))
 				Eventually(session).Should(Exit(1))
 			})
-		})
-
-		When("the user already has the desired role", func() {
-			BeforeEach(func() {
-				session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceDeveloper")
-				Eventually(session).Should(Say("Assigning role RoleSpaceDeveloper to user %s in org %s / space %s as admin...", username, orgName, spaceName))
-				Eventually(session).Should(Exit(0))
-			})
-
-			It("is idempotent", func() {
-				session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceDeveloper")
-				Eventually(session).Should(Say("Assigning role RoleSpaceDeveloper to user %s in org %s / space %s as admin...", username, orgName, spaceName))
-				Eventually(session).Should(Exit(0))
-			})
-		})
-	})
-
-	When("the user does not exist", func() {
-		var (
-			orgName   string
-			spaceName string
-		)
-
-		BeforeEach(func() {
-			helpers.LoginCF()
-			orgName = helpers.NewOrgName()
-			spaceName = helpers.NewSpaceName()
-			helpers.CreateOrgAndSpace(orgName, spaceName)
-		})
-
-		It("prints an appropriate error and exits 1", func() {
-			session := helpers.CF("set-space-role", "not-exists", orgName, spaceName, "SpaceAuditor")
-			Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user not-exists in org %s / space %s as admin...", orgName, spaceName))
-			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Say("Server error, status code: 404, error code: 20003, message: The user could not be found: not-exists"))
-			Eventually(session).Should(Exit(1))
 		})
 	})
 })
