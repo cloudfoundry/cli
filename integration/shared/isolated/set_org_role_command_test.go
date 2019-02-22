@@ -11,20 +11,15 @@ import (
 
 var _ = Describe("set-org-role command", func() {
 	var orgName string
+	var username string
 
 	BeforeEach(func() {
 		helpers.LoginCF()
-		orgName = helpers.NewOrgName()
-		helpers.CreateOrg(orgName)
+		orgName = ReadOnlyOrg
+		username, _ = helpers.CreateUser()
 	})
 
 	When("the org and user both exist", func() {
-		var username string
-
-		BeforeEach(func() {
-			username, _ = helpers.CreateUser()
-		})
-
 		It("sets the org role for the user", func() {
 			session := helpers.CF("set-org-role", username, orgName, "OrgAuditor")
 			Eventually(session).Should(Say("Assigning role OrgAuditor to user %s in org %s as admin...", username, orgName))
@@ -75,6 +70,15 @@ var _ = Describe("set-org-role command", func() {
 				Eventually(session).Should(Say(`\s+org-users, set-space-role`))
 				Eventually(session).Should(Exit(1))
 			})
+		})
+	})
+
+	When("the org does not exist", func() {
+		It("prints an appropriate error and exits 1", func() {
+			session := helpers.CF("set-org-role", username, "not-exists", "OrgAuditor")
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Say("Organization not-exists not found"))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 
