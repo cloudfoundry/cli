@@ -33,7 +33,7 @@ var _ = Describe("pushing docker images", func() {
 	When("the docker image is invalid", func() {
 		It("displays an error and exits 1", func() {
 			session := helpers.CF(PushCommandName, appName, "-o", "some-invalid-docker-image")
-			Eventually(session.Err).Should(Say("Error staging application: Staging error: staging failed"))
+			Eventually(session.Err).Should(Say("StagingError - Staging error: staging failed"))
 			Eventually(session).Should(Say("FAILED"))
 			Eventually(session).Should(Exit(1))
 		})
