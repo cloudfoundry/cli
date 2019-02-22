@@ -10,40 +10,58 @@ import (
 )
 
 var _ = Describe("set-org-role command", func() {
-	When("not enough arguments are provided", func() {
-		It("prints an error and help text", func() {
-			session := helpers.CF("set-org-role", "foo", "bar")
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `ROLE` was not provided"))
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("   set-org-role - Assign an org role to a user"))
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("   cf set-org-role USERNAME ORG ROLE"))
-			Eventually(session).Should(Say("ROLES:"))
-			Eventually(session).Should(Say("   'OrgManager' - Invite and manage users, select and change plans, and set spending limits"))
-			Eventually(session).Should(Say("   'BillingManager' - Create and manage the billing account and payment info"))
-			Eventually(session).Should(Say("   'OrgAuditor' - Read-only access to org info and reports"))
-			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say("   org-users, set-space-role"))
-			Eventually(session).Should(Exit(1))
+	Describe("help text and argument validation", func() {
+		When("-h is passed", func() {
+			It("prints the help text", func() {
+				session := helpers.CF("set-org-role", "-h")
+				Eventually(session).Should(Say(`NAME:`))
+				Eventually(session).Should(Say(`\s+set-org-role - Assign an org role to a user`))
+				Eventually(session).Should(Say(`USAGE:`))
+				Eventually(session).Should(Say(`\s+cf set-org-role USERNAME ORG ROLE`))
+				Eventually(session).Should(Say(`ROLES:`))
+				Eventually(session).Should(Say(`\s+'OrgManager' - Invite and manage users, select and change plans, and set spending limits`))
+				Eventually(session).Should(Say(`\s+'BillingManager' - Create and manage the billing account and payment info`))
+				Eventually(session).Should(Say(`\s+'OrgAuditor' - Read-only access to org info and reports`))
+				Eventually(session).Should(Say(`SEE ALSO:`))
+				Eventually(session).Should(Say(`\s+org-users, set-space-role`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		When("not enough arguments are provided", func() {
+			It("prints an error and help text", func() {
+				session := helpers.CF("set-org-role", "foo", "bar")
+				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `ROLE` was not provided"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("   set-org-role - Assign an org role to a user"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("   cf set-org-role USERNAME ORG ROLE"))
+				Eventually(session).Should(Say("ROLES:"))
+				Eventually(session).Should(Say("   'OrgManager' - Invite and manage users, select and change plans, and set spending limits"))
+				Eventually(session).Should(Say("   'BillingManager' - Create and manage the billing account and payment info"))
+				Eventually(session).Should(Say("   'OrgAuditor' - Read-only access to org info and reports"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("   org-users, set-space-role"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		When("too many arguments are provided", func() {
+			It("prints an error and help text", func() {
+				session := helpers.CF("set-org-role", "some-user", "some-org", "OrgManager", "some-extra-argument")
+				Eventually(session).Should(Say(`Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments`))
+				Eventually(session).Should(Say(`NAME:`))
+				Eventually(session).Should(Say(`\s+set-org-role - Assign an org role to a user`))
+				Eventually(session).Should(Say(`USAGE:`))
+				Eventually(session).Should(Say(`\s+cf set-org-role USERNAME ORG ROLE`))
+				Eventually(session).Should(Say(`ROLES:`))
+				Eventually(session).Should(Say(`\s+'OrgManager' - Invite and manage users, select and change plans, and set spending limits`))
+				Eventually(session).Should(Say(`\s+'BillingManager' - Create and manage the billing account and payment info`))
+				Eventually(session).Should(Say(`\s+'OrgAuditor' - Read-only access to org info and reports`))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 	})
-
-	When("too many arguments are provided", func() {
-		It("prints an error and help text", func() {
-			session := helpers.CF("set-org-role", "some-user", "some-org", "OrgManager", "some-extra-argument")
-			Eventually(session).Should(Say(`Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments`))
-			Eventually(session).Should(Say(`NAME:`))
-			Eventually(session).Should(Say(`\s+set-org-role - Assign an org role to a user`))
-			Eventually(session).Should(Say(`USAGE:`))
-			Eventually(session).Should(Say(`\s+cf set-org-role USERNAME ORG ROLE`))
-			Eventually(session).Should(Say(`ROLES:`))
-			Eventually(session).Should(Say(`\s+'OrgManager' - Invite and manage users, select and change plans, and set spending limits`))
-			Eventually(session).Should(Say(`\s+'BillingManager' - Create and manage the billing account and payment info`))
-			Eventually(session).Should(Say(`\s+'OrgAuditor' - Read-only access to org info and reports`))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
 	When("all required arguments are given", func() {
 		var orgName string
 		var username string
