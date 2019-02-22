@@ -58,6 +58,24 @@ var _ = Describe("set-org-role command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
+
+		When("the specified role is invalid", func() {
+			It("prints a useful error, prints help text, and exits 1", func() {
+				session := helpers.CF("set-org-role", username, orgName, "NotARealRole")
+				Eventually(session.Err).Should(Say(`Incorrect Usage: ROLE must be "OrgManager", "BillingManager" and "OrgAuditor"`))
+				Eventually(session).Should(Say(`NAME:`))
+				Eventually(session).Should(Say(`\s+set-org-role - Assign an org role to a user`))
+				Eventually(session).Should(Say(`USAGE:`))
+				Eventually(session).Should(Say(`\s+set-org-role USERNAME ORG ROLE`))
+				Eventually(session).Should(Say(`ROLES:`))
+				Eventually(session).Should(Say(`\s+'OrgManager' - Invite and manage users, select and change plans, and set spending limits`))
+				Eventually(session).Should(Say(`\s+'BillingManager' - Create and manage the billing account and payment info`))
+				Eventually(session).Should(Say(`\s+'OrgAuditor' - Read-only access to org info and reports`))
+				Eventually(session).Should(Say(`SEE ALSO:`))
+				Eventually(session).Should(Say(`\s+org-users, set-space-role`))
+				Eventually(session).Should(Exit(1))
+			})
+		})
 	})
 
 	When("the user does not exist", func() {
