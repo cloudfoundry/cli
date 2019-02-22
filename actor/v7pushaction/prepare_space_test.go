@@ -214,7 +214,7 @@ applications:
 
 		It("does not apply the manifest", func() {
 			Consistently(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(0))
-			Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
+			Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(SkippingApplicationCreation))
 			Eventually(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(1))
 			actualApp, actualSpaceGuid := fakeV7Actor.CreateApplicationInSpaceArgsForCall(0)
 			Expect(actualApp.Name).To(Equal(appName))

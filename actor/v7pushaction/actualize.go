@@ -30,7 +30,7 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 
 		var err error
 
-		state, err = actor.UpdateApplication(state, warningsStream, eventStream)
+		state, err = actor.updateApplication(state, warningsStream)
 		if err != nil {
 			errorStream <- err
 			return
@@ -193,13 +193,12 @@ func (actor Actor) CreateAndUploadApplicationBits(state PushState, progressBar P
 	return pkg, nil
 }
 
-func (actor Actor) UpdateApplication(state PushState, warningsStream chan Warnings, eventStream chan Event) (PushState, error) {
+func (actor Actor) updateApplication(state PushState, warningsStream chan Warnings) (PushState, error) {
 	if !state.ApplicationNeedsUpdate {
 		return state, nil
 	}
 
 	log.WithField("Name", state.Application.Name).Info("updating app")
-	eventStream <- SkippingApplicationCreation
 
 	application, warnings, err := actor.V7Actor.UpdateApplication(state.Application)
 	state.Application = application
@@ -207,8 +206,6 @@ func (actor Actor) UpdateApplication(state PushState, warningsStream chan Warnin
 	if err != nil {
 		return state, err
 	}
-
-	eventStream <- UpdatedApplication
 
 	return state, nil
 }

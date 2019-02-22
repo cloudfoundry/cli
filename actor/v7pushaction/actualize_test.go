@@ -157,9 +157,7 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("puts the updated application in the stream", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SkippingApplicationCreation))
 					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-update-warnings")))
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UpdatedApplication))
 
 					Eventually(stateStream).Should(Receive(MatchFields(IgnoreExtras,
 						Fields{
@@ -184,10 +182,8 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("returns the warnings and error", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SkippingApplicationCreation))
 					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-update-warnings")))
 					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(UpdatedApplication))
 				})
 			})
 		})

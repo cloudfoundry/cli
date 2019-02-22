@@ -36,12 +36,13 @@ func (actor Actor) PrepareSpace(
 			successEvent = ApplyManifestComplete
 			appNames = manifestParser.AppNames()
 		} else {
-			eventStream <- CreatingApplication
 			_, warnings, err = actor.V7Actor.CreateApplicationInSpace(v7action.Application{Name: appName}, spaceGUID)
 			if _, ok := err.(actionerror.ApplicationAlreadyExistsError); ok {
+				eventStream <- SkippingApplicationCreation
 				successEvent = ApplicationAlreadyExists
 				err = nil
 			} else {
+				eventStream <- CreatingApplication
 				successEvent = CreatedApplication
 			}
 			appNames = []string{appName}
