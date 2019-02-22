@@ -2,6 +2,7 @@ package v7
 
 import (
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"os"
 	"path/filepath"
 	"strings"
@@ -160,15 +161,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor(
-		"Pushing apps {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-		map[string]interface{}{
-			"AppName":   strings.Join(appNames, ", "),
-			"OrgName":   cmd.Config.TargetedOrganization().Name,
-			"SpaceName": cmd.Config.TargetedSpace().Name,
-			"Username":  user.Name,
-		},
-	)
+	cmd.announcePushing(appNames, user)
 
 	cmd.UI.DisplayText("Getting app info...")
 	log.Info("generating the app state")
@@ -243,6 +236,23 @@ func (cmd PushCommand) Execute(args []string) error {
 	}
 
 	return nil
+}
+
+func (cmd PushCommand) announcePushing(appNames []string, user configv3.User) {
+	tokens := map[string]interface{}{
+		"AppName":   strings.Join(appNames, ", "),
+		"OrgName":   cmd.Config.TargetedOrganization().Name,
+		"SpaceName": cmd.Config.TargetedSpace().Name,
+		"Username":  user.Name,
+	}
+	singular := "Pushing app {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+	plural := "Pushing apps {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+
+	if len(appNames) == 1 {
+		cmd.UI.DisplayTextWithFlavor(singular, tokens)
+	} else {
+		cmd.UI.DisplayTextWithFlavor(plural, tokens)
+	}
 }
 
 func (cmd PushCommand) processStreamsFromPrepareSpace(
