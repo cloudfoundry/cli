@@ -2,6 +2,7 @@ package v6
 
 import (
 	"net/url"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -44,36 +45,39 @@ func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *LoginCommand) Execute(args []string) error {
-	if cmd.Config.Experimental() {
-		if cmd.APIEndpoint == "" {
-			apiEndpoint, err := cmd.UI.DisplayTextPrompt("API endpoint")
-			if err != nil {
-				return err
-			}
-			cmd.APIEndpoint = apiEndpoint
-		} else {
-			cmd.UI.DisplayText("API endpoint: {{.APIEndpoint}}", map[string]interface{}{
-				"APIEndpoint": cmd.APIEndpoint,
-			})
-		}
-		endpoint, _ := url.Parse(cmd.APIEndpoint)
-		if endpoint.Scheme == "" {
-			endpoint.Scheme = "https"
-		}
-		settings := v2action.TargetSettings{
-			URL:               endpoint.String(),
-			SkipSSLValidation: true,
-		}
-		_, err := cmd.Actor.SetTarget(settings)
+	if !cmd.Config.Experimental() {
+		return translatableerror.UnrefactoredCommandError{}
+	}
+	if cmd.APIEndpoint == "" {
+		apiEndpoint, err := cmd.UI.DisplayTextPrompt("API endpoint")
 		if err != nil {
 			return err
 		}
-
-		cmd.UI.DisplayText("API endpoint: {{.APIEndpoint}} (API Version: {{.APIVersion}})", map[string]interface{}{
+		cmd.APIEndpoint = apiEndpoint
+	} else {
+		cmd.UI.DisplayText("API endpoint: {{.APIEndpoint}}", map[string]interface{}{
 			"APIEndpoint": cmd.APIEndpoint,
-			"APIVersion":  cmd.Config.APIVersion(),
 		})
-		return nil
 	}
-	return translatableerror.UnrefactoredCommandError{}
+
+	strippedEndpoint := strings.TrimRight(cmd.APIEndpoint, "/")
+	endpoint, _ := url.Parse(strippedEndpoint)
+	if endpoint.Scheme == "" {
+		endpoint.Scheme = "https"
+	}
+
+	settings := v2action.TargetSettings{
+		URL:               endpoint.String(),
+		SkipSSLValidation: true,
+	}
+	_, err := cmd.Actor.SetTarget(settings)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayText("API endpoint: {{.APIEndpoint}} (API Version: {{.APIVersion}})", map[string]interface{}{
+		"APIEndpoint": strippedEndpoint,
+		"APIVersion":  cmd.Config.APIVersion(),
+	})
+	return nil
 }
