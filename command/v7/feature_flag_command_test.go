@@ -75,7 +75,7 @@ var _ = Describe("Feature Flag Command", func() {
 
 		It("should print text indicating its running", func() {
 			Expect(executeErr).NotTo(HaveOccurred())
-			Expect(testUI.Out).To(Say(`Retrieving status of flag1 as apple\.\.\.`))
+			Expect(testUI.Out).To(Say(`Getting info for feature flag flag1 as apple\.\.\.`))
 		})
 
 		When("getting featureFlag fails", func() {

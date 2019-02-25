@@ -52,7 +52,7 @@ func (cmd FeatureFlagCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Retrieving status of {{.FeatureFlag}} as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Getting info for feature flag {{.FeatureFlag}} as {{.Username}}...", map[string]interface{}{
 		"FeatureFlag": cmd.RequiredArgs.Feature,
 		"Username":    user.Name,
 	})
