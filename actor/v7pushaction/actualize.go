@@ -37,14 +37,7 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 		}
 		stateStream <- state
 
-		// TODO Remove this
-		if len(state.Manifest) > 0 {
-			err = actor.ApplyManifest(state, warningsStream, eventStream)
-			if err != nil {
-				errorStream <- err
-				return
-			}
-		} else if !state.Overrides.SkipRouteCreation {
+		if !state.Overrides.SkipRouteCreation {
 			eventStream <- CreatingAndMappingRoutes
 			routeWarnings, routeErr := actor.CreateAndMapDefaultApplicationRoute(state.OrgGUID, state.SpaceGUID, state.Application)
 			warningsStream <- Warnings(routeWarnings)
@@ -128,18 +121,6 @@ func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
 		eventStream <- Complete
 	}()
 	return stateStream, eventStream, warningsStream, errorStream
-}
-
-func (actor Actor) ApplyManifest(state PushState, warningsStream chan Warnings, eventStream chan Event) error {
-	eventStream <- ApplyManifest
-	warnings, err := actor.V7Actor.SetApplicationManifest(state.Application.GUID, state.Manifest)
-	warningsStream <- Warnings(warnings)
-	if err != nil {
-		return err
-	}
-	eventStream <- ApplyManifestComplete
-
-	return nil
 }
 
 func (actor Actor) CreateAndUploadApplicationBits(state PushState, progressBar ProgressBar, warningsStream chan Warnings, eventStream chan Event) (v7action.Package, error) {

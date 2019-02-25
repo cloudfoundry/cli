@@ -200,58 +200,6 @@ var _ = Describe("Actualize", func() {
 		})
 	})
 
-	Describe("manifest", func() {
-		When("there is a manifest on the pushState", func() {
-			BeforeEach(func() {
-				state.Manifest = []byte("random yaml")
-			})
-
-			When("Applying the manifest succeeds", func() {
-				BeforeEach(func() {
-					fakeV7Actor.SetApplicationManifestReturns(v7action.Warnings{"manifest-warnings"}, nil)
-				})
-
-				It("returns warnings and continues", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
-					Eventually(warningsStream).Should(Receive(ConsistOf("manifest-warnings")))
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ApplyManifestComplete))
-
-					Expect(fakeV7Actor.SetApplicationManifestCallCount()).To(Equal(1))
-					passedAppGUID, passedManifest := fakeV7Actor.SetApplicationManifestArgsForCall(0)
-					Expect(passedManifest).To(Equal([]byte("random yaml")))
-					Expect(passedAppGUID).To(Equal("some-app-guid"))
-				})
-			})
-
-			When("Applying the manifest errors", func() {
-				var expectedErr error
-
-				BeforeEach(func() {
-					expectedErr = errors.New("nopes")
-					fakeV7Actor.SetApplicationManifestReturns(v7action.Warnings{"manifest-warnings"}, expectedErr)
-				})
-
-				It("returns warnings and an error", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
-					Eventually(warningsStream).Should(Receive(ConsistOf("manifest-warnings")))
-					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(ApplyManifestComplete))
-				})
-			})
-		})
-
-		When("There is no manifest on the pushState", func() {
-			BeforeEach(func() {
-				state.Manifest = nil
-			})
-
-			It("Does not pass the manifest to the cc", func() {
-				Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(ApplyManifest))
-				Expect(fakeV7Actor.SetApplicationManifestCallCount()).To(BeZero())
-			})
-		})
-	})
-
 	Describe("scaling the web process", func() {
 		When("a scale override is passed", func() {
 			When("the scale is successful", func() {
