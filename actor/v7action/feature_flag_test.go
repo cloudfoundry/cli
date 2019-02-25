@@ -147,7 +147,7 @@ var _ = Describe("FeatureFlag", func() {
 		var (
 			flagName        string
 			ccFlag          ccv3.FeatureFlag
-			expectedArgFlag FeatureFlag
+			expectedArgFlag ccv3.FeatureFlag
 			warnings        Warnings
 			executeErr      error
 		)
@@ -155,7 +155,7 @@ var _ = Describe("FeatureFlag", func() {
 		BeforeEach(func() {
 			flagName = "flag1"
 			ccFlag = ccv3.FeatureFlag{Name: flagName, Enabled: true}
-			expectedArgFlag = FeatureFlag{Name: flagName, Enabled: true}
+			expectedArgFlag = ccv3.FeatureFlag{Name: flagName, Enabled: true}
 		})
 
 		JustBeforeEach(func() {
@@ -219,7 +219,7 @@ var _ = Describe("FeatureFlag", func() {
 		var (
 			flagName        string
 			ccFlag          ccv3.FeatureFlag
-			expectedArgFlag FeatureFlag
+			expectedArgFlag ccv3.FeatureFlag
 			warnings        Warnings
 			executeErr      error
 		)
@@ -227,7 +227,7 @@ var _ = Describe("FeatureFlag", func() {
 		BeforeEach(func() {
 			flagName = "flag1"
 			ccFlag = ccv3.FeatureFlag{Name: flagName, Enabled: true}
-			expectedArgFlag = FeatureFlag{Name: flagName, Enabled: false}
+			expectedArgFlag = ccv3.FeatureFlag{Name: flagName, Enabled: false}
 		})
 
 		JustBeforeEach(func() {

@@ -244,7 +244,7 @@ var _ = Describe("Feature Flags", func() {
 		})
 	})
 
-	FDescribe("UpdateFeatureFlag", func() {
+	Describe("UpdateFeatureFlag", func() {
 		var (
 			argFlag      FeatureFlag
 			expectedBody string
