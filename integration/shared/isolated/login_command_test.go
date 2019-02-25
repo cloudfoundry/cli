@@ -194,6 +194,19 @@ var _ = Describe("login command", func() {
 						Eventually(session).Should(Exit(1))
 					})
 				})
+
+				When("the provided API endpoint has trailing slashes", func() {
+					It("removes the extra slashes", func() {
+						username, password := helpers.GetCredentials()
+						apiURLWithSlash := apiURL + "////"
+						session := helpers.CF("login", "-a", apiURLWithSlash, "-u", username, "-p", password, "--skip-ssl-validation")
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("api")
+						Eventually(session).Should(Say("api endpoint:\\s+%s\n", apiURL))
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 		})
 

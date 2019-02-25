@@ -16,7 +16,7 @@ var _ = Describe("login Command", func() {
 		testUI     *ui.UI
 		fakeActor  *v6fakes.FakeLoginActor
 		fakeConfig *commandfakes.FakeConfig
-		err        error
+		executeErr error
 		input      *Buffer
 	)
 
@@ -36,12 +36,13 @@ var _ = Describe("login Command", func() {
 	})
 
 	JustBeforeEach(func() {
-		err = cmd.Execute(nil)
+		executeErr = cmd.Execute(nil)
 	})
 
 	Describe("API Endpoint", func() {
 		BeforeEach(func() {
 			fakeConfig.ExperimentalReturns(true)
+			fakeConfig.APIVersionReturns("3.4.5")
 		})
 
 		When("user provides the api endpoint using the -a flag", func() {
@@ -50,7 +51,7 @@ var _ = Describe("login Command", func() {
 			})
 
 			It("target the provided api endpoint", func() {
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(testUI.Out).To(Say("API endpoint: api.boshlite.com"))
 				Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 				actualSettings := fakeActor.SetTargetArgsForCall(0)
@@ -62,10 +63,10 @@ var _ = Describe("login Command", func() {
 			BeforeEach(func() {
 				input.Write([]byte("api.boshlite.com\n"))
 				cmd.APIEndpoint = ""
-				fakeConfig.APIVersionReturns("3.4.5")
 			})
 
 			It("prompts the user for the api endpoint", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(testUI.Out).To(Say("API endpoint:"))
 				Expect(testUI.Out).To(Say("api.boshlite.com\n"))
 				Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API Version: 3\.4\.5\)`))
@@ -76,6 +77,19 @@ var _ = Describe("login Command", func() {
 			})
 		})
 
-	})
+		When("the endpoint has trailing slashes", func() {
+			BeforeEach(func() {
+				cmd.APIEndpoint = "api.boshlite.com////"
+			})
 
+			It("strips the backslashes before using the endpoint", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+				actualSettings := fakeActor.SetTargetArgsForCall(0)
+				Expect(actualSettings.URL).To(Equal("https://api.boshlite.com"))
+
+				Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API Version: 3\.4\.5\)`))
+			})
+		})
+	})
 })
