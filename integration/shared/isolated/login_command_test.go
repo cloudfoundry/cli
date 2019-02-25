@@ -772,9 +772,7 @@ var _ = Describe("login command", func() {
 				})
 
 				It("prompts twice, displays an error and fails", func() {
-					username, password := helpers.GetCredentials()
-					badPassword := password + "_wrong"
-					session := helpers.CF("login", "-p", badPassword, "-u", username)
+					session := helpers.CF("login", "-p", "nope", "-u", "faker")
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
 					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
@@ -798,9 +796,7 @@ var _ = Describe("login command", func() {
 					})
 
 					It("logs them out", func() {
-						username, password := helpers.GetCredentials()
-						badPassword := password + "_wrong"
-						session := helpers.CF("login", "-p", badPassword, "-u", username)
+						session := helpers.CF("login", "-p", "nope", "-u", "faker")
 						Eventually(session).Should(Say(`Not logged in. Use 'cf login' to log in.`))
 						Eventually(session).Should(Exit())
 
