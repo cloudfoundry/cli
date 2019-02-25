@@ -44,3 +44,20 @@ func (actor Actor) GetFeatureFlags() ([]FeatureFlag, Warnings, error) {
 
 	return featureFlags, Warnings(warnings), nil
 }
+
+func (actor Actor) EnableFeatureFlag(flagName string) (Warnings, error) {
+	return actor.updateFeatureFlag(FeatureFlag{Name: flagName, Enabled: true})
+}
+
+func (actor Actor) DisableFeatureFlag(flagName string) (Warnings, error) {
+	return actor.updateFeatureFlag(FeatureFlag{Name: flagName, Enabled: false})
+}
+
+func (actor Actor) updateFeatureFlag(flag FeatureFlag) (Warnings, error) {
+	_, warnings, err := actor.CloudControllerClient.UpdateFeatureFlag(ccv3.FeatureFlag(flag))
+
+	if _, ok := err.(ccerror.FeatureFlagNotFoundError); ok {
+		err = actionerror.FeatureFlagNotFoundError{FeatureFlagName: flag.Name}
+	}
+	return Warnings(warnings), err
+}

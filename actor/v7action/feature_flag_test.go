@@ -142,4 +142,148 @@ var _ = Describe("FeatureFlag", func() {
 			})
 		})
 	})
+
+	Describe("EnableFeatureFlag", func() {
+		var (
+			flagName        string
+			ccFlag          ccv3.FeatureFlag
+			expectedArgFlag FeatureFlag
+			warnings        Warnings
+			executeErr      error
+		)
+
+		BeforeEach(func() {
+			flagName = "flag1"
+			ccFlag = ccv3.FeatureFlag{Name: flagName, Enabled: true}
+			expectedArgFlag = FeatureFlag{Name: flagName, Enabled: true}
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.EnableFeatureFlag(flagName)
+		})
+
+		When("The flag exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateFeatureFlagReturns(
+					ccFlag,
+					ccv3.Warnings{"update-warning"},
+					nil,
+				)
+			})
+
+			It("returns warnings and no error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(Equal(Warnings{"update-warning"}))
+				Expect(fakeCloudControllerClient.UpdateFeatureFlagCallCount()).To(Equal(1))
+				argFlag := fakeCloudControllerClient.UpdateFeatureFlagArgsForCall(0)
+				Expect(argFlag).To(Equal(expectedArgFlag))
+			})
+		})
+
+		When("the flag doesn't exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateFeatureFlagReturns(
+					ccv3.FeatureFlag{},
+					ccv3.Warnings{"update-warning"},
+					ccerror.FeatureFlagNotFoundError{},
+				)
+			})
+			It("returns warnings and a FeatureFlagNotFoundError", func() {
+				Expect(executeErr).To(MatchError(actionerror.FeatureFlagNotFoundError{FeatureFlagName: flagName}))
+				Expect(warnings).To(Equal(Warnings{"update-warning"}))
+				Expect(fakeCloudControllerClient.UpdateFeatureFlagCallCount()).To(Equal(1))
+				argFlag := fakeCloudControllerClient.UpdateFeatureFlagArgsForCall(0)
+				Expect(argFlag).To(Equal(expectedArgFlag))
+			})
+		})
+
+		When("the client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateFeatureFlagReturns(
+					ccv3.FeatureFlag{},
+					ccv3.Warnings{"update-warning"},
+					errors.New("some-random-error"),
+				)
+			})
+			It("returns warnings and a FeatureFlagNotFoundError", func() {
+				Expect(executeErr).To(MatchError(errors.New("some-random-error")))
+				Expect(warnings).To(Equal(Warnings{"update-warning"}))
+				Expect(fakeCloudControllerClient.UpdateFeatureFlagCallCount()).To(Equal(1))
+				argFlag := fakeCloudControllerClient.UpdateFeatureFlagArgsForCall(0)
+				Expect(argFlag).To(Equal(expectedArgFlag))
+			})
+		})
+	})
+
+	Describe("EnableFeatureFlag", func() {
+		var (
+			flagName        string
+			ccFlag          ccv3.FeatureFlag
+			expectedArgFlag FeatureFlag
+			warnings        Warnings
+			executeErr      error
+		)
+
+		BeforeEach(func() {
+			flagName = "flag1"
+			ccFlag = ccv3.FeatureFlag{Name: flagName, Enabled: true}
+			expectedArgFlag = FeatureFlag{Name: flagName, Enabled: false}
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.DisableFeatureFlag(flagName)
+		})
+
+		When("The flag exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateFeatureFlagReturns(
+					ccFlag,
+					ccv3.Warnings{"update-warning"},
+					nil,
+				)
+			})
+
+			It("returns warnings and no error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(Equal(Warnings{"update-warning"}))
+				Expect(fakeCloudControllerClient.UpdateFeatureFlagCallCount()).To(Equal(1))
+				argFlag := fakeCloudControllerClient.UpdateFeatureFlagArgsForCall(0)
+				Expect(argFlag).To(Equal(expectedArgFlag))
+			})
+		})
+
+		When("the flag doesn't exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateFeatureFlagReturns(
+					ccv3.FeatureFlag{},
+					ccv3.Warnings{"update-warning"},
+					ccerror.FeatureFlagNotFoundError{},
+				)
+			})
+			It("returns warnings and a FeatureFlagNotFoundError", func() {
+				Expect(executeErr).To(MatchError(actionerror.FeatureFlagNotFoundError{FeatureFlagName: flagName}))
+				Expect(warnings).To(Equal(Warnings{"update-warning"}))
+				Expect(fakeCloudControllerClient.UpdateFeatureFlagCallCount()).To(Equal(1))
+				argFlag := fakeCloudControllerClient.UpdateFeatureFlagArgsForCall(0)
+				Expect(argFlag).To(Equal(expectedArgFlag))
+			})
+		})
+
+		When("the client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateFeatureFlagReturns(
+					ccv3.FeatureFlag{},
+					ccv3.Warnings{"update-warning"},
+					errors.New("some-random-error"),
+				)
+			})
+			It("returns warnings and a FeatureFlagNotFoundError", func() {
+				Expect(executeErr).To(MatchError(errors.New("some-random-error")))
+				Expect(warnings).To(Equal(Warnings{"update-warning"}))
+				Expect(fakeCloudControllerClient.UpdateFeatureFlagCallCount()).To(Equal(1))
+				argFlag := fakeCloudControllerClient.UpdateFeatureFlagArgsForCall(0)
+				Expect(argFlag).To(Equal(expectedArgFlag))
+			})
+		})
+	})
 })
