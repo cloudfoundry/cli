@@ -104,9 +104,8 @@ var _ = Describe("Feature Flags", func() {
 						Enabled: false,
 					},
 					FeatureFlag{
-						Name:               "flag3",
-						Enabled:            true,
-						CustomErrorMessage: "error message the user sees",
+						Name:    "flag3",
+						Enabled: true,
 					},
 				))
 			})
@@ -177,7 +176,6 @@ var _ = Describe("Feature Flags", func() {
 				Expect(warnings).To(Equal(Warnings{"this is a warning"}))
 				Expect(flag.Name).To(Equal(flagName))
 				Expect(flag.Enabled).To(Equal(true))
-				Expect(flag.CustomErrorMessage).To(Equal("This is wonky"))
 			})
 		})
 		When("The flag does not exist", func() {
@@ -222,6 +220,119 @@ var _ = Describe("Feature Flags", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, fmt.Sprintf("/v3/feature_flags/%s", flagName)),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeError).To(MatchError(ccerror.V3UnexpectedResponseError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+						},
+					},
+					ResponseCode: http.StatusTeapot,
+				},
+				))
+				Expect(warnings).To(Equal(Warnings{"this is a warning"}))
+			})
+		})
+	})
+
+	FDescribe("UpdateFeatureFlag", func() {
+		var (
+			argFlag      FeatureFlag
+			expectedBody string
+			ccFlag       FeatureFlag
+			warnings     Warnings
+			executeError error
+		)
+
+		BeforeEach(func() {
+			expectedBody = `{"enabled":false}`
+			argFlag = FeatureFlag{
+				Name:    "flag1",
+				Enabled: false,
+			}
+		})
+
+		JustBeforeEach(func() {
+			ccFlag, warnings, executeError = client.UpdateFeatureFlag(argFlag)
+		})
+
+		When("The flag exists", func() {
+			BeforeEach(func() {
+				response := `{
+  "updated_at": "2016-06-08T16:41:39Z",
+  "name": "flag1",
+  "enabled": false,
+  "custom_error_message": "This is wonky",
+  "links": {
+    "self": { "href": "https://example.com/v3/config/feature_flags/flag1" }
+  }
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, fmt.Sprintf("/v3/feature_flags/%s", argFlag.Name)),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("Successfully updates the flag", func() {
+				Expect(executeError).ToNot(HaveOccurred())
+				Expect(warnings).To(Equal(Warnings{"this is a warning"}))
+				Expect(ccFlag).To(Equal(argFlag))
+			})
+		})
+
+		When("The flag does not exist", func() {
+			BeforeEach(func() {
+				response := `{
+		   "errors": [
+		      {
+		         "detail": "Feature flag not found",
+		         "title": "CF-ResourceNotFound",
+		         "code": 10010
+		      }
+		   ]
+		}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, fmt.Sprintf("/v3/feature_flags/%s", argFlag.Name)),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns a flag not found error", func() {
+				Expect(executeError).To(MatchError(ccerror.FeatureFlagNotFoundError{}))
+				Expect(warnings).To(Equal(Warnings{"this is a warning"}))
+			})
+		})
+		When("some other error occurs", func() {
+			BeforeEach(func() {
+				response := `{
+		   "errors": [
+		     {
+		        "code": 10008,
+		        "detail": "The request is semantically invalid: command presence",
+		        "title": "CF-UnprocessableEntity"
+		      }
+		   ]
+		}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, fmt.Sprintf("/v3/feature_flags/%s", argFlag.Name)),
+						VerifyJSON(expectedBody),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
