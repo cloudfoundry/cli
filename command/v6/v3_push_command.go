@@ -20,8 +20,8 @@ import (
 //go:generate counterfeiter . V3PushActor
 
 type V3PushActor interface {
-	Actualize(state pushaction.PushState, progressBar pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
-	Conceptualize(setting pushaction.CommandLineSettings, spaceGUID string) ([]pushaction.PushState, pushaction.Warnings, error)
+	Actualize(state pushaction.PushPlan, progressBar pushaction.ProgressBar) (<-chan pushaction.PushPlan, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
+	Conceptualize(setting pushaction.CommandLineSettings, spaceGUID string) ([]pushaction.PushPlan, pushaction.Warnings, error)
 }
 
 //go:generate counterfeiter . V3PushVersionActor
@@ -139,18 +139,18 @@ func (cmd V3PushCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayText("Getting app info...")
 
-	log.Info("generating the app state")
-	pushState, warnings, err := cmd.Actor.Conceptualize(cliSettings, cmd.Config.TargetedSpace().GUID)
+	log.Info("generating the app plan")
+	pushPlans, warnings, err := cmd.Actor.Conceptualize(cliSettings, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
-	log.WithField("number of states", len(pushState)).Debug("completed generating state")
+	log.WithField("number of states", len(pushPlans)).Debug("completed generating plan")
 
-	for _, state := range pushState {
-		log.WithField("app_name", state.Application.Name).Info("actualizing")
-		stateStream, eventStream, warningsStream, errorStream := cmd.Actor.Actualize(state, cmd.ProgressBar)
-		updatedState, err := cmd.processApplyStreams(state.Application.Name, stateStream, eventStream, warningsStream, errorStream)
+	for _, plan := range pushPlans {
+		log.WithField("app_name", plan.Application.Name).Info("actualizing")
+		stateStream, eventStream, warningsStream, errorStream := cmd.Actor.Actualize(plan, cmd.ProgressBar)
+		updatedState, err := cmd.processApplyStreams(plan.Application.Name, stateStream, eventStream, warningsStream, errorStream)
 		if err != nil {
 			return err
 		}
@@ -196,13 +196,13 @@ func (cmd V3PushCommand) Execute(args []string) error {
 
 func (cmd V3PushCommand) processApplyStreams(
 	appName string,
-	stateStream <-chan pushaction.PushState,
+	stateStream <-chan pushaction.PushPlan,
 	eventStream <-chan pushaction.Event,
 	warningsStream <-chan pushaction.Warnings,
 	errorStream <-chan error,
-) (pushaction.PushState, error) {
+) (pushaction.PushPlan, error) {
 	var stateClosed, eventClosed, warningsClosed, complete bool
-	var updateState pushaction.PushState
+	var updateState pushaction.PushPlan
 
 	for {
 		select {
@@ -233,7 +233,7 @@ func (cmd V3PushCommand) processApplyStreams(
 				warningsClosed = true
 				break
 			}
-			return pushaction.PushState{}, err
+			return pushaction.PushPlan{}, err
 		}
 
 		if stateClosed && eventClosed && warningsClosed && complete {

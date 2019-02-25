@@ -17,7 +17,7 @@ import (
 )
 
 func actualizedStreamsDrainedAndClosed(
-	configStream <-chan PushState,
+	configStream <-chan PushPlan,
 	eventStream <-chan Event,
 	warningsStream <-chan Warnings,
 	errorStream <-chan error,
@@ -57,7 +57,7 @@ func actualizedStreamsDrainedAndClosed(
 // Expect(nextEvent()).Should(Equal(...))
 // Expect(nextEvent()).Should(Equal(...))
 // Expect(nextEvent()).Should(Equal(...))
-func getNextEvent(c <-chan PushState, e <-chan Event, w <-chan Warnings) func() Event {
+func getNextEvent(c <-chan PushPlan, e <-chan Event, w <-chan Warnings) func() Event {
 	timeOut := time.Tick(500 * time.Millisecond)
 
 	return func() Event {
@@ -84,10 +84,10 @@ var _ = Describe("Actualize", func() {
 		fakeV3Actor     *pushactionfakes.FakeV3Actor
 		fakeSharedActor *pushactionfakes.FakeSharedActor
 
-		state           PushState
+		state           PushPlan
 		fakeProgressBar *pushactionfakes.FakeProgressBar
 
-		stateStream    <-chan PushState
+		stateStream    <-chan PushPlan
 		eventStream    <-chan Event
 		warningsStream <-chan Warnings
 		errorStream    <-chan error
@@ -101,7 +101,7 @@ var _ = Describe("Actualize", func() {
 		actor = NewActor(fakeV2Actor, fakeV3Actor, fakeSharedActor)
 
 		fakeProgressBar = new(pushactionfakes.FakeProgressBar)
-		state = PushState{
+		state = PushPlan{
 			Application: v3action.Application{
 				Name: "some-app",
 			},
@@ -188,7 +188,7 @@ var _ = Describe("Actualize", func() {
 	Describe("package upload", func() {
 		When("app bits are provided", func() {
 			BeforeEach(func() {
-				state = PushState{
+				state = PushPlan{
 					Application: v3action.Application{
 						Name: "some-app",
 						GUID: "some-app-guid",

@@ -28,9 +28,9 @@ type Step struct {
 	Warnings pushaction.Warnings
 }
 
-func FillInValues(tuples []Step, state pushaction.PushState) func(pushaction.PushState, pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
-	return func(pushaction.PushState, pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
-		stateStream := make(chan pushaction.PushState)
+func FillInValues(tuples []Step, state pushaction.PushPlan) func(pushaction.PushPlan, pushaction.ProgressBar) (<-chan pushaction.PushPlan, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+	return func(pushaction.PushPlan, pushaction.ProgressBar) (<-chan pushaction.PushPlan, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+		stateStream := make(chan pushaction.PushPlan)
 
 		eventStream := make(chan pushaction.Event)
 		warningsStream := make(chan pushaction.Warnings)
@@ -192,7 +192,7 @@ var _ = Describe("v3-push Command", func() {
 			When("getting app settings is successful", func() {
 				BeforeEach(func() {
 					fakeActor.ConceptualizeReturns(
-						[]pushaction.PushState{
+						[]pushaction.PushPlan{
 							{
 								Application: v3action.Application{Name: appName},
 							},
@@ -228,10 +228,10 @@ var _ = Describe("v3-push Command", func() {
 							{
 								Event: pushaction.StagingComplete,
 							},
-						}, pushaction.PushState{})
+						}, pushaction.PushPlan{})
 					})
 
-					It("generates a push state with the specified app path", func() {
+					It("generates a push plan with the specified app path", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(testUI.Out).To(Say("Pushing app %s to org some-org / space some-space as some-user", appName))
 						Expect(testUI.Out).To(Say(`Getting app info\.\.\.`))
@@ -276,7 +276,7 @@ var _ = Describe("v3-push Command", func() {
 							{
 								Event: pushaction.StartingStaging,
 							},
-						}, pushaction.PushState{})
+						}, pushaction.PushPlan{})
 					})
 
 					When("there are no logging errors", func() {
@@ -339,7 +339,7 @@ var _ = Describe("v3-push Command", func() {
 					BeforeEach(func() {
 						fakeActor.ActualizeStub = FillInValues([]Step{
 							{},
-						}, pushaction.PushState{Application: v3action.Application{GUID: "potato"}})
+						}, pushaction.PushPlan{Application: v3action.Application{GUID: "potato"}})
 					})
 
 					// It("outputs flavor text prior to generating app configuration", func() {
@@ -421,7 +421,7 @@ var _ = Describe("v3-push Command", func() {
 							{
 								Error: errors.New("anti avant garde naming"),
 							},
-						}, pushaction.PushState{})
+						}, pushaction.PushPlan{})
 					})
 
 					It("returns the error", func() {
@@ -438,7 +438,7 @@ var _ = Describe("v3-push Command", func() {
 					fakeActor.ConceptualizeReturns(nil, pushaction.Warnings{"some-warning-1"}, expectedErr)
 				})
 
-				It("generates a push state with the specified app path", func() {
+				It("generates a push plan with the specified app path", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(testUI.Err).To(Say("some-warning-1"))
 				})
@@ -449,7 +449,7 @@ var _ = Describe("v3-push Command", func() {
 					cmd.AppPath = "some/app/path"
 				})
 
-				It("generates a push state with the specified app path", func() {
+				It("generates a push plan with the specified app path", func() {
 					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
 					settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
 					Expect(settings).To(MatchFields(IgnoreExtras, Fields{
@@ -465,7 +465,7 @@ var _ = Describe("v3-push Command", func() {
 					cmd.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
 				})
 
-				It("generates a push state with the specified buildpacks", func() {
+				It("generates a push plan with the specified buildpacks", func() {
 					Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
 					settings, spaceGUID := fakeActor.ConceptualizeArgsForCall(0)
 					Expect(settings).To(MatchFields(IgnoreExtras, Fields{

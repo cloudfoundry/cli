@@ -64,9 +64,9 @@ func FillInEvents(tuples []Step) (<-chan v7pushaction.Event, <-chan v7pushaction
 	return eventStream, warningsStream, errorStream
 }
 
-func FillInValues(tuples []Step, state v7pushaction.PushState) func(v7pushaction.PushState, v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
-	return func(v7pushaction.PushState, v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
-		stateStream := make(chan v7pushaction.PushState)
+func FillInValues(tuples []Step, state v7pushaction.PushPlan) func(v7pushaction.PushPlan, v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
+	return func(v7pushaction.PushPlan, v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
+		stateStream := make(chan v7pushaction.PushPlan)
 
 		eventStream := make(chan v7pushaction.Event)
 		warningsStream := make(chan v7pushaction.Warnings)
@@ -201,7 +201,7 @@ var _ = Describe("push Command", func() {
 
 			fakeActor.PrepareSpaceReturns(appNamesChannel, events, warnings, errors)
 
-			fakeActor.ActualizeStub = FillInValues([]Step{{}}, v7pushaction.PushState{})
+			fakeActor.ActualizeStub = FillInValues([]Step{{}}, v7pushaction.PushPlan{})
 		})
 
 		When("checking target fails", func() {
@@ -439,14 +439,14 @@ var _ = Describe("push Command", func() {
 						When("there are no flag overrides", func() {
 							BeforeEach(func() {
 								fakeActor.ConceptualizeReturns(
-									[]v7pushaction.PushState{
+									[]v7pushaction.PushPlan{
 										{Application: v7action.Application{Name: appName1}},
 										{Application: v7action.Application{Name: appName2}},
 									},
 									v7pushaction.Warnings{"conceptualize-warning-1"}, nil)
 							})
 
-							It("generates a push state with the specified app path", func() {
+							It("generates a push plan with the specified app path", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 								Expect(testUI.Out).To(Say(
 									"Pushing apps %s, %s to org some-org / space some-space as some-user",
@@ -469,7 +469,7 @@ var _ = Describe("push Command", func() {
 									BeforeEach(func() {
 										fakeActor.ActualizeStub = FillInValues([]Step{
 											{},
-										}, v7pushaction.PushState{Application: v7action.Application{GUID: "potato"}})
+										}, v7pushaction.PushPlan{Application: v7action.Application{GUID: "potato"}})
 									})
 
 									Describe("actualize events", func() {
@@ -504,7 +504,7 @@ var _ = Describe("push Command", func() {
 												{
 													Event: v7pushaction.UploadWithArchiveComplete,
 												},
-											}, v7pushaction.PushState{})
+											}, v7pushaction.PushPlan{})
 										})
 
 										It("actualizes the application and displays events/warnings", func() {
@@ -563,7 +563,7 @@ var _ = Describe("push Command", func() {
 												{
 													Event: v7pushaction.StartingStaging,
 												},
-											}, v7pushaction.PushState{})
+											}, v7pushaction.PushPlan{})
 										})
 
 										When("there are no logging errors", func() {
@@ -841,7 +841,7 @@ var _ = Describe("push Command", func() {
 											{
 												Error: errors.New("anti avant garde naming"),
 											},
-										}, v7pushaction.PushState{})
+										}, v7pushaction.PushPlan{})
 									})
 
 									It("returns the error", func() {
@@ -856,7 +856,7 @@ var _ = Describe("push Command", func() {
 								cmd.AppPath = "some/app/path"
 							})
 
-							It("generates a push state with the specified flag overrides", func() {
+							It("generates a push plan with the specified flag overrides", func() {
 								Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
 								_, _, _, _, overrides := fakeActor.ConceptualizeArgsForCall(0)
 								Expect(overrides).To(MatchFields(IgnoreExtras, Fields{
@@ -873,7 +873,7 @@ var _ = Describe("push Command", func() {
 								fakeActor.ConceptualizeReturns(nil, v7pushaction.Warnings{"some-warning-1"}, expectedErr)
 							})
 
-							It("generates a push state with the specified app path", func() {
+							It("generates a push plan with the specified app path", func() {
 								Expect(executeErr).To(MatchError(expectedErr))
 								Expect(testUI.Err).To(Say("some-warning-1"))
 							})

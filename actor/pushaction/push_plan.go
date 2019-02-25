@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 )
 
-type PushState struct {
+type PushPlan struct {
 	Application        v3action.Application
 	SpaceGUID          string
 	BitsPath           string
@@ -16,7 +16,7 @@ type PushState struct {
 	Archive            bool
 }
 
-func (actor Actor) Conceptualize(settings CommandLineSettings, spaceGUID string) ([]PushState, Warnings, error) {
+func (actor Actor) Conceptualize(settings CommandLineSettings, spaceGUID string) ([]PushPlan, Warnings, error) {
 	var (
 		application v3action.Application
 		warnings    v3action.Warnings
@@ -39,7 +39,7 @@ func (actor Actor) Conceptualize(settings CommandLineSettings, spaceGUID string)
 
 	resources, err := actor.SharedActor.GatherDirectoryResources(bitsPath)
 
-	desiredState := []PushState{
+	desiredState := []PushPlan{
 		{
 			Application:  application,
 			SpaceGUID:    spaceGUID,

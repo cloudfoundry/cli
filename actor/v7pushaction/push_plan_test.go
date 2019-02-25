@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("Push State", func() {
+var _ = Describe("Push plan", func() {
 	var (
 		actor           *Actor
 		fakeV7Actor     *v7pushactionfakes.FakeV7Actor
@@ -38,7 +38,7 @@ var _ = Describe("Push State", func() {
 			currentDir    string
 			flagOverrides FlagOverrides
 
-			states     []PushState
+			plans      []PushPlan
 			warnings   Warnings
 			executeErr error
 		)
@@ -56,7 +56,7 @@ var _ = Describe("Push State", func() {
 		})
 
 		JustBeforeEach(func() {
-			states, warnings, executeErr = actor.Conceptualize(appNames, spaceGUID, orgGUID, currentDir, flagOverrides)
+			plans, warnings, executeErr = actor.Conceptualize(appNames, spaceGUID, orgGUID, currentDir, flagOverrides)
 		})
 
 		Describe("application", func() {
@@ -81,12 +81,12 @@ var _ = Describe("Push State", func() {
 					fakeV7Actor.GetApplicationsByNamesAndSpaceReturns(apps, v7action.Warnings{"plural-get-warning"}, nil)
 				})
 
-				It("returns multiple push states", func() {
+				It("returns multiple push plans", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("plural-get-warning"))
-					Expect(states).To(HaveLen(len(apps)))
+					Expect(plans).To(HaveLen(len(apps)))
 
-					Expect(states).To(ConsistOf(
+					Expect(plans).To(ConsistOf(
 						MatchFields(IgnoreExtras, Fields{
 							"Application": Equal(apps[0]),
 							"SpaceGUID":   Equal(spaceGUID),
@@ -119,7 +119,7 @@ var _ = Describe("Push State", func() {
 			})
 		})
 
-		Describe("Push state construction", func() {
+		Describe("Push plan construction", func() {
 			var apps = []v7action.Application{
 				{
 					GUID: "app-guid-0",
@@ -140,7 +140,7 @@ var _ = Describe("Push State", func() {
 			})
 
 			It("defaults to needsUpdate = false", func() {
-				Expect(states[0].ApplicationNeedsUpdate).To(Equal(false))
+				Expect(plans[0].ApplicationNeedsUpdate).To(Equal(false))
 			})
 
 			Describe("lifecycle types", func() {
@@ -151,13 +151,13 @@ var _ = Describe("Push State", func() {
 
 					It("sets the buildpacks on the apps", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(states[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeBuildpack))
-						Expect(states[1].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeBuildpack))
-						Expect(states[0].Application.LifecycleBuildpacks).To(ConsistOf("some-buildpack-1", "some-buildpack-2"))
+						Expect(plans[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeBuildpack))
+						Expect(plans[1].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeBuildpack))
+						Expect(plans[0].Application.LifecycleBuildpacks).To(ConsistOf("some-buildpack-1", "some-buildpack-2"))
 					})
 
 					It("sets needsUpdate", func() {
-						Expect(states[0].ApplicationNeedsUpdate).To(Equal(true))
+						Expect(plans[0].ApplicationNeedsUpdate).To(Equal(true))
 					})
 				})
 
@@ -168,12 +168,12 @@ var _ = Describe("Push State", func() {
 
 					It("sets the stack on the app", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(states[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeBuildpack))
-						Expect(states[0].Application.StackName).To(Equal("validStack"))
+						Expect(plans[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeBuildpack))
+						Expect(plans[0].Application.StackName).To(Equal("validStack"))
 					})
 
 					It("sets needsUpdate", func() {
-						Expect(states[0].ApplicationNeedsUpdate).To(Equal(true))
+						Expect(plans[0].ApplicationNeedsUpdate).To(Equal(true))
 					})
 				})
 
@@ -182,11 +182,11 @@ var _ = Describe("Push State", func() {
 			Describe("bits path", func() {
 				When("no app path is provided in the command line settings", func() {
 					It("sets the bits path to the current directory in the settings", func() {
-						Expect(states[0].BitsPath).To(Equal(pwd))
+						Expect(plans[0].BitsPath).To(Equal(pwd))
 					})
 
 					It("does not set needsUpdate", func() {
-						Expect(states[0].ApplicationNeedsUpdate).To(Equal(false))
+						Expect(plans[0].ApplicationNeedsUpdate).To(Equal(false))
 					})
 				})
 
@@ -194,7 +194,7 @@ var _ = Describe("Push State", func() {
 					var providedPath string
 
 					BeforeEach(func() {
-						archive, err := ioutil.TempFile("", "push-state-provided-path")
+						archive, err := ioutil.TempFile("", "push-plan-provided-path")
 						Expect(err).ToNot(HaveOccurred())
 						defer archive.Close()
 
@@ -204,8 +204,8 @@ var _ = Describe("Push State", func() {
 
 					It("sets the bits paths to the provided app path", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(states[0].BitsPath).To(Equal(providedPath))
-						Expect(states[1].BitsPath).To(Equal(providedPath))
+						Expect(plans[0].BitsPath).To(Equal(providedPath))
+						Expect(plans[1].BitsPath).To(Equal(providedPath))
 					})
 				})
 			})
@@ -224,16 +224,16 @@ var _ = Describe("Push State", func() {
 							fakeSharedActor.GatherDirectoryResourcesReturns(resources, nil)
 						})
 
-						It("adds the gathered resources to the push state", func() {
+						It("adds the gathered resources to the push plan", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(3))
 							Expect(fakeSharedActor.GatherDirectoryResourcesArgsForCall(0)).To(Equal(pwd))
-							Expect(states[0].AllResources).To(Equal(resources))
+							Expect(plans[0].AllResources).To(Equal(resources))
 						})
 
 						It("sets Archive to false", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(states[0].Archive).To(BeFalse())
+							Expect(plans[0].Archive).To(BeFalse())
 						})
 					})
 
@@ -252,7 +252,7 @@ var _ = Describe("Push State", func() {
 					var archivePath string
 
 					BeforeEach(func() {
-						archive, err := ioutil.TempFile("", "push-state-archive")
+						archive, err := ioutil.TempFile("", "push-plan-archive")
 						Expect(err).ToNot(HaveOccurred())
 						defer archive.Close()
 
@@ -276,16 +276,16 @@ var _ = Describe("Push State", func() {
 							fakeSharedActor.GatherArchiveResourcesReturns(resources, nil)
 						})
 
-						It("adds the gathered resources to the push state", func() {
+						It("adds the gathered resources to the push plan", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(fakeSharedActor.GatherArchiveResourcesCallCount()).To(Equal(3))
 							Expect(fakeSharedActor.GatherArchiveResourcesArgsForCall(0)).To(Equal(archivePath))
-							Expect(states[0].AllResources).To(Equal(resources))
+							Expect(plans[0].AllResources).To(Equal(resources))
 						})
 
 						It("sets Archive to true", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(states[0].Archive).To(BeTrue())
+							Expect(plans[0].Archive).To(BeTrue())
 						})
 					})
 
@@ -307,7 +307,7 @@ var _ = Describe("Push State", func() {
 				})
 
 				It("sets the all the flag overrides on the state", func() {
-					Expect(states[0].Overrides).To(Equal(flagOverrides))
+					Expect(plans[0].Overrides).To(Equal(flagOverrides))
 				})
 			})
 		})

@@ -9,37 +9,37 @@ import (
 )
 
 type FakeV3PushActor struct {
-	ActualizeStub        func(pushaction.PushState, pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
+	ActualizeStub        func(pushaction.PushPlan, pushaction.ProgressBar) (<-chan pushaction.PushPlan, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
 	actualizeMutex       sync.RWMutex
 	actualizeArgsForCall []struct {
-		arg1 pushaction.PushState
+		arg1 pushaction.PushPlan
 		arg2 pushaction.ProgressBar
 	}
 	actualizeReturns struct {
-		result1 <-chan pushaction.PushState
+		result1 <-chan pushaction.PushPlan
 		result2 <-chan pushaction.Event
 		result3 <-chan pushaction.Warnings
 		result4 <-chan error
 	}
 	actualizeReturnsOnCall map[int]struct {
-		result1 <-chan pushaction.PushState
+		result1 <-chan pushaction.PushPlan
 		result2 <-chan pushaction.Event
 		result3 <-chan pushaction.Warnings
 		result4 <-chan error
 	}
-	ConceptualizeStub        func(pushaction.CommandLineSettings, string) ([]pushaction.PushState, pushaction.Warnings, error)
+	ConceptualizeStub        func(pushaction.CommandLineSettings, string) ([]pushaction.PushPlan, pushaction.Warnings, error)
 	conceptualizeMutex       sync.RWMutex
 	conceptualizeArgsForCall []struct {
 		arg1 pushaction.CommandLineSettings
 		arg2 string
 	}
 	conceptualizeReturns struct {
-		result1 []pushaction.PushState
+		result1 []pushaction.PushPlan
 		result2 pushaction.Warnings
 		result3 error
 	}
 	conceptualizeReturnsOnCall map[int]struct {
-		result1 []pushaction.PushState
+		result1 []pushaction.PushPlan
 		result2 pushaction.Warnings
 		result3 error
 	}
@@ -47,11 +47,11 @@ type FakeV3PushActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3PushActor) Actualize(arg1 pushaction.PushState, arg2 pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+func (fake *FakeV3PushActor) Actualize(arg1 pushaction.PushPlan, arg2 pushaction.ProgressBar) (<-chan pushaction.PushPlan, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
 	fake.actualizeMutex.Lock()
 	ret, specificReturn := fake.actualizeReturnsOnCall[len(fake.actualizeArgsForCall)]
 	fake.actualizeArgsForCall = append(fake.actualizeArgsForCall, struct {
-		arg1 pushaction.PushState
+		arg1 pushaction.PushPlan
 		arg2 pushaction.ProgressBar
 	}{arg1, arg2})
 	fake.recordInvocation("Actualize", []interface{}{arg1, arg2})
@@ -72,52 +72,52 @@ func (fake *FakeV3PushActor) ActualizeCallCount() int {
 	return len(fake.actualizeArgsForCall)
 }
 
-func (fake *FakeV3PushActor) ActualizeCalls(stub func(pushaction.PushState, pushaction.ProgressBar) (<-chan pushaction.PushState, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)) {
+func (fake *FakeV3PushActor) ActualizeCalls(stub func(pushaction.PushPlan, pushaction.ProgressBar) (<-chan pushaction.PushPlan, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)) {
 	fake.actualizeMutex.Lock()
 	defer fake.actualizeMutex.Unlock()
 	fake.ActualizeStub = stub
 }
 
-func (fake *FakeV3PushActor) ActualizeArgsForCall(i int) (pushaction.PushState, pushaction.ProgressBar) {
+func (fake *FakeV3PushActor) ActualizeArgsForCall(i int) (pushaction.PushPlan, pushaction.ProgressBar) {
 	fake.actualizeMutex.RLock()
 	defer fake.actualizeMutex.RUnlock()
 	argsForCall := fake.actualizeArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV3PushActor) ActualizeReturns(result1 <-chan pushaction.PushState, result2 <-chan pushaction.Event, result3 <-chan pushaction.Warnings, result4 <-chan error) {
+func (fake *FakeV3PushActor) ActualizeReturns(result1 <-chan pushaction.PushPlan, result2 <-chan pushaction.Event, result3 <-chan pushaction.Warnings, result4 <-chan error) {
 	fake.actualizeMutex.Lock()
 	defer fake.actualizeMutex.Unlock()
 	fake.ActualizeStub = nil
 	fake.actualizeReturns = struct {
-		result1 <-chan pushaction.PushState
+		result1 <-chan pushaction.PushPlan
 		result2 <-chan pushaction.Event
 		result3 <-chan pushaction.Warnings
 		result4 <-chan error
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeV3PushActor) ActualizeReturnsOnCall(i int, result1 <-chan pushaction.PushState, result2 <-chan pushaction.Event, result3 <-chan pushaction.Warnings, result4 <-chan error) {
+func (fake *FakeV3PushActor) ActualizeReturnsOnCall(i int, result1 <-chan pushaction.PushPlan, result2 <-chan pushaction.Event, result3 <-chan pushaction.Warnings, result4 <-chan error) {
 	fake.actualizeMutex.Lock()
 	defer fake.actualizeMutex.Unlock()
 	fake.ActualizeStub = nil
 	if fake.actualizeReturnsOnCall == nil {
 		fake.actualizeReturnsOnCall = make(map[int]struct {
-			result1 <-chan pushaction.PushState
+			result1 <-chan pushaction.PushPlan
 			result2 <-chan pushaction.Event
 			result3 <-chan pushaction.Warnings
 			result4 <-chan error
 		})
 	}
 	fake.actualizeReturnsOnCall[i] = struct {
-		result1 <-chan pushaction.PushState
+		result1 <-chan pushaction.PushPlan
 		result2 <-chan pushaction.Event
 		result3 <-chan pushaction.Warnings
 		result4 <-chan error
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeV3PushActor) Conceptualize(arg1 pushaction.CommandLineSettings, arg2 string) ([]pushaction.PushState, pushaction.Warnings, error) {
+func (fake *FakeV3PushActor) Conceptualize(arg1 pushaction.CommandLineSettings, arg2 string) ([]pushaction.PushPlan, pushaction.Warnings, error) {
 	fake.conceptualizeMutex.Lock()
 	ret, specificReturn := fake.conceptualizeReturnsOnCall[len(fake.conceptualizeArgsForCall)]
 	fake.conceptualizeArgsForCall = append(fake.conceptualizeArgsForCall, struct {
@@ -142,7 +142,7 @@ func (fake *FakeV3PushActor) ConceptualizeCallCount() int {
 	return len(fake.conceptualizeArgsForCall)
 }
 
-func (fake *FakeV3PushActor) ConceptualizeCalls(stub func(pushaction.CommandLineSettings, string) ([]pushaction.PushState, pushaction.Warnings, error)) {
+func (fake *FakeV3PushActor) ConceptualizeCalls(stub func(pushaction.CommandLineSettings, string) ([]pushaction.PushPlan, pushaction.Warnings, error)) {
 	fake.conceptualizeMutex.Lock()
 	defer fake.conceptualizeMutex.Unlock()
 	fake.ConceptualizeStub = stub
@@ -155,30 +155,30 @@ func (fake *FakeV3PushActor) ConceptualizeArgsForCall(i int) (pushaction.Command
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeV3PushActor) ConceptualizeReturns(result1 []pushaction.PushState, result2 pushaction.Warnings, result3 error) {
+func (fake *FakeV3PushActor) ConceptualizeReturns(result1 []pushaction.PushPlan, result2 pushaction.Warnings, result3 error) {
 	fake.conceptualizeMutex.Lock()
 	defer fake.conceptualizeMutex.Unlock()
 	fake.ConceptualizeStub = nil
 	fake.conceptualizeReturns = struct {
-		result1 []pushaction.PushState
+		result1 []pushaction.PushPlan
 		result2 pushaction.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3PushActor) ConceptualizeReturnsOnCall(i int, result1 []pushaction.PushState, result2 pushaction.Warnings, result3 error) {
+func (fake *FakeV3PushActor) ConceptualizeReturnsOnCall(i int, result1 []pushaction.PushPlan, result2 pushaction.Warnings, result3 error) {
 	fake.conceptualizeMutex.Lock()
 	defer fake.conceptualizeMutex.Unlock()
 	fake.ConceptualizeStub = nil
 	if fake.conceptualizeReturnsOnCall == nil {
 		fake.conceptualizeReturnsOnCall = make(map[int]struct {
-			result1 []pushaction.PushState
+			result1 []pushaction.PushPlan
 			result2 pushaction.Warnings
 			result3 error
 		})
 	}
 	fake.conceptualizeReturnsOnCall[i] = struct {
-		result1 []pushaction.PushState
+		result1 []pushaction.PushPlan
 		result2 pushaction.Warnings
 		result3 error
 	}{result1, result2, result3}

@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type PushState struct {
+type PushPlan struct {
 	Application v7action.Application
 	SpaceGUID   string
 	OrgGUID     string
@@ -43,7 +43,7 @@ type FlagOverrides struct {
 	StartCommand        types.FilteredString
 }
 
-func (state PushState) String() string {
+func (state PushPlan) String() string {
 	return fmt.Sprintf(
 		"Application: %#v - Space GUID: %s, Org GUID: %s, Archive: %t, Bits Path: %s",
 		state.Application,
@@ -69,7 +69,7 @@ func (actor Actor) Conceptualize(
 	orgGUID string,
 	currentDir string,
 	flagOverrides FlagOverrides,
-) ([]PushState, Warnings, error) {
+) ([]PushPlan, Warnings, error) {
 	var (
 		applications []v7action.Application
 		warnings     v7action.Warnings
@@ -84,7 +84,7 @@ func (actor Actor) Conceptualize(
 		return nil, Warnings(warnings), err
 	}
 
-	pushStates := []PushState{}
+	pushPlans := []PushPlan{}
 	for _, application := range applications {
 		applicationNeedsUpdate := false
 
@@ -123,7 +123,7 @@ func (actor Actor) Conceptualize(
 			return nil, Warnings(warnings), err
 		}
 
-		pushStates = append(pushStates, PushState{
+		pushPlans = append(pushPlans, PushPlan{
 			Application: application,
 			SpaceGUID:   spaceGUID,
 			OrgGUID:     orgGUID,
@@ -136,5 +136,5 @@ func (actor Actor) Conceptualize(
 		})
 	}
 
-	return pushStates, Warnings(warnings), err
+	return pushPlans, Warnings(warnings), err
 }

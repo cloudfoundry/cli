@@ -8,11 +8,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (actor Actor) Actualize(state PushState, progressBar ProgressBar) (
-	<-chan PushState, <-chan Event, <-chan Warnings, <-chan error,
+func (actor Actor) Actualize(state PushPlan, progressBar ProgressBar) (
+	<-chan PushPlan, <-chan Event, <-chan Warnings, <-chan error,
 ) {
-	log.Debugf("Starting to Actualize Push State: %#v\n", state)
-	stateStream := make(chan PushState)
+	log.Debugf("Starting to Actualize Push plan: %#v\n", state)
+	stateStream := make(chan PushPlan)
 	eventStream := make(chan Event)
 	warningsStream := make(chan Warnings)
 	errorStream := make(chan error)

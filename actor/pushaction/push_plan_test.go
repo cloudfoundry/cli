@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("Push State", func() {
+var _ = Describe("Push plan", func() {
 	var (
 		actor           *Actor
 		fakeV3Actor     *pushactionfakes.FakeV3Actor
@@ -33,7 +33,7 @@ var _ = Describe("Push State", func() {
 			settings  CommandLineSettings
 			spaceGUID string
 
-			states     []PushState
+			states     []PushPlan
 			warnings   Warnings
 			executeErr error
 		)
@@ -112,7 +112,7 @@ var _ = Describe("Push State", func() {
 					fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"some-app-warning"}, expectedErr)
 				})
 
-				It("translates command line settings into a single push state", func() {
+				It("translates command line settings into a single push plan", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("some-app-warning"))
 				})
@@ -152,7 +152,7 @@ var _ = Describe("Push State", func() {
 						fakeSharedActor.GatherDirectoryResourcesReturns(resources, nil)
 					})
 
-					It("adds the gathered resources to the push state", func() {
+					It("adds the gathered resources to the push plan", func() {
 						Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(1))
 						Expect(fakeSharedActor.GatherDirectoryResourcesArgsForCall(0)).To(Equal(pwd))
 						Expect(states[0].AllResources).To(Equal(resources))

@@ -10,25 +10,25 @@ import (
 )
 
 type FakePushActor struct {
-	ActualizeStub        func(v7pushaction.PushState, v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
+	ActualizeStub        func(v7pushaction.PushPlan, v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	actualizeMutex       sync.RWMutex
 	actualizeArgsForCall []struct {
-		arg1 v7pushaction.PushState
+		arg1 v7pushaction.PushPlan
 		arg2 v7pushaction.ProgressBar
 	}
 	actualizeReturns struct {
-		result1 <-chan v7pushaction.PushState
+		result1 <-chan v7pushaction.PushPlan
 		result2 <-chan v7pushaction.Event
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
 	}
 	actualizeReturnsOnCall map[int]struct {
-		result1 <-chan v7pushaction.PushState
+		result1 <-chan v7pushaction.PushPlan
 		result2 <-chan v7pushaction.Event
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
 	}
-	ConceptualizeStub        func([]string, string, string, string, v7pushaction.FlagOverrides) ([]v7pushaction.PushState, v7pushaction.Warnings, error)
+	ConceptualizeStub        func([]string, string, string, string, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
 	conceptualizeMutex       sync.RWMutex
 	conceptualizeArgsForCall []struct {
 		arg1 []string
@@ -38,12 +38,12 @@ type FakePushActor struct {
 		arg5 v7pushaction.FlagOverrides
 	}
 	conceptualizeReturns struct {
-		result1 []v7pushaction.PushState
+		result1 []v7pushaction.PushPlan
 		result2 v7pushaction.Warnings
 		result3 error
 	}
 	conceptualizeReturnsOnCall map[int]struct {
-		result1 []v7pushaction.PushState
+		result1 []v7pushaction.PushPlan
 		result2 v7pushaction.Warnings
 		result3 error
 	}
@@ -71,11 +71,11 @@ type FakePushActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakePushActor) Actualize(arg1 v7pushaction.PushState, arg2 v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
+func (fake *FakePushActor) Actualize(arg1 v7pushaction.PushPlan, arg2 v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
 	fake.actualizeMutex.Lock()
 	ret, specificReturn := fake.actualizeReturnsOnCall[len(fake.actualizeArgsForCall)]
 	fake.actualizeArgsForCall = append(fake.actualizeArgsForCall, struct {
-		arg1 v7pushaction.PushState
+		arg1 v7pushaction.PushPlan
 		arg2 v7pushaction.ProgressBar
 	}{arg1, arg2})
 	fake.recordInvocation("Actualize", []interface{}{arg1, arg2})
@@ -96,52 +96,52 @@ func (fake *FakePushActor) ActualizeCallCount() int {
 	return len(fake.actualizeArgsForCall)
 }
 
-func (fake *FakePushActor) ActualizeCalls(stub func(v7pushaction.PushState, v7pushaction.ProgressBar) (<-chan v7pushaction.PushState, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)) {
+func (fake *FakePushActor) ActualizeCalls(stub func(v7pushaction.PushPlan, v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)) {
 	fake.actualizeMutex.Lock()
 	defer fake.actualizeMutex.Unlock()
 	fake.ActualizeStub = stub
 }
 
-func (fake *FakePushActor) ActualizeArgsForCall(i int) (v7pushaction.PushState, v7pushaction.ProgressBar) {
+func (fake *FakePushActor) ActualizeArgsForCall(i int) (v7pushaction.PushPlan, v7pushaction.ProgressBar) {
 	fake.actualizeMutex.RLock()
 	defer fake.actualizeMutex.RUnlock()
 	argsForCall := fake.actualizeArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakePushActor) ActualizeReturns(result1 <-chan v7pushaction.PushState, result2 <-chan v7pushaction.Event, result3 <-chan v7pushaction.Warnings, result4 <-chan error) {
+func (fake *FakePushActor) ActualizeReturns(result1 <-chan v7pushaction.PushPlan, result2 <-chan v7pushaction.Event, result3 <-chan v7pushaction.Warnings, result4 <-chan error) {
 	fake.actualizeMutex.Lock()
 	defer fake.actualizeMutex.Unlock()
 	fake.ActualizeStub = nil
 	fake.actualizeReturns = struct {
-		result1 <-chan v7pushaction.PushState
+		result1 <-chan v7pushaction.PushPlan
 		result2 <-chan v7pushaction.Event
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakePushActor) ActualizeReturnsOnCall(i int, result1 <-chan v7pushaction.PushState, result2 <-chan v7pushaction.Event, result3 <-chan v7pushaction.Warnings, result4 <-chan error) {
+func (fake *FakePushActor) ActualizeReturnsOnCall(i int, result1 <-chan v7pushaction.PushPlan, result2 <-chan v7pushaction.Event, result3 <-chan v7pushaction.Warnings, result4 <-chan error) {
 	fake.actualizeMutex.Lock()
 	defer fake.actualizeMutex.Unlock()
 	fake.ActualizeStub = nil
 	if fake.actualizeReturnsOnCall == nil {
 		fake.actualizeReturnsOnCall = make(map[int]struct {
-			result1 <-chan v7pushaction.PushState
+			result1 <-chan v7pushaction.PushPlan
 			result2 <-chan v7pushaction.Event
 			result3 <-chan v7pushaction.Warnings
 			result4 <-chan error
 		})
 	}
 	fake.actualizeReturnsOnCall[i] = struct {
-		result1 <-chan v7pushaction.PushState
+		result1 <-chan v7pushaction.PushPlan
 		result2 <-chan v7pushaction.Event
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakePushActor) Conceptualize(arg1 []string, arg2 string, arg3 string, arg4 string, arg5 v7pushaction.FlagOverrides) ([]v7pushaction.PushState, v7pushaction.Warnings, error) {
+func (fake *FakePushActor) Conceptualize(arg1 []string, arg2 string, arg3 string, arg4 string, arg5 v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error) {
 	var arg1Copy []string
 	if arg1 != nil {
 		arg1Copy = make([]string, len(arg1))
@@ -174,7 +174,7 @@ func (fake *FakePushActor) ConceptualizeCallCount() int {
 	return len(fake.conceptualizeArgsForCall)
 }
 
-func (fake *FakePushActor) ConceptualizeCalls(stub func([]string, string, string, string, v7pushaction.FlagOverrides) ([]v7pushaction.PushState, v7pushaction.Warnings, error)) {
+func (fake *FakePushActor) ConceptualizeCalls(stub func([]string, string, string, string, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)) {
 	fake.conceptualizeMutex.Lock()
 	defer fake.conceptualizeMutex.Unlock()
 	fake.ConceptualizeStub = stub
@@ -187,30 +187,30 @@ func (fake *FakePushActor) ConceptualizeArgsForCall(i int) ([]string, string, st
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
-func (fake *FakePushActor) ConceptualizeReturns(result1 []v7pushaction.PushState, result2 v7pushaction.Warnings, result3 error) {
+func (fake *FakePushActor) ConceptualizeReturns(result1 []v7pushaction.PushPlan, result2 v7pushaction.Warnings, result3 error) {
 	fake.conceptualizeMutex.Lock()
 	defer fake.conceptualizeMutex.Unlock()
 	fake.ConceptualizeStub = nil
 	fake.conceptualizeReturns = struct {
-		result1 []v7pushaction.PushState
+		result1 []v7pushaction.PushPlan
 		result2 v7pushaction.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakePushActor) ConceptualizeReturnsOnCall(i int, result1 []v7pushaction.PushState, result2 v7pushaction.Warnings, result3 error) {
+func (fake *FakePushActor) ConceptualizeReturnsOnCall(i int, result1 []v7pushaction.PushPlan, result2 v7pushaction.Warnings, result3 error) {
 	fake.conceptualizeMutex.Lock()
 	defer fake.conceptualizeMutex.Unlock()
 	fake.ConceptualizeStub = nil
 	if fake.conceptualizeReturnsOnCall == nil {
 		fake.conceptualizeReturnsOnCall = make(map[int]struct {
-			result1 []v7pushaction.PushState
+			result1 []v7pushaction.PushPlan
 			result2 v7pushaction.Warnings
 			result3 error
 		})
 	}
 	fake.conceptualizeReturnsOnCall[i] = struct {
-		result1 []v7pushaction.PushState
+		result1 []v7pushaction.PushPlan
 		result2 v7pushaction.Warnings
 		result3 error
 	}{result1, result2, result3}
