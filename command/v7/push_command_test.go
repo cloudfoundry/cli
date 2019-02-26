@@ -649,74 +649,11 @@ var _ = Describe("push Command", func() {
 											When("when getting the application summary succeeds", func() {
 												BeforeEach(func() {
 													summary := v7action.ApplicationSummary{
-														Application: v7action.Application{
-															Name:  appName1,
-															State: constant.ApplicationStarted,
-														},
-														CurrentDroplet: v7action.Droplet{
-															Stack: "cflinuxfs2",
-															Buildpacks: []v7action.DropletBuildpack{
-																{
-																	Name:         "ruby_buildpack",
-																	DetectOutput: "some-detect-output",
-																},
-																{
-																	Name:         "some-buildpack",
-																	DetectOutput: "",
-																},
-															},
-														},
-														ProcessSummaries: v7action.ProcessSummaries{
-															{
-																Process: v7action.Process{
-																	Type:    constant.ProcessTypeWeb,
-																	Command: *types.NewFilteredString("some-command-1"),
-																},
-															},
-															{
-																Process: v7action.Process{
-																	Type:    "console",
-																	Command: *types.NewFilteredString("some-command-2"),
-																},
-															},
-														},
+														Application:      v7action.Application{},
+														CurrentDroplet:   v7action.Droplet{},
+														ProcessSummaries: v7action.ProcessSummaries{},
 													}
 													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(0, summary, v7action.Warnings{"app-1-summary-warning-1", "app-1-summary-warning-2"}, nil)
-
-													summary = v7action.ApplicationSummary{
-														Application: v7action.Application{
-															Name:  appName2,
-															State: constant.ApplicationStarted,
-														},
-														CurrentDroplet: v7action.Droplet{
-															Stack: "cflinuxfs2",
-															Buildpacks: []v7action.DropletBuildpack{
-																{
-																	Name:         "ruby_buildpack",
-																	DetectOutput: "some-detect-output",
-																},
-																{
-																	Name:         "some-buildpack",
-																	DetectOutput: "",
-																},
-															},
-														},
-														ProcessSummaries: v7action.ProcessSummaries{
-															{
-																Process: v7action.Process{
-																	Type:    constant.ProcessTypeWeb,
-																	Command: *types.NewFilteredString("some-command-1"),
-																},
-															},
-															{
-																Process: v7action.Process{
-																	Type:    "console",
-																	Command: *types.NewFilteredString("some-command-2"),
-																},
-															},
-														},
-													}
-
 													fakeVersionActor.GetApplicationSummaryByNameAndSpaceReturnsOnCall(1, summary, v7action.Warnings{"app-2-summary-warning-1", "app-2-summary-warning-2"}, nil)
 												})
 
@@ -724,35 +661,7 @@ var _ = Describe("push Command", func() {
 												// Use DI to pass in a new AppSummaryDisplayer to the Command instead.
 												It("displays the app summary", func() {
 													Expect(executeErr).ToNot(HaveOccurred())
-													Expect(testUI.Out).To(Say(`name:\s+first-app`))
-													Expect(testUI.Out).To(Say(`requested state:\s+started`))
-													Expect(testUI.Out).To(Say("type:\\s+web"))
-													Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
-													Expect(testUI.Out).To(Say("type:\\s+console"))
-													Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
-
-													Expect(testUI.Err).To(Say("app-1-summary-warning-1"))
-													Expect(testUI.Err).To(Say("app-1-summary-warning-2"))
-
-													Expect(testUI.Out).To(Say(`name:\s+second-app`))
-													Expect(testUI.Out).To(Say(`requested state:\s+started`))
-													Expect(testUI.Out).To(Say("type:\\s+web"))
-													Expect(testUI.Out).To(Say("start command:\\s+some-command-1"))
-													Expect(testUI.Out).To(Say("type:\\s+console"))
-													Expect(testUI.Out).To(Say("start command:\\s+some-command-2"))
-
-													Expect(testUI.Err).To(Say("app-2-summary-warning-1"))
-													Expect(testUI.Err).To(Say("app-2-summary-warning-2"))
-
 													Expect(fakeVersionActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(2))
-													name, spaceGUID, withObfuscatedValues, _ := fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-													Expect(name).To(Equal("first-app"))
-													Expect(spaceGUID).To(Equal("some-space-guid"))
-													Expect(withObfuscatedValues).To(BeTrue())
-													name, spaceGUID, withObfuscatedValues, _ = fakeVersionActor.GetApplicationSummaryByNameAndSpaceArgsForCall(1)
-													Expect(name).To(Equal("second-app"))
-													Expect(spaceGUID).To(Equal("some-space-guid"))
-													Expect(withObfuscatedValues).To(BeTrue())
 												})
 
 											})
