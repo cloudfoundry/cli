@@ -89,10 +89,10 @@ var _ = Describe("Actualize", func() {
 		fakeV7Actor     *v7pushactionfakes.FakeV7Actor
 		fakeSharedActor *v7pushactionfakes.FakeSharedActor
 
-		state           PushPlan
+		plan            PushPlan
 		fakeProgressBar *v7pushactionfakes.FakeProgressBar
 
-		stateStream    <-chan PushPlan
+		planStream     <-chan PushPlan
 		eventStream    <-chan Event
 		warningsStream <-chan Warnings
 		errorStream    <-chan error
@@ -106,7 +106,7 @@ var _ = Describe("Actualize", func() {
 		actor = NewActor(fakeV2Actor, fakeV7Actor, fakeSharedActor)
 
 		fakeProgressBar = new(v7pushactionfakes.FakeProgressBar)
-		state = PushPlan{
+		plan = PushPlan{
 			Application: v7action.Application{
 				Name: "some-app",
 				GUID: "some-app-guid",
@@ -127,21 +127,21 @@ var _ = Describe("Actualize", func() {
 	})
 
 	AfterEach(func() {
-		Eventually(actualizedStreamsDrainedAndClosed(stateStream, eventStream, warningsStream, errorStream)).Should(BeTrue())
+		Eventually(actualizedStreamsDrainedAndClosed(planStream, eventStream, warningsStream, errorStream)).Should(BeTrue())
 	})
 
 	JustBeforeEach(func() {
-		stateStream, eventStream, warningsStream, errorStream = actor.Actualize(state, fakeProgressBar)
+		planStream, eventStream, warningsStream, errorStream = actor.Actualize(plan, fakeProgressBar)
 	})
 
 	Describe("application", func() {
 		BeforeEach(func() {
-			state.Application.GUID = "some-app-guid"
+			plan.Application.GUID = "some-app-guid"
 		})
 
 		When("the apps needs an update", func() {
 			BeforeEach(func() {
-				state.ApplicationNeedsUpdate = true
+				plan.ApplicationNeedsUpdate = true
 			})
 
 			When("updating is successful", func() {
@@ -159,7 +159,7 @@ var _ = Describe("Actualize", func() {
 				It("puts the updated application in the stream", func() {
 					Eventually(warningsStream).Should(Receive(ConsistOf("some-app-update-warnings")))
 
-					Eventually(stateStream).Should(Receive(MatchFields(IgnoreExtras,
+					Eventually(planStream).Should(Receive(MatchFields(IgnoreExtras,
 						Fields{
 							"Application": Equal(v7action.Application{
 								Name:                "some-app",
@@ -188,13 +188,13 @@ var _ = Describe("Actualize", func() {
 			})
 		})
 
-		When("the state does not need an app update", func() {
+		When("the plan does not need an app update", func() {
 			BeforeEach(func() {
-				state.ApplicationNeedsUpdate = false
+				plan.ApplicationNeedsUpdate = false
 			})
 
 			It("does not update the application", func() {
-				Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(SkippingApplicationCreation))
+				Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(SkippingApplicationCreation))
 				Consistently(fakeV7Actor.UpdateApplicationCallCount).Should(Equal(0))
 			})
 		})
@@ -213,8 +213,8 @@ var _ = Describe("Actualize", func() {
 					instances = types.NullInt{IsSet: true, Value: 1000}
 					fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, nil)
 
-					state.Application.GUID = "some-app-guid"
-					state.Overrides = FlagOverrides{
+					plan.Application.GUID = "some-app-guid"
+					plan.Overrides = FlagOverrides{
 						Memory:    memory,
 						Disk:      disk,
 						Instances: instances,
@@ -222,16 +222,16 @@ var _ = Describe("Actualize", func() {
 					fakeV7Actor.UpdateApplicationReturns(
 						v7action.Application{
 							Name: "some-app",
-							GUID: state.Application.GUID,
+							GUID: plan.Application.GUID,
 						},
 						v7action.Warnings{"some-app-update-warnings"},
 						nil)
 				})
 
 				It("returns warnings and continues", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
 					Eventually(warningsStream).Should(Receive(ConsistOf("scaling-warnings")))
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcessComplete))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcessComplete))
 
 					Expect(fakeV7Actor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 					passedAppGUID, passedProcess := fakeV7Actor.ScaleProcessByApplicationArgsForCall(0)
@@ -249,7 +249,7 @@ var _ = Describe("Actualize", func() {
 			When("the scale errors", func() {
 				var expectedErr error
 				BeforeEach(func() {
-					state.Overrides = FlagOverrides{
+					plan.Overrides = FlagOverrides{
 						Memory: types.NullUint64{IsSet: true},
 					}
 					expectedErr = errors.New("nopes")
@@ -257,17 +257,17 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("returns warnings and an error", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
 					Eventually(warningsStream).Should(Receive(ConsistOf("scaling-warnings")))
 					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(ScaleWebProcessComplete))
+					Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(ScaleWebProcessComplete))
 				})
 			})
 		})
 
 		When("a scale override is not provided", func() {
 			It("should not scale the application", func() {
-				Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(ScaleWebProcess))
+				Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(ScaleWebProcess))
 				Consistently(fakeV7Actor.ScaleProcessByApplicationCallCount).Should(Equal(0))
 			})
 		})
@@ -277,12 +277,12 @@ var _ = Describe("Actualize", func() {
 		When("process configuration is provided", func() {
 			When("the update is successful", func() {
 				BeforeEach(func() {
-					state.Application.GUID = "some-app-guid"
+					plan.Application.GUID = "some-app-guid"
 
 					fakeV7Actor.UpdateApplicationReturns(
 						v7action.Application{
 							Name: "some-app",
-							GUID: state.Application.GUID,
+							GUID: plan.Application.GUID,
 						},
 						v7action.Warnings{"some-app-update-warnings"},
 						nil)
@@ -298,16 +298,16 @@ var _ = Describe("Actualize", func() {
 						healthCheckType = constant.HTTP
 						healthCheckEndpoint = "/the-health-check"
 
-						state.Overrides = FlagOverrides{
+						plan.Overrides = FlagOverrides{
 							HealthCheckType:     healthCheckType,
 							HealthCheckEndpoint: healthCheckEndpoint,
 						}
 					})
 
 					It("sets the health check config and returns warnings", func() {
-						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
 						Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
-						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
 
 						Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(1))
 						passedProcessType, passedAppGUID, passedProcess := fakeV7Actor.UpdateProcessByTypeAndApplicationArgsForCall(0)
@@ -327,15 +327,15 @@ var _ = Describe("Actualize", func() {
 
 					BeforeEach(func() {
 						command = *types.NewFilteredString("some-command")
-						state.Overrides = FlagOverrides{
+						plan.Overrides = FlagOverrides{
 							StartCommand: command,
 						}
 					})
 
 					It("sets the start command and returns warnings", func() {
-						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
 						Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
-						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
 
 						Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(1))
 						passedProcessType, passedAppGUID, passedProcess := fakeV7Actor.UpdateProcessByTypeAndApplicationArgsForCall(0)
@@ -358,7 +358,7 @@ var _ = Describe("Actualize", func() {
 						healthCheckType = constant.HTTP
 						healthCheckEndpoint = "/some-health-check"
 
-						state.Overrides = FlagOverrides{
+						plan.Overrides = FlagOverrides{
 							HealthCheckType:     healthCheckType,
 							HealthCheckEndpoint: healthCheckEndpoint,
 							StartCommand:        command,
@@ -366,9 +366,9 @@ var _ = Describe("Actualize", func() {
 					})
 
 					It("sets the health check config/start command and returns warnings", func() {
-						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
 						Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
-						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
 
 						Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(1))
 						passedProcessType, passedAppGUID, passedProcess := fakeV7Actor.UpdateProcessByTypeAndApplicationArgsForCall(0)
@@ -389,7 +389,7 @@ var _ = Describe("Actualize", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					state.Overrides = FlagOverrides{
+					plan.Overrides = FlagOverrides{
 						HealthCheckType: "doesn't matter",
 					}
 					expectedErr = errors.New("nopes")
@@ -397,17 +397,17 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("returns warnings and an error", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
 					Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
 					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(SetProcessConfigurationComplete))
+					Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(SetProcessConfigurationComplete))
 				})
 			})
 		})
 
 		When("process configuration is not provided", func() {
 			It("should not set the configuration", func() {
-				Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(SetProcessConfiguration))
+				Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(SetProcessConfiguration))
 				Consistently(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount).Should(Equal(0))
 			})
 		})
@@ -416,7 +416,7 @@ var _ = Describe("Actualize", func() {
 	Describe("default route creation", func() {
 		When("creating a default route", func() {
 			BeforeEach(func() {
-				state.Overrides.SkipRouteCreation = false
+				plan.Overrides.SkipRouteCreation = false
 			})
 
 			When("route creation and mapping is successful", func() {
@@ -448,9 +448,9 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("creates the route, maps it to the app, and returns any warnings", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingAndMappingRoutes))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingAndMappingRoutes))
 					Eventually(warningsStream).Should(Receive(ConsistOf("domain-warning", "route-warning", "route-create-warning", "map-warning")))
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatedRoutes))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatedRoutes))
 				})
 			})
 
@@ -472,21 +472,21 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("returns errors and warnings", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingAndMappingRoutes))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingAndMappingRoutes))
 					Eventually(warningsStream).Should(Receive(ConsistOf("domain-warning")))
 					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(CreatedRoutes))
+					Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(CreatedRoutes))
 				})
 			})
 		})
 
 		When("skipping default route creation", func() {
 			BeforeEach(func() {
-				state.Overrides.SkipRouteCreation = true
+				plan.Overrides.SkipRouteCreation = true
 			})
 
 			It("never attempts to create a route", func() {
-				Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Or(Equal(CreatingAndMappingRoutes), Equal(CreatedRoutes)))
+				Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Or(Equal(CreatingAndMappingRoutes), Equal(CreatedRoutes)))
 				Consistently(fakeV2Actor.GetApplicationRoutesCallCount).Should(BeZero())
 				Consistently(fakeV2Actor.CreateRouteCallCount).Should(BeZero())
 			})
@@ -497,15 +497,15 @@ var _ = Describe("Actualize", func() {
 	Describe("package upload", func() {
 		When("docker image is provided", func() {
 			BeforeEach(func() {
-				state.Application.LifecycleType = constant.AppLifecycleTypeDocker
-				state.Overrides.DockerImage = "some-docker-image"
-				state.Overrides.DockerPassword = "some-docker-password"
-				state.Overrides.DockerUsername = "some-docker-username"
+				plan.Application.LifecycleType = constant.AppLifecycleTypeDocker
+				plan.Overrides.DockerImage = "some-docker-image"
+				plan.Overrides.DockerPassword = "some-docker-password"
+				plan.Overrides.DockerUsername = "some-docker-username"
 
 				fakeV7Actor.CreateApplicationInSpaceReturns(
 					v7action.Application{
 						GUID:          "some-app-guid",
-						Name:          state.Application.Name,
+						Name:          plan.Application.Name,
 						LifecycleType: constant.AppLifecycleTypeDocker,
 					},
 					v7action.Warnings{"some-app-warnings"},
@@ -521,12 +521,12 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("sets the docker image", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetDockerImage))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetDockerImage))
 					Eventually(fakeV7Actor.CreateDockerPackageByApplicationCallCount).Should(Equal(1))
 					Eventually(warningsStream).Should(Receive(ConsistOf("some-package-warnings")))
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetDockerImageComplete))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetDockerImageComplete))
 
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
 					Eventually(fakeV7Actor.StageApplicationPackageCallCount).Should(Equal(1))
 
 					appGUID, dockerCredentials := fakeV7Actor.CreateDockerPackageByApplicationArgsForCall(0)
@@ -545,7 +545,7 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("does not create/upload archive", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(Complete))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(Complete))
 					Expect(fakeSharedActor.ZipDirectoryResourcesCallCount()).To(Equal(0))
 					Expect(fakeV7Actor.CreateBitsPackageByApplicationCallCount()).To(Equal(0))
 				})
@@ -560,17 +560,17 @@ var _ = Describe("Actualize", func() {
 				})
 
 				It("returns errors and warnings", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SetDockerImage))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetDockerImage))
 					Eventually(warningsStream).Should(Receive(ConsistOf("some-package-warnings")))
 					Eventually(errorStream).Should(Receive(MatchError(someErr)))
-					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(SetDockerImageComplete))
+					Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(SetDockerImageComplete))
 				})
 			})
 		})
 
 		When("uploading application bits", func() {
 			BeforeEach(func() {
-				state = PushPlan{
+				plan = PushPlan{
 					Application: v7action.Application{
 						Name: "some-app",
 						GUID: "some-app-guid",
@@ -587,11 +587,11 @@ var _ = Describe("Actualize", func() {
 
 			When("the bits path is an archive", func() {
 				BeforeEach(func() {
-					state.Archive = true
+					plan.Archive = true
 				})
 
 				It("creates the archive", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
 
 					Eventually(fakeSharedActor.ZipArchiveResourcesCallCount).Should(Equal(1))
 					bitsPath, resources := fakeSharedActor.ZipArchiveResourcesArgsForCall(0)
@@ -605,7 +605,7 @@ var _ = Describe("Actualize", func() {
 
 			When("The bits path is a directory", func() {
 				It("creates the archive", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
 
 					Eventually(fakeSharedActor.ZipDirectoryResourcesCallCount).Should(Equal(1))
 					bitsPath, resources := fakeSharedActor.ZipDirectoryResourcesArgsForCall(0)
@@ -623,14 +623,14 @@ var _ = Describe("Actualize", func() {
 					fakeV7Actor.UpdateApplicationReturns(
 						v7action.Application{
 							Name: "some-app",
-							GUID: state.Application.GUID,
+							GUID: plan.Application.GUID,
 						},
 						v7action.Warnings{"some-app-update-warnings"},
 						nil)
 				})
 
 				It("creates the package", func() {
-					Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
 
 					Eventually(fakeV7Actor.CreateBitsPackageByApplicationCallCount).Should(Equal(1))
 					Expect(fakeV7Actor.CreateBitsPackageByApplicationArgsForCall(0)).To(Equal("some-app-guid"))
@@ -642,7 +642,7 @@ var _ = Describe("Actualize", func() {
 					})
 
 					It("reads the archive", func() {
-						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
 						Eventually(fakeSharedActor.ReadArchiveCallCount).Should(Equal(1))
 						Expect(fakeSharedActor.ReadArchiveArgsForCall(0)).To(Equal("/some/archive/path"))
 					})
@@ -654,7 +654,7 @@ var _ = Describe("Actualize", func() {
 						})
 
 						It("uploads the bits package", func() {
-							Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+							Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
 							Eventually(fakeV7Actor.UploadBitsPackageCallCount).Should(Equal(1))
 							pkg, resource, _, size := fakeV7Actor.UploadBitsPackageArgsForCall(0)
 
@@ -672,7 +672,7 @@ var _ = Describe("Actualize", func() {
 							})
 
 							It("returns an upload complete event and warnings", func() {
-								Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+								Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
 								Eventually(warningsStream).Should(Receive(ConsistOf("some-upload-package-warning")))
 								Eventually(eventStream).Should(Receive(Equal(UploadWithArchiveComplete)))
 							})
@@ -687,19 +687,19 @@ var _ = Describe("Actualize", func() {
 									})
 
 									It("should send a RetryUpload event and retry uploading", func() {
-										Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
 										Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-										Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
+										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
 
-										Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
 										Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-										Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
+										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
 
-										Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
 										Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-										Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
+										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
 
-										Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
+										Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
 										Eventually(fakeV7Actor.UploadBitsPackageCallCount).Should(Equal(3))
 										Expect(errorStream).To(Receive(MatchError(actionerror.UploadFailedError{Err: someErr})))
 									})
@@ -712,9 +712,9 @@ var _ = Describe("Actualize", func() {
 									})
 
 									It("sends warnings and errors, then stops", func() {
-										Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
 										Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-										Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
+										Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
 										Eventually(errorStream).Should(Receive(MatchError("dios mio")))
 									})
 								})
@@ -727,7 +727,7 @@ var _ = Describe("Actualize", func() {
 							})
 
 							It("returns an error", func() {
-								Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
+								Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
 								Eventually(errorStream).Should(Receive(MatchError("the bits")))
 							})
 						})
@@ -739,7 +739,7 @@ var _ = Describe("Actualize", func() {
 						})
 
 						It("it returns errors and warnings", func() {
-							Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
+							Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
 
 							Eventually(warningsStream).Should(Receive(ConsistOf("package-creation-warning")))
 							Eventually(errorStream).Should(Receive(MatchError("the bits")))
@@ -753,7 +753,7 @@ var _ = Describe("Actualize", func() {
 					})
 
 					It("returns an error and exits", func() {
-						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
 
 						Eventually(errorStream).Should(Receive(MatchError("oh no")))
 					})
@@ -769,7 +769,7 @@ var _ = Describe("Actualize", func() {
 			})
 
 			It("returns warnings", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadWithArchiveComplete))
+				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadWithArchiveComplete))
 				Eventually(warningsStream).Should(Receive(ConsistOf("some-poll-package-warning")))
 			})
 		})
@@ -783,7 +783,7 @@ var _ = Describe("Actualize", func() {
 			})
 
 			It("returns errors and warnings", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(UploadWithArchiveComplete))
+				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadWithArchiveComplete))
 				Eventually(warningsStream).Should(Receive(ConsistOf("some-poll-package-warning")))
 				Eventually(errorStream).Should(Receive(MatchError(someErr)))
 			})
@@ -796,7 +796,7 @@ var _ = Describe("Actualize", func() {
 		})
 
 		It("stages the application using the package guid", func() {
-			Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
+			Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
 			Eventually(fakeV7Actor.StageApplicationPackageCallCount).Should(Equal(1))
 			Expect(fakeV7Actor.StageApplicationPackageArgsForCall(0)).To(Equal("some-pkg-guid"))
 		})
@@ -807,7 +807,7 @@ var _ = Describe("Actualize", func() {
 			})
 
 			It("returns a polling build event and warnings", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
+				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
 				Eventually(warningsStream).Should(Receive(ConsistOf("some-staging-warning")))
 				Eventually(eventStream).Should(Receive(Equal(PollingBuild)))
 			})
@@ -819,7 +819,7 @@ var _ = Describe("Actualize", func() {
 			})
 
 			It("returns errors and warnings", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
+				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
 				Eventually(warningsStream).Should(Receive(ConsistOf("some-staging-warning")))
 				Eventually(errorStream).Should(Receive(MatchError("ahhh, i failed")))
 			})
@@ -829,16 +829,16 @@ var _ = Describe("Actualize", func() {
 	Describe("no start", func() {
 		When("The no start flag is provided", func() {
 			BeforeEach(func() {
-				state.Overrides.NoStart = true
+				plan.Overrides.NoStart = true
 			})
 
 			When("The app is stopped", func() {
 				BeforeEach(func() {
-					state.Application.State = constant.ApplicationStopped
+					plan.Application.State = constant.ApplicationStopped
 				})
 
 				It("Uploads a package and exits", func() {
-					Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
+					Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
 					Expect(fakeV7Actor.StageApplicationPackageCallCount()).To(BeZero())
 				})
 			})
@@ -846,15 +846,15 @@ var _ = Describe("Actualize", func() {
 			When("The app is running", func() {
 				BeforeEach(func() {
 					fakeV7Actor.StopApplicationReturns(v7action.Warnings{"some-stopping-warning"}, nil)
-					state.Application.State = constant.ApplicationStarted
+					plan.Application.State = constant.ApplicationStarted
 				})
 
 				When("Stopping the app succeeds", func() {
 					It("Uploads a package and exits", func() {
-						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StoppingApplication))
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(StoppingApplication))
 						Eventually(warningsStream).Should(Receive(ConsistOf("some-stopping-warning")))
 						Eventually(eventStream).Should(Receive(Equal(StoppingApplicationComplete)))
-						Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
+						Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
 
 						Expect(fakeV7Actor.StopApplicationCallCount()).To(Equal(1))
 						actualGUID := fakeV7Actor.StopApplicationArgsForCall(0)
@@ -869,9 +869,9 @@ var _ = Describe("Actualize", func() {
 					})
 
 					It("returns errors and warnings", func() {
-						Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StoppingApplication))
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(StoppingApplication))
 						Eventually(warningsStream).Should(Receive(ConsistOf("some-stopping-warning")))
-						Consistently(getNextEvent(stateStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
+						Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
 						Eventually(errorStream).Should(Receive(MatchError("bummer")))
 					})
 				})
@@ -880,7 +880,7 @@ var _ = Describe("Actualize", func() {
 
 		When("The no start flag is not provided", func() {
 			It("stages the application using the package guid", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
+				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
 				Eventually(fakeV7Actor.StageApplicationPackageCallCount).Should(Equal(1))
 			})
 		})
@@ -893,7 +893,7 @@ var _ = Describe("Actualize", func() {
 			})
 
 			It("returns a staging complete event and warnings", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(PollingBuild))
+				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(PollingBuild))
 				Eventually(warningsStream).Should(Receive(ConsistOf("some-poll-build-warning")))
 				Eventually(eventStream).Should(Receive(Equal(StagingComplete)))
 			})
@@ -908,7 +908,7 @@ var _ = Describe("Actualize", func() {
 			})
 
 			It("returns errors and warnings", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(PollingBuild))
+				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(PollingBuild))
 				Eventually(warningsStream).Should(Receive(ConsistOf("some-poll-build-warning")))
 				Eventually(errorStream).Should(Receive(MatchError(someErr)))
 			})
@@ -922,7 +922,7 @@ var _ = Describe("Actualize", func() {
 			})
 
 			It("returns a SetDropletComplete event and warnings", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SettingDroplet))
+				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SettingDroplet))
 				Eventually(warningsStream).Should(Receive(ConsistOf("some-set-droplet-warning")))
 				Eventually(eventStream).Should(Receive(Equal(SetDropletComplete)))
 			})
@@ -934,7 +934,7 @@ var _ = Describe("Actualize", func() {
 			})
 
 			It("returns an error and warnings", func() {
-				Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(SettingDroplet))
+				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SettingDroplet))
 				Eventually(warningsStream).Should(Receive(ConsistOf("some-set-droplet-warning")))
 				Eventually(errorStream).Should(Receive(MatchError("the climate is arid")))
 			})
@@ -943,7 +943,7 @@ var _ = Describe("Actualize", func() {
 
 	When("all operations are finished", func() {
 		It("returns a complete event", func() {
-			Eventually(getNextEvent(stateStream, eventStream, warningsStream)).Should(Equal(Complete))
+			Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(Complete))
 		})
 	})
 })

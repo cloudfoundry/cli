@@ -123,19 +123,19 @@ func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) (
 	return planStream, eventStream, warningsStream, errorStream
 }
 
-func (actor Actor) CreateAndUploadApplicationBits(state PushPlan, progressBar ProgressBar, warningsStream chan Warnings, eventStream chan Event) (v7action.Package, error) {
-	log.WithField("Path", state.BitsPath).Info(string(CreatingArchive))
+func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar ProgressBar, warningsStream chan Warnings, eventStream chan Event) (v7action.Package, error) {
+	log.WithField("Path", plan.BitsPath).Info(string(CreatingArchive))
 
 	eventStream <- CreatingArchive
-	archivePath, err := actor.GetArchivePath(state)
+	archivePath, err := actor.GetArchivePath(plan)
 	if err != nil {
 		return v7action.Package{}, err
 	}
 	defer os.RemoveAll(archivePath)
 
 	eventStream <- CreatingPackage
-	log.WithField("GUID", state.Application.GUID).Info("creating package")
-	pkg, warnings, err := actor.V7Actor.CreateBitsPackageByApplication(state.Application.GUID)
+	log.WithField("GUID", plan.Application.GUID).Info("creating package")
+	pkg, warnings, err := actor.V7Actor.CreateBitsPackageByApplication(plan.Application.GUID)
 	warningsStream <- Warnings(warnings)
 	if err != nil {
 		return v7action.Package{}, err
@@ -144,7 +144,7 @@ func (actor Actor) CreateAndUploadApplicationBits(state PushPlan, progressBar Pr
 	// Uploading package/app bits
 	for count := 0; count < PushRetries; count++ {
 		eventStream <- ReadingArchive
-		log.WithField("GUID", state.Application.GUID).Info("reading archive")
+		log.WithField("GUID", plan.Application.GUID).Info("reading archive")
 		file, size, readErr := actor.SharedActor.ReadArchive(archivePath)
 		if readErr != nil {
 			return v7action.Package{}, readErr
@@ -153,7 +153,7 @@ func (actor Actor) CreateAndUploadApplicationBits(state PushPlan, progressBar Pr
 
 		eventStream <- UploadingApplicationWithArchive
 		progressReader := progressBar.NewProgressBarWrapper(file, size)
-		pkg, warnings, err = actor.V7Actor.UploadBitsPackage(pkg, state.MatchedResources, progressReader, size)
+		pkg, warnings, err = actor.V7Actor.UploadBitsPackage(pkg, plan.MatchedResources, progressReader, size)
 		warningsStream <- Warnings(warnings)
 
 		if _, ok := err.(ccerror.PipeSeekError); ok {
@@ -174,30 +174,30 @@ func (actor Actor) CreateAndUploadApplicationBits(state PushPlan, progressBar Pr
 	return pkg, nil
 }
 
-func (actor Actor) updateApplication(state PushPlan, warningsStream chan Warnings) (PushPlan, error) {
-	if !state.ApplicationNeedsUpdate {
-		return state, nil
+func (actor Actor) updateApplication(plan PushPlan, warningsStream chan Warnings) (PushPlan, error) {
+	if !plan.ApplicationNeedsUpdate {
+		return plan, nil
 	}
 
-	log.WithField("Name", state.Application.Name).Info("updating app")
+	log.WithField("Name", plan.Application.Name).Info("updating app")
 
-	application, warnings, err := actor.V7Actor.UpdateApplication(state.Application)
-	state.Application = application
+	application, warnings, err := actor.V7Actor.UpdateApplication(plan.Application)
+	plan.Application = application
 	warningsStream <- Warnings(warnings)
 	if err != nil {
-		return state, err
+		return plan, err
 	}
 
-	return state, nil
+	return plan, nil
 }
 
-func (actor Actor) CreatePackage(state PushPlan, progressBar ProgressBar, warningsStream chan Warnings, eventStream chan Event) (v7action.Package, error) {
-	if state.Application.LifecycleType == constant.AppLifecycleTypeDocker {
+func (actor Actor) CreatePackage(plan PushPlan, progressBar ProgressBar, warningsStream chan Warnings, eventStream chan Event) (v7action.Package, error) {
+	if plan.Application.LifecycleType == constant.AppLifecycleTypeDocker {
 		eventStream <- SetDockerImage
-		pkg, warnings, err := actor.V7Actor.CreateDockerPackageByApplication(state.Application.GUID, v7action.DockerImageCredentials{
-			Path:     state.Overrides.DockerImage,
-			Username: state.Overrides.DockerUsername,
-			Password: state.Overrides.DockerPassword,
+		pkg, warnings, err := actor.V7Actor.CreateDockerPackageByApplication(plan.Application.GUID, v7action.DockerImageCredentials{
+			Path:     plan.Overrides.DockerImage,
+			Username: plan.Overrides.DockerUsername,
+			Password: plan.Overrides.DockerPassword,
 		})
 		warningsStream <- Warnings(warnings)
 		if err != nil {
@@ -207,28 +207,28 @@ func (actor Actor) CreatePackage(state PushPlan, progressBar ProgressBar, warnin
 		return pkg, nil
 	}
 
-	return actor.CreateAndUploadApplicationBits(state, progressBar, warningsStream, eventStream)
+	return actor.CreateAndUploadApplicationBits(plan, progressBar, warningsStream, eventStream)
 }
 
-func (actor Actor) GetArchivePath(state PushPlan) (string, error) {
-	if state.Archive {
-		return actor.SharedActor.ZipArchiveResources(state.BitsPath, state.AllResources)
+func (actor Actor) GetArchivePath(plan PushPlan) (string, error) {
+	if plan.Archive {
+		return actor.SharedActor.ZipArchiveResources(plan.BitsPath, plan.AllResources)
 	}
-	return actor.SharedActor.ZipDirectoryResources(state.BitsPath, state.AllResources)
+	return actor.SharedActor.ZipDirectoryResources(plan.BitsPath, plan.AllResources)
 }
 
-func (actor Actor) ScaleProcess(state PushPlan, warningsStream chan Warnings, eventStream chan Event) error {
-	if shouldScaleProcess(state) {
+func (actor Actor) ScaleProcess(plan PushPlan, warningsStream chan Warnings, eventStream chan Event) error {
+	if shouldScaleProcess(plan) {
 		log.Info("Scaling Web Process")
 		eventStream <- ScaleWebProcess
 
 		process := v7action.Process{
 			Type:       constant.ProcessTypeWeb,
-			MemoryInMB: state.Overrides.Memory,
-			DiskInMB:   state.Overrides.Disk,
-			Instances:  state.Overrides.Instances,
+			MemoryInMB: plan.Overrides.Memory,
+			DiskInMB:   plan.Overrides.Disk,
+			Instances:  plan.Overrides.Instances,
 		}
-		scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(state.Application.GUID, process)
+		scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(plan.Application.GUID, process)
 		warningsStream <- Warnings(scaleWarnings)
 		if err != nil {
 			return err
@@ -239,26 +239,26 @@ func (actor Actor) ScaleProcess(state PushPlan, warningsStream chan Warnings, ev
 	return nil
 }
 
-func shouldScaleProcess(state PushPlan) bool {
-	return state.Overrides.Memory.IsSet || state.Overrides.Instances.IsSet || state.Overrides.Disk.IsSet
+func shouldScaleProcess(plan PushPlan) bool {
+	return plan.Overrides.Memory.IsSet || plan.Overrides.Instances.IsSet || plan.Overrides.Disk.IsSet
 }
 
-func (actor Actor) UpdateProcess(state PushPlan, warningsStream chan Warnings, eventStream chan Event) error {
-	if state.Overrides.StartCommand.IsSet || state.Overrides.HealthCheckType != "" {
+func (actor Actor) UpdateProcess(plan PushPlan, warningsStream chan Warnings, eventStream chan Event) error {
+	if plan.Overrides.StartCommand.IsSet || plan.Overrides.HealthCheckType != "" {
 		log.Info("Setting Web Process's Configuration")
 		eventStream <- SetProcessConfiguration
 
 		var process v7action.Process
-		if state.Overrides.StartCommand.IsSet {
-			process.Command = state.Overrides.StartCommand
+		if plan.Overrides.StartCommand.IsSet {
+			process.Command = plan.Overrides.StartCommand
 		}
-		if state.Overrides.HealthCheckType != "" {
-			process.HealthCheckType = state.Overrides.HealthCheckType
-			process.HealthCheckEndpoint = state.Overrides.HealthCheckEndpoint
+		if plan.Overrides.HealthCheckType != "" {
+			process.HealthCheckType = plan.Overrides.HealthCheckType
+			process.HealthCheckEndpoint = plan.Overrides.HealthCheckEndpoint
 		}
 
 		log.WithField("Process", process).Debug("Update process")
-		warnings, err := actor.V7Actor.UpdateProcessByTypeAndApplication(constant.ProcessTypeWeb, state.Application.GUID, process)
+		warnings, err := actor.V7Actor.UpdateProcessByTypeAndApplication(constant.ProcessTypeWeb, plan.Application.GUID, process)
 		warningsStream <- Warnings(warnings)
 		if err != nil {
 			return err
