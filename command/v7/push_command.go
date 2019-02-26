@@ -187,47 +187,14 @@ func (cmd PushCommand) Execute(args []string) error {
 			return err
 		}
 
-		anyProcessCrashed := false
-		if !cmd.NoStart {
-			cmd.UI.DisplayNewline()
-			cmd.UI.DisplayTextWithFlavor(
-				"Waiting for app {{.AppName}} to start...",
-				map[string]interface{}{
-					"AppName": plan.Application.Name,
-				},
-			)
-			warnings, restartErr := cmd.VersionActor.RestartApplication(updatedPlan.Application.GUID)
-			cmd.UI.DisplayWarnings(warnings)
-
-			if restartErr != nil {
-				if _, ok := restartErr.(actionerror.StartupTimeoutError); ok {
-					return translatableerror.StartupTimeoutError{
-						AppName:    plan.Application.Name,
-						BinaryName: cmd.Config.BinaryName(),
-					}
-				} else if _, ok := restartErr.(actionerror.AllInstancesCrashedError); ok {
-					anyProcessCrashed = true
-				} else {
-					return restartErr
-				}
-			}
-		}
-		log.Info("getting application summary info")
-		summary, warnings, err := cmd.VersionActor.GetApplicationSummaryByNameAndSpace(
-			plan.Application.Name,
-			cmd.Config.TargetedSpace().GUID,
-			true,
-			cmd.RouteActor,
-		)
-		cmd.UI.DisplayWarnings(warnings)
+		anyProcessCrashed, err := cmd.appRestarter(plan.Application.Name, updatedPlan.Application.GUID)
 		if err != nil {
 			return err
 		}
-
-		cmd.UI.DisplayNewline()
-		appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
-		appSummaryDisplayer.AppDisplay(summary, true)
-
+		err = cmd.displayAppSummary(plan)
+		if err != nil {
+			return err
+		}
 		if anyProcessCrashed {
 			return translatableerror.ApplicationUnableToStartError{
 				AppName:    plan.Application.Name,
@@ -254,6 +221,53 @@ func (cmd PushCommand) announcePushing(appNames []string, user configv3.User) {
 	} else {
 		cmd.UI.DisplayTextWithFlavor(plural, tokens)
 	}
+}
+
+func (cmd PushCommand) appRestarter(appName, appGUID string) (bool, error) {
+	anyProcessCrashed := false
+	if !cmd.NoStart {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayTextWithFlavor(
+			"Waiting for app {{.AppName}} to start...",
+			map[string]interface{}{
+				"AppName": appName,
+			},
+		)
+		warnings, restartErr := cmd.VersionActor.RestartApplication(appGUID)
+		cmd.UI.DisplayWarnings(warnings)
+
+		if restartErr != nil {
+			if _, ok := restartErr.(actionerror.StartupTimeoutError); ok {
+				return anyProcessCrashed, translatableerror.StartupTimeoutError{
+					AppName:    appName,
+					BinaryName: cmd.Config.BinaryName(),
+				}
+			} else if _, ok := restartErr.(actionerror.AllInstancesCrashedError); ok {
+				anyProcessCrashed = true
+			} else {
+				return anyProcessCrashed, restartErr
+			}
+		}
+	}
+	return anyProcessCrashed, nil
+}
+
+func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
+	log.Info("getting application summary info")
+	summary, warnings, err := cmd.VersionActor.GetApplicationSummaryByNameAndSpace(
+		plan.Application.Name,
+		cmd.Config.TargetedSpace().GUID,
+		true,
+		cmd.RouteActor,
+	)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+	cmd.UI.DisplayNewline()
+	appSummaryDisplayer := shared.NewAppSummaryDisplayer(cmd.UI)
+	appSummaryDisplayer.AppDisplay(summary, true)
+	return nil
 }
 
 func (cmd PushCommand) processStreamsFromPrepareSpace(
