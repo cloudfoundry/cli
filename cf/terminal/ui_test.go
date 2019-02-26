@@ -1,6 +1,7 @@
 package terminal_test
 
 import (
+	"errors"
 	"io"
 	"os"
 	"strings"
@@ -21,6 +22,12 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 )
+
+type readFailer struct{}
+
+func (r readFailer) Read(p []byte) (n int, err error) {
+	return 0, errors.New("read failer always fails")
+}
 
 var _ = Describe("UI", func() {
 	var fakeLogger *tracefakes.FakePrinter
@@ -90,11 +97,24 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		It("returns empty string if an error occured while reading string", func() {
-			_ = io_helpers.CaptureOutput(func() {
-				io_helpers.SimulateStdin("string without expected delimiter", func(reader io.Reader) {
-					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
+		When("reading from stdin fails", func() {
+			It("returns empty string", func() {
+				_ = io_helpers.CaptureOutput(func() {
+					ui := NewUI(&readFailer{}, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.Ask("?")).To(Equal(""))
+				})
+			})
+		})
+
+		When("a multi-line file is piped to the cli", func() {
+			It("consumes one line each prompt", func() {
+				_ = io_helpers.CaptureOutput(func() {
+					io_helpers.SimulateStdin("foo\nbar\nbat\n", func(reader io.Reader) {
+						ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
+						Expect(ui.Ask("?")).To(Equal("foo"))
+						Expect(ui.Ask("?")).To(Equal("bar"))
+						Expect(ui.Ask("?")).To(Equal("bat"))
+					})
 				})
 			})
 		})

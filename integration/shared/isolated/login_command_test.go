@@ -762,6 +762,35 @@ var _ = Describe("login command", func() {
 			})
 		})
 
+		When("multiple interactive prompts are used", func() {
+			var (
+				orgName  string
+				orgName2 string
+				username string
+				password string
+			)
+
+			BeforeEach(func() {
+				helpers.LoginCF()
+				orgName = helpers.NewOrgName()
+				session := helpers.CF("create-org", orgName)
+				Eventually(session).Should(Exit(0))
+				username, password = helpers.CreateUserInOrgRole(orgName, "OrgManager")
+
+				orgName2 = helpers.NewOrgName()
+				Eventually(helpers.CF("create-org", orgName2)).Should(Exit(0))
+				setOrgRoleSession := helpers.CF("set-org-role", username, orgName2, "OrgManager")
+				Eventually(setOrgRoleSession).Should(Exit(0))
+			})
+
+			It("should accept each value", func() {
+				input := NewBuffer()
+				input.Write([]byte(username + "\n" + orgName + "\n"))
+				session := helpers.CFWithStdin(input, "login", "-p", password)
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
 		When("the user provides the -p and -u flags", func() {
 			Context("and the credentials are correct", func() {
 				It("logs in successfully", func() {
