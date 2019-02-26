@@ -230,9 +230,14 @@ units-full: format vet lint build units-plugin units-non-plugin
 version: ## Print the version number of what would be built
 	@echo $(CF_BUILD_VERSION)+$(CF_BUILD_SHA).$(CF_BUILD_DATE)
 
+GO_VERSION=$$(go version)
 vet: ## Run go vet
 	@echo  "Vetting packages for potential issues..."
-	go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
+	if [[ $(GO_VERSION) =~ go1.11 ]] ; then \
+		go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version ;\
+	else \
+		go vet -all  ./api/... ./actor/... ./command ./integration/... ./types ./util ./version ;\
+	fi
 	@echo
 
 .PHONY: all build clean format version vet lint
