@@ -55,7 +55,6 @@ func (cmd DisableFeatureFlagCommand) Execute(args []string) error {
 		"FeatureFlag": cmd.RequiredArgs.Feature,
 		"Username":    user.Name,
 	})
-	cmd.UI.DisplayNewline()
 
 	warnings, err := cmd.Actor.DisableFeatureFlag(cmd.RequiredArgs.Feature)
 	cmd.UI.DisplayWarnings(warnings)
