@@ -525,12 +525,12 @@
   revision = "17bcc049122f272a32787ba38073ee47433023e9"
 
 [[projects]]
-  digest = "1:4fd1f40eda0f84905370fd2bcd92c7f169c2d2936ed9bcf75206e6884153593f"
+  digest = "1:30f55ee34f367e29620faaae69dcdf6b78a86348f3a1472cf63f2dbba0f9d4f7"
   name = "gopkg.in/cheggaaa/pb.v1"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "007b75a044e968336a69a6c0c617251ab62ac14c"
-  version = "v1.0.26"
+  revision = "1cc5bbe20449079337944d56292c7383510c534c"
+  version = "v1.0.27"
 
 [[projects]]
   digest = "1:1b91ae0dc69a41d4c2ed23ea5cffb721ea63f5037ca4b81e6d6771fbb8f45129"
