@@ -35,4 +35,61 @@ var _ = Describe("bind-route-service command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 	})
+
+	Describe("Targeted space requirements", func() {
+		Context("when an org or space is not targeted", func() {
+			It("display an error that no org or space is targeted", func() {
+				helpers.LoginCF()
+				session := helpers.CF("bind-route-service", "www.example.org", "myInstance")
+				Eventually(session).Should(Say("No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space"))
+			})
+		})
+
+		Context("when an org or space is targeted", func() {
+			var (
+				orgName             string
+				spaceName           string
+				domain              string
+				host                string
+				serviceInstanceName string
+			)
+
+			BeforeEach(func() {
+				orgName = helpers.NewOrgName()
+				spaceName = helpers.NewSpaceName()
+				host = helpers.PrefixedRandomName("host")
+
+				helpers.SetupCF(orgName, spaceName)
+				domain = helpers.DefaultSharedDomain()
+
+				serviceInstanceName = helpers.PrefixedRandomName("instance")
+				servicePlanName := "fake-plan"
+				serviceName := "fake-service"
+				broker := helpers.NewServiceBroker(
+					helpers.NewServiceBrokerName(),
+					helpers.NewAssets().ServiceBroker,
+					helpers.DefaultSharedDomain(),
+					serviceName,
+					servicePlanName,
+				)
+				broker.Push()
+				broker.Service.Requires = `["route_forwarding"]`
+				broker.Configure(true)
+				broker.Create()
+
+				Eventually(helpers.CF("enable-service-access", serviceName)).Should(Exit(0))
+				Eventually(helpers.CF("create-service", serviceName, servicePlanName, serviceInstanceName)).Should(Exit(0))
+				Eventually(helpers.CF("create-route", spaceName, domain, "--hostname", host)).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
+			It("succeeds", func() {
+				session := helpers.CF("bind-route-service", domain, serviceInstanceName, "--hostname", host)
+				Eventually(session).Should(Say("OK"))
+			})
+		})
+	})
 })

@@ -48,6 +48,7 @@ type ServiceBroker struct {
 		Name            string `json:"name"`
 		ID              string `json:"id"`
 		Bindable        bool   `json:"bindable"`
+		Requires        string `json:"-"`
 		DashboardClient struct {
 			ID          string `json:"id"`
 			Secret      string `json:"secret"`
@@ -66,6 +67,7 @@ func NewServiceBroker(name string, path string, appsDomain string, serviceName s
 	b.Service.Name = serviceName
 	b.Service.ID = RandomName()
 	b.Service.Bindable = true
+	b.Service.Requires = `[]`
 	b.SyncPlans = []Plan{
 		{Name: planName, ID: RandomName()},
 		{Name: RandomName(), ID: RandomName()},
@@ -89,6 +91,7 @@ func NewAsynchServiceBroker(name string, path string, appsDomain string, service
 	b.Service.Name = serviceName
 	b.Service.ID = RandomName()
 	b.Service.Bindable = true
+	b.Service.Requires = `[]`
 	b.SyncPlans = []Plan{
 		{Name: RandomName(), ID: RandomName()},
 		{Name: RandomName(), ID: RandomName()},
@@ -184,6 +187,7 @@ func (b ServiceBroker) ToJSON(shareable bool) string {
 		"\"<fake-plan-schema>\"", string(planSchema),
 		"\"<shareable-service>\"", fmt.Sprintf("%t", shareable),
 		"\"<bindable>\"", fmt.Sprintf("%t", b.Service.Bindable),
+		"\"<requires>\"", b.Service.Requires,
 	)
 
 	return replacer.Replace(string(bytes))
