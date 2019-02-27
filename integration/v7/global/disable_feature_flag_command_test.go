@@ -38,7 +38,6 @@ var _ = Describe("disable-feature-flags command", func() {
 		session := helpers.CF("disable-feature-flag", "private_domain_creation")
 		Eventually(session).Should(Say("Disabling feature flag private_domain_creation as"))
 		Eventually(session).Should(Say("OK"))
-		Eventually(session).Should(Say("Feature flag private_domain_creation disabled"))
 		Eventually(session).Should(Exit(0))
 
 		session = helpers.CF("feature-flag", "private_domain_creation")

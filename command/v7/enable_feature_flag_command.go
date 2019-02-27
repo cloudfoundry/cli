@@ -63,9 +63,5 @@ func (cmd EnableFeatureFlagCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayTextWithFlavor("Feature flag {{.FeatureFlag}} enabled",
-		map[string]interface{}{
-			"FeatureFlag": cmd.RequiredArgs.Feature,
-		})
 	return nil
 }
