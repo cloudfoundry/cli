@@ -34,6 +34,7 @@ type FlagOverrides struct {
 	DockerPassword      string
 	DockerUsername      string
 	HealthCheckEndpoint string
+	HealthCheckTimeout  int64
 	HealthCheckType     constant.HealthCheckType
 	Instances           types.NullInt
 	Memory              types.NullUint64

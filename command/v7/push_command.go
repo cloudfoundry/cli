@@ -60,6 +60,7 @@ type PushCommand struct {
 	DockerImage             flag.DockerImage              `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername          string                        `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	HealthCheckType         flag.HealthCheckType          `long:"health-check-type" short:"u" description:"Application health check type. Defaults to 'port'. 'http' requires a valid endpoint, for example, '/health'."`
+	HealthCheckTimeout      flag.PositiveInteger          `long:"app-start-timeout" short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
 	HealthCheckHTTPEndpoint string                        `long:"endpoint"  description:"Valid path on the app for an HTTP health check. Only used when specifying --health-check-type=http"`
 	Instances               flag.Instances                `long:"instances" short:"i" description:"Number of instances"`
 	PathToManifest          flag.PathWithExistenceCheck   `long:"manifest" short:"f" description:"Path to manifest"`
@@ -511,12 +512,12 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		DockerUsername:      cmd.DockerUsername,
 		HealthCheckEndpoint: cmd.HealthCheckHTTPEndpoint,
 		HealthCheckType:     cmd.HealthCheckType.Type,
-		Instances:           cmd.Instances.NullInt,
-		Memory:              cmd.Memory.NullUint64,
-		NoStart:             cmd.NoStart,
-		ProvidedAppPath:     string(cmd.AppPath),
-		SkipRouteCreation:   cmd.NoRoute,
-		StartCommand:        cmd.StartCommand.FilteredString,
+		HealthCheckTimeout:  cmd.HealthCheckTimeout.Value, Instances: cmd.Instances.NullInt,
+		Memory:            cmd.Memory.NullUint64,
+		NoStart:           cmd.NoStart,
+		ProvidedAppPath:   string(cmd.AppPath),
+		SkipRouteCreation: cmd.NoRoute,
+		StartCommand:      cmd.StartCommand.FilteredString,
 	}, nil
 }
 
