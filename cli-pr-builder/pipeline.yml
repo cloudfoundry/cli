@@ -105,7 +105,7 @@ jobs:
     - task: integration
       input_mapping:
         cli: cli-pr
-      file: cli/ci/cli-pr-builder/tasks/integration-linux.yml
+      file: cli-master/ci/cli-pr-builder/tasks/integration-linux.yml
       timeout: 1h30m
       params:
         CF_INT_IGNORE_API_VERSION_CHECK: false
