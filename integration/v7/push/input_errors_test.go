@@ -17,16 +17,6 @@ var _ = Describe("input errors", func() {
 		appName = helpers.PrefixedRandomName("app")
 	})
 
-	When("the app name is not provided", func() {
-		It("tells the user that the app name is required, prints help text, and exits 1", func() {
-			session := helpers.CF(PushCommandName)
-
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
 	When("the -p flag path does not exist", func() {
 		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
 			session := helpers.CF(PushCommandName, appName, "-p", "path/that/does/not/exist")

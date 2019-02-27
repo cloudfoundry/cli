@@ -54,7 +54,7 @@ type V7ActorForPush interface {
 }
 
 type PushCommand struct {
-	RequiredArgs            flag.AppName                  `positional-args:"yes"`
+	OptionalArgs            flag.OptionalAppName          `positional-args:"yes"`
 	Buildpacks              []string                      `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	Stack                   string                        `long:"stack" short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	DockerImage             flag.DockerImage              `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
@@ -148,7 +148,7 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	appNamesStream, eventStream, warningsStream, errorStream := cmd.Actor.PrepareSpace(
 		cmd.Config.TargetedSpace().GUID,
-		cmd.RequiredArgs.AppName,
+		cmd.OptionalArgs.AppName,
 		manifestParser,
 		overrides,
 	)
@@ -156,6 +156,9 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	if err != nil {
 		return err
+	}
+	if len(appNames) == 0 {
+		return translatableerror.AppNameOrManifestRequiredError{}
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -300,7 +303,7 @@ func (cmd PushCommand) processStreamsFromPrepareSpace(
 				eventClosed = true
 				break
 			}
-			cmd.processEvent(event, cmd.RequiredArgs.AppName)
+			cmd.processEvent(event, cmd.OptionalArgs.AppName)
 		case warnings, ok := <-warningsStream:
 			if !ok {
 				if !warningsClosed {

@@ -37,7 +37,7 @@ var _ = Describe("push with a simple manifest", func() {
 					},
 				})
 
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
 				Eventually(session).Should(Exit(0))
 			})
 

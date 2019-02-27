@@ -167,7 +167,7 @@ var _ = Describe("push Command", func() {
 		fakeConfig.ExperimentalReturns(true) // TODO: Delete once we remove the experimental flag
 
 		cmd = PushCommand{
-			RequiredArgs: flag.AppName{AppName: "passed-as-command-arg"},
+			OptionalArgs: flag.AppName{AppName: "passed-as-command-arg"},
 			UI:           testUI,
 			Config:       fakeConfig,
 			Actor:        fakeActor,
@@ -818,6 +818,36 @@ var _ = Describe("push Command", func() {
 					It("does not delegate to Actualize", func() {
 						Expect(fakeActor.ActualizeCallCount()).To(Equal(0))
 					})
+				})
+				When("Actor.PrepareSpace has no errors but returns no apps", func() {
+					var appNamesChannel chan []string
+
+					BeforeEach(func() {
+						appNamesChannel = make(chan []string)
+						close(appNamesChannel)
+						events, warnings, errors := FillInEvents([]Step{
+							{
+								Warnings: v7pushaction.Warnings{"prepare-no-app-or-manifest-space-warning"},
+								Error:    nil,
+							},
+						})
+
+						fakeActor.PrepareSpaceReturns(appNamesChannel, events, warnings, errors)
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError(translatableerror.AppNameOrManifestRequiredError{}))
+						Expect(testUI.Err).To(Say("prepare-no-app-or-manifest-space-warning"))
+					})
+
+					It("does not delegate to Conceptualize", func() {
+						Expect(fakeActor.ConceptualizeCallCount()).To(Equal(0))
+					})
+
+					It("does not delegate to Actualize", func() {
+						Expect(fakeActor.ActualizeCallCount()).To(Equal(0))
+					})
+
 				})
 			})
 		})

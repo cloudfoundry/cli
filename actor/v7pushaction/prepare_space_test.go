@@ -97,7 +97,6 @@ var _ = Describe("PrepareSpace", func() {
 
 		parser = manifestparser.NewParser()
 		spaceGUID = "some-space-guid"
-		appName = "some-app-name"
 	})
 
 	AfterEach(func() {
@@ -128,18 +127,39 @@ var _ = Describe("PrepareSpace", func() {
 			Expect(err).ToNot(HaveOccurred())
 			fakeV7Actor.SetSpaceManifestReturns(v7action.Warnings{"set-space-warning"}, nil)
 		})
+		When("An appname is specified", func() {
 
-		It("applies the manifest", func() {
-			Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
-			Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
-			Eventually(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(1))
-			actualSpaceGuid, actualManifestBytes := fakeV7Actor.SetSpaceManifestArgsForCall(0)
-			Expect(actualSpaceGuid).To(Equal(spaceGUID))
-			Expect(actualManifestBytes).To(Equal(yamlUnmarshalMarshal(manifest)))
-			Eventually(warningsStream).Should(Receive(Equal(Warnings{"set-space-warning"})))
-			Eventually(errorStream).Should(Receive(Succeed()))
-			Eventually(appNameStream).Should(Receive(ConsistOf("some-app-name")))
-			Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(ApplyManifestComplete))
+			It("applies the manifest", func() {
+				Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
+				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
+				Eventually(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(1))
+				actualSpaceGuid, actualManifestBytes := fakeV7Actor.SetSpaceManifestArgsForCall(0)
+				Expect(actualSpaceGuid).To(Equal(spaceGUID))
+				Expect(actualManifestBytes).To(Equal(yamlUnmarshalMarshal(manifest)))
+				Eventually(warningsStream).Should(Receive(Equal(Warnings{"set-space-warning"})))
+				Eventually(errorStream).Should(Receive(Succeed()))
+				Eventually(appNameStream).Should(Receive(ConsistOf("some-app-name")))
+				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(ApplyManifestComplete))
+			})
+		})
+
+		When("No app name is specified", func() {
+			BeforeEach(func() {
+				appName = ""
+			})
+
+			It("applies the manifest", func() {
+				Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
+				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
+				Eventually(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(1))
+				actualSpaceGuid, actualManifestBytes := fakeV7Actor.SetSpaceManifestArgsForCall(0)
+				Expect(actualSpaceGuid).To(Equal(spaceGUID))
+				Expect(actualManifestBytes).To(Equal(yamlUnmarshalMarshal(manifest)))
+				Eventually(warningsStream).Should(Receive(Equal(Warnings{"set-space-warning"})))
+				Eventually(errorStream).Should(Receive(Succeed()))
+				Eventually(appNameStream).Should(Receive(ConsistOf("some-app-name")))
+				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(ApplyManifestComplete))
+			})
 		})
 	})
 	// When("there is also an appName provided", func() {
@@ -190,6 +210,7 @@ applications:
 				v7action.Warnings{"create-app-warning"},
 				nil,
 			)
+			appName = "some-app-name"
 		})
 
 		When("The applications uses default lifecycle settings", func() {
@@ -235,6 +256,7 @@ applications:
 				v7action.Warnings{"create-app-warning"},
 				actionerror.ApplicationAlreadyExistsError{Name: "some-app-name"},
 			)
+			appName = "some-app-name"
 		})
 
 		It("does not apply the manifest", func() {
