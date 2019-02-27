@@ -4,13 +4,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 )
 
@@ -32,7 +30,7 @@ var _ = Describe("push with symlink path", func() {
 	})
 
 	AfterEach(func() {
-		Expect(os.RemoveAll(runningDir)).ToNot(HaveOccurred())
+		Expect(os.RemoveAll(runningDir)).To(Succeed())
 	})
 
 	Context("push with flag options", func() {
@@ -42,7 +40,7 @@ var _ = Describe("push with symlink path", func() {
 					Expect(os.Symlink(dir, symlinkedPath)).ToNot(HaveOccurred())
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: symlinkedPath}, PushCommandName, appName)
-					Eventually(session).Should(Say(`path:\s+(\/private)?%s`, regexp.QuoteMeta(dir)))
+					Eventually(session).Should(helpers.SayPath(`path:\s+(\/private)?%s`, dir))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -54,7 +52,7 @@ var _ = Describe("push with symlink path", func() {
 					Expect(os.Symlink(dir, symlinkedPath)).ToNot(HaveOccurred())
 
 					session := helpers.CF(PushCommandName, appName, "-p", symlinkedPath)
-					Eventually(session).Should(Say(`path:\s+(\/private)?%s`, regexp.QuoteMeta(dir)))
+					Eventually(session).Should(helpers.SayPath(`path:\s+(\/private)?%s`, dir))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -83,7 +81,7 @@ var _ = Describe("push with symlink path", func() {
 				Expect(os.Symlink(archive, symlinkedPath)).ToNot(HaveOccurred())
 
 				session := helpers.CF(PushCommandName, appName, "-p", symlinkedPath)
-				Eventually(session).Should(Say(`path:\s+(\/private)?%s`, regexp.QuoteMeta(archive)))
+				Eventually(session).Should(helpers.SayPath(`path:\s+(\/private)?%s`, archive))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -104,7 +102,7 @@ var _ = Describe("push with symlink path", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: runningDir}, PushCommandName)
-						Eventually(session).Should(Say(`path:\s+(\/private)?%s`, regexp.QuoteMeta(dir)))
+						Eventually(session).Should(helpers.SayPath(`path:\s+(\/private)?%s`, dir))
 						Eventually(session).Should(Exit(0))
 					})
 				})

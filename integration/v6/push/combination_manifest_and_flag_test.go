@@ -93,7 +93,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 								Eventually(session).Should(Say(`Getting app info\.\.\.`))
 								Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
 								Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
-								Eventually(session).Should(Say(`\s+path:\s+(/private)?%s`, regexp.QuoteMeta(dir)))
+								Eventually(session).Should(helpers.SayPath(`\s+path:\s+(\/private)?%s`, dir))
 								Eventually(session).Should(Say(`requested state:\s+started`))
 								Eventually(session).Should(Exit(0))
 							})
@@ -271,14 +271,14 @@ var _ = Describe("push with a simple manifest and flags", func() {
 				})
 
 				AfterEach(func() {
-					Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
+					Expect(os.RemoveAll(tempDir)).To(Succeed())
 				})
 
 				It("overrides the manifest path with the '-p' path", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, PushCommandName, "-p", dir)
 						Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
-						Eventually(session).Should(Say(`\s+path:\s+(/private)?%s`, regexp.QuoteMeta(dir)))
+						Eventually(session).Should(helpers.SayPath(`\s+path:\s+(\/private)?%s`, dir))
 						Eventually(session).Should(Say(`requested state:\s+started`))
 						Eventually(session).Should(Exit(0))
 					})

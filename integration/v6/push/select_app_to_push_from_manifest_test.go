@@ -2,7 +2,6 @@ package push
 
 import (
 	"path/filepath"
-	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 
@@ -66,7 +65,7 @@ var _ = Describe("pushes specified app from single manifest file", func() {
 
 				Eventually(session).Should(Say(`Creating app with these attributes\.\.\.`))
 				Eventually(session).Should(Say(`\+\s+name:\s+%s`, firstApp))
-				Eventually(session).Should(Say(`\s+path:\s+(/private)?%s`, regexp.QuoteMeta(dir)))
+				Eventually(session).Should(helpers.SayPath(`path:\s+(\/private)?%s`, dir))
 				Eventually(session).Should(Say(`\s+routes:`))
 				Eventually(session).Should(Say(`(?i)\+\s+%s.%s`, firstApp, helpers.DefaultSharedDomain()))
 				Eventually(session).Should(Say(`Mapping routes\.\.\.`))
