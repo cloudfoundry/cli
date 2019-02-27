@@ -99,7 +99,7 @@ var _ = Describe("Enable Feature Flag Command", func() {
 					Expect(featureFlagArgs).To(Equal(featureFlagName))
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(testUI.Err).To(Say("this is a warning"))
-					Expect(testUI.Out).To(Say(`Feature flag flag1 enabled`))
+					Expect(testUI.Out).To(Say(`OK`))
 				})
 			})
 			When("there is no featureFlag", func() {
