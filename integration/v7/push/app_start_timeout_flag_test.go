@@ -33,11 +33,11 @@ var _ = Describe("push with health check timeout flag", func() {
 		os.RemoveAll(tempDir)
 	})
 
-	When("the app exists with a http health check", func() {
+	When("the app exists with an http health check", func() {
 		BeforeEach(func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
-					PushCommandName, appName, "--health-check-type", "http",
+					PushCommandName, appName, "--health-check-type", "http", "--endpoint", "/",
 				)
 
 				Eventually(session).Should(Exit(0))
