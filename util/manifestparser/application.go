@@ -22,5 +22,5 @@ func (app *Application) UnmarshalYAML(unmarshal func(v interface{}) error) error
 		return nil
 	}
 
-	return errors.New("missing or invalid 'name' key")
+	return errors.New("Found an application with no name specified")
 }

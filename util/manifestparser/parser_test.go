@@ -308,12 +308,13 @@ applications:
 		})
 	})
 
-	Describe("RawManifest", func() {
+	Describe("RawAppManifest", func() {
 		var (
 			rawAppManifest []byte
 			appName        string
 			executeErr     error
 			rawManifest    []byte
+			pathToManifest string
 		)
 
 		BeforeEach(func() {
@@ -335,12 +336,16 @@ applications:
 			tempFile, err := ioutil.TempFile("", "manifest-test-")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(tempFile.Close()).ToNot(HaveOccurred())
-			pathToManifest := tempFile.Name()
+			pathToManifest = tempFile.Name()
 			err = ioutil.WriteFile(pathToManifest, rawManifest, 0666)
 			Expect(err).ToNot(HaveOccurred())
 			err = parser.InterpolateAndParse(pathToManifest, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 			rawAppManifest, executeErr = parser.RawAppManifest(appName)
+		})
+
+		AfterEach(func() {
+			os.RemoveAll(pathToManifest)
 		})
 
 		When("marshaling does not error", func() {
