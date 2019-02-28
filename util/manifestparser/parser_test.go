@@ -365,7 +365,7 @@ applications:
 			})
 
 			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(errors.New("app not in manifest")))
+				Expect(executeErr).To(MatchError(AppNotInManifestError{Name: "not-here"}))
 				Expect(rawAppManifest).To(BeNil())
 			})
 		})

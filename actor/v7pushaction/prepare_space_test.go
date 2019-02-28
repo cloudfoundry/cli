@@ -163,11 +163,6 @@ var _ = Describe("PrepareSpace", func() {
 			})
 		})
 	})
-	// When("there is also an appName provided", func() {
-	// 	It("errors", func() {
-
-	// 	})
-	// })
 
 	When("there are multiple applications in the manifest", func() {
 
@@ -196,7 +191,7 @@ applications:
 			Eventually(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(1))
 			actualSpaceGuid, actualManifestBytes := fakeV7Actor.SetSpaceManifestArgsForCall(0)
 			Expect(actualSpaceGuid).To(Equal(spaceGUID))
-			Expect(actualManifestBytes).To(Equal(yamlUnmarshalMarshal(manifest)))
+			Expect(actualManifestBytes).To(MatchYAML(manifest))
 			Eventually(warningsStream).Should(Receive(Equal(Warnings{"set-space-warning"})))
 			Eventually(errorStream).Should(Receive(Succeed()))
 			Eventually(appNameStream).Should(Receive(ConsistOf("some-app-name", "orange", "mushroom")))
@@ -230,7 +225,7 @@ applications:
 
 			It("errors saying the requested app was not in the manifest", func() {
 				Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
-				Eventually(errorStream).Should(Receive(Equal(errors.New("app not in manifest"))))
+				Eventually(errorStream).Should(Receive(Equal(manifestparser.AppNotInManifestError{Name: "hubbabubbamax"})))
 				Consistently(appNameStream).ShouldNot(Receive(ConsistOf("some-app-name")))
 				Consistently(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).ShouldNot(Equal(ApplyManifestComplete))
 			})

@@ -91,7 +91,7 @@ func (parser Parser) RawAppManifest(appName string) ([]byte, error) {
 			return yaml.Marshal(appManifest)
 		}
 	}
-	return nil, errors.New("app not in manifest")
+	return nil, AppNotInManifestError{Name: appName}
 }
 
 type rawManifest struct {
