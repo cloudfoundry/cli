@@ -167,7 +167,7 @@ var _ = Describe("push Command", func() {
 		fakeConfig.ExperimentalReturns(true) // TODO: Delete once we remove the experimental flag
 
 		cmd = PushCommand{
-			OptionalArgs: flag.AppName{AppName: "passed-as-command-arg"},
+			OptionalArgs: flag.OptionalAppName{AppName: "passed-as-command-arg"},
 			UI:           testUI,
 			Config:       fakeConfig,
 			Actor:        fakeActor,
