@@ -423,7 +423,7 @@ var _ = Describe("help Command", func() {
 			Expect(testUI.Out).To(Say(`  --help, -h\s+Show help`))
 			Expect(testUI.Out).To(Say(`  -v\s+Print API request diagnostics to stdout`))
 
-			Expect(testUI.Out).To(Say(`Use 'cf help -a' to see all commands\.`))
+			Expect(testUI.Out).To(Say(`TIP: Use 'cf help -a' to see all commands\.`))
 		})
 
 		When("there are multiple installed plugins", func() {

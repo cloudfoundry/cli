@@ -47,7 +47,7 @@ var _ = Describe("help command", func() {
 			Eventually(session).Should(Say("  --help, -h                         Show help"))
 			Eventually(session).Should(Say("  -v                                 Print API request diagnostics to stdout"))
 
-			Eventually(session).Should(Say(`Use 'cf help -a' to see all commands\.`))
+			Eventually(session).Should(Say(`TIP: Use 'cf help -a' to see all commands\.`))
 			Eventually(session).Should(Exit(0))
 		},
 

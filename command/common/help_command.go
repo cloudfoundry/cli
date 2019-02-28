@@ -214,7 +214,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 	cmd.UI.DisplayNonWrappingTable(commonCommandsIndent, cmd.globalOptionsTableData(), 25)
 	cmd.UI.DisplayNewline()
 
-	cmd.UI.DisplayText("Use 'cf help -a' to see all commands.")
+	cmd.UI.DisplayTextWithFlavor("TIP: Use '{{.FullHelpCommand}}' to see all commands.", map[string]interface{}{"FullHelpCommand": "cf help -a"})
 }
 
 func (cmd HelpCommand) displayCommand() error {
