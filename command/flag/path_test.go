@@ -35,7 +35,7 @@ var _ = Describe("path types", func() {
 		}
 
 		for _, dir := range []string{"~add", "add", "aee"} {
-			err := os.Mkdir(dir, os.ModeDir)
+			err := os.Mkdir(dir, 0700)
 			Expect(err).ToNot(HaveOccurred())
 		}
 	})
@@ -130,7 +130,7 @@ var _ = Describe("path types", func() {
 						}
 
 						for _, dir := range []string{"adir", "bdir"} {
-							err = os.Mkdir(filepath.Join(tempDir, dir), os.ModeDir)
+							err = os.Mkdir(filepath.Join(tempDir, dir), 0700)
 							Expect(err).ToNot(HaveOccurred())
 						}
 					})
@@ -180,7 +180,7 @@ var _ = Describe("path types", func() {
 						}
 
 						for _, dir := range []string{"adir", "bdir"} {
-							err = os.Mkdir(filepath.Join(tempDir, dir), os.ModeDir)
+							err = os.Mkdir(filepath.Join(tempDir, dir), 0700)
 							Expect(err).ToNot(HaveOccurred())
 						}
 					})
@@ -432,7 +432,7 @@ var _ = Describe("path types", func() {
 						}
 
 						for _, dir := range []string{"adir", "bdir"} {
-							err = os.Mkdir(filepath.Join(tempDir, dir), os.ModeDir)
+							err = os.Mkdir(filepath.Join(tempDir, dir), 0700)
 							Expect(err).ToNot(HaveOccurred())
 						}
 					})
@@ -482,7 +482,7 @@ var _ = Describe("path types", func() {
 						}
 
 						for _, dir := range []string{"adir", "bdir"} {
-							err = os.Mkdir(filepath.Join(tempDir, dir), os.ModeDir)
+							err = os.Mkdir(filepath.Join(tempDir, dir), 0700)
 							Expect(err).ToNot(HaveOccurred())
 						}
 					})
