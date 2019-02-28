@@ -97,6 +97,7 @@ var _ = Describe("PrepareSpace", func() {
 		actor, _, fakeV7Actor, _ = getTestPushActor()
 
 		parser = manifestparser.NewParser()
+		appName = ""
 		spaceGUID = "some-space-guid"
 	})
 
@@ -145,10 +146,6 @@ var _ = Describe("PrepareSpace", func() {
 		})
 
 		When("No app name is specified", func() {
-			BeforeEach(func() {
-				appName = ""
-			})
-
 			It("applies the manifest", func() {
 				Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
 				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
