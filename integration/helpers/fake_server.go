@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	DefaultV2Version string = "2.100.0"
-	DefaultV3Version string = "3.33.3"
+	DefaultV2Version string = "2.131.0"
+	DefaultV3Version string = "3.66.0"
 )
 
 func StartAndTargetServerWithAPIVersions(v2Version string, v3Version string) *Server {

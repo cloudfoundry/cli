@@ -74,7 +74,7 @@ var _ = Describe("login command", func() {
 			var server *ghttp.Server
 
 			BeforeEach(func() {
-				server = helpers.StartServerWithAPIVersions("1.0.0", "")
+				server = helpers.StartServerWithAPIVersions("2.99.9", "3.34.9")
 				server.RouteToHandler(http.MethodPost, "/oauth/token",
 					ghttp.RespondWithJSONEncoded(http.StatusOK, struct{}{}))
 				server.RouteToHandler(http.MethodGet, "/v2/organizations",
