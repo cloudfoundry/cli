@@ -1,11 +1,12 @@
 package v7pushaction_test
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"errors"
 	"io/ioutil"
 	"path/filepath"
 	"time"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -200,6 +201,39 @@ applications:
 			Eventually(errorStream).Should(Receive(Succeed()))
 			Eventually(appNameStream).Should(Receive(ConsistOf("some-app-name", "orange", "mushroom")))
 			Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(ApplyManifestComplete))
+		})
+
+		When("An app name from the manfiest is also provided", func() {
+			BeforeEach(func() {
+				appName = "some-app-name"
+			})
+
+			It("applies only the app's manifest", func() {
+				Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
+				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
+				Eventually(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(1))
+				actualSpaceGuid, actualManifestBytes := fakeV7Actor.SetSpaceManifestArgsForCall(0)
+				Expect(actualSpaceGuid).To(Equal(spaceGUID))
+				Expect(actualManifestBytes).To(MatchYAML(`applications:
+- name: some-app-name`))
+				Eventually(warningsStream).Should(Receive(Equal(Warnings{"set-space-warning"})))
+				Eventually(errorStream).Should(Receive(Succeed()))
+				Eventually(appNameStream).Should(Receive(ConsistOf("some-app-name")))
+				Eventually(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).Should(Equal(ApplyManifestComplete))
+			})
+		})
+
+		When("An app name not from the manfiest is also provided", func() {
+			BeforeEach(func() {
+				appName = "hubbabubbamax"
+			})
+
+			It("errors saying the requested app was not in the manifest", func() {
+				Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
+				Eventually(errorStream).Should(Receive(Equal(errors.New("app not in manifest"))))
+				Consistently(appNameStream).ShouldNot(Receive(ConsistOf("some-app-name")))
+				Consistently(getPrepareNextEvent(appNameStream, eventStream, warningsStream)).ShouldNot(Equal(ApplyManifestComplete))
+			})
 		})
 	})
 
