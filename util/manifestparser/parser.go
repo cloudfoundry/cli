@@ -83,7 +83,7 @@ func (parser Parser) FullRawManifest() []byte {
 	return parser.rawManifest
 }
 
-func (parser Parser) RawManifest(appName string) ([]byte, error) {
+func (parser Parser) RawAppManifest(appName string) ([]byte, error) {
 	var appManifest rawManifest
 	for _, app := range parser.Applications {
 		if app.Name == appName {

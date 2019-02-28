@@ -340,7 +340,7 @@ applications:
 			Expect(err).ToNot(HaveOccurred())
 			err = parser.InterpolateAndParse(pathToManifest, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
-			rawAppManifest, executeErr = parser.RawManifest(appName)
+			rawAppManifest, executeErr = parser.RawAppManifest(appName)
 		})
 
 		When("marshaling does not error", func() {

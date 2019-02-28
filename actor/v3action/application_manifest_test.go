@@ -52,7 +52,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 				BeforeEach(func() {
 					manifestContent = []byte("some-manifest-contents")
-					fakeParser.RawManifestReturns(manifestContent, nil)
+					fakeParser.RawAppManifestReturns(manifestContent, nil)
 				})
 
 				When("the app exists", func() {
@@ -85,8 +85,8 @@ var _ = Describe("Application Manifest Actions", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 								Expect(warnings).To(ConsistOf("app-1-warning", "apply-manifest-1-warning", "poll-1-warning"))
 
-								Expect(fakeParser.RawManifestCallCount()).To(Equal(1))
-								appName := fakeParser.RawManifestArgsForCall(0)
+								Expect(fakeParser.RawAppManifestCallCount()).To(Equal(1))
+								appName := fakeParser.RawAppManifestArgsForCall(0)
 								Expect(appName).To(Equal("app-1"))
 
 								Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
@@ -184,7 +184,7 @@ var _ = Describe("Application Manifest Actions", func() {
 			When("generating the raw manifest errors", func() {
 				getManifestErr := errors.New("get-manifest-error")
 				BeforeEach(func() {
-					fakeParser.RawManifestReturns(nil, getManifestErr)
+					fakeParser.RawAppManifestReturns(nil, getManifestErr)
 				})
 
 				It("returns error", func() {
