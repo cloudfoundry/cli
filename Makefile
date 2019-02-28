@@ -233,11 +233,11 @@ version: ## Print the version number of what would be built
 GO_VERSION=$$(go version)
 vet: ## Run go vet
 	@echo  "Vetting packages for potential issues..."
-	if [[ $(GO_VERSION) =~ go1.11 ]] ; then \
-		go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version ;\
-	else \
-		go vet -all  ./api/... ./actor/... ./command ./integration/... ./types ./util ./version ;\
-	fi
+	case $(GO_VERSION) in \
+	    (*go1.11*) echo go1.11 && go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version ;; \
+	    (*go1.12*) echo go1.12 && go vet -all  ./api/... ./actor/... ./command ./integration/... ./types ./util ./version ;; \
+	    (*) (>&2 echo "Unsupported golang version"); exit 13 ;; \
+	esac
 	@echo
 
 .PHONY: all build clean format version vet lint
