@@ -234,6 +234,7 @@ GO_VERSION=$$(go version)
 vet: ## Run go vet
 	@echo  "Vetting packages for potential issues..."
 	case $(GO_VERSION) in \
+	    (*go1.10*) echo go1.11 && go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version ;; \
 	    (*go1.11*) echo go1.11 && go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version ;; \
 	    (*go1.12*) echo go1.12 && go vet -all  ./api/... ./actor/... ./command ./integration/... ./types ./util ./version ;; \
 	    (*) (>&2 echo "Unsupported golang version"); exit 13 ;; \
