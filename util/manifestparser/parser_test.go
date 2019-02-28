@@ -131,7 +131,19 @@ applications:
 
 				Expect(parser.AppNames()).To(ConsistOf("spark", "flame"))
 				Expect(parser.PathToManifest).To(Equal(pathToManifest))
-				Expect(parser.RawManifest("doesn't, matter")).To(MatchYAML(rawManifest))
+				Expect(parser.FullRawManifest()).To(MatchYAML(rawManifest))
+			})
+		})
+
+		Context("invalid yaml is passed", func() {
+			BeforeEach(func() {
+				rawManifest = []byte("\t\t")
+				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("parses the manifest properly", func() {
+				Expect(executeErr).To(HaveOccurred())
 			})
 		})
 
@@ -297,60 +309,61 @@ applications:
 	})
 
 	Describe("RawManifest", func() {
-		When("given an app name", func() {
-			When("app is successfully marshalled", func() {
-				var manifestPath string
+		var (
+			rawAppManifest []byte
+			appName        string
+			executeErr     error
+			rawManifest    []byte
+		)
 
-				BeforeEach(func() {
-					tmpfile, err := ioutil.TempFile("", "")
-					Expect(err).ToNot(HaveOccurred())
-					manifestPath = tmpfile.Name()
-					Expect(tmpfile.Close()).ToNot(HaveOccurred())
+		BeforeEach(func() {
 
-					manifest := map[string]interface{}{
-						"applications": []map[string]string{
-							{
-								"name": "app-1",
-							},
-							{
-								"name": "app-2",
-							},
-						},
-					}
-					WriteManifest(manifestPath, manifest)
-
-					executeErr := parser.Parse(manifestPath)
-					Expect(executeErr).ToNot(HaveOccurred())
-				})
-
-				AfterEach(func() {
-					Expect(os.RemoveAll(manifestPath)).ToNot(HaveOccurred())
-				})
-
-				It("gets the app's manifest", func() {
-					rawManifest, err := parser.RawManifest("app-1")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(rawManifest).To(MatchYAML(`---
+			rawManifest = []byte(`---
 applications:
-- name: app-1
+- name: spark
+  memory: 1G
+  instances: 2
+- name: flame
+  memory: 1G
+  instances: 2
+`)
+			appName = "spark"
 
-- name: app-2
-`))
+		})
 
-					rawManifest, err = parser.RawManifest("app-2")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(rawManifest).To(MatchYAML(`---
-applications:
-- name: app-1
+		JustBeforeEach(func() {
+			tempFile, err := ioutil.TempFile("", "manifest-test-")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(tempFile.Close()).ToNot(HaveOccurred())
+			pathToManifest := tempFile.Name()
+			err = ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+			Expect(err).ToNot(HaveOccurred())
+			err = parser.InterpolateAndParse(pathToManifest, nil, nil)
+			Expect(err).ToNot(HaveOccurred())
+			rawAppManifest, executeErr = parser.RawManifest(appName)
+		})
 
-- name: app-2
-`))
-				})
-			})
+		When("marshaling does not error", func() {
 
-			PWhen("app marshalling errors", func() {
-				It("returns an error", func() {})
+			It("returns just the app's manifest", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(string(rawAppManifest)).To(MatchYAML(`applications:
+- name: spark
+  memory: 1G
+  instances: 2`))
 			})
 		})
+
+		When("The app is not present", func() {
+			BeforeEach(func() {
+				appName = "not-here"
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(errors.New("app not in manifest")))
+				Expect(rawAppManifest).To(BeNil())
+			})
+		})
+
 	})
 })

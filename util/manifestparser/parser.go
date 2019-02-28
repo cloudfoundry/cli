@@ -83,16 +83,25 @@ func (parser Parser) FullRawManifest() []byte {
 	return parser.rawManifest
 }
 
-func (parser Parser) RawManifest(_ string) ([]byte, error) {
-	return parser.rawManifest, nil
+func (parser Parser) RawManifest(appName string) ([]byte, error) {
+	var appManifest rawManifest
+	for _, app := range parser.Applications {
+		if app.Name == appName {
+			appManifest.Applications = []Application{app}
+			return yaml.Marshal(appManifest)
+		}
+	}
+	return nil, errors.New("app not in manifest")
+}
+
+type rawManifest struct {
+	Applications []Application `yaml:"applications"`
 }
 
 func (parser *Parser) parse(manifestBytes []byte) error {
 	parser.rawManifest = manifestBytes
 
-	var raw struct {
-		Applications []Application `yaml:"applications"`
-	}
+	var raw rawManifest
 
 	err := yaml.Unmarshal(manifestBytes, &raw)
 	if err != nil {
