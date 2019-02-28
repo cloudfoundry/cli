@@ -15,11 +15,13 @@ import (
 
 var _ = Describe("push with a simple manifest", func() {
 	var (
-		appName string
+		appName       string
+		secondAppName string
 	)
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
+		secondAppName = helpers.NewAppName()
 	})
 
 	When("the manifest is in the current directory", func() {
@@ -120,6 +122,13 @@ var _ = Describe("push with a simple manifest", func() {
 							"key4": false,
 						},
 					},
+					{
+						"name": secondAppName,
+						"env": map[string]interface{}{
+							"diff-key1": "diff-val1",
+							"diff-key4": true,
+						},
+					},
 				},
 			})
 		})
@@ -132,7 +141,7 @@ var _ = Describe("push with a simple manifest", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(
 					helpers.CFEnv{WorkingDirectory: dir},
-					PushCommandName, appName,
+					PushCommandName,
 					"-f", pathToManifest,
 					"--no-start")
 				Eventually(session).Should(Exit(0))
@@ -141,6 +150,11 @@ var _ = Describe("push with a simple manifest", func() {
 			session := helpers.CF("env", appName)
 			Eventually(session).Should(Say(`key1:\s+val1`))
 			Eventually(session).Should(Say(`key4:\s+false`))
+			Eventually(session).Should(Exit(0))
+
+			session = helpers.CF("env", secondAppName)
+			Eventually(session).Should(Say(`diff-key1:\s+diff-val1`))
+			Eventually(session).Should(Say(`diff-key4:\s+true`))
 			Eventually(session).Should(Exit(0))
 		})
 	})
