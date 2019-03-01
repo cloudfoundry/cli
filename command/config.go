@@ -24,6 +24,7 @@ type Config interface {
 	DialTimeout() time.Duration
 	DockerPassword() string
 	Experimental() bool
+	ExperimentalLogin() bool
 	GetPlugin(pluginName string) (configv3.Plugin, bool)
 	GetPluginCaseInsensitive(pluginName string) (configv3.Plugin, bool)
 	HasTargetedOrganization() bool

@@ -8,23 +8,24 @@ import (
 
 // EnvOverride represents all the environment variables read by the CF CLI
 type EnvOverride struct {
-	BinaryName       string
-	CFColor          string
-	CFDialTimeout    string
-	CFHome           string
-	CFLogLevel       string
-	CFPassword       string
-	CFPluginHome     string
-	CFStagingTimeout string
-	CFStartupTimeout string
-	CFTrace          string
-	CFUsername       string
-	DockerPassword   string
-	Experimental     string
-	ForceTTY         string
-	HTTPSProxy       string
-	Lang             string
-	LCAll            string
+	BinaryName        string
+	CFColor           string
+	CFDialTimeout     string
+	CFHome            string
+	CFLogLevel        string
+	CFPassword        string
+	CFPluginHome      string
+	CFStagingTimeout  string
+	CFStartupTimeout  string
+	CFTrace           string
+	CFUsername        string
+	DockerPassword    string
+	Experimental      string
+	ExperimentalLogin string
+	ForceTTY          string
+	HTTPSProxy        string
+	Lang              string
+	LCAll             string
 }
 
 // BinaryName returns the running name of the CF CLI
@@ -76,16 +77,27 @@ func (config *Config) Experimental() bool {
 	return false
 }
 
+// ExperimentalLogin is a temporary function during the rewrite of `cf login` that returns whether or not to run the rewritten login. This
+// is based off of:
+//   1. The $CF_EXPERIMENTAL_LOGIN environment variable if set
+//   2. Defaults to false
+func (config *Config) ExperimentalLogin() bool {
+	if config.ENV.ExperimentalLogin != "" {
+		envVal, err := strconv.ParseBool(config.ENV.ExperimentalLogin)
+		if err == nil {
+			return envVal
+		}
+	}
+
+	return false
+}
+
 // HTTPSProxy returns the proxy url that the CLI should use. The url is based
 // off of:
 //   1. The $https_proxy environment variable if set
 //   2. Defaults to the empty string
 func (config *Config) HTTPSProxy() string {
-	if config.ENV.HTTPSProxy != "" {
-		return config.ENV.HTTPSProxy
-	}
-
-	return ""
+	return config.ENV.HTTPSProxy
 }
 
 // LogLevel returns the global log level. The levels follow Logrus's log level

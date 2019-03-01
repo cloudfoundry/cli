@@ -1,7 +1,6 @@
 package configv3_test
 
 import (
-	"os"
 	"time"
 
 	. "code.cloudfoundry.org/cli/util/configv3"
@@ -13,45 +12,27 @@ import (
 
 var _ = Describe("Config", func() {
 	var (
-		config  *Config
-		homeDir string
+		config *Config
 	)
 
 	BeforeEach(func() {
-		homeDir = setup()
+		config = &Config{}
 	})
 
-	AfterEach(func() {
-		teardown(homeDir)
-	})
-
-	When("there are environment variables", func() {
+	When("there are environment variables set", func() {
 		BeforeEach(func() {
-			Expect(os.Setenv("CF_DIAL_TIMEOUT", "1234")).ToNot(HaveOccurred())
-			Expect(os.Setenv("CF_DOCKER_PASSWORD", "banana")).ToNot(HaveOccurred())
-			Expect(os.Setenv("CF_PASSWORD", "I am password.")).ToNot(HaveOccurred())
-			Expect(os.Setenv("CF_STAGING_TIMEOUT", "8675")).ToNot(HaveOccurred())
-			Expect(os.Setenv("CF_STARTUP_TIMEOUT", "309")).ToNot(HaveOccurred())
-			Expect(os.Setenv("CF_USERNAME", "i-R-user")).ToNot(HaveOccurred())
-			Expect(os.Setenv("https_proxy", "proxy.com")).ToNot(HaveOccurred())
-
-			var err error
-			config, err = LoadConfig()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(config).ToNot(BeNil())
+			config.ENV = EnvOverride{
+				CFDialTimeout:    "1234",
+				CFPassword:       "I am password.",
+				CFStagingTimeout: "8675",
+				CFStartupTimeout: "309",
+				CFUsername:       "i-R-user",
+				DockerPassword:   "banana",
+				HTTPSProxy:       "proxy.com",
+			}
 		})
 
-		AfterEach(func() {
-			Expect(os.Unsetenv("CF_DIAL_TIMEOUT")).ToNot(HaveOccurred())
-			Expect(os.Unsetenv("CF_DOCKER_PASSWORD")).ToNot(HaveOccurred())
-			Expect(os.Unsetenv("CF_PASSWORD")).ToNot(HaveOccurred())
-			Expect(os.Unsetenv("CF_STAGING_TIMEOUT")).ToNot(HaveOccurred())
-			Expect(os.Unsetenv("CF_STARTUP_TIMEOUT")).ToNot(HaveOccurred())
-			Expect(os.Unsetenv("CF_USERNAME")).ToNot(HaveOccurred())
-			Expect(os.Unsetenv("https_proxy")).ToNot(HaveOccurred())
-		})
-
-		It("overrides specific config values", func() {
+		It("overrides specific config values using those variables", func() {
 			Expect(config.CFUsername()).To(Equal("i-R-user"))
 			Expect(config.CFPassword()).To(Equal("I am password."))
 			Expect(config.DialTimeout()).To(Equal(1234 * time.Second))
@@ -63,14 +44,12 @@ var _ = Describe("Config", func() {
 	})
 
 	Describe("BinaryName", func() {
-		It("returns the name used to invoke", func() {
-			config, err := LoadConfig()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(config).ToNot(BeNil())
+		BeforeEach(func() {
+			config.ENV.BinaryName = "potatoman"
+		})
 
-			// Ginkgo will uses a config file as the first test argument, so that
-			// will be considered the binary name
-			Expect(config.BinaryName()).To(Equal("configv3.test"))
+		It("returns the name used to invoke", func() {
+			Expect(config.BinaryName()).To(Equal("potatoman"))
 		})
 	})
 
@@ -81,21 +60,33 @@ var _ = Describe("Config", func() {
 		})
 	})
 
+	Describe("DialTimeout", func() {
+		When("no DialTimeout is set in the env", func() {
+			BeforeEach(func() {
+				config.ENV.CFDialTimeout = ""
+			})
+
+			It("uses the default dial timeout", func() {
+				Expect(config.DialTimeout()).To(Equal(DefaultDialTimeout))
+			})
+		})
+	})
+
 	DescribeTable("Experimental",
 		func(envVal string, expected bool) {
-			setConfig(homeDir, `{}`)
-
-			defer os.Unsetenv("CF_CLI_EXPERIMENTAL")
-			Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).ToNot(HaveOccurred())
-			if envVal != "" {
-				Expect(os.Setenv("CF_CLI_EXPERIMENTAL", envVal)).ToNot(HaveOccurred())
-			}
-
-			config, err := LoadConfig()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(config).ToNot(BeNil())
-
+			config.ENV.Experimental = envVal
 			Expect(config.Experimental()).To(Equal(expected))
+		},
+
+		Entry("uses default value of false if environment value is not set", "", false),
+		Entry("uses environment value if a valid environment value is set", "true", true),
+		Entry("uses default value of false if an invalid environment value is set", "something-invalid", false),
+	)
+
+	DescribeTable("ExperimentalLogin",
+		func(envVal string, expected bool) {
+			config.ENV.ExperimentalLogin = envVal
+			Expect(config.ExperimentalLogin()).To(Equal(expected))
 		},
 
 		Entry("uses default value of false if environment value is not set", "", false),
@@ -118,4 +109,28 @@ var _ = Describe("Config", func() {
 		Entry("debug returns 5", "debug", 5),
 		Entry("dEbUg returns 5", "dEbUg", 5),
 	)
+
+	Describe("StagingTimeout", func() {
+		When("no StagingTimeout is set in the env", func() {
+			BeforeEach(func() {
+				config.ENV.CFStagingTimeout = ""
+			})
+
+			It("uses the default staging timeout", func() {
+				Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
+			})
+		})
+	})
+
+	Describe("StartupTimeout", func() {
+		When("no StartupTimeout is set in the env", func() {
+			BeforeEach(func() {
+				config.ENV.CFStartupTimeout = ""
+			})
+
+			It("uses the default startup timeout", func() {
+				Expect(config.StartupTimeout()).To(Equal(DefaultStartupTimeout))
+			})
+		})
+	})
 })

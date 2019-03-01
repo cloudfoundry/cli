@@ -11,6 +11,32 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+func (c *Config) loadPluginConfig() error {
+	pluginFilePath := filepath.Join(c.PluginHome(), "config.json")
+	if _, err := os.Stat(pluginFilePath); os.IsNotExist(err) {
+		c.pluginsConfig = PluginsConfig{
+			Plugins: make(map[string]Plugin),
+		}
+	} else {
+		var file []byte
+		file, err = ioutil.ReadFile(pluginFilePath)
+		if err != nil {
+			return err
+		}
+
+		err = json.Unmarshal(file, &c.pluginsConfig)
+		if err != nil {
+			return err
+		}
+
+		for name, plugin := range c.pluginsConfig.Plugins {
+			plugin.Name = name
+			c.pluginsConfig.Plugins[name] = plugin
+		}
+	}
+	return nil
+}
+
 // LoadConfig loads the config from the .cf/config.json and os.ENV. If the
 // config.json does not exists, it will use a default config in it's place.
 // Takes in an optional FlagOverride, will only use the first one passed, that
@@ -78,45 +104,28 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	}
 
 	config.ENV = EnvOverride{
-		BinaryName:       filepath.Base(os.Args[0]),
-		CFColor:          os.Getenv("CF_COLOR"),
-		CFDialTimeout:    os.Getenv("CF_DIAL_TIMEOUT"),
-		CFLogLevel:       os.Getenv("CF_LOG_LEVEL"),
-		CFPassword:       os.Getenv("CF_PASSWORD"),
-		CFPluginHome:     os.Getenv("CF_PLUGIN_HOME"),
-		CFStagingTimeout: os.Getenv("CF_STAGING_TIMEOUT"),
-		CFStartupTimeout: os.Getenv("CF_STARTUP_TIMEOUT"),
-		CFTrace:          os.Getenv("CF_TRACE"),
-		CFUsername:       os.Getenv("CF_USERNAME"),
-		DockerPassword:   os.Getenv("CF_DOCKER_PASSWORD"),
-		Experimental:     os.Getenv("CF_CLI_EXPERIMENTAL"),
-		ForceTTY:         os.Getenv("FORCE_TTY"),
-		HTTPSProxy:       os.Getenv("https_proxy"),
-		Lang:             os.Getenv("LANG"),
-		LCAll:            os.Getenv("LC_ALL"),
+		BinaryName:        filepath.Base(os.Args[0]),
+		CFColor:           os.Getenv("CF_COLOR"),
+		CFDialTimeout:     os.Getenv("CF_DIAL_TIMEOUT"),
+		CFLogLevel:        os.Getenv("CF_LOG_LEVEL"),
+		CFPassword:        os.Getenv("CF_PASSWORD"),
+		CFPluginHome:      os.Getenv("CF_PLUGIN_HOME"),
+		CFStagingTimeout:  os.Getenv("CF_STAGING_TIMEOUT"),
+		CFStartupTimeout:  os.Getenv("CF_STARTUP_TIMEOUT"),
+		CFTrace:           os.Getenv("CF_TRACE"),
+		CFUsername:        os.Getenv("CF_USERNAME"),
+		DockerPassword:    os.Getenv("CF_DOCKER_PASSWORD"),
+		Experimental:      os.Getenv("CF_CLI_EXPERIMENTAL"),
+		ExperimentalLogin: os.Getenv("CF_EXPERIMENTAL_LOGIN"),
+		ForceTTY:          os.Getenv("FORCE_TTY"),
+		HTTPSProxy:        os.Getenv("https_proxy"),
+		Lang:              os.Getenv("LANG"),
+		LCAll:             os.Getenv("LC_ALL"),
 	}
 
-	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
-	if _, err = os.Stat(pluginFilePath); os.IsNotExist(err) {
-		config.pluginsConfig = PluginsConfig{
-			Plugins: make(map[string]Plugin),
-		}
-	} else {
-		var file []byte
-		file, err = ioutil.ReadFile(pluginFilePath)
-		if err != nil {
-			return nil, err
-		}
-
-		err = json.Unmarshal(file, &config.pluginsConfig)
-		if err != nil {
-			return nil, err
-		}
-
-		for name, plugin := range config.pluginsConfig.Plugins {
-			plugin.Name = name
-			config.pluginsConfig.Plugins[name] = plugin
-		}
+	err = config.loadPluginConfig()
+	if err != nil {
+		return nil, err
 	}
 
 	if len(flags) > 0 {
