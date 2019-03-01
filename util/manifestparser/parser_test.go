@@ -55,9 +55,11 @@ var _ = Describe("Parser", func() {
 					"applications": []map[string]string{
 						{
 							"name": "app-1",
+							"path": "/first/path",
 						},
 						{
 							"name": "app-2",
+							"path": "/second/path",
 						},
 					},
 				}
@@ -65,6 +67,12 @@ var _ = Describe("Parser", func() {
 
 			It("returns nil and sets the applications", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(parser.Applications[0].Name).To(Equal("app-1"))
+				Expect(parser.Applications[1].Name).To(Equal("app-2"))
+
+				Expect(parser.Applications[0].Path).To(Equal("/first/path"))
+				Expect(parser.Applications[1].Path).To(Equal("/second/path"))
 			})
 		})
 

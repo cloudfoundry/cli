@@ -140,6 +140,11 @@ func (cmd PushCommand) Execute(args []string) error {
 		if manifestParser, err = cmd.readManifest(); err != nil {
 			return err
 		}
+
+		err = manifestparser.Validate(manifestParser)
+		if err != nil {
+			return err
+		}
 	}
 
 	overrides, err := cmd.GetFlagOverrides()
