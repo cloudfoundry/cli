@@ -75,20 +75,38 @@ var _ = Describe("login Command", func() {
 			})
 
 			When("user does not provide the api endpoint using the -a flag", func() {
-				BeforeEach(func() {
-					input.Write([]byte("api.boshlite.com\n"))
-					cmd.APIEndpoint = ""
+				When("the user enters something at the prompt", func() {
+					BeforeEach(func() {
+						input.Write([]byte("api.boshlite.com\n"))
+						cmd.APIEndpoint = ""
+					})
+
+					It("targets the API that the user inputted", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("API endpoint:"))
+						Expect(testUI.Out).To(Say("api.boshlite.com\n"))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API Version: 3\.4\.5\)`))
+
+						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+						actualSettings := fakeActor.SetTargetArgsForCall(0)
+						Expect(actualSettings.URL).To(Equal("https://api.boshlite.com"))
+					})
 				})
 
-				It("prompts the user for the api endpoint", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("API endpoint:"))
-					Expect(testUI.Out).To(Say("api.boshlite.com\n"))
-					Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API Version: 3\.4\.5\)`))
+				When("the user inputs an empty API", func() {
+					BeforeEach(func() {
+						cmd.APIEndpoint = ""
+						input.Write([]byte("\n\napi.boshlite.com\n"))
+					})
 
-					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-					actualSettings := fakeActor.SetTargetArgsForCall(0)
-					Expect(actualSettings.URL).To(Equal("https://api.boshlite.com"))
+					It("reprompts for the API", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("API endpoint:"))
+						Expect(testUI.Out).To(Say("API endpoint:"))
+						Expect(testUI.Out).To(Say("API endpoint:"))
+						Expect(testUI.Out).To(Say("api.boshlite.com\n"))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API Version: 3\.4\.5\)`))
+					})
 				})
 			})
 
