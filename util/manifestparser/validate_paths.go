@@ -10,18 +10,16 @@ import (
 func ValidatePaths(manifestParser Parser) error {
 	var err error
 
-	initialDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	err = os.Chdir(path.Dir(manifestParser.PathToManifest))
-	if err != nil {
-		return err
-	}
-
 	for _, application := range manifestParser.Applications {
 		if application.Path != "" {
-			_, err = os.Stat(application.Path)
+
+			if path.IsAbs(application.Path) {
+				_, err = os.Stat(application.Path)
+			} else {
+				manifestPath := path.Dir(manifestParser.PathToManifest)
+				_, err = os.Stat(path.Join(manifestPath, application.Path))
+			}
+
 			if err != nil {
 				if os.IsNotExist(err) {
 					return errors.New(
@@ -36,11 +34,5 @@ func ValidatePaths(manifestParser Parser) error {
 		}
 	}
 
-	err = os.Chdir(initialDir)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
-

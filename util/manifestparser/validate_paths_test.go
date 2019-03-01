@@ -2,6 +2,7 @@ package manifestparser_test
 
 import (
 	. "code.cloudfoundry.org/cli/util/manifestparser"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -9,7 +10,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
-
 
 var _ = Describe("ValidatePaths", func() {
 	var executeErr error
@@ -32,7 +32,42 @@ var _ = Describe("ValidatePaths", func() {
 		})
 
 		When("all application paths in the manifest do exist", func() {
-			It("should exit successfully", func() {
+			It("should successfully handle absolute paths", func() {
+				var err error
+				var yamlContents []byte
+				var yamlString string
+
+				pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
+				firstPath := filepath.Join(tempDir, "path-first-app")
+				err = os.Mkdir(firstPath, 0755)
+				Expect(err).ToNot(HaveOccurred())
+				secondPath := filepath.Join(tempDir, "path-second-app")
+				err = os.Mkdir(secondPath, 0755)
+				Expect(err).ToNot(HaveOccurred())
+
+				yamlString = `---
+applications:
+    - name: first-app
+      path: %s
+    - name: second-app
+      path: %s
+`
+				interpolatedManifest := fmt.Sprintf(yamlString, firstPath, secondPath)
+				yamlContents = []byte(interpolatedManifest)
+
+				err = ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
+				Expect(err).ToNot(HaveOccurred())
+
+				parser.PathToManifest = pathToYAMLFile
+				err = parser.Parse(pathToYAMLFile)
+				Expect(err).ToNot(HaveOccurred())
+
+				executeErr = parser.Validate()
+
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+			It("should successfully handle relative paths", func() {
 				var err error
 				var yamlContents []byte
 

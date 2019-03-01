@@ -10,8 +10,6 @@ import (
 
 	. "github.com/onsi/gomega/gstruct"
 
-	"code.cloudfoundry.org/cli/util/manifestparser"
-
 	"gopkg.in/yaml.v2"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -318,7 +316,8 @@ var _ = Describe("push Command", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 								Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
 								_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
-								Expect(manifestParser).To(Equal(manifestparser.NewParser()))
+								Expect(manifestParser.PathToManifest).To(Equal(""))
+								Expect(manifestParser.FullRawManifest()).To(HaveLen(0))
 							})
 						})
 					})
@@ -350,7 +349,8 @@ var _ = Describe("push Command", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
 							_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
-							Expect(manifestParser).To(Equal(manifestparser.NewParser()))
+							Expect(manifestParser.PathToManifest).To(Equal(""))
+							Expect(manifestParser.FullRawManifest()).To(HaveLen(0))
 						})
 					})
 				})
@@ -455,7 +455,8 @@ var _ = Describe("push Command", func() {
 					expectedSpaceGUID, expectedAppName, expectedParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 					Expect(expectedSpaceGUID).To(Equal("some-space-guid"))
 					Expect(expectedAppName).To(Equal("passed-as-command-arg"))
-					Expect(expectedParser).To(Equal(manifestparser.NewParser()))
+					Expect(expectedParser.PathToManifest).To(Equal(""))
+					Expect(expectedParser.FullRawManifest()).To(HaveLen(0))
 				})
 
 				When("Actor.PrepareSpace has no errors", func() {
