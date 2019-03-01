@@ -319,7 +319,7 @@ applications:
 	Describe("ContainsMultipleApps", func() {
 		When("given a valid manifest file with multiple apps", func() {
 			BeforeEach(func() {
-				parser.Applications = []Application{{Name: "app-1"}, {Name: "app-2"}}
+				parser.Applications = []Application{{ApplicationModel{Name: "app-1"}, nil}, {ApplicationModel{Name: "app-2"}, nil}}
 			})
 
 			It("returns true", func() {
@@ -329,7 +329,7 @@ applications:
 
 		When("given a valid manifest file with a single app", func() {
 			BeforeEach(func() {
-				parser.Applications = []Application{{Name: "app-1"}}
+				parser.Applications = []Application{{ApplicationModel{Name: "app-1"}, nil}}
 			})
 
 			It("returns false", func() {

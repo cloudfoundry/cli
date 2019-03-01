@@ -43,4 +43,3 @@ func Validate(manifestParser *Parser) error {
 
 	return nil
 }
-
