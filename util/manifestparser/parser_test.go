@@ -306,7 +306,7 @@ applications:
 	Describe("AppNames", func() {
 		When("given a valid manifest file", func() {
 			BeforeEach(func() {
-				parser.Applications = []Application{{Name: "app-1"}, {Name: "app-2"}}
+				parser.Applications = []Application{{ApplicationModel{Name: "app-1"}, nil}, {ApplicationModel{Name: "app-2"}, nil}}
 			})
 
 			It("gets the app names", func() {
@@ -354,9 +354,14 @@ applications:
 - name: spark
   memory: 1G
   instances: 2
+  docker:
+    username: experiment
+  path: /my/path
 - name: flame
   memory: 1G
   instances: 2
+  docker:
+    username: experiment
 `)
 			appName = "spark"
 
@@ -385,7 +390,10 @@ applications:
 				Expect(string(rawAppManifest)).To(MatchYAML(`applications:
 - name: spark
   memory: 1G
-  instances: 2`))
+  instances: 2
+  docker:
+    username: experiment
+  path: /my/path`))
 			})
 		})
 
