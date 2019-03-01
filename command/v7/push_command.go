@@ -141,7 +141,7 @@ func (cmd PushCommand) Execute(args []string) error {
 			return err
 		}
 
-		err = manifestparser.Validate(manifestParser)
+		err = manifestParser.Validate()
 		if err != nil {
 			return err
 		}

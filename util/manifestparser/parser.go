@@ -14,10 +14,16 @@ type Parser struct {
 	Applications []Application
 
 	rawManifest []byte
+
+	validators []validatorFunc
 }
 
 func NewParser() *Parser {
-	return new(Parser)
+	parser := new(Parser)
+	parser.validators = []validatorFunc{
+		ValidatePaths,
+	}
+	return parser
 }
 
 func (parser *Parser) Parse(manifestPath string) error {
