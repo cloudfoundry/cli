@@ -3,7 +3,7 @@ package manifestparser
 import "errors"
 
 type Application struct {
-	Name string `yaml:"name"`
+	Name string
 	Data map[string]interface{}
 }
 
