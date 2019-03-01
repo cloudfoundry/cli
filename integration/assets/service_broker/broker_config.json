@@ -13,6 +13,7 @@
               "no-sql",
               "relational"
             ],
+            "requires": "<requires>",
             "max_db_per_node": 5,
             "bindable": "<bindable>",
             "instances_retrievable": true,

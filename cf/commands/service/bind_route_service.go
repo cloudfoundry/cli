@@ -78,6 +78,7 @@ func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Facto
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.domainReq,
 		cmd.serviceInstanceReq,
 	}

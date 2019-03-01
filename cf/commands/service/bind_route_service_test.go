@@ -38,6 +38,7 @@ var _ = Describe("BindRouteService", func() {
 		fakeDomain models.DomainFields
 
 		loginRequirement           requirements.Requirement
+		targetRequirement          requirements.Requirement
 		domainRequirement          *requirementsfakes.FakeDomainRequirement
 		serviceInstanceRequirement *requirementsfakes.FakeServiceInstanceRequirement
 		minAPIVersionRequirement   requirements.Requirement
@@ -69,6 +70,9 @@ var _ = Describe("BindRouteService", func() {
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
+
+		targetRequirement = &passingRequirement{Name: "target-requirement"}
+		factory.NewTargetedSpaceRequirementReturns(targetRequirement)
 
 		domainRequirement = new(requirementsfakes.FakeDomainRequirement)
 		factory.NewDomainRequirementReturns(domainRequirement)
@@ -114,11 +118,18 @@ var _ = Describe("BindRouteService", func() {
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
+			It("returns a TargetedSpaceRequirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(targetRequirement))
+			})
+
 			It("returns a DomainRequirement", func() {
 				actualRequirements, err := cmd.Requirements(factory, flagContext)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
-				Expect(actualRequirements).To(ContainElement(loginRequirement))
+				Expect(factory.NewDomainRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(domainRequirement))
 			})
 
 			It("returns a ServiceInstanceRequirement", func() {
