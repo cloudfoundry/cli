@@ -278,7 +278,8 @@ var _ = Describe("push Command", func() {
 
 				var yamlUnmarshalMarshal = func(b []byte) []byte {
 					var obj interface{}
-					yaml.Unmarshal(b, &obj)
+					err := yaml.Unmarshal(b, &obj)
+					Expect(err).ToNot(HaveOccurred())
 					postMarshal, err := yaml.Marshal(obj)
 					Expect(err).ToNot(HaveOccurred())
 					return postMarshal
