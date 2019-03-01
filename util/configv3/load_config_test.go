@@ -48,6 +48,10 @@ var _ = Describe("Config", func() {
 			inFlags []FlagOverride
 		)
 
+		BeforeEach(func() {
+			inFlags = []FlagOverride{}
+		})
+
 		JustBeforeEach(func() {
 			config, loadErr = LoadConfig(inFlags...)
 		})
