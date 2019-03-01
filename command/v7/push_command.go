@@ -1,11 +1,12 @@
 package v7
 
 import (
-	"code.cloudfoundry.org/cli/command/v7/shared"
-	"code.cloudfoundry.org/cli/util/configv3"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/util/configv3"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
@@ -146,6 +147,11 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
+	err = cmd.ContainsAllowedFlagsForMultipleApps(manifestParser.ContainsMultipleApps())
+	if err != nil {
+		return err
+	}
+
 	appNamesStream, eventStream, warningsStream, errorStream := cmd.Actor.PrepareSpace(
 		cmd.Config.TargetedSpace().GUID,
 		cmd.OptionalArgs.AppName,
@@ -157,6 +163,7 @@ func (cmd PushCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+
 	if len(appNames) == 0 {
 		return translatableerror.AppNameOrManifestRequiredError{}
 	}
@@ -522,6 +529,28 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 		SkipRouteCreation: cmd.NoRoute,
 		StartCommand:      cmd.StartCommand.FilteredString,
 	}, nil
+}
+
+func (cmd PushCommand) ContainsAllowedFlagsForMultipleApps(containsMultipleApps bool) error {
+	allowedFlagsMultipleApps := !(len(cmd.Buildpacks) > 0 ||
+		cmd.Disk.IsSet ||
+		cmd.DockerImage.Path != "" ||
+		cmd.DockerUsername != "" ||
+		cmd.HealthCheckType.Type != "" ||
+		cmd.HealthCheckHTTPEndpoint != "" ||
+		cmd.HealthCheckTimeout.Value > 0 ||
+		cmd.Instances.IsSet ||
+		cmd.Stack != "" ||
+		cmd.Memory.IsSet ||
+		cmd.AppPath != "" ||
+		cmd.NoRoute ||
+		cmd.StartCommand.IsSet)
+
+	if containsMultipleApps && !allowedFlagsMultipleApps {
+		return translatableerror.CommandLineArgsWithMultipleAppsError{}
+	}
+
+	return nil
 }
 
 func (cmd PushCommand) ValidateFlags() error {

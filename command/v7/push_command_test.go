@@ -3,11 +3,12 @@ package v7_test
 import (
 	"errors"
 	"fmt"
-	. "github.com/onsi/gomega/gstruct"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
+
+	. "github.com/onsi/gomega/gstruct"
 
 	"code.cloudfoundry.org/cli/util/manifestparser"
 
@@ -288,7 +289,7 @@ var _ = Describe("push Command", func() {
 						cmd.PWD = tempDir
 					})
 
-					When("there is a manifest file in the current dir", func() {
+					When("there is a single-app manifest file in the current dir", func() {
 						var yamlContents []byte
 						var pathToYAMLFile string
 
@@ -317,6 +318,28 @@ var _ = Describe("push Command", func() {
 								Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
 								_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 								Expect(manifestParser).To(Equal(manifestparser.NewParser()))
+							})
+						})
+					})
+
+					When("there is a multi-app manifest file in the current dir", func() {
+						var yamlContents []byte
+						var pathToYAMLFile string
+
+						BeforeEach(func() {
+							yamlContents = []byte("---\napplications:\n- name: apple\n- name: banana")
+							pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
+							err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
+							Expect(err).ToNot(HaveOccurred())
+						})
+
+						When("invalid flags are used", func() {
+							BeforeEach(func() {
+								cmd.NoRoute = true
+							})
+
+							It("returns an error", func() {
+								Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
 							})
 						})
 					})
@@ -850,6 +873,103 @@ var _ = Describe("push Command", func() {
 
 				})
 			})
+		})
+	})
+
+	Describe("ContainsAllowedFlagsForMultipleApps", func() {
+		When("manifest contains a single app", func() {
+			DescribeTable("returns nil when",
+				func(setup func()) {
+					setup()
+					Expect(cmd.ContainsAllowedFlagsForMultipleApps(false)).ToNot(HaveOccurred())
+				},
+				Entry("buildpacks is specified",
+					func() {
+						cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
+					}),
+				Entry("disk is specified",
+					func() {
+						cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{IsSet: true}}
+					}),
+			)
+		})
+
+		When("manifest contains multiple apps", func() {
+			DescribeTable("throws an error when",
+				func(setup func()) {
+					setup()
+					Expect(cmd.ContainsAllowedFlagsForMultipleApps(true)).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
+				},
+				Entry("buildpacks is specified",
+					func() {
+						cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
+					}),
+				Entry("disk is specified",
+					func() {
+						cmd.Disk = flag.Megabytes{NullUint64: types.NullUint64{IsSet: true}}
+					}),
+				Entry("docker image is specified",
+					func() {
+						cmd.DockerImage = flag.DockerImage{Path: "some-docker"}
+					}),
+				Entry("docker username is specified",
+					func() {
+						fakeConfig.DockerPasswordReturns("some-password")
+						cmd.DockerUsername = "docker-username"
+					}),
+				Entry("health check type is specified",
+					func() {
+						cmd.HealthCheckType = flag.HealthCheckType{Type: constant.HTTP}
+					}),
+				Entry("health check HTTP endpoint is specified",
+					func() {
+						cmd.HealthCheckHTTPEndpoint = "some-endpoint"
+					}),
+				Entry("health check timeout is specified",
+					func() {
+						cmd.HealthCheckTimeout = flag.PositiveInteger{Value: 5}
+					}),
+				Entry("instances is specified",
+					func() {
+						cmd.Instances = flag.Instances{NullInt: types.NullInt{IsSet: true}}
+					}),
+				Entry("stack is specified",
+					func() {
+						cmd.Stack = "some-stack"
+					}),
+				Entry("memory is specified",
+					func() {
+						cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{IsSet: true}}
+					}),
+				Entry("provided app path is specified",
+					func() {
+						cmd.AppPath = "some-app-path"
+					}),
+				Entry("skip route creation is specified",
+					func() {
+						cmd.NoRoute = true
+					}),
+				Entry("start command is specified",
+					func() {
+						cmd.StartCommand = flag.Command{FilteredString: types.FilteredString{IsSet: true}}
+					}),
+			)
+
+			DescribeTable("is nil when",
+				func(setup func()) {
+					setup()
+					Expect(cmd.ContainsAllowedFlagsForMultipleApps(true)).ToNot(HaveOccurred())
+				},
+				Entry("no flags are specified", func() {}),
+				Entry("path is specified",
+					func() {
+						cmd.PathToManifest = flag.PathWithExistenceCheck("/some/path")
+					}),
+				Entry("no-start is specified",
+					func() {
+						cmd.NoStart = true
+					}),
+			)
 		})
 	})
 

@@ -79,6 +79,10 @@ func (parser Parser) AppNames() []string {
 	return names
 }
 
+func (parser Parser) ContainsMultipleApps() bool {
+	return len(parser.Applications) > 1
+}
+
 func (parser Parser) FullRawManifest() []byte {
 	return parser.rawManifest
 }

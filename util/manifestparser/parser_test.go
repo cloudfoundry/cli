@@ -308,6 +308,28 @@ applications:
 		})
 	})
 
+	Describe("ContainsMultipleApps", func() {
+		When("given a valid manifest file with multiple apps", func() {
+			BeforeEach(func() {
+				parser.Applications = []Application{{Name: "app-1"}, {Name: "app-2"}}
+			})
+
+			It("returns true", func() {
+				Expect(parser.ContainsMultipleApps()).To(BeTrue())
+			})
+		})
+
+		When("given a valid manifest file with a single app", func() {
+			BeforeEach(func() {
+				parser.Applications = []Application{{Name: "app-1"}}
+			})
+
+			It("returns false", func() {
+				Expect(parser.ContainsMultipleApps()).To(BeFalse())
+			})
+		})
+	})
+
 	Describe("RawAppManifest", func() {
 		var (
 			rawAppManifest []byte
