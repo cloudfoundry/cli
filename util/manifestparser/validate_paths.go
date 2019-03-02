@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 func ValidatePaths(manifestParser Parser) error {
@@ -13,11 +13,11 @@ func ValidatePaths(manifestParser Parser) error {
 	for _, application := range manifestParser.Applications {
 		if application.Path != "" {
 
-			if path.IsAbs(application.Path) {
+			if filepath.IsAbs(application.Path) {
 				_, err = os.Stat(application.Path)
 			} else {
-				manifestPath := path.Dir(manifestParser.PathToManifest)
-				_, err = os.Stat(path.Join(manifestPath, application.Path))
+				manifestPath := filepath.Dir(manifestParser.PathToManifest)
+				_, err = os.Stat(filepath.Join(manifestPath, application.Path))
 			}
 
 			if err != nil {

@@ -34,26 +34,24 @@ var _ = Describe("ValidatePaths", func() {
 		When("all application paths in the manifest do exist", func() {
 			It("should successfully handle absolute paths", func() {
 				var err error
-				var yamlContents []byte
-				var yamlString string
 
 				pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
-				firstPath := filepath.Join(tempDir, "path-first-app")
-				err = os.Mkdir(firstPath, 0755)
+				firstAbsolutePath := filepath.Join(tempDir, "path-first-app")
+				err = os.Mkdir(firstAbsolutePath, 0755)
 				Expect(err).ToNot(HaveOccurred())
-				secondPath := filepath.Join(tempDir, "path-second-app")
-				err = os.Mkdir(secondPath, 0755)
+				secondAbsolutePath := filepath.Join(tempDir, "path-second-app")
+				err = os.Mkdir(secondAbsolutePath, 0755)
 				Expect(err).ToNot(HaveOccurred())
 
-				yamlString = `---
+				yamlString := `---
 applications:
     - name: first-app
       path: %s
     - name: second-app
       path: %s
 `
-				interpolatedManifest := fmt.Sprintf(yamlString, firstPath, secondPath)
-				yamlContents = []byte(interpolatedManifest)
+				interpolatedManifest := fmt.Sprintf(yamlString, firstAbsolutePath, secondAbsolutePath)
+				yamlContents := []byte(interpolatedManifest)
 
 				err = ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
 				Expect(err).ToNot(HaveOccurred())
@@ -69,7 +67,6 @@ applications:
 
 			It("should successfully handle relative paths", func() {
 				var err error
-				var yamlContents []byte
 
 				pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
 				err = os.Mkdir(filepath.Join(tempDir, "path-first-app"), 0755)
@@ -77,13 +74,14 @@ applications:
 				err = os.Mkdir(filepath.Join(tempDir, "path-second-app"), 0755)
 				Expect(err).ToNot(HaveOccurred())
 
-				yamlContents = []byte(`---
+				yamlContents := []byte(`---
 applications:
     - name: first-app
-      path: ./path-first-app/
+      path: path-first-app
     - name: second-app
-      path: ./path-second-app/
+      path: path-second-app
 `)
+
 				err = ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -98,7 +96,6 @@ applications:
 
 			It("should not end up permanently changing the working directory", func() {
 				var err error
-				var yamlContents []byte
 
 				pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
 				err = os.Mkdir(filepath.Join(tempDir, "path-first-app"), 0755)
@@ -106,7 +103,7 @@ applications:
 				err = os.Mkdir(filepath.Join(tempDir, "path-second-app"), 0755)
 				Expect(err).ToNot(HaveOccurred())
 
-				yamlContents = []byte(`---
+				yamlContents := []byte(`---
 applications:
     - name: first-app
       path: ./path-first-app/
@@ -132,22 +129,20 @@ applications:
 		})
 
 		When("an application path in the manifest does not actually exist", func() {
-			var yamlContents []byte
+			It("exits with an error", func() {
+				var err error
 
-			BeforeEach(func() {
-				yamlContents = []byte(`---
+				yamlContents := []byte(`---
 applications:
     - name: first-app
       path: /does/not/exist
 `)
 				pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
-				err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
+				err = ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
 				Expect(err).ToNot(HaveOccurred())
-			})
 
-			It("exits with an error", func() {
 				parser.PathToManifest = pathToYAMLFile
-				err := parser.Parse(pathToYAMLFile)
+				err = parser.Parse(pathToYAMLFile)
 				Expect(err).ToNot(HaveOccurred())
 
 				executeErr = parser.Validate()
