@@ -166,7 +166,6 @@ var _ = Describe("push Command", func() {
 		fakeConfig.ExperimentalReturns(true) // TODO: Delete once we remove the experimental flag
 
 		cmd = PushCommand{
-			OptionalArgs: flag.OptionalAppName{AppName: "passed-as-command-arg"},
 			UI:           testUI,
 			Config:       fakeConfig,
 			Actor:        fakeActor,
@@ -451,6 +450,10 @@ var _ = Describe("push Command", func() {
 			})
 
 			Describe("delegating to Actor.PrepareSpace", func() {
+				BeforeEach(func() {
+					cmd.OptionalArgs.AppName = "passed-as-command-arg"
+				})
+
 				It("delegates to PrepareSpace", func() {
 					expectedSpaceGUID, expectedAppName, expectedParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 					Expect(expectedSpaceGUID).To(Equal("some-space-guid"))
