@@ -537,6 +537,10 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 }
 
 func (cmd PushCommand) ContainsAllowedFlagsForMultipleApps(containsMultipleApps bool) error {
+	if cmd.OptionalArgs.AppName != "" {
+		return nil
+	}
+
 	allowedFlagsMultipleApps := !(len(cmd.Buildpacks) > 0 ||
 		cmd.Disk.IsSet ||
 		cmd.DockerImage.Path != "" ||

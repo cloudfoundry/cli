@@ -974,6 +974,15 @@ var _ = Describe("push Command", func() {
 					func() {
 						cmd.NoStart = true
 					}),
+				Entry("single app name is specified, even with disallowed flags",
+					func() {
+						cmd.OptionalArgs.AppName = "some-app-name"
+
+						cmd.Stack = "some-stack"
+						cmd.NoRoute = true
+						cmd.DockerImage = flag.DockerImage{Path: "some-docker"}
+						cmd.Instances = flag.Instances{NullInt: types.NullInt{IsSet: true}}
+					}),
 			)
 		})
 	})
