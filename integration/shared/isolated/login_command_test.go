@@ -484,6 +484,27 @@ var _ = Describe("login command", func() {
 					Eventually(setOrgRoleSession).Should(Exit(0))
 				})
 
+				FWhen("there are more than 50 orgs", func() {
+					var server *ghttp.Server
+					BeforeEach(func() {
+						server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
+						helpers.AddLoginRoutes(server)
+						// helpers.OrgsHaveNoSpaces(server)
+						helpers.AddFiftyOneOrgs(server, orgName)
+					})
+
+					It("displays a message and prompt the user for the org name", func() {
+						input := NewBuffer()
+						input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
+
+						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
+
+						Eventually(session).Should(Exit(0))
+						Expect(session).Should(Say("There are too many options to display, please type in the name."))
+						Eventually(session).Should(Say("Org:\\s+%s", orgName))
+					})
+				})
+
 				When("user selects an organization by using numbered list", func() {
 					// required
 					It("prompts the user for org and target the selected org", func() {

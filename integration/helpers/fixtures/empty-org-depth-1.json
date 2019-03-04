@@ -1,0 +1,33 @@
+{
+    "next_url": null,
+    "prev_url": null,
+    "resources": [
+      {
+        "entity": {
+          "app_events_url": "/v2/organizations/some-org-guid/app_events",
+          "auditors_url": "/v2/organizations/some-org-guid/auditors",
+          "billing_enabled": false,
+          "billing_managers_url": "/v2/organizations/some-org-guid/billing_managers",
+          "default_isolation_segment_guid": null,
+          "domains_url": "/v2/organizations/some-org-guid/domains",
+          "managers_url": "/v2/organizations/some-org-guid/managers",
+          "name": "%s",
+          "private_domains_url": "/v2/organizations/some-org-guid/private_domains",
+          "quota_definition_guid": "005f1efc-0fcd-494a-8d1b-768906f430c5",
+          "quota_definition_url": "/v2/quota_definitions/005f1efc-0fcd-494a-8d1b-768906f430c5",
+          "space_quota_definitions_url": "/v2/organizations/some-org-guid/space_quota_definitions",
+          "spaces_url": "/v2/organizations/some-org-guid/spaces",
+          "status": "active",
+          "users_url": "/v2/organizations/some-org-guid/users"
+        },
+        "metadata": {
+          "created_at": "2019-04-10T15:37:32Z",
+          "guid": "some-org-guid",
+          "updated_at": "2019-04-10T15:37:32Z",
+          "url": "/v2/organizations/some-org-guid"
+        }
+      }
+    ],
+    "total_pages": 1,
+    "total_results": 1
+}
