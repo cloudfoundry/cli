@@ -123,11 +123,11 @@ var _ = Describe("login command", func() {
 
 	Describe("API Endpoint", func() {
 		BeforeEach(func() {
-			helpers.TurnOnExperimental()
+			helpers.TurnOnExperimentalLogin()
 		})
 
 		AfterEach(func() {
-			helpers.TurnOffExperimental()
+			helpers.TurnOffExperimentalLogin()
 		})
 
 		When("the API endpoint is not set", func() {

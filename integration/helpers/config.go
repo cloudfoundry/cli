@@ -22,6 +22,14 @@ func TurnOffExperimental() {
 	Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).To(Succeed())
 }
 
+func TurnOnExperimentalLogin() {
+	Expect(os.Setenv("CF_EXPERIMENTAL_LOGIN", "true")).To(Succeed())
+}
+
+func TurnOffExperimentalLogin() {
+	Expect(os.Unsetenv("CF_EXPERIMENTAL_LOGIN")).To(Succeed())
+}
+
 func SetHomeDir() string {
 	var err error
 	homeDir, err := ioutil.TempDir("", "cli-integration-test")
