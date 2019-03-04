@@ -881,12 +881,12 @@ var _ = Describe("push Command", func() {
 		})
 	})
 
-	Describe("ContainsAllowedFlagsForMultipleApps", func() {
+	Describe("ValidateAllowedFlagsForMultipleApps", func() {
 		When("manifest contains a single app", func() {
 			DescribeTable("returns nil when",
 				func(setup func()) {
 					setup()
-					Expect(cmd.ContainsAllowedFlagsForMultipleApps(false)).ToNot(HaveOccurred())
+					Expect(cmd.ValidateAllowedFlagsForMultipleApps(false)).ToNot(HaveOccurred())
 				},
 				Entry("buildpacks is specified",
 					func() {
@@ -903,8 +903,9 @@ var _ = Describe("push Command", func() {
 			DescribeTable("throws an error when",
 				func(setup func()) {
 					setup()
-					Expect(cmd.ContainsAllowedFlagsForMultipleApps(true)).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
+					Expect(cmd.ValidateAllowedFlagsForMultipleApps(true)).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
 				},
+
 				Entry("buildpacks is specified",
 					func() {
 						cmd.Buildpacks = []string{"buildpack-1", "buildpack-2"}
@@ -963,7 +964,7 @@ var _ = Describe("push Command", func() {
 			DescribeTable("is nil when",
 				func(setup func()) {
 					setup()
-					Expect(cmd.ContainsAllowedFlagsForMultipleApps(true)).ToNot(HaveOccurred())
+					Expect(cmd.ValidateAllowedFlagsForMultipleApps(true)).ToNot(HaveOccurred())
 				},
 				Entry("no flags are specified", func() {}),
 				Entry("path is specified",

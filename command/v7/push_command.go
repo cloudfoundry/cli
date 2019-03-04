@@ -152,7 +152,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.ContainsAllowedFlagsForMultipleApps(manifestParser.ContainsMultipleApps())
+	err = cmd.ValidateAllowedFlagsForMultipleApps(manifestParser.ContainsMultipleApps())
 	if err != nil {
 		return err
 	}
@@ -536,7 +536,7 @@ func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 	}, nil
 }
 
-func (cmd PushCommand) ContainsAllowedFlagsForMultipleApps(containsMultipleApps bool) error {
+func (cmd PushCommand) ValidateAllowedFlagsForMultipleApps(containsMultipleApps bool) error {
 	if cmd.OptionalArgs.AppName != "" {
 		return nil
 	}
