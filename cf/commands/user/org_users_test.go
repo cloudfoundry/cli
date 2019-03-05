@@ -11,7 +11,7 @@ import (
 	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
-	"code.cloudfoundry.org/cli/plugin/models"
+	plugin_models "code.cloudfoundry.org/cli/plugin/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -248,6 +248,41 @@ var _ = Describe("org-users command", func() {
 					[]string{"user2"},
 				))
 			})
+		})
+	})
+
+	Context("when logged in and given an org with clients", func() {
+		BeforeEach(func() {
+			org := models.Organization{}
+			org.Name = "the-org"
+			org.GUID = "the-org-guid"
+
+			client := models.UserFields{GUID: "some-client"}
+			userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+				userFields := map[models.Role][]models.UserFields{
+					models.RoleOrgManager:     {client},
+					models.RoleBillingManager: {},
+					models.RoleOrgAuditor:     {},
+				}[roleName]
+				return userFields, nil
+			}
+
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+			organizationReq.GetOrganizationReturns(org)
+			requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
+		})
+
+		It("lists a client user", func() {
+			runCommand("the-org")
+
+			orgGUID, _ := userRepo.ListUsersInOrgForRoleWithNoUAAArgsForCall(0)
+			Expect(orgGUID).To(Equal("the-org-guid"))
+			Expect(ui.Outputs()).To(ContainSubstrings(
+				[]string{"Getting users in org", "the-org", "my-user"},
+				[]string{"ORG MANAGER"},
+				[]string{"some-client (client)"},
+			))
 		})
 	})
 
