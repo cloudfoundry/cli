@@ -9,10 +9,20 @@ import (
 )
 
 type FakeFactory struct {
-	NewApplicationRequirementStub        func(name string) requirements.ApplicationRequirement
+	NewAPIEndpointRequirementStub        func() requirements.Requirement
+	newAPIEndpointRequirementMutex       sync.RWMutex
+	newAPIEndpointRequirementArgsForCall []struct {
+	}
+	newAPIEndpointRequirementReturns struct {
+		result1 requirements.Requirement
+	}
+	newAPIEndpointRequirementReturnsOnCall map[int]struct {
+		result1 requirements.Requirement
+	}
+	NewApplicationRequirementStub        func(string) requirements.ApplicationRequirement
 	newApplicationRequirementMutex       sync.RWMutex
 	newApplicationRequirementArgsForCall []struct {
-		name string
+		arg1 string
 	}
 	newApplicationRequirementReturns struct {
 		result1 requirements.ApplicationRequirement
@@ -20,105 +30,11 @@ type FakeFactory struct {
 	newApplicationRequirementReturnsOnCall map[int]struct {
 		result1 requirements.ApplicationRequirement
 	}
-	NewDEAApplicationRequirementStub        func(name string) requirements.DEAApplicationRequirement
-	newDEAApplicationRequirementMutex       sync.RWMutex
-	newDEAApplicationRequirementArgsForCall []struct {
-		name string
-	}
-	newDEAApplicationRequirementReturns struct {
-		result1 requirements.DEAApplicationRequirement
-	}
-	newDEAApplicationRequirementReturnsOnCall map[int]struct {
-		result1 requirements.DEAApplicationRequirement
-	}
-	NewServiceInstanceRequirementStub        func(name string) requirements.ServiceInstanceRequirement
-	newServiceInstanceRequirementMutex       sync.RWMutex
-	newServiceInstanceRequirementArgsForCall []struct {
-		name string
-	}
-	newServiceInstanceRequirementReturns struct {
-		result1 requirements.ServiceInstanceRequirement
-	}
-	newServiceInstanceRequirementReturnsOnCall map[int]struct {
-		result1 requirements.ServiceInstanceRequirement
-	}
-	NewLoginRequirementStub        func() requirements.Requirement
-	newLoginRequirementMutex       sync.RWMutex
-	newLoginRequirementArgsForCall []struct{}
-	newLoginRequirementReturns     struct {
-		result1 requirements.Requirement
-	}
-	newLoginRequirementReturnsOnCall map[int]struct {
-		result1 requirements.Requirement
-	}
-	NewSpaceRequirementStub        func(name string) requirements.SpaceRequirement
-	newSpaceRequirementMutex       sync.RWMutex
-	newSpaceRequirementArgsForCall []struct {
-		name string
-	}
-	newSpaceRequirementReturns struct {
-		result1 requirements.SpaceRequirement
-	}
-	newSpaceRequirementReturnsOnCall map[int]struct {
-		result1 requirements.SpaceRequirement
-	}
-	NewTargetedSpaceRequirementStub        func() requirements.Requirement
-	newTargetedSpaceRequirementMutex       sync.RWMutex
-	newTargetedSpaceRequirementArgsForCall []struct{}
-	newTargetedSpaceRequirementReturns     struct {
-		result1 requirements.Requirement
-	}
-	newTargetedSpaceRequirementReturnsOnCall map[int]struct {
-		result1 requirements.Requirement
-	}
-	NewTargetedOrgRequirementStub        func() requirements.TargetedOrgRequirement
-	newTargetedOrgRequirementMutex       sync.RWMutex
-	newTargetedOrgRequirementArgsForCall []struct{}
-	newTargetedOrgRequirementReturns     struct {
-		result1 requirements.TargetedOrgRequirement
-	}
-	newTargetedOrgRequirementReturnsOnCall map[int]struct {
-		result1 requirements.TargetedOrgRequirement
-	}
-	NewOrganizationRequirementStub        func(name string) requirements.OrganizationRequirement
-	newOrganizationRequirementMutex       sync.RWMutex
-	newOrganizationRequirementArgsForCall []struct {
-		name string
-	}
-	newOrganizationRequirementReturns struct {
-		result1 requirements.OrganizationRequirement
-	}
-	newOrganizationRequirementReturnsOnCall map[int]struct {
-		result1 requirements.OrganizationRequirement
-	}
-	NewDomainRequirementStub        func(name string) requirements.DomainRequirement
-	newDomainRequirementMutex       sync.RWMutex
-	newDomainRequirementArgsForCall []struct {
-		name string
-	}
-	newDomainRequirementReturns struct {
-		result1 requirements.DomainRequirement
-	}
-	newDomainRequirementReturnsOnCall map[int]struct {
-		result1 requirements.DomainRequirement
-	}
-	NewUserRequirementStub        func(username string, wantGUID bool) requirements.UserRequirement
-	newUserRequirementMutex       sync.RWMutex
-	newUserRequirementArgsForCall []struct {
-		username string
-		wantGUID bool
-	}
-	newUserRequirementReturns struct {
-		result1 requirements.UserRequirement
-	}
-	newUserRequirementReturnsOnCall map[int]struct {
-		result1 requirements.UserRequirement
-	}
-	NewBuildpackRequirementStub        func(buildpack, stack string) requirements.BuildpackRequirement
+	NewBuildpackRequirementStub        func(string, string) requirements.BuildpackRequirement
 	newBuildpackRequirementMutex       sync.RWMutex
 	newBuildpackRequirementArgsForCall []struct {
-		buildpack string
-		stack     string
+		arg1 string
+		arg2 string
 	}
 	newBuildpackRequirementReturns struct {
 		result1 requirements.BuildpackRequirement
@@ -126,32 +42,54 @@ type FakeFactory struct {
 	newBuildpackRequirementReturnsOnCall map[int]struct {
 		result1 requirements.BuildpackRequirement
 	}
-	NewAPIEndpointRequirementStub        func() requirements.Requirement
-	newAPIEndpointRequirementMutex       sync.RWMutex
-	newAPIEndpointRequirementArgsForCall []struct{}
-	newAPIEndpointRequirementReturns     struct {
+	NewClientRequirementStub        func(string) requirements.UserRequirement
+	newClientRequirementMutex       sync.RWMutex
+	newClientRequirementArgsForCall []struct {
+		arg1 string
+	}
+	newClientRequirementReturns struct {
+		result1 requirements.UserRequirement
+	}
+	newClientRequirementReturnsOnCall map[int]struct {
+		result1 requirements.UserRequirement
+	}
+	NewDEAApplicationRequirementStub        func(string) requirements.DEAApplicationRequirement
+	newDEAApplicationRequirementMutex       sync.RWMutex
+	newDEAApplicationRequirementArgsForCall []struct {
+		arg1 string
+	}
+	newDEAApplicationRequirementReturns struct {
+		result1 requirements.DEAApplicationRequirement
+	}
+	newDEAApplicationRequirementReturnsOnCall map[int]struct {
+		result1 requirements.DEAApplicationRequirement
+	}
+	NewDomainRequirementStub        func(string) requirements.DomainRequirement
+	newDomainRequirementMutex       sync.RWMutex
+	newDomainRequirementArgsForCall []struct {
+		arg1 string
+	}
+	newDomainRequirementReturns struct {
+		result1 requirements.DomainRequirement
+	}
+	newDomainRequirementReturnsOnCall map[int]struct {
+		result1 requirements.DomainRequirement
+	}
+	NewLoginRequirementStub        func() requirements.Requirement
+	newLoginRequirementMutex       sync.RWMutex
+	newLoginRequirementArgsForCall []struct {
+	}
+	newLoginRequirementReturns struct {
 		result1 requirements.Requirement
 	}
-	newAPIEndpointRequirementReturnsOnCall map[int]struct {
+	newLoginRequirementReturnsOnCall map[int]struct {
 		result1 requirements.Requirement
 	}
-	NewMinAPIVersionRequirementStub        func(commandName string, requiredVersion semver.Version) requirements.Requirement
-	newMinAPIVersionRequirementMutex       sync.RWMutex
-	newMinAPIVersionRequirementArgsForCall []struct {
-		commandName     string
-		requiredVersion semver.Version
-	}
-	newMinAPIVersionRequirementReturns struct {
-		result1 requirements.Requirement
-	}
-	newMinAPIVersionRequirementReturnsOnCall map[int]struct {
-		result1 requirements.Requirement
-	}
-	NewMaxAPIVersionRequirementStub        func(commandName string, maximumVersion semver.Version) requirements.Requirement
+	NewMaxAPIVersionRequirementStub        func(string, semver.Version) requirements.Requirement
 	newMaxAPIVersionRequirementMutex       sync.RWMutex
 	newMaxAPIVersionRequirementArgsForCall []struct {
-		commandName    string
-		maximumVersion semver.Version
+		arg1 string
+		arg2 semver.Version
 	}
 	newMaxAPIVersionRequirementReturns struct {
 		result1 requirements.Requirement
@@ -159,10 +97,87 @@ type FakeFactory struct {
 	newMaxAPIVersionRequirementReturnsOnCall map[int]struct {
 		result1 requirements.Requirement
 	}
-	NewUnsupportedLegacyFlagRequirementStub        func(flags ...string) requirements.Requirement
+	NewMinAPIVersionRequirementStub        func(string, semver.Version) requirements.Requirement
+	newMinAPIVersionRequirementMutex       sync.RWMutex
+	newMinAPIVersionRequirementArgsForCall []struct {
+		arg1 string
+		arg2 semver.Version
+	}
+	newMinAPIVersionRequirementReturns struct {
+		result1 requirements.Requirement
+	}
+	newMinAPIVersionRequirementReturnsOnCall map[int]struct {
+		result1 requirements.Requirement
+	}
+	NewNumberArgumentsStub        func([]string, ...string) requirements.Requirement
+	newNumberArgumentsMutex       sync.RWMutex
+	newNumberArgumentsArgsForCall []struct {
+		arg1 []string
+		arg2 []string
+	}
+	newNumberArgumentsReturns struct {
+		result1 requirements.Requirement
+	}
+	newNumberArgumentsReturnsOnCall map[int]struct {
+		result1 requirements.Requirement
+	}
+	NewOrganizationRequirementStub        func(string) requirements.OrganizationRequirement
+	newOrganizationRequirementMutex       sync.RWMutex
+	newOrganizationRequirementArgsForCall []struct {
+		arg1 string
+	}
+	newOrganizationRequirementReturns struct {
+		result1 requirements.OrganizationRequirement
+	}
+	newOrganizationRequirementReturnsOnCall map[int]struct {
+		result1 requirements.OrganizationRequirement
+	}
+	NewServiceInstanceRequirementStub        func(string) requirements.ServiceInstanceRequirement
+	newServiceInstanceRequirementMutex       sync.RWMutex
+	newServiceInstanceRequirementArgsForCall []struct {
+		arg1 string
+	}
+	newServiceInstanceRequirementReturns struct {
+		result1 requirements.ServiceInstanceRequirement
+	}
+	newServiceInstanceRequirementReturnsOnCall map[int]struct {
+		result1 requirements.ServiceInstanceRequirement
+	}
+	NewSpaceRequirementStub        func(string) requirements.SpaceRequirement
+	newSpaceRequirementMutex       sync.RWMutex
+	newSpaceRequirementArgsForCall []struct {
+		arg1 string
+	}
+	newSpaceRequirementReturns struct {
+		result1 requirements.SpaceRequirement
+	}
+	newSpaceRequirementReturnsOnCall map[int]struct {
+		result1 requirements.SpaceRequirement
+	}
+	NewTargetedOrgRequirementStub        func() requirements.TargetedOrgRequirement
+	newTargetedOrgRequirementMutex       sync.RWMutex
+	newTargetedOrgRequirementArgsForCall []struct {
+	}
+	newTargetedOrgRequirementReturns struct {
+		result1 requirements.TargetedOrgRequirement
+	}
+	newTargetedOrgRequirementReturnsOnCall map[int]struct {
+		result1 requirements.TargetedOrgRequirement
+	}
+	NewTargetedSpaceRequirementStub        func() requirements.Requirement
+	newTargetedSpaceRequirementMutex       sync.RWMutex
+	newTargetedSpaceRequirementArgsForCall []struct {
+	}
+	newTargetedSpaceRequirementReturns struct {
+		result1 requirements.Requirement
+	}
+	newTargetedSpaceRequirementReturnsOnCall map[int]struct {
+		result1 requirements.Requirement
+	}
+	NewUnsupportedLegacyFlagRequirementStub        func(...string) requirements.Requirement
 	newUnsupportedLegacyFlagRequirementMutex       sync.RWMutex
 	newUnsupportedLegacyFlagRequirementArgsForCall []struct {
-		flags []string
+		arg1 []string
 	}
 	newUnsupportedLegacyFlagRequirementReturns struct {
 		result1 requirements.Requirement
@@ -183,532 +198,27 @@ type FakeFactory struct {
 	newUsageRequirementReturnsOnCall map[int]struct {
 		result1 requirements.Requirement
 	}
-	NewNumberArgumentsStub        func([]string, ...string) requirements.Requirement
-	newNumberArgumentsMutex       sync.RWMutex
-	newNumberArgumentsArgsForCall []struct {
-		arg1 []string
-		arg2 []string
+	NewUserRequirementStub        func(string, bool) requirements.UserRequirement
+	newUserRequirementMutex       sync.RWMutex
+	newUserRequirementArgsForCall []struct {
+		arg1 string
+		arg2 bool
 	}
-	newNumberArgumentsReturns struct {
-		result1 requirements.Requirement
+	newUserRequirementReturns struct {
+		result1 requirements.UserRequirement
 	}
-	newNumberArgumentsReturnsOnCall map[int]struct {
-		result1 requirements.Requirement
+	newUserRequirementReturnsOnCall map[int]struct {
+		result1 requirements.UserRequirement
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
-	fake.newApplicationRequirementMutex.Lock()
-	ret, specificReturn := fake.newApplicationRequirementReturnsOnCall[len(fake.newApplicationRequirementArgsForCall)]
-	fake.newApplicationRequirementArgsForCall = append(fake.newApplicationRequirementArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("NewApplicationRequirement", []interface{}{name})
-	fake.newApplicationRequirementMutex.Unlock()
-	if fake.NewApplicationRequirementStub != nil {
-		return fake.NewApplicationRequirementStub(name)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newApplicationRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewApplicationRequirementCallCount() int {
-	fake.newApplicationRequirementMutex.RLock()
-	defer fake.newApplicationRequirementMutex.RUnlock()
-	return len(fake.newApplicationRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewApplicationRequirementArgsForCall(i int) string {
-	fake.newApplicationRequirementMutex.RLock()
-	defer fake.newApplicationRequirementMutex.RUnlock()
-	return fake.newApplicationRequirementArgsForCall[i].name
-}
-
-func (fake *FakeFactory) NewApplicationRequirementReturns(result1 requirements.ApplicationRequirement) {
-	fake.NewApplicationRequirementStub = nil
-	fake.newApplicationRequirementReturns = struct {
-		result1 requirements.ApplicationRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewApplicationRequirementReturnsOnCall(i int, result1 requirements.ApplicationRequirement) {
-	fake.NewApplicationRequirementStub = nil
-	if fake.newApplicationRequirementReturnsOnCall == nil {
-		fake.newApplicationRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.ApplicationRequirement
-		})
-	}
-	fake.newApplicationRequirementReturnsOnCall[i] = struct {
-		result1 requirements.ApplicationRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewDEAApplicationRequirement(name string) requirements.DEAApplicationRequirement {
-	fake.newDEAApplicationRequirementMutex.Lock()
-	ret, specificReturn := fake.newDEAApplicationRequirementReturnsOnCall[len(fake.newDEAApplicationRequirementArgsForCall)]
-	fake.newDEAApplicationRequirementArgsForCall = append(fake.newDEAApplicationRequirementArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("NewDEAApplicationRequirement", []interface{}{name})
-	fake.newDEAApplicationRequirementMutex.Unlock()
-	if fake.NewDEAApplicationRequirementStub != nil {
-		return fake.NewDEAApplicationRequirementStub(name)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newDEAApplicationRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewDEAApplicationRequirementCallCount() int {
-	fake.newDEAApplicationRequirementMutex.RLock()
-	defer fake.newDEAApplicationRequirementMutex.RUnlock()
-	return len(fake.newDEAApplicationRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewDEAApplicationRequirementArgsForCall(i int) string {
-	fake.newDEAApplicationRequirementMutex.RLock()
-	defer fake.newDEAApplicationRequirementMutex.RUnlock()
-	return fake.newDEAApplicationRequirementArgsForCall[i].name
-}
-
-func (fake *FakeFactory) NewDEAApplicationRequirementReturns(result1 requirements.DEAApplicationRequirement) {
-	fake.NewDEAApplicationRequirementStub = nil
-	fake.newDEAApplicationRequirementReturns = struct {
-		result1 requirements.DEAApplicationRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewDEAApplicationRequirementReturnsOnCall(i int, result1 requirements.DEAApplicationRequirement) {
-	fake.NewDEAApplicationRequirementStub = nil
-	if fake.newDEAApplicationRequirementReturnsOnCall == nil {
-		fake.newDEAApplicationRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.DEAApplicationRequirement
-		})
-	}
-	fake.newDEAApplicationRequirementReturnsOnCall[i] = struct {
-		result1 requirements.DEAApplicationRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewServiceInstanceRequirement(name string) requirements.ServiceInstanceRequirement {
-	fake.newServiceInstanceRequirementMutex.Lock()
-	ret, specificReturn := fake.newServiceInstanceRequirementReturnsOnCall[len(fake.newServiceInstanceRequirementArgsForCall)]
-	fake.newServiceInstanceRequirementArgsForCall = append(fake.newServiceInstanceRequirementArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("NewServiceInstanceRequirement", []interface{}{name})
-	fake.newServiceInstanceRequirementMutex.Unlock()
-	if fake.NewServiceInstanceRequirementStub != nil {
-		return fake.NewServiceInstanceRequirementStub(name)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newServiceInstanceRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewServiceInstanceRequirementCallCount() int {
-	fake.newServiceInstanceRequirementMutex.RLock()
-	defer fake.newServiceInstanceRequirementMutex.RUnlock()
-	return len(fake.newServiceInstanceRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewServiceInstanceRequirementArgsForCall(i int) string {
-	fake.newServiceInstanceRequirementMutex.RLock()
-	defer fake.newServiceInstanceRequirementMutex.RUnlock()
-	return fake.newServiceInstanceRequirementArgsForCall[i].name
-}
-
-func (fake *FakeFactory) NewServiceInstanceRequirementReturns(result1 requirements.ServiceInstanceRequirement) {
-	fake.NewServiceInstanceRequirementStub = nil
-	fake.newServiceInstanceRequirementReturns = struct {
-		result1 requirements.ServiceInstanceRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewServiceInstanceRequirementReturnsOnCall(i int, result1 requirements.ServiceInstanceRequirement) {
-	fake.NewServiceInstanceRequirementStub = nil
-	if fake.newServiceInstanceRequirementReturnsOnCall == nil {
-		fake.newServiceInstanceRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.ServiceInstanceRequirement
-		})
-	}
-	fake.newServiceInstanceRequirementReturnsOnCall[i] = struct {
-		result1 requirements.ServiceInstanceRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewLoginRequirement() requirements.Requirement {
-	fake.newLoginRequirementMutex.Lock()
-	ret, specificReturn := fake.newLoginRequirementReturnsOnCall[len(fake.newLoginRequirementArgsForCall)]
-	fake.newLoginRequirementArgsForCall = append(fake.newLoginRequirementArgsForCall, struct{}{})
-	fake.recordInvocation("NewLoginRequirement", []interface{}{})
-	fake.newLoginRequirementMutex.Unlock()
-	if fake.NewLoginRequirementStub != nil {
-		return fake.NewLoginRequirementStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newLoginRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewLoginRequirementCallCount() int {
-	fake.newLoginRequirementMutex.RLock()
-	defer fake.newLoginRequirementMutex.RUnlock()
-	return len(fake.newLoginRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewLoginRequirementReturns(result1 requirements.Requirement) {
-	fake.NewLoginRequirementStub = nil
-	fake.newLoginRequirementReturns = struct {
-		result1 requirements.Requirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewLoginRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
-	fake.NewLoginRequirementStub = nil
-	if fake.newLoginRequirementReturnsOnCall == nil {
-		fake.newLoginRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.Requirement
-		})
-	}
-	fake.newLoginRequirementReturnsOnCall[i] = struct {
-		result1 requirements.Requirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewSpaceRequirement(name string) requirements.SpaceRequirement {
-	fake.newSpaceRequirementMutex.Lock()
-	ret, specificReturn := fake.newSpaceRequirementReturnsOnCall[len(fake.newSpaceRequirementArgsForCall)]
-	fake.newSpaceRequirementArgsForCall = append(fake.newSpaceRequirementArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("NewSpaceRequirement", []interface{}{name})
-	fake.newSpaceRequirementMutex.Unlock()
-	if fake.NewSpaceRequirementStub != nil {
-		return fake.NewSpaceRequirementStub(name)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newSpaceRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewSpaceRequirementCallCount() int {
-	fake.newSpaceRequirementMutex.RLock()
-	defer fake.newSpaceRequirementMutex.RUnlock()
-	return len(fake.newSpaceRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewSpaceRequirementArgsForCall(i int) string {
-	fake.newSpaceRequirementMutex.RLock()
-	defer fake.newSpaceRequirementMutex.RUnlock()
-	return fake.newSpaceRequirementArgsForCall[i].name
-}
-
-func (fake *FakeFactory) NewSpaceRequirementReturns(result1 requirements.SpaceRequirement) {
-	fake.NewSpaceRequirementStub = nil
-	fake.newSpaceRequirementReturns = struct {
-		result1 requirements.SpaceRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewSpaceRequirementReturnsOnCall(i int, result1 requirements.SpaceRequirement) {
-	fake.NewSpaceRequirementStub = nil
-	if fake.newSpaceRequirementReturnsOnCall == nil {
-		fake.newSpaceRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.SpaceRequirement
-		})
-	}
-	fake.newSpaceRequirementReturnsOnCall[i] = struct {
-		result1 requirements.SpaceRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewTargetedSpaceRequirement() requirements.Requirement {
-	fake.newTargetedSpaceRequirementMutex.Lock()
-	ret, specificReturn := fake.newTargetedSpaceRequirementReturnsOnCall[len(fake.newTargetedSpaceRequirementArgsForCall)]
-	fake.newTargetedSpaceRequirementArgsForCall = append(fake.newTargetedSpaceRequirementArgsForCall, struct{}{})
-	fake.recordInvocation("NewTargetedSpaceRequirement", []interface{}{})
-	fake.newTargetedSpaceRequirementMutex.Unlock()
-	if fake.NewTargetedSpaceRequirementStub != nil {
-		return fake.NewTargetedSpaceRequirementStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newTargetedSpaceRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewTargetedSpaceRequirementCallCount() int {
-	fake.newTargetedSpaceRequirementMutex.RLock()
-	defer fake.newTargetedSpaceRequirementMutex.RUnlock()
-	return len(fake.newTargetedSpaceRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewTargetedSpaceRequirementReturns(result1 requirements.Requirement) {
-	fake.NewTargetedSpaceRequirementStub = nil
-	fake.newTargetedSpaceRequirementReturns = struct {
-		result1 requirements.Requirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewTargetedSpaceRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
-	fake.NewTargetedSpaceRequirementStub = nil
-	if fake.newTargetedSpaceRequirementReturnsOnCall == nil {
-		fake.newTargetedSpaceRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.Requirement
-		})
-	}
-	fake.newTargetedSpaceRequirementReturnsOnCall[i] = struct {
-		result1 requirements.Requirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewTargetedOrgRequirement() requirements.TargetedOrgRequirement {
-	fake.newTargetedOrgRequirementMutex.Lock()
-	ret, specificReturn := fake.newTargetedOrgRequirementReturnsOnCall[len(fake.newTargetedOrgRequirementArgsForCall)]
-	fake.newTargetedOrgRequirementArgsForCall = append(fake.newTargetedOrgRequirementArgsForCall, struct{}{})
-	fake.recordInvocation("NewTargetedOrgRequirement", []interface{}{})
-	fake.newTargetedOrgRequirementMutex.Unlock()
-	if fake.NewTargetedOrgRequirementStub != nil {
-		return fake.NewTargetedOrgRequirementStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newTargetedOrgRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewTargetedOrgRequirementCallCount() int {
-	fake.newTargetedOrgRequirementMutex.RLock()
-	defer fake.newTargetedOrgRequirementMutex.RUnlock()
-	return len(fake.newTargetedOrgRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewTargetedOrgRequirementReturns(result1 requirements.TargetedOrgRequirement) {
-	fake.NewTargetedOrgRequirementStub = nil
-	fake.newTargetedOrgRequirementReturns = struct {
-		result1 requirements.TargetedOrgRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewTargetedOrgRequirementReturnsOnCall(i int, result1 requirements.TargetedOrgRequirement) {
-	fake.NewTargetedOrgRequirementStub = nil
-	if fake.newTargetedOrgRequirementReturnsOnCall == nil {
-		fake.newTargetedOrgRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.TargetedOrgRequirement
-		})
-	}
-	fake.newTargetedOrgRequirementReturnsOnCall[i] = struct {
-		result1 requirements.TargetedOrgRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewOrganizationRequirement(name string) requirements.OrganizationRequirement {
-	fake.newOrganizationRequirementMutex.Lock()
-	ret, specificReturn := fake.newOrganizationRequirementReturnsOnCall[len(fake.newOrganizationRequirementArgsForCall)]
-	fake.newOrganizationRequirementArgsForCall = append(fake.newOrganizationRequirementArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("NewOrganizationRequirement", []interface{}{name})
-	fake.newOrganizationRequirementMutex.Unlock()
-	if fake.NewOrganizationRequirementStub != nil {
-		return fake.NewOrganizationRequirementStub(name)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newOrganizationRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewOrganizationRequirementCallCount() int {
-	fake.newOrganizationRequirementMutex.RLock()
-	defer fake.newOrganizationRequirementMutex.RUnlock()
-	return len(fake.newOrganizationRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewOrganizationRequirementArgsForCall(i int) string {
-	fake.newOrganizationRequirementMutex.RLock()
-	defer fake.newOrganizationRequirementMutex.RUnlock()
-	return fake.newOrganizationRequirementArgsForCall[i].name
-}
-
-func (fake *FakeFactory) NewOrganizationRequirementReturns(result1 requirements.OrganizationRequirement) {
-	fake.NewOrganizationRequirementStub = nil
-	fake.newOrganizationRequirementReturns = struct {
-		result1 requirements.OrganizationRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewOrganizationRequirementReturnsOnCall(i int, result1 requirements.OrganizationRequirement) {
-	fake.NewOrganizationRequirementStub = nil
-	if fake.newOrganizationRequirementReturnsOnCall == nil {
-		fake.newOrganizationRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.OrganizationRequirement
-		})
-	}
-	fake.newOrganizationRequirementReturnsOnCall[i] = struct {
-		result1 requirements.OrganizationRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewDomainRequirement(name string) requirements.DomainRequirement {
-	fake.newDomainRequirementMutex.Lock()
-	ret, specificReturn := fake.newDomainRequirementReturnsOnCall[len(fake.newDomainRequirementArgsForCall)]
-	fake.newDomainRequirementArgsForCall = append(fake.newDomainRequirementArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("NewDomainRequirement", []interface{}{name})
-	fake.newDomainRequirementMutex.Unlock()
-	if fake.NewDomainRequirementStub != nil {
-		return fake.NewDomainRequirementStub(name)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newDomainRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewDomainRequirementCallCount() int {
-	fake.newDomainRequirementMutex.RLock()
-	defer fake.newDomainRequirementMutex.RUnlock()
-	return len(fake.newDomainRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewDomainRequirementArgsForCall(i int) string {
-	fake.newDomainRequirementMutex.RLock()
-	defer fake.newDomainRequirementMutex.RUnlock()
-	return fake.newDomainRequirementArgsForCall[i].name
-}
-
-func (fake *FakeFactory) NewDomainRequirementReturns(result1 requirements.DomainRequirement) {
-	fake.NewDomainRequirementStub = nil
-	fake.newDomainRequirementReturns = struct {
-		result1 requirements.DomainRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewDomainRequirementReturnsOnCall(i int, result1 requirements.DomainRequirement) {
-	fake.NewDomainRequirementStub = nil
-	if fake.newDomainRequirementReturnsOnCall == nil {
-		fake.newDomainRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.DomainRequirement
-		})
-	}
-	fake.newDomainRequirementReturnsOnCall[i] = struct {
-		result1 requirements.DomainRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewUserRequirement(username string, wantGUID bool) requirements.UserRequirement {
-	fake.newUserRequirementMutex.Lock()
-	ret, specificReturn := fake.newUserRequirementReturnsOnCall[len(fake.newUserRequirementArgsForCall)]
-	fake.newUserRequirementArgsForCall = append(fake.newUserRequirementArgsForCall, struct {
-		username string
-		wantGUID bool
-	}{username, wantGUID})
-	fake.recordInvocation("NewUserRequirement", []interface{}{username, wantGUID})
-	fake.newUserRequirementMutex.Unlock()
-	if fake.NewUserRequirementStub != nil {
-		return fake.NewUserRequirementStub(username, wantGUID)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newUserRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewUserRequirementCallCount() int {
-	fake.newUserRequirementMutex.RLock()
-	defer fake.newUserRequirementMutex.RUnlock()
-	return len(fake.newUserRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewUserRequirementArgsForCall(i int) (string, bool) {
-	fake.newUserRequirementMutex.RLock()
-	defer fake.newUserRequirementMutex.RUnlock()
-	return fake.newUserRequirementArgsForCall[i].username, fake.newUserRequirementArgsForCall[i].wantGUID
-}
-
-func (fake *FakeFactory) NewUserRequirementReturns(result1 requirements.UserRequirement) {
-	fake.NewUserRequirementStub = nil
-	fake.newUserRequirementReturns = struct {
-		result1 requirements.UserRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewUserRequirementReturnsOnCall(i int, result1 requirements.UserRequirement) {
-	fake.NewUserRequirementStub = nil
-	if fake.newUserRequirementReturnsOnCall == nil {
-		fake.newUserRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.UserRequirement
-		})
-	}
-	fake.newUserRequirementReturnsOnCall[i] = struct {
-		result1 requirements.UserRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewBuildpackRequirement(buildpack string, stack string) requirements.BuildpackRequirement {
-	fake.newBuildpackRequirementMutex.Lock()
-	ret, specificReturn := fake.newBuildpackRequirementReturnsOnCall[len(fake.newBuildpackRequirementArgsForCall)]
-	fake.newBuildpackRequirementArgsForCall = append(fake.newBuildpackRequirementArgsForCall, struct {
-		buildpack string
-		stack     string
-	}{buildpack, stack})
-	fake.recordInvocation("NewBuildpackRequirement", []interface{}{buildpack, stack})
-	fake.newBuildpackRequirementMutex.Unlock()
-	if fake.NewBuildpackRequirementStub != nil {
-		return fake.NewBuildpackRequirementStub(buildpack, stack)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.newBuildpackRequirementReturns.result1
-}
-
-func (fake *FakeFactory) NewBuildpackRequirementCallCount() int {
-	fake.newBuildpackRequirementMutex.RLock()
-	defer fake.newBuildpackRequirementMutex.RUnlock()
-	return len(fake.newBuildpackRequirementArgsForCall)
-}
-
-func (fake *FakeFactory) NewBuildpackRequirementArgsForCall(i int) (string, string) {
-	fake.newBuildpackRequirementMutex.RLock()
-	defer fake.newBuildpackRequirementMutex.RUnlock()
-	return fake.newBuildpackRequirementArgsForCall[i].buildpack, fake.newBuildpackRequirementArgsForCall[i].stack
-}
-
-func (fake *FakeFactory) NewBuildpackRequirementReturns(result1 requirements.BuildpackRequirement) {
-	fake.NewBuildpackRequirementStub = nil
-	fake.newBuildpackRequirementReturns = struct {
-		result1 requirements.BuildpackRequirement
-	}{result1}
-}
-
-func (fake *FakeFactory) NewBuildpackRequirementReturnsOnCall(i int, result1 requirements.BuildpackRequirement) {
-	fake.NewBuildpackRequirementStub = nil
-	if fake.newBuildpackRequirementReturnsOnCall == nil {
-		fake.newBuildpackRequirementReturnsOnCall = make(map[int]struct {
-			result1 requirements.BuildpackRequirement
-		})
-	}
-	fake.newBuildpackRequirementReturnsOnCall[i] = struct {
-		result1 requirements.BuildpackRequirement
-	}{result1}
-}
-
 func (fake *FakeFactory) NewAPIEndpointRequirement() requirements.Requirement {
 	fake.newAPIEndpointRequirementMutex.Lock()
 	ret, specificReturn := fake.newAPIEndpointRequirementReturnsOnCall[len(fake.newAPIEndpointRequirementArgsForCall)]
-	fake.newAPIEndpointRequirementArgsForCall = append(fake.newAPIEndpointRequirementArgsForCall, struct{}{})
+	fake.newAPIEndpointRequirementArgsForCall = append(fake.newAPIEndpointRequirementArgsForCall, struct {
+	}{})
 	fake.recordInvocation("NewAPIEndpointRequirement", []interface{}{})
 	fake.newAPIEndpointRequirementMutex.Unlock()
 	if fake.NewAPIEndpointRequirementStub != nil {
@@ -717,7 +227,8 @@ func (fake *FakeFactory) NewAPIEndpointRequirement() requirements.Requirement {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.newAPIEndpointRequirementReturns.result1
+	fakeReturns := fake.newAPIEndpointRequirementReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeFactory) NewAPIEndpointRequirementCallCount() int {
@@ -726,7 +237,15 @@ func (fake *FakeFactory) NewAPIEndpointRequirementCallCount() int {
 	return len(fake.newAPIEndpointRequirementArgsForCall)
 }
 
+func (fake *FakeFactory) NewAPIEndpointRequirementCalls(stub func() requirements.Requirement) {
+	fake.newAPIEndpointRequirementMutex.Lock()
+	defer fake.newAPIEndpointRequirementMutex.Unlock()
+	fake.NewAPIEndpointRequirementStub = stub
+}
+
 func (fake *FakeFactory) NewAPIEndpointRequirementReturns(result1 requirements.Requirement) {
+	fake.newAPIEndpointRequirementMutex.Lock()
+	defer fake.newAPIEndpointRequirementMutex.Unlock()
 	fake.NewAPIEndpointRequirementStub = nil
 	fake.newAPIEndpointRequirementReturns = struct {
 		result1 requirements.Requirement
@@ -734,6 +253,8 @@ func (fake *FakeFactory) NewAPIEndpointRequirementReturns(result1 requirements.R
 }
 
 func (fake *FakeFactory) NewAPIEndpointRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
+	fake.newAPIEndpointRequirementMutex.Lock()
+	defer fake.newAPIEndpointRequirementMutex.Unlock()
 	fake.NewAPIEndpointRequirementStub = nil
 	if fake.newAPIEndpointRequirementReturnsOnCall == nil {
 		fake.newAPIEndpointRequirementReturnsOnCall = make(map[int]struct {
@@ -745,71 +266,376 @@ func (fake *FakeFactory) NewAPIEndpointRequirementReturnsOnCall(i int, result1 r
 	}{result1}
 }
 
-func (fake *FakeFactory) NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) requirements.Requirement {
-	fake.newMinAPIVersionRequirementMutex.Lock()
-	ret, specificReturn := fake.newMinAPIVersionRequirementReturnsOnCall[len(fake.newMinAPIVersionRequirementArgsForCall)]
-	fake.newMinAPIVersionRequirementArgsForCall = append(fake.newMinAPIVersionRequirementArgsForCall, struct {
-		commandName     string
-		requiredVersion semver.Version
-	}{commandName, requiredVersion})
-	fake.recordInvocation("NewMinAPIVersionRequirement", []interface{}{commandName, requiredVersion})
-	fake.newMinAPIVersionRequirementMutex.Unlock()
-	if fake.NewMinAPIVersionRequirementStub != nil {
-		return fake.NewMinAPIVersionRequirementStub(commandName, requiredVersion)
+func (fake *FakeFactory) NewApplicationRequirement(arg1 string) requirements.ApplicationRequirement {
+	fake.newApplicationRequirementMutex.Lock()
+	ret, specificReturn := fake.newApplicationRequirementReturnsOnCall[len(fake.newApplicationRequirementArgsForCall)]
+	fake.newApplicationRequirementArgsForCall = append(fake.newApplicationRequirementArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("NewApplicationRequirement", []interface{}{arg1})
+	fake.newApplicationRequirementMutex.Unlock()
+	if fake.NewApplicationRequirementStub != nil {
+		return fake.NewApplicationRequirementStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.newMinAPIVersionRequirementReturns.result1
+	fakeReturns := fake.newApplicationRequirementReturns
+	return fakeReturns.result1
 }
 
-func (fake *FakeFactory) NewMinAPIVersionRequirementCallCount() int {
-	fake.newMinAPIVersionRequirementMutex.RLock()
-	defer fake.newMinAPIVersionRequirementMutex.RUnlock()
-	return len(fake.newMinAPIVersionRequirementArgsForCall)
+func (fake *FakeFactory) NewApplicationRequirementCallCount() int {
+	fake.newApplicationRequirementMutex.RLock()
+	defer fake.newApplicationRequirementMutex.RUnlock()
+	return len(fake.newApplicationRequirementArgsForCall)
 }
 
-func (fake *FakeFactory) NewMinAPIVersionRequirementArgsForCall(i int) (string, semver.Version) {
-	fake.newMinAPIVersionRequirementMutex.RLock()
-	defer fake.newMinAPIVersionRequirementMutex.RUnlock()
-	return fake.newMinAPIVersionRequirementArgsForCall[i].commandName, fake.newMinAPIVersionRequirementArgsForCall[i].requiredVersion
+func (fake *FakeFactory) NewApplicationRequirementCalls(stub func(string) requirements.ApplicationRequirement) {
+	fake.newApplicationRequirementMutex.Lock()
+	defer fake.newApplicationRequirementMutex.Unlock()
+	fake.NewApplicationRequirementStub = stub
 }
 
-func (fake *FakeFactory) NewMinAPIVersionRequirementReturns(result1 requirements.Requirement) {
-	fake.NewMinAPIVersionRequirementStub = nil
-	fake.newMinAPIVersionRequirementReturns = struct {
+func (fake *FakeFactory) NewApplicationRequirementArgsForCall(i int) string {
+	fake.newApplicationRequirementMutex.RLock()
+	defer fake.newApplicationRequirementMutex.RUnlock()
+	argsForCall := fake.newApplicationRequirementArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeFactory) NewApplicationRequirementReturns(result1 requirements.ApplicationRequirement) {
+	fake.newApplicationRequirementMutex.Lock()
+	defer fake.newApplicationRequirementMutex.Unlock()
+	fake.NewApplicationRequirementStub = nil
+	fake.newApplicationRequirementReturns = struct {
+		result1 requirements.ApplicationRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewApplicationRequirementReturnsOnCall(i int, result1 requirements.ApplicationRequirement) {
+	fake.newApplicationRequirementMutex.Lock()
+	defer fake.newApplicationRequirementMutex.Unlock()
+	fake.NewApplicationRequirementStub = nil
+	if fake.newApplicationRequirementReturnsOnCall == nil {
+		fake.newApplicationRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.ApplicationRequirement
+		})
+	}
+	fake.newApplicationRequirementReturnsOnCall[i] = struct {
+		result1 requirements.ApplicationRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewBuildpackRequirement(arg1 string, arg2 string) requirements.BuildpackRequirement {
+	fake.newBuildpackRequirementMutex.Lock()
+	ret, specificReturn := fake.newBuildpackRequirementReturnsOnCall[len(fake.newBuildpackRequirementArgsForCall)]
+	fake.newBuildpackRequirementArgsForCall = append(fake.newBuildpackRequirementArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("NewBuildpackRequirement", []interface{}{arg1, arg2})
+	fake.newBuildpackRequirementMutex.Unlock()
+	if fake.NewBuildpackRequirementStub != nil {
+		return fake.NewBuildpackRequirementStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newBuildpackRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewBuildpackRequirementCallCount() int {
+	fake.newBuildpackRequirementMutex.RLock()
+	defer fake.newBuildpackRequirementMutex.RUnlock()
+	return len(fake.newBuildpackRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewBuildpackRequirementCalls(stub func(string, string) requirements.BuildpackRequirement) {
+	fake.newBuildpackRequirementMutex.Lock()
+	defer fake.newBuildpackRequirementMutex.Unlock()
+	fake.NewBuildpackRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewBuildpackRequirementArgsForCall(i int) (string, string) {
+	fake.newBuildpackRequirementMutex.RLock()
+	defer fake.newBuildpackRequirementMutex.RUnlock()
+	argsForCall := fake.newBuildpackRequirementArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeFactory) NewBuildpackRequirementReturns(result1 requirements.BuildpackRequirement) {
+	fake.newBuildpackRequirementMutex.Lock()
+	defer fake.newBuildpackRequirementMutex.Unlock()
+	fake.NewBuildpackRequirementStub = nil
+	fake.newBuildpackRequirementReturns = struct {
+		result1 requirements.BuildpackRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewBuildpackRequirementReturnsOnCall(i int, result1 requirements.BuildpackRequirement) {
+	fake.newBuildpackRequirementMutex.Lock()
+	defer fake.newBuildpackRequirementMutex.Unlock()
+	fake.NewBuildpackRequirementStub = nil
+	if fake.newBuildpackRequirementReturnsOnCall == nil {
+		fake.newBuildpackRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.BuildpackRequirement
+		})
+	}
+	fake.newBuildpackRequirementReturnsOnCall[i] = struct {
+		result1 requirements.BuildpackRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewClientRequirement(arg1 string) requirements.UserRequirement {
+	fake.newClientRequirementMutex.Lock()
+	ret, specificReturn := fake.newClientRequirementReturnsOnCall[len(fake.newClientRequirementArgsForCall)]
+	fake.newClientRequirementArgsForCall = append(fake.newClientRequirementArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("NewClientRequirement", []interface{}{arg1})
+	fake.newClientRequirementMutex.Unlock()
+	if fake.NewClientRequirementStub != nil {
+		return fake.NewClientRequirementStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newClientRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewClientRequirementCallCount() int {
+	fake.newClientRequirementMutex.RLock()
+	defer fake.newClientRequirementMutex.RUnlock()
+	return len(fake.newClientRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewClientRequirementCalls(stub func(string) requirements.UserRequirement) {
+	fake.newClientRequirementMutex.Lock()
+	defer fake.newClientRequirementMutex.Unlock()
+	fake.NewClientRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewClientRequirementArgsForCall(i int) string {
+	fake.newClientRequirementMutex.RLock()
+	defer fake.newClientRequirementMutex.RUnlock()
+	argsForCall := fake.newClientRequirementArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeFactory) NewClientRequirementReturns(result1 requirements.UserRequirement) {
+	fake.newClientRequirementMutex.Lock()
+	defer fake.newClientRequirementMutex.Unlock()
+	fake.NewClientRequirementStub = nil
+	fake.newClientRequirementReturns = struct {
+		result1 requirements.UserRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewClientRequirementReturnsOnCall(i int, result1 requirements.UserRequirement) {
+	fake.newClientRequirementMutex.Lock()
+	defer fake.newClientRequirementMutex.Unlock()
+	fake.NewClientRequirementStub = nil
+	if fake.newClientRequirementReturnsOnCall == nil {
+		fake.newClientRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.UserRequirement
+		})
+	}
+	fake.newClientRequirementReturnsOnCall[i] = struct {
+		result1 requirements.UserRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewDEAApplicationRequirement(arg1 string) requirements.DEAApplicationRequirement {
+	fake.newDEAApplicationRequirementMutex.Lock()
+	ret, specificReturn := fake.newDEAApplicationRequirementReturnsOnCall[len(fake.newDEAApplicationRequirementArgsForCall)]
+	fake.newDEAApplicationRequirementArgsForCall = append(fake.newDEAApplicationRequirementArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("NewDEAApplicationRequirement", []interface{}{arg1})
+	fake.newDEAApplicationRequirementMutex.Unlock()
+	if fake.NewDEAApplicationRequirementStub != nil {
+		return fake.NewDEAApplicationRequirementStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newDEAApplicationRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewDEAApplicationRequirementCallCount() int {
+	fake.newDEAApplicationRequirementMutex.RLock()
+	defer fake.newDEAApplicationRequirementMutex.RUnlock()
+	return len(fake.newDEAApplicationRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewDEAApplicationRequirementCalls(stub func(string) requirements.DEAApplicationRequirement) {
+	fake.newDEAApplicationRequirementMutex.Lock()
+	defer fake.newDEAApplicationRequirementMutex.Unlock()
+	fake.NewDEAApplicationRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewDEAApplicationRequirementArgsForCall(i int) string {
+	fake.newDEAApplicationRequirementMutex.RLock()
+	defer fake.newDEAApplicationRequirementMutex.RUnlock()
+	argsForCall := fake.newDEAApplicationRequirementArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeFactory) NewDEAApplicationRequirementReturns(result1 requirements.DEAApplicationRequirement) {
+	fake.newDEAApplicationRequirementMutex.Lock()
+	defer fake.newDEAApplicationRequirementMutex.Unlock()
+	fake.NewDEAApplicationRequirementStub = nil
+	fake.newDEAApplicationRequirementReturns = struct {
+		result1 requirements.DEAApplicationRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewDEAApplicationRequirementReturnsOnCall(i int, result1 requirements.DEAApplicationRequirement) {
+	fake.newDEAApplicationRequirementMutex.Lock()
+	defer fake.newDEAApplicationRequirementMutex.Unlock()
+	fake.NewDEAApplicationRequirementStub = nil
+	if fake.newDEAApplicationRequirementReturnsOnCall == nil {
+		fake.newDEAApplicationRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.DEAApplicationRequirement
+		})
+	}
+	fake.newDEAApplicationRequirementReturnsOnCall[i] = struct {
+		result1 requirements.DEAApplicationRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewDomainRequirement(arg1 string) requirements.DomainRequirement {
+	fake.newDomainRequirementMutex.Lock()
+	ret, specificReturn := fake.newDomainRequirementReturnsOnCall[len(fake.newDomainRequirementArgsForCall)]
+	fake.newDomainRequirementArgsForCall = append(fake.newDomainRequirementArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("NewDomainRequirement", []interface{}{arg1})
+	fake.newDomainRequirementMutex.Unlock()
+	if fake.NewDomainRequirementStub != nil {
+		return fake.NewDomainRequirementStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newDomainRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewDomainRequirementCallCount() int {
+	fake.newDomainRequirementMutex.RLock()
+	defer fake.newDomainRequirementMutex.RUnlock()
+	return len(fake.newDomainRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewDomainRequirementCalls(stub func(string) requirements.DomainRequirement) {
+	fake.newDomainRequirementMutex.Lock()
+	defer fake.newDomainRequirementMutex.Unlock()
+	fake.NewDomainRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewDomainRequirementArgsForCall(i int) string {
+	fake.newDomainRequirementMutex.RLock()
+	defer fake.newDomainRequirementMutex.RUnlock()
+	argsForCall := fake.newDomainRequirementArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeFactory) NewDomainRequirementReturns(result1 requirements.DomainRequirement) {
+	fake.newDomainRequirementMutex.Lock()
+	defer fake.newDomainRequirementMutex.Unlock()
+	fake.NewDomainRequirementStub = nil
+	fake.newDomainRequirementReturns = struct {
+		result1 requirements.DomainRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewDomainRequirementReturnsOnCall(i int, result1 requirements.DomainRequirement) {
+	fake.newDomainRequirementMutex.Lock()
+	defer fake.newDomainRequirementMutex.Unlock()
+	fake.NewDomainRequirementStub = nil
+	if fake.newDomainRequirementReturnsOnCall == nil {
+		fake.newDomainRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.DomainRequirement
+		})
+	}
+	fake.newDomainRequirementReturnsOnCall[i] = struct {
+		result1 requirements.DomainRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewLoginRequirement() requirements.Requirement {
+	fake.newLoginRequirementMutex.Lock()
+	ret, specificReturn := fake.newLoginRequirementReturnsOnCall[len(fake.newLoginRequirementArgsForCall)]
+	fake.newLoginRequirementArgsForCall = append(fake.newLoginRequirementArgsForCall, struct {
+	}{})
+	fake.recordInvocation("NewLoginRequirement", []interface{}{})
+	fake.newLoginRequirementMutex.Unlock()
+	if fake.NewLoginRequirementStub != nil {
+		return fake.NewLoginRequirementStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newLoginRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewLoginRequirementCallCount() int {
+	fake.newLoginRequirementMutex.RLock()
+	defer fake.newLoginRequirementMutex.RUnlock()
+	return len(fake.newLoginRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewLoginRequirementCalls(stub func() requirements.Requirement) {
+	fake.newLoginRequirementMutex.Lock()
+	defer fake.newLoginRequirementMutex.Unlock()
+	fake.NewLoginRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewLoginRequirementReturns(result1 requirements.Requirement) {
+	fake.newLoginRequirementMutex.Lock()
+	defer fake.newLoginRequirementMutex.Unlock()
+	fake.NewLoginRequirementStub = nil
+	fake.newLoginRequirementReturns = struct {
 		result1 requirements.Requirement
 	}{result1}
 }
 
-func (fake *FakeFactory) NewMinAPIVersionRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
-	fake.NewMinAPIVersionRequirementStub = nil
-	if fake.newMinAPIVersionRequirementReturnsOnCall == nil {
-		fake.newMinAPIVersionRequirementReturnsOnCall = make(map[int]struct {
+func (fake *FakeFactory) NewLoginRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
+	fake.newLoginRequirementMutex.Lock()
+	defer fake.newLoginRequirementMutex.Unlock()
+	fake.NewLoginRequirementStub = nil
+	if fake.newLoginRequirementReturnsOnCall == nil {
+		fake.newLoginRequirementReturnsOnCall = make(map[int]struct {
 			result1 requirements.Requirement
 		})
 	}
-	fake.newMinAPIVersionRequirementReturnsOnCall[i] = struct {
+	fake.newLoginRequirementReturnsOnCall[i] = struct {
 		result1 requirements.Requirement
 	}{result1}
 }
 
-func (fake *FakeFactory) NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) requirements.Requirement {
+func (fake *FakeFactory) NewMaxAPIVersionRequirement(arg1 string, arg2 semver.Version) requirements.Requirement {
 	fake.newMaxAPIVersionRequirementMutex.Lock()
 	ret, specificReturn := fake.newMaxAPIVersionRequirementReturnsOnCall[len(fake.newMaxAPIVersionRequirementArgsForCall)]
 	fake.newMaxAPIVersionRequirementArgsForCall = append(fake.newMaxAPIVersionRequirementArgsForCall, struct {
-		commandName    string
-		maximumVersion semver.Version
-	}{commandName, maximumVersion})
-	fake.recordInvocation("NewMaxAPIVersionRequirement", []interface{}{commandName, maximumVersion})
+		arg1 string
+		arg2 semver.Version
+	}{arg1, arg2})
+	fake.recordInvocation("NewMaxAPIVersionRequirement", []interface{}{arg1, arg2})
 	fake.newMaxAPIVersionRequirementMutex.Unlock()
 	if fake.NewMaxAPIVersionRequirementStub != nil {
-		return fake.NewMaxAPIVersionRequirementStub(commandName, maximumVersion)
+		return fake.NewMaxAPIVersionRequirementStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.newMaxAPIVersionRequirementReturns.result1
+	fakeReturns := fake.newMaxAPIVersionRequirementReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeFactory) NewMaxAPIVersionRequirementCallCount() int {
@@ -818,13 +644,22 @@ func (fake *FakeFactory) NewMaxAPIVersionRequirementCallCount() int {
 	return len(fake.newMaxAPIVersionRequirementArgsForCall)
 }
 
+func (fake *FakeFactory) NewMaxAPIVersionRequirementCalls(stub func(string, semver.Version) requirements.Requirement) {
+	fake.newMaxAPIVersionRequirementMutex.Lock()
+	defer fake.newMaxAPIVersionRequirementMutex.Unlock()
+	fake.NewMaxAPIVersionRequirementStub = stub
+}
+
 func (fake *FakeFactory) NewMaxAPIVersionRequirementArgsForCall(i int) (string, semver.Version) {
 	fake.newMaxAPIVersionRequirementMutex.RLock()
 	defer fake.newMaxAPIVersionRequirementMutex.RUnlock()
-	return fake.newMaxAPIVersionRequirementArgsForCall[i].commandName, fake.newMaxAPIVersionRequirementArgsForCall[i].maximumVersion
+	argsForCall := fake.newMaxAPIVersionRequirementArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeFactory) NewMaxAPIVersionRequirementReturns(result1 requirements.Requirement) {
+	fake.newMaxAPIVersionRequirementMutex.Lock()
+	defer fake.newMaxAPIVersionRequirementMutex.Unlock()
 	fake.NewMaxAPIVersionRequirementStub = nil
 	fake.newMaxAPIVersionRequirementReturns = struct {
 		result1 requirements.Requirement
@@ -832,6 +667,8 @@ func (fake *FakeFactory) NewMaxAPIVersionRequirementReturns(result1 requirements
 }
 
 func (fake *FakeFactory) NewMaxAPIVersionRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
+	fake.newMaxAPIVersionRequirementMutex.Lock()
+	defer fake.newMaxAPIVersionRequirementMutex.Unlock()
 	fake.NewMaxAPIVersionRequirementStub = nil
 	if fake.newMaxAPIVersionRequirementReturnsOnCall == nil {
 		fake.newMaxAPIVersionRequirementReturnsOnCall = make(map[int]struct {
@@ -843,21 +680,433 @@ func (fake *FakeFactory) NewMaxAPIVersionRequirementReturnsOnCall(i int, result1
 	}{result1}
 }
 
-func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirement(flags ...string) requirements.Requirement {
-	fake.newUnsupportedLegacyFlagRequirementMutex.Lock()
-	ret, specificReturn := fake.newUnsupportedLegacyFlagRequirementReturnsOnCall[len(fake.newUnsupportedLegacyFlagRequirementArgsForCall)]
-	fake.newUnsupportedLegacyFlagRequirementArgsForCall = append(fake.newUnsupportedLegacyFlagRequirementArgsForCall, struct {
-		flags []string
-	}{flags})
-	fake.recordInvocation("NewUnsupportedLegacyFlagRequirement", []interface{}{flags})
-	fake.newUnsupportedLegacyFlagRequirementMutex.Unlock()
-	if fake.NewUnsupportedLegacyFlagRequirementStub != nil {
-		return fake.NewUnsupportedLegacyFlagRequirementStub(flags...)
+func (fake *FakeFactory) NewMinAPIVersionRequirement(arg1 string, arg2 semver.Version) requirements.Requirement {
+	fake.newMinAPIVersionRequirementMutex.Lock()
+	ret, specificReturn := fake.newMinAPIVersionRequirementReturnsOnCall[len(fake.newMinAPIVersionRequirementArgsForCall)]
+	fake.newMinAPIVersionRequirementArgsForCall = append(fake.newMinAPIVersionRequirementArgsForCall, struct {
+		arg1 string
+		arg2 semver.Version
+	}{arg1, arg2})
+	fake.recordInvocation("NewMinAPIVersionRequirement", []interface{}{arg1, arg2})
+	fake.newMinAPIVersionRequirementMutex.Unlock()
+	if fake.NewMinAPIVersionRequirementStub != nil {
+		return fake.NewMinAPIVersionRequirementStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.newUnsupportedLegacyFlagRequirementReturns.result1
+	fakeReturns := fake.newMinAPIVersionRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewMinAPIVersionRequirementCallCount() int {
+	fake.newMinAPIVersionRequirementMutex.RLock()
+	defer fake.newMinAPIVersionRequirementMutex.RUnlock()
+	return len(fake.newMinAPIVersionRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewMinAPIVersionRequirementCalls(stub func(string, semver.Version) requirements.Requirement) {
+	fake.newMinAPIVersionRequirementMutex.Lock()
+	defer fake.newMinAPIVersionRequirementMutex.Unlock()
+	fake.NewMinAPIVersionRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewMinAPIVersionRequirementArgsForCall(i int) (string, semver.Version) {
+	fake.newMinAPIVersionRequirementMutex.RLock()
+	defer fake.newMinAPIVersionRequirementMutex.RUnlock()
+	argsForCall := fake.newMinAPIVersionRequirementArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeFactory) NewMinAPIVersionRequirementReturns(result1 requirements.Requirement) {
+	fake.newMinAPIVersionRequirementMutex.Lock()
+	defer fake.newMinAPIVersionRequirementMutex.Unlock()
+	fake.NewMinAPIVersionRequirementStub = nil
+	fake.newMinAPIVersionRequirementReturns = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewMinAPIVersionRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
+	fake.newMinAPIVersionRequirementMutex.Lock()
+	defer fake.newMinAPIVersionRequirementMutex.Unlock()
+	fake.NewMinAPIVersionRequirementStub = nil
+	if fake.newMinAPIVersionRequirementReturnsOnCall == nil {
+		fake.newMinAPIVersionRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.Requirement
+		})
+	}
+	fake.newMinAPIVersionRequirementReturnsOnCall[i] = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewNumberArguments(arg1 []string, arg2 ...string) requirements.Requirement {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.newNumberArgumentsMutex.Lock()
+	ret, specificReturn := fake.newNumberArgumentsReturnsOnCall[len(fake.newNumberArgumentsArgsForCall)]
+	fake.newNumberArgumentsArgsForCall = append(fake.newNumberArgumentsArgsForCall, struct {
+		arg1 []string
+		arg2 []string
+	}{arg1Copy, arg2})
+	fake.recordInvocation("NewNumberArguments", []interface{}{arg1Copy, arg2})
+	fake.newNumberArgumentsMutex.Unlock()
+	if fake.NewNumberArgumentsStub != nil {
+		return fake.NewNumberArgumentsStub(arg1, arg2...)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newNumberArgumentsReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewNumberArgumentsCallCount() int {
+	fake.newNumberArgumentsMutex.RLock()
+	defer fake.newNumberArgumentsMutex.RUnlock()
+	return len(fake.newNumberArgumentsArgsForCall)
+}
+
+func (fake *FakeFactory) NewNumberArgumentsCalls(stub func([]string, ...string) requirements.Requirement) {
+	fake.newNumberArgumentsMutex.Lock()
+	defer fake.newNumberArgumentsMutex.Unlock()
+	fake.NewNumberArgumentsStub = stub
+}
+
+func (fake *FakeFactory) NewNumberArgumentsArgsForCall(i int) ([]string, []string) {
+	fake.newNumberArgumentsMutex.RLock()
+	defer fake.newNumberArgumentsMutex.RUnlock()
+	argsForCall := fake.newNumberArgumentsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeFactory) NewNumberArgumentsReturns(result1 requirements.Requirement) {
+	fake.newNumberArgumentsMutex.Lock()
+	defer fake.newNumberArgumentsMutex.Unlock()
+	fake.NewNumberArgumentsStub = nil
+	fake.newNumberArgumentsReturns = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewNumberArgumentsReturnsOnCall(i int, result1 requirements.Requirement) {
+	fake.newNumberArgumentsMutex.Lock()
+	defer fake.newNumberArgumentsMutex.Unlock()
+	fake.NewNumberArgumentsStub = nil
+	if fake.newNumberArgumentsReturnsOnCall == nil {
+		fake.newNumberArgumentsReturnsOnCall = make(map[int]struct {
+			result1 requirements.Requirement
+		})
+	}
+	fake.newNumberArgumentsReturnsOnCall[i] = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewOrganizationRequirement(arg1 string) requirements.OrganizationRequirement {
+	fake.newOrganizationRequirementMutex.Lock()
+	ret, specificReturn := fake.newOrganizationRequirementReturnsOnCall[len(fake.newOrganizationRequirementArgsForCall)]
+	fake.newOrganizationRequirementArgsForCall = append(fake.newOrganizationRequirementArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("NewOrganizationRequirement", []interface{}{arg1})
+	fake.newOrganizationRequirementMutex.Unlock()
+	if fake.NewOrganizationRequirementStub != nil {
+		return fake.NewOrganizationRequirementStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newOrganizationRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewOrganizationRequirementCallCount() int {
+	fake.newOrganizationRequirementMutex.RLock()
+	defer fake.newOrganizationRequirementMutex.RUnlock()
+	return len(fake.newOrganizationRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewOrganizationRequirementCalls(stub func(string) requirements.OrganizationRequirement) {
+	fake.newOrganizationRequirementMutex.Lock()
+	defer fake.newOrganizationRequirementMutex.Unlock()
+	fake.NewOrganizationRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewOrganizationRequirementArgsForCall(i int) string {
+	fake.newOrganizationRequirementMutex.RLock()
+	defer fake.newOrganizationRequirementMutex.RUnlock()
+	argsForCall := fake.newOrganizationRequirementArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeFactory) NewOrganizationRequirementReturns(result1 requirements.OrganizationRequirement) {
+	fake.newOrganizationRequirementMutex.Lock()
+	defer fake.newOrganizationRequirementMutex.Unlock()
+	fake.NewOrganizationRequirementStub = nil
+	fake.newOrganizationRequirementReturns = struct {
+		result1 requirements.OrganizationRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewOrganizationRequirementReturnsOnCall(i int, result1 requirements.OrganizationRequirement) {
+	fake.newOrganizationRequirementMutex.Lock()
+	defer fake.newOrganizationRequirementMutex.Unlock()
+	fake.NewOrganizationRequirementStub = nil
+	if fake.newOrganizationRequirementReturnsOnCall == nil {
+		fake.newOrganizationRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.OrganizationRequirement
+		})
+	}
+	fake.newOrganizationRequirementReturnsOnCall[i] = struct {
+		result1 requirements.OrganizationRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewServiceInstanceRequirement(arg1 string) requirements.ServiceInstanceRequirement {
+	fake.newServiceInstanceRequirementMutex.Lock()
+	ret, specificReturn := fake.newServiceInstanceRequirementReturnsOnCall[len(fake.newServiceInstanceRequirementArgsForCall)]
+	fake.newServiceInstanceRequirementArgsForCall = append(fake.newServiceInstanceRequirementArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("NewServiceInstanceRequirement", []interface{}{arg1})
+	fake.newServiceInstanceRequirementMutex.Unlock()
+	if fake.NewServiceInstanceRequirementStub != nil {
+		return fake.NewServiceInstanceRequirementStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newServiceInstanceRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewServiceInstanceRequirementCallCount() int {
+	fake.newServiceInstanceRequirementMutex.RLock()
+	defer fake.newServiceInstanceRequirementMutex.RUnlock()
+	return len(fake.newServiceInstanceRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewServiceInstanceRequirementCalls(stub func(string) requirements.ServiceInstanceRequirement) {
+	fake.newServiceInstanceRequirementMutex.Lock()
+	defer fake.newServiceInstanceRequirementMutex.Unlock()
+	fake.NewServiceInstanceRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewServiceInstanceRequirementArgsForCall(i int) string {
+	fake.newServiceInstanceRequirementMutex.RLock()
+	defer fake.newServiceInstanceRequirementMutex.RUnlock()
+	argsForCall := fake.newServiceInstanceRequirementArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeFactory) NewServiceInstanceRequirementReturns(result1 requirements.ServiceInstanceRequirement) {
+	fake.newServiceInstanceRequirementMutex.Lock()
+	defer fake.newServiceInstanceRequirementMutex.Unlock()
+	fake.NewServiceInstanceRequirementStub = nil
+	fake.newServiceInstanceRequirementReturns = struct {
+		result1 requirements.ServiceInstanceRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewServiceInstanceRequirementReturnsOnCall(i int, result1 requirements.ServiceInstanceRequirement) {
+	fake.newServiceInstanceRequirementMutex.Lock()
+	defer fake.newServiceInstanceRequirementMutex.Unlock()
+	fake.NewServiceInstanceRequirementStub = nil
+	if fake.newServiceInstanceRequirementReturnsOnCall == nil {
+		fake.newServiceInstanceRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.ServiceInstanceRequirement
+		})
+	}
+	fake.newServiceInstanceRequirementReturnsOnCall[i] = struct {
+		result1 requirements.ServiceInstanceRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewSpaceRequirement(arg1 string) requirements.SpaceRequirement {
+	fake.newSpaceRequirementMutex.Lock()
+	ret, specificReturn := fake.newSpaceRequirementReturnsOnCall[len(fake.newSpaceRequirementArgsForCall)]
+	fake.newSpaceRequirementArgsForCall = append(fake.newSpaceRequirementArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("NewSpaceRequirement", []interface{}{arg1})
+	fake.newSpaceRequirementMutex.Unlock()
+	if fake.NewSpaceRequirementStub != nil {
+		return fake.NewSpaceRequirementStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newSpaceRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewSpaceRequirementCallCount() int {
+	fake.newSpaceRequirementMutex.RLock()
+	defer fake.newSpaceRequirementMutex.RUnlock()
+	return len(fake.newSpaceRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewSpaceRequirementCalls(stub func(string) requirements.SpaceRequirement) {
+	fake.newSpaceRequirementMutex.Lock()
+	defer fake.newSpaceRequirementMutex.Unlock()
+	fake.NewSpaceRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewSpaceRequirementArgsForCall(i int) string {
+	fake.newSpaceRequirementMutex.RLock()
+	defer fake.newSpaceRequirementMutex.RUnlock()
+	argsForCall := fake.newSpaceRequirementArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeFactory) NewSpaceRequirementReturns(result1 requirements.SpaceRequirement) {
+	fake.newSpaceRequirementMutex.Lock()
+	defer fake.newSpaceRequirementMutex.Unlock()
+	fake.NewSpaceRequirementStub = nil
+	fake.newSpaceRequirementReturns = struct {
+		result1 requirements.SpaceRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewSpaceRequirementReturnsOnCall(i int, result1 requirements.SpaceRequirement) {
+	fake.newSpaceRequirementMutex.Lock()
+	defer fake.newSpaceRequirementMutex.Unlock()
+	fake.NewSpaceRequirementStub = nil
+	if fake.newSpaceRequirementReturnsOnCall == nil {
+		fake.newSpaceRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.SpaceRequirement
+		})
+	}
+	fake.newSpaceRequirementReturnsOnCall[i] = struct {
+		result1 requirements.SpaceRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewTargetedOrgRequirement() requirements.TargetedOrgRequirement {
+	fake.newTargetedOrgRequirementMutex.Lock()
+	ret, specificReturn := fake.newTargetedOrgRequirementReturnsOnCall[len(fake.newTargetedOrgRequirementArgsForCall)]
+	fake.newTargetedOrgRequirementArgsForCall = append(fake.newTargetedOrgRequirementArgsForCall, struct {
+	}{})
+	fake.recordInvocation("NewTargetedOrgRequirement", []interface{}{})
+	fake.newTargetedOrgRequirementMutex.Unlock()
+	if fake.NewTargetedOrgRequirementStub != nil {
+		return fake.NewTargetedOrgRequirementStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newTargetedOrgRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewTargetedOrgRequirementCallCount() int {
+	fake.newTargetedOrgRequirementMutex.RLock()
+	defer fake.newTargetedOrgRequirementMutex.RUnlock()
+	return len(fake.newTargetedOrgRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewTargetedOrgRequirementCalls(stub func() requirements.TargetedOrgRequirement) {
+	fake.newTargetedOrgRequirementMutex.Lock()
+	defer fake.newTargetedOrgRequirementMutex.Unlock()
+	fake.NewTargetedOrgRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewTargetedOrgRequirementReturns(result1 requirements.TargetedOrgRequirement) {
+	fake.newTargetedOrgRequirementMutex.Lock()
+	defer fake.newTargetedOrgRequirementMutex.Unlock()
+	fake.NewTargetedOrgRequirementStub = nil
+	fake.newTargetedOrgRequirementReturns = struct {
+		result1 requirements.TargetedOrgRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewTargetedOrgRequirementReturnsOnCall(i int, result1 requirements.TargetedOrgRequirement) {
+	fake.newTargetedOrgRequirementMutex.Lock()
+	defer fake.newTargetedOrgRequirementMutex.Unlock()
+	fake.NewTargetedOrgRequirementStub = nil
+	if fake.newTargetedOrgRequirementReturnsOnCall == nil {
+		fake.newTargetedOrgRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.TargetedOrgRequirement
+		})
+	}
+	fake.newTargetedOrgRequirementReturnsOnCall[i] = struct {
+		result1 requirements.TargetedOrgRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewTargetedSpaceRequirement() requirements.Requirement {
+	fake.newTargetedSpaceRequirementMutex.Lock()
+	ret, specificReturn := fake.newTargetedSpaceRequirementReturnsOnCall[len(fake.newTargetedSpaceRequirementArgsForCall)]
+	fake.newTargetedSpaceRequirementArgsForCall = append(fake.newTargetedSpaceRequirementArgsForCall, struct {
+	}{})
+	fake.recordInvocation("NewTargetedSpaceRequirement", []interface{}{})
+	fake.newTargetedSpaceRequirementMutex.Unlock()
+	if fake.NewTargetedSpaceRequirementStub != nil {
+		return fake.NewTargetedSpaceRequirementStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newTargetedSpaceRequirementReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFactory) NewTargetedSpaceRequirementCallCount() int {
+	fake.newTargetedSpaceRequirementMutex.RLock()
+	defer fake.newTargetedSpaceRequirementMutex.RUnlock()
+	return len(fake.newTargetedSpaceRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewTargetedSpaceRequirementCalls(stub func() requirements.Requirement) {
+	fake.newTargetedSpaceRequirementMutex.Lock()
+	defer fake.newTargetedSpaceRequirementMutex.Unlock()
+	fake.NewTargetedSpaceRequirementStub = stub
+}
+
+func (fake *FakeFactory) NewTargetedSpaceRequirementReturns(result1 requirements.Requirement) {
+	fake.newTargetedSpaceRequirementMutex.Lock()
+	defer fake.newTargetedSpaceRequirementMutex.Unlock()
+	fake.NewTargetedSpaceRequirementStub = nil
+	fake.newTargetedSpaceRequirementReturns = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewTargetedSpaceRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
+	fake.newTargetedSpaceRequirementMutex.Lock()
+	defer fake.newTargetedSpaceRequirementMutex.Unlock()
+	fake.NewTargetedSpaceRequirementStub = nil
+	if fake.newTargetedSpaceRequirementReturnsOnCall == nil {
+		fake.newTargetedSpaceRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.Requirement
+		})
+	}
+	fake.newTargetedSpaceRequirementReturnsOnCall[i] = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirement(arg1 ...string) requirements.Requirement {
+	fake.newUnsupportedLegacyFlagRequirementMutex.Lock()
+	ret, specificReturn := fake.newUnsupportedLegacyFlagRequirementReturnsOnCall[len(fake.newUnsupportedLegacyFlagRequirementArgsForCall)]
+	fake.newUnsupportedLegacyFlagRequirementArgsForCall = append(fake.newUnsupportedLegacyFlagRequirementArgsForCall, struct {
+		arg1 []string
+	}{arg1})
+	fake.recordInvocation("NewUnsupportedLegacyFlagRequirement", []interface{}{arg1})
+	fake.newUnsupportedLegacyFlagRequirementMutex.Unlock()
+	if fake.NewUnsupportedLegacyFlagRequirementStub != nil {
+		return fake.NewUnsupportedLegacyFlagRequirementStub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newUnsupportedLegacyFlagRequirementReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementCallCount() int {
@@ -866,13 +1115,22 @@ func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementCallCount() int {
 	return len(fake.newUnsupportedLegacyFlagRequirementArgsForCall)
 }
 
+func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementCalls(stub func(...string) requirements.Requirement) {
+	fake.newUnsupportedLegacyFlagRequirementMutex.Lock()
+	defer fake.newUnsupportedLegacyFlagRequirementMutex.Unlock()
+	fake.NewUnsupportedLegacyFlagRequirementStub = stub
+}
+
 func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementArgsForCall(i int) []string {
 	fake.newUnsupportedLegacyFlagRequirementMutex.RLock()
 	defer fake.newUnsupportedLegacyFlagRequirementMutex.RUnlock()
-	return fake.newUnsupportedLegacyFlagRequirementArgsForCall[i].flags
+	argsForCall := fake.newUnsupportedLegacyFlagRequirementArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementReturns(result1 requirements.Requirement) {
+	fake.newUnsupportedLegacyFlagRequirementMutex.Lock()
+	defer fake.newUnsupportedLegacyFlagRequirementMutex.Unlock()
 	fake.NewUnsupportedLegacyFlagRequirementStub = nil
 	fake.newUnsupportedLegacyFlagRequirementReturns = struct {
 		result1 requirements.Requirement
@@ -880,6 +1138,8 @@ func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementReturns(result1 requ
 }
 
 func (fake *FakeFactory) NewUnsupportedLegacyFlagRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
+	fake.newUnsupportedLegacyFlagRequirementMutex.Lock()
+	defer fake.newUnsupportedLegacyFlagRequirementMutex.Unlock()
 	fake.NewUnsupportedLegacyFlagRequirementStub = nil
 	if fake.newUnsupportedLegacyFlagRequirementReturnsOnCall == nil {
 		fake.newUnsupportedLegacyFlagRequirementReturnsOnCall = make(map[int]struct {
@@ -907,7 +1167,8 @@ func (fake *FakeFactory) NewUsageRequirement(arg1 requirements.Usable, arg2 stri
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.newUsageRequirementReturns.result1
+	fakeReturns := fake.newUsageRequirementReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeFactory) NewUsageRequirementCallCount() int {
@@ -916,13 +1177,22 @@ func (fake *FakeFactory) NewUsageRequirementCallCount() int {
 	return len(fake.newUsageRequirementArgsForCall)
 }
 
+func (fake *FakeFactory) NewUsageRequirementCalls(stub func(requirements.Usable, string, func() bool) requirements.Requirement) {
+	fake.newUsageRequirementMutex.Lock()
+	defer fake.newUsageRequirementMutex.Unlock()
+	fake.NewUsageRequirementStub = stub
+}
+
 func (fake *FakeFactory) NewUsageRequirementArgsForCall(i int) (requirements.Usable, string, func() bool) {
 	fake.newUsageRequirementMutex.RLock()
 	defer fake.newUsageRequirementMutex.RUnlock()
-	return fake.newUsageRequirementArgsForCall[i].arg1, fake.newUsageRequirementArgsForCall[i].arg2, fake.newUsageRequirementArgsForCall[i].arg3
+	argsForCall := fake.newUsageRequirementArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeFactory) NewUsageRequirementReturns(result1 requirements.Requirement) {
+	fake.newUsageRequirementMutex.Lock()
+	defer fake.newUsageRequirementMutex.Unlock()
 	fake.NewUsageRequirementStub = nil
 	fake.newUsageRequirementReturns = struct {
 		result1 requirements.Requirement
@@ -930,6 +1200,8 @@ func (fake *FakeFactory) NewUsageRequirementReturns(result1 requirements.Require
 }
 
 func (fake *FakeFactory) NewUsageRequirementReturnsOnCall(i int, result1 requirements.Requirement) {
+	fake.newUsageRequirementMutex.Lock()
+	defer fake.newUsageRequirementMutex.Unlock()
 	fake.NewUsageRequirementStub = nil
 	if fake.newUsageRequirementReturnsOnCall == nil {
 		fake.newUsageRequirementReturnsOnCall = make(map[int]struct {
@@ -941,97 +1213,106 @@ func (fake *FakeFactory) NewUsageRequirementReturnsOnCall(i int, result1 require
 	}{result1}
 }
 
-func (fake *FakeFactory) NewNumberArguments(arg1 []string, arg2 ...string) requirements.Requirement {
-	var arg1Copy []string
-	if arg1 != nil {
-		arg1Copy = make([]string, len(arg1))
-		copy(arg1Copy, arg1)
-	}
-	fake.newNumberArgumentsMutex.Lock()
-	ret, specificReturn := fake.newNumberArgumentsReturnsOnCall[len(fake.newNumberArgumentsArgsForCall)]
-	fake.newNumberArgumentsArgsForCall = append(fake.newNumberArgumentsArgsForCall, struct {
-		arg1 []string
-		arg2 []string
-	}{arg1Copy, arg2})
-	fake.recordInvocation("NewNumberArguments", []interface{}{arg1Copy, arg2})
-	fake.newNumberArgumentsMutex.Unlock()
-	if fake.NewNumberArgumentsStub != nil {
-		return fake.NewNumberArgumentsStub(arg1, arg2...)
+func (fake *FakeFactory) NewUserRequirement(arg1 string, arg2 bool) requirements.UserRequirement {
+	fake.newUserRequirementMutex.Lock()
+	ret, specificReturn := fake.newUserRequirementReturnsOnCall[len(fake.newUserRequirementArgsForCall)]
+	fake.newUserRequirementArgsForCall = append(fake.newUserRequirementArgsForCall, struct {
+		arg1 string
+		arg2 bool
+	}{arg1, arg2})
+	fake.recordInvocation("NewUserRequirement", []interface{}{arg1, arg2})
+	fake.newUserRequirementMutex.Unlock()
+	if fake.NewUserRequirementStub != nil {
+		return fake.NewUserRequirementStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.newNumberArgumentsReturns.result1
+	fakeReturns := fake.newUserRequirementReturns
+	return fakeReturns.result1
 }
 
-func (fake *FakeFactory) NewNumberArgumentsCallCount() int {
-	fake.newNumberArgumentsMutex.RLock()
-	defer fake.newNumberArgumentsMutex.RUnlock()
-	return len(fake.newNumberArgumentsArgsForCall)
+func (fake *FakeFactory) NewUserRequirementCallCount() int {
+	fake.newUserRequirementMutex.RLock()
+	defer fake.newUserRequirementMutex.RUnlock()
+	return len(fake.newUserRequirementArgsForCall)
 }
 
-func (fake *FakeFactory) NewNumberArgumentsArgsForCall(i int) ([]string, []string) {
-	fake.newNumberArgumentsMutex.RLock()
-	defer fake.newNumberArgumentsMutex.RUnlock()
-	return fake.newNumberArgumentsArgsForCall[i].arg1, fake.newNumberArgumentsArgsForCall[i].arg2
+func (fake *FakeFactory) NewUserRequirementCalls(stub func(string, bool) requirements.UserRequirement) {
+	fake.newUserRequirementMutex.Lock()
+	defer fake.newUserRequirementMutex.Unlock()
+	fake.NewUserRequirementStub = stub
 }
 
-func (fake *FakeFactory) NewNumberArgumentsReturns(result1 requirements.Requirement) {
-	fake.NewNumberArgumentsStub = nil
-	fake.newNumberArgumentsReturns = struct {
-		result1 requirements.Requirement
+func (fake *FakeFactory) NewUserRequirementArgsForCall(i int) (string, bool) {
+	fake.newUserRequirementMutex.RLock()
+	defer fake.newUserRequirementMutex.RUnlock()
+	argsForCall := fake.newUserRequirementArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeFactory) NewUserRequirementReturns(result1 requirements.UserRequirement) {
+	fake.newUserRequirementMutex.Lock()
+	defer fake.newUserRequirementMutex.Unlock()
+	fake.NewUserRequirementStub = nil
+	fake.newUserRequirementReturns = struct {
+		result1 requirements.UserRequirement
 	}{result1}
 }
 
-func (fake *FakeFactory) NewNumberArgumentsReturnsOnCall(i int, result1 requirements.Requirement) {
-	fake.NewNumberArgumentsStub = nil
-	if fake.newNumberArgumentsReturnsOnCall == nil {
-		fake.newNumberArgumentsReturnsOnCall = make(map[int]struct {
-			result1 requirements.Requirement
+func (fake *FakeFactory) NewUserRequirementReturnsOnCall(i int, result1 requirements.UserRequirement) {
+	fake.newUserRequirementMutex.Lock()
+	defer fake.newUserRequirementMutex.Unlock()
+	fake.NewUserRequirementStub = nil
+	if fake.newUserRequirementReturnsOnCall == nil {
+		fake.newUserRequirementReturnsOnCall = make(map[int]struct {
+			result1 requirements.UserRequirement
 		})
 	}
-	fake.newNumberArgumentsReturnsOnCall[i] = struct {
-		result1 requirements.Requirement
+	fake.newUserRequirementReturnsOnCall[i] = struct {
+		result1 requirements.UserRequirement
 	}{result1}
 }
 
 func (fake *FakeFactory) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.newApplicationRequirementMutex.RLock()
-	defer fake.newApplicationRequirementMutex.RUnlock()
-	fake.newDEAApplicationRequirementMutex.RLock()
-	defer fake.newDEAApplicationRequirementMutex.RUnlock()
-	fake.newServiceInstanceRequirementMutex.RLock()
-	defer fake.newServiceInstanceRequirementMutex.RUnlock()
-	fake.newLoginRequirementMutex.RLock()
-	defer fake.newLoginRequirementMutex.RUnlock()
-	fake.newSpaceRequirementMutex.RLock()
-	defer fake.newSpaceRequirementMutex.RUnlock()
-	fake.newTargetedSpaceRequirementMutex.RLock()
-	defer fake.newTargetedSpaceRequirementMutex.RUnlock()
-	fake.newTargetedOrgRequirementMutex.RLock()
-	defer fake.newTargetedOrgRequirementMutex.RUnlock()
-	fake.newOrganizationRequirementMutex.RLock()
-	defer fake.newOrganizationRequirementMutex.RUnlock()
-	fake.newDomainRequirementMutex.RLock()
-	defer fake.newDomainRequirementMutex.RUnlock()
-	fake.newUserRequirementMutex.RLock()
-	defer fake.newUserRequirementMutex.RUnlock()
-	fake.newBuildpackRequirementMutex.RLock()
-	defer fake.newBuildpackRequirementMutex.RUnlock()
 	fake.newAPIEndpointRequirementMutex.RLock()
 	defer fake.newAPIEndpointRequirementMutex.RUnlock()
-	fake.newMinAPIVersionRequirementMutex.RLock()
-	defer fake.newMinAPIVersionRequirementMutex.RUnlock()
+	fake.newApplicationRequirementMutex.RLock()
+	defer fake.newApplicationRequirementMutex.RUnlock()
+	fake.newBuildpackRequirementMutex.RLock()
+	defer fake.newBuildpackRequirementMutex.RUnlock()
+	fake.newClientRequirementMutex.RLock()
+	defer fake.newClientRequirementMutex.RUnlock()
+	fake.newDEAApplicationRequirementMutex.RLock()
+	defer fake.newDEAApplicationRequirementMutex.RUnlock()
+	fake.newDomainRequirementMutex.RLock()
+	defer fake.newDomainRequirementMutex.RUnlock()
+	fake.newLoginRequirementMutex.RLock()
+	defer fake.newLoginRequirementMutex.RUnlock()
 	fake.newMaxAPIVersionRequirementMutex.RLock()
 	defer fake.newMaxAPIVersionRequirementMutex.RUnlock()
+	fake.newMinAPIVersionRequirementMutex.RLock()
+	defer fake.newMinAPIVersionRequirementMutex.RUnlock()
+	fake.newNumberArgumentsMutex.RLock()
+	defer fake.newNumberArgumentsMutex.RUnlock()
+	fake.newOrganizationRequirementMutex.RLock()
+	defer fake.newOrganizationRequirementMutex.RUnlock()
+	fake.newServiceInstanceRequirementMutex.RLock()
+	defer fake.newServiceInstanceRequirementMutex.RUnlock()
+	fake.newSpaceRequirementMutex.RLock()
+	defer fake.newSpaceRequirementMutex.RUnlock()
+	fake.newTargetedOrgRequirementMutex.RLock()
+	defer fake.newTargetedOrgRequirementMutex.RUnlock()
+	fake.newTargetedSpaceRequirementMutex.RLock()
+	defer fake.newTargetedSpaceRequirementMutex.RUnlock()
 	fake.newUnsupportedLegacyFlagRequirementMutex.RLock()
 	defer fake.newUnsupportedLegacyFlagRequirementMutex.RUnlock()
 	fake.newUsageRequirementMutex.RLock()
 	defer fake.newUsageRequirementMutex.RUnlock()
-	fake.newNumberArgumentsMutex.RLock()
-	defer fake.newNumberArgumentsMutex.RUnlock()
+	fake.newUserRequirementMutex.RLock()
+	defer fake.newUserRequirementMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

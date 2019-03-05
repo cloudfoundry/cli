@@ -55,7 +55,7 @@ var _ = Describe("SetOrgRole", func() {
 		cmd = &user.SetOrgRole{}
 		cmd.SetDependency(deps, false)
 
-		flagContext = flags.NewFlagContext(map[string]flags.FlagSet{})
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
 		factory = new(requirementsfakes.FakeFactory)
 
@@ -65,6 +65,7 @@ var _ = Describe("SetOrgRole", func() {
 		userRequirement = new(requirementsfakes.FakeUserRequirement)
 		userRequirement.ExecuteReturns(nil)
 		factory.NewUserRequirementReturns(userRequirement)
+		factory.NewClientRequirementReturns(userRequirement)
 
 		organizationRequirement = new(requirementsfakes.FakeOrganizationRequirement)
 		organizationRequirement.ExecuteReturns(nil)
@@ -166,6 +167,27 @@ var _ = Describe("SetOrgRole", func() {
 
 					Expect(actualRequirements).To(ContainElement(userRequirement))
 				})
+			})
+		})
+
+		Context("when given the --client flag", func() {
+			BeforeEach(func() {
+				flagContext.Parse("the-client-id", "the-org-name", "OrgManager", "--client")
+			})
+
+			It("returns a User Requirement", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewClientRequirementCallCount()).To(Equal(1))
+				actualUsername := factory.NewClientRequirementArgsForCall(0)
+				Expect(actualUsername).To(Equal("the-client-id"))
+
+				Expect(actualRequirements).To(ContainElement(userRequirement))
+			})
+
+			It("Ignores the set_roles_by_username feature flag", func() {
+				cmd.Requirements(factory, flagContext)
+				Expect(flagRepo.FindByNameCallCount()).To(BeZero())
 			})
 		})
 	})

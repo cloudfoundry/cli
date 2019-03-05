@@ -84,4 +84,18 @@ var _ = Describe("UserRequirement", func() {
 			})
 		})
 	})
+
+	Describe("NewClientRequirement", func() {
+		Context("Execute", func() {
+			It("returns a user model with the client ID as its GUID and Username", func() {
+				userReq := requirements.NewClientRequirement("the-client-id")
+
+				userReq.Execute()
+				user := userReq.GetUser()
+
+				Expect(user.GUID).To(Equal("the-client-id"))
+				Expect(user.Username).To(Equal("the-client-id"))
+			})
+		})
+	})
 })

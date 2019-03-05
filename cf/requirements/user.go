@@ -16,8 +16,15 @@ type userAPIRequirement struct {
 	username string
 	userRepo api.UserRepository
 	wantGUID bool
+	clientID string
 
 	user models.UserFields
+}
+
+func NewClientRequirement(clientID string) *userAPIRequirement {
+	req := new(userAPIRequirement)
+	req.clientID = clientID
+	return req
 }
 
 func NewUserRequirement(
@@ -40,6 +47,8 @@ func (req *userAPIRequirement) Execute() error {
 		if err != nil {
 			return err
 		}
+	} else if req.clientID != "" {
+		req.user = models.UserFields{GUID: req.clientID, Username: req.clientID}
 	} else {
 		req.user = models.UserFields{Username: req.username}
 	}
