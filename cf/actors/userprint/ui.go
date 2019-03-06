@@ -72,7 +72,11 @@ func (p *SpaceUsersUIPrinter) PrintUsers(guid string, username string) {
 			}))
 		} else {
 			for _, user := range users {
-				p.UI.Say("  %s", user.Username)
+				if len(user.Username) > 0 {
+					p.UI.Say("  %s", user.Username)
+				} else {
+					p.UI.Say("  %s (client)", user.GUID)
+				}
 			}
 		}
 	}

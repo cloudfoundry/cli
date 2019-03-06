@@ -14,7 +14,7 @@ import (
 	testcmd "code.cloudfoundry.org/cli/cf/util/testhelpers/commands"
 	testconfig "code.cloudfoundry.org/cli/cf/util/testhelpers/configuration"
 	testterm "code.cloudfoundry.org/cli/cf/util/testhelpers/terminal"
-	"code.cloudfoundry.org/cli/plugin/models"
+	plugin_models "code.cloudfoundry.org/cli/plugin/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -163,6 +163,44 @@ var _ = Describe("space-users command", func() {
 			Expect(ui.Outputs()).To(BeInDisplayOrder(
 				[]string{"Getting users in org", "Org1"},
 				[]string{"internet badness occurred"},
+			))
+		})
+	})
+
+	Context("when logged in and given a space with a client", func() {
+		BeforeEach(func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+
+			org := models.Organization{}
+			org.Name = "Org1"
+			org.GUID = "org1-guid"
+			space := models.Space{}
+			space.Name = "Space1"
+			space.GUID = "space1-guid"
+
+			organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+			organizationReq.GetOrganizationReturns(org)
+			requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
+			spaceRepo.FindByNameInOrgReturns(space, nil)
+
+			clientUser := models.UserFields{GUID: "some-client"}
+			userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+				userFields := map[models.Role][]models.UserFields{
+					models.RoleSpaceManager:   {clientUser},
+					models.RoleSpaceDeveloper: {},
+					models.RoleSpaceAuditor:   {},
+				}[roleName]
+				return userFields, nil
+			}
+		})
+
+		It("lists a client user and indicates the user is a client", func() {
+			runCommand("my-org", "my-space")
+
+			Expect(ui.Outputs()).To(ContainSubstrings(
+				[]string{"Getting users in org", "Org1", "Space1", "my-user"},
+				[]string{"SPACE MANAGER"},
+				[]string{"some-client (client)"},
 			))
 		})
 	})
