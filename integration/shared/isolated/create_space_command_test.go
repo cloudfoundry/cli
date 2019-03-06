@@ -1,9 +1,6 @@
 package isolated
 
 import (
-	"fmt"
-	"strings"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -37,13 +34,6 @@ func expectSuccessTextAndExitCode(session *Session, user, orgName, spaceName str
 	Eventually(session).Should(Say(`Assigning role SpaceDeveloper to user %s in org %s / space %s as %s\.\.\.`, user, orgName, spaceName, user))
 	Eventually(session).Should(Say(`OK\n\n`))
 	Eventually(session).Should(Say(`TIP: Use 'cf target -o "%s" -s "%s"' to target new space`, orgName, spaceName))
-	Eventually(session).Should(Exit(0))
-}
-
-func expectClientToHaveSpaceRole(clientID, spaceGUID, role string) {
-	spaceRoleEndpoint := fmt.Sprintf("/v2/spaces/%s/%ss", spaceGUID, role)
-	session := helpers.CF("curl", spaceRoleEndpoint)
-	Eventually(session).Should(Say(`"guid": "%s",`, clientID))
 	Eventually(session).Should(Exit(0))
 }
 
@@ -91,11 +81,12 @@ var _ = Describe("create-space", func() {
 
 			session = helpers.CF("space", spaceName, "--guid")
 			Eventually(session).Should(Exit(0))
-			spaceGUID := strings.TrimSpace(string(session.Out.Contents()))
+			session = helpers.CF("space-users", orgName, spaceName)
 
-			// TODO: #159969808 should allow us to remove this workaround.
-			expectClientToHaveSpaceRole(client, spaceGUID, "manager")
-			expectClientToHaveSpaceRole(client, spaceGUID, "developer")
+			Eventually(session).Should(Say("SPACE MANAGER"))
+			Eventually(session).Should(Say(`\s+%s \(client\)`, client))
+			Eventually(session).Should(Say("SPACE DEVELOPER"))
+			Eventually(session).Should(Say(`\s+%s \(client\)`, client))
 		})
 	})
 
