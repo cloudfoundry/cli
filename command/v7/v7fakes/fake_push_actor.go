@@ -47,6 +47,21 @@ type FakePushActor struct {
 		result2 v7pushaction.Warnings
 		result3 error
 	}
+	CreatePushPlansStub        func(string, manifestparser.Parser, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
+	createPushPlansMutex       sync.RWMutex
+	createPushPlansArgsForCall []struct {
+		arg1 string
+		arg2 manifestparser.Parser
+		arg3 v7pushaction.FlagOverrides
+	}
+	createPushPlansReturns struct {
+		result1 []v7pushaction.PushPlan
+		result2 error
+	}
+	createPushPlansReturnsOnCall map[int]struct {
+		result1 []v7pushaction.PushPlan
+		result2 error
+	}
 	PrepareSpaceStub        func(string, string, *manifestparser.Parser, v7pushaction.FlagOverrides) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	prepareSpaceMutex       sync.RWMutex
 	prepareSpaceArgsForCall []struct {
@@ -216,6 +231,71 @@ func (fake *FakePushActor) ConceptualizeReturnsOnCall(i int, result1 []v7pushact
 	}{result1, result2, result3}
 }
 
+func (fake *FakePushActor) CreatePushPlans(arg1 string, arg2 manifestparser.Parser, arg3 v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error) {
+	fake.createPushPlansMutex.Lock()
+	ret, specificReturn := fake.createPushPlansReturnsOnCall[len(fake.createPushPlansArgsForCall)]
+	fake.createPushPlansArgsForCall = append(fake.createPushPlansArgsForCall, struct {
+		arg1 string
+		arg2 manifestparser.Parser
+		arg3 v7pushaction.FlagOverrides
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("CreatePushPlans", []interface{}{arg1, arg2, arg3})
+	fake.createPushPlansMutex.Unlock()
+	if fake.CreatePushPlansStub != nil {
+		return fake.CreatePushPlansStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.createPushPlansReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakePushActor) CreatePushPlansCallCount() int {
+	fake.createPushPlansMutex.RLock()
+	defer fake.createPushPlansMutex.RUnlock()
+	return len(fake.createPushPlansArgsForCall)
+}
+
+func (fake *FakePushActor) CreatePushPlansCalls(stub func(string, manifestparser.Parser, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)) {
+	fake.createPushPlansMutex.Lock()
+	defer fake.createPushPlansMutex.Unlock()
+	fake.CreatePushPlansStub = stub
+}
+
+func (fake *FakePushActor) CreatePushPlansArgsForCall(i int) (string, manifestparser.Parser, v7pushaction.FlagOverrides) {
+	fake.createPushPlansMutex.RLock()
+	defer fake.createPushPlansMutex.RUnlock()
+	argsForCall := fake.createPushPlansArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakePushActor) CreatePushPlansReturns(result1 []v7pushaction.PushPlan, result2 error) {
+	fake.createPushPlansMutex.Lock()
+	defer fake.createPushPlansMutex.Unlock()
+	fake.CreatePushPlansStub = nil
+	fake.createPushPlansReturns = struct {
+		result1 []v7pushaction.PushPlan
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakePushActor) CreatePushPlansReturnsOnCall(i int, result1 []v7pushaction.PushPlan, result2 error) {
+	fake.createPushPlansMutex.Lock()
+	defer fake.createPushPlansMutex.Unlock()
+	fake.CreatePushPlansStub = nil
+	if fake.createPushPlansReturnsOnCall == nil {
+		fake.createPushPlansReturnsOnCall = make(map[int]struct {
+			result1 []v7pushaction.PushPlan
+			result2 error
+		})
+	}
+	fake.createPushPlansReturnsOnCall[i] = struct {
+		result1 []v7pushaction.PushPlan
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakePushActor) PrepareSpace(arg1 string, arg2 string, arg3 *manifestparser.Parser, arg4 v7pushaction.FlagOverrides) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
 	fake.prepareSpaceMutex.Lock()
 	ret, specificReturn := fake.prepareSpaceReturnsOnCall[len(fake.prepareSpaceArgsForCall)]
@@ -295,6 +375,8 @@ func (fake *FakePushActor) Invocations() map[string][][]interface{} {
 	defer fake.actualizeMutex.RUnlock()
 	fake.conceptualizeMutex.RLock()
 	defer fake.conceptualizeMutex.RUnlock()
+	fake.createPushPlansMutex.RLock()
+	defer fake.createPushPlansMutex.RUnlock()
 	fake.prepareSpaceMutex.RLock()
 	defer fake.prepareSpaceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

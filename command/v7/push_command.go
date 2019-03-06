@@ -38,6 +38,7 @@ type ProgressBar interface {
 //go:generate counterfeiter . PushActor
 
 type PushActor interface {
+	CreatePushPlans(appNameArg string, parser manifestparser.Parser, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
 	// Prepare the space by creating needed apps/applying the manifest
 	PrepareSpace(spaceGUID string, appName string, parser *manifestparser.Parser, overrides v7pushaction.FlagOverrides) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Actualize applies any necessary changes.
@@ -147,7 +148,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		}
 	}
 
-	overrides, err := cmd.GetFlagOverrides()
+	flagOverrides, err := cmd.GetFlagOverrides()
 	if err != nil {
 		return err
 	}
@@ -157,11 +158,13 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
+	pushPlans, err := cmd.Actor.CreatePushPlans("", *manifestParser, flagOverrides)
+
 	appNamesStream, eventStream, warningsStream, errorStream := cmd.Actor.PrepareSpace(
 		cmd.Config.TargetedSpace().GUID,
 		cmd.OptionalArgs.AppName,
 		manifestParser,
-		overrides,
+		flagOverrides,
 	)
 	appNames, err := cmd.processStreamsFromPrepareSpace(appNamesStream, eventStream, warningsStream, errorStream)
 
@@ -187,7 +190,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		cmd.Config.TargetedSpace().GUID,
 		cmd.Config.TargetedOrganization().GUID,
 		cmd.PWD,
-		overrides,
+		flagOverrides,
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
