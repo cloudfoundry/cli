@@ -21,13 +21,15 @@ var _ = Describe("set-space-role command", func() {
 				Eventually(session).Should(Say("'SpaceManager' - Invite and manage users, and enable features for a given space"))
 				Eventually(session).Should(Say("'SpaceDeveloper' - Create and manage apps and services, and see logs and reports"))
 				Eventually(session).Should(Say("'SpaceAuditor' - View logs, reports, and settings on this space"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say(`--client\s+Treat USERNAME as the client-id of a \(non-user\) service account`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("space-users"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
 
-		When("the role does not exit", func() {
+		When("the role does not exist", func() {
 			It("prints a useful error, prints help text, and exits 1", func() {
 				session := helpers.CF("set-space-role", "some-user", "some-org", "some-space", "NotARealRole")
 				Eventually(session.Err).Should(Say(`Incorrect Usage: ROLE must be "SpaceManager", "SpaceDeveloper" and "SpaceAuditor"`))
@@ -39,6 +41,8 @@ var _ = Describe("set-space-role command", func() {
 				Eventually(session).Should(Say(`\s+'SpaceManager' - Invite and manage users, and enable features for a given space`))
 				Eventually(session).Should(Say(`\s+'SpaceDeveloper' - Create and manage apps and services, and see logs and reports`))
 				Eventually(session).Should(Say(`\s+'SpaceAuditor' - View logs, reports, and settings on this space`))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say(`--client\s+Treat USERNAME as the client-id of a \(non-user\) service account`))
 				Eventually(session).Should(Say(`SEE ALSO:`))
 				Eventually(session).Should(Say(`\s+space-users`))
 				Eventually(session).Should(Exit(1))
@@ -57,6 +61,8 @@ var _ = Describe("set-space-role command", func() {
 				Eventually(session).Should(Say(`\s+'SpaceManager' - Invite and manage users, and enable features for a given space`))
 				Eventually(session).Should(Say(`\s+'SpaceDeveloper' - Create and manage apps and services, and see logs and reports`))
 				Eventually(session).Should(Say(`\s+'SpaceAuditor' - View logs, reports, and settings on this space`))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say(`--client\s+Treat USERNAME as the client-id of a \(non-user\) service account`))
 				Eventually(session).Should(Say(`SEE ALSO:`))
 				Eventually(session).Should(Say(`\s+space-users`))
 				Eventually(session).Should(Exit(1))
@@ -75,6 +81,8 @@ var _ = Describe("set-space-role command", func() {
 				Eventually(session).Should(Say(`\s+'SpaceManager' - Invite and manage users, and enable features for a given space`))
 				Eventually(session).Should(Say(`\s+'SpaceDeveloper' - Create and manage apps and services, and see logs and reports`))
 				Eventually(session).Should(Say(`\s+'SpaceAuditor' - View logs, reports, and settings on this space`))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say(`--client\s+Treat USERNAME as the client-id of a \(non-user\) service account`))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -90,6 +98,21 @@ var _ = Describe("set-space-role command", func() {
 			helpers.LoginCF()
 			orgName = ReadOnlyOrg
 			spaceName = ReadOnlySpace
+		})
+
+		When("the target user is a client-credentials user", func() {
+			var clientID string
+
+			BeforeEach(func() {
+				clientID, _ = helpers.SkipIfClientCredentialsNotSet()
+			})
+
+			It("sets the space role for the client", func() {
+				session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
+				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", clientID, orgName, spaceName))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 
 		When("the user exists", func() {

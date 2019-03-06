@@ -38,6 +38,8 @@ func init() {
 }
 
 func (cmd *SetSpaceRole) MetaData() commandregistry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["client"] = &flags.BoolFlag{Name: "client", Usage: T("Treat USERNAME as the client-id of a (non-user) service account")}
 	return commandregistry.CommandMetadata{
 		Name:        "set-space-role",
 		Description: T("Assign a space role to a user"),
@@ -48,6 +50,7 @@ func (cmd *SetSpaceRole) MetaData() commandregistry.CommandMetadata {
 			fmt.Sprintf("   'SpaceDeveloper' - %s", T("Create and manage apps and services, and see logs and reports\n")),
 			fmt.Sprintf("   'SpaceAuditor' - %s", T("View logs, reports, and settings on this space\n")),
 		},
+		Flags: fs,
 	}
 }
 
@@ -57,10 +60,14 @@ func (cmd *SetSpaceRole) Requirements(requirementsFactory requirements.Factory, 
 		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 4)
 	}
 
-	setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
-	wantGUID := (err != nil || !setRolesByUsernameFlag.Enabled)
+	if fc.Bool("client") {
+		cmd.userReq = requirementsFactory.NewClientRequirement(fc.Args()[0])
+	} else {
+		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
+		wantGUID := (err != nil || !setRolesByUsernameFlag.Enabled)
+		cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
+	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{

@@ -59,7 +59,7 @@ var _ = Describe("SetSpaceRole", func() {
 		cmd = &user.SetSpaceRole{}
 		cmd.SetDependency(deps, false)
 
-		flagContext = flags.NewFlagContext(map[string]flags.FlagSet{})
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
 		factory = new(requirementsfakes.FakeFactory)
 
@@ -69,6 +69,7 @@ var _ = Describe("SetSpaceRole", func() {
 		userRequirement = new(requirementsfakes.FakeUserRequirement)
 		userRequirement.ExecuteReturns(nil)
 		factory.NewUserRequirementReturns(userRequirement)
+		factory.NewClientRequirementReturns(userRequirement)
 
 		organizationRequirement = new(requirementsfakes.FakeOrganizationRequirement)
 		organizationRequirement.ExecuteReturns(nil)
@@ -169,6 +170,27 @@ var _ = Describe("SetSpaceRole", func() {
 
 					Expect(actualRequirements).To(ContainElement(userRequirement))
 				})
+			})
+		})
+
+		Context("when given the --client flag", func() {
+			BeforeEach(func() {
+				flagContext.Parse("the-client-id", "the-org-name", "the-space-name", "OrgManager", "--client")
+			})
+
+			It("returns a User Requirement with USERNAME field as it's GUID", func() {
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(factory.NewClientRequirementCallCount()).To(Equal(1))
+				actualUsername := factory.NewClientRequirementArgsForCall(0)
+				Expect(actualUsername).To(Equal("the-client-id"))
+
+				Expect(actualRequirements).To(ContainElement(userRequirement))
+			})
+
+			It("ignores the set_roles_by_username feature flag", func() {
+				cmd.Requirements(factory, flagContext)
+				Expect(flagRepo.FindByNameCallCount()).To(BeZero())
 			})
 		})
 	})
