@@ -1,6 +1,11 @@
 package v6_test
 
 import (
+	"errors"
+
+	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
@@ -13,12 +18,13 @@ import (
 
 var _ = Describe("login Command", func() {
 	var (
-		cmd        LoginCommand
-		testUI     *ui.UI
-		fakeActor  *v6fakes.FakeLoginActor
-		fakeConfig *commandfakes.FakeConfig
-		executeErr error
-		input      *Buffer
+		cmd            LoginCommand
+		testUI         *ui.UI
+		fakeActor      *v6fakes.FakeLoginActor
+		fakeConfig     *commandfakes.FakeConfig
+		fakeActorMaker *v6fakes.FakeActorMaker
+		executeErr     error
+		input          *Buffer
 	)
 
 	BeforeEach(func() {
@@ -26,11 +32,14 @@ var _ = Describe("login Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeActor = new(v6fakes.FakeLoginActor)
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeActorMaker = new(v6fakes.FakeActorMaker)
+		fakeActorMaker.NewActorReturns(fakeActor, nil)
 
 		cmd = LoginCommand{
-			UI:     testUI,
-			Actor:  fakeActor,
-			Config: fakeConfig,
+			UI:         testUI,
+			Actor:      fakeActor,
+			ActorMaker: fakeActorMaker,
+			Config:     fakeConfig,
 		}
 		cmd.APIEndpoint = ""
 		fakeConfig.BinaryNameReturns("faceman")
@@ -75,6 +84,18 @@ var _ = Describe("login Command", func() {
 			})
 
 			When("user does not provide the api endpoint using the -a flag", func() {
+				When("config has API endpoint already set", func() {
+					BeforeEach(func() {
+						fakeConfig.TargetReturns("api.fake.com")
+					})
+
+					It("does not prompt the user for an API endpoint", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say(`API endpoint:\s+api\.fake\.com \(API version: 3\.4\.5\)`))
+						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+					})
+				})
+
 				When("the user enters something at the prompt", func() {
 					BeforeEach(func() {
 						input.Write([]byte("api.boshlite.com\n"))
@@ -85,7 +106,7 @@ var _ = Describe("login Command", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(testUI.Out).To(Say("API endpoint:"))
 						Expect(testUI.Out).To(Say("api.boshlite.com\n"))
-						Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API Version: 3\.4\.5\)`))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API version: 3\.4\.5\)`))
 
 						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 						actualSettings := fakeActor.SetTargetArgsForCall(0)
@@ -105,7 +126,7 @@ var _ = Describe("login Command", func() {
 						Expect(testUI.Out).To(Say("API endpoint:"))
 						Expect(testUI.Out).To(Say("API endpoint:"))
 						Expect(testUI.Out).To(Say("api.boshlite.com\n"))
-						Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API Version: 3\.4\.5\)`))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API version: 3\.4\.5\)`))
 					})
 				})
 			})
@@ -121,7 +142,223 @@ var _ = Describe("login Command", func() {
 					actualSettings := fakeActor.SetTargetArgsForCall(0)
 					Expect(actualSettings.URL).To(Equal("https://api.boshlite.com"))
 
-					Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API Version: 3\.4\.5\)`))
+					Expect(testUI.Out).To(Say(`API endpoint:\s+api\.boshlite\.com \(API version: 3\.4\.5\)`))
+				})
+			})
+		})
+
+		Describe("username and password", func() {
+			BeforeEach(func() {
+				fakeConfig.TargetReturns("https://some.random.endpoint")
+			})
+
+			When("the current grant type is client credentials", func() {
+				BeforeEach(func() {
+					fakeConfig.UAAGrantTypeReturns(string(constant.GrantTypeClientCredentials))
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
+				})
+			})
+
+			When("the current grant type is password", func() {
+				BeforeEach(func() {
+					fakeConfig.UAAGrantTypeReturns(string(constant.GrantTypePassword))
+				})
+
+				It("fetches prompts from the UAA", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeActor.GetLoginPromptsCallCount()).To(Equal(1))
+				})
+
+				When("fetching prompts succeeds", func() {
+					When("one of the prompts has a username key and is text type", func() {
+						BeforeEach(func() {
+							fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
+								"username": {
+									DisplayName: "Username",
+									Type:        coreconfig.AuthPromptTypeText,
+								},
+							})
+						})
+
+						When("the username flag is set", func() {
+							BeforeEach(func() {
+								cmd.Username = "potatoface"
+							})
+
+							It("uses the provided value and does not prompt for the username", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(testUI.Out).NotTo(Say("Username:"))
+								Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+								username, _, _, _ := fakeActor.AuthenticateArgsForCall(0)
+								Expect(username).To(Equal("potatoface"))
+							})
+						})
+					})
+
+					When("one of the prompts has password key and is password type", func() {
+						BeforeEach(func() {
+							fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
+								"password": {
+									DisplayName: "Your Password",
+									Type:        coreconfig.AuthPromptTypePassword,
+								},
+							})
+						})
+
+						When("the password flag is set", func() {
+							BeforeEach(func() {
+								cmd.Password = "noprompto"
+							})
+
+							It("uses the provided value and does not prompt for the password", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(testUI.Out).NotTo(Say("Your Password:"))
+								Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+								_, password, _, _ := fakeActor.AuthenticateArgsForCall(0)
+								Expect(password).To(Equal("noprompto"))
+							})
+
+							It("does not reuse the flag value for subsequent attempts", func() {
+							})
+						})
+					})
+
+					When("a passcode prompt of type password is returned", func() {
+						BeforeEach(func() {
+							fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
+								"passcode": {
+									DisplayName: "gimme your passcode",
+									Type:        coreconfig.AuthPromptTypePassword,
+								},
+							})
+						})
+
+						It("does not prompt for the passcode", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).NotTo(Say("gimme your passcode"))
+							//TODO: after refactoring actor.Authenticate to take a map of creds, test that passcode is not included/is empty
+						})
+					})
+
+					When("multiple prompts of text and password type are returned", func() {
+						BeforeEach(func() {
+							fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
+								"account_number": {
+									DisplayName: "Account Number",
+									Type:        coreconfig.AuthPromptTypeText,
+								},
+								"username": {
+									DisplayName: "Username",
+									Type:        coreconfig.AuthPromptTypeText,
+								},
+								"passcode": {
+									DisplayName: "It's a passcode, what you want it to be???",
+									Type:        coreconfig.AuthPromptTypePassword,
+								},
+								"password": {
+									DisplayName: "Your Password",
+									Type:        coreconfig.AuthPromptTypePassword,
+								},
+								"supersecret": {
+									DisplayName: "Meaning of Life",
+									Type:        coreconfig.AuthPromptTypePassword,
+								},
+							})
+						})
+
+						When("no authentication flags are set", func() {
+							BeforeEach(func() {
+								input.Write([]byte("fakeman\nsomeaccount\nsomepassword\ngarbage\n"))
+							})
+
+							It("displays text prompts, starting with username, then password prompts, starting with password", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say("Username:"))
+								Expect(testUI.Out).To(Say("fakeman"))
+								Expect(testUI.Out).To(Say("Account Number:"))
+								Expect(testUI.Out).To(Say("someaccount"))
+
+								Expect(testUI.Out).To(Say("Your Password:"))
+								Expect(testUI.Out).NotTo(Say("somepassword"))
+								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Out).NotTo(Say("garbage"))
+							})
+
+							//TODO: need to refactor Authenticate so that it can take a map of credentials
+							It("authenticates with the responses", func() {
+								Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+								username, password, _, grantType := fakeActor.AuthenticateArgsForCall(0)
+								Expect(username).To(Equal("fakeman"))
+								Expect(password).To(Equal("somepassword"))
+								Expect(grantType).To(Equal(constant.GrantTypePassword))
+							})
+						})
+
+						When("authenticating succeeds", func() {
+							BeforeEach(func() {
+								fakeConfig.CurrentUserNameReturns("happyman", nil)
+							})
+
+							It("displays OK and a status summary", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(testUI.Out).To(Say("OK"))
+								Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+								Expect(testUI.Out).To(Say(`User:\s+happyman`))
+
+								Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+							})
+						})
+
+						When("authenticating fails", func() {
+							BeforeEach(func() {
+								fakeActor.AuthenticateReturns(errors.New("something died"))
+							})
+
+							It("prints the error message three times", func() {
+								Expect(testUI.Out).To(Say("Your Password:"))
+								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Err).To(Say("something died"))
+								Expect(testUI.Out).To(Say("Your Password:"))
+								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Err).To(Say("something died"))
+								Expect(testUI.Out).To(Say("Your Password:"))
+								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Err).To(Say("something died"))
+							})
+
+							It("returns an error indicating that it could not authenticate", func() {
+								Expect(executeErr).To(MatchError("Unable to authenticate."))
+							})
+
+							It("displays a status summary", func() {
+								Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+								Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' to log in.`, cmd.Config.BinaryName()))
+							})
+
+						})
+
+						When("authenticating fails with a bad credentials error", func() {
+							BeforeEach(func() {
+								fakeActor.AuthenticateReturns(uaa.UnauthorizedError{Message: "Bad credentials"})
+							})
+
+							It("converts the error before printing it", func() {
+								Expect(testUI.Out).To(Say("Your Password:"))
+								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
+								Expect(testUI.Out).To(Say("Your Password:"))
+								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
+								Expect(testUI.Out).To(Say("Your Password:"))
+								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
+							})
+						})
+					})
 				})
 			})
 		})

@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 )
 
 // Authenticate authenticates the user in UAA and sets the returned tokens in
@@ -34,4 +35,21 @@ func (actor Actor) Authenticate(ID string, secret string, origin string, grantTy
 	}
 
 	return nil
+}
+
+func (actor Actor) GetLoginPrompts() map[string]coreconfig.AuthPrompt {
+	rawPrompts := actor.UAAClient.LoginPrompts()
+	prompts := make(map[string]coreconfig.AuthPrompt)
+	for key, val := range rawPrompts {
+		prompts[key] = coreconfig.AuthPrompt{
+			Type:        knownAuthPromptTypes[val[0]],
+			DisplayName: val[1],
+		}
+	}
+	return prompts
+}
+
+var knownAuthPromptTypes = map[string]coreconfig.AuthPromptType{
+	"text":     coreconfig.AuthPromptTypeText,
+	"password": coreconfig.AuthPromptTypePassword,
 }

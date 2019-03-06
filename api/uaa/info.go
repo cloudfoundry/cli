@@ -9,6 +9,7 @@ type Info struct {
 		UAA   string `json:"uaa"`
 		Login string `json:"login"`
 	} `json:"links"`
+	Prompts map[string][]string `json:"prompts"`
 }
 
 // APIVersion is the version of the server.
@@ -19,6 +20,10 @@ func (info Info) APIVersion() string {
 // LoginLink is the URL to the login server.
 func (info Info) LoginLink() string {
 	return info.Links.Login
+}
+
+func (info Info) LoginPrompts() map[string][]string {
+	return info.Prompts
 }
 
 // UAALink is the URL to the UAA server.

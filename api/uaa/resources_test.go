@@ -52,6 +52,10 @@ var _ = Describe("SetupResources", func() {
 					},
 					"links": {
 						"uaa": "https://uaa.bosh-lite.com"
+					},
+					"prompts": {
+						"username": [ "text", "Email" ],
+						"password": [ "password", "Password" ]
 					}
 				}`
 
@@ -70,6 +74,15 @@ var _ = Describe("SetupResources", func() {
 
 				Expect(fakeConfig.SetUAAEndpointCallCount()).To(Equal(1))
 				Expect(fakeConfig.SetUAAEndpointArgsForCall(0)).To(Equal("https://uaa.bosh-lite.com"))
+			})
+
+			It("populates the client's info", func() {
+				Expect(client.Info.App.Version).To(Equal("sem.var"))
+				Expect(client.Info.Links.UAA).To(Equal("https://uaa.bosh-lite.com"))
+				Expect(client.Info.Prompts).To(Equal(map[string][]string{
+					"username": []string{"text", "Email"},
+					"password": []string{"password", "Password"},
+				}))
 			})
 		})
 

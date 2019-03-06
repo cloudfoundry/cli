@@ -2,13 +2,49 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
 type FakeLoginActor struct {
+	AuthenticateStub        func(string, string, string, constant.GrantType) error
+	authenticateMutex       sync.RWMutex
+	authenticateArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 constant.GrantType
+	}
+	authenticateReturns struct {
+		result1 error
+	}
+	authenticateReturnsOnCall map[int]struct {
+		result1 error
+	}
+	CloudControllerAPIVersionStub        func() string
+	cloudControllerAPIVersionMutex       sync.RWMutex
+	cloudControllerAPIVersionArgsForCall []struct {
+	}
+	cloudControllerAPIVersionReturns struct {
+		result1 string
+	}
+	cloudControllerAPIVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
+	GetLoginPromptsStub        func() map[string]coreconfig.AuthPrompt
+	getLoginPromptsMutex       sync.RWMutex
+	getLoginPromptsArgsForCall []struct {
+	}
+	getLoginPromptsReturns struct {
+		result1 map[string]coreconfig.AuthPrompt
+	}
+	getLoginPromptsReturnsOnCall map[int]struct {
+		result1 map[string]coreconfig.AuthPrompt
+	}
 	SetTargetStub        func(v2action.TargetSettings) (v2action.Warnings, error)
 	setTargetMutex       sync.RWMutex
 	setTargetArgsForCall []struct {
@@ -24,6 +60,173 @@ type FakeLoginActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeLoginActor) Authenticate(arg1 string, arg2 string, arg3 string, arg4 constant.GrantType) error {
+	fake.authenticateMutex.Lock()
+	ret, specificReturn := fake.authenticateReturnsOnCall[len(fake.authenticateArgsForCall)]
+	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 constant.GrantType
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("Authenticate", []interface{}{arg1, arg2, arg3, arg4})
+	fake.authenticateMutex.Unlock()
+	if fake.AuthenticateStub != nil {
+		return fake.AuthenticateStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.authenticateReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeLoginActor) AuthenticateCallCount() int {
+	fake.authenticateMutex.RLock()
+	defer fake.authenticateMutex.RUnlock()
+	return len(fake.authenticateArgsForCall)
+}
+
+func (fake *FakeLoginActor) AuthenticateCalls(stub func(string, string, string, constant.GrantType) error) {
+	fake.authenticateMutex.Lock()
+	defer fake.authenticateMutex.Unlock()
+	fake.AuthenticateStub = stub
+}
+
+func (fake *FakeLoginActor) AuthenticateArgsForCall(i int) (string, string, string, constant.GrantType) {
+	fake.authenticateMutex.RLock()
+	defer fake.authenticateMutex.RUnlock()
+	argsForCall := fake.authenticateArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeLoginActor) AuthenticateReturns(result1 error) {
+	fake.authenticateMutex.Lock()
+	defer fake.authenticateMutex.Unlock()
+	fake.AuthenticateStub = nil
+	fake.authenticateReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeLoginActor) AuthenticateReturnsOnCall(i int, result1 error) {
+	fake.authenticateMutex.Lock()
+	defer fake.authenticateMutex.Unlock()
+	fake.AuthenticateStub = nil
+	if fake.authenticateReturnsOnCall == nil {
+		fake.authenticateReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.authenticateReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeLoginActor) CloudControllerAPIVersion() string {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct {
+	}{})
+	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
+	fake.cloudControllerAPIVersionMutex.Unlock()
+	if fake.CloudControllerAPIVersionStub != nil {
+		return fake.CloudControllerAPIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.cloudControllerAPIVersionReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeLoginActor) CloudControllerAPIVersionCallCount() int {
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	return len(fake.cloudControllerAPIVersionArgsForCall)
+}
+
+func (fake *FakeLoginActor) CloudControllerAPIVersionCalls(stub func() string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = stub
+}
+
+func (fake *FakeLoginActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = nil
+	fake.cloudControllerAPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeLoginActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	defer fake.cloudControllerAPIVersionMutex.Unlock()
+	fake.CloudControllerAPIVersionStub = nil
+	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
+		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeLoginActor) GetLoginPrompts() map[string]coreconfig.AuthPrompt {
+	fake.getLoginPromptsMutex.Lock()
+	ret, specificReturn := fake.getLoginPromptsReturnsOnCall[len(fake.getLoginPromptsArgsForCall)]
+	fake.getLoginPromptsArgsForCall = append(fake.getLoginPromptsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("GetLoginPrompts", []interface{}{})
+	fake.getLoginPromptsMutex.Unlock()
+	if fake.GetLoginPromptsStub != nil {
+		return fake.GetLoginPromptsStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.getLoginPromptsReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeLoginActor) GetLoginPromptsCallCount() int {
+	fake.getLoginPromptsMutex.RLock()
+	defer fake.getLoginPromptsMutex.RUnlock()
+	return len(fake.getLoginPromptsArgsForCall)
+}
+
+func (fake *FakeLoginActor) GetLoginPromptsCalls(stub func() map[string]coreconfig.AuthPrompt) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = stub
+}
+
+func (fake *FakeLoginActor) GetLoginPromptsReturns(result1 map[string]coreconfig.AuthPrompt) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = nil
+	fake.getLoginPromptsReturns = struct {
+		result1 map[string]coreconfig.AuthPrompt
+	}{result1}
+}
+
+func (fake *FakeLoginActor) GetLoginPromptsReturnsOnCall(i int, result1 map[string]coreconfig.AuthPrompt) {
+	fake.getLoginPromptsMutex.Lock()
+	defer fake.getLoginPromptsMutex.Unlock()
+	fake.GetLoginPromptsStub = nil
+	if fake.getLoginPromptsReturnsOnCall == nil {
+		fake.getLoginPromptsReturnsOnCall = make(map[int]struct {
+			result1 map[string]coreconfig.AuthPrompt
+		})
+	}
+	fake.getLoginPromptsReturnsOnCall[i] = struct {
+		result1 map[string]coreconfig.AuthPrompt
+	}{result1}
 }
 
 func (fake *FakeLoginActor) SetTarget(arg1 v2action.TargetSettings) (v2action.Warnings, error) {
@@ -92,6 +295,12 @@ func (fake *FakeLoginActor) SetTargetReturnsOnCall(i int, result1 v2action.Warni
 func (fake *FakeLoginActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.authenticateMutex.RLock()
+	defer fake.authenticateMutex.RUnlock()
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	fake.getLoginPromptsMutex.RLock()
+	defer fake.getLoginPromptsMutex.RUnlock()
 	fake.setTargetMutex.RLock()
 	defer fake.setTargetMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

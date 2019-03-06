@@ -30,6 +30,16 @@ var _ = Describe("Info", func() {
 		})
 	})
 
+	Describe("Prompts", func() {
+		BeforeEach(func() {
+			info.Prompts = map[string][]string{"hi": []string{"fake type", "show prompt"}}
+		})
+
+		It("returns the UAA Link", func() {
+			Expect(info.LoginPrompts()).To(Equal(map[string][]string{"hi": []string{"fake type", "show prompt"}}))
+		})
+	})
+
 	Describe("UAALink", func() {
 		BeforeEach(func() {
 			info.Links.UAA = "uaa-something"

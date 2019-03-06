@@ -740,14 +740,21 @@ var _ = Describe("login command", func() {
 	})
 
 	Describe("User Credentials", func() {
+		BeforeEach(func() {
+			helpers.TurnOnExperimentalLogin()
+		})
+
+		AfterEach(func() {
+			helpers.TurnOffExperimentalLogin()
+		})
 		// TODO: Figure out a way to pass in password when we don't have a tty
-		XIt("prompts the user for email and password", func() {
+		It("prompts the user for email and password", func() {
 			username, password := helpers.GetCredentials()
 			buffer := NewBuffer()
 			buffer.Write([]byte(fmt.Sprintf("%s\n%s\n", username, password)))
 			session := helpers.CFWithStdin(buffer, "login")
-			Eventually(session).Should(Say("Email> "))
-			Eventually(session).Should(Say("Password> "))
+			Eventually(session).Should(Say("Email: "))
+			Eventually(session).Should(Say("Password: "))
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -757,7 +764,7 @@ var _ = Describe("login command", func() {
 				input := NewBuffer()
 				input.Write([]byte(username + "\n"))
 				session := helpers.CFWithStdin(input, "login", "-p", password)
-				Eventually(session).Should(Say("Email> "))
+				Eventually(session).Should(Say("Email: "))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -814,20 +821,22 @@ var _ = Describe("login command", func() {
 				})
 
 				It("prompts twice, displays an error and fails", func() {
-					session := helpers.CF("login", "-p", "nope", "-u", "faker")
+					input := NewBuffer()
+					input.Write([]byte("garbage\ngarbage\n"))
+					session := helpers.CFWithStdin(input, "login", "-p", "nope", "-u", "faker")
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
-					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
-					Eventually(session).Should(Say(`Password>`))
+					Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session).Should(Say(`Password:`))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
-					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
-					Eventually(session).Should(Say(`Password>`))
+					Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session).Should(Say(`Password:`))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
-					Eventually(session).Should(Say(`Credentials were rejected, please try again.`))
+					Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
 					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
 					Eventually(session).Should(Say(`Not logged in. Use 'cf login' to log in.`))
+					Eventually(session.Err).Should(Say(`Unable to authenticate.`))
 					Eventually(session).Should(Say(`FAILED`))
-					Eventually(session).Should(Say(`Unable to authenticate`))
 
 					Eventually(session).Should(Exit(1))
 				})

@@ -2,11 +2,11 @@
 package v2actionfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v2action "code.cloudfoundry.org/cli/actor/v2action"
-	uaa "code.cloudfoundry.org/cli/api/uaa"
-	constant "code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/constant"
 )
 
 type FakeUAAClient struct {
@@ -66,6 +66,16 @@ type FakeUAAClient struct {
 	getSSHPasscodeReturnsOnCall map[int]struct {
 		result1 string
 		result2 error
+	}
+	LoginPromptsStub        func() map[string][]string
+	loginPromptsMutex       sync.RWMutex
+	loginPromptsArgsForCall []struct {
+	}
+	loginPromptsReturns struct {
+		result1 map[string][]string
+	}
+	loginPromptsReturnsOnCall map[int]struct {
+		result1 map[string][]string
 	}
 	RefreshAccessTokenStub        func(string) (uaa.RefreshedTokens, error)
 	refreshAccessTokenMutex       sync.RWMutex
@@ -334,6 +344,58 @@ func (fake *FakeUAAClient) GetSSHPasscodeReturnsOnCall(i int, result1 string, re
 	}{result1, result2}
 }
 
+func (fake *FakeUAAClient) LoginPrompts() map[string][]string {
+	fake.loginPromptsMutex.Lock()
+	ret, specificReturn := fake.loginPromptsReturnsOnCall[len(fake.loginPromptsArgsForCall)]
+	fake.loginPromptsArgsForCall = append(fake.loginPromptsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("LoginPrompts", []interface{}{})
+	fake.loginPromptsMutex.Unlock()
+	if fake.LoginPromptsStub != nil {
+		return fake.LoginPromptsStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.loginPromptsReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeUAAClient) LoginPromptsCallCount() int {
+	fake.loginPromptsMutex.RLock()
+	defer fake.loginPromptsMutex.RUnlock()
+	return len(fake.loginPromptsArgsForCall)
+}
+
+func (fake *FakeUAAClient) LoginPromptsCalls(stub func() map[string][]string) {
+	fake.loginPromptsMutex.Lock()
+	defer fake.loginPromptsMutex.Unlock()
+	fake.LoginPromptsStub = stub
+}
+
+func (fake *FakeUAAClient) LoginPromptsReturns(result1 map[string][]string) {
+	fake.loginPromptsMutex.Lock()
+	defer fake.loginPromptsMutex.Unlock()
+	fake.LoginPromptsStub = nil
+	fake.loginPromptsReturns = struct {
+		result1 map[string][]string
+	}{result1}
+}
+
+func (fake *FakeUAAClient) LoginPromptsReturnsOnCall(i int, result1 map[string][]string) {
+	fake.loginPromptsMutex.Lock()
+	defer fake.loginPromptsMutex.Unlock()
+	fake.LoginPromptsStub = nil
+	if fake.loginPromptsReturnsOnCall == nil {
+		fake.loginPromptsReturnsOnCall = make(map[int]struct {
+			result1 map[string][]string
+		})
+	}
+	fake.loginPromptsReturnsOnCall[i] = struct {
+		result1 map[string][]string
+	}{result1}
+}
+
 func (fake *FakeUAAClient) RefreshAccessToken(arg1 string) (uaa.RefreshedTokens, error) {
 	fake.refreshAccessTokenMutex.Lock()
 	ret, specificReturn := fake.refreshAccessTokenReturnsOnCall[len(fake.refreshAccessTokenArgsForCall)]
@@ -408,6 +470,8 @@ func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	defer fake.createUserMutex.RUnlock()
 	fake.getSSHPasscodeMutex.RLock()
 	defer fake.getSSHPasscodeMutex.RUnlock()
+	fake.loginPromptsMutex.RLock()
+	defer fake.loginPromptsMutex.RUnlock()
 	fake.refreshAccessTokenMutex.RLock()
 	defer fake.refreshAccessTokenMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

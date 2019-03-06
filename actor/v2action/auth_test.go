@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -117,6 +118,35 @@ var _ = Describe("Auth Actions", func() {
 				Expect(sshOAuthClient).To(BeEmpty())
 
 				Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
+			})
+		})
+	})
+
+	Describe("GetLoginPrompts", func() {
+		When("getting login prompts info from UAA", func() {
+			var (
+				prompts map[string]coreconfig.AuthPrompt
+			)
+
+			BeforeEach(func() {
+				fakeUAAClient.LoginPromptsReturns(map[string][]string{
+					"username": {"text", "Email"},
+					"pin":      {"password", "PIN Number"},
+				})
+				prompts = actor.GetLoginPrompts()
+			})
+
+			It("gets the login prompts", func() {
+				Expect(prompts).To(Equal(map[string]coreconfig.AuthPrompt{
+					"username": {
+						DisplayName: "Email",
+						Type:        coreconfig.AuthPromptTypeText,
+					},
+					"pin": {
+						DisplayName: "PIN Number",
+						Type:        coreconfig.AuthPromptTypePassword,
+					},
+				}))
 			})
 		})
 	})
