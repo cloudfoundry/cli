@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 type Parser struct {
@@ -32,6 +32,22 @@ func (parser *Parser) Parse(manifestPath string) error {
 		return err
 	}
 	return parser.parse(bytes)
+}
+
+func (parser *Parser) GetPathToManifest() string {
+	return parser.PathToManifest
+}
+
+func (parser *Parser) Apps(appName string) ([]Application, error) {
+	if appName == "" {
+		return parser.Applications, nil
+	}
+	for _, app := range parser.Applications {
+		if app.Name == appName {
+			return []Application{app}, nil
+		}
+	}
+	return nil, AppNotInManifestError{Name: appName}
 }
 
 // InterpolateAndParse reads the manifest at the provided paths, interpolates
@@ -131,4 +147,17 @@ func (parser *Parser) parse(manifestBytes []byte) error {
 	}
 
 	return nil
+}
+
+//go:generate counterfeiter . ManifestParser
+
+type ManifestParser interface {
+	Apps(appName string) ([]Application, error)
+	Validate() error
+	ContainsMultipleApps() bool
+	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) error
+	FullRawManifest() []byte
+	AppNames() []string
+	RawAppManifest(appName string) ([]byte, error)
+	GetPathToManifest() string
 }

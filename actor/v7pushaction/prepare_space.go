@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (actor Actor) PrepareSpace(spaceGUID string, appName string, manifestParser *manifestparser.Parser, overrides FlagOverrides) (<-chan []string, <-chan Event, <-chan Warnings, <-chan error) {
+func (actor Actor) PrepareSpace(spaceGUID string, appName string, manifestParser manifestparser.ManifestParser, overrides FlagOverrides) (<-chan []string, <-chan Event, <-chan Warnings, <-chan error) {
 	log.Debugln("Starting to Actualize Space:", spaceGUID)
 	appNameStream := make(chan []string)
 	eventStream := make(chan Event)
@@ -73,7 +73,7 @@ func (actor Actor) PrepareSpace(spaceGUID string, appName string, manifestParser
 	return appNameStream, eventStream, warningsStream, errorStream
 }
 
-func getManifest(appName string, parser *manifestparser.Parser) ([]byte, error) {
+func getManifest(appName string, parser manifestparser.ManifestParser) ([]byte, error) {
 	if appName != "" {
 		return parser.RawAppManifest(appName)
 	}

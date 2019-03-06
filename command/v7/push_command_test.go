@@ -1,6 +1,7 @@
 package v7_test
 
 import (
+	"code.cloudfoundry.org/cli/util/manifestparser"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -166,14 +167,15 @@ var _ = Describe("push Command", func() {
 		fakeConfig.ExperimentalReturns(true) // TODO: Delete once we remove the experimental flag
 
 		cmd = PushCommand{
-			UI:           testUI,
-			Config:       fakeConfig,
-			Actor:        fakeActor,
-			VersionActor: fakeVersionActor,
-			SharedActor:  fakeSharedActor,
-			ProgressBar:  fakeProgressBar,
-			NOAAClient:   fakeNOAAClient,
-			PWD:          pwd,
+			UI:             testUI,
+			Config:         fakeConfig,
+			Actor:          fakeActor,
+			VersionActor:   fakeVersionActor,
+			SharedActor:    fakeSharedActor,
+			ProgressBar:    fakeProgressBar,
+			NOAAClient:     fakeNOAAClient,
+			PWD:            pwd,
+			ManifestParser: manifestparser.NewParser(),
 		}
 	})
 
@@ -303,7 +305,7 @@ var _ = Describe("push Command", func() {
 							Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
 							_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 							Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(yamlContents)))
-							Expect(manifestParser.PathToManifest).To(Equal(pathToYAMLFile))
+							Expect(manifestParser.GetPathToManifest()).To(Equal(pathToYAMLFile))
 							Expect(manifestParser.AppNames()).To(ConsistOf("banana"))
 						})
 
@@ -315,7 +317,7 @@ var _ = Describe("push Command", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 								Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
 								_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
-								Expect(manifestParser.PathToManifest).To(Equal(""))
+								Expect(manifestParser.GetPathToManifest()).To(Equal(""))
 								Expect(manifestParser.FullRawManifest()).To(HaveLen(0))
 							})
 						})
@@ -348,7 +350,7 @@ var _ = Describe("push Command", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
 							_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
-							Expect(manifestParser.PathToManifest).To(Equal(""))
+							Expect(manifestParser.GetPathToManifest()).To(Equal(""))
 							Expect(manifestParser.FullRawManifest()).To(HaveLen(0))
 						})
 					})
@@ -372,7 +374,7 @@ var _ = Describe("push Command", func() {
 							Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
 							_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 							Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(yamlContents)))
-							Expect(manifestParser.PathToManifest).To(Equal(pathToYAMLFile))
+							Expect(manifestParser.GetPathToManifest()).To(Equal(pathToYAMLFile))
 							Expect(manifestParser.AppNames()).To(ConsistOf("banana"))
 						})
 					})
@@ -416,7 +418,7 @@ var _ = Describe("push Command", func() {
 						Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
 						_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 						Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(expectedManifest)))
-						Expect(manifestParser.PathToManifest).To(Equal(pathToYAMLFile))
+						Expect(manifestParser.GetPathToManifest()).To(Equal(pathToYAMLFile))
 						Expect(manifestParser.AppNames()).To(ConsistOf("turtle"))
 					})
 				})
@@ -443,7 +445,7 @@ var _ = Describe("push Command", func() {
 						Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
 						_, _, manifestParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 						Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(expectedManifest)))
-						Expect(manifestParser.PathToManifest).To(Equal(pathToYAMLFile))
+						Expect(manifestParser.GetPathToManifest()).To(Equal(pathToYAMLFile))
 						Expect(manifestParser.AppNames()).To(ConsistOf("turtle"))
 					})
 				})
@@ -458,7 +460,7 @@ var _ = Describe("push Command", func() {
 					expectedSpaceGUID, expectedAppName, expectedParser, _ := fakeActor.PrepareSpaceArgsForCall(0)
 					Expect(expectedSpaceGUID).To(Equal("some-space-guid"))
 					Expect(expectedAppName).To(Equal("passed-as-command-arg"))
-					Expect(expectedParser.PathToManifest).To(Equal(""))
+					Expect(expectedParser.GetPathToManifest()).To(Equal(""))
 					Expect(expectedParser.FullRawManifest()).To(HaveLen(0))
 				})
 

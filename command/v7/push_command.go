@@ -38,9 +38,9 @@ type ProgressBar interface {
 //go:generate counterfeiter . PushActor
 
 type PushActor interface {
-	CreatePushPlans(appNameArg string, parser manifestparser.Parser, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
+	CreatePushPlans(appNameArg string, parser manifestparser.ManifestParser, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
 	// Prepare the space by creating needed apps/applying the manifest
-	PrepareSpace(spaceGUID string, appName string, parser *manifestparser.Parser, overrides v7pushaction.FlagOverrides) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
+	PrepareSpace(spaceGUID string, appName string, parser manifestparser.ManifestParser, overrides v7pushaction.FlagOverrides) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Actualize applies any necessary changes.
 	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Conceptualize figures out the state of the world.
@@ -80,15 +80,16 @@ type PushCommand struct {
 	envCFStagingTimeout     interface{}                   `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout     interface{}                   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	Config       command.Config
-	UI           command.UI
-	NOAAClient   v3action.NOAAClient
-	Actor        PushActor
-	VersionActor V7ActorForPush
-	SharedActor  command.SharedActor
-	RouteActor   v7action.RouteActor
-	ProgressBar  ProgressBar
-	PWD          string
+	Config         command.Config
+	UI             command.UI
+	NOAAClient     v3action.NOAAClient
+	Actor          PushActor
+	VersionActor   V7ActorForPush
+	SharedActor    command.SharedActor
+	RouteActor     v7action.RouteActor
+	ProgressBar    ProgressBar
+	PWD            string
+	ManifestParser manifestparser.ManifestParser
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -120,6 +121,8 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	currentDir, err := os.Getwd()
 	cmd.PWD = currentDir
 
+	cmd.ManifestParser = manifestparser.NewParser()
+
 	return err
 }
 
@@ -136,13 +139,12 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	var manifestParser = manifestparser.NewParser()
 	if !cmd.NoManifest {
-		if manifestParser, err = cmd.readManifest(); err != nil {
+		if err = cmd.readManifest(); err != nil {
 			return err
 		}
 
-		err = manifestParser.Validate()
+		err = cmd.ManifestParser.Validate()
 		if err != nil {
 			return err
 		}
@@ -153,17 +155,17 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.ValidateAllowedFlagsForMultipleApps(manifestParser.ContainsMultipleApps())
+	err = cmd.ValidateAllowedFlagsForMultipleApps(cmd.ManifestParser.ContainsMultipleApps())
 	if err != nil {
 		return err
 	}
 
-	pushPlans, err := cmd.Actor.CreatePushPlans("", *manifestParser, flagOverrides)
+	pushPlans, err := cmd.Actor.CreatePushPlans("", cmd.ManifestParser, flagOverrides)
 
 	appNamesStream, eventStream, warningsStream, errorStream := cmd.Actor.PrepareSpace(
 		cmd.Config.TargetedSpace().GUID,
 		cmd.OptionalArgs.AppName,
-		manifestParser,
+		cmd.ManifestParser,
 		flagOverrides,
 	)
 	appNames, err := cmd.processStreamsFromPrepareSpace(appNamesStream, eventStream, warningsStream, errorStream)
@@ -476,33 +478,31 @@ func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream 
 	}
 }
 
-func (cmd PushCommand) readManifest() (*manifestparser.Parser, error) {
+func (cmd PushCommand) readManifest() error {
 	log.Info("reading manifest if exists")
 	pathsToVarsFiles := []string{}
 	for _, varfilepath := range cmd.PathsToVarsFiles {
 		pathsToVarsFiles = append(pathsToVarsFiles, string(varfilepath))
 	}
 
-	parser := manifestparser.NewParser()
-
 	if len(cmd.PathToManifest) != 0 {
 		log.WithField("manifestPath", cmd.PathToManifest).Debug("reading '-f' provided manifest")
-		err := parser.InterpolateAndParse(string(cmd.PathToManifest), pathsToVarsFiles, cmd.Vars)
-		return parser, err
+		err := cmd.ManifestParser.InterpolateAndParse(string(cmd.PathToManifest), pathsToVarsFiles, cmd.Vars)
+		return err
 	}
 
 	pathToManifest := filepath.Join(cmd.PWD, "manifest.yml")
 	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
 
-	err := parser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
+	err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
 	if err != nil && !os.IsNotExist(err) {
 		log.Errorln("reading manifest:", err)
-		return &manifestparser.Parser{}, err
+		return err
 	} else if os.IsNotExist(err) {
 		log.Debug("no manifest exists")
 	}
 
-	return parser, nil
+	return nil
 }
 
 func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
