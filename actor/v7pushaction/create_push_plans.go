@@ -8,13 +8,16 @@ import (
 )
 
 // We assume that all flag and argument and manifest combinations have been validated by this point
-func (actor Actor) CreatePushPlans(appNameArg string, parser manifestparser.Parser, overrides FlagOverrides) ([]PushPlan, error) {
+func (actor Actor) CreatePushPlans(appNameArg string, spaceGUID string, orgGUID string, parser manifestparser.ManifestParser, overrides FlagOverrides) ([]PushPlan, error) {
 	var pushPlans []PushPlan
 
-	for _, application := range getEligibleApplications(parser, appNameArg) {
+	eligibleApps, err := getEligibleApplications(parser, appNameArg)
+	if err != nil {
+		return nil, err
+	}
+	for _, manifestApplication := range eligibleApps {
 		var err error
-
-		application.Name = appNameArg
+		application := v7action.Application{Name: manifestApplication.Name}
 
 		applicationNeedsUpdate := false
 
@@ -34,12 +37,14 @@ func (actor Actor) CreatePushPlans(appNameArg string, parser manifestparser.Pars
 			application.LifecycleType = constant.AppLifecycleTypeDocker
 		}
 
-		bitsPath, err := getBitsPath(overrides)
+		bitsPath, err := getBitsPath(overrides, manifestApplication.Path)
 		if err != nil {
 			return nil, err
 		}
 
 		pushPlans = append(pushPlans, PushPlan{
+			OrgGUID:                orgGUID,
+			SpaceGUID:              spaceGUID,
 			Application:            application,
 			ApplicationNeedsUpdate: applicationNeedsUpdate,
 			BitsPath:               bitsPath,
@@ -49,8 +54,13 @@ func (actor Actor) CreatePushPlans(appNameArg string, parser manifestparser.Pars
 	return pushPlans, nil
 }
 
-func getEligibleApplications(parser manifestparser.Parser, appNameArg string) []v7action.Application {
-	return []v7action.Application{{}}
+func getEligibleApplications(parser manifestparser.ManifestParser, appNameArg string) ([]manifestparser.Application, error) {
+	if parser.FullRawManifest() != nil {
+		return parser.Apps(appNameArg)
+	}
+	manifestApp := manifestparser.Application{}
+	manifestApp.Name = appNameArg
+	return []manifestparser.Application{manifestApp}, nil
 }
 
 func buildpacksPresent(overrides FlagOverrides) bool {
@@ -61,9 +71,11 @@ func stacksPresent(overrides FlagOverrides) bool {
 	return overrides.Stack != ""
 }
 
-func getBitsPath(overrides FlagOverrides) (string, error) {
+func getBitsPath(overrides FlagOverrides, manifestPath string) (string, error) {
 	if overrides.ProvidedAppPath != "" {
 		return overrides.ProvidedAppPath, nil
+	} else if manifestPath != "" {
+		return manifestPath, nil
 	}
 
 	return os.Getwd()

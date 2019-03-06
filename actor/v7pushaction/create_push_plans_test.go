@@ -4,6 +4,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/util/manifestparser"
+	"code.cloudfoundry.org/cli/util/manifestparser/manifestparserfakes"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -13,7 +14,7 @@ var _ = Describe("CreatePushPlans", func() {
 	var (
 		pushActor *Actor
 
-		manifestParser *manifestparser.Parser
+		fakeManifestParser *manifestparserfakes.FakeManifestParser
 
 		flagOverrides FlagOverrides
 
@@ -22,17 +23,23 @@ var _ = Describe("CreatePushPlans", func() {
 		executeErr error
 
 		appNameArg string
+
+		spaceGUID string
+
+		orgGUID string
 	)
 
 	BeforeEach(func() {
 		pushActor, _, _, _ = getTestPushActor()
-		manifestParser = manifestparser.NewParser()
+		fakeManifestParser = new(manifestparserfakes.FakeManifestParser)
 		appNameArg = "my-app"
 		flagOverrides = FlagOverrides{}
+		orgGUID = "org"
+		spaceGUID = "space"
 	})
 
 	JustBeforeEach(func() {
-		pushPlans, executeErr = pushActor.CreatePushPlans(appNameArg, *manifestParser, flagOverrides)
+		pushPlans, executeErr = pushActor.CreatePushPlans(appNameArg, spaceGUID, orgGUID, fakeManifestParser, flagOverrides)
 	})
 
 	AssertNameIsSet := func() {
@@ -214,6 +221,91 @@ var _ = Describe("CreatePushPlans", func() {
 			AssertNoExecuteErr()
 			AssertNameIsSet()
 			AssertPushPlanLength(1)
+		})
+	})
+
+	Describe("Manifest", func() {
+		When("There are multiple apps", func() {
+			BeforeEach(func() {
+				fakeManifestParser.AppsReturns([]manifestparser.Application{
+					{
+						ApplicationModel: manifestparser.ApplicationModel{
+							Name: "my-app",
+						},
+						FullUnmarshalledApplication: nil,
+					},
+					{
+						ApplicationModel: manifestparser.ApplicationModel{
+							Name: "spencers-app",
+							Path: "spencers/path",
+						},
+						FullUnmarshalledApplication: nil,
+					},
+				}, nil)
+
+				fakeManifestParser.FullRawManifestReturns([]byte("not-nil"))
+
+				appNameArg = ""
+			})
+
+			AssertNoExecuteErr()
+			AssertPushPlanLength(2)
+
+			It("it creates pushPlans based on the apps in the manifest", func() {
+				Expect(pushPlans[0].Application.Name).To(Equal("my-app"))
+				Expect(pushPlans[1].Application.Name).To(Equal("spencers-app"))
+				Expect(pushPlans[0].BitsPath).To(Equal(getCurrentDir()))
+				Expect(pushPlans[1].BitsPath).To(Equal("spencers/path"))
+			})
+		})
+
+		When("There is an appName specified", func() {
+			When("And that appName is NOT present in the manifest", func() {
+				BeforeEach(func() {
+					fakeManifestParser.AppsReturns(nil, manifestparser.AppNotInManifestError{Name: appNameArg})
+
+					fakeManifestParser.FullRawManifestReturns([]byte("not-nil"))
+
+					appNameArg = "my-app"
+				})
+
+				It("it returns an AppNotInManifestError", func() {
+					Expect(executeErr).To(MatchError(manifestparser.AppNotInManifestError{Name: appNameArg}))
+				})
+			})
+			When("And that appName is present in the manifest", func() {
+				BeforeEach(func() {
+					fakeManifestParser.AppsReturns([]manifestparser.Application{
+						{
+							ApplicationModel: manifestparser.ApplicationModel{
+								Name: "my-app",
+							},
+							FullUnmarshalledApplication: nil,
+						},
+					}, nil)
+
+					fakeManifestParser.FullRawManifestReturns([]byte("not-nil"))
+
+					appNameArg = "my-app"
+					flagOverrides.DockerImage = "image"
+				})
+
+				AssertNoExecuteErr()
+				AssertPushPlanLength(1)
+
+				It("it creates pushPlans based on the named app in the manifest", func() {
+					Expect(pushPlans[0].Application.Name).To(Equal("my-app"))
+					Expect(pushPlans[0].BitsPath).To(Equal(getCurrentDir()))
+					Expect(pushPlans[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeDocker))
+				})
+			})
+		})
+	})
+
+	FDescribe("Org and Space guid", func() {
+		It("creates pushPlans with org and space guids", func() {
+			Expect(pushPlans[0].SpaceGUID).To(Equal(spaceGUID))
+			Expect(pushPlans[0].OrgGUID).To(Equal(orgGUID))
 		})
 	})
 })
