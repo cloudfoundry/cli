@@ -110,6 +110,7 @@ func (f apiRequirementFactory) NewUserRequirement(username string, wantGUID bool
 func (f apiRequirementFactory) NewClientRequirement(username string) UserRequirement {
 	return NewClientRequirement(
 		username,
+		f.repoLocator.GetClientRepository(),
 	)
 }
 

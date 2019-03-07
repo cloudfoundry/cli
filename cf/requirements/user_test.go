@@ -86,15 +86,43 @@ var _ = Describe("UserRequirement", func() {
 	})
 
 	Describe("NewClientRequirement", func() {
+		var (
+			clientRepo *apifakes.FakeClientRepository
+		)
+
+		BeforeEach(func() {
+			clientRepo = new(apifakes.FakeClientRepository)
+		})
 		Context("Execute", func() {
 			It("returns a user model with the client ID as its GUID and Username", func() {
-				userReq := requirements.NewClientRequirement("the-client-id")
+				userReq := requirements.NewClientRequirement("the-client-id", clientRepo)
 
 				userReq.Execute()
 				user := userReq.GetUser()
 
 				Expect(user.GUID).To(Equal("the-client-id"))
 				Expect(user.Username).To(Equal("the-client-id"))
+			})
+
+			When("The client is not found by the clientRepo", func() {
+				var (
+					clientReq requirements.UserRequirement
+					err       error
+				)
+
+				BeforeEach(func() {
+					err = errors.New("Client not found")
+					clientRepo.ClientExistsReturns(false, err)
+				})
+
+				It("returns an error", func() {
+					clientReq = requirements.NewClientRequirement("the-client-id", clientRepo)
+					output := clientReq.Execute()
+
+					Expect(clientRepo.ClientExistsCallCount()).To(Equal(1))
+					Expect(clientRepo.ClientExistsArgsForCall(0)).To(Equal("the-client-id"))
+					Expect(output).To(Equal(err))
+				})
 			})
 		})
 	})

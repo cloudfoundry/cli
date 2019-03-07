@@ -51,7 +51,7 @@ var _ = Describe("org-users command", func() {
 			})
 		})
 
-		When("the target org has only a client-credentials user", func() {
+		When("the target org has a client-credentials user", func() {
 			var clientID string
 
 			BeforeEach(func() {
@@ -59,7 +59,7 @@ var _ = Describe("org-users command", func() {
 				Eventually(helpers.CF("set-org-role", clientID, orgName, "OrgManager", "--client")).Should(Exit(0))
 			})
 
-			It("sets the org role for the client", func() {
+			It("prints the client-credentials user", func() {
 				session := helpers.CF("org-users", orgName)
 				Eventually(session).Should(Say("Getting users in org %s as %s", orgName, adminUsername))
 				Eventually(session).Should(Say("ORG MANAGER"))

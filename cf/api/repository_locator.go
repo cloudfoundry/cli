@@ -57,6 +57,7 @@ type RepositoryLocator struct {
 	routeServiceBindingRepo         RouteServiceBindingRepository
 	serviceSummaryRepo              ServiceSummaryRepository
 	userRepo                        UserRepository
+	clientRepo                      ClientRepository
 	passwordRepo                    password.Repository
 	logsRepo                        logs.Repository
 	authTokenRepo                   ServiceAuthTokenRepository
@@ -130,6 +131,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.spaceRepo = spaces.NewCloudControllerSpaceRepository(config, cloudControllerGateway)
 	loc.userProvidedServiceInstanceRepo = NewCCUserProvidedServiceInstanceRepository(config, cloudControllerGateway)
 	loc.userRepo = NewCloudControllerUserRepository(config, uaaGateway, cloudControllerGateway)
+	loc.clientRepo = NewCloudControllerClientRepository(config, uaaGateway)
 	loc.buildpackRepo = NewCloudControllerBuildpackRepository(config, cloudControllerGateway)
 	loc.buildpackBitsRepo = NewCloudControllerBuildpackBitsRepository(config, cloudControllerGateway, appfiles.ApplicationZipper{})
 	loc.securityGroupRepo = securitygroups.NewSecurityGroupRepo(config, cloudControllerGateway)
@@ -334,6 +336,15 @@ func (locator RepositoryLocator) SetServiceSummaryRepository(repo ServiceSummary
 
 func (locator RepositoryLocator) GetUserRepository() UserRepository {
 	return locator.userRepo
+}
+
+func (locator RepositoryLocator) GetClientRepository() ClientRepository {
+	return locator.clientRepo
+}
+
+func (locator RepositoryLocator) SetClientRepository(repo ClientRepository) RepositoryLocator {
+	locator.clientRepo = repo
+	return locator
 }
 
 func (locator RepositoryLocator) SetPasswordRepository(repo password.Repository) RepositoryLocator {
