@@ -122,6 +122,15 @@ var _ = Describe("set-space-role command", func() {
 				username, _ = helpers.CreateUser()
 			})
 
+			When("the passed role is lowercase", func() {
+				It("sets the space role for the user", func() {
+					session := helpers.CF("set-space-role", username, orgName, spaceName, "spaceauditor")
+					Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", username, orgName, spaceName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
 			It("sets the space role for the user", func() {
 				session := helpers.CF("set-space-role", username, orgName, spaceName, "SpaceAuditor")
 				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", username, orgName, spaceName))

@@ -95,7 +95,7 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) error {
 
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
 		map[string]interface{}{
-			"Role":        terminal.EntityNameColor(roleStr),
+			"Role":        terminal.EntityNameColor(role.Display()),
 			"TargetUser":  terminal.EntityNameColor(user.Username),
 			"TargetOrg":   terminal.EntityNameColor(org.Name),
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),

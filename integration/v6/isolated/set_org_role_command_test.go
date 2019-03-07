@@ -95,6 +95,15 @@ var _ = Describe("set-org-role command", func() {
 		})
 
 		When("the org and user both exist", func() {
+			When("the passed role is all lowercase", func() {
+				It("sets the org role for the user", func() {
+					session := helpers.CF("set-org-role", username, orgName, "orgauditor")
+					Eventually(session).Should(Say("Assigning role OrgAuditor to user %s in org %s as admin...", username, orgName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
 			It("sets the org role for the user", func() {
 				session := helpers.CF("set-org-role", username, orgName, "OrgAuditor")
 				Eventually(session).Should(Say("Assigning role OrgAuditor to user %s in org %s as admin...", username, orgName))

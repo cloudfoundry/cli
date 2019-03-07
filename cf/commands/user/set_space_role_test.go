@@ -231,6 +231,21 @@ var _ = Describe("SetSpaceRole", func() {
 			})
 		})
 
+		Context("when provided a differently cased role", func() {
+			BeforeEach(func() {
+				flagContext.Parse("the-user-name", "the-org-name", "the-space-name", "spacemanager")
+				userRequirement.GetUserReturns(models.UserFields{Username: "the-user-name"})
+			})
+
+			It("tells the user it is assigning the role", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Assigning role", "SpaceManager", "the-user-name", "the-org", "the-user-name"},
+					[]string{"OK"},
+				))
+			})
+		})
+
 		Context("when the space is found", func() {
 			BeforeEach(func() {
 				space := models.Space{}

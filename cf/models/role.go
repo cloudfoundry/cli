@@ -1,6 +1,9 @@
 package models
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 type Role int
 
@@ -18,18 +21,18 @@ const (
 var ErrUnknownRole = errors.New("Unknown Role")
 
 func RoleFromString(roleString string) (Role, error) {
-	switch roleString {
-	case "OrgManager":
+	switch strings.ToLower(roleString) {
+	case "orgmanager":
 		return RoleOrgManager, nil
-	case "BillingManager":
+	case "billingmanager":
 		return RoleBillingManager, nil
-	case "OrgAuditor":
+	case "orgauditor":
 		return RoleOrgAuditor, nil
-	case "SpaceManager":
+	case "spacemanager":
 		return RoleSpaceManager, nil
-	case "SpaceDeveloper":
+	case "spacedeveloper":
 		return RoleSpaceDeveloper, nil
-	case "SpaceAuditor":
+	case "spaceauditor":
 		return RoleSpaceAuditor, nil
 	default:
 		return RoleUnknown, ErrUnknownRole
@@ -57,4 +60,8 @@ func (r Role) ToString() string {
 	default:
 		return ""
 	}
+}
+
+func (r Role) Display() string {
+	return strings.TrimPrefix(r.ToString(), "Role")
 }

@@ -209,6 +209,21 @@ var _ = Describe("SetOrgRole", func() {
 			err = cmd.Execute(flagContext)
 		})
 
+		Context("when provided a differently cased role", func() {
+			BeforeEach(func() {
+				flagContext.Parse("the-user-name", "the-org-name", "orgmanager")
+				userRequirement.GetUserReturns(models.UserFields{Username: "the-user-name"})
+			})
+
+			It("tells the user it is assigning the role", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Assigning role", "OrgManager", "the-user-name", "the-org", "the-user-name"},
+					[]string{"OK"},
+				))
+			})
+		})
+
 		Context("when the UserRequirement returns a user with a GUID", func() {
 			BeforeEach(func() {
 				userFields := models.UserFields{GUID: "the-user-guid", Username: "the-user-name"}
