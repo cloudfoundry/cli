@@ -869,11 +869,8 @@ var _ = Describe("login command", func() {
 					username, password := helpers.GetCredentials()
 					session := helpers.CF("login", "-p", password, "-u", username)
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
-					Eventually(session).Should(Say(`API endpoint:\s+` + helpers.GetAPI() + `\s+\(API version: \d\.\d{1,3}\.\d{1,3}\)`))
-					// The following message is a bit strange in the output. Consider removing?
-					Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Say("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
+					Eventually(session.Err).Should(Say("Service account currently logged in. Use 'cf logout' to log out service account and try again."))
 					Eventually(session).Should(Exit(1))
 				})
 			})
