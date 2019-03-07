@@ -747,7 +747,6 @@ var _ = Describe("login command", func() {
 		AfterEach(func() {
 			helpers.TurnOffExperimentalLogin()
 		})
-		// TODO: Figure out a way to pass in password when we don't have a tty
 		It("prompts the user for email and password", func() {
 			username, password := helpers.GetCredentials()
 			buffer := NewBuffer()
@@ -766,6 +765,22 @@ var _ = Describe("login command", func() {
 				session := helpers.CFWithStdin(input, "login", "-p", password)
 				Eventually(session).Should(Say("Email: "))
 				Eventually(session).Should(Exit(0))
+			})
+
+			When("the password flag is given incorrectly", func() {
+				It("Prompts the user two more times before exiting with an error", func() {
+					username, _ := helpers.GetCredentials()
+					input := NewBuffer()
+					input.Write([]byte(username + "\n" + "bad-password\n" + "bad-password\n"))
+					session := helpers.CFWithStdin(input, "login", "-p", "bad-password")
+					Eventually(session).Should(Say("Email: "))
+					Eventually(session.Err).Should(Say("Credentials were rejected, please try again."))
+					Eventually(session).Should(Say("Password: "))
+					Eventually(session.Err).Should(Say("Credentials were rejected, please try again."))
+					Eventually(session.Err).Should(Say("Unable to authenticate."))
+					Eventually(session).Should(Exit(1))
+				})
+
 			})
 		})
 
@@ -792,8 +807,8 @@ var _ = Describe("login command", func() {
 
 			It("should accept each value", func() {
 				input := NewBuffer()
-				input.Write([]byte(username + "\n" + orgName + "\n"))
-				session := helpers.CFWithStdin(input, "login", "-p", password)
+				input.Write([]byte(username + "\n" + password + "\n" + orgName + "\n"))
+				session := helpers.CFWithStdin(input, "login")
 				Eventually(session).Should(Exit(0))
 			})
 		})
