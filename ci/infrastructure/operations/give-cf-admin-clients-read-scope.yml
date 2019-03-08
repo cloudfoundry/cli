@@ -1,0 +1,7 @@
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients/cf/scope?
+  value: network.admin,network.write,cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write,doppler.firehose,uaa.user,routing.router_groups.read,routing.router_groups.write,cloud_controller.admin_read_only,cloud_controller.global_auditor,perm.admin,clients.read
+
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/scim/users/name=admin/groups/-
+  value: clients.read
