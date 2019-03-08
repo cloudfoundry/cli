@@ -73,7 +73,8 @@ var _ = Describe("Auth Actions", func() {
 					Expect(sshOAuthClient).To(BeEmpty())
 
 					Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
-					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(0))
+					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(1))
+					Expect(fakeConfig.SetUAAGrantTypeArgsForCall(0)).To(Equal(string(constant.GrantTypePassword)))
 				})
 
 				When("a previous user authenticated with a client grant type", func() {
