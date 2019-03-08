@@ -747,6 +747,7 @@ var _ = Describe("login command", func() {
 		AfterEach(func() {
 			helpers.TurnOffExperimentalLogin()
 		})
+
 		It("prompts the user for email and password", func() {
 			username, password := helpers.GetCredentials()
 			buffer := NewBuffer()
@@ -755,6 +756,17 @@ var _ = Describe("login command", func() {
 			Eventually(session).Should(Say("Email: "))
 			Eventually(session).Should(Say("Password: "))
 			Eventually(session).Should(Exit(0))
+		})
+
+		When("the -u flag is provided", func() {
+			It("prompts the user for their password", func() {
+				username, password := helpers.GetCredentials()
+				buffer := NewBuffer()
+				buffer.Write([]byte(fmt.Sprintf("%s\n", password)))
+				session := helpers.CFWithStdin(buffer, "login", "-u", username)
+				Eventually(session).Should(Say("Password: "))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 
 		When("the user provides the -p flag", func() {
@@ -777,10 +789,11 @@ var _ = Describe("login command", func() {
 					Eventually(session.Err).Should(Say("Credentials were rejected, please try again."))
 					Eventually(session).Should(Say("Password: "))
 					Eventually(session.Err).Should(Say("Credentials were rejected, please try again."))
+					Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Unable to authenticate."))
 					Eventually(session).Should(Exit(1))
 				})
-
 			})
 		})
 
@@ -810,6 +823,55 @@ var _ = Describe("login command", func() {
 				input.Write([]byte(username + "\n" + password + "\n" + orgName + "\n"))
 				session := helpers.CFWithStdin(input, "login")
 				Eventually(session).Should(Exit(0))
+			})
+
+			When("MFA is enabled", func() {
+				var (
+					password string
+					mfaCode  string
+					server   *ghttp.Server
+				)
+
+				BeforeEach(func() {
+					password = "some-password"
+					mfaCode = "123456"
+					server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
+					helpers.AddMfa(server, password, mfaCode)
+				})
+
+				AfterEach(func() {
+					server.Close()
+				})
+
+				When("correct MFA code and credentials are provided", func() {
+					It("logs in the user", func() {
+						input := NewBuffer()
+						input.Write([]byte(username + "\n" + password + "\n" + mfaCode + "\n"))
+						session := helpers.CFWithStdin(input, "login")
+						Eventually(session).Should(Say("Email: "))
+						Eventually(session).Should(Say("Password: "))
+						Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				When("incorrect MFA code and credentials are provided", func() {
+					It("fails", func() {
+						input := NewBuffer()
+						wrongMfaCode := mfaCode + "foo"
+						input.Write([]byte(username + "\n" + password + "\n" + wrongMfaCode + "\n"))
+						session := helpers.CFWithStdin(input, "login")
+						Eventually(session).Should(Say("Password: "))
+						Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
+						Eventually(session).Should(Say("Password: "))
+						Eventually(session).Should(Say("MFA Code \\( Register at %[1]s \\)", server.URL()))
+						Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Unable to authenticate."))
+
+						Eventually(session).Should(Exit(1))
+					})
+				})
 			})
 		})
 
