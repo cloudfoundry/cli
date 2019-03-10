@@ -75,6 +75,14 @@ sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundr
 # ...then, install the cf CLI (which will also download and add the public key to your system)
 sudo yum install cf-cli
 ```
+**Windows10** and **WindowsServer** using Powershell Gallery:
+
+```
+# First we istall the Install Script
+Install-Script install-cf-cli -Scope CurrentUser
+# Then we install the CLI. Use Tab to select Versions. The Installer uses Dynamic Variables to Browse <CLIRelease>
+Install-cf-cli.ps1 -CLIRelease '6.43.0' -DownloadDir "$HOME\Downloads" 
+```
 
 ### Installers and compressed binaries
 
