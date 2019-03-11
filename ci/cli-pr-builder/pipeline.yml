@@ -59,6 +59,10 @@ jobs:
       trigger: true
     - get: cli-master
   - aggregate:
+    - put: cli-pr
+      params:
+        path: cli-pr
+        status: pending
     - task: units-linux
       timeout: 30m
       input_mapping:
