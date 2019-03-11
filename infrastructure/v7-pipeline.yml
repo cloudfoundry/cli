@@ -116,7 +116,6 @@ jobs:
     params:
       SYSTEM_DOMAIN: ((stack-name)).cli.fun
       OPS_FILES: "add-persistent-isolation-segment-diego-cell.yml use-compiled-releases.yml use-latest-capi.yml cli-isolation-cell-overrides.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml uaa-vm_type-override.yml add-uaa-client-credentials.yml add-dummy-windows-stack.yml reduce-async-service-polling.yml add-oidc-provider.yml adjust-user-retry-attempts.yml enable-v3-deployments-endpoint.yml"
-      VARS_STORE_FILE: ci/infrastructure/((stack-name))/deployment-vars.yml
       VARS_FILES: vars.yml
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
   - task: bosh-cleanup
