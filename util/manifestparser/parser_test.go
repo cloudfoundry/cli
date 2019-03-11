@@ -306,7 +306,9 @@ applications:
 	Describe("AppNames", func() {
 		When("given a valid manifest file", func() {
 			BeforeEach(func() {
-				parser.Applications = []Application{{ApplicationModel{Name: "app-1"}, nil}, {ApplicationModel{Name: "app-2"}, nil}}
+				parser.Applications = []Application{
+					{ApplicationModel: ApplicationModel{Name: "app-1"}, FullUnmarshalledApplication: nil},
+					{ApplicationModel: ApplicationModel{Name: "app-2"}, FullUnmarshalledApplication: nil}}
 			})
 
 			It("gets the app names", func() {
@@ -319,7 +321,9 @@ applications:
 	Describe("ContainsMultipleApps", func() {
 		When("given a valid manifest file with multiple apps", func() {
 			BeforeEach(func() {
-				parser.Applications = []Application{{ApplicationModel{Name: "app-1"}, nil}, {ApplicationModel{Name: "app-2"}, nil}}
+				parser.Applications = []Application{
+					{ApplicationModel: ApplicationModel{Name: "app-1"}, FullUnmarshalledApplication: nil},
+					{ApplicationModel: ApplicationModel{Name: "app-2"}, FullUnmarshalledApplication: nil}}
 			})
 
 			It("returns true", func() {
@@ -329,7 +333,7 @@ applications:
 
 		When("given a valid manifest file with a single app", func() {
 			BeforeEach(func() {
-				parser.Applications = []Application{{ApplicationModel{Name: "app-1"}, nil}}
+				parser.Applications = []Application{{ApplicationModel: ApplicationModel{Name: "app-1"}, FullUnmarshalledApplication: nil}}
 			})
 
 			It("returns false", func() {
