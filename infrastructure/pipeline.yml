@@ -73,7 +73,7 @@ jobs:
   - task: upload-stemcell
     file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
     input_mapping:
-      bbl-state: state
+      bbl-state: updated-bbl-state
     params:
       INFRASTRUCTURE: google
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
@@ -91,7 +91,7 @@ jobs:
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
-      bbl-state: state
+      bbl-state: updated-bbl-state
       vars-files: vars_path
       ops-files: combine_inputs_output
     params:
@@ -103,7 +103,7 @@ jobs:
   - task: bosh-cleanup
     file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
     input_mapping:
-      bbl-state: state
+      bbl-state: updated-bbl-state
     params:
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
       CLEAN_ALL: true
