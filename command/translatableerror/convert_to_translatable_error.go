@@ -29,6 +29,8 @@ func ConvertToTranslatableError(err error) error {
 		return ApplicationNotStartedError(e)
 	case actionerror.AppNotFoundInManifestError:
 		return AppNotFoundInManifestError(e)
+	case manifestparser.AppNotInManifestError:
+		return AppNotFoundInManifestError(e)
 	case actionerror.AssignDropletError:
 		return AssignDropletError(e)
 	case actionerror.BuildpackNotFoundError:

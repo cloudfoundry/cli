@@ -38,13 +38,13 @@ type ProgressBar interface {
 //go:generate counterfeiter . PushActor
 
 type PushActor interface {
-	CreatePushPlans(appNameArg string, parser manifestparser.ManifestParser, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
+	CreatePushPlans(appNameArg string, spaceGUID string, orgGUID string, parser v7pushaction.ManifestParser, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
 	// Prepare the space by creating needed apps/applying the manifest
-	PrepareSpace(spaceGUID string, appName string, parser manifestparser.ManifestParser, overrides v7pushaction.FlagOverrides) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
+	PrepareSpace(pushPlans []v7pushaction.PushPlan, parser manifestparser.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Actualize applies any necessary changes.
 	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	// Conceptualize figures out the state of the world.
-	Conceptualize(appName []string, spaceGUID string, orgGUID string, currentDir string, flagOverrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
+	Conceptualize(pushPlans []v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
 }
 
 //go:generate counterfeiter . V7ActorForPush
@@ -134,11 +134,6 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.ValidateFlags()
-	if err != nil {
-		return err
-	}
-
 	if !cmd.NoManifest {
 		if err = cmd.readManifest(); err != nil {
 			return err
@@ -148,6 +143,11 @@ func (cmd PushCommand) Execute(args []string) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	err = cmd.ValidateFlags()
+	if err != nil {
+		return err
 	}
 
 	flagOverrides, err := cmd.GetFlagOverrides()
@@ -160,15 +160,19 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	pushPlans, err := cmd.Actor.CreatePushPlans("", cmd.ManifestParser, flagOverrides)
-
-	appNamesStream, eventStream, warningsStream, errorStream := cmd.Actor.PrepareSpace(
-		cmd.Config.TargetedSpace().GUID,
+	pushPlans, err := cmd.Actor.CreatePushPlans(
 		cmd.OptionalArgs.AppName,
+		cmd.Config.TargetedSpace().GUID,
+		cmd.Config.TargetedOrganization().GUID,
 		cmd.ManifestParser,
 		flagOverrides,
 	)
-	appNames, err := cmd.processStreamsFromPrepareSpace(appNamesStream, eventStream, warningsStream, errorStream)
+	if err != nil {
+		return err
+	}
+
+	pushPlansStream, eventStream, warningsStream, errorStream := cmd.Actor.PrepareSpace(pushPlans, cmd.ManifestParser)
+	appNames, err := cmd.processStreamsFromPrepareSpace(pushPlansStream, eventStream, warningsStream, errorStream)
 
 	if err != nil {
 		return err
@@ -187,13 +191,8 @@ func (cmd PushCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayText("Getting app info...")
 	log.Info("generating the app plan")
-	pushPlans, warnings, err := cmd.Actor.Conceptualize(
-		appNames,
-		cmd.Config.TargetedSpace().GUID,
-		cmd.Config.TargetedOrganization().GUID,
-		cmd.PWD,
-		flagOverrides,
-	)
+
+	pushPlans, warnings, err := cmd.Actor.Conceptualize(pushPlans)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -292,7 +291,7 @@ func (cmd PushCommand) displayAppSummary(plan v7pushaction.PushPlan) error {
 }
 
 func (cmd PushCommand) processStreamsFromPrepareSpace(
-	appNamesStream <-chan []string,
+	pushPlansStream <-chan []v7pushaction.PushPlan,
 	eventStream <-chan v7pushaction.Event,
 	warningsStream <-chan v7pushaction.Warnings,
 	errorStream <-chan error,
@@ -303,7 +302,7 @@ func (cmd PushCommand) processStreamsFromPrepareSpace(
 
 	for {
 		select {
-		case names, ok := <-appNamesStream:
+		case plans, ok := <-pushPlansStream:
 			if !ok {
 				if !namesClosed {
 					log.Debug("processing config stream closed")
@@ -311,7 +310,9 @@ func (cmd PushCommand) processStreamsFromPrepareSpace(
 				namesClosed = true
 				break
 			}
-			appNames = names
+			for _, plan := range plans {
+				appNames = append(appNames, plan.Application.Name)
+			}
 		case event, ok := <-eventStream:
 			if !ok {
 				if !eventClosed {
@@ -626,6 +627,7 @@ func (cmd PushCommand) ValidateFlags() error {
 			Arg1: "--health-check-type=http, -u=http",
 			Arg2: "--endpoint",
 		}
+
 	}
 	return nil
 }

@@ -68,7 +68,7 @@ func getPrepareNextEvent(c <-chan []PushPlan, e <-chan Event, w <-chan Warnings)
 	}
 }
 
-var _ = FDescribe("PrepareSpace", func() {
+var _ = Describe("PrepareSpace", func() {
 	var (
 		actor       *Actor
 		fakeV7Actor *v7pushactionfakes.FakeV7Actor

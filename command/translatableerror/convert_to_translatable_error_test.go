@@ -48,6 +48,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.AppNotFoundInManifestError{Name: "some-app"},
 			AppNotFoundInManifestError{Name: "some-app"}),
 
+		Entry("manifestparse.AppNotInManifestError -> AppNotFoundInManifestError",
+			manifestparser.AppNotInManifestError{Name: "some-app"},
+			AppNotFoundInManifestError{Name: "some-app"}),
+
 		Entry("actionerror.AssignDropletError -> AssignDropletError",
 			actionerror.AssignDropletError{Message: "some-message"},
 			AssignDropletError{Message: "some-message"}),

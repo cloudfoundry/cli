@@ -2,9 +2,8 @@ package v7pushaction_test
 
 import (
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/util/manifestparser"
-	"code.cloudfoundry.org/cli/util/manifestparser/manifestparserfakes"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,39 +13,40 @@ var _ = Describe("CreatePushPlans", func() {
 	var (
 		pushActor *Actor
 
-		fakeManifestParser *manifestparserfakes.FakeManifestParser
+		appNameArg         string
+		spaceGUID          string
+		orgGUID            string
+		fakeManifestParser *v7pushactionfakes.FakeManifestParser
+		flagOverrides      FlagOverrides
 
-		flagOverrides FlagOverrides
-
-		pushPlans []PushPlan
-
+		pushPlans  []PushPlan
 		executeErr error
 
-		appNameArg string
-
-		spaceGUID string
-
-		orgGUID string
+		testUpdatePlanCount int
 	)
+
+	testUpdatePlan := func(pushState PushPlan, manifestApp manifestparser.Application) (PushPlan, error) {
+		testUpdatePlanCount += 1
+		pushState.Application.Name = manifestApp.Name
+		return pushState, nil
+	}
 
 	BeforeEach(func() {
 		pushActor, _, _, _ = getTestPushActor()
-		fakeManifestParser = new(manifestparserfakes.FakeManifestParser)
+		pushActor.PushPlanFuncs = []UpdatePushPlanFunc{testUpdatePlan, testUpdatePlan}
+
 		appNameArg = "my-app"
-		flagOverrides = FlagOverrides{}
 		orgGUID = "org"
 		spaceGUID = "space"
+		flagOverrides = FlagOverrides{}
+		fakeManifestParser = new(v7pushactionfakes.FakeManifestParser)
+
+		testUpdatePlanCount = 0
 	})
 
 	JustBeforeEach(func() {
 		pushPlans, executeErr = pushActor.CreatePushPlans(appNameArg, spaceGUID, orgGUID, fakeManifestParser, flagOverrides)
 	})
-
-	AssertNameIsSet := func() {
-		It("sets the name", func() {
-			Expect(pushPlans[0].Application.Name).To(Equal(appNameArg))
-		})
-	}
 
 	AssertNoExecuteErr := func() {
 		It("returns nil", func() {
@@ -59,170 +59,6 @@ var _ = Describe("CreatePushPlans", func() {
 			Expect(pushPlans).To(HaveLen(length))
 		})
 	}
-
-	Describe("LifecycleType", func() {
-		When("our overrides contain a DockerImage", func() {
-			BeforeEach(func() {
-				flagOverrides.DockerImage = "docker://yes/yes"
-			})
-
-			It("creates a pushPlan with an app with LifecycleType docker", func() {
-				Expect(pushPlans[0].Application.LifecycleType).
-					To(Equal(constant.AppLifecycleTypeDocker))
-			})
-
-			AssertNoExecuteErr()
-			AssertNameIsSet()
-			AssertPushPlanLength(1)
-		})
-
-		When("our overrides do not contain a DockerImage", func() {
-			BeforeEach(func() {
-				flagOverrides.DockerImage = ""
-			})
-
-			It("Creates a pushPlan with an app without LifecycleType Buildpack", func() {
-				Expect(pushPlans[0].Application.LifecycleType).
-					ToNot(Equal(constant.AppLifecycleTypeDocker))
-			})
-
-			AssertNoExecuteErr()
-			AssertNameIsSet()
-			AssertPushPlanLength(1)
-		})
-	})
-
-	Describe("Buildpacks", func() {
-		When("our overrides contain one or more buildpacks", func() {
-			BeforeEach(func() {
-				flagOverrides.Buildpacks = []string{"buildpack-1", "buildpack-2"}
-			})
-
-			It("creates a pushPlan with an app with Buildpacks set", func() {
-				Expect(pushPlans[0].Application.LifecycleBuildpacks).To(Equal(
-					[]string{"buildpack-1", "buildpack-2"},
-				))
-			})
-
-			It("creates a pushPlan with an app with LifecycleType set to Buildpacks", func() {
-				Expect(pushPlans[0].Application.LifecycleType).
-					To(Equal(constant.AppLifecycleTypeBuildpack))
-			})
-
-			It("creates a pushPlan with an app with applicationNeedsUpdate set", func() {
-				Expect(pushPlans[0].ApplicationNeedsUpdate).To(BeTrue())
-			})
-
-			AssertNoExecuteErr()
-			AssertNameIsSet()
-			AssertPushPlanLength(1)
-		})
-
-		When("our overrides do not contain buildpacks", func() {
-			BeforeEach(func() {
-				flagOverrides.Buildpacks = []string{}
-			})
-
-			It("creates a pushPlan with an app without Buildpacks set", func() {
-				Expect(pushPlans[0].Application.LifecycleBuildpacks).
-					To(HaveLen(0))
-			})
-
-			It("creates a pushPlan with an app without applicationNeedsUpdate", func() {
-				Expect(pushPlans[0].ApplicationNeedsUpdate).To(BeFalse())
-			})
-
-			AssertNoExecuteErr()
-			AssertNameIsSet()
-			AssertPushPlanLength(1)
-		})
-	})
-
-	Describe("Stacks", func() {
-		When("our overrides contain a stack", func() {
-			BeforeEach(func() {
-				flagOverrides.Stack = "stack"
-			})
-
-			It("creates a pushPlan with an application with StackName matching the override", func() {
-				Expect(pushPlans[0].Application.StackName).To(Equal("stack"))
-			})
-
-			It("creates a pushPlan with an app with LifecycleType set to Buildpacks", func() {
-				Expect(pushPlans[0].Application.LifecycleType).
-					To(Equal(constant.AppLifecycleTypeBuildpack))
-			})
-
-			It("creates a pushPlan with an app with ApplicationNeedsUpdate set", func() {
-				Expect(pushPlans[0].ApplicationNeedsUpdate).To(BeTrue())
-			})
-
-			AssertNoExecuteErr()
-			AssertNameIsSet()
-			AssertPushPlanLength(1)
-		})
-
-		When("our overrides do not contain a stack", func() {
-			BeforeEach(func() {
-				flagOverrides.Stack = ""
-			})
-
-			It("creates a pushPlan with an app without StackName set", func() {
-				Expect(pushPlans[0].Application.StackName).To(BeEmpty())
-			})
-
-			It("creates a pushPlan with an app without Buildpacks set", func() {
-				Expect(pushPlans[0].Application.LifecycleBuildpacks).
-					To(HaveLen(0))
-			})
-
-			It("creates a pushPlan with an app without applicationNeedsUpdate", func() {
-				Expect(pushPlans[0].ApplicationNeedsUpdate).To(BeFalse())
-			})
-
-			AssertNoExecuteErr()
-			AssertNameIsSet()
-			AssertPushPlanLength(1)
-		})
-	})
-
-	Describe("Path", func() {
-		When("our overrides contain a path", func() {
-			BeforeEach(func() {
-				flagOverrides.ProvidedAppPath = "some/path"
-			})
-
-			It("creates a pushPlan with an app with BitsPath set", func() {
-				Expect(pushPlans[0].BitsPath).To(Equal("some/path"))
-			})
-
-			It("creates a pushPlan with an app without applicationNeedsUpdate", func() {
-				Expect(pushPlans[0].ApplicationNeedsUpdate).To(BeFalse())
-			})
-
-			AssertNoExecuteErr()
-			AssertNameIsSet()
-			AssertPushPlanLength(1)
-		})
-
-		When("our overrides do not contain a path", func() {
-			BeforeEach(func() {
-				flagOverrides.ProvidedAppPath = ""
-			})
-
-			It("creates a pushPlan with an app with BitsPath set to the currentDir", func() {
-				Expect(pushPlans[0].BitsPath).To(Equal(getCurrentDir()))
-			})
-
-			It("creates a pushPlan with an app without applicationNeedsUpdate", func() {
-				Expect(pushPlans[0].ApplicationNeedsUpdate).To(BeFalse())
-			})
-
-			AssertNoExecuteErr()
-			AssertNameIsSet()
-			AssertPushPlanLength(1)
-		})
-	})
 
 	Describe("Manifest", func() {
 		When("There are multiple apps", func() {
@@ -237,7 +73,6 @@ var _ = Describe("CreatePushPlans", func() {
 					{
 						ApplicationModel: manifestparser.ApplicationModel{
 							Name: "spencers-app",
-							Path: "spencers/path",
 						},
 						FullUnmarshalledApplication: nil,
 					},
@@ -254,8 +89,6 @@ var _ = Describe("CreatePushPlans", func() {
 			It("it creates pushPlans based on the apps in the manifest", func() {
 				Expect(pushPlans[0].Application.Name).To(Equal("my-app"))
 				Expect(pushPlans[1].Application.Name).To(Equal("spencers-app"))
-				Expect(pushPlans[0].BitsPath).To(Equal(getCurrentDir()))
-				Expect(pushPlans[1].BitsPath).To(Equal("spencers/path"))
 			})
 		})
 
@@ -295,17 +128,34 @@ var _ = Describe("CreatePushPlans", func() {
 
 				It("it creates pushPlans based on the named app in the manifest", func() {
 					Expect(pushPlans[0].Application.Name).To(Equal("my-app"))
-					Expect(pushPlans[0].BitsPath).To(Equal(getCurrentDir()))
-					Expect(pushPlans[0].Application.LifecycleType).To(Equal(constant.AppLifecycleTypeDocker))
 				})
 			})
 		})
 	})
 
-	FDescribe("Org and Space guid", func() {
-		It("creates pushPlans with org and space guids", func() {
+	Describe("Org and Space GUID", func() {
+		It("creates pushPlans with org and space GUIDs", func() {
 			Expect(pushPlans[0].SpaceGUID).To(Equal(spaceGUID))
 			Expect(pushPlans[0].OrgGUID).To(Equal(orgGUID))
+		})
+	})
+
+	Describe("Overrides", func() {
+		When("provided flag overrides", func() {
+			BeforeEach(func() {
+				flagOverrides.Stack = "some-stack"
+			})
+
+			It("sets overrides on push plan", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(pushPlans[0].Overrides).To(Equal(flagOverrides))
+			})
+		})
+	})
+
+	Describe("update push plans", func() {
+		It("runs through all the update push plan functions", func() {
+			Expect(testUpdatePlanCount).To(Equal(2))
 		})
 	})
 })

@@ -28,14 +28,10 @@ type FakePushActor struct {
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
 	}
-	ConceptualizeStub        func([]string, string, string, string, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
+	ConceptualizeStub        func([]v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
 	conceptualizeMutex       sync.RWMutex
 	conceptualizeArgsForCall []struct {
-		arg1 []string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 v7pushaction.FlagOverrides
+		arg1 []v7pushaction.PushPlan
 	}
 	conceptualizeReturns struct {
 		result1 []v7pushaction.PushPlan
@@ -47,12 +43,14 @@ type FakePushActor struct {
 		result2 v7pushaction.Warnings
 		result3 error
 	}
-	CreatePushPlansStub        func(string, manifestparser.ManifestParser, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
+	CreatePushPlansStub        func(string, string, string, v7pushaction.ManifestParser, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
 	createPushPlansMutex       sync.RWMutex
 	createPushPlansArgsForCall []struct {
 		arg1 string
-		arg2 manifestparser.ManifestParser
-		arg3 v7pushaction.FlagOverrides
+		arg2 string
+		arg3 string
+		arg4 v7pushaction.ManifestParser
+		arg5 v7pushaction.FlagOverrides
 	}
 	createPushPlansReturns struct {
 		result1 []v7pushaction.PushPlan
@@ -62,22 +60,20 @@ type FakePushActor struct {
 		result1 []v7pushaction.PushPlan
 		result2 error
 	}
-	PrepareSpaceStub        func(string, string, manifestparser.ManifestParser, v7pushaction.FlagOverrides) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
+	PrepareSpaceStub        func([]v7pushaction.PushPlan, manifestparser.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	prepareSpaceMutex       sync.RWMutex
 	prepareSpaceArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 manifestparser.ManifestParser
-		arg4 v7pushaction.FlagOverrides
+		arg1 []v7pushaction.PushPlan
+		arg2 manifestparser.ManifestParser
 	}
 	prepareSpaceReturns struct {
-		result1 <-chan []string
+		result1 <-chan []v7pushaction.PushPlan
 		result2 <-chan v7pushaction.Event
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
 	}
 	prepareSpaceReturnsOnCall map[int]struct {
-		result1 <-chan []string
+		result1 <-chan []v7pushaction.PushPlan
 		result2 <-chan v7pushaction.Event
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
@@ -156,25 +152,21 @@ func (fake *FakePushActor) ActualizeReturnsOnCall(i int, result1 <-chan v7pushac
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakePushActor) Conceptualize(arg1 []string, arg2 string, arg3 string, arg4 string, arg5 v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error) {
-	var arg1Copy []string
+func (fake *FakePushActor) Conceptualize(arg1 []v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error) {
+	var arg1Copy []v7pushaction.PushPlan
 	if arg1 != nil {
-		arg1Copy = make([]string, len(arg1))
+		arg1Copy = make([]v7pushaction.PushPlan, len(arg1))
 		copy(arg1Copy, arg1)
 	}
 	fake.conceptualizeMutex.Lock()
 	ret, specificReturn := fake.conceptualizeReturnsOnCall[len(fake.conceptualizeArgsForCall)]
 	fake.conceptualizeArgsForCall = append(fake.conceptualizeArgsForCall, struct {
-		arg1 []string
-		arg2 string
-		arg3 string
-		arg4 string
-		arg5 v7pushaction.FlagOverrides
-	}{arg1Copy, arg2, arg3, arg4, arg5})
-	fake.recordInvocation("Conceptualize", []interface{}{arg1Copy, arg2, arg3, arg4, arg5})
+		arg1 []v7pushaction.PushPlan
+	}{arg1Copy})
+	fake.recordInvocation("Conceptualize", []interface{}{arg1Copy})
 	fake.conceptualizeMutex.Unlock()
 	if fake.ConceptualizeStub != nil {
-		return fake.ConceptualizeStub(arg1, arg2, arg3, arg4, arg5)
+		return fake.ConceptualizeStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -189,17 +181,17 @@ func (fake *FakePushActor) ConceptualizeCallCount() int {
 	return len(fake.conceptualizeArgsForCall)
 }
 
-func (fake *FakePushActor) ConceptualizeCalls(stub func([]string, string, string, string, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)) {
+func (fake *FakePushActor) ConceptualizeCalls(stub func([]v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)) {
 	fake.conceptualizeMutex.Lock()
 	defer fake.conceptualizeMutex.Unlock()
 	fake.ConceptualizeStub = stub
 }
 
-func (fake *FakePushActor) ConceptualizeArgsForCall(i int) ([]string, string, string, string, v7pushaction.FlagOverrides) {
+func (fake *FakePushActor) ConceptualizeArgsForCall(i int) []v7pushaction.PushPlan {
 	fake.conceptualizeMutex.RLock()
 	defer fake.conceptualizeMutex.RUnlock()
 	argsForCall := fake.conceptualizeArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+	return argsForCall.arg1
 }
 
 func (fake *FakePushActor) ConceptualizeReturns(result1 []v7pushaction.PushPlan, result2 v7pushaction.Warnings, result3 error) {
@@ -231,18 +223,20 @@ func (fake *FakePushActor) ConceptualizeReturnsOnCall(i int, result1 []v7pushact
 	}{result1, result2, result3}
 }
 
-func (fake *FakePushActor) CreatePushPlans(arg1 string, arg2 manifestparser.ManifestParser, arg3 v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error) {
+func (fake *FakePushActor) CreatePushPlans(arg1 string, arg2 string, arg3 string, arg4 v7pushaction.ManifestParser, arg5 v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error) {
 	fake.createPushPlansMutex.Lock()
 	ret, specificReturn := fake.createPushPlansReturnsOnCall[len(fake.createPushPlansArgsForCall)]
 	fake.createPushPlansArgsForCall = append(fake.createPushPlansArgsForCall, struct {
 		arg1 string
-		arg2 manifestparser.ManifestParser
-		arg3 v7pushaction.FlagOverrides
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("CreatePushPlans", []interface{}{arg1, arg2, arg3})
+		arg2 string
+		arg3 string
+		arg4 v7pushaction.ManifestParser
+		arg5 v7pushaction.FlagOverrides
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("CreatePushPlans", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.createPushPlansMutex.Unlock()
 	if fake.CreatePushPlansStub != nil {
-		return fake.CreatePushPlansStub(arg1, arg2, arg3)
+		return fake.CreatePushPlansStub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -257,17 +251,17 @@ func (fake *FakePushActor) CreatePushPlansCallCount() int {
 	return len(fake.createPushPlansArgsForCall)
 }
 
-func (fake *FakePushActor) CreatePushPlansCalls(stub func(string, manifestparser.ManifestParser, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)) {
+func (fake *FakePushActor) CreatePushPlansCalls(stub func(string, string, string, v7pushaction.ManifestParser, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)) {
 	fake.createPushPlansMutex.Lock()
 	defer fake.createPushPlansMutex.Unlock()
 	fake.CreatePushPlansStub = stub
 }
 
-func (fake *FakePushActor) CreatePushPlansArgsForCall(i int) (string, manifestparser.ManifestParser, v7pushaction.FlagOverrides) {
+func (fake *FakePushActor) CreatePushPlansArgsForCall(i int) (string, string, string, v7pushaction.ManifestParser, v7pushaction.FlagOverrides) {
 	fake.createPushPlansMutex.RLock()
 	defer fake.createPushPlansMutex.RUnlock()
 	argsForCall := fake.createPushPlansArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
 }
 
 func (fake *FakePushActor) CreatePushPlansReturns(result1 []v7pushaction.PushPlan, result2 error) {
@@ -296,19 +290,22 @@ func (fake *FakePushActor) CreatePushPlansReturnsOnCall(i int, result1 []v7pusha
 	}{result1, result2}
 }
 
-func (fake *FakePushActor) PrepareSpace(arg1 string, arg2 string, arg3 manifestparser.ManifestParser, arg4 v7pushaction.FlagOverrides) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
+func (fake *FakePushActor) PrepareSpace(arg1 []v7pushaction.PushPlan, arg2 manifestparser.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
+	var arg1Copy []v7pushaction.PushPlan
+	if arg1 != nil {
+		arg1Copy = make([]v7pushaction.PushPlan, len(arg1))
+		copy(arg1Copy, arg1)
+	}
 	fake.prepareSpaceMutex.Lock()
 	ret, specificReturn := fake.prepareSpaceReturnsOnCall[len(fake.prepareSpaceArgsForCall)]
 	fake.prepareSpaceArgsForCall = append(fake.prepareSpaceArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 manifestparser.ManifestParser
-		arg4 v7pushaction.FlagOverrides
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("PrepareSpace", []interface{}{arg1, arg2, arg3, arg4})
+		arg1 []v7pushaction.PushPlan
+		arg2 manifestparser.ManifestParser
+	}{arg1Copy, arg2})
+	fake.recordInvocation("PrepareSpace", []interface{}{arg1Copy, arg2})
 	fake.prepareSpaceMutex.Unlock()
 	if fake.PrepareSpaceStub != nil {
-		return fake.PrepareSpaceStub(arg1, arg2, arg3, arg4)
+		return fake.PrepareSpaceStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4
@@ -323,45 +320,45 @@ func (fake *FakePushActor) PrepareSpaceCallCount() int {
 	return len(fake.prepareSpaceArgsForCall)
 }
 
-func (fake *FakePushActor) PrepareSpaceCalls(stub func(string, string, manifestparser.ManifestParser, v7pushaction.FlagOverrides) (<-chan []string, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)) {
+func (fake *FakePushActor) PrepareSpaceCalls(stub func([]v7pushaction.PushPlan, manifestparser.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)) {
 	fake.prepareSpaceMutex.Lock()
 	defer fake.prepareSpaceMutex.Unlock()
 	fake.PrepareSpaceStub = stub
 }
 
-func (fake *FakePushActor) PrepareSpaceArgsForCall(i int) (string, string, manifestparser.ManifestParser, v7pushaction.FlagOverrides) {
+func (fake *FakePushActor) PrepareSpaceArgsForCall(i int) ([]v7pushaction.PushPlan, manifestparser.ManifestParser) {
 	fake.prepareSpaceMutex.RLock()
 	defer fake.prepareSpaceMutex.RUnlock()
 	argsForCall := fake.prepareSpaceArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakePushActor) PrepareSpaceReturns(result1 <-chan []string, result2 <-chan v7pushaction.Event, result3 <-chan v7pushaction.Warnings, result4 <-chan error) {
+func (fake *FakePushActor) PrepareSpaceReturns(result1 <-chan []v7pushaction.PushPlan, result2 <-chan v7pushaction.Event, result3 <-chan v7pushaction.Warnings, result4 <-chan error) {
 	fake.prepareSpaceMutex.Lock()
 	defer fake.prepareSpaceMutex.Unlock()
 	fake.PrepareSpaceStub = nil
 	fake.prepareSpaceReturns = struct {
-		result1 <-chan []string
+		result1 <-chan []v7pushaction.PushPlan
 		result2 <-chan v7pushaction.Event
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakePushActor) PrepareSpaceReturnsOnCall(i int, result1 <-chan []string, result2 <-chan v7pushaction.Event, result3 <-chan v7pushaction.Warnings, result4 <-chan error) {
+func (fake *FakePushActor) PrepareSpaceReturnsOnCall(i int, result1 <-chan []v7pushaction.PushPlan, result2 <-chan v7pushaction.Event, result3 <-chan v7pushaction.Warnings, result4 <-chan error) {
 	fake.prepareSpaceMutex.Lock()
 	defer fake.prepareSpaceMutex.Unlock()
 	fake.PrepareSpaceStub = nil
 	if fake.prepareSpaceReturnsOnCall == nil {
 		fake.prepareSpaceReturnsOnCall = make(map[int]struct {
-			result1 <-chan []string
+			result1 <-chan []v7pushaction.PushPlan
 			result2 <-chan v7pushaction.Event
 			result3 <-chan v7pushaction.Warnings
 			result4 <-chan error
 		})
 	}
 	fake.prepareSpaceReturnsOnCall[i] = struct {
-		result1 <-chan []string
+		result1 <-chan []v7pushaction.PushPlan
 		result2 <-chan v7pushaction.Event
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error

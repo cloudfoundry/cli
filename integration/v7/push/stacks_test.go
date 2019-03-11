@@ -38,7 +38,6 @@ var _ = Describe("stack", func() {
 					"--stack", "invalidStack",
 				)
 
-				Eventually(session).Should(Say(`Pushing app\s+%s`, appName))
 				Eventually(session.Err).Should(Say(`Stack must be an existing stack`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))

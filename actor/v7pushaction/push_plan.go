@@ -2,7 +2,6 @@ package v7pushaction
 
 import (
 	"fmt"
-	"os"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -55,87 +54,42 @@ func (state PushPlan) String() string {
 	)
 }
 
-func sliceContains(items []string, target string) bool {
-	for _, item := range items {
-		if item == target {
-			return true
-		}
-	}
-	return false
-}
-
-func (actor Actor) Conceptualize(
-	appNames []string,
-	spaceGUID string,
-	orgGUID string,
-	currentDir string,
-	flagOverrides FlagOverrides,
-) ([]PushPlan, Warnings, error) {
-	var (
-		applications []v7action.Application
-		warnings     v7action.Warnings
-		err          error
-	)
-	// for each appName get the app
-	var getWarnings v7action.Warnings
-	applications, getWarnings, err = actor.V7Actor.GetApplicationsByNamesAndSpace(appNames, spaceGUID)
-	warnings = append(warnings, getWarnings...)
+// Update Application for push plan
+func (actor Actor) Conceptualize(pushPlans []PushPlan) ([]PushPlan, Warnings, error) {
+	appNames := actor.getAppNames(pushPlans)
+	applications, getWarnings, err := actor.V7Actor.GetApplicationsByNamesAndSpace(appNames, pushPlans[0].SpaceGUID)
+	warnings := Warnings(getWarnings)
 	if err != nil {
 		log.Errorln("Looking up applications:", err)
-		return nil, Warnings(warnings), err
+		return nil, warnings, err
 	}
 
-	pushPlans := []PushPlan{}
-	for _, application := range applications {
-		applicationNeedsUpdate := false
+	nameToApp := actor.generateAppNameToApplicationMapping(applications)
 
-		if len(flagOverrides.Buildpacks) != 0 {
-			application.LifecycleType = constant.AppLifecycleTypeBuildpack
-			application.LifecycleBuildpacks = flagOverrides.Buildpacks
-			applicationNeedsUpdate = true
-		}
+	var updatedPushPlans []PushPlan
+	for _, pushPlan := range pushPlans {
+		app := nameToApp[pushPlan.Application.Name]
+		pushPlan.Application.GUID = app.GUID
+		pushPlan.Application.State = app.State
 
-		if flagOverrides.Stack != "" {
-			application.LifecycleType = constant.AppLifecycleTypeBuildpack
-			application.StackName = flagOverrides.Stack
-			applicationNeedsUpdate = true
-		}
-
-		bitsPath := currentDir
-		if flagOverrides.ProvidedAppPath != "" {
-			bitsPath = flagOverrides.ProvidedAppPath
-		}
-
-		var info os.FileInfo
-		info, err = os.Stat(bitsPath)
-		if err != nil {
-			return nil, Warnings(warnings), err
-		}
-
-		var archive bool
-		var resources []sharedaction.Resource
-		if info.IsDir() {
-			resources, err = actor.SharedActor.GatherDirectoryResources(bitsPath)
-		} else {
-			archive = true
-			resources, err = actor.SharedActor.GatherArchiveResources(bitsPath)
-		}
-		if err != nil {
-			return nil, Warnings(warnings), err
-		}
-
-		pushPlans = append(pushPlans, PushPlan{
-			Application: application,
-			SpaceGUID:   spaceGUID,
-			OrgGUID:     orgGUID,
-			Overrides:   flagOverrides,
-
-			Archive:                archive,
-			BitsPath:               bitsPath,
-			AllResources:           resources,
-			ApplicationNeedsUpdate: applicationNeedsUpdate,
-		})
+		updatedPushPlans = append(updatedPushPlans, pushPlan)
 	}
 
-	return pushPlans, Warnings(warnings), err
+	return updatedPushPlans, warnings, err
+}
+
+func (Actor) getAppNames(pushPlans []PushPlan) []string {
+	var appNames []string
+	for _, pushPlan := range pushPlans {
+		appNames = append(appNames, pushPlan.Application.Name)
+	}
+	return appNames
+}
+
+func (Actor) generateAppNameToApplicationMapping(applications []v7action.Application) map[string]v7action.Application {
+	nameToApp := map[string]v7action.Application{}
+	for _, currApp := range applications {
+		nameToApp[currApp.Name] = currApp
+	}
+	return nameToApp
 }
