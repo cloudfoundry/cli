@@ -7,27 +7,32 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
+type InfoLinks struct {
+	// AppSSH is the link for application ssh info.
+	AppSSH APILink `json:"app_ssh"`
+
+	// CCV3 is the link to the Cloud Controller V3 API.
+	CCV3 APILink `json:"cloud_controller_v3"`
+
+	// Logging is the link to the Logging API.
+	Logging APILink `json:"logging"`
+
+	// NetworkPolicyV1 is the link to the Container to Container Networking
+	// API.
+	NetworkPolicyV1 APILink `json:"network_policy_v1"`
+
+	// Routing is the link to the routing API
+	Routing APILink `json:"routing"`
+
+	// UAA is the link to the UAA API.
+	UAA APILink `json:"uaa"`
+}
+
 // Info represents a GET response from the '/' endpoint of the cloud
 // controller API.
 type Info struct {
 	// Links is a list of top level Cloud Controller APIs.
-	Links struct {
-		// AppSSH is the link for application ssh info.
-		AppSSH APILink `json:"app_ssh"`
-
-		// CCV3 is the link to the Cloud Controller V3 API.
-		CCV3 APILink `json:"cloud_controller_v3"`
-
-		// Logging is the link to the Logging API.
-		Logging APILink `json:"logging"`
-
-		// NetworkPolicyV1 is the link to the Container to Container Networking
-		// API.
-		NetworkPolicyV1 APILink `json:"network_policy_v1"`
-
-		// UAA is the link to the UAA API.
-		UAA APILink `json:"uaa"`
-	} `json:"links"`
+	Links InfoLinks `json:"links"`
 }
 
 // AppSSHEndpoint returns the HREF for SSHing into an app container.
@@ -60,6 +65,10 @@ func (info Info) NetworkPolicyV1() string {
 // connections to application instances.
 func (info Info) OAuthClient() string {
 	return info.Links.AppSSH.Meta.OAuthClient
+}
+
+func (info Info) Routing() string {
+	return info.Links.Routing.HREF
 }
 
 // UAA returns the HREF of the UAA server.

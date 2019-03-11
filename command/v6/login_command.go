@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/command"
@@ -22,7 +22,7 @@ type LoginActor interface {
 	Authenticate(ID string, secret string, origin string, grantType constant.GrantType) error
 	CloudControllerAPIVersion() string
 	GetLoginPrompts() map[string]coreconfig.AuthPrompt
-	SetTarget(settings v2action.TargetSettings) (v2action.Warnings, error)
+	SetTarget(settings v3action.TargetSettings) (v3action.Warnings, error)
 }
 
 //go:generate counterfeiter . ActorMaker
@@ -38,11 +38,13 @@ func (a ActorMakerFunc) NewActor(config command.Config, ui command.UI, targetCF 
 }
 
 var actorMaker ActorMakerFunc = func(config command.Config, ui command.UI, targetCF bool) (LoginActor, error) {
-	actor, err := shared.NewActor(config, ui, targetCF)
+	client, uaa, err := shared.NewV3BasedClients(config, ui, targetCF, "")
 	if err != nil {
 		return nil, err
 	}
-	return actor, nil
+
+	v3Actor := v3action.NewActor(client, config, nil, uaa)
+	return v3Actor, nil
 }
 
 type LoginCommand struct {
@@ -104,7 +106,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		endpoint.Scheme = "https"
 	}
 
-	settings := v2action.TargetSettings{
+	settings := v3action.TargetSettings{
 		URL:               endpoint.String(),
 		SkipSSLValidation: true,
 	}

@@ -4,7 +4,7 @@ package v6fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	v6 "code.cloudfoundry.org/cli/command/v6"
@@ -45,17 +45,17 @@ type FakeLoginActor struct {
 	getLoginPromptsReturnsOnCall map[int]struct {
 		result1 map[string]coreconfig.AuthPrompt
 	}
-	SetTargetStub        func(v2action.TargetSettings) (v2action.Warnings, error)
+	SetTargetStub        func(v3action.TargetSettings) (v3action.Warnings, error)
 	setTargetMutex       sync.RWMutex
 	setTargetArgsForCall []struct {
-		arg1 v2action.TargetSettings
+		arg1 v3action.TargetSettings
 	}
 	setTargetReturns struct {
-		result1 v2action.Warnings
+		result1 v3action.Warnings
 		result2 error
 	}
 	setTargetReturnsOnCall map[int]struct {
-		result1 v2action.Warnings
+		result1 v3action.Warnings
 		result2 error
 	}
 	invocations      map[string][][]interface{}
@@ -229,11 +229,11 @@ func (fake *FakeLoginActor) GetLoginPromptsReturnsOnCall(i int, result1 map[stri
 	}{result1}
 }
 
-func (fake *FakeLoginActor) SetTarget(arg1 v2action.TargetSettings) (v2action.Warnings, error) {
+func (fake *FakeLoginActor) SetTarget(arg1 v3action.TargetSettings) (v3action.Warnings, error) {
 	fake.setTargetMutex.Lock()
 	ret, specificReturn := fake.setTargetReturnsOnCall[len(fake.setTargetArgsForCall)]
 	fake.setTargetArgsForCall = append(fake.setTargetArgsForCall, struct {
-		arg1 v2action.TargetSettings
+		arg1 v3action.TargetSettings
 	}{arg1})
 	fake.recordInvocation("SetTarget", []interface{}{arg1})
 	fake.setTargetMutex.Unlock()
@@ -253,41 +253,41 @@ func (fake *FakeLoginActor) SetTargetCallCount() int {
 	return len(fake.setTargetArgsForCall)
 }
 
-func (fake *FakeLoginActor) SetTargetCalls(stub func(v2action.TargetSettings) (v2action.Warnings, error)) {
+func (fake *FakeLoginActor) SetTargetCalls(stub func(v3action.TargetSettings) (v3action.Warnings, error)) {
 	fake.setTargetMutex.Lock()
 	defer fake.setTargetMutex.Unlock()
 	fake.SetTargetStub = stub
 }
 
-func (fake *FakeLoginActor) SetTargetArgsForCall(i int) v2action.TargetSettings {
+func (fake *FakeLoginActor) SetTargetArgsForCall(i int) v3action.TargetSettings {
 	fake.setTargetMutex.RLock()
 	defer fake.setTargetMutex.RUnlock()
 	argsForCall := fake.setTargetArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeLoginActor) SetTargetReturns(result1 v2action.Warnings, result2 error) {
+func (fake *FakeLoginActor) SetTargetReturns(result1 v3action.Warnings, result2 error) {
 	fake.setTargetMutex.Lock()
 	defer fake.setTargetMutex.Unlock()
 	fake.SetTargetStub = nil
 	fake.setTargetReturns = struct {
-		result1 v2action.Warnings
+		result1 v3action.Warnings
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeLoginActor) SetTargetReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+func (fake *FakeLoginActor) SetTargetReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
 	fake.setTargetMutex.Lock()
 	defer fake.setTargetMutex.Unlock()
 	fake.SetTargetStub = nil
 	if fake.setTargetReturnsOnCall == nil {
 		fake.setTargetReturnsOnCall = make(map[int]struct {
-			result1 v2action.Warnings
+			result1 v3action.Warnings
 			result2 error
 		})
 	}
 	fake.setTargetReturnsOnCall[i] = struct {
-		result1 v2action.Warnings
+		result1 v3action.Warnings
 		result2 error
 	}{result1, result2}
 }
