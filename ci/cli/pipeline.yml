@@ -273,29 +273,29 @@ jobs:
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-eng'
+           channel: '#cli-dev-internal'
            text: |
              Linux unit tests failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
     - task: units-osx
       file: cli-ci/ci/cli/tasks/units-osx.yml
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-eng'
+           channel: '#cli-dev-internal'
            text: |
              OS X unit tests failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
     - task: units-windows
       tags: ["cli-windows"]
       file: cli-ci/ci/cli/tasks/units-windows.yml
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-eng'
+           channel: '#cli-dev-internal'
            text: |
              Windows unit tests failed :(
-             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+             $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
 
 - name: build-binaries
   serial: true
@@ -311,28 +311,28 @@ jobs:
     on_failure:
       put: slack-alert
       params:
-        channel: '#cli-eng'
+        channel: '#cli-dev-internal'
         text: |
           i18n generation failed :(
-          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
   - task: build
     file: cli-ci/ci/cli/tasks/build-binaries.yml
     on_failure:
       put: slack-alert
       params:
-        channel: '#cli-eng'
+        channel: '#cli-dev-internal'
         text: |
           build binaries failed :(
-          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
   - task: build-osx
     file: cli-ci/ci/cli/tasks/build-osx-binary.yml
     on_failure:
       put: slack-alert
       params:
-        channel: '#cli-eng'
+        channel: '#cli-dev-internal'
         text: |
           build OS X binaries failed :(
-          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+          $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
   - task: combine-binaries
     file: cli-ci/ci/cli/tasks/combine-binaries.yml
   - put: cf-cli-binaries
@@ -363,10 +363,10 @@ jobs:
       on_failure:
         put: slack-alert
         params:
-          channel: '#cli-eng'
+          channel: '#cli-dev-internal'
           text: |
             Linux integration failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -411,10 +411,10 @@ jobs:
       on_failure:
         put: slack-alert
         params:
-          channel: '#cli-eng'
+          channel: '#cli-dev-internal'
           text: |
             Windows integration failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -452,10 +452,10 @@ jobs:
       on_failure:
         put: slack-alert
         params:
-          channel: '#cli-eng'
+          channel: '#cli-dev-internal'
           text: |
             Windows integration-experimental failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -464,10 +464,10 @@ jobs:
       on_failure:
         put: slack-alert
         params:
-          channel: '#cli-eng'
+          channel: '#cli-dev-internal'
           text: |
             Linux integration-experimental failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -505,10 +505,10 @@ jobs:
       on_failure:
         put: slack-alert
         params:
-          channel: '#cli-eng'
+          channel: '#cli-dev-internal'
           text: |
             Legacy integration failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -532,7 +532,7 @@ jobs:
     on_failure:
        put: slack-alert
        params:
-         channel: '#cli-eng'
+         channel: '#cli-dev-internal'
          text: "extracting the binaries in installer creation failed :("
   - aggregate:
     - task: unix
@@ -540,7 +540,7 @@ jobs:
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-eng'
+           channel: '#cli-dev-internal'
            text: "create unix installers failed :("
     - task: windows
       tags: ["cli-windows"]
@@ -548,14 +548,14 @@ jobs:
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-eng'
+           channel: '#cli-dev-internal'
            text: "create windows installer failed :("
   - task: package-binaries
     file: cli-ci/ci/cli/tasks/package-binaries.yml
     on_failure:
        put: slack-alert
        params:
-         channel: '#cli-eng'
+         channel: '#cli-dev-internal'
          text: "extracting the binaries in installer creation failed :("
   - aggregate:
     - put: edge-linux-binary-32
@@ -643,10 +643,10 @@ jobs:
       on_failure:
         put: slack-alert
         params:
-          channel: '#cli-eng'
+          channel: '#cli-dev-internal'
           text: |
             CATs Linux failed :(
-            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+            $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME - (Viewable internally only)
   ensure:
     put: gcp-bosh-pool
     params:
