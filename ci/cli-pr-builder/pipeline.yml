@@ -68,6 +68,11 @@ jobs:
       input_mapping:
         cli: cli-pr
       file: cli-master/ci/cli/tasks/units-linux.yml
+      on_failure:
+        put: cli-pr
+        params:
+          path: cli-pr
+          status: failure
 
 - name: claim-bosh-lite # TODO: record PR number instead of usernames
   serial: true
@@ -91,6 +96,11 @@ jobs:
         committer_name: commit-info/committer-name
         committer_email: commit-info/committer-email
         commit_message_prefix: CLI-PR-BUILDER-
+    on_failure:
+      put: cli-pr
+      params:
+        path: cli-pr
+        status: error
 
 - name: integration-linux # TODO: clean this up
   serial: true
@@ -106,6 +116,10 @@ jobs:
       version: every
       trigger: true
   - do:
+    - put: cli-pr
+      params:
+        path: cli-pr
+        status: pending
     - task: integration
       input_mapping:
         cli: cli-pr
