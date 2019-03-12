@@ -263,6 +263,37 @@ var _ = Describe("push Command", func() {
 			})
 
 			Describe("reading manifest", func() {
+				When("Reading the manifest fails", func() {
+					BeforeEach(func() {
+						fakeManifestParser.InterpolateAndParseReturns(errors.New("oh no"))
+					})
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError("oh no"))
+					})
+				})
+
+				When("Reading the manifest succeeds", func() {
+					It("interpolates the manifest", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+					})
+
+					It("calls validate", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(fakeManifestParser.ValidateCallCount()).To(Equal(1))
+					})
+
+					When("Validate fails", func() {
+						BeforeEach(func() {
+							fakeManifestParser.ValidateReturns(errors.New("uh oh"))
+						})
+
+						It("returns the error", func() {
+							Expect(executeErr).To(MatchError("uh oh"))
+						})
+					})
+				})
+
 				When("no manifest flag", func() {
 					BeforeEach(func() {
 						cmd.NoManifest = true
