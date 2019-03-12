@@ -76,7 +76,7 @@ var _ = Describe("push manifest with a path", func() {
 				},
 			})
 			session := helpers.CF(PushCommandName, appName, "-f", manifestPath)
-			Eventually(session.Err).Should(Say("Path '/I/am/a/potato' does not exist for application '%s' in manifest", appName))
+			Eventually(session.Err).Should(Say("File not found locally, make sure the file exists at given path /I/am/a/potato"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
