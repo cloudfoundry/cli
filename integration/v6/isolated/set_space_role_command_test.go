@@ -100,18 +100,48 @@ var _ = Describe("set-space-role command", func() {
 			spaceName = ReadOnlySpace
 		})
 
-		When("the target user is a client-credentials user", func() {
+		When("the --client flag is passed", func() {
 			var clientID string
 
 			BeforeEach(func() {
 				clientID, _ = helpers.SkipIfClientCredentialsNotSet()
 			})
 
-			It("sets the space role for the client", func() {
-				session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
-				Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", clientID, orgName, spaceName))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Exit(0))
+			When("the client exists", func() {
+				It("sets the org role for the client", func() {
+					session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
+					Eventually(session).Should(Say("Assigning role RoleSpaceAuditor to user %s in org %s / space %s as admin...", clientID, orgName, spaceName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+				})
+
+				When("the active user lacks permissions to look up clients", func() {
+					BeforeEach(func() {
+						helpers.SwitchToSpaceRole(orgName, spaceName, "SpaceManager")
+					})
+
+					It("prints an appropriate error and exits 1", func() {
+						session := helpers.CF("set-space-role", clientID, orgName, spaceName, "SpaceAuditor", "--client")
+						Eventually(session).Should(Say("FAILED"))
+						Eventually(session).Should(Say("Server error, status code: 403: Access is denied.  You do not have privileges to execute this command."))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+
+			When("the targeted client does not exist", func() {
+				var badClientID string
+
+				BeforeEach(func() {
+					badClientID = "nonexistent-client"
+				})
+
+				It("fails with an appropriate error message", func() {
+					session := helpers.CF("set-space-role", badClientID, orgName, spaceName, "SpaceAuditor", "--client")
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Say("Client nonexistent-client not found"))
+					Eventually(session).Should(Exit(1))
+				})
 			})
 		})
 
