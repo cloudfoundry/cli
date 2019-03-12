@@ -40,11 +40,11 @@ type ProgressBar interface {
 type PushActor interface {
 	CreatePushPlans(appNameArg string, spaceGUID string, orgGUID string, parser v7pushaction.ManifestParser, overrides v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
 	// Prepare the space by creating needed apps/applying the manifest
-	PrepareSpace(pushPlans []v7pushaction.PushPlan, parser manifestparser.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
+	PrepareSpace(pushPlans []v7pushaction.PushPlan, parser v7pushaction.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
+	// UpdateApplicationSettings figures out the state of the world.
+	UpdateApplicationSettings(pushPlans []v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
 	// Actualize applies any necessary changes.
 	Actualize(plan v7pushaction.PushPlan, progressBar v7pushaction.ProgressBar) (<-chan v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
-	// Conceptualize figures out the state of the world.
-	Conceptualize(pushPlans []v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
 }
 
 //go:generate counterfeiter . V7ActorForPush
@@ -53,6 +53,15 @@ type V7ActorForPush interface {
 	AppActor
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v7action.NOAAClient) (<-chan *v7action.LogMessage, <-chan error, v7action.Warnings, error)
 	RestartApplication(appGUID string) (v7action.Warnings, error)
+}
+
+//go:generate counterfeiter . ManifestParser
+
+type ManifestParser interface {
+	v7pushaction.ManifestParser
+	ContainsMultipleApps() bool
+	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) error
+	Validate() error
 }
 
 type PushCommand struct {
@@ -89,7 +98,7 @@ type PushCommand struct {
 	RouteActor     v7action.RouteActor
 	ProgressBar    ProgressBar
 	PWD            string
-	ManifestParser manifestparser.ManifestParser
+	ManifestParser ManifestParser
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -135,7 +144,7 @@ func (cmd PushCommand) Execute(args []string) error {
 	}
 
 	if !cmd.NoManifest {
-		if err = cmd.readManifest(); err != nil {
+		if err = cmd.ReadManifest(); err != nil {
 			return err
 		}
 
@@ -192,7 +201,7 @@ func (cmd PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("Getting app info...")
 	log.Info("generating the app plan")
 
-	pushPlans, warnings, err := cmd.Actor.Conceptualize(pushPlans)
+	pushPlans, warnings, err := cmd.Actor.UpdateApplicationSettings(pushPlans)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -479,20 +488,19 @@ func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream 
 	}
 }
 
-func (cmd PushCommand) readManifest() error {
+func (cmd PushCommand) ReadManifest() error {
 	log.Info("reading manifest if exists")
 	pathsToVarsFiles := []string{}
 	for _, varfilepath := range cmd.PathsToVarsFiles {
 		pathsToVarsFiles = append(pathsToVarsFiles, string(varfilepath))
 	}
 
+	pathToManifest := filepath.Join(cmd.PWD, "manifest.yml")
 	if len(cmd.PathToManifest) != 0 {
 		log.WithField("manifestPath", cmd.PathToManifest).Debug("reading '-f' provided manifest")
-		err := cmd.ManifestParser.InterpolateAndParse(string(cmd.PathToManifest), pathsToVarsFiles, cmd.Vars)
-		return err
+		pathToManifest = string(cmd.PathToManifest)
 	}
 
-	pathToManifest := filepath.Join(cmd.PWD, "manifest.yml")
 	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
 
 	err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)

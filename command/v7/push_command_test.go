@@ -2,17 +2,11 @@ package v7_test
 
 import (
 	"errors"
-	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
 
-	"code.cloudfoundry.org/cli/util/manifestparser"
-
 	. "github.com/onsi/gomega/gstruct"
-
-	"gopkg.in/yaml.v2"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -138,12 +132,13 @@ var _ = Describe("push Command", func() {
 		binaryName       string
 		executeErr       error
 
-		appName1  string
-		appName2  string
-		userName  string
-		spaceName string
-		orgName   string
-		pwd       string
+		appName1           string
+		appName2           string
+		userName           string
+		spaceName          string
+		orgName            string
+		pwd                string
+		fakeManifestParser *v7fakes.FakeManifestParser
 	)
 
 	BeforeEach(func() {
@@ -162,6 +157,7 @@ var _ = Describe("push Command", func() {
 		spaceName = "some-space"
 		orgName = "some-org"
 		pwd = "/push/cmd/test"
+		fakeManifestParser = new(v7fakes.FakeManifestParser)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -176,7 +172,7 @@ var _ = Describe("push Command", func() {
 			ProgressBar:    fakeProgressBar,
 			NOAAClient:     fakeNOAAClient,
 			PWD:            pwd,
-			ManifestParser: manifestparser.NewParser(),
+			ManifestParser: fakeManifestParser,
 		}
 	})
 
@@ -266,191 +262,28 @@ var _ = Describe("push Command", func() {
 				})
 			})
 
-			Describe("manifest", func() {
-				var tempDir string
-
-				BeforeEach(func() {
-					var err error
-					tempDir, err = ioutil.TempDir("", "manifest-push-unit")
-					Expect(err).ToNot(HaveOccurred())
-				})
-
-				AfterEach(func() {
-					Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
-				})
-
-				var yamlUnmarshalMarshal = func(b []byte) []byte {
-					var obj interface{}
-					err := yaml.Unmarshal(b, &obj)
-					Expect(err).ToNot(HaveOccurred())
-					postMarshal, err := yaml.Marshal(obj)
-					Expect(err).ToNot(HaveOccurred())
-					return postMarshal
-				}
-
-				When("No path is provided", func() {
+			Describe("reading manifest", func() {
+				When("no manifest flag", func() {
 					BeforeEach(func() {
-						cmd.PWD = tempDir
+						cmd.NoManifest = true
 					})
 
-					When("there is a single-app manifest file in the current dir", func() {
-						var yamlContents []byte
-						var pathToYAMLFile string
-
-						BeforeEach(func() {
-							yamlContents = []byte("---\napplications:\n- name: banana")
-							pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
-							err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
-							Expect(err).ToNot(HaveOccurred())
-						})
-
-						It("creates a parser and passes through to PrepareSpace", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-							_, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
-							Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(yamlContents)))
-							Expect(manifestParser.GetPathToManifest()).To(Equal(pathToYAMLFile))
-							Expect(manifestParser.AppNames()).To(ConsistOf("banana"))
-						})
-
-						When("the --no-manifest flag is specified", func() {
-							BeforeEach(func() {
-								cmd.NoManifest = true
-							})
-							It("passes an empty manifest to PrepareSpace", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-								_, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
-								Expect(manifestParser.GetPathToManifest()).To(Equal(""))
-								Expect(manifestParser.FullRawManifest()).To(HaveLen(0))
-							})
-						})
-					})
-
-					When("there is a multi-app manifest file in the current dir", func() {
-						var yamlContents []byte
-						var pathToYAMLFile string
-
-						BeforeEach(func() {
-							yamlContents = []byte("---\napplications:\n- name: apple\n- name: banana")
-							pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
-							err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
-							Expect(err).ToNot(HaveOccurred())
-						})
-
-						When("invalid flags are used", func() {
-							BeforeEach(func() {
-								cmd.NoRoute = true
-							})
-
-							It("returns an error", func() {
-								Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
-							})
-						})
-					})
-
-					When("there is not a manifest in the current dir", func() {
-						It("does not pass a manifest to PrepareSpace", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-							_, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
-							Expect(manifestParser.GetPathToManifest()).To(Equal(""))
-							Expect(manifestParser.FullRawManifest()).To(HaveLen(0))
-						})
-					})
-				})
-
-				When("The -f flag is specified", func() {
-					When("The manifest exists at the path", func() {
-						var yamlContents []byte
-						var pathToYAMLFile string
-
-						BeforeEach(func() {
-							yamlContents = []byte("---\napplications:\n- name: banana")
-							pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
-							err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
-							Expect(err).ToNot(HaveOccurred())
-							cmd.PathToManifest = flag.PathWithExistenceCheck(pathToYAMLFile)
-						})
-
-						It("reads the manifest and passes through to PrepareSpace", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-							Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-							_, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
-							Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(yamlContents)))
-							Expect(manifestParser.GetPathToManifest()).To(Equal(pathToYAMLFile))
-							Expect(manifestParser.AppNames()).To(ConsistOf("banana"))
-						})
-					})
-
-					When("The manifest does not exist at the path", func() {
-						BeforeEach(func() {
-							cmd.PathToManifest = "/some/non-existant/path.yml"
-						})
-
-						It("throws an error", func() {
-							Expect(os.IsNotExist(executeErr)).To(BeTrue(), fmt.Sprintf("expected to get an 'is not exists' error but got %#v", executeErr))
-						})
-					})
-				})
-
-				When("--vars-files are specified", func() {
-					var yamlContents []byte
-					var varFileContents []byte
-					var expectedManifest []byte
-					var pathToYAMLFile string
-
-					BeforeEach(func() {
-						expectedManifest = yamlUnmarshalMarshal([]byte("---\napplications:\n- name: turtle"))
-						yamlContents = []byte("---\napplications:\n- name: ((put-var-here))")
-						pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
-						err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
-						Expect(err).ToNot(HaveOccurred())
-						cmd.PathToManifest = flag.PathWithExistenceCheck(pathToYAMLFile)
-
-						varFileContents = []byte("---\nput-var-here: turtle")
-						pathToVarFile := filepath.Join(tempDir, "var.yml")
-						err = ioutil.WriteFile(pathToVarFile, varFileContents, 0644)
-						Expect(err).ToNot(HaveOccurred())
-						cmd.PathsToVarsFiles = []flag.PathWithExistenceCheck{
-							flag.PathWithExistenceCheck(pathToVarFile),
-						}
-					})
-
-					It("reads the manifest, substitutes vars, and passes through to PrepareSpace", func() {
+					It("does not read the manifest", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-						_, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
-						Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(expectedManifest)))
-						Expect(manifestParser.GetPathToManifest()).To(Equal(pathToYAMLFile))
-						Expect(manifestParser.AppNames()).To(ConsistOf("turtle"))
+
+						Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
+						Expect(fakeManifestParser.ValidateCallCount()).To(Equal(0))
 					})
 				})
 
-				When("The --var flag is provided", func() {
-					var yamlContents []byte
-					var expectedManifest []byte
-					var pathToYAMLFile string
-
+				When("multi app manifest + flag overrides", func() {
 					BeforeEach(func() {
-						expectedManifest = yamlUnmarshalMarshal([]byte("---\napplications:\n- name: turtle"))
-						yamlContents = []byte("---\napplications:\n- name: ((put-var-here))")
-						pathToYAMLFile = filepath.Join(tempDir, "manifest.yml")
-						err := ioutil.WriteFile(pathToYAMLFile, yamlContents, 0644)
-						Expect(err).ToNot(HaveOccurred())
-						cmd.PathToManifest = flag.PathWithExistenceCheck(pathToYAMLFile)
-						cmd.Vars = []template.VarKV{
-							{Name: "put-var-here", Value: "turtle"},
-						}
+						fakeManifestParser.ContainsMultipleAppsReturns(true)
+						cmd.NoRoute = true
 					})
 
-					It("reads the manifest, substitutes vars, and passes through to PrepareSpace", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeActor.PrepareSpaceCallCount()).To(Equal(1))
-						_, manifestParser := fakeActor.PrepareSpaceArgsForCall(0)
-						Expect(manifestParser.FullRawManifest()).To(Equal(yamlUnmarshalMarshal(expectedManifest)))
-						Expect(manifestParser.GetPathToManifest()).To(Equal(pathToYAMLFile))
-						Expect(manifestParser.AppNames()).To(ConsistOf("turtle"))
+					It("returns an error", func() {
+						Expect(executeErr).To(MatchError(translatableerror.CommandLineArgsWithMultipleAppsError{}))
 					})
 				})
 			})
@@ -459,6 +292,7 @@ var _ = Describe("push Command", func() {
 				BeforeEach(func() {
 					cmd.OptionalArgs.AppName = appName1
 				})
+
 				It("delegates the correct values", func() {
 					Expect(fakeActor.CreatePushPlansCallCount()).To(Equal(1))
 					actualAppName, actualSpaceGUID, actualOrgGUID, _, _ := fakeActor.CreatePushPlansArgsForCall(0)
@@ -466,7 +300,6 @@ var _ = Describe("push Command", func() {
 					Expect(actualAppName).To(Equal(appName1))
 					Expect(actualSpaceGUID).To(Equal("some-space-guid"))
 					Expect(actualOrgGUID).To(Equal("some-org-guid"))
-
 				})
 
 				When("Creating the pushPlans errors", func() {
@@ -491,22 +324,20 @@ var _ = Describe("push Command", func() {
 					})
 
 					Describe("delegating to Actor.PrepareSpace", func() {
-
 						It("delegates to PrepareSpace", func() {
 							actualPushPlans, actualParser := fakeActor.PrepareSpaceArgsForCall(0)
 							Expect(actualPushPlans).To(ConsistOf(
 								v7pushaction.PushPlan{Application: v7action.Application{Name: appName1}, SpaceGUID: "some-space-guid"},
 								v7pushaction.PushPlan{Application: v7action.Application{Name: appName2}, SpaceGUID: "some-space-guid"},
 							))
-							Expect(actualParser.GetPathToManifest()).To(Equal(""))
-							Expect(actualParser.FullRawManifest()).To(HaveLen(0))
+							Expect(actualParser).To(Equal(fakeManifestParser))
 						})
 
 						When("Actor.PrepareSpace has no errors", func() {
-							Describe("delegating to Actor.Conceptualize", func() {
+							Describe("delegating to Actor.UpdateApplicationSettings", func() {
 								When("there are no flag overrides", func() {
 									BeforeEach(func() {
-										fakeActor.ConceptualizeReturns(
+										fakeActor.UpdateApplicationSettingsReturns(
 											[]v7pushaction.PushPlan{
 												{Application: v7action.Application{Name: appName1}},
 												{Application: v7action.Application{Name: appName2}},
@@ -524,8 +355,8 @@ var _ = Describe("push Command", func() {
 										Expect(testUI.Out).To(Say(`Getting app info\.\.\.`))
 										Expect(testUI.Err).To(Say("conceptualize-warning-1"))
 
-										Expect(fakeActor.ConceptualizeCallCount()).To(Equal(1))
-										actualPushPlans := fakeActor.ConceptualizeArgsForCall(0)
+										Expect(fakeActor.UpdateApplicationSettingsCallCount()).To(Equal(1))
+										actualPushPlans := fakeActor.UpdateApplicationSettingsArgsForCall(0)
 										Expect(actualPushPlans).To(ConsistOf(
 											v7pushaction.PushPlan{Application: v7action.Application{Name: appName1}, SpaceGUID: "some-space-guid"},
 											v7pushaction.PushPlan{Application: v7action.Application{Name: appName2}, SpaceGUID: "some-space-guid"},
@@ -847,7 +678,7 @@ var _ = Describe("push Command", func() {
 
 									BeforeEach(func() {
 										expectedErr = errors.New("some-error")
-										fakeActor.ConceptualizeReturns(nil, v7pushaction.Warnings{"some-warning-1"}, expectedErr)
+										fakeActor.UpdateApplicationSettingsReturns(nil, v7pushaction.Warnings{"some-warning-1"}, expectedErr)
 									})
 
 									It("generates a push plan with the specified app path", func() {
@@ -879,8 +710,8 @@ var _ = Describe("push Command", func() {
 								Expect(testUI.Err).To(Say("prepare-space-warning-1"))
 							})
 
-							It("does not delegate to Conceptualize", func() {
-								Expect(fakeActor.ConceptualizeCallCount()).To(Equal(0))
+							It("does not delegate to UpdateApplicationSettings", func() {
+								Expect(fakeActor.UpdateApplicationSettingsCallCount()).To(Equal(0))
 							})
 
 							It("does not delegate to Actualize", func() {
@@ -909,8 +740,8 @@ var _ = Describe("push Command", func() {
 								Expect(testUI.Err).To(Say("prepare-no-app-or-manifest-space-warning"))
 							})
 
-							It("does not delegate to Conceptualize", func() {
-								Expect(fakeActor.ConceptualizeCallCount()).To(Equal(0))
+							It("does not delegate to UpdateApplicationSettings", func() {
+								Expect(fakeActor.UpdateApplicationSettingsCallCount()).To(Equal(0))
 							})
 
 							It("does not delegate to Actualize", func() {
@@ -920,7 +751,6 @@ var _ = Describe("push Command", func() {
 						})
 					})
 				})
-
 			})
 		})
 	})
@@ -1118,6 +948,101 @@ var _ = Describe("push Command", func() {
 						Expect(overrides.DockerPassword).To(Equal("some-docker-password"))
 					})
 				})
+			})
+		})
+	})
+
+	Describe("ReadManifest", func() {
+		var (
+			pathToYAMLFile string
+			executeErr     error
+		)
+
+		BeforeEach(func() {
+			pathToYAMLFile = "/some/path/to/manifest.yml"
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.ReadManifest()
+		})
+
+		When("No path is provided", func() {
+			BeforeEach(func() {
+				cmd.PWD = filepath.Dir(pathToYAMLFile)
+			})
+
+			When("a manifest exists in the current dir", func() {
+				It("uses the manifest in the current directory", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+					Expect(actualManifestPath).To(Equal(pathToYAMLFile))
+				})
+			})
+
+			When("there is not a manifest in the current dir", func() {
+				BeforeEach(func() {
+					fakeManifestParser.InterpolateAndParseReturns(os.ErrNotExist)
+				})
+
+				It("ignores the file not found error", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+					Expect(actualManifestPath).To(Equal(pathToYAMLFile))
+				})
+			})
+		})
+
+		When("The -f flag is specified", func() {
+			BeforeEach(func() {
+				cmd.PathToManifest = flag.PathWithExistenceCheck(pathToYAMLFile)
+			})
+
+			It("reads the manifest and passes through to PrepareSpace", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
+				actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(actualManifestPath).To(Equal(pathToYAMLFile))
+			})
+		})
+
+		When("--vars-files are specified", func() {
+			var varsFiles []string
+
+			BeforeEach(func() {
+				varsFiles = []string{"path1", "path2"}
+				for _, path := range varsFiles {
+					cmd.PathsToVarsFiles = append(cmd.PathsToVarsFiles, flag.PathWithExistenceCheck(path))
+				}
+			})
+
+			It("passes vars files to the manifest parser", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				_, actualVarsFiles, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(actualVarsFiles).To(Equal(varsFiles))
+			})
+		})
+
+		When("The --var flag is provided", func() {
+			var vars []template.VarKV
+
+			BeforeEach(func() {
+				vars = []template.VarKV{
+					{Name: "put-var-here", Value: "turtle"},
+				}
+				cmd.Vars = vars
+			})
+
+			It("passes vars files to the manifest parser", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				_, _, actualVars := fakeManifestParser.InterpolateAndParseArgsForCall(0)
+				Expect(actualVars).To(Equal(vars))
 			})
 		})
 	})

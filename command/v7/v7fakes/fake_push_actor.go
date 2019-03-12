@@ -6,7 +6,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v7pushaction"
 	v7 "code.cloudfoundry.org/cli/command/v7"
-	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
 type FakePushActor struct {
@@ -28,21 +27,6 @@ type FakePushActor struct {
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
 	}
-	ConceptualizeStub        func([]v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
-	conceptualizeMutex       sync.RWMutex
-	conceptualizeArgsForCall []struct {
-		arg1 []v7pushaction.PushPlan
-	}
-	conceptualizeReturns struct {
-		result1 []v7pushaction.PushPlan
-		result2 v7pushaction.Warnings
-		result3 error
-	}
-	conceptualizeReturnsOnCall map[int]struct {
-		result1 []v7pushaction.PushPlan
-		result2 v7pushaction.Warnings
-		result3 error
-	}
 	CreatePushPlansStub        func(string, string, string, v7pushaction.ManifestParser, v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error)
 	createPushPlansMutex       sync.RWMutex
 	createPushPlansArgsForCall []struct {
@@ -60,11 +44,11 @@ type FakePushActor struct {
 		result1 []v7pushaction.PushPlan
 		result2 error
 	}
-	PrepareSpaceStub        func([]v7pushaction.PushPlan, manifestparser.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
+	PrepareSpaceStub        func([]v7pushaction.PushPlan, v7pushaction.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)
 	prepareSpaceMutex       sync.RWMutex
 	prepareSpaceArgsForCall []struct {
 		arg1 []v7pushaction.PushPlan
-		arg2 manifestparser.ManifestParser
+		arg2 v7pushaction.ManifestParser
 	}
 	prepareSpaceReturns struct {
 		result1 <-chan []v7pushaction.PushPlan
@@ -77,6 +61,21 @@ type FakePushActor struct {
 		result2 <-chan v7pushaction.Event
 		result3 <-chan v7pushaction.Warnings
 		result4 <-chan error
+	}
+	UpdateApplicationSettingsStub        func([]v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)
+	updateApplicationSettingsMutex       sync.RWMutex
+	updateApplicationSettingsArgsForCall []struct {
+		arg1 []v7pushaction.PushPlan
+	}
+	updateApplicationSettingsReturns struct {
+		result1 []v7pushaction.PushPlan
+		result2 v7pushaction.Warnings
+		result3 error
+	}
+	updateApplicationSettingsReturnsOnCall map[int]struct {
+		result1 []v7pushaction.PushPlan
+		result2 v7pushaction.Warnings
+		result3 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -152,77 +151,6 @@ func (fake *FakePushActor) ActualizeReturnsOnCall(i int, result1 <-chan v7pushac
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakePushActor) Conceptualize(arg1 []v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error) {
-	var arg1Copy []v7pushaction.PushPlan
-	if arg1 != nil {
-		arg1Copy = make([]v7pushaction.PushPlan, len(arg1))
-		copy(arg1Copy, arg1)
-	}
-	fake.conceptualizeMutex.Lock()
-	ret, specificReturn := fake.conceptualizeReturnsOnCall[len(fake.conceptualizeArgsForCall)]
-	fake.conceptualizeArgsForCall = append(fake.conceptualizeArgsForCall, struct {
-		arg1 []v7pushaction.PushPlan
-	}{arg1Copy})
-	fake.recordInvocation("Conceptualize", []interface{}{arg1Copy})
-	fake.conceptualizeMutex.Unlock()
-	if fake.ConceptualizeStub != nil {
-		return fake.ConceptualizeStub(arg1)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	fakeReturns := fake.conceptualizeReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
-}
-
-func (fake *FakePushActor) ConceptualizeCallCount() int {
-	fake.conceptualizeMutex.RLock()
-	defer fake.conceptualizeMutex.RUnlock()
-	return len(fake.conceptualizeArgsForCall)
-}
-
-func (fake *FakePushActor) ConceptualizeCalls(stub func([]v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)) {
-	fake.conceptualizeMutex.Lock()
-	defer fake.conceptualizeMutex.Unlock()
-	fake.ConceptualizeStub = stub
-}
-
-func (fake *FakePushActor) ConceptualizeArgsForCall(i int) []v7pushaction.PushPlan {
-	fake.conceptualizeMutex.RLock()
-	defer fake.conceptualizeMutex.RUnlock()
-	argsForCall := fake.conceptualizeArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakePushActor) ConceptualizeReturns(result1 []v7pushaction.PushPlan, result2 v7pushaction.Warnings, result3 error) {
-	fake.conceptualizeMutex.Lock()
-	defer fake.conceptualizeMutex.Unlock()
-	fake.ConceptualizeStub = nil
-	fake.conceptualizeReturns = struct {
-		result1 []v7pushaction.PushPlan
-		result2 v7pushaction.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakePushActor) ConceptualizeReturnsOnCall(i int, result1 []v7pushaction.PushPlan, result2 v7pushaction.Warnings, result3 error) {
-	fake.conceptualizeMutex.Lock()
-	defer fake.conceptualizeMutex.Unlock()
-	fake.ConceptualizeStub = nil
-	if fake.conceptualizeReturnsOnCall == nil {
-		fake.conceptualizeReturnsOnCall = make(map[int]struct {
-			result1 []v7pushaction.PushPlan
-			result2 v7pushaction.Warnings
-			result3 error
-		})
-	}
-	fake.conceptualizeReturnsOnCall[i] = struct {
-		result1 []v7pushaction.PushPlan
-		result2 v7pushaction.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakePushActor) CreatePushPlans(arg1 string, arg2 string, arg3 string, arg4 v7pushaction.ManifestParser, arg5 v7pushaction.FlagOverrides) ([]v7pushaction.PushPlan, error) {
 	fake.createPushPlansMutex.Lock()
 	ret, specificReturn := fake.createPushPlansReturnsOnCall[len(fake.createPushPlansArgsForCall)]
@@ -290,7 +218,7 @@ func (fake *FakePushActor) CreatePushPlansReturnsOnCall(i int, result1 []v7pusha
 	}{result1, result2}
 }
 
-func (fake *FakePushActor) PrepareSpace(arg1 []v7pushaction.PushPlan, arg2 manifestparser.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
+func (fake *FakePushActor) PrepareSpace(arg1 []v7pushaction.PushPlan, arg2 v7pushaction.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error) {
 	var arg1Copy []v7pushaction.PushPlan
 	if arg1 != nil {
 		arg1Copy = make([]v7pushaction.PushPlan, len(arg1))
@@ -300,7 +228,7 @@ func (fake *FakePushActor) PrepareSpace(arg1 []v7pushaction.PushPlan, arg2 manif
 	ret, specificReturn := fake.prepareSpaceReturnsOnCall[len(fake.prepareSpaceArgsForCall)]
 	fake.prepareSpaceArgsForCall = append(fake.prepareSpaceArgsForCall, struct {
 		arg1 []v7pushaction.PushPlan
-		arg2 manifestparser.ManifestParser
+		arg2 v7pushaction.ManifestParser
 	}{arg1Copy, arg2})
 	fake.recordInvocation("PrepareSpace", []interface{}{arg1Copy, arg2})
 	fake.prepareSpaceMutex.Unlock()
@@ -320,13 +248,13 @@ func (fake *FakePushActor) PrepareSpaceCallCount() int {
 	return len(fake.prepareSpaceArgsForCall)
 }
 
-func (fake *FakePushActor) PrepareSpaceCalls(stub func([]v7pushaction.PushPlan, manifestparser.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)) {
+func (fake *FakePushActor) PrepareSpaceCalls(stub func([]v7pushaction.PushPlan, v7pushaction.ManifestParser) (<-chan []v7pushaction.PushPlan, <-chan v7pushaction.Event, <-chan v7pushaction.Warnings, <-chan error)) {
 	fake.prepareSpaceMutex.Lock()
 	defer fake.prepareSpaceMutex.Unlock()
 	fake.PrepareSpaceStub = stub
 }
 
-func (fake *FakePushActor) PrepareSpaceArgsForCall(i int) ([]v7pushaction.PushPlan, manifestparser.ManifestParser) {
+func (fake *FakePushActor) PrepareSpaceArgsForCall(i int) ([]v7pushaction.PushPlan, v7pushaction.ManifestParser) {
 	fake.prepareSpaceMutex.RLock()
 	defer fake.prepareSpaceMutex.RUnlock()
 	argsForCall := fake.prepareSpaceArgsForCall[i]
@@ -365,17 +293,88 @@ func (fake *FakePushActor) PrepareSpaceReturnsOnCall(i int, result1 <-chan []v7p
 	}{result1, result2, result3, result4}
 }
 
+func (fake *FakePushActor) UpdateApplicationSettings(arg1 []v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error) {
+	var arg1Copy []v7pushaction.PushPlan
+	if arg1 != nil {
+		arg1Copy = make([]v7pushaction.PushPlan, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.updateApplicationSettingsMutex.Lock()
+	ret, specificReturn := fake.updateApplicationSettingsReturnsOnCall[len(fake.updateApplicationSettingsArgsForCall)]
+	fake.updateApplicationSettingsArgsForCall = append(fake.updateApplicationSettingsArgsForCall, struct {
+		arg1 []v7pushaction.PushPlan
+	}{arg1Copy})
+	fake.recordInvocation("UpdateApplicationSettings", []interface{}{arg1Copy})
+	fake.updateApplicationSettingsMutex.Unlock()
+	if fake.UpdateApplicationSettingsStub != nil {
+		return fake.UpdateApplicationSettingsStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateApplicationSettingsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakePushActor) UpdateApplicationSettingsCallCount() int {
+	fake.updateApplicationSettingsMutex.RLock()
+	defer fake.updateApplicationSettingsMutex.RUnlock()
+	return len(fake.updateApplicationSettingsArgsForCall)
+}
+
+func (fake *FakePushActor) UpdateApplicationSettingsCalls(stub func([]v7pushaction.PushPlan) ([]v7pushaction.PushPlan, v7pushaction.Warnings, error)) {
+	fake.updateApplicationSettingsMutex.Lock()
+	defer fake.updateApplicationSettingsMutex.Unlock()
+	fake.UpdateApplicationSettingsStub = stub
+}
+
+func (fake *FakePushActor) UpdateApplicationSettingsArgsForCall(i int) []v7pushaction.PushPlan {
+	fake.updateApplicationSettingsMutex.RLock()
+	defer fake.updateApplicationSettingsMutex.RUnlock()
+	argsForCall := fake.updateApplicationSettingsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakePushActor) UpdateApplicationSettingsReturns(result1 []v7pushaction.PushPlan, result2 v7pushaction.Warnings, result3 error) {
+	fake.updateApplicationSettingsMutex.Lock()
+	defer fake.updateApplicationSettingsMutex.Unlock()
+	fake.UpdateApplicationSettingsStub = nil
+	fake.updateApplicationSettingsReturns = struct {
+		result1 []v7pushaction.PushPlan
+		result2 v7pushaction.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakePushActor) UpdateApplicationSettingsReturnsOnCall(i int, result1 []v7pushaction.PushPlan, result2 v7pushaction.Warnings, result3 error) {
+	fake.updateApplicationSettingsMutex.Lock()
+	defer fake.updateApplicationSettingsMutex.Unlock()
+	fake.UpdateApplicationSettingsStub = nil
+	if fake.updateApplicationSettingsReturnsOnCall == nil {
+		fake.updateApplicationSettingsReturnsOnCall = make(map[int]struct {
+			result1 []v7pushaction.PushPlan
+			result2 v7pushaction.Warnings
+			result3 error
+		})
+	}
+	fake.updateApplicationSettingsReturnsOnCall[i] = struct {
+		result1 []v7pushaction.PushPlan
+		result2 v7pushaction.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakePushActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.actualizeMutex.RLock()
 	defer fake.actualizeMutex.RUnlock()
-	fake.conceptualizeMutex.RLock()
-	defer fake.conceptualizeMutex.RUnlock()
 	fake.createPushPlansMutex.RLock()
 	defer fake.createPushPlansMutex.RUnlock()
 	fake.prepareSpaceMutex.RLock()
 	defer fake.prepareSpaceMutex.RUnlock()
+	fake.updateApplicationSettingsMutex.RLock()
+	defer fake.updateApplicationSettingsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

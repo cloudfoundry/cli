@@ -3,11 +3,10 @@ package v7pushaction
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/util/manifestparser"
 	log "github.com/sirupsen/logrus"
 )
 
-func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser manifestparser.ManifestParser) (<-chan []PushPlan, <-chan Event, <-chan Warnings, <-chan error) {
+func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser ManifestParser) (<-chan []PushPlan, <-chan Event, <-chan Warnings, <-chan error) {
 	pushPlansStream := make(chan []PushPlan)
 	eventStream := make(chan Event)
 	warningsStream := make(chan Warnings)
@@ -58,7 +57,7 @@ func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser manifestpar
 	return pushPlansStream, eventStream, warningsStream, errorStream
 }
 
-func getManifest(plans []PushPlan, parser manifestparser.ManifestParser) ([]byte, error) {
+func getManifest(plans []PushPlan, parser ManifestParser) ([]byte, error) {
 	if len(plans) == 1 {
 		return parser.RawAppManifest(plans[0].Application.Name)
 	}

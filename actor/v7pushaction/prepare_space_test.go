@@ -1,11 +1,11 @@
 package v7pushaction_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/util/manifestparser/manifestparserfakes"
 	"errors"
 	"time"
+
+	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/v7action"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
@@ -74,7 +74,7 @@ var _ = Describe("PrepareSpace", func() {
 		fakeV7Actor *v7pushactionfakes.FakeV7Actor
 
 		pushPlans          []PushPlan
-		fakeManifestParser *manifestparserfakes.FakeManifestParser
+		fakeManifestParser *v7pushactionfakes.FakeManifestParser
 
 		spaceGUID string
 
@@ -90,7 +90,7 @@ var _ = Describe("PrepareSpace", func() {
 
 		spaceGUID = "space"
 
-		fakeManifestParser = new(manifestparserfakes.FakeManifestParser)
+		fakeManifestParser = new(v7pushactionfakes.FakeManifestParser)
 	})
 
 	AfterEach(func() {
