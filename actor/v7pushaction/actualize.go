@@ -124,7 +124,7 @@ func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) (
 }
 
 func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar ProgressBar, warningsStream chan Warnings, eventStream chan Event) (v7action.Package, error) {
-	log.WithField("Path", plan.BitsPath).Info(string(CreatingArchive))
+	log.WithField("Path", plan.BitsPath).Info("creating archive")
 
 	eventStream <- CreatingArchive
 	archivePath, err := actor.GetArchivePath(plan)

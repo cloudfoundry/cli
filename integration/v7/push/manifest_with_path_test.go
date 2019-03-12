@@ -55,7 +55,7 @@ var _ = Describe("push manifest with a path", func() {
 				appName,
 				"-f", manifestPath,
 			)
-			Eventually(session.Err).Should(helpers.SayPath(`msg="creating archive"\s+Path=%s`, dir))
+			Eventually(session.Err).Should(helpers.SayPath(`msg="creating archive"\s+Path="?%s"?`, dir))
 			Eventually(session).Should(Exit(0))
 		})
 	})
