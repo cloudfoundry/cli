@@ -13,7 +13,7 @@ inputs:
 
 params:
   CF_CLI_EXPERIMENTAL: false
-  NODES: 16
+  NODES: 8
 
 run:
   path: bash
