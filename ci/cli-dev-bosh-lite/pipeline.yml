@@ -166,6 +166,7 @@ jobs:
                   - capi-ci/cf-deployment-operations/seed-credhub-asg.yml
                   - cli/ci/infrastructure/operations/default-app-memory.yml
                   - cli/ci/infrastructure/operations/add-oidc-provider.yml
+                  - cli/ci/infrastructure/operations/give-cf-admin-clients-read-scope.yml
               - task: upload-to-gcs
                 file: capi-ci/ci/gcs/upload-to-gcs.yml
                 input_mapping:
