@@ -11,13 +11,12 @@ import (
 )
 
 type FakeLoginActor struct {
-	AuthenticateStub        func(string, string, string, constant.GrantType) error
+	AuthenticateStub        func(map[string]string, string, constant.GrantType) error
 	authenticateMutex       sync.RWMutex
 	authenticateArgsForCall []struct {
-		arg1 string
+		arg1 map[string]string
 		arg2 string
-		arg3 string
-		arg4 constant.GrantType
+		arg3 constant.GrantType
 	}
 	authenticateReturns struct {
 		result1 error
@@ -62,19 +61,18 @@ type FakeLoginActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeLoginActor) Authenticate(arg1 string, arg2 string, arg3 string, arg4 constant.GrantType) error {
+func (fake *FakeLoginActor) Authenticate(arg1 map[string]string, arg2 string, arg3 constant.GrantType) error {
 	fake.authenticateMutex.Lock()
 	ret, specificReturn := fake.authenticateReturnsOnCall[len(fake.authenticateArgsForCall)]
 	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
-		arg1 string
+		arg1 map[string]string
 		arg2 string
-		arg3 string
-		arg4 constant.GrantType
-	}{arg1, arg2, arg3, arg4})
-	fake.recordInvocation("Authenticate", []interface{}{arg1, arg2, arg3, arg4})
+		arg3 constant.GrantType
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("Authenticate", []interface{}{arg1, arg2, arg3})
 	fake.authenticateMutex.Unlock()
 	if fake.AuthenticateStub != nil {
-		return fake.AuthenticateStub(arg1, arg2, arg3, arg4)
+		return fake.AuthenticateStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
@@ -89,17 +87,17 @@ func (fake *FakeLoginActor) AuthenticateCallCount() int {
 	return len(fake.authenticateArgsForCall)
 }
 
-func (fake *FakeLoginActor) AuthenticateCalls(stub func(string, string, string, constant.GrantType) error) {
+func (fake *FakeLoginActor) AuthenticateCalls(stub func(map[string]string, string, constant.GrantType) error) {
 	fake.authenticateMutex.Lock()
 	defer fake.authenticateMutex.Unlock()
 	fake.AuthenticateStub = stub
 }
 
-func (fake *FakeLoginActor) AuthenticateArgsForCall(i int) (string, string, string, constant.GrantType) {
+func (fake *FakeLoginActor) AuthenticateArgsForCall(i int) (map[string]string, string, constant.GrantType) {
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
 	argsForCall := fake.authenticateArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeLoginActor) AuthenticateReturns(result1 error) {

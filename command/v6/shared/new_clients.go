@@ -1,7 +1,6 @@
 package shared
 
 import (
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	ccWrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/router"
@@ -121,13 +120,4 @@ func NewRouterClient(config command.Config, ui command.UI, uaaClient *uaa.Client
 
 	routerClient := router.NewClient(routerConfig)
 	return routerClient, nil
-}
-
-func NewActor(config command.Config, ui command.UI, targetCF bool) (*v2action.Actor, error) {
-	ccClient, uaaClient, err := NewClients(config, ui, targetCF)
-	if err != nil {
-		return nil, err
-	}
-
-	return v2action.NewActor(ccClient, uaaClient, config), nil
 }

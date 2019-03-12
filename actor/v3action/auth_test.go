@@ -18,12 +18,18 @@ var _ = Describe("Auth Actions", func() {
 		actor         *Actor
 		fakeUAAClient *v3actionfakes.FakeUAAClient
 		fakeConfig    *v3actionfakes.FakeConfig
+		creds         map[string]string
 	)
 
 	BeforeEach(func() {
 		fakeUAAClient = new(v3actionfakes.FakeUAAClient)
 		fakeConfig = new(v3actionfakes.FakeConfig)
 		actor = NewActor(nil, fakeConfig, nil, fakeUAAClient)
+		creds = map[string]string{
+			"client_id":     "some-username",
+			"client_secret": "some-password",
+			"origin":        "uaa",
+		}
 	})
 
 	Describe("Authenticate", func() {
@@ -33,7 +39,7 @@ var _ = Describe("Auth Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			actualErr = actor.Authenticate("some-username", "some-password", "uaa", grantType)
+			actualErr = actor.Authenticate(creds, "uaa", grantType)
 		})
 
 		When("no API errors occur", func() {
@@ -54,9 +60,9 @@ var _ = Describe("Auth Actions", func() {
 					Expect(actualErr).NotTo(HaveOccurred())
 
 					Expect(fakeUAAClient.AuthenticateCallCount()).To(Equal(1))
-					ID, secret, origin, passedGrantType := fakeUAAClient.AuthenticateArgsForCall(0)
-					Expect(ID).To(Equal("some-username"))
-					Expect(secret).To(Equal("some-password"))
+					creds, origin, passedGrantType := fakeUAAClient.AuthenticateArgsForCall(0)
+					Expect(creds["client_id"]).To(Equal("some-username"))
+					Expect(creds["client_secret"]).To(Equal("some-password"))
 					Expect(origin).To(Equal("uaa"))
 					Expect(passedGrantType).To(Equal(constant.GrantTypePassword))
 
@@ -93,6 +99,25 @@ var _ = Describe("Auth Actions", func() {
 					Expect(clientSecret).To(Equal("some-password"))
 					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(1))
 					Expect(fakeConfig.SetUAAGrantTypeArgsForCall(0)).To(Equal(string(constant.GrantTypeClientCredentials)))
+				})
+			})
+
+			When("extra information is needed to authenticate, e.g., MFA", func() {
+				BeforeEach(func() {
+					creds = map[string]string{
+						"username": "some-username",
+						"password": "some-password",
+						"mfaCode":  "some-one-time-code",
+					}
+				})
+
+				It("passes the extra information on to the UAA client", func() {
+					uaaCredentials, _, _ := fakeUAAClient.AuthenticateArgsForCall(0)
+					Expect(uaaCredentials).To(BeEquivalentTo(map[string]string{
+						"username": "some-username",
+						"password": "some-password",
+						"mfaCode":  "some-one-time-code",
+					}))
 				})
 			})
 		})
