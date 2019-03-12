@@ -1,11 +1,12 @@
 package manifestparser_test
 
 import (
-	. "code.cloudfoundry.org/cli/util/manifestparser"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	. "code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -147,7 +148,7 @@ applications:
 
 				executeErr = parser.Validate()
 
-				Expect(executeErr).To(HaveOccurred())
+				Expect(executeErr).To(MatchError(InvalidManifestApplicationPathError{Path: "/does/not/exist"}))
 			})
 		})
 	})

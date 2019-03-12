@@ -1,11 +1,17 @@
 package manifestparser
 
 import (
-	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 )
+
+type InvalidManifestApplicationPathError struct {
+	Path string
+}
+
+func (InvalidManifestApplicationPathError) Error() string {
+	return "Path in manifest is invalid"
+}
 
 func ValidatePaths(manifestParser Parser) error {
 	var err error
@@ -22,13 +28,9 @@ func ValidatePaths(manifestParser Parser) error {
 
 			if err != nil {
 				if os.IsNotExist(err) {
-					return errors.New(
-						fmt.Sprintf(
-							"Path '%s' does not exist for application '%s' in manifest",
-							application.Path,
-							application.Name,
-						),
-					)
+					return InvalidManifestApplicationPathError{
+						Path: application.Path,
+					}
 				}
 			}
 		}

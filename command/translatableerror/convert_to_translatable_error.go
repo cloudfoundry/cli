@@ -83,6 +83,8 @@ func ConvertToTranslatableError(err error) error {
 		return NoMatchingDomainError(e)
 	case actionerror.NonexistentAppPathError:
 		return FileNotFoundError(e)
+	case manifestparser.InvalidManifestApplicationPathError:
+		return FileNotFoundError(e)
 	case actionerror.NoOrganizationTargetedError:
 		return NoOrganizationTargetedError(e)
 	case actionerror.NoSpaceTargetedError:

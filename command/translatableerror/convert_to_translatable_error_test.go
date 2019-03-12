@@ -157,6 +157,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.NonexistentAppPathError{Path: "some-path"},
 			FileNotFoundError{Path: "some-path"}),
 
+		Entry("manifestparser.InvalidManifestApplicationPathError -> FileNotFoundError",
+			manifestparser.InvalidManifestApplicationPathError{Path: "some-path"},
+			FileNotFoundError{Path: "some-path"}),
+
 		Entry("actionerror.NoOrganizationTargetedError -> NoOrganizationTargetedError",
 			actionerror.NoOrganizationTargetedError{BinaryName: "faceman"},
 			NoOrganizationTargetedError{BinaryName: "faceman"}),
