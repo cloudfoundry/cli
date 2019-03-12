@@ -1008,7 +1008,7 @@ var _ = Describe("push Command", func() {
 
 					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
 					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
-					Expect(actualManifestPath).To(Equal(pathToYAMLFile))
+					Expect(filepath.ToSlash(actualManifestPath)).To(Equal(pathToYAMLFile))
 				})
 			})
 
@@ -1022,7 +1022,7 @@ var _ = Describe("push Command", func() {
 
 					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
 					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
-					Expect(actualManifestPath).To(Equal(pathToYAMLFile))
+					Expect(filepath.ToSlash(actualManifestPath)).To(Equal(pathToYAMLFile))
 				})
 			})
 		})
