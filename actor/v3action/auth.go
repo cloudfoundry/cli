@@ -8,14 +8,14 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 )
 
-func (actor Actor) Authenticate(ID string, secret string, origin string, grantType constant.GrantType) error {
+func (actor Actor) Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error {
 	if grantType == constant.GrantTypePassword && actor.Config.UAAGrantType() == string(constant.GrantTypeClientCredentials) {
 		return actionerror.PasswordGrantTypeLogoutRequiredError{}
 	}
 
 	actor.Config.UnsetOrganizationAndSpaceInformation()
 
-	accessToken, refreshToken, err := actor.UAAClient.Authenticate(ID, secret, origin, grantType)
+	accessToken, refreshToken, err := actor.UAAClient.Authenticate(credentials, origin, grantType)
 	if err != nil {
 		actor.Config.SetTokenInformation("", "", "")
 		return err
@@ -24,9 +24,9 @@ func (actor Actor) Authenticate(ID string, secret string, origin string, grantTy
 	accessToken = fmt.Sprintf("bearer %s", accessToken)
 	actor.Config.SetTokenInformation(accessToken, refreshToken, "")
 
-	if grantType != constant.GrantTypePassword {
+	if grantType == constant.GrantTypeClientCredentials {
 		actor.Config.SetUAAGrantType(string(grantType))
-		actor.Config.SetUAAClientCredentials(ID, secret)
+		actor.Config.SetUAAClientCredentials(credentials["client_id"], credentials["client_secret"])
 	}
 
 	return nil

@@ -19,17 +19,17 @@ type AuthResponse struct {
 
 // Authenticate sends a username and password to UAA then returns an access
 // token and a refresh token.
-func (client Client) Authenticate(ID string, secret string, origin string, grantType constant.GrantType) (string, string, error) {
+func (client Client) Authenticate(creds map[string]string, origin string, grantType constant.GrantType) (string, string, error) {
 	requestBody := url.Values{
 		"grant_type": {string(grantType)},
 	}
 	switch grantType {
 	case constant.GrantTypeClientCredentials:
-		requestBody.Set("client_id", ID)
-		requestBody.Set("client_secret", secret)
+		requestBody.Set("client_id", creds["client_id"])
+		requestBody.Set("client_secret", creds["client_secret"])
 	default:
-		requestBody.Set("username", ID)
-		requestBody.Set("password", secret)
+		requestBody.Set("username", creds["username"])
+		requestBody.Set("password", creds["password"])
 	}
 
 	type loginHint struct {

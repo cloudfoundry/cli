@@ -19,7 +19,7 @@ import (
 const maxLoginTries = 3
 
 type LoginActor interface {
-	Authenticate(ID string, secret string, origin string, grantType constant.GrantType) error
+	Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error
 	CloudControllerAPIVersion() string
 	GetLoginPrompts() map[string]coreconfig.AuthPrompt
 	SetTarget(settings v3action.TargetSettings) (v3action.Warnings, error)
@@ -204,8 +204,7 @@ func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPromp
 	}
 
 	cmd.UI.DisplayText("Authenticating...")
-	//TODO: we should be passing the full credentials copy. will need to refactor actor.Authenticate a bit.
-	return cmd.Actor.Authenticate(credentialsCopy["username"], credentialsCopy["password"], "", constant.GrantTypePassword)
+	return cmd.Actor.Authenticate(credentialsCopy, "", constant.GrantTypePassword)
 
 }
 
