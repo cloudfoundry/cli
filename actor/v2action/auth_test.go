@@ -35,10 +35,6 @@ var _ = Describe("Auth Actions", func() {
 			actualErr = actor.Authenticate("some-username", "some-password", "uaa", grantType)
 		})
 
-		It("unsets org and space targeting", func() {
-			Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
-		})
-
 		When("no API errors occur", func() {
 			BeforeEach(func() {
 				fakeUAAClient.AuthenticateReturns(
@@ -46,14 +42,6 @@ var _ = Describe("Auth Actions", func() {
 					"some-refresh-token",
 					nil,
 				)
-			})
-
-			It("sets the auth and refresh tokens in the config", func() {
-				Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
-				accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)
-				Expect(accessToken).To(Equal("bearer some-access-token"))
-				Expect(refreshToken).To(Equal("some-refresh-token"))
-				Expect(sshOAuthClient).To(BeEmpty())
 			})
 
 			When("the grant type is a password grant", func() {
@@ -65,23 +53,26 @@ var _ = Describe("Auth Actions", func() {
 					Expect(actualErr).NotTo(HaveOccurred())
 
 					Expect(fakeUAAClient.AuthenticateCallCount()).To(Equal(1))
-					creds, origin, passedGrantType := fakeUAAClient.AuthenticateArgsForCall(0)
-					Expect(creds).To(Equal(map[string]string{
-						"username": "some-username",
-						"password": "some-password",
-					}))
+					ID, secret, origin, passedGrantType := fakeUAAClient.AuthenticateArgsForCall(0)
+					Expect(ID).To(Equal("some-username"))
+					Expect(secret).To(Equal("some-password"))
 					Expect(origin).To(Equal("uaa"))
 					Expect(passedGrantType).To(Equal(constant.GrantTypePassword))
 
-					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(1))
-					Expect(fakeConfig.SetUAAGrantTypeArgsForCall(0)).To(BeEquivalentTo(constant.GrantTypePassword))
+					Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
+					accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)
+					Expect(accessToken).To(Equal("bearer some-access-token"))
+					Expect(refreshToken).To(Equal("some-refresh-token"))
+					Expect(sshOAuthClient).To(BeEmpty())
+
+					Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
+					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(0))
 				})
 
 				When("a previous user authenticated with a client grant type", func() {
 					BeforeEach(func() {
 						fakeConfig.UAAGrantTypeReturns("client_credentials")
 					})
-
 					It("returns a PasswordGrantTypeLogoutRequiredError", func() {
 						Expect(actualErr).To(MatchError(actionerror.PasswordGrantTypeLogoutRequiredError{}))
 						Expect(fakeConfig.UAAGrantTypeCallCount()).To(Equal(1))
@@ -89,7 +80,7 @@ var _ = Describe("Auth Actions", func() {
 				})
 			})
 
-			When("the grant type is client credentials", func() {
+			When("the grant type is not password", func() {
 				BeforeEach(func() {
 					grantType = constant.GrantTypeClientCredentials
 				})
@@ -101,22 +92,6 @@ var _ = Describe("Auth Actions", func() {
 					Expect(clientSecret).To(Equal("some-password"))
 					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(1))
 					Expect(fakeConfig.SetUAAGrantTypeArgsForCall(0)).To(Equal(string(constant.GrantTypeClientCredentials)))
-				})
-
-				It("authenticates the user and returns access and refresh tokens", func() {
-					Expect(actualErr).NotTo(HaveOccurred())
-
-					Expect(fakeUAAClient.AuthenticateCallCount()).To(Equal(1))
-					creds, origin, passedGrantType := fakeUAAClient.AuthenticateArgsForCall(0)
-					Expect(creds).To(Equal(map[string]string{
-						"client_id":     "some-username",
-						"client_secret": "some-password",
-					}))
-					Expect(origin).To(Equal("uaa"))
-					Expect(passedGrantType).To(Equal(constant.GrantTypeClientCredentials))
-
-					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(1))
-					Expect(fakeConfig.SetUAAGrantTypeArgsForCall(0)).To(BeEquivalentTo(constant.GrantTypeClientCredentials))
 				})
 			})
 		})

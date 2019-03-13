@@ -27,8 +27,8 @@ var _ = Describe("Auth", func() {
 
 	Describe("Authenticate", func() {
 		var (
-			credentials map[string]string
-
+			identity  string
+			secret    string
 			origin    string
 			grantType constant.GrantType
 
@@ -37,8 +37,13 @@ var _ = Describe("Auth", func() {
 			executeErr   error
 		)
 
+		BeforeEach(func() {
+			identity = "some-identity"
+			secret = "some-secret"
+		})
+
 		JustBeforeEach(func() {
-			accessToken, refreshToken, executeErr = client.Authenticate(credentials, origin, grantType)
+			accessToken, refreshToken, executeErr = client.Authenticate(identity, secret, origin, grantType)
 		})
 
 		When("no errors occur", func() {
@@ -48,10 +53,6 @@ var _ = Describe("Auth", func() {
 						"access_token":"some-access-token",
 						"refresh_token":"some-refresh-token"
 					}`
-					credentials = map[string]string{
-						"username": "some-username",
-						"password": "some-password",
-					}
 					origin = ""
 					grantType = constant.GrantTypePassword
 					server.AppendHandlers(
@@ -60,7 +61,7 @@ var _ = Describe("Auth", func() {
 							VerifyRequest(http.MethodPost, "/oauth/token"),
 							VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
 							VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
-							VerifyBody([]byte(fmt.Sprintf("grant_type=%s&password=%s&username=%s", grantType, credentials["password"], credentials["username"]))),
+							VerifyBody([]byte(fmt.Sprintf("grant_type=%s&password=%s&username=%s", grantType, secret, identity))),
 							RespondWith(http.StatusOK, response),
 						))
 				})
@@ -88,7 +89,7 @@ var _ = Describe("Auth", func() {
 							VerifyRequest(http.MethodPost, "/oauth/token", expectedQuery),
 							VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
 							VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
-							VerifyBody([]byte(fmt.Sprintf("grant_type=%s&password=%s&username=%s", grantType, credentials["password"], credentials["username"]))),
+							VerifyBody([]byte(fmt.Sprintf("grant_type=%s&password=%s&username=%s", grantType, secret, identity))),
 							RespondWith(http.StatusOK, response),
 						))
 				})
@@ -107,10 +108,6 @@ var _ = Describe("Auth", func() {
 						"access_token":"some-access-token"
 					}`
 
-					credentials = map[string]string{
-						"client_id":     "some-client-id",
-						"client_secret": "some-client-secret",
-					}
 					origin = ""
 					grantType = constant.GrantTypeClientCredentials
 					server.AppendHandlers(
@@ -119,7 +116,7 @@ var _ = Describe("Auth", func() {
 							VerifyRequest(http.MethodPost, "/oauth/token"),
 							VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
 							VerifyHeaderKV("Authorization"),
-							VerifyBody([]byte(fmt.Sprintf("client_id=%s&client_secret=%s&grant_type=%s", credentials["client_id"], credentials["client_secret"], grantType))),
+							VerifyBody([]byte(fmt.Sprintf("client_id=%s&client_secret=%s&grant_type=%s", identity, secret, grantType))),
 							RespondWith(http.StatusOK, response),
 						))
 				})

@@ -20,12 +20,13 @@ type FakeUAAClient struct {
 	aPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	AuthenticateStub        func(map[string]string, string, constant.GrantType) (string, string, error)
+	AuthenticateStub        func(string, string, string, constant.GrantType) (string, string, error)
 	authenticateMutex       sync.RWMutex
 	authenticateArgsForCall []struct {
-		arg1 map[string]string
+		arg1 string
 		arg2 string
-		arg3 constant.GrantType
+		arg3 string
+		arg4 constant.GrantType
 	}
 	authenticateReturns struct {
 		result1 string
@@ -145,18 +146,19 @@ func (fake *FakeUAAClient) APIVersionReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
-func (fake *FakeUAAClient) Authenticate(arg1 map[string]string, arg2 string, arg3 constant.GrantType) (string, string, error) {
+func (fake *FakeUAAClient) Authenticate(arg1 string, arg2 string, arg3 string, arg4 constant.GrantType) (string, string, error) {
 	fake.authenticateMutex.Lock()
 	ret, specificReturn := fake.authenticateReturnsOnCall[len(fake.authenticateArgsForCall)]
 	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
-		arg1 map[string]string
+		arg1 string
 		arg2 string
-		arg3 constant.GrantType
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("Authenticate", []interface{}{arg1, arg2, arg3})
+		arg3 string
+		arg4 constant.GrantType
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("Authenticate", []interface{}{arg1, arg2, arg3, arg4})
 	fake.authenticateMutex.Unlock()
 	if fake.AuthenticateStub != nil {
-		return fake.AuthenticateStub(arg1, arg2, arg3)
+		return fake.AuthenticateStub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -171,17 +173,17 @@ func (fake *FakeUAAClient) AuthenticateCallCount() int {
 	return len(fake.authenticateArgsForCall)
 }
 
-func (fake *FakeUAAClient) AuthenticateCalls(stub func(map[string]string, string, constant.GrantType) (string, string, error)) {
+func (fake *FakeUAAClient) AuthenticateCalls(stub func(string, string, string, constant.GrantType) (string, string, error)) {
 	fake.authenticateMutex.Lock()
 	defer fake.authenticateMutex.Unlock()
 	fake.AuthenticateStub = stub
 }
 
-func (fake *FakeUAAClient) AuthenticateArgsForCall(i int) (map[string]string, string, constant.GrantType) {
+func (fake *FakeUAAClient) AuthenticateArgsForCall(i int) (string, string, string, constant.GrantType) {
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
 	argsForCall := fake.authenticateArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
 func (fake *FakeUAAClient) AuthenticateReturns(result1 string, result2 string, result3 error) {
