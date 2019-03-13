@@ -3,8 +3,9 @@
 package v7pushaction
 
 import (
-	"code.cloudfoundry.org/cli/util/manifestparser"
 	"regexp"
+
+	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
 // UpdatePushPlanFunc is a function that is used by CreatePushPlans to setup
@@ -43,6 +44,7 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 		SetupApplicationForPushPlan,
 		SetupBitsPathForPushPlan,
 		actor.SetupAllResourcesForPushPlan,
+		SetupNoStartForPushPlan,
 	}
 
 	return actor

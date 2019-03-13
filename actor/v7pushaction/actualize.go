@@ -73,7 +73,7 @@ func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) (
 			return
 		}
 
-		if plan.Overrides.NoStart == true {
+		if plan.NoStart == true {
 			if plan.Application.State == constant.ApplicationStarted {
 				eventStream <- StoppingApplication
 				warnings, err = actor.V7Actor.StopApplication(plan.Application.GUID)

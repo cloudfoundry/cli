@@ -855,7 +855,7 @@ var _ = Describe("Actualize", func() {
 	Describe("no start", func() {
 		When("The no start flag is provided", func() {
 			BeforeEach(func() {
-				plan.Overrides.NoStart = true
+				plan.NoStart = true
 			})
 
 			When("The app is stopped", func() {

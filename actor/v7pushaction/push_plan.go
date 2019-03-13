@@ -10,18 +10,22 @@ import (
 )
 
 type PushPlan struct {
-	Application v7action.Application
-	SpaceGUID   string
-	OrgGUID     string
-	Overrides   FlagOverrides
-	Manifest    []byte
+	SpaceGUID string
+	OrgGUID   string
 
-	Archive                bool
+	Application            v7action.Application
 	ApplicationNeedsUpdate bool
-	BitsPath               string
-	AllResources           []sharedaction.Resource
-	MatchedResources       []sharedaction.Resource
-	UnmatchedResources     []sharedaction.Resource
+
+	NoStart bool
+
+	Overrides FlagOverrides
+	Manifest  []byte
+
+	Archive            bool
+	BitsPath           string
+	AllResources       []sharedaction.Resource
+	MatchedResources   []sharedaction.Resource
+	UnmatchedResources []sharedaction.Resource
 }
 
 type FlagOverrides struct {
