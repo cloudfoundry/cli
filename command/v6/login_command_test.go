@@ -314,7 +314,6 @@ var _ = Describe("login Command", func() {
 								credentials, _, grantType := fakeActor.AuthenticateArgsForCall(0)
 								Expect(credentials["username"]).To(Equal("fakeman"))
 								Expect(credentials["password"]).To(Equal("somepassword"))
-								Expect(credentials["supersecret"]).To(Equal("garbage"))
 								Expect(grantType).To(Equal(constant.GrantTypePassword))
 							})
 						})

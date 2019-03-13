@@ -23,9 +23,13 @@ func (client Client) Authenticate(creds map[string]string, origin string, grantT
 	requestBody := url.Values{
 		"grant_type": {string(grantType)},
 	}
-
-	for k, v := range creds {
-		requestBody.Set(k, v)
+	switch grantType {
+	case constant.GrantTypeClientCredentials:
+		requestBody.Set("client_id", creds["client_id"])
+		requestBody.Set("client_secret", creds["client_secret"])
+	default:
+		requestBody.Set("username", creds["username"])
+		requestBody.Set("password", creds["password"])
 	}
 
 	type loginHint struct {
