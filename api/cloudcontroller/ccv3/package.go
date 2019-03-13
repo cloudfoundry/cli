@@ -192,7 +192,7 @@ func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
 //
 // Note: In order to determine if package creation is successful, poll the
 // Package's state field for more information.
-func (client *Client) UploadBitsPackage(pkg Package, existingResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+func (client *Client) UploadBitsPackage(pkg Package, existingResources []V2FormattedResource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
 	link, ok := pkg.Links["upload"]
 	if !ok {
 		return Package{}, nil, ccerror.UploadLinkNotFoundError{PackageGUID: pkg.GUID}
@@ -242,7 +242,7 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 	return responsePackage, response.Warnings, err
 }
 
-func (*Client) calculateAppBitsRequestSize(existingResources []Resource, newResourcesLength int64) (int64, error) {
+func (*Client) calculateAppBitsRequestSize(existingResources []V2FormattedResource, newResourcesLength int64) (int64, error) {
 	body := &bytes.Buffer{}
 	form := multipart.NewWriter(body)
 
@@ -266,7 +266,7 @@ func (*Client) calculateAppBitsRequestSize(existingResources []Resource, newReso
 	return int64(body.Len()) + newResourcesLength, nil
 }
 
-func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
+func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []V2FormattedResource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
 	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
 	form := multipart.NewWriter(writerInput)
 
@@ -387,7 +387,7 @@ func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, wri
 	return pkg, response.Warnings, firstError
 }
 
-func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, existingResources []Resource) (Package, Warnings, error) {
+func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, existingResources []V2FormattedResource) (Package, Warnings, error) {
 	jsonResources, err := json.Marshal(existingResources)
 	if err != nil {
 		return Package{}, nil, err
@@ -425,7 +425,7 @@ func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, existingRe
 	return pkg, response.Warnings, err
 }
 
-func (client *Client) uploadNewAndExistingResources(uploadLink APILink, existingResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+func (client *Client) uploadNewAndExistingResources(uploadLink APILink, existingResources []V2FormattedResource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
 	contentLength, err := client.calculateAppBitsRequestSize(existingResources, newResourcesLength)
 	if err != nil {
 		return Package{}, nil, err

@@ -8,10 +8,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Resource", func() {
+var _ = Describe("V2FormattedResource", func() {
 	Describe("MarshalJSON", func() {
 		It("marshals the json properly", func() {
-			resource := Resource{
+			resource := V2FormattedResource{
 				Filename: "some-file-1",
 				Mode:     0744,
 				SHA1:     "some-sha-1",
@@ -37,10 +37,10 @@ var _ = Describe("Resource", func() {
 				"size": 1
 			}`
 
-			var data Resource
+			var data V2FormattedResource
 			err := json.Unmarshal([]byte(raw), &data)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(data).To(Equal(Resource{
+			Expect(data).To(Equal(V2FormattedResource{
 				Filename: "some-file-1",
 				Mode:     0744,
 				SHA1:     "some-sha-1",

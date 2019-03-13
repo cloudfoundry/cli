@@ -8,8 +8,13 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
-// Resource represents a Cloud Controller Resource.
-type Resource struct {
+// V2FormattedResource represents a Cloud Controller Resource that still has the same shape as the V2 Resource.
+// The v3 package upload endpoint understands both the V2 shape and the new V3 shape.
+// The v3 resource matching endpoint only understands the new V3 shape.
+//
+// Deprecated: Use Resource going forward. We anticipate that this struct will only be used
+// by the v6 cli's v3-push command, which is experimental.
+type V2FormattedResource struct {
 
 	// Filename is the name of the resource.
 	Filename string `json:"fn"`
@@ -25,8 +30,8 @@ type Resource struct {
 	Size int64 `json:"size"`
 }
 
-// MarshalJSON converts a resource into a Cloud Controller Resource.
-func (r Resource) MarshalJSON() ([]byte, error) {
+// MarshalJSON converts a resource into a Cloud Controller V2FormattedResource.
+func (r V2FormattedResource) MarshalJSON() ([]byte, error) {
 	var ccResource struct {
 		Filename string `json:"fn,omitempty"`
 		Mode     string `json:"mode,omitempty"`
@@ -41,8 +46,8 @@ func (r Resource) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccResource)
 }
 
-// UnmarshalJSON helps unmarshal a Cloud Controller Resource response.
-func (r *Resource) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON helps unmarshal a Cloud Controller V2FormattedResource response.
+func (r *V2FormattedResource) UnmarshalJSON(data []byte) error {
 	var ccResource struct {
 		Filename string `json:"fn,omitempty"`
 		Mode     string `json:"mode,omitempty"`

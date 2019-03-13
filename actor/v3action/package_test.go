@@ -805,7 +805,7 @@ var _ = Describe("Package Actions", func() {
 				Expect(fakeCloudControllerClient.UploadBitsPackageCallCount()).To(Equal(1))
 				passedPackage, passedExistingResources, passedReader, passedReaderLength := fakeCloudControllerClient.UploadBitsPackageArgsForCall(0)
 				Expect(passedPackage).To(Equal(ccv3.Package(appPkg)))
-				Expect(passedExistingResources).To(ConsistOf(ccv3.Resource{Filename: "some-resource"}, ccv3.Resource{Filename: "another-resource"}))
+				Expect(passedExistingResources).To(ConsistOf(ccv3.V2FormattedResource{Filename: "some-resource"}, ccv3.V2FormattedResource{Filename: "another-resource"}))
 				Expect(passedReader).To(Equal(reader))
 				Expect(passedReaderLength).To(Equal(readerLength))
 			})

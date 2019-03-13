@@ -451,7 +451,7 @@ var _ = Describe("Package", func() {
 
 		When("the upload is successful", func() {
 			var (
-				resources  []Resource
+				resources  []V2FormattedResource
 				readerBody []byte
 			)
 
@@ -459,7 +459,7 @@ var _ = Describe("Package", func() {
 				var reader io.Reader
 
 				BeforeEach(func() {
-					resources = []Resource{
+					resources = []V2FormattedResource{
 						{Filename: "foo"},
 						{Filename: "bar"},
 					}
@@ -525,7 +525,7 @@ var _ = Describe("Package", func() {
 
 			When("there are no application bits to upload", func() {
 				BeforeEach(func() {
-					resources = []Resource{
+					resources = []V2FormattedResource{
 						{Filename: "foo"},
 						{Filename: "bar"},
 					}
@@ -602,7 +602,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the error", func() {
-				_, warnings, err := client.UploadBitsPackage(inputPackage, []Resource{}, bytes.NewReader(nil), 0)
+				_, warnings, err := client.UploadBitsPackage(inputPackage, []V2FormattedResource{}, bytes.NewReader(nil), 0)
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Banana"}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -632,7 +632,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the error", func() {
-				_, _, err := client.UploadBitsPackage(inputPackage, []Resource{}, fakeReader, 3)
+				_, _, err := client.UploadBitsPackage(inputPackage, []V2FormattedResource{}, fakeReader, 3)
 				Expect(err).To(MatchError(expectedErr))
 			})
 		})
@@ -657,7 +657,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the PipeSeekError", func() {
-				_, _, err := client.UploadBitsPackage(inputPackage, []Resource{}, strings.NewReader("hello world"), 3)
+				_, _, err := client.UploadBitsPackage(inputPackage, []V2FormattedResource{}, strings.NewReader("hello world"), 3)
 				Expect(err).To(MatchError(ccerror.PipeSeekError{}))
 			})
 		})
@@ -688,7 +688,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the http error", func() {
-				_, _, err := client.UploadBitsPackage(inputPackage, []Resource{}, strings.NewReader(strings.Repeat("a", UploadSize)), 3)
+				_, _, err := client.UploadBitsPackage(inputPackage, []V2FormattedResource{}, strings.NewReader(strings.Repeat("a", UploadSize)), 3)
 				Expect(err).To(MatchError(expectedErr))
 			})
 		})
