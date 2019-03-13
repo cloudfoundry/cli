@@ -11,6 +11,10 @@ inputs:
   path: go/src/code.cloudfoundry.org/cli
 - name: bosh-lite
 
+outputs:
+- name: failure_summary
+  path: outputs/failures
+
 params:
   CF_CLI_EXPERIMENTAL: false
   NODES: 8
@@ -23,6 +27,7 @@ run:
 
     set -e
 
+
     source bosh-lite/env
     credhub login --skip-tls-validation
     export CF_INT_PASSWORD=$(credhub get --name '/bosh-lite/cf/cf_admin_password' | bosh interpolate --path /value -)
@@ -30,6 +35,12 @@ run:
 
     export CF_INT_OIDC_USERNAME="admin-oidc"
     export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-lite/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+
+    export PR_BUILDER_OUTPUT_DIR="$PWD/outputs/failures"
+
+    if [ ! -d $PR_BUILDER_OUTPUT_DIR ]; then
+      mkdir -p $PR_BUILDER_OUTPUT_DIR
+    fi
 
     set -x
     export CF_INT_API="https://api.${domain}"
