@@ -442,7 +442,7 @@ var _ = Describe("Actualize", func() {
 	Describe("default route creation", func() {
 		When("creating a default route", func() {
 			BeforeEach(func() {
-				plan.Overrides.SkipRouteCreation = false
+				plan.SkipRouteCreation = false
 			})
 
 			When("route creation and mapping is successful", func() {
@@ -508,7 +508,7 @@ var _ = Describe("Actualize", func() {
 
 		When("skipping default route creation", func() {
 			BeforeEach(func() {
-				plan.Overrides.SkipRouteCreation = true
+				plan.SkipRouteCreation = true
 			})
 
 			It("never attempts to create a route", func() {
@@ -516,7 +516,6 @@ var _ = Describe("Actualize", func() {
 				Consistently(fakeV2Actor.GetApplicationRoutesCallCount).Should(BeZero())
 				Consistently(fakeV2Actor.CreateRouteCallCount).Should(BeZero())
 			})
-
 		})
 	})
 

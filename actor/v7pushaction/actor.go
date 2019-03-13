@@ -45,6 +45,7 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 		SetupBitsPathForPushPlan,
 		actor.SetupAllResourcesForPushPlan,
 		SetupNoStartForPushPlan,
+		SetupSkipRouteCreationForPushPlan,
 	}
 
 	return actor

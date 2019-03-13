@@ -16,7 +16,8 @@ type PushPlan struct {
 	Application            v7action.Application
 	ApplicationNeedsUpdate bool
 
-	NoStart bool
+	NoStart           bool
+	SkipRouteCreation bool
 
 	Overrides FlagOverrides
 	Manifest  []byte
