@@ -19,6 +19,9 @@ type PushPlan struct {
 	NoStart           bool
 	SkipRouteCreation bool
 
+	DockerImageCredentials            v7action.DockerImageCredentials
+	DockerImageCredentialsNeedsUpdate bool
+
 	Overrides FlagOverrides
 	Manifest  []byte
 

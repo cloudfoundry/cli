@@ -192,13 +192,9 @@ func (actor Actor) updateApplication(plan PushPlan, warningsStream chan Warnings
 }
 
 func (actor Actor) CreatePackage(plan PushPlan, progressBar ProgressBar, warningsStream chan Warnings, eventStream chan Event) (v7action.Package, error) {
-	if plan.Application.LifecycleType == constant.AppLifecycleTypeDocker {
+	if plan.DockerImageCredentialsNeedsUpdate {
 		eventStream <- SetDockerImage
-		pkg, warnings, err := actor.V7Actor.CreateDockerPackageByApplication(plan.Application.GUID, v7action.DockerImageCredentials{
-			Path:     plan.Overrides.DockerImage,
-			Username: plan.Overrides.DockerUsername,
-			Password: plan.Overrides.DockerPassword,
-		})
+		pkg, warnings, err := actor.V7Actor.CreateDockerPackageByApplication(plan.Application.GUID, plan.DockerImageCredentials)
 		warningsStream <- Warnings(warnings)
 		if err != nil {
 			return v7action.Package{}, err

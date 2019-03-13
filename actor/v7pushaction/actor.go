@@ -42,6 +42,7 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 
 	actor.PushPlanFuncs = []UpdatePushPlanFunc{
 		SetupApplicationForPushPlan,
+		SetupDockerImageCredentialsForPushPlan,
 		SetupBitsPathForPushPlan,
 		actor.SetupAllResourcesForPushPlan,
 		SetupNoStartForPushPlan,

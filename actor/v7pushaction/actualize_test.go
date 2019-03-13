@@ -522,10 +522,10 @@ var _ = Describe("Actualize", func() {
 	Describe("package upload", func() {
 		When("docker image is provided", func() {
 			BeforeEach(func() {
-				plan.Application.LifecycleType = constant.AppLifecycleTypeDocker
-				plan.Overrides.DockerImage = "some-docker-image"
-				plan.Overrides.DockerPassword = "some-docker-password"
-				plan.Overrides.DockerUsername = "some-docker-username"
+				plan.DockerImageCredentialsNeedsUpdate = true
+				plan.DockerImageCredentials.Path = "some-docker-image"
+				plan.DockerImageCredentials.Password = "some-docker-password"
+				plan.DockerImageCredentials.Username = "some-docker-username"
 
 				fakeV7Actor.CreateApplicationInSpaceReturns(
 					v7action.Application{
