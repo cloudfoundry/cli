@@ -22,6 +22,9 @@ type PushPlan struct {
 	DockerImageCredentials            v7action.DockerImageCredentials
 	DockerImageCredentialsNeedsUpdate bool
 
+	ScaleWebProcess            v7action.Process
+	ScaleWebProcessNeedsUpdate bool
+
 	Overrides FlagOverrides
 	Manifest  []byte
 

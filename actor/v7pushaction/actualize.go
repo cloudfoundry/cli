@@ -214,17 +214,11 @@ func (actor Actor) GetArchivePath(plan PushPlan) (string, error) {
 }
 
 func (actor Actor) ScaleProcess(plan PushPlan, warningsStream chan Warnings, eventStream chan Event) error {
-	if shouldScaleProcess(plan) {
+	if plan.ScaleWebProcessNeedsUpdate {
 		log.Info("Scaling Web Process")
 		eventStream <- ScaleWebProcess
 
-		process := v7action.Process{
-			Type:       constant.ProcessTypeWeb,
-			MemoryInMB: plan.Overrides.Memory,
-			DiskInMB:   plan.Overrides.Disk,
-			Instances:  plan.Overrides.Instances,
-		}
-		scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(plan.Application.GUID, process)
+		scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(plan.Application.GUID, plan.ScaleWebProcess)
 		warningsStream <- Warnings(scaleWarnings)
 		if err != nil {
 			return err
@@ -233,10 +227,6 @@ func (actor Actor) ScaleProcess(plan PushPlan, warningsStream chan Warnings, eve
 	}
 
 	return nil
-}
-
-func shouldScaleProcess(plan PushPlan) bool {
-	return plan.Overrides.Memory.IsSet || plan.Overrides.Instances.IsSet || plan.Overrides.Disk.IsSet
 }
 
 func (actor Actor) UpdateProcess(plan PushPlan, warningsStream chan Warnings, eventStream chan Event) error {

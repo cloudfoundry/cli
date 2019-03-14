@@ -204,21 +204,17 @@ var _ = Describe("Actualize", func() {
 		When("a scale override is passed", func() {
 			When("the scale is successful", func() {
 				var memory types.NullUint64
-				var disk types.NullUint64
-				var instances types.NullInt
 
 				BeforeEach(func() {
-					memory = types.NullUint64{IsSet: true, Value: 2048}
-					disk = types.NullUint64{IsSet: true, Value: 1024}
-					instances = types.NullInt{IsSet: true, Value: 1000}
-					fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, nil)
-
 					plan.Application.GUID = "some-app-guid"
-					plan.Overrides = FlagOverrides{
-						Memory:    memory,
-						Disk:      disk,
-						Instances: instances,
+
+					plan.ScaleWebProcessNeedsUpdate = true
+					memory = types.NullUint64{IsSet: true, Value: 2048}
+					plan.ScaleWebProcess = v7action.Process{
+						MemoryInMB: memory,
 					}
+
+					fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, nil)
 					fakeV7Actor.UpdateApplicationReturns(
 						v7action.Application{
 							Name: "some-app",
@@ -238,20 +234,17 @@ var _ = Describe("Actualize", func() {
 					Expect(passedAppGUID).To(Equal("some-app-guid"))
 					Expect(passedProcess).To(MatchFields(IgnoreExtras,
 						Fields{
-							"Type":       Equal("web"),
 							"MemoryInMB": Equal(memory),
-							"DiskInMB":   Equal(disk),
-							"Instances":  Equal(instances),
 						}))
 				})
 			})
 
 			When("the scale errors", func() {
 				var expectedErr error
+
 				BeforeEach(func() {
-					plan.Overrides = FlagOverrides{
-						Memory: types.NullUint64{IsSet: true},
-					}
+					plan.ScaleWebProcessNeedsUpdate = true
+
 					expectedErr = errors.New("nopes")
 					fakeV7Actor.ScaleProcessByApplicationReturns(v7action.Warnings{"scaling-warnings"}, expectedErr)
 				})
