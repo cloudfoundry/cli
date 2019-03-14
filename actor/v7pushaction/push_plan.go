@@ -25,6 +25,9 @@ type PushPlan struct {
 	ScaleWebProcess            v7action.Process
 	ScaleWebProcessNeedsUpdate bool
 
+	UpdateWebProcess            v7action.Process
+	UpdateWebProcessNeedsUpdate bool
+
 	Overrides FlagOverrides
 	Manifest  []byte
 

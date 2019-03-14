@@ -268,6 +268,17 @@ var _ = Describe("Actualize", func() {
 
 	Describe("setting process configuration", func() {
 		When("process configuration is provided", func() {
+			var startCommand types.FilteredString
+
+			BeforeEach(func() {
+				plan.UpdateWebProcessNeedsUpdate = true
+
+				startCommand = types.FilteredString{IsSet: true, Value: "some-start-command"}
+				plan.UpdateWebProcess = v7action.Process{
+					Command: startCommand,
+				}
+			})
+
 			When("the update is successful", func() {
 				BeforeEach(func() {
 					plan.Application.GUID = "some-app-guid"
@@ -283,124 +294,19 @@ var _ = Describe("Actualize", func() {
 					fakeV7Actor.UpdateProcessByTypeAndApplicationReturns(v7action.Warnings{"health-check-warnings"}, nil)
 				})
 
-				When("health check information is provided", func() {
-					var healthCheckType constant.HealthCheckType
-					var healthCheckEndpoint string
+				It("sets the process config and returns warnings", func() {
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
+					Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
 
-					BeforeEach(func() {
-						healthCheckType = constant.HTTP
-						healthCheckEndpoint = "/the-health-check"
-
-						plan.Overrides = FlagOverrides{
-							HealthCheckType:     healthCheckType,
-							HealthCheckEndpoint: healthCheckEndpoint,
-						}
-					})
-
-					It("sets the health check config and returns warnings", func() {
-						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
-						Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
-						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
-
-						Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(1))
-						passedProcessType, passedAppGUID, passedProcess := fakeV7Actor.UpdateProcessByTypeAndApplicationArgsForCall(0)
-						Expect(passedProcessType).To(Equal(constant.ProcessTypeWeb))
-						Expect(passedAppGUID).To(Equal("some-app-guid"))
-						Expect(passedProcess).To(MatchFields(IgnoreExtras,
-							Fields{
-								"HealthCheckType":              Equal(healthCheckType),
-								"HealthCheckEndpoint":          Equal(healthCheckEndpoint),
-								"HealthCheckInvocationTimeout": BeZero(),
-							}))
-					})
-				})
-
-				When("health check timeout is provided", func() {
-					var healthCheckTimeout int64
-
-					BeforeEach(func() {
-						healthCheckTimeout = 7
-						plan.Overrides = FlagOverrides{
-							HealthCheckTimeout: healthCheckTimeout,
-						}
-					})
-
-					It("sets the health check timeout and returns warnings", func() {
-						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
-						Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
-						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
-
-						Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(1))
-						passedProcessType, passedAppGUID, passedProcess := fakeV7Actor.UpdateProcessByTypeAndApplicationArgsForCall(0)
-						Expect(passedProcessType).To(Equal(constant.ProcessTypeWeb))
-						Expect(passedAppGUID).To(Equal("some-app-guid"))
-						Expect(passedProcess).To(MatchFields(IgnoreExtras,
-							Fields{
-								"HealthCheckTimeout": Equal(healthCheckTimeout),
-							}))
-					})
-				})
-
-				When("start command is provided", func() {
-					var command types.FilteredString
-
-					BeforeEach(func() {
-						command = *types.NewFilteredString("some-command")
-						plan.Overrides = FlagOverrides{
-							StartCommand: command,
-						}
-					})
-
-					It("sets the start command and returns warnings", func() {
-						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
-						Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
-						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
-
-						Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(1))
-						passedProcessType, passedAppGUID, passedProcess := fakeV7Actor.UpdateProcessByTypeAndApplicationArgsForCall(0)
-						Expect(passedProcessType).To(Equal(constant.ProcessTypeWeb))
-						Expect(passedAppGUID).To(Equal("some-app-guid"))
-						Expect(passedProcess).To(MatchFields(IgnoreExtras,
-							Fields{
-								"Command": Equal(command),
-							}))
-					})
-				})
-
-				When("start command and health check are provided", func() {
-					var command types.FilteredString
-					var healthCheckType constant.HealthCheckType
-					var healthCheckEndpoint string
-
-					BeforeEach(func() {
-						command = *types.NewFilteredString("some-command")
-						healthCheckType = constant.HTTP
-						healthCheckEndpoint = "/some-health-check"
-
-						plan.Overrides = FlagOverrides{
-							HealthCheckType:     healthCheckType,
-							HealthCheckEndpoint: healthCheckEndpoint,
-							StartCommand:        command,
-						}
-					})
-
-					It("sets the health check config/start command and returns warnings", func() {
-						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
-						Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
-						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
-
-						Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(1))
-						passedProcessType, passedAppGUID, passedProcess := fakeV7Actor.UpdateProcessByTypeAndApplicationArgsForCall(0)
-						Expect(passedProcessType).To(Equal(constant.ProcessTypeWeb))
-						Expect(passedAppGUID).To(Equal("some-app-guid"))
-						Expect(passedProcess).To(MatchFields(IgnoreExtras,
-							Fields{
-								"Command":                      Equal(command),
-								"HealthCheckType":              Equal(healthCheckType),
-								"HealthCheckEndpoint":          Equal(healthCheckEndpoint),
-								"HealthCheckInvocationTimeout": BeZero(),
-							}))
-					})
+					Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(1))
+					passedProcessType, passedAppGUID, passedProcess := fakeV7Actor.UpdateProcessByTypeAndApplicationArgsForCall(0)
+					Expect(passedProcessType).To(Equal(constant.ProcessTypeWeb))
+					Expect(passedAppGUID).To(Equal("some-app-guid"))
+					Expect(passedProcess).To(MatchFields(IgnoreExtras,
+						Fields{
+							"Command": Equal(startCommand),
+						}))
 				})
 			})
 
@@ -408,9 +314,6 @@ var _ = Describe("Actualize", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					plan.Overrides = FlagOverrides{
-						HealthCheckType: "doesn't matter",
-					}
 					expectedErr = errors.New("nopes")
 					fakeV7Actor.UpdateProcessByTypeAndApplicationReturns(v7action.Warnings{"health-check-warnings"}, expectedErr)
 				})
