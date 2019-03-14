@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func (actor Actor) SetupAllResourcesForPushPlan(pushPlan PushPlan, manifestApp manifestparser.Application) (PushPlan, error) {
+func (actor Actor) SetupAllResourcesForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
 	if pushPlan.Application.LifecycleType == constant.AppLifecycleTypeDocker {
 		return pushPlan, nil
 	}

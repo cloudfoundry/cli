@@ -12,6 +12,7 @@ import (
 var _ = Describe("SetupSkipRouteCreationForPushPlan", func() {
 	var (
 		pushPlan    PushPlan
+		overrides   FlagOverrides
 		manifestApp manifestparser.Application
 
 		expectedPushPlan PushPlan
@@ -20,16 +21,17 @@ var _ = Describe("SetupSkipRouteCreationForPushPlan", func() {
 
 	BeforeEach(func() {
 		pushPlan = PushPlan{}
+		overrides = FlagOverrides{}
 		manifestApp = manifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeErr = SetupSkipRouteCreationForPushPlan(pushPlan, manifestApp)
+		expectedPushPlan, executeErr = SetupSkipRouteCreationForPushPlan(pushPlan, overrides, manifestApp)
 	})
 
 	When("flag overrides specifies skipping route creation", func() {
 		BeforeEach(func() {
-			pushPlan.Overrides.SkipRouteCreation = true
+			overrides.SkipRouteCreation = true
 		})
 
 		It("sets SkipRouteCreation on the push plan", func() {

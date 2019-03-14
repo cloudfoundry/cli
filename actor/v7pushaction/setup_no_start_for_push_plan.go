@@ -4,8 +4,8 @@ import (
 	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
-func SetupNoStartForPushPlan(pushPlan PushPlan, manifestApp manifestparser.Application) (PushPlan, error) {
-	pushPlan.NoStart = pushPlan.Overrides.NoStart
+func SetupNoStartForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
+	pushPlan.NoStart = overrides.NoStart
 
 	return pushPlan, nil
 }

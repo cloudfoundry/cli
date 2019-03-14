@@ -15,6 +15,7 @@ import (
 var _ = Describe("SetupScaleWebProcessForPushPlan", func() {
 	var (
 		pushPlan    PushPlan
+		overrides   FlagOverrides
 		manifestApp manifestparser.Application
 
 		expectedPushPlan PushPlan
@@ -23,11 +24,12 @@ var _ = Describe("SetupScaleWebProcessForPushPlan", func() {
 
 	BeforeEach(func() {
 		pushPlan = PushPlan{}
+		overrides = FlagOverrides{}
 		manifestApp = manifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeErr = SetupScaleWebProcessForPushPlan(pushPlan, manifestApp)
+		expectedPushPlan, executeErr = SetupScaleWebProcessForPushPlan(pushPlan, overrides, manifestApp)
 	})
 
 	When("disk, instances, and memory are not set", func() {
@@ -41,7 +43,7 @@ var _ = Describe("SetupScaleWebProcessForPushPlan", func() {
 
 	When("when the disk is set on flag overrides", func() {
 		BeforeEach(func() {
-			pushPlan.Overrides.Disk = types.NullUint64{IsSet: true, Value: 555}
+			overrides.Disk = types.NullUint64{IsSet: true, Value: 555}
 		})
 
 		It("sets the disk on the push plan", func() {
@@ -57,7 +59,7 @@ var _ = Describe("SetupScaleWebProcessForPushPlan", func() {
 
 	When("when the instances is set on flag overrides", func() {
 		BeforeEach(func() {
-			pushPlan.Overrides.Instances = types.NullInt{IsSet: true, Value: 555}
+			overrides.Instances = types.NullInt{IsSet: true, Value: 555}
 		})
 
 		It("sets the instances on the push plan", func() {
@@ -73,7 +75,7 @@ var _ = Describe("SetupScaleWebProcessForPushPlan", func() {
 
 	When("when the memory is set on flag overrides", func() {
 		BeforeEach(func() {
-			pushPlan.Overrides.Memory = types.NullUint64{IsSet: true, Value: 555}
+			overrides.Memory = types.NullUint64{IsSet: true, Value: 555}
 		})
 
 		It("sets the memory on the push plan", func() {

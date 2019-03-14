@@ -25,7 +25,7 @@ var _ = Describe("CreatePushPlans", func() {
 		testUpdatePlanCount int
 	)
 
-	testUpdatePlan := func(pushState PushPlan, manifestApp manifestparser.Application) (PushPlan, error) {
+	testUpdatePlan := func(pushState PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
 		testUpdatePlanCount += 1
 		pushState.Application.Name = manifestApp.Name
 		return pushState, nil
@@ -137,19 +137,6 @@ var _ = Describe("CreatePushPlans", func() {
 		It("creates pushPlans with org and space GUIDs", func() {
 			Expect(pushPlans[0].SpaceGUID).To(Equal(spaceGUID))
 			Expect(pushPlans[0].OrgGUID).To(Equal(orgGUID))
-		})
-	})
-
-	Describe("Overrides", func() {
-		When("provided flag overrides", func() {
-			BeforeEach(func() {
-				flagOverrides.Stack = "some-stack"
-			})
-
-			It("sets overrides on push plan", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(pushPlans[0].Overrides).To(Equal(flagOverrides))
-			})
 		})
 	})
 

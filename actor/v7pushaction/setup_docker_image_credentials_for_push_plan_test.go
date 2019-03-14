@@ -14,6 +14,7 @@ import (
 var _ = Describe("SetupDockerImageCredentialsForPushPlan", func() {
 	var (
 		pushPlan    PushPlan
+		overrides   FlagOverrides
 		manifestApp manifestparser.Application
 
 		expectedPushPlan PushPlan
@@ -22,11 +23,12 @@ var _ = Describe("SetupDockerImageCredentialsForPushPlan", func() {
 
 	BeforeEach(func() {
 		pushPlan = PushPlan{}
+		overrides = FlagOverrides{}
 		manifestApp = manifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeErr = SetupDockerImageCredentialsForPushPlan(pushPlan, manifestApp)
+		expectedPushPlan, executeErr = SetupDockerImageCredentialsForPushPlan(pushPlan, overrides, manifestApp)
 	})
 
 	When("the LifecycleType is not Docker", func() {
@@ -45,9 +47,9 @@ var _ = Describe("SetupDockerImageCredentialsForPushPlan", func() {
 
 		When("when the flag overrides contain docker settings", func() {
 			BeforeEach(func() {
-				pushPlan.Overrides.DockerImage = "some-image"
-				pushPlan.Overrides.DockerUsername = "some-username"
-				pushPlan.Overrides.DockerPassword = "some-password"
+				overrides.DockerImage = "some-image"
+				overrides.DockerUsername = "some-username"
+				overrides.DockerPassword = "some-password"
 			})
 
 			It("sets the docker credentials on the push plan", func() {

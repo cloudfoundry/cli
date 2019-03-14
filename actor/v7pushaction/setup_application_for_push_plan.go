@@ -6,12 +6,11 @@ import (
 	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
-func SetupApplicationForPushPlan(pushPlan PushPlan, manifestApp manifestparser.Application) (PushPlan, error) {
+func SetupApplicationForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
 	application := v7action.Application{Name: manifestApp.Name}
 
 	var applicationNeedsUpdate bool
 
-	overrides := pushPlan.Overrides
 	if buildpacksPresent(overrides) {
 		application.LifecycleType = constant.AppLifecycleTypeBuildpack
 		application.LifecycleBuildpacks = overrides.Buildpacks

@@ -21,6 +21,7 @@ var _ = Describe("SetupAllResourcesForPushPlan", func() {
 		fakeSharedActor *v7pushactionfakes.FakeSharedActor
 
 		pushPlan    PushPlan
+		overrides   FlagOverrides
 		manifestApp manifestparser.Application
 
 		expectedPushPlan PushPlan
@@ -31,11 +32,12 @@ var _ = Describe("SetupAllResourcesForPushPlan", func() {
 		actor, _, _, fakeSharedActor = getTestPushActor()
 
 		pushPlan = PushPlan{}
+		overrides = FlagOverrides{}
 		manifestApp = manifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeErr = actor.SetupAllResourcesForPushPlan(pushPlan, manifestApp)
+		expectedPushPlan, executeErr = actor.SetupAllResourcesForPushPlan(pushPlan, overrides, manifestApp)
 	})
 
 	When("the application is a docker app", func() {

@@ -28,8 +28,7 @@ type PushPlan struct {
 	UpdateWebProcess            v7action.Process
 	UpdateWebProcessNeedsUpdate bool
 
-	Overrides FlagOverrides
-	Manifest  []byte
+	Manifest []byte
 
 	Archive            bool
 	BitsPath           string

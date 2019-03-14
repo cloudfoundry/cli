@@ -11,6 +11,7 @@ import (
 var _ = Describe("SetupApplicationForPushPlan", func() {
 	var (
 		pushPlan    PushPlan
+		overrides   FlagOverrides
 		manifestApp manifestparser.Application
 
 		expectedPushPlan PushPlan
@@ -23,12 +24,13 @@ var _ = Describe("SetupApplicationForPushPlan", func() {
 		appName = "some-app-name"
 
 		pushPlan = PushPlan{}
+		overrides = FlagOverrides{}
 		manifestApp = manifestparser.Application{}
 		manifestApp.Name = appName
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeErr = SetupApplicationForPushPlan(pushPlan, manifestApp)
+		expectedPushPlan, executeErr = SetupApplicationForPushPlan(pushPlan, overrides, manifestApp)
 	})
 
 	AssertNameIsSet := func() {
@@ -46,7 +48,7 @@ var _ = Describe("SetupApplicationForPushPlan", func() {
 	Describe("LifecycleType", func() {
 		When("our overrides contain a DockerImage", func() {
 			BeforeEach(func() {
-				pushPlan.Overrides.DockerImage = "docker://yes/yes"
+				overrides.DockerImage = "docker://yes/yes"
 			})
 
 			It("creates a pushPlan with an app with LifecycleType docker", func() {
@@ -72,7 +74,7 @@ var _ = Describe("SetupApplicationForPushPlan", func() {
 	Describe("Buildpacks", func() {
 		When("our overrides contain one or more buildpacks", func() {
 			BeforeEach(func() {
-				pushPlan.Overrides.Buildpacks = []string{"buildpack-1", "buildpack-2"}
+				overrides.Buildpacks = []string{"buildpack-1", "buildpack-2"}
 			})
 
 			It("creates a pushPlan with an app with Buildpacks set", func() {
@@ -112,7 +114,7 @@ var _ = Describe("SetupApplicationForPushPlan", func() {
 	Describe("Stacks", func() {
 		When("our overrides contain a stack", func() {
 			BeforeEach(func() {
-				pushPlan.Overrides.Stack = "stack"
+				overrides.Stack = "stack"
 			})
 
 			It("creates a pushPlan with an application with StackName matching the override", func() {

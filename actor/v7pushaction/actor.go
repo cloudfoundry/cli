@@ -10,7 +10,7 @@ import (
 
 // UpdatePushPlanFunc is a function that is used by CreatePushPlans to setup
 // push plans for the push command.
-type UpdatePushPlanFunc func(pushPlan PushPlan, manifestApp manifestparser.Application) (PushPlan, error)
+type UpdatePushPlanFunc func(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error)
 
 // Warnings is a list of warnings returned back from the cloud controller
 type Warnings []string

@@ -7,11 +7,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func SetupBitsPathForPushPlan(pushPlan PushPlan, manifestApp manifestparser.Application) (PushPlan, error) {
+func SetupBitsPathForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
 	log.Info("determine bits path")
-	if pushPlan.Overrides.ProvidedAppPath != "" {
-		log.WithField("path", pushPlan.Overrides.ProvidedAppPath).Debug("using flag override path for bits path")
-		pushPlan.BitsPath = pushPlan.Overrides.ProvidedAppPath
+	if overrides.ProvidedAppPath != "" {
+		log.WithField("path", overrides.ProvidedAppPath).Debug("using flag override path for bits path")
+		pushPlan.BitsPath = overrides.ProvidedAppPath
 	} else if manifestApp.Path != "" {
 		log.WithField("path", manifestApp.Path).Debug("using manifest path for bits path")
 		pushPlan.BitsPath = manifestApp.Path

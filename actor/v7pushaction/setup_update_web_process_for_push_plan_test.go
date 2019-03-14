@@ -15,6 +15,7 @@ import (
 var _ = Describe("SetupUpdateWebProcessForPushPlan", func() {
 	var (
 		pushPlan    PushPlan
+		overrides   FlagOverrides
 		manifestApp manifestparser.Application
 
 		expectedPushPlan PushPlan
@@ -23,11 +24,12 @@ var _ = Describe("SetupUpdateWebProcessForPushPlan", func() {
 
 	BeforeEach(func() {
 		pushPlan = PushPlan{}
+		overrides = FlagOverrides{}
 		manifestApp = manifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeErr = SetupUpdateWebProcessForPushPlan(pushPlan, manifestApp)
+		expectedPushPlan, executeErr = SetupUpdateWebProcessForPushPlan(pushPlan, overrides, manifestApp)
 	})
 
 	When("start command, health check type, and health check timeout are not set", func() {
@@ -41,7 +43,7 @@ var _ = Describe("SetupUpdateWebProcessForPushPlan", func() {
 
 	When("the start command is set on flag overrides", func() {
 		BeforeEach(func() {
-			pushPlan.Overrides.StartCommand = types.FilteredString{IsSet: true, Value: "some-command"}
+			overrides.StartCommand = types.FilteredString{IsSet: true, Value: "some-command"}
 		})
 
 		It("sets the start command on the push plan", func() {
@@ -56,8 +58,8 @@ var _ = Describe("SetupUpdateWebProcessForPushPlan", func() {
 
 	When("the health check type is set on flag overrides", func() {
 		BeforeEach(func() {
-			pushPlan.Overrides.HealthCheckType = constant.HTTP
-			pushPlan.Overrides.HealthCheckEndpoint = "/potato"
+			overrides.HealthCheckType = constant.HTTP
+			overrides.HealthCheckEndpoint = "/potato"
 		})
 
 		It("sets the health check type and endpoint on the push plan", func() {
@@ -73,7 +75,7 @@ var _ = Describe("SetupUpdateWebProcessForPushPlan", func() {
 
 	When("the health check timeout is set on flag overrides", func() {
 		BeforeEach(func() {
-			pushPlan.Overrides.HealthCheckTimeout = 100
+			overrides.HealthCheckTimeout = 100
 		})
 
 		It("sets the health check timeout on the push plan", func() {

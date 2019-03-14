@@ -10,6 +10,7 @@ import (
 var _ = Describe("SetupBitsPathForPushPlan", func() {
 	var (
 		pushPlan    PushPlan
+		overrides   FlagOverrides
 		manifestApp manifestparser.Application
 
 		expectedPushPlan PushPlan
@@ -18,17 +19,18 @@ var _ = Describe("SetupBitsPathForPushPlan", func() {
 
 	BeforeEach(func() {
 		pushPlan = PushPlan{}
+		overrides = FlagOverrides{}
 		manifestApp = manifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeError = SetupBitsPathForPushPlan(pushPlan, manifestApp)
+		expectedPushPlan, executeError = SetupBitsPathForPushPlan(pushPlan, overrides, manifestApp)
 	})
 
 	Describe("Path", func() {
 		When("overrides contain a path", func() {
 			BeforeEach(func() {
-				pushPlan.Overrides.ProvidedAppPath = "some/path"
+				overrides.ProvidedAppPath = "some/path"
 			})
 
 			It("creates a pushPlan with an app with BitsPath set", func() {

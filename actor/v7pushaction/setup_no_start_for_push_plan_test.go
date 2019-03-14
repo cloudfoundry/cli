@@ -12,6 +12,7 @@ import (
 var _ = Describe("SetupNoStartForPushPlan", func() {
 	var (
 		pushPlan    PushPlan
+		overrides   FlagOverrides
 		manifestApp manifestparser.Application
 
 		expectedPushPlan PushPlan
@@ -20,16 +21,17 @@ var _ = Describe("SetupNoStartForPushPlan", func() {
 
 	BeforeEach(func() {
 		pushPlan = PushPlan{}
+		overrides = FlagOverrides{}
 		manifestApp = manifestparser.Application{}
 	})
 
 	JustBeforeEach(func() {
-		expectedPushPlan, executeErr = SetupNoStartForPushPlan(pushPlan, manifestApp)
+		expectedPushPlan, executeErr = SetupNoStartForPushPlan(pushPlan, overrides, manifestApp)
 	})
 
 	When("flag overrides specifies no start", func() {
 		BeforeEach(func() {
-			pushPlan.Overrides.NoStart = true
+			overrides.NoStart = true
 		})
 
 		It("sets no start on the push plan", func() {

@@ -6,15 +6,15 @@ import (
 	"code.cloudfoundry.org/cli/util/manifestparser"
 )
 
-func SetupScaleWebProcessForPushPlan(pushPlan PushPlan, manifestApp manifestparser.Application) (PushPlan, error) {
-	if pushPlan.Overrides.Memory.IsSet || pushPlan.Overrides.Disk.IsSet || pushPlan.Overrides.Instances.IsSet {
+func SetupScaleWebProcessForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
+	if overrides.Memory.IsSet || overrides.Disk.IsSet || overrides.Instances.IsSet {
 		pushPlan.ScaleWebProcessNeedsUpdate = true
 
 		pushPlan.ScaleWebProcess = v7action.Process{
 			Type:       constant.ProcessTypeWeb,
-			DiskInMB:   pushPlan.Overrides.Disk,
-			Instances:  pushPlan.Overrides.Instances,
-			MemoryInMB: pushPlan.Overrides.Memory,
+			DiskInMB:   overrides.Disk,
+			Instances:  overrides.Instances,
+			MemoryInMB: overrides.Memory,
 		}
 	}
 	return pushPlan, nil

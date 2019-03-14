@@ -6,23 +6,23 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func SetupUpdateWebProcessForPushPlan(pushPlan PushPlan, manifestApp manifestparser.Application) (PushPlan, error) {
-	if shouldUpdateWebProcess(pushPlan) {
+func SetupUpdateWebProcessForPushPlan(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error) {
+	if shouldUpdateWebProcess(overrides) {
 		log.Info("Setting Web Process's Configuration")
 		pushPlan.UpdateWebProcessNeedsUpdate = true
 
 		pushPlan.UpdateWebProcess = v7action.Process{
-			Command:             pushPlan.Overrides.StartCommand,
-			HealthCheckType:     pushPlan.Overrides.HealthCheckType,
-			HealthCheckEndpoint: pushPlan.Overrides.HealthCheckEndpoint,
-			HealthCheckTimeout:  pushPlan.Overrides.HealthCheckTimeout,
+			Command:             overrides.StartCommand,
+			HealthCheckType:     overrides.HealthCheckType,
+			HealthCheckEndpoint: overrides.HealthCheckEndpoint,
+			HealthCheckTimeout:  overrides.HealthCheckTimeout,
 		}
 	}
 	return pushPlan, nil
 }
 
-func shouldUpdateWebProcess(pushPlan PushPlan) bool {
-	return pushPlan.Overrides.StartCommand.IsSet ||
-		pushPlan.Overrides.HealthCheckType != "" ||
-		pushPlan.Overrides.HealthCheckTimeout != 0
+func shouldUpdateWebProcess(overrides FlagOverrides) bool {
+	return overrides.StartCommand.IsSet ||
+		overrides.HealthCheckType != "" ||
+		overrides.HealthCheckTimeout != 0
 }

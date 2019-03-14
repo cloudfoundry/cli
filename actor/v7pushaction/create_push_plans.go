@@ -19,11 +19,10 @@ func (actor Actor) CreatePushPlans(appNameArg string, spaceGUID string, orgGUID 
 		plan := PushPlan{
 			OrgGUID:   orgGUID,
 			SpaceGUID: spaceGUID,
-			Overrides: overrides,
 		}
 		for _, updatePlan := range actor.PushPlanFuncs {
 			var err error
-			plan, err = updatePlan(plan, manifestApplication)
+			plan, err = updatePlan(plan, overrides, manifestApplication)
 			if err != nil {
 				return nil, err
 			}
