@@ -24,17 +24,13 @@ func (refreshTokenResponse RefreshedTokens) AuthorizationToken() string {
 
 // RefreshAccessToken refreshes the current access token.
 func (client *Client) RefreshAccessToken(refreshToken string) (RefreshedTokens, error) {
-	values := url.Values{
-		"client_id":     {client.config.UAAOAuthClient()},
-		"client_secret": {client.config.UAAOAuthClientSecret()},
-	}
+	var values url.Values
 
-	// An empty grant_type implies that the authentication grant_type is 'password'
-	if client.config.UAAGrantType() != "" {
-		values.Add("grant_type", client.config.UAAGrantType())
-	} else {
-		values.Add("grant_type", string(constant.GrantTypeRefreshToken))
-		values.Add("refresh_token", refreshToken)
+	switch client.config.UAAGrantType() {
+	case string(constant.GrantTypeClientCredentials):
+		values = client.clientCredentialRefreshBody()
+	case "", string(constant.GrantTypePassword): // CLI used to write empty string for grant type in the case of password; preserve compatibility with old config.json files
+		values = client.refreshTokenBody(refreshToken)
 	}
 
 	body := strings.NewReader(values.Encode())
@@ -63,4 +59,19 @@ func (client *Client) RefreshAccessToken(refreshToken string) (RefreshedTokens, 
 	}
 
 	return refreshResponse, nil
+}
+
+func (client *Client) clientCredentialRefreshBody() url.Values {
+	return url.Values{
+		"client_id":     {client.config.UAAOAuthClient()},
+		"client_secret": {client.config.UAAOAuthClientSecret()},
+		"grant_type":    {string(constant.GrantTypeClientCredentials)},
+	}
+}
+
+func (client *Client) refreshTokenBody(refreshToken string) url.Values {
+	return url.Values{
+		"refresh_token": {refreshToken},
+		"grant_type":    {string(constant.GrantTypeRefreshToken)},
+	}
 }

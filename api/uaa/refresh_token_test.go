@@ -70,8 +70,10 @@ var _ = Describe("UAA Client", func() {
 			})
 		})
 
-		When("the provided grant_type is not client_credentials", func() {
+		When("the provided grant_type is password", func() {
 			BeforeEach(func() {
+				fakeConfig.UAAGrantTypeReturns(string(constant.GrantTypePassword))
+
 				returnedAccessToken = "I-ACCESS-TOKEN"
 				sentRefreshToken = "I-R-REFRESH-TOKEN"
 				returnedRefreshToken = "I-R-NEW-REFRESH-TOKEN"
@@ -91,7 +93,48 @@ var _ = Describe("UAA Client", func() {
 						VerifyHeaderKV("Accept", "application/json"),
 						VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
 						VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
-						VerifyBody([]byte(fmt.Sprintf("client_id=client-id&client_secret=client-secret&grant_type=%s&refresh_token=%s", constant.GrantTypeRefreshToken, sentRefreshToken))),
+						VerifyBody([]byte(fmt.Sprintf("grant_type=%s&refresh_token=%s", constant.GrantTypeRefreshToken, sentRefreshToken))),
+						RespondWith(http.StatusOK, response),
+					))
+			})
+
+			It("refreshes the tokens", func() {
+				token, err := client.RefreshAccessToken(sentRefreshToken)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(token).To(Equal(RefreshedTokens{
+					AccessToken:  returnedAccessToken,
+					RefreshToken: returnedRefreshToken,
+					Type:         "bearer",
+				}))
+
+				Expect(server.ReceivedRequests()).To(HaveLen(2))
+			})
+		})
+
+		When("the provided grant_type is empty", func() {
+			BeforeEach(func() {
+				fakeConfig.UAAGrantTypeReturns("")
+
+				returnedAccessToken = "I-ACCESS-TOKEN"
+				sentRefreshToken = "I-R-REFRESH-TOKEN"
+				returnedRefreshToken = "I-R-NEW-REFRESH-TOKEN"
+				response := fmt.Sprintf(`{
+				"access_token": "%s",
+				"token_type": "bearer",
+				"refresh_token": "%s",
+				"expires_in": 599,
+				"scope": "cloud_controller.read password.write cloud_controller.write openid uaa.user",
+				"jti": "4150c08afa2848278e5ad57201024e32"
+			}`, returnedAccessToken, returnedRefreshToken)
+
+				server.AppendHandlers(
+					CombineHandlers(
+						verifyRequestHost(TestAuthorizationResource),
+						VerifyRequest(http.MethodPost, "/oauth/token"),
+						VerifyHeaderKV("Accept", "application/json"),
+						VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
+						VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
+						VerifyBody([]byte(fmt.Sprintf("grant_type=%s&refresh_token=%s", constant.GrantTypeRefreshToken, sentRefreshToken))),
 						RespondWith(http.StatusOK, response),
 					))
 			})
