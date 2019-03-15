@@ -1,12 +1,14 @@
 package helpers
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/util/configv3"
 
+	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
@@ -37,6 +39,8 @@ func SetHomeDir() string {
 
 	Expect(os.Setenv("CF_HOME", homeDir)).To(Succeed())
 	Expect(os.Setenv("CF_PLUGIN_HOME", homeDir)).To(Succeed())
+
+	GinkgoWriter.Write([]byte(fmt.Sprintln("HOME DIR>", homeDir)))
 	return homeDir
 }
 
