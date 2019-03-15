@@ -942,44 +942,6 @@ var _ = Describe("push Command", func() {
 				Expect(overridesErr).ToNot(HaveOccurred())
 				Expect(overrides.DockerImage).To(Equal("some-docker-image"))
 			})
-
-			When("docker username is provided", func() {
-				When("a password is provided via environment variable", func() {
-					BeforeEach(func() {
-						cmd.DockerUsername = "some-docker-username"
-						fakeConfig.DockerPasswordReturns("some-docker-password")
-					})
-
-					It("takes the password from the environment", func() {
-						Expect(overridesErr).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).ToNot(Say("Environment variable CF_DOCKER_PASSWORD not set."))
-						Expect(testUI.Out).ToNot(Say("Docker password"))
-
-						Expect(testUI.Out).To(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
-
-						Expect(overrides.DockerUsername).To(Equal("some-docker-username"))
-						Expect(overrides.DockerPassword).To(Equal("some-docker-password"))
-					})
-				})
-
-				When("no password is provided", func() {
-					BeforeEach(func() {
-						cmd.DockerUsername = "some-docker-username"
-						input.Write([]byte("some-docker-password\n"))
-					})
-
-					It("prompts for a password", func() {
-						Expect(overridesErr).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).To(Say("Environment variable CF_DOCKER_PASSWORD not set."))
-						Expect(testUI.Out).To(Say("Docker password"))
-
-						Expect(overrides.DockerUsername).To(Equal("some-docker-username"))
-						Expect(overrides.DockerPassword).To(Equal("some-docker-password"))
-					})
-				})
-			})
 		})
 	})
 

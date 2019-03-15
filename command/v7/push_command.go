@@ -169,6 +169,11 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
+	flagOverrides.DockerPassword, err = GetDockerPassword(cmd.UI, cmd.Config, flagOverrides.DockerUsername)
+	if err != nil {
+		return err
+	}
+
 	pushPlans, err := cmd.Actor.CreatePushPlans(
 		cmd.OptionalArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
@@ -514,28 +519,26 @@ func (cmd PushCommand) ReadManifest() error {
 	return nil
 }
 
-func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
-	var dockerPassword string
-	if cmd.DockerUsername != "" {
-		if cmd.Config.DockerPassword() == "" {
-			var err error
-			cmd.UI.DisplayText("Environment variable CF_DOCKER_PASSWORD not set.")
-			dockerPassword, err = cmd.UI.DisplayPasswordPrompt("Docker password")
-			if err != nil {
-				return v7pushaction.FlagOverrides{}, err
-			}
-		} else {
-			cmd.UI.DisplayText("Using docker repository password from environment variable CF_DOCKER_PASSWORD.")
-			dockerPassword = cmd.Config.DockerPassword()
-		}
+func (cmd PushCommand) getDockerPassword() (string, error) {
+	if cmd.DockerUsername == "" { // no need for a password without a username
+		return "", nil
 	}
 
+	if cmd.Config.DockerPassword() == "" {
+		cmd.UI.DisplayText("Environment variable CF_DOCKER_PASSWORD not set.")
+		return cmd.UI.DisplayPasswordPrompt("Docker password")
+	}
+
+	cmd.UI.DisplayText("Using docker repository password from environment variable CF_DOCKER_PASSWORD.")
+	return cmd.Config.DockerPassword(), nil
+}
+
+func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 	return v7pushaction.FlagOverrides{
 		Buildpacks:          cmd.Buildpacks,
 		Stack:               cmd.Stack,
 		Disk:                cmd.Disk.NullUint64,
 		DockerImage:         cmd.DockerImage.Path,
-		DockerPassword:      dockerPassword,
 		DockerUsername:      cmd.DockerUsername,
 		HealthCheckEndpoint: cmd.HealthCheckHTTPEndpoint,
 		HealthCheckType:     cmd.HealthCheckType.Type,
