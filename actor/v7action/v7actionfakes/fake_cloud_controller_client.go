@@ -638,6 +638,21 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	ResourceMatchStub        func([]ccv3.Resource) ([]ccv3.Resource, ccv3.Warnings, error)
+	resourceMatchMutex       sync.RWMutex
+	resourceMatchArgsForCall []struct {
+		arg1 []ccv3.Resource
+	}
+	resourceMatchReturns struct {
+		result1 []ccv3.Resource
+		result2 ccv3.Warnings
+		result3 error
+	}
+	resourceMatchReturnsOnCall map[int]struct {
+		result1 []ccv3.Resource
+		result2 ccv3.Warnings
+		result3 error
+	}
 	SetApplicationDropletStub        func(string, string) (ccv3.Relationship, ccv3.Warnings, error)
 	setApplicationDropletMutex       sync.RWMutex
 	setApplicationDropletArgsForCall []struct {
@@ -3713,6 +3728,77 @@ func (fake *FakeCloudControllerClient) PollJobReturnsOnCall(i int, result1 ccv3.
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) ResourceMatch(arg1 []ccv3.Resource) ([]ccv3.Resource, ccv3.Warnings, error) {
+	var arg1Copy []ccv3.Resource
+	if arg1 != nil {
+		arg1Copy = make([]ccv3.Resource, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.resourceMatchMutex.Lock()
+	ret, specificReturn := fake.resourceMatchReturnsOnCall[len(fake.resourceMatchArgsForCall)]
+	fake.resourceMatchArgsForCall = append(fake.resourceMatchArgsForCall, struct {
+		arg1 []ccv3.Resource
+	}{arg1Copy})
+	fake.recordInvocation("ResourceMatch", []interface{}{arg1Copy})
+	fake.resourceMatchMutex.Unlock()
+	if fake.ResourceMatchStub != nil {
+		return fake.ResourceMatchStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.resourceMatchReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) ResourceMatchCallCount() int {
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
+	return len(fake.resourceMatchArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) ResourceMatchCalls(stub func([]ccv3.Resource) ([]ccv3.Resource, ccv3.Warnings, error)) {
+	fake.resourceMatchMutex.Lock()
+	defer fake.resourceMatchMutex.Unlock()
+	fake.ResourceMatchStub = stub
+}
+
+func (fake *FakeCloudControllerClient) ResourceMatchArgsForCall(i int) []ccv3.Resource {
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
+	argsForCall := fake.resourceMatchArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) ResourceMatchReturns(result1 []ccv3.Resource, result2 ccv3.Warnings, result3 error) {
+	fake.resourceMatchMutex.Lock()
+	defer fake.resourceMatchMutex.Unlock()
+	fake.ResourceMatchStub = nil
+	fake.resourceMatchReturns = struct {
+		result1 []ccv3.Resource
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) ResourceMatchReturnsOnCall(i int, result1 []ccv3.Resource, result2 ccv3.Warnings, result3 error) {
+	fake.resourceMatchMutex.Lock()
+	defer fake.resourceMatchMutex.Unlock()
+	fake.ResourceMatchStub = nil
+	if fake.resourceMatchReturnsOnCall == nil {
+		fake.resourceMatchReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Resource
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.resourceMatchReturnsOnCall[i] = struct {
+		result1 []ccv3.Resource
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) SetApplicationDroplet(arg1 string, arg2 string) (ccv3.Relationship, ccv3.Warnings, error) {
 	fake.setApplicationDropletMutex.Lock()
 	ret, specificReturn := fake.setApplicationDropletReturnsOnCall[len(fake.setApplicationDropletArgsForCall)]
@@ -5024,6 +5110,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getStacksMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()
 	defer fake.setApplicationDropletMutex.RUnlock()
 	fake.shareServiceInstanceToSpacesMutex.RLock()
