@@ -759,6 +759,31 @@ var _ = Describe("login command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
+		When("the user's account has been locked due to too many failed attempts", func() {
+			var username string
+
+			BeforeEach(func() {
+				helpers.LoginCF()
+				username, _ = helpers.CreateUser()
+				helpers.LogoutCF()
+			})
+
+			It("displays a helpful error", func() {
+				input := NewBuffer()
+				input.Write([]byte("garbage\ngarbage\ngarbage\ngarbage\ngarbage\ngarbage\n"))
+				session := helpers.CFWithStdin(input, "login", "-u", username)
+				Eventually(session).Should(Exit(1))
+
+				session = helpers.CFWithStdin(input, "login", "-u", username)
+				Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
+				Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
+				Eventually(session.Err).Should(Say(`Your account has been locked because of too many failed attempts to login\.`))
+				Eventually(session.Err).Should(Say(`Unable to authenticate.`))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
 		When("the -u flag is provided", func() {
 			It("prompts the user for their password", func() {
 				username, password := helpers.GetCredentials()

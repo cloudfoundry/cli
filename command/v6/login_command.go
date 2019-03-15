@@ -289,4 +289,5 @@ func (cmd *LoginCommand) showStatus() {
 	tableContent = append(tableContent, []string{cmd.UI.TranslateText("User:"), user})
 
 	cmd.UI.DisplayKeyValueTable("", tableContent, 3)
+	cmd.UI.DisplayNewline()
 }
