@@ -32,9 +32,9 @@ type PushPlan struct {
 
 	Archive            bool
 	BitsPath           string
-	AllResources       []sharedaction.Resource
-	MatchedResources   []sharedaction.Resource
-	UnmatchedResources []sharedaction.Resource
+	AllResources       []sharedaction.V3Resource
+	MatchedResources   []sharedaction.V3Resource
+	UnmatchedResources []sharedaction.V3Resource
 }
 
 type FlagOverrides struct {

@@ -2,6 +2,7 @@ package sharedaction
 
 import (
 	"archive/zip"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"crypto/sha1"
 	"fmt"
 	"io"
@@ -39,6 +40,28 @@ type Resource struct {
 	Mode     os.FileMode `json:"mode"`
 	SHA1     string      `json:"sha1"`
 	Size     int64       `json:"size"`
+}
+
+type V3Resource ccv3.Resource
+
+// Translate shared action Resource to V3 Resource format
+func (r Resource) ToV3Resource() V3Resource {
+	return V3Resource{
+		FilePath:    r.Filename,
+		Mode:        r.Mode,
+		Checksum:    ccv3.Checksum{Value: r.SHA1},
+		SizeInBytes: r.Size,
+	}
+}
+
+// Translate shared action Resource to V3 Resource format
+func (r V3Resource) ToV2Resource() Resource {
+	return Resource{
+		Filename: r.FilePath,
+		Mode:     r.Mode,
+		SHA1:     r.Checksum.Value,
+		Size:     r.SizeInBytes,
+	}
 }
 
 // GatherArchiveResources returns a list of resources for an archive.

@@ -320,10 +320,10 @@ var _ = Describe("Package Actions", func() {
 
 	Describe("UploadBitsPackage", func() {
 		var (
-			pkg               Package
-			existingResources []sharedaction.Resource
-			reader            io.Reader
-			readerLength      int64
+			pkg              Package
+			matchedResources []sharedaction.V3Resource
+			reader           io.Reader
+			readerLength     int64
 
 			appPkg     Package
 			warnings   Warnings
@@ -333,14 +333,14 @@ var _ = Describe("Package Actions", func() {
 		BeforeEach(func() {
 			pkg = Package{GUID: "some-package-guid"}
 
-			existingResources = []sharedaction.Resource{{Filename: "some-resource"}, {Filename: "another-resource"}}
+			matchedResources = []sharedaction.V3Resource{{FilePath: "some-resource"}, {FilePath: "another-resource"}}
 			someString := "who reads these days"
 			reader = strings.NewReader(someString)
 			readerLength = int64(len([]byte(someString)))
 		})
 
 		JustBeforeEach(func() {
-			appPkg, warnings, executeErr = actor.UploadBitsPackage(pkg, existingResources, reader, readerLength)
+			appPkg, warnings, executeErr = actor.UploadBitsPackage(pkg, matchedResources, reader, readerLength)
 		})
 
 		When("the upload is successful", func() {
@@ -356,7 +356,7 @@ var _ = Describe("Package Actions", func() {
 				Expect(fakeCloudControllerClient.UploadBitsPackageCallCount()).To(Equal(1))
 				passedPackage, passedExistingResources, passedReader, passedReaderLength := fakeCloudControllerClient.UploadBitsPackageArgsForCall(0)
 				Expect(passedPackage).To(Equal(ccv3.Package(appPkg)))
-				Expect(passedExistingResources).To(ConsistOf(ccv3.V2FormattedResource{Filename: "some-resource"}, ccv3.V2FormattedResource{Filename: "another-resource"}))
+				Expect(passedExistingResources).To(ConsistOf(ccv3.Resource{FilePath: "some-resource"}, ccv3.Resource{FilePath: "another-resource"}))
 				Expect(passedReader).To(Equal(reader))
 				Expect(passedReaderLength).To(Equal(readerLength))
 			})

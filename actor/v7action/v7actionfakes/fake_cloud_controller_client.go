@@ -870,11 +870,11 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UploadBitsPackageStub        func(ccv3.Package, []ccv3.V2FormattedResource, io.Reader, int64) (ccv3.Package, ccv3.Warnings, error)
+	UploadBitsPackageStub        func(ccv3.Package, []ccv3.Resource, io.Reader, int64) (ccv3.Package, ccv3.Warnings, error)
 	uploadBitsPackageMutex       sync.RWMutex
 	uploadBitsPackageArgsForCall []struct {
 		arg1 ccv3.Package
-		arg2 []ccv3.V2FormattedResource
+		arg2 []ccv3.Resource
 		arg3 io.Reader
 		arg4 int64
 	}
@@ -4725,17 +4725,17 @@ func (fake *FakeCloudControllerClient) UpdateTaskCancelReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UploadBitsPackage(arg1 ccv3.Package, arg2 []ccv3.V2FormattedResource, arg3 io.Reader, arg4 int64) (ccv3.Package, ccv3.Warnings, error) {
-	var arg2Copy []ccv3.V2FormattedResource
+func (fake *FakeCloudControllerClient) UploadBitsPackage(arg1 ccv3.Package, arg2 []ccv3.Resource, arg3 io.Reader, arg4 int64) (ccv3.Package, ccv3.Warnings, error) {
+	var arg2Copy []ccv3.Resource
 	if arg2 != nil {
-		arg2Copy = make([]ccv3.V2FormattedResource, len(arg2))
+		arg2Copy = make([]ccv3.Resource, len(arg2))
 		copy(arg2Copy, arg2)
 	}
 	fake.uploadBitsPackageMutex.Lock()
 	ret, specificReturn := fake.uploadBitsPackageReturnsOnCall[len(fake.uploadBitsPackageArgsForCall)]
 	fake.uploadBitsPackageArgsForCall = append(fake.uploadBitsPackageArgsForCall, struct {
 		arg1 ccv3.Package
-		arg2 []ccv3.V2FormattedResource
+		arg2 []ccv3.Resource
 		arg3 io.Reader
 		arg4 int64
 	}{arg1, arg2Copy, arg3, arg4})
@@ -4757,13 +4757,13 @@ func (fake *FakeCloudControllerClient) UploadBitsPackageCallCount() int {
 	return len(fake.uploadBitsPackageArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UploadBitsPackageCalls(stub func(ccv3.Package, []ccv3.V2FormattedResource, io.Reader, int64) (ccv3.Package, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UploadBitsPackageCalls(stub func(ccv3.Package, []ccv3.Resource, io.Reader, int64) (ccv3.Package, ccv3.Warnings, error)) {
 	fake.uploadBitsPackageMutex.Lock()
 	defer fake.uploadBitsPackageMutex.Unlock()
 	fake.UploadBitsPackageStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UploadBitsPackageArgsForCall(i int) (ccv3.Package, []ccv3.V2FormattedResource, io.Reader, int64) {
+func (fake *FakeCloudControllerClient) UploadBitsPackageArgsForCall(i int) (ccv3.Package, []ccv3.Resource, io.Reader, int64) {
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
 	argsForCall := fake.uploadBitsPackageArgsForCall[i]

@@ -2,6 +2,7 @@ package sharedaction_test
 
 import (
 	"archive/zip"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"io"
 	"io/ioutil"
 	"os"
@@ -62,6 +63,50 @@ var _ = Describe("Resource Actions", func() {
 
 	AfterEach(func() {
 		Expect(os.RemoveAll(srcDir)).ToNot(HaveOccurred())
+	})
+
+	Describe("SharedToV3Resource", func() {
+
+		var returnedV3Resource V3Resource
+		var sharedResource = Resource{Filename: "file1", SHA1: "a43rknl", Mode: os.FileMode(644), Size: 100000}
+
+		JustBeforeEach(func() {
+			returnedV3Resource = sharedResource.ToV3Resource()
+		})
+
+		It("returns a ccv3 Resource", func() {
+			Expect(returnedV3Resource).To(Equal(V3Resource{
+				FilePath: "file1",
+				Checksum: ccv3.Checksum{
+					Value: "a43rknl",
+				},
+				SizeInBytes: 100000,
+				Mode:        os.FileMode(644),
+			}))
+		})
+
+	})
+
+	Describe("ToSharedResource", func() {
+
+		var returnedSharedResource Resource
+		var v3Resource = V3Resource{
+			FilePath: "file1",
+			Checksum: ccv3.Checksum{
+				Value: "a43rknl",
+			},
+			SizeInBytes: 100000,
+			Mode:        os.FileMode(644),
+		}
+
+		JustBeforeEach(func() {
+			returnedSharedResource = v3Resource.ToV2Resource()
+		})
+
+		It("returns a ccv3 Resource", func() {
+			Expect(returnedSharedResource).To(Equal(Resource{Filename: "file1", SHA1: "a43rknl", Mode: os.FileMode(644), Size: 100000}))
+
+		})
 	})
 
 	Describe("GatherArchiveResources", func() {

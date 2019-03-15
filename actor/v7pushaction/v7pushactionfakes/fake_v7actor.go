@@ -235,11 +235,11 @@ type FakeV7Actor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
-	UploadBitsPackageStub        func(v7action.Package, []sharedaction.Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)
+	UploadBitsPackageStub        func(v7action.Package, []sharedaction.V3Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)
 	uploadBitsPackageMutex       sync.RWMutex
 	uploadBitsPackageArgsForCall []struct {
 		arg1 v7action.Package
-		arg2 []sharedaction.Resource
+		arg2 []sharedaction.V3Resource
 		arg3 io.Reader
 		arg4 int64
 	}
@@ -1255,17 +1255,17 @@ func (fake *FakeV7Actor) UpdateProcessByTypeAndApplicationReturnsOnCall(i int, r
 	}{result1, result2}
 }
 
-func (fake *FakeV7Actor) UploadBitsPackage(arg1 v7action.Package, arg2 []sharedaction.Resource, arg3 io.Reader, arg4 int64) (v7action.Package, v7action.Warnings, error) {
-	var arg2Copy []sharedaction.Resource
+func (fake *FakeV7Actor) UploadBitsPackage(arg1 v7action.Package, arg2 []sharedaction.V3Resource, arg3 io.Reader, arg4 int64) (v7action.Package, v7action.Warnings, error) {
+	var arg2Copy []sharedaction.V3Resource
 	if arg2 != nil {
-		arg2Copy = make([]sharedaction.Resource, len(arg2))
+		arg2Copy = make([]sharedaction.V3Resource, len(arg2))
 		copy(arg2Copy, arg2)
 	}
 	fake.uploadBitsPackageMutex.Lock()
 	ret, specificReturn := fake.uploadBitsPackageReturnsOnCall[len(fake.uploadBitsPackageArgsForCall)]
 	fake.uploadBitsPackageArgsForCall = append(fake.uploadBitsPackageArgsForCall, struct {
 		arg1 v7action.Package
-		arg2 []sharedaction.Resource
+		arg2 []sharedaction.V3Resource
 		arg3 io.Reader
 		arg4 int64
 	}{arg1, arg2Copy, arg3, arg4})
@@ -1287,13 +1287,13 @@ func (fake *FakeV7Actor) UploadBitsPackageCallCount() int {
 	return len(fake.uploadBitsPackageArgsForCall)
 }
 
-func (fake *FakeV7Actor) UploadBitsPackageCalls(stub func(v7action.Package, []sharedaction.Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)) {
+func (fake *FakeV7Actor) UploadBitsPackageCalls(stub func(v7action.Package, []sharedaction.V3Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)) {
 	fake.uploadBitsPackageMutex.Lock()
 	defer fake.uploadBitsPackageMutex.Unlock()
 	fake.UploadBitsPackageStub = stub
 }
 
-func (fake *FakeV7Actor) UploadBitsPackageArgsForCall(i int) (v7action.Package, []sharedaction.Resource, io.Reader, int64) {
+func (fake *FakeV7Actor) UploadBitsPackageArgsForCall(i int) (v7action.Package, []sharedaction.V3Resource, io.Reader, int64) {
 	fake.uploadBitsPackageMutex.RLock()
 	defer fake.uploadBitsPackageMutex.RUnlock()
 	argsForCall := fake.uploadBitsPackageArgsForCall[i]

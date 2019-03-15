@@ -35,8 +35,13 @@ func (actor Actor) SetupAllResourcesForPushPlan(pushPlan PushPlan, overrides Fla
 		return PushPlan{}, err
 	}
 
+	var v3Resources []sharedaction.V3Resource
+	for _, resource := range resources {
+		v3Resources = append(v3Resources, resource.ToV3Resource())
+	}
+
 	pushPlan.Archive = archive
-	pushPlan.AllResources = resources
+	pushPlan.AllResources = v3Resources
 
 	return pushPlan, nil
 }

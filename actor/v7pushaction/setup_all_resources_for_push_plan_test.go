@@ -90,7 +90,7 @@ var _ = Describe("SetupAllResourcesForPushPlan", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(1))
 					Expect(fakeSharedActor.GatherDirectoryResourcesArgsForCall(0)).To(Equal(pwd))
-					Expect(expectedPushPlan.AllResources).To(Equal(resources))
+					Expect(expectedPushPlan.AllResources[0]).To(Equal(resources[0].ToV3Resource()))
 				})
 
 				It("sets Archive to false", func() {
@@ -142,7 +142,7 @@ var _ = Describe("SetupAllResourcesForPushPlan", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeSharedActor.GatherArchiveResourcesCallCount()).To(Equal(1))
 					Expect(fakeSharedActor.GatherArchiveResourcesArgsForCall(0)).To(Equal(archivePath))
-					Expect(expectedPushPlan.AllResources).To(Equal(resources))
+					Expect(expectedPushPlan.AllResources[0]).To(Equal(resources[0].ToV3Resource()))
 				})
 
 				It("sets Archive to true", func() {

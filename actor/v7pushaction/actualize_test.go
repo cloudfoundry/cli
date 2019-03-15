@@ -497,11 +497,11 @@ var _ = Describe("Actualize", func() {
 						GUID: "some-app-guid",
 					},
 					BitsPath: "/some-bits-path",
-					AllResources: []sharedaction.Resource{
-						{Filename: "some-filename", Size: 6},
+					AllResources: []sharedaction.V3Resource{
+						{FilePath: "some-filename", SizeInBytes: 6},
 					},
-					MatchedResources: []sharedaction.Resource{
-						{Filename: "some-matched-filename", Size: 6},
+					MatchedResources: []sharedaction.V3Resource{
+						{FilePath: "some-matched-filename", SizeInBytes: 6},
 					},
 				}
 			})
@@ -580,9 +580,9 @@ var _ = Describe("Actualize", func() {
 							pkg, resource, _, size := fakeV7Actor.UploadBitsPackageArgsForCall(0)
 
 							Expect(pkg).To(Equal(v7action.Package{GUID: "some-guid"}))
-							Expect(resource).To(ConsistOf(sharedaction.Resource{
-								Filename: "some-matched-filename",
-								Size:     6,
+							Expect(resource).To(ConsistOf(sharedaction.V3Resource{
+								FilePath:    "some-matched-filename",
+								SizeInBytes: 6,
 							}))
 							Expect(size).To(BeNumerically("==", 6))
 						})

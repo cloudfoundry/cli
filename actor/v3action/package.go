@@ -169,10 +169,10 @@ func (actor Actor) CreateBitsPackageByApplication(appGUID string) (Package, Warn
 }
 
 func (actor Actor) UploadBitsPackage(pkg Package, existingResources []sharedaction.Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
-	apiResources := make([]ccv3.V2FormattedResource, 0, len(existingResources)) // Explicitly done to prevent nils
+	apiResources := make([]ccv3.Resource, 0, len(existingResources)) // Explicitly done to prevent nils
 
 	for _, resource := range existingResources {
-		apiResources = append(apiResources, ccv3.V2FormattedResource(resource))
+		apiResources = append(apiResources, ccv3.Resource(resource.ToV3Resource()))
 	}
 
 	appPkg, warnings, err := actor.CloudControllerClient.UploadBitsPackage(ccv3.Package(pkg), apiResources, newResources, newResourcesLength)

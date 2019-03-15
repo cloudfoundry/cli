@@ -1,6 +1,7 @@
 package v7pushaction
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -207,10 +208,16 @@ func (actor Actor) CreatePackage(plan PushPlan, progressBar ProgressBar, warning
 }
 
 func (actor Actor) GetArchivePath(plan PushPlan) (string, error) {
-	if plan.Archive {
-		return actor.SharedActor.ZipArchiveResources(plan.BitsPath, plan.AllResources)
+
+	var v2Resources []sharedaction.Resource
+	for _, resource := range plan.AllResources {
+		v2Resources = append(v2Resources, resource.ToV2Resource())
 	}
-	return actor.SharedActor.ZipDirectoryResources(plan.BitsPath, plan.AllResources)
+
+	if plan.Archive {
+		return actor.SharedActor.ZipArchiveResources(plan.BitsPath, v2Resources)
+	}
+	return actor.SharedActor.ZipDirectoryResources(plan.BitsPath, v2Resources)
 }
 
 func (actor Actor) ScaleProcess(plan PushPlan, warningsStream chan Warnings, eventStream chan Event) error {

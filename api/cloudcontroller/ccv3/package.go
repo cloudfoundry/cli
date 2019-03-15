@@ -192,21 +192,21 @@ func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
 //
 // Note: In order to determine if package creation is successful, poll the
 // Package's state field for more information.
-func (client *Client) UploadBitsPackage(pkg Package, existingResources []V2FormattedResource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+func (client *Client) UploadBitsPackage(pkg Package, matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
 	link, ok := pkg.Links["upload"]
 	if !ok {
 		return Package{}, nil, ccerror.UploadLinkNotFoundError{PackageGUID: pkg.GUID}
 	}
 
-	if existingResources == nil {
-		return Package{}, nil, ccerror.NilObjectError{Object: "existingResources"}
+	if matchedResources == nil {
+		return Package{}, nil, ccerror.NilObjectError{Object: "matchedResources"}
 	}
 
 	if newResources == nil {
-		return client.uploadExistingResourcesOnly(link, existingResources)
+		return client.uploadExistingResourcesOnly(link, matchedResources)
 	}
 
-	return client.uploadNewAndExistingResources(link, existingResources, newResources, newResourcesLength)
+	return client.uploadNewAndExistingResources(link, matchedResources, newResources, newResourcesLength)
 }
 
 // UploadPackage uploads a file to a given package's Upload resource. Note:
@@ -242,11 +242,11 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 	return responsePackage, response.Warnings, err
 }
 
-func (*Client) calculateAppBitsRequestSize(existingResources []V2FormattedResource, newResourcesLength int64) (int64, error) {
+func (*Client) calculateAppBitsRequestSize(matchedResources []Resource, newResourcesLength int64) (int64, error) {
 	body := &bytes.Buffer{}
 	form := multipart.NewWriter(body)
 
-	jsonResources, err := json.Marshal(existingResources)
+	jsonResources, err := json.Marshal(matchedResources)
 	if err != nil {
 		return 0, err
 	}
@@ -266,7 +266,7 @@ func (*Client) calculateAppBitsRequestSize(existingResources []V2FormattedResour
 	return int64(body.Len()) + newResourcesLength, nil
 }
 
-func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []V2FormattedResource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
+func (*Client) createMultipartBodyAndHeaderForAppBits(matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
 	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
 	form := multipart.NewWriter(writerInput)
 
@@ -276,7 +276,7 @@ func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []V2Form
 		defer close(writeErrors)
 		defer writerInput.Close()
 
-		jsonResources, err := json.Marshal(existingResources)
+		jsonResources, err := json.Marshal(matchedResources)
 		if err != nil {
 			writeErrors <- err
 			return
@@ -387,8 +387,8 @@ func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, wri
 	return pkg, response.Warnings, firstError
 }
 
-func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, existingResources []V2FormattedResource) (Package, Warnings, error) {
-	jsonResources, err := json.Marshal(existingResources)
+func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, matchedResources []Resource) (Package, Warnings, error) {
+	jsonResources, err := json.Marshal(matchedResources)
 	if err != nil {
 		return Package{}, nil, err
 	}
@@ -425,13 +425,13 @@ func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, existingRe
 	return pkg, response.Warnings, err
 }
 
-func (client *Client) uploadNewAndExistingResources(uploadLink APILink, existingResources []V2FormattedResource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
-	contentLength, err := client.calculateAppBitsRequestSize(existingResources, newResourcesLength)
+func (client *Client) uploadNewAndExistingResources(uploadLink APILink, matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (Package, Warnings, error) {
+	contentLength, err := client.calculateAppBitsRequestSize(matchedResources, newResourcesLength)
 	if err != nil {
 		return Package{}, nil, err
 	}
 
-	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(existingResources, newResources, newResourcesLength)
+	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(matchedResources, newResources, newResourcesLength)
 
 	// This request uses URL/Method instead of an internal RequestName to support
 	// the possibility of external bit services.
