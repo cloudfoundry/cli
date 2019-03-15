@@ -9,47 +9,6 @@ import (
 )
 
 var _ = Describe("Resource", func() {
-	Describe("V3 formatted resource", func() {
-		Describe("MarshalJSON", func() {
-			It("marshals the json properly", func() {
-				resource := Resource{
-					FilePath:    "some-file-1",
-					Mode:        0744,
-					Checksum:    Checksum{Value: "some-sha-1"},
-					SizeInBytes: 1,
-				}
-				data, err := json.Marshal(resource)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(data).To(MatchJSON(`{
-				"path":   "some-file-1",
-				"mode": "744",
-				"checksum": {"value":"some-sha-1"},
-				"size_in_bytes": 1
-			}`))
-			})
-		})
-
-		Describe("UnmarshalJSON", func() {
-			It("Unmarshals the json properly", func() {
-				raw := `{
-				"path":   "some-file-1",
-				"mode": "744",
-				"checksum": {"value":"some-sha-1"},
-				"size_in_bytes": 1
-			}`
-
-				var data Resource
-				err := json.Unmarshal([]byte(raw), &data)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(data).To(Equal(Resource{
-					FilePath:    "some-file-1",
-					Mode:        0744,
-					Checksum:    Checksum{Value: "some-sha-1"},
-					SizeInBytes: 1,
-				}))
-			})
-		})
-	})
 	Describe("V2 Formatted Resource", func() {
 		Describe("MarshalJSON", func() {
 			It("marshals the json properly", func() {

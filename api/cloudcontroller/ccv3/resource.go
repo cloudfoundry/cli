@@ -8,67 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
-type Checksum struct {
-	Value string `json:"value"`
-}
-
-type Resource struct {
-	// FilePath is the path of the resource.
-	FilePath string `json:"path"`
-
-	// Mode is the operating system file mode (aka file permissions) of the
-	// resource.
-	Mode os.FileMode `json:"mode"`
-
-	// SHA1 represents the SHA-1 hash of the resource.
-	Checksum Checksum `json:"checksum"`
-
-	// Size represents the file size of the resource.
-	SizeInBytes int64 `json:"size_in_bytes"`
-}
-
-// MarshalJSON converts a resource into a Cloud Controller Resource.
-func (r Resource) MarshalJSON() ([]byte, error) {
-	var ccResource struct {
-		FilePath    string   `json:"path,omitempty"`
-		Mode        string   `json:"mode,omitempty"`
-		Checksum    Checksum `json:"checksum"`
-		SizeInBytes int64    `json:"size_in_bytes"`
-	}
-
-	ccResource.FilePath = r.FilePath
-	ccResource.SizeInBytes = r.SizeInBytes
-	ccResource.Checksum = r.Checksum
-	ccResource.Mode = strconv.FormatUint(uint64(r.Mode), 8)
-	return json.Marshal(ccResource)
-}
-
-// UnmarshalJSON helps unmarshal a Cloud Controller Resource response.
-func (r *Resource) UnmarshalJSON(data []byte) error {
-	var ccResource struct {
-		FilePath    string   `json:"path,omitempty"`
-		Mode        string   `json:"mode,omitempty"`
-		Checksum    Checksum `json:"checksum"`
-		SizeInBytes int64    `json:"size_in_bytes"`
-	}
-
-	err := cloudcontroller.DecodeJSON(data, &ccResource)
-	if err != nil {
-		return err
-	}
-
-	r.FilePath = ccResource.FilePath
-	r.SizeInBytes = ccResource.SizeInBytes
-	r.Checksum = ccResource.Checksum
-	mode, err := strconv.ParseUint(ccResource.Mode, 8, 32)
-	if err != nil {
-		return err
-	}
-
-	r.Mode = os.FileMode(mode)
-	return nil
-}
-
 // V2FormattedResource represents a Cloud Controller Resource that still has the same shape as the V2 Resource.
 // The v3 package upload endpoint understands both the V2 shape and the new V3 shape.
 // The v3 resource matching endpoint only understands the new V3 shape.

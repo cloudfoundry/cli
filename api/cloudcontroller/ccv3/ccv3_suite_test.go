@@ -131,6 +131,9 @@ func SetupV3Response() {
 			},
 			"feature_flags": {
 				"href": "SERVER_URL/v3/feature_flags"
+			},
+			"resource_matches": {
+				"href": "SERVER_URL/v3/resource_matches"
 			}
 		}
 	}`, "SERVER_URL", serverURL, -1)
