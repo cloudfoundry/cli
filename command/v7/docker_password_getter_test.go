@@ -12,24 +12,32 @@ import (
 
 var _ = Describe("GetDockerPassword", func() {
 	var (
+		cmd        PushCommand
+		fakeConfig *commandfakes.FakeConfig
+		testUI     *ui.UI
+
+		dockerUsername string
+
 		executeErr     error
 		dockerPassword string
 
-		fakeConfig     *commandfakes.FakeConfig
-		input          *Buffer
-		testUI         *ui.UI
-		dockerUsername string
+		input *Buffer
 	)
 
 	BeforeEach(func() {
 		input = NewBuffer()
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
+
+		cmd = PushCommand{
+			Config: fakeConfig,
+			UI:     testUI,
+		}
 	})
 
 	Describe("Get", func() {
 		JustBeforeEach(func() {
-			dockerPassword, executeErr = GetDockerPassword(testUI, fakeConfig, dockerUsername)
+			dockerPassword, executeErr = cmd.GetDockerPassword(dockerUsername)
 		})
 
 		When("docker username is provided", func() {

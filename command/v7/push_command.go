@@ -169,7 +169,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	flagOverrides.DockerPassword, err = GetDockerPassword(cmd.UI, cmd.Config, flagOverrides.DockerUsername)
+	flagOverrides.DockerPassword, err = cmd.GetDockerPassword(flagOverrides.DockerUsername)
 	if err != nil {
 		return err
 	}
