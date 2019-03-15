@@ -98,14 +98,15 @@ var _ = Describe("create-app-manifest command", func() {
 		When("the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start")).Should(Exit(0))
 				})
 			})
 
 			It("creates the manifest", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
 				Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-				Eventually(session).Should(Say("Manifest file created successfully at %s", helpers.OSAgnosticPath(tempDir, "%s_manifest.yml", appName)))
+				path := filepath.Join(tempDir, fmt.Sprintf("%s_manifest.yml", appName))
+				Eventually(session).Should(helpers.SayPath("Manifest file created successfully at %s", path))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
