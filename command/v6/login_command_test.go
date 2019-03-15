@@ -18,28 +18,35 @@ import (
 
 var _ = Describe("login Command", func() {
 	var (
-		cmd            LoginCommand
-		testUI         *ui.UI
-		fakeActor      *v6fakes.FakeLoginActor
-		fakeConfig     *commandfakes.FakeConfig
-		fakeActorMaker *v6fakes.FakeActorMaker
-		executeErr     error
-		input          *Buffer
+		cmd              LoginCommand
+		testUI           *ui.UI
+		fakeActor        *v6fakes.FakeLoginActor
+		fakeChecker      *v6fakes.FakeVersionChecker
+		fakeConfig       *commandfakes.FakeConfig
+		fakeActorMaker   *v6fakes.FakeActorMaker
+		fakeCheckerMaker *v6fakes.FakeCheckerMaker
+		executeErr       error
+		input            *Buffer
 	)
 
 	BeforeEach(func() {
 		input = NewBuffer()
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
-		fakeActor = new(v6fakes.FakeLoginActor)
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeActor = new(v6fakes.FakeLoginActor)
 		fakeActorMaker = new(v6fakes.FakeActorMaker)
 		fakeActorMaker.NewActorReturns(fakeActor, nil)
 
+		fakeChecker = new(v6fakes.FakeVersionChecker)
+		fakeCheckerMaker = new(v6fakes.FakeCheckerMaker)
+		fakeCheckerMaker.NewVersionCheckerReturns(fakeChecker, nil)
+
 		cmd = LoginCommand{
-			UI:         testUI,
-			Actor:      fakeActor,
-			ActorMaker: fakeActorMaker,
-			Config:     fakeConfig,
+			UI:           testUI,
+			Actor:        fakeActor,
+			ActorMaker:   fakeActorMaker,
+			Config:       fakeConfig,
+			CheckerMaker: fakeCheckerMaker,
 		}
 		cmd.APIEndpoint = ""
 		fakeConfig.BinaryNameReturns("faceman")
@@ -379,6 +386,49 @@ var _ = Describe("login Command", func() {
 								Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
 							})
 						})
+					})
+				})
+			})
+		})
+
+		Describe("Minimum CLI version ", func() {
+			BeforeEach(func() {
+				fakeConfig.TargetReturns("whatever.com")
+
+				fakeChecker.MinCLIVersionReturns("9000.0.0")
+			})
+
+			It("sets the minimum CLI version in the config", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(fakeConfig.SetMinCLIVersionCallCount()).To(Equal(1))
+				Expect(fakeConfig.SetMinCLIVersionArgsForCall(0)).To(Equal("9000.0.0"))
+			})
+
+			When("The current version is below the minimum supported", func() {
+				BeforeEach(func() {
+					fakeChecker.CloudControllerAPIVersionReturns("2.123.0")
+					fakeConfig.BinaryVersionReturns("1.2.3")
+					fakeConfig.MinCLIVersionReturns("9000.0.0")
+				})
+
+				It("displays a warning", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(testUI.Err).To(Say("Cloud Foundry API version 2.123.0 requires CLI version 9000.0.0. You are currently on version 1.2.3. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"))
+				})
+
+				Context("ordering of output", func() {
+					BeforeEach(func() {
+						outAndErr := NewBuffer()
+						testUI.Out = outAndErr
+						testUI.Err = outAndErr
+					})
+
+					It("displays the warning after all prompts but before the summary ", func() {
+						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(testUI.Out).To(Say(`Authenticating...`))
+						Expect(testUI.Err).To(Say("Cloud Foundry API version 2.123.0 requires CLI version 9000.0.0. You are currently on version 1.2.3. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"))
+						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+						Expect(testUI.Out).To(Say(`Not logged in. Use 'faceman login' to log in.`))
 					})
 				})
 			})

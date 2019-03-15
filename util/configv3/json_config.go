@@ -131,6 +131,11 @@ func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken
 }
 
+// SetMinCLIVersion sets the minimum CLI version required by the CC.
+func (config *Config) SetMinCLIVersion(minVersion string) {
+	config.ConfigFile.MinCLIVersion = minVersion
+}
+
 // SetOrganizationInformation sets the currently targeted organization.
 func (config *Config) SetOrganizationInformation(guid string, name string) {
 	config.ConfigFile.TargetedOrganization.GUID = guid
@@ -155,7 +160,7 @@ func (config *Config) SetTargetInformation(api string, apiVersion string, auth s
 	config.ConfigFile.Target = api
 	config.ConfigFile.APIVersion = apiVersion
 	config.ConfigFile.AuthorizationEndpoint = auth
-	config.ConfigFile.MinCLIVersion = minCLIVersion
+	config.SetMinCLIVersion(minCLIVersion)
 	config.ConfigFile.DopplerEndpoint = doppler
 	config.ConfigFile.RoutingEndpoint = routing
 	config.ConfigFile.SkipSSLValidation = skipSSLValidation

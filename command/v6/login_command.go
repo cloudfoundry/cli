@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -20,9 +21,15 @@ const maxLoginTries = 3
 
 type LoginActor interface {
 	Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error
-	CloudControllerAPIVersion() string
 	GetLoginPrompts() map[string]coreconfig.AuthPrompt
 	SetTarget(settings v3action.TargetSettings) (v3action.Warnings, error)
+}
+
+//go:generate counterfeiter . VersionChecker
+
+type VersionChecker interface {
+	MinCLIVersion() string
+	CloudControllerAPIVersion() string
 }
 
 //go:generate counterfeiter . ActorMaker
@@ -31,10 +38,21 @@ type ActorMaker interface {
 	NewActor(command.Config, command.UI, bool) (LoginActor, error)
 }
 
+//go:generate counterfeiter . CheckerMaker
+
+type CheckerMaker interface {
+	NewVersionChecker(command.Config, command.UI, bool) (VersionChecker, error)
+}
+
 type ActorMakerFunc func(command.Config, command.UI, bool) (LoginActor, error)
+type CheckerMakerFunc func(command.Config, command.UI, bool) (VersionChecker, error)
 
 func (a ActorMakerFunc) NewActor(config command.Config, ui command.UI, targetCF bool) (LoginActor, error) {
 	return a(config, ui, targetCF)
+}
+
+func (c CheckerMakerFunc) NewVersionChecker(config command.Config, ui command.UI, targetCF bool) (VersionChecker, error) {
+	return c(config, ui, targetCF)
 }
 
 var actorMaker ActorMakerFunc = func(config command.Config, ui command.UI, targetCF bool) (LoginActor, error) {
@@ -45,6 +63,16 @@ var actorMaker ActorMakerFunc = func(config command.Config, ui command.UI, targe
 
 	v3Actor := v3action.NewActor(client, config, nil, uaa)
 	return v3Actor, nil
+}
+
+var checkerMaker CheckerMakerFunc = func(config command.Config, ui command.UI, targetCF bool) (VersionChecker, error) {
+	client, uaa, err := shared.NewClients(config, ui, targetCF)
+	if err != nil {
+		return nil, err
+	}
+
+	v2Actor := v2action.NewActor(client, uaa, config)
+	return v2Actor, nil
 }
 
 type LoginCommand struct {
@@ -59,10 +87,12 @@ type LoginCommand struct {
 	usage             interface{} `usage:"CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE] [--sso | --sso-passcode PASSCODE]\n\nWARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\nEXAMPLES:\n   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\n   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\n   CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n   CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)\n   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time passcode to login)"`
 	relatedCommands   interface{} `related_commands:"api, auth, target"`
 
-	UI         command.UI
-	Actor      LoginActor
-	ActorMaker ActorMaker
-	Config     command.Config
+	UI           command.UI
+	Actor        LoginActor
+	ActorMaker   ActorMaker
+	Checker      VersionChecker
+	CheckerMaker CheckerMaker
+	Config       command.Config
 }
 
 func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
@@ -71,6 +101,7 @@ func (cmd *LoginCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
+	cmd.CheckerMaker = checkerMaker
 	cmd.Actor = actor
 	cmd.UI = ui
 	cmd.Config = config
@@ -115,12 +146,12 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		return err
 	}
 
-	newActor, err := cmd.ActorMaker.NewActor(cmd.Config, cmd.UI, true)
+	err = cmd.reloadActor()
 	if err != nil {
 		return err
 	}
 
-	cmd.Actor = newActor
+	defer cmd.showStatus()
 
 	if cmd.Config.UAAGrantType() == "client_credentials" {
 		return errors.New("Service account currently logged in. Use 'cf logout' to log out service account and try again.")
@@ -129,6 +160,11 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	err = cmd.authenticate()
 	if err != nil {
 		return errors.New("Unable to authenticate.")
+	}
+
+	err = cmd.checkMinCLIVersion()
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -176,11 +212,21 @@ func (cmd *LoginCommand) authenticate() error {
 			break
 		}
 	}
-	cmd.showStatus()
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (cmd *LoginCommand) checkMinCLIVersion() error {
+	newChecker, err := cmd.CheckerMaker.NewVersionChecker(cmd.Config, cmd.UI, true)
+	if err != nil {
+		return err
+	}
+
+	cmd.Checker = newChecker
+	cmd.Config.SetMinCLIVersion(cmd.Checker.MinCLIVersion())
+	return command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.Checker.CloudControllerAPIVersion(), cmd.UI)
 }
 
 func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPrompt, credentials map[string]string, passwordKeys []string) error {
@@ -206,6 +252,17 @@ func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPromp
 	cmd.UI.DisplayText("Authenticating...")
 	return cmd.Actor.Authenticate(credentialsCopy, "", constant.GrantTypePassword)
 
+}
+
+func (cmd *LoginCommand) reloadActor() error {
+	newActor, err := cmd.ActorMaker.NewActor(cmd.Config, cmd.UI, true)
+	if err != nil {
+		return err
+	}
+
+	cmd.Actor = newActor
+
+	return nil
 }
 
 func (cmd *LoginCommand) showStatus() {

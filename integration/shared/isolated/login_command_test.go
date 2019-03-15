@@ -98,6 +98,7 @@ var _ = Describe("login command", func() {
 			var server *ghttp.Server
 
 			BeforeEach(func() {
+				helpers.TurnOnExperimentalLogin()
 				server = helpers.StartServerWithMinimumCLIVersion("9000.0.0")
 				server.RouteToHandler(http.MethodPost, "/oauth/token",
 					ghttp.RespondWithJSONEncoded(http.StatusOK, struct{}{}))
@@ -109,12 +110,13 @@ var _ = Describe("login command", func() {
 			})
 
 			AfterEach(func() {
+				helpers.TurnOffExperimentalLogin()
 				server.Close()
 			})
 
 			It("displays the warning and exits successfully", func() {
 				session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
-				Eventually(session).Should(Say(`Cloud Foundry API version .+ requires CLI version .+\.  You are currently on version .+\. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads`))
+				Eventually(session.Err).Should(Say(`Cloud Foundry API version .+ requires CLI version .+\. You are currently on version .+\. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads`))
 				Eventually(session).Should(Exit(0))
 			})
 		})

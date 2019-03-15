@@ -42,6 +42,7 @@ type Config interface {
 	RequestRetryCount() int
 	RoutingEndpoint() string
 	SetAccessToken(token string)
+	SetMinCLIVersion(version string)
 	SetOrganizationInformation(guid string, name string)
 	SetRefreshToken(token string)
 	SetSpaceInformation(guid string, name string, allowSSH bool)

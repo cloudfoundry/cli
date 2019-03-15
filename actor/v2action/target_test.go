@@ -28,6 +28,49 @@ var _ = Describe("Targeting", func() {
 		}
 	})
 
+	Describe("ClearTarget", func() {
+		It("clears all the target information", func() {
+			actor.ClearTarget()
+			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
+			api, apiVersion, auth, minCLIVersion, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+
+			Expect(api).To(BeEmpty())
+			Expect(apiVersion).To(BeEmpty())
+			Expect(auth).To(BeEmpty())
+			Expect(minCLIVersion).To(BeEmpty())
+			Expect(doppler).To(BeEmpty())
+			Expect(routing).To(BeEmpty())
+			Expect(sslDisabled).To(BeFalse())
+		})
+
+		It("clears all the token information", func() {
+			actor.ClearTarget()
+
+			Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
+			accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)
+
+			Expect(accessToken).To(BeEmpty())
+			Expect(refreshToken).To(BeEmpty())
+			Expect(sshOAuthClient).To(BeEmpty())
+		})
+	})
+
+	Describe("MinCLIVersion", func() {
+		var version string
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.MinCLIVersionReturns("10.9.8")
+		})
+
+		JustBeforeEach(func() {
+			version = actor.MinCLIVersion()
+		})
+
+		It("returns the version that the API reports", func() {
+			Expect(version).To(Equal("10.9.8"))
+		})
+	})
+
 	Describe("SetTarget", func() {
 		var expectedAPI, expectedAPIVersion, expectedAuth, expectedMinCLIVersion, expectedDoppler, expectedRouting string
 
@@ -107,30 +150,4 @@ var _ = Describe("Targeting", func() {
 		})
 	})
 
-	Describe("ClearTarget", func() {
-		It("clears all the target information", func() {
-			actor.ClearTarget()
-			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, minCLIVersion, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
-
-			Expect(api).To(BeEmpty())
-			Expect(apiVersion).To(BeEmpty())
-			Expect(auth).To(BeEmpty())
-			Expect(minCLIVersion).To(BeEmpty())
-			Expect(doppler).To(BeEmpty())
-			Expect(routing).To(BeEmpty())
-			Expect(sslDisabled).To(BeFalse())
-		})
-
-		It("clears all the token information", func() {
-			actor.ClearTarget()
-
-			Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
-			accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)
-
-			Expect(accessToken).To(BeEmpty())
-			Expect(refreshToken).To(BeEmpty())
-			Expect(sshOAuthClient).To(BeEmpty())
-		})
-	})
 })
