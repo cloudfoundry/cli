@@ -105,6 +105,15 @@ func (parser Parser) ContainsMultipleApps() bool {
 	return len(parser.Applications) > 1
 }
 
+func (parser Parser) ContainsPrivateDockerImages() bool {
+	for _, app := range parser.Applications {
+		if app.Docker != nil && app.Docker.Username != "" {
+			return true
+		}
+	}
+	return false
+}
+
 func (parser Parser) FullRawManifest() []byte {
 	return parser.rawManifest
 }

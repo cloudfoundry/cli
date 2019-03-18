@@ -1,7 +1,7 @@
 package v7
 
-func (cmd PushCommand) GetDockerPassword(dockerUsername string) (string, error) {
-	if dockerUsername == "" { // no need for a password without a username
+func (cmd PushCommand) GetDockerPassword(dockerUsername string, containsPrivateDockerImages bool) (string, error) {
+	if dockerUsername == "" && !containsPrivateDockerImages { // no need for a password without a username
 		return "", nil
 	}
 

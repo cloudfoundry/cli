@@ -16,7 +16,8 @@ var _ = Describe("GetDockerPassword", func() {
 		fakeConfig *commandfakes.FakeConfig
 		testUI     *ui.UI
 
-		dockerUsername string
+		dockerUsername        string
+		containsPrivateDocker bool
 
 		executeErr     error
 		dockerPassword string
@@ -37,51 +38,94 @@ var _ = Describe("GetDockerPassword", func() {
 
 	Describe("Get", func() {
 		JustBeforeEach(func() {
-			dockerPassword, executeErr = cmd.GetDockerPassword(dockerUsername)
+			dockerPassword, executeErr = cmd.GetDockerPassword(dockerUsername, containsPrivateDocker)
 		})
 
-		When("docker username is provided", func() {
-			BeforeEach(func() {
-				dockerUsername = "some-docker-username"
+		When("docker image is private", func() {
+			When("there is a manifest", func() {
+				BeforeEach(func() {
+					dockerUsername = ""
+					containsPrivateDocker = true
+				})
+
+				When("a password is provided via environment variable", func() {
+					BeforeEach(func() {
+						fakeConfig.DockerPasswordReturns("some-docker-password")
+					})
+
+					It("takes the password from the environment", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).ToNot(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+						Expect(testUI.Out).ToNot(Say("Docker password"))
+
+						Expect(testUI.Out).To(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
+
+						Expect(dockerPassword).To(Equal("some-docker-password"))
+					})
+				})
+
+				When("no password is provided", func() {
+					BeforeEach(func() {
+						_, err := input.Write([]byte("some-docker-password\n"))
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("prompts for a password", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+						Expect(testUI.Out).To(Say("Docker password"))
+
+						Expect(dockerPassword).To(Equal("some-docker-password"))
+					})
+				})
 			})
 
-			When("a password is provided via environment variable", func() {
+			When("there is no manifest", func() {
 				BeforeEach(func() {
-					fakeConfig.DockerPasswordReturns("some-docker-password")
+					dockerUsername = "some-docker-username"
+					containsPrivateDocker = false
 				})
 
-				It("takes the password from the environment", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+				When("a password is provided via environment variable", func() {
+					BeforeEach(func() {
+						fakeConfig.DockerPasswordReturns("some-docker-password")
+					})
 
-					Expect(testUI.Out).ToNot(Say("Environment variable CF_DOCKER_PASSWORD not set."))
-					Expect(testUI.Out).ToNot(Say("Docker password"))
+					It("takes the password from the environment", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
+						Expect(testUI.Out).ToNot(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+						Expect(testUI.Out).ToNot(Say("Docker password"))
 
-					Expect(dockerPassword).To(Equal("some-docker-password"))
+						Expect(testUI.Out).To(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
+
+						Expect(dockerPassword).To(Equal("some-docker-password"))
+					})
 				})
-			})
 
-			When("no password is provided", func() {
-				BeforeEach(func() {
-					_, err := input.Write([]byte("some-docker-password\n"))
-					Expect(err).ToNot(HaveOccurred())
-				})
+				When("no password is provided", func() {
+					BeforeEach(func() {
+						_, err := input.Write([]byte("some-docker-password\n"))
+						Expect(err).ToNot(HaveOccurred())
+					})
 
-				It("prompts for a password", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+					It("prompts for a password", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Environment variable CF_DOCKER_PASSWORD not set."))
-					Expect(testUI.Out).To(Say("Docker password"))
+						Expect(testUI.Out).To(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+						Expect(testUI.Out).To(Say("Docker password"))
 
-					Expect(dockerPassword).To(Equal("some-docker-password"))
+						Expect(dockerPassword).To(Equal("some-docker-password"))
+					})
 				})
 			})
 		})
-
-		When("docker username is not provided", func() {
+		When("docker image is public", func() {
 			BeforeEach(func() {
 				dockerUsername = ""
+				containsPrivateDocker = false
 			})
 
 			It("does not prompt for a password", func() {

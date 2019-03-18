@@ -23,7 +23,7 @@ func SetupApplicationForPushPlan(pushPlan PushPlan, overrides FlagOverrides, man
 		applicationNeedsUpdate = true
 	}
 
-	if overrides.DockerImage != "" {
+	if overrides.DockerImage != "" || manifestApp.Docker != nil {
 		application.LifecycleType = constant.AppLifecycleTypeDocker
 	}
 

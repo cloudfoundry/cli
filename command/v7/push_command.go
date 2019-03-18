@@ -62,6 +62,7 @@ type ManifestParser interface {
 	ContainsMultipleApps() bool
 	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) error
 	Validate() error
+	ContainsPrivateDockerImages() bool
 }
 
 type PushCommand struct {
@@ -169,7 +170,7 @@ func (cmd PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	flagOverrides.DockerPassword, err = cmd.GetDockerPassword(flagOverrides.DockerUsername)
+	flagOverrides.DockerPassword, err = cmd.GetDockerPassword(flagOverrides.DockerUsername, cmd.ManifestParser.ContainsPrivateDockerImages())
 	if err != nil {
 		return err
 	}

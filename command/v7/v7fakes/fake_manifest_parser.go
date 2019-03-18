@@ -33,6 +33,16 @@ type FakeManifestParser struct {
 	containsMultipleAppsReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	ContainsPrivateDockerImagesStub        func() bool
+	containsPrivateDockerImagesMutex       sync.RWMutex
+	containsPrivateDockerImagesArgsForCall []struct {
+	}
+	containsPrivateDockerImagesReturns struct {
+		result1 bool
+	}
+	containsPrivateDockerImagesReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	FullRawManifestStub        func() []byte
 	fullRawManifestMutex       sync.RWMutex
 	fullRawManifestArgsForCall []struct {
@@ -194,6 +204,58 @@ func (fake *FakeManifestParser) ContainsMultipleAppsReturnsOnCall(i int, result1
 		})
 	}
 	fake.containsMultipleAppsReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeManifestParser) ContainsPrivateDockerImages() bool {
+	fake.containsPrivateDockerImagesMutex.Lock()
+	ret, specificReturn := fake.containsPrivateDockerImagesReturnsOnCall[len(fake.containsPrivateDockerImagesArgsForCall)]
+	fake.containsPrivateDockerImagesArgsForCall = append(fake.containsPrivateDockerImagesArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ContainsPrivateDockerImages", []interface{}{})
+	fake.containsPrivateDockerImagesMutex.Unlock()
+	if fake.ContainsPrivateDockerImagesStub != nil {
+		return fake.ContainsPrivateDockerImagesStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.containsPrivateDockerImagesReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeManifestParser) ContainsPrivateDockerImagesCallCount() int {
+	fake.containsPrivateDockerImagesMutex.RLock()
+	defer fake.containsPrivateDockerImagesMutex.RUnlock()
+	return len(fake.containsPrivateDockerImagesArgsForCall)
+}
+
+func (fake *FakeManifestParser) ContainsPrivateDockerImagesCalls(stub func() bool) {
+	fake.containsPrivateDockerImagesMutex.Lock()
+	defer fake.containsPrivateDockerImagesMutex.Unlock()
+	fake.ContainsPrivateDockerImagesStub = stub
+}
+
+func (fake *FakeManifestParser) ContainsPrivateDockerImagesReturns(result1 bool) {
+	fake.containsPrivateDockerImagesMutex.Lock()
+	defer fake.containsPrivateDockerImagesMutex.Unlock()
+	fake.ContainsPrivateDockerImagesStub = nil
+	fake.containsPrivateDockerImagesReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeManifestParser) ContainsPrivateDockerImagesReturnsOnCall(i int, result1 bool) {
+	fake.containsPrivateDockerImagesMutex.Lock()
+	defer fake.containsPrivateDockerImagesMutex.Unlock()
+	fake.ContainsPrivateDockerImagesStub = nil
+	if fake.containsPrivateDockerImagesReturnsOnCall == nil {
+		fake.containsPrivateDockerImagesReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.containsPrivateDockerImagesReturnsOnCall[i] = struct {
 		result1 bool
 	}{result1}
 }
@@ -444,6 +506,8 @@ func (fake *FakeManifestParser) Invocations() map[string][][]interface{} {
 	defer fake.appsMutex.RUnlock()
 	fake.containsMultipleAppsMutex.RLock()
 	defer fake.containsMultipleAppsMutex.RUnlock()
+	fake.containsPrivateDockerImagesMutex.RLock()
+	defer fake.containsPrivateDockerImagesMutex.RUnlock()
 	fake.fullRawManifestMutex.RLock()
 	defer fake.fullRawManifestMutex.RUnlock()
 	fake.interpolateAndParseMutex.RLock()

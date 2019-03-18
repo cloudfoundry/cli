@@ -61,13 +61,29 @@ var _ = Describe("SetupApplicationForPushPlan", func() {
 		})
 
 		When("our overrides do not contain a DockerImage", func() {
-			It("Creates a pushPlan with an app without LifecycleType Buildpack", func() {
-				Expect(expectedPushPlan.Application.LifecycleType).
-					ToNot(Equal(constant.AppLifecycleTypeDocker))
+			When("The app manifest contains a Docker image", func() {
+				BeforeEach(func() {
+					manifestApp.Docker = new(manifestparser.Docker)
+					manifestApp.Docker.Image = "docker-image"
+				})
+				It("creates a pushPlan with an app with LifecycleType docker", func() {
+					Expect(expectedPushPlan.Application.LifecycleType).
+						To(Equal(constant.AppLifecycleTypeDocker))
+				})
+
+				AssertNoExecuteErr()
+				AssertNameIsSet()
 			})
 
-			AssertNoExecuteErr()
-			AssertNameIsSet()
+			When("The app manifest does not contain a Docker image", func() {
+				It("Creates a pushPlan with an app without LifecycleType Docker", func() {
+					Expect(expectedPushPlan.Application.LifecycleType).
+						ToNot(Equal(constant.AppLifecycleTypeDocker))
+				})
+
+				AssertNoExecuteErr()
+				AssertNameIsSet()
+			})
 		})
 	})
 

@@ -413,4 +413,46 @@ applications:
 		})
 
 	})
+
+	Describe("ContainsPrivateDockerImages", func() {
+		When("the manifest contains a docker image", func() {
+			When("the image is public", func() {
+				BeforeEach(func() {
+					parser.Applications = []Application{
+						{ApplicationModel: ApplicationModel{Name: "app-1", Docker: &Docker{Image: "image-1"}}, FullUnmarshalledApplication: nil},
+						{ApplicationModel: ApplicationModel{Name: "app-2", Docker: &Docker{Image: "image-2"}}, FullUnmarshalledApplication: nil}}
+				})
+
+				It("returns false", func() {
+					Expect(parser.ContainsPrivateDockerImages()).To(BeFalse())
+				})
+			})
+
+			When("the image is private", func() {
+				BeforeEach(func() {
+					parser.Applications = []Application{
+						{ApplicationModel: ApplicationModel{Name: "app-1", Docker: &Docker{Image: "image-1"}}},
+						{ApplicationModel: ApplicationModel{Name: "app-2", Docker: &Docker{Image: "image-2", Username: "user"}}},
+					}
+				})
+
+				It("returns true", func() {
+					Expect(parser.ContainsPrivateDockerImages()).To(BeTrue())
+				})
+			})
+		})
+
+		When("the manifest does not contain a docker image", func() {
+			BeforeEach(func() {
+				parser.Applications = []Application{
+					{ApplicationModel: ApplicationModel{Name: "app-1"}},
+					{ApplicationModel: ApplicationModel{Name: "app-2"}},
+				}
+			})
+
+			It("returns false", func() {
+				Expect(parser.ContainsPrivateDockerImages()).To(BeFalse())
+			})
+		})
+	})
 })

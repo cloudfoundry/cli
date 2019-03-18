@@ -9,8 +9,13 @@ func SetupDockerImageCredentialsForPushPlan(pushPlan PushPlan, overrides FlagOve
 	if pushPlan.Application.LifecycleType == constant.AppLifecycleTypeDocker {
 		pushPlan.DockerImageCredentialsNeedsUpdate = true
 
-		pushPlan.DockerImageCredentials.Path = overrides.DockerImage
-		pushPlan.DockerImageCredentials.Username = overrides.DockerUsername
+		if overrides.DockerImage == "" && overrides.DockerUsername == "" {
+			pushPlan.DockerImageCredentials.Path = manifestApp.Docker.Image
+			pushPlan.DockerImageCredentials.Username = manifestApp.Docker.Username
+		} else {
+			pushPlan.DockerImageCredentials.Path = overrides.DockerImage
+			pushPlan.DockerImageCredentials.Username = overrides.DockerUsername
+		}
 		pushPlan.DockerImageCredentials.Password = overrides.DockerPassword
 	}
 

@@ -50,14 +50,40 @@ var _ = Describe("SetupDockerImageCredentialsForPushPlan", func() {
 				overrides.DockerImage = "some-image"
 				overrides.DockerUsername = "some-username"
 				overrides.DockerPassword = "some-password"
+
+				manifestApp.Docker = &manifestparser.Docker{
+					Image:    "ignored-docker-image",
+					Username: "ignored-docker-username",
+				}
 			})
 
-			It("sets the docker credentials on the push plan", func() {
+			It("sets the flag overrides docker credentials on the push plan", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(expectedPushPlan.DockerImageCredentials).To(Equal(v7action.DockerImageCredentials{
 					Path:     "some-image",
 					Username: "some-username",
+					Password: "some-password",
+				}))
+				Expect(expectedPushPlan.DockerImageCredentialsNeedsUpdate).To(BeTrue())
+			})
+		})
+
+		When("the manifest contains flag overrides", func() {
+			BeforeEach(func() {
+				manifestApp.Docker = &manifestparser.Docker{
+					Image:    "manifest-docker-image",
+					Username: "manifest-docker-username",
+				}
+				overrides.DockerPassword = "some-password"
+			})
+
+			It("sets the manifest docker credentials on the push plan", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(expectedPushPlan.DockerImageCredentials).To(Equal(v7action.DockerImageCredentials{
+					Path:     "manifest-docker-image",
+					Username: "manifest-docker-username",
 					Password: "some-password",
 				}))
 				Expect(expectedPushPlan.DockerImageCredentialsNeedsUpdate).To(BeTrue())
