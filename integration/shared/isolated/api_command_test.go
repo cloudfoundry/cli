@@ -62,6 +62,7 @@ var _ = Describe("api command", func() {
 					Eventually(session).Should(Say(`api endpoint:\s+%s`, target))
 					Eventually(session).Should(Say(`api version:\s+%s`, apiVersion))
 					Eventually(session).Should(Exit(0))
+					Expect(true).To(BeFalse())
 				})
 			})
 		})
