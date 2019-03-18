@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -55,7 +56,14 @@ var _ = Describe("push manifest with a path", func() {
 				appName,
 				"-f", manifestPath,
 			)
-			Eventually(session.Err).Should(helpers.SayPath(`msg="creating archive"\s+Path="?%s"?`, dir))
+
+			if runtime.GOOS == "windows" {
+				// The paths in windows logging have extra escaping that is difficult
+				// to match. Instead match on uploading the right number of files.
+				Eventually(session.Err).Should(Say("zipped_file_count=2"))
+			} else {
+				Eventually(session.Err).Should(helpers.SayPath(`msg="creating archive"\s+Path="?%s"?`, dir))
+			}
 			Eventually(session).Should(Exit(0))
 		})
 	})
