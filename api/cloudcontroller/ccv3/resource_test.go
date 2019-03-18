@@ -12,8 +12,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Resource Match", func() {
-
+var _ = Describe("Resource", func() {
 	Describe("V3 formatted resource", func() {
 		Describe("MarshalJSON", func() {
 			It("marshals the json properly", func() {
