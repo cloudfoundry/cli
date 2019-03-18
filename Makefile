@@ -207,7 +207,7 @@ rsrc.syso:
 	@# Generates icon file
 	rsrc -ico ci/installers/windows/cf.ico
 
-test: units ## Runs everything that can run locally
+test: units ## (synonym for units)
 
 units: format vet lint build ## Ensure the code looks good, compiles, and passes unit tests
 	ginkgo -r -p -randomizeAllSpecs -randomizeSuites \
