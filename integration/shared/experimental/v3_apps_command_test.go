@@ -30,7 +30,7 @@ var _ = Describe("v3-apps command", func() {
 
 	Describe("help", func() {
 		When("--help flag is set", func() {
-			It("Displays command usage to output", func() {
+			FIt("Displays command usage to output", func() {
 				session := helpers.CF("v3-apps", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
@@ -38,7 +38,7 @@ var _ = Describe("v3-apps command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf v3-apps"))
 
-				Eventually(session).Should(Exit(0))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})

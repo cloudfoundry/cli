@@ -22,7 +22,7 @@ var _ = Describe("v3-delete command", func() {
 	})
 
 	When("--help flag is set", func() {
-		It("Displays command usage to output", func() {
+		FIt("Displays command usage to output", func() {
 			session := helpers.CF("v3-delete", "--help")
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("v3-delete - Delete a V3 App"))
@@ -30,7 +30,7 @@ var _ = Describe("v3-delete command", func() {
 			Eventually(session).Should(Say(`cf v3-delete APP_NAME \[-f\]`))
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`\s+-f\s+Force deletion without confirmation`))
-			Eventually(session).Should(Exit(0))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 

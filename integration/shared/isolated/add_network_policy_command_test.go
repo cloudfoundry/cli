@@ -13,7 +13,7 @@ import (
 var _ = Describe("add-network-policy command", func() {
 	Describe("help", func() {
 		When("--help flag is set", func() {
-			It("Displays command usage to output", func() {
+			FIt("Displays command usage to output", func() {
 				session := helpers.CF("add-network-policy", "--help")
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("add-network-policy - Create policy to allow direct network traffic from one app to another"))
@@ -30,7 +30,7 @@ var _ = Describe("add-network-policy command", func() {
 				Eventually(session).Should(Say(`   -s                     The space of the destination app \(Default: targeted space\)`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("   apps, network-policies, remove-network-policy"))
-				Eventually(session).Should(Exit(0))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})

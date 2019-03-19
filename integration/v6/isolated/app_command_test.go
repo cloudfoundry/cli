@@ -27,7 +27,7 @@ var _ = Describe("app command", func() {
 
 	Describe("help", func() {
 		When("--help flag is set", func() {
-			It("Displays command usage to output", func() {
+			FIt("Displays command usage to output", func() {
 				session := helpers.CF("app", "--help")
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("app - Display health and status for an app"))
@@ -37,7 +37,7 @@ var _ = Describe("app command", func() {
 				Eventually(session).Should(Say("--guid      Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("apps, events, logs, map-route, push, unmap-route"))
-				Eventually(session).Should(Exit(0))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})

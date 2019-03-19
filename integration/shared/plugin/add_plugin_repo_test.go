@@ -18,7 +18,7 @@ import (
 var _ = Describe("add-plugin-repo command", func() {
 	Describe("help", func() {
 		When("--help flag is provided", func() {
-			It("displays command usage to output", func() {
+			FIt("displays command usage to output", func() {
 				session := helpers.CF("add-plugin-repo", "--help", "-k")
 
 				Eventually(session).Should(Say("NAME:"))
@@ -29,7 +29,7 @@ var _ = Describe("add-plugin-repo command", func() {
 				Eventually(session).Should(Say(`cf add-plugin-repo ExampleRepo https://example\.com/repo`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("install-plugin, list-plugin-repos"))
-				Eventually(session).Should(Exit(0))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})

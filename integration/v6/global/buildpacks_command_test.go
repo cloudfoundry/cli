@@ -14,7 +14,7 @@ import (
 var _ = Describe("buildpacks command", func() {
 
 	When("--help is passed", func() {
-		It("displays the help message", func() {
+		FIt("displays the help message", func() {
 			session := helpers.CF("buildpacks", "--help")
 			Eventually(session).Should(Say("NAME:"))
 			Eventually(session).Should(Say("buildpacks - List all buildpacks"))
@@ -22,7 +22,7 @@ var _ = Describe("buildpacks command", func() {
 			Eventually(session).Should(Say("cf buildpacks"))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("push"))
-			Eventually(session).Should(Exit(0))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 
