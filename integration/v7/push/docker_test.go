@@ -32,23 +32,74 @@ var _ = Describe("pushing docker images", func() {
 		Eventually(session).Should(Exit(0))
 	}
 
-	When("the docker image is valid", func() {
-		It("uses the specified docker image", func() {
-			session := helpers.CF(PushCommandName, appName, "-o", PublicDockerImage)
+	When("a public docker image is specified in command line", func() {
+		When("the docker image is valid", func() {
+			It("uses the specified docker image", func() {
+				session := helpers.CF(PushCommandName, appName, "-o", PublicDockerImage)
 
-			AssertThatItPrintsSuccessfulDockerPushOutput(session, PublicDockerImage)
+				AssertThatItPrintsSuccessfulDockerPushOutput(session, PublicDockerImage)
+			})
+		})
+
+		When("the docker image is invalid", func() {
+			It("displays an error and exits 1", func() {
+				session := helpers.CF(PushCommandName, appName, "-o", "some-invalid-docker-image")
+				Eventually(session.Err).Should(Say("StagingError - Staging error: staging failed"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 	})
 
-	When("the docker image is invalid", func() {
-		It("displays an error and exits 1", func() {
-			session := helpers.CF(PushCommandName, appName, "-o", "some-invalid-docker-image")
-			Eventually(session.Err).Should(Say("StagingError - Staging error: staging failed"))
-			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Exit(1))
+	When("a public docker image is only provided in the manifest", func() {
+		When("the docker image is valid", func() {
+			It("uses the specified docker image", func() {
+				manifestPath := filepath.Join(tempDir, "manifest.yml")
+
+				helpers.WriteManifest(manifestPath, map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"name": appName,
+							"docker": map[string]interface{}{
+								"image": PublicDockerImage,
+							},
+						},
+					},
+				})
+				session := helpers.CF(
+					PushCommandName, appName,
+					"-f", manifestPath,
+				)
+
+				AssertThatItPrintsSuccessfulDockerPushOutput(session, PublicDockerImage)
+			})
+		})
+
+		When("the docker image is invalid", func() {
+			It("displays an error and exits 1", func() {
+				manifestPath := filepath.Join(tempDir, "manifest.yml")
+
+				helpers.WriteManifest(manifestPath, map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"name": appName,
+							"docker": map[string]interface{}{
+								"image": "some-invalid-docker-image",
+							},
+						},
+					},
+				})
+				session := helpers.CF(
+					PushCommandName, appName,
+					"-f", manifestPath,
+				)
+
+				Eventually(session.Err).Should(Say("StagingError - Staging error: staging failed"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 	})
-
 	When("a docker username and password are provided with a private image", func() {
 		var (
 			privateDockerImage    string

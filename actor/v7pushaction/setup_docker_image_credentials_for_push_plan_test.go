@@ -69,7 +69,7 @@ var _ = Describe("SetupDockerImageCredentialsForPushPlan", func() {
 			})
 		})
 
-		When("the manifest contains flag overrides", func() {
+		When("the manifest contains docker settings", func() {
 			BeforeEach(func() {
 				manifestApp.Docker = &manifestparser.Docker{
 					Image:    "manifest-docker-image",
