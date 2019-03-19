@@ -33,7 +33,14 @@ var (
 
 func TestPush(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Push Integration Suite")
+	reporters := []Reporter{}
+
+	prBuilderReporter := helpers.GetPRBuilderReporter()
+	if prBuilderReporter != nil {
+		reporters = append(reporters, prBuilderReporter)
+	}
+
+	RunSpecsWithDefaultAndCustomReporters(t, "Push Integration Suite", reporters)
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -87,6 +94,10 @@ var _ = SynchronizedAfterSuite(func() {
 	helpers.DestroyHomeDir(homeDir)
 	GinkgoWriter.Write([]byte(fmt.Sprintf("==============================End of Global Node %d Synchronized After Each==============================", GinkgoParallelNode())))
 }, func() {
+	outputRoot := os.Getenv(helpers.PRBuilderOutputEnvVar)
+	if outputRoot != "" {
+		helpers.WriteFailureSummary(outputRoot, "summary_ivp.txt")
+	}
 })
 
 var _ = BeforeEach(func() {

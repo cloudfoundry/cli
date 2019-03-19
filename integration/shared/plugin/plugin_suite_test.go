@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -28,9 +29,16 @@ var (
 	homeDir string
 )
 
-func TestGlobal(t *testing.T) {
+func TestPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Plugin Suite")
+	reporters := []Reporter{}
+
+	prBuilderReporter := helpers.GetPRBuilderReporter()
+	if prBuilderReporter != nil {
+		reporters = append(reporters, prBuilderReporter)
+	}
+
+	RunSpecsWithDefaultAndCustomReporters(t, "Plugin Suite", reporters)
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -54,9 +62,16 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).ToNot(HaveOccurred())
 })
 
-var _ = AfterSuite(func() {
+var _ = SynchronizedAfterSuite(func() {
 	CleanupBuildArtifacts()
-})
+},
+	func() {
+		outputRoot := os.Getenv(helpers.PRBuilderOutputEnvVar)
+		if outputRoot != "" {
+			helpers.WriteFailureSummary(outputRoot, "summary_isplugins.txt")
+		}
+	},
+)
 
 var _ = BeforeEach(func() {
 	homeDir = helpers.SetHomeDir()

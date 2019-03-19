@@ -1,8 +1,11 @@
 package helpers
 
 import (
+	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -50,6 +53,52 @@ func (reporter *PRBuilderReporter) SpecDidComplete(specSummary *types.SpecSummar
 		if err != nil {
 			panic(err)
 		}
+	}
+}
+
+// WriteFailureSummary aggregates test failures from all parallel nodes, sorts
+// them, and writes the result to a file.
+func WriteFailureSummary(outputRoot, filename string) {
+	outfile, err := os.Create(filepath.Join(outputRoot, filename))
+	failureSummaries := make([]string, 0)
+	if err != nil {
+		panic(err)
+	}
+	err = filepath.Walk(outputRoot, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		if strings.Contains(path, "summary") {
+			return nil
+		}
+		defer os.Remove(path)
+		allFailures, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		failures := strings.Split(string(allFailures), "\n")
+		failureSummaries = append(failureSummaries, failures...)
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	sort.Strings(failureSummaries)
+	anyFailures := false
+	var previousLine string
+	for _, line := range failureSummaries {
+		if line != "" && line != previousLine {
+			anyFailures = true
+			previousLine = line
+			fmt.Fprintln(outfile, line)
+		}
+	}
+	if !anyFailures {
+		err = os.Remove(filepath.Join(outputRoot, filename))
+	}
+	if err != nil {
+		panic(err)
 	}
 }
 

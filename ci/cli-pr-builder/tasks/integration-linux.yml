@@ -57,6 +57,26 @@ run:
 
     go get -u github.com/onsi/ginkgo/ginkgo
 
-    # TODO uncomment slow integration tests when the rest of the PR builder is working
-    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/isolated # integration/v6/isolated integration/shared/plugin integration/v6/push
-    # ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/shared/global integration/v6/global
+    set +e
+    ginkgo -r -nodes=$NODES -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs -keepGoing integration/shared/isolated integration/v6/isolated integration/shared/plugin integration/v6/push
+    parallel_failed=$?
+
+    ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs -keepGoing integration/shared/global integration/v6/global
+    serial_failed=$?
+    set -e
+
+    SUMMARY_FILE="$PR_BUILDER_OUTPUT_DIR/summary.txt"
+
+    cat <<'EOF' > $SUMMARY_FILE
+    ### CI Run Summary:
+    The following failures were detected in the pipeline:
+    ```
+    EOF
+
+    cat $PR_BUILDER_OUTPUT_DIR/summary_* | sort >> $SUMMARY_FILE
+
+    echo '```' >> $SUMMARY_FILE
+
+    if [[ $parallel_failed -ne 0 || $serial_failed -ne 0 ]]; then
+      exit 1
+    fi
