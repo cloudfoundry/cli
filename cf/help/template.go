@@ -18,12 +18,15 @@ func GetHelpTemplate() string {
 {{.Title "` + T("ENVIRONMENT VARIABLES:") + `"}}
    CF_COLOR=false                     ` + T("Do not colorize output") + `
    CF_HOME=path/to/dir/               ` + T("Override path to default config directory") + `
+	 CF_PASSWORD                        ` + T("Sets the log in password") + `
    CF_DIAL_TIMEOUT=5                  ` + T("Max wait time to establish a connection, including name resolution, in seconds") + `
    CF_PLUGIN_HOME=path/to/dir/        ` + T("Override path to default plugin config directory") + `
    CF_STAGING_TIMEOUT=15              ` + T("Max wait time for buildpack staging, in minutes") + `
    CF_STARTUP_TIMEOUT=5               ` + T("Max wait time for app instance startup, in minutes") + `
    CF_TRACE=true                      ` + T("Print API request diagnostics to stdout") + `
    CF_TRACE=path/to/trace.log         ` + T("Append API request diagnostics to a log file") + `
+	 CF_USERNAME=                       ` + T("Sets the log in username") + `
+	 all_proxy=proxy.example.com:8080   ` + T("Specify a proxy server to enable proxying for all requests") + `
    https_proxy=proxy.example.com:8080 ` + T("Enable HTTP proxying for API requests") + `
 
 {{.Title "` + T("GLOBAL OPTIONS:") + `"}}

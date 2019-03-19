@@ -311,9 +311,11 @@ func (cmd HelpCommand) environmentalVariablesTableData() [][]string {
 		{"CF_COLOR=false", cmd.UI.TranslateText("Do not colorize output")},
 		{"CF_DIAL_TIMEOUT=5", cmd.UI.TranslateText("Max wait time to establish a connection, including name resolution, in seconds")},
 		{"CF_HOME=path/to/dir/", cmd.UI.TranslateText("Override path to default config directory")},
+		{"CF_PASSWORD", cmd.UI.TranslateText("Sets the log in password")},
 		{"CF_PLUGIN_HOME=path/to/dir/", cmd.UI.TranslateText("Override path to default plugin config directory")},
 		{"CF_TRACE=true", cmd.UI.TranslateText("Print API request diagnostics to stdout")},
 		{"CF_TRACE=path/to/trace.log", cmd.UI.TranslateText("Append API request diagnostics to a log file")},
+		{"CF_USERNAME", cmd.UI.TranslateText("Sets the log in username")},
 		{"all_proxy=proxy.example.com:8080", cmd.UI.TranslateText("Specify a proxy server to enable proxying for all requests")},
 		{"https_proxy=proxy.example.com:8080", cmd.UI.TranslateText("Enable proxying for HTTP requests")},
 	}
