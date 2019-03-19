@@ -121,6 +121,21 @@ type FakeV7Actor struct {
 		result2 v7action.Warnings
 		result3 error
 	}
+	ResourceMatchStub        func([]sharedaction.V3Resource) ([]sharedaction.V3Resource, v7action.Warnings, error)
+	resourceMatchMutex       sync.RWMutex
+	resourceMatchArgsForCall []struct {
+		arg1 []sharedaction.V3Resource
+	}
+	resourceMatchReturns struct {
+		result1 []sharedaction.V3Resource
+		result2 v7action.Warnings
+		result3 error
+	}
+	resourceMatchReturnsOnCall map[int]struct {
+		result1 []sharedaction.V3Resource
+		result2 v7action.Warnings
+		result3 error
+	}
 	ScaleProcessByApplicationStub        func(string, v7action.Process) (v7action.Warnings, error)
 	scaleProcessByApplicationMutex       sync.RWMutex
 	scaleProcessByApplicationArgsForCall []struct {
@@ -724,6 +739,77 @@ func (fake *FakeV7Actor) PollPackageReturnsOnCall(i int, result1 v7action.Packag
 	}
 	fake.pollPackageReturnsOnCall[i] = struct {
 		result1 v7action.Package
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV7Actor) ResourceMatch(arg1 []sharedaction.V3Resource) ([]sharedaction.V3Resource, v7action.Warnings, error) {
+	var arg1Copy []sharedaction.V3Resource
+	if arg1 != nil {
+		arg1Copy = make([]sharedaction.V3Resource, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.resourceMatchMutex.Lock()
+	ret, specificReturn := fake.resourceMatchReturnsOnCall[len(fake.resourceMatchArgsForCall)]
+	fake.resourceMatchArgsForCall = append(fake.resourceMatchArgsForCall, struct {
+		arg1 []sharedaction.V3Resource
+	}{arg1Copy})
+	fake.recordInvocation("ResourceMatch", []interface{}{arg1Copy})
+	fake.resourceMatchMutex.Unlock()
+	if fake.ResourceMatchStub != nil {
+		return fake.ResourceMatchStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.resourceMatchReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeV7Actor) ResourceMatchCallCount() int {
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
+	return len(fake.resourceMatchArgsForCall)
+}
+
+func (fake *FakeV7Actor) ResourceMatchCalls(stub func([]sharedaction.V3Resource) ([]sharedaction.V3Resource, v7action.Warnings, error)) {
+	fake.resourceMatchMutex.Lock()
+	defer fake.resourceMatchMutex.Unlock()
+	fake.ResourceMatchStub = stub
+}
+
+func (fake *FakeV7Actor) ResourceMatchArgsForCall(i int) []sharedaction.V3Resource {
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
+	argsForCall := fake.resourceMatchArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeV7Actor) ResourceMatchReturns(result1 []sharedaction.V3Resource, result2 v7action.Warnings, result3 error) {
+	fake.resourceMatchMutex.Lock()
+	defer fake.resourceMatchMutex.Unlock()
+	fake.ResourceMatchStub = nil
+	fake.resourceMatchReturns = struct {
+		result1 []sharedaction.V3Resource
+		result2 v7action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV7Actor) ResourceMatchReturnsOnCall(i int, result1 []sharedaction.V3Resource, result2 v7action.Warnings, result3 error) {
+	fake.resourceMatchMutex.Lock()
+	defer fake.resourceMatchMutex.Unlock()
+	fake.ResourceMatchStub = nil
+	if fake.resourceMatchReturnsOnCall == nil {
+		fake.resourceMatchReturnsOnCall = make(map[int]struct {
+			result1 []sharedaction.V3Resource
+			result2 v7action.Warnings
+			result3 error
+		})
+	}
+	fake.resourceMatchReturnsOnCall[i] = struct {
+		result1 []sharedaction.V3Resource
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1346,6 +1432,8 @@ func (fake *FakeV7Actor) Invocations() map[string][][]interface{} {
 	defer fake.pollBuildMutex.RUnlock()
 	fake.pollPackageMutex.RLock()
 	defer fake.pollPackageMutex.RUnlock()
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
 	fake.scaleProcessByApplicationMutex.RLock()
 	defer fake.scaleProcessByApplicationMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()

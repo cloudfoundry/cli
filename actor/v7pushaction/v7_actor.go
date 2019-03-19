@@ -17,6 +17,7 @@ type V7Actor interface {
 	GetApplicationsByNamesAndSpace(appNames []string, spaceGUID string) ([]v7action.Application, v7action.Warnings, error)
 	PollBuild(buildGUID string, appName string) (v7action.Droplet, v7action.Warnings, error)
 	PollPackage(pkg v7action.Package) (v7action.Package, v7action.Warnings, error)
+	ResourceMatch(resources []sharedaction.V3Resource) ([]sharedaction.V3Resource, v7action.Warnings, error)
 	ScaleProcessByApplication(appGUID string, process v7action.Process) (v7action.Warnings, error)
 	SetApplicationDroplet(appGUID string, dropletGUID string) (v7action.Warnings, error)
 	SetApplicationManifest(appGUID string, rawManifest []byte) (v7action.Warnings, error)
@@ -25,5 +26,5 @@ type V7Actor interface {
 	StopApplication(appGUID string) (v7action.Warnings, error)
 	UpdateApplication(app v7action.Application) (v7action.Application, v7action.Warnings, error)
 	UpdateProcessByTypeAndApplication(processType string, appGUID string, updatedProcess v7action.Process) (v7action.Warnings, error)
-	UploadBitsPackage(v7action.Package, []sharedaction.V3Resource, io.Reader, int64) (v7action.Package, v7action.Warnings, error)
+	UploadBitsPackage(pkg v7action.Package, matchedResources []sharedaction.V3Resource, newResources io.Reader, newResourcesLength int64) (v7action.Package, v7action.Warnings, error)
 }
