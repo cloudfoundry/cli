@@ -1,12 +1,15 @@
 package wrapper
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 )
 
 //go:generate counterfeiter . UAAClient
+
+const accessTokenExpirationMargin = time.Second * 5
 
 // UAAClient is the interface for getting a valid access token
 type UAAClient interface {
@@ -19,8 +22,10 @@ type UAAClient interface {
 type TokenCache interface {
 	AccessToken() string
 	RefreshToken() string
+	AccessTokenExpiryDate() time.Time
 	SetAccessToken(token string)
 	SetRefreshToken(token string)
+	SetAccessTokenExpiryDate(time time.Time)
 }
 
 // UAAAuthentication wraps connections and adds authentication headers to all
@@ -47,33 +52,13 @@ func (t *UAAAuthentication) Make(request *cloudcontroller.Request, passedRespons
 	if t.client == nil {
 		return t.connection.Make(request, passedResponse)
 	}
-
-	request.Header.Set("Authorization", t.cache.AccessToken())
-
-	requestErr := t.connection.Make(request, passedResponse)
-	if _, ok := requestErr.(ccerror.InvalidAuthTokenError); ok {
-		tokens, err := t.client.RefreshAccessToken(t.cache.RefreshToken())
-		if err != nil {
-			return err
-		}
-
-		t.cache.SetAccessToken(tokens.AuthorizationToken())
-		t.cache.SetRefreshToken(tokens.RefreshToken)
-
-		if request.Body != nil {
-			err = request.ResetBody()
-			if err != nil {
-				if _, ok := err.(ccerror.PipeSeekError); ok {
-					return ccerror.PipeSeekError{Err: requestErr}
-				}
-				return err
-			}
-		}
-		request.Header.Set("Authorization", t.cache.AccessToken())
-		requestErr = t.connection.Make(request, passedResponse)
+	err := t.refreshToken()
+	if nil != err {
+		return err
 	}
-
-	return requestErr
+	request.Header.Set("Authorization", t.cache.AccessToken())
+	err = t.connection.Make(request, passedResponse)
+	return err
 }
 
 // SetClient sets the UAA client that the wrapper will use.
@@ -85,4 +70,20 @@ func (t *UAAAuthentication) SetClient(client UAAClient) {
 func (t *UAAAuthentication) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
 	t.connection = innerconnection
 	return t
+}
+
+// refreshToken refreshes the JWT access token if it is expired or about to expire.
+// If the access token is not yet expired, no action is performed.
+func (t *UAAAuthentication) refreshToken() error {
+	expiresIn := t.cache.AccessTokenExpiryDate().Sub(time.Now())
+	if expiresIn < accessTokenExpirationMargin {
+		tokens, err := t.client.RefreshAccessToken(t.cache.RefreshToken())
+		if err != nil {
+			return err
+		}
+		t.cache.SetAccessToken(tokens.AuthorizationToken())
+		t.cache.SetRefreshToken(tokens.RefreshToken)
+		t.cache.SetAccessTokenExpiryDate(time.Now().Add(time.Second * time.Duration(tokens.ExpiresIn)))
+	}
+	return nil
 }

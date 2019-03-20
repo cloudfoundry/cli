@@ -28,9 +28,10 @@ var _ = Describe("UAA Client", func() {
 
 	Describe("RefreshAccessToken", func() {
 		var (
-			returnedAccessToken  string
-			sentRefreshToken     string
-			returnedRefreshToken string
+			returnedAccessToken    string
+			sentRefreshToken       string
+			returnedRefreshToken   string
+			tokenExpirationSeconds int
 		)
 
 		When("the provided grant_type is client_credentials", func() {
@@ -38,13 +39,14 @@ var _ = Describe("UAA Client", func() {
 				fakeConfig.UAAGrantTypeReturns(string(constant.GrantTypeClientCredentials))
 
 				returnedAccessToken = "I-ACCESS-TOKEN"
+				tokenExpirationSeconds = 599
 				response := fmt.Sprintf(`{
 				"access_token": "%s",
 				"token_type": "bearer",
-				"expires_in": 599,
+				"expires_in": %d,
 				"scope": "cloud_controller.read password.write cloud_controller.write openid uaa.user",
 				"jti": "4150c08afa2848278e5ad57201024e32"
-			}`, returnedAccessToken)
+			}`, returnedAccessToken, tokenExpirationSeconds)
 
 				server.AppendHandlers(
 					CombineHandlers(
@@ -64,6 +66,7 @@ var _ = Describe("UAA Client", func() {
 				Expect(token).To(Equal(RefreshedTokens{
 					AccessToken: returnedAccessToken,
 					Type:        "bearer",
+					ExpiresIn:   tokenExpirationSeconds,
 				}))
 
 				Expect(server.ReceivedRequests()).To(HaveLen(2))
@@ -81,10 +84,10 @@ var _ = Describe("UAA Client", func() {
 				"access_token": "%s",
 				"token_type": "bearer",
 				"refresh_token": "%s",
-				"expires_in": 599,
+				"expires_in": %d,
 				"scope": "cloud_controller.read password.write cloud_controller.write openid uaa.user",
 				"jti": "4150c08afa2848278e5ad57201024e32"
-			}`, returnedAccessToken, returnedRefreshToken)
+			}`, returnedAccessToken, returnedRefreshToken, tokenExpirationSeconds)
 
 				server.AppendHandlers(
 					CombineHandlers(
@@ -105,6 +108,7 @@ var _ = Describe("UAA Client", func() {
 					AccessToken:  returnedAccessToken,
 					RefreshToken: returnedRefreshToken,
 					Type:         "bearer",
+					ExpiresIn:    tokenExpirationSeconds,
 				}))
 
 				Expect(server.ReceivedRequests()).To(HaveLen(2))
@@ -122,10 +126,10 @@ var _ = Describe("UAA Client", func() {
 				"access_token": "%s",
 				"token_type": "bearer",
 				"refresh_token": "%s",
-				"expires_in": 599,
+				"expires_in": %d,
 				"scope": "cloud_controller.read password.write cloud_controller.write openid uaa.user",
 				"jti": "4150c08afa2848278e5ad57201024e32"
-			}`, returnedAccessToken, returnedRefreshToken)
+			}`, returnedAccessToken, returnedRefreshToken, tokenExpirationSeconds)
 
 				server.AppendHandlers(
 					CombineHandlers(
@@ -146,6 +150,7 @@ var _ = Describe("UAA Client", func() {
 					AccessToken:  returnedAccessToken,
 					RefreshToken: returnedRefreshToken,
 					Type:         "bearer",
+					ExpiresIn:    tokenExpirationSeconds,
 				}))
 
 				Expect(server.ReceivedRequests()).To(HaveLen(2))

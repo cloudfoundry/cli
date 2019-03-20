@@ -17,6 +17,8 @@ import (
 
 //go:generate counterfeiter . TokenRefresher
 
+const accessTokenExpirationMargin = time.Second * 5
+
 type TokenRefresher interface {
 	RefreshAuthToken() (updatedToken string, apiErr error)
 }
@@ -181,6 +183,11 @@ func (uaa UAARepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[strin
 }
 
 func (uaa UAARepository) RefreshAuthToken() (string, error) {
+	expiresIn := uaa.config.AccessTokenExpiryDate().Sub(time.Now())
+	if expiresIn > accessTokenExpirationMargin {
+		return uaa.config.AccessToken(), nil
+	}
+
 	data := url.Values{}
 
 	switch uaa.config.UAAGrantType() {
@@ -213,6 +220,7 @@ func (uaa UAARepository) getAuthToken(data url.Values) error {
 		TokenType    string           `json:"token_type"`
 		RefreshToken string           `json:"refresh_token"`
 		Error        uaaErrorResponse `json:"error"`
+		ExpiresIn    int              `json:"expires_in"`
 	}
 
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthenticationEndpoint())
@@ -248,6 +256,7 @@ func (uaa UAARepository) getAuthToken(data url.Values) error {
 
 	uaa.config.SetAccessToken(fmt.Sprintf("%s %s", response.TokenType, response.AccessToken))
 	uaa.config.SetRefreshToken(response.RefreshToken)
+	uaa.config.SetAccessTokenExpiryDate(time.Now().Add(time.Second * time.Duration(response.ExpiresIn)))
 
 	return nil
 }

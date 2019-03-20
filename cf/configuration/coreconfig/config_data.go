@@ -20,6 +20,7 @@ type AuthPrompt struct {
 
 type Data struct {
 	AccessToken              string
+	AccessTokenExpiryDate    string
 	APIVersion               string
 	AsyncTimeout             uint
 	AuthorizationEndpoint    string

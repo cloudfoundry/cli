@@ -30,6 +30,16 @@ type FakeConfig struct {
 	accessTokenReturnsOnCall map[int]struct {
 		result1 string
 	}
+	AccessTokenExpiryDateStub        func() time.Time
+	accessTokenExpiryDateMutex       sync.RWMutex
+	accessTokenExpiryDateArgsForCall []struct {
+	}
+	accessTokenExpiryDateReturns struct {
+		result1 time.Time
+	}
+	accessTokenExpiryDateReturnsOnCall map[int]struct {
+		result1 time.Time
+	}
 	AddPluginStub        func(configv3.Plugin)
 	addPluginMutex       sync.RWMutex
 	addPluginArgsForCall []struct {
@@ -330,6 +340,11 @@ type FakeConfig struct {
 	setAccessTokenMutex       sync.RWMutex
 	setAccessTokenArgsForCall []struct {
 		arg1 string
+	}
+	SetAccessTokenExpiryDateStub        func(time.Time)
+	setAccessTokenExpiryDateMutex       sync.RWMutex
+	setAccessTokenExpiryDateArgsForCall []struct {
+		arg1 time.Time
 	}
 	SetMinCLIVersionStub        func(string)
 	setMinCLIVersionMutex       sync.RWMutex
@@ -643,6 +658,58 @@ func (fake *FakeConfig) AccessTokenReturnsOnCall(i int, result1 string) {
 	}
 	fake.accessTokenReturnsOnCall[i] = struct {
 		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) AccessTokenExpiryDate() time.Time {
+	fake.accessTokenExpiryDateMutex.Lock()
+	ret, specificReturn := fake.accessTokenExpiryDateReturnsOnCall[len(fake.accessTokenExpiryDateArgsForCall)]
+	fake.accessTokenExpiryDateArgsForCall = append(fake.accessTokenExpiryDateArgsForCall, struct {
+	}{})
+	fake.recordInvocation("AccessTokenExpiryDate", []interface{}{})
+	fake.accessTokenExpiryDateMutex.Unlock()
+	if fake.AccessTokenExpiryDateStub != nil {
+		return fake.AccessTokenExpiryDateStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.accessTokenExpiryDateReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeConfig) AccessTokenExpiryDateCallCount() int {
+	fake.accessTokenExpiryDateMutex.RLock()
+	defer fake.accessTokenExpiryDateMutex.RUnlock()
+	return len(fake.accessTokenExpiryDateArgsForCall)
+}
+
+func (fake *FakeConfig) AccessTokenExpiryDateCalls(stub func() time.Time) {
+	fake.accessTokenExpiryDateMutex.Lock()
+	defer fake.accessTokenExpiryDateMutex.Unlock()
+	fake.AccessTokenExpiryDateStub = stub
+}
+
+func (fake *FakeConfig) AccessTokenExpiryDateReturns(result1 time.Time) {
+	fake.accessTokenExpiryDateMutex.Lock()
+	defer fake.accessTokenExpiryDateMutex.Unlock()
+	fake.AccessTokenExpiryDateStub = nil
+	fake.accessTokenExpiryDateReturns = struct {
+		result1 time.Time
+	}{result1}
+}
+
+func (fake *FakeConfig) AccessTokenExpiryDateReturnsOnCall(i int, result1 time.Time) {
+	fake.accessTokenExpiryDateMutex.Lock()
+	defer fake.accessTokenExpiryDateMutex.Unlock()
+	fake.AccessTokenExpiryDateStub = nil
+	if fake.accessTokenExpiryDateReturnsOnCall == nil {
+		fake.accessTokenExpiryDateReturnsOnCall = make(map[int]struct {
+			result1 time.Time
+		})
+	}
+	fake.accessTokenExpiryDateReturnsOnCall[i] = struct {
+		result1 time.Time
 	}{result1}
 }
 
@@ -2203,6 +2270,37 @@ func (fake *FakeConfig) SetAccessTokenArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
+func (fake *FakeConfig) SetAccessTokenExpiryDate(arg1 time.Time) {
+	fake.setAccessTokenExpiryDateMutex.Lock()
+	fake.setAccessTokenExpiryDateArgsForCall = append(fake.setAccessTokenExpiryDateArgsForCall, struct {
+		arg1 time.Time
+	}{arg1})
+	fake.recordInvocation("SetAccessTokenExpiryDate", []interface{}{arg1})
+	fake.setAccessTokenExpiryDateMutex.Unlock()
+	if fake.SetAccessTokenExpiryDateStub != nil {
+		fake.SetAccessTokenExpiryDateStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) SetAccessTokenExpiryDateCallCount() int {
+	fake.setAccessTokenExpiryDateMutex.RLock()
+	defer fake.setAccessTokenExpiryDateMutex.RUnlock()
+	return len(fake.setAccessTokenExpiryDateArgsForCall)
+}
+
+func (fake *FakeConfig) SetAccessTokenExpiryDateCalls(stub func(time.Time)) {
+	fake.setAccessTokenExpiryDateMutex.Lock()
+	defer fake.setAccessTokenExpiryDateMutex.Unlock()
+	fake.SetAccessTokenExpiryDateStub = stub
+}
+
+func (fake *FakeConfig) SetAccessTokenExpiryDateArgsForCall(i int) time.Time {
+	fake.setAccessTokenExpiryDateMutex.RLock()
+	defer fake.setAccessTokenExpiryDateMutex.RUnlock()
+	argsForCall := fake.setAccessTokenExpiryDateArgsForCall[i]
+	return argsForCall.arg1
+}
+
 func (fake *FakeConfig) SetMinCLIVersion(arg1 string) {
 	fake.setMinCLIVersionMutex.Lock()
 	fake.setMinCLIVersionArgsForCall = append(fake.setMinCLIVersionArgsForCall, struct {
@@ -3281,6 +3379,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.aPIVersionMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
+	fake.accessTokenExpiryDateMutex.RLock()
+	defer fake.accessTokenExpiryDateMutex.RUnlock()
 	fake.addPluginMutex.RLock()
 	defer fake.addPluginMutex.RUnlock()
 	fake.addPluginRepositoryMutex.RLock()
@@ -3343,6 +3443,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
+	fake.setAccessTokenExpiryDateMutex.RLock()
+	defer fake.setAccessTokenExpiryDateMutex.RUnlock()
 	fake.setMinCLIVersionMutex.RLock()
 	defer fake.setMinCLIVersionMutex.RUnlock()
 	fake.setOrganizationInformationMutex.RLock()

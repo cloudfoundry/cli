@@ -16,6 +16,7 @@ type JSONConfig struct {
 	UAAEndpoint              string             `json:"UaaEndpoint"`
 	RoutingEndpoint          string             `json:"RoutingAPIEndpoint"`
 	AccessToken              string             `json:"AccessToken"`
+	AccessTokenExpiryDate    string             `json:"AccessTokenExpiryDate"`
 	SSHOAuthClient           string             `json:"SSHOAuthClient"`
 	UAAOAuthClient           string             `json:"UAAOAuthClient"`
 	UAAOAuthClientSecret     string             `json:"UAAOAuthClientSecret"`
@@ -68,6 +69,15 @@ type User struct {
 // AccessToken returns the access token for making authenticated API calls.
 func (config *Config) AccessToken() string {
 	return config.ConfigFile.AccessToken
+}
+
+// AccessTokenExpiryDate returns the expiration date for the JWT access token.
+func (config *Config) AccessTokenExpiryDate() time.Time {
+	t, err := time.Parse(time.RFC3339, config.ConfigFile.AccessTokenExpiryDate)
+	if err != nil {
+		return time.Time{}
+	}
+	return t
 }
 
 // APIVersion returns the CC API Version.
@@ -129,6 +139,11 @@ func (config *Config) RoutingEndpoint() string {
 // SetAccessToken sets the current access token.
 func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken
+}
+
+// SetAccessTokenExpiryDate sets the expiration date for the JWT access token.
+func (config *Config) SetAccessTokenExpiryDate(t time.Time) {
+	config.ConfigFile.AccessTokenExpiryDate = t.Format(time.RFC3339)
 }
 
 // SetMinCLIVersion sets the minimum CLI version required by the CC.

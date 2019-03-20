@@ -334,6 +334,8 @@ var _ = Describe("Gateway", func() {
 			authServer, _ = testnet.NewTLSServer([]testnet.TestRequest{})
 
 			config, authRepo = createAuthenticationRepository(apiServer, authServer)
+			config.SetAccessTokenExpiryDate(time.Now().AddDate(0, 0, 1))
+
 			ccGateway.SetTokenRefresher(authRepo)
 
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
@@ -650,6 +652,8 @@ var _ = Describe("Gateway", func() {
 			authServer, _ = testnet.NewTLSServer([]testnet.TestRequest{})
 
 			config, authRepo = createAuthenticationRepository(apiServer, authServer)
+			config.SetAccessTokenExpiryDate(time.Now().AddDate(0, 0, 1))
+
 			ccGateway.SetTokenRefresher(authRepo)
 
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)

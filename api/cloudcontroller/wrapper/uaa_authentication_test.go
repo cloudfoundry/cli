@@ -5,9 +5,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper/wrapperfakes"
@@ -63,6 +65,15 @@ var _ = Describe("UAA Authentication", func() {
 		})
 
 		When("the token is valid", func() {
+			BeforeEach(func() {
+				// token is set and not yet expired
+				inMemoryCache.SetAccessTokenExpiryDate(time.Now().AddDate(0, 0, 1))
+			})
+
+			It("does not refresh the token", func() {
+				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(0))
+			})
+
 			It("adds authentication headers", func() {
 				err := wrapper.Make(request, nil)
 				Expect(err).ToNot(HaveOccurred())
@@ -113,6 +124,10 @@ var _ = Describe("UAA Authentication", func() {
 				executeErr   error
 			)
 
+			newAccessToken := "newAccessToken"
+			newRefreshToken := "newRefreshToken"
+			refreshTokenExpiry := time.Duration(time.Second * 42)
+
 			BeforeEach(func() {
 				expectedBody = "this body content should be preserved"
 				body := strings.NewReader(expectedBody)
@@ -121,27 +136,14 @@ var _ = Describe("UAA Authentication", func() {
 					Body:   ioutil.NopCloser(body),
 				}, body)
 
-				makeCount := 0
-				fakeConnection.MakeStub = func(request *cloudcontroller.Request, response *cloudcontroller.Response) error {
-					body, err := ioutil.ReadAll(request.Body)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(string(body)).To(Equal(expectedBody))
-
-					if makeCount == 0 {
-						makeCount++
-						return ccerror.InvalidAuthTokenError{}
-					} else {
-						return nil
-					}
-				}
-
-				inMemoryCache.SetAccessToken("what")
+				inMemoryCache.SetAccessToken("old access token")
 
 				fakeClient.RefreshAccessTokenReturns(
 					uaa.RefreshedTokens{
-						AccessToken:  "foobar-2",
-						RefreshToken: "bananananananana",
+						AccessToken:  newAccessToken,
+						RefreshToken: newRefreshToken,
 						Type:         "bearer",
+						ExpiresIn:    int(refreshTokenExpiry.Seconds()),
 					},
 					nil,
 				)
@@ -156,40 +158,23 @@ var _ = Describe("UAA Authentication", func() {
 				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(1))
 			})
 
-			It("should resend the request", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeConnection.MakeCallCount()).To(Equal(2))
-
-				requestArg, _ := fakeConnection.MakeArgsForCall(1)
-				Expect(requestArg.Header.Get("Authorization")).To(Equal("bearer foobar-2"))
-			})
-
 			It("should save the refresh token", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(inMemoryCache.RefreshToken()).To(Equal("bananananananana"))
+				Expect(inMemoryCache.RefreshToken()).To(Equal(newRefreshToken))
+				Expect(inMemoryCache.AccessToken()).To(ContainSubstring(newAccessToken))
+				Expect(inMemoryCache.AccessTokenExpiryDate()).Should(BeTemporally("~", time.Now(), refreshTokenExpiry))
 			})
 
-			When("a PipeSeekError is returned from ResetBody", func() {
-				BeforeEach(func() {
-					body, writer := cloudcontroller.NewPipeBomb()
-					req, err := http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", body)
-					Expect(err).NotTo(HaveOccurred())
-					request = cloudcontroller.NewRequest(req, body)
-
-					go func() {
-						defer GinkgoRecover()
-
-						_, err := writer.Write([]byte(expectedBody))
-						Expect(err).NotTo(HaveOccurred())
-						err = writer.Close()
-						Expect(err).NotTo(HaveOccurred())
-					}()
+			When("token cannot be refreshed", func() {
+				JustBeforeEach(func() {
+					fakeConnection.MakeReturns(ccerror.InvalidAuthTokenError{})
 				})
 
-				It("set the err on PipeSeekError", func() {
-					Expect(executeErr).To(MatchError(ccerror.PipeSeekError{Err: ccerror.InvalidAuthTokenError{}}))
+				It("should not re-try the initial request", func() {
+					Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 				})
 			})
+
 		})
 	})
 })

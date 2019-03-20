@@ -11,6 +11,7 @@ import (
 // Config a way of getting basic CF configuration
 type Config interface {
 	AccessToken() string
+	AccessTokenExpiryDate() time.Time
 	AddPlugin(configv3.Plugin)
 	AddPluginRepository(name string, url string)
 	APIVersion() string
@@ -42,6 +43,7 @@ type Config interface {
 	RequestRetryCount() int
 	RoutingEndpoint() string
 	SetAccessToken(token string)
+	SetAccessTokenExpiryDate(t time.Time)
 	SetMinCLIVersion(version string)
 	SetOrganizationInformation(guid string, name string)
 	SetRefreshToken(token string)
