@@ -1,7 +1,9 @@
 package manifestparser_test
 
 import (
+	"code.cloudfoundry.org/cli/integration/helpers"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -31,7 +33,10 @@ var _ = Describe("Parser", func() {
 			manifestPath string
 			manifest     map[string]interface{}
 
-			executeErr error
+			tmpPath1      string
+			tmpPath2      string
+			tmpNestedPath string
+			executeErr    error
 		)
 
 		JustBeforeEach(func() {
@@ -39,13 +44,29 @@ var _ = Describe("Parser", func() {
 			Expect(err).ToNot(HaveOccurred())
 			manifestPath = tmpfile.Name()
 			Expect(tmpfile.Close()).ToNot(HaveOccurred())
-
+			parser.PathToManifest = manifestPath
 			WriteManifest(manifestPath, manifest)
-
 			executeErr = parser.Parse(manifestPath)
+
+		})
+
+		BeforeEach(func() {
+			var err error
+			tmpPath1, err = ioutil.TempDir("", "")
+			Expect(err).ToNot(HaveOccurred())
+
+			tmpNestedPath, err = ioutil.TempDir(tmpPath1, "")
+			Expect(err).ToNot(HaveOccurred())
+
+			tmpNestedPath = filepath.Join(tmpNestedPath, "..")
+
+			tmpPath2, err = ioutil.TempDir("", "")
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		AfterEach(func() {
+			err := os.RemoveAll("second")
+			Expect(err).ToNot(HaveOccurred())
 			Expect(os.RemoveAll(manifestPath)).ToNot(HaveOccurred())
 		})
 
@@ -55,11 +76,11 @@ var _ = Describe("Parser", func() {
 					"applications": []map[string]string{
 						{
 							"name": "app-1",
-							"path": "/first/path",
+							"path": tmpNestedPath,
 						},
 						{
 							"name": "app-2",
-							"path": "/second/path",
+							"path": tmpPath2,
 						},
 					},
 				}
@@ -71,8 +92,8 @@ var _ = Describe("Parser", func() {
 				Expect(parser.Applications[0].Name).To(Equal("app-1"))
 				Expect(parser.Applications[1].Name).To(Equal("app-2"))
 
-				Expect(parser.Applications[0].Path).To(Equal("/first/path"))
-				Expect(parser.Applications[1].Path).To(Equal("/second/path"))
+				Expect(parser.Applications[0].Path).To(helpers.EqualPath("%s", tmpPath1))
+				Expect(parser.Applications[1].Path).To(helpers.EqualPath("%s", tmpPath2))
 			})
 		})
 
@@ -349,25 +370,31 @@ applications:
 			executeErr     error
 			rawManifest    []byte
 			pathToManifest string
+			tmpMyPath      string
 		)
 
 		BeforeEach(func() {
+			var err error
 
-			rawManifest = []byte(`---
+			appName = "spark"
+
+			tmpMyPath, err = ioutil.TempDir("", "")
+			Expect(err).ToNot(HaveOccurred())
+
+			rawManifest = []byte(fmt.Sprintf(`---
 applications:
 - name: spark
   memory: 1G
   instances: 2
   docker:
     username: experiment
-  path: /my/path
+  path: %s
 - name: flame
   memory: 1G
   instances: 2
   docker:
     username: experiment
-`)
-			appName = "spark"
+`, tmpMyPath))
 
 		})
 
@@ -385,19 +412,20 @@ applications:
 
 		AfterEach(func() {
 			os.RemoveAll(pathToManifest)
+
 		})
 
 		When("marshaling does not error", func() {
 
 			It("returns just the app's manifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(string(rawAppManifest)).To(MatchYAML(`applications:
+				Expect(string(rawAppManifest)).To(MatchYAML(fmt.Sprintf(`applications:
 - name: spark
   memory: 1G
   instances: 2
   docker:
     username: experiment
-  path: /my/path`))
+  path: %s`, tmpMyPath)))
 			})
 		})
 

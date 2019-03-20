@@ -33,14 +33,19 @@ var _ = Describe("push manifest with a path", func() {
 		Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
 	})
 
-	It("pushes the apps using the path specified", func() {
+	It("pushes the apps using the relative path to the manifest specified", func() {
 		helpers.WithHelloWorldApp(func(dir string) {
-			manifestPath := filepath.Join(dir, "manifest.yml")
+			nestedDir := filepath.Join(dir, "nested")
+			err := os.Mkdir(nestedDir, os.FileMode(0777))
+			if err != nil {
+				Expect(err).NotTo(HaveOccurred())
+			}
+			manifestPath := filepath.Join(nestedDir, "manifest.yml")
 			helpers.WriteManifest(manifestPath, map[string]interface{}{
 				"applications": []map[string]interface{}{
 					{
 						"name": appName,
-						"path": dir,
+						"path": "..",
 					},
 					{
 						"name": secondName,

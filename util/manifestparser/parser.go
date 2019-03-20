@@ -3,6 +3,7 @@ package manifestparser
 import (
 	"errors"
 	"io/ioutil"
+	"path/filepath"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	"gopkg.in/yaml.v2"
@@ -135,7 +136,7 @@ type rawManifest struct {
 
 func (parser *Parser) parse(manifestBytes []byte) error {
 	parser.rawManifest = manifestBytes
-
+	pathToManifest := parser.GetPathToManifest()
 	var raw rawManifest
 
 	err := yaml.Unmarshal(manifestBytes, &raw)
@@ -149,12 +150,26 @@ func (parser *Parser) parse(manifestBytes []byte) error {
 		return errors.New("must have at least one application")
 	}
 
-	for _, application := range parser.Applications {
+	for index, application := range parser.Applications {
 		if application.Name == "" {
 			return errors.New("Found an application with no name specified")
 		}
-	}
 
+		if application.Path == "" {
+			continue
+		}
+
+		var finalPath = application.Path
+		if !filepath.IsAbs(finalPath) {
+			finalPath = filepath.Join(filepath.Dir(pathToManifest), finalPath)
+		}
+		finalPath, err = filepath.EvalSymlinks(finalPath)
+		if err != nil {
+			return err
+		}
+		parser.Applications[index].Path = finalPath
+
+	}
 	return nil
 }
 

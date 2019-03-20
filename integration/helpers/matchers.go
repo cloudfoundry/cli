@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"github.com/onsi/gomega/matchers"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -25,4 +26,21 @@ func SayPath(format string, path string) types.GomegaMatcher {
 		return gbytes.Say(expected)
 	}
 	return gbytes.Say(format, theRealPath)
+}
+
+func EqualPath(format string, path string) types.GomegaMatcher {
+	theRealDir, err := filepath.EvalSymlinks(filepath.Dir(path))
+	Expect(err).ToNot(HaveOccurred())
+	theRealPath := filepath.Join(theRealDir, filepath.Base(path))
+
+	if runtime.GOOS == "windows" {
+		expected := "(?i)" + format
+		expected = fmt.Sprintf(expected, regexp.QuoteMeta(path))
+		return &matchers.EqualMatcher{
+			Expected: expected,
+		}
+	}
+	return &matchers.EqualMatcher{
+		Expected: theRealPath,
+	}
 }
