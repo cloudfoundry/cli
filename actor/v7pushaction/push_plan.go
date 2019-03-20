@@ -30,11 +30,9 @@ type PushPlan struct {
 
 	Manifest []byte
 
-	Archive            bool
-	BitsPath           string
-	AllResources       []sharedaction.V3Resource
-	MatchedResources   []sharedaction.V3Resource
-	UnmatchedResources []sharedaction.V3Resource
+	Archive      bool
+	BitsPath     string
+	AllResources []sharedaction.V3Resource
 }
 
 type FlagOverrides struct {

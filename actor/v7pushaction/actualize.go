@@ -1,8 +1,9 @@
 package v7pushaction
 
 import (
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"os"
+
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -126,9 +127,17 @@ func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) (
 
 func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar ProgressBar, warningsStream chan Warnings, eventStream chan Event) (v7action.Package, error) {
 	log.WithField("Path", plan.BitsPath).Info("creating archive")
+	var v7warnings v7action.Warnings
+
+	eventStream <- ResourceMatching
+	matchedResources, unmatchedResources, warnings, err := actor.MatchResources(plan.AllResources)
+	warningsStream <- warnings
+	if err != nil {
+		return v7action.Package{}, err
+	}
 
 	eventStream <- CreatingArchive
-	archivePath, err := actor.GetArchivePath(plan)
+	archivePath, err := actor.GetArchivePath(plan, unmatchedResources)
 	if err != nil {
 		return v7action.Package{}, err
 	}
@@ -136,8 +145,8 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 
 	eventStream <- CreatingPackage
 	log.WithField("GUID", plan.Application.GUID).Info("creating package")
-	pkg, warnings, err := actor.V7Actor.CreateBitsPackageByApplication(plan.Application.GUID)
-	warningsStream <- Warnings(warnings)
+	pkg, v7warnings, err := actor.V7Actor.CreateBitsPackageByApplication(plan.Application.GUID)
+	warningsStream <- Warnings(v7warnings)
 	if err != nil {
 		return v7action.Package{}, err
 	}
@@ -154,8 +163,8 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 
 		eventStream <- UploadingApplicationWithArchive
 		progressReader := progressBar.NewProgressBarWrapper(file, size)
-		pkg, warnings, err = actor.V7Actor.UploadBitsPackage(pkg, plan.MatchedResources, progressReader, size)
-		warningsStream <- Warnings(warnings)
+		pkg, v7warnings, err = actor.V7Actor.UploadBitsPackage(pkg, matchedResources, progressReader, size)
+		warningsStream <- Warnings(v7warnings)
 
 		if _, ok := err.(ccerror.PipeSeekError); ok {
 			eventStream <- RetryUpload
@@ -207,10 +216,10 @@ func (actor Actor) CreatePackage(plan PushPlan, progressBar ProgressBar, warning
 	return actor.CreateAndUploadApplicationBits(plan, progressBar, warningsStream, eventStream)
 }
 
-func (actor Actor) GetArchivePath(plan PushPlan) (string, error) {
-
+func (actor Actor) GetArchivePath(plan PushPlan, unmatchedResources []sharedaction.V3Resource) (string, error) {
+	// translate between v3 and v2 resources
 	var v2Resources []sharedaction.Resource
-	for _, resource := range plan.AllResources {
+	for _, resource := range unmatchedResources {
 		v2Resources = append(v2Resources, resource.ToV2Resource())
 	}
 

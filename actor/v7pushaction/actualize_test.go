@@ -2,7 +2,10 @@ package v7pushaction_test
 
 import (
 	"errors"
+	"fmt"
 	"time"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -79,6 +82,14 @@ func getNextEvent(c <-chan PushPlan, e <-chan Event, w <-chan Warnings) func() E
 				return "getNextEvent timedout"
 			}
 		}
+	}
+}
+
+func buildV3Resource(name string) sharedaction.V3Resource {
+	return sharedaction.V3Resource{
+		FilePath:    name,
+		Checksum:    ccv3.Checksum{Value: fmt.Sprintf("checksum-%s", name)},
+		SizeInBytes: 6,
 	}
 }
 
@@ -490,193 +501,221 @@ var _ = Describe("Actualize", func() {
 		})
 
 		When("uploading application bits", func() {
-			BeforeEach(func() {
-				plan = PushPlan{
-					Application: v7action.Application{
-						Name: "some-app",
-						GUID: "some-app-guid",
-					},
-					BitsPath: "/some-bits-path",
-					AllResources: []sharedaction.V3Resource{
-						{FilePath: "some-filename", SizeInBytes: 6},
-					},
-					MatchedResources: []sharedaction.V3Resource{
-						{FilePath: "some-matched-filename", SizeInBytes: 6},
-					},
-				}
-			})
-
-			When("the bits path is an archive", func() {
+			When("resource match errors ", func() {
 				BeforeEach(func() {
-					plan.Archive = true
+					fakeV7Actor.ResourceMatchReturns(
+						nil,
+						v7action.Warnings{"some-resource-match-warning"},
+						errors.New("resource-match-error"))
 				})
 
-				It("creates the archive", func() {
-					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
-
-					Eventually(fakeSharedActor.ZipArchiveResourcesCallCount).Should(Equal(1))
-					bitsPath, resources := fakeSharedActor.ZipArchiveResourcesArgsForCall(0)
-					Expect(bitsPath).To(Equal("/some-bits-path"))
-					Expect(resources).To(ConsistOf(sharedaction.Resource{
-						Filename: "some-filename",
-						Size:     6,
-					}))
+				It("raises the error", func() {
+					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ResourceMatching))
+					Eventually(warningsStream).Should(Receive(ConsistOf("some-resource-match-warning")))
+					Eventually(errorStream).Should(Receive(MatchError("resource-match-error")))
+					Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(CreatingArchive))
 				})
 			})
 
-			When("The bits path is a directory", func() {
-				It("creates the archive", func() {
-					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+			When("resource match is successful", func() {
+				var (
+					matches   []sharedaction.V3Resource
+					unmatches []sharedaction.V3Resource
+				)
 
-					Eventually(fakeSharedActor.ZipDirectoryResourcesCallCount).Should(Equal(1))
-					bitsPath, resources := fakeSharedActor.ZipDirectoryResourcesArgsForCall(0)
-					Expect(bitsPath).To(Equal("/some-bits-path"))
-					Expect(resources).To(ConsistOf(sharedaction.Resource{
-						Filename: "some-filename",
-						Size:     6,
-					}))
-				})
-			})
-
-			When("the archive creation is successful", func() {
 				BeforeEach(func() {
-					fakeSharedActor.ZipDirectoryResourcesReturns("/some/archive/path", nil)
-					fakeV7Actor.UpdateApplicationReturns(
-						v7action.Application{
+					matches = []sharedaction.V3Resource{
+						buildV3Resource("some-matching-filename"),
+					}
+
+					unmatches = []sharedaction.V3Resource{
+						buildV3Resource("some-unmatching-filename"),
+					}
+
+					plan = PushPlan{
+						Application: v7action.Application{
 							Name: "some-app",
-							GUID: plan.Application.GUID,
+							GUID: "some-app-guid",
 						},
-						v7action.Warnings{"some-app-update-warnings"},
-						nil)
+						BitsPath: "/some-bits-path",
+						AllResources: append(
+							matches,
+							unmatches...,
+						),
+					}
+
+					fakeV7Actor.ResourceMatchReturns(
+						matches,
+						v7action.Warnings{"some-good-good-resource-match-warnings"},
+						nil,
+					)
 				})
 
-				It("creates the package", func() {
-					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
-
-					Eventually(fakeV7Actor.CreateBitsPackageByApplicationCallCount).Should(Equal(1))
-					Expect(fakeV7Actor.CreateBitsPackageByApplicationArgsForCall(0)).To(Equal("some-app-guid"))
-				})
-
-				When("the package creation is successful", func() {
+				When("the bits path is an archive", func() {
 					BeforeEach(func() {
-						fakeV7Actor.CreateBitsPackageByApplicationReturns(v7action.Package{GUID: "some-guid"}, v7action.Warnings{"some-create-package-warning"}, nil)
+						plan.Archive = true
 					})
 
-					It("reads the archive", func() {
-						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
-						Eventually(fakeSharedActor.ReadArchiveCallCount).Should(Equal(1))
-						Expect(fakeSharedActor.ReadArchiveArgsForCall(0)).To(Equal("/some/archive/path"))
+					It("creates the archive with the unmatched resources", func() {
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+
+						Eventually(fakeSharedActor.ZipArchiveResourcesCallCount).Should(Equal(1))
+						bitsPath, resources := fakeSharedActor.ZipArchiveResourcesArgsForCall(0)
+						Expect(bitsPath).To(Equal("/some-bits-path"))
+						Expect(resources).To(HaveLen(1))
+						Expect(resources[0].ToV3Resource()).To(Equal(unmatches[0]))
+					})
+				})
+
+				When("The bits path is a directory", func() {
+					It("creates the archive", func() {
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
+
+						Eventually(fakeSharedActor.ZipDirectoryResourcesCallCount).Should(Equal(1))
+						bitsPath, resources := fakeSharedActor.ZipDirectoryResourcesArgsForCall(0)
+						Expect(bitsPath).To(Equal("/some-bits-path"))
+						Expect(resources).To(HaveLen(1))
+						Expect(resources[0].ToV3Resource()).To(Equal(unmatches[0]))
+					})
+				})
+
+				When("the archive creation is successful", func() {
+					BeforeEach(func() {
+						fakeSharedActor.ZipDirectoryResourcesReturns("/some/archive/path", nil)
+						fakeV7Actor.UpdateApplicationReturns(
+							v7action.Application{
+								Name: "some-app",
+								GUID: plan.Application.GUID,
+							},
+							v7action.Warnings{"some-app-update-warnings"},
+							nil)
 					})
 
-					When("reading the archive is successful", func() {
+					It("creates the package", func() {
+						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
+
+						Eventually(fakeV7Actor.CreateBitsPackageByApplicationCallCount).Should(Equal(1))
+						Expect(fakeV7Actor.CreateBitsPackageByApplicationArgsForCall(0)).To(Equal("some-app-guid"))
+					})
+
+					When("the package creation is successful", func() {
 						BeforeEach(func() {
-							fakeReadCloser := new(v7pushactionfakes.FakeReadCloser)
-							fakeSharedActor.ReadArchiveReturns(fakeReadCloser, 6, nil)
+							fakeV7Actor.CreateBitsPackageByApplicationReturns(v7action.Package{GUID: "some-guid"}, v7action.Warnings{"some-create-package-warning"}, nil)
 						})
 
-						It("uploads the bits package", func() {
-							Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-							Eventually(fakeV7Actor.UploadBitsPackageCallCount).Should(Equal(1))
-							pkg, resource, _, size := fakeV7Actor.UploadBitsPackageArgsForCall(0)
-
-							Expect(pkg).To(Equal(v7action.Package{GUID: "some-guid"}))
-							Expect(resource).To(ConsistOf(sharedaction.V3Resource{
-								FilePath:    "some-matched-filename",
-								SizeInBytes: 6,
-							}))
-							Expect(size).To(BeNumerically("==", 6))
+						It("reads the archive", func() {
+							Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
+							Eventually(fakeSharedActor.ReadArchiveCallCount).Should(Equal(1))
+							Expect(fakeSharedActor.ReadArchiveArgsForCall(0)).To(Equal("/some/archive/path"))
 						})
 
-						When("the upload is successful", func() {
+						When("reading the archive is successful", func() {
 							BeforeEach(func() {
-								fakeV7Actor.UploadBitsPackageReturns(v7action.Package{GUID: "some-guid"}, v7action.Warnings{"some-upload-package-warning"}, nil)
+								fakeReadCloser := new(v7pushactionfakes.FakeReadCloser)
+								fakeSharedActor.ReadArchiveReturns(fakeReadCloser, 6, nil)
 							})
 
-							It("returns an upload complete event and warnings", func() {
+							It("uploads the bits package", func() {
 								Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-								Eventually(warningsStream).Should(Receive(ConsistOf("some-upload-package-warning")))
-								Eventually(eventStream).Should(Receive(Equal(UploadWithArchiveComplete)))
+								Eventually(fakeV7Actor.UploadBitsPackageCallCount).Should(Equal(1))
+								pkg, resource, _, size := fakeV7Actor.UploadBitsPackageArgsForCall(0)
+
+								Expect(pkg).To(Equal(v7action.Package{GUID: "some-guid"}))
+								Expect(resource).To(Equal(matches))
+								Expect(size).To(BeNumerically("==", 6))
 							})
 
-							When("the upload errors", func() {
-								When("the upload error is a retryable error", func() {
-									var someErr error
-
-									BeforeEach(func() {
-										someErr = errors.New("I AM A BANANA")
-										fakeV7Actor.UploadBitsPackageReturns(v7action.Package{}, v7action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{Err: someErr})
-									})
-
-									It("should send a RetryUpload event and retry uploading", func() {
-										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-										Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
-
-										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-										Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
-
-										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-										Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
-
-										Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
-										Eventually(fakeV7Actor.UploadBitsPackageCallCount).Should(Equal(3))
-										Expect(errorStream).To(Receive(MatchError(actionerror.UploadFailedError{Err: someErr})))
-									})
-
+							When("the upload is successful", func() {
+								BeforeEach(func() {
+									fakeV7Actor.UploadBitsPackageReturns(v7action.Package{GUID: "some-guid"}, v7action.Warnings{"some-upload-package-warning"}, nil)
 								})
 
-								When("the upload error is not a retryable error", func() {
-									BeforeEach(func() {
-										fakeV7Actor.UploadBitsPackageReturns(v7action.Package{}, v7action.Warnings{"upload-warnings-1", "upload-warnings-2"}, errors.New("dios mio"))
+								It("returns an upload complete event and warnings", func() {
+									Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+									Eventually(warningsStream).Should(Receive(ConsistOf("some-upload-package-warning")))
+									Eventually(eventStream).Should(Receive(Equal(UploadWithArchiveComplete)))
+								})
+
+								When("the upload errors", func() {
+									When("the upload error is a retryable error", func() {
+										var someErr error
+
+										BeforeEach(func() {
+											someErr = errors.New("I AM A BANANA")
+											fakeV7Actor.UploadBitsPackageReturns(v7action.Package{}, v7action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{Err: someErr})
+										})
+
+										It("should send a RetryUpload event and retry uploading", func() {
+											Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+											Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+											Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
+
+											Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+											Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+											Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
+
+											Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+											Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+											Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
+
+											Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
+											Eventually(fakeV7Actor.UploadBitsPackageCallCount).Should(Equal(3))
+											Expect(errorStream).To(Receive(MatchError(actionerror.UploadFailedError{Err: someErr})))
+										})
+
 									})
 
-									It("sends warnings and errors, then stops", func() {
-										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-										Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-										Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
-										Eventually(errorStream).Should(Receive(MatchError("dios mio")))
+									When("the upload error is not a retryable error", func() {
+										BeforeEach(func() {
+											fakeV7Actor.UploadBitsPackageReturns(v7action.Package{}, v7action.Warnings{"upload-warnings-1", "upload-warnings-2"}, errors.New("dios mio"))
+										})
+
+										It("sends warnings and errors, then stops", func() {
+											Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
+											Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+											Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
+											Eventually(errorStream).Should(Receive(MatchError("dios mio")))
+										})
 									})
+								})
+							})
+
+							When("reading the archive fails", func() {
+								BeforeEach(func() {
+									fakeSharedActor.ReadArchiveReturns(nil, 0, errors.New("the bits"))
+								})
+
+								It("returns an error", func() {
+									Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
+									Eventually(errorStream).Should(Receive(MatchError("the bits")))
 								})
 							})
 						})
 
-						When("reading the archive fails", func() {
+						When("the package creation errors", func() {
 							BeforeEach(func() {
-								fakeSharedActor.ReadArchiveReturns(nil, 0, errors.New("the bits"))
+								fakeV7Actor.CreateBitsPackageByApplicationReturns(v7action.Package{}, v7action.Warnings{"package-creation-warning"}, errors.New("the bits"))
 							})
 
-							It("returns an error", func() {
-								Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
+							It("it returns errors and warnings", func() {
+								Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
+
+								Eventually(warningsStream).Should(Receive(ConsistOf("package-creation-warning")))
 								Eventually(errorStream).Should(Receive(MatchError("the bits")))
 							})
 						})
 					})
 
-					When("the package creation errors", func() {
+					When("the archive creation errors", func() {
 						BeforeEach(func() {
-							fakeV7Actor.CreateBitsPackageByApplicationReturns(v7action.Package{}, v7action.Warnings{"package-creation-warning"}, errors.New("the bits"))
+							fakeSharedActor.ZipDirectoryResourcesReturns("", errors.New("oh no"))
 						})
 
-						It("it returns errors and warnings", func() {
-							Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
+						It("returns an error and exits", func() {
+							Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
 
-							Eventually(warningsStream).Should(Receive(ConsistOf("package-creation-warning")))
-							Eventually(errorStream).Should(Receive(MatchError("the bits")))
+							Eventually(errorStream).Should(Receive(MatchError("oh no")))
 						})
-					})
-				})
-
-				When("the archive creation errors", func() {
-					BeforeEach(func() {
-						fakeSharedActor.ZipDirectoryResourcesReturns("", errors.New("oh no"))
-					})
-
-					It("returns an error and exits", func() {
-						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
-
-						Eventually(errorStream).Should(Receive(MatchError("oh no")))
 					})
 				})
 			})
