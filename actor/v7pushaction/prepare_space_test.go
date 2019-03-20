@@ -85,7 +85,6 @@ var _ = Describe("PrepareSpace", func() {
 	)
 
 	BeforeEach(func() {
-		fakeV7Actor = new(v7pushactionfakes.FakeV7Actor) // TODO why do we new this up?
 		actor, _, fakeV7Actor, _ = getTestPushActor()
 
 		spaceGUID = "space"
