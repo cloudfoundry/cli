@@ -12,6 +12,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
+	"github.com/blang/semver"
 )
 
 //go:generate counterfeiter io.Reader
@@ -183,9 +185,9 @@ func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
 	return fullPackagesList, warnings, err
 }
 
-// UploadApplicationPackage uploads the newResources and a list of existing
-// resources to the cloud controller. An updated package is returned. The
-// function will act differently given the following Readers:
+// UploadBitsPackage uploads the newResources and a list of existing resources
+// to the cloud controller. An updated package is returned. The function will
+// act differently given the following Readers:
 //   - io.ReadSeeker: Will function properly on retry.
 //   - io.Reader: Will return a ccerror.PipeSeekError on retry.
 //   - nil: Will not add the "application" section to the request. The newResourcesLength is ignored in this case.
@@ -242,11 +244,11 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 	return responsePackage, response.Warnings, err
 }
 
-func (*Client) calculateAppBitsRequestSize(matchedResources []Resource, newResourcesLength int64) (int64, error) {
+func (client *Client) calculateAppBitsRequestSize(matchedResources []Resource, newResourcesLength int64) (int64, error) {
 	body := &bytes.Buffer{}
 	form := multipart.NewWriter(body)
 
-	jsonResources, err := json.Marshal(matchedResources)
+	jsonResources, err := client.marshalResourcesBasedOnAPIVersion(matchedResources)
 	if err != nil {
 		return 0, err
 	}
@@ -266,7 +268,7 @@ func (*Client) calculateAppBitsRequestSize(matchedResources []Resource, newResou
 	return int64(body.Len()) + newResourcesLength, nil
 }
 
-func (*Client) createMultipartBodyAndHeaderForAppBits(matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
+func (client *Client) createMultipartBodyAndHeaderForAppBits(matchedResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
 	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
 	form := multipart.NewWriter(writerInput)
 
@@ -276,7 +278,7 @@ func (*Client) createMultipartBodyAndHeaderForAppBits(matchedResources []Resourc
 		defer close(writeErrors)
 		defer writerInput.Close()
 
-		jsonResources, err := json.Marshal(matchedResources)
+		jsonResources, err := client.marshalResourcesBasedOnAPIVersion(matchedResources)
 		if err != nil {
 			writeErrors <- err
 			return
@@ -334,6 +336,24 @@ func (*Client) createUploadStream(path string, paramName string) (io.ReadSeeker,
 	return bytes.NewReader(body.Bytes()), writer.FormDataContentType(), err
 }
 
+func (client *Client) marshalResourcesBasedOnAPIVersion(matchedResources []Resource) ([]byte, error) {
+	minVersion := semver.MustParse(ccversion.MinVersionUpdatedResourcesFormatOnPackageUploadV3)
+	currentVersion, err := semver.Parse(client.CloudControllerAPIVersion())
+	if err != nil {
+		return nil, err
+	}
+
+	if currentVersion.GTE(minVersion) {
+		return json.Marshal(matchedResources)
+	}
+
+	oldFormatResources := make([]V2FormattedResource, 0, len(matchedResources))
+	for _, resource := range matchedResources {
+		oldFormatResources = append(oldFormatResources, resource.ToV2FormattedResource())
+	}
+	return json.Marshal(oldFormatResources)
+}
+
 func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Package, Warnings, error) {
 	var pkg Package
 	response := cloudcontroller.Response{
@@ -388,7 +408,7 @@ func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, wri
 }
 
 func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, matchedResources []Resource) (Package, Warnings, error) {
-	jsonResources, err := json.Marshal(matchedResources)
+	jsonResources, err := client.marshalResourcesBasedOnAPIVersion(matchedResources)
 	if err != nil {
 		return Package{}, nil, err
 	}

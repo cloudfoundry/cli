@@ -45,6 +45,15 @@ func (r Resource) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccResource)
 }
 
+func (r Resource) ToV2FormattedResource() V2FormattedResource {
+	return V2FormattedResource{
+		Filename: r.FilePath,
+		Mode:     r.Mode,
+		SHA1:     r.Checksum.Value,
+		Size:     r.SizeInBytes,
+	}
+}
+
 // UnmarshalJSON helps unmarshal a Cloud Controller Resource response.
 func (r *Resource) UnmarshalJSON(data []byte) error {
 	var ccResource struct {

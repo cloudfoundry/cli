@@ -17,7 +17,9 @@ import (
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"github.com/blang/semver"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -451,132 +453,226 @@ var _ = Describe("Package", func() {
 
 		When("the upload is successful", func() {
 			var (
-				resources  []Resource
-				readerBody []byte
+				resources           []Resource
+				readerBody          []byte
+				verifyHeaderAndBody func(http.ResponseWriter, *http.Request)
 			)
 
-			When("the upload has application bits to upload", func() {
-				var reader io.Reader
+			BeforeEach(func() {
+				resources = []Resource{
+					{FilePath: "foo"},
+					{FilePath: "bar"},
+				}
 
-				BeforeEach(func() {
-					resources = []Resource{
-						{FilePath: "foo"},
-						{FilePath: "bar"},
-					}
-
-					readerBody = []byte("hello world")
-					reader = bytes.NewReader(readerBody)
-
-					verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
-						contentType := req.Header.Get("Content-Type")
-						Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
-
-						defer req.Body.Close()
-						requestReader := multipart.NewReader(req.Body, contentType[30:])
-
-						// Verify that matched resources are sent properly
-						resourcesPart, err := requestReader.NextPart()
-						Expect(err).NotTo(HaveOccurred())
-
-						Expect(resourcesPart.FormName()).To(Equal("resources"))
-
-						defer resourcesPart.Close()
-						expectedJSON, err := json.Marshal(resources)
-						Expect(err).NotTo(HaveOccurred())
-						Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
-
-						// Verify that the application bits are sent properly
-						resourcesPart, err = requestReader.NextPart()
-						Expect(err).NotTo(HaveOccurred())
-
-						Expect(resourcesPart.FormName()).To(Equal("bits"))
-						Expect(resourcesPart.FileName()).To(Equal("package.zip"))
-
-						defer resourcesPart.Close()
-						Expect(ioutil.ReadAll(resourcesPart)).To(Equal(readerBody))
-					}
-
-					response := `{
+				response := `{
 						"guid": "some-package-guid",
 						"type": "bits",
 						"state": "PROCESSING_UPLOAD"
 					}`
 
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
-							verifyHeaderAndBody,
-							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-						),
-					)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
+						func(writer http.ResponseWriter, req *http.Request) {
+							verifyHeaderAndBody(writer, req)
+						},
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			When("the API is greater than or equal to MinVersionUpdatedResourcesFormatOnPackageUploadV3", func() {
+				BeforeEach(func() {
+					client.Info.Links.CCV3.Meta.Version = ccversion.MinVersionUpdatedResourcesFormatOnPackageUploadV3
 				})
 
-				It("returns the created job and warnings", func() {
-					pkg, warnings, err := client.UploadBitsPackage(inputPackage, resources, reader, int64(len(readerBody)))
-					Expect(err).NotTo(HaveOccurred())
-					Expect(warnings).To(ConsistOf("this is a warning"))
-					Expect(pkg).To(Equal(Package{
-						GUID:  "some-package-guid",
-						Type:  constant.PackageTypeBits,
-						State: constant.PackageProcessingUpload,
-					}))
+				When("the upload has application bits to upload", func() {
+					var reader io.Reader
+
+					BeforeEach(func() {
+						readerBody = []byte("hello world")
+						reader = bytes.NewReader(readerBody)
+
+						verifyHeaderAndBody = func(_ http.ResponseWriter, req *http.Request) {
+							contentType := req.Header.Get("Content-Type")
+							Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
+
+							defer req.Body.Close()
+							requestReader := multipart.NewReader(req.Body, contentType[30:])
+
+							// Verify that matched resources are sent properly
+							resourcesPart, err := requestReader.NextPart()
+							Expect(err).NotTo(HaveOccurred())
+
+							Expect(resourcesPart.FormName()).To(Equal("resources"))
+
+							defer resourcesPart.Close()
+							expectedJSON, err := json.Marshal(resources)
+							Expect(err).NotTo(HaveOccurred())
+							Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+
+							// Verify that the application bits are sent properly
+							resourcesPart, err = requestReader.NextPart()
+							Expect(err).NotTo(HaveOccurred())
+
+							Expect(resourcesPart.FormName()).To(Equal("bits"))
+							Expect(resourcesPart.FileName()).To(Equal("package.zip"))
+
+							defer resourcesPart.Close()
+							Expect(ioutil.ReadAll(resourcesPart)).To(Equal(readerBody))
+						}
+					})
+
+					It("returns the created job and warnings", func() {
+						pkg, warnings, err := client.UploadBitsPackage(inputPackage, resources, reader, int64(len(readerBody)))
+						Expect(err).NotTo(HaveOccurred())
+						Expect(warnings).To(ConsistOf("this is a warning"))
+						Expect(pkg).To(Equal(Package{
+							GUID:  "some-package-guid",
+							Type:  constant.PackageTypeBits,
+							State: constant.PackageProcessingUpload,
+						}))
+					})
+				})
+
+				When("there are no application bits to upload", func() {
+					BeforeEach(func() {
+						verifyHeaderAndBody = func(_ http.ResponseWriter, req *http.Request) {
+							contentType := req.Header.Get("Content-Type")
+							Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
+
+							defer req.Body.Close()
+							requestReader := multipart.NewReader(req.Body, contentType[30:])
+
+							// Verify that matched resources are sent properly
+							resourcesPart, err := requestReader.NextPart()
+							Expect(err).NotTo(HaveOccurred())
+
+							Expect(resourcesPart.FormName()).To(Equal("resources"))
+
+							defer resourcesPart.Close()
+							expectedJSON, err := json.Marshal(resources)
+							Expect(err).NotTo(HaveOccurred())
+							Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+
+							// Verify that the application bits are not sent
+							resourcesPart, err = requestReader.NextPart()
+							Expect(err).To(MatchError(io.EOF))
+						}
+					})
+
+					It("does not send the application bits", func() {
+						pkg, warnings, err := client.UploadBitsPackage(inputPackage, resources, nil, 33513531353)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(warnings).To(ConsistOf("this is a warning"))
+						Expect(pkg).To(Equal(Package{
+							GUID:  "some-package-guid",
+							Type:  constant.PackageTypeBits,
+							State: constant.PackageProcessingUpload,
+						}))
+					})
 				})
 			})
 
-			When("there are no application bits to upload", func() {
+			When("the API is below MinVersionUpdatedResourcesFormatOnPackageUploadV3", func() {
+				var oldFormatResources []V2FormattedResource
+
 				BeforeEach(func() {
-					resources = []Resource{
-						{FilePath: "foo"},
-						{FilePath: "bar"},
+					minVersion := semver.MustParse(ccversion.MinVersionUpdatedResourcesFormatOnPackageUploadV3)
+					minVersion.Minor -= 1
+					client.Info.Links.CCV3.Meta.Version = minVersion.String()
+
+					oldFormatResources = []V2FormattedResource{}
+					for _, resource := range resources {
+						oldFormatResources = append(oldFormatResources, resource.ToV2FormattedResource())
 					}
-
-					verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
-						contentType := req.Header.Get("Content-Type")
-						Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
-
-						defer req.Body.Close()
-						requestReader := multipart.NewReader(req.Body, contentType[30:])
-
-						// Verify that matched resources are sent properly
-						resourcesPart, err := requestReader.NextPart()
-						Expect(err).NotTo(HaveOccurred())
-
-						Expect(resourcesPart.FormName()).To(Equal("resources"))
-
-						defer resourcesPart.Close()
-						expectedJSON, err := json.Marshal(resources)
-						Expect(err).NotTo(HaveOccurred())
-						Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
-
-						// Verify that the application bits are not sent
-						resourcesPart, err = requestReader.NextPart()
-						Expect(err).To(MatchError(io.EOF))
-					}
-
-					response := `{
-						"guid": "some-package-guid",
-						"type": "bits",
-						"state": "PROCESSING_UPLOAD"
-					}`
-
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodPost, "/v3/my-special-endpoint/some-pkg-guid/upload"),
-							verifyHeaderAndBody,
-							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-						),
-					)
 				})
 
-				It("does not send the application bits", func() {
-					pkg, warnings, err := client.UploadBitsPackage(inputPackage, resources, nil, 33513531353)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(warnings).To(ConsistOf("this is a warning"))
-					Expect(pkg).To(Equal(Package{
-						GUID:  "some-package-guid",
-						Type:  constant.PackageTypeBits,
-						State: constant.PackageProcessingUpload,
-					}))
+				When("the upload has application bits to upload", func() {
+					var reader io.Reader
+
+					BeforeEach(func() {
+						readerBody = []byte("hello world")
+						reader = bytes.NewReader(readerBody)
+
+						verifyHeaderAndBody = func(_ http.ResponseWriter, req *http.Request) {
+							contentType := req.Header.Get("Content-Type")
+							Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
+
+							defer req.Body.Close()
+							requestReader := multipart.NewReader(req.Body, contentType[30:])
+
+							// Verify that matched resources are sent properly
+							resourcesPart, err := requestReader.NextPart()
+							Expect(err).NotTo(HaveOccurred())
+
+							Expect(resourcesPart.FormName()).To(Equal("resources"))
+
+							defer resourcesPart.Close()
+							expectedJSON, err := json.Marshal(oldFormatResources)
+							Expect(err).NotTo(HaveOccurred())
+							Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+
+							// Verify that the application bits are sent properly
+							resourcesPart, err = requestReader.NextPart()
+							Expect(err).NotTo(HaveOccurred())
+
+							Expect(resourcesPart.FormName()).To(Equal("bits"))
+							Expect(resourcesPart.FileName()).To(Equal("package.zip"))
+
+							defer resourcesPart.Close()
+							Expect(ioutil.ReadAll(resourcesPart)).To(Equal(readerBody))
+						}
+					})
+
+					It("returns the created job and warnings", func() {
+						pkg, warnings, err := client.UploadBitsPackage(inputPackage, resources, reader, int64(len(readerBody)))
+						Expect(err).NotTo(HaveOccurred())
+						Expect(warnings).To(ConsistOf("this is a warning"))
+						Expect(pkg).To(Equal(Package{
+							GUID:  "some-package-guid",
+							Type:  constant.PackageTypeBits,
+							State: constant.PackageProcessingUpload,
+						}))
+					})
+				})
+
+				When("there are no application bits to upload", func() {
+					BeforeEach(func() {
+						verifyHeaderAndBody = func(_ http.ResponseWriter, req *http.Request) {
+							contentType := req.Header.Get("Content-Type")
+							Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
+
+							defer req.Body.Close()
+							requestReader := multipart.NewReader(req.Body, contentType[30:])
+
+							// Verify that matched resources are sent properly
+							resourcesPart, err := requestReader.NextPart()
+							Expect(err).NotTo(HaveOccurred())
+
+							Expect(resourcesPart.FormName()).To(Equal("resources"))
+
+							defer resourcesPart.Close()
+							expectedJSON, err := json.Marshal(oldFormatResources)
+							Expect(err).NotTo(HaveOccurred())
+							Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+
+							// Verify that the application bits are not sent
+							resourcesPart, err = requestReader.NextPart()
+							Expect(err).To(MatchError(io.EOF))
+						}
+					})
+
+					It("does not send the application bits", func() {
+						pkg, warnings, err := client.UploadBitsPackage(inputPackage, resources, nil, 33513531353)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(warnings).To(ConsistOf("this is a warning"))
+						Expect(pkg).To(Equal(Package{
+							GUID:  "some-package-guid",
+							Type:  constant.PackageTypeBits,
+							State: constant.PackageProcessingUpload,
+						}))
+					})
 				})
 			})
 		})

@@ -12,7 +12,8 @@ const (
 	MinVersionMultiServiceRegistrationV2            = "2.125.0"
 	MinVersionUpdateServiceNameWhenPlanNotVisibleV2 = "2.131.0"
 
-	MinVersionShareServiceV3     = "3.36.0"
-	MinVersionZeroDowntimePushV3 = "3.57.0"
-	MinVersionSpacesGUIDsParamV3 = "3.56.0"
+	MinVersionShareServiceV3                          = "3.36.0"
+	MinVersionZeroDowntimePushV3                      = "3.57.0"
+	MinVersionSpacesGUIDsParamV3                      = "3.56.0"
+	MinVersionUpdatedResourcesFormatOnPackageUploadV3 = "3.10000.0"
 )
