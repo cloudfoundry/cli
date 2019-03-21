@@ -299,14 +299,14 @@ var _ = Describe("login Command", func() {
 
 						When("no authentication flags are set", func() {
 							BeforeEach(func() {
-								input.Write([]byte("fakeman\nsomeaccount\nsomepassword\ngarbage\n"))
+								input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
 							})
 
 							It("displays text prompts, starting with username, then password prompts, starting with password", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
 								Expect(testUI.Out).To(Say("Username:"))
-								Expect(testUI.Out).To(Say("fakeman"))
+								Expect(testUI.Out).To(Say("faker"))
 								Expect(testUI.Out).To(Say("Account Number:"))
 								Expect(testUI.Out).To(Say("someaccount"))
 
@@ -319,23 +319,111 @@ var _ = Describe("login Command", func() {
 							It("authenticates with the responses", func() {
 								Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
 								credentials, _, grantType := fakeActor.AuthenticateArgsForCall(0)
-								Expect(credentials["username"]).To(Equal("fakeman"))
+								Expect(credentials["username"]).To(Equal("faker"))
 								Expect(credentials["password"]).To(Equal("somepassword"))
 								Expect(credentials["supersecret"]).To(Equal("garbage"))
 								Expect(grantType).To(Equal(constant.GrantTypePassword))
 							})
 						})
 
+						When("an error occurs prompting for the username", func() {
+							var fakeUI *commandfakes.FakeUI
+							BeforeEach(func() {
+								fakeUI = new(commandfakes.FakeUI)
+								fakeUI.DisplayTextPromptReturns("", errors.New("some-error"))
+								cmd = LoginCommand{
+									UI:           fakeUI,
+									Actor:        fakeActor,
+									ActorMaker:   fakeActorMaker,
+									Config:       fakeConfig,
+									CheckerMaker: fakeCheckerMaker,
+								}
+							})
+							It("stops prompting after the first prompt", func() {
+								Expect(fakeUI.DisplayTextPromptCallCount()).To(Equal(1))
+							})
+							It("errors", func() {
+								Expect(executeErr).To(MatchError("Unable to authenticate."))
+							})
+
+						})
+						When("an error occurs in an additional text prompt after username", func() {
+							var fakeUI *commandfakes.FakeUI
+							BeforeEach(func() {
+								fakeUI = new(commandfakes.FakeUI)
+								fakeUI.DisplayTextPromptReturnsOnCall(0, "some-name", nil)
+								fakeUI.DisplayTextPromptReturnsOnCall(1, "", errors.New("some-error"))
+								cmd = LoginCommand{
+									UI:           fakeUI,
+									Actor:        fakeActor,
+									ActorMaker:   fakeActorMaker,
+									Config:       fakeConfig,
+									CheckerMaker: fakeCheckerMaker,
+								}
+							})
+
+							It("returns the error", func() {
+								Expect(executeErr).To(MatchError("Unable to authenticate."))
+							})
+						})
+
+						When("an error occurs prompting for the password", func() {
+							var fakeUI *commandfakes.FakeUI
+							BeforeEach(func() {
+								fakeUI = new(commandfakes.FakeUI)
+								fakeUI.DisplayPasswordPromptReturns("", errors.New("some-error"))
+								cmd = LoginCommand{
+									UI:           fakeUI,
+									Actor:        fakeActor,
+									ActorMaker:   fakeActorMaker,
+									Config:       fakeConfig,
+									CheckerMaker: fakeCheckerMaker,
+								}
+							})
+							It("stops prompting after the first prompt", func() {
+								Expect(fakeUI.DisplayPasswordPromptCallCount()).To(Equal(1))
+							})
+							It("errors", func() {
+								Expect(executeErr).To(MatchError("Unable to authenticate."))
+							})
+
+						})
+
+						When("an error occurs prompting for prompts of type password that are not the 'password'", func() {
+							var fakeUI *commandfakes.FakeUI
+							BeforeEach(func() {
+								fakeUI = new(commandfakes.FakeUI)
+								fakeUI.DisplayPasswordPromptReturnsOnCall(0, "some-password", nil)
+								fakeUI.DisplayPasswordPromptReturnsOnCall(1, "", errors.New("some-error"))
+
+								cmd = LoginCommand{
+									UI:           fakeUI,
+									Actor:        fakeActor,
+									ActorMaker:   fakeActorMaker,
+									Config:       fakeConfig,
+									CheckerMaker: fakeCheckerMaker,
+								}
+							})
+							It("stops prompting after the second prompt", func() {
+								Expect(fakeUI.DisplayPasswordPromptCallCount()).To(Equal(2))
+							})
+							It("errors", func() {
+								Expect(executeErr).To(MatchError("Unable to authenticate."))
+							})
+
+						})
+
 						When("authenticating succeeds", func() {
 							BeforeEach(func() {
-								fakeConfig.CurrentUserNameReturns("happyman", nil)
+								fakeConfig.CurrentUserNameReturns("potatoface", nil)
+								input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\n"))
 							})
 
 							It("displays OK and a status summary", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 								Expect(testUI.Out).To(Say("OK"))
 								Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
-								Expect(testUI.Out).To(Say(`User:\s+happyman`))
+								Expect(testUI.Out).To(Say(`User:\s+potatoface`))
 
 								Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
 							})
@@ -344,6 +432,7 @@ var _ = Describe("login Command", func() {
 						When("authenticating fails", func() {
 							BeforeEach(func() {
 								fakeActor.AuthenticateReturns(errors.New("something died"))
+								input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
 							})
 
 							It("prints the error message three times", func() {
@@ -372,6 +461,7 @@ var _ = Describe("login Command", func() {
 						When("authenticating fails with a bad credentials error", func() {
 							BeforeEach(func() {
 								fakeActor.AuthenticateReturns(uaa.UnauthorizedError{Message: "Bad credentials"})
+								input.Write([]byte("faker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\nfaker\nsomeaccount\nsomepassword\ngarbage\n"))
 							})
 
 							It("converts the error before printing it", func() {
@@ -387,6 +477,132 @@ var _ = Describe("login Command", func() {
 							})
 						})
 					})
+				})
+			})
+		})
+
+		Describe("SSO Passcode", func() {
+			BeforeEach(func() {
+				fakeConfig.TargetReturns("whatever.com")
+
+				input.Write([]byte("some-passcode\n"))
+				fakeActor.GetLoginPromptsReturns(map[string]coreconfig.AuthPrompt{
+					"passcode": {
+						DisplayName: "some-sso-prompt",
+						Type:        coreconfig.AuthPromptTypePassword,
+					},
+				})
+
+				fakeConfig.CurrentUserNameReturns("potatoface", nil)
+			})
+
+			When("--sso flag is set", func() {
+				BeforeEach(func() {
+					cmd.SSO = true
+				})
+
+				It("prompts the user for SSO passcode", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(fakeActor.GetLoginPromptsCallCount()).To(Equal(1))
+					Expect(testUI.Out).To(Say("some-sso-prompt:"))
+				})
+
+				It("authenticates with the inputted code", func() {
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+					Expect(testUI.Out).To(Say(`User:\s+potatoface`))
+
+					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+					credentials, origin, grantType := fakeActor.AuthenticateArgsForCall(0)
+					Expect(credentials["passcode"]).To(Equal("some-passcode"))
+					Expect(origin).To(BeEmpty())
+					Expect(grantType).To(Equal(constant.GrantTypePassword))
+				})
+
+				When("an error occurs prompting for the code", func() {
+					var fakeUI *commandfakes.FakeUI
+					BeforeEach(func() {
+						fakeUI = new(commandfakes.FakeUI)
+						fakeUI.DisplayPasswordPromptReturns("", errors.New("some-error"))
+						cmd = LoginCommand{
+							UI:           fakeUI,
+							Actor:        fakeActor,
+							ActorMaker:   fakeActorMaker,
+							Config:       fakeConfig,
+							CheckerMaker: fakeCheckerMaker,
+							SSO:          true,
+						}
+					})
+					It("errors", func() {
+						Expect(fakeUI.DisplayPasswordPromptCallCount()).To(Equal(1))
+						Expect(executeErr).To(MatchError("Unable to authenticate."))
+					})
+				})
+			})
+
+			When("the --sso-passcode flag is set", func() {
+				BeforeEach(func() {
+					cmd.SSOPasscode = "a-passcode"
+				})
+
+				It("does not prompt the user for SSO passcode", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(testUI.Out).ToNot(Say("some-sso-prompt:"))
+				})
+
+				It("uses the flag value to authenticate", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+					credentials, origin, grantType := fakeActor.AuthenticateArgsForCall(0)
+					Expect(credentials["passcode"]).To(Equal("a-passcode"))
+					Expect(origin).To(BeEmpty())
+					Expect(grantType).To(Equal(constant.GrantTypePassword))
+				})
+
+				It("displays a summary with user information", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+					Expect(testUI.Out).To(Say(`User:\s+potatoface`))
+				})
+
+				When("an incorrect passcode is inputted", func() {
+					BeforeEach(func() {
+						cmd.SSOPasscode = "some-garbage"
+						fakeActor.AuthenticateReturns(errors.New("Credentials were rejected, please try again."))
+						fakeConfig.CurrentUserNameReturns("", nil)
+						input.Write([]byte("some-passcode\n"))
+					})
+
+					It("re-prompts two more times", func() {
+						Expect(testUI.Out).To(Say("some-sso-prompt:"))
+						Expect(testUI.Out).To(Say(`Authenticating\.\.\.`))
+						Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
+						Expect(testUI.Out).To(Say("some-sso-prompt:"))
+						Expect(testUI.Out).To(Say(`Authenticating\.\.\.`))
+						Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
+					})
+
+					It("returns an error message", func() {
+						Expect(executeErr).To(MatchError("Unable to authenticate."))
+					})
+
+					It("does not include user information in the summary", func() {
+						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
+						Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' to log in.`, cmd.Config.BinaryName()))
+					})
+				})
+			})
+
+			When("both --sso and --sso-passcode flags are set", func() {
+				BeforeEach(func() {
+					cmd.SSO = true
+					cmd.SSOPasscode = "a-passcode"
+				})
+
+				It("returns an error message", func() {
+					Expect(fakeActor.AuthenticateCallCount()).To(Equal(0))
+					Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{Args: []string{"--sso-passcode", "--sso"}}))
 				})
 			})
 		})

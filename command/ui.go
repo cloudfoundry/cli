@@ -8,6 +8,7 @@ import (
 )
 
 // UI is the interface to STDOUT, STDERR, and STDIN.
+//go:generate counterfeiter . UI
 type UI interface {
 	DisplayBoolPrompt(defaultResponse bool, template string, templateValues ...map[string]interface{}) (bool, error)
 	DisplayChangesForPush(changeSet []ui.Change) error

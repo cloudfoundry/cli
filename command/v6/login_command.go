@@ -139,7 +139,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 
 	settings := v3action.TargetSettings{
 		URL:               endpoint.String(),
-		SkipSSLValidation: true,
+		SkipSSLValidation: cmd.Config.SkipSSLValidation() || cmd.SkipSSLValidation,
 	}
 	_, err := cmd.Actor.SetTarget(settings)
 	if err != nil {
@@ -157,8 +157,16 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		return errors.New("Service account currently logged in. Use 'cf logout' to log out service account and try again.")
 	}
 
-	err = cmd.authenticate()
-	if err != nil {
+	var authErr error
+	if cmd.SSO == true || cmd.SSOPasscode != "" {
+		if cmd.SSO && cmd.SSOPasscode != "" {
+			return translatableerror.ArgumentCombinationError{Args: []string{"--sso-passcode", "--sso"}}
+		}
+		authErr = cmd.authenticateSSO()
+	} else {
+		authErr = cmd.authenticate()
+	}
+	if authErr != nil {
 		return errors.New("Unable to authenticate.")
 	}
 
@@ -178,7 +186,11 @@ func (cmd *LoginCommand) authenticate() error {
 		if prompts["username"].Type == coreconfig.AuthPromptTypeText && cmd.Username != "" {
 			credentials["username"] = cmd.Username
 		} else {
-			credentials["username"], _ = cmd.UI.DisplayTextPrompt(value.DisplayName)
+			var err error
+			credentials["username"], err = cmd.UI.DisplayTextPrompt(value.DisplayName)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -193,13 +205,65 @@ func (cmd *LoginCommand) authenticate() error {
 		} else if key == "username" {
 			continue
 		} else {
-			credentials[key], _ = cmd.UI.DisplayTextPrompt(prompt.DisplayName)
+			var err error
+			credentials[key], err = cmd.UI.DisplayTextPrompt(prompt.DisplayName)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	var err error
 	for i := 0; i < maxLoginTries; i++ {
-		err = cmd.passwordPrompts(prompts, credentials, passwordKeys)
+		var promptedCredentials map[string]string
+		promptedCredentials, err = cmd.passwordPrompts(prompts, credentials, passwordKeys)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayText("Authenticating...")
+		err = cmd.Actor.Authenticate(promptedCredentials, "", constant.GrantTypePassword)
+
+		if err != nil {
+			cmd.UI.DisplayWarning(translatableerror.ConvertToTranslatableError(err).Error())
+			cmd.UI.DisplayNewline()
+		}
+
+		if err == nil {
+			cmd.UI.DisplayOK()
+			cmd.UI.DisplayNewline()
+			break
+		}
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (cmd *LoginCommand) authenticateSSO() error {
+	prompts := cmd.Actor.GetLoginPrompts()
+	credentials := make(map[string]string)
+
+	var err error
+	for i := 0; i < maxLoginTries; i++ {
+		if len(cmd.SSOPasscode) > 0 {
+			credentials["passcode"] = cmd.SSOPasscode
+			cmd.SSOPasscode = ""
+		} else {
+			credentials["passcode"], err = cmd.UI.DisplayPasswordPrompt(prompts["passcode"].DisplayName)
+			if err != nil {
+				return err
+			}
+		}
+
+		credentialsCopy := make(map[string]string, len(credentials))
+		for k, v := range credentials {
+			credentialsCopy[k] = v
+		}
+
+		cmd.UI.DisplayText("Authenticating...")
+		err = cmd.Actor.Authenticate(credentialsCopy, "", constant.GrantTypePassword)
 
 		if err != nil {
 			cmd.UI.DisplayWarning(translatableerror.ConvertToTranslatableError(err).Error())
@@ -229,19 +293,26 @@ func (cmd *LoginCommand) checkMinCLIVersion() error {
 	return command.WarnIfCLIVersionBelowAPIDefinedMinimum(cmd.Config, cmd.Checker.CloudControllerAPIVersion(), cmd.UI)
 }
 
-func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPrompt, credentials map[string]string, passwordKeys []string) error {
+func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPrompt, credentials map[string]string, passwordKeys []string) (map[string]string, error) {
 	// ensure that password gets prompted before other codes (eg. mfa code)
+	var err error
 	if passPrompt, ok := prompts["password"]; ok {
 		if cmd.Password != "" {
 			credentials["password"] = cmd.Password
 			cmd.Password = ""
 		} else {
-			credentials["password"], _ = cmd.UI.DisplayPasswordPrompt(passPrompt.DisplayName)
+			credentials["password"], err = cmd.UI.DisplayPasswordPrompt(passPrompt.DisplayName)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
 	for _, key := range passwordKeys {
-		credentials[key], _ = cmd.UI.DisplayPasswordPrompt(prompts[key].DisplayName)
+		credentials[key], err = cmd.UI.DisplayPasswordPrompt(prompts[key].DisplayName)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	credentialsCopy := make(map[string]string, len(credentials))
@@ -249,9 +320,7 @@ func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPromp
 		credentialsCopy[k] = v
 	}
 
-	cmd.UI.DisplayText("Authenticating...")
-	return cmd.Actor.Authenticate(credentialsCopy, "", constant.GrantTypePassword)
-
+	return credentialsCopy, nil
 }
 
 func (cmd *LoginCommand) reloadActor() error {
