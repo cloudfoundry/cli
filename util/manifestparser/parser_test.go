@@ -98,12 +98,29 @@ var _ = Describe("Parser", func() {
 		})
 
 		When("given an invalid manifest file", func() {
-			BeforeEach(func() {
-				manifest = map[string]interface{}{}
-			})
+			When("the manifest file is empty", func() {
+				BeforeEach(func() {
+					manifest = map[string]interface{}{}
+				})
 
-			It("returns an error", func() {
-				Expect(executeErr).To(MatchError("must have at least one application"))
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("must have at least one application"))
+				})
+			})
+			When("given an invalid app path", func() {
+				BeforeEach(func() {
+					manifest = map[string]interface{}{
+						"applications": []map[string]string{
+							{
+								"name": "app-1",
+								"path": "/invalid/path",
+							},
+						},
+					}
+				})
+				It("returns an InvalidManifestApplicationPathError", func() {
+					Expect(executeErr).To(MatchError(InvalidManifestApplicationPathError{"/invalid/path"}))
+				})
 			})
 		})
 	})
@@ -411,8 +428,8 @@ applications:
 		})
 
 		AfterEach(func() {
-			os.RemoveAll(pathToManifest)
-
+			err := os.RemoveAll(pathToManifest)
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		When("marshaling does not error", func() {

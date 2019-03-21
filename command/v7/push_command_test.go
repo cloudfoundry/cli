@@ -278,25 +278,13 @@ var _ = Describe("push Command", func() {
 						Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
 					})
 
-					It("calls validate", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeManifestParser.ValidateCallCount()).To(Equal(1))
-					})
 					When("the manifest contains private docker images", func() {
 						It("returns docker password", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(fakeManifestParser.ContainsPrivateDockerImagesCallCount()).To(Equal(1))
 						})
 					})
-					When("Validate fails", func() {
-						BeforeEach(func() {
-							fakeManifestParser.ValidateReturns(errors.New("uh oh"))
-						})
 
-						It("returns the error", func() {
-							Expect(executeErr).To(MatchError("uh oh"))
-						})
-					})
 				})
 
 				When("no manifest flag", func() {

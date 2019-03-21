@@ -61,7 +61,6 @@ type ManifestParser interface {
 	v7pushaction.ManifestParser
 	ContainsMultipleApps() bool
 	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) error
-	Validate() error
 	ContainsPrivateDockerImages() bool
 }
 
@@ -149,10 +148,6 @@ func (cmd PushCommand) Execute(args []string) error {
 			return err
 		}
 
-		err = cmd.ManifestParser.Validate()
-		if err != nil {
-			return err
-		}
 	}
 
 	err = cmd.ValidateFlags()

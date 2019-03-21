@@ -3,6 +3,7 @@ package manifestparser
 import (
 	"errors"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
@@ -21,9 +22,7 @@ type Parser struct {
 
 func NewParser() *Parser {
 	parser := new(Parser)
-	parser.validators = []validatorFunc{
-		ValidatePaths,
-	}
+
 	return parser
 }
 
@@ -134,6 +133,14 @@ type rawManifest struct {
 	Applications []Application `yaml:"applications"`
 }
 
+type InvalidManifestApplicationPathError struct {
+	Path string
+}
+
+func (InvalidManifestApplicationPathError) Error() string {
+	return "Path in manifest is invalid"
+}
+
 func (parser *Parser) parse(manifestBytes []byte) error {
 	parser.rawManifest = manifestBytes
 	pathToManifest := parser.GetPathToManifest()
@@ -165,6 +172,11 @@ func (parser *Parser) parse(manifestBytes []byte) error {
 		}
 		finalPath, err = filepath.EvalSymlinks(finalPath)
 		if err != nil {
+			if os.IsNotExist(err) {
+				return InvalidManifestApplicationPathError{
+					Path: application.Path,
+				}
+			}
 			return err
 		}
 		parser.Applications[index].Path = finalPath
@@ -177,7 +189,6 @@ func (parser *Parser) parse(manifestBytes []byte) error {
 
 type ManifestParser interface {
 	Apps(appName string) ([]Application, error)
-	Validate() error
 	ContainsMultipleApps() bool
 	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) error
 	FullRawManifest() []byte
