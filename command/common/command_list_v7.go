@@ -6,8 +6,8 @@ import (
 	"reflect"
 
 	"code.cloudfoundry.org/cli/command/plugin"
-	"code.cloudfoundry.org/cli/command/v6"
-	"code.cloudfoundry.org/cli/command/v7"
+	v6 "code.cloudfoundry.org/cli/command/v6"
+	v7 "code.cloudfoundry.org/cli/command/v7"
 )
 
 var Commands commandList
@@ -151,6 +151,7 @@ type commandList struct {
 	Service                            v6.ServiceCommand                            `command:"service" description:"Show service instance info"`
 	SetEnv                             v7.SetEnvCommand                             `command:"set-env" alias:"se" description:"Set an env variable for an app"`
 	SetHealthCheck                     v7.SetHealthCheckCommand                     `command:"set-health-check" description:"Change type of health check performed on an app's process"`
+	SetLabel                           v7.SetLabelCommand                           `command:"set-label" description:"Set a label (key-value pairs) for an API resource."`
 	SetOrgDefaultIsolationSegment      v6.SetOrgDefaultIsolationSegmentCommand      `command:"set-org-default-isolation-segment" description:"Set the default isolation segment used for apps in spaces in an org"`
 	SetOrgRole                         v6.SetOrgRoleCommand                         `command:"set-org-role" description:"Assign an org role to a user"`
 	SetQuota                           v6.SetQuotaCommand                           `command:"set-quota" description:"Assign a quota to an org"`

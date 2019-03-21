@@ -135,6 +135,12 @@ var HelpCategoryList = []HelpCategory{
 		},
 	},
 	{
+		CategoryName: "METADATA:",
+		CommandList: [][]string{
+			{"set-label"},
+		},
+	},
+	{
 		CategoryName: "ADVANCED:",
 		CommandList: [][]string{
 			{"curl", "config", "oauth-token", "ssh-code"},
