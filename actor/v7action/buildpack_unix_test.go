@@ -61,6 +61,7 @@ var _ = Describe("Buildpack", func() {
 				defer zipFile.Close()
 
 				zipStat, err := zipFile.Stat()
+				Expect(err).ToNot(HaveOccurred())
 				reader, err := ykk.NewReader(zipFile, zipStat.Size())
 				Expect(err).ToNot(HaveOccurred())
 
