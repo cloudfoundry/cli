@@ -3,7 +3,6 @@ package v7
 import (
 	"io/ioutil"
 	"os"
-	"strconv"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -16,7 +15,6 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v7/shared"
 	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/util/ui"
 )
 
 //go:generate counterfeiter . CreateBuildpackActor
@@ -130,25 +128,5 @@ func (cmd CreateBuildpackCommand) wrapWithTip(err error) error {
 			"CfDeleteBuildpackCommand": cmd.Config.BinaryName() + " delete-buildpack",
 			"CfUpdateBuildpackCommand": cmd.Config.BinaryName() + " update-buildpack",
 		},
-	}
-}
-
-func (cmd CreateBuildpackCommand) displayTable(buildpacks []v7action.Buildpack) {
-	if len(buildpacks) > 0 {
-		var keyValueTable = [][]string{
-			{"position", "name", "stack", "enabled", "locked", "filename"},
-		}
-		for _, buildpack := range buildpacks {
-			keyValueTable = append(keyValueTable, []string{
-				strconv.Itoa(buildpack.Position.Value),
-				buildpack.Name,
-				buildpack.Stack,
-				strconv.FormatBool(buildpack.Enabled.Value),
-				strconv.FormatBool(buildpack.Locked.Value),
-				buildpack.Filename,
-			})
-		}
-
-		cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
 	}
 }

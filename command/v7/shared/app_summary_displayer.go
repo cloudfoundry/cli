@@ -119,17 +119,6 @@ func (display AppSummaryDisplayer) getCreatedTime(summary v7action.ApplicationSu
 	return ""
 }
 
-func (AppSummaryDisplayer) usageSummary(processSummaries v7action.ProcessSummaries) string {
-	var usageStrings []string
-	for _, summary := range processSummaries {
-		if summary.TotalInstanceCount() > 0 {
-			usageStrings = append(usageStrings, fmt.Sprintf("%dM x %d", summary.MemoryInMB.Value, summary.TotalInstanceCount()))
-		}
-	}
-
-	return strings.Join(usageStrings, ", ")
-}
-
 func (AppSummaryDisplayer) buildpackNames(buildpacks []v7action.DropletBuildpack) string {
 	var names []string
 	for _, buildpack := range buildpacks {
@@ -145,26 +134,4 @@ func (AppSummaryDisplayer) buildpackNames(buildpacks []v7action.DropletBuildpack
 
 func (AppSummaryDisplayer) appInstanceDate(input time.Time) string {
 	return input.UTC().Format(time.RFC3339)
-}
-
-func (AppSummaryDisplayer) processHasAnInstanceUp(processSummary *v7action.ProcessSummary) bool {
-	for _, processInstance := range processSummary.InstanceDetails {
-		if processInstance.State != constant.ProcessInstanceDown {
-			return true
-		}
-	}
-	return false
-}
-
-func (AppSummaryDisplayer) processInstancesAreAllCrashed(processSummary *v7action.ProcessSummary) bool {
-	if len(processSummary.InstanceDetails) < 1 {
-		return false
-	}
-
-	for _, processInstance := range processSummary.InstanceDetails {
-		if processInstance.State != constant.ProcessInstanceDown {
-			return false
-		}
-	}
-	return true
 }

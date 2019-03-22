@@ -1,9 +1,6 @@
 package v7pushaction
 
 import (
-	"regexp"
-	"strings"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -85,16 +82,4 @@ func (Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route
 	}
 
 	return v2action.Route{}, false
-}
-
-func (Actor) sanitize(name string) string {
-	name = strings.ToLower(name)
-
-	re := regexp.MustCompile("\\s+")
-	name = re.ReplaceAllString(name, "-")
-
-	re = regexp.MustCompile("[^[:alnum:]\\-]")
-	name = re.ReplaceAllString(name, "")
-
-	return strings.TrimLeft(name, "-")
 }

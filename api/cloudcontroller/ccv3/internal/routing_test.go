@@ -110,7 +110,7 @@ var _ = Describe("Routing", func() {
 				When("the resource exists exists", func() {
 					It("returns an error", func() {
 						_, err := router.CreateRequest(badRouteName, nil, nil)
-						Expect(err).To(MatchError("No resource exists with the name fake-resource"))
+						Expect(err).To(MatchError("no resource exists with the name fake-resource"))
 					})
 				})
 			})
@@ -118,7 +118,7 @@ var _ = Describe("Routing", func() {
 			When("the route does not exists exist", func() {
 				It("returns an error", func() {
 					_, err := router.CreateRequest("fake-route", nil, nil)
-					Expect(err).To(MatchError("No route exists with the name fake-route"))
+					Expect(err).To(MatchError("no route exists with the name fake-route"))
 				})
 			})
 		})

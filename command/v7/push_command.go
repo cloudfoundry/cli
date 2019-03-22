@@ -515,20 +515,6 @@ func (cmd PushCommand) ReadManifest() error {
 	return nil
 }
 
-func (cmd PushCommand) getDockerPassword() (string, error) {
-	if cmd.DockerUsername == "" { // no need for a password without a username
-		return "", nil
-	}
-
-	if cmd.Config.DockerPassword() == "" {
-		cmd.UI.DisplayText("Environment variable CF_DOCKER_PASSWORD not set.")
-		return cmd.UI.DisplayPasswordPrompt("Docker password")
-	}
-
-	cmd.UI.DisplayText("Using docker repository password from environment variable CF_DOCKER_PASSWORD.")
-	return cmd.Config.DockerPassword(), nil
-}
-
 func (cmd PushCommand) GetFlagOverrides() (v7pushaction.FlagOverrides, error) {
 	return v7pushaction.FlagOverrides{
 		Buildpacks:          cmd.Buildpacks,

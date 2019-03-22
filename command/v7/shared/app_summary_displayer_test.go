@@ -44,7 +44,7 @@ var _ = Describe("app summary displayer", func() {
 				var uptime time.Duration
 
 				BeforeEach(func() {
-					uptime = time.Now().Sub(time.Unix(267321600, 0))
+					uptime = time.Since(time.Unix(267321600, 0))
 					summary = v7action.ApplicationSummary{
 						Application: v7action.Application{
 							GUID:  "some-app-guid",
@@ -75,7 +75,7 @@ var _ = Describe("app summary displayer", func() {
 										DiskUsage:   2000000,
 										MemoryQuota: 33554432,
 										DiskQuota:   4000000,
-										Uptime:      time.Now().Sub(time.Unix(330480000, 0)),
+										Uptime:      time.Since(time.Unix(330480000, 0)),
 										Details:     "Some Details 2",
 									},
 									v7action.ProcessInstance{
@@ -85,7 +85,7 @@ var _ = Describe("app summary displayer", func() {
 										DiskUsage:   3000000,
 										MemoryQuota: 33554432,
 										DiskQuota:   6000000,
-										Uptime:      time.Now().Sub(time.Unix(1277164800, 0)),
+										Uptime:      time.Since(time.Unix(1277164800, 0)),
 									},
 								},
 							},
@@ -103,7 +103,7 @@ var _ = Describe("app summary displayer", func() {
 										DiskUsage:   1000000,
 										MemoryQuota: 33554432,
 										DiskQuota:   8000000,
-										Uptime:      time.Now().Sub(time.Unix(167572800, 0)),
+										Uptime:      time.Since(time.Unix(167572800, 0)),
 									},
 								},
 							},
@@ -169,7 +169,7 @@ var _ = Describe("app summary displayer", func() {
 										DiskUsage:   1000000,
 										MemoryQuota: 33554432,
 										DiskQuota:   2000000,
-										Uptime:      time.Now().Sub(time.Unix(267321600, 0)),
+										Uptime:      time.Since(time.Unix(267321600, 0)),
 									},
 								},
 							},

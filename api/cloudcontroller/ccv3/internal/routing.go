@@ -116,7 +116,7 @@ func NewRouter(routes []Route, resources map[string]string) *Router {
 func (router Router) CreateRequest(name string, params Params, body io.Reader) (*http.Request, error) {
 	route, ok := router.routes[name]
 	if !ok {
-		return &http.Request{}, fmt.Errorf("No route exists with the name %s", name)
+		return &http.Request{}, fmt.Errorf("no route exists with the name %s", name)
 	}
 
 	uri, err := route.CreatePath(params)
@@ -126,7 +126,7 @@ func (router Router) CreateRequest(name string, params Params, body io.Reader) (
 
 	resource, ok := router.resources[route.Resource]
 	if !ok {
-		return &http.Request{}, fmt.Errorf("No resource exists with the name %s", route.Resource)
+		return &http.Request{}, fmt.Errorf("no resource exists with the name %s", route.Resource)
 	}
 
 	url, err := router.urlFrom(resource, uri)

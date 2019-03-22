@@ -113,10 +113,6 @@ func (cmd SSHCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd SSHCommand) parseForwardSpecs() ([]sharedaction.LocalPortForward, error) {
-	return nil, nil
-}
-
 // EvaluateTTYOption determines which TTY options are mutually exclusive and
 // returns an error accordingly.
 func (cmd SSHCommand) EvaluateTTYOption() (sharedaction.TTYOption, error) {

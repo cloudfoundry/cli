@@ -1,7 +1,7 @@
 package v7action
 
 import (
-	. "code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
@@ -61,7 +61,7 @@ func (actor *Actor) UnsetEnvironmentVariableByApplicationNameAndSpace(appName st
 	}
 
 	if _, ok := envGroups.EnvironmentVariables[environmentVariableName]; !ok {
-		return warnings, EnvironmentVariableNotSetError{EnvironmentVariableName: environmentVariableName}
+		return warnings, actionerror.EnvironmentVariableNotSetError{EnvironmentVariableName: environmentVariableName}
 	}
 
 	_, patchWarnings, patchErr := actor.CloudControllerClient.UpdateApplicationEnvironmentVariables(
