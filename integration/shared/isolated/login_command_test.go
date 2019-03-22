@@ -351,13 +351,6 @@ var _ = Describe("login command", func() {
 			helpers.TurnOffExperimentalLogin()
 		})
 
-		When("--sso is provided", func() {
-			It("Presents the default UAA prompt", func() {
-				session := helpers.CF("login", "--sso")
-				Eventually(session).Should(Say(`Temporary Authentication Code \( Get one at https:\/\/login\..*passcode \)`))
-			})
-		})
-
 		When("--sso-passcode is provided", func() {
 			Context("and --sso is also passed", func() {
 				It("fails with a useful error message", func() {
