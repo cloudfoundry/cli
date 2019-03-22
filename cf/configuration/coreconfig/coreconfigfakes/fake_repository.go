@@ -3,7 +3,6 @@ package coreconfigfakes
 
 import (
 	"sync"
-	"time"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/models"
@@ -13,9 +12,8 @@ import (
 type FakeRepository struct {
 	APIEndpointStub        func() string
 	aPIEndpointMutex       sync.RWMutex
-	aPIEndpointArgsForCall []struct {
-	}
-	aPIEndpointReturns struct {
+	aPIEndpointArgsForCall []struct{}
+	aPIEndpointReturns     struct {
 		result1 string
 	}
 	aPIEndpointReturnsOnCall map[int]struct {
@@ -23,130 +21,182 @@ type FakeRepository struct {
 	}
 	APIVersionStub        func() string
 	aPIVersionMutex       sync.RWMutex
-	aPIVersionArgsForCall []struct {
-	}
-	aPIVersionReturns struct {
+	aPIVersionArgsForCall []struct{}
+	aPIVersionReturns     struct {
 		result1 string
 	}
 	aPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	AccessTokenStub        func() string
-	accessTokenMutex       sync.RWMutex
-	accessTokenArgsForCall []struct {
-	}
-	accessTokenReturns struct {
-		result1 string
-	}
-	accessTokenReturnsOnCall map[int]struct {
-		result1 string
-	}
-	AccessTokenExpiryDateStub        func() time.Time
-	accessTokenExpiryDateMutex       sync.RWMutex
-	accessTokenExpiryDateArgsForCall []struct {
-	}
-	accessTokenExpiryDateReturns struct {
-		result1 time.Time
-	}
-	accessTokenExpiryDateReturnsOnCall map[int]struct {
-		result1 time.Time
-	}
-	AsyncTimeoutStub        func() uint
-	asyncTimeoutMutex       sync.RWMutex
-	asyncTimeoutArgsForCall []struct {
-	}
-	asyncTimeoutReturns struct {
-		result1 uint
-	}
-	asyncTimeoutReturnsOnCall map[int]struct {
-		result1 uint
-	}
-	AuthenticationEndpointStub        func() string
-	authenticationEndpointMutex       sync.RWMutex
-	authenticationEndpointArgsForCall []struct {
-	}
-	authenticationEndpointReturns struct {
-		result1 string
-	}
-	authenticationEndpointReturnsOnCall map[int]struct {
-		result1 string
-	}
-	CLIVersionStub        func() string
-	cLIVersionMutex       sync.RWMutex
-	cLIVersionArgsForCall []struct {
-	}
-	cLIVersionReturns struct {
-		result1 string
-	}
-	cLIVersionReturnsOnCall map[int]struct {
-		result1 string
-	}
-	ClearSessionStub        func()
-	clearSessionMutex       sync.RWMutex
-	clearSessionArgsForCall []struct {
-	}
-	CloseStub        func()
-	closeMutex       sync.RWMutex
-	closeArgsForCall []struct {
-	}
-	ColorEnabledStub        func() string
-	colorEnabledMutex       sync.RWMutex
-	colorEnabledArgsForCall []struct {
-	}
-	colorEnabledReturns struct {
-		result1 string
-	}
-	colorEnabledReturnsOnCall map[int]struct {
-		result1 string
-	}
-	DopplerEndpointStub        func() string
-	dopplerEndpointMutex       sync.RWMutex
-	dopplerEndpointArgsForCall []struct {
-	}
-	dopplerEndpointReturns struct {
-		result1 string
-	}
-	dopplerEndpointReturnsOnCall map[int]struct {
-		result1 string
-	}
 	HasAPIEndpointStub        func() bool
 	hasAPIEndpointMutex       sync.RWMutex
-	hasAPIEndpointArgsForCall []struct {
-	}
-	hasAPIEndpointReturns struct {
+	hasAPIEndpointArgsForCall []struct{}
+	hasAPIEndpointReturns     struct {
 		result1 bool
 	}
 	hasAPIEndpointReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	AuthenticationEndpointStub        func() string
+	authenticationEndpointMutex       sync.RWMutex
+	authenticationEndpointArgsForCall []struct{}
+	authenticationEndpointReturns     struct {
+		result1 string
+	}
+	authenticationEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
+	DopplerEndpointStub        func() string
+	dopplerEndpointMutex       sync.RWMutex
+	dopplerEndpointArgsForCall []struct{}
+	dopplerEndpointReturns     struct {
+		result1 string
+	}
+	dopplerEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
+	UaaEndpointStub        func() string
+	uaaEndpointMutex       sync.RWMutex
+	uaaEndpointArgsForCall []struct{}
+	uaaEndpointReturns     struct {
+		result1 string
+	}
+	uaaEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
+	RoutingAPIEndpointStub        func() string
+	routingAPIEndpointMutex       sync.RWMutex
+	routingAPIEndpointArgsForCall []struct{}
+	routingAPIEndpointReturns     struct {
+		result1 string
+	}
+	routingAPIEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
+	AccessTokenStub        func() string
+	accessTokenMutex       sync.RWMutex
+	accessTokenArgsForCall []struct{}
+	accessTokenReturns     struct {
+		result1 string
+	}
+	accessTokenReturnsOnCall map[int]struct {
+		result1 string
+	}
+	UAAOAuthClientStub        func() string
+	uAAOAuthClientMutex       sync.RWMutex
+	uAAOAuthClientArgsForCall []struct{}
+	uAAOAuthClientReturns     struct {
+		result1 string
+	}
+	uAAOAuthClientReturnsOnCall map[int]struct {
+		result1 string
+	}
+	UAAOAuthClientSecretStub        func() string
+	uAAOAuthClientSecretMutex       sync.RWMutex
+	uAAOAuthClientSecretArgsForCall []struct{}
+	uAAOAuthClientSecretReturns     struct {
+		result1 string
+	}
+	uAAOAuthClientSecretReturnsOnCall map[int]struct {
+		result1 string
+	}
+	SSHOAuthClientStub        func() string
+	sSHOAuthClientMutex       sync.RWMutex
+	sSHOAuthClientArgsForCall []struct{}
+	sSHOAuthClientReturns     struct {
+		result1 string
+	}
+	sSHOAuthClientReturnsOnCall map[int]struct {
+		result1 string
+	}
+	RefreshTokenStub        func() string
+	refreshTokenMutex       sync.RWMutex
+	refreshTokenArgsForCall []struct{}
+	refreshTokenReturns     struct {
+		result1 string
+	}
+	refreshTokenReturnsOnCall map[int]struct {
+		result1 string
+	}
+	OrganizationFieldsStub        func() models.OrganizationFields
+	organizationFieldsMutex       sync.RWMutex
+	organizationFieldsArgsForCall []struct{}
+	organizationFieldsReturns     struct {
+		result1 models.OrganizationFields
+	}
+	organizationFieldsReturnsOnCall map[int]struct {
+		result1 models.OrganizationFields
+	}
 	HasOrganizationStub        func() bool
 	hasOrganizationMutex       sync.RWMutex
-	hasOrganizationArgsForCall []struct {
-	}
-	hasOrganizationReturns struct {
+	hasOrganizationArgsForCall []struct{}
+	hasOrganizationReturns     struct {
 		result1 bool
 	}
 	hasOrganizationReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	SpaceFieldsStub        func() models.SpaceFields
+	spaceFieldsMutex       sync.RWMutex
+	spaceFieldsArgsForCall []struct{}
+	spaceFieldsReturns     struct {
+		result1 models.SpaceFields
+	}
+	spaceFieldsReturnsOnCall map[int]struct {
+		result1 models.SpaceFields
+	}
 	HasSpaceStub        func() bool
 	hasSpaceMutex       sync.RWMutex
-	hasSpaceArgsForCall []struct {
-	}
-	hasSpaceReturns struct {
+	hasSpaceArgsForCall []struct{}
+	hasSpaceReturns     struct {
 		result1 bool
 	}
 	hasSpaceReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	UsernameStub        func() string
+	usernameMutex       sync.RWMutex
+	usernameArgsForCall []struct{}
+	usernameReturns     struct {
+		result1 string
+	}
+	usernameReturnsOnCall map[int]struct {
+		result1 string
+	}
+	UserGUIDStub        func() string
+	userGUIDMutex       sync.RWMutex
+	userGUIDArgsForCall []struct{}
+	userGUIDReturns     struct {
+		result1 string
+	}
+	userGUIDReturnsOnCall map[int]struct {
+		result1 string
+	}
+	UserEmailStub        func() string
+	userEmailMutex       sync.RWMutex
+	userEmailArgsForCall []struct{}
+	userEmailReturns     struct {
+		result1 string
+	}
+	userEmailReturnsOnCall map[int]struct {
+		result1 string
+	}
 	IsLoggedInStub        func() bool
 	isLoggedInMutex       sync.RWMutex
-	isLoggedInArgsForCall []struct {
-	}
-	isLoggedInReturns struct {
+	isLoggedInArgsForCall []struct{}
+	isLoggedInReturns     struct {
 		result1 bool
 	}
 	isLoggedInReturnsOnCall map[int]struct {
+		result1 bool
+	}
+	IsSSLDisabledStub        func() bool
+	isSSLDisabledMutex       sync.RWMutex
+	isSSLDisabledArgsForCall []struct{}
+	isSSLDisabledReturns     struct {
+		result1 bool
+	}
+	isSSLDisabledReturnsOnCall map[int]struct {
 		result1 bool
 	}
 	IsMinAPIVersionStub        func(semver.Version) bool
@@ -171,31 +221,10 @@ type FakeRepository struct {
 	isMinCLIVersionReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	IsSSLDisabledStub        func() bool
-	isSSLDisabledMutex       sync.RWMutex
-	isSSLDisabledArgsForCall []struct {
-	}
-	isSSLDisabledReturns struct {
-		result1 bool
-	}
-	isSSLDisabledReturnsOnCall map[int]struct {
-		result1 bool
-	}
-	LocaleStub        func() string
-	localeMutex       sync.RWMutex
-	localeArgsForCall []struct {
-	}
-	localeReturns struct {
-		result1 string
-	}
-	localeReturnsOnCall map[int]struct {
-		result1 string
-	}
 	MinCLIVersionStub        func() string
 	minCLIVersionMutex       sync.RWMutex
-	minCLIVersionArgsForCall []struct {
-	}
-	minCLIVersionReturns struct {
+	minCLIVersionArgsForCall []struct{}
+	minCLIVersionReturns     struct {
 		result1 string
 	}
 	minCLIVersionReturnsOnCall map[int]struct {
@@ -203,64 +232,70 @@ type FakeRepository struct {
 	}
 	MinRecommendedCLIVersionStub        func() string
 	minRecommendedCLIVersionMutex       sync.RWMutex
-	minRecommendedCLIVersionArgsForCall []struct {
-	}
-	minRecommendedCLIVersionReturns struct {
+	minRecommendedCLIVersionArgsForCall []struct{}
+	minRecommendedCLIVersionReturns     struct {
 		result1 string
 	}
 	minRecommendedCLIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	OrganizationFieldsStub        func() models.OrganizationFields
-	organizationFieldsMutex       sync.RWMutex
-	organizationFieldsArgsForCall []struct {
+	CLIVersionStub        func() string
+	cLIVersionMutex       sync.RWMutex
+	cLIVersionArgsForCall []struct{}
+	cLIVersionReturns     struct {
+		result1 string
 	}
-	organizationFieldsReturns struct {
-		result1 models.OrganizationFields
+	cLIVersionReturnsOnCall map[int]struct {
+		result1 string
 	}
-	organizationFieldsReturnsOnCall map[int]struct {
-		result1 models.OrganizationFields
+	AsyncTimeoutStub        func() uint
+	asyncTimeoutMutex       sync.RWMutex
+	asyncTimeoutArgsForCall []struct{}
+	asyncTimeoutReturns     struct {
+		result1 uint
+	}
+	asyncTimeoutReturnsOnCall map[int]struct {
+		result1 uint
+	}
+	TraceStub        func() string
+	traceMutex       sync.RWMutex
+	traceArgsForCall []struct{}
+	traceReturns     struct {
+		result1 string
+	}
+	traceReturnsOnCall map[int]struct {
+		result1 string
+	}
+	ColorEnabledStub        func() string
+	colorEnabledMutex       sync.RWMutex
+	colorEnabledArgsForCall []struct{}
+	colorEnabledReturns     struct {
+		result1 string
+	}
+	colorEnabledReturnsOnCall map[int]struct {
+		result1 string
+	}
+	LocaleStub        func() string
+	localeMutex       sync.RWMutex
+	localeArgsForCall []struct{}
+	localeReturns     struct {
+		result1 string
+	}
+	localeReturnsOnCall map[int]struct {
+		result1 string
 	}
 	PluginReposStub        func() []models.PluginRepo
 	pluginReposMutex       sync.RWMutex
-	pluginReposArgsForCall []struct {
-	}
-	pluginReposReturns struct {
+	pluginReposArgsForCall []struct{}
+	pluginReposReturns     struct {
 		result1 []models.PluginRepo
 	}
 	pluginReposReturnsOnCall map[int]struct {
 		result1 []models.PluginRepo
 	}
-	RefreshTokenStub        func() string
-	refreshTokenMutex       sync.RWMutex
-	refreshTokenArgsForCall []struct {
-	}
-	refreshTokenReturns struct {
-		result1 string
-	}
-	refreshTokenReturnsOnCall map[int]struct {
-		result1 string
-	}
-	RoutingAPIEndpointStub        func() string
-	routingAPIEndpointMutex       sync.RWMutex
-	routingAPIEndpointArgsForCall []struct {
-	}
-	routingAPIEndpointReturns struct {
-		result1 string
-	}
-	routingAPIEndpointReturnsOnCall map[int]struct {
-		result1 string
-	}
-	SSHOAuthClientStub        func() string
-	sSHOAuthClientMutex       sync.RWMutex
-	sSHOAuthClientArgsForCall []struct {
-	}
-	sSHOAuthClientReturns struct {
-		result1 string
-	}
-	sSHOAuthClientReturnsOnCall map[int]struct {
-		result1 string
-	}
+	ClearSessionStub          func()
+	clearSessionMutex         sync.RWMutex
+	clearSessionArgsForCall   []struct{}
 	SetAPIEndpointStub        func(string)
 	setAPIEndpointMutex       sync.RWMutex
 	setAPIEndpointArgsForCall []struct {
@@ -269,46 +304,6 @@ type FakeRepository struct {
 	SetAPIVersionStub        func(string)
 	setAPIVersionMutex       sync.RWMutex
 	setAPIVersionArgsForCall []struct {
-		arg1 string
-	}
-	SetAccessTokenStub        func(string)
-	setAccessTokenMutex       sync.RWMutex
-	setAccessTokenArgsForCall []struct {
-		arg1 string
-	}
-	SetAccessTokenExpiryDateStub        func(time.Time)
-	setAccessTokenExpiryDateMutex       sync.RWMutex
-	setAccessTokenExpiryDateArgsForCall []struct {
-		arg1 time.Time
-	}
-	SetAsyncTimeoutStub        func(uint)
-	setAsyncTimeoutMutex       sync.RWMutex
-	setAsyncTimeoutArgsForCall []struct {
-		arg1 uint
-	}
-	SetAuthenticationEndpointStub        func(string)
-	setAuthenticationEndpointMutex       sync.RWMutex
-	setAuthenticationEndpointArgsForCall []struct {
-		arg1 string
-	}
-	SetCLIVersionStub        func(string)
-	setCLIVersionMutex       sync.RWMutex
-	setCLIVersionArgsForCall []struct {
-		arg1 string
-	}
-	SetColorEnabledStub        func(string)
-	setColorEnabledMutex       sync.RWMutex
-	setColorEnabledArgsForCall []struct {
-		arg1 string
-	}
-	SetDopplerEndpointStub        func(string)
-	setDopplerEndpointMutex       sync.RWMutex
-	setDopplerEndpointArgsForCall []struct {
-		arg1 string
-	}
-	SetLocaleStub        func(string)
-	setLocaleMutex       sync.RWMutex
-	setLocaleArgsForCall []struct {
 		arg1 string
 	}
 	SetMinCLIVersionStub        func(string)
@@ -321,19 +316,19 @@ type FakeRepository struct {
 	setMinRecommendedCLIVersionArgsForCall []struct {
 		arg1 string
 	}
-	SetOrganizationFieldsStub        func(models.OrganizationFields)
-	setOrganizationFieldsMutex       sync.RWMutex
-	setOrganizationFieldsArgsForCall []struct {
-		arg1 models.OrganizationFields
+	SetAuthenticationEndpointStub        func(string)
+	setAuthenticationEndpointMutex       sync.RWMutex
+	setAuthenticationEndpointArgsForCall []struct {
+		arg1 string
 	}
-	SetPluginRepoStub        func(models.PluginRepo)
-	setPluginRepoMutex       sync.RWMutex
-	setPluginRepoArgsForCall []struct {
-		arg1 models.PluginRepo
+	SetDopplerEndpointStub        func(string)
+	setDopplerEndpointMutex       sync.RWMutex
+	setDopplerEndpointArgsForCall []struct {
+		arg1 string
 	}
-	SetRefreshTokenStub        func(string)
-	setRefreshTokenMutex       sync.RWMutex
-	setRefreshTokenArgsForCall []struct {
+	SetUaaEndpointStub        func(string)
+	setUaaEndpointMutex       sync.RWMutex
+	setUaaEndpointArgsForCall []struct {
 		arg1 string
 	}
 	SetRoutingAPIEndpointStub        func(string)
@@ -341,29 +336,9 @@ type FakeRepository struct {
 	setRoutingAPIEndpointArgsForCall []struct {
 		arg1 string
 	}
-	SetSSHOAuthClientStub        func(string)
-	setSSHOAuthClientMutex       sync.RWMutex
-	setSSHOAuthClientArgsForCall []struct {
-		arg1 string
-	}
-	SetSSLDisabledStub        func(bool)
-	setSSLDisabledMutex       sync.RWMutex
-	setSSLDisabledArgsForCall []struct {
-		arg1 bool
-	}
-	SetSpaceFieldsStub        func(models.SpaceFields)
-	setSpaceFieldsMutex       sync.RWMutex
-	setSpaceFieldsArgsForCall []struct {
-		arg1 models.SpaceFields
-	}
-	SetTraceStub        func(string)
-	setTraceMutex       sync.RWMutex
-	setTraceArgsForCall []struct {
-		arg1 string
-	}
-	SetUAAGrantTypeStub        func(string)
-	setUAAGrantTypeMutex       sync.RWMutex
-	setUAAGrantTypeArgsForCall []struct {
+	SetAccessTokenStub        func(string)
+	setAccessTokenMutex       sync.RWMutex
+	setAccessTokenArgsForCall []struct {
 		arg1 string
 	}
 	SetUAAOAuthClientStub        func(string)
@@ -376,106 +351,83 @@ type FakeRepository struct {
 	setUAAOAuthClientSecretArgsForCall []struct {
 		arg1 string
 	}
-	SetUaaEndpointStub        func(string)
-	setUaaEndpointMutex       sync.RWMutex
-	setUaaEndpointArgsForCall []struct {
+	SetSSHOAuthClientStub        func(string)
+	setSSHOAuthClientMutex       sync.RWMutex
+	setSSHOAuthClientArgsForCall []struct {
 		arg1 string
 	}
-	SpaceFieldsStub        func() models.SpaceFields
-	spaceFieldsMutex       sync.RWMutex
-	spaceFieldsArgsForCall []struct {
+	SetRefreshTokenStub        func(string)
+	setRefreshTokenMutex       sync.RWMutex
+	setRefreshTokenArgsForCall []struct {
+		arg1 string
 	}
-	spaceFieldsReturns struct {
-		result1 models.SpaceFields
+	SetOrganizationFieldsStub        func(models.OrganizationFields)
+	setOrganizationFieldsMutex       sync.RWMutex
+	setOrganizationFieldsArgsForCall []struct {
+		arg1 models.OrganizationFields
 	}
-	spaceFieldsReturnsOnCall map[int]struct {
-		result1 models.SpaceFields
+	SetSpaceFieldsStub        func(models.SpaceFields)
+	setSpaceFieldsMutex       sync.RWMutex
+	setSpaceFieldsArgsForCall []struct {
+		arg1 models.SpaceFields
 	}
-	TraceStub        func() string
-	traceMutex       sync.RWMutex
-	traceArgsForCall []struct {
+	SetSSLDisabledStub        func(bool)
+	setSSLDisabledMutex       sync.RWMutex
+	setSSLDisabledArgsForCall []struct {
+		arg1 bool
 	}
-	traceReturns struct {
-		result1 string
+	SetAsyncTimeoutStub        func(uint)
+	setAsyncTimeoutMutex       sync.RWMutex
+	setAsyncTimeoutArgsForCall []struct {
+		arg1 uint
 	}
-	traceReturnsOnCall map[int]struct {
-		result1 string
+	SetTraceStub        func(string)
+	setTraceMutex       sync.RWMutex
+	setTraceArgsForCall []struct {
+		arg1 string
 	}
-	UAAGrantTypeStub        func() string
-	uAAGrantTypeMutex       sync.RWMutex
-	uAAGrantTypeArgsForCall []struct {
+	SetColorEnabledStub        func(string)
+	setColorEnabledMutex       sync.RWMutex
+	setColorEnabledArgsForCall []struct {
+		arg1 string
 	}
-	uAAGrantTypeReturns struct {
-		result1 string
+	SetLocaleStub        func(string)
+	setLocaleMutex       sync.RWMutex
+	setLocaleArgsForCall []struct {
+		arg1 string
 	}
-	uAAGrantTypeReturnsOnCall map[int]struct {
-		result1 string
-	}
-	UAAOAuthClientStub        func() string
-	uAAOAuthClientMutex       sync.RWMutex
-	uAAOAuthClientArgsForCall []struct {
-	}
-	uAAOAuthClientReturns struct {
-		result1 string
-	}
-	uAAOAuthClientReturnsOnCall map[int]struct {
-		result1 string
-	}
-	UAAOAuthClientSecretStub        func() string
-	uAAOAuthClientSecretMutex       sync.RWMutex
-	uAAOAuthClientSecretArgsForCall []struct {
-	}
-	uAAOAuthClientSecretReturns struct {
-		result1 string
-	}
-	uAAOAuthClientSecretReturnsOnCall map[int]struct {
-		result1 string
-	}
-	UaaEndpointStub        func() string
-	uaaEndpointMutex       sync.RWMutex
-	uaaEndpointArgsForCall []struct {
-	}
-	uaaEndpointReturns struct {
-		result1 string
-	}
-	uaaEndpointReturnsOnCall map[int]struct {
-		result1 string
+	SetPluginRepoStub        func(models.PluginRepo)
+	setPluginRepoMutex       sync.RWMutex
+	setPluginRepoArgsForCall []struct {
+		arg1 models.PluginRepo
 	}
 	UnSetPluginRepoStub        func(int)
 	unSetPluginRepoMutex       sync.RWMutex
 	unSetPluginRepoArgsForCall []struct {
 		arg1 int
 	}
-	UserEmailStub        func() string
-	userEmailMutex       sync.RWMutex
-	userEmailArgsForCall []struct {
+	SetCLIVersionStub        func(string)
+	setCLIVersionMutex       sync.RWMutex
+	setCLIVersionArgsForCall []struct {
+		arg1 string
 	}
-	userEmailReturns struct {
+	SetUAAGrantTypeStub        func(string)
+	setUAAGrantTypeMutex       sync.RWMutex
+	setUAAGrantTypeArgsForCall []struct {
+		arg1 string
+	}
+	UAAGrantTypeStub        func() string
+	uAAGrantTypeMutex       sync.RWMutex
+	uAAGrantTypeArgsForCall []struct{}
+	uAAGrantTypeReturns     struct {
 		result1 string
 	}
-	userEmailReturnsOnCall map[int]struct {
+	uAAGrantTypeReturnsOnCall map[int]struct {
 		result1 string
 	}
-	UserGUIDStub        func() string
-	userGUIDMutex       sync.RWMutex
-	userGUIDArgsForCall []struct {
-	}
-	userGUIDReturns struct {
-		result1 string
-	}
-	userGUIDReturnsOnCall map[int]struct {
-		result1 string
-	}
-	UsernameStub        func() string
-	usernameMutex       sync.RWMutex
-	usernameArgsForCall []struct {
-	}
-	usernameReturns struct {
-		result1 string
-	}
-	usernameReturnsOnCall map[int]struct {
-		result1 string
-	}
+	CloseStub        func()
+	closeMutex       sync.RWMutex
+	closeArgsForCall []struct{}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -483,8 +435,7 @@ type FakeRepository struct {
 func (fake *FakeRepository) APIEndpoint() string {
 	fake.aPIEndpointMutex.Lock()
 	ret, specificReturn := fake.aPIEndpointReturnsOnCall[len(fake.aPIEndpointArgsForCall)]
-	fake.aPIEndpointArgsForCall = append(fake.aPIEndpointArgsForCall, struct {
-	}{})
+	fake.aPIEndpointArgsForCall = append(fake.aPIEndpointArgsForCall, struct{}{})
 	fake.recordInvocation("APIEndpoint", []interface{}{})
 	fake.aPIEndpointMutex.Unlock()
 	if fake.APIEndpointStub != nil {
@@ -493,8 +444,7 @@ func (fake *FakeRepository) APIEndpoint() string {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.aPIEndpointReturns
-	return fakeReturns.result1
+	return fake.aPIEndpointReturns.result1
 }
 
 func (fake *FakeRepository) APIEndpointCallCount() int {
@@ -503,15 +453,7 @@ func (fake *FakeRepository) APIEndpointCallCount() int {
 	return len(fake.aPIEndpointArgsForCall)
 }
 
-func (fake *FakeRepository) APIEndpointCalls(stub func() string) {
-	fake.aPIEndpointMutex.Lock()
-	defer fake.aPIEndpointMutex.Unlock()
-	fake.APIEndpointStub = stub
-}
-
 func (fake *FakeRepository) APIEndpointReturns(result1 string) {
-	fake.aPIEndpointMutex.Lock()
-	defer fake.aPIEndpointMutex.Unlock()
 	fake.APIEndpointStub = nil
 	fake.aPIEndpointReturns = struct {
 		result1 string
@@ -519,8 +461,6 @@ func (fake *FakeRepository) APIEndpointReturns(result1 string) {
 }
 
 func (fake *FakeRepository) APIEndpointReturnsOnCall(i int, result1 string) {
-	fake.aPIEndpointMutex.Lock()
-	defer fake.aPIEndpointMutex.Unlock()
 	fake.APIEndpointStub = nil
 	if fake.aPIEndpointReturnsOnCall == nil {
 		fake.aPIEndpointReturnsOnCall = make(map[int]struct {
@@ -535,8 +475,7 @@ func (fake *FakeRepository) APIEndpointReturnsOnCall(i int, result1 string) {
 func (fake *FakeRepository) APIVersion() string {
 	fake.aPIVersionMutex.Lock()
 	ret, specificReturn := fake.aPIVersionReturnsOnCall[len(fake.aPIVersionArgsForCall)]
-	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct {
-	}{})
+	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct{}{})
 	fake.recordInvocation("APIVersion", []interface{}{})
 	fake.aPIVersionMutex.Unlock()
 	if fake.APIVersionStub != nil {
@@ -545,8 +484,7 @@ func (fake *FakeRepository) APIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.aPIVersionReturns
-	return fakeReturns.result1
+	return fake.aPIVersionReturns.result1
 }
 
 func (fake *FakeRepository) APIVersionCallCount() int {
@@ -555,15 +493,7 @@ func (fake *FakeRepository) APIVersionCallCount() int {
 	return len(fake.aPIVersionArgsForCall)
 }
 
-func (fake *FakeRepository) APIVersionCalls(stub func() string) {
-	fake.aPIVersionMutex.Lock()
-	defer fake.aPIVersionMutex.Unlock()
-	fake.APIVersionStub = stub
-}
-
 func (fake *FakeRepository) APIVersionReturns(result1 string) {
-	fake.aPIVersionMutex.Lock()
-	defer fake.aPIVersionMutex.Unlock()
 	fake.APIVersionStub = nil
 	fake.aPIVersionReturns = struct {
 		result1 string
@@ -571,8 +501,6 @@ func (fake *FakeRepository) APIVersionReturns(result1 string) {
 }
 
 func (fake *FakeRepository) APIVersionReturnsOnCall(i int, result1 string) {
-	fake.aPIVersionMutex.Lock()
-	defer fake.aPIVersionMutex.Unlock()
 	fake.APIVersionStub = nil
 	if fake.aPIVersionReturnsOnCall == nil {
 		fake.aPIVersionReturnsOnCall = make(map[int]struct {
@@ -584,421 +512,10 @@ func (fake *FakeRepository) APIVersionReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
-func (fake *FakeRepository) AccessToken() string {
-	fake.accessTokenMutex.Lock()
-	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
-	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct {
-	}{})
-	fake.recordInvocation("AccessToken", []interface{}{})
-	fake.accessTokenMutex.Unlock()
-	if fake.AccessTokenStub != nil {
-		return fake.AccessTokenStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.accessTokenReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) AccessTokenCallCount() int {
-	fake.accessTokenMutex.RLock()
-	defer fake.accessTokenMutex.RUnlock()
-	return len(fake.accessTokenArgsForCall)
-}
-
-func (fake *FakeRepository) AccessTokenCalls(stub func() string) {
-	fake.accessTokenMutex.Lock()
-	defer fake.accessTokenMutex.Unlock()
-	fake.AccessTokenStub = stub
-}
-
-func (fake *FakeRepository) AccessTokenReturns(result1 string) {
-	fake.accessTokenMutex.Lock()
-	defer fake.accessTokenMutex.Unlock()
-	fake.AccessTokenStub = nil
-	fake.accessTokenReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) AccessTokenReturnsOnCall(i int, result1 string) {
-	fake.accessTokenMutex.Lock()
-	defer fake.accessTokenMutex.Unlock()
-	fake.AccessTokenStub = nil
-	if fake.accessTokenReturnsOnCall == nil {
-		fake.accessTokenReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.accessTokenReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) AccessTokenExpiryDate() time.Time {
-	fake.accessTokenExpiryDateMutex.Lock()
-	ret, specificReturn := fake.accessTokenExpiryDateReturnsOnCall[len(fake.accessTokenExpiryDateArgsForCall)]
-	fake.accessTokenExpiryDateArgsForCall = append(fake.accessTokenExpiryDateArgsForCall, struct {
-	}{})
-	fake.recordInvocation("AccessTokenExpiryDate", []interface{}{})
-	fake.accessTokenExpiryDateMutex.Unlock()
-	if fake.AccessTokenExpiryDateStub != nil {
-		return fake.AccessTokenExpiryDateStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.accessTokenExpiryDateReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) AccessTokenExpiryDateCallCount() int {
-	fake.accessTokenExpiryDateMutex.RLock()
-	defer fake.accessTokenExpiryDateMutex.RUnlock()
-	return len(fake.accessTokenExpiryDateArgsForCall)
-}
-
-func (fake *FakeRepository) AccessTokenExpiryDateCalls(stub func() time.Time) {
-	fake.accessTokenExpiryDateMutex.Lock()
-	defer fake.accessTokenExpiryDateMutex.Unlock()
-	fake.AccessTokenExpiryDateStub = stub
-}
-
-func (fake *FakeRepository) AccessTokenExpiryDateReturns(result1 time.Time) {
-	fake.accessTokenExpiryDateMutex.Lock()
-	defer fake.accessTokenExpiryDateMutex.Unlock()
-	fake.AccessTokenExpiryDateStub = nil
-	fake.accessTokenExpiryDateReturns = struct {
-		result1 time.Time
-	}{result1}
-}
-
-func (fake *FakeRepository) AccessTokenExpiryDateReturnsOnCall(i int, result1 time.Time) {
-	fake.accessTokenExpiryDateMutex.Lock()
-	defer fake.accessTokenExpiryDateMutex.Unlock()
-	fake.AccessTokenExpiryDateStub = nil
-	if fake.accessTokenExpiryDateReturnsOnCall == nil {
-		fake.accessTokenExpiryDateReturnsOnCall = make(map[int]struct {
-			result1 time.Time
-		})
-	}
-	fake.accessTokenExpiryDateReturnsOnCall[i] = struct {
-		result1 time.Time
-	}{result1}
-}
-
-func (fake *FakeRepository) AsyncTimeout() uint {
-	fake.asyncTimeoutMutex.Lock()
-	ret, specificReturn := fake.asyncTimeoutReturnsOnCall[len(fake.asyncTimeoutArgsForCall)]
-	fake.asyncTimeoutArgsForCall = append(fake.asyncTimeoutArgsForCall, struct {
-	}{})
-	fake.recordInvocation("AsyncTimeout", []interface{}{})
-	fake.asyncTimeoutMutex.Unlock()
-	if fake.AsyncTimeoutStub != nil {
-		return fake.AsyncTimeoutStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.asyncTimeoutReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) AsyncTimeoutCallCount() int {
-	fake.asyncTimeoutMutex.RLock()
-	defer fake.asyncTimeoutMutex.RUnlock()
-	return len(fake.asyncTimeoutArgsForCall)
-}
-
-func (fake *FakeRepository) AsyncTimeoutCalls(stub func() uint) {
-	fake.asyncTimeoutMutex.Lock()
-	defer fake.asyncTimeoutMutex.Unlock()
-	fake.AsyncTimeoutStub = stub
-}
-
-func (fake *FakeRepository) AsyncTimeoutReturns(result1 uint) {
-	fake.asyncTimeoutMutex.Lock()
-	defer fake.asyncTimeoutMutex.Unlock()
-	fake.AsyncTimeoutStub = nil
-	fake.asyncTimeoutReturns = struct {
-		result1 uint
-	}{result1}
-}
-
-func (fake *FakeRepository) AsyncTimeoutReturnsOnCall(i int, result1 uint) {
-	fake.asyncTimeoutMutex.Lock()
-	defer fake.asyncTimeoutMutex.Unlock()
-	fake.AsyncTimeoutStub = nil
-	if fake.asyncTimeoutReturnsOnCall == nil {
-		fake.asyncTimeoutReturnsOnCall = make(map[int]struct {
-			result1 uint
-		})
-	}
-	fake.asyncTimeoutReturnsOnCall[i] = struct {
-		result1 uint
-	}{result1}
-}
-
-func (fake *FakeRepository) AuthenticationEndpoint() string {
-	fake.authenticationEndpointMutex.Lock()
-	ret, specificReturn := fake.authenticationEndpointReturnsOnCall[len(fake.authenticationEndpointArgsForCall)]
-	fake.authenticationEndpointArgsForCall = append(fake.authenticationEndpointArgsForCall, struct {
-	}{})
-	fake.recordInvocation("AuthenticationEndpoint", []interface{}{})
-	fake.authenticationEndpointMutex.Unlock()
-	if fake.AuthenticationEndpointStub != nil {
-		return fake.AuthenticationEndpointStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.authenticationEndpointReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) AuthenticationEndpointCallCount() int {
-	fake.authenticationEndpointMutex.RLock()
-	defer fake.authenticationEndpointMutex.RUnlock()
-	return len(fake.authenticationEndpointArgsForCall)
-}
-
-func (fake *FakeRepository) AuthenticationEndpointCalls(stub func() string) {
-	fake.authenticationEndpointMutex.Lock()
-	defer fake.authenticationEndpointMutex.Unlock()
-	fake.AuthenticationEndpointStub = stub
-}
-
-func (fake *FakeRepository) AuthenticationEndpointReturns(result1 string) {
-	fake.authenticationEndpointMutex.Lock()
-	defer fake.authenticationEndpointMutex.Unlock()
-	fake.AuthenticationEndpointStub = nil
-	fake.authenticationEndpointReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) AuthenticationEndpointReturnsOnCall(i int, result1 string) {
-	fake.authenticationEndpointMutex.Lock()
-	defer fake.authenticationEndpointMutex.Unlock()
-	fake.AuthenticationEndpointStub = nil
-	if fake.authenticationEndpointReturnsOnCall == nil {
-		fake.authenticationEndpointReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.authenticationEndpointReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) CLIVersion() string {
-	fake.cLIVersionMutex.Lock()
-	ret, specificReturn := fake.cLIVersionReturnsOnCall[len(fake.cLIVersionArgsForCall)]
-	fake.cLIVersionArgsForCall = append(fake.cLIVersionArgsForCall, struct {
-	}{})
-	fake.recordInvocation("CLIVersion", []interface{}{})
-	fake.cLIVersionMutex.Unlock()
-	if fake.CLIVersionStub != nil {
-		return fake.CLIVersionStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.cLIVersionReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) CLIVersionCallCount() int {
-	fake.cLIVersionMutex.RLock()
-	defer fake.cLIVersionMutex.RUnlock()
-	return len(fake.cLIVersionArgsForCall)
-}
-
-func (fake *FakeRepository) CLIVersionCalls(stub func() string) {
-	fake.cLIVersionMutex.Lock()
-	defer fake.cLIVersionMutex.Unlock()
-	fake.CLIVersionStub = stub
-}
-
-func (fake *FakeRepository) CLIVersionReturns(result1 string) {
-	fake.cLIVersionMutex.Lock()
-	defer fake.cLIVersionMutex.Unlock()
-	fake.CLIVersionStub = nil
-	fake.cLIVersionReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) CLIVersionReturnsOnCall(i int, result1 string) {
-	fake.cLIVersionMutex.Lock()
-	defer fake.cLIVersionMutex.Unlock()
-	fake.CLIVersionStub = nil
-	if fake.cLIVersionReturnsOnCall == nil {
-		fake.cLIVersionReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.cLIVersionReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) ClearSession() {
-	fake.clearSessionMutex.Lock()
-	fake.clearSessionArgsForCall = append(fake.clearSessionArgsForCall, struct {
-	}{})
-	fake.recordInvocation("ClearSession", []interface{}{})
-	fake.clearSessionMutex.Unlock()
-	if fake.ClearSessionStub != nil {
-		fake.ClearSessionStub()
-	}
-}
-
-func (fake *FakeRepository) ClearSessionCallCount() int {
-	fake.clearSessionMutex.RLock()
-	defer fake.clearSessionMutex.RUnlock()
-	return len(fake.clearSessionArgsForCall)
-}
-
-func (fake *FakeRepository) ClearSessionCalls(stub func()) {
-	fake.clearSessionMutex.Lock()
-	defer fake.clearSessionMutex.Unlock()
-	fake.ClearSessionStub = stub
-}
-
-func (fake *FakeRepository) Close() {
-	fake.closeMutex.Lock()
-	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
-	}{})
-	fake.recordInvocation("Close", []interface{}{})
-	fake.closeMutex.Unlock()
-	if fake.CloseStub != nil {
-		fake.CloseStub()
-	}
-}
-
-func (fake *FakeRepository) CloseCallCount() int {
-	fake.closeMutex.RLock()
-	defer fake.closeMutex.RUnlock()
-	return len(fake.closeArgsForCall)
-}
-
-func (fake *FakeRepository) CloseCalls(stub func()) {
-	fake.closeMutex.Lock()
-	defer fake.closeMutex.Unlock()
-	fake.CloseStub = stub
-}
-
-func (fake *FakeRepository) ColorEnabled() string {
-	fake.colorEnabledMutex.Lock()
-	ret, specificReturn := fake.colorEnabledReturnsOnCall[len(fake.colorEnabledArgsForCall)]
-	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct {
-	}{})
-	fake.recordInvocation("ColorEnabled", []interface{}{})
-	fake.colorEnabledMutex.Unlock()
-	if fake.ColorEnabledStub != nil {
-		return fake.ColorEnabledStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.colorEnabledReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) ColorEnabledCallCount() int {
-	fake.colorEnabledMutex.RLock()
-	defer fake.colorEnabledMutex.RUnlock()
-	return len(fake.colorEnabledArgsForCall)
-}
-
-func (fake *FakeRepository) ColorEnabledCalls(stub func() string) {
-	fake.colorEnabledMutex.Lock()
-	defer fake.colorEnabledMutex.Unlock()
-	fake.ColorEnabledStub = stub
-}
-
-func (fake *FakeRepository) ColorEnabledReturns(result1 string) {
-	fake.colorEnabledMutex.Lock()
-	defer fake.colorEnabledMutex.Unlock()
-	fake.ColorEnabledStub = nil
-	fake.colorEnabledReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) ColorEnabledReturnsOnCall(i int, result1 string) {
-	fake.colorEnabledMutex.Lock()
-	defer fake.colorEnabledMutex.Unlock()
-	fake.ColorEnabledStub = nil
-	if fake.colorEnabledReturnsOnCall == nil {
-		fake.colorEnabledReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.colorEnabledReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) DopplerEndpoint() string {
-	fake.dopplerEndpointMutex.Lock()
-	ret, specificReturn := fake.dopplerEndpointReturnsOnCall[len(fake.dopplerEndpointArgsForCall)]
-	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct {
-	}{})
-	fake.recordInvocation("DopplerEndpoint", []interface{}{})
-	fake.dopplerEndpointMutex.Unlock()
-	if fake.DopplerEndpointStub != nil {
-		return fake.DopplerEndpointStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.dopplerEndpointReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) DopplerEndpointCallCount() int {
-	fake.dopplerEndpointMutex.RLock()
-	defer fake.dopplerEndpointMutex.RUnlock()
-	return len(fake.dopplerEndpointArgsForCall)
-}
-
-func (fake *FakeRepository) DopplerEndpointCalls(stub func() string) {
-	fake.dopplerEndpointMutex.Lock()
-	defer fake.dopplerEndpointMutex.Unlock()
-	fake.DopplerEndpointStub = stub
-}
-
-func (fake *FakeRepository) DopplerEndpointReturns(result1 string) {
-	fake.dopplerEndpointMutex.Lock()
-	defer fake.dopplerEndpointMutex.Unlock()
-	fake.DopplerEndpointStub = nil
-	fake.dopplerEndpointReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) DopplerEndpointReturnsOnCall(i int, result1 string) {
-	fake.dopplerEndpointMutex.Lock()
-	defer fake.dopplerEndpointMutex.Unlock()
-	fake.DopplerEndpointStub = nil
-	if fake.dopplerEndpointReturnsOnCall == nil {
-		fake.dopplerEndpointReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.dopplerEndpointReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeRepository) HasAPIEndpoint() bool {
 	fake.hasAPIEndpointMutex.Lock()
 	ret, specificReturn := fake.hasAPIEndpointReturnsOnCall[len(fake.hasAPIEndpointArgsForCall)]
-	fake.hasAPIEndpointArgsForCall = append(fake.hasAPIEndpointArgsForCall, struct {
-	}{})
+	fake.hasAPIEndpointArgsForCall = append(fake.hasAPIEndpointArgsForCall, struct{}{})
 	fake.recordInvocation("HasAPIEndpoint", []interface{}{})
 	fake.hasAPIEndpointMutex.Unlock()
 	if fake.HasAPIEndpointStub != nil {
@@ -1007,8 +524,7 @@ func (fake *FakeRepository) HasAPIEndpoint() bool {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.hasAPIEndpointReturns
-	return fakeReturns.result1
+	return fake.hasAPIEndpointReturns.result1
 }
 
 func (fake *FakeRepository) HasAPIEndpointCallCount() int {
@@ -1017,15 +533,7 @@ func (fake *FakeRepository) HasAPIEndpointCallCount() int {
 	return len(fake.hasAPIEndpointArgsForCall)
 }
 
-func (fake *FakeRepository) HasAPIEndpointCalls(stub func() bool) {
-	fake.hasAPIEndpointMutex.Lock()
-	defer fake.hasAPIEndpointMutex.Unlock()
-	fake.HasAPIEndpointStub = stub
-}
-
 func (fake *FakeRepository) HasAPIEndpointReturns(result1 bool) {
-	fake.hasAPIEndpointMutex.Lock()
-	defer fake.hasAPIEndpointMutex.Unlock()
 	fake.HasAPIEndpointStub = nil
 	fake.hasAPIEndpointReturns = struct {
 		result1 bool
@@ -1033,8 +541,6 @@ func (fake *FakeRepository) HasAPIEndpointReturns(result1 bool) {
 }
 
 func (fake *FakeRepository) HasAPIEndpointReturnsOnCall(i int, result1 bool) {
-	fake.hasAPIEndpointMutex.Lock()
-	defer fake.hasAPIEndpointMutex.Unlock()
 	fake.HasAPIEndpointStub = nil
 	if fake.hasAPIEndpointReturnsOnCall == nil {
 		fake.hasAPIEndpointReturnsOnCall = make(map[int]struct {
@@ -1046,11 +552,410 @@ func (fake *FakeRepository) HasAPIEndpointReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeRepository) AuthenticationEndpoint() string {
+	fake.authenticationEndpointMutex.Lock()
+	ret, specificReturn := fake.authenticationEndpointReturnsOnCall[len(fake.authenticationEndpointArgsForCall)]
+	fake.authenticationEndpointArgsForCall = append(fake.authenticationEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("AuthenticationEndpoint", []interface{}{})
+	fake.authenticationEndpointMutex.Unlock()
+	if fake.AuthenticationEndpointStub != nil {
+		return fake.AuthenticationEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.authenticationEndpointReturns.result1
+}
+
+func (fake *FakeRepository) AuthenticationEndpointCallCount() int {
+	fake.authenticationEndpointMutex.RLock()
+	defer fake.authenticationEndpointMutex.RUnlock()
+	return len(fake.authenticationEndpointArgsForCall)
+}
+
+func (fake *FakeRepository) AuthenticationEndpointReturns(result1 string) {
+	fake.AuthenticationEndpointStub = nil
+	fake.authenticationEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) AuthenticationEndpointReturnsOnCall(i int, result1 string) {
+	fake.AuthenticationEndpointStub = nil
+	if fake.authenticationEndpointReturnsOnCall == nil {
+		fake.authenticationEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.authenticationEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) DopplerEndpoint() string {
+	fake.dopplerEndpointMutex.Lock()
+	ret, specificReturn := fake.dopplerEndpointReturnsOnCall[len(fake.dopplerEndpointArgsForCall)]
+	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("DopplerEndpoint", []interface{}{})
+	fake.dopplerEndpointMutex.Unlock()
+	if fake.DopplerEndpointStub != nil {
+		return fake.DopplerEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.dopplerEndpointReturns.result1
+}
+
+func (fake *FakeRepository) DopplerEndpointCallCount() int {
+	fake.dopplerEndpointMutex.RLock()
+	defer fake.dopplerEndpointMutex.RUnlock()
+	return len(fake.dopplerEndpointArgsForCall)
+}
+
+func (fake *FakeRepository) DopplerEndpointReturns(result1 string) {
+	fake.DopplerEndpointStub = nil
+	fake.dopplerEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) DopplerEndpointReturnsOnCall(i int, result1 string) {
+	fake.DopplerEndpointStub = nil
+	if fake.dopplerEndpointReturnsOnCall == nil {
+		fake.dopplerEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.dopplerEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UaaEndpoint() string {
+	fake.uaaEndpointMutex.Lock()
+	ret, specificReturn := fake.uaaEndpointReturnsOnCall[len(fake.uaaEndpointArgsForCall)]
+	fake.uaaEndpointArgsForCall = append(fake.uaaEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("UaaEndpoint", []interface{}{})
+	fake.uaaEndpointMutex.Unlock()
+	if fake.UaaEndpointStub != nil {
+		return fake.UaaEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.uaaEndpointReturns.result1
+}
+
+func (fake *FakeRepository) UaaEndpointCallCount() int {
+	fake.uaaEndpointMutex.RLock()
+	defer fake.uaaEndpointMutex.RUnlock()
+	return len(fake.uaaEndpointArgsForCall)
+}
+
+func (fake *FakeRepository) UaaEndpointReturns(result1 string) {
+	fake.UaaEndpointStub = nil
+	fake.uaaEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UaaEndpointReturnsOnCall(i int, result1 string) {
+	fake.UaaEndpointStub = nil
+	if fake.uaaEndpointReturnsOnCall == nil {
+		fake.uaaEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uaaEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) RoutingAPIEndpoint() string {
+	fake.routingAPIEndpointMutex.Lock()
+	ret, specificReturn := fake.routingAPIEndpointReturnsOnCall[len(fake.routingAPIEndpointArgsForCall)]
+	fake.routingAPIEndpointArgsForCall = append(fake.routingAPIEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("RoutingAPIEndpoint", []interface{}{})
+	fake.routingAPIEndpointMutex.Unlock()
+	if fake.RoutingAPIEndpointStub != nil {
+		return fake.RoutingAPIEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.routingAPIEndpointReturns.result1
+}
+
+func (fake *FakeRepository) RoutingAPIEndpointCallCount() int {
+	fake.routingAPIEndpointMutex.RLock()
+	defer fake.routingAPIEndpointMutex.RUnlock()
+	return len(fake.routingAPIEndpointArgsForCall)
+}
+
+func (fake *FakeRepository) RoutingAPIEndpointReturns(result1 string) {
+	fake.RoutingAPIEndpointStub = nil
+	fake.routingAPIEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) RoutingAPIEndpointReturnsOnCall(i int, result1 string) {
+	fake.RoutingAPIEndpointStub = nil
+	if fake.routingAPIEndpointReturnsOnCall == nil {
+		fake.routingAPIEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.routingAPIEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) AccessToken() string {
+	fake.accessTokenMutex.Lock()
+	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
+	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
+	fake.recordInvocation("AccessToken", []interface{}{})
+	fake.accessTokenMutex.Unlock()
+	if fake.AccessTokenStub != nil {
+		return fake.AccessTokenStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.accessTokenReturns.result1
+}
+
+func (fake *FakeRepository) AccessTokenCallCount() int {
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
+	return len(fake.accessTokenArgsForCall)
+}
+
+func (fake *FakeRepository) AccessTokenReturns(result1 string) {
+	fake.AccessTokenStub = nil
+	fake.accessTokenReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) AccessTokenReturnsOnCall(i int, result1 string) {
+	fake.AccessTokenStub = nil
+	if fake.accessTokenReturnsOnCall == nil {
+		fake.accessTokenReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.accessTokenReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UAAOAuthClient() string {
+	fake.uAAOAuthClientMutex.Lock()
+	ret, specificReturn := fake.uAAOAuthClientReturnsOnCall[len(fake.uAAOAuthClientArgsForCall)]
+	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("UAAOAuthClient", []interface{}{})
+	fake.uAAOAuthClientMutex.Unlock()
+	if fake.UAAOAuthClientStub != nil {
+		return fake.UAAOAuthClientStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.uAAOAuthClientReturns.result1
+}
+
+func (fake *FakeRepository) UAAOAuthClientCallCount() int {
+	fake.uAAOAuthClientMutex.RLock()
+	defer fake.uAAOAuthClientMutex.RUnlock()
+	return len(fake.uAAOAuthClientArgsForCall)
+}
+
+func (fake *FakeRepository) UAAOAuthClientReturns(result1 string) {
+	fake.UAAOAuthClientStub = nil
+	fake.uAAOAuthClientReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UAAOAuthClientReturnsOnCall(i int, result1 string) {
+	fake.UAAOAuthClientStub = nil
+	if fake.uAAOAuthClientReturnsOnCall == nil {
+		fake.uAAOAuthClientReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uAAOAuthClientReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UAAOAuthClientSecret() string {
+	fake.uAAOAuthClientSecretMutex.Lock()
+	ret, specificReturn := fake.uAAOAuthClientSecretReturnsOnCall[len(fake.uAAOAuthClientSecretArgsForCall)]
+	fake.uAAOAuthClientSecretArgsForCall = append(fake.uAAOAuthClientSecretArgsForCall, struct{}{})
+	fake.recordInvocation("UAAOAuthClientSecret", []interface{}{})
+	fake.uAAOAuthClientSecretMutex.Unlock()
+	if fake.UAAOAuthClientSecretStub != nil {
+		return fake.UAAOAuthClientSecretStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.uAAOAuthClientSecretReturns.result1
+}
+
+func (fake *FakeRepository) UAAOAuthClientSecretCallCount() int {
+	fake.uAAOAuthClientSecretMutex.RLock()
+	defer fake.uAAOAuthClientSecretMutex.RUnlock()
+	return len(fake.uAAOAuthClientSecretArgsForCall)
+}
+
+func (fake *FakeRepository) UAAOAuthClientSecretReturns(result1 string) {
+	fake.UAAOAuthClientSecretStub = nil
+	fake.uAAOAuthClientSecretReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UAAOAuthClientSecretReturnsOnCall(i int, result1 string) {
+	fake.UAAOAuthClientSecretStub = nil
+	if fake.uAAOAuthClientSecretReturnsOnCall == nil {
+		fake.uAAOAuthClientSecretReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uAAOAuthClientSecretReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) SSHOAuthClient() string {
+	fake.sSHOAuthClientMutex.Lock()
+	ret, specificReturn := fake.sSHOAuthClientReturnsOnCall[len(fake.sSHOAuthClientArgsForCall)]
+	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("SSHOAuthClient", []interface{}{})
+	fake.sSHOAuthClientMutex.Unlock()
+	if fake.SSHOAuthClientStub != nil {
+		return fake.SSHOAuthClientStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.sSHOAuthClientReturns.result1
+}
+
+func (fake *FakeRepository) SSHOAuthClientCallCount() int {
+	fake.sSHOAuthClientMutex.RLock()
+	defer fake.sSHOAuthClientMutex.RUnlock()
+	return len(fake.sSHOAuthClientArgsForCall)
+}
+
+func (fake *FakeRepository) SSHOAuthClientReturns(result1 string) {
+	fake.SSHOAuthClientStub = nil
+	fake.sSHOAuthClientReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) SSHOAuthClientReturnsOnCall(i int, result1 string) {
+	fake.SSHOAuthClientStub = nil
+	if fake.sSHOAuthClientReturnsOnCall == nil {
+		fake.sSHOAuthClientReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.sSHOAuthClientReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) RefreshToken() string {
+	fake.refreshTokenMutex.Lock()
+	ret, specificReturn := fake.refreshTokenReturnsOnCall[len(fake.refreshTokenArgsForCall)]
+	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct{}{})
+	fake.recordInvocation("RefreshToken", []interface{}{})
+	fake.refreshTokenMutex.Unlock()
+	if fake.RefreshTokenStub != nil {
+		return fake.RefreshTokenStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.refreshTokenReturns.result1
+}
+
+func (fake *FakeRepository) RefreshTokenCallCount() int {
+	fake.refreshTokenMutex.RLock()
+	defer fake.refreshTokenMutex.RUnlock()
+	return len(fake.refreshTokenArgsForCall)
+}
+
+func (fake *FakeRepository) RefreshTokenReturns(result1 string) {
+	fake.RefreshTokenStub = nil
+	fake.refreshTokenReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) RefreshTokenReturnsOnCall(i int, result1 string) {
+	fake.RefreshTokenStub = nil
+	if fake.refreshTokenReturnsOnCall == nil {
+		fake.refreshTokenReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.refreshTokenReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) OrganizationFields() models.OrganizationFields {
+	fake.organizationFieldsMutex.Lock()
+	ret, specificReturn := fake.organizationFieldsReturnsOnCall[len(fake.organizationFieldsArgsForCall)]
+	fake.organizationFieldsArgsForCall = append(fake.organizationFieldsArgsForCall, struct{}{})
+	fake.recordInvocation("OrganizationFields", []interface{}{})
+	fake.organizationFieldsMutex.Unlock()
+	if fake.OrganizationFieldsStub != nil {
+		return fake.OrganizationFieldsStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.organizationFieldsReturns.result1
+}
+
+func (fake *FakeRepository) OrganizationFieldsCallCount() int {
+	fake.organizationFieldsMutex.RLock()
+	defer fake.organizationFieldsMutex.RUnlock()
+	return len(fake.organizationFieldsArgsForCall)
+}
+
+func (fake *FakeRepository) OrganizationFieldsReturns(result1 models.OrganizationFields) {
+	fake.OrganizationFieldsStub = nil
+	fake.organizationFieldsReturns = struct {
+		result1 models.OrganizationFields
+	}{result1}
+}
+
+func (fake *FakeRepository) OrganizationFieldsReturnsOnCall(i int, result1 models.OrganizationFields) {
+	fake.OrganizationFieldsStub = nil
+	if fake.organizationFieldsReturnsOnCall == nil {
+		fake.organizationFieldsReturnsOnCall = make(map[int]struct {
+			result1 models.OrganizationFields
+		})
+	}
+	fake.organizationFieldsReturnsOnCall[i] = struct {
+		result1 models.OrganizationFields
+	}{result1}
+}
+
 func (fake *FakeRepository) HasOrganization() bool {
 	fake.hasOrganizationMutex.Lock()
 	ret, specificReturn := fake.hasOrganizationReturnsOnCall[len(fake.hasOrganizationArgsForCall)]
-	fake.hasOrganizationArgsForCall = append(fake.hasOrganizationArgsForCall, struct {
-	}{})
+	fake.hasOrganizationArgsForCall = append(fake.hasOrganizationArgsForCall, struct{}{})
 	fake.recordInvocation("HasOrganization", []interface{}{})
 	fake.hasOrganizationMutex.Unlock()
 	if fake.HasOrganizationStub != nil {
@@ -1059,8 +964,7 @@ func (fake *FakeRepository) HasOrganization() bool {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.hasOrganizationReturns
-	return fakeReturns.result1
+	return fake.hasOrganizationReturns.result1
 }
 
 func (fake *FakeRepository) HasOrganizationCallCount() int {
@@ -1069,15 +973,7 @@ func (fake *FakeRepository) HasOrganizationCallCount() int {
 	return len(fake.hasOrganizationArgsForCall)
 }
 
-func (fake *FakeRepository) HasOrganizationCalls(stub func() bool) {
-	fake.hasOrganizationMutex.Lock()
-	defer fake.hasOrganizationMutex.Unlock()
-	fake.HasOrganizationStub = stub
-}
-
 func (fake *FakeRepository) HasOrganizationReturns(result1 bool) {
-	fake.hasOrganizationMutex.Lock()
-	defer fake.hasOrganizationMutex.Unlock()
 	fake.HasOrganizationStub = nil
 	fake.hasOrganizationReturns = struct {
 		result1 bool
@@ -1085,8 +981,6 @@ func (fake *FakeRepository) HasOrganizationReturns(result1 bool) {
 }
 
 func (fake *FakeRepository) HasOrganizationReturnsOnCall(i int, result1 bool) {
-	fake.hasOrganizationMutex.Lock()
-	defer fake.hasOrganizationMutex.Unlock()
 	fake.HasOrganizationStub = nil
 	if fake.hasOrganizationReturnsOnCall == nil {
 		fake.hasOrganizationReturnsOnCall = make(map[int]struct {
@@ -1098,11 +992,50 @@ func (fake *FakeRepository) HasOrganizationReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeRepository) SpaceFields() models.SpaceFields {
+	fake.spaceFieldsMutex.Lock()
+	ret, specificReturn := fake.spaceFieldsReturnsOnCall[len(fake.spaceFieldsArgsForCall)]
+	fake.spaceFieldsArgsForCall = append(fake.spaceFieldsArgsForCall, struct{}{})
+	fake.recordInvocation("SpaceFields", []interface{}{})
+	fake.spaceFieldsMutex.Unlock()
+	if fake.SpaceFieldsStub != nil {
+		return fake.SpaceFieldsStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.spaceFieldsReturns.result1
+}
+
+func (fake *FakeRepository) SpaceFieldsCallCount() int {
+	fake.spaceFieldsMutex.RLock()
+	defer fake.spaceFieldsMutex.RUnlock()
+	return len(fake.spaceFieldsArgsForCall)
+}
+
+func (fake *FakeRepository) SpaceFieldsReturns(result1 models.SpaceFields) {
+	fake.SpaceFieldsStub = nil
+	fake.spaceFieldsReturns = struct {
+		result1 models.SpaceFields
+	}{result1}
+}
+
+func (fake *FakeRepository) SpaceFieldsReturnsOnCall(i int, result1 models.SpaceFields) {
+	fake.SpaceFieldsStub = nil
+	if fake.spaceFieldsReturnsOnCall == nil {
+		fake.spaceFieldsReturnsOnCall = make(map[int]struct {
+			result1 models.SpaceFields
+		})
+	}
+	fake.spaceFieldsReturnsOnCall[i] = struct {
+		result1 models.SpaceFields
+	}{result1}
+}
+
 func (fake *FakeRepository) HasSpace() bool {
 	fake.hasSpaceMutex.Lock()
 	ret, specificReturn := fake.hasSpaceReturnsOnCall[len(fake.hasSpaceArgsForCall)]
-	fake.hasSpaceArgsForCall = append(fake.hasSpaceArgsForCall, struct {
-	}{})
+	fake.hasSpaceArgsForCall = append(fake.hasSpaceArgsForCall, struct{}{})
 	fake.recordInvocation("HasSpace", []interface{}{})
 	fake.hasSpaceMutex.Unlock()
 	if fake.HasSpaceStub != nil {
@@ -1111,8 +1044,7 @@ func (fake *FakeRepository) HasSpace() bool {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.hasSpaceReturns
-	return fakeReturns.result1
+	return fake.hasSpaceReturns.result1
 }
 
 func (fake *FakeRepository) HasSpaceCallCount() int {
@@ -1121,15 +1053,7 @@ func (fake *FakeRepository) HasSpaceCallCount() int {
 	return len(fake.hasSpaceArgsForCall)
 }
 
-func (fake *FakeRepository) HasSpaceCalls(stub func() bool) {
-	fake.hasSpaceMutex.Lock()
-	defer fake.hasSpaceMutex.Unlock()
-	fake.HasSpaceStub = stub
-}
-
 func (fake *FakeRepository) HasSpaceReturns(result1 bool) {
-	fake.hasSpaceMutex.Lock()
-	defer fake.hasSpaceMutex.Unlock()
 	fake.HasSpaceStub = nil
 	fake.hasSpaceReturns = struct {
 		result1 bool
@@ -1137,8 +1061,6 @@ func (fake *FakeRepository) HasSpaceReturns(result1 bool) {
 }
 
 func (fake *FakeRepository) HasSpaceReturnsOnCall(i int, result1 bool) {
-	fake.hasSpaceMutex.Lock()
-	defer fake.hasSpaceMutex.Unlock()
 	fake.HasSpaceStub = nil
 	if fake.hasSpaceReturnsOnCall == nil {
 		fake.hasSpaceReturnsOnCall = make(map[int]struct {
@@ -1150,11 +1072,130 @@ func (fake *FakeRepository) HasSpaceReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeRepository) Username() string {
+	fake.usernameMutex.Lock()
+	ret, specificReturn := fake.usernameReturnsOnCall[len(fake.usernameArgsForCall)]
+	fake.usernameArgsForCall = append(fake.usernameArgsForCall, struct{}{})
+	fake.recordInvocation("Username", []interface{}{})
+	fake.usernameMutex.Unlock()
+	if fake.UsernameStub != nil {
+		return fake.UsernameStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.usernameReturns.result1
+}
+
+func (fake *FakeRepository) UsernameCallCount() int {
+	fake.usernameMutex.RLock()
+	defer fake.usernameMutex.RUnlock()
+	return len(fake.usernameArgsForCall)
+}
+
+func (fake *FakeRepository) UsernameReturns(result1 string) {
+	fake.UsernameStub = nil
+	fake.usernameReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UsernameReturnsOnCall(i int, result1 string) {
+	fake.UsernameStub = nil
+	if fake.usernameReturnsOnCall == nil {
+		fake.usernameReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.usernameReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UserGUID() string {
+	fake.userGUIDMutex.Lock()
+	ret, specificReturn := fake.userGUIDReturnsOnCall[len(fake.userGUIDArgsForCall)]
+	fake.userGUIDArgsForCall = append(fake.userGUIDArgsForCall, struct{}{})
+	fake.recordInvocation("UserGUID", []interface{}{})
+	fake.userGUIDMutex.Unlock()
+	if fake.UserGUIDStub != nil {
+		return fake.UserGUIDStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.userGUIDReturns.result1
+}
+
+func (fake *FakeRepository) UserGUIDCallCount() int {
+	fake.userGUIDMutex.RLock()
+	defer fake.userGUIDMutex.RUnlock()
+	return len(fake.userGUIDArgsForCall)
+}
+
+func (fake *FakeRepository) UserGUIDReturns(result1 string) {
+	fake.UserGUIDStub = nil
+	fake.userGUIDReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UserGUIDReturnsOnCall(i int, result1 string) {
+	fake.UserGUIDStub = nil
+	if fake.userGUIDReturnsOnCall == nil {
+		fake.userGUIDReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.userGUIDReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UserEmail() string {
+	fake.userEmailMutex.Lock()
+	ret, specificReturn := fake.userEmailReturnsOnCall[len(fake.userEmailArgsForCall)]
+	fake.userEmailArgsForCall = append(fake.userEmailArgsForCall, struct{}{})
+	fake.recordInvocation("UserEmail", []interface{}{})
+	fake.userEmailMutex.Unlock()
+	if fake.UserEmailStub != nil {
+		return fake.UserEmailStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.userEmailReturns.result1
+}
+
+func (fake *FakeRepository) UserEmailCallCount() int {
+	fake.userEmailMutex.RLock()
+	defer fake.userEmailMutex.RUnlock()
+	return len(fake.userEmailArgsForCall)
+}
+
+func (fake *FakeRepository) UserEmailReturns(result1 string) {
+	fake.UserEmailStub = nil
+	fake.userEmailReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) UserEmailReturnsOnCall(i int, result1 string) {
+	fake.UserEmailStub = nil
+	if fake.userEmailReturnsOnCall == nil {
+		fake.userEmailReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.userEmailReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeRepository) IsLoggedIn() bool {
 	fake.isLoggedInMutex.Lock()
 	ret, specificReturn := fake.isLoggedInReturnsOnCall[len(fake.isLoggedInArgsForCall)]
-	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct {
-	}{})
+	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct{}{})
 	fake.recordInvocation("IsLoggedIn", []interface{}{})
 	fake.isLoggedInMutex.Unlock()
 	if fake.IsLoggedInStub != nil {
@@ -1163,8 +1204,7 @@ func (fake *FakeRepository) IsLoggedIn() bool {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.isLoggedInReturns
-	return fakeReturns.result1
+	return fake.isLoggedInReturns.result1
 }
 
 func (fake *FakeRepository) IsLoggedInCallCount() int {
@@ -1173,15 +1213,7 @@ func (fake *FakeRepository) IsLoggedInCallCount() int {
 	return len(fake.isLoggedInArgsForCall)
 }
 
-func (fake *FakeRepository) IsLoggedInCalls(stub func() bool) {
-	fake.isLoggedInMutex.Lock()
-	defer fake.isLoggedInMutex.Unlock()
-	fake.IsLoggedInStub = stub
-}
-
 func (fake *FakeRepository) IsLoggedInReturns(result1 bool) {
-	fake.isLoggedInMutex.Lock()
-	defer fake.isLoggedInMutex.Unlock()
 	fake.IsLoggedInStub = nil
 	fake.isLoggedInReturns = struct {
 		result1 bool
@@ -1189,8 +1221,6 @@ func (fake *FakeRepository) IsLoggedInReturns(result1 bool) {
 }
 
 func (fake *FakeRepository) IsLoggedInReturnsOnCall(i int, result1 bool) {
-	fake.isLoggedInMutex.Lock()
-	defer fake.isLoggedInMutex.Unlock()
 	fake.IsLoggedInStub = nil
 	if fake.isLoggedInReturnsOnCall == nil {
 		fake.isLoggedInReturnsOnCall = make(map[int]struct {
@@ -1198,6 +1228,46 @@ func (fake *FakeRepository) IsLoggedInReturnsOnCall(i int, result1 bool) {
 		})
 	}
 	fake.isLoggedInReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeRepository) IsSSLDisabled() bool {
+	fake.isSSLDisabledMutex.Lock()
+	ret, specificReturn := fake.isSSLDisabledReturnsOnCall[len(fake.isSSLDisabledArgsForCall)]
+	fake.isSSLDisabledArgsForCall = append(fake.isSSLDisabledArgsForCall, struct{}{})
+	fake.recordInvocation("IsSSLDisabled", []interface{}{})
+	fake.isSSLDisabledMutex.Unlock()
+	if fake.IsSSLDisabledStub != nil {
+		return fake.IsSSLDisabledStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.isSSLDisabledReturns.result1
+}
+
+func (fake *FakeRepository) IsSSLDisabledCallCount() int {
+	fake.isSSLDisabledMutex.RLock()
+	defer fake.isSSLDisabledMutex.RUnlock()
+	return len(fake.isSSLDisabledArgsForCall)
+}
+
+func (fake *FakeRepository) IsSSLDisabledReturns(result1 bool) {
+	fake.IsSSLDisabledStub = nil
+	fake.isSSLDisabledReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeRepository) IsSSLDisabledReturnsOnCall(i int, result1 bool) {
+	fake.IsSSLDisabledStub = nil
+	if fake.isSSLDisabledReturnsOnCall == nil {
+		fake.isSSLDisabledReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.isSSLDisabledReturnsOnCall[i] = struct {
 		result1 bool
 	}{result1}
 }
@@ -1216,8 +1286,7 @@ func (fake *FakeRepository) IsMinAPIVersion(arg1 semver.Version) bool {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.isMinAPIVersionReturns
-	return fakeReturns.result1
+	return fake.isMinAPIVersionReturns.result1
 }
 
 func (fake *FakeRepository) IsMinAPIVersionCallCount() int {
@@ -1226,22 +1295,13 @@ func (fake *FakeRepository) IsMinAPIVersionCallCount() int {
 	return len(fake.isMinAPIVersionArgsForCall)
 }
 
-func (fake *FakeRepository) IsMinAPIVersionCalls(stub func(semver.Version) bool) {
-	fake.isMinAPIVersionMutex.Lock()
-	defer fake.isMinAPIVersionMutex.Unlock()
-	fake.IsMinAPIVersionStub = stub
-}
-
 func (fake *FakeRepository) IsMinAPIVersionArgsForCall(i int) semver.Version {
 	fake.isMinAPIVersionMutex.RLock()
 	defer fake.isMinAPIVersionMutex.RUnlock()
-	argsForCall := fake.isMinAPIVersionArgsForCall[i]
-	return argsForCall.arg1
+	return fake.isMinAPIVersionArgsForCall[i].arg1
 }
 
 func (fake *FakeRepository) IsMinAPIVersionReturns(result1 bool) {
-	fake.isMinAPIVersionMutex.Lock()
-	defer fake.isMinAPIVersionMutex.Unlock()
 	fake.IsMinAPIVersionStub = nil
 	fake.isMinAPIVersionReturns = struct {
 		result1 bool
@@ -1249,8 +1309,6 @@ func (fake *FakeRepository) IsMinAPIVersionReturns(result1 bool) {
 }
 
 func (fake *FakeRepository) IsMinAPIVersionReturnsOnCall(i int, result1 bool) {
-	fake.isMinAPIVersionMutex.Lock()
-	defer fake.isMinAPIVersionMutex.Unlock()
 	fake.IsMinAPIVersionStub = nil
 	if fake.isMinAPIVersionReturnsOnCall == nil {
 		fake.isMinAPIVersionReturnsOnCall = make(map[int]struct {
@@ -1276,8 +1334,7 @@ func (fake *FakeRepository) IsMinCLIVersion(arg1 string) bool {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.isMinCLIVersionReturns
-	return fakeReturns.result1
+	return fake.isMinCLIVersionReturns.result1
 }
 
 func (fake *FakeRepository) IsMinCLIVersionCallCount() int {
@@ -1286,22 +1343,13 @@ func (fake *FakeRepository) IsMinCLIVersionCallCount() int {
 	return len(fake.isMinCLIVersionArgsForCall)
 }
 
-func (fake *FakeRepository) IsMinCLIVersionCalls(stub func(string) bool) {
-	fake.isMinCLIVersionMutex.Lock()
-	defer fake.isMinCLIVersionMutex.Unlock()
-	fake.IsMinCLIVersionStub = stub
-}
-
 func (fake *FakeRepository) IsMinCLIVersionArgsForCall(i int) string {
 	fake.isMinCLIVersionMutex.RLock()
 	defer fake.isMinCLIVersionMutex.RUnlock()
-	argsForCall := fake.isMinCLIVersionArgsForCall[i]
-	return argsForCall.arg1
+	return fake.isMinCLIVersionArgsForCall[i].arg1
 }
 
 func (fake *FakeRepository) IsMinCLIVersionReturns(result1 bool) {
-	fake.isMinCLIVersionMutex.Lock()
-	defer fake.isMinCLIVersionMutex.Unlock()
 	fake.IsMinCLIVersionStub = nil
 	fake.isMinCLIVersionReturns = struct {
 		result1 bool
@@ -1309,8 +1357,6 @@ func (fake *FakeRepository) IsMinCLIVersionReturns(result1 bool) {
 }
 
 func (fake *FakeRepository) IsMinCLIVersionReturnsOnCall(i int, result1 bool) {
-	fake.isMinCLIVersionMutex.Lock()
-	defer fake.isMinCLIVersionMutex.Unlock()
 	fake.IsMinCLIVersionStub = nil
 	if fake.isMinCLIVersionReturnsOnCall == nil {
 		fake.isMinCLIVersionReturnsOnCall = make(map[int]struct {
@@ -1322,115 +1368,10 @@ func (fake *FakeRepository) IsMinCLIVersionReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
-func (fake *FakeRepository) IsSSLDisabled() bool {
-	fake.isSSLDisabledMutex.Lock()
-	ret, specificReturn := fake.isSSLDisabledReturnsOnCall[len(fake.isSSLDisabledArgsForCall)]
-	fake.isSSLDisabledArgsForCall = append(fake.isSSLDisabledArgsForCall, struct {
-	}{})
-	fake.recordInvocation("IsSSLDisabled", []interface{}{})
-	fake.isSSLDisabledMutex.Unlock()
-	if fake.IsSSLDisabledStub != nil {
-		return fake.IsSSLDisabledStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.isSSLDisabledReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) IsSSLDisabledCallCount() int {
-	fake.isSSLDisabledMutex.RLock()
-	defer fake.isSSLDisabledMutex.RUnlock()
-	return len(fake.isSSLDisabledArgsForCall)
-}
-
-func (fake *FakeRepository) IsSSLDisabledCalls(stub func() bool) {
-	fake.isSSLDisabledMutex.Lock()
-	defer fake.isSSLDisabledMutex.Unlock()
-	fake.IsSSLDisabledStub = stub
-}
-
-func (fake *FakeRepository) IsSSLDisabledReturns(result1 bool) {
-	fake.isSSLDisabledMutex.Lock()
-	defer fake.isSSLDisabledMutex.Unlock()
-	fake.IsSSLDisabledStub = nil
-	fake.isSSLDisabledReturns = struct {
-		result1 bool
-	}{result1}
-}
-
-func (fake *FakeRepository) IsSSLDisabledReturnsOnCall(i int, result1 bool) {
-	fake.isSSLDisabledMutex.Lock()
-	defer fake.isSSLDisabledMutex.Unlock()
-	fake.IsSSLDisabledStub = nil
-	if fake.isSSLDisabledReturnsOnCall == nil {
-		fake.isSSLDisabledReturnsOnCall = make(map[int]struct {
-			result1 bool
-		})
-	}
-	fake.isSSLDisabledReturnsOnCall[i] = struct {
-		result1 bool
-	}{result1}
-}
-
-func (fake *FakeRepository) Locale() string {
-	fake.localeMutex.Lock()
-	ret, specificReturn := fake.localeReturnsOnCall[len(fake.localeArgsForCall)]
-	fake.localeArgsForCall = append(fake.localeArgsForCall, struct {
-	}{})
-	fake.recordInvocation("Locale", []interface{}{})
-	fake.localeMutex.Unlock()
-	if fake.LocaleStub != nil {
-		return fake.LocaleStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.localeReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) LocaleCallCount() int {
-	fake.localeMutex.RLock()
-	defer fake.localeMutex.RUnlock()
-	return len(fake.localeArgsForCall)
-}
-
-func (fake *FakeRepository) LocaleCalls(stub func() string) {
-	fake.localeMutex.Lock()
-	defer fake.localeMutex.Unlock()
-	fake.LocaleStub = stub
-}
-
-func (fake *FakeRepository) LocaleReturns(result1 string) {
-	fake.localeMutex.Lock()
-	defer fake.localeMutex.Unlock()
-	fake.LocaleStub = nil
-	fake.localeReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) LocaleReturnsOnCall(i int, result1 string) {
-	fake.localeMutex.Lock()
-	defer fake.localeMutex.Unlock()
-	fake.LocaleStub = nil
-	if fake.localeReturnsOnCall == nil {
-		fake.localeReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.localeReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeRepository) MinCLIVersion() string {
 	fake.minCLIVersionMutex.Lock()
 	ret, specificReturn := fake.minCLIVersionReturnsOnCall[len(fake.minCLIVersionArgsForCall)]
-	fake.minCLIVersionArgsForCall = append(fake.minCLIVersionArgsForCall, struct {
-	}{})
+	fake.minCLIVersionArgsForCall = append(fake.minCLIVersionArgsForCall, struct{}{})
 	fake.recordInvocation("MinCLIVersion", []interface{}{})
 	fake.minCLIVersionMutex.Unlock()
 	if fake.MinCLIVersionStub != nil {
@@ -1439,8 +1380,7 @@ func (fake *FakeRepository) MinCLIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.minCLIVersionReturns
-	return fakeReturns.result1
+	return fake.minCLIVersionReturns.result1
 }
 
 func (fake *FakeRepository) MinCLIVersionCallCount() int {
@@ -1449,15 +1389,7 @@ func (fake *FakeRepository) MinCLIVersionCallCount() int {
 	return len(fake.minCLIVersionArgsForCall)
 }
 
-func (fake *FakeRepository) MinCLIVersionCalls(stub func() string) {
-	fake.minCLIVersionMutex.Lock()
-	defer fake.minCLIVersionMutex.Unlock()
-	fake.MinCLIVersionStub = stub
-}
-
 func (fake *FakeRepository) MinCLIVersionReturns(result1 string) {
-	fake.minCLIVersionMutex.Lock()
-	defer fake.minCLIVersionMutex.Unlock()
 	fake.MinCLIVersionStub = nil
 	fake.minCLIVersionReturns = struct {
 		result1 string
@@ -1465,8 +1397,6 @@ func (fake *FakeRepository) MinCLIVersionReturns(result1 string) {
 }
 
 func (fake *FakeRepository) MinCLIVersionReturnsOnCall(i int, result1 string) {
-	fake.minCLIVersionMutex.Lock()
-	defer fake.minCLIVersionMutex.Unlock()
 	fake.MinCLIVersionStub = nil
 	if fake.minCLIVersionReturnsOnCall == nil {
 		fake.minCLIVersionReturnsOnCall = make(map[int]struct {
@@ -1481,8 +1411,7 @@ func (fake *FakeRepository) MinCLIVersionReturnsOnCall(i int, result1 string) {
 func (fake *FakeRepository) MinRecommendedCLIVersion() string {
 	fake.minRecommendedCLIVersionMutex.Lock()
 	ret, specificReturn := fake.minRecommendedCLIVersionReturnsOnCall[len(fake.minRecommendedCLIVersionArgsForCall)]
-	fake.minRecommendedCLIVersionArgsForCall = append(fake.minRecommendedCLIVersionArgsForCall, struct {
-	}{})
+	fake.minRecommendedCLIVersionArgsForCall = append(fake.minRecommendedCLIVersionArgsForCall, struct{}{})
 	fake.recordInvocation("MinRecommendedCLIVersion", []interface{}{})
 	fake.minRecommendedCLIVersionMutex.Unlock()
 	if fake.MinRecommendedCLIVersionStub != nil {
@@ -1491,8 +1420,7 @@ func (fake *FakeRepository) MinRecommendedCLIVersion() string {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.minRecommendedCLIVersionReturns
-	return fakeReturns.result1
+	return fake.minRecommendedCLIVersionReturns.result1
 }
 
 func (fake *FakeRepository) MinRecommendedCLIVersionCallCount() int {
@@ -1501,15 +1429,7 @@ func (fake *FakeRepository) MinRecommendedCLIVersionCallCount() int {
 	return len(fake.minRecommendedCLIVersionArgsForCall)
 }
 
-func (fake *FakeRepository) MinRecommendedCLIVersionCalls(stub func() string) {
-	fake.minRecommendedCLIVersionMutex.Lock()
-	defer fake.minRecommendedCLIVersionMutex.Unlock()
-	fake.MinRecommendedCLIVersionStub = stub
-}
-
 func (fake *FakeRepository) MinRecommendedCLIVersionReturns(result1 string) {
-	fake.minRecommendedCLIVersionMutex.Lock()
-	defer fake.minRecommendedCLIVersionMutex.Unlock()
 	fake.MinRecommendedCLIVersionStub = nil
 	fake.minRecommendedCLIVersionReturns = struct {
 		result1 string
@@ -1517,8 +1437,6 @@ func (fake *FakeRepository) MinRecommendedCLIVersionReturns(result1 string) {
 }
 
 func (fake *FakeRepository) MinRecommendedCLIVersionReturnsOnCall(i int, result1 string) {
-	fake.minRecommendedCLIVersionMutex.Lock()
-	defer fake.minRecommendedCLIVersionMutex.Unlock()
 	fake.MinRecommendedCLIVersionStub = nil
 	if fake.minRecommendedCLIVersionReturnsOnCall == nil {
 		fake.minRecommendedCLIVersionReturnsOnCall = make(map[int]struct {
@@ -1530,63 +1448,210 @@ func (fake *FakeRepository) MinRecommendedCLIVersionReturnsOnCall(i int, result1
 	}{result1}
 }
 
-func (fake *FakeRepository) OrganizationFields() models.OrganizationFields {
-	fake.organizationFieldsMutex.Lock()
-	ret, specificReturn := fake.organizationFieldsReturnsOnCall[len(fake.organizationFieldsArgsForCall)]
-	fake.organizationFieldsArgsForCall = append(fake.organizationFieldsArgsForCall, struct {
-	}{})
-	fake.recordInvocation("OrganizationFields", []interface{}{})
-	fake.organizationFieldsMutex.Unlock()
-	if fake.OrganizationFieldsStub != nil {
-		return fake.OrganizationFieldsStub()
+func (fake *FakeRepository) CLIVersion() string {
+	fake.cLIVersionMutex.Lock()
+	ret, specificReturn := fake.cLIVersionReturnsOnCall[len(fake.cLIVersionArgsForCall)]
+	fake.cLIVersionArgsForCall = append(fake.cLIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("CLIVersion", []interface{}{})
+	fake.cLIVersionMutex.Unlock()
+	if fake.CLIVersionStub != nil {
+		return fake.CLIVersionStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.organizationFieldsReturns
-	return fakeReturns.result1
+	return fake.cLIVersionReturns.result1
 }
 
-func (fake *FakeRepository) OrganizationFieldsCallCount() int {
-	fake.organizationFieldsMutex.RLock()
-	defer fake.organizationFieldsMutex.RUnlock()
-	return len(fake.organizationFieldsArgsForCall)
+func (fake *FakeRepository) CLIVersionCallCount() int {
+	fake.cLIVersionMutex.RLock()
+	defer fake.cLIVersionMutex.RUnlock()
+	return len(fake.cLIVersionArgsForCall)
 }
 
-func (fake *FakeRepository) OrganizationFieldsCalls(stub func() models.OrganizationFields) {
-	fake.organizationFieldsMutex.Lock()
-	defer fake.organizationFieldsMutex.Unlock()
-	fake.OrganizationFieldsStub = stub
-}
-
-func (fake *FakeRepository) OrganizationFieldsReturns(result1 models.OrganizationFields) {
-	fake.organizationFieldsMutex.Lock()
-	defer fake.organizationFieldsMutex.Unlock()
-	fake.OrganizationFieldsStub = nil
-	fake.organizationFieldsReturns = struct {
-		result1 models.OrganizationFields
+func (fake *FakeRepository) CLIVersionReturns(result1 string) {
+	fake.CLIVersionStub = nil
+	fake.cLIVersionReturns = struct {
+		result1 string
 	}{result1}
 }
 
-func (fake *FakeRepository) OrganizationFieldsReturnsOnCall(i int, result1 models.OrganizationFields) {
-	fake.organizationFieldsMutex.Lock()
-	defer fake.organizationFieldsMutex.Unlock()
-	fake.OrganizationFieldsStub = nil
-	if fake.organizationFieldsReturnsOnCall == nil {
-		fake.organizationFieldsReturnsOnCall = make(map[int]struct {
-			result1 models.OrganizationFields
+func (fake *FakeRepository) CLIVersionReturnsOnCall(i int, result1 string) {
+	fake.CLIVersionStub = nil
+	if fake.cLIVersionReturnsOnCall == nil {
+		fake.cLIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
 		})
 	}
-	fake.organizationFieldsReturnsOnCall[i] = struct {
-		result1 models.OrganizationFields
+	fake.cLIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) AsyncTimeout() uint {
+	fake.asyncTimeoutMutex.Lock()
+	ret, specificReturn := fake.asyncTimeoutReturnsOnCall[len(fake.asyncTimeoutArgsForCall)]
+	fake.asyncTimeoutArgsForCall = append(fake.asyncTimeoutArgsForCall, struct{}{})
+	fake.recordInvocation("AsyncTimeout", []interface{}{})
+	fake.asyncTimeoutMutex.Unlock()
+	if fake.AsyncTimeoutStub != nil {
+		return fake.AsyncTimeoutStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.asyncTimeoutReturns.result1
+}
+
+func (fake *FakeRepository) AsyncTimeoutCallCount() int {
+	fake.asyncTimeoutMutex.RLock()
+	defer fake.asyncTimeoutMutex.RUnlock()
+	return len(fake.asyncTimeoutArgsForCall)
+}
+
+func (fake *FakeRepository) AsyncTimeoutReturns(result1 uint) {
+	fake.AsyncTimeoutStub = nil
+	fake.asyncTimeoutReturns = struct {
+		result1 uint
+	}{result1}
+}
+
+func (fake *FakeRepository) AsyncTimeoutReturnsOnCall(i int, result1 uint) {
+	fake.AsyncTimeoutStub = nil
+	if fake.asyncTimeoutReturnsOnCall == nil {
+		fake.asyncTimeoutReturnsOnCall = make(map[int]struct {
+			result1 uint
+		})
+	}
+	fake.asyncTimeoutReturnsOnCall[i] = struct {
+		result1 uint
+	}{result1}
+}
+
+func (fake *FakeRepository) Trace() string {
+	fake.traceMutex.Lock()
+	ret, specificReturn := fake.traceReturnsOnCall[len(fake.traceArgsForCall)]
+	fake.traceArgsForCall = append(fake.traceArgsForCall, struct{}{})
+	fake.recordInvocation("Trace", []interface{}{})
+	fake.traceMutex.Unlock()
+	if fake.TraceStub != nil {
+		return fake.TraceStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.traceReturns.result1
+}
+
+func (fake *FakeRepository) TraceCallCount() int {
+	fake.traceMutex.RLock()
+	defer fake.traceMutex.RUnlock()
+	return len(fake.traceArgsForCall)
+}
+
+func (fake *FakeRepository) TraceReturns(result1 string) {
+	fake.TraceStub = nil
+	fake.traceReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) TraceReturnsOnCall(i int, result1 string) {
+	fake.TraceStub = nil
+	if fake.traceReturnsOnCall == nil {
+		fake.traceReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.traceReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) ColorEnabled() string {
+	fake.colorEnabledMutex.Lock()
+	ret, specificReturn := fake.colorEnabledReturnsOnCall[len(fake.colorEnabledArgsForCall)]
+	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct{}{})
+	fake.recordInvocation("ColorEnabled", []interface{}{})
+	fake.colorEnabledMutex.Unlock()
+	if fake.ColorEnabledStub != nil {
+		return fake.ColorEnabledStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.colorEnabledReturns.result1
+}
+
+func (fake *FakeRepository) ColorEnabledCallCount() int {
+	fake.colorEnabledMutex.RLock()
+	defer fake.colorEnabledMutex.RUnlock()
+	return len(fake.colorEnabledArgsForCall)
+}
+
+func (fake *FakeRepository) ColorEnabledReturns(result1 string) {
+	fake.ColorEnabledStub = nil
+	fake.colorEnabledReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) ColorEnabledReturnsOnCall(i int, result1 string) {
+	fake.ColorEnabledStub = nil
+	if fake.colorEnabledReturnsOnCall == nil {
+		fake.colorEnabledReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.colorEnabledReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) Locale() string {
+	fake.localeMutex.Lock()
+	ret, specificReturn := fake.localeReturnsOnCall[len(fake.localeArgsForCall)]
+	fake.localeArgsForCall = append(fake.localeArgsForCall, struct{}{})
+	fake.recordInvocation("Locale", []interface{}{})
+	fake.localeMutex.Unlock()
+	if fake.LocaleStub != nil {
+		return fake.LocaleStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.localeReturns.result1
+}
+
+func (fake *FakeRepository) LocaleCallCount() int {
+	fake.localeMutex.RLock()
+	defer fake.localeMutex.RUnlock()
+	return len(fake.localeArgsForCall)
+}
+
+func (fake *FakeRepository) LocaleReturns(result1 string) {
+	fake.LocaleStub = nil
+	fake.localeReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) LocaleReturnsOnCall(i int, result1 string) {
+	fake.LocaleStub = nil
+	if fake.localeReturnsOnCall == nil {
+		fake.localeReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.localeReturnsOnCall[i] = struct {
+		result1 string
 	}{result1}
 }
 
 func (fake *FakeRepository) PluginRepos() []models.PluginRepo {
 	fake.pluginReposMutex.Lock()
 	ret, specificReturn := fake.pluginReposReturnsOnCall[len(fake.pluginReposArgsForCall)]
-	fake.pluginReposArgsForCall = append(fake.pluginReposArgsForCall, struct {
-	}{})
+	fake.pluginReposArgsForCall = append(fake.pluginReposArgsForCall, struct{}{})
 	fake.recordInvocation("PluginRepos", []interface{}{})
 	fake.pluginReposMutex.Unlock()
 	if fake.PluginReposStub != nil {
@@ -1595,8 +1660,7 @@ func (fake *FakeRepository) PluginRepos() []models.PluginRepo {
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.pluginReposReturns
-	return fakeReturns.result1
+	return fake.pluginReposReturns.result1
 }
 
 func (fake *FakeRepository) PluginReposCallCount() int {
@@ -1605,15 +1669,7 @@ func (fake *FakeRepository) PluginReposCallCount() int {
 	return len(fake.pluginReposArgsForCall)
 }
 
-func (fake *FakeRepository) PluginReposCalls(stub func() []models.PluginRepo) {
-	fake.pluginReposMutex.Lock()
-	defer fake.pluginReposMutex.Unlock()
-	fake.PluginReposStub = stub
-}
-
 func (fake *FakeRepository) PluginReposReturns(result1 []models.PluginRepo) {
-	fake.pluginReposMutex.Lock()
-	defer fake.pluginReposMutex.Unlock()
 	fake.PluginReposStub = nil
 	fake.pluginReposReturns = struct {
 		result1 []models.PluginRepo
@@ -1621,8 +1677,6 @@ func (fake *FakeRepository) PluginReposReturns(result1 []models.PluginRepo) {
 }
 
 func (fake *FakeRepository) PluginReposReturnsOnCall(i int, result1 []models.PluginRepo) {
-	fake.pluginReposMutex.Lock()
-	defer fake.pluginReposMutex.Unlock()
 	fake.PluginReposStub = nil
 	if fake.pluginReposReturnsOnCall == nil {
 		fake.pluginReposReturnsOnCall = make(map[int]struct {
@@ -1634,160 +1688,20 @@ func (fake *FakeRepository) PluginReposReturnsOnCall(i int, result1 []models.Plu
 	}{result1}
 }
 
-func (fake *FakeRepository) RefreshToken() string {
-	fake.refreshTokenMutex.Lock()
-	ret, specificReturn := fake.refreshTokenReturnsOnCall[len(fake.refreshTokenArgsForCall)]
-	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct {
-	}{})
-	fake.recordInvocation("RefreshToken", []interface{}{})
-	fake.refreshTokenMutex.Unlock()
-	if fake.RefreshTokenStub != nil {
-		return fake.RefreshTokenStub()
+func (fake *FakeRepository) ClearSession() {
+	fake.clearSessionMutex.Lock()
+	fake.clearSessionArgsForCall = append(fake.clearSessionArgsForCall, struct{}{})
+	fake.recordInvocation("ClearSession", []interface{}{})
+	fake.clearSessionMutex.Unlock()
+	if fake.ClearSessionStub != nil {
+		fake.ClearSessionStub()
 	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.refreshTokenReturns
-	return fakeReturns.result1
 }
 
-func (fake *FakeRepository) RefreshTokenCallCount() int {
-	fake.refreshTokenMutex.RLock()
-	defer fake.refreshTokenMutex.RUnlock()
-	return len(fake.refreshTokenArgsForCall)
-}
-
-func (fake *FakeRepository) RefreshTokenCalls(stub func() string) {
-	fake.refreshTokenMutex.Lock()
-	defer fake.refreshTokenMutex.Unlock()
-	fake.RefreshTokenStub = stub
-}
-
-func (fake *FakeRepository) RefreshTokenReturns(result1 string) {
-	fake.refreshTokenMutex.Lock()
-	defer fake.refreshTokenMutex.Unlock()
-	fake.RefreshTokenStub = nil
-	fake.refreshTokenReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) RefreshTokenReturnsOnCall(i int, result1 string) {
-	fake.refreshTokenMutex.Lock()
-	defer fake.refreshTokenMutex.Unlock()
-	fake.RefreshTokenStub = nil
-	if fake.refreshTokenReturnsOnCall == nil {
-		fake.refreshTokenReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.refreshTokenReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) RoutingAPIEndpoint() string {
-	fake.routingAPIEndpointMutex.Lock()
-	ret, specificReturn := fake.routingAPIEndpointReturnsOnCall[len(fake.routingAPIEndpointArgsForCall)]
-	fake.routingAPIEndpointArgsForCall = append(fake.routingAPIEndpointArgsForCall, struct {
-	}{})
-	fake.recordInvocation("RoutingAPIEndpoint", []interface{}{})
-	fake.routingAPIEndpointMutex.Unlock()
-	if fake.RoutingAPIEndpointStub != nil {
-		return fake.RoutingAPIEndpointStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.routingAPIEndpointReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) RoutingAPIEndpointCallCount() int {
-	fake.routingAPIEndpointMutex.RLock()
-	defer fake.routingAPIEndpointMutex.RUnlock()
-	return len(fake.routingAPIEndpointArgsForCall)
-}
-
-func (fake *FakeRepository) RoutingAPIEndpointCalls(stub func() string) {
-	fake.routingAPIEndpointMutex.Lock()
-	defer fake.routingAPIEndpointMutex.Unlock()
-	fake.RoutingAPIEndpointStub = stub
-}
-
-func (fake *FakeRepository) RoutingAPIEndpointReturns(result1 string) {
-	fake.routingAPIEndpointMutex.Lock()
-	defer fake.routingAPIEndpointMutex.Unlock()
-	fake.RoutingAPIEndpointStub = nil
-	fake.routingAPIEndpointReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) RoutingAPIEndpointReturnsOnCall(i int, result1 string) {
-	fake.routingAPIEndpointMutex.Lock()
-	defer fake.routingAPIEndpointMutex.Unlock()
-	fake.RoutingAPIEndpointStub = nil
-	if fake.routingAPIEndpointReturnsOnCall == nil {
-		fake.routingAPIEndpointReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.routingAPIEndpointReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) SSHOAuthClient() string {
-	fake.sSHOAuthClientMutex.Lock()
-	ret, specificReturn := fake.sSHOAuthClientReturnsOnCall[len(fake.sSHOAuthClientArgsForCall)]
-	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct {
-	}{})
-	fake.recordInvocation("SSHOAuthClient", []interface{}{})
-	fake.sSHOAuthClientMutex.Unlock()
-	if fake.SSHOAuthClientStub != nil {
-		return fake.SSHOAuthClientStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.sSHOAuthClientReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) SSHOAuthClientCallCount() int {
-	fake.sSHOAuthClientMutex.RLock()
-	defer fake.sSHOAuthClientMutex.RUnlock()
-	return len(fake.sSHOAuthClientArgsForCall)
-}
-
-func (fake *FakeRepository) SSHOAuthClientCalls(stub func() string) {
-	fake.sSHOAuthClientMutex.Lock()
-	defer fake.sSHOAuthClientMutex.Unlock()
-	fake.SSHOAuthClientStub = stub
-}
-
-func (fake *FakeRepository) SSHOAuthClientReturns(result1 string) {
-	fake.sSHOAuthClientMutex.Lock()
-	defer fake.sSHOAuthClientMutex.Unlock()
-	fake.SSHOAuthClientStub = nil
-	fake.sSHOAuthClientReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) SSHOAuthClientReturnsOnCall(i int, result1 string) {
-	fake.sSHOAuthClientMutex.Lock()
-	defer fake.sSHOAuthClientMutex.Unlock()
-	fake.SSHOAuthClientStub = nil
-	if fake.sSHOAuthClientReturnsOnCall == nil {
-		fake.sSHOAuthClientReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.sSHOAuthClientReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
+func (fake *FakeRepository) ClearSessionCallCount() int {
+	fake.clearSessionMutex.RLock()
+	defer fake.clearSessionMutex.RUnlock()
+	return len(fake.clearSessionArgsForCall)
 }
 
 func (fake *FakeRepository) SetAPIEndpoint(arg1 string) {
@@ -1808,17 +1722,10 @@ func (fake *FakeRepository) SetAPIEndpointCallCount() int {
 	return len(fake.setAPIEndpointArgsForCall)
 }
 
-func (fake *FakeRepository) SetAPIEndpointCalls(stub func(string)) {
-	fake.setAPIEndpointMutex.Lock()
-	defer fake.setAPIEndpointMutex.Unlock()
-	fake.SetAPIEndpointStub = stub
-}
-
 func (fake *FakeRepository) SetAPIEndpointArgsForCall(i int) string {
 	fake.setAPIEndpointMutex.RLock()
 	defer fake.setAPIEndpointMutex.RUnlock()
-	argsForCall := fake.setAPIEndpointArgsForCall[i]
-	return argsForCall.arg1
+	return fake.setAPIEndpointArgsForCall[i].arg1
 }
 
 func (fake *FakeRepository) SetAPIVersion(arg1 string) {
@@ -1839,265 +1746,10 @@ func (fake *FakeRepository) SetAPIVersionCallCount() int {
 	return len(fake.setAPIVersionArgsForCall)
 }
 
-func (fake *FakeRepository) SetAPIVersionCalls(stub func(string)) {
-	fake.setAPIVersionMutex.Lock()
-	defer fake.setAPIVersionMutex.Unlock()
-	fake.SetAPIVersionStub = stub
-}
-
 func (fake *FakeRepository) SetAPIVersionArgsForCall(i int) string {
 	fake.setAPIVersionMutex.RLock()
 	defer fake.setAPIVersionMutex.RUnlock()
-	argsForCall := fake.setAPIVersionArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetAccessToken(arg1 string) {
-	fake.setAccessTokenMutex.Lock()
-	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetAccessToken", []interface{}{arg1})
-	fake.setAccessTokenMutex.Unlock()
-	if fake.SetAccessTokenStub != nil {
-		fake.SetAccessTokenStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetAccessTokenCallCount() int {
-	fake.setAccessTokenMutex.RLock()
-	defer fake.setAccessTokenMutex.RUnlock()
-	return len(fake.setAccessTokenArgsForCall)
-}
-
-func (fake *FakeRepository) SetAccessTokenCalls(stub func(string)) {
-	fake.setAccessTokenMutex.Lock()
-	defer fake.setAccessTokenMutex.Unlock()
-	fake.SetAccessTokenStub = stub
-}
-
-func (fake *FakeRepository) SetAccessTokenArgsForCall(i int) string {
-	fake.setAccessTokenMutex.RLock()
-	defer fake.setAccessTokenMutex.RUnlock()
-	argsForCall := fake.setAccessTokenArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetAccessTokenExpiryDate(arg1 time.Time) {
-	fake.setAccessTokenExpiryDateMutex.Lock()
-	fake.setAccessTokenExpiryDateArgsForCall = append(fake.setAccessTokenExpiryDateArgsForCall, struct {
-		arg1 time.Time
-	}{arg1})
-	fake.recordInvocation("SetAccessTokenExpiryDate", []interface{}{arg1})
-	fake.setAccessTokenExpiryDateMutex.Unlock()
-	if fake.SetAccessTokenExpiryDateStub != nil {
-		fake.SetAccessTokenExpiryDateStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetAccessTokenExpiryDateCallCount() int {
-	fake.setAccessTokenExpiryDateMutex.RLock()
-	defer fake.setAccessTokenExpiryDateMutex.RUnlock()
-	return len(fake.setAccessTokenExpiryDateArgsForCall)
-}
-
-func (fake *FakeRepository) SetAccessTokenExpiryDateCalls(stub func(time.Time)) {
-	fake.setAccessTokenExpiryDateMutex.Lock()
-	defer fake.setAccessTokenExpiryDateMutex.Unlock()
-	fake.SetAccessTokenExpiryDateStub = stub
-}
-
-func (fake *FakeRepository) SetAccessTokenExpiryDateArgsForCall(i int) time.Time {
-	fake.setAccessTokenExpiryDateMutex.RLock()
-	defer fake.setAccessTokenExpiryDateMutex.RUnlock()
-	argsForCall := fake.setAccessTokenExpiryDateArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetAsyncTimeout(arg1 uint) {
-	fake.setAsyncTimeoutMutex.Lock()
-	fake.setAsyncTimeoutArgsForCall = append(fake.setAsyncTimeoutArgsForCall, struct {
-		arg1 uint
-	}{arg1})
-	fake.recordInvocation("SetAsyncTimeout", []interface{}{arg1})
-	fake.setAsyncTimeoutMutex.Unlock()
-	if fake.SetAsyncTimeoutStub != nil {
-		fake.SetAsyncTimeoutStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetAsyncTimeoutCallCount() int {
-	fake.setAsyncTimeoutMutex.RLock()
-	defer fake.setAsyncTimeoutMutex.RUnlock()
-	return len(fake.setAsyncTimeoutArgsForCall)
-}
-
-func (fake *FakeRepository) SetAsyncTimeoutCalls(stub func(uint)) {
-	fake.setAsyncTimeoutMutex.Lock()
-	defer fake.setAsyncTimeoutMutex.Unlock()
-	fake.SetAsyncTimeoutStub = stub
-}
-
-func (fake *FakeRepository) SetAsyncTimeoutArgsForCall(i int) uint {
-	fake.setAsyncTimeoutMutex.RLock()
-	defer fake.setAsyncTimeoutMutex.RUnlock()
-	argsForCall := fake.setAsyncTimeoutArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetAuthenticationEndpoint(arg1 string) {
-	fake.setAuthenticationEndpointMutex.Lock()
-	fake.setAuthenticationEndpointArgsForCall = append(fake.setAuthenticationEndpointArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetAuthenticationEndpoint", []interface{}{arg1})
-	fake.setAuthenticationEndpointMutex.Unlock()
-	if fake.SetAuthenticationEndpointStub != nil {
-		fake.SetAuthenticationEndpointStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetAuthenticationEndpointCallCount() int {
-	fake.setAuthenticationEndpointMutex.RLock()
-	defer fake.setAuthenticationEndpointMutex.RUnlock()
-	return len(fake.setAuthenticationEndpointArgsForCall)
-}
-
-func (fake *FakeRepository) SetAuthenticationEndpointCalls(stub func(string)) {
-	fake.setAuthenticationEndpointMutex.Lock()
-	defer fake.setAuthenticationEndpointMutex.Unlock()
-	fake.SetAuthenticationEndpointStub = stub
-}
-
-func (fake *FakeRepository) SetAuthenticationEndpointArgsForCall(i int) string {
-	fake.setAuthenticationEndpointMutex.RLock()
-	defer fake.setAuthenticationEndpointMutex.RUnlock()
-	argsForCall := fake.setAuthenticationEndpointArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetCLIVersion(arg1 string) {
-	fake.setCLIVersionMutex.Lock()
-	fake.setCLIVersionArgsForCall = append(fake.setCLIVersionArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetCLIVersion", []interface{}{arg1})
-	fake.setCLIVersionMutex.Unlock()
-	if fake.SetCLIVersionStub != nil {
-		fake.SetCLIVersionStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetCLIVersionCallCount() int {
-	fake.setCLIVersionMutex.RLock()
-	defer fake.setCLIVersionMutex.RUnlock()
-	return len(fake.setCLIVersionArgsForCall)
-}
-
-func (fake *FakeRepository) SetCLIVersionCalls(stub func(string)) {
-	fake.setCLIVersionMutex.Lock()
-	defer fake.setCLIVersionMutex.Unlock()
-	fake.SetCLIVersionStub = stub
-}
-
-func (fake *FakeRepository) SetCLIVersionArgsForCall(i int) string {
-	fake.setCLIVersionMutex.RLock()
-	defer fake.setCLIVersionMutex.RUnlock()
-	argsForCall := fake.setCLIVersionArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetColorEnabled(arg1 string) {
-	fake.setColorEnabledMutex.Lock()
-	fake.setColorEnabledArgsForCall = append(fake.setColorEnabledArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetColorEnabled", []interface{}{arg1})
-	fake.setColorEnabledMutex.Unlock()
-	if fake.SetColorEnabledStub != nil {
-		fake.SetColorEnabledStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetColorEnabledCallCount() int {
-	fake.setColorEnabledMutex.RLock()
-	defer fake.setColorEnabledMutex.RUnlock()
-	return len(fake.setColorEnabledArgsForCall)
-}
-
-func (fake *FakeRepository) SetColorEnabledCalls(stub func(string)) {
-	fake.setColorEnabledMutex.Lock()
-	defer fake.setColorEnabledMutex.Unlock()
-	fake.SetColorEnabledStub = stub
-}
-
-func (fake *FakeRepository) SetColorEnabledArgsForCall(i int) string {
-	fake.setColorEnabledMutex.RLock()
-	defer fake.setColorEnabledMutex.RUnlock()
-	argsForCall := fake.setColorEnabledArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetDopplerEndpoint(arg1 string) {
-	fake.setDopplerEndpointMutex.Lock()
-	fake.setDopplerEndpointArgsForCall = append(fake.setDopplerEndpointArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetDopplerEndpoint", []interface{}{arg1})
-	fake.setDopplerEndpointMutex.Unlock()
-	if fake.SetDopplerEndpointStub != nil {
-		fake.SetDopplerEndpointStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetDopplerEndpointCallCount() int {
-	fake.setDopplerEndpointMutex.RLock()
-	defer fake.setDopplerEndpointMutex.RUnlock()
-	return len(fake.setDopplerEndpointArgsForCall)
-}
-
-func (fake *FakeRepository) SetDopplerEndpointCalls(stub func(string)) {
-	fake.setDopplerEndpointMutex.Lock()
-	defer fake.setDopplerEndpointMutex.Unlock()
-	fake.SetDopplerEndpointStub = stub
-}
-
-func (fake *FakeRepository) SetDopplerEndpointArgsForCall(i int) string {
-	fake.setDopplerEndpointMutex.RLock()
-	defer fake.setDopplerEndpointMutex.RUnlock()
-	argsForCall := fake.setDopplerEndpointArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetLocale(arg1 string) {
-	fake.setLocaleMutex.Lock()
-	fake.setLocaleArgsForCall = append(fake.setLocaleArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetLocale", []interface{}{arg1})
-	fake.setLocaleMutex.Unlock()
-	if fake.SetLocaleStub != nil {
-		fake.SetLocaleStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetLocaleCallCount() int {
-	fake.setLocaleMutex.RLock()
-	defer fake.setLocaleMutex.RUnlock()
-	return len(fake.setLocaleArgsForCall)
-}
-
-func (fake *FakeRepository) SetLocaleCalls(stub func(string)) {
-	fake.setLocaleMutex.Lock()
-	defer fake.setLocaleMutex.Unlock()
-	fake.SetLocaleStub = stub
-}
-
-func (fake *FakeRepository) SetLocaleArgsForCall(i int) string {
-	fake.setLocaleMutex.RLock()
-	defer fake.setLocaleMutex.RUnlock()
-	argsForCall := fake.setLocaleArgsForCall[i]
-	return argsForCall.arg1
+	return fake.setAPIVersionArgsForCall[i].arg1
 }
 
 func (fake *FakeRepository) SetMinCLIVersion(arg1 string) {
@@ -2118,17 +1770,10 @@ func (fake *FakeRepository) SetMinCLIVersionCallCount() int {
 	return len(fake.setMinCLIVersionArgsForCall)
 }
 
-func (fake *FakeRepository) SetMinCLIVersionCalls(stub func(string)) {
-	fake.setMinCLIVersionMutex.Lock()
-	defer fake.setMinCLIVersionMutex.Unlock()
-	fake.SetMinCLIVersionStub = stub
-}
-
 func (fake *FakeRepository) SetMinCLIVersionArgsForCall(i int) string {
 	fake.setMinCLIVersionMutex.RLock()
 	defer fake.setMinCLIVersionMutex.RUnlock()
-	argsForCall := fake.setMinCLIVersionArgsForCall[i]
-	return argsForCall.arg1
+	return fake.setMinCLIVersionArgsForCall[i].arg1
 }
 
 func (fake *FakeRepository) SetMinRecommendedCLIVersion(arg1 string) {
@@ -2149,358 +1794,58 @@ func (fake *FakeRepository) SetMinRecommendedCLIVersionCallCount() int {
 	return len(fake.setMinRecommendedCLIVersionArgsForCall)
 }
 
-func (fake *FakeRepository) SetMinRecommendedCLIVersionCalls(stub func(string)) {
-	fake.setMinRecommendedCLIVersionMutex.Lock()
-	defer fake.setMinRecommendedCLIVersionMutex.Unlock()
-	fake.SetMinRecommendedCLIVersionStub = stub
-}
-
 func (fake *FakeRepository) SetMinRecommendedCLIVersionArgsForCall(i int) string {
 	fake.setMinRecommendedCLIVersionMutex.RLock()
 	defer fake.setMinRecommendedCLIVersionMutex.RUnlock()
-	argsForCall := fake.setMinRecommendedCLIVersionArgsForCall[i]
-	return argsForCall.arg1
+	return fake.setMinRecommendedCLIVersionArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) SetOrganizationFields(arg1 models.OrganizationFields) {
-	fake.setOrganizationFieldsMutex.Lock()
-	fake.setOrganizationFieldsArgsForCall = append(fake.setOrganizationFieldsArgsForCall, struct {
-		arg1 models.OrganizationFields
-	}{arg1})
-	fake.recordInvocation("SetOrganizationFields", []interface{}{arg1})
-	fake.setOrganizationFieldsMutex.Unlock()
-	if fake.SetOrganizationFieldsStub != nil {
-		fake.SetOrganizationFieldsStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetOrganizationFieldsCallCount() int {
-	fake.setOrganizationFieldsMutex.RLock()
-	defer fake.setOrganizationFieldsMutex.RUnlock()
-	return len(fake.setOrganizationFieldsArgsForCall)
-}
-
-func (fake *FakeRepository) SetOrganizationFieldsCalls(stub func(models.OrganizationFields)) {
-	fake.setOrganizationFieldsMutex.Lock()
-	defer fake.setOrganizationFieldsMutex.Unlock()
-	fake.SetOrganizationFieldsStub = stub
-}
-
-func (fake *FakeRepository) SetOrganizationFieldsArgsForCall(i int) models.OrganizationFields {
-	fake.setOrganizationFieldsMutex.RLock()
-	defer fake.setOrganizationFieldsMutex.RUnlock()
-	argsForCall := fake.setOrganizationFieldsArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetPluginRepo(arg1 models.PluginRepo) {
-	fake.setPluginRepoMutex.Lock()
-	fake.setPluginRepoArgsForCall = append(fake.setPluginRepoArgsForCall, struct {
-		arg1 models.PluginRepo
-	}{arg1})
-	fake.recordInvocation("SetPluginRepo", []interface{}{arg1})
-	fake.setPluginRepoMutex.Unlock()
-	if fake.SetPluginRepoStub != nil {
-		fake.SetPluginRepoStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetPluginRepoCallCount() int {
-	fake.setPluginRepoMutex.RLock()
-	defer fake.setPluginRepoMutex.RUnlock()
-	return len(fake.setPluginRepoArgsForCall)
-}
-
-func (fake *FakeRepository) SetPluginRepoCalls(stub func(models.PluginRepo)) {
-	fake.setPluginRepoMutex.Lock()
-	defer fake.setPluginRepoMutex.Unlock()
-	fake.SetPluginRepoStub = stub
-}
-
-func (fake *FakeRepository) SetPluginRepoArgsForCall(i int) models.PluginRepo {
-	fake.setPluginRepoMutex.RLock()
-	defer fake.setPluginRepoMutex.RUnlock()
-	argsForCall := fake.setPluginRepoArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetRefreshToken(arg1 string) {
-	fake.setRefreshTokenMutex.Lock()
-	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
+func (fake *FakeRepository) SetAuthenticationEndpoint(arg1 string) {
+	fake.setAuthenticationEndpointMutex.Lock()
+	fake.setAuthenticationEndpointArgsForCall = append(fake.setAuthenticationEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.recordInvocation("SetRefreshToken", []interface{}{arg1})
-	fake.setRefreshTokenMutex.Unlock()
-	if fake.SetRefreshTokenStub != nil {
-		fake.SetRefreshTokenStub(arg1)
+	fake.recordInvocation("SetAuthenticationEndpoint", []interface{}{arg1})
+	fake.setAuthenticationEndpointMutex.Unlock()
+	if fake.SetAuthenticationEndpointStub != nil {
+		fake.SetAuthenticationEndpointStub(arg1)
 	}
 }
 
-func (fake *FakeRepository) SetRefreshTokenCallCount() int {
-	fake.setRefreshTokenMutex.RLock()
-	defer fake.setRefreshTokenMutex.RUnlock()
-	return len(fake.setRefreshTokenArgsForCall)
+func (fake *FakeRepository) SetAuthenticationEndpointCallCount() int {
+	fake.setAuthenticationEndpointMutex.RLock()
+	defer fake.setAuthenticationEndpointMutex.RUnlock()
+	return len(fake.setAuthenticationEndpointArgsForCall)
 }
 
-func (fake *FakeRepository) SetRefreshTokenCalls(stub func(string)) {
-	fake.setRefreshTokenMutex.Lock()
-	defer fake.setRefreshTokenMutex.Unlock()
-	fake.SetRefreshTokenStub = stub
+func (fake *FakeRepository) SetAuthenticationEndpointArgsForCall(i int) string {
+	fake.setAuthenticationEndpointMutex.RLock()
+	defer fake.setAuthenticationEndpointMutex.RUnlock()
+	return fake.setAuthenticationEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) SetRefreshTokenArgsForCall(i int) string {
-	fake.setRefreshTokenMutex.RLock()
-	defer fake.setRefreshTokenMutex.RUnlock()
-	argsForCall := fake.setRefreshTokenArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetRoutingAPIEndpoint(arg1 string) {
-	fake.setRoutingAPIEndpointMutex.Lock()
-	fake.setRoutingAPIEndpointArgsForCall = append(fake.setRoutingAPIEndpointArgsForCall, struct {
+func (fake *FakeRepository) SetDopplerEndpoint(arg1 string) {
+	fake.setDopplerEndpointMutex.Lock()
+	fake.setDopplerEndpointArgsForCall = append(fake.setDopplerEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.recordInvocation("SetRoutingAPIEndpoint", []interface{}{arg1})
-	fake.setRoutingAPIEndpointMutex.Unlock()
-	if fake.SetRoutingAPIEndpointStub != nil {
-		fake.SetRoutingAPIEndpointStub(arg1)
+	fake.recordInvocation("SetDopplerEndpoint", []interface{}{arg1})
+	fake.setDopplerEndpointMutex.Unlock()
+	if fake.SetDopplerEndpointStub != nil {
+		fake.SetDopplerEndpointStub(arg1)
 	}
 }
 
-func (fake *FakeRepository) SetRoutingAPIEndpointCallCount() int {
-	fake.setRoutingAPIEndpointMutex.RLock()
-	defer fake.setRoutingAPIEndpointMutex.RUnlock()
-	return len(fake.setRoutingAPIEndpointArgsForCall)
+func (fake *FakeRepository) SetDopplerEndpointCallCount() int {
+	fake.setDopplerEndpointMutex.RLock()
+	defer fake.setDopplerEndpointMutex.RUnlock()
+	return len(fake.setDopplerEndpointArgsForCall)
 }
 
-func (fake *FakeRepository) SetRoutingAPIEndpointCalls(stub func(string)) {
-	fake.setRoutingAPIEndpointMutex.Lock()
-	defer fake.setRoutingAPIEndpointMutex.Unlock()
-	fake.SetRoutingAPIEndpointStub = stub
-}
-
-func (fake *FakeRepository) SetRoutingAPIEndpointArgsForCall(i int) string {
-	fake.setRoutingAPIEndpointMutex.RLock()
-	defer fake.setRoutingAPIEndpointMutex.RUnlock()
-	argsForCall := fake.setRoutingAPIEndpointArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetSSHOAuthClient(arg1 string) {
-	fake.setSSHOAuthClientMutex.Lock()
-	fake.setSSHOAuthClientArgsForCall = append(fake.setSSHOAuthClientArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetSSHOAuthClient", []interface{}{arg1})
-	fake.setSSHOAuthClientMutex.Unlock()
-	if fake.SetSSHOAuthClientStub != nil {
-		fake.SetSSHOAuthClientStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetSSHOAuthClientCallCount() int {
-	fake.setSSHOAuthClientMutex.RLock()
-	defer fake.setSSHOAuthClientMutex.RUnlock()
-	return len(fake.setSSHOAuthClientArgsForCall)
-}
-
-func (fake *FakeRepository) SetSSHOAuthClientCalls(stub func(string)) {
-	fake.setSSHOAuthClientMutex.Lock()
-	defer fake.setSSHOAuthClientMutex.Unlock()
-	fake.SetSSHOAuthClientStub = stub
-}
-
-func (fake *FakeRepository) SetSSHOAuthClientArgsForCall(i int) string {
-	fake.setSSHOAuthClientMutex.RLock()
-	defer fake.setSSHOAuthClientMutex.RUnlock()
-	argsForCall := fake.setSSHOAuthClientArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetSSLDisabled(arg1 bool) {
-	fake.setSSLDisabledMutex.Lock()
-	fake.setSSLDisabledArgsForCall = append(fake.setSSLDisabledArgsForCall, struct {
-		arg1 bool
-	}{arg1})
-	fake.recordInvocation("SetSSLDisabled", []interface{}{arg1})
-	fake.setSSLDisabledMutex.Unlock()
-	if fake.SetSSLDisabledStub != nil {
-		fake.SetSSLDisabledStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetSSLDisabledCallCount() int {
-	fake.setSSLDisabledMutex.RLock()
-	defer fake.setSSLDisabledMutex.RUnlock()
-	return len(fake.setSSLDisabledArgsForCall)
-}
-
-func (fake *FakeRepository) SetSSLDisabledCalls(stub func(bool)) {
-	fake.setSSLDisabledMutex.Lock()
-	defer fake.setSSLDisabledMutex.Unlock()
-	fake.SetSSLDisabledStub = stub
-}
-
-func (fake *FakeRepository) SetSSLDisabledArgsForCall(i int) bool {
-	fake.setSSLDisabledMutex.RLock()
-	defer fake.setSSLDisabledMutex.RUnlock()
-	argsForCall := fake.setSSLDisabledArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetSpaceFields(arg1 models.SpaceFields) {
-	fake.setSpaceFieldsMutex.Lock()
-	fake.setSpaceFieldsArgsForCall = append(fake.setSpaceFieldsArgsForCall, struct {
-		arg1 models.SpaceFields
-	}{arg1})
-	fake.recordInvocation("SetSpaceFields", []interface{}{arg1})
-	fake.setSpaceFieldsMutex.Unlock()
-	if fake.SetSpaceFieldsStub != nil {
-		fake.SetSpaceFieldsStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetSpaceFieldsCallCount() int {
-	fake.setSpaceFieldsMutex.RLock()
-	defer fake.setSpaceFieldsMutex.RUnlock()
-	return len(fake.setSpaceFieldsArgsForCall)
-}
-
-func (fake *FakeRepository) SetSpaceFieldsCalls(stub func(models.SpaceFields)) {
-	fake.setSpaceFieldsMutex.Lock()
-	defer fake.setSpaceFieldsMutex.Unlock()
-	fake.SetSpaceFieldsStub = stub
-}
-
-func (fake *FakeRepository) SetSpaceFieldsArgsForCall(i int) models.SpaceFields {
-	fake.setSpaceFieldsMutex.RLock()
-	defer fake.setSpaceFieldsMutex.RUnlock()
-	argsForCall := fake.setSpaceFieldsArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetTrace(arg1 string) {
-	fake.setTraceMutex.Lock()
-	fake.setTraceArgsForCall = append(fake.setTraceArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetTrace", []interface{}{arg1})
-	fake.setTraceMutex.Unlock()
-	if fake.SetTraceStub != nil {
-		fake.SetTraceStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetTraceCallCount() int {
-	fake.setTraceMutex.RLock()
-	defer fake.setTraceMutex.RUnlock()
-	return len(fake.setTraceArgsForCall)
-}
-
-func (fake *FakeRepository) SetTraceCalls(stub func(string)) {
-	fake.setTraceMutex.Lock()
-	defer fake.setTraceMutex.Unlock()
-	fake.SetTraceStub = stub
-}
-
-func (fake *FakeRepository) SetTraceArgsForCall(i int) string {
-	fake.setTraceMutex.RLock()
-	defer fake.setTraceMutex.RUnlock()
-	argsForCall := fake.setTraceArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetUAAGrantType(arg1 string) {
-	fake.setUAAGrantTypeMutex.Lock()
-	fake.setUAAGrantTypeArgsForCall = append(fake.setUAAGrantTypeArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetUAAGrantType", []interface{}{arg1})
-	fake.setUAAGrantTypeMutex.Unlock()
-	if fake.SetUAAGrantTypeStub != nil {
-		fake.SetUAAGrantTypeStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetUAAGrantTypeCallCount() int {
-	fake.setUAAGrantTypeMutex.RLock()
-	defer fake.setUAAGrantTypeMutex.RUnlock()
-	return len(fake.setUAAGrantTypeArgsForCall)
-}
-
-func (fake *FakeRepository) SetUAAGrantTypeCalls(stub func(string)) {
-	fake.setUAAGrantTypeMutex.Lock()
-	defer fake.setUAAGrantTypeMutex.Unlock()
-	fake.SetUAAGrantTypeStub = stub
-}
-
-func (fake *FakeRepository) SetUAAGrantTypeArgsForCall(i int) string {
-	fake.setUAAGrantTypeMutex.RLock()
-	defer fake.setUAAGrantTypeMutex.RUnlock()
-	argsForCall := fake.setUAAGrantTypeArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetUAAOAuthClient(arg1 string) {
-	fake.setUAAOAuthClientMutex.Lock()
-	fake.setUAAOAuthClientArgsForCall = append(fake.setUAAOAuthClientArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetUAAOAuthClient", []interface{}{arg1})
-	fake.setUAAOAuthClientMutex.Unlock()
-	if fake.SetUAAOAuthClientStub != nil {
-		fake.SetUAAOAuthClientStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetUAAOAuthClientCallCount() int {
-	fake.setUAAOAuthClientMutex.RLock()
-	defer fake.setUAAOAuthClientMutex.RUnlock()
-	return len(fake.setUAAOAuthClientArgsForCall)
-}
-
-func (fake *FakeRepository) SetUAAOAuthClientCalls(stub func(string)) {
-	fake.setUAAOAuthClientMutex.Lock()
-	defer fake.setUAAOAuthClientMutex.Unlock()
-	fake.SetUAAOAuthClientStub = stub
-}
-
-func (fake *FakeRepository) SetUAAOAuthClientArgsForCall(i int) string {
-	fake.setUAAOAuthClientMutex.RLock()
-	defer fake.setUAAOAuthClientMutex.RUnlock()
-	argsForCall := fake.setUAAOAuthClientArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRepository) SetUAAOAuthClientSecret(arg1 string) {
-	fake.setUAAOAuthClientSecretMutex.Lock()
-	fake.setUAAOAuthClientSecretArgsForCall = append(fake.setUAAOAuthClientSecretArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetUAAOAuthClientSecret", []interface{}{arg1})
-	fake.setUAAOAuthClientSecretMutex.Unlock()
-	if fake.SetUAAOAuthClientSecretStub != nil {
-		fake.SetUAAOAuthClientSecretStub(arg1)
-	}
-}
-
-func (fake *FakeRepository) SetUAAOAuthClientSecretCallCount() int {
-	fake.setUAAOAuthClientSecretMutex.RLock()
-	defer fake.setUAAOAuthClientSecretMutex.RUnlock()
-	return len(fake.setUAAOAuthClientSecretArgsForCall)
-}
-
-func (fake *FakeRepository) SetUAAOAuthClientSecretCalls(stub func(string)) {
-	fake.setUAAOAuthClientSecretMutex.Lock()
-	defer fake.setUAAOAuthClientSecretMutex.Unlock()
-	fake.SetUAAOAuthClientSecretStub = stub
-}
-
-func (fake *FakeRepository) SetUAAOAuthClientSecretArgsForCall(i int) string {
-	fake.setUAAOAuthClientSecretMutex.RLock()
-	defer fake.setUAAOAuthClientSecretMutex.RUnlock()
-	argsForCall := fake.setUAAOAuthClientSecretArgsForCall[i]
-	return argsForCall.arg1
+func (fake *FakeRepository) SetDopplerEndpointArgsForCall(i int) string {
+	fake.setDopplerEndpointMutex.RLock()
+	defer fake.setDopplerEndpointMutex.RUnlock()
+	return fake.setDopplerEndpointArgsForCall[i].arg1
 }
 
 func (fake *FakeRepository) SetUaaEndpoint(arg1 string) {
@@ -2521,329 +1866,346 @@ func (fake *FakeRepository) SetUaaEndpointCallCount() int {
 	return len(fake.setUaaEndpointArgsForCall)
 }
 
-func (fake *FakeRepository) SetUaaEndpointCalls(stub func(string)) {
-	fake.setUaaEndpointMutex.Lock()
-	defer fake.setUaaEndpointMutex.Unlock()
-	fake.SetUaaEndpointStub = stub
-}
-
 func (fake *FakeRepository) SetUaaEndpointArgsForCall(i int) string {
 	fake.setUaaEndpointMutex.RLock()
 	defer fake.setUaaEndpointMutex.RUnlock()
-	argsForCall := fake.setUaaEndpointArgsForCall[i]
-	return argsForCall.arg1
+	return fake.setUaaEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) SpaceFields() models.SpaceFields {
-	fake.spaceFieldsMutex.Lock()
-	ret, specificReturn := fake.spaceFieldsReturnsOnCall[len(fake.spaceFieldsArgsForCall)]
-	fake.spaceFieldsArgsForCall = append(fake.spaceFieldsArgsForCall, struct {
-	}{})
-	fake.recordInvocation("SpaceFields", []interface{}{})
-	fake.spaceFieldsMutex.Unlock()
-	if fake.SpaceFieldsStub != nil {
-		return fake.SpaceFieldsStub()
+func (fake *FakeRepository) SetRoutingAPIEndpoint(arg1 string) {
+	fake.setRoutingAPIEndpointMutex.Lock()
+	fake.setRoutingAPIEndpointArgsForCall = append(fake.setRoutingAPIEndpointArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetRoutingAPIEndpoint", []interface{}{arg1})
+	fake.setRoutingAPIEndpointMutex.Unlock()
+	if fake.SetRoutingAPIEndpointStub != nil {
+		fake.SetRoutingAPIEndpointStub(arg1)
 	}
-	if specificReturn {
-		return ret.result1
+}
+
+func (fake *FakeRepository) SetRoutingAPIEndpointCallCount() int {
+	fake.setRoutingAPIEndpointMutex.RLock()
+	defer fake.setRoutingAPIEndpointMutex.RUnlock()
+	return len(fake.setRoutingAPIEndpointArgsForCall)
+}
+
+func (fake *FakeRepository) SetRoutingAPIEndpointArgsForCall(i int) string {
+	fake.setRoutingAPIEndpointMutex.RLock()
+	defer fake.setRoutingAPIEndpointMutex.RUnlock()
+	return fake.setRoutingAPIEndpointArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetAccessToken(arg1 string) {
+	fake.setAccessTokenMutex.Lock()
+	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetAccessToken", []interface{}{arg1})
+	fake.setAccessTokenMutex.Unlock()
+	if fake.SetAccessTokenStub != nil {
+		fake.SetAccessTokenStub(arg1)
 	}
-	fakeReturns := fake.spaceFieldsReturns
-	return fakeReturns.result1
 }
 
-func (fake *FakeRepository) SpaceFieldsCallCount() int {
-	fake.spaceFieldsMutex.RLock()
-	defer fake.spaceFieldsMutex.RUnlock()
-	return len(fake.spaceFieldsArgsForCall)
+func (fake *FakeRepository) SetAccessTokenCallCount() int {
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
+	return len(fake.setAccessTokenArgsForCall)
 }
 
-func (fake *FakeRepository) SpaceFieldsCalls(stub func() models.SpaceFields) {
-	fake.spaceFieldsMutex.Lock()
-	defer fake.spaceFieldsMutex.Unlock()
-	fake.SpaceFieldsStub = stub
+func (fake *FakeRepository) SetAccessTokenArgsForCall(i int) string {
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
+	return fake.setAccessTokenArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) SpaceFieldsReturns(result1 models.SpaceFields) {
-	fake.spaceFieldsMutex.Lock()
-	defer fake.spaceFieldsMutex.Unlock()
-	fake.SpaceFieldsStub = nil
-	fake.spaceFieldsReturns = struct {
-		result1 models.SpaceFields
-	}{result1}
-}
-
-func (fake *FakeRepository) SpaceFieldsReturnsOnCall(i int, result1 models.SpaceFields) {
-	fake.spaceFieldsMutex.Lock()
-	defer fake.spaceFieldsMutex.Unlock()
-	fake.SpaceFieldsStub = nil
-	if fake.spaceFieldsReturnsOnCall == nil {
-		fake.spaceFieldsReturnsOnCall = make(map[int]struct {
-			result1 models.SpaceFields
-		})
+func (fake *FakeRepository) SetUAAOAuthClient(arg1 string) {
+	fake.setUAAOAuthClientMutex.Lock()
+	fake.setUAAOAuthClientArgsForCall = append(fake.setUAAOAuthClientArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetUAAOAuthClient", []interface{}{arg1})
+	fake.setUAAOAuthClientMutex.Unlock()
+	if fake.SetUAAOAuthClientStub != nil {
+		fake.SetUAAOAuthClientStub(arg1)
 	}
-	fake.spaceFieldsReturnsOnCall[i] = struct {
-		result1 models.SpaceFields
-	}{result1}
 }
 
-func (fake *FakeRepository) Trace() string {
-	fake.traceMutex.Lock()
-	ret, specificReturn := fake.traceReturnsOnCall[len(fake.traceArgsForCall)]
-	fake.traceArgsForCall = append(fake.traceArgsForCall, struct {
-	}{})
-	fake.recordInvocation("Trace", []interface{}{})
-	fake.traceMutex.Unlock()
-	if fake.TraceStub != nil {
-		return fake.TraceStub()
+func (fake *FakeRepository) SetUAAOAuthClientCallCount() int {
+	fake.setUAAOAuthClientMutex.RLock()
+	defer fake.setUAAOAuthClientMutex.RUnlock()
+	return len(fake.setUAAOAuthClientArgsForCall)
+}
+
+func (fake *FakeRepository) SetUAAOAuthClientArgsForCall(i int) string {
+	fake.setUAAOAuthClientMutex.RLock()
+	defer fake.setUAAOAuthClientMutex.RUnlock()
+	return fake.setUAAOAuthClientArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetUAAOAuthClientSecret(arg1 string) {
+	fake.setUAAOAuthClientSecretMutex.Lock()
+	fake.setUAAOAuthClientSecretArgsForCall = append(fake.setUAAOAuthClientSecretArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetUAAOAuthClientSecret", []interface{}{arg1})
+	fake.setUAAOAuthClientSecretMutex.Unlock()
+	if fake.SetUAAOAuthClientSecretStub != nil {
+		fake.SetUAAOAuthClientSecretStub(arg1)
 	}
-	if specificReturn {
-		return ret.result1
+}
+
+func (fake *FakeRepository) SetUAAOAuthClientSecretCallCount() int {
+	fake.setUAAOAuthClientSecretMutex.RLock()
+	defer fake.setUAAOAuthClientSecretMutex.RUnlock()
+	return len(fake.setUAAOAuthClientSecretArgsForCall)
+}
+
+func (fake *FakeRepository) SetUAAOAuthClientSecretArgsForCall(i int) string {
+	fake.setUAAOAuthClientSecretMutex.RLock()
+	defer fake.setUAAOAuthClientSecretMutex.RUnlock()
+	return fake.setUAAOAuthClientSecretArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetSSHOAuthClient(arg1 string) {
+	fake.setSSHOAuthClientMutex.Lock()
+	fake.setSSHOAuthClientArgsForCall = append(fake.setSSHOAuthClientArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetSSHOAuthClient", []interface{}{arg1})
+	fake.setSSHOAuthClientMutex.Unlock()
+	if fake.SetSSHOAuthClientStub != nil {
+		fake.SetSSHOAuthClientStub(arg1)
 	}
-	fakeReturns := fake.traceReturns
-	return fakeReturns.result1
 }
 
-func (fake *FakeRepository) TraceCallCount() int {
-	fake.traceMutex.RLock()
-	defer fake.traceMutex.RUnlock()
-	return len(fake.traceArgsForCall)
+func (fake *FakeRepository) SetSSHOAuthClientCallCount() int {
+	fake.setSSHOAuthClientMutex.RLock()
+	defer fake.setSSHOAuthClientMutex.RUnlock()
+	return len(fake.setSSHOAuthClientArgsForCall)
 }
 
-func (fake *FakeRepository) TraceCalls(stub func() string) {
-	fake.traceMutex.Lock()
-	defer fake.traceMutex.Unlock()
-	fake.TraceStub = stub
+func (fake *FakeRepository) SetSSHOAuthClientArgsForCall(i int) string {
+	fake.setSSHOAuthClientMutex.RLock()
+	defer fake.setSSHOAuthClientMutex.RUnlock()
+	return fake.setSSHOAuthClientArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) TraceReturns(result1 string) {
-	fake.traceMutex.Lock()
-	defer fake.traceMutex.Unlock()
-	fake.TraceStub = nil
-	fake.traceReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) TraceReturnsOnCall(i int, result1 string) {
-	fake.traceMutex.Lock()
-	defer fake.traceMutex.Unlock()
-	fake.TraceStub = nil
-	if fake.traceReturnsOnCall == nil {
-		fake.traceReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
+func (fake *FakeRepository) SetRefreshToken(arg1 string) {
+	fake.setRefreshTokenMutex.Lock()
+	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetRefreshToken", []interface{}{arg1})
+	fake.setRefreshTokenMutex.Unlock()
+	if fake.SetRefreshTokenStub != nil {
+		fake.SetRefreshTokenStub(arg1)
 	}
-	fake.traceReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
 }
 
-func (fake *FakeRepository) UAAGrantType() string {
-	fake.uAAGrantTypeMutex.Lock()
-	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
-	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct {
-	}{})
-	fake.recordInvocation("UAAGrantType", []interface{}{})
-	fake.uAAGrantTypeMutex.Unlock()
-	if fake.UAAGrantTypeStub != nil {
-		return fake.UAAGrantTypeStub()
+func (fake *FakeRepository) SetRefreshTokenCallCount() int {
+	fake.setRefreshTokenMutex.RLock()
+	defer fake.setRefreshTokenMutex.RUnlock()
+	return len(fake.setRefreshTokenArgsForCall)
+}
+
+func (fake *FakeRepository) SetRefreshTokenArgsForCall(i int) string {
+	fake.setRefreshTokenMutex.RLock()
+	defer fake.setRefreshTokenMutex.RUnlock()
+	return fake.setRefreshTokenArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetOrganizationFields(arg1 models.OrganizationFields) {
+	fake.setOrganizationFieldsMutex.Lock()
+	fake.setOrganizationFieldsArgsForCall = append(fake.setOrganizationFieldsArgsForCall, struct {
+		arg1 models.OrganizationFields
+	}{arg1})
+	fake.recordInvocation("SetOrganizationFields", []interface{}{arg1})
+	fake.setOrganizationFieldsMutex.Unlock()
+	if fake.SetOrganizationFieldsStub != nil {
+		fake.SetOrganizationFieldsStub(arg1)
 	}
-	if specificReturn {
-		return ret.result1
+}
+
+func (fake *FakeRepository) SetOrganizationFieldsCallCount() int {
+	fake.setOrganizationFieldsMutex.RLock()
+	defer fake.setOrganizationFieldsMutex.RUnlock()
+	return len(fake.setOrganizationFieldsArgsForCall)
+}
+
+func (fake *FakeRepository) SetOrganizationFieldsArgsForCall(i int) models.OrganizationFields {
+	fake.setOrganizationFieldsMutex.RLock()
+	defer fake.setOrganizationFieldsMutex.RUnlock()
+	return fake.setOrganizationFieldsArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetSpaceFields(arg1 models.SpaceFields) {
+	fake.setSpaceFieldsMutex.Lock()
+	fake.setSpaceFieldsArgsForCall = append(fake.setSpaceFieldsArgsForCall, struct {
+		arg1 models.SpaceFields
+	}{arg1})
+	fake.recordInvocation("SetSpaceFields", []interface{}{arg1})
+	fake.setSpaceFieldsMutex.Unlock()
+	if fake.SetSpaceFieldsStub != nil {
+		fake.SetSpaceFieldsStub(arg1)
 	}
-	fakeReturns := fake.uAAGrantTypeReturns
-	return fakeReturns.result1
 }
 
-func (fake *FakeRepository) UAAGrantTypeCallCount() int {
-	fake.uAAGrantTypeMutex.RLock()
-	defer fake.uAAGrantTypeMutex.RUnlock()
-	return len(fake.uAAGrantTypeArgsForCall)
+func (fake *FakeRepository) SetSpaceFieldsCallCount() int {
+	fake.setSpaceFieldsMutex.RLock()
+	defer fake.setSpaceFieldsMutex.RUnlock()
+	return len(fake.setSpaceFieldsArgsForCall)
 }
 
-func (fake *FakeRepository) UAAGrantTypeCalls(stub func() string) {
-	fake.uAAGrantTypeMutex.Lock()
-	defer fake.uAAGrantTypeMutex.Unlock()
-	fake.UAAGrantTypeStub = stub
+func (fake *FakeRepository) SetSpaceFieldsArgsForCall(i int) models.SpaceFields {
+	fake.setSpaceFieldsMutex.RLock()
+	defer fake.setSpaceFieldsMutex.RUnlock()
+	return fake.setSpaceFieldsArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) UAAGrantTypeReturns(result1 string) {
-	fake.uAAGrantTypeMutex.Lock()
-	defer fake.uAAGrantTypeMutex.Unlock()
-	fake.UAAGrantTypeStub = nil
-	fake.uAAGrantTypeReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) UAAGrantTypeReturnsOnCall(i int, result1 string) {
-	fake.uAAGrantTypeMutex.Lock()
-	defer fake.uAAGrantTypeMutex.Unlock()
-	fake.UAAGrantTypeStub = nil
-	if fake.uAAGrantTypeReturnsOnCall == nil {
-		fake.uAAGrantTypeReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
+func (fake *FakeRepository) SetSSLDisabled(arg1 bool) {
+	fake.setSSLDisabledMutex.Lock()
+	fake.setSSLDisabledArgsForCall = append(fake.setSSLDisabledArgsForCall, struct {
+		arg1 bool
+	}{arg1})
+	fake.recordInvocation("SetSSLDisabled", []interface{}{arg1})
+	fake.setSSLDisabledMutex.Unlock()
+	if fake.SetSSLDisabledStub != nil {
+		fake.SetSSLDisabledStub(arg1)
 	}
-	fake.uAAGrantTypeReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
 }
 
-func (fake *FakeRepository) UAAOAuthClient() string {
-	fake.uAAOAuthClientMutex.Lock()
-	ret, specificReturn := fake.uAAOAuthClientReturnsOnCall[len(fake.uAAOAuthClientArgsForCall)]
-	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct {
-	}{})
-	fake.recordInvocation("UAAOAuthClient", []interface{}{})
-	fake.uAAOAuthClientMutex.Unlock()
-	if fake.UAAOAuthClientStub != nil {
-		return fake.UAAOAuthClientStub()
+func (fake *FakeRepository) SetSSLDisabledCallCount() int {
+	fake.setSSLDisabledMutex.RLock()
+	defer fake.setSSLDisabledMutex.RUnlock()
+	return len(fake.setSSLDisabledArgsForCall)
+}
+
+func (fake *FakeRepository) SetSSLDisabledArgsForCall(i int) bool {
+	fake.setSSLDisabledMutex.RLock()
+	defer fake.setSSLDisabledMutex.RUnlock()
+	return fake.setSSLDisabledArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetAsyncTimeout(arg1 uint) {
+	fake.setAsyncTimeoutMutex.Lock()
+	fake.setAsyncTimeoutArgsForCall = append(fake.setAsyncTimeoutArgsForCall, struct {
+		arg1 uint
+	}{arg1})
+	fake.recordInvocation("SetAsyncTimeout", []interface{}{arg1})
+	fake.setAsyncTimeoutMutex.Unlock()
+	if fake.SetAsyncTimeoutStub != nil {
+		fake.SetAsyncTimeoutStub(arg1)
 	}
-	if specificReturn {
-		return ret.result1
+}
+
+func (fake *FakeRepository) SetAsyncTimeoutCallCount() int {
+	fake.setAsyncTimeoutMutex.RLock()
+	defer fake.setAsyncTimeoutMutex.RUnlock()
+	return len(fake.setAsyncTimeoutArgsForCall)
+}
+
+func (fake *FakeRepository) SetAsyncTimeoutArgsForCall(i int) uint {
+	fake.setAsyncTimeoutMutex.RLock()
+	defer fake.setAsyncTimeoutMutex.RUnlock()
+	return fake.setAsyncTimeoutArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetTrace(arg1 string) {
+	fake.setTraceMutex.Lock()
+	fake.setTraceArgsForCall = append(fake.setTraceArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetTrace", []interface{}{arg1})
+	fake.setTraceMutex.Unlock()
+	if fake.SetTraceStub != nil {
+		fake.SetTraceStub(arg1)
 	}
-	fakeReturns := fake.uAAOAuthClientReturns
-	return fakeReturns.result1
 }
 
-func (fake *FakeRepository) UAAOAuthClientCallCount() int {
-	fake.uAAOAuthClientMutex.RLock()
-	defer fake.uAAOAuthClientMutex.RUnlock()
-	return len(fake.uAAOAuthClientArgsForCall)
+func (fake *FakeRepository) SetTraceCallCount() int {
+	fake.setTraceMutex.RLock()
+	defer fake.setTraceMutex.RUnlock()
+	return len(fake.setTraceArgsForCall)
 }
 
-func (fake *FakeRepository) UAAOAuthClientCalls(stub func() string) {
-	fake.uAAOAuthClientMutex.Lock()
-	defer fake.uAAOAuthClientMutex.Unlock()
-	fake.UAAOAuthClientStub = stub
+func (fake *FakeRepository) SetTraceArgsForCall(i int) string {
+	fake.setTraceMutex.RLock()
+	defer fake.setTraceMutex.RUnlock()
+	return fake.setTraceArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) UAAOAuthClientReturns(result1 string) {
-	fake.uAAOAuthClientMutex.Lock()
-	defer fake.uAAOAuthClientMutex.Unlock()
-	fake.UAAOAuthClientStub = nil
-	fake.uAAOAuthClientReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) UAAOAuthClientReturnsOnCall(i int, result1 string) {
-	fake.uAAOAuthClientMutex.Lock()
-	defer fake.uAAOAuthClientMutex.Unlock()
-	fake.UAAOAuthClientStub = nil
-	if fake.uAAOAuthClientReturnsOnCall == nil {
-		fake.uAAOAuthClientReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
+func (fake *FakeRepository) SetColorEnabled(arg1 string) {
+	fake.setColorEnabledMutex.Lock()
+	fake.setColorEnabledArgsForCall = append(fake.setColorEnabledArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetColorEnabled", []interface{}{arg1})
+	fake.setColorEnabledMutex.Unlock()
+	if fake.SetColorEnabledStub != nil {
+		fake.SetColorEnabledStub(arg1)
 	}
-	fake.uAAOAuthClientReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
 }
 
-func (fake *FakeRepository) UAAOAuthClientSecret() string {
-	fake.uAAOAuthClientSecretMutex.Lock()
-	ret, specificReturn := fake.uAAOAuthClientSecretReturnsOnCall[len(fake.uAAOAuthClientSecretArgsForCall)]
-	fake.uAAOAuthClientSecretArgsForCall = append(fake.uAAOAuthClientSecretArgsForCall, struct {
-	}{})
-	fake.recordInvocation("UAAOAuthClientSecret", []interface{}{})
-	fake.uAAOAuthClientSecretMutex.Unlock()
-	if fake.UAAOAuthClientSecretStub != nil {
-		return fake.UAAOAuthClientSecretStub()
+func (fake *FakeRepository) SetColorEnabledCallCount() int {
+	fake.setColorEnabledMutex.RLock()
+	defer fake.setColorEnabledMutex.RUnlock()
+	return len(fake.setColorEnabledArgsForCall)
+}
+
+func (fake *FakeRepository) SetColorEnabledArgsForCall(i int) string {
+	fake.setColorEnabledMutex.RLock()
+	defer fake.setColorEnabledMutex.RUnlock()
+	return fake.setColorEnabledArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetLocale(arg1 string) {
+	fake.setLocaleMutex.Lock()
+	fake.setLocaleArgsForCall = append(fake.setLocaleArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetLocale", []interface{}{arg1})
+	fake.setLocaleMutex.Unlock()
+	if fake.SetLocaleStub != nil {
+		fake.SetLocaleStub(arg1)
 	}
-	if specificReturn {
-		return ret.result1
+}
+
+func (fake *FakeRepository) SetLocaleCallCount() int {
+	fake.setLocaleMutex.RLock()
+	defer fake.setLocaleMutex.RUnlock()
+	return len(fake.setLocaleArgsForCall)
+}
+
+func (fake *FakeRepository) SetLocaleArgsForCall(i int) string {
+	fake.setLocaleMutex.RLock()
+	defer fake.setLocaleMutex.RUnlock()
+	return fake.setLocaleArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetPluginRepo(arg1 models.PluginRepo) {
+	fake.setPluginRepoMutex.Lock()
+	fake.setPluginRepoArgsForCall = append(fake.setPluginRepoArgsForCall, struct {
+		arg1 models.PluginRepo
+	}{arg1})
+	fake.recordInvocation("SetPluginRepo", []interface{}{arg1})
+	fake.setPluginRepoMutex.Unlock()
+	if fake.SetPluginRepoStub != nil {
+		fake.SetPluginRepoStub(arg1)
 	}
-	fakeReturns := fake.uAAOAuthClientSecretReturns
-	return fakeReturns.result1
 }
 
-func (fake *FakeRepository) UAAOAuthClientSecretCallCount() int {
-	fake.uAAOAuthClientSecretMutex.RLock()
-	defer fake.uAAOAuthClientSecretMutex.RUnlock()
-	return len(fake.uAAOAuthClientSecretArgsForCall)
+func (fake *FakeRepository) SetPluginRepoCallCount() int {
+	fake.setPluginRepoMutex.RLock()
+	defer fake.setPluginRepoMutex.RUnlock()
+	return len(fake.setPluginRepoArgsForCall)
 }
 
-func (fake *FakeRepository) UAAOAuthClientSecretCalls(stub func() string) {
-	fake.uAAOAuthClientSecretMutex.Lock()
-	defer fake.uAAOAuthClientSecretMutex.Unlock()
-	fake.UAAOAuthClientSecretStub = stub
-}
-
-func (fake *FakeRepository) UAAOAuthClientSecretReturns(result1 string) {
-	fake.uAAOAuthClientSecretMutex.Lock()
-	defer fake.uAAOAuthClientSecretMutex.Unlock()
-	fake.UAAOAuthClientSecretStub = nil
-	fake.uAAOAuthClientSecretReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) UAAOAuthClientSecretReturnsOnCall(i int, result1 string) {
-	fake.uAAOAuthClientSecretMutex.Lock()
-	defer fake.uAAOAuthClientSecretMutex.Unlock()
-	fake.UAAOAuthClientSecretStub = nil
-	if fake.uAAOAuthClientSecretReturnsOnCall == nil {
-		fake.uAAOAuthClientSecretReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.uAAOAuthClientSecretReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) UaaEndpoint() string {
-	fake.uaaEndpointMutex.Lock()
-	ret, specificReturn := fake.uaaEndpointReturnsOnCall[len(fake.uaaEndpointArgsForCall)]
-	fake.uaaEndpointArgsForCall = append(fake.uaaEndpointArgsForCall, struct {
-	}{})
-	fake.recordInvocation("UaaEndpoint", []interface{}{})
-	fake.uaaEndpointMutex.Unlock()
-	if fake.UaaEndpointStub != nil {
-		return fake.UaaEndpointStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.uaaEndpointReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) UaaEndpointCallCount() int {
-	fake.uaaEndpointMutex.RLock()
-	defer fake.uaaEndpointMutex.RUnlock()
-	return len(fake.uaaEndpointArgsForCall)
-}
-
-func (fake *FakeRepository) UaaEndpointCalls(stub func() string) {
-	fake.uaaEndpointMutex.Lock()
-	defer fake.uaaEndpointMutex.Unlock()
-	fake.UaaEndpointStub = stub
-}
-
-func (fake *FakeRepository) UaaEndpointReturns(result1 string) {
-	fake.uaaEndpointMutex.Lock()
-	defer fake.uaaEndpointMutex.Unlock()
-	fake.UaaEndpointStub = nil
-	fake.uaaEndpointReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) UaaEndpointReturnsOnCall(i int, result1 string) {
-	fake.uaaEndpointMutex.Lock()
-	defer fake.uaaEndpointMutex.Unlock()
-	fake.UaaEndpointStub = nil
-	if fake.uaaEndpointReturnsOnCall == nil {
-		fake.uaaEndpointReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.uaaEndpointReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
+func (fake *FakeRepository) SetPluginRepoArgsForCall(i int) models.PluginRepo {
+	fake.setPluginRepoMutex.RLock()
+	defer fake.setPluginRepoMutex.RUnlock()
+	return fake.setPluginRepoArgsForCall[i].arg1
 }
 
 func (fake *FakeRepository) UnSetPluginRepo(arg1 int) {
@@ -2864,173 +2226,114 @@ func (fake *FakeRepository) UnSetPluginRepoCallCount() int {
 	return len(fake.unSetPluginRepoArgsForCall)
 }
 
-func (fake *FakeRepository) UnSetPluginRepoCalls(stub func(int)) {
-	fake.unSetPluginRepoMutex.Lock()
-	defer fake.unSetPluginRepoMutex.Unlock()
-	fake.UnSetPluginRepoStub = stub
-}
-
 func (fake *FakeRepository) UnSetPluginRepoArgsForCall(i int) int {
 	fake.unSetPluginRepoMutex.RLock()
 	defer fake.unSetPluginRepoMutex.RUnlock()
-	argsForCall := fake.unSetPluginRepoArgsForCall[i]
-	return argsForCall.arg1
+	return fake.unSetPluginRepoArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) UserEmail() string {
-	fake.userEmailMutex.Lock()
-	ret, specificReturn := fake.userEmailReturnsOnCall[len(fake.userEmailArgsForCall)]
-	fake.userEmailArgsForCall = append(fake.userEmailArgsForCall, struct {
-	}{})
-	fake.recordInvocation("UserEmail", []interface{}{})
-	fake.userEmailMutex.Unlock()
-	if fake.UserEmailStub != nil {
-		return fake.UserEmailStub()
+func (fake *FakeRepository) SetCLIVersion(arg1 string) {
+	fake.setCLIVersionMutex.Lock()
+	fake.setCLIVersionArgsForCall = append(fake.setCLIVersionArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetCLIVersion", []interface{}{arg1})
+	fake.setCLIVersionMutex.Unlock()
+	if fake.SetCLIVersionStub != nil {
+		fake.SetCLIVersionStub(arg1)
+	}
+}
+
+func (fake *FakeRepository) SetCLIVersionCallCount() int {
+	fake.setCLIVersionMutex.RLock()
+	defer fake.setCLIVersionMutex.RUnlock()
+	return len(fake.setCLIVersionArgsForCall)
+}
+
+func (fake *FakeRepository) SetCLIVersionArgsForCall(i int) string {
+	fake.setCLIVersionMutex.RLock()
+	defer fake.setCLIVersionMutex.RUnlock()
+	return fake.setCLIVersionArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetUAAGrantType(arg1 string) {
+	fake.setUAAGrantTypeMutex.Lock()
+	fake.setUAAGrantTypeArgsForCall = append(fake.setUAAGrantTypeArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetUAAGrantType", []interface{}{arg1})
+	fake.setUAAGrantTypeMutex.Unlock()
+	if fake.SetUAAGrantTypeStub != nil {
+		fake.SetUAAGrantTypeStub(arg1)
+	}
+}
+
+func (fake *FakeRepository) SetUAAGrantTypeCallCount() int {
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
+	return len(fake.setUAAGrantTypeArgsForCall)
+}
+
+func (fake *FakeRepository) SetUAAGrantTypeArgsForCall(i int) string {
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
+	return fake.setUAAGrantTypeArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) UAAGrantType() string {
+	fake.uAAGrantTypeMutex.Lock()
+	ret, specificReturn := fake.uAAGrantTypeReturnsOnCall[len(fake.uAAGrantTypeArgsForCall)]
+	fake.uAAGrantTypeArgsForCall = append(fake.uAAGrantTypeArgsForCall, struct{}{})
+	fake.recordInvocation("UAAGrantType", []interface{}{})
+	fake.uAAGrantTypeMutex.Unlock()
+	if fake.UAAGrantTypeStub != nil {
+		return fake.UAAGrantTypeStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.userEmailReturns
-	return fakeReturns.result1
+	return fake.uAAGrantTypeReturns.result1
 }
 
-func (fake *FakeRepository) UserEmailCallCount() int {
-	fake.userEmailMutex.RLock()
-	defer fake.userEmailMutex.RUnlock()
-	return len(fake.userEmailArgsForCall)
+func (fake *FakeRepository) UAAGrantTypeCallCount() int {
+	fake.uAAGrantTypeMutex.RLock()
+	defer fake.uAAGrantTypeMutex.RUnlock()
+	return len(fake.uAAGrantTypeArgsForCall)
 }
 
-func (fake *FakeRepository) UserEmailCalls(stub func() string) {
-	fake.userEmailMutex.Lock()
-	defer fake.userEmailMutex.Unlock()
-	fake.UserEmailStub = stub
-}
-
-func (fake *FakeRepository) UserEmailReturns(result1 string) {
-	fake.userEmailMutex.Lock()
-	defer fake.userEmailMutex.Unlock()
-	fake.UserEmailStub = nil
-	fake.userEmailReturns = struct {
+func (fake *FakeRepository) UAAGrantTypeReturns(result1 string) {
+	fake.UAAGrantTypeStub = nil
+	fake.uAAGrantTypeReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeRepository) UserEmailReturnsOnCall(i int, result1 string) {
-	fake.userEmailMutex.Lock()
-	defer fake.userEmailMutex.Unlock()
-	fake.UserEmailStub = nil
-	if fake.userEmailReturnsOnCall == nil {
-		fake.userEmailReturnsOnCall = make(map[int]struct {
+func (fake *FakeRepository) UAAGrantTypeReturnsOnCall(i int, result1 string) {
+	fake.UAAGrantTypeStub = nil
+	if fake.uAAGrantTypeReturnsOnCall == nil {
+		fake.uAAGrantTypeReturnsOnCall = make(map[int]struct {
 			result1 string
 		})
 	}
-	fake.userEmailReturnsOnCall[i] = struct {
+	fake.uAAGrantTypeReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeRepository) UserGUID() string {
-	fake.userGUIDMutex.Lock()
-	ret, specificReturn := fake.userGUIDReturnsOnCall[len(fake.userGUIDArgsForCall)]
-	fake.userGUIDArgsForCall = append(fake.userGUIDArgsForCall, struct {
-	}{})
-	fake.recordInvocation("UserGUID", []interface{}{})
-	fake.userGUIDMutex.Unlock()
-	if fake.UserGUIDStub != nil {
-		return fake.UserGUIDStub()
+func (fake *FakeRepository) Close() {
+	fake.closeMutex.Lock()
+	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
+	fake.recordInvocation("Close", []interface{}{})
+	fake.closeMutex.Unlock()
+	if fake.CloseStub != nil {
+		fake.CloseStub()
 	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.userGUIDReturns
-	return fakeReturns.result1
 }
 
-func (fake *FakeRepository) UserGUIDCallCount() int {
-	fake.userGUIDMutex.RLock()
-	defer fake.userGUIDMutex.RUnlock()
-	return len(fake.userGUIDArgsForCall)
-}
-
-func (fake *FakeRepository) UserGUIDCalls(stub func() string) {
-	fake.userGUIDMutex.Lock()
-	defer fake.userGUIDMutex.Unlock()
-	fake.UserGUIDStub = stub
-}
-
-func (fake *FakeRepository) UserGUIDReturns(result1 string) {
-	fake.userGUIDMutex.Lock()
-	defer fake.userGUIDMutex.Unlock()
-	fake.UserGUIDStub = nil
-	fake.userGUIDReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) UserGUIDReturnsOnCall(i int, result1 string) {
-	fake.userGUIDMutex.Lock()
-	defer fake.userGUIDMutex.Unlock()
-	fake.UserGUIDStub = nil
-	if fake.userGUIDReturnsOnCall == nil {
-		fake.userGUIDReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.userGUIDReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) Username() string {
-	fake.usernameMutex.Lock()
-	ret, specificReturn := fake.usernameReturnsOnCall[len(fake.usernameArgsForCall)]
-	fake.usernameArgsForCall = append(fake.usernameArgsForCall, struct {
-	}{})
-	fake.recordInvocation("Username", []interface{}{})
-	fake.usernameMutex.Unlock()
-	if fake.UsernameStub != nil {
-		return fake.UsernameStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.usernameReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeRepository) UsernameCallCount() int {
-	fake.usernameMutex.RLock()
-	defer fake.usernameMutex.RUnlock()
-	return len(fake.usernameArgsForCall)
-}
-
-func (fake *FakeRepository) UsernameCalls(stub func() string) {
-	fake.usernameMutex.Lock()
-	defer fake.usernameMutex.Unlock()
-	fake.UsernameStub = stub
-}
-
-func (fake *FakeRepository) UsernameReturns(result1 string) {
-	fake.usernameMutex.Lock()
-	defer fake.usernameMutex.Unlock()
-	fake.UsernameStub = nil
-	fake.usernameReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeRepository) UsernameReturnsOnCall(i int, result1 string) {
-	fake.usernameMutex.Lock()
-	defer fake.usernameMutex.Unlock()
-	fake.UsernameStub = nil
-	if fake.usernameReturnsOnCall == nil {
-		fake.usernameReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.usernameReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
+func (fake *FakeRepository) CloseCallCount() int {
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return len(fake.closeArgsForCall)
 }
 
 func (fake *FakeRepository) Invocations() map[string][][]interface{} {
@@ -3040,122 +2343,118 @@ func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	defer fake.aPIEndpointMutex.RUnlock()
 	fake.aPIVersionMutex.RLock()
 	defer fake.aPIVersionMutex.RUnlock()
-	fake.accessTokenMutex.RLock()
-	defer fake.accessTokenMutex.RUnlock()
-	fake.accessTokenExpiryDateMutex.RLock()
-	defer fake.accessTokenExpiryDateMutex.RUnlock()
-	fake.asyncTimeoutMutex.RLock()
-	defer fake.asyncTimeoutMutex.RUnlock()
-	fake.authenticationEndpointMutex.RLock()
-	defer fake.authenticationEndpointMutex.RUnlock()
-	fake.cLIVersionMutex.RLock()
-	defer fake.cLIVersionMutex.RUnlock()
-	fake.clearSessionMutex.RLock()
-	defer fake.clearSessionMutex.RUnlock()
-	fake.closeMutex.RLock()
-	defer fake.closeMutex.RUnlock()
-	fake.colorEnabledMutex.RLock()
-	defer fake.colorEnabledMutex.RUnlock()
-	fake.dopplerEndpointMutex.RLock()
-	defer fake.dopplerEndpointMutex.RUnlock()
 	fake.hasAPIEndpointMutex.RLock()
 	defer fake.hasAPIEndpointMutex.RUnlock()
-	fake.hasOrganizationMutex.RLock()
-	defer fake.hasOrganizationMutex.RUnlock()
-	fake.hasSpaceMutex.RLock()
-	defer fake.hasSpaceMutex.RUnlock()
-	fake.isLoggedInMutex.RLock()
-	defer fake.isLoggedInMutex.RUnlock()
-	fake.isMinAPIVersionMutex.RLock()
-	defer fake.isMinAPIVersionMutex.RUnlock()
-	fake.isMinCLIVersionMutex.RLock()
-	defer fake.isMinCLIVersionMutex.RUnlock()
-	fake.isSSLDisabledMutex.RLock()
-	defer fake.isSSLDisabledMutex.RUnlock()
-	fake.localeMutex.RLock()
-	defer fake.localeMutex.RUnlock()
-	fake.minCLIVersionMutex.RLock()
-	defer fake.minCLIVersionMutex.RUnlock()
-	fake.minRecommendedCLIVersionMutex.RLock()
-	defer fake.minRecommendedCLIVersionMutex.RUnlock()
-	fake.organizationFieldsMutex.RLock()
-	defer fake.organizationFieldsMutex.RUnlock()
-	fake.pluginReposMutex.RLock()
-	defer fake.pluginReposMutex.RUnlock()
-	fake.refreshTokenMutex.RLock()
-	defer fake.refreshTokenMutex.RUnlock()
+	fake.authenticationEndpointMutex.RLock()
+	defer fake.authenticationEndpointMutex.RUnlock()
+	fake.dopplerEndpointMutex.RLock()
+	defer fake.dopplerEndpointMutex.RUnlock()
+	fake.uaaEndpointMutex.RLock()
+	defer fake.uaaEndpointMutex.RUnlock()
 	fake.routingAPIEndpointMutex.RLock()
 	defer fake.routingAPIEndpointMutex.RUnlock()
-	fake.sSHOAuthClientMutex.RLock()
-	defer fake.sSHOAuthClientMutex.RUnlock()
-	fake.setAPIEndpointMutex.RLock()
-	defer fake.setAPIEndpointMutex.RUnlock()
-	fake.setAPIVersionMutex.RLock()
-	defer fake.setAPIVersionMutex.RUnlock()
-	fake.setAccessTokenMutex.RLock()
-	defer fake.setAccessTokenMutex.RUnlock()
-	fake.setAccessTokenExpiryDateMutex.RLock()
-	defer fake.setAccessTokenExpiryDateMutex.RUnlock()
-	fake.setAsyncTimeoutMutex.RLock()
-	defer fake.setAsyncTimeoutMutex.RUnlock()
-	fake.setAuthenticationEndpointMutex.RLock()
-	defer fake.setAuthenticationEndpointMutex.RUnlock()
-	fake.setCLIVersionMutex.RLock()
-	defer fake.setCLIVersionMutex.RUnlock()
-	fake.setColorEnabledMutex.RLock()
-	defer fake.setColorEnabledMutex.RUnlock()
-	fake.setDopplerEndpointMutex.RLock()
-	defer fake.setDopplerEndpointMutex.RUnlock()
-	fake.setLocaleMutex.RLock()
-	defer fake.setLocaleMutex.RUnlock()
-	fake.setMinCLIVersionMutex.RLock()
-	defer fake.setMinCLIVersionMutex.RUnlock()
-	fake.setMinRecommendedCLIVersionMutex.RLock()
-	defer fake.setMinRecommendedCLIVersionMutex.RUnlock()
-	fake.setOrganizationFieldsMutex.RLock()
-	defer fake.setOrganizationFieldsMutex.RUnlock()
-	fake.setPluginRepoMutex.RLock()
-	defer fake.setPluginRepoMutex.RUnlock()
-	fake.setRefreshTokenMutex.RLock()
-	defer fake.setRefreshTokenMutex.RUnlock()
-	fake.setRoutingAPIEndpointMutex.RLock()
-	defer fake.setRoutingAPIEndpointMutex.RUnlock()
-	fake.setSSHOAuthClientMutex.RLock()
-	defer fake.setSSHOAuthClientMutex.RUnlock()
-	fake.setSSLDisabledMutex.RLock()
-	defer fake.setSSLDisabledMutex.RUnlock()
-	fake.setSpaceFieldsMutex.RLock()
-	defer fake.setSpaceFieldsMutex.RUnlock()
-	fake.setTraceMutex.RLock()
-	defer fake.setTraceMutex.RUnlock()
-	fake.setUAAGrantTypeMutex.RLock()
-	defer fake.setUAAGrantTypeMutex.RUnlock()
-	fake.setUAAOAuthClientMutex.RLock()
-	defer fake.setUAAOAuthClientMutex.RUnlock()
-	fake.setUAAOAuthClientSecretMutex.RLock()
-	defer fake.setUAAOAuthClientSecretMutex.RUnlock()
-	fake.setUaaEndpointMutex.RLock()
-	defer fake.setUaaEndpointMutex.RUnlock()
-	fake.spaceFieldsMutex.RLock()
-	defer fake.spaceFieldsMutex.RUnlock()
-	fake.traceMutex.RLock()
-	defer fake.traceMutex.RUnlock()
-	fake.uAAGrantTypeMutex.RLock()
-	defer fake.uAAGrantTypeMutex.RUnlock()
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
 	fake.uAAOAuthClientMutex.RLock()
 	defer fake.uAAOAuthClientMutex.RUnlock()
 	fake.uAAOAuthClientSecretMutex.RLock()
 	defer fake.uAAOAuthClientSecretMutex.RUnlock()
-	fake.uaaEndpointMutex.RLock()
-	defer fake.uaaEndpointMutex.RUnlock()
-	fake.unSetPluginRepoMutex.RLock()
-	defer fake.unSetPluginRepoMutex.RUnlock()
-	fake.userEmailMutex.RLock()
-	defer fake.userEmailMutex.RUnlock()
-	fake.userGUIDMutex.RLock()
-	defer fake.userGUIDMutex.RUnlock()
+	fake.sSHOAuthClientMutex.RLock()
+	defer fake.sSHOAuthClientMutex.RUnlock()
+	fake.refreshTokenMutex.RLock()
+	defer fake.refreshTokenMutex.RUnlock()
+	fake.organizationFieldsMutex.RLock()
+	defer fake.organizationFieldsMutex.RUnlock()
+	fake.hasOrganizationMutex.RLock()
+	defer fake.hasOrganizationMutex.RUnlock()
+	fake.spaceFieldsMutex.RLock()
+	defer fake.spaceFieldsMutex.RUnlock()
+	fake.hasSpaceMutex.RLock()
+	defer fake.hasSpaceMutex.RUnlock()
 	fake.usernameMutex.RLock()
 	defer fake.usernameMutex.RUnlock()
+	fake.userGUIDMutex.RLock()
+	defer fake.userGUIDMutex.RUnlock()
+	fake.userEmailMutex.RLock()
+	defer fake.userEmailMutex.RUnlock()
+	fake.isLoggedInMutex.RLock()
+	defer fake.isLoggedInMutex.RUnlock()
+	fake.isSSLDisabledMutex.RLock()
+	defer fake.isSSLDisabledMutex.RUnlock()
+	fake.isMinAPIVersionMutex.RLock()
+	defer fake.isMinAPIVersionMutex.RUnlock()
+	fake.isMinCLIVersionMutex.RLock()
+	defer fake.isMinCLIVersionMutex.RUnlock()
+	fake.minCLIVersionMutex.RLock()
+	defer fake.minCLIVersionMutex.RUnlock()
+	fake.minRecommendedCLIVersionMutex.RLock()
+	defer fake.minRecommendedCLIVersionMutex.RUnlock()
+	fake.cLIVersionMutex.RLock()
+	defer fake.cLIVersionMutex.RUnlock()
+	fake.asyncTimeoutMutex.RLock()
+	defer fake.asyncTimeoutMutex.RUnlock()
+	fake.traceMutex.RLock()
+	defer fake.traceMutex.RUnlock()
+	fake.colorEnabledMutex.RLock()
+	defer fake.colorEnabledMutex.RUnlock()
+	fake.localeMutex.RLock()
+	defer fake.localeMutex.RUnlock()
+	fake.pluginReposMutex.RLock()
+	defer fake.pluginReposMutex.RUnlock()
+	fake.clearSessionMutex.RLock()
+	defer fake.clearSessionMutex.RUnlock()
+	fake.setAPIEndpointMutex.RLock()
+	defer fake.setAPIEndpointMutex.RUnlock()
+	fake.setAPIVersionMutex.RLock()
+	defer fake.setAPIVersionMutex.RUnlock()
+	fake.setMinCLIVersionMutex.RLock()
+	defer fake.setMinCLIVersionMutex.RUnlock()
+	fake.setMinRecommendedCLIVersionMutex.RLock()
+	defer fake.setMinRecommendedCLIVersionMutex.RUnlock()
+	fake.setAuthenticationEndpointMutex.RLock()
+	defer fake.setAuthenticationEndpointMutex.RUnlock()
+	fake.setDopplerEndpointMutex.RLock()
+	defer fake.setDopplerEndpointMutex.RUnlock()
+	fake.setUaaEndpointMutex.RLock()
+	defer fake.setUaaEndpointMutex.RUnlock()
+	fake.setRoutingAPIEndpointMutex.RLock()
+	defer fake.setRoutingAPIEndpointMutex.RUnlock()
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
+	fake.setUAAOAuthClientMutex.RLock()
+	defer fake.setUAAOAuthClientMutex.RUnlock()
+	fake.setUAAOAuthClientSecretMutex.RLock()
+	defer fake.setUAAOAuthClientSecretMutex.RUnlock()
+	fake.setSSHOAuthClientMutex.RLock()
+	defer fake.setSSHOAuthClientMutex.RUnlock()
+	fake.setRefreshTokenMutex.RLock()
+	defer fake.setRefreshTokenMutex.RUnlock()
+	fake.setOrganizationFieldsMutex.RLock()
+	defer fake.setOrganizationFieldsMutex.RUnlock()
+	fake.setSpaceFieldsMutex.RLock()
+	defer fake.setSpaceFieldsMutex.RUnlock()
+	fake.setSSLDisabledMutex.RLock()
+	defer fake.setSSLDisabledMutex.RUnlock()
+	fake.setAsyncTimeoutMutex.RLock()
+	defer fake.setAsyncTimeoutMutex.RUnlock()
+	fake.setTraceMutex.RLock()
+	defer fake.setTraceMutex.RUnlock()
+	fake.setColorEnabledMutex.RLock()
+	defer fake.setColorEnabledMutex.RUnlock()
+	fake.setLocaleMutex.RLock()
+	defer fake.setLocaleMutex.RUnlock()
+	fake.setPluginRepoMutex.RLock()
+	defer fake.setPluginRepoMutex.RUnlock()
+	fake.unSetPluginRepoMutex.RLock()
+	defer fake.unSetPluginRepoMutex.RUnlock()
+	fake.setCLIVersionMutex.RLock()
+	defer fake.setCLIVersionMutex.RUnlock()
+	fake.setUAAGrantTypeMutex.RLock()
+	defer fake.setUAAGrantTypeMutex.RUnlock()
+	fake.uAAGrantTypeMutex.RLock()
+	defer fake.uAAGrantTypeMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

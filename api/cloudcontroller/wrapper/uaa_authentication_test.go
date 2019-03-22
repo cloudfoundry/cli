@@ -7,13 +7,17 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/cli/api/uaa"
+
+	"github.com/SermoDigital/jose/crypto"
+	"github.com/SermoDigital/jose/jws"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper/wrapperfakes"
-	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/wrapper/util"
 
 	. "github.com/onsi/ginkgo"
@@ -35,8 +39,6 @@ var _ = Describe("UAA Authentication", func() {
 		fakeConnection = new(cloudcontrollerfakes.FakeConnection)
 		fakeClient = new(wrapperfakes.FakeUAAClient)
 		inMemoryCache = util.NewInMemoryTokenCache()
-		inMemoryCache.SetAccessToken("a-ok")
-
 		inner = NewUAAAuthentication(fakeClient, inMemoryCache)
 		wrapper = inner.Wrap(fakeConnection)
 
@@ -65,9 +67,11 @@ var _ = Describe("UAA Authentication", func() {
 		})
 
 		When("the token is valid", func() {
+			var (
+				accessToken = buildTokenString(time.Now().AddDate(0, 0, 1))
+			)
 			BeforeEach(func() {
-				// token is set and not yet expired
-				inMemoryCache.SetAccessTokenExpiryDate(time.Now().AddDate(0, 0, 1))
+				inMemoryCache.SetAccessToken(accessToken)
 			})
 
 			It("does not refresh the token", func() {
@@ -81,7 +85,7 @@ var _ = Describe("UAA Authentication", func() {
 				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 				authenticatedRequest, _ := fakeConnection.MakeArgsForCall(0)
 				headers := authenticatedRequest.Header
-				Expect(headers["Authorization"]).To(ConsistOf([]string{"a-ok"}))
+				Expect(headers["Authorization"]).To(ConsistOf([]string{accessToken}))
 			})
 
 			When("the request already has headers", func() {
@@ -124,9 +128,9 @@ var _ = Describe("UAA Authentication", func() {
 				executeErr   error
 			)
 
-			newAccessToken := "newAccessToken"
+			invalidAccessToken := buildTokenString(time.Time{})
+			newAccessToken := buildTokenString(time.Now().AddDate(0, 1, 1))
 			newRefreshToken := "newRefreshToken"
-			refreshTokenExpiry := time.Duration(time.Second * 42)
 
 			BeforeEach(func() {
 				expectedBody = "this body content should be preserved"
@@ -136,14 +140,13 @@ var _ = Describe("UAA Authentication", func() {
 					Body:   ioutil.NopCloser(body),
 				}, body)
 
-				inMemoryCache.SetAccessToken("old access token")
+				inMemoryCache.SetAccessToken(invalidAccessToken)
 
 				fakeClient.RefreshAccessTokenReturns(
 					uaa.RefreshedTokens{
 						AccessToken:  newAccessToken,
 						RefreshToken: newRefreshToken,
 						Type:         "bearer",
-						ExpiresIn:    int(refreshTokenExpiry.Seconds()),
 					},
 					nil,
 				)
@@ -159,10 +162,8 @@ var _ = Describe("UAA Authentication", func() {
 			})
 
 			It("should save the refresh token", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(inMemoryCache.RefreshToken()).To(Equal(newRefreshToken))
 				Expect(inMemoryCache.AccessToken()).To(ContainSubstring(newAccessToken))
-				Expect(inMemoryCache.AccessTokenExpiryDate()).Should(BeTemporally("~", time.Now(), refreshTokenExpiry))
 			})
 
 			When("token cannot be refreshed", func() {
@@ -178,3 +179,11 @@ var _ = Describe("UAA Authentication", func() {
 		})
 	})
 })
+
+func buildTokenString(expiration time.Time) string {
+	c := jws.Claims{}
+	c.SetExpiration(expiration)
+	token := jws.NewJWT(c, crypto.Unsecured)
+	tokenBytes, _ := token.Serialize(nil)
+	return string(tokenBytes)
+}

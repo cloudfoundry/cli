@@ -3,7 +3,6 @@ package coreconfig
 import (
 	"strings"
 	"sync"
-	"time"
 
 	"code.cloudfoundry.org/cli/cf/configuration"
 	"code.cloudfoundry.org/cli/cf/models"
@@ -66,7 +65,6 @@ type Reader interface {
 	UaaEndpoint() string
 	RoutingAPIEndpoint() string
 	AccessToken() string
-	AccessTokenExpiryDate() time.Time
 	UAAOAuthClient() string
 	UAAOAuthClientSecret() string
 	SSHOAuthClient() string
@@ -105,7 +103,6 @@ type ReadWriter interface {
 	Reader
 	ClearSession()
 	SetAccessToken(string)
-	SetAccessTokenExpiryDate(t time.Time)
 	SetAPIEndpoint(string)
 	SetAPIVersion(string)
 	SetAsyncTimeout(uint)
@@ -237,13 +234,6 @@ func (c *ConfigRepository) HasAPIEndpoint() (hasEndpoint bool) {
 func (c *ConfigRepository) AccessToken() (accessToken string) {
 	c.read(func() {
 		accessToken = c.data.AccessToken
-	})
-	return
-}
-
-func (c *ConfigRepository) AccessTokenExpiryDate() (t time.Time) {
-	c.read(func() {
-		t, _ = time.Parse(time.RFC3339, c.data.AccessTokenExpiryDate)
 	})
 	return
 }
@@ -499,12 +489,6 @@ func (c *ConfigRepository) SetRoutingAPIEndpoint(routingAPIEndpoint string) {
 func (c *ConfigRepository) SetAccessToken(token string) {
 	c.write(func() {
 		c.data.AccessToken = token
-	})
-}
-
-func (c *ConfigRepository) SetAccessTokenExpiryDate(t time.Time) {
-	c.write(func() {
-		c.data.AccessTokenExpiryDate = t.Format(time.RFC3339)
 	})
 }
 

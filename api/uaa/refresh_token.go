@@ -15,7 +15,6 @@ type RefreshedTokens struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	Type         string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
 }
 
 // AuthorizationToken returns formatted authorization header.

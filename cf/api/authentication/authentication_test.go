@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/net"
@@ -19,6 +20,8 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
 )
+
+var testAccessToken = testconfig.BuildTokenString(time.Now())
 
 var _ = Describe("AuthenticationRepository", func() {
 	Describe("legacy tests", func() {
@@ -69,7 +72,7 @@ var _ = Describe("AuthenticationRepository", func() {
 					Expect(handler).To(HaveAllRequestsCalled())
 					Expect(err).NotTo(HaveOccurred())
 					Expect(config.AuthenticationEndpoint()).To(Equal(testServer.URL))
-					Expect(config.AccessToken()).To(Equal("BEARER my_access_token"))
+					Expect(config.AccessToken()).To(Equal(fmt.Sprintf("BEARER %s", testAccessToken)))
 					Expect(config.RefreshToken()).To(Equal("my_refresh_token"))
 				})
 			})
@@ -210,28 +213,32 @@ var _ = Describe("AuthenticationRepository", func() {
 			Context("when the user is authenticated with client credentials grant", func() {
 				BeforeEach(func() {
 					config.SetUAAGrantType("client_credentials")
+					config.SetAccessToken(testAccessToken)
 					setupTestServer(successfulClientCredentialsLoginRequest)
 				})
 
 				It("uses client credentials to refresh the access token", func() {
-					Expect(accessToken).To(Equal("BEARER my_new_access_token"))
+					Expect(apiErr).ToNot(HaveOccurred())
+					Expect(accessToken).To(Equal(fmt.Sprintf("BEARER %s", testAccessToken)))
 				})
 			})
 
 			Context("when the user is authenticated with password grant", func() {
 				BeforeEach(func() {
 					config.SetUAAGrantType("")
+					config.SetAccessToken(testAccessToken)
 					setupTestServer(successfulPasswordRefreshTokenRequest)
 				})
 
 				It("uses the refresh token to refresh the access token", func() {
-					Expect(accessToken).To(Equal("BEARER my_new_access_token"))
+					Expect(accessToken).To(Equal(fmt.Sprintf("BEARER %s", testAccessToken)))
 				})
 			})
 
 			Context("when the refresh token has expired", func() {
 				BeforeEach(func() {
 					setupTestServer(refreshTokenExpiredRequestError)
+					config.SetAccessToken(testAccessToken)
 				})
 
 				It("the returns the reauthentication error message", func() {
@@ -371,14 +378,14 @@ var successfulPasswordLoginRequest = testnet.TestRequest{
 	Matcher: successfulPasswordLoginMatcher,
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
-		Body: `
+		Body: fmt.Sprintf(`
 {
-  "access_token": "my_access_token",
+  "access_token": "%s",
   "token_type": "BEARER",
   "refresh_token": "my_refresh_token",
   "scope": "openid",
   "expires_in": 98765
-} `},
+} `, testAccessToken)},
 }
 
 var successfulClientCredentialsLoginRequest = testnet.TestRequest{
@@ -388,13 +395,13 @@ var successfulClientCredentialsLoginRequest = testnet.TestRequest{
 	Matcher: successfulClientCredentialsLoginMatcher,
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
-		Body: `
+		Body: fmt.Sprintf(`
 {
-  "access_token": "my_new_access_token",
+  "access_token": "%s",
   "token_type": "BEARER",
   "scope": "openid",
   "expires_in": 98765
-} `},
+} `, testAccessToken)},
 }
 
 var successfulPasswordRefreshTokenRequest = testnet.TestRequest{
@@ -404,14 +411,14 @@ var successfulPasswordRefreshTokenRequest = testnet.TestRequest{
 	Matcher: successfulPasswordRefreshTokenLoginMatcher,
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
-		Body: `
+		Body: fmt.Sprintf(`
 {
-  "access_token": "my_new_access_token",
+  "access_token": "%s",
   "token_type": "BEARER",
   "refresh_token": "my_refresh_token",
   "scope": "openid",
   "expires_in": 98765
-} `},
+} `, testAccessToken)},
 }
 
 var successfulPasswordLoginMatcher = func(request *http.Request) {

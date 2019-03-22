@@ -1,7 +1,10 @@
 package wrapper
 
 import (
+	"strings"
 	"time"
+
+	"github.com/SermoDigital/jose/jws"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -9,7 +12,7 @@ import (
 
 //go:generate counterfeiter . UAAClient
 
-const accessTokenExpirationMargin = time.Second * 5
+const accessTokenExpirationMargin = time.Minute
 
 // UAAClient is the interface for getting a valid access token
 type UAAClient interface {
@@ -22,10 +25,8 @@ type UAAClient interface {
 type TokenCache interface {
 	AccessToken() string
 	RefreshToken() string
-	AccessTokenExpiryDate() time.Time
 	SetAccessToken(token string)
 	SetRefreshToken(token string)
-	SetAccessTokenExpiryDate(time time.Time)
 }
 
 // UAAAuthentication wraps connections and adds authentication headers to all
@@ -75,15 +76,19 @@ func (t *UAAAuthentication) Wrap(innerconnection cloudcontroller.Connection) clo
 // refreshToken refreshes the JWT access token if it is expired or about to expire.
 // If the access token is not yet expired, no action is performed.
 func (t *UAAAuthentication) refreshToken() error {
-	expiresIn := t.cache.AccessTokenExpiryDate().Sub(time.Now())
-	if expiresIn < accessTokenExpirationMargin {
+	tokenStr := strings.TrimPrefix(t.cache.AccessToken(), "bearer ")
+	token, err := jws.ParseJWT([]byte(tokenStr))
+	if err != nil {
+		return err
+	}
+	expiration, _ := token.Claims().Expiration()
+	if expiration.Sub(time.Now()) < accessTokenExpirationMargin {
 		tokens, err := t.client.RefreshAccessToken(t.cache.RefreshToken())
 		if err != nil {
 			return err
 		}
 		t.cache.SetAccessToken(tokens.AuthorizationToken())
 		t.cache.SetRefreshToken(tokens.RefreshToken)
-		t.cache.SetAccessTokenExpiryDate(time.Now().Add(time.Second * time.Duration(tokens.ExpiresIn)))
 	}
 	return nil
 }

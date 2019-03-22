@@ -30,6 +30,12 @@ import (
 	"github.com/onsi/gomega/ghttp"
 )
 
+var (
+	initialAccessToken   = testconfig.BuildTokenString(time.Now().AddDate(0, 0, 1))
+	refreshedAccessToken = testconfig.BuildTokenString(time.Now().AddDate(0, 1, 1))
+	refreshToken         = "refresh-token"
+)
+
 var _ = Describe("Gateway", func() {
 	var (
 		ccServer    *ghttp.Server
@@ -108,7 +114,7 @@ var _ = Describe("Gateway", func() {
 
 		Context("when the body is nil", func() {
 			BeforeEach(func() {
-				request, apiErr = ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
+				request, apiErr = ccGateway.NewRequest("GET", "https://example.com/v2/apps", initialAccessToken, nil)
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
 
@@ -117,7 +123,7 @@ var _ = Describe("Gateway", func() {
 			})
 
 			It("sets the Authorization header", func() {
-				Expect(request.HTTPReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
+				Expect(request.HTTPReq.Header.Get("Authorization")).To(Equal(initialAccessToken))
 			})
 
 			It("sets the accept header to application/json", func() {
@@ -132,7 +138,7 @@ var _ = Describe("Gateway", func() {
 		Context("when the body is a file", func() {
 			BeforeEach(func() {
 				f, _ := os.Open("../../fixtures/test.file")
-				request, apiErr = ccGateway.NewRequestForFile("PUT", "https://example.com/v2/apps", "BEARER my-access-token", f)
+				request, apiErr = ccGateway.NewRequestForFile("PUT", "https://example.com/v2/apps", initialAccessToken, f)
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
 
@@ -334,8 +340,6 @@ var _ = Describe("Gateway", func() {
 			authServer, _ = testnet.NewTLSServer([]testnet.TestRequest{})
 
 			config, authRepo = createAuthenticationRepository(apiServer, authServer)
-			config.SetAccessTokenExpiryDate(time.Now().AddDate(0, 0, 1))
-
 			ccGateway.SetTokenRefresher(authRepo)
 
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
@@ -401,7 +405,7 @@ var _ = Describe("Gateway", func() {
 			authServer = httptest.NewTLSServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 				fmt.Fprintln(
 					writer,
-					`{ "access_token": "new-access-token", "token_type": "bearer", "refresh_token": "new-refresh-token"}`)
+					fmt.Sprintf(`{ "access_token": "%s", "token_type": "bearer", "refresh_token": "new-refresh-token"}`, refreshedAccessToken))
 			}))
 			apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 			authServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
@@ -428,136 +432,81 @@ var _ = Describe("Gateway", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(request.HTTPReq.ContentLength).To(Equal(int64(13)))
 		})
-
-		Describe("when the access token expires during the upload", func() {
-			It("successfully re-sends the file on the second request", func() {
-				_, apiErr = ccGateway.PerformRequest(request)
-				Expect(apiErr).NotTo(HaveOccurred())
-			})
-		})
 	})
 
 	Describe("refreshing the auth token", func() {
-		var authServer *httptest.Server
-
-		BeforeEach(func() {
-			authServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				fmt.Fprintln(w, `{
-				 	"access_token": "new-access-token",
-				 	"token_type": "bearer",
-					"refresh_token": "new-refresh-token"
-				}`)
-			}))
-
-			uaaGateway.SetTrustedCerts(authServer.TLS.Certificates)
-			authServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
-		})
+		var (
+			authServer  *httptest.Server
+			requestPath = "/v2/foo"
+		)
 
 		AfterEach(func() {
 			authServer.Close()
 		})
 
-		It("refreshes the token when UAA requests fail", func() {
-			apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
-				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
-				testnet.TestResponse{Status: http.StatusOK},
-			))
+		It("is done when the token is expired", func() {
+			authServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprintln(w, fmt.Sprintf(`{
+					"access_token": "%s",
+					"token_type": "bearer",
+					"refresh_token": "%s"
+				}`, refreshedAccessToken, refreshToken))
+			}))
+			uaaGateway.SetTrustedCerts(authServer.TLS.Certificates)
+			authServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
+
+			requestPath := "/v2/foo"
+			apiServer := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// refresh call
+				if r.Header.Get("Authorization") == "bearer "+refreshedAccessToken && r.URL.Path == requestPath {
+					return // 200 with no body
+				} else {
+					http.Error(w, "unexpected request", http.StatusTeapot)
+				}
+			}))
+
 			defer apiServer.Close()
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
+			expiredToken := testconfig.BuildTokenString(time.Time{})
+			config.SetAccessToken("bearer " + expiredToken)
 			uaaGateway.SetTokenRefresher(auth)
-			request, apiErr := uaaGateway.NewRequest("POST", config.APIEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
+			request, apiErr := uaaGateway.NewRequest("POST", config.APIEndpoint()+requestPath, "bearer "+expiredToken, strings.NewReader("expected body"))
 			_, apiErr = uaaGateway.PerformRequest(request)
 
 			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
-			Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
+			Expect(config.AccessToken()).To(Equal("bearer " + refreshedAccessToken))
+			Expect(config.RefreshToken()).To(Equal(refreshToken))
 		})
 
-		It("refreshes the token when CC requests fail", func() {
-			apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
-				`{ "code": 1000, "description": "Auth token is invalid" }`,
-				testnet.TestResponse{Status: http.StatusOK}))
+		It("is not done when the token is still valid", func() {
+			authServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				http.Error(w, "dont call me", http.StatusTeapot)
+			}))
+			uaaGateway.SetTrustedCerts(authServer.TLS.Certificates)
+			authServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
+
+			apiServer := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Header.Get("Authorization") == "bearer "+initialAccessToken && r.URL.Path == requestPath {
+					return // 200 with no body
+				} else {
+					http.Error(w, "unexpected request", http.StatusTeapot)
+				}
+			}))
 			defer apiServer.Close()
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
-			ccGateway.SetTokenRefresher(auth)
-			request, apiErr := ccGateway.NewRequest("POST", config.APIEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
-			_, apiErr = ccGateway.PerformRequest(request)
-
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
-			Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
-		})
-
-		Context("v3 endpoint", func() {
-			It("refreshes the token when the CC requests fail", func() {
-				invalidTokenResponse := `{
-					"errors": [
-						{
-							"detail": "Invalid Auth Token",
-							"title": "CF-InvalidAuthToken",
-							"code": 1000
-						}
-					]
-				}`
-				apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
-					invalidTokenResponse,
-					testnet.TestResponse{Status: http.StatusOK},
-				))
-
-				defer apiServer.Close()
-				ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
-
-				config, auth := createAuthenticationRepository(apiServer, authServer)
-				ccGateway.SetTokenRefresher(auth)
-				request, apiErr := ccGateway.NewRequest("POST", config.APIEndpoint()+"/v3/foo", config.AccessToken(), strings.NewReader("expected body"))
-				_, apiErr = ccGateway.PerformRequest(request)
-
-				Expect(apiErr).NotTo(HaveOccurred())
-				Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
-				Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
-			})
-		})
-		It("returns a failure response when token refresh fails after a UAA request", func() {
-			apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
-				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
-				testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
-					"error": "333", "error_description": "bad request"
-				}`}))
-			defer apiServer.Close()
-			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
-			apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
-
-			config, auth := createAuthenticationRepository(apiServer, authServer)
+			config.SetAccessToken("bearer " + initialAccessToken)
 			uaaGateway.SetTokenRefresher(auth)
-			request, apiErr := uaaGateway.NewRequest("POST", config.APIEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
+			request, apiErr := uaaGateway.NewRequest("POST", config.APIEndpoint()+requestPath, "bearer "+initialAccessToken, strings.NewReader("some body"))
 			_, apiErr = uaaGateway.PerformRequest(request)
 
-			Expect(apiErr).To(HaveOccurred())
-			Expect(apiErr.(errors.HTTPError).ErrorCode()).To(Equal("333"))
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(config.AccessToken()).To(Equal("bearer " + initialAccessToken))
 		})
 
-		It("returns a failure response when token refresh fails after a CC request", func() {
-			apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
-				`{ "code": 1000, "description": "Auth token is invalid" }`,
-				testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
-					"code": 333, "description": "bad request"
-				}`}))
-			defer apiServer.Close()
-			apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
-			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
-
-			config, auth := createAuthenticationRepository(apiServer, authServer)
-			ccGateway.SetTokenRefresher(auth)
-			request, apiErr := ccGateway.NewRequest("POST", config.APIEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
-			_, apiErr = ccGateway.PerformRequest(request)
-
-			Expect(apiErr).To(HaveOccurred())
-			Expect(apiErr.(errors.HTTPError).ErrorCode()).To(Equal("333"))
-		})
 	})
 
 	Describe("SSL certificate validation errors", func() {
@@ -652,8 +601,6 @@ var _ = Describe("Gateway", func() {
 			authServer, _ = testnet.NewTLSServer([]testnet.TestRequest{})
 
 			config, authRepo = createAuthenticationRepository(apiServer, authServer)
-			config.SetAccessTokenExpiryDate(time.Now().AddDate(0, 0, 1))
-
 			ccGateway.SetTokenRefresher(authRepo)
 
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
@@ -704,10 +651,10 @@ func refreshTokenAPIEndPoint(unauthorizedBody string, secondReqResp testnet.Test
 		}
 
 		switch request.Header.Get("Authorization") {
-		case "bearer initial-access-token":
+		case initialAccessToken:
 			writer.WriteHeader(http.StatusUnauthorized)
 			jsonResponse = unauthorizedBody
-		case "bearer new-access-token":
+		case refreshedAccessToken:
 			writer.WriteHeader(secondReqResp.Status)
 			jsonResponse = secondReqResp.Body
 		default:
@@ -722,8 +669,6 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 	config := testconfig.NewRepository()
 	config.SetAuthenticationEndpoint(authServer.URL)
 	config.SetAPIEndpoint(apiServer.URL)
-	config.SetAccessToken("bearer initial-access-token")
-	config.SetRefreshToken("initial-refresh-token")
 
 	authGateway := NewUAAGateway(config, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 	authGateway.SetTrustedCerts(authServer.TLS.Certificates)
