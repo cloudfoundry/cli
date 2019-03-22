@@ -65,7 +65,7 @@ var _ = Describe("push manifest with a path", func() {
 			if runtime.GOOS == "windows" {
 				// The paths in windows logging have extra escaping that is difficult
 				// to match. Instead match on uploading the right number of files.
-				Eventually(session.Err).Should(Say("zipped_file_count=2"))
+				Eventually(session.Err).Should(Say("zipped_file_count=3"))
 			} else {
 				Eventually(session.Err).Should(helpers.SayPath(`msg="creating archive"\s+Path="?%s"?`, dir))
 			}
