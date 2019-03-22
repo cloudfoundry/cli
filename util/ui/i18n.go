@@ -126,7 +126,7 @@ func loadAssetFromResources(locale string) ([]byte, error) {
 	assetName := fmt.Sprintf(assetPath, locale)
 	assetBytes, err := resources.Asset(assetName)
 	if err != nil {
-		err = fmt.Errorf("Could not load asset '%s': %s", assetName, err.Error())
+		err = fmt.Errorf("could not load asset '%s': %s", assetName, err.Error())
 	}
 
 	return assetBytes, err

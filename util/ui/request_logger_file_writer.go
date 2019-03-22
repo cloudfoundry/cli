@@ -57,7 +57,7 @@ func (display *RequestLoggerFileWriter) DisplayHost(name string) error {
 }
 
 func (display *RequestLoggerFileWriter) DisplayJSONBody(body []byte) error {
-	if body == nil || len(body) == 0 {
+	if len(body) == 0 {
 		return nil
 	}
 

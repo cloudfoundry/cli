@@ -255,7 +255,7 @@ func (ui *UI) displayWrappingTableWithWidth(prefix string, table [][]string, pad
 	lastColumnWidth := ui.TerminalWidth - spilloverPadding
 
 	for row := 0; row < rows; row++ {
-		fmt.Fprintf(ui.Out, prefix)
+		fmt.Fprint(ui.Out, prefix)
 
 		// for all columns except last, add cell value and padding
 		for col := 0; col < columns-1; col++ {
@@ -306,7 +306,7 @@ func (ui *UI) modifyColor(text string, colorPrinter *color.Color) string {
 // getFirstSet returns the first map if 1 or more maps are provided. Otherwise
 // it returns the empty map.
 func getFirstSet(list []map[string]interface{}) map[string]interface{} {
-	if list == nil || len(list) == 0 {
+	if len(list) == 0 {
 		return map[string]interface{}{}
 	}
 	return list[0]

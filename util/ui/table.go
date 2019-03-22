@@ -65,7 +65,7 @@ func (ui *UI) DisplayNonWrappingTable(prefix string, table [][]string, padding i
 	}
 
 	for row := 0; row < rows; row++ {
-		fmt.Fprintf(ui.Out, prefix)
+		fmt.Fprint(ui.Out, prefix)
 		for col := 0; col < columns; col++ {
 			data := table[row][col]
 			var addedPadding int

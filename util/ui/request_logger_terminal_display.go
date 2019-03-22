@@ -45,7 +45,7 @@ func (display *RequestLoggerTerminalDisplay) DisplayHost(name string) error {
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayJSONBody(body []byte) error {
-	if body == nil || len(body) == 0 {
+	if len(body) == 0 {
 		return nil
 	}
 

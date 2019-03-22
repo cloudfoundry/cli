@@ -102,7 +102,7 @@ func (config *Config) GetPlugin(pluginName string) (Plugin, bool) {
 // insensitive and returns true if it exists.
 func (config *Config) GetPluginCaseInsensitive(pluginName string) (Plugin, bool) {
 	for name, plugin := range config.pluginsConfig.Plugins {
-		if strings.ToLower(name) == strings.ToLower(pluginName) {
+		if strings.EqualFold(name, pluginName) {
 			return plugin, true
 		}
 	}
