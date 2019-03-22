@@ -503,14 +503,15 @@ func (cmd PushCommand) ReadManifest() error {
 	}
 
 	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
-	cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{"Path": pathToManifest})
 	err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
-	if err != nil && !os.IsNotExist(err) {
+	if os.IsNotExist(err) {
+		log.Debug("no manifest exists")
+		return nil
+	} else if err != nil {
 		log.Errorln("reading manifest:", err)
 		return err
-	} else if os.IsNotExist(err) {
-		log.Debug("no manifest exists")
 	}
+	cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{"Path": pathToManifest})
 
 	return nil
 }
