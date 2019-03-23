@@ -136,13 +136,6 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 		return v7action.Package{}, err
 	}
 
-	eventStream <- CreatingArchive
-	archivePath, err := actor.GetArchivePath(plan, unmatchedResources)
-	if err != nil {
-		return v7action.Package{}, err
-	}
-	defer os.RemoveAll(archivePath)
-
 	eventStream <- CreatingPackage
 	log.WithField("GUID", plan.Application.GUID).Info("creating package")
 	pkg, v7warnings, err := actor.V7Actor.CreateBitsPackageByApplication(plan.Application.GUID)
@@ -151,36 +144,53 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 		return v7action.Package{}, err
 	}
 
-	// Uploading package/app bits
-	for count := 0; count < PushRetries; count++ {
-		eventStream <- ReadingArchive
-		log.WithField("GUID", plan.Application.GUID).Info("reading archive")
-		file, size, readErr := actor.SharedActor.ReadArchive(archivePath)
-		if readErr != nil {
-			return v7action.Package{}, readErr
+	if len(unmatchedResources) > 0 {
+		eventStream <- CreatingArchive
+		archivePath, err := actor.GetArchivePath(plan, unmatchedResources)
+		if err != nil {
+			return v7action.Package{}, err
 		}
-		defer file.Close()
+		defer os.RemoveAll(archivePath)
 
-		eventStream <- UploadingApplicationWithArchive
-		progressReader := progressBar.NewProgressBarWrapper(file, size)
-		pkg, v7warnings, err = actor.V7Actor.UploadBitsPackage(pkg, matchedResources, progressReader, size)
+		// Uploading package/app bits
+		for count := 0; count < PushRetries; count++ {
+			eventStream <- ReadingArchive
+			log.WithField("GUID", plan.Application.GUID).Info("reading archive")
+			file, size, readErr := actor.SharedActor.ReadArchive(archivePath)
+			if readErr != nil {
+				return v7action.Package{}, readErr
+			}
+			defer file.Close()
+
+			eventStream <- UploadingApplicationWithArchive
+			progressReader := progressBar.NewProgressBarWrapper(file, size)
+			pkg, v7warnings, err = actor.V7Actor.UploadBitsPackage(pkg, matchedResources, progressReader, size)
+			warningsStream <- Warnings(v7warnings)
+
+			if _, ok := err.(ccerror.PipeSeekError); ok {
+				eventStream <- RetryUpload
+				continue
+			}
+			break
+		}
+
+		if err != nil {
+			if e, ok := err.(ccerror.PipeSeekError); ok {
+				return v7action.Package{}, actionerror.UploadFailedError{Err: e.Err}
+			}
+			return v7action.Package{}, err
+		}
+
+		eventStream <- UploadWithArchiveComplete
+	} else {
+		eventStream <- UploadingApplication
+		pkg, v7warnings, err = actor.V7Actor.UploadBitsPackage(pkg, matchedResources, nil, 0)
+
 		warningsStream <- Warnings(v7warnings)
-
-		if _, ok := err.(ccerror.PipeSeekError); ok {
-			eventStream <- RetryUpload
-			continue
+		if err != nil {
+			return v7action.Package{}, err
 		}
-		break
 	}
-
-	if err != nil {
-		if e, ok := err.(ccerror.PipeSeekError); ok {
-			return v7action.Package{}, actionerror.UploadFailedError{Err: e.Err}
-		}
-		return v7action.Package{}, err
-	}
-
-	eventStream <- UploadWithArchiveComplete
 	return pkg, nil
 }
 

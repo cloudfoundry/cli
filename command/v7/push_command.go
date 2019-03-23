@@ -435,6 +435,9 @@ func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) bo
 		cmd.UI.DisplayText("Uploading files...")
 		log.Debug("starting progress bar")
 		cmd.ProgressBar.Ready()
+	case v7pushaction.UploadingApplication:
+		cmd.UI.DisplayText("All files found in remote cache; nothing to upload.")
+		cmd.UI.DisplayText("Waiting for API to complete processing files...")
 	case v7pushaction.RetryUpload:
 		cmd.UI.DisplayText("Retrying upload due to an error...")
 	case v7pushaction.UploadWithArchiveComplete:
