@@ -20,6 +20,10 @@ type Application struct {
 	LifecycleBuildpacks []string
 	// LifecycleType is the type of the lifecycle.
 	LifecycleType constant.AppLifecycleType
+	// Metadata is used for custom tagging of API resources
+	Metadata struct {
+		Labels map[string]string `json:"labels,omitempty"`
+	}
 	// Name is the name given to the application.
 	Name string
 	// Relationships list the relationships to the application.
@@ -33,6 +37,10 @@ func (a Application) MarshalJSON() ([]byte, error) {
 	ccApp := ccApplication{
 		Name:          a.Name,
 		Relationships: a.Relationships,
+	}
+
+	if len(a.Metadata.Labels) != 0 {
+		ccApp.Metadata = &a.Metadata
 	}
 
 	if a.LifecycleType == constant.AppLifecycleTypeDocker {
@@ -94,6 +102,9 @@ type ccApplication struct {
 	Lifecycle     interface{}               `json:"lifecycle,omitempty"`
 	GUID          string                    `json:"guid,omitempty"`
 	State         constant.ApplicationState `json:"state,omitempty"`
+	Metadata      *struct {
+		Labels map[string]string `json:"labels,omitempty"`
+	} `json:"metadata,omitempty"`
 }
 
 func (ccApp *ccApplication) setAutodetectedBuildpackLifecycle(a Application) {

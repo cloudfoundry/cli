@@ -233,6 +233,12 @@ type RenameBuildpackArgs struct {
 	NewBuildpackName string `positional-arg-name:"NEW_BUILDPACK_NAME" required:"true" description:"The new buildpack name"`
 }
 
+type SetLabelArgs struct {
+	ResourceType string   `positional-arg-name:"RESOURCE" required:"true" description:"The type of resource to label"`
+	ResourceName string   `positional-arg-name:"RESOURCE_NAME" required:"true" description:"The name of the resource"`
+	Labels       []string `positional-arg-name:"KEY=VALUE" required:"true" description:"A space-separated list of labels to set on the resource"`
+}
+
 type SetOrgRoleArgs struct {
 	Username     string  `positional-arg-name:"USERNAME" required:"true" description:"The user"`
 	Organization string  `positional-arg-name:"ORG" required:"true" description:"The organization"`

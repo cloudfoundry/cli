@@ -110,6 +110,34 @@ var _ = Describe("Application", func() {
 					})
 				})
 			})
+
+			When("metadata is provided", func() {
+				BeforeEach(func() {
+					app = Application{
+						Metadata: struct {
+							Labels map[string]string `json:"labels,omitempty"`
+						}{
+							Labels: map[string]string{
+								"some-key":  "some-value",
+								"other-key": "other-value",
+							},
+						},
+					}
+				})
+
+				It("should include the labels in the JSON", func() {
+					Expect(string(appBytes)).To(MatchJSON(`{
+						"metadata": {
+							"labels": {
+								"some-key":"some-value",
+								"other-key":"other-value"
+							}
+						}
+					}`))
+
+				})
+
+			})
 		})
 
 		Describe("UnmarshalJSON", func() {

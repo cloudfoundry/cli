@@ -17,6 +17,9 @@ type Application struct {
 	State               constant.ApplicationState
 	LifecycleType       constant.AppLifecycleType
 	LifecycleBuildpacks []string
+	Metadata            struct {
+		Labels map[string]string `json:"labels,omitempty"`
+	}
 }
 
 func (app Application) Started() bool {
@@ -223,6 +226,7 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 		StackName:           app.StackName,
 		LifecycleType:       app.LifecycleType,
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
+		Metadata:            app.Metadata,
 	}
 
 	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccApp)

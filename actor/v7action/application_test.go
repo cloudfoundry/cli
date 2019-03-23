@@ -404,6 +404,10 @@ var _ = Describe("Application Actions", func() {
 				LifecycleType:       constant.AppLifecycleTypeBuildpack,
 				LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
 			}
+			submitApp.Metadata.Labels = map[string]string{
+				"some-label":  "some-value",
+				"other-label": "other-value",
+			}
 			resultApp, warnings, err = actor.UpdateApplication(submitApp)
 		})
 
@@ -440,6 +444,7 @@ var _ = Describe("Application Actions", func() {
 					StackName:           submitApp.StackName,
 					LifecycleType:       submitApp.LifecycleType,
 					LifecycleBuildpacks: submitApp.LifecycleBuildpacks,
+					Metadata:            submitApp.Metadata,
 				}))
 			})
 		})

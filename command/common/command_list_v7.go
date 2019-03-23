@@ -36,88 +36,92 @@ type commandList struct {
 	V3Stop               v6.V3StopCommand                `command:"v3-stop" description:"Stop an app"`
 	V3ZdtRestart         v6.V3ZeroDowntimeRestartCommand `command:"v3-zdt-restart" description:"Sequentially restart each instance of an app."`
 
-	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
-	AddNetworkPolicy                   v6.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
-	AllowSpaceSSH                      v6.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
-	Api                                v6.ApiCommand                                `command:"api" description:"Set or view target api url"`
-	Apps                               v6.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
-	Auth                               v6.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
-	BindRouteService                   v6.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
-	BindRunningSecurityGroup           v6.BindRunningSecurityGroupCommand           `command:"bind-running-security-group" description:"Bind a security group to the list of security groups to be used for running applications"`
-	BindSecurityGroup                  v6.BindSecurityGroupCommand                  `command:"bind-security-group" description:"Bind a security group to a particular space, or all existing spaces of an org"`
-	BindService                        v6.BindServiceCommand                        `command:"bind-service" alias:"bs" description:"Bind a service instance to an app"`
-	BindStagingSecurityGroup           v6.BindStagingSecurityGroupCommand           `command:"bind-staging-security-group" description:"Bind a security group to the list of security groups to be used for staging applications"`
-	Buildpacks                         v7.BuildpacksCommand                         `command:"buildpacks" description:"List all buildpacks"`
-	CheckRoute                         v6.CheckRouteCommand                         `command:"check-route" description:"Perform a simple check to determine whether a route currently exists or not"`
-	Config                             v6.ConfigCommand                             `command:"config" description:"Write default values to the config"`
-	CopySource                         v6.CopySourceCommand                         `command:"copy-source" description:"Copies the source code of an application to another existing application (and restarts that application)"`
-	CreateAppManifest                  v7.CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
-	CreateBuildpack                    v7.CreateBuildpackCommand                    `command:"create-buildpack" description:"Create a buildpack"`
-	CreateDomain                       v6.CreateDomainCommand                       `command:"create-domain" description:"Create a domain in an org for later use"`
-	CreateIsolationSegment             v6.CreateIsolationSegmentCommand             `command:"create-isolation-segment" description:"Create an isolation segment"`
-	CreateOrg                          v6.CreateOrgCommand                          `command:"create-org" alias:"co" description:"Create an org"`
-	CreateQuota                        v6.CreateQuotaCommand                        `command:"create-quota" description:"Define a new resource quota"`
-	CreateRoute                        v6.CreateRouteCommand                        `command:"create-route" description:"Create a url route in a space for later use"`
-	CreateSecurityGroup                v6.CreateSecurityGroupCommand                `command:"create-security-group" description:"Create a security group"`
-	CreateServiceBroker                v6.CreateServiceBrokerCommand                `command:"create-service-broker" alias:"csb" description:"Create a service broker"`
-	CreateServiceKey                   v6.CreateServiceKeyCommand                   `command:"create-service-key" alias:"csk" description:"Create key for a service instance"`
-	CreateService                      v6.CreateServiceCommand                      `command:"create-service" alias:"cs" description:"Create a service instance"`
-	CreateSharedDomain                 v6.CreateSharedDomainCommand                 `command:"create-shared-domain" description:"Create a domain that can be used by all orgs (admin-only)"`
-	CreateSpaceQuota                   v6.CreateSpaceQuotaCommand                   `command:"create-space-quota" description:"Define a new space resource quota"`
-	CreateSpace                        v6.CreateSpaceCommand                        `command:"create-space" description:"Create a space"`
-	CreateUserProvidedService          v6.CreateUserProvidedServiceCommand          `command:"create-user-provided-service" alias:"cups" description:"Make a user-provided service instance available to CF apps"`
-	CreateUser                         v6.CreateUserCommand                         `command:"create-user" description:"Create a new user"`
-	Curl                               v6.CurlCommand                               `command:"curl" description:"Executes a request to the targeted API endpoint"`
-	DeleteBuildpack                    v7.DeleteBuildpackCommand                    `command:"delete-buildpack" description:"Delete a buildpack"`
-	DeleteDomain                       v6.DeleteDomainCommand                       `command:"delete-domain" description:"Delete a domain"`
-	DeleteIsolationSegment             v6.DeleteIsolationSegmentCommand             `command:"delete-isolation-segment" description:"Delete an isolation segment"`
-	DeleteOrg                          v6.DeleteOrgCommand                          `command:"delete-org" description:"Delete an org"`
-	DeleteOrphanedRoutes               v6.DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes" description:"Delete all orphaned routes (i.e. those that are not mapped to an app)"`
-	DeleteQuota                        v6.DeleteQuotaCommand                        `command:"delete-quota" description:"Delete a quota"`
-	DeleteRoute                        v6.DeleteRouteCommand                        `command:"delete-route" description:"Delete a route"`
-	DeleteSecurityGroup                v6.DeleteSecurityGroupCommand                `command:"delete-security-group" description:"Deletes a security group"`
-	DeleteServiceBroker                v6.DeleteServiceBrokerCommand                `command:"delete-service-broker" description:"Delete a service broker"`
-	DeleteServiceKey                   v6.DeleteServiceKeyCommand                   `command:"delete-service-key" alias:"dsk" description:"Delete a service key"`
-	DeleteService                      v6.DeleteServiceCommand                      `command:"delete-service" alias:"ds" description:"Delete a service instance"`
-	DeleteSharedDomain                 v6.DeleteSharedDomainCommand                 `command:"delete-shared-domain" description:"Delete a shared domain"`
-	DeleteSpaceQuota                   v6.DeleteSpaceQuotaCommand                   `command:"delete-space-quota" description:"Delete a space quota definition and unassign the space quota from all spaces"`
-	DeleteSpace                        v6.DeleteSpaceCommand                        `command:"delete-space" description:"Delete a space"`
-	DeleteUser                         v6.DeleteUserCommand                         `command:"delete-user" description:"Delete a user"`
-	Delete                             v7.DeleteCommand                             `command:"delete" alias:"d" description:"Delete an app"`
-	DisableFeatureFlag                 v7.DisableFeatureFlagCommand                 `command:"disable-feature-flag" description:"Prevent use of a feature"`
-	DisableOrgIsolation                v6.DisableOrgIsolationCommand                `command:"disable-org-isolation" description:"Revoke an organization's entitlement to an isolation segment"`
-	DisableServiceAccess               v6.DisableServiceAccessCommand               `command:"disable-service-access" description:"Disable access to a service or service plan for one or all orgs"`
-	DisableSSH                         v6.DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`
-	DisallowSpaceSSH                   v6.DisallowSpaceSSHCommand                   `command:"disallow-space-ssh" description:"Disallow SSH access for the space"`
-	Domains                            v6.DomainsCommand                            `command:"domains" description:"List domains in the target org"`
-	EnableFeatureFlag                  v7.EnableFeatureFlagCommand                  `command:"enable-feature-flag" description:"Allow use of a feature"`
-	EnableOrgIsolation                 v6.EnableOrgIsolationCommand                 `command:"enable-org-isolation" description:"Entitle an organization to an isolation segment"`
-	EnableServiceAccess                v6.EnableServiceAccessCommand                `command:"enable-service-access" description:"Enable access to a service or service plan for one or all orgs"`
-	EnableSSH                          v6.EnableSSHCommand                          `command:"enable-ssh" description:"Enable ssh for the application"`
-	Env                                v7.EnvCommand                                `command:"env" alias:"e" description:"Show all env variables for an app"`
-	Events                             v6.EventsCommand                             `command:"events" description:"Show recent app events"`
-	FeatureFlags                       v7.FeatureFlagsCommand                       `command:"feature-flags" description:"Retrieve list of feature flags with status"`
-	FeatureFlag                        v7.FeatureFlagCommand                        `command:"feature-flag" description:"Retrieve an individual feature flag with status"`
-	GetHealthCheck                     v7.GetHealthCheckCommand                     `command:"get-health-check" description:"Show the type of health check performed on an app"`
-	Help                               HelpCommand                                  `command:"help" alias:"h" description:"Show help"`
-	InstallPlugin                      InstallPluginCommand                         `command:"install-plugin" description:"Install CLI plugin"`
-	IsolationSegments                  v6.IsolationSegmentsCommand                  `command:"isolation-segments" description:"List all isolation segments"`
-	NetworkPolicies                    v6.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
-	ListPluginRepos                    plugin.ListPluginReposCommand                `command:"list-plugin-repos" description:"List all the added plugin repositories"`
-	Login                              v6.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
-	Logout                             v6.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
-	Logs                               v6.LogsCommand                               `command:"logs" description:"Tail or show recent logs for an app"`
-	MapRoute                           v6.MapRouteCommand                           `command:"map-route" description:"Add a url route to an app"`
-	Marketplace                        v6.MarketplaceCommand                        `command:"marketplace" alias:"m" description:"List available offerings in the marketplace"`
-	OauthToken                         v6.OauthTokenCommand                         `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
-	Orgs                               v6.OrgsCommand                               `command:"orgs" alias:"o" description:"List all orgs"`
-	OrgUsers                           v6.OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
-	Org                                v6.OrgCommand                                `command:"org" description:"Show org info"`
-	Passwd                             v6.PasswdCommand                             `command:"passwd" alias:"pw" description:"Change user password"`
-	Plugins                            plugin.PluginsCommand                        `command:"plugins" description:"List commands of installed plugins"`
-	PurgeServiceInstance               v6.PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
-	PurgeServiceOffering               v6.PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"`
-	Push                               v7.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
+	AddPluginRepo             plugin.AddPluginRepoCommand         `command:"add-plugin-repo" description:"Add a new plugin repository"`
+	AddNetworkPolicy          v6.AddNetworkPolicyCommand          `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
+	AllowSpaceSSH             v6.AllowSpaceSSHCommand             `command:"allow-space-ssh" description:"Allow SSH access for the space"`
+	Api                       v6.ApiCommand                       `command:"api" description:"Set or view target api url"`
+	Apps                      v6.AppsCommand                      `command:"apps" alias:"a" description:"List all apps in the target space"`
+	Auth                      v6.AuthCommand                      `command:"auth" description:"Authenticate non-interactively"`
+	BindRouteService          v6.BindRouteServiceCommand          `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
+	BindRunningSecurityGroup  v6.BindRunningSecurityGroupCommand  `command:"bind-running-security-group" description:"Bind a security group to the list of security groups to be used for running applications"`
+	BindSecurityGroup         v6.BindSecurityGroupCommand         `command:"bind-security-group" description:"Bind a security group to a particular space, or all existing spaces of an org"`
+	BindService               v6.BindServiceCommand               `command:"bind-service" alias:"bs" description:"Bind a service instance to an app"`
+	BindStagingSecurityGroup  v6.BindStagingSecurityGroupCommand  `command:"bind-staging-security-group" description:"Bind a security group to the list of security groups to be used for staging applications"`
+	Buildpacks                v7.BuildpacksCommand                `command:"buildpacks" description:"List all buildpacks"`
+	CheckRoute                v6.CheckRouteCommand                `command:"check-route" description:"Perform a simple check to determine whether a route currently exists or not"`
+	Config                    v6.ConfigCommand                    `command:"config" description:"Write default values to the config"`
+	CopySource                v6.CopySourceCommand                `command:"copy-source" description:"Copies the source code of an application to another existing application (and restarts that application)"`
+	CreateAppManifest         v7.CreateAppManifestCommand         `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
+	CreateBuildpack           v7.CreateBuildpackCommand           `command:"create-buildpack" description:"Create a buildpack"`
+	CreateDomain              v6.CreateDomainCommand              `command:"create-domain" description:"Create a domain in an org for later use"`
+	CreateIsolationSegment    v6.CreateIsolationSegmentCommand    `command:"create-isolation-segment" description:"Create an isolation segment"`
+	CreateOrg                 v6.CreateOrgCommand                 `command:"create-org" alias:"co" description:"Create an org"`
+	CreateQuota               v6.CreateQuotaCommand               `command:"create-quota" description:"Define a new resource quota"`
+	CreateRoute               v6.CreateRouteCommand               `command:"create-route" description:"Create a url route in a space for later use"`
+	CreateSecurityGroup       v6.CreateSecurityGroupCommand       `command:"create-security-group" description:"Create a security group"`
+	CreateServiceBroker       v6.CreateServiceBrokerCommand       `command:"create-service-broker" alias:"csb" description:"Create a service broker"`
+	CreateServiceKey          v6.CreateServiceKeyCommand          `command:"create-service-key" alias:"csk" description:"Create key for a service instance"`
+	CreateService             v6.CreateServiceCommand             `command:"create-service" alias:"cs" description:"Create a service instance"`
+	CreateSharedDomain        v6.CreateSharedDomainCommand        `command:"create-shared-domain" description:"Create a domain that can be used by all orgs (admin-only)"`
+	CreateSpaceQuota          v6.CreateSpaceQuotaCommand          `command:"create-space-quota" description:"Define a new space resource quota"`
+	CreateSpace               v6.CreateSpaceCommand               `command:"create-space" description:"Create a space"`
+	CreateUserProvidedService v6.CreateUserProvidedServiceCommand `command:"create-user-provided-service" alias:"cups" description:"Make a user-provided service instance available to CF apps"`
+	CreateUser                v6.CreateUserCommand                `command:"create-user" description:"Create a new user"`
+	Curl                      v6.CurlCommand                      `command:"curl" description:"Executes a request to the targeted API endpoint"`
+	DeleteBuildpack           v7.DeleteBuildpackCommand           `command:"delete-buildpack" description:"Delete a buildpack"`
+	DeleteDomain              v6.DeleteDomainCommand              `command:"delete-domain" description:"Delete a domain"`
+	DeleteIsolationSegment    v6.DeleteIsolationSegmentCommand    `command:"delete-isolation-segment" description:"Delete an isolation segment"`
+	DeleteOrg                 v6.DeleteOrgCommand                 `command:"delete-org" description:"Delete an org"`
+	DeleteOrphanedRoutes      v6.DeleteOrphanedRoutesCommand      `command:"delete-orphaned-routes" description:"Delete all orphaned routes (i.e. those that are not mapped to an app)"`
+	DeleteQuota               v6.DeleteQuotaCommand               `command:"delete-quota" description:"Delete a quota"`
+	DeleteRoute               v6.DeleteRouteCommand               `command:"delete-route" description:"Delete a route"`
+	DeleteSecurityGroup       v6.DeleteSecurityGroupCommand       `command:"delete-security-group" description:"Deletes a security group"`
+	DeleteServiceBroker       v6.DeleteServiceBrokerCommand       `command:"delete-service-broker" description:"Delete a service broker"`
+	DeleteServiceKey          v6.DeleteServiceKeyCommand          `command:"delete-service-key" alias:"dsk" description:"Delete a service key"`
+	DeleteService             v6.DeleteServiceCommand             `command:"delete-service" alias:"ds" description:"Delete a service instance"`
+	DeleteSharedDomain        v6.DeleteSharedDomainCommand        `command:"delete-shared-domain" description:"Delete a shared domain"`
+	DeleteSpaceQuota          v6.DeleteSpaceQuotaCommand          `command:"delete-space-quota" description:"Delete a space quota definition and unassign the space quota from all spaces"`
+	DeleteSpace               v6.DeleteSpaceCommand               `command:"delete-space" description:"Delete a space"`
+	DeleteUser                v6.DeleteUserCommand                `command:"delete-user" description:"Delete a user"`
+	Delete                    v7.DeleteCommand                    `command:"delete" alias:"d" description:"Delete an app"`
+	DisableFeatureFlag        v7.DisableFeatureFlagCommand        `command:"disable-feature-flag" description:"Prevent use of a feature"`
+	DisableOrgIsolation       v6.DisableOrgIsolationCommand       `command:"disable-org-isolation" description:"Revoke an organization's entitlement to an isolation segment"`
+	DisableServiceAccess      v6.DisableServiceAccessCommand      `command:"disable-service-access" description:"Disable access to a service or service plan for one or all orgs"`
+	DisableSSH                v6.DisableSSHCommand                `command:"disable-ssh" description:"Disable ssh for the application"`
+	DisallowSpaceSSH          v6.DisallowSpaceSSHCommand          `command:"disallow-space-ssh" description:"Disallow SSH access for the space"`
+	Domains                   v6.DomainsCommand                   `command:"domains" description:"List domains in the target org"`
+	EnableFeatureFlag         v7.EnableFeatureFlagCommand         `command:"enable-feature-flag" description:"Allow use of a feature"`
+	EnableOrgIsolation        v6.EnableOrgIsolationCommand        `command:"enable-org-isolation" description:"Entitle an organization to an isolation segment"`
+	EnableServiceAccess       v6.EnableServiceAccessCommand       `command:"enable-service-access" description:"Enable access to a service or service plan for one or all orgs"`
+	EnableSSH                 v6.EnableSSHCommand                 `command:"enable-ssh" description:"Enable ssh for the application"`
+	Env                       v7.EnvCommand                       `command:"env" alias:"e" description:"Show all env variables for an app"`
+	Events                    v6.EventsCommand                    `command:"events" description:"Show recent app events"`
+	FeatureFlags              v7.FeatureFlagsCommand              `command:"feature-flags" description:"Retrieve list of feature flags with status"`
+	FeatureFlag               v7.FeatureFlagCommand               `command:"feature-flag" description:"Retrieve an individual feature flag with status"`
+	GetHealthCheck            v7.GetHealthCheckCommand            `command:"get-health-check" description:"Show the type of health check performed on an app"`
+	Help                      HelpCommand                         `command:"help" alias:"h" description:"Show help"`
+	InstallPlugin             InstallPluginCommand                `command:"install-plugin" description:"Install CLI plugin"`
+	IsolationSegments         v6.IsolationSegmentsCommand         `command:"isolation-segments" description:"List all isolation segments"`
+	NetworkPolicies           v6.NetworkPoliciesCommand           `command:"network-policies" description:"List direct network traffic policies"`
+	ListPluginRepos           plugin.ListPluginReposCommand       `command:"list-plugin-repos" description:"List all the added plugin repositories"`
+	Login                     v6.LoginCommand                     `command:"login" alias:"l" description:"Log user in"`
+	Logout                    v6.LogoutCommand                    `command:"logout" alias:"lo" description:"Log user out"`
+	Logs                      v6.LogsCommand                      `command:"logs" description:"Tail or show recent logs for an app"`
+	MapRoute                  v6.MapRouteCommand                  `command:"map-route" description:"Add a url route to an app"`
+	Marketplace               v6.MarketplaceCommand               `command:"marketplace" alias:"m" description:"List available offerings in the marketplace"`
+	OauthToken                v6.OauthTokenCommand                `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
+	Orgs                      v6.OrgsCommand                      `command:"orgs" alias:"o" description:"List all orgs"`
+	OrgUsers                  v6.OrgUsersCommand                  `command:"org-users" description:"Show org users by role"`
+	Org                       v6.OrgCommand                       `command:"org" description:"Show org info"`
+	Passwd                    v6.PasswdCommand                    `command:"passwd" alias:"pw" description:"Change user password"`
+	Plugins                   plugin.PluginsCommand               `command:"plugins" description:"List commands of installed plugins"`
+	PurgeServiceInstance      v6.PurgeServiceInstanceCommand      `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
+	PurgeServiceOffering      v6.PurgeServiceOfferingCommand      `command:"purge-service-offering" description:"Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"`
+	// IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
+	// TODO: vvvvvvvCHANGE THIS BACK TO v7.PushCommand BEFORE PUSHING
+	Push v6.PushCommand `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
+	// TODO: ^^^^^^CHANGE THIS BACK TO v7.PushCommand BEFORE PUSHING
+	// IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
 	V3Push                             v7.PushCommand                               `command:"v3-push" description:"Push a new app or sync changes to an existing app" hidden:"true"`
 	Quotas                             v6.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	Quota                              v6.QuotaCommand                              `command:"quota" description:"Show quota info"`
