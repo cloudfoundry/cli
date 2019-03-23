@@ -15,7 +15,7 @@ var _ = Describe("set-label command", func() {
 				session := helpers.CF("set-label", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say(`\s+set-label - Set a label \(key-value pairs\) for an API resource.`))
+				Eventually(session).Should(Say(`\s+set-label - Set a label \(key-value pairs\) for an API resource`))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(`\s+cf set-label RESOURCE RESOURCE_NAME KEY=VALUE\.\.\.`))
 				Eventually(session).Should(Say("EXAMPLES:"))
