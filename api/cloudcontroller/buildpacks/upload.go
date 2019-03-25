@@ -2,11 +2,14 @@ package buildpacks
 
 import (
 	"bytes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"io"
 	"mime/multipart"
 	"path/filepath"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
+
+// tested via the ccv2.buildpack_test.go file at this point
 
 func CalculateRequestSize(buildpackSize int64, bpPath string, fieldName string) (int64, error) {
 	body := &bytes.Buffer{}
