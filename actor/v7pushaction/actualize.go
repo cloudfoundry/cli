@@ -146,9 +146,9 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 
 	if len(unmatchedResources) > 0 {
 		eventStream <- CreatingArchive
-		archivePath, err := actor.GetArchivePath(plan, unmatchedResources)
-		if err != nil {
-			return v7action.Package{}, err
+		archivePath, archiveErr := actor.GetArchivePath(plan, unmatchedResources)
+		if archiveErr != nil {
+			return v7action.Package{}, archiveErr
 		}
 		defer os.RemoveAll(archivePath)
 
