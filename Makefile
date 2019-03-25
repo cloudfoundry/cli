@@ -123,7 +123,7 @@ integration-tests-full: build integration-cleanup integration-isolated integrati
 
 lint: ## Run our custom linters
 	@echo "style linting files:" # this list will grow as we cleanup all the code
-	@bash -c "go run bin/style/main.go api util/{configv3,manifestparser,manifest,randomword,sorting,ui}"
+	@bash -c "go run bin/style/main.go api util"
 	@echo "No lint errors!"
 	@echo
 

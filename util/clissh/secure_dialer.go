@@ -5,6 +5,12 @@ import (
 	"golang.org/x/net/proxy"
 )
 
+//go:generate counterfeiter . SecureDialer
+
+type SecureDialer interface {
+	Dial(network, address string, config *ssh.ClientConfig) (SecureClient, error)
+}
+
 type fakeConn struct{}
 
 type secureDialer struct{}

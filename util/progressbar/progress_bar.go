@@ -19,6 +19,12 @@ func NewProgressBar() *ProgressBar {
 	}
 }
 
+func (p *ProgressBar) Complete() {
+	// Adding sleep to ensure UI has finished drawing
+	time.Sleep(time.Second)
+	p.bar.Finish()
+}
+
 func (p *ProgressBar) NewProgressBarWrapper(reader io.Reader, sizeOfFile int64) io.Reader {
 	log.WithField("file_size", sizeOfFile).Debug("new progress bar")
 
@@ -36,10 +42,4 @@ func (p *ProgressBar) NewProgressBarWrapper(reader io.Reader, sizeOfFile int64) 
 
 func (p *ProgressBar) Ready() {
 	p.ready <- true
-}
-
-func (p *ProgressBar) Complete() {
-	// Adding sleep to ensure UI has finished drawing
-	time.Sleep(time.Second)
-	p.bar.Finish()
 }

@@ -19,12 +19,6 @@ type Map interface {
 	String() string
 }
 
-type ConcreteMap map[interface{}]interface{}
-
-func newEmptyMap() Map {
-	return &ConcreteMap{}
-}
-
 func NewMap(data ...interface{}) Map {
 	if len(data) == 0 {
 		return newEmptyMap()
@@ -58,17 +52,20 @@ func NewMap(data ...interface{}) Map {
 	panic("NewMap called with unexpected argument")
 }
 
-func (data *ConcreteMap) IsEmpty() bool {
-	return data.Count() == 0
+type Iterator func(key, val interface{})
+
+func newEmptyMap() Map {
+	return &ConcreteMap{}
 }
+
+type ConcreteMap map[interface{}]interface{}
 
 func (data *ConcreteMap) Count() int {
 	return len(*data)
 }
 
-func (data *ConcreteMap) Has(key interface{}) bool {
-	_, ok := (*data)[key]
-	return ok
+func (data *ConcreteMap) Delete(key interface{}) {
+	delete(*data, key)
 }
 
 func (data *ConcreteMap) Except(keys []interface{}) Map {
@@ -81,14 +78,22 @@ func (data *ConcreteMap) Except(keys []interface{}) Map {
 	return otherMap
 }
 
+func (data *ConcreteMap) Get(key interface{}) interface{} {
+	return (*data)[key]
+}
+
+func (data *ConcreteMap) Has(key interface{}) bool {
+	_, ok := (*data)[key]
+	return ok
+}
+
+func (data *ConcreteMap) IsEmpty() bool {
+	return data.Count() == 0
+}
+
 func (data *ConcreteMap) IsNil(key interface{}) bool {
 	maybe, ok := (*data)[key]
 	return ok && maybe == nil
-}
-
-func (data *ConcreteMap) NotNil(key interface{}) bool {
-	maybe, ok := (*data)[key]
-	return ok && maybe != nil
 }
 
 func (data *ConcreteMap) Keys() (keys []interface{}) {
@@ -100,40 +105,17 @@ func (data *ConcreteMap) Keys() (keys []interface{}) {
 	return
 }
 
-func (data *ConcreteMap) Get(key interface{}) interface{} {
-	return (*data)[key]
+func (data *ConcreteMap) NotNil(key interface{}) bool {
+	maybe, ok := (*data)[key]
+	return ok && maybe != nil
 }
 
 func (data *ConcreteMap) Set(key, value interface{}) {
 	(*data)[key] = value
 }
 
-func (data *ConcreteMap) Delete(key interface{}) {
-	delete(*data, key)
-}
-
 func (data *ConcreteMap) String() string {
 	return fmt.Sprintf("% v", *data)
-}
-
-func IsMappable(value interface{}) bool {
-	if value == nil {
-		return false
-	}
-	switch value.(type) {
-	case Map:
-		return true
-	default:
-		return reflect.TypeOf(value).Kind() == reflect.Map
-	}
-}
-
-type Iterator func(key, val interface{})
-
-func Each(collection Map, cb Iterator) {
-	for _, key := range collection.Keys() {
-		cb(key, collection.Get(key))
-	}
 }
 
 func Contains(collection, item interface{}) bool {
@@ -150,4 +132,22 @@ func Contains(collection, item interface{}) bool {
 	}
 
 	panic("unexpected type passed to Contains")
+}
+
+func Each(collection Map, cb Iterator) {
+	for _, key := range collection.Keys() {
+		cb(key, collection.Get(key))
+	}
+}
+
+func IsMappable(value interface{}) bool {
+	if value == nil {
+		return false
+	}
+	switch value.(type) {
+	case Map:
+		return true
+	default:
+		return reflect.TypeOf(value).Kind() == reflect.Map
+	}
 }

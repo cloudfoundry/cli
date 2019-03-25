@@ -1,5 +1,12 @@
 package generic
 
+type Reducer func(key, val interface{}, reducedVal Map) Map
+
+func DeepMerge(maps ...Map) Map {
+	mergedMap := NewMap()
+	return Reduce(maps, mergedMap, mergeReducer)
+}
+
 func Merge(collection, otherCollection Map) Map {
 	mergedMap := NewMap()
 
@@ -13,9 +20,13 @@ func Merge(collection, otherCollection Map) Map {
 	return mergedMap
 }
 
-func DeepMerge(maps ...Map) Map {
-	mergedMap := NewMap()
-	return Reduce(maps, mergedMap, mergeReducer)
+func Reduce(collections []Map, resultVal Map, cb Reducer) Map {
+	for _, collection := range collections {
+		for _, key := range collection.Keys() {
+			resultVal = cb(key, collection.Get(key), resultVal)
+		}
+	}
+	return resultVal
 }
 
 func mergeReducer(key, val interface{}, reduced Map) Map {
@@ -38,15 +49,4 @@ func mergeReducer(key, val interface{}, reduced Map) Map {
 		reduced.Set(key, val)
 		return reduced
 	}
-}
-
-type Reducer func(key, val interface{}, reducedVal Map) Map
-
-func Reduce(collections []Map, resultVal Map, cb Reducer) Map {
-	for _, collection := range collections {
-		for _, key := range collection.Keys() {
-			resultVal = cb(key, collection.Get(key), resultVal)
-		}
-	}
-	return resultVal
 }
