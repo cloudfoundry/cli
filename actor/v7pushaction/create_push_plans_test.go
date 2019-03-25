@@ -1,10 +1,11 @@
 package v7pushaction_test
 
 import (
+	"fmt"
+
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	"code.cloudfoundry.org/cli/util/manifestparser"
-	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -78,7 +79,7 @@ var _ = Describe("CreatePushPlans", func() {
 					},
 				}, nil)
 
-				fakeManifestParser.FullRawManifestReturns([]byte("not-nil"))
+				fakeManifestParser.ContainsManifestReturns(true)
 
 				appNameArg = ""
 			})
@@ -97,7 +98,7 @@ var _ = Describe("CreatePushPlans", func() {
 				BeforeEach(func() {
 					fakeManifestParser.AppsReturns(nil, manifestparser.AppNotInManifestError{Name: appNameArg})
 
-					fakeManifestParser.FullRawManifestReturns([]byte("not-nil"))
+					fakeManifestParser.ContainsManifestReturns(true)
 
 					appNameArg = "my-app"
 				})
@@ -117,7 +118,7 @@ var _ = Describe("CreatePushPlans", func() {
 						},
 					}, nil)
 
-					fakeManifestParser.FullRawManifestReturns([]byte("not-nil"))
+					fakeManifestParser.ContainsManifestReturns(true)
 
 					appNameArg = "my-app"
 					flagOverrides.DockerImage = "image"

@@ -1,12 +1,13 @@
 package manifestparser_test
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "code.cloudfoundry.org/cli/util/manifestparser"
 
@@ -376,6 +377,65 @@ applications:
 
 			It("returns false", func() {
 				Expect(parser.ContainsMultipleApps()).To(BeFalse())
+			})
+		})
+	})
+
+	Describe("ContainsManifest", func() {
+		var (
+			pathToManifest string
+		)
+
+		BeforeEach(func() {
+			tempFile, err := ioutil.TempFile("", "contains-manifest-test")
+			Expect(err).ToNot(HaveOccurred())
+			pathToManifest = tempFile.Name()
+			Expect(tempFile.Close()).ToNot(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			err := os.RemoveAll(pathToManifest)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		Context("when the manifest is parsed successfully", func() {
+			BeforeEach(func() {
+				rawManifest := []byte(`---
+applications:
+- name: spark
+`)
+				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = parser.Parse(pathToManifest)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns true", func() {
+				Expect(parser.ContainsManifest()).To(BeTrue())
+			})
+		})
+
+		Context("when the manifest is not parsed successfully", func() {
+			BeforeEach(func() {
+				rawManifest := []byte(`---
+applications:
+`)
+				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = parser.Parse(pathToManifest)
+				Expect(err).To(HaveOccurred())
+			})
+
+			It("returns false", func() {
+				Expect(parser.ContainsManifest()).To(BeFalse())
+			})
+		})
+
+		Context("when the manifest has not been parsed", func() {
+			It("returns false", func() {
+				Expect(parser.ContainsManifest()).To(BeFalse())
 			})
 		})
 	})

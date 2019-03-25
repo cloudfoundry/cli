@@ -147,7 +147,6 @@ func (cmd PushCommand) Execute(args []string) error {
 		if err = cmd.ReadManifest(); err != nil {
 			return err
 		}
-
 	}
 
 	err = cmd.ValidateFlags()

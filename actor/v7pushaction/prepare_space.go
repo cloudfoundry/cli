@@ -23,7 +23,17 @@ func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser ManifestPar
 		var err error
 		var successEvent Event
 
-		if manifestParser.FullRawManifest() == nil {
+		if manifestParser.ContainsManifest() {
+			var manifest []byte
+			manifest, err = getManifest(pushPlans, manifestParser)
+			if err != nil {
+				errorStream <- err
+				return
+			}
+			eventStream <- ApplyManifest
+			warnings, err = actor.V7Actor.SetSpaceManifest(pushPlans[0].SpaceGUID, manifest)
+			successEvent = ApplyManifestComplete
+		} else {
 			_, warnings, err = actor.V7Actor.CreateApplicationInSpace(pushPlans[0].Application, pushPlans[0].SpaceGUID)
 			if _, ok := err.(actionerror.ApplicationAlreadyExistsError); ok {
 				eventStream <- SkippingApplicationCreation
@@ -33,16 +43,6 @@ func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser ManifestPar
 				eventStream <- CreatingApplication
 				successEvent = CreatedApplication
 			}
-		} else {
-			var manifest []byte
-			manifest, err = getManifest(pushPlans, manifestParser)
-			if err != nil {
-				errorStream <- err
-				return
-			}
-			eventStream <- ApplyManifest
-			warnings, err = actor.V7Actor.SetSpaceManifest(pushPlans[0].SpaceGUID, manifest) // CAN WE HAVE AN EMPTY MANIFEST
-			successEvent = ApplyManifestComplete
 		}
 
 		warningsStream <- Warnings(warnings)

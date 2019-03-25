@@ -23,6 +23,16 @@ type FakeManifestParser struct {
 		result1 []manifestparser.Application
 		result2 error
 	}
+	ContainsManifestStub        func() bool
+	containsManifestMutex       sync.RWMutex
+	containsManifestArgsForCall []struct {
+	}
+	containsManifestReturns struct {
+		result1 bool
+	}
+	containsManifestReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	ContainsMultipleAppsStub        func() bool
 	containsMultipleAppsMutex       sync.RWMutex
 	containsMultipleAppsArgsForCall []struct {
@@ -78,16 +88,6 @@ type FakeManifestParser struct {
 	rawAppManifestReturnsOnCall map[int]struct {
 		result1 []byte
 		result2 error
-	}
-	ValidateStub        func() error
-	validateMutex       sync.RWMutex
-	validateArgsForCall []struct {
-	}
-	validateReturns struct {
-		result1 error
-	}
-	validateReturnsOnCall map[int]struct {
-		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -154,6 +154,58 @@ func (fake *FakeManifestParser) AppsReturnsOnCall(i int, result1 []manifestparse
 		result1 []manifestparser.Application
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeManifestParser) ContainsManifest() bool {
+	fake.containsManifestMutex.Lock()
+	ret, specificReturn := fake.containsManifestReturnsOnCall[len(fake.containsManifestArgsForCall)]
+	fake.containsManifestArgsForCall = append(fake.containsManifestArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ContainsManifest", []interface{}{})
+	fake.containsManifestMutex.Unlock()
+	if fake.ContainsManifestStub != nil {
+		return fake.ContainsManifestStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.containsManifestReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeManifestParser) ContainsManifestCallCount() int {
+	fake.containsManifestMutex.RLock()
+	defer fake.containsManifestMutex.RUnlock()
+	return len(fake.containsManifestArgsForCall)
+}
+
+func (fake *FakeManifestParser) ContainsManifestCalls(stub func() bool) {
+	fake.containsManifestMutex.Lock()
+	defer fake.containsManifestMutex.Unlock()
+	fake.ContainsManifestStub = stub
+}
+
+func (fake *FakeManifestParser) ContainsManifestReturns(result1 bool) {
+	fake.containsManifestMutex.Lock()
+	defer fake.containsManifestMutex.Unlock()
+	fake.ContainsManifestStub = nil
+	fake.containsManifestReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeManifestParser) ContainsManifestReturnsOnCall(i int, result1 bool) {
+	fake.containsManifestMutex.Lock()
+	defer fake.containsManifestMutex.Unlock()
+	fake.ContainsManifestStub = nil
+	if fake.containsManifestReturnsOnCall == nil {
+		fake.containsManifestReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.containsManifestReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
 }
 
 func (fake *FakeManifestParser) ContainsMultipleApps() bool {
@@ -447,63 +499,13 @@ func (fake *FakeManifestParser) RawAppManifestReturnsOnCall(i int, result1 []byt
 	}{result1, result2}
 }
 
-func (fake *FakeManifestParser) Validate() error {
-	fake.validateMutex.Lock()
-	ret, specificReturn := fake.validateReturnsOnCall[len(fake.validateArgsForCall)]
-	fake.validateArgsForCall = append(fake.validateArgsForCall, struct {
-	}{})
-	fake.recordInvocation("Validate", []interface{}{})
-	fake.validateMutex.Unlock()
-	if fake.ValidateStub != nil {
-		return fake.ValidateStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.validateReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeManifestParser) ValidateCallCount() int {
-	fake.validateMutex.RLock()
-	defer fake.validateMutex.RUnlock()
-	return len(fake.validateArgsForCall)
-}
-
-func (fake *FakeManifestParser) ValidateCalls(stub func() error) {
-	fake.validateMutex.Lock()
-	defer fake.validateMutex.Unlock()
-	fake.ValidateStub = stub
-}
-
-func (fake *FakeManifestParser) ValidateReturns(result1 error) {
-	fake.validateMutex.Lock()
-	defer fake.validateMutex.Unlock()
-	fake.ValidateStub = nil
-	fake.validateReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeManifestParser) ValidateReturnsOnCall(i int, result1 error) {
-	fake.validateMutex.Lock()
-	defer fake.validateMutex.Unlock()
-	fake.ValidateStub = nil
-	if fake.validateReturnsOnCall == nil {
-		fake.validateReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.validateReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
 func (fake *FakeManifestParser) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.appsMutex.RLock()
 	defer fake.appsMutex.RUnlock()
+	fake.containsManifestMutex.RLock()
+	defer fake.containsManifestMutex.RUnlock()
 	fake.containsMultipleAppsMutex.RLock()
 	defer fake.containsMultipleAppsMutex.RUnlock()
 	fake.containsPrivateDockerImagesMutex.RLock()
@@ -514,8 +516,6 @@ func (fake *FakeManifestParser) Invocations() map[string][][]interface{} {
 	defer fake.interpolateAndParseMutex.RUnlock()
 	fake.rawAppManifestMutex.RLock()
 	defer fake.rawAppManifestMutex.RUnlock()
-	fake.validateMutex.RLock()
-	defer fake.validateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -35,7 +35,7 @@ func (actor Actor) CreatePushPlans(appNameArg string, spaceGUID string, orgGUID 
 }
 
 func (Actor) getEligibleApplications(parser ManifestParser, appNameArg string) ([]manifestparser.Application, error) {
-	if parser.FullRawManifest() != nil {
+	if parser.ContainsManifest() {
 		return parser.Apps(appNameArg)
 	}
 	manifestApp := manifestparser.Application{}

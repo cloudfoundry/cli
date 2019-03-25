@@ -296,7 +296,6 @@ var _ = Describe("push Command", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
-						Expect(fakeManifestParser.ValidateCallCount()).To(Equal(0))
 					})
 				})
 

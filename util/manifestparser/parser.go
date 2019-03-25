@@ -18,6 +18,8 @@ type Parser struct {
 	rawManifest []byte
 
 	validators []validatorFunc
+
+	hasParsed bool
 }
 
 func NewParser() *Parser {
@@ -101,6 +103,10 @@ func (parser Parser) AppNames() []string {
 	return names
 }
 
+func (parser Parser) ContainsManifest() bool {
+	return parser.hasParsed
+}
+
 func (parser Parser) ContainsMultipleApps() bool {
 	return len(parser.Applications) > 1
 }
@@ -182,5 +188,6 @@ func (parser *Parser) parse(manifestBytes []byte) error {
 		parser.Applications[index].Path = finalPath
 
 	}
+	parser.hasParsed = true
 	return nil
 }

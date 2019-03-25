@@ -22,6 +22,16 @@ type FakeManifestParser struct {
 		result1 []manifestparser.Application
 		result2 error
 	}
+	ContainsManifestStub        func() bool
+	containsManifestMutex       sync.RWMutex
+	containsManifestArgsForCall []struct {
+	}
+	containsManifestReturns struct {
+		result1 bool
+	}
+	containsManifestReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	FullRawManifestStub        func() []byte
 	fullRawManifestMutex       sync.RWMutex
 	fullRawManifestArgsForCall []struct {
@@ -110,6 +120,58 @@ func (fake *FakeManifestParser) AppsReturnsOnCall(i int, result1 []manifestparse
 		result1 []manifestparser.Application
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeManifestParser) ContainsManifest() bool {
+	fake.containsManifestMutex.Lock()
+	ret, specificReturn := fake.containsManifestReturnsOnCall[len(fake.containsManifestArgsForCall)]
+	fake.containsManifestArgsForCall = append(fake.containsManifestArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ContainsManifest", []interface{}{})
+	fake.containsManifestMutex.Unlock()
+	if fake.ContainsManifestStub != nil {
+		return fake.ContainsManifestStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.containsManifestReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeManifestParser) ContainsManifestCallCount() int {
+	fake.containsManifestMutex.RLock()
+	defer fake.containsManifestMutex.RUnlock()
+	return len(fake.containsManifestArgsForCall)
+}
+
+func (fake *FakeManifestParser) ContainsManifestCalls(stub func() bool) {
+	fake.containsManifestMutex.Lock()
+	defer fake.containsManifestMutex.Unlock()
+	fake.ContainsManifestStub = stub
+}
+
+func (fake *FakeManifestParser) ContainsManifestReturns(result1 bool) {
+	fake.containsManifestMutex.Lock()
+	defer fake.containsManifestMutex.Unlock()
+	fake.ContainsManifestStub = nil
+	fake.containsManifestReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeManifestParser) ContainsManifestReturnsOnCall(i int, result1 bool) {
+	fake.containsManifestMutex.Lock()
+	defer fake.containsManifestMutex.Unlock()
+	fake.ContainsManifestStub = nil
+	if fake.containsManifestReturnsOnCall == nil {
+		fake.containsManifestReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.containsManifestReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
 }
 
 func (fake *FakeManifestParser) FullRawManifest() []byte {
@@ -232,6 +294,8 @@ func (fake *FakeManifestParser) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.appsMutex.RLock()
 	defer fake.appsMutex.RUnlock()
+	fake.containsManifestMutex.RLock()
+	defer fake.containsManifestMutex.RUnlock()
 	fake.fullRawManifestMutex.RLock()
 	defer fake.fullRawManifestMutex.RUnlock()
 	fake.rawAppManifestMutex.RLock()

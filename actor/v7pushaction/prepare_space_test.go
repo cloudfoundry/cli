@@ -102,9 +102,7 @@ var _ = Describe("PrepareSpace", func() {
 
 	When("there is a single push state and no manifest", func() {
 		var appName = "app-name"
-		BeforeEach(func() {
-			fakeManifestParser.FullRawManifestReturns(nil)
-		})
+
 		When("Creating the app succeeds", func() {
 			BeforeEach(func() {
 				pushPlans = []PushPlan{{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName}}}
@@ -114,6 +112,7 @@ var _ = Describe("PrepareSpace", func() {
 					nil,
 				)
 			})
+
 			It("creates the app using the API", func() {
 				Consistently(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(0))
 				Eventually(getPrepareNextEvent(pushPlansStream, eventStream, warningsStream)).Should(Equal(CreatingApplication))
@@ -188,7 +187,7 @@ var _ = Describe("PrepareSpace", func() {
 		When("applying the manifest fails", func() {
 			BeforeEach(func() {
 				pushPlans = []PushPlan{{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}}}
-				fakeManifestParser.FullRawManifestReturns(manifest)
+				fakeManifestParser.ContainsManifestReturns(true)
 				fakeManifestParser.RawAppManifestReturns(manifest, nil)
 				fakeV7Actor.SetSpaceManifestReturns(v7action.Warnings{"apply-manifest-warnings"}, errors.New("some-error"))
 			})
@@ -213,14 +212,13 @@ var _ = Describe("PrepareSpace", func() {
 
 			BeforeEach(func() {
 				pushPlans = []PushPlan{{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}}}
-				fakeManifestParser.FullRawManifestReturns(manifest)
+				fakeManifestParser.ContainsManifestReturns(true)
 				fakeManifestParser.RawAppManifestReturns(manifest, nil)
 				fakeV7Actor.SetSpaceManifestReturns(v7action.Warnings{"apply-manifest-warnings"}, nil)
 			})
 
 			It("applies the app specific manifest", func() {
 				Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
-				Consistently(fakeManifestParser.FullRawManifestCallCount).Should(Equal(1))
 				Eventually(getPrepareNextEvent(pushPlansStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
 				Eventually(fakeManifestParser.RawAppManifestCallCount).Should(Equal(1))
 				actualAppName := fakeManifestParser.RawAppManifestArgsForCall(0)
@@ -244,6 +242,7 @@ var _ = Describe("PrepareSpace", func() {
 					{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}},
 					{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName2}},
 				}
+				fakeManifestParser.ContainsManifestReturns(true)
 				fakeManifestParser.FullRawManifestReturns(manifest)
 				fakeV7Actor.SetSpaceManifestReturns(v7action.Warnings{"apply-manifest-warnings"}, nil)
 			})
@@ -252,7 +251,7 @@ var _ = Describe("PrepareSpace", func() {
 				Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
 				Consistently(fakeManifestParser.RawAppManifestCallCount).Should(Equal(0))
 				Eventually(getPrepareNextEvent(pushPlansStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
-				Eventually(fakeManifestParser.FullRawManifestCallCount).Should(Equal(2))
+				Eventually(fakeManifestParser.FullRawManifestCallCount).Should(Equal(1))
 				Eventually(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(1))
 				actualSpaceGUID, actualManifest := fakeV7Actor.SetSpaceManifestArgsForCall(0)
 				Expect(actualManifest).To(Equal(manifest))
@@ -267,5 +266,4 @@ var _ = Describe("PrepareSpace", func() {
 			})
 		})
 	})
-
 })

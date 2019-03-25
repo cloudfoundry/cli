@@ -6,6 +6,7 @@ import "code.cloudfoundry.org/cli/util/manifestparser"
 
 type ManifestParser interface {
 	Apps(appName string) ([]manifestparser.Application, error)
+	ContainsManifest() bool
 	FullRawManifest() []byte
 	RawAppManifest(appName string) ([]byte, error)
 }
