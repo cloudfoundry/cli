@@ -184,15 +184,3 @@ func (parser *Parser) parse(manifestBytes []byte) error {
 	}
 	return nil
 }
-
-//go:generate counterfeiter . ManifestParser
-
-type ManifestParser interface {
-	Apps(appName string) ([]Application, error)
-	ContainsMultipleApps() bool
-	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) error
-	FullRawManifest() []byte
-	AppNames() []string
-	RawAppManifest(appName string) ([]byte, error)
-	GetPathToManifest() string
-}
