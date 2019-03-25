@@ -45,12 +45,12 @@ var _ = Describe("resource matching", func() {
 		})
 	})
 
-	FWhen("the app has all of it's resources matched", func() {
+	When("the app has all of it's resources matched", func() {
 		It("does not display the progress bar", func() {
 			// Skip("until #164837999 is complete")
 			helpers.WithNoResourceMatchedApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
-				Eventually(session).Should(Say(`\+\s+name:\s+%s`, appName))
+				Eventually(session).Should(Say(`\s+name:\s+%s`, appName))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-b", "staticfile_buildpack")
