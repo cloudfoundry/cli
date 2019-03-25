@@ -27,6 +27,146 @@ var _ = Describe("Parser", func() {
 		})
 	})
 
+	Describe("AppNames", func() {
+		When("given a valid manifest file", func() {
+			BeforeEach(func() {
+				parser.Applications = []Application{
+					{ApplicationModel: ApplicationModel{Name: "app-1"}, FullUnmarshalledApplication: nil},
+					{ApplicationModel: ApplicationModel{Name: "app-2"}, FullUnmarshalledApplication: nil}}
+			})
+
+			It("gets the app names", func() {
+				appNames := parser.AppNames()
+				Expect(appNames).To(ConsistOf("app-1", "app-2"))
+			})
+		})
+	})
+
+	Describe("ContainsManifest", func() {
+		var (
+			pathToManifest string
+		)
+
+		BeforeEach(func() {
+			tempFile, err := ioutil.TempFile("", "contains-manifest-test")
+			Expect(err).ToNot(HaveOccurred())
+			pathToManifest = tempFile.Name()
+			Expect(tempFile.Close()).ToNot(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			err := os.RemoveAll(pathToManifest)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		Context("when the manifest is parsed successfully", func() {
+			BeforeEach(func() {
+				rawManifest := []byte(`---
+applications:
+- name: spark
+`)
+				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = parser.InterpolateAndParse(pathToManifest, nil, nil)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns true", func() {
+				Expect(parser.ContainsManifest()).To(BeTrue())
+			})
+		})
+
+		Context("when the manifest is not parsed successfully", func() {
+			BeforeEach(func() {
+				rawManifest := []byte(`---
+applications:
+`)
+				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = parser.InterpolateAndParse(pathToManifest, nil, nil)
+				Expect(err).To(HaveOccurred())
+			})
+
+			It("returns false", func() {
+				Expect(parser.ContainsManifest()).To(BeFalse())
+			})
+		})
+
+		Context("when the manifest has not been parsed", func() {
+			It("returns false", func() {
+				Expect(parser.ContainsManifest()).To(BeFalse())
+			})
+		})
+	})
+
+	Describe("ContainsMultipleApps", func() {
+		When("given a valid manifest file with multiple apps", func() {
+			BeforeEach(func() {
+				parser.Applications = []Application{
+					{ApplicationModel: ApplicationModel{Name: "app-1"}, FullUnmarshalledApplication: nil},
+					{ApplicationModel: ApplicationModel{Name: "app-2"}, FullUnmarshalledApplication: nil}}
+			})
+
+			It("returns true", func() {
+				Expect(parser.ContainsMultipleApps()).To(BeTrue())
+			})
+		})
+
+		When("given a valid manifest file with a single app", func() {
+			BeforeEach(func() {
+				parser.Applications = []Application{{ApplicationModel: ApplicationModel{Name: "app-1"}, FullUnmarshalledApplication: nil}}
+			})
+
+			It("returns false", func() {
+				Expect(parser.ContainsMultipleApps()).To(BeFalse())
+			})
+		})
+	})
+
+	Describe("ContainsPrivateDockerImages", func() {
+		When("the manifest contains a docker image", func() {
+			When("the image is public", func() {
+				BeforeEach(func() {
+					parser.Applications = []Application{
+						{ApplicationModel: ApplicationModel{Name: "app-1", Docker: &Docker{Image: "image-1"}}, FullUnmarshalledApplication: nil},
+						{ApplicationModel: ApplicationModel{Name: "app-2", Docker: &Docker{Image: "image-2"}}, FullUnmarshalledApplication: nil}}
+				})
+
+				It("returns false", func() {
+					Expect(parser.ContainsPrivateDockerImages()).To(BeFalse())
+				})
+			})
+
+			When("the image is private", func() {
+				BeforeEach(func() {
+					parser.Applications = []Application{
+						{ApplicationModel: ApplicationModel{Name: "app-1", Docker: &Docker{Image: "image-1"}}},
+						{ApplicationModel: ApplicationModel{Name: "app-2", Docker: &Docker{Image: "image-2", Username: "user"}}},
+					}
+				})
+
+				It("returns true", func() {
+					Expect(parser.ContainsPrivateDockerImages()).To(BeTrue())
+				})
+			})
+		})
+
+		When("the manifest does not contain a docker image", func() {
+			BeforeEach(func() {
+				parser.Applications = []Application{
+					{ApplicationModel: ApplicationModel{Name: "app-1"}},
+					{ApplicationModel: ApplicationModel{Name: "app-2"}},
+				}
+			})
+
+			It("returns false", func() {
+				Expect(parser.ContainsPrivateDockerImages()).To(BeFalse())
+			})
+		})
+	})
+
 	Describe("InterpolateAndParse", func() {
 		var (
 			pathToManifest   string
@@ -243,104 +383,6 @@ applications:
 		})
 	})
 
-	Describe("AppNames", func() {
-		When("given a valid manifest file", func() {
-			BeforeEach(func() {
-				parser.Applications = []Application{
-					{ApplicationModel: ApplicationModel{Name: "app-1"}, FullUnmarshalledApplication: nil},
-					{ApplicationModel: ApplicationModel{Name: "app-2"}, FullUnmarshalledApplication: nil}}
-			})
-
-			It("gets the app names", func() {
-				appNames := parser.AppNames()
-				Expect(appNames).To(ConsistOf("app-1", "app-2"))
-			})
-		})
-	})
-
-	Describe("ContainsMultipleApps", func() {
-		When("given a valid manifest file with multiple apps", func() {
-			BeforeEach(func() {
-				parser.Applications = []Application{
-					{ApplicationModel: ApplicationModel{Name: "app-1"}, FullUnmarshalledApplication: nil},
-					{ApplicationModel: ApplicationModel{Name: "app-2"}, FullUnmarshalledApplication: nil}}
-			})
-
-			It("returns true", func() {
-				Expect(parser.ContainsMultipleApps()).To(BeTrue())
-			})
-		})
-
-		When("given a valid manifest file with a single app", func() {
-			BeforeEach(func() {
-				parser.Applications = []Application{{ApplicationModel: ApplicationModel{Name: "app-1"}, FullUnmarshalledApplication: nil}}
-			})
-
-			It("returns false", func() {
-				Expect(parser.ContainsMultipleApps()).To(BeFalse())
-			})
-		})
-	})
-
-	Describe("ContainsManifest", func() {
-		var (
-			pathToManifest string
-		)
-
-		BeforeEach(func() {
-			tempFile, err := ioutil.TempFile("", "contains-manifest-test")
-			Expect(err).ToNot(HaveOccurred())
-			pathToManifest = tempFile.Name()
-			Expect(tempFile.Close()).ToNot(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			err := os.RemoveAll(pathToManifest)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		Context("when the manifest is parsed successfully", func() {
-			BeforeEach(func() {
-				rawManifest := []byte(`---
-applications:
-- name: spark
-`)
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
-				Expect(err).ToNot(HaveOccurred())
-
-				err = parser.InterpolateAndParse(pathToManifest, nil, nil)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("returns true", func() {
-				Expect(parser.ContainsManifest()).To(BeTrue())
-			})
-		})
-
-		Context("when the manifest is not parsed successfully", func() {
-			BeforeEach(func() {
-				rawManifest := []byte(`---
-applications:
-`)
-				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
-				Expect(err).ToNot(HaveOccurred())
-
-				err = parser.InterpolateAndParse(pathToManifest, nil, nil)
-				Expect(err).To(HaveOccurred())
-			})
-
-			It("returns false", func() {
-				Expect(parser.ContainsManifest()).To(BeFalse())
-			})
-		})
-
-		Context("when the manifest has not been parsed", func() {
-			It("returns false", func() {
-				Expect(parser.ContainsManifest()).To(BeFalse())
-			})
-		})
-	})
-
 	Describe("RawAppManifest", func() {
 		var (
 			rawAppManifest []byte
@@ -418,47 +460,5 @@ applications:
 			})
 		})
 
-	})
-
-	Describe("ContainsPrivateDockerImages", func() {
-		When("the manifest contains a docker image", func() {
-			When("the image is public", func() {
-				BeforeEach(func() {
-					parser.Applications = []Application{
-						{ApplicationModel: ApplicationModel{Name: "app-1", Docker: &Docker{Image: "image-1"}}, FullUnmarshalledApplication: nil},
-						{ApplicationModel: ApplicationModel{Name: "app-2", Docker: &Docker{Image: "image-2"}}, FullUnmarshalledApplication: nil}}
-				})
-
-				It("returns false", func() {
-					Expect(parser.ContainsPrivateDockerImages()).To(BeFalse())
-				})
-			})
-
-			When("the image is private", func() {
-				BeforeEach(func() {
-					parser.Applications = []Application{
-						{ApplicationModel: ApplicationModel{Name: "app-1", Docker: &Docker{Image: "image-1"}}},
-						{ApplicationModel: ApplicationModel{Name: "app-2", Docker: &Docker{Image: "image-2", Username: "user"}}},
-					}
-				})
-
-				It("returns true", func() {
-					Expect(parser.ContainsPrivateDockerImages()).To(BeTrue())
-				})
-			})
-		})
-
-		When("the manifest does not contain a docker image", func() {
-			BeforeEach(func() {
-				parser.Applications = []Application{
-					{ApplicationModel: ApplicationModel{Name: "app-1"}},
-					{ApplicationModel: ApplicationModel{Name: "app-2"}},
-				}
-			})
-
-			It("returns false", func() {
-				Expect(parser.ContainsPrivateDockerImages()).To(BeFalse())
-			})
-		})
 	})
 })

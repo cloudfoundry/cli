@@ -28,8 +28,12 @@ func NewParser() *Parser {
 	return parser
 }
 
-func (parser *Parser) GetPathToManifest() string {
-	return parser.PathToManifest
+func (parser Parser) AppNames() []string {
+	var names []string
+	for _, app := range parser.Applications {
+		names = append(names, app.Name)
+	}
+	return names
 }
 
 func (parser *Parser) Apps(appName string) ([]Application, error) {
@@ -42,6 +46,31 @@ func (parser *Parser) Apps(appName string) ([]Application, error) {
 		}
 	}
 	return nil, AppNotInManifestError{Name: appName}
+}
+
+func (parser Parser) ContainsManifest() bool {
+	return parser.hasParsed
+}
+
+func (parser Parser) ContainsMultipleApps() bool {
+	return len(parser.Applications) > 1
+}
+
+func (parser Parser) ContainsPrivateDockerImages() bool {
+	for _, app := range parser.Applications {
+		if app.Docker != nil && app.Docker.Username != "" {
+			return true
+		}
+	}
+	return false
+}
+
+func (parser Parser) FullRawManifest() []byte {
+	return parser.rawManifest
+}
+
+func (parser *Parser) GetPathToManifest() string {
+	return parser.PathToManifest
 }
 
 // InterpolateAndParse reads the manifest at the provided paths, interpolates
@@ -87,37 +116,8 @@ func (parser *Parser) InterpolateAndParse(pathToManifest string, pathsToVarsFile
 	return parser.parse(rawManifest)
 }
 
-func (parser Parser) AppNames() []string {
-	var names []string
-	for _, app := range parser.Applications {
-		names = append(names, app.Name)
-	}
-	return names
-}
-
-func (parser Parser) ContainsManifest() bool {
-	return parser.hasParsed
-}
-
-func (parser Parser) ContainsMultipleApps() bool {
-	return len(parser.Applications) > 1
-}
-
-func (parser Parser) ContainsPrivateDockerImages() bool {
-	for _, app := range parser.Applications {
-		if app.Docker != nil && app.Docker.Username != "" {
-			return true
-		}
-	}
-	return false
-}
-
-func (parser Parser) FullRawManifest() []byte {
-	return parser.rawManifest
-}
-
 func (parser Parser) RawAppManifest(appName string) ([]byte, error) {
-	var appManifest rawManifest
+	var appManifest manifest
 	for _, app := range parser.Applications {
 		if app.Name == appName {
 			appManifest.Applications = []Application{app}
@@ -127,22 +127,10 @@ func (parser Parser) RawAppManifest(appName string) ([]byte, error) {
 	return nil, AppNotInManifestError{Name: appName}
 }
 
-type rawManifest struct {
-	Applications []Application `yaml:"applications"`
-}
-
-type InvalidManifestApplicationPathError struct {
-	Path string
-}
-
-func (InvalidManifestApplicationPathError) Error() string {
-	return "Path in manifest is invalid"
-}
-
 func (parser *Parser) parse(manifestBytes []byte) error {
 	parser.rawManifest = manifestBytes
 	pathToManifest := parser.GetPathToManifest()
-	var raw rawManifest
+	var raw manifest
 
 	err := yaml.Unmarshal(manifestBytes, &raw)
 	if err != nil {
