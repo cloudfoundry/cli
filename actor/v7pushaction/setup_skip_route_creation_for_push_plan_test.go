@@ -39,4 +39,16 @@ var _ = Describe("SetupSkipRouteCreationForPushPlan", func() {
 			Expect(expectedPushPlan.SkipRouteCreation).To(BeTrue())
 		})
 	})
+
+	When("flag overrides specifies skipping route creation", func() {
+		BeforeEach(func() {
+			manifestApp.NoRoute = true
+		})
+
+		It("sets SkipRouteCreation on the push plan", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+			Expect(expectedPushPlan.SkipRouteCreation).To(BeTrue())
+		})
+	})
+
 })

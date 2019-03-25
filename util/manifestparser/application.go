@@ -4,9 +4,10 @@ package manifestparser
 // add a field for the CLI to extract from the manifest, just add it to this
 // struct.
 type ApplicationModel struct {
-	Name   string  `yaml:"name"`
-	Docker *Docker `yaml:"docker"`
-	Path   string  `yaml:"path"`
+	Name    string  `yaml:"name"`
+	Docker  *Docker `yaml:"docker"`
+	Path    string  `yaml:"path"`
+	NoRoute bool    `yaml:"no-route"`
 }
 
 type Application struct {
@@ -27,6 +28,6 @@ func (application *Application) UnmarshalYAML(unmarshal func(v interface{}) erro
 }
 
 type Docker struct {
-	Username string `yaml:"username"`
 	Image    string `yaml:"image"`
+	Username string `yaml:"username"`
 }
