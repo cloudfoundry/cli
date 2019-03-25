@@ -28,14 +28,6 @@ func NewParser() *Parser {
 	return parser
 }
 
-func (parser *Parser) Parse(manifestPath string) error {
-	bytes, err := ioutil.ReadFile(manifestPath)
-	if err != nil {
-		return err
-	}
-	return parser.parse(bytes)
-}
-
 func (parser *Parser) GetPathToManifest() string {
 	return parser.PathToManifest
 }

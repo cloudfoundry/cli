@@ -7,13 +7,14 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v6/shared"
 	"code.cloudfoundry.org/cli/util/manifestparser"
+	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
 //go:generate counterfeiter . ManifestParser
 
 type ManifestParser interface {
 	v3action.ManifestParser
-	Parse(manifestPath string) error
+	InterpolateAndParse(pathToManifest string, pathsToVarsFiles []string, vars []template.VarKV) error
 }
 
 //go:generate counterfeiter . V3ApplyManifestActor
@@ -70,7 +71,7 @@ func (cmd V3ApplyManifestCommand) Execute(args []string) error {
 		"Username":     user.Name,
 	})
 
-	err = cmd.Parser.Parse(pathToManifest)
+	err = cmd.Parser.InterpolateAndParse(pathToManifest, nil, nil)
 	if err != nil {
 		return err
 	}

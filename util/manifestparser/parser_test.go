@@ -7,8 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "code.cloudfoundry.org/cli/util/manifestparser"
 
 	"github.com/cloudfoundry/bosh-cli/director/template"
@@ -26,103 +24,6 @@ var _ = Describe("Parser", func() {
 	Describe("NewParser", func() {
 		It("returns a parser", func() {
 			Expect(parser).ToNot(BeNil())
-		})
-	})
-
-	Describe("Parse", func() {
-		var (
-			manifestPath string
-			manifest     map[string]interface{}
-
-			tmpPath1      string
-			tmpPath2      string
-			tmpNestedPath string
-			executeErr    error
-		)
-
-		JustBeforeEach(func() {
-			tmpfile, err := ioutil.TempFile("", "")
-			Expect(err).ToNot(HaveOccurred())
-			manifestPath = tmpfile.Name()
-			Expect(tmpfile.Close()).ToNot(HaveOccurred())
-			parser.PathToManifest = manifestPath
-			WriteManifest(manifestPath, manifest)
-			executeErr = parser.Parse(manifestPath)
-
-		})
-
-		BeforeEach(func() {
-			var err error
-			tmpPath1, err = ioutil.TempDir("", "")
-			Expect(err).ToNot(HaveOccurred())
-
-			tmpNestedPath, err = ioutil.TempDir(tmpPath1, "")
-			Expect(err).ToNot(HaveOccurred())
-
-			tmpNestedPath = filepath.Join(tmpNestedPath, "..")
-
-			tmpPath2, err = ioutil.TempDir("", "")
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			err := os.RemoveAll("second")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(os.RemoveAll(manifestPath)).ToNot(HaveOccurred())
-		})
-
-		When("given a valid manifest file", func() {
-			BeforeEach(func() {
-				manifest = map[string]interface{}{
-					"applications": []map[string]string{
-						{
-							"name": "app-1",
-							"path": tmpNestedPath,
-						},
-						{
-							"name": "app-2",
-							"path": tmpPath2,
-						},
-					},
-				}
-			})
-
-			It("returns nil and sets the applications", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-
-				Expect(parser.Applications[0].Name).To(Equal("app-1"))
-				Expect(parser.Applications[1].Name).To(Equal("app-2"))
-
-				Expect(parser.Applications[0].Path).To(helpers.EqualPath("%s", tmpPath1))
-				Expect(parser.Applications[1].Path).To(helpers.EqualPath("%s", tmpPath2))
-			})
-		})
-
-		When("given an invalid manifest file", func() {
-			When("the manifest file is empty", func() {
-				BeforeEach(func() {
-					manifest = map[string]interface{}{}
-				})
-
-				It("returns an error", func() {
-					Expect(executeErr).To(MatchError("must have at least one application"))
-				})
-			})
-			When("given an invalid app path", func() {
-				BeforeEach(func() {
-					manifest = map[string]interface{}{
-						"applications": []map[string]string{
-							{
-								"name": "app-1",
-								"path": "/invalid/path",
-							},
-						},
-					}
-				})
-				It("returns an InvalidManifestApplicationPathError", func() {
-					Expect(executeErr).To(MatchError(InvalidManifestApplicationPathError{"/invalid/path"}))
-				})
-			})
 		})
 	})
 
@@ -407,7 +308,7 @@ applications:
 				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
-				err = parser.Parse(pathToManifest)
+				err = parser.InterpolateAndParse(pathToManifest, nil, nil)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -424,7 +325,7 @@ applications:
 				err := ioutil.WriteFile(pathToManifest, rawManifest, 0666)
 				Expect(err).ToNot(HaveOccurred())
 
-				err = parser.Parse(pathToManifest)
+				err = parser.InterpolateAndParse(pathToManifest, nil, nil)
 				Expect(err).To(HaveOccurred())
 			})
 

@@ -2,9 +2,10 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
 	v6 "code.cloudfoundry.org/cli/command/v6"
+	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
 type FakeManifestParser struct {
@@ -18,15 +19,17 @@ type FakeManifestParser struct {
 	appNamesReturnsOnCall map[int]struct {
 		result1 []string
 	}
-	ParseStub        func(string) error
-	parseMutex       sync.RWMutex
-	parseArgsForCall []struct {
+	InterpolateAndParseStub        func(string, []string, []template.VarKV) error
+	interpolateAndParseMutex       sync.RWMutex
+	interpolateAndParseArgsForCall []struct {
 		arg1 string
+		arg2 []string
+		arg3 []template.VarKV
 	}
-	parseReturns struct {
+	interpolateAndParseReturns struct {
 		result1 error
 	}
-	parseReturnsOnCall map[int]struct {
+	interpolateAndParseReturnsOnCall map[int]struct {
 		result1 error
 	}
 	RawAppManifestStub        func(string) ([]byte, error)
@@ -98,62 +101,74 @@ func (fake *FakeManifestParser) AppNamesReturnsOnCall(i int, result1 []string) {
 	}{result1}
 }
 
-func (fake *FakeManifestParser) Parse(arg1 string) error {
-	fake.parseMutex.Lock()
-	ret, specificReturn := fake.parseReturnsOnCall[len(fake.parseArgsForCall)]
-	fake.parseArgsForCall = append(fake.parseArgsForCall, struct {
+func (fake *FakeManifestParser) InterpolateAndParse(arg1 string, arg2 []string, arg3 []template.VarKV) error {
+	var arg2Copy []string
+	if arg2 != nil {
+		arg2Copy = make([]string, len(arg2))
+		copy(arg2Copy, arg2)
+	}
+	var arg3Copy []template.VarKV
+	if arg3 != nil {
+		arg3Copy = make([]template.VarKV, len(arg3))
+		copy(arg3Copy, arg3)
+	}
+	fake.interpolateAndParseMutex.Lock()
+	ret, specificReturn := fake.interpolateAndParseReturnsOnCall[len(fake.interpolateAndParseArgsForCall)]
+	fake.interpolateAndParseArgsForCall = append(fake.interpolateAndParseArgsForCall, struct {
 		arg1 string
-	}{arg1})
-	fake.recordInvocation("Parse", []interface{}{arg1})
-	fake.parseMutex.Unlock()
-	if fake.ParseStub != nil {
-		return fake.ParseStub(arg1)
+		arg2 []string
+		arg3 []template.VarKV
+	}{arg1, arg2Copy, arg3Copy})
+	fake.recordInvocation("InterpolateAndParse", []interface{}{arg1, arg2Copy, arg3Copy})
+	fake.interpolateAndParseMutex.Unlock()
+	if fake.InterpolateAndParseStub != nil {
+		return fake.InterpolateAndParseStub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.parseReturns
+	fakeReturns := fake.interpolateAndParseReturns
 	return fakeReturns.result1
 }
 
-func (fake *FakeManifestParser) ParseCallCount() int {
-	fake.parseMutex.RLock()
-	defer fake.parseMutex.RUnlock()
-	return len(fake.parseArgsForCall)
+func (fake *FakeManifestParser) InterpolateAndParseCallCount() int {
+	fake.interpolateAndParseMutex.RLock()
+	defer fake.interpolateAndParseMutex.RUnlock()
+	return len(fake.interpolateAndParseArgsForCall)
 }
 
-func (fake *FakeManifestParser) ParseCalls(stub func(string) error) {
-	fake.parseMutex.Lock()
-	defer fake.parseMutex.Unlock()
-	fake.ParseStub = stub
+func (fake *FakeManifestParser) InterpolateAndParseCalls(stub func(string, []string, []template.VarKV) error) {
+	fake.interpolateAndParseMutex.Lock()
+	defer fake.interpolateAndParseMutex.Unlock()
+	fake.InterpolateAndParseStub = stub
 }
 
-func (fake *FakeManifestParser) ParseArgsForCall(i int) string {
-	fake.parseMutex.RLock()
-	defer fake.parseMutex.RUnlock()
-	argsForCall := fake.parseArgsForCall[i]
-	return argsForCall.arg1
+func (fake *FakeManifestParser) InterpolateAndParseArgsForCall(i int) (string, []string, []template.VarKV) {
+	fake.interpolateAndParseMutex.RLock()
+	defer fake.interpolateAndParseMutex.RUnlock()
+	argsForCall := fake.interpolateAndParseArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeManifestParser) ParseReturns(result1 error) {
-	fake.parseMutex.Lock()
-	defer fake.parseMutex.Unlock()
-	fake.ParseStub = nil
-	fake.parseReturns = struct {
+func (fake *FakeManifestParser) InterpolateAndParseReturns(result1 error) {
+	fake.interpolateAndParseMutex.Lock()
+	defer fake.interpolateAndParseMutex.Unlock()
+	fake.InterpolateAndParseStub = nil
+	fake.interpolateAndParseReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeManifestParser) ParseReturnsOnCall(i int, result1 error) {
-	fake.parseMutex.Lock()
-	defer fake.parseMutex.Unlock()
-	fake.ParseStub = nil
-	if fake.parseReturnsOnCall == nil {
-		fake.parseReturnsOnCall = make(map[int]struct {
+func (fake *FakeManifestParser) InterpolateAndParseReturnsOnCall(i int, result1 error) {
+	fake.interpolateAndParseMutex.Lock()
+	defer fake.interpolateAndParseMutex.Unlock()
+	fake.InterpolateAndParseStub = nil
+	if fake.interpolateAndParseReturnsOnCall == nil {
+		fake.interpolateAndParseReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.parseReturnsOnCall[i] = struct {
+	fake.interpolateAndParseReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -226,8 +241,8 @@ func (fake *FakeManifestParser) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.appNamesMutex.RLock()
 	defer fake.appNamesMutex.RUnlock()
-	fake.parseMutex.RLock()
-	defer fake.parseMutex.RUnlock()
+	fake.interpolateAndParseMutex.RLock()
+	defer fake.interpolateAndParseMutex.RUnlock()
 	fake.rawAppManifestMutex.RLock()
 	defer fake.rawAppManifestMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

@@ -117,8 +117,9 @@ var _ = Describe("v3-apply-manifest Command", func() {
 				Expect(testUI.Err).To(Say("some-manifest-warning"))
 				Expect(testUI.Out).To(Say("OK"))
 
-				Expect(fakeParser.ParseCallCount()).To(Equal(1))
-				Expect(fakeParser.ParseArgsForCall(0)).To(Equal(providedPath))
+				Expect(fakeParser.InterpolateAndParseCallCount()).To(Equal(1))
+				path, _, _ := fakeParser.InterpolateAndParseArgsForCall(0)
+				Expect(path).To(Equal(providedPath))
 
 				Expect(fakeActor.ApplyApplicationManifestCallCount()).To(Equal(1))
 				parserArg, spaceGUIDArg := fakeActor.ApplyApplicationManifestArgsForCall(0)
@@ -132,7 +133,7 @@ var _ = Describe("v3-apply-manifest Command", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("oooooh nooooos")
-				fakeParser.ParseReturns(expectedErr)
+				fakeParser.InterpolateAndParseReturns(expectedErr)
 			})
 
 			It("returns back the parse error", func() {
