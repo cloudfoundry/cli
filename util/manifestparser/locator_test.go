@@ -117,10 +117,9 @@ var _ = Describe("Locator", func() {
 			})
 		})
 
-		When("there's an error detecting the file", func() {
+		When("there's an error detecting the manifest", func() {
 			BeforeEach(func() {
-				path := filepath.Join(workingDir, strings.Repeat("a", 10000), "some-manifest.yml")
-				filepathOrDirectory = path
+				filepathOrDirectory = filepath.Join(workingDir, strings.Repeat("a", 10000))
 			})
 
 			It("returns the error", func() {

@@ -38,7 +38,7 @@ func (loc Locator) handleDir(dir string) (string, bool, error) {
 		fullPath := filepath.Join(dir, filename)
 		if _, err := os.Stat(fullPath); err == nil {
 			return fullPath, true, nil
-		} else if err != nil && !os.IsNotExist(err) {
+		} else if !os.IsNotExist(err) {
 			return "", false, err
 		}
 	}
