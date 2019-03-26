@@ -193,7 +193,7 @@ resources:
   type: docker-image
   source:
     repository: golang
-    tag: 1.11
+    tag: 1.12
 
 - name: baseimage
   type: docker-image
