@@ -1,6 +1,8 @@
 package push
 
 import (
+	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -38,7 +40,7 @@ var _ = Describe("reading of the manifest based on location", func() {
 			})
 		})
 
-		When("the manifest has a .yml extension", func() {
+		When("the manifest has a .yaml extension", func() {
 			It("detects manifests with a .yaml suffix", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					pathToManifest := filepath.Join(dir, "manifest.yaml")
@@ -50,6 +52,62 @@ var _ = Describe("reading of the manifest based on location", func() {
 						},
 					})
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
+	})
+
+	When("the manifest exists in some other directory", func() {
+		var workingDir string
+
+		BeforeEach(func() {
+			var err error
+			workingDir, err = ioutil.TempDir("", "manifest-working-dir")
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(workingDir)).ToNot(HaveOccurred())
+		})
+
+		When("the manifest has a .yml extension", func() {
+			BeforeEach(func() {
+				pathToManifest := filepath.Join(workingDir, "manifest.yml")
+				helpers.WriteManifest(pathToManifest, map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"name": appName,
+						},
+					},
+				})
+			})
+
+			It("detects manifests with a .yml suffix", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", workingDir, "--no-start")
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
+
+		When("the manifest has a .yaml extension", func() {
+			BeforeEach(func() {
+				pathToManifest := filepath.Join(workingDir, "manifest.yaml")
+				helpers.WriteManifest(pathToManifest, map[string]interface{}{
+					"applications": []map[string]interface{}{
+						{
+							"name": appName,
+						},
+					},
+				})
+			})
+
+			It("detects manifests with a .yaml suffix", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", workingDir, "--no-start")
 					Eventually(session).Should(Say("name:\\s+%s", appName))
 					Eventually(session).Should(Exit(0))
 				})
