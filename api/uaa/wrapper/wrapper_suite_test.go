@@ -13,7 +13,7 @@ import (
 
 func TestUAA(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Wrapper Suite")
+	RunSpecs(t, "UAA Wrapper Suite")
 }
 
 var server *Server

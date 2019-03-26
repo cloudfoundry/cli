@@ -9,5 +9,5 @@ import (
 
 func TestInternal(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Cloud Controller V3 Internal Suite")
+	RunSpecs(t, "UAA Internal Suite")
 }

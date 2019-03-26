@@ -13,7 +13,7 @@ import (
 
 func TestCloudcontroller(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Wrapper Suite")
+	RunSpecs(t, "Cloud Controller Wrapper Suite")
 }
 
 var server *Server
