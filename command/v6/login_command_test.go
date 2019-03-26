@@ -291,7 +291,7 @@ var _ = Describe("login Command", func() {
 									Type:        coreconfig.AuthPromptTypePassword,
 								},
 								"supersecret": {
-									DisplayName: "Meaning of Life",
+									DisplayName: "MFA Code",
 									Type:        coreconfig.AuthPromptTypePassword,
 								},
 							})
@@ -305,14 +305,20 @@ var _ = Describe("login Command", func() {
 							It("displays text prompts, starting with username, then password prompts, starting with password", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
+								Expect(testUI.Out).To(Say("\n\n"))
 								Expect(testUI.Out).To(Say("Username:"))
 								Expect(testUI.Out).To(Say("faker"))
+
+								Expect(testUI.Out).To(Say("\n\n"))
 								Expect(testUI.Out).To(Say("Account Number:"))
 								Expect(testUI.Out).To(Say("someaccount"))
 
+								Expect(testUI.Out).To(Say("\n\n"))
 								Expect(testUI.Out).To(Say("Your Password:"))
 								Expect(testUI.Out).NotTo(Say("somepassword"))
-								Expect(testUI.Out).To(Say("Meaning of Life:"))
+
+								Expect(testUI.Out).To(Say("\n\n"))
+								Expect(testUI.Out).To(Say("MFA Code:"))
 								Expect(testUI.Out).NotTo(Say("garbage"))
 							})
 
@@ -437,13 +443,13 @@ var _ = Describe("login Command", func() {
 
 							It("prints the error message three times", func() {
 								Expect(testUI.Out).To(Say("Your Password:"))
-								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Out).To(Say("MFA Code:"))
 								Expect(testUI.Err).To(Say("something died"))
 								Expect(testUI.Out).To(Say("Your Password:"))
-								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Out).To(Say("MFA Code:"))
 								Expect(testUI.Err).To(Say("something died"))
 								Expect(testUI.Out).To(Say("Your Password:"))
-								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Out).To(Say("MFA Code:"))
 								Expect(testUI.Err).To(Say("something died"))
 							})
 
@@ -466,13 +472,13 @@ var _ = Describe("login Command", func() {
 
 							It("converts the error before printing it", func() {
 								Expect(testUI.Out).To(Say("Your Password:"))
-								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Out).To(Say("MFA Code:"))
 								Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
 								Expect(testUI.Out).To(Say("Your Password:"))
-								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Out).To(Say("MFA Code:"))
 								Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
 								Expect(testUI.Out).To(Say("Your Password:"))
-								Expect(testUI.Out).To(Say("Meaning of Life:"))
+								Expect(testUI.Out).To(Say("MFA Code:"))
 								Expect(testUI.Err).To(Say("Credentials were rejected, please try again."))
 							})
 						})

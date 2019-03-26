@@ -186,11 +186,13 @@ func (cmd *LoginCommand) authenticate() error {
 		if prompts["username"].Type == coreconfig.AuthPromptTypeText && cmd.Username != "" {
 			credentials["username"] = cmd.Username
 		} else {
+			cmd.UI.DisplayNewline()
 			var err error
 			credentials["username"], err = cmd.UI.DisplayTextPrompt(value.DisplayName)
 			if err != nil {
 				return err
 			}
+			cmd.UI.DisplayNewline()
 		}
 	}
 
@@ -210,6 +212,7 @@ func (cmd *LoginCommand) authenticate() error {
 			if err != nil {
 				return err
 			}
+			cmd.UI.DisplayNewline()
 		}
 	}
 
@@ -309,6 +312,7 @@ func (cmd *LoginCommand) passwordPrompts(prompts map[string]coreconfig.AuthPromp
 	}
 
 	for _, key := range passwordKeys {
+		cmd.UI.DisplayNewline()
 		credentials[key], err = cmd.UI.DisplayPasswordPrompt(prompts[key].DisplayName)
 		if err != nil {
 			return nil, err
