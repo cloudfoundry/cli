@@ -2,10 +2,10 @@
 package ccv3fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	cloudcontroller "code.cloudfoundry.org/cli/api/cloudcontroller"
-	ccv3 "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
 type FakeConnectionWrapper struct {

@@ -2,10 +2,10 @@
 package pluginfakes
 
 import (
-	http "net/http"
-	sync "sync"
+	"net/http"
+	"sync"
 
-	plugin "code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/api/plugin"
 )
 
 type FakeConnection struct {

@@ -2,9 +2,9 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	cfnetworkingaction "code.cloudfoundry.org/cli/actor/cfnetworkingaction"
+	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 

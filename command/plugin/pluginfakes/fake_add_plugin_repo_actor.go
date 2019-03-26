@@ -2,9 +2,9 @@
 package pluginfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	plugin "code.cloudfoundry.org/cli/command/plugin"
+	"code.cloudfoundry.org/cli/command/plugin"
 )
 
 type FakeAddPluginRepoActor struct {

@@ -2,10 +2,10 @@
 package ccv3fakes
 
 import (
-	sync "sync"
-	time "time"
+	"sync"
+	"time"
 
-	ccv3 "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
 type FakeClock struct {

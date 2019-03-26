@@ -2,10 +2,10 @@
 package clisshfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	clissh "code.cloudfoundry.org/cli/util/clissh"
-	ssh "golang.org/x/crypto/ssh"
+	"code.cloudfoundry.org/cli/util/clissh"
+	"golang.org/x/crypto/ssh"
 )
 
 type FakeSecureDialer struct {

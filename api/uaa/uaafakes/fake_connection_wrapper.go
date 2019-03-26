@@ -2,10 +2,10 @@
 package uaafakes
 
 import (
-	http "net/http"
-	sync "sync"
+	"net/http"
+	"sync"
 
-	uaa "code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa"
 )
 
 type FakeConnectionWrapper struct {

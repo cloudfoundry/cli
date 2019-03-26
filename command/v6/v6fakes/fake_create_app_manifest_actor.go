@@ -2,11 +2,11 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v2v3action "code.cloudfoundry.org/cli/actor/v2v3action"
+	"code.cloudfoundry.org/cli/actor/v2v3action"
 	v6 "code.cloudfoundry.org/cli/command/v6"
-	manifest "code.cloudfoundry.org/cli/util/manifest"
+	"code.cloudfoundry.org/cli/util/manifest"
 )
 
 type FakeCreateAppManifestActor struct {

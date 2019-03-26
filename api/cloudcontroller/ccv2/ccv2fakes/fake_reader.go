@@ -2,9 +2,9 @@
 package ccv2fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	ccv2 "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 type FakeReader struct {

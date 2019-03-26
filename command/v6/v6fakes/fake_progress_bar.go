@@ -2,8 +2,8 @@
 package v6fakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )

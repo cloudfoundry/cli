@@ -2,10 +2,10 @@
 package v3actionfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	sharedaction "code.cloudfoundry.org/cli/actor/sharedaction"
-	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v3action"
 )
 
 type FakeSSHActor struct {

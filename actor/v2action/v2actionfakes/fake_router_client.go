@@ -2,10 +2,10 @@
 package v2actionfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v2action "code.cloudfoundry.org/cli/actor/v2action"
-	router "code.cloudfoundry.org/cli/api/router"
+	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/router"
 )
 
 type FakeRouterClient struct {

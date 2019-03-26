@@ -2,10 +2,10 @@
 package pluginfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	plugin "code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/api/plugin"
 )
 
 type FakeProxyReader struct {

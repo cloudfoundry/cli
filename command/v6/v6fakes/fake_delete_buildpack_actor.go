@@ -2,7 +2,7 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )

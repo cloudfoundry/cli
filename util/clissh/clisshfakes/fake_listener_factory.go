@@ -2,10 +2,10 @@
 package clisshfakes
 
 import (
-	net "net"
-	sync "sync"
+	"net"
+	"sync"
 
-	clissh "code.cloudfoundry.org/cli/util/clissh"
+	"code.cloudfoundry.org/cli/util/clissh"
 )
 
 type FakeListenerFactory struct {

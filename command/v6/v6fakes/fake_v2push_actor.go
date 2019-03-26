@@ -2,12 +2,12 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	pushaction "code.cloudfoundry.org/cli/actor/pushaction"
+	"code.cloudfoundry.org/cli/actor/pushaction"
 	v6 "code.cloudfoundry.org/cli/command/v6"
-	manifest "code.cloudfoundry.org/cli/util/manifest"
-	template "github.com/cloudfoundry/bosh-cli/director/template"
+	"code.cloudfoundry.org/cli/util/manifest"
+	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
 type FakeV2PushActor struct {

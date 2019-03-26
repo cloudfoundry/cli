@@ -2,10 +2,10 @@
 package v3actionfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v3action "code.cloudfoundry.org/cli/actor/v3action"
-	events "github.com/cloudfoundry/sonde-go/events"
+	"code.cloudfoundry.org/cli/actor/v3action"
+	"github.com/cloudfoundry/sonde-go/events"
 )
 
 type FakeNOAAClient struct {

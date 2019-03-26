@@ -2,11 +2,11 @@
 package clisshfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	clissh "code.cloudfoundry.org/cli/util/clissh"
-	ssh "golang.org/x/crypto/ssh"
+	"code.cloudfoundry.org/cli/util/clissh"
+	"golang.org/x/crypto/ssh"
 )
 
 type FakeSecureSession struct {

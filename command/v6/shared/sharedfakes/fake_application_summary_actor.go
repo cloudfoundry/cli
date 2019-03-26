@@ -2,10 +2,10 @@
 package sharedfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v2v3action "code.cloudfoundry.org/cli/actor/v2v3action"
-	shared "code.cloudfoundry.org/cli/command/v6/shared"
+	"code.cloudfoundry.org/cli/actor/v2v3action"
+	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
 type FakeApplicationSummaryActor struct {

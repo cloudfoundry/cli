@@ -2,11 +2,11 @@
 package pushactionfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	pushaction "code.cloudfoundry.org/cli/actor/pushaction"
-	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/pushaction"
+	"code.cloudfoundry.org/cli/actor/v2action"
 )
 
 type FakeV2Actor struct {

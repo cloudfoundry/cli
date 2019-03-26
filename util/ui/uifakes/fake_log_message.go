@@ -2,10 +2,10 @@
 package uifakes
 
 import (
-	sync "sync"
-	time "time"
+	"sync"
+	"time"
 
-	ui "code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/util/ui"
 )
 
 type FakeLogMessage struct {

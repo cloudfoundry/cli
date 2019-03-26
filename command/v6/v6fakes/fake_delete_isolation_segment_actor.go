@@ -2,9 +2,9 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 

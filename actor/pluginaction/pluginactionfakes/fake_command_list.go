@@ -2,9 +2,9 @@
 package pluginactionfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	pluginaction "code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/actor/pluginaction"
 )
 
 type FakeCommandList struct {

@@ -2,10 +2,10 @@
 package downloadfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	download "code.cloudfoundry.org/cli/util/download"
+	"code.cloudfoundry.org/cli/util/download"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 

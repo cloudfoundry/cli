@@ -2,10 +2,10 @@
 package sharedactionfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	sharedaction "code.cloudfoundry.org/cli/actor/sharedaction"
-	clissh "code.cloudfoundry.org/cli/util/clissh"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/util/clissh"
 )
 
 type FakeSecureShellClient struct {

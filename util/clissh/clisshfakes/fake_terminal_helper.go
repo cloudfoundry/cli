@@ -2,11 +2,11 @@
 package clisshfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	clissh "code.cloudfoundry.org/cli/util/clissh"
-	term "github.com/moby/moby/pkg/term"
+	"code.cloudfoundry.org/cli/util/clissh"
+	"github.com/moby/moby/pkg/term"
 )
 
 type FakeTerminalHelper struct {

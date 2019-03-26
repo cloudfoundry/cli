@@ -2,10 +2,10 @@
 package v2actionfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	v2action "code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2action"
 )
 
 type FakeSimpleProgressBar struct {

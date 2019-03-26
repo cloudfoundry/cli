@@ -2,9 +2,9 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	pushaction "code.cloudfoundry.org/cli/actor/pushaction"
+	"code.cloudfoundry.org/cli/actor/pushaction"
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 

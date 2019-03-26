@@ -2,12 +2,12 @@
 package pushactionfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	pushaction "code.cloudfoundry.org/cli/actor/pushaction"
-	sharedaction "code.cloudfoundry.org/cli/actor/sharedaction"
-	v3action "code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/actor/pushaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v3action"
 )
 
 type FakeV3Actor struct {

@@ -2,9 +2,9 @@
 package v6fakes
 
 import (
-	sync "sync"
+	"sync"
 
-	constant "code.cloudfoundry.org/cli/api/uaa/constant"
+	"code.cloudfoundry.org/cli/api/uaa/constant"
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 

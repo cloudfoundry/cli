@@ -2,10 +2,10 @@
 package noaabridgefakes
 
 import (
-	sync "sync"
+	"sync"
 
-	uaa "code.cloudfoundry.org/cli/api/uaa"
-	noaabridge "code.cloudfoundry.org/cli/api/uaa/noaabridge"
+	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/noaabridge"
 )
 
 type FakeUAAClient struct {

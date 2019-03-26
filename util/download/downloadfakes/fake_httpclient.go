@@ -2,10 +2,10 @@
 package downloadfakes
 
 import (
-	http "net/http"
-	sync "sync"
+	"net/http"
+	"sync"
 
-	download "code.cloudfoundry.org/cli/util/download"
+	"code.cloudfoundry.org/cli/util/download"
 )
 
 type FakeHTTPClient struct {

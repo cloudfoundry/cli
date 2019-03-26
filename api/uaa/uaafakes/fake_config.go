@@ -2,10 +2,10 @@
 package uaafakes
 
 import (
-	sync "sync"
-	time "time"
+	"sync"
+	"time"
 
-	uaa "code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa"
 )
 
 type FakeConfig struct {

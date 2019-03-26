@@ -2,10 +2,10 @@
 package compositefakes
 
 import (
-	sync "sync"
+	"sync"
 
-	v2action "code.cloudfoundry.org/cli/actor/v2action"
-	composite "code.cloudfoundry.org/cli/actor/v2action/composite"
+	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2action/composite"
 )
 
 type FakeOrganizationActor struct {

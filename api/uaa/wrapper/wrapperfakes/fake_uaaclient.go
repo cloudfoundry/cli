@@ -2,10 +2,10 @@
 package wrapperfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	uaa "code.cloudfoundry.org/cli/api/uaa"
-	wrapper "code.cloudfoundry.org/cli/api/uaa/wrapper"
+	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/wrapper"
 )
 
 type FakeUAAClient struct {

@@ -2,8 +2,8 @@
 package ccv3fakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 )
 
 type FakeReader struct {

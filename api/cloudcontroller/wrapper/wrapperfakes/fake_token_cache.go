@@ -2,9 +2,9 @@
 package wrapperfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	wrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 )
 
 type FakeTokenCache struct {

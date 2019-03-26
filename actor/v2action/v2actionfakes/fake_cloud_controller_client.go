@@ -2,11 +2,11 @@
 package v2actionfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	v2action "code.cloudfoundry.org/cli/actor/v2action"
-	ccv2 "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 type FakeCloudControllerClient struct {

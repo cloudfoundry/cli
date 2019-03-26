@@ -2,10 +2,10 @@
 package pluginactionfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	pluginaction "code.cloudfoundry.org/cli/actor/pluginaction"
-	configv3 "code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type FakeConfig struct {

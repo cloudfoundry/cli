@@ -2,10 +2,10 @@
 package wrapperfakes
 
 import (
-	sync "sync"
-	time "time"
+	"sync"
+	"time"
 
-	wrapper "code.cloudfoundry.org/cli/api/uaa/wrapper"
+	"code.cloudfoundry.org/cli/api/uaa/wrapper"
 )
 
 type FakeRequestLoggerOutput struct {
