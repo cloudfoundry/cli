@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"fmt"
+	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -11,6 +12,20 @@ import (
 )
 
 var _ = Describe("delete-orphaned-routes command", func() {
+	Describe("help text", func() {
+		It("displays the help information", func() {
+			session := helpers.CF("delete-orphaned-routes", "--help")
+			Eventually(session).Should(Say("NAME:\n"))
+			Eventually(session).Should(Say(regexp.QuoteMeta("delete-orphaned-routes - Delete all orphaned routes in the currently targeted space (i.e. those that are not mapped to an app)\n")))
+			Eventually(session).Should(Say("USAGE:\n"))
+			Eventually(session).Should(Say(regexp.QuoteMeta("cf delete-orphaned-routes [-f]")))
+			Eventually(session).Should(Say("OPTIONS:\n"))
+			Eventually(session).Should(Say(`-f\s+Force deletion without confirmation`))
+			Eventually(session).Should(Say("SEE ALSO:\n"))
+			Eventually(session).Should(Say("delete-route, routes"))
+			Eventually(session).Should(Exit(0))
+		})
+	})
 	When("the environment is not setup correctly", func() {
 		It("fails with the appropriate errors", func() {
 			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "delete-orphaned-routes")
