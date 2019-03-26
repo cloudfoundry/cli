@@ -12,8 +12,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
-	"github.com/blang/semver"
 )
 
 //go:generate counterfeiter io.Reader
@@ -248,7 +246,7 @@ func (client *Client) calculateAppBitsRequestSize(matchedResources []Resource, n
 	body := &bytes.Buffer{}
 	form := multipart.NewWriter(body)
 
-	jsonResources, err := client.marshalResourcesBasedOnAPIVersion(matchedResources)
+	jsonResources, err := json.Marshal(matchedResources)
 	if err != nil {
 		return 0, err
 	}
@@ -278,7 +276,7 @@ func (client *Client) createMultipartBodyAndHeaderForAppBits(matchedResources []
 		defer close(writeErrors)
 		defer writerInput.Close()
 
-		jsonResources, err := client.marshalResourcesBasedOnAPIVersion(matchedResources)
+		jsonResources, err := json.Marshal(matchedResources)
 		if err != nil {
 			writeErrors <- err
 			return
@@ -336,24 +334,6 @@ func (*Client) createUploadStream(path string, paramName string) (io.ReadSeeker,
 	return bytes.NewReader(body.Bytes()), writer.FormDataContentType(), err
 }
 
-func (client *Client) marshalResourcesBasedOnAPIVersion(matchedResources []Resource) ([]byte, error) {
-	minVersion := semver.MustParse(ccversion.MinVersionUpdatedResourcesFormatOnPackageUploadV3)
-	currentVersion, err := semver.Parse(client.CloudControllerAPIVersion())
-	if err != nil {
-		return nil, err
-	}
-
-	if currentVersion.GTE(minVersion) {
-		return json.Marshal(matchedResources)
-	}
-
-	oldFormatResources := make([]V2FormattedResource, 0, len(matchedResources))
-	for _, resource := range matchedResources {
-		oldFormatResources = append(oldFormatResources, resource.ToV2FormattedResource())
-	}
-	return json.Marshal(oldFormatResources)
-}
-
 func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Package, Warnings, error) {
 	var pkg Package
 	response := cloudcontroller.Response{
@@ -408,7 +388,7 @@ func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, wri
 }
 
 func (client *Client) uploadExistingResourcesOnly(uploadLink APILink, matchedResources []Resource) (Package, Warnings, error) {
-	jsonResources, err := client.marshalResourcesBasedOnAPIVersion(matchedResources)
+	jsonResources, err := json.Marshal(matchedResources)
 	if err != nil {
 		return Package{}, nil, err
 	}
