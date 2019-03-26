@@ -66,7 +66,9 @@ func (w *CodeWriter) WriteGoFile(filename, pkg string) {
 func (w *CodeWriter) WriteVersionedGoFile(filename, pkg string) {
 	tags := buildTags()
 	if tags != "" {
-		filename = insertVersion(filename, UnicodeVersion())
+		pattern := fileToPattern(filename)
+		updateBuildTags(pattern)
+		filename = fmt.Sprintf(pattern, UnicodeVersion())
 	}
 	f, err := os.Create(filename)
 	if err != nil {

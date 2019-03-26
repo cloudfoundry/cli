@@ -455,7 +455,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:53a1494ea11fd60e114b6b6d82af3f945af61ba98ffbd6c9cfe052acfc526aa0"
+  digest = "1:2f853a86c2a5f407020543d2db12d00b6408e0726ce6d55231d9a4b5b2f2a189"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
@@ -468,11 +468,11 @@
     "ssh/terminal",
   ]
   pruneopts = "NUT"
-  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+  revision = "a5d413f7728c81fb97d96a2b722368945f651e78"
 
 [[projects]]
   branch = "master"
-  digest = "1:e5302092a1150c381b7fa42044733028907ad13724e33be20cb05d1a1f6bb309"
+  digest = "1:276556ec29ad295168d8f07a1b432584396e196340a4797f7518f1aac6f3582d"
   name = "golang.org/x/net"
   packages = [
     "html",
@@ -483,13 +483,14 @@
     "websocket",
   ]
   pruneopts = "NUT"
-  revision = "610586996380ceef02dd726cc09df7e00a3f8e56"
+  revision = "15845e8f865bdabdefb6e7da65b4d9e8de5e94ef"
 
 [[projects]]
   branch = "master"
-  digest = "1:c2a2f2d6ce937c44bf04b647783e49cd949c9257b0cf204ef91a2cff9066cdaa"
+  digest = "1:f9e20bced7052ba08f1a25aeba19dc82b8f83fc4a6d4ffc1d793adb4f85cefe7"
   name = "golang.org/x/sys"
   packages = [
+    "cpu",
     "unix",
     "windows",
   ]
@@ -498,7 +499,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e0ecf92722206929511338ca09d5385e2d85dcae78e083e148df10a19e0adea7"
+  digest = "1:b2d97c24b6f7cc3a6a230308e911d9c77512833e1be69688214408ae7db46390"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -522,7 +523,7 @@
     "unicode/cldr",
   ]
   pruneopts = "NUT"
-  revision = "17bcc049122f272a32787ba38073ee47433023e9"
+  revision = "fe223c5a2583471b2791ca99e716c65b4a76117e"
 
 [[projects]]
   digest = "1:30f55ee34f367e29620faaae69dcdf6b78a86348f3a1472cf63f2dbba0f9d4f7"
