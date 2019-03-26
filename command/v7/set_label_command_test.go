@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = FDescribe("set-label command", func() {
+var _ = Describe("set-label command", func() {
 	var (
 		cmd             SetLabelCommand
 		fakeActor       *v7fakes.FakeSetLabelActor
