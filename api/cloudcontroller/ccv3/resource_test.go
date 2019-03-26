@@ -18,7 +18,7 @@ var _ = Describe("Resource", func() {
 			It("marshals the json properly", func() {
 				resource := Resource{
 					FilePath:    "some-file-1",
-					Mode:        os.FileMode(744),
+					Mode:        os.FileMode(0744),
 					Checksum:    Checksum{Value: "some-sha-1"},
 					SizeInBytes: 1,
 				}
@@ -47,7 +47,7 @@ var _ = Describe("Resource", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(data).To(Equal(Resource{
 					FilePath:    "some-file-1",
-					Mode:        os.FileMode(744),
+					Mode:        os.FileMode(0744),
 					Checksum:    Checksum{Value: "some-sha-1"},
 					SizeInBytes: 1,
 				}))
@@ -132,7 +132,7 @@ var _ = Describe("Resource", func() {
 						Checksum:    Checksum{Value: "scooby dooby"},
 						SizeInBytes: 2,
 						FilePath:    "where are you? we got a job for you now",
-						Mode:        os.FileMode(644),
+						Mode:        os.FileMode(0644),
 					}))
 				})
 			})

@@ -41,7 +41,7 @@ func (r Resource) MarshalJSON() ([]byte, error) {
 	ccResource.FilePath = r.FilePath
 	ccResource.SizeInBytes = r.SizeInBytes
 	ccResource.Checksum = r.Checksum
-	ccResource.Mode = strconv.FormatUint(uint64(r.Mode), 10)
+	ccResource.Mode = strconv.FormatUint(uint64(r.Mode), 8)
 	return json.Marshal(ccResource)
 }
 
@@ -71,7 +71,7 @@ func (r *Resource) UnmarshalJSON(data []byte) error {
 	r.FilePath = ccResource.FilePath
 	r.SizeInBytes = ccResource.SizeInBytes
 	r.Checksum = ccResource.Checksum
-	mode, err := strconv.ParseUint(ccResource.Mode, 10, 32)
+	mode, err := strconv.ParseUint(ccResource.Mode, 8, 32)
 	if err != nil {
 		return err
 	}
