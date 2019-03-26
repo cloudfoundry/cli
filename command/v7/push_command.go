@@ -2,7 +2,6 @@ package v7
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 
 	"code.cloudfoundry.org/cli/command/v7/shared"
@@ -64,6 +63,12 @@ type ManifestParser interface {
 	ContainsPrivateDockerImages() bool
 }
 
+//go:generate counterfeiter . ManifestLocator
+
+type ManifestLocator interface {
+	Path(filepathOrDirectory string) (string, bool, error)
+}
+
 type PushCommand struct {
 	OptionalArgs            flag.OptionalAppName          `positional-args:"yes"`
 	HealthCheckTimeout      flag.PositiveInteger          `long:"app-start-timeout" short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
@@ -89,16 +94,17 @@ type PushCommand struct {
 	envCFStagingTimeout     interface{}                   `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout     interface{}                   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	Config         command.Config
-	UI             command.UI
-	NOAAClient     v3action.NOAAClient
-	Actor          PushActor
-	VersionActor   V7ActorForPush
-	SharedActor    command.SharedActor
-	RouteActor     v7action.RouteActor
-	ProgressBar    ProgressBar
-	PWD            string
-	ManifestParser ManifestParser
+	Config          command.Config
+	UI              command.UI
+	NOAAClient      v3action.NOAAClient
+	Actor           PushActor
+	VersionActor    V7ActorForPush
+	SharedActor     command.SharedActor
+	RouteActor      v7action.RouteActor
+	ProgressBar     ProgressBar
+	PWD             string
+	ManifestLocator ManifestLocator
+	ManifestParser  ManifestParser
 }
 
 func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -130,6 +136,7 @@ func (cmd *PushCommand) Setup(config command.Config, ui command.UI) error {
 	currentDir, err := os.Getwd()
 	cmd.PWD = currentDir
 
+	cmd.ManifestLocator = manifestparser.NewLocator()
 	cmd.ManifestParser = manifestparser.NewParser()
 
 	return err
@@ -498,22 +505,27 @@ func (cmd PushCommand) ReadManifest() error {
 		pathsToVarsFiles = append(pathsToVarsFiles, string(varfilepath))
 	}
 
-	pathToManifest := filepath.Join(cmd.PWD, "manifest.yml")
+	readPath := cmd.PWD
 	if len(cmd.PathToManifest) != 0 {
 		log.WithField("manifestPath", cmd.PathToManifest).Debug("reading '-f' provided manifest")
-		pathToManifest = string(cmd.PathToManifest)
+		readPath = string(cmd.PathToManifest)
 	}
 
-	log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
-	err := cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
-	if os.IsNotExist(err) {
-		log.Debug("no manifest exists")
-		return nil
-	} else if err != nil {
-		log.Errorln("reading manifest:", err)
+	pathToManifest, exists, err := cmd.ManifestLocator.Path(readPath)
+	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{"Path": pathToManifest})
+
+	if exists {
+		log.WithField("manifestPath", pathToManifest).Debug("path to manifest")
+		err = cmd.ManifestParser.InterpolateAndParse(pathToManifest, pathsToVarsFiles, cmd.Vars)
+		if err != nil {
+			log.Errorln("reading manifest:", err)
+			return err
+		}
+
+		cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{"Path": pathToManifest})
+	}
 
 	return nil
 }

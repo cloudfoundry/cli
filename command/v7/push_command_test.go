@@ -2,8 +2,6 @@ package v7_test
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
 	"time"
 
 	. "github.com/onsi/gomega/gstruct"
@@ -120,17 +118,18 @@ func ReturnLogs(logevents []LogEvent, passedWarnings v7action.Warnings, passedEr
 
 var _ = Describe("push Command", func() {
 	var (
-		cmd              PushCommand
-		input            *Buffer
-		testUI           *ui.UI
-		fakeConfig       *commandfakes.FakeConfig
-		fakeSharedActor  *commandfakes.FakeSharedActor
-		fakeActor        *v7fakes.FakePushActor
-		fakeVersionActor *v7fakes.FakeV7ActorForPush
-		fakeProgressBar  *v6fakes.FakeProgressBar
-		fakeNOAAClient   *v7actionfakes.FakeNOAAClient
-		binaryName       string
-		executeErr       error
+		cmd                 PushCommand
+		input               *Buffer
+		testUI              *ui.UI
+		fakeConfig          *commandfakes.FakeConfig
+		fakeSharedActor     *commandfakes.FakeSharedActor
+		fakeActor           *v7fakes.FakePushActor
+		fakeVersionActor    *v7fakes.FakeV7ActorForPush
+		fakeProgressBar     *v6fakes.FakeProgressBar
+		fakeNOAAClient      *v7actionfakes.FakeNOAAClient
+		fakeManifestLocator *v7fakes.FakeManifestLocator
+		binaryName          string
+		executeErr          error
 
 		appName1           string
 		appName2           string
@@ -157,6 +156,7 @@ var _ = Describe("push Command", func() {
 		spaceName = "some-space"
 		orgName = "some-org"
 		pwd = "/push/cmd/test"
+		fakeManifestLocator = new(v7fakes.FakeManifestLocator)
 		fakeManifestParser = new(v7fakes.FakeManifestParser)
 
 		binaryName = "faceman"
@@ -164,15 +164,16 @@ var _ = Describe("push Command", func() {
 		fakeConfig.ExperimentalReturns(true) // TODO: Delete once we remove the experimental flag
 
 		cmd = PushCommand{
-			UI:             testUI,
-			Config:         fakeConfig,
-			Actor:          fakeActor,
-			VersionActor:   fakeVersionActor,
-			SharedActor:    fakeSharedActor,
-			ProgressBar:    fakeProgressBar,
-			NOAAClient:     fakeNOAAClient,
-			PWD:            pwd,
-			ManifestParser: fakeManifestParser,
+			UI:              testUI,
+			Config:          fakeConfig,
+			Actor:           fakeActor,
+			VersionActor:    fakeVersionActor,
+			SharedActor:     fakeSharedActor,
+			ProgressBar:     fakeProgressBar,
+			NOAAClient:      fakeNOAAClient,
+			PWD:             pwd,
+			ManifestLocator: fakeManifestLocator,
+			ManifestParser:  fakeManifestParser,
 		}
 	})
 
@@ -263,6 +264,10 @@ var _ = Describe("push Command", func() {
 			})
 
 			Describe("reading manifest", func() {
+				BeforeEach(func() {
+					fakeManifestLocator.PathReturns("", true, nil)
+				})
+
 				When("Reading the manifest fails", func() {
 					BeforeEach(func() {
 						fakeManifestParser.InterpolateAndParseReturns(errors.New("oh no"))
@@ -284,7 +289,6 @@ var _ = Describe("push Command", func() {
 							Expect(fakeManifestParser.ContainsPrivateDockerImagesCallCount()).To(Equal(1))
 						})
 					})
-
 				})
 
 				When("no manifest flag", func() {
@@ -939,12 +943,12 @@ var _ = Describe("push Command", func() {
 
 	Describe("ReadManifest", func() {
 		var (
-			pathToYAMLFile string
-			executeErr     error
+			somePath   string
+			executeErr error
 		)
 
 		BeforeEach(func() {
-			pathToYAMLFile = "/some/path/to/manifest.yml"
+			somePath = "/some/path"
 		})
 
 		JustBeforeEach(func() {
@@ -953,45 +957,66 @@ var _ = Describe("push Command", func() {
 
 		When("No path is provided", func() {
 			BeforeEach(func() {
-				cmd.PWD = filepath.Dir(pathToYAMLFile)
+				cmd.PWD = somePath
 			})
 
 			When("a manifest exists in the current dir", func() {
+				BeforeEach(func() {
+					fakeManifestLocator.PathReturns("/manifest/path", true, nil)
+				})
+
 				It("uses the manifest in the current directory", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
+					Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
+					Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(cmd.PWD))
+
 					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
 					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
-					Expect(filepath.ToSlash(actualManifestPath)).To(Equal(pathToYAMLFile))
+					Expect(actualManifestPath).To(Equal("/manifest/path"))
 				})
 			})
 
 			When("there is not a manifest in the current dir", func() {
 				BeforeEach(func() {
-					fakeManifestParser.InterpolateAndParseReturns(os.ErrNotExist)
+					fakeManifestLocator.PathReturns("", false, nil)
 				})
 
 				It("ignores the file not found error", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
-					actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
-					Expect(filepath.ToSlash(actualManifestPath)).To(Equal(pathToYAMLFile))
+					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
+				})
+			})
+
+			When("when there is an error locating the manifest in the current directory", func() {
+				BeforeEach(func() {
+					fakeManifestLocator.PathReturns("", false, errors.New("err-location"))
+				})
+
+				It("ignores the file not found error", func() {
+					Expect(executeErr).To(MatchError("err-location"))
+
+					Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(0))
 				})
 			})
 		})
 
 		When("The -f flag is specified", func() {
 			BeforeEach(func() {
-				cmd.PathToManifest = flag.PathWithExistenceCheck(pathToYAMLFile)
+				cmd.PathToManifest = flag.PathWithExistenceCheck(somePath)
+				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
 			})
 
 			It("reads the manifest and passes through to PrepareSpace", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
+				Expect(fakeManifestLocator.PathCallCount()).To(Equal(1))
+				Expect(fakeManifestLocator.PathArgsForCall(0)).To(Equal(somePath))
+
 				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
 				actualManifestPath, _, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
-				Expect(actualManifestPath).To(Equal(pathToYAMLFile))
+				Expect(actualManifestPath).To(Equal("/manifest/path"))
 			})
 		})
 
@@ -999,6 +1024,7 @@ var _ = Describe("push Command", func() {
 			var varsFiles []string
 
 			BeforeEach(func() {
+				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
 				varsFiles = []string{"path1", "path2"}
 				for _, path := range varsFiles {
 					cmd.PathsToVarsFiles = append(cmd.PathsToVarsFiles, flag.PathWithExistenceCheck(path))
@@ -1008,6 +1034,7 @@ var _ = Describe("push Command", func() {
 			It("passes vars files to the manifest parser", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
+				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
 				_, actualVarsFiles, _ := fakeManifestParser.InterpolateAndParseArgsForCall(0)
 				Expect(actualVarsFiles).To(Equal(varsFiles))
 			})
@@ -1017,6 +1044,7 @@ var _ = Describe("push Command", func() {
 			var vars []template.VarKV
 
 			BeforeEach(func() {
+				fakeManifestLocator.PathReturns("/manifest/path", true, nil)
 				vars = []template.VarKV{
 					{Name: "put-var-here", Value: "turtle"},
 				}
@@ -1026,6 +1054,7 @@ var _ = Describe("push Command", func() {
 			It("passes vars files to the manifest parser", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
+				Expect(fakeManifestParser.InterpolateAndParseCallCount()).To(Equal(1))
 				_, _, actualVars := fakeManifestParser.InterpolateAndParseArgsForCall(0)
 				Expect(actualVars).To(Equal(vars))
 			})
