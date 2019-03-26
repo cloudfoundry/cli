@@ -4,6 +4,7 @@ import (
 	"errors"
 	"regexp"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -110,6 +111,26 @@ var _ = Describe("set-label command", func() {
 						Expect(testUI.Err).To(Say("some-warning-1"))
 						Expect(testUI.Err).To(Say("some-warning-2"))
 					})
+				})
+			})
+
+			When("the application doesn't exist", func() {
+				BeforeEach(func() {
+					cmd.RequiredArgs = flag.SetLabelArgs{
+						ResourceType: "app",
+						ResourceName: appName,
+						Labels:       []string{"FOO=BAR", "ENV=FAKE"},
+					}
+					fakeActor.UpdateApplicationLabelsByApplicationNameReturns(
+						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
+						actionerror.ApplicationNotFoundError{Name: appName},
+					)
+				})
+				It("displays warnings and an error message", func() {
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+					Expect(executeErr).To(HaveOccurred())
+					Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{Name: appName}))
 				})
 			})
 

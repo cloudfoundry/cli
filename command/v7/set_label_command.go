@@ -72,12 +72,14 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 		labels[parts[0]] = parts[1]
 	}
 
-	warnings, _ := cmd.Actor.UpdateApplicationLabelsByApplicationName(appName,
+	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(appName,
 		cmd.Config.TargetedSpace().GUID,
 		labels)
-
 	for _, warning := range warnings {
 		cmd.UI.DisplayWarning(warning)
+	}
+	if err != nil {
+		return err
 	}
 
 	cmd.UI.DisplayOK()

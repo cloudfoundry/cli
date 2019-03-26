@@ -75,5 +75,12 @@ var _ = Describe("set-label command", func() {
 			Expect(app.Metadata.Labels["some-key"]).To(Equal("some-value"))
 			Expect(app.Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
 		})
+
+		It("displays an error for an unknown app", func() {
+			session := helpers.CF("set-label", "app", "non-existent-app", "some-key=some-value")
+			Eventually(session.Err).Should(Say("App non-existent-app not found"))
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Exit(1))
+		})
 	})
 })
