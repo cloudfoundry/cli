@@ -1,6 +1,6 @@
 language: go
 go:
-  - "1.12"
+  - 1.12.x
 go_import_path: code.cloudfoundry.org/cli
 install:
 - go get -u github.com/onsi/ginkgo/ginkgo

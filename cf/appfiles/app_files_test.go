@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/cf/appfiles"
-	"github.com/nu7hatch/gouuid"
+	uuid "github.com/nu7hatch/gouuid"
 
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/gofileutils/fileutils"
@@ -221,7 +221,7 @@ var _ = Describe("AppFiles", func() {
 				untraversableDirName = guid.String()
 				untraversableDirPath := filepath.Join(tmpDir, untraversableDirName)
 
-				err = os.Mkdir(untraversableDirPath, os.ModeDir) // untraversable without os.ModePerm
+				err = os.Mkdir(untraversableDirPath, 0777)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
@@ -235,12 +235,7 @@ var _ = Describe("AppFiles", func() {
 
 				BeforeEach(func() {
 					cfIgnorePath = filepath.Join(tmpDir, ".cfignore")
-					err := ioutil.WriteFile(cfIgnorePath, []byte(untraversableDirName+"\n"), os.ModePerm)
-					Expect(err).NotTo(HaveOccurred())
-				})
-
-				AfterEach(func() {
-					err := os.Remove(cfIgnorePath)
+					err := ioutil.WriteFile(cfIgnorePath, []byte(untraversableDirName+"\n"), 0666)
 					Expect(err).NotTo(HaveOccurred())
 				})
 
