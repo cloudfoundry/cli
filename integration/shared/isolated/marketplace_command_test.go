@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("marketplace command", func() {
+var _ = FDescribe("marketplace command", func() {
 	Describe("help", func() {
 		When("the --help flag is set", func() {
 			It("displays command usage to output", func() {

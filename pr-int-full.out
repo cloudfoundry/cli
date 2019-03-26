@@ -1,0 +1,2324 @@
+/home/pivotal/go/src/code.cloudfoundry.org/cli/bin/cleanup-integration
+Setting api endpoint to [36;1mhttps://api.tartine.cli.fun[0m...
+[32;1mOK[0m
+
+api endpoint:   https://api.tartine.cli.fun
+api version:    2.133.0
+API endpoint: [36;1mhttps://api.tartine.cli.fun[0m
+Authenticating...
+[32;1mOK[0m
+
+Use '[36;1mcf target[0m' to view or set your target org and space.
+Creating org [36;1mtemp-org[0m as [36;1madmin[0m...
+[32;1mOK[0m
+
+api endpoint:   https://api.tartine.cli.fun
+api version:    2.133.0
+user:           admin
+org:            temp-org
+No space targeted, use 'cf target -s SPACE'
+Deleting org [36;1mtemp-org[0m as [36;1madmin[0m...
+[32;1mOK[0m
+
+Deleting user INTEGRATION-USER-f070cdd9-ede4-48d8-42ad-46a5a87d6e59 as admin...
+Deleting user INTEGRATION-USER-b215b257-c2b6-4125-4575-76b7aa51d6a1 as admin...
+Deleting user INTEGRATION-USER-7cd63e02-b557-4130-544c-6723559421d1 as admin...
+Deleting user INTEGRATION-USER-51ba5312-9b50-4fab-4a28-dc6223653b7e as admin...
+Deleting user INTEGRATION-USER-b0a404cf-26d6-4e8b-5ae5-b2e14b10f019 as admin...
+Deleting user INTEGRATION-USER-31a5a06c-66e8-49cb-6ea6-968811748cd3 as admin...
+Deleting user INTEGRATION-USER-b4682ecc-f0a1-4853-6113-ad2d8f7a1f80 as admin...
+Deleting user INTEGRATION-USER-4fb98b54-c6a2-4b91-727a-484303c29bc9 as admin...
+Deleting user INTEGRATION-USER-1f4b368a-e49e-4f7d-6d93-8c58e982a06f as admin...
+Deleting user INTEGRATION-USER-d250decc-184a-4225-465c-b3164325c02d as admin...
+Deleting user INTEGRATION-USER-5c238526-cb43-48e1-68af-5669a4a3e51c as admin...
+Deleting user INTEGRATION-USER-8597de06-4232-4d4a-6630-a51f25ceae35 as admin...
+Deleting user INTEGRATION-USER-838d9a1b-11b4-4c6e-5d1c-fb235da89c27 as admin...
+Deleting user INTEGRATION-USER-7176a6f6-35dc-4554-7d74-342abb8cbe9b as admin...
+Deleting user INTEGRATION-USER-3f5d4f1a-9ff8-4c12-6bb2-f8a3d8e43235 as admin...
+FAILED
+Error deleting user INTEGRATION-USER-f070cdd9-ede4-48d8-42ad-46a5a87d6e59 
+The user exists in multiple origins.
+Deleting user INTEGRATION-USER-20a2041f-2b88-429a-49b4-b9dc00594719 as admin...
+FAILED
+Error deleting user INTEGRATION-USER-31a5a06c-66e8-49cb-6ea6-968811748cd3 
+The user exists in multiple origins.
+Deleting user INTEGRATION-USER-ec2b2230-cd28-4877-521d-8c6c54a21c35 as admin...
+OK
+Deleting user INTEGRATION-USER-88a09aa5-9740-4055-7b45-967dcd799a51 as admin...
+OK
+Deleting user INTEGRATION-USER-99bdc96e-b5ec-4548-74dc-31928dd6d6c7 as admin...
+OK
+OK
+OK
+OK
+OK
+Deleting user INTEGRATION-USER-98b028ef-220a-4b1e-4f89-514ce6926163 as admin...
+Deleting user INTEGRATION-USER-2b6f521b-c688-4f8e-6b3e-34e19c532b76 as admin...
+Deleting user INTEGRATION-USER-3efb30b0-024e-4c1a-48d4-214c61da90e2 as admin...
+Deleting user INTEGRATION-USER-fe181618-32fd-4404-5d36-624bab798436 as admin...
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+
+ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes 10 integration/shared/isolated
+Running Suite: Isolated Integration Suite
+=========================================
+Random Seed: [1m1553540457[0m - Will randomize all specs
+Will run [1m754[0m specs
+
+Running in parallel across [1m10[0m nodes
+
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+2019/03/25 12:02:00 http: TLS handshake error from 127.0.0.1:49320: remote error: tls: bad certificate
+2019/03/25 12:02:00 http: TLS handshake error from 127.0.0.1:49322: remote error: tls: bad certificate
+2019/03/25 12:02:00 http: TLS handshake error from 127.0.0.1:49326: remote error: tls: bad certificate
+
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.608 seconds][0m
+update-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/update_service_command_test.go:11[0m
+  when an api is targeted, the user is logged in, and an org and space are targeted
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/update_service_command_test.go:12[0m
+    when there is a service instance
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/update_service_command_test.go:27[0m
+      when updating to a service plan that does not exist
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/update_service_command_test.go:55[0m
+        displays an informative error message, exits 1
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/update_service_command_test.go:56[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:64.603 seconds][0m
+service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:12[0m
+  service instance sharing when there are multiple spaces
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:438[0m
+    service is shared between two spaces
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:481[0m
+      when the user is targeted to the source space
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:493[0m
+        when there are no externally bound apps to the service
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:518[0m
+          should NOT display the number of bound apps next to the target space name
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:519[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.207 seconds][0m
+service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:12[0m
+  when an api is targeted, the user is logged in, and an org and space are targeted
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:42[0m
+    when the service instance belongs to this space
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:72[0m
+      when the service instance is a managed service instance
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:218[0m
+        when the --guid flag is provided
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:242[0m
+          displays the service instance GUID
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:243[0m
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:62.313 seconds][0m
+purge-service-offering command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:12[0m
+  when service name is passed
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:74[0m
+    when user is logged in
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:103[0m
+      when the service exists
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:108[0m
+        when the user enters 'y'
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:138[0m
+          purges the service offering, asking for confirmation
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:143[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:66.608 seconds][0m
+create-service-key command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:14[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:68[0m
+    when provided with a brokered service instance
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:118[0m
+      when a service key with the provided name already exists
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:196[0m
+        displays OK and an informative error message
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:201[0m
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:118.271 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when two services with the same name are registered
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:215[0m
+        when a service name and broker name are provided
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:225[0m
+          when no broker by that name exists
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:259[0m
+            displays an informative message, exits 1
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:260[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+==============================Global Before Each==============================HOME DIR> /tmp/cli-integration-test238206772
+
+CMD> cf api https://api.tartine.cli.fun 
+OUT: Setting api endpoint to https://api.tartine.cli.fun...
+OUT: OK
+OUT: 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: Not logged in. Use 'cf login' to log in.
+==============================End of Global Before Each==============================
+CMD> cf logout 
+OUT: Logging out ...
+OUT: OK
+OUT: 
+
+CMD> CF_USERNAME=admin CF_PASSWORD=***** cf auth 
+OUT: API endpoint: https://api.tartine.cli.fun
+OUT: Authenticating...
+OUT: OK
+OUT: 
+OUT: Use 'cf target' to view or set your target org and space.
+
+CMD> cf create-org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 
+OUT: Creating org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 as admin...
+OUT: OK
+OUT: 
+OUT: Assigning role OrgManager to user admin in org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964...
+OUT: OK
+OUT: 
+OUT: TIP: Use 'cf target -o "INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964"' to target new org
+
+CMD> cf target -o INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: user:           admin
+OUT: org:            INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964
+OUT: No space targeted, use 'cf target -s SPACE'
+
+CMD> CF_CLI_EXPERIMENTAL=false cf create-space INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 
+OUT: Creating space INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 in org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 as admin...
+OUT: OK
+OUT: 
+OUT: Assigning role SpaceManager to user admin in org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 / space INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 as admin...
+OUT: OK
+OUT: 
+OUT: Assigning role SpaceDeveloper to user admin in org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 / space INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 as admin...
+OUT: OK
+OUT: 
+OUT: TIP: Use 'cf target -o "INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964" -s "INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79"' to target new space
+
+CMD> cf target -o INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 -s INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: user:           admin
+OUT: org:            INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964
+OUT: space:          INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79
+
+CMD> cf target -o INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 -s INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: user:           admin
+OUT: org:            INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964
+OUT: space:          INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79
+
+CMD> cf push INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 --no-start -m 256M -p ../../assets/service_broker --no-route 
+OUT: Pushing app INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 to org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 / space INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 as admin...
+OUT: Getting app info...
+OUT: Creating app with these attributes...
+OUT: + name:       INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8
+OUT:   path:       /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/assets/service_broker
+OUT: + memory:     256M
+OUT: 
+OUT: Creating app INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8...
+OUT: Comparing local files to remote cache...
+OUT: Packaging files to upload...
+OUT: Uploading files...
+OUT:  0 B / 238.13 KiB [-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------]   0.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [=====================================================================================================================================================================================================================] 100.00% 1s
+OUT: 
+OUT: Waiting for API to complete processing files...
+OUT: 
+OUT: name:              INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8
+OUT: requested state:   stopped
+OUT: routes:            
+OUT: last uploaded:     
+OUT: stack:             
+OUT: buildpacks:        
+OUT: 
+OUT: type:           web
+OUT: instances:      0/1
+OUT: memory usage:   256M
+OUT:      state   since                  cpu    memory   disk     details
+OUT: #0   down    2019-03-25T19:02:20Z   0.0%   0 of 0   0 of 0   
+OUT: 
+
+CMD> cf map-route INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 tartine.cli.fun --hostname INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 
+OUT: Creating route INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8.tartine.cli.fun for org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 / space INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 as admin...
+OUT: OK
+OUT: Adding route INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8.tartine.cli.fun to app INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 in org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 / space INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 as admin...
+OUT: OK
+
+CMD> cf start INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 
+OUT: Starting app INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 in org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 / space INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 as admin...
+OUT: 
+OUT: Staging app and tracing logs...
+OUT:    Downloading r_buildpack...
+OUT:    Downloading nodejs_buildpack...
+OUT:    Downloading php_buildpack...
+OUT:    Downloading binary_buildpack...
+OUT:    Downloading go_buildpack...
+OUT:    Downloaded go_buildpack
+OUT:    Downloading python_buildpack...
+OUT:    Downloaded nodejs_buildpack
+OUT:    Downloaded r_buildpack
+OUT:    Downloading staticfile_buildpack...
+OUT:    Downloaded php_buildpack
+OUT:    Downloading nginx_buildpack...
+OUT:    Downloading java_buildpack...
+OUT:    Downloaded binary_buildpack
+OUT:    Downloading ruby_buildpack...
+OUT:    Downloaded python_buildpack
+OUT:    Downloading dotnet_core_buildpack...
+OUT:    Downloaded nginx_buildpack
+OUT:    Downloaded staticfile_buildpack
+OUT:    Downloaded ruby_buildpack
+OUT:    Downloaded java_buildpack
+OUT:    Downloaded dotnet_core_buildpack
+OUT:    Cell 152ba8f9-5751-48a4-bbdb-f7f472b54922 creating container for instance 294d821d-38f2-4590-8cf7-de1eb3e898f0
+OUT:    Cell 152ba8f9-5751-48a4-bbdb-f7f472b54922 successfully created container for instance 294d821d-38f2-4590-8cf7-de1eb3e898f0
+OUT:    Downloading app package...
+OUT:    Downloaded app package (1.2M)
+OUT:    -----> Ruby Buildpack version 1.7.31
+OUT:    -----> Supplying Ruby
+OUT:    -----> Installing bundler 1.17.3
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/bundler/bundler-1.17.3-any-stack-b7502506.tgz]
+OUT:    -----> Installing bundler 2.0.1
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/bundler/bundler-2.0.1-any-stack-fcffef5f.tgz]
+OUT:           [31;1m**WARNING**[0m You have not declared a Ruby version in your Gemfile.
+OUT:           Defaulting to 2.4.5
+OUT:           See http://docs.cloudfoundry.org/buildpacks/ruby/index.html#runtime for more information.
+OUT:    -----> Installing ruby 2.4.5
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/ruby/ruby-2.4.5-linux-x64-cflinuxfs3-bedb8b6b.tgz]
+OUT:    -----> Update rubygems from 2.6.14.3 to 3.0.2
+OUT:    -----> Installing rubygems 3.0.2
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/rubygems/rubygems-3.0.2-any-stack-ad7433a4.tgz]
+OUT:    -----> Installing dependencies using bundler 2.0.1
+OUT:           Running: bundle install --without development:test --jobs=4 --retry=4 --path /tmp/contents172774134/deps/0/vendor_bundle --binstubs /tmp/contents172774134/deps/0/binstubs --deployment
+OUT:           Using bundler 1.17.3
+OUT:           Installing json 2.1.0 with native extensions
+OUT:           Installing mustermann 1.0.3
+OUT:           Installing rack 2.0.6
+OUT:           Installing rainbow 3.0.0
+OUT:           Installing tilt 2.0.9
+OUT:           Installing rack-protection 2.0.4
+OUT:           Installing sinatra 2.0.4
+OUT:           Bundle complete! 5 Gemfile dependencies, 8 gems now installed.
+OUT:           Gems in the groups development and test were not installed.
+OUT:           Bundled gems are installed into `/tmp/contents172774134/deps/0/vendor_bundle`
+OUT:    -----> Regenerating bundler binstubs...
+OUT:           Cleaning up the bundler cache.
+OUT:    -----> Creating runtime environment
+OUT:    -----> Saving vendor_bundle to cache
+OUT:    -----> Finalizing Ruby
+OUT:    -----> Copy binaries to app/bin directory
+OUT:    Exit status 0
+OUT:    Uploading droplet, build artifacts cache...
+OUT:    Uploading build artifacts cache...
+OUT:    Uploading droplet...
+OUT:    Uploaded build artifacts cache (21.6M)
+OUT:    Uploaded droplet (23M)
+OUT:    Uploading complete
+OUT: 
+OUT: Waiting for app to start...
+OUT:    Cell 152ba8f9-5751-48a4-bbdb-f7f472b54922 stopping instance 294d821d-38f2-4590-8cf7-de1eb3e898f0
+OUT: 
+OUT: name:              INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8
+OUT: requested state:   started
+OUT: routes:            INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8.tartine.cli.fun
+OUT: last uploaded:     Mon 25 Mar 12:02:48 PDT 2019
+OUT: stack:             cflinuxfs3
+OUT: buildpacks:        ruby
+OUT: 
+OUT: type:            web
+OUT: instances:       1/1
+OUT: memory usage:    256M
+OUT: start command:   bundle exec rackup config.ru -p $PORT
+OUT:      state     since                  cpu    memory          disk          details
+OUT: #0   running   2019-03-25T19:03:01Z   0.0%   19.4M of 256M   90.1M of 1G   
+
+CMD> cf create-service-broker INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 username password http://INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8.tartine.cli.fun 
+OUT: Creating service broker INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 as admin...
+OUT: OK
+OUT: 
+
+CMD> cf service-brokers 
+OUT: Getting service brokers as admin...
+OUT: 
+OUT: name                                                              url
+OUT: INTEGRATION-SERVICE-BROKER-1d7d6059-4147-486f-6150-78db06fc68a6   http://INTEGRATION-SERVICE-BROKER-1d7d6059-4147-486f-6150-78db06fc68a6.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8   http://INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-53c551de-36e1-41cb-5469-d12ce4af2069   http://INTEGRATION-SERVICE-BROKER-53c551de-36e1-41cb-5469-d12ce4af2069.tartine.cli.fun
+
+CMD> cf enable-service-access SERVICE-54dafada-9ecc-468e-6eff-5b2b3ec363a7 
+OUT: Enabling access to all plans of service SERVICE-54dafada-9ecc-468e-6eff-5b2b3ec363a7 for all orgs as admin...
+OUT: OK
+OUT: 
+
+CMD> cf logout 
+OUT: Logging out admin...
+OUT: OK
+OUT: 
+
+CMD> cf marketplace -s SERVICE-54dafada-9ecc-468e-6eff-5b2b3ec363a7 
+OUT: Getting service plan information for service SERVICE-54dafada-9ecc-468e-6eff-5b2b3ec363a7...
+ERR: not a compact JWS
+OUT: FAILED
+
+CMD> CF_PASSWORD=***** CF_USERNAME=admin cf auth 
+OUT: API endpoint: https://api.tartine.cli.fun
+OUT: Authenticating...
+OUT: OK
+OUT: 
+OUT: Use 'cf target' to view or set your target org and space.
+
+CMD> cf target -o INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 -s INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: user:           admin
+OUT: org:            INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964
+OUT: space:          INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79
+
+CMD> cf purge-service-offering SERVICE-54dafada-9ecc-468e-6eff-5b2b3ec363a7 -b INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 -f 
+OUT: WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.
+OUT: 
+OUT: Purging service SERVICE-54dafada-9ecc-468e-6eff-5b2b3ec363a7...
+OUT: OK
+OUT: 
+
+CMD> cf delete-service-broker INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 -f 
+OUT: Deleting service broker INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 as admin...
+OUT: OK
+
+CMD> cf service-brokers 
+OUT: Getting service brokers as admin...
+OUT: 
+OUT: name                                                              url
+OUT: INTEGRATION-SERVICE-BROKER-1d7d6059-4147-486f-6150-78db06fc68a6   http://INTEGRATION-SERVICE-BROKER-1d7d6059-4147-486f-6150-78db06fc68a6.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-53c551de-36e1-41cb-5469-d12ce4af2069   http://INTEGRATION-SERVICE-BROKER-53c551de-36e1-41cb-5469-d12ce4af2069.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-bc0fcec4-da03-4819-780f-06bf0cc5038f   http://INTEGRATION-SERVICE-BROKER-bc0fcec4-da03-4819-780f-06bf0cc5038f.tartine.cli.fun
+
+CMD> cf delete INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 -f -r 
+OUT: Deleting app INTEGRATION-SERVICE-BROKER-39aac82d-ae07-4878-4bb4-7655eaf03ca8 in org INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 / space INTEGRATION-SPACE-8b56a3b8-d279-458d-6bab-8c4096ca4b79 as admin...
+OUT: OK
+
+CMD> cf org --guid INTEGRATION-ORG-787ba38c-f5eb-4eb3-73f1-38bece6b5964 
+OUT: 2567f814-f664-42bc-a809-3ef0820fbcf2
+
+CMD> cf curl -X DELETE /v2/organizations/2567f814-f664-42bc-a809-3ef0820fbcf2?recursive=true&async=true 
+OUT: {
+OUT:    "metadata": {
+OUT:       "guid": "807f5b8e-2cad-44c1-baf2-57f15710cbe4",
+OUT:       "created_at": "2019-03-25T19:03:14Z",
+OUT:       "url": "/v2/jobs/807f5b8e-2cad-44c1-baf2-57f15710cbe4"
+OUT:    },
+OUT:    "entity": {
+OUT:       "guid": "807f5b8e-2cad-44c1-baf2-57f15710cbe4",
+OUT:       "status": "queued"
+OUT:    }
+OUT: }
+==============================Global After Each==============================
+==============================End of Global After Each==============================
+
+[91m[1m• Failure [61.999 seconds][0m
+marketplace command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:15[0m
+  when no flags are passed
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:34[0m
+    when the -s flag is passed
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:197[0m
+      when the api is set
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:211[0m
+        when not logged in
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:212[0m
+          when the specified service exists
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:227[0m
+            [91m[1mdisplays extended information about the service [It][0m
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:255[0m
+
+            [91mNo future change is possible.  Bailing out early after 0.000s.
+            Got stuck at:
+                
+                FAILED
+                
+            Waiting for:
+                OK[0m
+
+            /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:259
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:75.547 seconds][0m
+service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:12[0m
+  service instance sharing when there are multiple spaces
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:438[0m
+    service is shared between two spaces
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:481[0m
+      when the user is targeted to the target space
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:543[0m
+        when there are bound apps to the service with no binding names
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:560[0m
+          should display the bound apps in alphanumeric sort order
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:561[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:84.412 seconds][0m
+bind-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:17[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:86[0m
+    when the app exists
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:120[0m
+      when the service is provided by a broker
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:305[0m
+        when the service binding is asynchronous
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:334[0m
+          binds the service to the app, displays OK and TIP
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:352[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:61.902 seconds][0m
+create-service-key command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:14[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:68[0m
+    when provided with a brokered service instance
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:118[0m
+      creates the service key and displays OK
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:135[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.407 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:99[0m
+      when a service has access enabled for all orgs and plans
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:127[0m
+        when a service name and plan name are provided
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:150[0m
+          displays an informative message, exits 0, and disables the plan for all orgs
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:151[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:71.437 seconds][0m
+bind-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:17[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:86[0m
+    when the app exists
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:120[0m
+      when the service is provided by a broker
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:305[0m
+        when the service binding is blocking
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:312[0m
+          binds the service to the app, displays OK and TIP
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/bind_service_command_test.go:320[0m
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:63.158 seconds][0m
+create-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:16[0m
+  when logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:74[0m
+    when the environment is setup correctly
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:85[0m
+      when the service provided is accessible
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:178[0m
+        displays an informative success message, exits 0
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:200[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:113.719 seconds][0m
+create-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:16[0m
+  when logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:74[0m
+    when the environment is setup correctly
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:85[0m
+      when there are two services with the same name from different brokers
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:327[0m
+        when the user does not specify which broker to use
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:352[0m
+          displays an informative error message, exits 1
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:353[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[33mP [PENDING][0m
+apps command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:12[0m
+  when the environment is set up correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:50[0m
+    with no apps
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:62[0m
+      displays empty list
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:63[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:61.729 seconds][0m
+create-service-key command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:14[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:68[0m
+    when provided with a brokered service instance
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:118[0m
+      when provided invalid configuration parameters
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:151[0m
+        displays an invalid configuration error
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:152[0m
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:130.420 seconds][0m
+service-access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:11[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:45[0m
+    when there are service offerings
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:79[0m
+      when multiple brokers are registered and with varying service accessibility
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:142[0m
+        when the -o flag is passed
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:208[0m
+          displays only plans accessible by the specified organization
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:209[0m
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:65.745 seconds][0m
+unbind-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:14[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:31[0m
+    when the service is provided by a broker
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:125[0m
+      when the unbinding is blocking
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:164[0m
+        when the service does not exist
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:212[0m
+          fails to unbind the service
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:219[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.587 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when the plan does not exist
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:327[0m
+        displays FAILED, an informative error message, and exits 1
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:328[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[33mP [PENDING][0m
+apps command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:12[0m
+  help
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:27[0m
+    when --help flag is set
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:28[0m
+      Displays command usage to output
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:29[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:122.252 seconds][0m
+purge-service-offering command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:12[0m
+  when service name is passed
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:74[0m
+    when user is logged in
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:103[0m
+      when the -b flag is provided
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:224[0m
+        when the service is provided by multiple brokers
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:245[0m
+          when the user specifies the desired broker
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:274[0m
+            purges the service offering, asking for confirmation
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:276[0m
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:61.391 seconds][0m
+create-service-key command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:14[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:68[0m
+    when provided with a brokered service instance
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:118[0m
+      when configuration parameters are provided in a file
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:159[0m
+        when the file-path does not exist
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:161[0m
+          displays an invalid configuration error, and exits 1
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:162[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:63.007 seconds][0m
+service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:12[0m
+  service instance sharing when there are multiple spaces
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:438[0m
+    service has no type of shares
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:471[0m
+      when the service is shareable
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:472[0m
+        should not display shared from or shared with information, but DOES display not currently shared info
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:473[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:124.027 seconds][0m
+create-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:16[0m
+  when logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:74[0m
+    when the environment is setup correctly
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:85[0m
+      when there are two services with the same name from different brokers
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:327[0m
+        when the user specifies which broker to use
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:363[0m
+          when the user is a space developer
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:364[0m
+            the broker is not accessible by that user
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:391[0m
+              displays an informative error message, exits 1
+              [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:392[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[33mP [PENDING][0m
+apps command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:12[0m
+  when the environment is set up correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:50[0m
+    with existing apps
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:71[0m
+      when one app is stopped
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:93[0m
+        displays app as stopped
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:98[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:66.756 seconds][0m
+unbind-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:14[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:31[0m
+    when the service is provided by a broker
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:125[0m
+      when the unbinding is blocking
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:164[0m
+        when the service is not bound to an app
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:196[0m
+          returns a warning and continues
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:204[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:77.179 seconds][0m
+unbind-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:14[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:31[0m
+    when the service is provided by a broker
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:125[0m
+      when the unbinding is asynchronous
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:126[0m
+        returns that the unbind is in progress
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:156[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:108.606 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when two services with the same name are registered
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:215[0m
+        when a service name and broker name are provided
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:225[0m
+          when a broker name is not provided
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:241[0m
+            fails to create the service
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:242[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.727 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:99[0m
+      when a service has access enabled for multiple orgs and a specific plan
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:171[0m
+        when a service name and org is provided
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:186[0m
+          displays an informative message, and exits 0, and disables the service for the given org
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:187[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:62.705 seconds][0m
+create-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:16[0m
+  when logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:74[0m
+    when the environment is setup correctly
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:85[0m
+      when the service provided is accessible
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:178[0m
+        when creating with tags
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:280[0m
+          displays an informative message, exits 0, and creates the service with tags
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:281[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.515 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when a service name is provided
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:157[0m
+        when service is already enabled for an org for a plan
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:173[0m
+          when enabling access globally
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:196[0m
+            should disbale org level access first
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:197[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:126.224 seconds][0m
+create-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:16[0m
+  when logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:74[0m
+    when the environment is setup correctly
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:85[0m
+      when there are two services with the same name from different brokers
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:327[0m
+        when the user specifies which broker to use
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:363[0m
+          when the user is a space developer
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:364[0m
+            displays an informative success message, exits 0
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:374[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[33mP [PENDING][0m
+apps command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:12[0m
+  when the environment is not setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:44[0m
+    fails with the appropriate errors
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:45[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.783 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when access is already globally enabled
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:371[0m
+        when when we try to enable access for an org
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:376[0m
+          should still be enabled only globally
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:377[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:61.312 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when the org does not exist
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:317[0m
+        displays FAILED, an informative error message, and exits 1
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:318[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:69.799 seconds][0m
+restart command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_command_test.go:16[0m
+  when the environment is set up correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_command_test.go:44[0m
+    when the app does exist
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_command_test.go:72[0m
+      when the app is stopped
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_command_test.go:101[0m
+        when the app stages properly
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_command_test.go:171[0m
+          when isolation segments are available
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_command_test.go:227[0m
+            displays the isolation segment information
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_command_test.go:238[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+==============================Global Before Each==============================HOME DIR> /tmp/cli-integration-test380709877
+
+CMD> cf api https://api.tartine.cli.fun 
+OUT: Setting api endpoint to https://api.tartine.cli.fun...
+OUT: OK
+OUT: 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: Not logged in. Use 'cf login' to log in.
+==============================End of Global Before Each==============================
+CMD> cf login -a https://127.0.0.1:43353 --skip-ssl-validation 
+OUT: API endpoint: https://127.0.0.1:43353
+OUT: Your API version is no longer supported. Upgrade to a newer version of the API.
+OUT: Authenticating...
+OUT: OK
+OUT: 
+OUT: 
+OUT: 
+OUT: API endpoint:   https://127.0.0.1:43353 (API version: 2.99.9)
+OUT: User:
+OUT: No org or space targeted, use 'cf target -o ORG -s SPACE'
+OUT: FAILED
+OUT: Error finding available orgs
+OUT: not a compact JWS
+==============================Global After Each==============================
+==============================End of Global After Each==============================
+
+[91m[1m• Failure [0.226 seconds][0m
+login command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:17[0m
+  Minimum Version Check
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:71[0m
+    when the api version is less than the minimum supported version
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:72[0m
+      [91m[1mdisplays the warning and exits successfully [It][0m
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:90[0m
+
+      [91mNo future change is possible.  Bailing out early after 0.010s.
+      Expected
+          <int>: 1
+      to match exit code:
+          <int>: 0[0m
+
+      /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:93
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:65.597 seconds][0m
+rename-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/rename_service_command_test.go:12[0m
+  when there is a service instance created
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/rename_service_command_test.go:13[0m
+    when and that service access is revoked for a non-admin user
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/rename_service_command_test.go:49[0m
+      when CC API allows updating a service when plan is not visible
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/rename_service_command_test.go:67[0m
+        can still rename the service
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/rename_service_command_test.go:72[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[33mP [PENDING][0m
+table alignment
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/table_alignment_test.go:11[0m
+  when output is in language with multibyte characters
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/table_alignment_test.go:36[0m
+    aligns the table correctly
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/table_alignment_test.go:46[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.844 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:99[0m
+      when the plan does not exist
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:233[0m
+        displays FAILED, an informative error message, and exits 1
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:234[0m
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:62.486 seconds][0m
+create-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:16[0m
+  when logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:74[0m
+    when the environment is setup correctly
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:85[0m
+      when the service provided is async and accessible
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:295[0m
+        creates the service and displays a message that creation is in progress
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:317[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:61.706 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when a service name is provided
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:157[0m
+        displays an informative message, exits 0, and enables the service for all orgs
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:158[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[33mP [PENDING][0m
+restart command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:11[0m
+  when the environment is not setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:28[0m
+    fails with the appropriate errors
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:29[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:62.938 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when access is already globally enabled
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:371[0m
+        when the service already has access globally enabled
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:411[0m
+          displays an informative message, and exits 0
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:412[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:76.205 seconds][0m
+service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:12[0m
+  when an api is targeted, the user is logged in, and an org and space are targeted
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:42[0m
+    when the service instance belongs to this space
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:72[0m
+      when the service instance is a managed service instance
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:218[0m
+        when apps are bound to the service instance
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:251[0m
+          when the service bindings have binding names
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:355[0m
+            displays service instance info
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:373[0m
+[90m------------------------------[0m
+[36m[1mS [SKIPPING] in Spec Setup (BeforeEach) [75.264 seconds][0m
+service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:12[0m
+  when an api is targeted, the user is logged in, and an org and space are targeted
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:42[0m
+    when the service instance belongs to this space
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:72[0m
+      when the service instance is a managed service instance
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:218[0m
+        when apps are bound to the service instance
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:251[0m
+          when the service bindings do not have binding names
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:272[0m
+            when cc api version < 2.125.0
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:283[0m
+              [36m[1mdisplays service instance info [BeforeEach][0m
+              [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:288[0m
+
+              [36mmaximum version 2.125.0 exceeded by API version 2.133.0[0m
+
+              /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/helpers/version.go:109
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.008 seconds][0m
+marketplace command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:15[0m
+  when no flags are passed
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:34[0m
+    when the -s flag is passed
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:197[0m
+      when the api is set
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:211[0m
+        when logged in
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:268[0m
+          when a space is targeted
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:289[0m
+            when the specified service is accessible but not in the targeted space
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:340[0m
+              displays an error that the service doesn't exist
+              [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:367[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:64.621 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:99[0m
+      when a service has access enabled for all orgs and plans
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:127[0m
+        when a service name is provided
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:133[0m
+          displays an informative message, exits 0, and disables the service for all orgs
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:134[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:62.570 seconds][0m
+create-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:16[0m
+  when logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:74[0m
+    when the environment is setup correctly
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:85[0m
+      when the service provided is accessible
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:178[0m
+        when creating with valid params json in a file
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:252[0m
+          displays an informative success message, exits 0
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:263[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+==============================Global Before Each==============================HOME DIR> /tmp/cli-integration-test604109289
+
+CMD> cf api https://api.tartine.cli.fun 
+OUT: Setting api endpoint to https://api.tartine.cli.fun...
+OUT: OK
+OUT: 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: Not logged in. Use 'cf login' to log in.
+==============================End of Global Before Each==============================
+CMD> CF_USERNAME=admin CF_PASSWORD=***** cf auth 
+OUT: API endpoint: https://api.tartine.cli.fun
+OUT: Authenticating...
+OUT: OK
+OUT: 
+OUT: Use 'cf target' to view or set your target org and space.
+
+CMD> cf create-org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e 
+OUT: Creating org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e as admin...
+OUT: OK
+OUT: 
+OUT: Assigning role OrgManager to user admin in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e...
+OUT: OK
+OUT: 
+OUT: TIP: Use 'cf target -o "INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e"' to target new org
+
+CMD> cf target -o INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: user:           admin
+OUT: org:            INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e
+OUT: No space targeted, use 'cf target -s SPACE'
+
+CMD> CF_CLI_EXPERIMENTAL=false cf create-space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 
+OUT: Creating space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e as admin...
+OUT: OK
+OUT: 
+OUT: Assigning role SpaceManager to user admin in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: OK
+OUT: 
+OUT: Assigning role SpaceDeveloper to user admin in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: OK
+OUT: 
+OUT: TIP: Use 'cf target -o "INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e" -s "INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565"' to target new space
+
+CMD> cf target -o INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e -s INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: user:           admin
+OUT: org:            INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e
+OUT: space:          INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565
+
+CMD> cf target -o INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e -s INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: user:           admin
+OUT: org:            INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e
+OUT: space:          INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565
+
+CMD> cf push INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 --no-start -m 256M -p ../../assets/service_broker --no-route 
+OUT: Pushing app INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 to org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: Getting app info...
+OUT: Creating app with these attributes...
+OUT: + name:       INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08
+OUT:   path:       /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/assets/service_broker
+OUT: + memory:     256M
+OUT: 
+OUT: Creating app INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08...
+OUT: Comparing local files to remote cache...
+OUT: Packaging files to upload...
+OUT: Uploading files...
+OUT:  0 B / 238.13 KiB [-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------]   0.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [=====================================================================================================================================================================================================================] 100.00% 1s
+OUT: 
+OUT: Waiting for API to complete processing files...
+OUT: 
+OUT: name:              INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08
+OUT: requested state:   stopped
+OUT: routes:            
+OUT: last uploaded:     
+OUT: stack:             
+OUT: buildpacks:        
+OUT: 
+OUT: type:           web
+OUT: instances:      0/1
+OUT: memory usage:   256M
+OUT:      state   since                  cpu    memory   disk     details
+OUT: #0   down    2019-03-25T19:08:33Z   0.0%   0 of 0   0 of 0   
+OUT: 
+
+CMD> cf map-route INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 tartine.cli.fun --hostname INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 
+OUT: Creating route INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08.tartine.cli.fun for org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: OK
+OUT: Adding route INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08.tartine.cli.fun to app INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: OK
+
+CMD> cf start INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 
+OUT: Starting app INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: 
+OUT: Staging app and tracing logs...
+OUT:    Downloading r_buildpack...
+OUT:    Downloading java_buildpack...
+OUT:    Downloading staticfile_buildpack...
+OUT:    Downloading go_buildpack...
+OUT:    Downloaded staticfile_buildpack
+OUT:    Downloading ruby_buildpack...
+OUT:    Downloaded r_buildpack
+OUT:    Downloading dotnet_core_buildpack...
+OUT:    Downloaded java_buildpack
+OUT:    Downloading nodejs_buildpack...
+OUT:    Downloaded dotnet_core_buildpack
+OUT:    Downloading php_buildpack...
+OUT:    Downloaded go_buildpack
+OUT:    Downloading python_buildpack...
+OUT:    Downloaded ruby_buildpack
+OUT:    Downloading binary_buildpack...
+OUT:    Downloaded php_buildpack
+OUT:    Downloading nginx_buildpack...
+OUT:    Downloaded nodejs_buildpack
+OUT:    Downloaded python_buildpack
+OUT:    Downloaded binary_buildpack
+OUT:    Downloaded nginx_buildpack
+OUT:    Cell 13879c0b-a84a-46c4-862b-2fbc7ba46a95 creating container for instance db23b419-7845-4753-b616-1b644e7ac930
+OUT:    Cell 13879c0b-a84a-46c4-862b-2fbc7ba46a95 successfully created container for instance db23b419-7845-4753-b616-1b644e7ac930
+OUT:    Downloading app package...
+OUT:    Downloaded app package (1.2M)
+OUT:    -----> Ruby Buildpack version 1.7.31
+OUT:    -----> Supplying Ruby
+OUT:    -----> Installing bundler 1.17.3
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/bundler/bundler-1.17.3-any-stack-b7502506.tgz]
+OUT:    -----> Installing bundler 2.0.1
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/bundler/bundler-2.0.1-any-stack-fcffef5f.tgz]
+OUT:           [31;1m**WARNING**[0m You have not declared a Ruby version in your Gemfile.
+OUT:           Defaulting to 2.4.5
+OUT:           See http://docs.cloudfoundry.org/buildpacks/ruby/index.html#runtime for more information.
+OUT:    -----> Installing ruby 2.4.5
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/ruby/ruby-2.4.5-linux-x64-cflinuxfs3-bedb8b6b.tgz]
+OUT:    -----> Update rubygems from 2.6.14.3 to 3.0.2
+OUT:    -----> Installing rubygems 3.0.2
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/rubygems/rubygems-3.0.2-any-stack-ad7433a4.tgz]
+OUT:    -----> Installing dependencies using bundler 2.0.1
+OUT:           Running: bundle install --without development:test --jobs=4 --retry=4 --path /tmp/contents080864843/deps/0/vendor_bundle --binstubs /tmp/contents080864843/deps/0/binstubs --deployment
+OUT:           Using bundler 1.17.3
+OUT:           Installing json 2.1.0 with native extensions
+OUT:           Installing mustermann 1.0.3
+OUT:           Installing rack 2.0.6
+OUT:           Installing rainbow 3.0.0
+OUT:           Installing tilt 2.0.9
+OUT:           Installing rack-protection 2.0.4
+OUT:           Installing sinatra 2.0.4
+OUT:           Bundle complete! 5 Gemfile dependencies, 8 gems now installed.
+OUT:           Gems in the groups development and test were not installed.
+OUT:           Bundled gems are installed into `/tmp/contents080864843/deps/0/vendor_bundle`
+OUT:    -----> Regenerating bundler binstubs...
+OUT:           Cleaning up the bundler cache.
+OUT:    -----> Creating runtime environment
+OUT:    -----> Saving vendor_bundle to cache
+OUT:    -----> Finalizing Ruby
+OUT:    -----> Copy binaries to app/bin directory
+OUT:    Exit status 0
+OUT:    Uploading droplet, build artifacts cache...
+OUT:    Uploading build artifacts cache...
+OUT:    Uploading droplet...
+OUT:    Uploaded build artifacts cache (21.6M)
+OUT:    Uploaded droplet (23M)
+OUT:    Uploading complete
+OUT:    Cell 13879c0b-a84a-46c4-862b-2fbc7ba46a95 stopping instance db23b419-7845-4753-b616-1b644e7ac930
+OUT:    Cell 13879c0b-a84a-46c4-862b-2fbc7ba46a95 destroying container for instance db23b419-7845-4753-b616-1b644e7ac930
+OUT:    Cell 13879c0b-a84a-46c4-862b-2fbc7ba46a95 successfully destroyed container for instance db23b419-7845-4753-b616-1b644e7ac930
+OUT: 
+OUT: Waiting for app to start...
+OUT: 
+OUT: name:              INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08
+OUT: requested state:   started
+OUT: routes:            INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08.tartine.cli.fun
+OUT: last uploaded:     Mon 25 Mar 12:09:01 PDT 2019
+OUT: stack:             cflinuxfs3
+OUT: buildpacks:        ruby
+OUT: 
+OUT: type:            web
+OUT: instances:       1/1
+OUT: memory usage:    256M
+OUT: start command:   bundle exec rackup config.ru -p $PORT
+OUT:      state     since                  cpu    memory          disk          details
+OUT: #0   running   2019-03-25T19:09:12Z   0.0%   16.3M of 256M   90.1M of 1G   
+
+CMD> cf create-service-broker INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 username password http://INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08.tartine.cli.fun 
+OUT: Creating service broker INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 as admin...
+OUT: OK
+OUT: 
+
+CMD> cf service-brokers 
+OUT: Getting service brokers as admin...
+OUT: 
+OUT: name                                                              url
+OUT: INTEGRATION-SERVICE-BROKER-ace5c03c-e3be-43fd-7479-12c274d661e1   http://INTEGRATION-SERVICE-BROKER-ace5c03c-e3be-43fd-7479-12c274d661e1.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08   http://INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08.tartine.cli.fun
+
+CMD> cf enable-service-access SERVICE-1-c464cc79-9fe7-48bb-7c58-d9d4dc41c7e9 
+OUT: Enabling access to all plans of service SERVICE-1-c464cc79-9fe7-48bb-7c58-d9d4dc41c7e9 for all orgs as admin...
+OUT: OK
+OUT: 
+
+CMD> cf push INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 --no-start -m 256M -p ../../assets/service_broker --no-route 
+OUT: Pushing app INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 to org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: Getting app info...
+OUT: Creating app with these attributes...
+OUT: + name:       INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0
+OUT:   path:       /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/assets/service_broker
+OUT: + memory:     256M
+OUT: 
+OUT: Creating app INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0...
+OUT: Comparing local files to remote cache...
+OUT: Packaging files to upload...
+OUT: Uploading files...
+OUT:  0 B / 238.13 KiB [-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------]   0.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [========================================================================================================================================================================================================================] 100.00% 238.13 KiB / 238.13 KiB [=====================================================================================================================================================================================================================] 100.00% 1s
+OUT: 
+OUT: Waiting for API to complete processing files...
+OUT: 
+OUT: name:              INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0
+OUT: requested state:   stopped
+OUT: routes:            
+OUT: last uploaded:     
+OUT: stack:             
+OUT: buildpacks:        
+OUT: 
+OUT: type:           web
+OUT: instances:      0/1
+OUT: memory usage:   256M
+OUT:      state   since                  cpu    memory   disk     details
+OUT: #0   down    2019-03-25T19:09:25Z   0.0%   0 of 0   0 of 0   
+OUT: 
+
+CMD> cf map-route INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 tartine.cli.fun --hostname INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 
+OUT: Creating route INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0.tartine.cli.fun for org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: OK
+OUT: Adding route INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0.tartine.cli.fun to app INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: OK
+
+CMD> cf start INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 
+OUT: Starting app INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: 
+OUT: Staging app and tracing logs...
+OUT:    Downloading r_buildpack...
+OUT:    Downloading go_buildpack...
+OUT:    Downloading staticfile_buildpack...
+OUT:    Downloading java_buildpack...
+OUT:    Downloading dotnet_core_buildpack...
+OUT:    Downloaded go_buildpack
+OUT:    Downloading ruby_buildpack...
+OUT:    Downloaded dotnet_core_buildpack
+OUT:    Downloading binary_buildpack...
+OUT:    Downloaded java_buildpack
+OUT:    Downloading python_buildpack...
+OUT:    Downloaded r_buildpack
+OUT:    Downloading php_buildpack...
+OUT:    Downloaded staticfile_buildpack
+OUT:    Downloading nodejs_buildpack...
+OUT:    Downloaded nodejs_buildpack
+OUT:    Downloading nginx_buildpack...
+OUT:    Downloaded python_buildpack
+OUT:    Downloaded binary_buildpack
+OUT:    Downloaded php_buildpack
+OUT:    Downloaded ruby_buildpack
+OUT:    Downloaded nginx_buildpack
+OUT:    Cell ac099cf6-9500-436b-9aea-f4724f4fd3ac creating container for instance 9b400f18-e0e1-4fad-9b8e-75eec464af3b
+OUT:    Cell ac099cf6-9500-436b-9aea-f4724f4fd3ac successfully created container for instance 9b400f18-e0e1-4fad-9b8e-75eec464af3b
+OUT:    Downloading app package...
+OUT:    Downloaded app package (1.2M)
+OUT:    -----> Ruby Buildpack version 1.7.31
+OUT:    -----> Supplying Ruby
+OUT:    -----> Installing bundler 1.17.3
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/bundler/bundler-1.17.3-any-stack-b7502506.tgz]
+OUT:    -----> Installing bundler 2.0.1
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/bundler/bundler-2.0.1-any-stack-fcffef5f.tgz]
+OUT:           [31;1m**WARNING**[0m You have not declared a Ruby version in your Gemfile.
+OUT:           Defaulting to 2.4.5
+OUT:           See http://docs.cloudfoundry.org/buildpacks/ruby/index.html#runtime for more information.
+OUT:    -----> Installing ruby 2.4.5
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/ruby/ruby-2.4.5-linux-x64-cflinuxfs3-bedb8b6b.tgz]
+OUT:    -----> Update rubygems from 2.6.14.3 to 3.0.2
+OUT:    -----> Installing rubygems 3.0.2
+OUT:           Download [https://buildpacks.cloudfoundry.org/dependencies/rubygems/rubygems-3.0.2-any-stack-ad7433a4.tgz]
+OUT:    -----> Installing dependencies using bundler 2.0.1
+OUT:           Running: bundle install --without development:test --jobs=4 --retry=4 --path /tmp/contents845361103/deps/0/vendor_bundle --binstubs /tmp/contents845361103/deps/0/binstubs --deployment
+OUT:           Using bundler 1.17.3
+OUT:           Installing json 2.1.0 with native extensions
+OUT:           Installing mustermann 1.0.3
+OUT:           Installing rack 2.0.6
+OUT:           Installing rainbow 3.0.0
+OUT:           Installing tilt 2.0.9
+OUT:           Installing rack-protection 2.0.4
+OUT:           Installing sinatra 2.0.4
+OUT:           Bundle complete! 5 Gemfile dependencies, 8 gems now installed.
+OUT:           Gems in the groups development and test were not installed.
+OUT:           Bundled gems are installed into `/tmp/contents845361103/deps/0/vendor_bundle`
+OUT:    -----> Regenerating bundler binstubs...
+OUT:           Cleaning up the bundler cache.
+OUT:    -----> Creating runtime environment
+OUT:    -----> Saving vendor_bundle to cache
+OUT:    -----> Finalizing Ruby
+OUT:    -----> Copy binaries to app/bin directory
+OUT:    Exit status 0
+OUT:    Uploading droplet, build artifacts cache...
+OUT:    Uploading droplet...
+OUT:    Uploading build artifacts cache...
+OUT:    Uploaded build artifacts cache (21.6M)
+OUT:    Uploaded droplet (23M)
+OUT:    Uploading complete
+OUT:    Cell ac099cf6-9500-436b-9aea-f4724f4fd3ac stopping instance 9b400f18-e0e1-4fad-9b8e-75eec464af3b
+OUT:    Cell ac099cf6-9500-436b-9aea-f4724f4fd3ac destroying container for instance 9b400f18-e0e1-4fad-9b8e-75eec464af3b
+OUT:    Cell ac099cf6-9500-436b-9aea-f4724f4fd3ac successfully destroyed container for instance 9b400f18-e0e1-4fad-9b8e-75eec464af3b
+OUT: 
+OUT: Waiting for app to start...
+OUT: 
+OUT: name:              INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0
+OUT: requested state:   started
+OUT: routes:            INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0.tartine.cli.fun
+OUT: last uploaded:     Mon 25 Mar 12:09:53 PDT 2019
+OUT: stack:             cflinuxfs3
+OUT: buildpacks:        ruby
+OUT: 
+OUT: type:            web
+OUT: instances:       1/1
+OUT: memory usage:    256M
+OUT: start command:   bundle exec rackup config.ru -p $PORT
+OUT:      state     since                  cpu    memory        disk          details
+OUT: #0   running   2019-03-25T19:10:03Z   0.0%   44K of 256M   51.6M of 1G   
+
+CMD> cf create-service-broker INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 username password http://INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0.tartine.cli.fun 
+OUT: Creating service broker INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 as admin...
+OUT: OK
+OUT: 
+
+CMD> cf service-brokers 
+OUT: Getting service brokers as admin...
+OUT: 
+OUT: name                                                              url
+OUT: INTEGRATION-SERVICE-BROKER-21dd4e9c-9247-47b7-4abb-2ac9b00b3990   http://INTEGRATION-SERVICE-BROKER-21dd4e9c-9247-47b7-4abb-2ac9b00b3990.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0   http://INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-ace5c03c-e3be-43fd-7479-12c274d661e1   http://INTEGRATION-SERVICE-BROKER-ace5c03c-e3be-43fd-7479-12c274d661e1.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-ae230818-943f-4aae-754b-bf5b76b47682   http://INTEGRATION-SERVICE-BROKER-ae230818-943f-4aae-754b-bf5b76b47682.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08   http://INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08.tartine.cli.fun
+
+CMD> cf enable-service-access SERVICE-2-bf027810-24db-44b8-46f1-199acede136e 
+OUT: Enabling access to all plans of service SERVICE-2-bf027810-24db-44b8-46f1-199acede136e for all orgs as admin...
+OUT: OK
+OUT: 
+
+CMD> cf logout 
+OUT: Logging out admin...
+OUT: OK
+OUT: 
+
+CMD> cf marketplace 
+OUT: Getting all services from marketplace...
+ERR: not a compact JWS
+OUT: FAILED
+
+CMD> CF_USERNAME=admin CF_PASSWORD=***** cf auth 
+OUT: API endpoint: https://api.tartine.cli.fun
+OUT: Authenticating...
+OUT: OK
+OUT: 
+OUT: Use 'cf target' to view or set your target org and space.
+
+CMD> cf create-org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e 
+OUT: Creating org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e as admin...
+OUT: OK
+OUT: 
+ERR: Org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e already exists.
+ERR: 
+
+CMD> cf target -o INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: user:           admin
+OUT: org:            INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e
+OUT: space:          INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565
+
+CMD> CF_CLI_EXPERIMENTAL=false cf create-space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 
+OUT: Creating space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e as admin...
+OUT: OK
+OUT: 
+ERR: Space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 already exists
+ERR: 
+
+CMD> cf target -o INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e -s INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: user:           admin
+OUT: org:            INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e
+OUT: space:          INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565
+
+CMD> cf purge-service-offering SERVICE-1-c464cc79-9fe7-48bb-7c58-d9d4dc41c7e9 -b INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 -f 
+OUT: WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.
+OUT: 
+OUT: Purging service SERVICE-1-c464cc79-9fe7-48bb-7c58-d9d4dc41c7e9...
+OUT: OK
+OUT: 
+
+CMD> cf delete-service-broker INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 -f 
+OUT: Deleting service broker INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 as admin...
+OUT: OK
+
+CMD> cf service-brokers 
+OUT: Getting service brokers as admin...
+OUT: 
+OUT: name                                                              url
+OUT: INTEGRATION-SERVICE-BROKER-21dd4e9c-9247-47b7-4abb-2ac9b00b3990   http://INTEGRATION-SERVICE-BROKER-21dd4e9c-9247-47b7-4abb-2ac9b00b3990.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0   http://INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-5794cd8c-f1c7-44f6-745d-48c563e5823c   http://INTEGRATION-SERVICE-BROKER-5794cd8c-f1c7-44f6-745d-48c563e5823c.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-ace5c03c-e3be-43fd-7479-12c274d661e1   http://INTEGRATION-SERVICE-BROKER-ace5c03c-e3be-43fd-7479-12c274d661e1.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-ae230818-943f-4aae-754b-bf5b76b47682   http://INTEGRATION-SERVICE-BROKER-ae230818-943f-4aae-754b-bf5b76b47682.tartine.cli.fun
+
+CMD> cf delete INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 -f -r 
+OUT: Deleting app INTEGRATION-SERVICE-BROKER-f8ae18a1-ddcc-44d5-4e71-905607951e08 in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: OK
+
+CMD> cf purge-service-offering SERVICE-2-bf027810-24db-44b8-46f1-199acede136e -b INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 -f 
+OUT: WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.
+OUT: 
+OUT: Purging service SERVICE-2-bf027810-24db-44b8-46f1-199acede136e...
+OUT: OK
+OUT: 
+
+CMD> cf delete-service-broker INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 -f 
+OUT: Deleting service broker INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 as admin...
+OUT: OK
+
+CMD> cf service-brokers 
+OUT: Getting service brokers as admin...
+OUT: 
+OUT: name                                                              url
+OUT: INTEGRATION-SERVICE-BROKER-21dd4e9c-9247-47b7-4abb-2ac9b00b3990   http://INTEGRATION-SERVICE-BROKER-21dd4e9c-9247-47b7-4abb-2ac9b00b3990.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-5794cd8c-f1c7-44f6-745d-48c563e5823c   http://INTEGRATION-SERVICE-BROKER-5794cd8c-f1c7-44f6-745d-48c563e5823c.tartine.cli.fun
+OUT: INTEGRATION-SERVICE-BROKER-ace5c03c-e3be-43fd-7479-12c274d661e1   http://INTEGRATION-SERVICE-BROKER-ace5c03c-e3be-43fd-7479-12c274d661e1.tartine.cli.fun
+
+CMD> cf delete INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 -f -r 
+OUT: Deleting app INTEGRATION-SERVICE-BROKER-2d941135-74e8-4e2c-42f2-0d605d7475b0 in org INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e / space INTEGRATION-SPACE-1862f837-ab7e-43b5-74e0-492916eaa565 as admin...
+OUT: OK
+
+CMD> cf org --guid INTEGRATION-ORG-de1cac98-568c-4f59-7a99-9e29eb49838e 
+OUT: c4e340f1-894e-4fd6-896c-1479c1b21a4c
+
+CMD> cf curl -X DELETE /v2/organizations/c4e340f1-894e-4fd6-896c-1479c1b21a4c?recursive=true&async=true 
+OUT: {
+OUT:    "metadata": {
+OUT:       "guid": "28d2efbb-6c4b-48b7-9d98-fd49ff666161",
+OUT:       "created_at": "2019-03-25T19:10:24Z",
+OUT:       "url": "/v2/jobs/28d2efbb-6c4b-48b7-9d98-fd49ff666161"
+OUT:    },
+OUT:    "entity": {
+OUT:       "guid": "28d2efbb-6c4b-48b7-9d98-fd49ff666161",
+OUT:       "status": "queued"
+OUT:    }
+OUT: }
+==============================Global After Each==============================
+==============================End of Global After Each==============================
+
+[91m[1m• Failure [119.136 seconds][0m
+marketplace command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:15[0m
+  when no flags are passed
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:34[0m
+    when an API endpoint is set
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:48[0m
+      when not logged in
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:49[0m
+        when there are accessible services
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:50[0m
+          [91m[1mdisplays a table of all available services and a tip [It][0m
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:81[0m
+
+          [91mNo future change is possible.  Bailing out early after 0.000s.
+          Got stuck at:
+              ...
+              FAILED
+              
+          Waiting for:
+              OK[0m
+
+          /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:84
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:116.515 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    multiple service brokers are registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:276[0m
+      when two services have access enabled in different orgs
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:332[0m
+        fails to disable access when no broker is specified
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:345[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:63.467 seconds][0m
+create-service-key command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:14[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:68[0m
+    when provided with a brokered service instance
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:118[0m
+      when the service is not bindable
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:209[0m
+        displays FAILED and an informative error, and exits 1
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_key_command_test.go:216[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:61.747 seconds][0m
+service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:12[0m
+  service instance sharing when there are multiple spaces
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:438[0m
+    service is shared between two spaces
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:481[0m
+      when the user is targeted to the source space
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:493[0m
+        when the service is no longer shareable
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:527[0m
+          due to service broker settings
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:528[0m
+            should display that service instance sharing is disabled for this service
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:534[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:63.331 seconds][0m
+service-access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:11[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:45[0m
+    when there are service offerings
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:79[0m
+      displays all service access information
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:111[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:126.904 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    multiple service brokers are registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:276[0m
+      when two services have access enabled in the same org
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:308[0m
+        successfully disables access when the broker is specified
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:322[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:62.577 seconds][0m
+marketplace command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:15[0m
+  when no flags are passed
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:34[0m
+    when the -s flag is passed
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:197[0m
+      when the api is set
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:211[0m
+        when logged in
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:268[0m
+          when a space is targeted
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:289[0m
+            when the specified service exists
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:304[0m
+              displays extended information about the service
+              [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:328[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+2019/03/25 12:11:37 http: TLS handshake error from 127.0.0.1:60490: remote error: tls: bad certificate
+2019/03/25 12:11:37 http: TLS handshake error from 127.0.0.1:60492: remote error: tls: bad certificate
+2019/03/25 12:11:37 http: TLS handshake error from 127.0.0.1:60494: remote error: tls: bad certificate
+
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:72.465 seconds][0m
+restage command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restage_command_test.go:16[0m
+  when the environment is set up correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restage_command_test.go:44[0m
+    when the app does exist
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restage_command_test.go:72[0m
+      when the app stages and starts properly
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restage_command_test.go:120[0m
+        when isolation segments are available
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restage_command_test.go:169[0m
+          displays app isolation segment information
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restage_command_test.go:176[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:116.265 seconds][0m
+service-access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:11[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:45[0m
+    when there are service offerings
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:79[0m
+      when multiple brokers are registered and with varying service accessibility
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:142[0m
+        when the -b flag is passed
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:184[0m
+          shows only services from the specified broker
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:185[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[36m[1mS [SKIPPING] in Spec Setup (BeforeEach) [79.963 seconds][0m
+services command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/services_command_test.go:12[0m
+  has services
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/services_command_test.go:55[0m
+    when CAPI version is < 2.125.0
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/services_command_test.go:121[0m
+      [36m[1mdisplays all service information [BeforeEach][0m
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/services_command_test.go:126[0m
+
+      [36mmaximum version 2.125.0 exceeded by API version 2.133.0[0m
+
+      /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/helpers/version.go:109
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.324 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when a service name is provided
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:157[0m
+        when service is already enabled for an org for a plan
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:173[0m
+          disables the limited access for that org
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:180[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:61.653 seconds][0m
+service-key command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_key_command_test.go:14[0m
+  when the service key is not found
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_key_command_test.go:40[0m
+    outputs an error message and exits 1
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_key_command_test.go:52[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[36m[1mS [SKIPPING] in Spec Setup (BeforeEach) [0.214 seconds][0m
+auth command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/auth_command_test.go:12[0m
+  when the origin flag is set
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/auth_command_test.go:236[0m
+    when the UAA version is too low to use the --origin flag
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/auth_command_test.go:237[0m
+      [36m[1mprints an error message [BeforeEach][0m
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/auth_command_test.go:241[0m
+
+      [36mTest requires UAA version less than 4.19.0[0m
+
+      /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/helpers/version.go:78
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:115.266 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:99[0m
+      when two services with the same name are enabled
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:243[0m
+        when a service name and broker name are provided
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:257[0m
+          displays an informative message, exits 0, and disables access to the service
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:258[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:61.739 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when access is already enabled in the org
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:357[0m
+        displays OK, and exits 0
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:363[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[33mP [PENDING][0m
+restart command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:11[0m
+  help
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:12[0m
+    when --help flag is set
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:13[0m
+      Displays command usage to output
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:14[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:66.105 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:99[0m
+      when a service has access enabled for multiple orgs and a specific plan
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:171[0m
+        when a service name, plan name and org is provided
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:204[0m
+          displays an informative message, and exits 0, disables the service for the given org and plan
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:205[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:79.825 seconds][0m
+service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:12[0m
+  when an api is targeted, the user is logged in, and an org and space are targeted
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:42[0m
+    when the service instance belongs to this space
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:72[0m
+      when the service instance is a managed service instance
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:218[0m
+        when apps are bound to the service instance
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:251[0m
+          when the binding has a state
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:403[0m
+            displays it in the status field
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:422[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:62.080 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when a service name and plan name are provided
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:272[0m
+        displays an informative message, exits 0, and enables the plan for all orgs
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:273[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:77.293 seconds][0m
+service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:12[0m
+  when an api is targeted, the user is logged in, and an org and space are targeted
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:42[0m
+    when the service instance belongs to this space
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:72[0m
+      when the service instance is a managed service instance
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:218[0m
+        when apps are bound to the service instance
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:251[0m
+          when the service bindings do not have binding names
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:272[0m
+            when cc api version >= 2.125.0
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:319[0m
+              displays service instance info
+              [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:324[0m
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+==============================Global Before Each==============================HOME DIR> /tmp/cli-integration-test866435073
+
+CMD> cf api https://api.tartine.cli.fun 
+OUT: Setting api endpoint to https://api.tartine.cli.fun...
+OUT: OK
+OUT: 
+OUT: api endpoint:   https://api.tartine.cli.fun
+OUT: api version:    2.133.0
+OUT: Not logged in. Use 'cf login' to log in.
+==============================End of Global Before Each==============================
+CMD> cf logout 
+OUT: Logging out ...
+OUT: OK
+OUT: 
+
+CMD> cf marketplace -s not-found-service 
+OUT: Getting service plan information for service not-found-service...
+ERR: not a compact JWS
+OUT: FAILED
+==============================Global After Each==============================
+==============================End of Global After Each==============================
+
+[91m[1m• Failure [0.397 seconds][0m
+marketplace command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:15[0m
+  when no flags are passed
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:34[0m
+    when the -s flag is passed
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:197[0m
+      when the api is set
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:211[0m
+        when not logged in
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:212[0m
+          when the specified service does not exist
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:217[0m
+            [91m[1mdisplays an error that the service doesn't exist [It][0m
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:218[0m
+
+            [91mNo future change is possible.  Bailing out early after 0.000s.
+            Got stuck at:
+                not a compact JWS
+                
+            Waiting for:
+                Service offering 'not-found-service' not found[0m
+
+            /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:222
+[90m------------------------------[0m
+[32m• [SLOW TEST:116.050 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    multiple service brokers are registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:276[0m
+      when two services have access enabled in the same org
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:308[0m
+        fails to disable access when no broker is specified
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:316[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[33mP [PENDING][0m
+login command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:17[0m
+  SSO
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:345[0m
+    when a user authenticates with valid client credentials
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:385[0m
+      when a different user logs in with valid sso passcode
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:392[0m
+        should fail log in and display an error informing the user they need to log out
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:394[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.683 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when the plan does exist and the org does not exist
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:337[0m
+        displays FAILED, an informative error message, and exits 1
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:338[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:118.482 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when two services with the same name are registered
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:215[0m
+        when a service name and broker name are provided
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:225[0m
+          displays an informative message, exits 0, and enables access to the service
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:226[0m
+[90m------------------------------[0m
+[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:80.799 seconds][0m
+service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:12[0m
+  service instance sharing when there are multiple spaces
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:438[0m
+    service is shared between two spaces
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:481[0m
+      when the user is targeted to the source space
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:493[0m
+        when there are externally bound apps to the service
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:494[0m
+          should display the number of bound apps next to the target space name
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_command_test.go:509[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:65.199 seconds][0m
+create-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:16[0m
+  when logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:74[0m
+    when the environment is setup correctly
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:85[0m
+      when the service provided is accessible
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:178[0m
+        when the provided plan does not exist
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:223[0m
+          displays an informative error message, exits 1
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_command_test.go:224[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:62.475 seconds][0m
+service-key command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_key_command_test.go:14[0m
+  when the service key is not found
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_key_command_test.go:40[0m
+    when the --guid option is given
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_key_command_test.go:59[0m
+      outputs nothing and exits 0
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_key_command_test.go:60[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:124.711 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    multiple service brokers are registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:276[0m
+      when two services have plan enabeled in different orgs
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:365[0m
+        successfully disables access when the broker is specified
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:388[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:60.209 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when the plan does not exist and the org does exist
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:347[0m
+        displays FAILED, an informative error message, and exits 1
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:348[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:122.709 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    multiple service brokers are registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:276[0m
+      when two services have access enabled in different orgs
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:332[0m
+        successfully disables access when the broker is specified
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:355[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:69.333 seconds][0m
+delete-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/delete_service_command_test.go:11[0m
+  when an api is targeted and the user is logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/delete_service_command_test.go:12[0m
+    when an org and space are targeted
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/delete_service_command_test.go:34[0m
+      when there is a service instance and it is bound to an app
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/delete_service_command_test.go:51[0m
+        should display an error message that the service instance's keys, bindings, and shares must first be deleted
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/delete_service_command_test.go:89[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:65.009 seconds][0m
+enable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:82[0m
+    a service broker is registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:129[0m
+      when access is already globally enabled
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:371[0m
+        when the plan already has access globally enabled
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:420[0m
+          displays an informative message, and exits 0
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/enable_service_access_command_test.go:421[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:104.365 seconds][0m
+create-service-broker command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_broker_command_test.go:13[0m
+  when logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_broker_command_test.go:61[0m
+    when all arguments are provided
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_broker_command_test.go:62[0m
+      when the --space-scoped flag is passed
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_broker_command_test.go:97[0m
+        when both org and space are targeted
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_broker_command_test.go:111[0m
+          registers the broker and exposes its services only to the targeted space
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/create_service_broker_command_test.go:132[0m
+[90m------------------------------[0m
+[33mP [PENDING][0m
+apps command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:12[0m
+  when the environment is set up correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:50[0m
+    with existing apps
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:71[0m
+      displays apps in the list
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/apps_command_test.go:83[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[33mP [PENDING][0m
+restart command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:11[0m
+  when the environment is set up correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:34[0m
+    when the app does not exist
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:55[0m
+      tells the user that the start is not found and exits 1
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/restart_app_instance_command_test.go:56[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:113.969 seconds][0m
+disable service access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:12[0m
+  logged in
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:82[0m
+    multiple service brokers are registered
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:276[0m
+      when two services have plan enabeled in different orgs
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:365[0m
+        fails to disable access when no broker is specified
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/disable_service_access_command_test.go:378[0m
+[90m------------------------------[0m
+[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m[32m•[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:63.174 seconds][0m
+update-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/update_service_command_test.go:11[0m
+  when an api is targeted, the user is logged in, and an org and space are targeted
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/update_service_command_test.go:12[0m
+    when there is a service instance
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/update_service_command_test.go:27[0m
+      when updating to the same service plan (no-op)
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/update_service_command_test.go:63[0m
+        displays an informative success message, exits 0
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/update_service_command_test.go:64[0m
+[90m------------------------------[0m
+[36m[1mS [SKIPPING] in Spec Setup (BeforeEach) [119.784 seconds][0m
+marketplace command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:15[0m
+  when no flags are passed
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:34[0m
+    when an API endpoint is set
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:48[0m
+      when logged in
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:95[0m
+        when a service is accessible but not in the currently targeted org
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:116[0m
+          when CC API does not return broker names in response
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:155[0m
+            [36m[1mdisplays a table and tip that does not include that service [BeforeEach][0m
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:160[0m
+
+            [36mmaximum version 2.125.0 exceeded by API version 2.133.0[0m
+
+            /home/pivotal/go/src/code.cloudfoundry.org/cli/integration/helpers/version.go:109
+[90m------------------------------[0m
+[32m• [SLOW TEST:116.074 seconds][0m
+purge-service-offering command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:12[0m
+  when service name is passed
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:74[0m
+    when user is logged in
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:103[0m
+      when the -b flag is provided
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:224[0m
+        when the service is provided by multiple brokers
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:245[0m
+          when the user does not specify the desired broker
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:293[0m
+            does not purge the service offering
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/purge_service_offering_command_test.go:294[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:116.094 seconds][0m
+service-access command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:11[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:45[0m
+    when there are service offerings
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:79[0m
+      when multiple brokers are registered and with varying service accessibility
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:142[0m
+        when the -e flag is passed
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:196[0m
+          shows only services from the specified service
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/service_access_command_test.go:197[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:78.931 seconds][0m
+services command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/services_command_test.go:12[0m
+  has services
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/services_command_test.go:55[0m
+    when CAPI version is => 2.125.0
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/services_command_test.go:138[0m
+      displays all service information
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/services_command_test.go:143[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:69.962 seconds][0m
+unbind-service command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:14[0m
+  when the environment is setup correctly
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:31[0m
+    when the service is provided by a broker
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:125[0m
+      when the unbinding is blocking
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:164[0m
+        when the service is bound to an app
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:174[0m
+          unbinds the service
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/unbind_service_command_test.go:183[0m
+[90m------------------------------[0m
+[32m• [SLOW TEST:115.724 seconds][0m
+marketplace command
+[90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:15[0m
+  when no flags are passed
+  [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:34[0m
+    when an API endpoint is set
+    [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:48[0m
+      when logged in
+      [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:95[0m
+        when a service is accessible but not in the currently targeted org
+        [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:116[0m
+          when CC API returns broker names in response
+          [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:174[0m
+            displays a table with broker name
+            [90m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:179[0m
+[90m------------------------------[0m
+
+
+[91m[1mSummarizing 4 Failures:[0m
+
+[91m[1m[Fail] [0m[90mmarketplace command [0m[0mwhen no flags are passed [0m[90mwhen the -s flag is passed [0m[0mwhen the api is set [0m[90mwhen not logged in [0m[0mwhen the specified service exists [0m[91m[1m[It] displays extended information about the service [0m
+[37m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:259[0m
+
+[91m[1m[Fail] [0m[90mlogin command [0m[0mMinimum Version Check [0m[90mwhen the api version is less than the minimum supported version [0m[91m[1m[It] displays the warning and exits successfully [0m
+[37m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/login_command_test.go:93[0m
+
+[91m[1m[Fail] [0m[90mmarketplace command [0m[0mwhen no flags are passed [0m[90mwhen an API endpoint is set [0m[0mwhen not logged in [0m[90mwhen there are accessible services [0m[91m[1m[It] displays a table of all available services and a tip [0m
+[37m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:84[0m
+
+[91m[1m[Fail] [0m[90mmarketplace command [0m[0mwhen no flags are passed [0m[90mwhen the -s flag is passed [0m[0mwhen the api is set [0m[90mwhen not logged in [0m[0mwhen the specified service does not exist [0m[91m[1m[It] displays an error that the service doesn't exist [0m
+[37m/home/pivotal/go/src/code.cloudfoundry.org/cli/integration/shared/isolated/marketplace_command_test.go:222[0m
+
+[1m[91mRan 740 of 754 Specs in 1078.070 seconds[0m
+[1m[91mFAIL![0m -- [32m[1m736 Passed[0m | [91m[1m4 Failed[0m | [33m[1m10 Pending[0m | [36m[1m4 Skipped[0m
+
+
+Ginkgo ran 1 suite in 17m59.962606971s
+Test Suite Failed
+Makefile:104: recipe for target 'integration-shared-isolated' failed

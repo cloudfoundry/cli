@@ -90,6 +90,7 @@ var _ = Describe("login command", func() {
 			It("displays the warning and exits successfully", func() {
 				session := helpers.CF("login", "-a", server.URL(), "--skip-ssl-validation")
 				Eventually(session).Should(Say("Your API version is no longer supported. Upgrade to a newer version of the API."))
+				//TODO
 				Eventually(session).Should(Exit(0))
 			})
 		})

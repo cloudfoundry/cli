@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Token Refreshing", func() {
+var _ = FDescribe("Token Refreshing", func() {
 	Describe("password grant type", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
