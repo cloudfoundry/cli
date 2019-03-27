@@ -2,7 +2,6 @@ package sharedaction
 
 import (
 	"archive/zip"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"crypto/sha1"
 	"fmt"
 	"io"
@@ -10,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/ykk"
@@ -415,7 +416,10 @@ func (Actor) addFileToZipFromFileSystem(srcPath string,
 			return actionerror.FileChangedError{Filename: srcPath}
 		}
 	} else if fileInfo.Mode()&os.ModeSymlink == os.ModeSymlink {
-		io.Copy(destFileWriter, srcFile)
+		_, err = io.Copy(destFileWriter, srcFile)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
