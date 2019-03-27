@@ -5,14 +5,25 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"github.com/SermoDigital/jose/crypto"
+	"github.com/SermoDigital/jose/jws"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	"github.com/onsi/gomega/ghttp"
 )
+
+func BuildTokenString(expiration time.Time) string {
+	c := jws.Claims{}
+	c.SetExpiration(expiration)
+	token := jws.NewJWT(c, crypto.Unsecured)
+	tokenBytes, _ := token.Serialize(nil)
+	return string(tokenBytes)
+}
 
 var _ = Describe("login command", func() {
 	Describe("Help Text", func() {
@@ -74,8 +85,14 @@ var _ = Describe("login command", func() {
 
 			BeforeEach(func() {
 				server = helpers.StartServerWithAPIVersions("2.99.9", "3.34.9")
+
+				fakeTokenResponse := map[string]string{
+					"access_token":  BuildTokenString(time.Now()),
+					"token_type":    "bearer",
+					"refresh_token": "refresh-token",
+				}
 				server.RouteToHandler(http.MethodPost, "/oauth/token",
-					ghttp.RespondWithJSONEncoded(http.StatusOK, struct{}{}))
+					ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
 				server.RouteToHandler(http.MethodGet, "/v2/organizations",
 					ghttp.RespondWith(http.StatusOK, `{
 					 "total_results": 0,
