@@ -40,7 +40,7 @@ func SetHomeDir() string {
 	Expect(os.Setenv("CF_HOME", homeDir)).To(Succeed())
 	Expect(os.Setenv("CF_PLUGIN_HOME", homeDir)).To(Succeed())
 
-	GinkgoWriter.Write([]byte(fmt.Sprintln("HOME DIR>", homeDir)))
+	GinkgoWriter.Write([]byte(fmt.Sprintln("\nHOME DIR>", homeDir)))
 	return homeDir
 }
 
