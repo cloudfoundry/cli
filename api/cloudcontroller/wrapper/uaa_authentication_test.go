@@ -66,7 +66,34 @@ var _ = Describe("UAA Authentication", func() {
 			})
 		})
 
-		When("the token is valid", func() {
+		When("no tokens are set", func() {
+			BeforeEach(func() {
+				inMemoryCache.SetAccessToken("")
+				inMemoryCache.SetRefreshToken("")
+			})
+
+			It("does not attempt to refresh the token", func() {
+				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(0))
+			})
+		})
+
+		When("the access token is invalid", func() {
+			var (
+				executeErr error
+			)
+			BeforeEach(func() {
+				inMemoryCache.SetAccessToken("Bearer some.invalid.token")
+				inMemoryCache.SetRefreshToken("some refresh token")
+				executeErr = wrapper.Make(request, nil)
+			})
+
+			It("should refresh the token", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(1))
+			})
+		})
+
+		When("the access token is valid", func() {
 			var (
 				accessToken = buildTokenString(time.Now().AddDate(0, 0, 1))
 			)
@@ -121,7 +148,7 @@ var _ = Describe("UAA Authentication", func() {
 			})
 		})
 
-		When("the token is invalid", func() {
+		When("the access token is expired", func() {
 			var (
 				expectedBody string
 				request      *cloudcontroller.Request
