@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
+	log "github.com/sirupsen/logrus"
 )
 
 type AppSummaryDisplayer struct {
@@ -112,7 +113,11 @@ func (display AppSummaryDisplayer) displayProcessTable(summary v7action.Applicat
 
 func (display AppSummaryDisplayer) getCreatedTime(summary v7action.ApplicationSummary) string {
 	if summary.CurrentDroplet.CreatedAt != "" {
-		timestamp, _ := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
+		timestamp, err := time.Parse(time.RFC3339, summary.CurrentDroplet.CreatedAt)
+		if err != nil {
+			log.WithField("createdAt", summary.CurrentDroplet.CreatedAt).Errorln("error parsing created at:", err)
+		}
+
 		return display.UI.UserFriendlyDate(timestamp)
 	}
 

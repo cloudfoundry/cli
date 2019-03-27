@@ -21,7 +21,8 @@ func BuildTokenString(expiration time.Time) string {
 	c := jws.Claims{}
 	c.SetExpiration(expiration)
 	token := jws.NewJWT(c, crypto.Unsecured)
-	tokenBytes, _ := token.Serialize(nil)
+	tokenBytes, err := token.Serialize(nil)
+	Expect(err).NotTo(HaveOccurred())
 	return string(tokenBytes)
 }
 

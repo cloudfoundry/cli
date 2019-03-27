@@ -257,7 +257,8 @@ var _ = Describe("unshare-service command", func() {
 
 				When("the user enters 'y'", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("y\n"))
+						_, err := buffer.Write([]byte("y\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("fails with a service instance not found error", func() {
@@ -274,7 +275,8 @@ var _ = Describe("unshare-service command", func() {
 
 				When("the user enters 'n'", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("n\n"))
+						_, err := buffer.Write([]byte("n\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("does not attempt to unshare", func() {
@@ -288,7 +290,8 @@ var _ = Describe("unshare-service command", func() {
 
 				When("the user enters the default input (hits return)", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("\n"))
+						_, err := buffer.Write([]byte("\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("does not attempt to unshare", func() {
@@ -305,7 +308,8 @@ var _ = Describe("unshare-service command", func() {
 						// The second '\n' is intentional. Otherwise the buffer will be
 						// closed while the interaction is still waiting for input; it gets
 						// an EOF and causes an error.
-						buffer.Write([]byte("wat\n\n"))
+						_, err := buffer.Write([]byte("wat\n\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("asks again", func() {

@@ -26,7 +26,11 @@ var _ = Describe("v3-apply-manifest command", func() {
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
-		appDir, _ = ioutil.TempDir("", "simple-app")
+
+		var err error
+		appDir, err = ioutil.TempDir("", "simple-app")
+		Expect(err).NotTo(HaveOccurred())
+
 		manifestPath = filepath.Join(appDir, "manifest.yml")
 		// Ensure the file exists at the minimum
 		helpers.WriteManifest(manifestPath, map[string]interface{}{})

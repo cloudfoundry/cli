@@ -100,7 +100,7 @@ var _ = Describe("stack command", func() {
 				session := helpers.CF("curl", "-d", jsonBody, "-X", "POST", "/v3/stacks")
 				Eventually(session).Should(Exit(0))
 
-				r, _ := regexp.Compile(`[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`)
+				r := regexp.MustCompile(`[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}`)
 				stackGUID = string(r.Find(session.Out.Contents()))
 			})
 

@@ -38,7 +38,8 @@ var _ = Describe("Sha1Checksum", func() {
 				f, err = ioutil.TempFile("", "sha1_test_")
 				Expect(err).NotTo(HaveOccurred())
 				defer f.Close()
-				f.Write([]byte("abc"))
+				_, err = f.Write([]byte("abc"))
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			AfterEach(func() {
@@ -81,7 +82,8 @@ var _ = Describe("Sha1Checksum", func() {
 				f, err = ioutil.TempFile("", "sha1_test_")
 				Expect(err).NotTo(HaveOccurred())
 				defer f.Close()
-				f.Write([]byte("abc"))
+				_, err = f.Write([]byte("abc"))
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			AfterEach(func() {

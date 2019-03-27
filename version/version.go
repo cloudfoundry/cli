@@ -13,7 +13,7 @@ var (
 func VersionString() string {
 	versionString, err := semver.Make(binaryVersion)
 	if err != nil {
-		versionString, _ = semver.Make(DefaultVersion)
+		versionString = semver.MustParse(DefaultVersion)
 	}
 
 	metaData := []string{}

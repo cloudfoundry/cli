@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	log "github.com/sirupsen/logrus"
 )
 
 //go:generate counterfeiter . EnvActor
@@ -74,10 +75,16 @@ func (cmd EnvCommand) Execute(_ []string) error {
 
 	if len(envGroups.System) > 0 || len(envGroups.Application) > 0 {
 		cmd.UI.DisplayHeader("System-Provided:")
-		cmd.displaySystem(envGroups.System)
+		err = cmd.displaySystem(envGroups.System)
+		if err != nil {
+			log.Errorln("error formatting system provided:", err)
+		}
 		if len(envGroups.Application) > 0 {
 			cmd.UI.DisplayNewline()
-			cmd.displaySystem(envGroups.Application)
+			err = cmd.displaySystem(envGroups.Application)
+			if err != nil {
+				log.Errorln("error formatting application:", err)
+			}
 		}
 	} else {
 		cmd.UI.DisplayText("No system-provided env variables have been set")
@@ -111,13 +118,12 @@ func (cmd EnvCommand) Execute(_ []string) error {
 	return nil
 }
 
-func (cmd EnvCommand) displayEnvGroup(group map[string]interface{}) error {
+func (cmd EnvCommand) displayEnvGroup(group map[string]interface{}) {
 	keys := sortKeys(group)
 
 	for _, key := range keys {
 		cmd.UI.DisplayText(fmt.Sprintf("%s: %v", key, group[key]))
 	}
-	return nil
 }
 
 func sortKeys(group map[string]interface{}) []string {

@@ -24,6 +24,10 @@
       "^util/generic",
       "^util/manifest",
       ".*fake.*"
+    ],
+    "skip-files": [
+      "command/v7/shared/noaa_debug_printer.go",
+      "integration/helpers/fake_server.go"
     ]
   },
   "linters":{
@@ -34,5 +38,14 @@
     "errcheck":{
       "check-blank": true
     }
+  },
+  "issues":{
+    "exclude":[
+      "Error return value of `client.GetApplicationTasks` is not checked",
+      "Error return value of `logger.output.Stop` is not checked",
+      "Error return value of `request.ResetBody` is not checked",
+      "Error return value of `GinkgoWriter.Write` is not checked",
+      "Error return value of `c.terminalHelper.RestoreTerminal` is not checked"
+    ]
   }
 }

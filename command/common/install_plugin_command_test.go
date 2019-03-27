@@ -289,7 +289,8 @@ var _ = Describe("install-plugin command", func() {
 
 				When("the user chooses no", func() {
 					BeforeEach(func() {
-						input.Write([]byte("n\n"))
+						_, err := input.Write([]byte("n\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("cancels plugin installation", func() {
@@ -301,7 +302,8 @@ var _ = Describe("install-plugin command", func() {
 
 				When("the user chooses the default", func() {
 					BeforeEach(func() {
-						input.Write([]byte("\n"))
+						_, err := input.Write([]byte("\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("cancels plugin installation", func() {
@@ -313,7 +315,8 @@ var _ = Describe("install-plugin command", func() {
 
 				When("the user input is invalid", func() {
 					BeforeEach(func() {
-						input.Write([]byte("e\n"))
+						_, err := input.Write([]byte("e\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("returns an error", func() {
@@ -325,7 +328,8 @@ var _ = Describe("install-plugin command", func() {
 
 				When("the user chooses yes", func() {
 					BeforeEach(func() {
-						input.Write([]byte("y\n"))
+						_, err := input.Write([]byte("y\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					When("the plugin is not already installed", func() {
@@ -633,7 +637,8 @@ var _ = Describe("install-plugin command", func() {
 
 			When("the user chooses no", func() {
 				BeforeEach(func() {
-					input.Write([]byte("n\n"))
+					_, err := input.Write([]byte("n\n"))
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				It("cancels plugin installation", func() {
@@ -645,7 +650,8 @@ var _ = Describe("install-plugin command", func() {
 
 			When("the user chooses the default", func() {
 				BeforeEach(func() {
-					input.Write([]byte("\n"))
+					_, err := input.Write([]byte("\n"))
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				It("cancels plugin installation", func() {
@@ -657,7 +663,8 @@ var _ = Describe("install-plugin command", func() {
 
 			When("the user input is invalid", func() {
 				BeforeEach(func() {
-					input.Write([]byte("e\n"))
+					_, err := input.Write([]byte("e\n"))
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				It("returns an error", func() {
@@ -669,7 +676,8 @@ var _ = Describe("install-plugin command", func() {
 
 			When("the user chooses yes", func() {
 				BeforeEach(func() {
-					input.Write([]byte("y\n"))
+					_, err := input.Write([]byte("y\n"))
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				When("the plugin is not already installed", func() {

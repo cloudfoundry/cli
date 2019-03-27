@@ -549,7 +549,8 @@ var _ = Describe("install-plugin command", func() {
 
 						When("the user chooses no", func() {
 							BeforeEach(func() {
-								input.Write([]byte("n\n"))
+								_, err := input.Write([]byte("n\n"))
+								Expect(err).ToNot(HaveOccurred())
 							})
 
 							It("cancels plugin installation", func() {
@@ -567,7 +568,8 @@ var _ = Describe("install-plugin command", func() {
 
 						When("the user chooses the default", func() {
 							BeforeEach(func() {
-								input.Write([]byte("\n"))
+								_, err := input.Write([]byte("\n"))
+								Expect(err).ToNot(HaveOccurred())
 							})
 
 							It("cancels plugin installation", func() {
@@ -580,7 +582,8 @@ var _ = Describe("install-plugin command", func() {
 
 						When("the user input is invalid", func() {
 							BeforeEach(func() {
-								input.Write([]byte("e\n"))
+								_, err := input.Write([]byte("e\n"))
+								Expect(err).ToNot(HaveOccurred())
 							})
 
 							It("returns an error", func() {
@@ -594,7 +597,8 @@ var _ = Describe("install-plugin command", func() {
 
 						When("the user chooses yes", func() {
 							BeforeEach(func() {
-								input.Write([]byte("y\n"))
+								_, err := input.Write([]byte("y\n"))
+								Expect(err).ToNot(HaveOccurred())
 								fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", nil)
 								fakeActor.CreateExecutableCopyReturns("copy-path", nil)
 								fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
@@ -624,7 +628,8 @@ var _ = Describe("install-plugin command", func() {
 					When("the plugin is NOT already installed", func() {
 						When("the user chooses no", func() {
 							BeforeEach(func() {
-								input.Write([]byte("n\n"))
+								_, err := input.Write([]byte("n\n"))
+								Expect(err).ToNot(HaveOccurred())
 							})
 
 							It("cancels plugin installation", func() {
@@ -641,7 +646,8 @@ var _ = Describe("install-plugin command", func() {
 
 						When("the user chooses the default", func() {
 							BeforeEach(func() {
-								input.Write([]byte("\n"))
+								_, err := input.Write([]byte("\n"))
+								Expect(err).ToNot(HaveOccurred())
 							})
 
 							It("cancels plugin installation", func() {
@@ -654,7 +660,8 @@ var _ = Describe("install-plugin command", func() {
 
 						When("the user input is invalid", func() {
 							BeforeEach(func() {
-								input.Write([]byte("e\n"))
+								_, err := input.Write([]byte("e\n"))
+								Expect(err).ToNot(HaveOccurred())
 							})
 
 							It("returns an error", func() {
@@ -670,7 +677,8 @@ var _ = Describe("install-plugin command", func() {
 							var execPath string
 
 							BeforeEach(func() {
-								input.Write([]byte("y\n"))
+								_, err := input.Write([]byte("y\n"))
+								Expect(err).ToNot(HaveOccurred())
 								execPath = helpers.PrefixedRandomName("some-path")
 								fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, nil)
 								fakeActor.CreateExecutableCopyReturns("copy-path", nil)
@@ -837,7 +845,8 @@ var _ = Describe("install-plugin command", func() {
 						BeforeEach(func() {
 							cmd.Force = false
 							fakeActor.ValidateFileChecksumReturns(false)
-							input.Write([]byte("y\n"))
+							_, err := input.Write([]byte("y\n"))
+							Expect(err).ToNot(HaveOccurred())
 						})
 
 						It("returns the checksum error", func() {
@@ -977,7 +986,8 @@ var _ = Describe("install-plugin command", func() {
 					BeforeEach(func() {
 						cmd.Force = false
 						fakeActor.DownloadExecutableBinaryFromURLReturns("", errors.New("some-error"))
-						input.Write([]byte("y\n"))
+						_, err := input.Write([]byte("y\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("returns the checksum error", func() {
@@ -1069,7 +1079,8 @@ var _ = Describe("install-plugin command", func() {
 						checksum = helpers.PrefixedRandomName("checksum")
 
 						fakeActor.CreateExecutableCopyReturns("", errors.New("some-error"))
-						input.Write([]byte("y\n"))
+						_, err := input.Write([]byte("y\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("returns the error", func() {

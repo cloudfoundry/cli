@@ -42,7 +42,8 @@ func IsUAAVersionAtLeast(minVersion string) bool {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipSSLValidation()},
 	}
-	req, _ := http.NewRequest("GET", uaaUrl, nil)
+	req, err := http.NewRequest("GET", uaaUrl, nil)
+	Expect(err).ToNot(HaveOccurred())
 	req.Header.Add("Accept", "application/json")
 	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)

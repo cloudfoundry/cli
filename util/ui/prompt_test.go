@@ -37,9 +37,17 @@ var _ = Describe("Prompts", func() {
 	})
 
 	Describe("DisplayBoolPrompt", func() {
-		It("displays the passed in string", func() {
-			_, _ = ui.DisplayBoolPrompt(false, "some-prompt", nil)
-			Expect(out).To(Say(`some-prompt \[yN\]:`))
+		Describe("display text", func() {
+			BeforeEach(func() {
+				_, err := inBuffer.Write([]byte("\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("displays the passed in string", func() {
+				_, err := ui.DisplayBoolPrompt(false, "some-prompt", nil)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(out).To(Say(`some-prompt \[yN\]:`))
+			})
 		})
 
 		When("the user chooses yes", func() {
@@ -103,13 +111,15 @@ var _ = Describe("Prompts", func() {
 
 	Describe("DisplayPasswordPrompt", func() {
 		BeforeEach(func() {
-			inBuffer.Write([]byte("some-input\n"))
+			_, err := inBuffer.Write([]byte("some-input\n"))
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("displays the passed in string", func() {
-			_, _ = ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+			_, err := ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
 				"AppName": "some-app",
 			})
+			Expect(err).NotTo(HaveOccurred())
 			Expect(out).To(Say("App some-app does not exist."))
 		})
 
@@ -133,12 +143,19 @@ var _ = Describe("Prompts", func() {
 
 				ui.Out = out
 				ui.OutForInteration = out
+
+				inBuffer = NewBuffer()
+				ui.In = inBuffer
+
+				_, err = inBuffer.Write([]byte("ffffff\n"))
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("translates and displays the prompt", func() {
-				_, _ = ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+				_, err := ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
 					"AppName": "some-app",
 				})
+				Expect(err).NotTo(HaveOccurred())
 				Expect(out).To(Say("L'application some-app n'existe pas.\n"))
 			})
 		})
@@ -146,7 +163,8 @@ var _ = Describe("Prompts", func() {
 
 	Describe("DisplayTextPrompt", func() {
 		BeforeEach(func() {
-			inBuffer.Write([]byte("some-input\n"))
+			_, err := inBuffer.Write([]byte("some-input\n"))
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("displays the passed in string and returns the user input string", func() {
@@ -170,12 +188,19 @@ var _ = Describe("Prompts", func() {
 
 				ui.Out = out
 				ui.OutForInteration = out
+
+				inBuffer = NewBuffer()
+				ui.In = inBuffer
+
+				_, err = inBuffer.Write([]byte("ffffff\n"))
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("translates and displays the prompt", func() {
-				_, _ = ui.DisplayTextPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+				_, err := ui.DisplayTextPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
 					"AppName": "some-app",
 				})
+				Expect(err).NotTo(HaveOccurred())
 				Expect(out).To(Say("L'application some-app n'existe pas.\n"))
 			})
 		})

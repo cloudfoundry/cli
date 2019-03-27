@@ -65,7 +65,8 @@ var _ = Describe("delete-isolation-segment command", func() {
 
 				When("'yes' is inputted", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("y\n"))
+						_, err := buffer.Write([]byte("y\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("deletes the isolation segment", func() {
@@ -81,7 +82,8 @@ var _ = Describe("delete-isolation-segment command", func() {
 
 				When("'no' is inputted", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("n\n"))
+						_, err := buffer.Write([]byte("n\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("cancels the deletion", func() {

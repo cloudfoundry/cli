@@ -20,6 +20,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/ssh/sigwinch"
 	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"github.com/moby/moby/pkg/term"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -146,7 +147,10 @@ func (c *SecureShell) InteractiveSession(commands []string, terminalRequest TTYR
 		var state *term.State
 		state, err = c.terminalHelper.SetRawTerminal(stdinFd)
 		if err == nil {
-			defer c.terminalHelper.RestoreTerminal(stdinFd, state)
+			defer func() {
+				err := c.terminalHelper.RestoreTerminal(stdinFd, state)
+				log.Errorln("restore terminal", err)
+			}()
 		}
 	}
 
@@ -293,7 +297,10 @@ func (c *SecureShell) resize(resized <-chan os.Signal, session SecureSession, te
 			Height: uint32(height),
 		}
 
-		_, _ = session.SendRequest("window-change", false, ssh.Marshal(message))
+		_, err := session.SendRequest("window-change", false, ssh.Marshal(message))
+		if err != nil {
+			log.Errorln("window-change:", err)
+		}
 
 		previousWidth = width
 		previousHeight = height
@@ -329,7 +336,10 @@ func base64Sha256Fingerprint(key ssh.PublicKey) string {
 }
 
 func copyAndClose(wg *sync.WaitGroup, dest io.WriteCloser, src io.Reader) {
-	_, _ = io.Copy(dest, src)
+	_, err := io.Copy(dest, src)
+	if err != nil {
+		log.Errorln("copy and close:", err)
+	}
 	_ = dest.Close()
 	if wg != nil {
 		wg.Done()
@@ -337,7 +347,10 @@ func copyAndClose(wg *sync.WaitGroup, dest io.WriteCloser, src io.Reader) {
 }
 
 func copyAndDone(wg *sync.WaitGroup, dest io.Writer, src io.Reader) {
-	_, _ = io.Copy(dest, src)
+	_, err := io.Copy(dest, src)
+	if err != nil {
+		log.Errorln("copy and done:", err)
+	}
 	wg.Done()
 }
 
@@ -379,7 +392,10 @@ func keepalive(conn ssh.Conn, ticker *time.Ticker, stopCh chan struct{}) {
 	for {
 		select {
 		case <-ticker.C:
-			_, _, _ = conn.SendRequest("keepalive@cloudfoundry.org", true, nil)
+			_, _, err := conn.SendRequest("keepalive@cloudfoundry.org", true, nil)
+			if err != nil {
+				log.Errorln("err sending keep alive:", err)
+			}
 		case <-stopCh:
 			ticker.Stop()
 			return

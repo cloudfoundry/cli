@@ -69,7 +69,8 @@ var _ = Describe("set-label command", func() {
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "fake-org"})
 				fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "fake-space", GUID: "some-space-guid"})
 
-				u, _ := uuid.NewV4()
+				u, err := uuid.NewV4()
+				Expect(err).NotTo(HaveOccurred())
 				appName = u.String()
 			})
 

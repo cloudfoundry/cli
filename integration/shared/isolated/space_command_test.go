@@ -101,7 +101,7 @@ var _ = Describe("space command", func() {
 					securityGroupRules2, err = ioutil.TempFile("", "security-group-rules")
 					Expect(err).ToNot(HaveOccurred())
 
-					securityGroupRules2.Write([]byte(`
+					_, err := securityGroupRules2.Write([]byte(`
 						[
 							{
 								"protocol": "udp",
@@ -117,6 +117,7 @@ var _ = Describe("space command", func() {
 							}
 						]
 					`))
+					Expect(err).ToNot(HaveOccurred())
 
 					Eventually(helpers.CF("create-security-group", securityGroupName2, securityGroupRules2.Name())).Should(Exit(0))
 					os.Remove(securityGroupRules2.Name())

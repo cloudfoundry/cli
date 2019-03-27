@@ -337,7 +337,10 @@ func (cmd PushCommand) processStreamsFromPrepareSpace(
 				eventClosed = true
 				break
 			}
-			cmd.processEvent(event, cmd.OptionalArgs.AppName)
+			_, err := cmd.processEvent(event, cmd.OptionalArgs.AppName)
+			if err != nil {
+				return nil, err
+			}
 		case warnings, ok := <-warningsStream:
 			if !ok {
 				if !warningsClosed {
@@ -355,7 +358,7 @@ func (cmd PushCommand) processStreamsFromPrepareSpace(
 				errClosed = true
 				break
 			}
-			err = receivedError
+			return nil, receivedError
 		}
 
 		if namesClosed && eventClosed && warningsClosed && errClosed {
@@ -395,7 +398,11 @@ func (cmd PushCommand) processApplyStreams(
 				eventClosed = true
 				break
 			}
-			complete = cmd.processEvent(event, appName)
+			var err error
+			complete, err = cmd.processEvent(event, appName)
+			if err != nil {
+				return v7pushaction.PushPlan{}, err
+			}
 		case warnings, ok := <-warningsStream:
 			if !ok {
 				if !warningsClosed {
@@ -424,7 +431,7 @@ func (cmd PushCommand) processApplyStreams(
 	return updatePlan, nil
 }
 
-func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) bool {
+func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) (bool, error) {
 	switch event {
 	case v7pushaction.SkippingApplicationCreation:
 		cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}}...", map[string]interface{}{
@@ -462,17 +469,20 @@ func (cmd PushCommand) processEvent(event v7pushaction.Event, appName string) bo
 	case v7pushaction.StartingStaging:
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Staging app and tracing logs...")
-		logStream, errStream, warnings, _ := cmd.VersionActor.GetStreamingLogsForApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+		logStream, errStream, warnings, err := cmd.VersionActor.GetStreamingLogsForApplicationByNameAndSpace(appName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
 		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return false, err
+		}
 		go cmd.getLogs(logStream, errStream)
 	case v7pushaction.StagingComplete:
 		cmd.NOAAClient.Close()
 	case v7pushaction.Complete:
-		return true
+		return true, nil
 	default:
 		log.WithField("event", event).Debug("ignoring event")
 	}
-	return false
+	return false, nil
 }
 
 func (cmd PushCommand) getLogs(logStream <-chan *v7action.LogMessage, errStream <-chan error) {

@@ -25,7 +25,8 @@ var _ = Describe("BindingName", func() {
 
 	When("the value provided to the --binding-name flag is greater than 0 characters long", func() {
 		It("stores the binding name and does not return an error", func() {
-			bindingName.UnmarshalFlag("some-name")
+			err := bindingName.UnmarshalFlag("some-name")
+			Expect(err).NotTo(HaveOccurred())
 			Expect(bindingName.Value).To(Equal("some-name"))
 		})
 	})

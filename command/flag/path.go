@@ -140,8 +140,8 @@ func (PathWithBool) Complete(prefix string) []flags.Completion {
 }
 
 func findMatches(pattern string, formatMatch func(string) string) []flags.Completion {
-	paths, _ := filepath.Glob(pattern)
-	if paths == nil {
+	paths, err := filepath.Glob(pattern)
+	if paths == nil || err != nil {
 		return nil
 	}
 

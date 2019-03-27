@@ -7,6 +7,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 
 	"testing"
@@ -37,4 +38,8 @@ var _ = BeforeSuite(func() {
 
 	TestHostKey = hostKey
 	TestPrivateKey = privateKey
+})
+
+var _ = BeforeEach(func() {
+	log.SetLevel(log.PanicLevel)
 })

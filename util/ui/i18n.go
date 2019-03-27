@@ -8,6 +8,7 @@ import (
 	"text/template"
 
 	"code.cloudfoundry.org/cli/i18n/resources"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/text/language"
 )
 
@@ -116,7 +117,10 @@ func generateTranslationFunc(rawTranslation []byte) (TranslateFunc, error) {
 
 		var buffer bytes.Buffer
 		formattedTemplate := template.Must(template.New("Display Text").Parse(translated))
-		formattedTemplate.Execute(&buffer, keys)
+		err := formattedTemplate.Execute(&buffer, keys)
+		if err != nil {
+			log.WithField("translationID", translationID).Errorln("executing template:", err)
+		}
 
 		return buffer.String()
 	}, nil
