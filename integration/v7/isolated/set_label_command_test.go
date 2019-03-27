@@ -82,5 +82,19 @@ var _ = Describe("set-label command", func() {
 			Eventually(session).Should(Say("FAILED"))
 			Eventually(session).Should(Exit(1))
 		})
+
+		It("displays an error for a label with an empty key and an invalid value", func() {
+			session := helpers.CF("set-label", "app", appName, "=test", "sha2=108&eb90d734")
+			Eventually(session.Err).Should(Say("Metadata key error: label key cannot be empty string, Metadata value error: label '108&eb90d734' contains invalid characters"))
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Exit(1))
+		})
+
+		It("displays an error for a label without an '='", func() {
+			session := helpers.CF("set-label", "app", appName, "test-label")
+			Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Exit(1))
+		})
 	})
 })

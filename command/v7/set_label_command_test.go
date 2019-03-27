@@ -4,7 +4,6 @@ import (
 	"errors"
 	"regexp"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -114,7 +113,7 @@ var _ = Describe("set-label command", func() {
 				})
 			})
 
-			When("the application doesn't exist", func() {
+			When("updating the application labels fail", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs = flag.SetLabelArgs{
 						ResourceType: "app",
@@ -123,18 +122,18 @@ var _ = Describe("set-label command", func() {
 					}
 					fakeActor.UpdateApplicationLabelsByApplicationNameReturns(
 						v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
-						actionerror.ApplicationNotFoundError{Name: appName},
+						errors.New("some-updating-error"),
 					)
 				})
 				It("displays warnings and an error message", func() {
 					Expect(testUI.Err).To(Say("some-warning-1"))
 					Expect(testUI.Err).To(Say("some-warning-2"))
 					Expect(executeErr).To(HaveOccurred())
-					Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{Name: appName}))
+					Expect(executeErr).To(MatchError("some-updating-error"))
 				})
 			})
 
-			When("all provided labels are not valid", func() {
+			When("some provided labels do not have a value part", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs = flag.SetLabelArgs{
 						ResourceType: "app",
@@ -144,6 +143,7 @@ var _ = Describe("set-label command", func() {
 				})
 
 				It("complains about the missing equal sign", func() {
+					Expect(executeErr).To(MatchError("Metadata error: no value provided for label 'MISSING_EQUALS'"))
 					Expect(executeErr).To(HaveOccurred())
 				})
 			})

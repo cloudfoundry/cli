@@ -66,8 +66,7 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 	for _, label := range cmd.RequiredArgs.Labels {
 		parts := strings.SplitN(label, "=", 2)
 		if len(parts) < 2 {
-			//TODO: Fix text
-			return fmt.Errorf("Invalid label %s has no VALUE part", label)
+			return fmt.Errorf("Metadata error: no value provided for label '%s'", label)
 		}
 		labels[parts[0]] = parts[1]
 	}
