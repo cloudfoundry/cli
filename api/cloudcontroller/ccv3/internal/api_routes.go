@@ -62,6 +62,7 @@ const (
 	PostBuildRequest                                            = "PostBuild"
 	PostBuildpackBitsRequest                                    = "PostBuildpackBits"
 	PostBuildpackRequest                                        = "PostBuildpack"
+	PostDomainRequest                                           = "PostDomain"
 	PostIsolationSegmentRelationshipOrganizationsRequest        = "PostIsolationSegmentRelationshipOrganizations"
 	PostIsolationSegmentsRequest                                = "PostIsolationSegments"
 	PostPackageRequest                                          = "PostPackage"
@@ -103,6 +104,7 @@ var APIRoutes = []Route{
 	{Resource: DeploymentsResource, Path: "/", Method: http.MethodPost, Name: PostApplicationDeploymentRequest},
 	{Resource: DeploymentsResource, Path: "/:deployment_guid", Method: http.MethodGet, Name: GetDeploymentRequest},
 	{Resource: DeploymentsResource, Path: "/:deployment_guid/actions/cancel", Method: http.MethodPost, Name: PostApplicationDeploymentActionCancelRequest},
+	{Resource: DomainsResource, Path: "/", Method: http.MethodPost, Name: PostDomainRequest},
 	{Resource: DropletsResource, Path: "/", Method: http.MethodGet, Name: GetDropletsRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid", Method: http.MethodGet, Name: GetDropletRequest},
 	{Resource: FeatureFlagsResource, Path: "/:name", Method: http.MethodGet, Name: GetFeatureFlagRequest},

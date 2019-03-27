@@ -120,6 +120,9 @@ func SetupV3Response() {
 			"droplets": {
 				"href": "SERVER_URL/v3/droplets"
 			},
+            "domains": {
+              "href": "SERVER_URL/v3/domains"
+            },
 			"deployments": {
 				"href": "SERVER_URL/v3/deployments"
 			},

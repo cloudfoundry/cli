@@ -6,6 +6,7 @@ const (
 	BuildpacksResource        = "buildpacks"
 	BuildsResource            = "builds"
 	DeploymentsResource       = "deployments"
+	DomainsResource           = "domains"
 	DropletsResource          = "droplets"
 	FeatureFlagsResource      = "feature_flags"
 	IsolationSegmentsResource = "isolation_segments"

@@ -62,7 +62,7 @@ type commandList struct {
 	CreateServiceBroker                v6.CreateServiceBrokerCommand                `command:"create-service-broker" alias:"csb" description:"Create a service broker"`
 	CreateServiceKey                   v6.CreateServiceKeyCommand                   `command:"create-service-key" alias:"csk" description:"Create key for a service instance"`
 	CreateService                      v6.CreateServiceCommand                      `command:"create-service" alias:"cs" description:"Create a service instance"`
-	CreateSharedDomain                 v6.CreateSharedDomainCommand                 `command:"create-shared-domain" description:"Create a domain that can be used by all orgs (admin-only)"`
+	CreateSharedDomain                 v7.CreateSharedDomainCommand                 `command:"create-shared-domain" description:"Create a domain that can be used by all orgs (admin-only)"`
 	CreateSpaceQuota                   v6.CreateSpaceQuotaCommand                   `command:"create-space-quota" description:"Define a new space resource quota"`
 	CreateSpace                        v6.CreateSpaceCommand                        `command:"create-space" description:"Create a space"`
 	CreateUserProvidedService          v6.CreateUserProvidedServiceCommand          `command:"create-user-provided-service" alias:"cups" description:"Make a user-provided service instance available to CF apps"`
