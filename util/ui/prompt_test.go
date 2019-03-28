@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
+	"github.com/vito/go-interact/interact"
 )
 
 var _ = Describe("Prompts", func() {
@@ -204,5 +205,48 @@ var _ = Describe("Prompts", func() {
 				Expect(out).To(Say("L'application some-app n'existe pas.\n"))
 			})
 		})
+	})
+
+	Describe("interrupt handling", func() {
+		When("the prompt is canceled by a keyboard interrupt", func() {
+			var (
+				fakeResolver   *uifakes.FakeResolver
+				fakeExiter     *uifakes.FakeExiter
+				fakeInteractor *uifakes.FakeInteractor
+			)
+
+			BeforeEach(func() {
+				fakeResolver = new(uifakes.FakeResolver)
+				fakeResolver.ResolveReturns(interact.ErrKeyboardInterrupt)
+				fakeExiter = new(uifakes.FakeExiter)
+				fakeInteractor = new(uifakes.FakeInteractor)
+				fakeInteractor.NewInteractionReturns(fakeResolver)
+				ui.Interactor = fakeInteractor
+				ui.Exiter = fakeExiter
+			})
+
+			It("exits immediately from password prompt", func() {
+				_, _ = ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+					"AppName": "some-app",
+				})
+				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
+				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
+			})
+
+			It("exits immediately from text prompt", func() {
+				_, _ = ui.DisplayTextPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+					"AppName": "some-app",
+				})
+				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
+				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
+			})
+
+			It("exits immediately from bool prompt", func() {
+				_, _ = ui.DisplayBoolPrompt(false, "some-prompt", nil)
+				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
+				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
+			})
+		})
+
 	})
 })

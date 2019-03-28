@@ -17,7 +17,54 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/fatih/color"
 	runewidth "github.com/mattn/go-runewidth"
+	"github.com/vito/go-interact/interact"
 )
+
+var realExiter exiterFunc = os.Exit
+
+var realInteract interactorFunc = func(prompt string, choices ...interact.Choice) Resolver {
+	return &interactionWrapper{
+		interact.NewInteraction(prompt, choices...),
+	}
+}
+
+//go:generate counterfeiter . Interactor
+
+// Interactor hides interact.NewInteraction for testing purposes
+type Interactor interface {
+	NewInteraction(prompt string, choices ...interact.Choice) Resolver
+}
+
+type interactorFunc func(prompt string, choices ...interact.Choice) Resolver
+
+func (f interactorFunc) NewInteraction(prompt string, choices ...interact.Choice) Resolver {
+	return f(prompt, choices...)
+}
+
+type interactionWrapper struct {
+	interact.Interaction
+}
+
+func (w *interactionWrapper) SetIn(in io.Reader) {
+	w.Input = in
+}
+
+func (w *interactionWrapper) SetOut(o io.Writer) {
+	w.Output = o
+}
+
+//go:generate counterfeiter . Exiter
+
+// Exiter hides os.Exit for testing purposes
+type Exiter interface {
+	Exit(code int)
+}
+
+type exiterFunc func(int)
+
+func (f exiterFunc) Exit(code int) {
+	f(code)
+}
 
 // UI is interface to interact with the user
 type UI struct {
@@ -34,9 +81,12 @@ type UI struct {
 
 	colorEnabled configv3.ColorSetting
 	translate    TranslateFunc
+	Exiter       Exiter
 
 	terminalLock *sync.Mutex
 	fileLock     *sync.Mutex
+
+	Interactor Interactor
 
 	IsTTY         bool
 	TerminalWidth int
@@ -62,7 +112,9 @@ func NewUI(config Config) (*UI, error) {
 		colorEnabled:     config.ColorEnabled(),
 		translate:        translateFunc,
 		terminalLock:     &sync.Mutex{},
+		Exiter:           realExiter,
 		fileLock:         &sync.Mutex{},
+		Interactor:       realInteract,
 		IsTTY:            config.IsTTY(),
 		TerminalWidth:    config.TerminalWidth(),
 		TimezoneLocation: location,
@@ -82,8 +134,10 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 		Out:              out,
 		OutForInteration: out,
 		Err:              err,
+		Exiter:           realExiter,
 		colorEnabled:     configv3.ColorDisabled,
 		translate:        translationFunc,
+		Interactor:       realInteract,
 		terminalLock:     &sync.Mutex{},
 		fileLock:         &sync.Mutex{},
 		TimezoneLocation: time.UTC,
