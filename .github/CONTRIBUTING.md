@@ -66,7 +66,8 @@ version that the `cli` binary is built and tested with.
 ## Development tools
 
 The CF CLI requires the following development tools in order to run our test:
-- [Ginkgo](https://github.com/onsi/ginkgo)/[Gomega](https://github.com/onsi/gomega) - Test framework/Matchers Library.
+- [Ginkgo](https://github.com/onsi/ginkgo) / [Gomega](https://github.com/onsi/gomega) - Test framework/Matchers Library
+- [golangci-lint](https://github.com/golangci/golangci-lint) - Comprehensive linting tool
 - [counterfeiter](https://github.com/maxbrunsfeld/counterfeiter) - Generate
   fakes/mocks for testing. Currently using version `6.*`.
 - [dep](https://github.com/golang/dep) - `vendor` dependency management tool
