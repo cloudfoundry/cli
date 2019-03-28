@@ -66,6 +66,9 @@ fly-windows-global: check-target-env
 fly-windows-units:
 	fly -t ci execute -c ci/cli/tasks/units-windows.yml -i cli=./ -i cli-ci=./ --tag "cli-windows"
 
+golangci-lint:
+    golangci-lint run
+
 integration-cleanup:
 	$(PWD)/bin/cleanup-integration
 
@@ -209,7 +212,7 @@ rsrc.syso:
 
 test: units ## (synonym for units)
 
-units: format vet lint build ## Ensure the code looks good, compiles, and passes unit tests
+units: format vet lint build golangci-lint ## Ensure the code looks good, compiles, and passes unit tests
 	ginkgo -r -p -randomizeAllSpecs -randomizeSuites \
 		$(PACKAGES)
 	@echo "\nSWEET SUITE SUCCESS"
