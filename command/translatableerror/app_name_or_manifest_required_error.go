@@ -9,7 +9,7 @@ type AppNameOrManifestRequiredError struct {
 func (AppNameOrManifestRequiredError) DisplayUsage() {}
 
 func (AppNameOrManifestRequiredError) Error() string {
-	return "Incorrect Usage:  The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file."
+	return "Incorrect Usage: The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file."
 }
 
 func (e AppNameOrManifestRequiredError) Translate(translate func(string, ...interface{}) string) string {

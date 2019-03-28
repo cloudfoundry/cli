@@ -153,7 +153,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
-						Eventually(session.Err).Should(Say("Incorrect usage: The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file."))
+						Eventually(session.Err).Should(Say("Incorrect Usage: The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -183,7 +183,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 			It("returns an error", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
-					Eventually(session.Err).Should(Say("Incorrect usage: The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file."))
+					Eventually(session.Err).Should(Say("Incorrect Usage: The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file."))
 					Eventually(session).Should(Exit(1))
 				})
 			})
