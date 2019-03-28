@@ -56,13 +56,13 @@ var _ = Describe("Verbose", func() {
 			session := helpers.CFWithEnv(envMap, command...)
 
 			Eventually(session).Should(Say("REQUEST:"))
-			Eventually(session).Should(Say("GET /v3/apps"))
-			Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
-			Eventually(session).Should(Say("RESPONSE:"))
-			Eventually(session).Should(Say("REQUEST:"))
 			Eventually(session).Should(Say("POST /oauth/token"))
 			Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
 			Eventually(session).Should(Say(`\[PRIVATE DATA HIDDEN\]`)) //This is required to test the previous line. If it fails, the previous matcher went too far.
+			Eventually(session).Should(Say("RESPONSE:"))
+			Eventually(session).Should(Say("REQUEST:"))
+			Eventually(session).Should(Say("GET /v3/apps"))
+			Eventually(session).Should(Say(`User-Agent: cf/[\w.+-]+ \(go\d+\.\d+(\.\d+)?; %s %s\)`, runtime.GOARCH, runtime.GOOS))
 			Eventually(session).Should(Say("RESPONSE:"))
 			Eventually(session).Should(Exit(1))
 		},
