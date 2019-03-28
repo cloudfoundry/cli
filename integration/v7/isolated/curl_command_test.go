@@ -499,7 +499,8 @@ var _ = Describe("curl command", func() {
 
 				It("generates a new auth token by using the refresh token", func() {
 					path := fmt.Sprintf("/v2/spaces/%s", spaceGUID)
-					session := helpers.CF("curl", path, "-H", "Authorization: bearer some-token", "-X", "DELETE", "-v")
+					authHeader := fmt.Sprintf("Authorization: %s", helpers.InvalidAccessToken())
+					session := helpers.CF("curl", path, "-H", authHeader, "-X", "DELETE", "-v")
 					Eventually(session).Should(Exit(0))
 
 					Expect(session).To(Say("POST /oauth/token"))
