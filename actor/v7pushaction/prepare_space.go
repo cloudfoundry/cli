@@ -46,8 +46,8 @@ func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser ManifestPar
 		}
 
 		warningsStream <- Warnings(warnings)
-		errorStream <- err
 		if err != nil {
+			errorStream <- err
 			return
 		}
 		pushPlansStream <- pushPlans

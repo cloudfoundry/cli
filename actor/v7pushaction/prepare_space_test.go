@@ -121,7 +121,6 @@ var _ = Describe("PrepareSpace", func() {
 				Expect(actualApp).To(Equal(v7action.Application{Name: appName}))
 				Expect(actualSpaceGUID).To(Equal(spaceGUID))
 				Eventually(warningsStream).Should(Receive(Equal(Warnings{"create-app-warning"})))
-				Eventually(errorStream).Should(Receive(Succeed()))
 				Eventually(pushPlansStream).Should(Receive(ConsistOf(PushPlan{
 					SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName},
 				})))
@@ -146,7 +145,6 @@ var _ = Describe("PrepareSpace", func() {
 				Expect(actualApp).To(Equal(v7action.Application{Name: appName}))
 				Expect(actualSpaceGUID).To(Equal(spaceGUID))
 				Eventually(warningsStream).Should(Receive(Equal(Warnings{"create-app-warning"})))
-				Eventually(errorStream).Should(Receive(Succeed()))
 				Eventually(pushPlansStream).Should(Receive(ConsistOf(PushPlan{
 					SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName},
 				})))
@@ -228,7 +226,6 @@ var _ = Describe("PrepareSpace", func() {
 				Expect(actualManifest).To(Equal(manifest))
 				Expect(actualSpaceGUID).To(Equal(spaceGUID))
 				Eventually(warningsStream).Should(Receive(Equal(Warnings{"apply-manifest-warnings"})))
-				Eventually(errorStream).Should(Receive(Succeed()))
 				Eventually(pushPlansStream).Should(Receive(ConsistOf(PushPlan{
 					SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1},
 				})))
@@ -257,7 +254,6 @@ var _ = Describe("PrepareSpace", func() {
 				Expect(actualManifest).To(Equal(manifest))
 				Expect(actualSpaceGUID).To(Equal(spaceGUID))
 				Eventually(warningsStream).Should(Receive(Equal(Warnings{"apply-manifest-warnings"})))
-				Eventually(errorStream).Should(Receive(Succeed()))
 				Eventually(pushPlansStream).Should(Receive(ConsistOf(
 					PushPlan{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}},
 					PushPlan{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName2}},
