@@ -81,7 +81,7 @@ var _ = Describe("scale command", func() {
 			It("displays app not found and exits 1", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("scale", invalidAppName)
-				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
+				Eventually(session.Err).Should(Say("App '%s' not found", invalidAppName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

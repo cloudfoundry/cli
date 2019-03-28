@@ -132,7 +132,7 @@ var _ = Describe("v3-apply-manifest command", func() {
 
 				It("reports an error", func() {
 					session := helpers.CF("v3-apply-manifest", "-f", manifestPath)
-					Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
+					Eventually(session.Err).Should(Say("App '%s' not found", invalidAppName))
 					Eventually(session).Should(Say("FAILED"))
 
 					Eventually(session).Should(Exit(1))

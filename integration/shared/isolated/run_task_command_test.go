@@ -182,7 +182,7 @@ var _ = Describe("run-task command", func() {
 			It("fails and outputs an app not found message", func() {
 				session := helpers.CF("run-task", appName, "echo hi")
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say(fmt.Sprintf("App %s not found", appName)))
+				Eventually(session.Err).Should(Say(fmt.Sprintf("App '%s' not found", appName)))
 				Eventually(session).Should(Exit(1))
 			})
 		})

@@ -104,7 +104,7 @@ var _ = Describe("v3-stop-application command", func() {
 					invalidAppName := "invalid-app-name"
 					session := helpers.CF("v3-stop", invalidAppName)
 
-					Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
+					Eventually(session.Err).Should(Say("App '%s' not found", invalidAppName))
 					Eventually(session).Should(Say("FAILED"))
 
 					Eventually(session).Should(Exit(1))

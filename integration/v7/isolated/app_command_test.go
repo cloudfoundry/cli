@@ -250,7 +250,7 @@ applications:
 						session := helpers.CF("app", appName)
 
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("App %s not found", appName))
+						Eventually(session.Err).Should(Say("App '%s' not found", appName))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -260,7 +260,7 @@ applications:
 						session := helpers.CF("app", "--guid", appName)
 
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("App %s not found", appName))
+						Eventually(session.Err).Should(Say("App '%s' not found", appName))
 						Eventually(session).Should(Exit(1))
 					})
 				})

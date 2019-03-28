@@ -68,7 +68,7 @@ var _ = Describe("push with a manifest and an app name", func() {
 		Eventually(session).Should(Exit(0))
 
 		session = helpers.CF("env", secondName)
-		Eventually(session.Err).Should(Say(fmt.Sprintf("App %s not found", secondName)))
+		Eventually(session.Err).Should(Say(fmt.Sprintf("App '%s' not found", secondName)))
 		Eventually(session).Should(Exit(1))
 	})
 

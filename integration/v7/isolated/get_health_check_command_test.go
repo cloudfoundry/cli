@@ -183,7 +183,7 @@ var _ = Describe("get-health-check command", func() {
 				session := helpers.CF("get-health-check", appName)
 
 				Eventually(session).Should(Say(`Getting health check type for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
-				Eventually(session.Err).Should(Say("App %s not found", appName))
+				Eventually(session.Err).Should(Say("App '%s' not found", appName))
 				Eventually(session).Should(Say("FAILED"))
 
 				Eventually(session).Should(Exit(1))

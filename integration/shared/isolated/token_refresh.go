@@ -31,7 +31,7 @@ var _ = Describe("Token Refreshing", func() {
 					When("the cloud controller client encounters an invalid token response", func() {
 						It("refreshes the token", func() {
 							session := helpers.CF("run-task", "app", "'echo banana'")
-							Eventually(session.Err).Should(Say("App app not found"))
+							Eventually(session.Err).Should(Say("App 'app' not found"))
 							Eventually(session).Should(Exit(1))
 						})
 					})
@@ -52,7 +52,7 @@ var _ = Describe("Token Refreshing", func() {
 					When("the cloud controller client encounters an invalid token response", func() {
 						It("refreshes the token", func() {
 							session := helpers.CF("run-task", "app", "'echo banana'")
-							Eventually(session.Err).Should(Say("App app not found"))
+							Eventually(session.Err).Should(Say("App 'app' not found"))
 							Eventually(session).Should(Exit(1))
 						})
 					})
@@ -79,7 +79,7 @@ var _ = Describe("Token Refreshing", func() {
 				When("the cloud controller client encounters an invalid token response", func() {
 					It("refreshes the token", func() {
 						session := helpers.CF("run-task", "app", "'echo banana'")
-						Eventually(session.Err).Should(Say("App app not found"))
+						Eventually(session.Err).Should(Say("App 'app' not found"))
 						Eventually(session).Should(Exit(1))
 					})
 				})

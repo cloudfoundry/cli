@@ -9,7 +9,7 @@ func (e ApplicationNotFoundError) Error() string {
 	if e.GUID != "" {
 		return "Application with GUID {{.GUID}} not found."
 	}
-	return "App {{.AppName}} not found"
+	return "App '{{.AppName}}' not found"
 }
 
 func (e ApplicationNotFoundError) Translate(translate func(string, ...interface{}) string) string {

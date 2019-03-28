@@ -131,7 +131,7 @@ var _ = Describe("v3-zdt-restart command", func() {
 				invalidAppName := helpers.PrefixedRandomName("invalid-app")
 				session := helpers.CF("v3-zdt-restart", invalidAppName)
 
-				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
+				Eventually(session.Err).Should(Say("App '%s' not found", invalidAppName))
 				Eventually(session).Should(Say("FAILED"))
 
 				Eventually(session).Should(Exit(1))

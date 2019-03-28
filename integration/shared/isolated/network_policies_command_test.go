@@ -181,7 +181,7 @@ var _ = Describe("network-policies command", func() {
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Listing network policies of app pineapple in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
-				Eventually(session.Err).Should(Say("App pineapple not found"))
+				Eventually(session.Err).Should(Say("App 'pineapple' not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

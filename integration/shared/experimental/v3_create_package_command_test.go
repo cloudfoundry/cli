@@ -97,7 +97,7 @@ var _ = Describe("v3-create-package command", func() {
 				session := helpers.CF("v3-create-package", appName)
 				userName, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-				Eventually(session.Err).Should(Say("App %s not found", appName))
+				Eventually(session.Err).Should(Say("App '%s' not found", appName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

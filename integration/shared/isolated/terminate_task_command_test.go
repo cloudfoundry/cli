@@ -39,7 +39,7 @@ var _ = Describe("terminate-task command", func() {
 		When("the application does not exist", func() {
 			It("fails to terminate task and outputs an error message", func() {
 				session := helpers.CF("terminate-task", appName, "1")
-				Eventually(session.Err).Should(Say(fmt.Sprintf("App %s not found", appName)))
+				Eventually(session.Err).Should(Say(fmt.Sprintf("App '%s' not found", appName)))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

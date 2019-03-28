@@ -140,7 +140,7 @@ var _ = Describe("add-network-policy command", func() {
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Adding network policy from app pineapple to app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
-				Eventually(session.Err).Should(Say("App pineapple not found"))
+				Eventually(session.Err).Should(Say("App 'pineapple' not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
@@ -152,7 +152,7 @@ var _ = Describe("add-network-policy command", func() {
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Adding network policy from app %s to app pineapple in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
-				Eventually(session.Err).Should(Say("App pineapple not found"))
+				Eventually(session.Err).Should(Say("App 'pineapple' not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

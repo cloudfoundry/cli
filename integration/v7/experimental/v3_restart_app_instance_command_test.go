@@ -85,7 +85,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			It("fails with error", func() {
 				session := helpers.CF("v3-restart-app-instance", appName, "0", "--process", "some-process")
 				Eventually(session).Should(Say("Restarting instance 0 of process some-process of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
-				Eventually(session.Err).Should(Say("App %s not found", appName))
+				Eventually(session.Err).Should(Say("App '%s' not found", appName))
 				Eventually(session).Should(Exit(1))
 			})
 		})

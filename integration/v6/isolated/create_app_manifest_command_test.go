@@ -118,7 +118,7 @@ var _ = Describe("create-app-manifest command", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
 				Eventually(session).Should(Say(`Creating an app manifest from current settings of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("App %s not found", appName))
+				Eventually(session.Err).Should(Say("App '%s' not found", appName))
 
 				Eventually(session).Should(Exit(1))
 			})

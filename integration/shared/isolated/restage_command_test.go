@@ -64,7 +64,7 @@ var _ = Describe("restage command", func() {
 				session := helpers.CF("restage", appName)
 
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("App %s not found", appName))
+				Eventually(session.Err).Should(Say("App '%s' not found", appName))
 				Eventually(session).Should(Exit(1))
 			})
 		})

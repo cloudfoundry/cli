@@ -139,7 +139,7 @@ var _ = Describe("v3-ssh command", func() {
 			It("it displays the app does not exist", func() {
 				session := helpers.CF("v3-ssh", appName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("App %s not found", appName))
+				Eventually(session.Err).Should(Say("App '%s' not found", appName))
 				Eventually(session).Should(Exit(1))
 			})
 		})

@@ -76,7 +76,7 @@ var _ = Describe("v3-packages command", func() {
 				userName, _ = helpers.GetCredentials()
 
 				Eventually(session).Should(Say(`Listing packages of app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
-				Eventually(session.Err).Should(Say("App %s not found", appName))
+				Eventually(session.Err).Should(Say("App '%s' not found", appName))
 				Eventually(session).Should(Say("FAILED"))
 
 				Eventually(session).Should(Exit(1))

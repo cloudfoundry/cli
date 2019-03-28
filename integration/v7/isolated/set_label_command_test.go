@@ -78,7 +78,7 @@ var _ = Describe("set-label command", func() {
 
 		It("displays an error for an unknown app", func() {
 			session := helpers.CF("set-label", "app", "non-existent-app", "some-key=some-value")
-			Eventually(session.Err).Should(Say("App non-existent-app not found"))
+			Eventually(session.Err).Should(Say("App 'non-existent-app' not found"))
 			Eventually(session).Should(Say("FAILED"))
 			Eventually(session).Should(Exit(1))
 		})

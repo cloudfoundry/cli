@@ -57,7 +57,7 @@ var _ = XDescribe("restart command", func() {
 				session := helpers.CF("restart", appName, "0")
 
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("App %s not found", appName))
+				Eventually(session.Err).Should(Say("App '%s' not found", appName))
 				Eventually(session).Should(Exit(1))
 			})
 		})

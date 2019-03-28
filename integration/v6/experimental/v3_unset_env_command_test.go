@@ -138,7 +138,7 @@ var _ = Describe("v3-unset-env command", func() {
 				session := helpers.CF("v3-unset-env", invalidAppName, envVarName)
 
 				Eventually(session).Should(Say(`Removing env variable %s from app %s in org %s / space %s as %s\.\.\.`, envVarName, invalidAppName, orgName, spaceName, userName))
-				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
+				Eventually(session.Err).Should(Say("App '%s' not found", invalidAppName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

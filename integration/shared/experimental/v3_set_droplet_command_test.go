@@ -128,7 +128,7 @@ var _ = Describe("v3-set-droplet command", func() {
 					userName, _ := helpers.GetCredentials()
 
 					Eventually(session).Should(Say(`Setting app %s to droplet %s in org %s / space %s as %s\.\.\.`, invalidAppName, dropletGUID, orgName, spaceName, userName))
-					Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
+					Eventually(session.Err).Should(Say("App '%s' not found", invalidAppName))
 					Eventually(session).Should(Say("FAILED"))
 
 					Eventually(session).Should(Exit(1))

@@ -99,7 +99,7 @@ var _ = Describe("set-env command", func() {
 				session := helpers.CF("set-env", invalidAppName, envVarName, envVarValue)
 
 				Eventually(session).Should(Say(`Setting env variable %s for app %s in org %s / space %s as %s\.\.\.`, envVarName, invalidAppName, orgName, spaceName, userName))
-				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
+				Eventually(session.Err).Should(Say("App '%s' not found", invalidAppName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
