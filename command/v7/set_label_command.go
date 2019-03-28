@@ -50,10 +50,10 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 		return err
 	}
 
+	preFlavoringText := fmt.Sprintf("Setting label(s) for %s {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...", cmd.RequiredArgs.ResourceType)
 	cmd.UI.DisplayTextWithFlavor(
-		"Setting label(s) for {{.ResourceType}} {{.ResourceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.User}}...",
+		preFlavoringText,
 		map[string]interface{}{
-			"ResourceType": cmd.RequiredArgs.ResourceType,
 			"ResourceName": cmd.RequiredArgs.ResourceName,
 			"OrgName":      cmd.Config.TargetedOrganization().Name,
 			"SpaceName":    cmd.Config.TargetedSpace().Name,
