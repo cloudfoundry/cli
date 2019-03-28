@@ -106,7 +106,6 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("RepositoryNameTakenError", RepositoryNameTakenError{}),
 		Entry("RequiredArgumentError", RequiredArgumentError{}),
 		Entry("RequiredFlagsError", RequiredFlagsError{}),
-		Entry("RequiredNameForPushError", RequiredNameForPushError{}),
 		Entry("RouteInDifferentSpaceError", RouteInDifferentSpaceError{}),
 		Entry("RoutePathWithTCPDomainError", RoutePathWithTCPDomainError{}),
 		Entry("RunTaskError", RunTaskError{}),

@@ -69,8 +69,6 @@ func ConvertToTranslatableError(err error) error {
 		return HostAndPathNotAllowedWithTCPDomainError(e)
 	case actionerror.IsolationSegmentNotFoundError:
 		return IsolationSegmentNotFoundError(e)
-	case actionerror.MissingNameError:
-		return RequiredNameForPushError{}
 	case actionerror.MultipleBuildpacksFoundError:
 		return MultipleBuildpacksFoundError(e)
 	case actionerror.NoCompatibleBinaryError:

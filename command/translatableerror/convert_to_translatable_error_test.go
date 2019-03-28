@@ -129,10 +129,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.InvalidTCPRouteSettings{Domain: "some-domain"},
 			HostAndPathNotAllowedWithTCPDomainError{Domain: "some-domain"}),
 
-		Entry("actionerror.MissingNameError -> RequiredNameForPushError",
-			actionerror.MissingNameError{},
-			RequiredNameForPushError{}),
-
 		Entry("actionerror.MultipleBuildpacksFoundError -> MultipleBuildpacksFoundError",
 			actionerror.MultipleBuildpacksFoundError{BuildpackName: "some-bp-name"},
 			MultipleBuildpacksFoundError{BuildpackName: "some-bp-name"}),
