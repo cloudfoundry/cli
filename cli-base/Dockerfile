@@ -6,7 +6,7 @@ RUN go version
 RUN go get golang.org/x/tools/cmd/cover
 
 # used by go-bindata
-RUN go get github.com/jteeuwen/go-bindata
+RUN go get github.com/shuLhan/go-bindata
 
 # used to set the icon when build binaries for windows
 RUN go get github.com/akavel/rsrc
