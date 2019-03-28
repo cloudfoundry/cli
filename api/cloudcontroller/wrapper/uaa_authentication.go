@@ -81,14 +81,19 @@ func (t *UAAAuthentication) Wrap(innerconnection cloudcontroller.Connection) clo
 // refreshToken refreshes the JWT access token if it is expired or about to expire.
 // If the access token is not yet expired, no action is performed.
 func (t *UAAAuthentication) refreshToken() error {
-	expiration := time.Time{}
+	var expiresIn time.Duration
+
 	tokenStr := strings.TrimPrefix(t.cache.AccessToken(), "bearer ")
 	token, err := jws.ParseJWT([]byte(tokenStr))
-	if err == nil {
-		// if the JWT could not be parsed, the empty value of time.Time forces a refresh
-		expiration, _ = token.Claims().Expiration()
+	if err != nil {
+		// if the JWT could not be parsed, force a refresh
+		expiresIn = 0
+	} else {
+		expiration, _ := token.Claims().Expiration()
+		expiresIn = expiration.Sub(time.Now())
 	}
-	if expiration.Sub(time.Now()) < accessTokenExpirationMargin {
+
+	if expiresIn < accessTokenExpirationMargin {
 		tokens, err := t.client.RefreshAccessToken(t.cache.RefreshToken())
 		if err != nil {
 			return err
