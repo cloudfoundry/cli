@@ -848,8 +848,7 @@ var _ = Describe("CLI SSH", func() {
 
 			echoHandler = new(fake_server.FakeConnectionHandler)
 			echoHandler.HandleConnectionStub = func(conn net.Conn) {
-				_, err = io.Copy(conn, conn)
-				Expect(err).ToNot(HaveOccurred())
+				io.Copy(conn, conn)
 				conn.Close()
 			}
 
@@ -866,8 +865,7 @@ var _ = Describe("CLI SSH", func() {
 			fakeLocalListener.AcceptReturns(nil, errors.New("Not Accepting Connections"))
 
 			echoServer = server.NewServer(logger.Session("echo"), "", echoHandler)
-			err = echoServer.SetListener(echoListener)
-			Expect(err).NotTo(HaveOccurred())
+			echoServer.SetListener(echoListener)
 			go echoServer.Serve()
 
 			forwardSpecs = []LocalPortForward{{

@@ -187,8 +187,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 		When("the user enters 'y'", func() {
 			BeforeEach(func() {
-				_, err := buffer.Write([]byte("y\n"))
-				Expect(err).ToNot(HaveOccurred())
+				buffer.Write([]byte("y\n"))
 			})
 
 			It("deletes the buildpack", func() {
@@ -201,8 +200,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 		When("the user enters 'n'", func() {
 			BeforeEach(func() {
-				_, err := buffer.Write([]byte("n\n"))
-				Expect(err).ToNot(HaveOccurred())
+				buffer.Write([]byte("n\n"))
 			})
 
 			It("does not delete the buildpack", func() {
@@ -218,8 +216,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 		When("the user enters the default input (hits return)", func() {
 			BeforeEach(func() {
-				_, err := buffer.Write([]byte("\n"))
-				Expect(err).ToNot(HaveOccurred())
+				buffer.Write([]byte("\n"))
 			})
 
 			It("does not delete the buildpack", func() {

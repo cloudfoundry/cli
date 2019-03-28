@@ -517,8 +517,7 @@ var _ = Describe("install-plugin command", func() {
 				When("the user says yes", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
-						_, err := buffer.Write([]byte("y\n"))
-						Expect(err).ToNot(HaveOccurred())
+						_, _ = buffer.Write([]byte("y\n"))
 					})
 
 					It("installs the plugin", func() {
@@ -566,8 +565,7 @@ var _ = Describe("install-plugin command", func() {
 				When("the user says no", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
-						_, err := buffer.Write([]byte("n\n"))
-						Expect(err).ToNot(HaveOccurred())
+						_, _ = buffer.Write([]byte("n\n"))
 					})
 
 					It("does not install the plugin", func() {
@@ -603,8 +601,7 @@ var _ = Describe("install-plugin command", func() {
 				When("the user interrupts with control-c", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
-						_, err := buffer.Write([]byte("y")) // but not enter
-						Expect(err).ToNot(HaveOccurred())
+						_, _ = buffer.Write([]byte("y")) // but not enter
 					})
 
 					It("does not install the plugin and does not create a bad state", func() {
@@ -830,8 +827,7 @@ var _ = Describe("install-plugin command", func() {
 			When("the user says yes", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					_, err := buffer.Write([]byte("y\n"))
-					Expect(err).ToNot(HaveOccurred())
+					_, _ = buffer.Write([]byte("y\n"))
 				})
 
 				It("installs the plugin", func() {
@@ -877,8 +873,7 @@ var _ = Describe("install-plugin command", func() {
 			When("the user says no", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					_, err := buffer.Write([]byte("n\n"))
-					Expect(err).ToNot(HaveOccurred())
+					_, _ = buffer.Write([]byte("n\n"))
 				})
 
 				It("does not install the plugin", func() {
@@ -898,8 +893,7 @@ var _ = Describe("install-plugin command", func() {
 			When("the user interrupts with control-c", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					_, err := buffer.Write([]byte("y")) // but not enter
-					Expect(err).ToNot(HaveOccurred())
+					_, _ = buffer.Write([]byte("y")) // but not enter
 				})
 
 				It("does not install the plugin and does not create a bad state", func() {

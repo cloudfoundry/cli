@@ -161,12 +161,9 @@ var _ = Describe("ssh command", func() {
 
 						When("using default tty option (auto)", func() {
 							It("the remote shell is not TTY", func() {
-								_, err := buffer.Write([]byte("tty\n"))
-								Expect(err).ToNot(HaveOccurred())
-								_, err = buffer.Write([]byte("echo hello\n"))
-								Expect(err).ToNot(HaveOccurred())
-								_, err = buffer.Write([]byte("exit\n"))
-								Expect(err).ToNot(HaveOccurred())
+								buffer.Write([]byte("tty\n"))
+								buffer.Write([]byte("echo hello\n"))
+								buffer.Write([]byte("exit\n"))
 								session := helpers.CFWithStdin(buffer, "ssh", appName)
 								Eventually(session).Should(Say("not a tty"))
 								Eventually(session).Should(Exit(0))
@@ -175,15 +172,9 @@ var _ = Describe("ssh command", func() {
 
 						When("disable-pseudo-tty is specified", func() {
 							It("the remote shell is not TTY", func() {
-								_, err := buffer.Write([]byte("tty\n"))
-								Expect(err).ToNot(HaveOccurred())
-
-								_, err = buffer.Write([]byte("echo hello\n"))
-								Expect(err).ToNot(HaveOccurred())
-
-								_, err = buffer.Write([]byte("exit\n"))
-								Expect(err).ToNot(HaveOccurred())
-
+								buffer.Write([]byte("tty\n"))
+								buffer.Write([]byte("echo hello\n"))
+								buffer.Write([]byte("exit\n"))
 								session := helpers.CFWithStdin(buffer, "ssh", appName, "--disable-pseudo-tty")
 								Eventually(session).Should(Say("not a tty"))
 								Eventually(session).Should(Exit(0))

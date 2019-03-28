@@ -295,8 +295,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					When("the user says yes", func() {
 						BeforeEach(func() {
-							_, err := buffer.Write([]byte("y\n"))
-							Expect(err).ToNot(HaveOccurred())
+							_, _ = buffer.Write([]byte("y\n"))
 						})
 
 						It("installs the plugin", func() {
@@ -318,8 +317,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					When("the user says no", func() {
 						BeforeEach(func() {
-							_, err := buffer.Write([]byte("n\n"))
-							Expect(err).ToNot(HaveOccurred())
+							_, _ = buffer.Write([]byte("n\n"))
 						})
 
 						It("does not install the plugin", func() {
@@ -349,8 +347,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					When("the user chooses yes", func() {
 						BeforeEach(func() {
-							_, err := buffer.Write([]byte("y\n"))
-							Expect(err).ToNot(HaveOccurred())
+							_, _ = buffer.Write([]byte("y\n"))
 						})
 
 						When("the plugin checksum is valid", func() {
@@ -420,8 +417,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 							repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
 							Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 
-							_, err := buffer.Write([]byte("n\n"))
-							Expect(err).ToNot(HaveOccurred())
+							_, _ = buffer.Write([]byte("n\n"))
 						})
 
 						AfterEach(func() {
@@ -747,8 +743,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 					When("the plugin is not already installed", func() {
 						When("the user says yes", func() {
 							BeforeEach(func() {
-								_, err := buffer.Write([]byte("y\n"))
-								Expect(err).ToNot(HaveOccurred())
+								_, _ = buffer.Write([]byte("y\n"))
 							})
 
 							When("the checksum is valid", func() {
@@ -801,8 +796,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 						When("the user says no", func() {
 							BeforeEach(func() {
-								_, err := buffer.Write([]byte("n\n"))
-								Expect(err).ToNot(HaveOccurred())
+								_, _ = buffer.Write([]byte("n\n"))
 							})
 
 							It("does not install the plugin", func() {
@@ -828,8 +822,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 						When("the user says yes", func() {
 							BeforeEach(func() {
-								_, err := buffer.Write([]byte("y\n"))
-								Expect(err).ToNot(HaveOccurred())
+								_, _ = buffer.Write([]byte("y\n"))
 							})
 
 							When("the checksum is valid", func() {
@@ -858,8 +851,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 						When("the user says no", func() {
 							BeforeEach(func() {
-								_, err := buffer.Write([]byte("n\n"))
-								Expect(err).ToNot(HaveOccurred())
+								_, _ = buffer.Write([]byte("n\n"))
 							})
 
 							It("does not install the plugin", func() {

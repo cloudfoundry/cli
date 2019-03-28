@@ -81,8 +81,7 @@ var _ = Describe("delete command", func() {
 
 				When("the user enters 'y'", func() {
 					BeforeEach(func() {
-						_, err := buffer.Write([]byte("y\n"))
-						Expect(err).ToNot(HaveOccurred())
+						buffer.Write([]byte("y\n"))
 					})
 
 					It("it displays the app does not exist", func() {
@@ -98,8 +97,7 @@ var _ = Describe("delete command", func() {
 
 				When("the user enters 'n'", func() {
 					BeforeEach(func() {
-						_, err := buffer.Write([]byte("n\n"))
-						Expect(err).ToNot(HaveOccurred())
+						buffer.Write([]byte("n\n"))
 					})
 
 					It("does not delete the app", func() {
@@ -112,8 +110,7 @@ var _ = Describe("delete command", func() {
 
 				When("the user enters the default input (hits return)", func() {
 					BeforeEach(func() {
-						_, err := buffer.Write([]byte("\n"))
-						Expect(err).ToNot(HaveOccurred())
+						buffer.Write([]byte("\n"))
 					})
 
 					It("does not delete the app", func() {
@@ -129,8 +126,7 @@ var _ = Describe("delete command", func() {
 						// The second '\n' is intentional. Otherwise the buffer will be
 						// closed while the interaction is still waiting for input; it gets
 						// an EOF and causes an error.
-						_, err := buffer.Write([]byte("wat\n\n"))
-						Expect(err).ToNot(HaveOccurred())
+						buffer.Write([]byte("wat\n\n"))
 					})
 
 					It("asks again", func() {
