@@ -134,6 +134,157 @@ var _ = Describe("marketplace Command", func() {
 			})
 		})
 
+		Context("and the -s and --no-plans flags are passed", func() {
+			BeforeEach(func() {
+				cmd.ServiceName = "service-a"
+				cmd.NoPlans = true
+			})
+
+			When("a service exists that has has multiple plans", func() {
+				BeforeEach(func() {
+					serviceSummary := v2action.ServiceSummary{
+						Service: v2action.Service{
+							Label:       "service-a",
+							Description: "fake service",
+						},
+						Plans: []v2action.ServicePlanSummary{
+							{
+								ServicePlan: v2action.ServicePlan{
+									Name:        "plan-a",
+									Description: "plan-a-description",
+									Free:        false,
+								},
+							},
+							{
+								ServicePlan: v2action.ServicePlan{
+									Name:        "plan-b",
+									Description: "plan-b-description",
+									Free:        true,
+								},
+							},
+						},
+					}
+
+					fakeActor.GetServiceSummaryByNameReturns(serviceSummary, v2action.Warnings{"warning"}, nil)
+				})
+
+				It("outputs a header", func() {
+					Expect(testUI.Out).To(Say("Getting service plan information for service service-a\\.\\.\\."))
+				})
+
+				It("outputs OK", func() {
+					Expect(testUI.Out).To(Say("OK"))
+				})
+
+				It("outputs details about the specific service", func() {
+					Expect(testUI.Out).Should(Say(
+						"service plan\\s+description\\s+free or paid\n" +
+							"plan-a\\s+plan-a-description\\s+paid" +
+							"\nplan-b\\s+plan-b-description\\s+free"))
+				})
+
+				It("outputs any warnings", func() {
+					Expect(testUI.Err).To(Say("warning"))
+				})
+			})
+
+			When("there is an error getting the service", func() {
+				BeforeEach(func() {
+					fakeActor.GetServiceSummaryByNameReturns(v2action.ServiceSummary{}, v2action.Warnings{"warning"}, errors.New("oops"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError("oops"))
+				})
+
+				It("outputs any warnings", func() {
+					Expect(testUI.Err).To(Say("warning"))
+				})
+			})
+		})
+
+		When("--no-plans is passed", func() {
+			BeforeEach(func() {
+				cmd.NoPlans = true
+			})
+
+			When("there are no services available", func() {
+				BeforeEach(func() {
+					fakeActor.GetServicesSummariesReturns([]v2action.ServiceSummary{}, v2action.Warnings{}, nil)
+				})
+
+				It("outputs a header", func() {
+					Expect(testUI.Out).To(Say("Getting all services from marketplace\\.\\.\\."))
+				})
+
+				It("outputs OK", func() {
+					Expect(testUI.Out).To(Say("OK"))
+				})
+
+				It("outputs that none are available", func() {
+					Expect(testUI.Out).To(Say("No service offerings found"))
+				})
+			})
+
+			When("there are multiple services available", func() {
+				BeforeEach(func() {
+					servicesSummaries := []v2action.ServiceSummary{
+						{
+							Service: v2action.Service{
+								Label:             "service-a",
+								Description:       "fake service-a",
+								ServiceBrokerName: "broker-a",
+							},
+							Plans: []v2action.ServicePlanSummary{
+								{
+									ServicePlan: v2action.ServicePlan{Name: "plan-a"},
+								},
+								{
+									ServicePlan: v2action.ServicePlan{Name: "plan-b"},
+								},
+							},
+						},
+						{
+							Service: v2action.Service{
+								Label:             "service-b",
+								Description:       "fake service-b",
+								ServiceBrokerName: "broker-b",
+							},
+							Plans: []v2action.ServicePlanSummary{
+								{
+									ServicePlan: v2action.ServicePlan{Name: "plan-c"},
+								},
+							},
+						},
+					}
+
+					fakeActor.GetServicesSummariesReturns(servicesSummaries, v2action.Warnings{"warning"}, nil)
+				})
+
+				It("outputs a header", func() {
+					Expect(testUI.Out).To(Say("Getting all services from marketplace\\.\\.\\."))
+				})
+
+				It("outputs OK", func() {
+					Expect(testUI.Out).To(Say("OK"))
+				})
+
+				It("outputs available services and plans", func() {
+					Expect(testUI.Out).Should(Say("service\\s+description\\s+broker\n" +
+						"service-a\\s+fake service-a\\s+broker-a\n" +
+						"service-b\\s+fake service-b\\s+broker-b"))
+				})
+
+				It("outputs a tip to use the -s flag", func() {
+					Expect(testUI.Out).To(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
+				})
+
+				It("outputs any warnings", func() {
+					Expect(testUI.Err).To(Say("warning"))
+				})
+			})
+		})
+
 		When("there are no flags passed", func() {
 			When("there are no services available", func() {
 				BeforeEach(func() {
@@ -359,6 +510,157 @@ var _ = Describe("marketplace Command", func() {
 
 					It("returns the error", func() {
 						Expect(executeErr).To(MatchError("oops"))
+					})
+
+					It("outputs any warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+					})
+				})
+			})
+
+			When("the -s and --no-plans flags are passed", func() {
+				BeforeEach(func() {
+					cmd.ServiceName = "service-a"
+					cmd.NoPlans = true
+				})
+
+				When("a service exists that has has multiple plans", func() {
+					BeforeEach(func() {
+						serviceSummary := v2action.ServiceSummary{
+							Service: v2action.Service{
+								Label:       "service-a",
+								Description: "fake service",
+							},
+							Plans: []v2action.ServicePlanSummary{
+								{
+									ServicePlan: v2action.ServicePlan{
+										Name:        "plan-a",
+										Description: "plan-a-description",
+										Free:        false,
+									},
+								},
+								{
+									ServicePlan: v2action.ServicePlan{
+										Name:        "plan-b",
+										Description: "plan-b-description",
+										Free:        true,
+									},
+								},
+							},
+						}
+
+						fakeActor.GetServiceSummaryForSpaceByNameReturns(serviceSummary, v2action.Warnings{"warning"}, nil)
+					})
+
+					It("outputs a header", func() {
+						Expect(testUI.Out).To(Say("Getting service plan information for service service-a as user-a\\.\\.\\."))
+					})
+
+					It("outputs OK", func() {
+						Expect(testUI.Out).To(Say("OK"))
+					})
+
+					It("outputs details about the specific service", func() {
+						Expect(testUI.Out).Should(Say(
+							"service plan\\s+description\\s+free or paid\n" +
+								"plan-a\\s+plan-a-description\\s+paid" +
+								"\nplan-b\\s+plan-b-description\\s+free"))
+					})
+
+					It("outputs any warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+					})
+				})
+
+				When("there is an error getting the service", func() {
+					BeforeEach(func() {
+						fakeActor.GetServiceSummaryForSpaceByNameReturns(v2action.ServiceSummary{}, v2action.Warnings{"warning"}, errors.New("oops"))
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError("oops"))
+					})
+
+					It("outputs any warnings", func() {
+						Expect(testUI.Err).To(Say("warning"))
+					})
+				})
+			})
+
+			When("--no-plans is passed", func() {
+				BeforeEach(func() {
+					cmd.NoPlans = true
+				})
+
+				When("there are no services available", func() {
+					BeforeEach(func() {
+						fakeActor.GetServicesSummariesReturns([]v2action.ServiceSummary{}, v2action.Warnings{}, nil)
+					})
+
+					It("outputs a header", func() {
+						Expect(testUI.Out).To(Say("Getting services from marketplace in org org-a / space space-a as user-a\\.\\.\\."))
+					})
+
+					It("outputs OK", func() {
+						Expect(testUI.Out).To(Say("OK"))
+					})
+
+					It("outputs that none are available", func() {
+						Expect(testUI.Out).To(Say("No service offerings found"))
+					})
+				})
+
+				When("there are multiple services available", func() {
+					BeforeEach(func() {
+						servicesSummaries := []v2action.ServiceSummary{
+							{
+								Service: v2action.Service{
+									Label:             "service-a",
+									Description:       "fake service-a",
+									ServiceBrokerName: "broker-a",
+								},
+								Plans: []v2action.ServicePlanSummary{
+									{
+										ServicePlan: v2action.ServicePlan{Name: "plan-a"},
+									},
+									{
+										ServicePlan: v2action.ServicePlan{Name: "plan-b"},
+									},
+								},
+							},
+							{
+								Service: v2action.Service{
+									Label:             "service-b",
+									Description:       "fake service-b",
+									ServiceBrokerName: "broker-b",
+								},
+								Plans: []v2action.ServicePlanSummary{
+									{
+										ServicePlan: v2action.ServicePlan{Name: "plan-c"},
+									},
+								},
+							},
+						}
+
+						fakeActor.GetServicesSummariesForSpaceReturns(servicesSummaries, v2action.Warnings{"warning"}, nil)
+					})
+
+					It("outputs a header", func() {
+						Expect(testUI.Out).To(Say("Getting services from marketplace in org org-a / space space-a as user-a\\.\\.\\."))
+					})
+
+					It("outputs OK", func() {
+						Expect(testUI.Out).To(Say("OK"))
+					})
+
+					It("outputs available services and plans", func() {
+						Expect(testUI.Out).Should(Say("service\\s+description\\s+broker\n" +
+							"service-a\\s+fake service-a\\s+broker-a\n" +
+							"service-b\\s+fake service-b\\s+broker-b"))
+					})
+
+					It("outputs a tip to use the -s flag", func() {
+						Expect(testUI.Out).To(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
 					})
 
 					It("outputs any warnings", func() {
