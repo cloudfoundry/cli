@@ -49,7 +49,7 @@ type AsyncResource struct {
 type apiErrorHandler func(statusCode int, body []byte) error
 
 type tokenRefresher interface {
-	RefreshAuthToken() (string, error)
+	RefreshToken(token string) (string, error)
 }
 
 type Request struct {
@@ -362,33 +362,22 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (*http.Response, 
 		httpReq.Body = ioutil.NopCloser(request.SeekableBody)
 	}
 
+	if gateway.authenticator != nil {
+		authHeader := request.HTTPReq.Header.Get("Authorization")
+		// in case the request is purposefully unauthenticated (invocation without prior login)
+		// do not attempt to refresh the token (it does not exist)
+		if authHeader != "" {
+			token, err := gateway.authenticator.RefreshToken(authHeader)
+			if err != nil {
+				return nil, err
+			}
+			// if the token has not been refreshed, token is equivalent to the previously set header value
+			httpReq.Header.Set("Authorization", token)
+		}
+	}
+
 	// perform request
-	rawResponse, err := gateway.doRequestAndHandlerError(request)
-	if err == nil || gateway.authenticator == nil {
-		return rawResponse, err
-	}
-
-	switch err.(type) {
-	case *errors.InvalidTokenError:
-		// refresh the auth token
-		var newToken string
-		newToken, err = gateway.authenticator.RefreshAuthToken()
-		if err != nil {
-			return rawResponse, err
-		}
-
-		// reset the auth token and request body
-		httpReq.Header.Set("Authorization", newToken)
-		if request.SeekableBody != nil {
-			_, _ = request.SeekableBody.Seek(0, 0)
-			httpReq.Body = ioutil.NopCloser(request.SeekableBody)
-		}
-
-		// make the request again
-		rawResponse, err = gateway.doRequestAndHandlerError(request)
-	}
-
-	return rawResponse, err
+	return gateway.doRequestAndHandlerError(request)
 }
 
 func (gateway Gateway) doRequestAndHandlerError(request *Request) (*http.Response, error) {
