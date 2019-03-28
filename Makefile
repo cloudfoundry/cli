@@ -67,7 +67,7 @@ fly-windows-units:
 	fly -t ci execute -c ci/cli/tasks/units-windows.yml -i cli=./ -i cli-ci=./ --tag "cli-windows"
 
 golangci-lint:
-    golangci-lint run
+	golangci-lint run
 
 integration-cleanup:
 	$(PWD)/bin/cleanup-integration
