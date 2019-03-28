@@ -1,0 +1,26 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundry/capi
+    tag: bosh-lite
+
+inputs:
+  - name: cli
+  - name: env-pool
+
+outputs:
+  - name: updated-env-pool
+
+run:
+  path: cli/ci/cli-dev-bosh-lite/tasks/check-pool-size.sh
+
+params:
+  POOL_NAME: ""
+  BUILDING_POOL_NAME: ""
+  MIN_UNCLAIMED_COUNT: ""
+  GIT_USERNAME: ""
+  GIT_EMAIL: ""
+  TRIGGER_FILE_NAME: ""
