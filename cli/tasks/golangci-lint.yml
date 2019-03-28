@@ -1,0 +1,34 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
+
+inputs:
+- name: cli
+  path: gopath/src/code.cloudfoundry.org/cli
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e
+
+    export GOPATH=$PWD/gopath
+    export PATH=$GOPATH/bin:$PATH
+
+
+    export LC_ALL="en_US.UTF-8"
+    export GOLANGCI_LINT_VERSION="1.15.0"
+
+    go version
+
+
+    cd $GOPATH/src/code.cloudfoundry.org/cli
+    golangci-lint --version
+    golangci-lint run -v
+
+    exit 0
