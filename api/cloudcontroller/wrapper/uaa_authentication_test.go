@@ -95,9 +95,13 @@ var _ = Describe("UAA Authentication", func() {
 
 		When("the access token is valid", func() {
 			var (
-				accessToken = buildTokenString(time.Now().AddDate(0, 0, 1))
+				accessToken string
 			)
+
 			BeforeEach(func() {
+				var err error
+				accessToken, err = buildTokenString(time.Now().AddDate(0, 0, 1))
+				Expect(err).ToNot(HaveOccurred())
 				inMemoryCache.SetAccessToken(accessToken)
 			})
 
@@ -150,16 +154,22 @@ var _ = Describe("UAA Authentication", func() {
 
 		When("the access token is expired", func() {
 			var (
-				expectedBody string
-				request      *cloudcontroller.Request
-				executeErr   error
+				expectedBody       string
+				request            *cloudcontroller.Request
+				executeErr         error
+				invalidAccessToken string
+				newAccessToken     string
+				newRefreshToken    string
 			)
 
-			invalidAccessToken := buildTokenString(time.Time{})
-			newAccessToken := buildTokenString(time.Now().AddDate(0, 1, 1))
-			newRefreshToken := "newRefreshToken"
-
 			BeforeEach(func() {
+				var err error
+				invalidAccessToken, err = buildTokenString(time.Time{})
+				Expect(err).ToNot(HaveOccurred())
+				newAccessToken, err = buildTokenString(time.Now().AddDate(0, 1, 1))
+				Expect(err).ToNot(HaveOccurred())
+				newRefreshToken = "newRefreshToken"
+
 				expectedBody = "this body content should be preserved"
 				body := strings.NewReader(expectedBody)
 				request = cloudcontroller.NewRequest(&http.Request{
@@ -207,10 +217,10 @@ var _ = Describe("UAA Authentication", func() {
 	})
 })
 
-func buildTokenString(expiration time.Time) string {
+func buildTokenString(expiration time.Time) (string, error) {
 	c := jws.Claims{}
 	c.SetExpiration(expiration)
 	token := jws.NewJWT(c, crypto.Unsecured)
-	tokenBytes, _ := token.Serialize(nil)
-	return string(tokenBytes)
+	tokenBytes, err := token.Serialize(nil)
+	return string(tokenBytes), err
 }

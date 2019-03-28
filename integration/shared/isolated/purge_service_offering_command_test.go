@@ -137,7 +137,8 @@ var _ = Describe("purge-service-offering command", func() {
 
 				When("the user enters 'y'", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("y\n"))
+						_, err := buffer.Write([]byte("y\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("purges the service offering, asking for confirmation", func() {
@@ -158,7 +159,8 @@ var _ = Describe("purge-service-offering command", func() {
 
 				When("the user enters something other than 'y' or 'yes'", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("wat\n\n"))
+						_, err := buffer.Write([]byte("wat\n\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("asks again", func() {
@@ -174,7 +176,8 @@ var _ = Describe("purge-service-offering command", func() {
 
 				When("the user enters 'n' or 'no'", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("n\n"))
+						_, err := buffer.Write([]byte("n\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("does not purge the service offering", func() {
@@ -247,7 +250,8 @@ var _ = Describe("purge-service-offering command", func() {
 						helpers.SkipIfVersionLessThan(ccversion.MinVersionMultiServiceRegistrationV2)
 
 						buffer = NewBuffer()
-						buffer.Write([]byte("y\n"))
+						_, err := buffer.Write([]byte("y\n"))
+						Expect(err).ToNot(HaveOccurred())
 						orgName = helpers.NewOrgName()
 						spaceName = helpers.NewSpaceName()
 						helpers.SetupCF(orgName, spaceName)

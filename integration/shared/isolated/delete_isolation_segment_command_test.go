@@ -96,7 +96,8 @@ var _ = Describe("delete-isolation-segment command", func() {
 
 				When("using the default value", func() {
 					BeforeEach(func() {
-						buffer.Write([]byte("\n"))
+						_, err := buffer.Write([]byte("\n"))
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					It("cancels the deletion", func() {

@@ -234,6 +234,7 @@ GO_VERSION=$$(go version)
 vet: ## Run go vet
 	@echo  "Vetting packages for potential issues..."
 	go vet -all  ./api/... ./actor/... ./command ./integration/... ./types ./util ./version
+	golangci-lint run
 	@echo
 
 .PHONY: all build clean format version vet lint

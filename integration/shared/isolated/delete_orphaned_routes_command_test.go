@@ -147,7 +147,8 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			When("the user inputs y", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					buffer.Write([]byte("y\n"))
+					_, err := buffer.Write([]byte("y\n"))
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				It("deletes the orphaned routes", func() {
@@ -163,7 +164,8 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			When("the user inputs n", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					buffer.Write([]byte("n\n"))
+					_, err := buffer.Write([]byte("n\n"))
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				It("exits without deleting the orphaned routes", func() {
