@@ -1,7 +1,7 @@
 package translatableerror
 
-// ArgumentCombinationError represent an error caused by using two command line
-// arguments that cannot be used together.
+// AppNameOrManifestRequiredError represent an error caused by using two
+// command line arguments that cannot be used together.
 type AppNameOrManifestRequiredError struct {
 	Args []string
 }
