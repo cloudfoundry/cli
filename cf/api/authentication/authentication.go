@@ -31,6 +31,7 @@ type Repository interface {
 	net.RequestDumperInterface
 
 	RefreshAuthToken() (updatedToken string, apiErr error)
+	RefreshToken(token string) (updatedToken string, apiErr error)
 	Authenticate(credentials map[string]string) (apiErr error)
 	Authorize(token string) (string, error)
 	GetLoginPromptsAndSaveUAAServerURL() (map[string]coreconfig.AuthPrompt, error)
@@ -185,14 +186,18 @@ func (uaa UAARepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[strin
 }
 
 func (uaa UAARepository) RefreshAuthToken() (string, error) {
-	tokenStr := strings.TrimPrefix(uaa.config.AccessToken(), "bearer ")
+	return uaa.RefreshToken(uaa.config.AccessToken())
+}
+
+func (uaa UAARepository) RefreshToken(t string) (string, error) {
+	tokenStr := strings.TrimPrefix(t, "bearer ")
 	token, err := jws.ParseJWT([]byte(tokenStr))
 	if err != nil {
 		return "", err
 	}
 	expiration, _ := token.Claims().Expiration()
 	if expiration.Sub(time.Now()) > accessTokenExpirationMargin {
-		return uaa.config.AccessToken(), nil
+		return t, nil
 	}
 
 	data := url.Values{}

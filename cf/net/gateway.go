@@ -49,7 +49,7 @@ type AsyncResource struct {
 type apiErrorHandler func(statusCode int, body []byte) error
 
 type tokenRefresher interface {
-	RefreshAuthToken() (string, error)
+	RefreshToken(token string) (string, error)
 }
 
 type Request struct {
@@ -363,10 +363,11 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (*http.Response, 
 	}
 
 	if gateway.authenticator != nil {
+		authHeader := request.HTTPReq.Header.Get("Authorization")
 		// in case the request is purposefully unauthenticated (invocation without prior login)
 		// do not attempt to refresh the token (it does not exist)
-		if request.HTTPReq.Header.Get("Authorization") != "" {
-			token, err := gateway.authenticator.RefreshAuthToken()
+		if authHeader != "" {
+			token, err := gateway.authenticator.RefreshToken(authHeader)
 			if err != nil {
 				return nil, err
 			}
