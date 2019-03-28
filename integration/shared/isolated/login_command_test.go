@@ -157,7 +157,8 @@ var _ = Describe("login command", func() {
 			When("the user does not provide the -a flag", func() {
 				It("prompts the user for an endpoint", func() {
 					input := NewBuffer()
-					input.Write([]byte("\n"))
+					_, err := input.Write([]byte("\n"))
+					Expect(err).ToNot(HaveOccurred())
 					session := helpers.CFWithStdin(input, "login")
 					Eventually(session).Should(Say("API endpoint:"))
 					session.Interrupt()
@@ -167,7 +168,8 @@ var _ = Describe("login command", func() {
 				When("the API endpoint provided at the prompt is unreachable", func() {
 					It("returns an error", func() {
 						input := NewBuffer()
-						input.Write([]byte("does.not.exist\n"))
+						_, err := input.Write([]byte("does.not.exist\n"))
+						Expect(err).ToNot(HaveOccurred())
 						session := helpers.CFWithStdin(input, "login")
 						Eventually(session).Should(Say("API endpoint:"))
 						Eventually(session).Should(Say("FAILED"))
@@ -381,7 +383,8 @@ var _ = Describe("login command", func() {
 			Context("and the provided passcode is incorrect", func() {
 				It("prompts twice, displays an error and fails", func() {
 					input := NewBuffer()
-					input.Write([]byte("bad-passcode-again\nbad-passcode-strikes-back\n"))
+					_, err := input.Write([]byte("bad-passcode-again\nbad-passcode-strikes-back\n"))
+					Expect(err).ToNot(HaveOccurred())
 					session := helpers.CFWithStdin(input, "login", "--sso-passcode", "some-passcode")
 					Eventually(session).Should(Say("API endpoint:\\s+" + helpers.GetAPI()))
 					Eventually(session).Should(Say(`Authenticating\.\.\.`))
@@ -474,7 +477,8 @@ var _ = Describe("login command", func() {
 				When("user selects an organization by using numbered list", func() {
 					It("prompt the user for org and target the selected org", func() {
 						input := NewBuffer()
-						input.Write([]byte("1\n"))
+						_, err := input.Write([]byte("1\n"))
+						Expect(err).ToNot(HaveOccurred())
 						var session *Session
 						if skipSSLValidation {
 							session = helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
@@ -495,7 +499,8 @@ var _ = Describe("login command", func() {
 					When("the user selects a number greater than the number of orgs", func() {
 						It("prompts the user until a valid number is entered", func() {
 							input := NewBuffer()
-							input.Write([]byte("3\n"))
+							_, err := input.Write([]byte("3\n"))
+							Expect(err).ToNot(HaveOccurred())
 
 							session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password)
 
@@ -511,7 +516,8 @@ var _ = Describe("login command", func() {
 				When("user selects an organization by org name", func() {
 					It("prompt the user for org and target the selected org", func() {
 						input := NewBuffer()
-						input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
+						_, err := input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
+						Expect(err).ToNot(HaveOccurred())
 
 						var session *Session
 						if skipSSLValidation {
@@ -531,7 +537,8 @@ var _ = Describe("login command", func() {
 				When("user does not select an organization", func() {
 					It("succesfully logs in but does not target any org", func() {
 						input := NewBuffer()
-						input.Write([]byte("\n"))
+						_, err := input.Write([]byte("\n"))
+						Expect(err).ToNot(HaveOccurred())
 
 						var session *Session
 						if skipSSLValidation {
@@ -552,7 +559,8 @@ var _ = Describe("login command", func() {
 					It("displays an error message and does not target the org", func() {
 						orgName = "invalid-org"
 						input := NewBuffer()
-						input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
+						_, err := input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
+						Expect(err).ToNot(HaveOccurred())
 
 						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
 						Eventually(session).Should(Exit(1))
@@ -696,7 +704,8 @@ var _ = Describe("login command", func() {
 			When("the -s flag is not passed", func() {
 				It("prompts the user to pick their space by list position", func() {
 					input := NewBuffer()
-					input.Write([]byte("1\n"))
+					_, err := input.Write([]byte("1\n"))
+					Expect(err).ToNot(HaveOccurred())
 
 					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
 					Eventually(session).Should(Exit(0))
@@ -711,7 +720,8 @@ var _ = Describe("login command", func() {
 
 				It("reprompts the user if an invalid number is entered", func() {
 					input := NewBuffer()
-					input.Write([]byte("4\n"))
+					_, err := input.Write([]byte("4\n"))
+					Expect(err).ToNot(HaveOccurred())
 
 					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
 					Eventually(session).Should(Say(regexp.QuoteMeta("Select a space (or press enter to skip):")))
@@ -722,7 +732,8 @@ var _ = Describe("login command", func() {
 
 				It("prompts the user to pick their space by name", func() {
 					input := NewBuffer()
-					input.Write([]byte(spaceName + "\n"))
+					_, err := input.Write([]byte(spaceName + "\n"))
+					Expect(err).ToNot(HaveOccurred())
 
 					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
 					Eventually(session).Should(Exit(0))
@@ -734,7 +745,8 @@ var _ = Describe("login command", func() {
 
 				It("allows the user to skip picking a space", func() {
 					input := NewBuffer()
-					input.Write([]byte(" \n"))
+					_, err := input.Write([]byte(" \n"))
+					Expect(err).ToNot(HaveOccurred())
 
 					session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
 					Eventually(session).Should(Exit(0))
@@ -751,7 +763,8 @@ var _ = Describe("login command", func() {
 
 					It("the command fails and displays an error message. It does not target the space.", func() {
 						input := NewBuffer()
-						input.Write([]byte(spaceName + "\n"))
+						_, err := input.Write([]byte(spaceName + "\n"))
+						Expect(err).ToNot(HaveOccurred())
 
 						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL, "--skip-ssl-validation")
 						Eventually(session).Should(Exit(1))
@@ -801,12 +814,14 @@ var _ = Describe("login command", func() {
 
 			It("displays a helpful error", func() {
 				input := NewBuffer()
-				input.Write([]byte("garbage\ngarbage\ngarbage\n"))
+				_, err := input.Write([]byte("garbage\ngarbage\ngarbage\n"))
+				Expect(err).ToNot(HaveOccurred())
 				session := helpers.CFWithStdin(input, "login", "-u", username)
 				Eventually(session).Should(Exit(1))
 
 				input = NewBuffer()
-				input.Write([]byte("garbage\ngarbage\ngarbage\n"))
+				_, err := input.Write([]byte("garbage\ngarbage\ngarbage\n"))
+				Expect(err).ToNot(HaveOccurred())
 				session = helpers.CFWithStdin(input, "login", "-u", username)
 				Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
 				Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
@@ -832,7 +847,8 @@ var _ = Describe("login command", func() {
 			It("prompts the user for their email and logs in successfully", func() {
 				username, password := helpers.GetCredentials()
 				input := NewBuffer()
-				input.Write([]byte(username + "\n"))
+				_, err := input.Write([]byte(username + "\n"))
+				Expect(err).ToNot(HaveOccurred())
 				session := helpers.CFWithStdin(input, "login", "-p", password)
 				Eventually(session).Should(Say("Email: "))
 				Eventually(session).Should(Exit(0))
