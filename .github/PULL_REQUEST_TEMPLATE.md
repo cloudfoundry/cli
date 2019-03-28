@@ -19,28 +19,6 @@ If your contribution falls under a company CLA but your membership is not public
 <!-- Or perhaps both? Neither?
 If you aren't sure what this is referring to, please check out our Architecture Guide: https://github.com/cloudfoundry/cli/wiki/Architecture-Guide -->
 
-## What Need Does It Address?
-
-<!-- What benefits will be realized by the code change? Explain its value to users. What is their current solution to the problem, and why is it insufficient? -->
-
-## Who Is The Functionality For?
-
-<!--
-Explain who specifically the change would benefit. What users would want this change? Is there broad demand for the change, or is there a single customer who benefits?
--->
-
-## How Often Will This Functionality Be Used?
-
-<!-- How often will the change be used? -->
-
-## Possible Drawbacks
-
-<!-- What are the possible side-effects or negative impacts of the code change? -->
-
-## Why Should This Be In Core?
-
-<!-- Explain why this functionality should be in the cf CLI, as opposed to a plugin. -->
-
 ## Description of the Change
 
 <!--
@@ -49,13 +27,17 @@ Keep in mind that the maintainer reviewing this PR may not be familiar with or
 have worked with the code here recently, so please walk us through the concepts.
 -->
 
-## Alternate Designs
+## Why Is This PR Valuable?
 
-<!-- Explain what other alternates were considered and why the proposed version was selected -->
+<!-- What benefits will be realized by the code change? What users would want this change? What user need is this change addressing? -->
+
+## Why Should This Be In Core?
+
+<!-- Explain why this functionality should be in the cf CLI, as opposed to a plugin. -->
 
 ## Applicable Issues
 
-<!-- List any applicable Issues here -->
+<!-- List any applicable Github Issues here -->
 
 ## How Urgent Is The Change?
 
