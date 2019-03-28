@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/uaa"
+
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
@@ -166,6 +168,7 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	} else {
 		authErr = cmd.authenticate()
 	}
+
 	if authErr != nil {
 		return errors.New("Unable to authenticate.")
 	}
@@ -225,11 +228,16 @@ func (cmd *LoginCommand) authenticate() error {
 		}
 
 		cmd.UI.DisplayText("Authenticating...")
+
 		err = cmd.Actor.Authenticate(promptedCredentials, "", constant.GrantTypePassword)
 
 		if err != nil {
 			cmd.UI.DisplayWarning(translatableerror.ConvertToTranslatableError(err).Error())
 			cmd.UI.DisplayNewline()
+
+			if _, ok := err.(uaa.AccountLockedError); ok {
+				break
+			}
 		}
 
 		if err == nil {

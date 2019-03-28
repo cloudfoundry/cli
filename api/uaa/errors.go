@@ -88,3 +88,11 @@ type InvalidSCIMResourceError struct {
 func (e InvalidSCIMResourceError) Error() string {
 	return e.Message
 }
+
+type AccountLockedError struct {
+	Message string
+}
+
+func (e AccountLockedError) Error() string {
+	return ""
+}

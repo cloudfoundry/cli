@@ -432,8 +432,12 @@ var _ = Describe("ConvertToTranslatableError", func() {
 
 		// UAA Errors
 		Entry("uaa.BadCredentialsError -> BadCredentialsError",
-			uaa.UnauthorizedError{},
-			UnauthorizedError{}),
+			uaa.UnauthorizedError{Message: "some message"},
+			UnauthorizedError{Message: "some message"}),
+
+		Entry("uaa.AccountLockedError -> AccountLockedError",
+			uaa.AccountLockedError{Message: "locked out"},
+			AccountLockedError{Message: "locked out"}),
 
 		Entry("uaa.InsufficientScopeError -> UnauthorizedToPerformActionError",
 			uaa.InsufficientScopeError{},

@@ -142,6 +142,20 @@ var _ = Describe("auth Command", func() {
 		})
 	})
 
+	When("there is an account locked error", func() {
+		BeforeEach(func() {
+			cmd.RequiredArgs.Username = "foo"
+			cmd.RequiredArgs.Password = "bar"
+
+			fakeConfig.TargetReturns("some-api-target")
+			fakeActor.AuthenticateReturns(uaa.AccountLockedError{Message: "some message"})
+		})
+
+		It("returns a BadCredentialsError", func() {
+			Expect(err).To(MatchError(uaa.AccountLockedError{Message: "some message"}))
+		})
+	})
+
 	When("there is a non-auth error", func() {
 		var expectedError error
 

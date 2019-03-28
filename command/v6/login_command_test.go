@@ -239,6 +239,22 @@ var _ = Describe("login Command", func() {
 									Expect(credentials["password"]).To(Equal("other-password"))
 								})
 							})
+
+							When("there have been too many failed login attempts", func() {
+								BeforeEach(func() {
+									input.Write([]byte("other-password\n"))
+									fakeActor.AuthenticateReturns(
+										uaa.AccountLockedError{
+											Message: "Your account has been locked because of too many failed attempts to login.",
+										},
+									)
+								})
+
+								It("does not reuse the flag value for subsequent attempts", func() {
+									Expect(fakeActor.AuthenticateCallCount()).To(Equal(1), "called Authenticate again after lockout")
+									Expect(testUI.Err).To(Say("Your account has been locked because of too many failed attempts to login."))
+								})
+							})
 						})
 					})
 
@@ -334,6 +350,7 @@ var _ = Describe("login Command", func() {
 
 						When("an error occurs prompting for the username", func() {
 							var fakeUI *commandfakes.FakeUI
+
 							BeforeEach(func() {
 								fakeUI = new(commandfakes.FakeUI)
 								fakeUI.DisplayTextPromptReturns("", errors.New("some-error"))
@@ -345,16 +362,19 @@ var _ = Describe("login Command", func() {
 									CheckerMaker: fakeCheckerMaker,
 								}
 							})
+
 							It("stops prompting after the first prompt", func() {
 								Expect(fakeUI.DisplayTextPromptCallCount()).To(Equal(1))
 							})
+
 							It("errors", func() {
 								Expect(executeErr).To(MatchError("Unable to authenticate."))
 							})
-
 						})
+
 						When("an error occurs in an additional text prompt after username", func() {
 							var fakeUI *commandfakes.FakeUI
+
 							BeforeEach(func() {
 								fakeUI = new(commandfakes.FakeUI)
 								fakeUI.DisplayTextPromptReturnsOnCall(0, "some-name", nil)
@@ -375,6 +395,7 @@ var _ = Describe("login Command", func() {
 
 						When("an error occurs prompting for the password", func() {
 							var fakeUI *commandfakes.FakeUI
+
 							BeforeEach(func() {
 								fakeUI = new(commandfakes.FakeUI)
 								fakeUI.DisplayPasswordPromptReturns("", errors.New("some-error"))
@@ -386,17 +407,19 @@ var _ = Describe("login Command", func() {
 									CheckerMaker: fakeCheckerMaker,
 								}
 							})
+
 							It("stops prompting after the first prompt", func() {
 								Expect(fakeUI.DisplayPasswordPromptCallCount()).To(Equal(1))
 							})
+
 							It("errors", func() {
 								Expect(executeErr).To(MatchError("Unable to authenticate."))
 							})
-
 						})
 
 						When("an error occurs prompting for prompts of type password that are not the 'password'", func() {
 							var fakeUI *commandfakes.FakeUI
+
 							BeforeEach(func() {
 								fakeUI = new(commandfakes.FakeUI)
 								fakeUI.DisplayPasswordPromptReturnsOnCall(0, "some-password", nil)
@@ -410,13 +433,14 @@ var _ = Describe("login Command", func() {
 									CheckerMaker: fakeCheckerMaker,
 								}
 							})
+
 							It("stops prompting after the second prompt", func() {
 								Expect(fakeUI.DisplayPasswordPromptCallCount()).To(Equal(2))
 							})
+
 							It("errors", func() {
 								Expect(executeErr).To(MatchError("Unable to authenticate."))
 							})
-
 						})
 
 						When("authenticating succeeds", func() {
@@ -527,6 +551,7 @@ var _ = Describe("login Command", func() {
 
 				When("an error occurs prompting for the code", func() {
 					var fakeUI *commandfakes.FakeUI
+
 					BeforeEach(func() {
 						fakeUI = new(commandfakes.FakeUI)
 						fakeUI.DisplayPasswordPromptReturns("", errors.New("some-error"))
@@ -539,6 +564,7 @@ var _ = Describe("login Command", func() {
 							SSO:          true,
 						}
 					})
+
 					It("errors", func() {
 						Expect(fakeUI.DisplayPasswordPromptCallCount()).To(Equal(1))
 						Expect(executeErr).To(MatchError("Unable to authenticate."))
@@ -575,7 +601,9 @@ var _ = Describe("login Command", func() {
 				When("an incorrect passcode is inputted", func() {
 					BeforeEach(func() {
 						cmd.SSOPasscode = "some-garbage"
-						fakeActor.AuthenticateReturns(errors.New("Credentials were rejected, please try again."))
+						fakeActor.AuthenticateReturns(uaa.UnauthorizedError{
+							Message: "Bad credentials",
+						})
 						fakeConfig.CurrentUserNameReturns("", nil)
 						input.Write([]byte("some-passcode\n"))
 					})

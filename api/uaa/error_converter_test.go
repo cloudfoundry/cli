@@ -119,7 +119,7 @@ var _ = Describe("Error Wrapper", func() {
 					})
 				})
 
-				Context("unauthorized", func() {
+				Context("unauthorized with bad credentials", func() {
 					BeforeEach(func() {
 						fakeConnectionErr.RawResponse = []byte(`{
   "error": "unauthorized",
@@ -132,6 +132,22 @@ var _ = Describe("Error Wrapper", func() {
 						Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 
 						Expect(makeErr).To(MatchError(UnauthorizedError{Message: "Bad credentials"}))
+					})
+				})
+
+				Context("unauthorized - too many failed login attempts", func() {
+					BeforeEach(func() {
+						fakeConnectionErr.RawResponse = []byte(`{
+  "error": "unauthorized",
+  "error_description": "Your account has been locked because of too many failed attempts to login."
+}`)
+						fakeConnection.MakeReturns(fakeConnectionErr)
+					})
+
+					It("returns a BadCredentialsError", func() {
+						Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+
+						Expect(makeErr).To(MatchError(AccountLockedError{Message: "Your account has been locked because of too many failed attempts to login."}))
 					})
 				})
 			})

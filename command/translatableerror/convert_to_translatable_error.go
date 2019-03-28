@@ -222,6 +222,8 @@ func ConvertToTranslatableError(err error) error {
 	// UAA Errors
 	case uaa.UnauthorizedError:
 		return UnauthorizedError(e)
+	case uaa.AccountLockedError:
+		return AccountLockedError(e)
 	case uaa.InsufficientScopeError:
 		return UnauthorizedToPerformActionError{}
 	case uaa.InvalidAuthTokenError:

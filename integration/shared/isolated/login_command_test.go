@@ -813,7 +813,7 @@ var _ = Describe("login command", func() {
 				helpers.LogoutCF()
 			})
 
-			It("displays a helpful error", func() {
+			It("displays a helpful error and does not reprompt", func() {
 				input := NewBuffer()
 				_, err := input.Write([]byte("garbage\ngarbage\ngarbage\n"))
 				Expect(err).ToNot(HaveOccurred())
@@ -824,9 +824,14 @@ var _ = Describe("login command", func() {
 				_, err = input.Write([]byte("garbage\ngarbage\ngarbage\n"))
 				Expect(err).ToNot(HaveOccurred())
 				session = helpers.CFWithStdin(input, "login", "-u", username)
-				Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
-				Eventually(session.Err).Should(Say(`Credentials were rejected, please try again.`))
+				Eventually(session).Should(Exit(1))
+
+				input = NewBuffer()
+				input.Write([]byte("garbage\ngarbage\ngarbage\n"))
+				session = helpers.CFWithStdin(input, "login", "-u", username)
+				Eventually(session).Should(Say(`Password`))
 				Eventually(session.Err).Should(Say(`Your account has been locked because of too many failed attempts to login\.`))
+				Consistently(session).ShouldNot(Say(`Password`))
 				Eventually(session.Err).Should(Say(`Unable to authenticate.`))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
