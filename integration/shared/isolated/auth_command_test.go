@@ -260,8 +260,16 @@ var _ = Describe("auth command", func() {
 			})
 
 			When("a user authenticates with valid user credentials for that origin", func() {
+				var (
+					username string
+					password string
+				)
+
+				BeforeEach(func() {
+					username, password = helpers.SkipIfOIDCCredentialsNotSet()
+				})
+
 				It("authenticates the user", func() {
-					username, password := helpers.GetOIDCCredentials()
 					session := helpers.CF("auth", username, password, "--origin", "cli-oidc-provider")
 
 					Eventually(session).Should(Say("API endpoint: %s", helpers.GetAPI()))

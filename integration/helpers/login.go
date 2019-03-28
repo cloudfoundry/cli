@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
 )
@@ -91,17 +92,17 @@ func GetCredentials() (string, string) {
 	return username, password
 }
 
-// GetOIDCCredentials returns back the username and the password for OIDC origin.
-func GetOIDCCredentials() (string, string) {
-	username := os.Getenv("CF_INT_OIDC_USERNAME")
-	if username == "" {
-		username = "admin_oidc"
+// SkipIfOIDCCredentialsNotSet returns back the username and the password for
+// OIDC origin, or skips the test if those values are not set.
+func SkipIfOIDCCredentialsNotSet() (string, string) {
+	oidcUsername := os.Getenv("CF_INT_OIDC_USERNAME")
+	oidcPassword := os.Getenv("CF_INT_OIDC_PASSWORD")
+
+	if oidcUsername == "" || oidcPassword == "" {
+		Skip("CF_INT_OIDC_USERNAME or CF_INT_OIDC_PASSWORD is not set")
 	}
-	password := os.Getenv("CF_INT_OIDC_PASSWORD")
-	if password == "" {
-		password = "admin"
-	}
-	return username, password
+
+	return oidcUsername, oidcPassword
 }
 
 func LogoutCF() {
