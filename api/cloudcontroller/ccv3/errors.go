@@ -8,6 +8,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
+const taskWorkersUnavailable = "CF-TaskWorkersUnavailable"
+
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status
 // codes to an error.
 type errorWrapper struct {
@@ -61,7 +63,7 @@ func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError, request *cloudcontr
 	case http.StatusUnprocessableEntity: // 422
 		return handleUnprocessableEntity(firstErr)
 	case http.StatusServiceUnavailable: // 503
-		if firstErr.Title == "CF-TaskWorkersUnavailable" {
+		if firstErr.Title == taskWorkersUnavailable {
 			return ccerror.TaskWorkersUnavailableError{Message: firstErr.Detail}
 		}
 		return ccerror.ServiceUnavailableError{Message: firstErr.Detail}
@@ -81,7 +83,7 @@ func convert500(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 		if err != nil {
 			return err
 		}
-		if firstErr.Title == "CF-TaskWorkersUnavailable" {
+		if firstErr.Title == taskWorkersUnavailable {
 			return ccerror.TaskWorkersUnavailableError{Message: firstErr.Detail}
 		}
 		return ccerror.ServiceUnavailableError{Message: firstErr.Detail}
