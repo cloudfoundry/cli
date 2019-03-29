@@ -304,9 +304,3 @@ var _ = Describe("Verbose", func() {
 		)
 	})
 })
-
-func assertLogsWrittenToFile(filepath string, expected string) {
-	contents, err := ioutil.ReadFile(filepath)
-	Expect(err).ToNot(HaveOccurred())
-	Expect(string(contents)).To(ContainSubstring(expected), "Logging to a file failed")
-}

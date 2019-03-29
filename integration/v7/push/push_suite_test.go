@@ -16,7 +16,6 @@ import (
 const (
 	CFEventuallyTimeout   = 300 * time.Second
 	CFConsistentlyTimeout = 500 * time.Millisecond
-	RealIsolationSegment  = "persistent_isolation_segment"
 	PushCommandName       = "push"
 	PublicDockerImage     = "cloudfoundry/diego-docker-app-custom"
 )

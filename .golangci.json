@@ -33,7 +33,7 @@
   },
   "linters":{
     "disable-all": true,
-    "enable": ["errcheck"]
+    "enable": ["errcheck", "unused"]
   },
   "linters-settings": {
     "errcheck":{
@@ -46,7 +46,14 @@
       "Error return value of `logger.output.Stop` is not checked",
       "Error return value of `request.ResetBody` is not checked",
       "Error return value of `GinkgoWriter.Write` is not checked",
-      "Error return value of `c.terminalHelper.RestoreTerminal` is not checked"
+      "Error return value of `c.terminalHelper.RestoreTerminal` is not checked",
+
+      "U1000: field `allproxy` is unused",
+      "U1000: field `dockerPassword` is unused",
+      "U1000: field `envCFStagingTimeout` is unused",
+      "U1000: field `envCFStartupTimeout` is unused",
+      "U1000: field `relatedCommands` is unused",
+      "U1000: field `usage` is unused"
     ]
   }
 }

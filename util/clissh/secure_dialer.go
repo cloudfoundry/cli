@@ -11,8 +11,6 @@ type SecureDialer interface {
 	Dial(network, address string, config *ssh.ClientConfig) (SecureClient, error)
 }
 
-type fakeConn struct{}
-
 type secureDialer struct{}
 
 func DefaultSecureDialer() secureDialer {
