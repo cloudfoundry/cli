@@ -40,7 +40,8 @@
       "gosimple",
       "structcheck",
       "varcheck",
-      "ineffassign"
+      "ineffassign",
+      "deadcode"
     ]
   },
   "linters-settings": {
