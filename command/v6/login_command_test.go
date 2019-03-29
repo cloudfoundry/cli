@@ -83,7 +83,7 @@ var _ = Describe("login Command", func() {
 
 				It("target the provided api endpoint", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(testUI.Out).To(Say("API endpoint: api.boshlite.com"))
+					Expect(testUI.Out).To(Say("API endpoint: api.boshlite.com\n\n"))
 					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
 					actualSettings := fakeActor.SetTargetArgsForCall(0)
 					Expect(actualSettings.URL).To(Equal("https://api.boshlite.com"))

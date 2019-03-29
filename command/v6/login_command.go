@@ -133,6 +133,8 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		cmd.APIEndpoint = apiEndpoint
 	}
 
+	cmd.UI.DisplayNewline()
+
 	strippedEndpoint := strings.TrimRight(cmd.APIEndpoint, "/")
 	endpoint, _ := url.Parse(strippedEndpoint)
 	if endpoint.Scheme == "" {
@@ -189,7 +191,6 @@ func (cmd *LoginCommand) authenticate() error {
 		if prompts["username"].Type == coreconfig.AuthPromptTypeText && cmd.Username != "" {
 			credentials["username"] = cmd.Username
 		} else {
-			cmd.UI.DisplayNewline()
 			var err error
 			credentials["username"], err = cmd.UI.DisplayTextPrompt(value.DisplayName)
 			if err != nil {
