@@ -54,7 +54,7 @@ func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) sharedaction.Comm
 
 func LongestCommandName(cmds map[string]sharedaction.CommandInfo, pluginCmds []configv3.PluginCommand) int {
 	longest := 0
-	for name, _ := range cmds {
+	for name := range cmds {
 		if len(name) > longest {
 			longest = len(name)
 		}

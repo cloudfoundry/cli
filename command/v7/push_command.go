@@ -272,17 +272,15 @@ func (cmd PushCommand) appRestarter(appName, appGUID string) (bool, error) {
 		warnings, restartErr := cmd.VersionActor.RestartApplication(appGUID)
 		cmd.UI.DisplayWarnings(warnings)
 
-		if restartErr != nil {
-			if _, ok := restartErr.(actionerror.StartupTimeoutError); ok {
-				return anyProcessCrashed, translatableerror.StartupTimeoutError{
-					AppName:    appName,
-					BinaryName: cmd.Config.BinaryName(),
-				}
-			} else if _, ok := restartErr.(actionerror.AllInstancesCrashedError); ok {
-				anyProcessCrashed = true
-			} else {
-				return anyProcessCrashed, restartErr
+		if _, ok := restartErr.(actionerror.StartupTimeoutError); ok {
+			return anyProcessCrashed, translatableerror.StartupTimeoutError{
+				AppName:    appName,
+				BinaryName: cmd.Config.BinaryName(),
 			}
+		} else if _, ok := restartErr.(actionerror.AllInstancesCrashedError); ok {
+			anyProcessCrashed = true
+		} else if restartErr != nil {
+			return anyProcessCrashed, restartErr
 		}
 	}
 	return anyProcessCrashed, nil

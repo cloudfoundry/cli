@@ -52,9 +52,7 @@ func WriteConfig(c *Config) error {
 // ends.  Note:  we cannot intercept a `kill -9`, so a well-timed `kill -9`
 // will allow a temp config file to linger.
 func catchSignal(sig chan os.Signal, tempConfigFileName string) {
-	select {
-	case <-sig:
-		_ = os.Remove(tempConfigFileName)
-		os.Exit(2)
-	}
+	<-sig
+	_ = os.Remove(tempConfigFileName)
+	os.Exit(2)
 }

@@ -90,7 +90,7 @@ func (t *UAAAuthentication) refreshToken() error {
 		expiresIn = 0
 	} else {
 		expiration, _ := token.Claims().Expiration()
-		expiresIn = expiration.Sub(time.Now())
+		expiresIn = time.Until(expiration)
 	}
 
 	if expiresIn < accessTokenExpirationMargin {

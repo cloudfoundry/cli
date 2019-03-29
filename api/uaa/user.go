@@ -81,5 +81,5 @@ func (client *Client) CreateUser(user string, password string, origin string) (U
 		return User{}, err
 	}
 
-	return User{ID: userResponse.ID}, nil
+	return User(userResponse), nil
 }

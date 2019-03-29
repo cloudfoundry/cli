@@ -146,7 +146,7 @@ func (logger *RequestLogger) displayResponse(passedResponse *cloudcontroller.Res
 
 func (logger *RequestLogger) displaySortedHeaders(headers http.Header) error {
 	keys := []string{}
-	for key, _ := range headers {
+	for key := range headers {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)

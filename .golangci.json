@@ -33,7 +33,7 @@
   },
   "linters":{
     "disable-all": true,
-    "enable": ["errcheck", "unused"]
+    "enable": ["errcheck", "unused", "gosimple"]
   },
   "linters-settings": {
     "errcheck":{
