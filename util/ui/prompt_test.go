@@ -226,23 +226,26 @@ var _ = Describe("Prompts", func() {
 			})
 
 			It("exits immediately from password prompt", func() {
-				_, _ = ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+				_, err := ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
 					"AppName": "some-app",
 				})
+				Expect(err).To(MatchError("keyboard interrupt"))
 				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
 				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
 			})
 
 			It("exits immediately from text prompt", func() {
-				_, _ = ui.DisplayTextPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+				_, err := ui.DisplayTextPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
 					"AppName": "some-app",
 				})
+				Expect(err).To(MatchError("keyboard interrupt"))
 				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
 				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
 			})
 
 			It("exits immediately from bool prompt", func() {
-				_, _ = ui.DisplayBoolPrompt(false, "some-prompt", nil)
+				_, err := ui.DisplayBoolPrompt(false, "some-prompt", nil)
+				Expect(err).To(MatchError("keyboard interrupt"))
 				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
 				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
 			})

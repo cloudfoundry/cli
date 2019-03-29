@@ -827,7 +827,8 @@ var _ = Describe("login command", func() {
 				Eventually(session).Should(Exit(1))
 
 				input = NewBuffer()
-				input.Write([]byte("garbage\ngarbage\ngarbage\n"))
+				_, err = input.Write([]byte("garbage\ngarbage\ngarbage\n"))
+				Expect(err).NotTo(HaveOccurred())
 				session = helpers.CFWithStdin(input, "login", "-u", username)
 				Eventually(session).Should(Say(`Password`))
 				Eventually(session.Err).Should(Say(`Your account has been locked because of too many failed attempts to login\.`))
