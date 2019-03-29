@@ -46,7 +46,7 @@ func ConvertToTranslatableError(err error) error {
 	case manifest.EmptyBuildpacksError:
 		return EmptyBuildpacksError(e)
 	case actionerror.EmptyArchiveError:
-		return EmptyArchiveError(e)
+		return EmptyDirectoryError(e)
 	case actionerror.EmptyDirectoryError:
 		return EmptyDirectoryError(e)
 	case actionerror.EmptyBuildpackDirectoryError:

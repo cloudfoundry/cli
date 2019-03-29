@@ -51,7 +51,6 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("CommandLineOptionsAndManifestConflictError", CommandLineOptionsAndManifestConflictError{}),
 		Entry("DockerPasswordNotSetError", DockerPasswordNotSetError{}),
 		Entry("DownloadPluginHTTPError", DownloadPluginHTTPError{}),
-		Entry("EmptyArchiveError", EmptyArchiveError{}),
 		Entry("EmptyDirectoryError", EmptyDirectoryError{}),
 		Entry("EmptyBuildpacksError", EmptyBuildpacksError{}),
 		Entry("FetchingPluginInfoFromRepositoriesError", FetchingPluginInfoFromRepositoriesError{}),
