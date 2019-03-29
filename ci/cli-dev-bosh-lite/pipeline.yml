@@ -54,6 +54,13 @@ resources:
       uri: ((env-pool-repo))
       pool: bosh-lites
       private_key: ((bosh-lite-pools-github-private-key))
+  - name: legacy-ready-pool
+    type: pool
+    source:
+      branch: master
+      uri: ((env-pool-repo))
+      pool: legacy-bosh-lites
+      private_key: ((bosh-lite-pools-github-private-key))
   - name: deleting-pool
     type: pool
     source:
@@ -67,6 +74,13 @@ resources:
       branch: master
       uri: ((env-pool-repo))
       pool: building-bosh-lites
+      private_key: ((bosh-lite-pools-github-private-key))
+  - name: legacy-building-pool
+    type: pool
+    source:
+      branch: master
+      uri: ((env-pool-repo))
+      pool: building-legacy-bosh-lites
       private_key: ((bosh-lite-pools-github-private-key))
   - name: pool-repo
     type: git
@@ -82,6 +96,14 @@ resources:
       private_key: ((bosh-lite-pools-github-private-key))
       paths:
         - .trigger-bosh-lites-create # updated by check-pool-size
+  - name: create-legacy-bosh-lite-trigger
+    type: git
+    source:
+      branch: master
+      uri: ((env-pool-repo))
+      private_key: ((bosh-lite-pools-github-private-key))
+      paths:
+        - .trigger-legacy-bosh-lites-create # updated by check-pool-size
   - name: destroy-bosh-lite-trigger
     type: git
     source:
@@ -96,6 +118,12 @@ resources:
       uri: git@github.com:cloudfoundry/cf-deployment.git
       private_key: ((bosh-lite-pools-github-private-key))
       tag_filter: v7.*
+  - name: legacy-cf-deployment
+    type: git
+    source:
+      uri: git@github.com:cloudfoundry/cf-deployment.git
+      private_key: ((bosh-lite-pools-github-private-key))
+      tag_filter: v1.7.0
   - name: cf-deploy
     type: bosh-deployment
     source:
@@ -108,6 +136,18 @@ resources:
     type: slack-notification
     source:
       url: ((slack-webhook-url))
+
+groups:
+- name: modern
+  jobs:
+  - create-bosh-lite
+  - delete-bosh-lite
+  - check-pool-size
+- name: legacy
+  jobs:
+  - create-legacy-bosh-lite
+  - delete-bosh-lite
+  - check-legacy-pool-size
 
 jobs:
   - name: create-bosh-lite
@@ -218,6 +258,113 @@ jobs:
               get_params:
                 action: destroy
 
+  - name: create-legacy-bosh-lite
+    plan:
+      - aggregate:
+        - get: capi-ci
+        - get: bosh-deployment
+        - get: legacy-cf-deployment # Diff
+        - get: cli
+        - get: create-legacy-bosh-lite-trigger # Diff
+          trigger: true
+      - task: generate-fake-env-for-building-pool
+        file: capi-ci/ci/bosh-lite/generate-fake-env-for-building-pool.yml
+      - put: legacy-building-pool # Diff
+        params:
+          add_claimed: fake-placeholder-env/
+      - put: terraform
+        params:
+          generate_random_name: true
+          delete_on_failure: true
+          terraform_source: capi-ci/terraform/bosh-lite/
+          vars:
+            project_id: ((bosh-lite-project-id)) # Should be different?
+            json_key: ((bosh-lite-gcp-json-key))
+            dns_project_id: ((bosh-lite-project-id))
+            dns_json_key: ((bosh-lite-gcp-json-key))
+            system_domain_suffix: ((bosh-lite-system-domain-suffix))
+            dns_zone_name: ((bosh-lite-dns-zone-name))
+            region: ((bosh-lite-region))
+      - do:
+          - task: create-bosh-lite
+            file: capi-ci/ci/bosh-lite/create-bosh-lite.yml
+            params:
+              GCP_JSON_KEY: ((bosh-lite-gcp-json-key))
+              GCP_INSTANCE_TYPE: n1-standard-4
+          - do:
+              - task: create-env-vars-file
+                file: capi-ci/ci/bosh-lite/create-env-vars-file.yml
+              - task: upload-cf-assets
+                file: capi-ci/ci/bosh-lite/upload-cf-assets.yml
+              - task: write-bosh-target-file
+                file: capi-ci/ci/bosh-lite/write-bosh-target-file.yml
+              - put: cf-deploy
+                params:
+                  source_file: bosh-target/target.yml
+                  manifest: legacy-cf-deployment/cf-deployment.yml # diff
+                  vars_files:
+                  - bosh-target/vars.yml
+                  ops_files:
+                  - capi-ci/cf-deployment-operations/skip-cert-verify.yml
+                  - legacy-cf-deployment/operations/bosh-lite.yml
+                  - legacy-cf-deployment/operations/use-compiled-releases.yml
+                  - legacy-cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell.yml
+                  - legacy-cf-deployment/operations/test/add-persistent-isolation-segment-diego-cell-bosh-lite.yml
+                  - cli/ci/infrastructure/operations/default-app-memory.yml
+                  - cli/ci/infrastructure/operations/add-oidc-provider.yml
+                  - cli/ci/infrastructure/operations/give-cf-admin-clients-read-scope.yml
+              - task: upload-to-gcs
+                file: capi-ci/ci/gcs/upload-to-gcs.yml
+                input_mapping:
+                  environment: terraform
+                  source-directory: director-state
+                params:
+                  GCP_JSON_KEY: ((bosh-lite-gcp-json-key))
+                  GCP_BUCKET: ((bosh-lite-storage-bucket))
+                  GCP_PATH: director-state
+                  USE_ENV_NAMED_SUBDIR: true
+              - put: legacy-ready-pool # should be different?
+                params:
+                  add: bosh-lite-env-info/
+              - put: legacy-building-pool
+                params:
+                  remove: fake-placeholder-env/ # how does this work?
+            on_failure:
+              aggregate:
+                - task: delete-bosh-lite
+                  file: capi-ci/ci/bosh-lite/delete-bosh-lite.yml
+                - put: slack-alert
+                  params:
+                     channel: '#cli-eng'
+                     text: |
+                       Creating a **legacy** bosh-lite failed :(
+                       ```
+                       Do the following tasks:
+                       1.Make sure the bosh-lite is deleted and resources are cleaned up.
+                       2.Remove the corresponding sha file from building-legacy-bosh-lites pool.
+                       3.Retrigger the create-legacy-bosh-lite task in the pipeline.
+                       Link: $ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+                       https://bit.ly/2S5aIov
+                       ```
+        on_failure:
+          aggregate:
+            - put: terraform
+              params:
+                action: destroy
+                env_name_file: terraform/name
+                terraform_source: capi-ci/terraform/bosh-lite/
+                vars:
+                  project_id: ((bosh-lite-project-id))
+                  json_key: ((bosh-lite-gcp-json-key))
+                  dns_project_id: ((bosh-lite-project-id))
+                  dns_json_key: ((bosh-lite-gcp-json-key))
+                  system_domain_suffix: ((bosh-lite-system-domain-suffix))
+                  dns_zone_name: ((bosh-lite-dns-zone-name))
+                  region: ((bosh-lite-region))
+              get_params:
+                action: destroy
+
+
   - name: delete-bosh-lite
     plan:
       - aggregate:
@@ -291,3 +438,51 @@ jobs:
         params:
           repository: updated-env-pool
           rebase: true
+
+  - name: check-legacy-pool-size
+    build_logs_to_retain: 100
+    plan:
+      - aggregate:
+        - get: cli
+        - get: pool-repo
+        - get: 5m
+          trigger: true
+      - task: check-pool-size
+        # file: capi-ci/ci/bosh-lite/check-pool-size.yml
+        file: cli/ci/cli-dev-bosh-lite/tasks/check-pool-size.yml
+        input_mapping:
+          env-pool: pool-repo
+        params:
+          MIN_UNCLAIMED_COUNT: 1
+          GIT_USERNAME: ((git-username))
+          GIT_EMAIL: ((git-email))
+          POOL_NAME: legacy-bosh-lites
+          BUILDING_POOL_NAME: building-legacy-bosh-lites
+          TRIGGER_FILE_NAME: ".trigger-legacy-bosh-lites-create"
+      - put: pool-repo
+        params:
+          repository: updated-env-pool
+          rebase: true
+  # - name: check-legacy-pool-size
+  #   build_logs_to_retain: 100
+  #   plan:
+  #     - aggregate:
+  #       - get: cli
+  #       - get: pool-repo
+  #       - get: 5m
+  #         trigger: true
+  #     - task: check-pool-size
+  #       file: cli/ci/cli-dev-bosh-lite/tasks/check-pool-size.yml
+  #       input_mapping:
+  #         env-pool: pool-repo
+  #       params:
+  #         MIN_UNCLAIMED_COUNT: 1
+  #         GIT_USERNAME: ((git-username))
+  #         GIT_EMAIL: ((git-email))
+  #         POOL_NAME: legacy-bosh-lites
+  #         BUILDING_POOL_NAME: building-legacy-bosh-lites
+  #         TRIGGER_FILE_NAME: ".trigger-legacy-bosh-lites-create"
+  #     - put: pool-repo
+  #       params:
+  #         repository: updated-env-pool
+  #         rebase: true
