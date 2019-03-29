@@ -1,6 +1,6 @@
 package translatableerror
 
-// ProcessInstanceNotFoundError is returned when a proccess type or process instance can't be found
+// ProcessInstanceNotFoundError is returned when a process type or process instance can't be found
 type ProcessInstanceNotFoundError struct {
 	ProcessType   string
 	InstanceIndex uint

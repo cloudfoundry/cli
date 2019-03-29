@@ -1,6 +1,6 @@
 package translatableerror
 
-// ProcessNotFoundError is returned when a proccess type can't be found
+// ProcessNotFoundError is returned when a process type can't be found
 type ProcessNotFoundError struct {
 	ProcessType string
 }

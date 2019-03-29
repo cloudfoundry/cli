@@ -156,7 +156,7 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 			return err
 		}
 
-		// if file ignored contine to the next file
+		// if file ignored continue to the next file
 		if gitIgnore.MatchesPath(relPath) {
 			return nil
 		}

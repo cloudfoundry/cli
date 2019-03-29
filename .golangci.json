@@ -46,7 +46,8 @@
       "interfacer",
       "goconst",
       "unconvert",
-      "depguard"
+      "depguard",
+      "misspell"
     ]
   },
   "linters-settings": {
@@ -56,6 +57,9 @@
     "goconst":{
       "min-len": "2",
       "min-occurrences": 3
+    },
+    "misspell": {
+      "locale": "US"
     }
   },
   "issues":{

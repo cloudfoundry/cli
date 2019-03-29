@@ -100,7 +100,7 @@ func (config *Config) HasTargetedSpace() bool {
 	return config.ConfigFile.TargetedSpace.GUID != ""
 }
 
-// MinCLIVersion returns the minimum CLI version requried by the CC.
+// MinCLIVersion returns the minimum CLI version required by the CC.
 func (config *Config) MinCLIVersion() string {
 	return config.ConfigFile.MinCLIVersion
 }

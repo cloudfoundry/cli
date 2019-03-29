@@ -2,5 +2,5 @@
 // errors.
 //
 // In order to prevent future import cycles, this package should **not** have
-// any non-builtin dependancies!!!
+// any non-builtin dependencies!!!
 package translatableerror

@@ -48,7 +48,7 @@ func (actor Actor) SetApplicationDroplet(appGUID string, dropletGUID string) (Wa
 	return Warnings(warnings), err
 }
 
-// GetApplicationDroplets returns the list of droplets that belong to applicaiton.
+// GetApplicationDroplets returns the list of droplets that belong to application.
 func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]Droplet, Warnings, error) {
 	allWarnings := Warnings{}
 	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)

@@ -46,7 +46,7 @@ func (actor *Actor) SetEnvironmentVariableByApplicationNameAndSpace(appName stri
 	return warnings, apiErr
 }
 
-// UnsetEnvironmentVariableByApplicationNameAndSpace removes an enviornment
+// UnsetEnvironmentVariableByApplicationNameAndSpace removes an environment
 // variable from an application. It must be restarted for changes to take
 // effect.
 func (actor *Actor) UnsetEnvironmentVariableByApplicationNameAndSpace(appName string, spaceGUID string, environmentVariableName string) (Warnings, error) {

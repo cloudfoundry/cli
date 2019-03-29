@@ -56,7 +56,7 @@ func (config *Config) TerminalWidth() int {
 // a slice of absolute paths in which verbose text will appear. This is based
 // off of:
 //   - The config file's trace value (true/false/file path)
-//   - The $CF_TRACE enviroment variable if set (true/false/file path)
+//   - The $CF_TRACE environment variable if set (true/false/file path)
 //   - The '-v/--verbose' global flag
 //   - Defaults to false
 func (config *Config) Verbose() (bool, []string) {

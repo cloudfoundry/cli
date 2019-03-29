@@ -33,8 +33,8 @@ const (
 	// conjunction with the OrderBy QueryKey.
 	NameOrder = "name"
 
-	// PositionOrder is a query value for ordering by posiiton. This value is
-	// used in conjuction with the OrderBy QueryKey.
+	// PositionOrder is a query value for ordering by position. This value is
+	// used in conjunction with the OrderBy QueryKey.
 	PositionOrder = "position"
 )
 

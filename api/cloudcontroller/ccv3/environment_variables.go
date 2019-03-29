@@ -35,7 +35,7 @@ func (variables *EnvironmentVariables) UnmarshalJSON(data []byte) error {
 }
 
 // UpdateApplicationEnvironmentVariables adds/updates the user provided
-// environment variables on an applicaiton. A restart is required for changes
+// environment variables on an application. A restart is required for changes
 // to take effect.
 func (client *Client) UpdateApplicationEnvironmentVariables(appGUID string, envVars EnvironmentVariables) (EnvironmentVariables, Warnings, error) {
 	bodyBytes, err := json.Marshal(envVars)

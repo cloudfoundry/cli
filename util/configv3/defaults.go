@@ -10,8 +10,8 @@ const (
 	DefaultNOAARetryCount = 5
 
 	// DefaultOverallPollingTimeout is the default maximum time that the CLI will
-	// poll a job running on the Cloud Controller. By default it's infinit, which
-	// is represented by MaxInt64.
+	// poll a job running on the Cloud Controller. By default it's infinite,
+	// which is represented by MaxInt64.
 	DefaultOverallPollingTimeout = time.Duration(1 << 62)
 	// Developer Note: Due to bugs in using MaxInt64 during comparison, the above
 	// was chosen as a replacement.

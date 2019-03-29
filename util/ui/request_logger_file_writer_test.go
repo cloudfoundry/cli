@@ -159,7 +159,7 @@ Origin: wss://doppler.bosh-lite.com:443`
   "don't escape HTML": "<&>"
 }
 
-` // Additonal spaces required
+` // Additional spaces required
 					err := display.DisplayJSONBody([]byte(raw))
 					Expect(err).ToNot(HaveOccurred())
 
