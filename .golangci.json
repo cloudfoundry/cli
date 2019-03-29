@@ -34,7 +34,12 @@
   },
   "linters":{
     "disable-all": true,
-    "enable": ["errcheck", "unused", "gosimple"]
+    "enable": [
+      "errcheck",
+      "unused",
+      "gosimple",
+      "structcheck"
+    ]
   },
   "linters-settings": {
     "errcheck":{
@@ -54,7 +59,14 @@
       "U1000: field `envCFStagingTimeout` is unused",
       "U1000: field `envCFStartupTimeout` is unused",
       "U1000: field `relatedCommands` is unused",
-      "U1000: field `usage` is unused"
+      "U1000: field `usage` is unused",
+
+      "`allproxy` is unused",
+      "`dockerPassword` is unused",
+      "`envCFStagingTimeout` is unused",
+      "`envCFStartupTimeout` is unused",
+      "`relatedCommands` is unused",
+      "`usage` is unused"
     ]
   }
 }
