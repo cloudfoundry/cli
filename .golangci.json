@@ -41,7 +41,9 @@
       "structcheck",
       "varcheck",
       "ineffassign",
-      "deadcode"
+      "deadcode",
+      "typecheck",
+      "interfacer"
     ]
   },
   "linters-settings": {

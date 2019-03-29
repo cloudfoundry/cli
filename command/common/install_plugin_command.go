@@ -153,7 +153,7 @@ func (cmd InstallPluginCommand) installPlugin(plugin configv3.Plugin, pluginPath
 	return nil
 }
 
-func (cmd InstallPluginCommand) uninstallPlugin(plugin configv3.Plugin, rpcService *shared.RPCService) error {
+func (cmd InstallPluginCommand) uninstallPlugin(plugin configv3.Plugin, rpcService pluginaction.PluginUninstaller) error {
 	cmd.UI.DisplayText("Plugin {{.Name}} {{.Version}} is already installed. Uninstalling existing plugin...", map[string]interface{}{
 		"Name":    plugin.Name,
 		"Version": plugin.Version.String(),
