@@ -137,7 +137,7 @@ var HelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "METADATA:",
 		CommandList: [][]string{
-			{"set-label"},
+			{"set-label", "delete-label"},
 		},
 	},
 	{

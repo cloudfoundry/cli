@@ -19,7 +19,7 @@ type SetLabelActor interface {
 
 type SetLabelCommand struct {
 	RequiredArgs flag.SetLabelArgs `positional-args:"yes"`
-	usage        interface{}       `usage:"cf set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n\n RESOURCES:\n   APP\n\nSEE ALSO:\n   delete-label, labels"`
+	usage        interface{}       `usage:"cf set-label RESOURCE RESOURCE_NAME KEY=VALUE...\n\nEXAMPLES:\n   cf set-label app dora env=production\n\nRESOURCES:\n   APP\n\nSEE ALSO:\n   delete-label, labels"`
 
 	UI          command.UI
 	Config      command.Config

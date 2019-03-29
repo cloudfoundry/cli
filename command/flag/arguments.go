@@ -239,6 +239,11 @@ type SetLabelArgs struct {
 	Labels       []string `positional-arg-name:"KEY=VALUE" required:"true" description:"A space-separated list of labels to set on the resource"`
 }
 
+type DeleteLabelArgs struct {
+	ResourceType string `positional-arg-name:"RESOURCE" required:"true" description:"The type of resource"`
+	ResourceName string `positional-arg-name:"RESOURCE_NAME" required:"true" description:"The name of the resource"`
+	LabelKey     string `positional-arg-name:"KEY" required:"true" description:"A label to delete on the resource"`
+}
 type SetOrgRoleArgs struct {
 	Username     string  `positional-arg-name:"USERNAME" required:"true" description:"The user"`
 	Organization string  `positional-arg-name:"ORG" required:"true" description:"The organization"`
