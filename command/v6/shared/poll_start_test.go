@@ -147,7 +147,7 @@ var _ = Describe("Poll Start", func() {
 			actionerror.ApplicationInstanceCrashedError{
 				Name: "some application crashed name",
 			},
-			translatableerror.UnsuccessfulStartError{
+			translatableerror.ApplicationUnableToStartError{
 				AppName:    "some application crashed name",
 				BinaryName: "FiveThirtyEight",
 			},
@@ -157,7 +157,7 @@ var _ = Describe("Poll Start", func() {
 			actionerror.ApplicationInstanceFlappingError{
 				Name: "some application flapping name",
 			},
-			translatableerror.UnsuccessfulStartError{
+			translatableerror.ApplicationUnableToStartError{
 				AppName:    "some application flapping name",
 				BinaryName: "FiveThirtyEight",
 			},

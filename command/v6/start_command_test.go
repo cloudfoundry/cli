@@ -462,8 +462,8 @@ var _ = Describe("Start Command", func() {
 							apiErr = actionerror.ApplicationInstanceCrashedError{Name: appName}
 						})
 
-						It("stops logging and returns UnsuccessfulStartError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.UnsuccessfulStartError{AppName: appName, BinaryName: "faceman"}))
+						It("stops logging and returns ApplicationUnableToStartError", func() {
+							Expect(executeErr).To(MatchError(translatableerror.ApplicationUnableToStartError{AppName: appName, BinaryName: "faceman"}))
 						})
 					})
 
@@ -472,8 +472,8 @@ var _ = Describe("Start Command", func() {
 							apiErr = actionerror.ApplicationInstanceFlappingError{Name: appName}
 						})
 
-						It("stops logging and returns UnsuccessfulStartError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.UnsuccessfulStartError{AppName: appName, BinaryName: "faceman"}))
+						It("stops logging and returns ApplicationUnableToStartError", func() {
+							Expect(executeErr).To(MatchError(translatableerror.ApplicationUnableToStartError{AppName: appName, BinaryName: "faceman"}))
 						})
 					})
 
