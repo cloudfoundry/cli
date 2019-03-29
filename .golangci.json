@@ -39,7 +39,8 @@
       "unused",
       "gosimple",
       "structcheck",
-      "varcheck"
+      "varcheck",
+      "ineffassign"
     ]
   },
   "linters-settings": {
