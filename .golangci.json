@@ -38,7 +38,8 @@
       "errcheck",
       "unused",
       "gosimple",
-      "structcheck"
+      "structcheck",
+      "varcheck"
     ]
   },
   "linters-settings": {
