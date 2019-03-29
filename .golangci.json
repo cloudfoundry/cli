@@ -1,5 +1,6 @@
 {
   "run":{
+    "deadline": "3m",
     "build-tags": ["V7"],
     "skip-dirs": [
       "^cf",

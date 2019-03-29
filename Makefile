@@ -66,7 +66,7 @@ fly-windows-global: check-target-env
 fly-windows-units:
 	fly -t ci execute -c ci/cli/tasks/units-windows.yml -i cli=./ -i cli-ci=./ --tag "cli-windows"
 
-golangci-lint:
+golangci-lint: ## Run golangci-lint to validate code quality
 	golangci-lint run
 
 integration-cleanup:
