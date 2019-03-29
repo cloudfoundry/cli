@@ -45,7 +45,8 @@
       "typecheck",
       "interfacer",
       "goconst",
-      "unconvert"
+      "unconvert",
+      "depguard"
     ]
   },
   "linters-settings": {
