@@ -141,7 +141,7 @@ var _ = Describe("ProcessInstance", func() {
 						MemoryUsage:      1000000,
 						State:            constant.ProcessInstanceRunning,
 						Type:             "web",
-						Uptime:           time.Duration(123 * time.Second),
+						Uptime:           123 * time.Second,
 					},
 					ProcessInstance{
 						CPU:              0.02,
@@ -153,7 +153,7 @@ var _ = Describe("ProcessInstance", func() {
 						MemoryUsage:      8000000,
 						State:            constant.ProcessInstanceRunning,
 						Type:             "web",
-						Uptime:           time.Duration(456 * time.Second),
+						Uptime:           456 * time.Second,
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1"))

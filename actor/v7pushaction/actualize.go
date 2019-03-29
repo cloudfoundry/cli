@@ -42,7 +42,7 @@ func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) (
 		if !plan.SkipRouteCreation {
 			eventStream <- CreatingAndMappingRoutes
 			routeWarnings, routeErr := actor.CreateAndMapDefaultApplicationRoute(plan.OrgGUID, plan.SpaceGUID, plan.Application)
-			warningsStream <- Warnings(routeWarnings)
+			warningsStream <- routeWarnings
 			if routeErr != nil {
 				errorStream <- routeErr
 				return

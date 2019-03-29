@@ -43,7 +43,7 @@ func (actor Actor) UpdateProcessByTypeAndApplication(processType string, appGUID
 	}
 
 	process, warnings, err := actor.GetProcessByTypeAndApplication(processType, appGUID)
-	allWarnings := Warnings(warnings)
+	allWarnings := warnings
 	if err != nil {
 		return allWarnings, err
 	}

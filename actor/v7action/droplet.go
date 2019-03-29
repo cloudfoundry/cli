@@ -93,7 +93,7 @@ func (actor Actor) convertCCToActorDroplet(ccDroplet ccv3.Droplet) Droplet {
 
 	return Droplet{
 		GUID:       ccDroplet.GUID,
-		State:      constant.DropletState(ccDroplet.State),
+		State:      ccDroplet.State,
 		CreatedAt:  ccDroplet.CreatedAt,
 		Stack:      ccDroplet.Stack,
 		Buildpacks: buildpacks,

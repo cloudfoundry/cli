@@ -48,7 +48,7 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string, spaceGUID
 	}
 
 	droplet, warnings, err := actor.GetCurrentDropletByApplication(app.GUID)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		if _, ok := err.(actionerror.DropletNotFoundError); !ok {
 			return ApplicationSummary{}, allWarnings, err

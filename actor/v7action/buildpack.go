@@ -2,13 +2,14 @@ package v7action
 
 import (
 	"archive/zip"
+	"io"
+	"os"
+	"path/filepath"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/util"
-	"io"
-	"os"
-	"path/filepath"
 )
 
 type Buildpack ccv3.Buildpack
@@ -96,7 +97,7 @@ func (actor Actor) UpdateBuildpackByNameAndStack(buildpackName string, buildpack
 	warnings = append(warnings, getWarnings...)
 
 	if err != nil {
-		return Buildpack{}, Warnings(warnings), err
+		return Buildpack{}, warnings, err
 	}
 
 	buildpack.GUID = foundBuildpack.GUID
@@ -104,7 +105,7 @@ func (actor Actor) UpdateBuildpackByNameAndStack(buildpackName string, buildpack
 	updatedBuildpack, updateWarnings, err := actor.CloudControllerClient.UpdateBuildpack(ccv3.Buildpack(buildpack))
 	warnings = append(warnings, updateWarnings...)
 	if err != nil {
-		return Buildpack{}, Warnings(warnings), err
+		return Buildpack{}, warnings, err
 	}
 
 	return Buildpack(updatedBuildpack), warnings, nil
@@ -271,5 +272,5 @@ func (actor Actor) DeleteBuildpackByNameAndStack(buildpackName string, buildpack
 	pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
 	allWarnings = append(allWarnings, pollWarnings...)
 
-	return Warnings(allWarnings), err
+	return allWarnings, err
 }

@@ -7,5 +7,5 @@ func (actor *Actor) UpdateApplicationLabelsByApplicationName(appName string, spa
 	}
 	app.Metadata.Labels = labels
 	_, updateWarnings, err := actor.UpdateApplication(app)
-	return Warnings(append(appWarnings, updateWarnings...)), err
+	return append(appWarnings, updateWarnings...), err
 }

@@ -44,7 +44,8 @@
       "deadcode",
       "typecheck",
       "interfacer",
-      "goconst"
+      "goconst",
+      "unconvert"
     ]
   },
   "linters-settings": {
@@ -57,6 +58,7 @@
     }
   },
   "issues":{
+    "max-same-issue": 0,
     "exclude":[
       "Error return value of `client.GetApplicationTasks` is not checked",
       "Error return value of `logger.output.Stop` is not checked",
