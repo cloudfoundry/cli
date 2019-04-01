@@ -25,6 +25,7 @@ var _ = Describe("marketplace command", func() {
 				Eventually(session).Should(Say("m"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("-s\\s+Show plan details for a particular service offering"))
+				Eventually(session).Should(Say("--no-plans\\s+Hide plan information for service offerings"))
 				Eventually(session).Should(Say("create-service, services"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -188,6 +189,19 @@ var _ = Describe("marketplace command", func() {
 							Eventually(session).Should(Say("%s\\s+%s\\s+fake service\\s+%s", getServiceName(broker2), getBrokerPlanNames(broker2), broker2.Name))
 							Eventually(session).Should(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
 							Eventually(session).Should(Exit(0))
+						})
+
+						When("--no-plans is passed", func() {
+							It("displays a table with broker name", func() {
+								session := helpers.CF("marketplace", "--no-plans")
+								Eventually(session).Should(Say("Getting services from marketplace in org %s / space %s as %s\\.\\.\\.", org2, space2, user))
+								Eventually(session).Should(Say("OK"))
+								Eventually(session).Should(Say("\n\n"))
+								Eventually(session).Should(Say("service\\s+description\\s+broker"))
+								Eventually(session).Should(Say("%s\\s+fake service\\s+%s", getServiceName(broker2), broker2.Name))
+								Eventually(session).Should(Say("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
+								Eventually(session).Should(Exit(0))
+							})
 						})
 					})
 				})

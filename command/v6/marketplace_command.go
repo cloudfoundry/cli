@@ -25,6 +25,7 @@ type ServicesSummariesActor interface {
 
 type MarketplaceCommand struct {
 	ServiceName     string      `short:"s" description:"Show plan details for a particular service offering"`
+	NoPlans         bool        `long:"no-plans" description:"Hide plan information for service offerings"`
 	usage           interface{} `usage:"CF_NAME marketplace [-s SERVICE]"`
 	relatedCommands interface{} `related_commands:"create-service, services"`
 
@@ -146,17 +147,29 @@ func (cmd *MarketplaceCommand) displayServiceSummaries(serviceSummaries []v2acti
 	if len(serviceSummaries) == 0 {
 		cmd.UI.DisplayText("No service offerings found")
 	} else {
-		tableHeaders := []string{"service", "plans", "description", "broker"}
-		table := [][]string{tableHeaders}
-		for _, serviceSummary := range serviceSummaries {
-			table = append(table, []string{
-				serviceSummary.Label,
-				planNames(serviceSummary),
-				serviceSummary.Description,
-				serviceSummary.ServiceBrokerName,
-			})
+		var table = [][]string{}
+		if cmd.NoPlans {
+			tableHeaders := []string{"service", "description", "broker"}
+			table = [][]string{tableHeaders}
+			for _, serviceSummary := range serviceSummaries {
+				table = append(table, []string{
+					serviceSummary.Label,
+					serviceSummary.Description,
+					serviceSummary.ServiceBrokerName,
+				})
+			}
+		} else {
+			tableHeaders := []string{"service", "plans", "description", "broker"}
+			table = [][]string{tableHeaders}
+			for _, serviceSummary := range serviceSummaries {
+				table = append(table, []string{
+					serviceSummary.Label,
+					planNames(serviceSummary),
+					serviceSummary.Description,
+					serviceSummary.ServiceBrokerName,
+				})
+			}
 		}
-
 		cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("TIP: Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service.")
