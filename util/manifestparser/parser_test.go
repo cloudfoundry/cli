@@ -438,6 +438,8 @@ applications:
 		When("marshaling does not error", func() {
 
 			It("returns just the app's manifest", func() {
+				expectedExpandedPath, err := filepath.EvalSymlinks(tmpMyPath)
+				Expect(err).ToNot(HaveOccurred())
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(string(rawAppManifest)).To(MatchYAML(fmt.Sprintf(`applications:
 - name: spark
@@ -445,7 +447,7 @@ applications:
   instances: 2
   docker:
     username: experiment
-  path: %s`, tmpMyPath)))
+  path: %s`, expectedExpandedPath)))
 			})
 		})
 
