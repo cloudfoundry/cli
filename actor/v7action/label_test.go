@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/actor/v7action/v7actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -20,7 +21,7 @@ var _ = Describe("UpdateApplicationLabelsByApplicationName", func() {
 		executeErr                error
 		appName                   string
 		spaceGUID                 string
-		labels                    map[string]string
+		labels                    map[string]types.NullString
 	)
 
 	BeforeEach(func() {

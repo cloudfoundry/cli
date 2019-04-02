@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v7"
 	"code.cloudfoundry.org/cli/command/v7/v7fakes"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	uuid "github.com/nu7hatch/gouuid"
@@ -92,9 +93,9 @@ var _ = Describe("set-label command", func() {
 						name, spaceGUID, labels := fakeActor.UpdateApplicationLabelsByApplicationNameArgsForCall(0)
 						Expect(name).To(Equal(appName), "failed to pass app name")
 						Expect(spaceGUID).To(Equal("some-space-guid"))
-						Expect(labels).To(BeEquivalentTo(map[string]string{
-							"FOO": "BAR",
-							"ENV": "FAKE",
+						Expect(labels).To(BeEquivalentTo(map[string]types.NullString{
+							"FOO": types.NewNullString("BAR"),
+							"ENV": types.NewNullString("FAKE"),
 						}))
 					})
 

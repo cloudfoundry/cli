@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -115,12 +116,11 @@ var _ = Describe("Application", func() {
 				BeforeEach(func() {
 					app = Application{
 						Metadata: struct {
-							Labels map[string]string `json:"labels,omitempty"`
+							Labels map[string]types.NullString `json:"labels,omitempty"`
 						}{
-							Labels: map[string]string{
-								"some-key":  "some-value",
-								"other-key": "other-value",
-							},
+							Labels: map[string]types.NullString{
+								"some-key":  types.NewNullString("some-value"),
+								"other-key": types.NewNullString("other-value")},
 						},
 					}
 				})
@@ -134,9 +134,35 @@ var _ = Describe("Application", func() {
 							}
 						}
 					}`))
-
 				})
 
+				When("labels need to be removed", func() {
+					BeforeEach(func() {
+						app = Application{
+							Metadata: struct {
+								Labels map[string]types.NullString `json:"labels,omitempty"`
+							}{
+								Labels: map[string]types.NullString{
+									"some-key":      types.NewNullString("some-value"),
+									"other-key":     types.NewNullString("other-value"),
+									"key-to-delete": types.NewNullString(),
+								},
+							},
+						}
+					})
+
+					It("should send nulls for those lables", func() {
+						Expect(string(appBytes)).To(MatchJSON(`{
+						"metadata": {
+							"labels": {
+								"some-key":"some-value",
+								"other-key":"other-value",
+								"key-to-delete":null
+							}
+						}
+					}`))
+					})
+				})
 			})
 		})
 

@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/types"
 )
 
 // Application represents a Cloud Controller V3 Application.
@@ -22,7 +23,7 @@ type Application struct {
 	LifecycleType constant.AppLifecycleType
 	// Metadata is used for custom tagging of API resources
 	Metadata struct {
-		Labels map[string]string `json:"labels,omitempty"`
+		Labels map[string]types.NullString `json:"labels,omitempty"`
 	}
 	// Name is the name given to the application.
 	Name string
@@ -103,7 +104,7 @@ type ccApplication struct {
 	GUID          string                    `json:"guid,omitempty"`
 	State         constant.ApplicationState `json:"state,omitempty"`
 	Metadata      *struct {
-		Labels map[string]string `json:"labels,omitempty"`
+		Labels map[string]types.NullString `json:"labels,omitempty"`
 	} `json:"metadata,omitempty"`
 }
 

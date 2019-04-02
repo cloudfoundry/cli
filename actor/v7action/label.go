@@ -1,6 +1,8 @@
 package v7action
 
-func (actor *Actor) UpdateApplicationLabelsByApplicationName(appName string, spaceGUID string, labels map[string]string) (Warnings, error) {
+import "code.cloudfoundry.org/cli/types"
+
+func (actor *Actor) UpdateApplicationLabelsByApplicationName(appName string, spaceGUID string, labels map[string]types.NullString) (Warnings, error) {
 	app, appWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return appWarnings, err

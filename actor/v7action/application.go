@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/types"
 )
 
 // Application represents a V3 actor application.
@@ -18,7 +19,7 @@ type Application struct {
 	LifecycleType       constant.AppLifecycleType
 	LifecycleBuildpacks []string
 	Metadata            struct {
-		Labels map[string]string `json:"labels,omitempty"`
+		Labels map[string]types.NullString `json:"labels,omitempty"`
 	}
 }
 

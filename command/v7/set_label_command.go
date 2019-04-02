@@ -9,12 +9,13 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/types"
 )
 
 //go:generate counterfeiter . SetLabelActor
 
 type SetLabelActor interface {
-	UpdateApplicationLabelsByApplicationName(string, string, map[string]string) (v7action.Warnings, error)
+	UpdateApplicationLabelsByApplicationName(string, string, map[string]types.NullString) (v7action.Warnings, error)
 }
 
 type SetLabelCommand struct {
@@ -62,13 +63,13 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 	)
 
 	appName := cmd.RequiredArgs.ResourceName
-	labels := make(map[string]string)
+	labels := make(map[string]types.NullString)
 	for _, label := range cmd.RequiredArgs.Labels {
 		parts := strings.SplitN(label, "=", 2)
 		if len(parts) < 2 {
 			return fmt.Errorf("Metadata error: no value provided for label '%s'", label)
 		}
-		labels[parts[0]] = parts[1]
+		labels[parts[0]] = types.NewNullString(parts[1])
 	}
 
 	warnings, err := cmd.Actor.UpdateApplicationLabelsByApplicationName(appName,

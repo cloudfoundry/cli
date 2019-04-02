@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -404,9 +405,9 @@ var _ = Describe("Application Actions", func() {
 				LifecycleType:       constant.AppLifecycleTypeBuildpack,
 				LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
 			}
-			submitApp.Metadata.Labels = map[string]string{
-				"some-label":  "some-value",
-				"other-label": "other-value",
+			submitApp.Metadata.Labels = map[string]types.NullString{
+				"some-label":  types.NewNullString("some-value"),
+				"other-label": types.NewNullString("other-value"),
 			}
 			resultApp, warnings, err = actor.UpdateApplication(submitApp)
 		})

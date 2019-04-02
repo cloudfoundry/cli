@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-type FakeSetLabelActor struct {
+type FakeDeleteLabelActor struct {
 	UpdateApplicationLabelsByApplicationNameStub        func(string, string, map[string]types.NullString) (v7action.Warnings, error)
 	updateApplicationLabelsByApplicationNameMutex       sync.RWMutex
 	updateApplicationLabelsByApplicationNameArgsForCall []struct {
@@ -29,7 +29,7 @@ type FakeSetLabelActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationName(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
+func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationName(arg1 string, arg2 string, arg3 map[string]types.NullString) (v7action.Warnings, error) {
 	fake.updateApplicationLabelsByApplicationNameMutex.Lock()
 	ret, specificReturn := fake.updateApplicationLabelsByApplicationNameReturnsOnCall[len(fake.updateApplicationLabelsByApplicationNameArgsForCall)]
 	fake.updateApplicationLabelsByApplicationNameArgsForCall = append(fake.updateApplicationLabelsByApplicationNameArgsForCall, struct {
@@ -49,26 +49,26 @@ func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationName(arg1 str
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationNameCallCount() int {
+func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameCallCount() int {
 	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
 	return len(fake.updateApplicationLabelsByApplicationNameArgsForCall)
 }
 
-func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationNameCalls(stub func(string, string, map[string]types.NullString) (v7action.Warnings, error)) {
+func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameCalls(stub func(string, string, map[string]types.NullString) (v7action.Warnings, error)) {
 	fake.updateApplicationLabelsByApplicationNameMutex.Lock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.Unlock()
 	fake.UpdateApplicationLabelsByApplicationNameStub = stub
 }
 
-func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationNameArgsForCall(i int) (string, string, map[string]types.NullString) {
+func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameArgsForCall(i int) (string, string, map[string]types.NullString) {
 	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
 	argsForCall := fake.updateApplicationLabelsByApplicationNameArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationNameReturns(result1 v7action.Warnings, result2 error) {
+func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameReturns(result1 v7action.Warnings, result2 error) {
 	fake.updateApplicationLabelsByApplicationNameMutex.Lock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.Unlock()
 	fake.UpdateApplicationLabelsByApplicationNameStub = nil
@@ -78,7 +78,7 @@ func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationNameReturns(r
 	}{result1, result2}
 }
 
-func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+func (fake *FakeDeleteLabelActor) UpdateApplicationLabelsByApplicationNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
 	fake.updateApplicationLabelsByApplicationNameMutex.Lock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.Unlock()
 	fake.UpdateApplicationLabelsByApplicationNameStub = nil
@@ -94,7 +94,7 @@ func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationNameReturnsOn
 	}{result1, result2}
 }
 
-func (fake *FakeSetLabelActor) Invocations() map[string][][]interface{} {
+func (fake *FakeDeleteLabelActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
@@ -106,7 +106,7 @@ func (fake *FakeSetLabelActor) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeSetLabelActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeDeleteLabelActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -118,4 +118,4 @@ func (fake *FakeSetLabelActor) recordInvocation(key string, args []interface{}) 
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v7.SetLabelActor = new(FakeSetLabelActor)
+var _ v7.DeleteLabelActor = new(FakeDeleteLabelActor)
