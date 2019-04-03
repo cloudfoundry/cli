@@ -438,7 +438,7 @@ var _ = Describe("login command", func() {
 		})
 	})
 
-	Describe("Target Organization", func() {
+	FDescribe("Target Organization", func() {
 		var (
 			orgName  string
 			username string
@@ -446,11 +446,16 @@ var _ = Describe("login command", func() {
 		)
 
 		BeforeEach(func() {
+			helpers.TurnOnExperimentalLogin()
 			helpers.LoginCF()
 			orgName = helpers.NewOrgName()
 			session := helpers.CF("create-org", orgName)
 			Eventually(session).Should(Exit(0))
 			username, password = helpers.CreateUserInOrgRole(orgName, "OrgManager")
+		})
+
+		AfterEach(func() {
+			helpers.TurnOffExperimentalLogin()
 		})
 
 		When("there is only one org available to the user", func() {
@@ -577,7 +582,7 @@ var _ = Describe("login command", func() {
 			})
 		})
 
-		When("the -o flag is passed", func() {
+		FWhen("the -o flag is passed", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 			})
@@ -587,6 +592,7 @@ var _ = Describe("login command", func() {
 					session := helpers.CF("login", "-u", username, "-p", password, "-o", orgName)
 
 					Eventually(session).Should(Exit(0))
+					Eventually(session).Should(Say(`Org:\s+%s`, orgName))
 
 					targetSession := helpers.CF("target")
 					Eventually(targetSession).Should(Exit(0))
@@ -601,7 +607,7 @@ var _ = Describe("login command", func() {
 
 					Eventually(session).Should(Exit(1))
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Say("Organization %s not found", orgName))
+					Eventually(session.Err).Should(Say("Organization '%s' not found", orgName))
 
 					targetSession := helpers.CF("target")
 					Eventually(targetSession).Should(Exit(0))

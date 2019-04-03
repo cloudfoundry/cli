@@ -58,6 +58,10 @@ func (actor Actor) GetOrganizationsByGUIDs(guids ...string) ([]Organization, War
 	return actor.convertCCToActorOrganizations(orgs), Warnings(warnings), nil
 }
 
+func (actor Actor) GetOrganizations() ([]Organization, Warnings, error) {
+	return []Organization{}, Warnings{}, nil
+}
+
 func (actor Actor) convertCCToActorOrganizations(v3orgs []ccv3.Organization) []Organization {
 	orgs := make([]Organization, len(v3orgs))
 	for i := range v3orgs {

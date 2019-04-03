@@ -3,6 +3,7 @@ package v6_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -18,6 +19,7 @@ import (
 
 var _ = Describe("login Command", func() {
 	var (
+		binaryName       string
 		cmd              LoginCommand
 		testUI           *ui.UI
 		fakeActor        *v6fakes.FakeLoginActor
@@ -40,6 +42,8 @@ var _ = Describe("login Command", func() {
 		fakeChecker = new(v6fakes.FakeVersionChecker)
 		fakeCheckerMaker = new(v6fakes.FakeCheckerMaker)
 		fakeCheckerMaker.NewVersionCheckerReturns(fakeChecker, nil)
+		binaryName = "some-executable"
+		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = LoginCommand{
 			UI:           testUI,
@@ -49,7 +53,6 @@ var _ = Describe("login Command", func() {
 			CheckerMaker: fakeCheckerMaker,
 		}
 		cmd.APIEndpoint = ""
-		fakeConfig.BinaryNameReturns("faceman")
 	})
 
 	JustBeforeEach(func() {
@@ -678,7 +681,161 @@ var _ = Describe("login Command", func() {
 						Expect(testUI.Out).To(Say(`Authenticating...`))
 						Expect(testUI.Err).To(Say("Cloud Foundry API version 2.123.0 requires CLI version 9000.0.0. You are currently on version 1.2.3. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"))
 						Expect(testUI.Out).To(Say(`API endpoint:\s+%s`, cmd.APIEndpoint))
-						Expect(testUI.Out).To(Say(`Not logged in. Use 'faceman login' to log in.`))
+						Expect(testUI.Out).To(Say(`Not logged in. Use '%s login' to log in.`, binaryName))
+					})
+				})
+			})
+		})
+
+		Describe("Targeting Org and Space", func() {
+			BeforeEach(func() {
+				cmd.APIEndpoint = "example.com"
+				cmd.Username = "some-user"
+				cmd.Password = "some-password"
+				fakeConfig.APIVersionReturns("3.4.5")
+				fakeConfig.CurrentUserNameReturns("some-user", nil)
+			})
+
+			When("-o was passed", func() {
+				BeforeEach(func() {
+					cmd.Organization = "some-org"
+				})
+
+				It("fetches the specified organization", func() {
+					Expect(fakeActor.GetOrganizationByNameCallCount()).To(Equal(1))
+					Expect(fakeActor.GetOrganizationsCallCount()).To(Equal(0))
+					Expect(fakeActor.GetOrganizationByNameArgsForCall(0)).To(Equal("some-org"))
+				})
+
+				When("fetching the organization succeeds", func() {
+					BeforeEach(func() {
+						fakeActor.GetOrganizationByNameReturns(
+							v3action.Organization{Name: "some-org", GUID: "some-guid"},
+							v3action.Warnings{"some-warning-1", "some-warning-2"},
+							nil)
+						fakeConfig.TargetedOrganizationNameReturns("some-org")
+					})
+
+					It("prints all warnings", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
+					})
+
+					It("sets the targeted organization in the config", func() {
+						Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
+						orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
+						Expect(orgGUID).To(Equal("some-guid"))
+						Expect(orgName).To(Equal("some-org"))
+					})
+
+					It("reports to the user that the org is targeted", func() {
+						Expect(testUI.Out).To(Say("API endpoint:   example.com \\(API version: 3.4.5\\)"))
+						Expect(testUI.Out).To(Say("User:           some-user"))
+						Expect(testUI.Out).To(Say("Org:            some-org"))
+					})
+				})
+
+				When("fetching  the organization fails", func() {
+					BeforeEach(func() {
+						fakeActor.GetOrganizationByNameReturns(
+							v3action.Organization{},
+							v3action.Warnings{"some-warning-1", "some-warning-2"},
+							errors.New("org-not-found"),
+						)
+					})
+
+					It("prints all warnings", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
+					})
+
+					It("does not set the targeted org", func() {
+						Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
+					})
+				})
+			})
+
+			When("-o was not passed", func() {
+				BeforeEach(func() {
+					cmd.APIEndpoint = "example.com"
+					cmd.Username = "some-user"
+					cmd.Password = "some-password"
+					fakeActor.GetOrganizationsReturns(
+						[]v3action.Organization{},
+						v3action.Warnings{"some-org-warning-1", "some-org-warning-2"},
+						nil,
+					)
+				})
+
+				It("fetches the available organizations", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeActor.GetOrganizationsCallCount()).To(Equal(1))
+				})
+
+				It("prints all warnings", func() {
+					Expect(testUI.Err).To(Say("some-org-warning-1"))
+					Expect(testUI.Err).To(Say("some-org-warning-2"))
+				})
+
+				When("fetching the organizations succeeds", func() {
+					BeforeEach(func() {
+						fakeConfig.CurrentUserNameReturns("some-user", nil)
+					})
+
+					When("no org exists", func() {
+						It("displays how to target an org and space", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("API endpoint:   example.com \\(API version: 3.4.5\\)"))
+							Expect(testUI.Out).To(Say("User:           some-user"))
+							Expect(testUI.Out).To(Say("No org or space targeted, use '%s target -o ORG -s SPACE'", binaryName))
+						})
+					})
+
+					When("only one org exists", func() {
+						BeforeEach(func() {
+							fakeActor.GetOrganizationsReturns(
+								[]v3action.Organization{v3action.Organization{
+									GUID: "some-org-guid",
+									Name: "some-org-name",
+								}},
+								v3action.Warnings{"some-org-warning-1", "some-org-warning-2"},
+								nil,
+							)
+						})
+
+						It("targets that org", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
+							orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
+							Expect(orgGUID).To(Equal("some-org-guid"))
+							Expect(orgName).To(Equal("some-org-name"))
+						})
+					})
+
+					When("more than one org exists", func() {
+						It("prompts the user to select an org", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+						})
+					})
+				})
+
+				When("fetching the organizations fails", func() {
+					BeforeEach(func() {
+						fakeActor.GetOrganizationsReturns(
+							[]v3action.Organization{},
+							v3action.Warnings{"some-warning-1", "some-warning-2"},
+							errors.New("api call failed"),
+						)
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError("api call failed"))
+					})
+
+					It("prints all warnings", func() {
+						Expect(testUI.Err).To(Say("some-warning-1"))
+						Expect(testUI.Err).To(Say("some-warning-2"))
 					})
 				})
 			})

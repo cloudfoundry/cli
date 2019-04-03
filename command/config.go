@@ -56,6 +56,7 @@ type Config interface {
 	SSHOAuthClient() string
 	StagingTimeout() time.Duration
 	StartupTimeout() time.Duration
+	// TODO: Rename to APITarget()
 	Target() string
 	TargetedOrganization() configv3.Organization
 	TargetedOrganizationName() string
