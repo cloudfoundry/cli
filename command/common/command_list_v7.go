@@ -104,6 +104,7 @@ type commandList struct {
 	InstallPlugin                      InstallPluginCommand                         `command:"install-plugin" description:"Install CLI plugin"`
 	IsolationSegments                  v6.IsolationSegmentsCommand                  `command:"isolation-segments" description:"List all isolation segments"`
 	NetworkPolicies                    v6.NetworkPoliciesCommand                    `command:"network-policies" description:"List direct network traffic policies"`
+	Labels                             v7.LabelsCommand                             `command:"labels" description:"List all labels (key-value pairs) for an API resource"`
 	ListPluginRepos                    plugin.ListPluginReposCommand                `command:"list-plugin-repos" description:"List all the added plugin repositories"`
 	Login                              v6.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
 	Logout                             v6.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
