@@ -259,15 +259,7 @@ func (cmd HelpCommand) displayCommand() error {
 		cmd.UI.DisplayText("OPTIONS:")
 		nameWidth := internal.LongestFlagWidth(cmdInfo.Flags) + 6
 		for _, flag := range cmdInfo.Flags {
-			var name string
-			if flag.Short != "" && flag.Long != "" {
-				name = fmt.Sprintf("--%s, -%s", flag.Long, flag.Short)
-			} else if flag.Short != "" {
-				name = "-" + flag.Short
-			} else {
-				name = "--" + flag.Long
-			}
-
+			name := internal.FlagWithHyphens(flag)
 			defaultText := ""
 			if flag.Default != "" {
 				defaultText = cmd.UI.TranslateText(" (Default: {{.DefaultValue}})", map[string]interface{}{

@@ -45,7 +45,8 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 			continue
 		}
 
-		if strings.HasPrefix(row, "#") {
+		switch {
+		case strings.HasPrefix(row, "#"):
 			// instance row
 			columns := splitColumns(row)
 			details := ""
@@ -68,19 +69,22 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 				instanceRow,
 			)
 
-		} else if strings.HasPrefix(row, "type:") {
+		case strings.HasPrefix(row, "type:"):
 			appTable.Processes = append(appTable.Processes, AppProcessTable{
 				Type: strings.TrimSpace(strings.TrimPrefix(row, "type:")),
 			})
-		} else if strings.HasPrefix(row, "instances:") {
+
+		case strings.HasPrefix(row, "instances:"):
 			lpi := len(appTable.Processes) - 1
 			iVal := strings.TrimSpace(strings.TrimPrefix(row, "instances:"))
 			appTable.Processes[lpi].InstanceCount = iVal
-		} else if strings.HasPrefix(row, "memory usage:") {
+
+		case strings.HasPrefix(row, "memory usage:"):
 			lpi := len(appTable.Processes) - 1
 			mVal := strings.TrimSpace(strings.TrimPrefix(row, "memory usage:"))
 			appTable.Processes[lpi].MemUsage = mVal
-		} else {
+
+		default:
 			// column headers
 			continue
 		}

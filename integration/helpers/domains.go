@@ -36,9 +36,7 @@ func DefaultSharedDomain() string {
 		session := CF("domains")
 		Eventually(session).Should(Exit(0))
 
-		regex, err := regexp.Compile(`(.+?)\s+shared`)
-		Expect(err).ToNot(HaveOccurred())
-
+		regex := regexp.MustCompile(`(.+?)\s+shared`)
 		matches := regex.FindStringSubmatch(string(session.Out.Contents()))
 		Expect(matches).To(HaveLen(2))
 

@@ -92,8 +92,7 @@ var _ = Describe("v3-set-droplet command", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-package", appName)
 					Eventually(pkgSession).Should(Exit(0))
-					regex, err := regexp.Compile(`package guid: (.+)`)
-					Expect(err).ToNot(HaveOccurred())
+					regex := regexp.MustCompile(`package guid: (.+)`)
 					matches := regex.FindStringSubmatch(string(pkgSession.Out.Contents()))
 					Expect(matches).To(HaveLen(2))
 
@@ -103,8 +102,7 @@ var _ = Describe("v3-set-droplet command", func() {
 				stageSession := helpers.CF("v3-stage", appName, "--package-guid", packageGUID)
 				Eventually(stageSession).Should(Exit(0))
 
-				regex, err := regexp.Compile(`droplet guid:\s+(.+)`)
-				Expect(err).ToNot(HaveOccurred())
+				regex := regexp.MustCompile(`droplet guid:\s+(.+)`)
 				matches := regex.FindStringSubmatch(string(stageSession.Out.Contents()))
 				Expect(matches).To(HaveLen(2))
 

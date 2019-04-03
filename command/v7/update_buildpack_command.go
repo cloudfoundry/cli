@@ -1,6 +1,10 @@
 package v7
 
 import (
+	"io/ioutil"
+	"os"
+	"time"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v7action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -11,9 +15,6 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/download"
-	"io/ioutil"
-	"os"
-	"time"
 )
 
 //go:generate counterfeiter . UpdateBuildpackActor
@@ -192,7 +193,8 @@ func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
 		})
 	}
 
-	if cmd.NewStack != "" {
+	switch {
+	case cmd.NewStack != "":
 		cmd.UI.DisplayTextWithFlavor("Assigning stack {{.Stack}} to {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   buildpackName,
 			"CurrentUser": userName,
@@ -205,12 +207,12 @@ func (cmd UpdateBuildpackCommand) printInitialText(userName string) {
 				"Stack":       cmd.NewStack,
 			})
 		}
-	} else if cmd.CurrentStack == "" {
+	case cmd.CurrentStack == "":
 		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   buildpackName,
 			"CurrentUser": userName,
 		})
-	} else {
+	default:
 		cmd.UI.DisplayTextWithFlavor("Updating buildpack {{.Buildpack}} with stack {{.Stack}} as {{.CurrentUser}}...", map[string]interface{}{
 			"Buildpack":   buildpackName,
 			"CurrentUser": userName,

@@ -34,13 +34,14 @@ func (actor Actor) CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID
 	spaceRoute, spaceRouteWarnings, err := actor.V2Actor.FindRouteBoundToSpaceWithSettings(defaultRoute)
 	warnings = append(warnings, spaceRouteWarnings...)
 	routeAlreadyExists := true
-	if _, ok := err.(actionerror.RouteNotFoundError); ok {
+	switch err.(type) {
+	case actionerror.RouteNotFoundError:
 		routeAlreadyExists = false
-	} else if err != nil {
+	case nil:
+		log.Debug("route already exists")
+	default:
 		log.Errorln("checking if route is in space:", err)
 		return warnings, err
-	} else {
-		log.Debug("route already exists")
 	}
 
 	if !routeAlreadyExists {

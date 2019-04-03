@@ -194,12 +194,13 @@ func (ui UI) displayDiffForStrings(offset string, header string, oldList []strin
 		inOld := existsIn(item, oldList)
 		inNew := existsIn(item, newList)
 
-		if inOld && inNew {
+		switch {
+		case inOld && inNew:
 			fmt.Fprintf(ui.Out, "    %s\n", item)
-		} else if inOld {
+		case inOld:
 			formattedOld := fmt.Sprintf("-   %s", item)
 			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
-		} else {
+		default:
 			formattedNew := fmt.Sprintf("+   %s", item)
 			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
 		}

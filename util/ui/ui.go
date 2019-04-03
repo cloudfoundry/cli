@@ -326,13 +326,14 @@ func (ui *UI) displayWrappingTableWithWidth(prefix string, table [][]string, pad
 
 		for _, word := range words {
 			wordWidth := runewidth.StringWidth(word)
-			if currentWidth == 0 {
+			switch {
+			case currentWidth == 0:
 				currentWidth = wordWidth
 				fmt.Fprintf(ui.Out, "%s", word)
-			} else if wordWidth+1+currentWidth > lastColumnWidth {
+			case (wordWidth + 1 + currentWidth) > lastColumnWidth:
 				fmt.Fprintf(ui.Out, "\n%s%s", strings.Repeat(" ", spilloverPadding), word)
 				currentWidth = wordWidth
-			} else {
+			default:
 				fmt.Fprintf(ui.Out, " %s", word)
 				currentWidth += wordWidth + 1
 			}

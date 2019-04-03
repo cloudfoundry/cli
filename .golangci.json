@@ -48,6 +48,8 @@
       "unconvert",
       "depguard",
       "misspell",
+      "gochecknoinits",
+      "gocritic",
       "staticcheck"
     ]
   },

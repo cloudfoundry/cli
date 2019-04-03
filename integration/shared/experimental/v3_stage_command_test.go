@@ -91,8 +91,7 @@ var _ = Describe("v3-stage command", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-package", appName)
 					Eventually(pkgSession).Should(Exit(0))
-					regex, err := regexp.Compile(`package guid: (.+)`)
-					Expect(err).ToNot(HaveOccurred())
+					regex := regexp.MustCompile(`package guid: (.+)`)
 					matches := regex.FindStringSubmatch(string(pkgSession.Out.Contents()))
 					Expect(matches).To(HaveLen(2))
 
