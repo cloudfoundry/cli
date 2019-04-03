@@ -47,7 +47,8 @@
       "goconst",
       "unconvert",
       "depguard",
-      "misspell"
+      "misspell",
+      "staticcheck"
     ]
   },
   "linters-settings": {

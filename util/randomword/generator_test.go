@@ -12,10 +12,6 @@ import (
 var _ = Describe("Generator", func() {
 	var gen Generator
 
-	BeforeEach(func() {
-		gen = Generator{}
-	})
-
 	Describe("RandomAdjective", func() {
 		It("generates a random adjective each time it is called", func() {
 			setOne := []string{}
@@ -25,7 +21,7 @@ var _ = Describe("Generator", func() {
 				setOne = append(setOne, gen.RandomAdjective())
 				// We wait for 3 millisecond because the seed we use to generate the
 				// randomness has a unit of 1 nanosecond plus random test flakiness
-				time.Sleep(3)
+				time.Sleep(3 * time.Nanosecond)
 				setTwo = append(setTwo, gen.RandomAdjective())
 			}
 			Expect(setOne).ToNot(ConsistOf(setTwo))
@@ -41,7 +37,7 @@ var _ = Describe("Generator", func() {
 				setOne = append(setOne, gen.RandomNoun())
 				// We wait for 3 millisecond because the seed we use to generate the
 				// randomness has a unit of 1 nanosecond plus random test flakiness
-				time.Sleep(3)
+				time.Sleep(3 * time.Nanosecond)
 				setTwo = append(setTwo, gen.RandomNoun())
 			}
 			Expect(setOne).ToNot(ConsistOf(setTwo))

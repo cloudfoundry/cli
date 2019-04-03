@@ -33,10 +33,7 @@ func ParseV3AppProcessTable(input []byte) AppTable {
 	foundFirstProcess := false
 	for _, row := range rows {
 		if !foundFirstProcess {
-			ok, err := regexp.MatchString(`\Atype:([^:]+)\z`, row)
-			if err != nil {
-				panic(err)
-			}
+			ok := regexp.MustCompile(`\Atype:([^:]+)\z`).Match([]byte(row))
 			if ok {
 				foundFirstProcess = true
 			} else {

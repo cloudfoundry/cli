@@ -15,8 +15,8 @@ func ConvertPathToRegularExpression(path string) string {
 
 func TempFileWithContent(contents string) string {
 	tempFile, err := ioutil.TempFile("", "*")
-	defer tempFile.Close()
 	Expect(err).NotTo(HaveOccurred())
+	defer tempFile.Close()
 
 	bytes := []byte(contents)
 	_, err = tempFile.Write(bytes)

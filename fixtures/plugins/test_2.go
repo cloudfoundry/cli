@@ -1,3 +1,5 @@
+// +build !V7
+
 /**
 	* 1. Setup the server so cf can call it under main.
 				e.g. `cf my-plugin` creates the callable server. now we can call the Run command

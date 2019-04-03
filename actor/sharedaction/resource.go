@@ -304,11 +304,11 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 			}
 		} else {
 			srcFile, err := os.Open(fullPath)
-			defer srcFile.Close()
 			if err != nil {
 				log.WithField("fullPath", fullPath).Errorln("opening path in dir:", err)
 				return zipPath, err
 			}
+			defer srcFile.Close()
 
 			err = actor.addFileToZipFromFileSystem(
 				fullPath, srcFile, fileInfo,

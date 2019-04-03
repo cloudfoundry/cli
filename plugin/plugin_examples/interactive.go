@@ -1,3 +1,5 @@
+// +build !V7
+
 /**
 * This is an example of an interactive plugin. The plugin is invoked with
 * `cf interactive` after which the user is prompted to enter a word. This word is

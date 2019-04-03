@@ -65,6 +65,10 @@ func WriteFailureSummary(outputRoot, filename string) {
 		panic(err)
 	}
 	err = filepath.Walk(outputRoot, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
 		if info.IsDir() {
 			return nil
 		}

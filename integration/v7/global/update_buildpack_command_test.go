@@ -316,8 +316,8 @@ var _ = Describe("update-buildpack command", func() {
 									buildpackPath, err = ioutil.TempDir("", "create-buildpack-test-")
 									Expect(err).ToNot(HaveOccurred())
 									file, err := ioutil.TempFile(buildpackPath, "")
-									defer file.Close()
 									Expect(err).ToNot(HaveOccurred())
+									defer file.Close()
 								})
 
 								AfterEach(func() {
