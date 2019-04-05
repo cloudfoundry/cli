@@ -40,6 +40,31 @@ var _ = Describe("Job", func() {
 			Entry("when complete, it returns false", constant.JobComplete, false),
 			Entry("when processing, it returns false", constant.JobProcessing, false),
 		)
+
+		DescribeTable("Errors converts JobErrorDetails",
+			func(code int, expectedErrType error) {
+				rawErr := JobErrorDetails{
+					Code:   constant.JobErrorCode(code),
+					Detail: fmt.Sprintf("code %d", code),
+					Title:  "some-err-title",
+				}
+
+				job := Job{
+					GUID:      "some-job-guid",
+					RawErrors: []JobErrorDetails{rawErr},
+				}
+
+				Expect(job.Errors()).To(HaveLen(1))
+				Expect(job.Errors()[0]).To(MatchError(expectedErrType))
+			},
+
+			Entry("BuildpackNameStackTaken", 290000, ccerror.BuildpackAlreadyExistsForStackError{Message: "code 290000"}),
+			Entry("BuildpackInvalid", 290003, ccerror.BuildpackAlreadyExistsWithoutStackError{Message: "code 290003"}),
+			Entry("BuildpackStacksDontMatch", 390011, ccerror.BuildpackStacksDontMatchError{Message: "code 390011"}),
+			Entry("BuildpackStackDoesNotExist", 390012, ccerror.BuildpackStackDoesNotExistError{Message: "code 390012"}),
+			Entry("BuildpackZipError", 390013, ccerror.BuildpackZipInvalidError{Message: "code 390013"}),
+			Entry("V3JobFailedError", 1111111, ccerror.V3JobFailedError{JobGUID: "some-job-guid", Code: constant.JobErrorCode(1111111), Detail: "code 1111111", Title: "some-err-title"}),
+		)
 	})
 
 	Describe("GetJob", func() {
@@ -126,9 +151,9 @@ var _ = Describe("Job", func() {
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
 				Expect(job.State).To(Equal(constant.JobFailed))
-				Expect(job.Errors[0].Detail).To(Equal("blah blah"))
-				Expect(job.Errors[0].Title).To(Equal("CF-JobFail"))
-				Expect(job.Errors[0].Code).To(BeEquivalentTo(1234))
+				Expect(job.RawErrors[0].Detail).To(Equal("blah blah"))
+				Expect(job.RawErrors[0].Title).To(Equal("CF-JobFail"))
+				Expect(job.RawErrors[0].Code).To(BeEquivalentTo(1234))
 			})
 		})
 	})
@@ -214,11 +239,7 @@ var _ = Describe("Job", func() {
 		})
 
 		When("the job starts queued and then fails", func() {
-			var jobFailureMessage string
-
 			BeforeEach(func() {
-				jobFailureMessage = "I am a banana!!!"
-
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/some-job-location"),
@@ -264,24 +285,20 @@ var _ = Describe("Job", func() {
 							"state": "FAILED",
 							"errors": [ {
 								"detail": "%s",
-								"title": "CF-AppBitsUploadInvalid",
-								"code": 160001
+								"code": %d
 							} ],
 							"links": {
 								"self": {
 									"href": "/v3/jobs/job-guid"
 								}
 							}
-						}`, jobFailureMessage), http.Header{"X-Cf-Warnings": {"warning-4"}}),
+						}`, "some-message", constant.JobErrorCodeBuildpackAlreadyExistsForStack), http.Header{"X-Cf-Warnings": {"warning-4"}}),
 					))
 			})
 
-			It("returns a JobFailedError", func() {
-				Expect(executeErr).To(MatchError(ccerror.V3JobFailedError{
-					JobGUID: "job-guid",
-					Code:    160001,
-					Detail:  jobFailureMessage,
-					Title:   "CF-AppBitsUploadInvalid",
+			It("returns the first error", func() {
+				Expect(executeErr).To(MatchError(ccerror.BuildpackAlreadyExistsForStackError{
+					Message: "some-message",
 				}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
 			})

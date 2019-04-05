@@ -11,3 +11,14 @@ const (
 	// JobProcessing is when the job is waiting to be run.
 	JobProcessing JobState = "PROCESSING"
 )
+
+// JobErrorCode is the numeric code for a particular error.
+type JobErrorCode int64
+
+const (
+	JobErrorCodeBuildpackAlreadyExistsForStack     JobErrorCode = 290000
+	JobErrorCodeBuildpackAlreadyExistsWithoutStack JobErrorCode = 290003
+	JobErrorCodeBuildpackStacksDontMatch           JobErrorCode = 390011
+	JobErrorCodeBuildpackStackDoesNotExist         JobErrorCode = 390012
+	JobErrorCodeBuildpackZipInvalid                JobErrorCode = 390013
+)

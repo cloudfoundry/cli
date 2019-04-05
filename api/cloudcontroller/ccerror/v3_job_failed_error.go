@@ -2,6 +2,8 @@ package ccerror
 
 import (
 	"fmt"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 // V2JobFailedError represents a failed Cloud Controller Job. It wraps the error
@@ -10,7 +12,7 @@ type V3JobFailedError struct {
 	JobGUID string
 
 	// Code is a numeric code for this error.
-	Code int64 `json:"code"`
+	Code constant.JobErrorCode `json:"code"`
 	// Detail is a verbose description of the error.
 	Detail string `json:"detail"`
 	// Title is a short description of the error.
