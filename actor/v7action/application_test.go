@@ -187,6 +187,13 @@ var _ = Describe("Application Actions", func() {
 						{
 							Name: "some-app-name",
 							GUID: "some-app-guid",
+							Metadata: struct {
+								Labels map[string]types.NullString `json:"labels,omitempty"`
+							}{
+								Labels: map[string]types.NullString{
+									"some-key": types.NewNullString("some-value"),
+								},
+							},
 						},
 					},
 					ccv3.Warnings{"some-warning"},
@@ -200,6 +207,11 @@ var _ = Describe("Application Actions", func() {
 				Expect(app).To(Equal(Application{
 					Name: "some-app-name",
 					GUID: "some-app-guid",
+					Metadata: struct {
+						Labels map[string]types.NullString `json:"labels,omitempty"`
+					}{
+						Labels: map[string]types.NullString{"some-key": types.NewNullString("some-value")},
+					},
 				}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 

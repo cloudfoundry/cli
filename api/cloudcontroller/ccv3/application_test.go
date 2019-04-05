@@ -175,6 +175,7 @@ var _ = Describe("Application", func() {
 
 			BeforeEach(func() {
 				appBytes = []byte("{}")
+				app = Application{}
 			})
 
 			JustBeforeEach(func() {
@@ -216,6 +217,24 @@ var _ = Describe("Application", func() {
 							LifecycleBuildpacks: []string{"some-buildpack"},
 						}))
 					})
+				})
+			})
+
+			When("Labels are provided", func() {
+				BeforeEach(func() {
+					appBytes = []byte(`{"metadata":{"labels":{"some-key":"some-value"}}}`)
+				})
+
+				It("sets the labels", func() {
+					Expect(app).To(Equal(Application{
+						Metadata: struct {
+							Labels map[string]types.NullString `json:"labels,omitempty"`
+						}{
+							Labels: map[string]types.NullString{
+								"some-key": types.NewNullString("some-value"),
+							},
+						},
+					}))
 				})
 			})
 		})
