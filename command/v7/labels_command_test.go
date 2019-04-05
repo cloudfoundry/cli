@@ -2,6 +2,7 @@ package v7_test
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/actor/v7action"
@@ -26,10 +27,13 @@ var _ = Describe("labels command", func() {
 		testUI          *ui.UI
 
 		executeErr error
+		out        *Buffer
 	)
 
 	BeforeEach(func() {
-		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+
+		out = NewBuffer()
+		testUI = ui.NewTestUI(nil, out, NewBuffer())
 		fakeActor = new(v7fakes.FakeGetLabelsActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
@@ -77,8 +81,8 @@ var _ = Describe("labels command", func() {
 		It("displays a message that it is retrieving the labels", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for app dora in org fake-org / space fake-space as some-user...`)))
-			Expect(testUI.Out).To(Say("OK"))
+			Eventually(testUI.Out).Should(Say(regexp.QuoteMeta(`Getting labels for app dora in org fake-org / space fake-space as some-user...`)))
+			Eventually(testUI.Out).Should(Say("OK"))
 		})
 
 		It("retrieves the labels associated with the application", func() {
@@ -89,9 +93,10 @@ var _ = Describe("labels command", func() {
 		})
 
 		It("displays the labels that are associated with the application", func() {
-			Expect(testUI.Out).To(Say(`Key\s+Value`))
-			Expect(testUI.Out).To(Say(`some-label\s+some-value`))
-			Expect(testUI.Out).To(Say(`some-other-label\s+some-other-value`))
+			Eventually(testUI.Out).Should(Say(`Key\s+Value`))
+			Eventually(testUI.Out).Should(Say(`some-label\s+some-value`))
+			fmt.Println(string(out.Contents()))
+			Eventually(testUI.Out).Should(Say(`some-other-label\s+some-other-value`))
 		})
 
 		When("CAPI returns warnings", func() {
@@ -106,8 +111,8 @@ var _ = Describe("labels command", func() {
 			})
 
 			It("prints all warnings", func() {
-				Expect(testUI.Err).To(Say("some-warning-1"))
-				Expect(testUI.Err).To(Say("some-warning-2"))
+				Eventually(testUI.Err).Should(Say("some-warning-1"))
+				Eventually(testUI.Err).Should(Say("some-warning-2"))
 			})
 		})
 
@@ -127,8 +132,8 @@ var _ = Describe("labels command", func() {
 			})
 
 			It("still prints all warnings", func() {
-				Expect(testUI.Err).To(Say("some-warning-1"))
-				Expect(testUI.Err).To(Say("some-warning-2"))
+				Eventually(testUI.Err).Should(Say("some-warning-1"))
+				Eventually(testUI.Err).Should(Say("some-warning-2"))
 			})
 
 			It("doesn't say ok", func() {
