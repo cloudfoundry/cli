@@ -63,6 +63,7 @@ var _ = Describe("delete-label command", func() {
 		It("sets the specified labels on the app", func() {
 			session := helpers.CF("delete-label", "app", appName, "some-other-key", "some-third-key")
 			Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting label(s) for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
+			Consistently(session).ShouldNot(Say("\n\nOK"))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 

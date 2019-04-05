@@ -53,7 +53,6 @@ func (cmd DeleteLabelCommand) Execute(args []string) error {
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
-	cmd.UI.DisplayNewline()
 
 	labels := make(map[string]types.NullString)
 	for _, value := range cmd.RequiredArgs.LabelKeys {
