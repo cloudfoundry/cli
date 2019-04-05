@@ -79,7 +79,7 @@ var _ = Describe("push with a manifest and an app name", func() {
 		})
 
 		session := helpers.CF("app", appName)
-		Consistently(session).ShouldNot(Say(`routes:\s+\S+`))
+		Eventually(session).Should(Say(`(?m)routes:\s+$`))
 		Eventually(session).Should(Exit(0))
 
 	})
