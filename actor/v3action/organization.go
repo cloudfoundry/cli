@@ -55,20 +55,21 @@ func (actor Actor) GetOrganizationsByGUIDs(guids ...string) ([]Organization, War
 	}
 	orgs = filteredOrgs
 
-	return actor.convertCCToActorOrganizations(orgs), Warnings(warnings), nil
+	return convertCCToActorOrganizations(orgs), Warnings(warnings), nil
 }
 
 func (actor Actor) GetOrganizations() ([]Organization, Warnings, error) {
-	return []Organization{}, Warnings{}, nil
+	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations()
+	if err != nil {
+		return []Organization{}, Warnings(warnings), err
+	}
+	return convertCCToActorOrganizations(orgs), Warnings(warnings), nil
 }
 
-func (actor Actor) convertCCToActorOrganizations(v3orgs []ccv3.Organization) []Organization {
+func convertCCToActorOrganizations(v3orgs []ccv3.Organization) []Organization {
 	orgs := make([]Organization, len(v3orgs))
 	for i := range v3orgs {
-		orgs[i] = Organization{
-			GUID: v3orgs[i].GUID,
-			Name: v3orgs[i].Name,
-		}
+		orgs[i] = Organization(v3orgs[i])
 	}
 	return orgs
 }

@@ -9,5 +9,5 @@ type RequiredDestination struct {
 
 // Required is a convenience function for constructing a RequiredDestination.
 func Required(dst interface{}) RequiredDestination {
-	return RequiredDestination{dst}
+	return RequiredDestination{Destination: dst}
 }

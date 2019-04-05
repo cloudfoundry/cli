@@ -65,6 +65,43 @@ func (ui *UI) DisplayTextPrompt(template string, templateValues ...map[string]in
 	return value, err
 }
 
+func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateValues ...map[string]interface{}) (string, error) {
+	orgChoices := make([]interact.Choice, len(choices))
+	for i, c := range choices {
+		orgChoices[i] = interact.Choice{Display: c, Value: c}
+	}
+
+	translatedPrompt := ui.TranslateText(promptTemplate, templateValues...)
+
+	var value string
+	interactivePrompt := ui.Interactor.NewInteraction(translatedPrompt, orgChoices...)
+
+	interactivePrompt.SetIn(ui.In)
+	interactivePrompt.SetOut(ui.OutForInteration)
+
+	err := interactivePrompt.Resolve(&value)
+	// break out of prompt on keyboard interrupt
+	if isInterrupt(err) {
+		value = ""
+		return value, nil
+	}
+
+	return value, err
+}
+
+// func (ui *UI) DisplayTextPromptWithDefault(template string, defaultValue string, templateValues ...map[string]interface{}) (string, error) {
+
+// 	interactivePrompt := ui.Interactor.NewInteraction(ui.TranslateText(template, templateValues...))
+// 	var value string
+// 	interactivePrompt.SetIn(ui.In)
+// 	interactivePrompt.SetOut(ui.OutForInteration)
+// 	err := interactivePrompt.Resolve(&value)
+// 	if isInterrupt(err) {
+// 		ui.Exiter.Exit(sigIntExitCode)
+// 	}
+// 	return value, err
+// }
+
 func isInterrupt(err error) bool {
 	return err == interact.ErrKeyboardInterrupt || err == terminal.ErrKeyboardInterrupt
 }

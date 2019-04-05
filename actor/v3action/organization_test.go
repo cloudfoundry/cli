@@ -220,4 +220,82 @@ var _ = Describe("Organization Actions", func() {
 		})
 	})
 
+	Describe("GetOrganizations", func() {
+		var (
+			executeErr error
+			warnings   Warnings
+			orgs       []Organization
+		)
+
+		JustBeforeEach(func() {
+			orgs, warnings, executeErr = actor.GetOrganizations()
+		})
+
+		It("fetches all the organizations", func() {
+			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+		})
+
+		When("no error occurs", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{
+						ccv3.Organization{
+							Name: "some-org-1",
+							GUID: "some-org-guid-1",
+						},
+						ccv3.Organization{
+							Name: "some-org-2",
+							GUID: "some-org-guid-2",
+						},
+					},
+					ccv3.Warnings{
+						"some-warning-1",
+						"some-warning-2",
+					},
+					nil,
+				)
+			})
+
+			It("returns the organizations", func() {
+				Expect(orgs).To(Equal(
+					[]Organization{
+						Organization{
+							Name: "some-org-1",
+							GUID: "some-org-guid-1",
+						},
+						Organization{
+							Name: "some-org-2",
+							GUID: "some-org-guid-2",
+						},
+					},
+				))
+			})
+
+			It("returns all the warnings", func() {
+				Expect(warnings).To(Equal(Warnings{"some-warning-1", "some-warning-2"}))
+			})
+		})
+
+		When("an error occurs", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv3.Organization{},
+					ccv3.Warnings{
+						"some-warning-1",
+						"some-warning-2",
+					},
+					errors.New("get-organization-error"),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError("get-organization-error"))
+			})
+
+			It("returns the warnings", func() {
+				Expect(warnings).To(Equal(Warnings{"some-warning-1", "some-warning-2"}))
+			})
+		})
+	})
+
 })

@@ -190,9 +190,18 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		if err != nil {
 			return err
 		}
-
-		if len(orgs) == 1 {
+		switch {
+		case len(orgs) == 1:
 			cmd.Config.SetOrganizationInformation(orgs[0].GUID, orgs[0].Name)
+		case len(orgs) > 1:
+			chosenOrg, err := cmd.promptChosenOrg(orgs)
+			if err != nil {
+				return err
+			}
+			var emptyOrg v3action.Organization
+			if chosenOrg != emptyOrg {
+				cmd.Config.SetOrganizationInformation(chosenOrg.GUID, chosenOrg.Name)
+			}
 		}
 	}
 	err = cmd.checkMinCLIVersion()
@@ -414,4 +423,26 @@ func (cmd *LoginCommand) displayNotTargetted() {
 			"CFTargetCommand": fmt.Sprintf("%s target", cmd.Config.BinaryName()),
 		},
 	)
+}
+
+func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action.Organization, error) {
+	cmd.UI.DisplayText("Select an org:")
+
+	orgNames := make([]string, len(orgs))
+	for i, org := range orgs {
+		orgNames[i] = org.Name
+	}
+
+	chosenOrgName, err := cmd.UI.DisplayTextMenu(orgNames, "Org")
+	if err != nil {
+		return v3action.Organization{}, err
+	}
+
+	for _, org := range orgs {
+		if org.Name == chosenOrgName {
+			return org, nil
+		}
+	}
+
+	return v3action.Organization{}, errors.New("Error Choosing Organization")
 }

@@ -27,6 +27,7 @@ type UI interface {
 	DisplayTableWithHeader(prefix string, table [][]string, padding int)
 	DisplayText(template string, data ...map[string]interface{})
 	DisplayTextPrompt(template string, templateValues ...map[string]interface{}) (string, error)
+	DisplayTextMenu(choices []string, promptTemplate string, templateValues ...map[string]interface{}) (string, error)
 	DisplayTextWithBold(text string, keys ...map[string]interface{})
 	DisplayTextWithFlavor(text string, keys ...map[string]interface{})
 	DisplayWarning(formattedString string, keys ...map[string]interface{})

@@ -120,6 +120,21 @@ type FakeUI struct {
 		arg1 string
 		arg2 []map[string]interface{}
 	}
+	DisplayTextMenuStub        func([]string, string, ...map[string]interface{}) (string, error)
+	displayTextMenuMutex       sync.RWMutex
+	displayTextMenuArgsForCall []struct {
+		arg1 []string
+		arg2 string
+		arg3 []map[string]interface{}
+	}
+	displayTextMenuReturns struct {
+		result1 string
+		result2 error
+	}
+	displayTextMenuReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
 	DisplayTextPromptStub        func(string, ...map[string]interface{}) (string, error)
 	displayTextPromptMutex       sync.RWMutex
 	displayTextPromptArgsForCall []struct {
@@ -843,6 +858,76 @@ func (fake *FakeUI) DisplayTextArgsForCall(i int) (string, []map[string]interfac
 	return argsForCall.arg1, argsForCall.arg2
 }
 
+func (fake *FakeUI) DisplayTextMenu(arg1 []string, arg2 string, arg3 ...map[string]interface{}) (string, error) {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.displayTextMenuMutex.Lock()
+	ret, specificReturn := fake.displayTextMenuReturnsOnCall[len(fake.displayTextMenuArgsForCall)]
+	fake.displayTextMenuArgsForCall = append(fake.displayTextMenuArgsForCall, struct {
+		arg1 []string
+		arg2 string
+		arg3 []map[string]interface{}
+	}{arg1Copy, arg2, arg3})
+	fake.recordInvocation("DisplayTextMenu", []interface{}{arg1Copy, arg2, arg3})
+	fake.displayTextMenuMutex.Unlock()
+	if fake.DisplayTextMenuStub != nil {
+		return fake.DisplayTextMenuStub(arg1, arg2, arg3...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.displayTextMenuReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeUI) DisplayTextMenuCallCount() int {
+	fake.displayTextMenuMutex.RLock()
+	defer fake.displayTextMenuMutex.RUnlock()
+	return len(fake.displayTextMenuArgsForCall)
+}
+
+func (fake *FakeUI) DisplayTextMenuCalls(stub func([]string, string, ...map[string]interface{}) (string, error)) {
+	fake.displayTextMenuMutex.Lock()
+	defer fake.displayTextMenuMutex.Unlock()
+	fake.DisplayTextMenuStub = stub
+}
+
+func (fake *FakeUI) DisplayTextMenuArgsForCall(i int) ([]string, string, []map[string]interface{}) {
+	fake.displayTextMenuMutex.RLock()
+	defer fake.displayTextMenuMutex.RUnlock()
+	argsForCall := fake.displayTextMenuArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeUI) DisplayTextMenuReturns(result1 string, result2 error) {
+	fake.displayTextMenuMutex.Lock()
+	defer fake.displayTextMenuMutex.Unlock()
+	fake.DisplayTextMenuStub = nil
+	fake.displayTextMenuReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUI) DisplayTextMenuReturnsOnCall(i int, result1 string, result2 error) {
+	fake.displayTextMenuMutex.Lock()
+	defer fake.displayTextMenuMutex.Unlock()
+	fake.DisplayTextMenuStub = nil
+	if fake.displayTextMenuReturnsOnCall == nil {
+		fake.displayTextMenuReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.displayTextMenuReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeUI) DisplayTextPrompt(arg1 string, arg2 ...map[string]interface{}) (string, error) {
 	fake.displayTextPromptMutex.Lock()
 	ret, specificReturn := fake.displayTextPromptReturnsOnCall[len(fake.displayTextPromptArgsForCall)]
@@ -1520,6 +1605,8 @@ func (fake *FakeUI) Invocations() map[string][][]interface{} {
 	defer fake.displayTableWithHeaderMutex.RUnlock()
 	fake.displayTextMutex.RLock()
 	defer fake.displayTextMutex.RUnlock()
+	fake.displayTextMenuMutex.RLock()
+	defer fake.displayTextMenuMutex.RUnlock()
 	fake.displayTextPromptMutex.RLock()
 	defer fake.displayTextPromptMutex.RUnlock()
 	fake.displayTextWithBoldMutex.RLock()
