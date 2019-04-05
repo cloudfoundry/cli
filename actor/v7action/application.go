@@ -246,7 +246,6 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 		Name:                app.Name,
 		State:               app.State,
-		Metadata:            app.Metadata,
 	}
 }
 

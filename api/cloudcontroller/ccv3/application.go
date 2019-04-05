@@ -78,9 +78,6 @@ func (a *Application) UnmarshalJSON(data []byte) error {
 	a.Name = ccApp.Name
 	a.Relationships = ccApp.Relationships
 	a.State = ccApp.State
-	if ccApp.Metadata != nil {
-		a.Metadata = *ccApp.Metadata
-	}
 
 	return nil
 }
