@@ -25,6 +25,13 @@ func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser ManifestPar
 
 		if manifestParser.ContainsManifest() {
 			var manifest []byte
+			if len(pushPlans) == 1 {
+				err = manifestParser.ApplyNoRouteOverride(pushPlans[0].Application.Name, pushPlans[0].SkipRouteCreation)
+				if err != nil {
+					errorStream <- err
+					return
+				}
+			}
 			manifest, err = getManifest(pushPlans, manifestParser)
 			if err != nil {
 				errorStream <- err

@@ -10,6 +10,18 @@ import (
 )
 
 type FakeManifestParser struct {
+	ApplyNoRouteOverrideStub        func(string, bool) error
+	applyNoRouteOverrideMutex       sync.RWMutex
+	applyNoRouteOverrideArgsForCall []struct {
+		arg1 string
+		arg2 bool
+	}
+	applyNoRouteOverrideReturns struct {
+		result1 error
+	}
+	applyNoRouteOverrideReturnsOnCall map[int]struct {
+		result1 error
+	}
 	AppsStub        func(string) ([]manifestparser.Application, error)
 	appsMutex       sync.RWMutex
 	appsArgsForCall []struct {
@@ -91,6 +103,67 @@ type FakeManifestParser struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeManifestParser) ApplyNoRouteOverride(arg1 string, arg2 bool) error {
+	fake.applyNoRouteOverrideMutex.Lock()
+	ret, specificReturn := fake.applyNoRouteOverrideReturnsOnCall[len(fake.applyNoRouteOverrideArgsForCall)]
+	fake.applyNoRouteOverrideArgsForCall = append(fake.applyNoRouteOverrideArgsForCall, struct {
+		arg1 string
+		arg2 bool
+	}{arg1, arg2})
+	fake.recordInvocation("ApplyNoRouteOverride", []interface{}{arg1, arg2})
+	fake.applyNoRouteOverrideMutex.Unlock()
+	if fake.ApplyNoRouteOverrideStub != nil {
+		return fake.ApplyNoRouteOverrideStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.applyNoRouteOverrideReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeManifestParser) ApplyNoRouteOverrideCallCount() int {
+	fake.applyNoRouteOverrideMutex.RLock()
+	defer fake.applyNoRouteOverrideMutex.RUnlock()
+	return len(fake.applyNoRouteOverrideArgsForCall)
+}
+
+func (fake *FakeManifestParser) ApplyNoRouteOverrideCalls(stub func(string, bool) error) {
+	fake.applyNoRouteOverrideMutex.Lock()
+	defer fake.applyNoRouteOverrideMutex.Unlock()
+	fake.ApplyNoRouteOverrideStub = stub
+}
+
+func (fake *FakeManifestParser) ApplyNoRouteOverrideArgsForCall(i int) (string, bool) {
+	fake.applyNoRouteOverrideMutex.RLock()
+	defer fake.applyNoRouteOverrideMutex.RUnlock()
+	argsForCall := fake.applyNoRouteOverrideArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeManifestParser) ApplyNoRouteOverrideReturns(result1 error) {
+	fake.applyNoRouteOverrideMutex.Lock()
+	defer fake.applyNoRouteOverrideMutex.Unlock()
+	fake.ApplyNoRouteOverrideStub = nil
+	fake.applyNoRouteOverrideReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeManifestParser) ApplyNoRouteOverrideReturnsOnCall(i int, result1 error) {
+	fake.applyNoRouteOverrideMutex.Lock()
+	defer fake.applyNoRouteOverrideMutex.Unlock()
+	fake.ApplyNoRouteOverrideStub = nil
+	if fake.applyNoRouteOverrideReturnsOnCall == nil {
+		fake.applyNoRouteOverrideReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.applyNoRouteOverrideReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeManifestParser) Apps(arg1 string) ([]manifestparser.Application, error) {
@@ -502,6 +575,8 @@ func (fake *FakeManifestParser) RawAppManifestReturnsOnCall(i int, result1 []byt
 func (fake *FakeManifestParser) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.applyNoRouteOverrideMutex.RLock()
+	defer fake.applyNoRouteOverrideMutex.RUnlock()
 	fake.appsMutex.RLock()
 	defer fake.appsMutex.RUnlock()
 	fake.containsManifestMutex.RLock()

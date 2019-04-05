@@ -40,7 +40,7 @@ var _ = Describe("SetupSkipRouteCreationForPushPlan", func() {
 		})
 	})
 
-	When("flag overrides specifies skipping route creation", func() {
+	When("manifest specifies skipping route creation", func() {
 		BeforeEach(func() {
 			manifestApp.NoRoute = true
 		})
