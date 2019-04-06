@@ -80,10 +80,11 @@ func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateV
 	interactivePrompt.SetOut(ui.OutForInteration)
 
 	err := interactivePrompt.Resolve(&value)
-	// break out of prompt on keyboard interrupt
+
 	if isInterrupt(err) {
-		value = ""
-		return value, nil
+		return "", io.EOF // break out of prompt on keyboard interrupt
+		// exiting program from menu requires CTRL+C twice.
+		// callers can interpret EOF as "nothing was chosen"
 	}
 
 	return value, err

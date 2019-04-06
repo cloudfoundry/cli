@@ -2,6 +2,7 @@ package v6_test
 
 import (
 	"errors"
+	"io"
 
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -872,15 +873,26 @@ var _ = Describe("login Command", func() {
 							})
 						})
 
-						When("the user does not make a selection", func() {
+						When("the user exits the prompt early", func() {
+							var fakeUI *commandfakes.FakeUI
+
 							BeforeEach(func() {
-								input.Write([]byte("\n"))
+								fakeUI = new(commandfakes.FakeUI)
+								cmd.UI = fakeUI
 							})
 
-							It("It does not target an org", func() {
-								Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
+							When("the user exits the prompt with CTRL+D or CTRL+C", func() {
+								BeforeEach(func() {
+									fakeUI.DisplayTextMenuReturns("", io.EOF)
+								})
+
+								It("selects no org and returns no error", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+									Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
+								})
 							})
 						})
+
 					})
 				})
 

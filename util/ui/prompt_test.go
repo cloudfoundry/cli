@@ -1,6 +1,8 @@
 package ui_test
 
 import (
+	"io"
+
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/cli/util/ui/uifakes"
@@ -251,5 +253,13 @@ var _ = Describe("Prompts", func() {
 			})
 		})
 
+		When("the prompt is a multiple choice prompt", func() {
+			It("interprets CTRL+C as 'choose nothing'", func() {
+				choices := []string{"foo", "bar"}
+				choice, err := ui.DisplayTextMenu(choices, "choose!")
+				Expect(choice).To(Equal(""))
+				Expect(err).To(Equal(io.EOF))
+			})
+		})
 	})
 })

@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -24,6 +25,13 @@ func BuildTokenString(expiration time.Time) string {
 	tokenBytes, err := token.Serialize(nil)
 	Expect(err).NotTo(HaveOccurred())
 	return string(tokenBytes)
+}
+
+type closedStdin struct {
+}
+
+func (c *closedStdin) Read(p []byte) (n int, err error) {
+	return 0, io.EOF
 }
 
 var _ = Describe("login command", func() {
@@ -545,9 +553,7 @@ var _ = Describe("login command", func() {
 
 				When("user does not select an organization", func() {
 					It("succesfully logs in but does not target any org", func() {
-						input := NewBuffer()
-						_, err := input.Write([]byte{4})
-						Expect(err).ToNot(HaveOccurred())
+						input := &closedStdin{} // simulates CTRL + D on org selection prompt
 
 						var session *Session
 						if skipSSLValidation {
@@ -556,7 +562,6 @@ var _ = Describe("login command", func() {
 							session = helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "-a", apiURL)
 						}
 						Eventually(session).Should(Say("Org:"))
-						session.Interrupt()
 						Eventually(session).Should(Exit(0))
 
 						targetSession := helpers.CF("target")
