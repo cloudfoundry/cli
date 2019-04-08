@@ -84,7 +84,6 @@ var _ = Describe("labels command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			Expect(testUI.Out).To(Say(regexp.QuoteMeta(`Getting labels for app dora in org fake-org / space fake-space as some-user...`)))
-			Expect(testUI.Out).To(Say("OK"))
 		})
 
 		It("retrieves the labels associated with the application", func() {
