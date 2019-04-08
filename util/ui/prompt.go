@@ -1,7 +1,10 @@
 package ui
 
 import (
+	"errors"
+	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/vito/go-interact/interact"
 	"github.com/vito/go-interact/interact/terminal"
@@ -52,6 +55,62 @@ func (ui *UI) DisplayPasswordPrompt(template string, templateValues ...map[strin
 	return string(password), err
 }
 
+func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateValues ...map[string]interface{}) (string, error) {
+	for i, c := range choices {
+		t := fmt.Sprintf("%d. %s", i+1, c)
+		ui.DisplayText(t)
+	}
+
+	translatedPrompt := ui.TranslateText(promptTemplate, templateValues...)
+
+	interactivePrompt := ui.Interactor.NewInteraction(translatedPrompt)
+
+	interactivePrompt.SetIn(ui.In)
+	interactivePrompt.SetOut(ui.OutForInteration)
+
+	var value string = "enter to skip"
+	err := interactivePrompt.Resolve(&value)
+	if err != nil {
+		return "", err
+	}
+
+	if value == "enter to skip" {
+		return "", nil
+	}
+
+	i, err := strconv.Atoi(value)
+	if err != nil {
+		if inSlice(choices, value) {
+			return value, nil
+		}
+		return "", InvalidChoiceError
+	}
+
+	if i >= len(choices) {
+		return "", InvalidChoiceError
+	}
+	return choices[i-1], nil
+
+	// if isInterrupt(err) {
+	// 	return "", io.EOF // break out of prompt on keyboard interrupt
+	// 	// exiting program from menu requires CTRL+C twice.
+	// 	// callers can interpret EOF as "nothing was chosen"
+	// }
+
+	// return value, err
+}
+
+func inSlice(s []string, v string) bool {
+	for _, x := range s {
+		if x == v {
+			return true
+		}
+	}
+	return false
+}
+
+var InvalidChoiceError error = errors.New("invalid choice")
+
 // DisplayTextPrompt outputs the prompt and waits for user input.
 func (ui *UI) DisplayTextPrompt(template string, templateValues ...map[string]interface{}) (string, error) {
 	interactivePrompt := ui.Interactor.NewInteraction(ui.TranslateText(template, templateValues...))
@@ -62,31 +121,6 @@ func (ui *UI) DisplayTextPrompt(template string, templateValues ...map[string]in
 	if isInterrupt(err) {
 		ui.Exiter.Exit(sigIntExitCode)
 	}
-	return value, err
-}
-
-func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateValues ...map[string]interface{}) (string, error) {
-	orgChoices := make([]interact.Choice, len(choices))
-	for i, c := range choices {
-		orgChoices[i] = interact.Choice{Display: c, Value: c}
-	}
-
-	translatedPrompt := ui.TranslateText(promptTemplate, templateValues...)
-
-	var value string
-	interactivePrompt := ui.Interactor.NewInteraction(translatedPrompt, orgChoices...)
-
-	interactivePrompt.SetIn(ui.In)
-	interactivePrompt.SetOut(ui.OutForInteration)
-
-	err := interactivePrompt.Resolve(&value)
-
-	if isInterrupt(err) {
-		return "", io.EOF // break out of prompt on keyboard interrupt
-		// exiting program from menu requires CTRL+C twice.
-		// callers can interpret EOF as "nothing was chosen"
-	}
-
 	return value, err
 }
 

@@ -1,8 +1,6 @@
 package ui_test
 
 import (
-	"io"
-
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/cli/util/ui/uifakes"
@@ -209,6 +207,106 @@ var _ = Describe("Prompts", func() {
 		})
 	})
 
+	Describe("DisplayTextMenu", func() {
+		var (
+			choices []string
+			prompt  string
+			values  map[string]interface{}
+			menuErr error
+			choice  string
+		)
+		BeforeEach(func() {
+			choices = []string{
+				"choice-1",
+				"choice-2",
+				"choice-3",
+				"choice-4",
+			}
+
+			prompt = "some-{{.prompt}}"
+			values = map[string]interface{}{
+				"prompt": "org",
+			}
+		})
+
+		JustBeforeEach(func() {
+			choice, menuErr = ui.DisplayTextMenu(choices, prompt, values)
+		})
+
+		It("displays the templated prompt correctly", func() {
+			Expect(ui.Out).To(Say("some-org \\(enter to skip\\):"))
+		})
+
+		It("displays the choices correctly", func() {
+			Expect(ui.Out).To(Say("1. choice-1"))
+			Expect(ui.Out).To(Say("2. choice-2"))
+			Expect(ui.Out).To(Say("3. choice-3"))
+			Expect(ui.Out).To(Say("4. choice-4"))
+		})
+
+		When("the user enters a valid list index", func() {
+			BeforeEach(func() {
+				_, err := inBuffer.Write([]byte("2\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns the value at that list position", func() {
+				Expect(choice).To(Equal("choice-2"))
+			})
+		})
+
+		When("the user enters a valid list display value", func() {
+			BeforeEach(func() {
+				_, err := inBuffer.Write([]byte("choice-3\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns that value", func() {
+				Expect(choice).To(Equal("choice-3"))
+			})
+		})
+
+		When("the user enters an invalid list index", func() {
+			BeforeEach(func() {
+				_, err := inBuffer.Write([]byte("47\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns an invalid choice error", func() {
+				Expect(choice).To(Equal(""))
+				Expect(menuErr).To(Equal(InvalidChoiceError))
+			})
+		})
+
+		When("the user enters an invalid list display value", func() {
+			BeforeEach(func() {
+				_, err := inBuffer.Write([]byte("choice-94\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns an invalid choice error", func() {
+				Expect(choice).To(Equal(""))
+				Expect(menuErr).To(Equal(InvalidChoiceError))
+			})
+		})
+
+		When("the user enters a blank line to decline to choose", func() {
+			BeforeEach(func() {
+				_, err := inBuffer.Write([]byte("\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns an empty string and no error", func() {
+				Expect(menuErr).ToNot(HaveOccurred())
+				Expect(choice).To(Equal(""))
+			})
+		})
+
+		When("the user presses CTRL+C or CTRL+D", func() {
+
+		})
+	})
+
 	Describe("interrupt handling", func() {
 		When("the prompt is canceled by a keyboard interrupt", func() {
 			var (
@@ -253,13 +351,13 @@ var _ = Describe("Prompts", func() {
 			})
 		})
 
-		When("the prompt is a multiple choice prompt", func() {
-			It("interprets CTRL+C as 'choose nothing'", func() {
-				choices := []string{"foo", "bar"}
-				choice, err := ui.DisplayTextMenu(choices, "choose!")
-				Expect(choice).To(Equal(""))
-				Expect(err).To(Equal(io.EOF))
-			})
-		})
+		// When("the prompt is a multiple choice prompt", func() {
+		// 	It("interprets CTRL+C as 'choose nothing'", func() {
+		// 		choices := []string{"foo", "bar"}
+		// 		choice, err := ui.DisplayTextMenu(choices, "choose!")
+		// 		Expect(choice).To(Equal(""))
+		// 		Expect(err).To(Equal(io.EOF))
+		// 	})
+		// })
 	})
 })

@@ -851,7 +851,28 @@ var _ = Describe("login Command", func() {
 								Expect(testUI.Out).To(Say("Select an org:"))
 								Expect(testUI.Out).To(Say("1. some-org-name1"))
 								Expect(testUI.Out).To(Say("2. some-org-name2"))
-								Expect(testUI.Out).To(Say("Org:"))
+								Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
+								Expect(executeErr).ToNot(HaveOccurred())
+							})
+
+							It("targets that org", func() {
+								Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
+								orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
+								Expect(orgGUID).To(Equal("some-org-guid2"))
+								Expect(orgName).To(Equal("some-org-name2"))
+							})
+						})
+
+						When("the user selects an org by name", func() {
+							BeforeEach(func() {
+								input.Write([]byte("some-org-name2\n"))
+							})
+
+							It("prompts the user to select an org", func() {
+								Expect(testUI.Out).To(Say("Select an org:"))
+								Expect(testUI.Out).To(Say("1. some-org-name1"))
+								Expect(testUI.Out).To(Say("2. some-org-name2"))
+								Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
 								Expect(executeErr).ToNot(HaveOccurred())
 							})
 
@@ -873,7 +894,7 @@ var _ = Describe("login Command", func() {
 							})
 						})
 
-						When("the user exits the prompt early", func() {
+						XWhen("the user exits the prompt early", func() {
 							var fakeUI *commandfakes.FakeUI
 
 							BeforeEach(func() {

@@ -3,7 +3,6 @@ package v6
 import (
 	"errors"
 	"fmt"
-	"io"
 	"net/url"
 	"strings"
 
@@ -435,12 +434,13 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action
 	}
 
 	chosenOrgName, err := cmd.UI.DisplayTextMenu(orgNames, "Org")
-	if err == io.EOF {
-		return v3action.Organization{}, nil
-	}
 
 	if err != nil {
 		return v3action.Organization{}, err
+	}
+
+	if chosenOrgName == "" {
+		return v3action.Organization{}, nil
 	}
 
 	for _, org := range orgs {
