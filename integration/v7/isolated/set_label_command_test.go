@@ -76,25 +76,31 @@ var _ = Describe("set-label command", func() {
 			Expect(app.Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
 		})
 
-		It("displays an error for an unknown app", func() {
-			session := helpers.CF("set-label", "app", "non-existent-app", "some-key=some-value")
-			Eventually(session.Err).Should(Say("App 'non-existent-app' not found"))
-			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Exit(1))
+		When("there the app is unknown", func() {
+			It("displays an error", func() {
+				session := helpers.CF("set-label", "app", "non-existent-app", "some-key=some-value")
+				Eventually(session.Err).Should(Say("App 'non-existent-app' not found"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 
-		It("displays an error for a label with an empty key and an invalid value", func() {
-			session := helpers.CF("set-label", "app", appName, "=test", "sha2=108&eb90d734")
-			Eventually(session.Err).Should(Say("Metadata key error: label key cannot be empty string, Metadata value error: label '108&eb90d734' contains invalid characters"))
-			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Exit(1))
+		When("the label has an empty key and an invalid value", func() {
+			It("displays an error", func() {
+				session := helpers.CF("set-label", "app", appName, "=test", "sha2=108&eb90d734")
+				Eventually(session.Err).Should(Say("Metadata key error: label key cannot be empty string, Metadata value error: label '108&eb90d734' contains invalid characters"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 
-		It("displays an error for a label without an '='", func() {
-			session := helpers.CF("set-label", "app", appName, "test-label")
-			Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
-			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Exit(1))
+		When("the label does not include a '=' to separate the key and value", func() {
+			It("displays an error", func() {
+				session := helpers.CF("set-label", "app", appName, "test-label")
+				Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
 		})
 	})
 })
