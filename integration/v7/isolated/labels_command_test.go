@@ -56,7 +56,7 @@ var _ = Describe("labels command", func() {
 			})
 			It("lists the labels", func() {
 				session := helpers.CF("labels", "app", appName)
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Getting labels for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
+				Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for app %s in org %s / space %s as %s...\n\n"), appName, orgName, spaceName, username))
 				Eventually(session).Should(Say(`Key\s+Value`))
 				Eventually(session).Should(Say(`some-key\s+some-value`))
 				Eventually(session).Should(Say(`some-other-key\s+some-other-value`))
@@ -67,7 +67,7 @@ var _ = Describe("labels command", func() {
 		When("there are no labels set on the application", func() {
 			It("indicates that there are no labels", func() {
 				session := helpers.CF("labels", "app", appName)
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Getting labels for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
+				Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for app %s in org %s / space %s as %s...\n\n"), appName, orgName, spaceName, username))
 				Expect(session).ToNot(Say(`Key\s+Value`))
 				Eventually(session).Should(Say("No labels found."))
 				Eventually(session).Should(Exit(0))

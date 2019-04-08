@@ -57,6 +57,7 @@ func (cmd LabelsCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	cmd.UI.DisplayNewline()
 
 	if len(labels) == 0 {
 		cmd.UI.DisplayText("No labels found.")
