@@ -65,8 +65,8 @@ var _ = Describe("set-label command", func() {
 			Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for app %s in org %s / space %s as %s...`), appName, orgName, spaceName, username))
 			Eventually(session).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
-			appGuid := helpers.AppGUID(appName)
-			session = helpers.CF("curl", fmt.Sprintf("/v3/apps/%s", appGuid))
+			appGUID := helpers.AppGUID(appName)
+			session = helpers.CF("curl", fmt.Sprintf("/v3/apps/%s", appGUID))
 			Eventually(session).Should(Exit(0))
 			appJSON := session.Out.Contents()
 			var app AppResource
@@ -100,6 +100,21 @@ var _ = Describe("set-label command", func() {
 				Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		When("more than one value is provided for the same key", func() {
+			It("uses the last value", func() {
+				session := helpers.CF("set-label", "app", appName, "owner=sue", "owner=beth")
+				Eventually(session).Should(Exit(0))
+				appGUID := helpers.AppGUID(appName)
+				session = helpers.CF("curl", fmt.Sprintf("/v3/apps/%s", appGUID))
+				Eventually(session).Should(Exit(0))
+				appJSON := session.Out.Contents()
+				var app AppResource
+				Expect(json.Unmarshal(appJSON, &app)).To(Succeed())
+				Expect(len(app.Metadata.Labels)).To(Equal(1))
+				Expect(app.Metadata.Labels["owner"]).To(Equal("beth"))
 			})
 		})
 	})
