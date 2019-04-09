@@ -24,8 +24,12 @@ var _ = Describe("set-label command", func() {
 				Eventually(session).Should(Say(`\s+cf set-label RESOURCE RESOURCE_NAME KEY=VALUE\.\.\.`))
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say(`\s+cf set-label app dora env=production`))
+				Eventually(session).Should(Say(`\s+cf set-label org business pci=true public-facing=false`))
+				Eventually(session).Should(Say(`\s+cf set-label space business_space public-facing=false owner=jane_doe`))
 				Eventually(session).Should(Say("RESOURCES:"))
-				Eventually(session).Should(Say(`\s+APP`))
+				Eventually(session).Should(Say(`\s+app`))
+				Eventually(session).Should(Say(`\s+org`))
+				Eventually(session).Should(Say(`\s+space`))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say(`\s+delete-label, labels`))
 
