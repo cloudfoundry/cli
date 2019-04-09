@@ -13,7 +13,7 @@ import (
 
 type LabelsCommand struct {
 	RequiredArgs flag.LabelsArgs `positional-args:"yes"`
-	usage        interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\n EXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   APP\n\nSEE ALSO:\n   set-label, delete-label"`
+	usage        interface{}     `usage:"CF_NAME labels RESOURCE RESOURCE_NAME\n\nEXAMPLES:\n   cf labels app dora \n\nRESOURCES:\n   APP\n\nSEE ALSO:\n   set-label, delete-label"`
 	UI           command.UI
 	Config       command.Config
 	SharedActor  command.SharedActor
