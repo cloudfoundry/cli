@@ -77,6 +77,7 @@ var _ = Describe("labels command", func() {
 		When("the app does not exist", func() {
 			It("displays an error", func() {
 				session := helpers.CF("labels", "app", "non-existent-app")
+				Eventually(session).Should(Say(regexp.QuoteMeta("Getting labels for app non-existent-app in org %s / space %s as %s...\n\n"), orgName, spaceName, username))
 				Eventually(session.Err).Should(Say("App 'non-existent-app' not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))

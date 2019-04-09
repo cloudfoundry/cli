@@ -50,6 +50,8 @@ func (cmd LabelsCommand) Execute(args []string) error {
 		"Username":  username,
 	})
 
+	cmd.UI.DisplayNewline()
+
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID)
 	labels := app.Metadata.Labels
 
@@ -57,7 +59,6 @@ func (cmd LabelsCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayNewline()
 
 	if len(labels) == 0 {
 		cmd.UI.DisplayText("No labels found.")
