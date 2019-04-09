@@ -28,7 +28,7 @@ var _ = Describe("Verbose", func() {
 			// Invalidate the access token to cause a token refresh in order to
 			// test the call to the UAA.
 			helpers.SetConfig(func(config *configv3.Config) {
-				config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
+				config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
 			})
 
 			var envMap map[string]string
@@ -94,7 +94,7 @@ var _ = Describe("Verbose", func() {
 			// Invalidate the access token to cause a token refresh in order to
 			// test the call to the UAA.
 			helpers.SetConfig(func(config *configv3.Config) {
-				config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
+				config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
 			})
 
 			var envMap map[string]string

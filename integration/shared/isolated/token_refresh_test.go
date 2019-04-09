@@ -20,7 +20,7 @@ var _ = Describe("Token Refreshing", func() {
 			When("password is explicitly stored as the grant type", func() {
 				BeforeEach(func() {
 					helpers.SetConfig(func(config *configv3.Config) {
-						config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
+						config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
 						config.ConfigFile.TargetedOrganization.GUID = "fake-org"
 						config.ConfigFile.TargetedSpace.GUID = "fake-space"
 						config.ConfigFile.UAAGrantType = "password"
@@ -41,7 +41,7 @@ var _ = Describe("Token Refreshing", func() {
 			When("no grant type is explicitly stored", func() {
 				BeforeEach(func() {
 					helpers.SetConfig(func(config *configv3.Config) {
-						config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
+						config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
 						config.ConfigFile.TargetedOrganization.GUID = "fake-org"
 						config.ConfigFile.TargetedSpace.GUID = "fake-space"
 						config.ConfigFile.UAAGrantType = ""
@@ -69,7 +69,7 @@ var _ = Describe("Token Refreshing", func() {
 		When("the token is invalid", func() {
 			BeforeEach(func() {
 				helpers.SetConfig(func(config *configv3.Config) {
-					config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
+					config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
 					config.ConfigFile.TargetedOrganization.GUID = "fake-org"
 					config.ConfigFile.TargetedSpace.GUID = "fake-space"
 				})
