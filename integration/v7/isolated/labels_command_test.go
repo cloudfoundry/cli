@@ -22,7 +22,7 @@ var _ = Describe("labels command", func() {
 			Eventually(session).Should(Say("EXAMPLES:"))
 			Eventually(session).Should(Say(`\s+cf labels app dora`))
 			Eventually(session).Should(Say("RESOURCES:"))
-			Eventually(session).Should(Say(`\s+APP`))
+			Eventually(session).Should(Say(`\s+app`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, delete-label`))
 			Eventually(session).Should(Exit(0))

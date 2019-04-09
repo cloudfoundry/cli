@@ -24,7 +24,7 @@ var _ = Describe("delete-label command", func() {
 			Eventually(session).Should(Say("EXAMPLES:"))
 			Eventually(session).Should(Say(`\s+cf delete-label app dora ci_signature_sha2`))
 			Eventually(session).Should(Say("RESOURCES:"))
-			Eventually(session).Should(Say(`\s+APP`))
+			Eventually(session).Should(Say(`\s+app`))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say(`\s+set-label, labels`))
 			Eventually(session).Should(Exit(0))
