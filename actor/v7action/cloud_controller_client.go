@@ -65,6 +65,7 @@ type CloudControllerClient interface {
 	UpdateApplicationStop(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	UpdateBuildpack(buildpack ccv3.Buildpack) (ccv3.Buildpack, ccv3.Warnings, error)
 	UpdateFeatureFlag(flag ccv3.FeatureFlag) (ccv3.FeatureFlag, ccv3.Warnings, error)
+	UpdateOrganization(org ccv3.Organization) (ccv3.Organization, ccv3.Warnings, error)
 	UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	UpdateProcess(process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
 	UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte) (ccv3.JobURL, ccv3.Warnings, error)

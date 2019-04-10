@@ -822,6 +822,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateOrganizationStub        func(ccv3.Organization) (ccv3.Organization, ccv3.Warnings, error)
+	updateOrganizationMutex       sync.RWMutex
+	updateOrganizationArgsForCall []struct {
+		arg1 ccv3.Organization
+	}
+	updateOrganizationReturns struct {
+		result1 ccv3.Organization
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateOrganizationReturnsOnCall map[int]struct {
+		result1 ccv3.Organization
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateOrganizationDefaultIsolationSegmentRelationshipStub        func(string, string) (ccv3.Relationship, ccv3.Warnings, error)
 	updateOrganizationDefaultIsolationSegmentRelationshipMutex       sync.RWMutex
 	updateOrganizationDefaultIsolationSegmentRelationshipArgsForCall []struct {
@@ -4554,6 +4569,72 @@ func (fake *FakeCloudControllerClient) UpdateFeatureFlagReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateOrganization(arg1 ccv3.Organization) (ccv3.Organization, ccv3.Warnings, error) {
+	fake.updateOrganizationMutex.Lock()
+	ret, specificReturn := fake.updateOrganizationReturnsOnCall[len(fake.updateOrganizationArgsForCall)]
+	fake.updateOrganizationArgsForCall = append(fake.updateOrganizationArgsForCall, struct {
+		arg1 ccv3.Organization
+	}{arg1})
+	fake.recordInvocation("UpdateOrganization", []interface{}{arg1})
+	fake.updateOrganizationMutex.Unlock()
+	if fake.UpdateOrganizationStub != nil {
+		return fake.UpdateOrganizationStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.updateOrganizationReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationCallCount() int {
+	fake.updateOrganizationMutex.RLock()
+	defer fake.updateOrganizationMutex.RUnlock()
+	return len(fake.updateOrganizationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationCalls(stub func(ccv3.Organization) (ccv3.Organization, ccv3.Warnings, error)) {
+	fake.updateOrganizationMutex.Lock()
+	defer fake.updateOrganizationMutex.Unlock()
+	fake.UpdateOrganizationStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationArgsForCall(i int) ccv3.Organization {
+	fake.updateOrganizationMutex.RLock()
+	defer fake.updateOrganizationMutex.RUnlock()
+	argsForCall := fake.updateOrganizationArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationReturns(result1 ccv3.Organization, result2 ccv3.Warnings, result3 error) {
+	fake.updateOrganizationMutex.Lock()
+	defer fake.updateOrganizationMutex.Unlock()
+	fake.UpdateOrganizationStub = nil
+	fake.updateOrganizationReturns = struct {
+		result1 ccv3.Organization
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateOrganizationReturnsOnCall(i int, result1 ccv3.Organization, result2 ccv3.Warnings, result3 error) {
+	fake.updateOrganizationMutex.Lock()
+	defer fake.updateOrganizationMutex.Unlock()
+	fake.UpdateOrganizationStub = nil
+	if fake.updateOrganizationReturnsOnCall == nil {
+		fake.updateOrganizationReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Organization
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateOrganizationReturnsOnCall[i] = struct {
+		result1 ccv3.Organization
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateOrganizationDefaultIsolationSegmentRelationship(arg1 string, arg2 string) (ccv3.Relationship, ccv3.Warnings, error) {
 	fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.Lock()
 	ret, specificReturn := fake.updateOrganizationDefaultIsolationSegmentRelationshipReturnsOnCall[len(fake.updateOrganizationDefaultIsolationSegmentRelationshipArgsForCall)]
@@ -5215,6 +5296,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.updateBuildpackMutex.RUnlock()
 	fake.updateFeatureFlagMutex.RLock()
 	defer fake.updateFeatureFlagMutex.RUnlock()
+	fake.updateOrganizationMutex.RLock()
+	defer fake.updateOrganizationMutex.RUnlock()
 	fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RLock()
 	defer fake.updateOrganizationDefaultIsolationSegmentRelationshipMutex.RUnlock()
 	fake.updateProcessMutex.RLock()
