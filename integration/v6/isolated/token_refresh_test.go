@@ -18,6 +18,53 @@ var _ = Describe("Token Refreshing", func() {
 			helpers.LoginCF()
 		})
 
+		Describe("config file backwards compatibility", func() {
+			// If we write "password" as the grant type, versions of the CLI before 6.44.0 will not be
+			// able to use their refresh token correctly.
+			When("logging in with rewritten cf auth", func() {
+				BeforeEach(func() {
+					helpers.LoginCF()
+				})
+
+				It("persists an empty string as the grant type in config.json", func() {
+					c := helpers.GetConfig()
+					Expect(c.UAAGrantType()).To(Equal(""))
+				})
+			})
+
+			When("logging in with un-rewritten cf login", func() {
+				BeforeEach(func() {
+					helpers.TurnOffExperimentalLogin()
+					u, p := helpers.GetCredentials()
+					session := helpers.CF("login", "-u", u, "-p", p)
+					Eventually(session).Should(Exit(0))
+				})
+
+				It("persists an empty string as the grant type in config.json", func() {
+					c := helpers.GetConfig()
+					Expect(c.UAAGrantType()).To(Equal(""))
+				})
+			})
+
+			When("logging in with rewritten cf login", func() {
+				BeforeEach(func() {
+					helpers.TurnOnExperimentalLogin()
+					u, p := helpers.GetCredentials()
+					session := helpers.CF("login", "-u", u, "-p", p)
+					Eventually(session).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					helpers.TurnOffExperimentalLogin()
+				})
+
+				It("persists an empty string as the grant type in config.json", func() {
+					c := helpers.GetConfig()
+					Expect(c.UAAGrantType()).To(Equal(""))
+				})
+			})
+		})
+
 		When("the token is invalid", func() {
 			When("password is explicitly stored as the grant type", func() {
 				BeforeEach(func() {

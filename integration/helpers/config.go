@@ -58,6 +58,12 @@ func DestroyHomeDir(homeDir string) {
 	}
 }
 
+func GetConfig() *configv3.Config {
+	c, err := configv3.LoadConfig()
+	Expect(err).ToNot(HaveOccurred())
+	return c
+}
+
 func SetConfig(cb func(conf *configv3.Config)) {
 	config, err := configv3.LoadConfig()
 	Expect(err).ToNot(HaveOccurred())

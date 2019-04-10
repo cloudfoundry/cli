@@ -74,7 +74,7 @@ var _ = Describe("Auth Actions", func() {
 
 					Expect(fakeConfig.UnsetOrganizationAndSpaceInformationCallCount()).To(Equal(1))
 					Expect(fakeConfig.SetUAAGrantTypeCallCount()).To(Equal(1))
-					Expect(fakeConfig.SetUAAGrantTypeArgsForCall(0)).To(Equal(string(constant.GrantTypePassword)))
+					Expect(fakeConfig.SetUAAGrantTypeArgsForCall(0)).To(Equal(""))
 				})
 
 				When("a previous user authenticated with a client grant type", func() {

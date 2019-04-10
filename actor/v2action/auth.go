@@ -38,7 +38,11 @@ func (actor Actor) Authenticate(ID string, secret string, origin string, grantTy
 	accessToken = fmt.Sprintf("bearer %s", accessToken)
 	actor.Config.SetTokenInformation(accessToken, refreshToken, "")
 
-	actor.Config.SetUAAGrantType(string(grantType))
+	if grantType == constant.GrantTypePassword {
+		actor.Config.SetUAAGrantType("")
+	} else {
+		actor.Config.SetUAAGrantType(string(grantType))
+	}
 
 	if grantType == constant.GrantTypeClientCredentials {
 		actor.Config.SetUAAClientCredentials(ID, secret)
