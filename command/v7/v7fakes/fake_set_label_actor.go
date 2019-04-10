@@ -25,6 +25,20 @@ type FakeSetLabelActor struct {
 		result1 v7action.Warnings
 		result2 error
 	}
+	UpdateOrganizationLabelsByOrganizationNameStub        func(string, map[string]types.NullString) (v7action.Warnings, error)
+	updateOrganizationLabelsByOrganizationNameMutex       sync.RWMutex
+	updateOrganizationLabelsByOrganizationNameArgsForCall []struct {
+		arg1 string
+		arg2 map[string]types.NullString
+	}
+	updateOrganizationLabelsByOrganizationNameReturns struct {
+		result1 v7action.Warnings
+		result2 error
+	}
+	updateOrganizationLabelsByOrganizationNameReturnsOnCall map[int]struct {
+		result1 v7action.Warnings
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -94,11 +108,77 @@ func (fake *FakeSetLabelActor) UpdateApplicationLabelsByApplicationNameReturnsOn
 	}{result1, result2}
 }
 
+func (fake *FakeSetLabelActor) UpdateOrganizationLabelsByOrganizationName(arg1 string, arg2 map[string]types.NullString) (v7action.Warnings, error) {
+	fake.updateOrganizationLabelsByOrganizationNameMutex.Lock()
+	ret, specificReturn := fake.updateOrganizationLabelsByOrganizationNameReturnsOnCall[len(fake.updateOrganizationLabelsByOrganizationNameArgsForCall)]
+	fake.updateOrganizationLabelsByOrganizationNameArgsForCall = append(fake.updateOrganizationLabelsByOrganizationNameArgsForCall, struct {
+		arg1 string
+		arg2 map[string]types.NullString
+	}{arg1, arg2})
+	fake.recordInvocation("UpdateOrganizationLabelsByOrganizationName", []interface{}{arg1, arg2})
+	fake.updateOrganizationLabelsByOrganizationNameMutex.Unlock()
+	if fake.UpdateOrganizationLabelsByOrganizationNameStub != nil {
+		return fake.UpdateOrganizationLabelsByOrganizationNameStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.updateOrganizationLabelsByOrganizationNameReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeSetLabelActor) UpdateOrganizationLabelsByOrganizationNameCallCount() int {
+	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()
+	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
+	return len(fake.updateOrganizationLabelsByOrganizationNameArgsForCall)
+}
+
+func (fake *FakeSetLabelActor) UpdateOrganizationLabelsByOrganizationNameCalls(stub func(string, map[string]types.NullString) (v7action.Warnings, error)) {
+	fake.updateOrganizationLabelsByOrganizationNameMutex.Lock()
+	defer fake.updateOrganizationLabelsByOrganizationNameMutex.Unlock()
+	fake.UpdateOrganizationLabelsByOrganizationNameStub = stub
+}
+
+func (fake *FakeSetLabelActor) UpdateOrganizationLabelsByOrganizationNameArgsForCall(i int) (string, map[string]types.NullString) {
+	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()
+	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
+	argsForCall := fake.updateOrganizationLabelsByOrganizationNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeSetLabelActor) UpdateOrganizationLabelsByOrganizationNameReturns(result1 v7action.Warnings, result2 error) {
+	fake.updateOrganizationLabelsByOrganizationNameMutex.Lock()
+	defer fake.updateOrganizationLabelsByOrganizationNameMutex.Unlock()
+	fake.UpdateOrganizationLabelsByOrganizationNameStub = nil
+	fake.updateOrganizationLabelsByOrganizationNameReturns = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSetLabelActor) UpdateOrganizationLabelsByOrganizationNameReturnsOnCall(i int, result1 v7action.Warnings, result2 error) {
+	fake.updateOrganizationLabelsByOrganizationNameMutex.Lock()
+	defer fake.updateOrganizationLabelsByOrganizationNameMutex.Unlock()
+	fake.UpdateOrganizationLabelsByOrganizationNameStub = nil
+	if fake.updateOrganizationLabelsByOrganizationNameReturnsOnCall == nil {
+		fake.updateOrganizationLabelsByOrganizationNameReturnsOnCall = make(map[int]struct {
+			result1 v7action.Warnings
+			result2 error
+		})
+	}
+	fake.updateOrganizationLabelsByOrganizationNameReturnsOnCall[i] = struct {
+		result1 v7action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeSetLabelActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.updateApplicationLabelsByApplicationNameMutex.RLock()
 	defer fake.updateApplicationLabelsByApplicationNameMutex.RUnlock()
+	fake.updateOrganizationLabelsByOrganizationNameMutex.RLock()
+	defer fake.updateOrganizationLabelsByOrganizationNameMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

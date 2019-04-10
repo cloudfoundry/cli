@@ -47,6 +47,7 @@ const (
 	PatchApplicationRequest                                     = "PatchApplication"
 	PatchBuildpackRequest                                       = "PatchBuildpack"
 	PatchFeatureFlagRequest                                     = "PatchFeatureFlag"
+	PatchOrganizationRequest                                    = "PatchOrganization"
 	PatchOrganizationRelationshipDefaultIsolationSegmentRequest = "PatchOrganizationRelationshipDefaultIsolationSegment"
 	PatchProcessRequest                                         = "PatchProcess"
 	PatchSpaceRelationshipIsolationSegmentRequest               = "PatchSpaceRelationshipIsolationSegment"
@@ -120,6 +121,7 @@ var APIRoutes = []Route{
 	{Resource: OrgsResource, Path: "/", Method: http.MethodGet, Name: GetOrganizationsRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodGet, Name: GetOrganizationRelationshipDefaultIsolationSegmentRequest},
 	{Resource: OrgsResource, Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodPatch, Name: PatchOrganizationRelationshipDefaultIsolationSegmentRequest},
+	{Resource: OrgsResource, Path: "/:organization_guid/", Method: http.MethodPatch, Name: PatchOrganizationRequest},
 	{Resource: PackagesResource, Path: "/", Method: http.MethodGet, Name: GetPackagesRequest},
 	{Resource: PackagesResource, Path: "/", Method: http.MethodPost, Name: PostPackageRequest},
 	{Resource: PackagesResource, Path: "/:package_guid", Method: http.MethodGet, Name: GetPackageRequest},
