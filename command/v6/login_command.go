@@ -3,10 +3,12 @@ package v6
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/url"
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/util/ui"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -426,16 +428,30 @@ func (cmd *LoginCommand) displayNotTargetted() {
 }
 
 func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action.Organization, error) {
-	cmd.UI.DisplayText("Select an org:")
-
 	orgNames := make([]string, len(orgs))
 	for i, org := range orgs {
 		orgNames[i] = org.Name
 	}
+	var (
+		chosenOrgName string
+		err           error
+	)
 
-	chosenOrgName, err := cmd.UI.DisplayTextMenu(orgNames, "Org")
+	for {
+		cmd.UI.DisplayText("Select an org:")
+		chosenOrgName, err = cmd.UI.DisplayTextMenu(orgNames, "Org")
+		if err != ui.InvalidIndexError {
+			break
+		}
+	}
 
 	if err != nil {
+		if invalidChoice, ok := err.(ui.InvalidChoiceError); ok {
+			return v3action.Organization{}, translatableerror.OrganizationNotFoundError{Name: invalidChoice.Choice}
+		} else if err == io.EOF {
+			return v3action.Organization{}, nil
+		}
+
 		return v3action.Organization{}, err
 	}
 

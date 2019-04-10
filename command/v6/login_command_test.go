@@ -843,58 +843,83 @@ var _ = Describe("login Command", func() {
 						})
 
 						When("the user selects an org by list position", func() {
-							BeforeEach(func() {
-								input.Write([]byte("2\n"))
+							When("the position is valid", func() {
+								BeforeEach(func() {
+									input.Write([]byte("2\n"))
+								})
+
+								It("prompts the user to select an org", func() {
+									Expect(testUI.Out).To(Say("Select an org:"))
+									Expect(testUI.Out).To(Say("1. some-org-name1"))
+									Expect(testUI.Out).To(Say("2. some-org-name2"))
+									Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
+									Expect(executeErr).ToNot(HaveOccurred())
+								})
+
+								It("targets that org", func() {
+									Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
+									orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
+									Expect(orgGUID).To(Equal("some-org-guid2"))
+									Expect(orgName).To(Equal("some-org-name2"))
+								})
 							})
 
-							It("prompts the user to select an org", func() {
-								Expect(testUI.Out).To(Say("Select an org:"))
-								Expect(testUI.Out).To(Say("1. some-org-name1"))
-								Expect(testUI.Out).To(Say("2. some-org-name2"))
-								Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
-								Expect(executeErr).ToNot(HaveOccurred())
-							})
+							When("the position is invalid", func() {
+								BeforeEach(func() {
+									input.Write([]byte("4\n"))
+								})
 
-							It("targets that org", func() {
-								Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
-								orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
-								Expect(orgGUID).To(Equal("some-org-guid2"))
-								Expect(orgName).To(Equal("some-org-name2"))
+								It("reprompts the user", func() {
+									Expect(testUI.Out).To(Say("Select an org:"))
+									Expect(testUI.Out).To(Say("1. some-org-name1"))
+									Expect(testUI.Out).To(Say("2. some-org-name2"))
+									Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
+									Expect(testUI.Out).To(Say("Select an org:"))
+									Expect(testUI.Out).To(Say("1. some-org-name1"))
+									Expect(testUI.Out).To(Say("2. some-org-name2"))
+									Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
+								})
 							})
 						})
 
 						When("the user selects an org by name", func() {
-							BeforeEach(func() {
-								input.Write([]byte("some-org-name2\n"))
+							When("the list contains that org", func() {
+								BeforeEach(func() {
+									input.Write([]byte("some-org-name2\n"))
+								})
+
+								It("prompts the user to select an org", func() {
+									Expect(testUI.Out).To(Say("Select an org:"))
+									Expect(testUI.Out).To(Say("1. some-org-name1"))
+									Expect(testUI.Out).To(Say("2. some-org-name2"))
+									Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
+									Expect(executeErr).ToNot(HaveOccurred())
+								})
+
+								It("targets that org", func() {
+									Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
+									orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
+									Expect(orgGUID).To(Equal("some-org-guid2"))
+									Expect(orgName).To(Equal("some-org-name2"))
+								})
 							})
 
-							It("prompts the user to select an org", func() {
-								Expect(testUI.Out).To(Say("Select an org:"))
-								Expect(testUI.Out).To(Say("1. some-org-name1"))
-								Expect(testUI.Out).To(Say("2. some-org-name2"))
-								Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
-								Expect(executeErr).ToNot(HaveOccurred())
-							})
+							When("the org is not in the list", func() {
+								BeforeEach(func() {
+									input.Write([]byte("invalid-org\n"))
+								})
 
-							It("targets that org", func() {
-								Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
-								orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
-								Expect(orgGUID).To(Equal("some-org-guid2"))
-								Expect(orgName).To(Equal("some-org-name2"))
+								It("returns an error", func() {
+									Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "invalid-org"}))
+								})
+
+								It("does not target the org", func() {
+									Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
+								})
 							})
 						})
 
-						When("the user selects an org by index out of bounds", func() {
-							BeforeEach(func() {
-								input.Write([]byte("4\n"))
-							})
-
-							It("It does not target an org", func() {
-								Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
-							})
-						})
-
-						XWhen("the user exits the prompt early", func() {
+						When("the user exits the prompt early", func() {
 							var fakeUI *commandfakes.FakeUI
 
 							BeforeEach(func() {
@@ -902,7 +927,7 @@ var _ = Describe("login Command", func() {
 								cmd.UI = fakeUI
 							})
 
-							When("the user exits the prompt with CTRL+D or CTRL+C", func() {
+							When("the prompt returns with an EOF", func() {
 								BeforeEach(func() {
 									fakeUI.DisplayTextMenuReturns("", io.EOF)
 								})

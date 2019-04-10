@@ -14,6 +14,8 @@ const sigIntExitCode = 130
 
 //go:generate counterfeiter . Resolver
 
+var InvalidIndexError = errors.New("invalid list index")
+
 type Resolver interface {
 	Resolve(dst interface{}) error
 	SetIn(io.Reader)
@@ -80,14 +82,14 @@ func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateV
 
 	i, err := strconv.Atoi(value)
 	if err != nil {
-		if inSlice(choices, value) {
+		if contains(choices, value) {
 			return value, nil
 		}
-		return "", InvalidChoiceError
+		return "", InvalidChoiceError{Choice: value} //some org not found
 	}
 
-	if i >= len(choices) {
-		return "", InvalidChoiceError
+	if i >= len(choices) || i <= 0 {
+		return "", InvalidIndexError // list position out of range
 	}
 	return choices[i-1], nil
 
@@ -100,16 +102,13 @@ func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateV
 	// return value, err
 }
 
-func inSlice(s []string, v string) bool {
-	for _, x := range s {
-		if x == v {
-			return true
-		}
-	}
-	return false
+type InvalidChoiceError struct {
+	Choice string
 }
 
-var InvalidChoiceError error = errors.New("invalid choice")
+func (InvalidChoiceError) Error() string {
+	return "Some error"
+}
 
 // DisplayTextPrompt outputs the prompt and waits for user input.
 func (ui *UI) DisplayTextPrompt(template string, templateValues ...map[string]interface{}) (string, error) {
@@ -124,18 +123,14 @@ func (ui *UI) DisplayTextPrompt(template string, templateValues ...map[string]in
 	return value, err
 }
 
-// func (ui *UI) DisplayTextPromptWithDefault(template string, defaultValue string, templateValues ...map[string]interface{}) (string, error) {
-
-// 	interactivePrompt := ui.Interactor.NewInteraction(ui.TranslateText(template, templateValues...))
-// 	var value string
-// 	interactivePrompt.SetIn(ui.In)
-// 	interactivePrompt.SetOut(ui.OutForInteration)
-// 	err := interactivePrompt.Resolve(&value)
-// 	if isInterrupt(err) {
-// 		ui.Exiter.Exit(sigIntExitCode)
-// 	}
-// 	return value, err
-// }
+func contains(s []string, v string) bool {
+	for _, x := range s {
+		if x == v {
+			return true
+		}
+	}
+	return false
+}
 
 func isInterrupt(err error) bool {
 	return err == interact.ErrKeyboardInterrupt || err == terminal.ErrKeyboardInterrupt

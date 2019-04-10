@@ -264,7 +264,7 @@ func (config *Config) UnsetUserInformation() {
 
 }
 
-// SetSpaceInformation sets the currently targeted space.
+// V7SetSpaceInformation sets the currently targeted space.
 func (config *Config) V7SetSpaceInformation(guid string, name string) {
 	config.ConfigFile.TargetedSpace.GUID = guid
 	config.ConfigFile.TargetedSpace.Name = name

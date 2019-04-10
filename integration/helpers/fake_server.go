@@ -81,10 +81,17 @@ func startServerWithVersions(v2Version string, v3Version string, minimumCLIVersi
 		MinCLIVersion:         minimumCLIVersion}
 
 	server.RouteToHandler(http.MethodGet, "/v2/info", RespondWithJSONEncoded(http.StatusOK, v2InfoResponse))
+
+	v3Response := fmt.Sprintf(`{"links": {
+			"organizations": {
+				"href": "%s/v3/organizations"
+			}
+		}}`, server.URL())
 	server.RouteToHandler(http.MethodGet, "/v3", func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusOK)
-		res.Write([]byte(`{"links":{}}`))
+		res.Write([]byte(v3Response))
 	})
+
 	server.RouteToHandler(http.MethodGet, "/login", func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusOK)
 		res.Write([]byte(`{"links":{}}`))

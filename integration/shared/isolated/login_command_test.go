@@ -118,9 +118,14 @@ var _ = Describe("login command", func() {
 			BeforeEach(func() {
 				helpers.TurnOnExperimentalLogin()
 				server = helpers.StartServerWithMinimumCLIVersion("9000.0.0")
+
+				fakeTokenResponse := map[string]string{
+					"access_token": "",
+					"token_type":   "bearer",
+				}
 				server.RouteToHandler(http.MethodPost, "/oauth/token",
-					ghttp.RespondWithJSONEncoded(http.StatusOK, struct{}{}))
-				server.RouteToHandler(http.MethodGet, "/v2/organizations",
+					ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
+				server.RouteToHandler(http.MethodGet, "/v3/organizations",
 					ghttp.RespondWith(http.StatusOK, `{
 					 "total_results": 0,
 					 "total_pages": 1,
@@ -438,7 +443,7 @@ var _ = Describe("login command", func() {
 		})
 	})
 
-	FDescribe("Target Organization", func() {
+	Describe("Target Organization", func() {
 		var (
 			orgName  string
 			username string
@@ -515,8 +520,8 @@ var _ = Describe("login command", func() {
 							session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password)
 
 							Eventually(session).Should(Say(regexp.QuoteMeta("Select an org:")))
-							Eventually(session).Should(Say(regexp.QuoteMeta(`Org \(enter to skip\):`)))
-							Eventually(session).Should(Say(regexp.QuoteMeta(`Org \(enter to skip\):`)))
+							Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
+							Eventually(session).Should(Say(regexp.QuoteMeta(`Org (enter to skip):`)))
 
 							session.Interrupt()
 							Eventually(session).Should(Exit())
@@ -944,6 +949,20 @@ var _ = Describe("login command", func() {
 				})
 
 				When("correct MFA code and credentials are provided", func() {
+					BeforeEach(func() {
+						fakeTokenResponse := map[string]string{
+							"access_token": "",
+							"token_type":   "bearer",
+						}
+						server.RouteToHandler(http.MethodPost, "/oauth/token",
+							ghttp.RespondWithJSONEncoded(http.StatusOK, fakeTokenResponse))
+						server.RouteToHandler(http.MethodGet, "/v3/organizations",
+							ghttp.RespondWith(http.StatusOK, `{
+							 "total_results": 0,
+							 "total_pages": 1,
+							 "resources": []}`))
+					})
+
 					It("logs in the user", func() {
 						input := NewBuffer()
 						_, err := input.Write([]byte(username + "\n" + password + "\n" + mfaCode + "\n"))

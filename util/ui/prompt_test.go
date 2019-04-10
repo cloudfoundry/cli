@@ -266,7 +266,7 @@ var _ = Describe("Prompts", func() {
 			})
 		})
 
-		When("the user enters an invalid list index", func() {
+		When("the user enters a list index which is too high", func() {
 			BeforeEach(func() {
 				_, err := inBuffer.Write([]byte("47\n"))
 				Expect(err).ToNot(HaveOccurred())
@@ -274,7 +274,19 @@ var _ = Describe("Prompts", func() {
 
 			It("returns an invalid choice error", func() {
 				Expect(choice).To(Equal(""))
-				Expect(menuErr).To(Equal(InvalidChoiceError))
+				Expect(menuErr).To(Equal(InvalidIndexError))
+			})
+		})
+
+		When("the user enters a list index which is too low", func() {
+			BeforeEach(func() {
+				_, err := inBuffer.Write([]byte("0\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns an invalid choice error", func() {
+				Expect(choice).To(Equal(""))
+				Expect(menuErr).To(Equal(InvalidIndexError))
 			})
 		})
 
@@ -286,7 +298,7 @@ var _ = Describe("Prompts", func() {
 
 			It("returns an invalid choice error", func() {
 				Expect(choice).To(Equal(""))
-				Expect(menuErr).To(Equal(InvalidChoiceError))
+				Expect(menuErr).To(MatchError(InvalidChoiceError{Choice: "choice-94"}))
 			})
 		})
 
