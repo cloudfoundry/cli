@@ -59,24 +59,6 @@ var _ = Describe("set-label command", func() {
 			helpers.CreateOrg(orgName)
 		})
 
-		When("assigning label to org", func() {
-			It("sets the specified labels on the org", func() {
-				session := helpers.CF("set-label", "org", orgName, "pci=true", "public-facing=false")
-				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for org %s as %s...`), orgName, username))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Exit(0))
-
-				orgGUID := helpers.GetOrgGUID(orgName)
-				session = helpers.CF("curl", fmt.Sprintf("/v3/organizations/%s", orgGUID))
-				Eventually(session).Should(Exit(0))
-				orgJSON := session.Out.Contents()
-				var org commonResource
-				Expect(json.Unmarshal(orgJSON, &org)).To(Succeed())
-				Expect(len(org.Metadata.Labels)).To(Equal(2))
-				Expect(org.Metadata.Labels["pci"]).To(Equal("true"))
-				Expect(org.Metadata.Labels["public-facing"]).To(Equal("false"))
-			})
-		})
 
 		When("assigning label to app", func() {
 			BeforeEach(func() {
@@ -105,7 +87,7 @@ var _ = Describe("set-label command", func() {
 				Expect(app.Metadata.Labels["some-other-key"]).To(Equal("some-other-value"))
 			})
 
-			When("there the app is unknown", func() {
+			When("the app is unknown", func() {
 				It("displays an error", func() {
 					session := helpers.CF("set-label", "app", "non-existent-app", "some-key=some-value")
 					Eventually(session.Err).Should(Say("App 'non-existent-app' not found"))
@@ -144,6 +126,67 @@ var _ = Describe("set-label command", func() {
 					Expect(json.Unmarshal(appJSON, &app)).To(Succeed())
 					Expect(len(app.Metadata.Labels)).To(Equal(1))
 					Expect(app.Metadata.Labels["owner"]).To(Equal("beth"))
+				})
+			})
+		})
+		
+		When("assigning label to org", func() {
+			It("sets the specified labels on the org", func() {
+				session := helpers.CF("set-label", "org", orgName, "pci=true", "public-facing=false")
+				Eventually(session).Should(Say(regexp.QuoteMeta(`Setting label(s) for org %s as %s...`), orgName, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Exit(0))
+
+				orgGUID := helpers.GetOrgGUID(orgName)
+				session = helpers.CF("curl", fmt.Sprintf("/v3/organizations/%s", orgGUID))
+				Eventually(session).Should(Exit(0))
+				orgJSON := session.Out.Contents()
+				var org commonResource
+				Expect(json.Unmarshal(orgJSON, &org)).To(Succeed())
+				Expect(len(org.Metadata.Labels)).To(Equal(2))
+				Expect(org.Metadata.Labels["pci"]).To(Equal("true"))
+				Expect(org.Metadata.Labels["public-facing"]).To(Equal("false"))
+			})
+			
+			When("the org is unknown", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "org", "non-existent-org", "some-key=some-value")
+					Eventually(session.Err).Should(Say("Organization 'non-existent-org' not found"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the label has an empty key and an invalid value", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "org", orgName, "=test", "sha2=108&eb90d734")
+					Eventually(session.Err).Should(Say("Metadata key error: label key cannot be empty string, Metadata value error: label '108&eb90d734' contains invalid characters"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("the label does not include a '=' to separate the key and value", func() {
+				It("displays an error", func() {
+					session := helpers.CF("set-label", "org", orgName, "test-label")
+					Eventually(session.Err).Should(Say("Metadata error: no value provided for label 'test-label'"))
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			When("more than one value is provided for the same key", func() {
+				It("uses the last value", func() {
+					session := helpers.CF("set-label", "org", orgName, "owner=sue", "owner=beth")
+					Eventually(session).Should(Exit(0))
+					orgGUID := helpers.GetOrgGUID(orgName)
+					session = helpers.CF("curl", fmt.Sprintf("/v3/organizations/%s", orgGUID))
+					Eventually(session).Should(Exit(0))
+					orgJSON := session.Out.Contents()
+					var org commonResource
+					Expect(json.Unmarshal(orgJSON, &org)).To(Succeed())
+					Expect(len(org.Metadata.Labels)).To(Equal(1))
+					Expect(org.Metadata.Labels["owner"]).To(Equal("beth"))
 				})
 			})
 		})
