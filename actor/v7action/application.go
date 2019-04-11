@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
-	"code.cloudfoundry.org/cli/types"
 )
 
 // Application represents a V3 actor application.
@@ -18,9 +17,7 @@ type Application struct {
 	State               constant.ApplicationState
 	LifecycleType       constant.AppLifecycleType
 	LifecycleBuildpacks []string
-	Metadata            struct {
-		Labels map[string]types.NullString `json:"labels,omitempty"`
-	}
+	Metadata            *Metadata
 }
 
 func (app Application) Started() bool {
@@ -227,7 +224,7 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 		StackName:           app.StackName,
 		LifecycleType:       app.LifecycleType,
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
-		Metadata:            app.Metadata,
+		Metadata:            (*ccv3.Metadata)(app.Metadata),
 	}
 
 	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccApp)
@@ -246,7 +243,7 @@ func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 		LifecycleBuildpacks: app.LifecycleBuildpacks,
 		Name:                app.Name,
 		State:               app.State,
-		Metadata:            app.Metadata,
+		Metadata:            (*Metadata)(app.Metadata),
 	}
 }
 

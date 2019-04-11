@@ -56,9 +56,7 @@ var _ = Describe("labels command", func() {
 			}
 			fakeActor.GetApplicationByNameAndSpaceReturns(
 				v7action.Application{
-					Metadata: struct {
-						Labels map[string]types.NullString `json:"labels,omitempty"`
-					}{
+					Metadata: &v7action.Metadata{
 						Labels: map[string]types.NullString{
 							"some-other-label": types.NewNullString("some-other-value"),
 							"some-label":       types.NewNullString("some-value"),
@@ -103,9 +101,7 @@ var _ = Describe("labels command", func() {
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
 					v7action.Application{
-						Metadata: struct {
-							Labels map[string]types.NullString `json:"labels,omitempty"`
-						}{
+						Metadata: &v7action.Metadata{
 							Labels: map[string]types.NullString{
 								"some-other-label": types.NewNullString("some-other-value"),
 								"some-label":       types.NewNullString("some-value"),

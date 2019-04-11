@@ -292,9 +292,7 @@ var _ = Describe("Organizations", func() {
 				orgToUpdate = Organization{
 					Name: "some-org-name",
 					GUID: "some-guid",
-					Metadata: struct {
-						Labels map[string]types.NullString `json:"labels,omitempty"`
-					}{
+					Metadata: &Metadata{
 						Labels: map[string]types.NullString{
 							"k1": types.NewNullString("v1"),
 							"k2": types.NewNullString("v2"),
