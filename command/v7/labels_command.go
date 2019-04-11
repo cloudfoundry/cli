@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v7/shared"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -53,13 +54,16 @@ func (cmd LabelsCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.ResourceName, cmd.Config.TargetedSpace().GUID)
-	labels := app.Metadata.Labels
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
 	}
 
+	var labels map[string]types.NullString
+	if app.Metadata != nil {
+		labels = app.Metadata.Labels
+	}
 	if len(labels) == 0 {
 		cmd.UI.DisplayText("No labels found.")
 		return nil

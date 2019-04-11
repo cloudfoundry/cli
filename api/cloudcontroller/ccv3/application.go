@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/types"
 )
 
 // Application represents a Cloud Controller V3 Application.
@@ -22,9 +21,7 @@ type Application struct {
 	// LifecycleType is the type of the lifecycle.
 	LifecycleType constant.AppLifecycleType
 	// Metadata is used for custom tagging of API resources
-	Metadata struct {
-		Labels map[string]types.NullString `json:"labels,omitempty"`
-	}
+	Metadata *Metadata
 	// Name is the name given to the application.
 	Name string
 	// Relationships list the relationships to the application.
@@ -38,10 +35,7 @@ func (a Application) MarshalJSON() ([]byte, error) {
 	ccApp := ccApplication{
 		Name:          a.Name,
 		Relationships: a.Relationships,
-	}
-
-	if len(a.Metadata.Labels) != 0 {
-		ccApp.Metadata = &a.Metadata
+		Metadata:      a.Metadata,
 	}
 
 	if a.LifecycleType == constant.AppLifecycleTypeDocker {
@@ -78,9 +72,7 @@ func (a *Application) UnmarshalJSON(data []byte) error {
 	a.Name = ccApp.Name
 	a.Relationships = ccApp.Relationships
 	a.State = ccApp.State
-	if ccApp.Metadata != nil {
-		a.Metadata = *ccApp.Metadata
-	}
+	a.Metadata = ccApp.Metadata
 
 	return nil
 }
@@ -106,9 +98,7 @@ type ccApplication struct {
 	Lifecycle     interface{}               `json:"lifecycle,omitempty"`
 	GUID          string                    `json:"guid,omitempty"`
 	State         constant.ApplicationState `json:"state,omitempty"`
-	Metadata      *struct {
-		Labels map[string]types.NullString `json:"labels,omitempty"`
-	} `json:"metadata,omitempty"`
+	Metadata      *Metadata                 `json:"metadata,omitempty"`
 }
 
 func (ccApp *ccApplication) setAutodetectedBuildpackLifecycle(a Application) {
