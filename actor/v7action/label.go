@@ -10,7 +10,7 @@ func (actor *Actor) UpdateApplicationLabelsByApplicationName(appName string, spa
 	if err != nil {
 		return appWarnings, err
 	}
-	app.Metadata.Labels = labels
+	app.Metadata = &Metadata{Labels: labels}
 	_, updateWarnings, err := actor.UpdateApplication(app)
 	return append(appWarnings, updateWarnings...), err
 }
@@ -20,7 +20,7 @@ func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, l
 	if err != nil {
 		return warnings, err
 	}
-	org.Metadata.Labels = labels
+	org.Metadata = &ccv3.Metadata{Labels: labels}
 	_, updateWarnings, err := actor.CloudControllerClient.UpdateOrganization(ccv3.Organization(org))
 	return append(warnings, updateWarnings...), err
 }

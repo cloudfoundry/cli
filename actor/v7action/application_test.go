@@ -187,9 +187,7 @@ var _ = Describe("Application Actions", func() {
 						{
 							Name: "some-app-name",
 							GUID: "some-app-guid",
-							Metadata: struct {
-								Labels map[string]types.NullString `json:"labels,omitempty"`
-							}{
+							Metadata: &ccv3.Metadata{
 								Labels: map[string]types.NullString{
 									"some-key": types.NewNullString("some-value"),
 								},
@@ -207,9 +205,7 @@ var _ = Describe("Application Actions", func() {
 				Expect(app).To(Equal(Application{
 					Name: "some-app-name",
 					GUID: "some-app-guid",
-					Metadata: struct {
-						Labels map[string]types.NullString `json:"labels,omitempty"`
-					}{
+					Metadata: &Metadata{
 						Labels: map[string]types.NullString{"some-key": types.NewNullString("some-value")},
 					},
 				}))
@@ -416,11 +412,12 @@ var _ = Describe("Application Actions", func() {
 				StackName:           "some-stack-name",
 				LifecycleType:       constant.AppLifecycleTypeBuildpack,
 				LifecycleBuildpacks: []string{"buildpack-1", "buildpack-2"},
+				Metadata: &Metadata{Labels: map[string]types.NullString{
+					"some-label":  types.NewNullString("some-value"),
+					"other-label": types.NewNullString("other-value"),
+				}},
 			}
-			submitApp.Metadata.Labels = map[string]types.NullString{
-				"some-label":  types.NewNullString("some-value"),
-				"other-label": types.NewNullString("other-value"),
-			}
+
 			resultApp, warnings, err = actor.UpdateApplication(submitApp)
 		})
 
@@ -457,7 +454,7 @@ var _ = Describe("Application Actions", func() {
 					StackName:           submitApp.StackName,
 					LifecycleType:       submitApp.LifecycleType,
 					LifecycleBuildpacks: submitApp.LifecycleBuildpacks,
-					Metadata:            submitApp.Metadata,
+					Metadata:            (*ccv3.Metadata)(submitApp.Metadata),
 				}))
 			})
 		})

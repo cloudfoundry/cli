@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/types"
 )
 
 // Organization represents a Cloud Controller V3 Organization.
@@ -18,9 +17,7 @@ type Organization struct {
 	Name string `json:"name"`
 
 	// Metadata is used for custom tagging of API resources
-	Metadata struct {
-		Labels map[string]types.NullString `json:"labels,omitempty"`
-	} `json:"metadata,omitempty"`
+	Metadata *Metadata `json:"metadata,omitempty"`
 }
 
 // GetIsolationSegmentOrganizations lists organizations

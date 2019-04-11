@@ -115,9 +115,7 @@ var _ = Describe("Application", func() {
 			When("metadata is provided", func() {
 				BeforeEach(func() {
 					app = Application{
-						Metadata: struct {
-							Labels map[string]types.NullString `json:"labels,omitempty"`
-						}{
+						Metadata: &Metadata{
 							Labels: map[string]types.NullString{
 								"some-key":  types.NewNullString("some-value"),
 								"other-key": types.NewNullString("other-value")},
@@ -139,9 +137,7 @@ var _ = Describe("Application", func() {
 				When("labels need to be removed", func() {
 					BeforeEach(func() {
 						app = Application{
-							Metadata: struct {
-								Labels map[string]types.NullString `json:"labels,omitempty"`
-							}{
+							Metadata: &Metadata{
 								Labels: map[string]types.NullString{
 									"some-key":      types.NewNullString("some-value"),
 									"other-key":     types.NewNullString("other-value"),
@@ -227,9 +223,7 @@ var _ = Describe("Application", func() {
 
 				It("sets the labels", func() {
 					Expect(app).To(Equal(Application{
-						Metadata: struct {
-							Labels map[string]types.NullString `json:"labels,omitempty"`
-						}{
+						Metadata: &Metadata{
 							Labels: map[string]types.NullString{
 								"some-key": types.NewNullString("some-value"),
 							},
