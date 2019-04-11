@@ -332,9 +332,9 @@ func (actor Actor) calculateRoute(route string, domainCache map[string]v2action.
 func (actor Actor) calculatePath(manifestApp manifest.Application, domain v2action.Domain) (string, error) {
 	if manifestApp.RoutePath != "" && domain.IsTCP() {
 		return "", actionerror.RoutePathWithTCPDomainError{}
-	} else {
-		return manifestApp.RoutePath, nil
 	}
+
+	return manifestApp.RoutePath, nil
 }
 
 func (actor Actor) findOrReturnPartialRouteWithSettings(route v2action.Route) (v2action.Route, Warnings, error) {

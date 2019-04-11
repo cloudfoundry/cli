@@ -45,7 +45,7 @@ type Resource struct {
 
 type V3Resource ccv3.Resource
 
-// Translate shared action Resource to V3 Resource format
+// ToV3Resource converts a sharedaction Resource to V3 Resource format
 func (r Resource) ToV3Resource() V3Resource {
 	return V3Resource{
 		FilePath:    r.Filename,
@@ -55,7 +55,7 @@ func (r Resource) ToV3Resource() V3Resource {
 	}
 }
 
-// Translate shared action Resource to V3 Resource format
+// ToV2Resource converts a V3 Resource to V2 Resource format
 func (r V3Resource) ToV2Resource() Resource {
 	return Resource{
 		Filename: r.FilePath,

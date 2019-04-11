@@ -1,6 +1,6 @@
 package actionerror
 
-// SSHHostkeyFingerprintNotSetError is returned when staging an application fails.
+// SSHHostKeyFingerprintNotSetError is returned when staging an application fails.
 type SSHHostKeyFingerprintNotSetError struct {
 }
 

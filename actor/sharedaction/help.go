@@ -48,7 +48,7 @@ type CommandFlag struct {
 	Default string
 }
 
-// Environment contains env vars specific for this command
+// EnvironmentVariable contains env vars specific for this command
 type EnvironmentVariable struct {
 	Name         string
 	Description  string

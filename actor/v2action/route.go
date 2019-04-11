@@ -56,7 +56,9 @@ func (r Route) Validate() error {
 	return nil
 }
 
-// TODO: rename to ValidateWithPortOptions
+// ValidateWithRandomPort will return an error if a random port is requested
+// for an HTTP route, or if the route is TCP, a random port wasn't requested,
+// and the route has no port set.
 func (r Route) ValidateWithRandomPort(randomPort bool) error {
 	if r.Domain.IsHTTP() && randomPort {
 		return actionerror.InvalidHTTPRouteSettings{Domain: r.Domain.Name}

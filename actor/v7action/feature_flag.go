@@ -8,7 +8,7 @@ import (
 
 type FeatureFlag ccv3.FeatureFlag
 
-// Returns a featureFlag with the provided name.
+// GetFeatureFlagByName returns a featureFlag with the provided name.
 func (actor Actor) GetFeatureFlagByName(featureFlagName string) (FeatureFlag, Warnings, error) {
 	var (
 		ccv3FeatureFlag ccv3.FeatureFlag

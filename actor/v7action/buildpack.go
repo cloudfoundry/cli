@@ -35,9 +35,10 @@ func (actor Actor) GetBuildpacks() ([]Buildpack, Warnings, error) {
 	return buildpacks, Warnings(warnings), err
 }
 
-// Returns a buildpack with the provided name and stack.
-// If `buildpackStack` is not specified, and there are multiple buildpacks with the same name, it will return the one
-// with no stack, if present.
+// GetBuildpackByNameAndStack returns a buildpack with the provided name and
+// stack. If `buildpackStack` is not specified, and there are multiple
+// buildpacks with the same name, it will return the one with no stack, if
+// present.
 func (actor Actor) GetBuildpackByNameAndStack(buildpackName string, buildpackStack string) (Buildpack, Warnings, error) {
 	var (
 		ccv3Buildpacks []ccv3.Buildpack

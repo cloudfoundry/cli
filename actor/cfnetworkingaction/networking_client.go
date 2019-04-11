@@ -3,6 +3,7 @@ package cfnetworkingaction
 import "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 
 //go:generate counterfeiter . NetworkingClient
+
 type NetworkingClient interface {
 	CreatePolicies(policies []cfnetv1.Policy) error
 	ListPolicies(appGUIDs ...string) ([]cfnetv1.Policy, error)

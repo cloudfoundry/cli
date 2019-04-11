@@ -331,7 +331,7 @@ func (actor *Actor) UploadBuildpack(GUID string, pathToBuildpackBits string, pro
 	return Warnings(warnings), nil
 }
 
-func (actor *Actor) UploadBuildpackFromPath(inputPath, buildpackGuid string, progressBar SimpleProgressBar) (Warnings, error) {
+func (actor *Actor) UploadBuildpackFromPath(inputPath, buildpackGUID string, progressBar SimpleProgressBar) (Warnings, error) {
 	downloader := download.NewDownloader(time.Second * 30)
 	tmpDirPath, err := ioutil.TempDir("", "buildpack-dir-")
 	if err != nil {
@@ -344,7 +344,7 @@ func (actor *Actor) UploadBuildpackFromPath(inputPath, buildpackGuid string, pro
 		return Warnings{}, err
 	}
 
-	return actor.UploadBuildpack(buildpackGuid, pathToBuildpackBits, progressBar)
+	return actor.UploadBuildpack(buildpackGUID, pathToBuildpackBits, progressBar)
 }
 
 // Zipit zips the source into a .zip file in the target dir
