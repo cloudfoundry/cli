@@ -12,9 +12,17 @@ import (
 
 const sigIntExitCode = 130
 
-//go:generate counterfeiter . Resolver
+var ErrInvalidIndex = errors.New("invalid list index")
 
-var InvalidIndexError = errors.New("invalid list index")
+type InvalidChoiceError struct {
+	Choice string
+}
+
+func (InvalidChoiceError) Error() string {
+	return "Some error"
+}
+
+//go:generate counterfeiter . Resolver
 
 type Resolver interface {
 	Resolve(dst interface{}) error
@@ -72,6 +80,11 @@ func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateV
 
 	var value string = "enter to skip"
 	err := interactivePrompt.Resolve(&value)
+
+	if isInterrupt(err) {
+		ui.Exiter.Exit(sigIntExitCode)
+	}
+
 	if err != nil {
 		return "", err
 	}
@@ -89,25 +102,9 @@ func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateV
 	}
 
 	if i >= len(choices) || i <= 0 {
-		return "", InvalidIndexError // list position out of range
+		return "", ErrInvalidIndex // list position out of range
 	}
 	return choices[i-1], nil
-
-	// if isInterrupt(err) {
-	// 	return "", io.EOF // break out of prompt on keyboard interrupt
-	// 	// exiting program from menu requires CTRL+C twice.
-	// 	// callers can interpret EOF as "nothing was chosen"
-	// }
-
-	// return value, err
-}
-
-type InvalidChoiceError struct {
-	Choice string
-}
-
-func (InvalidChoiceError) Error() string {
-	return "Some error"
 }
 
 // DisplayTextPrompt outputs the prompt and waits for user input.

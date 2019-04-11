@@ -274,7 +274,7 @@ var _ = Describe("Prompts", func() {
 
 			It("returns an invalid choice error", func() {
 				Expect(choice).To(Equal(""))
-				Expect(menuErr).To(Equal(InvalidIndexError))
+				Expect(menuErr).To(Equal(ErrInvalidIndex))
 			})
 		})
 
@@ -286,7 +286,7 @@ var _ = Describe("Prompts", func() {
 
 			It("returns an invalid choice error", func() {
 				Expect(choice).To(Equal(""))
-				Expect(menuErr).To(Equal(InvalidIndexError))
+				Expect(menuErr).To(Equal(ErrInvalidIndex))
 			})
 		})
 
@@ -320,7 +320,7 @@ var _ = Describe("Prompts", func() {
 	})
 
 	Describe("interrupt handling", func() {
-		When("the prompt is canceled by a keyboard interrupt", func() {
+		When("the prompt is canceled by a keyboard interrupt (e.g. CTRL-C)", func() {
 			var (
 				fakeResolver   *uifakes.FakeResolver
 				fakeExiter     *uifakes.FakeExiter
@@ -361,15 +361,15 @@ var _ = Describe("Prompts", func() {
 				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
 				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
 			})
-		})
 
-		// When("the prompt is a multiple choice prompt", func() {
-		// 	It("interprets CTRL+C as 'choose nothing'", func() {
-		// 		choices := []string{"foo", "bar"}
-		// 		choice, err := ui.DisplayTextMenu(choices, "choose!")
-		// 		Expect(choice).To(Equal(""))
-		// 		Expect(err).To(Equal(io.EOF))
-		// 	})
-		// })
+			It("exits immediately from multiple choice prompt", func() {
+				choices := []string{"foo", "bar"}
+				choice, err := ui.DisplayTextMenu(choices, "choose!")
+				Expect(choice).To(Equal(""))
+				Expect(err).To(MatchError("keyboard interrupt"))
+				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
+				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
+			})
+		})
 	})
 })

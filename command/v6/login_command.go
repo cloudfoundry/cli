@@ -440,7 +440,7 @@ func (cmd *LoginCommand) promptChosenOrg(orgs []v3action.Organization) (v3action
 	for {
 		cmd.UI.DisplayText("Select an org:")
 		chosenOrgName, err = cmd.UI.DisplayTextMenu(orgNames, "Org")
-		if err != ui.InvalidIndexError {
+		if err != ui.ErrInvalidIndex {
 			break
 		}
 	}
