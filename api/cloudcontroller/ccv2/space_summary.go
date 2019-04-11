@@ -11,28 +11,28 @@ type SpaceSummaryApplication struct {
 	ServiceNames []string `json:"service_names"`
 }
 
-// SpaceSummaryApplication represents a service inside a space
+// SpaceSummaryService represents a service inside a space
 type SpaceSummaryService struct {
 	GUID              string
 	Label             string
 	ServiceBrokerName string
 }
 
-// SpaceSummaryApplication represents a service plan inside a space
+// SpaceSummaryServicePlan represents a service plan inside a space
 type SpaceSummaryServicePlan struct {
 	GUID    string              `json:"guid"`
 	Name    string              `json:"name"`
 	Service SpaceSummaryService `json:"service"`
 }
 
-// SpaceSummaryApplication represents a service instance inside a space
+// SpaceSummaryServiceInstance represents a service instance inside a space
 type SpaceSummaryServiceInstance struct {
 	LastOperation LastOperation           `json:"last_operation"`
 	Name          string                  `json:"name"`
 	ServicePlan   SpaceSummaryServicePlan `json:"service_plan"`
 }
 
-// SpaceSummaryApplication represents a service instance inside a space
+// SpaceSummary represents a service instance inside a space
 type SpaceSummary struct {
 	Applications     []SpaceSummaryApplication
 	Name             string

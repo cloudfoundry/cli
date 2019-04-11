@@ -62,7 +62,7 @@ func (buildpack Buildpack) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccBuildpack)
 }
 
-func (b *Buildpack) UnmarshalJSON(data []byte) error {
+func (buildpack *Buildpack) UnmarshalJSON(data []byte) error {
 	var ccBuildpack struct {
 		GUID     string         `json:"guid,omitempty"`
 		Links    APILinks       `json:"links,omitempty"`
@@ -80,15 +80,15 @@ func (b *Buildpack) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	b.Enabled = ccBuildpack.Enabled
-	b.Filename = ccBuildpack.Filename
-	b.GUID = ccBuildpack.GUID
-	b.Locked = ccBuildpack.Locked
-	b.Name = ccBuildpack.Name
-	b.Position = ccBuildpack.Position
-	b.Stack = ccBuildpack.Stack
-	b.State = ccBuildpack.State
-	b.Links = ccBuildpack.Links
+	buildpack.Enabled = ccBuildpack.Enabled
+	buildpack.Filename = ccBuildpack.Filename
+	buildpack.GUID = ccBuildpack.GUID
+	buildpack.Locked = ccBuildpack.Locked
+	buildpack.Name = ccBuildpack.Name
+	buildpack.Position = ccBuildpack.Position
+	buildpack.Stack = ccBuildpack.Stack
+	buildpack.State = ccBuildpack.State
+	buildpack.Links = ccBuildpack.Links
 
 	return nil
 }
@@ -118,7 +118,7 @@ func (client *Client) CreateBuildpack(bp Buildpack) (Buildpack, Warnings, error)
 	return responseBuildpack, response.Warnings, err
 }
 
-// Delete a buildpack by guid
+// DeleteBuildpack deletes the buildpack with the provided guid.
 func (client Client) DeleteBuildpack(buildpackGUID string) (JobURL, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteBuildpackRequest,

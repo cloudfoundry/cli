@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
-// Represents a Cloud Controller V3 Feature Flag.
+// FeatureFlag represents a Cloud Controller V3 Feature Flag.
 type FeatureFlag struct {
 	Name    string `json:"name"`
 	Enabled bool   `json:"enabled"`
@@ -47,7 +47,7 @@ func (client *Client) GetFeatureFlag(flagName string) (FeatureFlag, Warnings, er
 	return ccFlag, response.Warnings, nil
 }
 
-// Lists feature flags.
+// GetFeatureFlags lists feature flags.
 func (client *Client) GetFeatureFlags() ([]FeatureFlag, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetFeatureFlagsRequest,

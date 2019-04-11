@@ -1,4 +1,4 @@
-// Package nooabridge wraps a UAA client and a tokenCache to support the
+// Package noaabridge wraps a UAA client and a tokenCache to support the
 // TokenRefresher interface for noaa/consumer.
 package noaabridge
 

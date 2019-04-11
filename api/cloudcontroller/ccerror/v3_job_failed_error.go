@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
-// V2JobFailedError represents a failed Cloud Controller Job. It wraps the error
+// V3JobFailedError represents a failed Cloud Controller Job. It wraps the error
 // returned back from the Cloud Controller.
 type V3JobFailedError struct {
 	JobGUID string

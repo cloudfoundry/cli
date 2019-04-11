@@ -10,8 +10,8 @@ const (
 )
 
 const (
-	// Represents the awaiting upload state of a buildpack
+	// BuildpackAwaitingUpload represents the awaiting upload state of a buildpack.
 	BuildpackAwaitingUpload = "AWAITING_UPLOAD"
-	// Represents the ready state of a buildpack
+	// BuildpackReady represents the ready state of a buildpack.
 	BuildpackReady = "READY"
 )

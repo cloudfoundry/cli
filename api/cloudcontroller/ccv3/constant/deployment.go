@@ -1,15 +1,16 @@
 package constant
 
-// A zero down time deployment used to push new apps without restart
+// DeploymentState describes the states a zero down time deployment used to
+// push new apps without restart can be in.
 type DeploymentState string
 
 const (
-	// Deployment is in state 'DEPLOYING'
+	// DeploymentDeploying means the deployment is in state 'DEPLOYING'
 	DeploymentDeploying DeploymentState = "DEPLOYING"
 
-	// Deployment is in state 'CANCELED'
+	// DeploymentCanceled means the deployment is in state 'CANCELED'
 	DeploymentCanceled DeploymentState = "CANCELED"
 
-	// Deployment is in state 'DEPLOYED'
+	// DeploymentDeployed means the deployment is in state 'DEPLOYED'
 	DeploymentDeployed DeploymentState = "DEPLOYED"
 )
