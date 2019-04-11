@@ -46,7 +46,7 @@ type commandList struct {
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AddNetworkPolicy                   v6.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
 	AllowSpaceSSH                      v6.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
-	Api                                v6.ApiCommand                                `command:"api" description:"Set or view target api url"`
+	API                                v6.APICommand                                `command:"api" description:"Set or view target api url"`
 	Apps                               v6.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
 	Auth                               v6.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
 	BindRouteService                   v6.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`

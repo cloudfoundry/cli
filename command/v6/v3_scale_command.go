@@ -122,9 +122,9 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 				AppName:    cmd.RequiredArgs.AppName,
 				BinaryName: cmd.Config.BinaryName(),
 			}
-		} else {
-			return err
 		}
+
+		return err
 	}
 
 	return cmd.showCurrentScale(user.Name)

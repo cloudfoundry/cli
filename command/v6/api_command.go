@@ -10,14 +10,14 @@ import (
 	"code.cloudfoundry.org/cli/command/v6/shared"
 )
 
-//go:generate counterfeiter . ApiActor
+//go:generate counterfeiter . APIActor
 
-type ApiActor interface {
+type APIActor interface {
 	ClearTarget()
 	SetTarget(settings v2action.TargetSettings) (v2action.Warnings, error)
 }
 
-type ApiCommand struct {
+type APICommand struct {
 	OptionalArgs      flag.APITarget `positional-args:"yes"`
 	SkipSSLValidation bool           `long:"skip-ssl-validation" description:"Skip verification of the API endpoint. Not recommended!"`
 	Unset             bool           `long:"unset" description:"Remove all api endpoint targeting"`
@@ -25,11 +25,11 @@ type ApiCommand struct {
 	relatedCommands   interface{}    `related_commands:"auth, login, target"`
 
 	UI     command.UI
-	Actor  ApiActor
+	Actor  APIActor
 	Config command.Config
 }
 
-func (cmd *ApiCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *APICommand) Setup(config command.Config, ui command.UI) error {
 	ccClient, uaaClient, err := shared.NewClients(config, ui, false)
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (cmd *ApiCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd *ApiCommand) Execute(args []string) error {
+func (cmd *APICommand) Execute(args []string) error {
 	if cmd.Unset {
 		return cmd.ClearTarget()
 	}
@@ -81,14 +81,14 @@ func (cmd *ApiCommand) Execute(args []string) error {
 	return err
 }
 
-func (cmd *ApiCommand) ClearTarget() error {
+func (cmd *APICommand) ClearTarget() error {
 	cmd.UI.DisplayTextWithFlavor("Unsetting api endpoint...")
 	cmd.Actor.ClearTarget()
 	cmd.UI.DisplayOK()
 	return nil
 }
 
-func (cmd *ApiCommand) setAPI() error {
+func (cmd *APICommand) setAPI() error {
 	cmd.UI.DisplayTextWithFlavor("Setting api endpoint to {{.Endpoint}}...", map[string]interface{}{
 		"Endpoint": cmd.OptionalArgs.URL,
 	})

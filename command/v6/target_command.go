@@ -12,6 +12,7 @@ import (
 )
 
 //go:generate counterfeiter . TargetActor
+
 type TargetActor interface {
 	GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error)
 	GetOrganizationSpaces(orgGUID string) ([]v2action.Space, v2action.Warnings, error)

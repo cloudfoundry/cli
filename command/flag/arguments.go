@@ -295,7 +295,7 @@ type MigrateServiceInstancesArgs struct {
 
 type SecurityGroupArgs struct {
 	SecurityGroup   string                 `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group"`
-	PathToJsonRules PathWithExistenceCheck `positional-arg-name:"PATH_TO_JSON_RULES_FILE" required:"true" description:"Path to file of JSON describing security group rules"`
+	PathToJSONRules PathWithExistenceCheck `positional-arg-name:"PATH_TO_JSON_RULES_FILE" required:"true" description:"Path to file of JSON describing security group rules"`
 }
 
 type AddPluginRepoArgs struct {

@@ -72,9 +72,9 @@ func (cmd OrgCommand) Execute(args []string) error {
 
 	if cmd.GUID {
 		return cmd.displayOrgGUID()
-	} else {
-		return cmd.displayOrgSummary()
 	}
+
+	return cmd.displayOrgSummary()
 }
 
 func (cmd OrgCommand) displayOrgGUID() error {

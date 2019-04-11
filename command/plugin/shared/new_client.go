@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 )
 
-// NewClients creates a new V2 Cloud Controller client and UAA client using the
+// NewClient creates a new V2 Cloud Controller client and UAA client using the
 // passed in config.
 func NewClient(config command.Config, ui command.UI, skipSSLValidation bool) *plugin.Client {
 

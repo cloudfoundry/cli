@@ -16,19 +16,19 @@ import (
 
 var _ = Describe("api Command", func() {
 	var (
-		cmd        ApiCommand
+		cmd        APICommand
 		testUI     *ui.UI
-		fakeActor  *v6fakes.FakeApiActor
+		fakeActor  *v6fakes.FakeAPIActor
 		fakeConfig *commandfakes.FakeConfig
 		err        error
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		fakeActor = new(v6fakes.FakeApiActor)
+		fakeActor = new(v6fakes.FakeAPIActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 
-		cmd = ApiCommand{
+		cmd = APICommand{
 			UI:     testUI,
 			Actor:  fakeActor,
 			Config: fakeConfig,

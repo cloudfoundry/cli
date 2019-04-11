@@ -71,9 +71,8 @@ func (cmd CreateOrgCommand) Execute(args []string) error {
 				"OrgName": cmd.RequiredArgs.Organization,
 			})
 			return nil
-		} else {
-			return err
 		}
+		return err
 	}
 	cmd.UI.DisplayOK()
 

@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	ALLOWED_UNITS = "mg"
+	AllowedUnits = "mg"
 )
 
 type Megabytes struct {
@@ -25,7 +25,7 @@ func (m *Megabytes) UnmarshalFlag(val string) error {
 	size, err := bytefmt.ToMegabytes(val)
 
 	if err != nil ||
-		!strings.ContainsAny(strings.ToLower(val), ALLOWED_UNITS) ||
+		!strings.ContainsAny(strings.ToLower(val), AllowedUnits) ||
 		strings.Contains(strings.ToLower(val), ".") {
 		return &flags.Error{
 			Type:    flags.ErrRequired,

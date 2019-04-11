@@ -8,7 +8,7 @@ import (
 	v6 "code.cloudfoundry.org/cli/command/v6"
 )
 
-type FakeApiActor struct {
+type FakeAPIActor struct {
 	ClearTargetStub        func()
 	clearTargetMutex       sync.RWMutex
 	clearTargetArgsForCall []struct {
@@ -30,7 +30,7 @@ type FakeApiActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeApiActor) ClearTarget() {
+func (fake *FakeAPIActor) ClearTarget() {
 	fake.clearTargetMutex.Lock()
 	fake.clearTargetArgsForCall = append(fake.clearTargetArgsForCall, struct {
 	}{})
@@ -41,19 +41,19 @@ func (fake *FakeApiActor) ClearTarget() {
 	}
 }
 
-func (fake *FakeApiActor) ClearTargetCallCount() int {
+func (fake *FakeAPIActor) ClearTargetCallCount() int {
 	fake.clearTargetMutex.RLock()
 	defer fake.clearTargetMutex.RUnlock()
 	return len(fake.clearTargetArgsForCall)
 }
 
-func (fake *FakeApiActor) ClearTargetCalls(stub func()) {
+func (fake *FakeAPIActor) ClearTargetCalls(stub func()) {
 	fake.clearTargetMutex.Lock()
 	defer fake.clearTargetMutex.Unlock()
 	fake.ClearTargetStub = stub
 }
 
-func (fake *FakeApiActor) SetTarget(arg1 v2action.TargetSettings) (v2action.Warnings, error) {
+func (fake *FakeAPIActor) SetTarget(arg1 v2action.TargetSettings) (v2action.Warnings, error) {
 	fake.setTargetMutex.Lock()
 	ret, specificReturn := fake.setTargetReturnsOnCall[len(fake.setTargetArgsForCall)]
 	fake.setTargetArgsForCall = append(fake.setTargetArgsForCall, struct {
@@ -71,26 +71,26 @@ func (fake *FakeApiActor) SetTarget(arg1 v2action.TargetSettings) (v2action.Warn
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeApiActor) SetTargetCallCount() int {
+func (fake *FakeAPIActor) SetTargetCallCount() int {
 	fake.setTargetMutex.RLock()
 	defer fake.setTargetMutex.RUnlock()
 	return len(fake.setTargetArgsForCall)
 }
 
-func (fake *FakeApiActor) SetTargetCalls(stub func(v2action.TargetSettings) (v2action.Warnings, error)) {
+func (fake *FakeAPIActor) SetTargetCalls(stub func(v2action.TargetSettings) (v2action.Warnings, error)) {
 	fake.setTargetMutex.Lock()
 	defer fake.setTargetMutex.Unlock()
 	fake.SetTargetStub = stub
 }
 
-func (fake *FakeApiActor) SetTargetArgsForCall(i int) v2action.TargetSettings {
+func (fake *FakeAPIActor) SetTargetArgsForCall(i int) v2action.TargetSettings {
 	fake.setTargetMutex.RLock()
 	defer fake.setTargetMutex.RUnlock()
 	argsForCall := fake.setTargetArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeApiActor) SetTargetReturns(result1 v2action.Warnings, result2 error) {
+func (fake *FakeAPIActor) SetTargetReturns(result1 v2action.Warnings, result2 error) {
 	fake.setTargetMutex.Lock()
 	defer fake.setTargetMutex.Unlock()
 	fake.SetTargetStub = nil
@@ -100,7 +100,7 @@ func (fake *FakeApiActor) SetTargetReturns(result1 v2action.Warnings, result2 er
 	}{result1, result2}
 }
 
-func (fake *FakeApiActor) SetTargetReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+func (fake *FakeAPIActor) SetTargetReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
 	fake.setTargetMutex.Lock()
 	defer fake.setTargetMutex.Unlock()
 	fake.SetTargetStub = nil
@@ -116,7 +116,7 @@ func (fake *FakeApiActor) SetTargetReturnsOnCall(i int, result1 v2action.Warning
 	}{result1, result2}
 }
 
-func (fake *FakeApiActor) Invocations() map[string][][]interface{} {
+func (fake *FakeAPIActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.clearTargetMutex.RLock()
@@ -130,7 +130,7 @@ func (fake *FakeApiActor) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeApiActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeAPIActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -142,4 +142,4 @@ func (fake *FakeApiActor) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v6.ApiActor = new(FakeApiActor)
+var _ v6.APIActor = new(FakeAPIActor)

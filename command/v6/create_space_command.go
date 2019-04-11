@@ -77,9 +77,8 @@ func (cmd CreateSpaceCommand) Execute(args []string) error {
 				"SpaceName": spaceName,
 			})
 			return nil
-		} else {
-			return err
 		}
+		return err
 	}
 
 	cmd.UI.DisplayOK()

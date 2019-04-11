@@ -90,7 +90,7 @@ func (cmd *MarketplaceCommand) marketplace() error {
 		cmd.displayServiceSummaries(serviceSummaries)
 	} else {
 		if !cmd.SharedActor.IsOrgTargeted() || !cmd.SharedActor.IsSpaceTargeted() {
-			return errors.New(fmt.Sprintf("Cannot list plan information for %s without a targeted space", cmd.ServiceName))
+			return fmt.Errorf("Cannot list plan information for %s without a targeted space", cmd.ServiceName)
 		}
 
 		cmd.UI.DisplayTextWithFlavor("Getting service plan information for service {{.ServiceName}} as {{.Username}}...",
