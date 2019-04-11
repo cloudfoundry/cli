@@ -194,14 +194,14 @@ var _ = Describe("Service Instance", func() {
 		Describe("Managed", func() {
 			When("type is MANAGED_SERVICE", func() {
 				It("returns false", func() {
-					service := ServiceInstance{Type: constant.ServiceInstanceTypeManagedService}
+					service := ServiceInstance{Type: constant.ManagedService}
 					Expect(service.Managed()).To(BeTrue())
 				})
 			})
 
 			When("type is USER_PROVIDED_SERVICE", func() {
 				It("returns true", func() {
-					service := ServiceInstance{Type: constant.ServiceInstanceTypeUserProvidedService}
+					service := ServiceInstance{Type: constant.UserProvidedService}
 					Expect(service.Managed()).To(BeFalse())
 				})
 			})
@@ -210,14 +210,14 @@ var _ = Describe("Service Instance", func() {
 		Describe("UserProvided", func() {
 			When("type is USER_PROVIDED_SERVICE", func() {
 				It("returns true", func() {
-					service := ServiceInstance{Type: constant.ServiceInstanceTypeUserProvidedService}
+					service := ServiceInstance{Type: constant.UserProvidedService}
 					Expect(service.UserProvided()).To(BeTrue())
 				})
 			})
 
 			When("type is MANAGED_SERVICE", func() {
 				It("returns false", func() {
-					service := ServiceInstance{Type: constant.ServiceInstanceTypeManagedService}
+					service := ServiceInstance{Type: constant.ManagedService}
 					Expect(service.UserProvided()).To(BeFalse())
 				})
 			})
@@ -271,7 +271,7 @@ var _ = Describe("Service Instance", func() {
 					SpaceGUID:       "some-space-guid",
 					ServiceGUID:     "some-service-guid",
 					ServicePlanGUID: "some-service-plan-guid",
-					Type:            constant.ServiceInstanceTypeManagedService,
+					Type:            constant.ManagedService,
 					Tags:            []string{"tag-1", "tag-2"},
 					DashboardURL:    "some-dashboard-url",
 					RouteServiceURL: "some-route-service-url",
@@ -373,25 +373,25 @@ var _ = Describe("Service Instance", func() {
 						GUID:        "some-service-guid-1",
 						SpaceGUID:   "some-space-guid",
 						ServiceGUID: "some-service-guid",
-						Type:        constant.ServiceInstanceTypeManagedService,
+						Type:        constant.ManagedService,
 					},
 					{
 						Name:      "some-service-name-2",
 						GUID:      "some-service-guid-2",
 						SpaceGUID: "some-space-guid",
-						Type:      constant.ServiceInstanceTypeManagedService,
+						Type:      constant.ManagedService,
 					},
 					{
 						Name:      "some-service-name-3",
 						GUID:      "some-service-guid-3",
 						SpaceGUID: "some-space-guid",
-						Type:      constant.ServiceInstanceTypeManagedService,
+						Type:      constant.ManagedService,
 					},
 					{
 						Name:      "some-service-name-4",
 						GUID:      "some-service-guid-4",
 						SpaceGUID: "some-space-guid",
-						Type:      constant.ServiceInstanceTypeManagedService,
+						Type:      constant.ManagedService,
 					},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
@@ -480,10 +480,10 @@ var _ = Describe("Service Instance", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
-						{Name: "some-service-name-1", GUID: "some-service-guid-1", SpaceGUID: "some-space-guid", ServiceGUID: "some-service-guid", Type: constant.ServiceInstanceTypeManagedService},
-						{Name: "some-service-name-2", GUID: "some-service-guid-2", SpaceGUID: "some-space-guid", Type: constant.ServiceInstanceTypeUserProvidedService},
-						{Name: "some-service-name-3", GUID: "some-service-guid-3", SpaceGUID: "some-space-guid", Type: constant.ServiceInstanceTypeManagedService},
-						{Name: "some-service-name-4", GUID: "some-service-guid-4", SpaceGUID: "some-space-guid", Type: constant.ServiceInstanceTypeUserProvidedService},
+						{Name: "some-service-name-1", GUID: "some-service-guid-1", SpaceGUID: "some-space-guid", ServiceGUID: "some-service-guid", Type: constant.ManagedService},
+						{Name: "some-service-name-2", GUID: "some-service-guid-2", SpaceGUID: "some-space-guid", Type: constant.UserProvidedService},
+						{Name: "some-service-name-3", GUID: "some-service-guid-3", SpaceGUID: "some-space-guid", Type: constant.ManagedService},
+						{Name: "some-service-name-4", GUID: "some-service-guid-4", SpaceGUID: "some-space-guid", Type: constant.UserProvidedService},
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 				})
@@ -536,8 +536,8 @@ var _ = Describe("Service Instance", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
-						{Name: "some-service-name-1", GUID: "some-service-guid-1", SpaceGUID: "some-space-guid", Type: constant.ServiceInstanceTypeManagedService},
-						{Name: "some-service-name-2", GUID: "some-service-guid-2", SpaceGUID: "some-space-guid", Type: constant.ServiceInstanceTypeManagedService},
+						{Name: "some-service-name-1", GUID: "some-service-guid-1", SpaceGUID: "some-space-guid", Type: constant.ManagedService},
+						{Name: "some-service-name-2", GUID: "some-service-guid-2", SpaceGUID: "some-space-guid", Type: constant.ManagedService},
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 				})
@@ -671,28 +671,28 @@ var _ = Describe("Service Instance", func() {
 						GUID:            "some-service-guid-1",
 						SpaceGUID:       "some-space-guid",
 						RouteServiceURL: "some-route-service-url",
-						Type:            constant.ServiceInstanceTypeUserProvidedService,
+						Type:            constant.UserProvidedService,
 					},
 					{
 						Name:            "some-service-name-2",
 						GUID:            "some-service-guid-2",
 						SpaceGUID:       "some-space-guid",
 						RouteServiceURL: "some-route-service-url",
-						Type:            constant.ServiceInstanceTypeUserProvidedService,
+						Type:            constant.UserProvidedService,
 					},
 					{
 						Name:            "some-service-name-3",
 						GUID:            "some-service-guid-3",
 						SpaceGUID:       "some-space-guid",
 						RouteServiceURL: "some-route-service-url",
-						Type:            constant.ServiceInstanceTypeUserProvidedService,
+						Type:            constant.UserProvidedService,
 					},
 					{
 						Name:            "some-service-name-4",
 						GUID:            "some-service-guid-4",
 						SpaceGUID:       "some-space-guid",
 						RouteServiceURL: "some-route-service-url",
-						Type:            constant.ServiceInstanceTypeUserProvidedService,
+						Type:            constant.UserProvidedService,
 					},
 				}))
 

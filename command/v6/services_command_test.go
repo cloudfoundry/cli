@@ -137,7 +137,7 @@ var _ = Describe("services Command", func() {
 										Type:  "some-type",
 										State: "some-state",
 									},
-									Type: constant.ServiceInstanceTypeManagedService,
+									Type: constant.ManagedService,
 								},
 								ServicePlan: v2action.ServicePlan{Name: "some-plan"},
 								Service: v2action.Service{
@@ -152,13 +152,13 @@ var _ = Describe("services Command", func() {
 							{
 								ServiceInstance: v2action.ServiceInstance{
 									Name: "instance-3",
-									Type: constant.ServiceInstanceTypeUserProvidedService,
+									Type: constant.UserProvidedService,
 								},
 							},
 							{
 								ServiceInstance: v2action.ServiceInstance{
 									Name: "instance-2",
-									Type: constant.ServiceInstanceTypeManagedService,
+									Type: constant.ManagedService,
 								},
 								Service: v2action.Service{
 									Label:             "some-service-2",

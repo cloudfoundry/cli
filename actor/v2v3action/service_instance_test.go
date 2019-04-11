@@ -58,7 +58,7 @@ var _ = Describe("Service Instance Actions", func() {
 							v2action.ServiceInstance{
 								GUID:        "some-service-instance-guid",
 								ServiceGUID: "some-service-guid",
-								Type:        constant.ServiceInstanceTypeManagedService,
+								Type:        constant.ManagedService,
 							},
 							v2action.Warnings{"get-service-instance-warning"},
 							nil)
@@ -390,7 +390,7 @@ var _ = Describe("Service Instance Actions", func() {
 							v2action.ServiceInstance{
 								GUID:        "some-service-instance-guid",
 								ServiceGUID: "some-service-guid",
-								Type:        constant.ServiceInstanceTypeUserProvidedService,
+								Type:        constant.UserProvidedService,
 							},
 							v2action.Warnings{"get-service-instance-warning"},
 							nil)
@@ -514,7 +514,7 @@ var _ = Describe("Service Instance Actions", func() {
 					v2action.ServiceInstance{
 						GUID:        "some-service-instance-guid",
 						ServiceGUID: "some-service-guid",
-						Type:        constant.ServiceInstanceTypeManagedService,
+						Type:        constant.ManagedService,
 					},
 					v2action.Warnings{"get-service-instance-warning"},
 					nil)

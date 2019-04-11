@@ -48,7 +48,7 @@ var _ = Describe("Service Instance Actions", func() {
 						SpaceGUID:       "space-guid",
 						ServiceGUID:     "service-guid",
 						ServicePlanGUID: "service-plan-guid",
-						Type:            constant.ServiceInstanceTypeManagedService,
+						Type:            constant.ManagedService,
 						Tags:            []string{"some", "tags"},
 						DashboardURL:    "http://dashboard.com",
 						LastOperation:   ccv2.LastOperation{},
@@ -323,7 +323,7 @@ var _ = Describe("Service Instance Actions", func() {
 						SpaceGUID:       "space-guid",
 						ServiceGUID:     "service-guid",
 						ServicePlanGUID: "service-plan-guid",
-						Type:            constant.ServiceInstanceTypeManagedService,
+						Type:            constant.ManagedService,
 						Tags:            []string{"some", "tags"},
 						DashboardURL:    "http://dashboard.com",
 						LastOperation:   ccv2.LastOperation{},
@@ -476,8 +476,8 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(ServiceInstance{Type: iType}.IsManaged()).To(Equal(expected))
 			},
 
-			Entry("return true for managed service", constant.ServiceInstanceTypeManagedService, true),
-			Entry("return false for any other type of service", constant.ServiceInstanceTypeUserProvidedService, false),
+			Entry("return true for managed service", constant.ManagedService, true),
+			Entry("return false for any other type of service", constant.UserProvidedService, false),
 		)
 
 		DescribeTable("IsUserProvided",
@@ -485,8 +485,8 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(ServiceInstance{Type: iType}.IsUserProvided()).To(Equal(expected))
 			},
 
-			Entry("return true for UserProvidedService service", constant.ServiceInstanceTypeUserProvidedService, true),
-			Entry("return false for any other type of service", constant.ServiceInstanceTypeManagedService, false),
+			Entry("return true for UserProvidedService service", constant.UserProvidedService, true),
+			Entry("return false for any other type of service", constant.ManagedService, false),
 		)
 	})
 

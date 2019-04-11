@@ -52,7 +52,7 @@ type ServiceInstance struct {
 
 // Managed returns true if the Service Instance is a managed service.
 func (serviceInstance ServiceInstance) Managed() bool {
-	return serviceInstance.Type == constant.ServiceInstanceTypeManagedService
+	return serviceInstance.Type == constant.ManagedService
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service Instance response.
@@ -92,7 +92,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 // UserProvided returns true if the Service Instance is a user provided
 // service.
 func (serviceInstance ServiceInstance) UserProvided() bool {
-	return serviceInstance.Type == constant.ServiceInstanceTypeUserProvidedService
+	return serviceInstance.Type == constant.UserProvidedService
 }
 
 type createServiceInstanceRequestBody struct {

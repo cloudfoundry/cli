@@ -87,7 +87,7 @@ func (cmd ServicesCommand) Execute(args []string) error {
 
 	for _, summary := range instanceSummaries {
 		serviceLabel := summary.Service.Label
-		if summary.ServiceInstance.Type == constant.ServiceInstanceTypeUserProvidedService {
+		if summary.ServiceInstance.Type == constant.UserProvidedService {
 			serviceLabel = "user-provided"
 		}
 

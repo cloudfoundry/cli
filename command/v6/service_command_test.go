@@ -246,7 +246,7 @@ var _ = Describe("service Command", func() {
 							returnedSummary = v2action.ServiceInstanceSummary{
 								ServiceInstance: v2action.ServiceInstance{
 									Name:         "some-service-instance",
-									Type:         constant.ServiceInstanceTypeManagedService,
+									Type:         constant.ManagedService,
 									Tags:         []string{"tag-1", "tag-2", "tag-3"},
 									DashboardURL: "some-dashboard",
 									LastOperation: ccv2.LastOperation{
@@ -700,7 +700,7 @@ var _ = Describe("service Command", func() {
 								v2action.ServiceInstanceSummary{
 									ServiceInstance: v2action.ServiceInstance{
 										Name: "some-service-instance",
-										Type: constant.ServiceInstanceTypeUserProvidedService,
+										Type: constant.UserProvidedService,
 									},
 								},
 								v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
@@ -746,7 +746,7 @@ var _ = Describe("service Command", func() {
 										v2action.ServiceInstanceSummary{
 											ServiceInstance: v2action.ServiceInstance{
 												Name: "some-service-instance",
-												Type: constant.ServiceInstanceTypeUserProvidedService,
+												Type: constant.UserProvidedService,
 											},
 											BoundApplications: []v2action.BoundApplication{
 												{
@@ -800,7 +800,7 @@ var _ = Describe("service Command", func() {
 										v2action.ServiceInstanceSummary{
 											ServiceInstance: v2action.ServiceInstance{
 												Name: "some-service-instance",
-												Type: constant.ServiceInstanceTypeUserProvidedService,
+												Type: constant.UserProvidedService,
 											},
 											BoundApplications: []v2action.BoundApplication{
 												{AppName: "app-1"},
@@ -860,7 +860,7 @@ var _ = Describe("service Command", func() {
 									v2action.ServiceInstanceSummary{
 										ServiceInstance: v2action.ServiceInstance{
 											Name: "some-service-instance",
-											Type: constant.ServiceInstanceTypeUserProvidedService,
+											Type: constant.UserProvidedService,
 											Tags: []string{"tag-1", "tag-2", "tag-3"},
 										},
 									},
@@ -882,7 +882,7 @@ var _ = Describe("service Command", func() {
 									v2action.ServiceInstanceSummary{
 										ServiceInstance: v2action.ServiceInstance{
 											Name:            "some-service-instance",
-											Type:            constant.ServiceInstanceTypeUserProvidedService,
+											Type:            constant.UserProvidedService,
 											RouteServiceURL: "some-route-service-url",
 										},
 									},

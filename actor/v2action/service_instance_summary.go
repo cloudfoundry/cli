@@ -280,9 +280,9 @@ func findServiceInstanceBoundApplications(instanceName string, spaceApps []ccv2.
 
 func discoverServiceInstanceType(instance ccv2.SpaceSummaryServiceInstance) constant.ServiceInstanceType {
 	if isUserProvided(instance) {
-		return constant.ServiceInstanceTypeUserProvidedService
+		return constant.UserProvidedService
 	}
-	return constant.ServiceInstanceTypeManagedService
+	return constant.ManagedService
 }
 
 func isUserProvided(instance ccv2.SpaceSummaryServiceInstance) bool {
