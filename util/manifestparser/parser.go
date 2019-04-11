@@ -28,15 +28,6 @@ func NewParser() *Parser {
 	return parser
 }
 
-func (parser Parser) ApplyNoRouteOverride(appName string, noRoute bool) error {
-	_, err := parser.Apps(appName)
-	if err != nil {
-		return err
-	}
-	parser.Applications[0].NoRoute = noRoute
-	return nil
-}
-
 func (parser Parser) AppNames() []string {
 	var names []string
 	for _, app := range parser.Applications {

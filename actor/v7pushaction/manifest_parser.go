@@ -9,5 +9,4 @@ type ManifestParser interface {
 	ContainsManifest() bool
 	FullRawManifest() []byte
 	RawAppManifest(appName string) ([]byte, error)
-	ApplyNoRouteOverride(appName string, noRoute bool) error
 }

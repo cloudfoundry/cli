@@ -6,7 +6,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v7action"
-	"code.cloudfoundry.org/cli/util/manifestparser"
 
 	. "code.cloudfoundry.org/cli/actor/v7pushaction"
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
@@ -208,40 +207,6 @@ var _ = Describe("PrepareSpace", func() {
 		})
 
 		When("There is a single pushPlan", func() {
-
-			When("noRoute flag is provided with a manifest", func() {
-
-				When("When the app name is in the manifest", func() {
-					BeforeEach(func() {
-						pushPlans = []PushPlan{{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}, SkipRouteCreation: true}}
-						fakeManifestParser.ContainsManifestReturns(true)
-						fakeManifestParser.ApplyNoRouteOverrideReturns(nil)
-					})
-
-					It("it overrides the manifest for the app", func() {
-						Eventually(fakeManifestParser.ApplyNoRouteOverrideCallCount).Should(Equal(1))
-						actualNoRouteAppName, actualNoRoute := fakeManifestParser.ApplyNoRouteOverrideArgsForCall(0)
-						Expect(actualNoRouteAppName).To(Equal(appName1))
-						Expect(actualNoRoute).To(BeTrue())
-					})
-				})
-
-				When("When the app name is not in the manifest", func() {
-					BeforeEach(func() {
-						pushPlans = []PushPlan{{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}, SkipRouteCreation: true}}
-						fakeManifestParser.ContainsManifestReturns(true)
-						fakeManifestParser.ApplyNoRouteOverrideReturns(manifestparser.AppNotInManifestError{Name: appName1})
-					})
-
-					It("it errors", func() {
-						Eventually(fakeManifestParser.ApplyNoRouteOverrideCallCount).Should(Equal(1))
-						actualNoRouteAppName, actualNoRoute := fakeManifestParser.ApplyNoRouteOverrideArgsForCall(0)
-						Expect(actualNoRouteAppName).To(Equal(appName1))
-						Expect(actualNoRoute).To(BeTrue())
-						Eventually(errorStream).Should(Receive(MatchError(manifestparser.AppNotInManifestError{Name: appName1})))
-					})
-				})
-			})
 
 			BeforeEach(func() {
 				pushPlans = []PushPlan{{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}}}

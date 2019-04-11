@@ -42,27 +42,6 @@ var _ = Describe("Parser", func() {
 		})
 	})
 
-	Describe("ApplyNoRouteOverride", func() {
-		var (
-			executeErr error
-			appName    string
-		)
-
-		BeforeEach(func() {
-			parser.Applications = []Application{{ApplicationModel{Name: "appName", NoRoute: false}, nil}}
-		})
-
-		JustBeforeEach(func() {
-			executeErr = parser.ApplyNoRouteOverride(appName, true)
-		})
-
-		When("App is in the manifest", func() {
-			It("returns nil", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(parser.Applications[0].NoRoute).To(BeTrue())
-			})
-		})
-	})
 	Describe("ContainsManifest", func() {
 		var (
 			pathToManifest string
