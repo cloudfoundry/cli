@@ -150,7 +150,6 @@ var _ = Describe("set-label command", func() {
 
 					It("complains about the missing equal sign", func() {
 						Expect(executeErr).To(MatchError("Metadata error: no value provided for label 'MISSING_EQUALS'"))
-						Expect(executeErr).To(HaveOccurred())
 					})
 				})
 			})
@@ -266,14 +265,14 @@ var _ = Describe("set-label command", func() {
 					})
 				})
 
-				XWhen("updating the application labels fail", func() {
+				When("updating the application labels fail", func() {
 					BeforeEach(func() {
 						cmd.RequiredArgs = flag.SetLabelArgs{
 							ResourceType: "org",
 							ResourceName: resourceName,
 							Labels:       []string{"FOO=BAR", "ENV=FAKE"},
 						}
-						fakeActor.UpdateApplicationLabelsByApplicationNameReturns(
+						fakeActor.UpdateOrganizationLabelsByOrganizationNameReturns(
 							v7action.Warnings([]string{"some-warning-1", "some-warning-2"}),
 							errors.New("some-updating-error"),
 						)
@@ -282,7 +281,6 @@ var _ = Describe("set-label command", func() {
 					It("displays warnings and an error message", func() {
 						Expect(testUI.Err).To(Say("some-warning-1"))
 						Expect(testUI.Err).To(Say("some-warning-2"))
-						Expect(executeErr).To(HaveOccurred())
 						Expect(executeErr).To(MatchError("some-updating-error"))
 					})
 				})
