@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
@@ -174,15 +175,14 @@ func makeMFAValidator(password string, mfaToken string) http.HandlerFunc {
 
 func AddLoginRoutes(s *Server) {
 	s.RouteToHandler("POST", "/oauth/token", RespondWith(http.StatusOK,
-		`{
-			"access_token": "some-token-value",
+		fmt.Sprintf(`{
+			"access_token": "%s",
 			"expires_in": 599,
 			"id_token": "some-other-token",
 			"jti": "some-other-string",
 			"refresh_token": "some-refresh-token",
 			"scope": "openid routing.router_groups.write scim.read cloud_controller.admin uaa.user routing.router_groups.read cloud_controller.read password.write cloud_controller.write network.admin doppler.firehose scim.write",
-			"token_type": "some-type"
-		 }
-		 `,
-	))
+			"token_type": "bearer"
+		 }`, BuildTokenString(time.Now()))),
+	)
 }

@@ -8,23 +8,12 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"github.com/SermoDigital/jose/crypto"
-	"github.com/SermoDigital/jose/jws"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	"github.com/onsi/gomega/ghttp"
 )
-
-func BuildTokenString(expiration time.Time) string {
-	c := jws.Claims{}
-	c.SetExpiration(expiration)
-	token := jws.NewJWT(c, crypto.Unsecured)
-	tokenBytes, err := token.Serialize(nil)
-	Expect(err).NotTo(HaveOccurred())
-	return string(tokenBytes)
-}
 
 var _ = Describe("login command", func() {
 	Describe("Help Text", func() {
@@ -88,7 +77,7 @@ var _ = Describe("login command", func() {
 				server = helpers.StartServerWithAPIVersions("2.99.9", "3.34.9")
 
 				fakeTokenResponse := map[string]string{
-					"access_token":  BuildTokenString(time.Now()),
+					"access_token":  helpers.BuildTokenString(time.Now()),
 					"token_type":    "bearer",
 					"refresh_token": "refresh-token",
 				}
@@ -484,24 +473,25 @@ var _ = Describe("login command", func() {
 					Eventually(setOrgRoleSession).Should(Exit(0))
 				})
 
-				FWhen("there are more than 50 orgs", func() {
+				When("there are more than 50 orgs", func() {
 					var server *ghttp.Server
+
 					BeforeEach(func() {
 						server = helpers.StartAndTargetServerWithAPIVersions(helpers.DefaultV2Version, helpers.DefaultV3Version)
 						helpers.AddLoginRoutes(server)
-						// helpers.OrgsHaveNoSpaces(server)
-						helpers.AddFiftyOneOrgs(server, orgName)
+						helpers.AddFiftyOneOrgs(server)
 					})
 
 					It("displays a message and prompt the user for the org name", func() {
 						input := NewBuffer()
-						input.Write([]byte(fmt.Sprintf("%s\n", orgName)))
+						_, wErr := input.Write([]byte(fmt.Sprintf("%s\n", "org20"))) // "org20" is one of the orgs in the text fixture
+						Expect(wErr).ToNot(HaveOccurred())
 
 						session := helpers.CFWithStdin(input, "login", "-u", username, "-p", password, "--skip-ssl-validation")
 
+						Eventually(session).Should(Say("There are too many options to display; please type in the name."))
+						Eventually(session).Should(Say("Org:\\s+org20"))
 						Eventually(session).Should(Exit(0))
-						Expect(session).Should(Say("There are too many options to display, please type in the name."))
-						Eventually(session).Should(Say("Org:\\s+%s", orgName))
 					})
 				})
 

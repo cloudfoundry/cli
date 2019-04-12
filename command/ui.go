@@ -23,6 +23,7 @@ type UI interface {
 	DisplayNewline()
 	DisplayNonWrappingTable(prefix string, table [][]string, padding int)
 	DisplayOK()
+	DisplayOptionalTextPrompt(defaultValue string, template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayPasswordPrompt(template string, templateValues ...map[string]interface{}) (string, error)
 	DisplayTableWithHeader(prefix string, table [][]string, padding int)
 	DisplayText(template string, data ...map[string]interface{})

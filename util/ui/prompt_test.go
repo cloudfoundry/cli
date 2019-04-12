@@ -1,6 +1,8 @@
 package ui_test
 
 import (
+	"regexp"
+
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/cli/util/ui/uifakes"
@@ -207,6 +209,43 @@ var _ = Describe("Prompts", func() {
 		})
 	})
 
+	Describe("DisplayOptionalTextPrompt", func() {
+		When("the user enters a value", func() {
+			BeforeEach(func() {
+				_, err := inBuffer.Write([]byte("some-input\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("displays the passed in string and returns the user input string", func() {
+				userInput, err := ui.DisplayOptionalTextPrompt("default", "App {{.AppName}} does not exist.", map[string]interface{}{
+					"AppName": "some-app",
+				})
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(out).To(Say(regexp.QuoteMeta("App some-app does not exist. (default):")))
+				Expect(userInput).To(Equal("some-input"))
+				Expect(out).To(Say("some-input"))
+			})
+		})
+
+		When("the user presses enter to accept the default", func() {
+			BeforeEach(func() {
+				_, err := inBuffer.Write([]byte("\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("displays the passed in string and returns the default value", func() {
+				userInput, err := ui.DisplayOptionalTextPrompt("default", "App {{.AppName}} does not exist.", map[string]interface{}{
+					"AppName": "some-app",
+				})
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(out).To(Say(regexp.QuoteMeta("App some-app does not exist. (default):")))
+				Expect(userInput).To(Equal("default"))
+			})
+		})
+	})
+
 	Describe("DisplayTextMenu", func() {
 		var (
 			choices []string
@@ -348,6 +387,15 @@ var _ = Describe("Prompts", func() {
 
 			It("exits immediately from text prompt", func() {
 				_, err := ui.DisplayTextPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+					"AppName": "some-app",
+				})
+				Expect(err).To(MatchError("keyboard interrupt"))
+				Expect(fakeExiter.ExitCallCount()).To(Equal(1))
+				Expect(fakeExiter.ExitArgsForCall(0)).To(Equal(130))
+			})
+
+			It("exits immediately from optional text prompt", func() {
+				_, err := ui.DisplayOptionalTextPrompt("some-default-value", "App {{.AppName}} does not exist.", map[string]interface{}{
 					"AppName": "some-app",
 				})
 				Expect(err).To(MatchError("keyboard interrupt"))

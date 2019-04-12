@@ -2,6 +2,7 @@ package v6_test
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -820,7 +821,7 @@ var _ = Describe("login Command", func() {
 						})
 					})
 
-					When("more than one org exists", func() {
+					When("more than one but fewer than 50 orgs exists", func() {
 						BeforeEach(func() {
 							fakeActor.GetOrganizationsReturns(
 								[]v3action.Organization{
@@ -934,6 +935,58 @@ var _ = Describe("login Command", func() {
 
 								It("selects no org and returns no error", func() {
 									Expect(executeErr).ToNot(HaveOccurred())
+									Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
+								})
+							})
+						})
+
+					})
+
+					When("more than 50 orgs exist", func() {
+						BeforeEach(func() {
+							orgs := make([]v3action.Organization, 51)
+							for i := range orgs {
+								orgs[i].Name = fmt.Sprintf("org%d", i+1)
+								orgs[i].GUID = fmt.Sprintf("org-guid%d", i+1)
+							}
+
+							fakeActor.GetOrganizationsReturns(
+								orgs,
+								v3action.Warnings{"some-org-warning-1", "some-org-warning-2"},
+								nil,
+							)
+						})
+
+						When("the user selects an org by name", func() {
+							When("the list contains that org", func() {
+								BeforeEach(func() {
+									input.Write([]byte("org37\n"))
+								})
+
+								It("prompts the user to select an org", func() {
+									Expect(testUI.Out).To(Say("There are too many options to display; please type in the name."))
+									Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
+									Expect(executeErr).ToNot(HaveOccurred())
+								})
+
+								It("targets that org", func() {
+									Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
+									orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
+									Expect(orgGUID).To(Equal("org-guid37"))
+									Expect(orgName).To(Equal("org37"))
+								})
+							})
+
+							When("the org is not in the list", func() {
+								BeforeEach(func() {
+									input.Write([]byte("invalid-org\n"))
+								})
+
+								It("returns an error", func() {
+									Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "invalid-org"}))
+								})
+
+								It("does not target the org", func() {
 									Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 								})
 							})

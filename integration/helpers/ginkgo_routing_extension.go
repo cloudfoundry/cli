@@ -1,10 +1,13 @@
 package helpers
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
 
+	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
 )
 
@@ -30,14 +33,18 @@ func AddHandler(ser *ghttp.Server, method string, pathAndQuery string, status in
 
 	if !seenRoutes[key(method, u)] {
 		ser.RouteToHandler(method, u.Path, func(w http.ResponseWriter, r *http.Request) {
-			res := responses[key(r.Method, r.URL)]
+			res, ok := responses[key(r.Method, r.URL)]
+			if !ok {
+				Expect(errors.New("Unexpected request: " + key(r.Method, r.URL))).ToNot(HaveOccurred())
+			}
 			w.WriteHeader(res.status)
-			w.Write(res.body)
+			_, err := w.Write(res.body)
+			Expect(err).ToNot(HaveOccurred())
 		})
 		seenRoutes[key(method, u)] = true
 	}
 }
 
-func key(method string, url *url.URL) string {
+func key(method string, url fmt.Stringer) string {
 	return strings.ToLower(method + url.String())
 }

@@ -48,6 +48,19 @@ func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateV
 	return response, err
 }
 
+// DisplayOptionalTextPrompt outputs the prompt and waits for user input.
+func (ui *UI) DisplayOptionalTextPrompt(defaultValue string, template string, templateValues ...map[string]interface{}) (string, error) {
+	interactivePrompt := ui.Interactor.NewInteraction(ui.TranslateText(template, templateValues...))
+	var value = defaultValue
+	interactivePrompt.SetIn(ui.In)
+	interactivePrompt.SetOut(ui.OutForInteration)
+	err := interactivePrompt.Resolve(&value)
+	if isInterrupt(err) {
+		ui.Exiter.Exit(sigIntExitCode)
+	}
+	return value, err
+}
+
 // DisplayPasswordPrompt outputs the prompt and waits for user input. Hides
 // user's response from the screen.
 func (ui *UI) DisplayPasswordPrompt(template string, templateValues ...map[string]interface{}) (string, error) {

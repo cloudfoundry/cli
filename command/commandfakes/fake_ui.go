@@ -93,6 +93,21 @@ type FakeUI struct {
 	displayOKMutex       sync.RWMutex
 	displayOKArgsForCall []struct {
 	}
+	DisplayOptionalTextPromptStub        func(string, string, ...map[string]interface{}) (string, error)
+	displayOptionalTextPromptMutex       sync.RWMutex
+	displayOptionalTextPromptArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 []map[string]interface{}
+	}
+	displayOptionalTextPromptReturns struct {
+		result1 string
+		result2 error
+	}
+	displayOptionalTextPromptReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
 	DisplayPasswordPromptStub        func(string, ...map[string]interface{}) (string, error)
 	displayPasswordPromptMutex       sync.RWMutex
 	displayPasswordPromptArgsForCall []struct {
@@ -722,6 +737,71 @@ func (fake *FakeUI) DisplayOKCalls(stub func()) {
 	fake.displayOKMutex.Lock()
 	defer fake.displayOKMutex.Unlock()
 	fake.DisplayOKStub = stub
+}
+
+func (fake *FakeUI) DisplayOptionalTextPrompt(arg1 string, arg2 string, arg3 ...map[string]interface{}) (string, error) {
+	fake.displayOptionalTextPromptMutex.Lock()
+	ret, specificReturn := fake.displayOptionalTextPromptReturnsOnCall[len(fake.displayOptionalTextPromptArgsForCall)]
+	fake.displayOptionalTextPromptArgsForCall = append(fake.displayOptionalTextPromptArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 []map[string]interface{}
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("DisplayOptionalTextPrompt", []interface{}{arg1, arg2, arg3})
+	fake.displayOptionalTextPromptMutex.Unlock()
+	if fake.DisplayOptionalTextPromptStub != nil {
+		return fake.DisplayOptionalTextPromptStub(arg1, arg2, arg3...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.displayOptionalTextPromptReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeUI) DisplayOptionalTextPromptCallCount() int {
+	fake.displayOptionalTextPromptMutex.RLock()
+	defer fake.displayOptionalTextPromptMutex.RUnlock()
+	return len(fake.displayOptionalTextPromptArgsForCall)
+}
+
+func (fake *FakeUI) DisplayOptionalTextPromptCalls(stub func(string, string, ...map[string]interface{}) (string, error)) {
+	fake.displayOptionalTextPromptMutex.Lock()
+	defer fake.displayOptionalTextPromptMutex.Unlock()
+	fake.DisplayOptionalTextPromptStub = stub
+}
+
+func (fake *FakeUI) DisplayOptionalTextPromptArgsForCall(i int) (string, string, []map[string]interface{}) {
+	fake.displayOptionalTextPromptMutex.RLock()
+	defer fake.displayOptionalTextPromptMutex.RUnlock()
+	argsForCall := fake.displayOptionalTextPromptArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeUI) DisplayOptionalTextPromptReturns(result1 string, result2 error) {
+	fake.displayOptionalTextPromptMutex.Lock()
+	defer fake.displayOptionalTextPromptMutex.Unlock()
+	fake.DisplayOptionalTextPromptStub = nil
+	fake.displayOptionalTextPromptReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUI) DisplayOptionalTextPromptReturnsOnCall(i int, result1 string, result2 error) {
+	fake.displayOptionalTextPromptMutex.Lock()
+	defer fake.displayOptionalTextPromptMutex.Unlock()
+	fake.DisplayOptionalTextPromptStub = nil
+	if fake.displayOptionalTextPromptReturnsOnCall == nil {
+		fake.displayOptionalTextPromptReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.displayOptionalTextPromptReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeUI) DisplayPasswordPrompt(arg1 string, arg2 ...map[string]interface{}) (string, error) {
@@ -1599,6 +1679,8 @@ func (fake *FakeUI) Invocations() map[string][][]interface{} {
 	defer fake.displayNonWrappingTableMutex.RUnlock()
 	fake.displayOKMutex.RLock()
 	defer fake.displayOKMutex.RUnlock()
+	fake.displayOptionalTextPromptMutex.RLock()
+	defer fake.displayOptionalTextPromptMutex.RUnlock()
 	fake.displayPasswordPromptMutex.RLock()
 	defer fake.displayPasswordPromptMutex.RUnlock()
 	fake.displayTableWithHeaderMutex.RLock()
