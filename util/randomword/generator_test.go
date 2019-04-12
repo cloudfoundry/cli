@@ -19,7 +19,7 @@ var _ = Describe("Generator", func() {
 
 			for i := 0; i < 3; i++ {
 				setOne = append(setOne, gen.RandomAdjective())
-				// We wait for 3 millisecond because the seed we use to generate the
+				// We wait for 3 nanoseconds because the seed we use to generate the
 				// randomness has a unit of 1 nanosecond plus random test flakiness
 				time.Sleep(3 * time.Nanosecond)
 				setTwo = append(setTwo, gen.RandomAdjective())
@@ -35,7 +35,7 @@ var _ = Describe("Generator", func() {
 
 			for i := 0; i < 3; i++ {
 				setOne = append(setOne, gen.RandomNoun())
-				// We wait for 3 millisecond because the seed we use to generate the
+				// We wait for 3 nanoseconds because the seed we use to generate the
 				// randomness has a unit of 1 nanosecond plus random test flakiness
 				time.Sleep(3 * time.Nanosecond)
 				setTwo = append(setTwo, gen.RandomNoun())
