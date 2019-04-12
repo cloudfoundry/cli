@@ -326,4 +326,32 @@ var _ = Describe("set-label command", func() {
 			})
 		})
 	})
+	When("an unrecognized resource is specified", func() {
+		BeforeEach(func() {
+			testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+			fakeActor = new(v7fakes.FakeSetLabelActor)
+			fakeConfig = new(commandfakes.FakeConfig)
+			fakeSharedActor = new(commandfakes.FakeSharedActor)
+			resourceName = "some-unrecognized-resource"
+			cmd = SetLabelCommand{
+				Actor:       fakeActor,
+				UI:          testUI,
+				Config:      fakeConfig,
+				SharedActor: fakeSharedActor,
+			}
+			cmd.RequiredArgs = flag.SetLabelArgs{
+				ResourceType: "unrecognized-resource",
+				ResourceName: resourceName,
+			}
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(nil)
+		})
+
+		It("errors", func() {
+			Expect(executeErr).To(MatchError("Unsupported resource type of unrecognized-resource"))
+		})
+	})
+
 })
