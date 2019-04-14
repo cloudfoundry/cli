@@ -29,10 +29,11 @@ environment. If `TARGET_V7` is unset, `make` commands will target V6.
 
 Before working on a PR to the CLI code base, please:
 
-  - chat with us on our [Slack #cli channel](https://cloudfoundry.slack.com) ([request an invite](http://slack.cloudfoundry.org/)),
   - reach out to us first via a [GitHub issue](https://github.com/cloudfoundry/cli/issues),
-  - or, look for the [contributions welcome label on GitHub](https://github.com/cloudfoundry/cli/issues?q=is%3Aopen+is%3Aissue+label%3A%22contributions+welcome%22)
+  - look for the [contributions welcome label on GitHub](https://github.com/cloudfoundry/cli/issues?q=is%3Aopen+is%3Aissue+label%3A%22contributions+welcome%22)
     for issues we are actively looking for help on.
+
+You can always chat with us on our [Slack #cli channel](https://cloudfoundry.slack.com) ([request an invite](http://slack.cloudfoundry.org/)),
 
 After reaching out to the CLI team and the conclusion is to make a PR, please follow these steps:
 
