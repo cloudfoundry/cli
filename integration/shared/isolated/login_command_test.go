@@ -702,6 +702,14 @@ var _ = Describe("login command", func() {
 			})
 
 			When("the -s flag is passed", func() {
+				BeforeEach(func() {
+					helpers.TurnOnExperimentalLogin()
+				})
+
+				AfterEach(func() {
+					helpers.TurnOffExperimentalLogin()
+				})
+
 				It("targets the org and the space", func() {
 					session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
 					Eventually(session).Should(Exit(0))
@@ -721,7 +729,7 @@ var _ = Describe("login command", func() {
 						session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
 						Eventually(session).Should(Exit(1))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Space %s not found", spaceName))
+						Eventually(session.Err).Should(Say("Space '%s' not found", spaceName))
 
 						targetSession := helpers.CF("target")
 						Eventually(targetSession).Should(Exit(0))

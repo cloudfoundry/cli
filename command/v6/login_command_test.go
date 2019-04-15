@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
@@ -13,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v6"
 	"code.cloudfoundry.org/cli/command/v6/v6fakes"
+	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -1011,6 +1013,66 @@ var _ = Describe("login Command", func() {
 					It("prints all warnings", func() {
 						Expect(testUI.Err).To(Say("some-warning-1"))
 						Expect(testUI.Err).To(Say("some-warning-2"))
+					})
+				})
+			})
+
+			When("an org has been successfully targeted", func() {
+				BeforeEach(func() {
+					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+						GUID: "targeted-org-guid",
+						Name: "targeted-org-name"},
+					)
+				})
+
+				When("-s was passed", func() {
+					BeforeEach(func() {
+						cmd.Space = "some-space"
+					})
+
+					When("the specified space exists", func() {
+						BeforeEach(func() {
+							fakeActor.GetSpaceByNameAndOrganizationReturns(
+								v3action.Space{
+									Name: "some-space",
+									GUID: "some-space-guid",
+								},
+								v3action.Warnings{"some-warning-1", "some-warning-2"},
+								nil,
+							)
+						})
+
+						It("targets that space", func() {
+							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+							spaceGUID, spaceName, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
+							Expect(spaceGUID).To(Equal("some-space-guid"))
+							Expect(spaceName).To(Equal("some-space"))
+							Expect(allowSSH).To(BeTrue())
+						})
+
+						It("prints all warnings", func() {
+							Expect(testUI.Err).To(Say("some-warning-1"))
+							Expect(testUI.Err).To(Say("some-warning-2"))
+						})
+					})
+
+					When("the specified space does not exist or does not belong to the targeted org", func() {
+						BeforeEach(func() {
+							fakeActor.GetSpaceByNameAndOrganizationReturns(
+								v3action.Space{},
+								v3action.Warnings{"some-warning-1", "some-warning-2"},
+								actionerror.SpaceNotFoundError{Name: "some-space"},
+							)
+						})
+
+						It("returns an error", func() {
+							Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: "some-space"}))
+						})
+
+						It("prints all warnings", func() {
+							Expect(testUI.Err).To(Say("some-warning-1"))
+							Expect(testUI.Err).To(Say("some-warning-2"))
+						})
 					})
 				})
 			})

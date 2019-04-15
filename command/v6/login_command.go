@@ -27,6 +27,7 @@ type LoginActor interface {
 	Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error
 	GetLoginPrompts() map[string]coreconfig.AuthPrompt
 	GetOrganizationByName(orgName string) (v3action.Organization, v3action.Warnings, error)
+	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error)
 	GetOrganizations() ([]v3action.Organization, v3action.Warnings, error)
 	SetTarget(settings v3action.TargetSettings) (v3action.Warnings, error)
 }
@@ -196,16 +197,33 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		case len(orgs) == 1:
 			cmd.Config.SetOrganizationInformation(orgs[0].GUID, orgs[0].Name)
 		case len(orgs) > 1:
+			var emptyOrg v3action.Organization
 			chosenOrg, err := cmd.promptChosenOrg(orgs)
 			if err != nil {
 				return err
 			}
-			var emptyOrg v3action.Organization
 			if chosenOrg != emptyOrg {
 				cmd.Config.SetOrganizationInformation(chosenOrg.GUID, chosenOrg.Name)
 			}
 		}
 	}
+
+	targetedOrg := cmd.Config.TargetedOrganization()
+
+	if targetedOrg.GUID != "" {
+		if cmd.Space != "" {
+			space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.Space, targetedOrg.GUID)
+			cmd.UI.DisplayWarnings(warnings)
+			if err != nil {
+				return err
+			}
+			// the "AllowSSH" field is not returned by v3, and is never read from the config.
+			// persist `true` to maintain compatibility in the config file.
+			// TODO: this field should be removed entirely in v7
+			cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
+		}
+	}
+
 	err = cmd.checkMinCLIVersion()
 	if err != nil {
 		return err
