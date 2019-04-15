@@ -22,6 +22,7 @@ var _ = Describe("push with a manifest and an app name", func() {
 	)
 
 	BeforeEach(func() {
+		Skip("Waiting for no-route changes to be made on the API")
 		appName = helpers.NewAppName()
 		domainName := helpers.DefaultSharedDomain()
 		randomHostName = helpers.RandomName()
