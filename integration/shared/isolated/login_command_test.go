@@ -644,7 +644,7 @@ var _ = Describe("login command", func() {
 		})
 	})
 
-	Describe("Target Space", func() {
+	FDescribe("Target Space", func() {
 		var (
 			orgName  string
 			username string
@@ -702,8 +702,27 @@ var _ = Describe("login command", func() {
 			})
 
 			When("the -s flag is passed", func() {
-				It("targets the org and the space", func() {
-					session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+				BeforeEach(func() {
+					helpers.TurnOnExperimentalLogin()
+					orgName2 := helpers.NewOrgName()
+					session := helpers.CF("create-org", orgName2)
+					Eventually(session).Should(Exit(0))
+					session = helpers.CF("set-org-role", username, orgName2, "OrgManager")
+					Eventually(session).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					helpers.TurnOffExperimentalLogin()
+				})
+
+				FIt("targets the org and the space", func() {
+					stdin := NewBuffer()
+					session := helpers.CFWithStdin(stdin, "login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
+					_, writeErr := stdin.Write([]byte(orgName + "\n"))
+					Expect(writeErr).ToNot(HaveOccurred())
+					Eventually(session).Should(Say("\n\n\nAPI"))
+					Eventually(session).Should(Say(`Org:\s+%s`, orgName))
+					Eventually(session).Should(Say(`Space:\s+%s`, spaceName))
 					Eventually(session).Should(Exit(0))
 
 					targetSession := helpers.CF("target")
@@ -721,7 +740,7 @@ var _ = Describe("login command", func() {
 						session := helpers.CF("login", "-u", username, "-p", password, "-a", apiURL, "-s", spaceName, "--skip-ssl-validation")
 						Eventually(session).Should(Exit(1))
 						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Say("Space %s not found", spaceName))
+						Eventually(session.Err).Should(Say("Space '%s' not found", spaceName))
 
 						targetSession := helpers.CF("target")
 						Eventually(targetSession).Should(Exit(0))

@@ -27,6 +27,7 @@ type LoginActor interface {
 	Authenticate(credentials map[string]string, origin string, grantType constant.GrantType) error
 	GetLoginPrompts() map[string]coreconfig.AuthPrompt
 	GetOrganizationByName(orgName string) (v3action.Organization, v3action.Warnings, error)
+	GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (v3action.Space, v3action.Warnings, error)
 	GetOrganizations() ([]v3action.Organization, v3action.Warnings, error)
 	SetTarget(settings v3action.TargetSettings) (v3action.Warnings, error)
 }
@@ -119,42 +120,16 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		return translatableerror.UnrefactoredCommandError{}
 	}
 	cmd.UI.DisplayWarning("Using experimental login command, some behavior may be different")
+	var err error
 
-	if cmd.APIEndpoint != "" {
-		cmd.UI.DisplayTextWithFlavor("API endpoint: {{.APIEndpoint}}", map[string]interface{}{
-			"APIEndpoint": cmd.APIEndpoint,
-		})
-	} else if cmd.Config.Target() != "" {
-		cmd.APIEndpoint = cmd.Config.Target()
-		cmd.UI.DisplayTextWithFlavor("API endpoint: {{.APIEndpoint}}", map[string]interface{}{
-			"APIEndpoint": cmd.APIEndpoint,
-		})
-	} else {
-		apiEndpoint, err := cmd.UI.DisplayTextPrompt("API endpoint")
-		if err != nil {
-			return err
-		}
-		cmd.APIEndpoint = apiEndpoint
-	}
-
-	cmd.UI.DisplayNewline()
-
-	strippedEndpoint := strings.TrimRight(cmd.APIEndpoint, "/")
-	endpoint, _ := url.Parse(strippedEndpoint)
-	if endpoint.Scheme == "" {
-		endpoint.Scheme = "https"
-	}
-
-	settings := v3action.TargetSettings{
-		URL:               endpoint.String(),
-		SkipSSLValidation: cmd.Config.SkipSSLValidation() || cmd.SkipSSLValidation,
-	}
-	_, err := cmd.Actor.SetTarget(settings)
+	err = cmd.getAPI()
 	if err != nil {
 		return err
 	}
 
-	err = cmd.reloadActor()
+	cmd.UI.DisplayNewline()
+
+	err = cmd.retargetAPI()
 	if err != nil {
 		return err
 	}
@@ -196,22 +171,78 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		case len(orgs) == 1:
 			cmd.Config.SetOrganizationInformation(orgs[0].GUID, orgs[0].Name)
 		case len(orgs) > 1:
+			var emptyOrg v3action.Organization
 			chosenOrg, err := cmd.promptChosenOrg(orgs)
 			if err != nil {
 				return err
 			}
-			var emptyOrg v3action.Organization
 			if chosenOrg != emptyOrg {
 				cmd.Config.SetOrganizationInformation(chosenOrg.GUID, chosenOrg.Name)
 			}
 		}
 	}
+
+	targetedOrg := cmd.Config.TargetedOrganization()
+
+	if targetedOrg.GUID != "" {
+		if cmd.Space != "" {
+			space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.Space, targetedOrg.GUID)
+			cmd.UI.DisplayWarnings(warnings)
+			if err != nil {
+				return err
+			}
+			// the "AllowSSH" field is not returned by v3, and is never read from the config.
+			// persist `true` to maintain compatibility in the config file.
+			// TODO: this field should be removed entirely in v7
+			cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
+		}
+	}
+
 	err = cmd.checkMinCLIVersion()
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (cmd *LoginCommand) getAPI() error {
+	if cmd.APIEndpoint != "" {
+		cmd.UI.DisplayTextWithFlavor("API endpoint: {{.APIEndpoint}}", map[string]interface{}{
+			"APIEndpoint": cmd.APIEndpoint,
+		})
+	} else if cmd.Config.Target() != "" {
+		cmd.APIEndpoint = cmd.Config.Target()
+		cmd.UI.DisplayTextWithFlavor("API endpoint: {{.APIEndpoint}}", map[string]interface{}{
+			"APIEndpoint": cmd.APIEndpoint,
+		})
+	} else {
+		apiEndpoint, err := cmd.UI.DisplayTextPrompt("API endpoint")
+		if err != nil {
+			return err
+		}
+		cmd.APIEndpoint = apiEndpoint
+	}
+	return nil
+}
+
+func (cmd *LoginCommand) retargetAPI() error {
+	strippedEndpoint := strings.TrimRight(cmd.APIEndpoint, "/")
+	endpoint, _ := url.Parse(strippedEndpoint)
+	if endpoint.Scheme == "" {
+		endpoint.Scheme = "https"
+	}
+
+	settings := v3action.TargetSettings{
+		URL:               endpoint.String(),
+		SkipSSLValidation: cmd.Config.SkipSSLValidation() || cmd.SkipSSLValidation,
+	}
+	_, err := cmd.Actor.SetTarget(settings)
+	if err != nil {
+		return err
+	}
+
+	return cmd.reloadActor()
 }
 
 func (cmd *LoginCommand) authenticate() error {
@@ -406,6 +437,19 @@ func (cmd *LoginCommand) showStatus() {
 	}
 	tableContent = append(tableContent, []string{cmd.UI.TranslateText("Org:"), orgName})
 
+	spaceName := cmd.Config.TargetedSpace().Name
+	if spaceName == "" {
+		tableContent = append(tableContent, []string{cmd.UI.TranslateText("Space:"),
+			cmd.UI.TranslateText("No space targeted, use '{{.Command}}'", map[string]interface{}{
+				"Command": fmt.Sprintf("%s target -s SPACE", cmd.Config.BinaryName()),
+			})})
+	} else {
+		tableContent = append(tableContent, []string{cmd.UI.TranslateText("Space:"), spaceName})
+	}
+
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayKeyValueTable("", tableContent, 3)
 	cmd.UI.DisplayNewline()
 }
