@@ -1023,6 +1023,7 @@ var _ = Describe("login Command", func() {
 						GUID: "targeted-org-guid",
 						Name: "targeted-org-name"},
 					)
+					fakeConfig.TargetedOrganizationNameReturns("targeted-org-name")
 				})
 
 				When("-s was passed", func() {
@@ -1054,6 +1055,16 @@ var _ = Describe("login Command", func() {
 							Expect(testUI.Err).To(Say("some-warning-1"))
 							Expect(testUI.Err).To(Say("some-warning-2"))
 						})
+
+						When("the space has been successfully targeted", func() {
+							BeforeEach(func() {
+								fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space"})
+							})
+
+							It("displays that the spacce has been targeted", func() {
+								Expect(testUI.Out).To(Say(`Space:\s+some-space`))
+							})
+						})
 					})
 
 					When("the specified space does not exist or does not belong to the targeted org", func() {
@@ -1072,6 +1083,10 @@ var _ = Describe("login Command", func() {
 						It("prints all warnings", func() {
 							Expect(testUI.Err).To(Say("some-warning-1"))
 							Expect(testUI.Err).To(Say("some-warning-2"))
+						})
+
+						It("reports that no space is targeted", func() {
+							Expect(testUI.Out).To(Say(`Space:\s+No space targeted, use 'some-executable target -s SPACE'`))
 						})
 					})
 				})
