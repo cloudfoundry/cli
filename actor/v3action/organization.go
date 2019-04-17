@@ -59,7 +59,11 @@ func (actor Actor) GetOrganizationsByGUIDs(guids ...string) ([]Organization, War
 }
 
 func (actor Actor) GetOrganizations() ([]Organization, Warnings, error) {
-	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations()
+	orderBy := ccv3.Query{
+		Key:    "order_by",
+		Values: []string{"name"},
+	}
+	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(orderBy)
 	if err != nil {
 		return []Organization{}, Warnings(warnings), err
 	}
