@@ -185,6 +185,11 @@ func (cmd *LoginCommand) Execute(args []string) error {
 	targetedOrg := cmd.Config.TargetedOrganization()
 
 	if targetedOrg.GUID != "" {
+
+		cmd.UI.DisplayTextWithFlavor("Targeted org: {{.Organization}}", map[string]interface{}{
+			"Organization": cmd.Config.TargetedOrganizationName(),
+		})
+
 		if cmd.Space != "" {
 			space, warnings, err := cmd.Actor.GetSpaceByNameAndOrganization(cmd.Space, targetedOrg.GUID)
 			cmd.UI.DisplayWarnings(warnings)
@@ -195,13 +200,22 @@ func (cmd *LoginCommand) Execute(args []string) error {
 			// persist `true` to maintain compatibility in the config file.
 			// TODO: this field should be removed entirely in v7
 			cmd.Config.SetSpaceInformation(space.GUID, space.Name, true)
+
+			cmd.UI.DisplayNewline()
+			cmd.UI.DisplayTextWithFlavor("Targeted space: {{.Space}}", map[string]interface{}{
+				"Space": space.Name,
+			})
 		}
+		cmd.UI.DisplayNewline()
 	}
 
 	err = cmd.checkMinCLIVersion()
 	if err != nil {
 		return err
 	}
+
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayNewline()
 
 	return nil
 }
@@ -305,7 +319,6 @@ func (cmd *LoginCommand) authenticate() error {
 
 		if err == nil {
 			cmd.UI.DisplayOK()
-			cmd.UI.DisplayNewline()
 			break
 		}
 	}
@@ -447,11 +460,7 @@ func (cmd *LoginCommand) showStatus() {
 		tableContent = append(tableContent, []string{cmd.UI.TranslateText("Space:"), spaceName})
 	}
 
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayKeyValueTable("", tableContent, 3)
-	cmd.UI.DisplayNewline()
 }
 
 func (cmd *LoginCommand) displayNotLoggedIn() {
