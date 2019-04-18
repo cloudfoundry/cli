@@ -14,7 +14,7 @@ import (
 func AddFiftyOneOrgs(server *ghttp.Server) {
 	AddHandler(server,
 		http.MethodGet,
-		"/v3/organizations",
+		"/v3/organizations?order_by=name",
 		http.StatusOK,
 		[]byte(fmt.Sprintf(string(fixtureData("fifty-orgs-page-1.json")), server.URL())),
 	)
