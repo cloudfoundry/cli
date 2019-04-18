@@ -828,16 +828,16 @@ var _ = Describe("login Command", func() {
 							fakeActor.GetOrganizationsReturns(
 								[]v3action.Organization{
 									v3action.Organization{
+										GUID: "some-org-guid3",
+										Name: "1234",
+									},
+									v3action.Organization{
 										GUID: "some-org-guid1",
 										Name: "some-org-name1",
 									},
 									v3action.Organization{
 										GUID: "some-org-guid2",
 										Name: "some-org-name2",
-									},
-									v3action.Organization{
-										GUID: "some-org-guid3",
-										Name: "1234",
 									},
 								},
 								v3action.Warnings{"some-org-warning-1", "some-org-warning-2"},
@@ -853,8 +853,9 @@ var _ = Describe("login Command", func() {
 
 								It("prompts the user to select an org", func() {
 									Expect(testUI.Out).To(Say("Select an org:"))
-									Expect(testUI.Out).To(Say("1. some-org-name1"))
-									Expect(testUI.Out).To(Say("2. some-org-name2"))
+									Expect(testUI.Out).To(Say("1. 1234"))
+									Expect(testUI.Out).To(Say("2. some-org-name1"))
+									Expect(testUI.Out).To(Say("3. some-org-name2"))
 									Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
 									Expect(executeErr).ToNot(HaveOccurred())
 								})
@@ -862,8 +863,8 @@ var _ = Describe("login Command", func() {
 								It("targets that org", func() {
 									Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
 									orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
-									Expect(orgGUID).To(Equal("some-org-guid2"))
-									Expect(orgName).To(Equal("some-org-name2"))
+									Expect(orgGUID).To(Equal("some-org-guid1"))
+									Expect(orgName).To(Equal("some-org-name1"))
 								})
 							})
 
@@ -874,12 +875,14 @@ var _ = Describe("login Command", func() {
 
 								It("reprompts the user", func() {
 									Expect(testUI.Out).To(Say("Select an org:"))
-									Expect(testUI.Out).To(Say("1. some-org-name1"))
-									Expect(testUI.Out).To(Say("2. some-org-name2"))
+									Expect(testUI.Out).To(Say("1. 1234"))
+									Expect(testUI.Out).To(Say("2. some-org-name1"))
+									Expect(testUI.Out).To(Say("3. some-org-name2"))
 									Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
 									Expect(testUI.Out).To(Say("Select an org:"))
-									Expect(testUI.Out).To(Say("1. some-org-name1"))
-									Expect(testUI.Out).To(Say("2. some-org-name2"))
+									Expect(testUI.Out).To(Say("1. 1234"))
+									Expect(testUI.Out).To(Say("2. some-org-name1"))
+									Expect(testUI.Out).To(Say("3. some-org-name2"))
 									Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
 								})
 							})
@@ -893,8 +896,9 @@ var _ = Describe("login Command", func() {
 
 								It("prompts the user to select an org", func() {
 									Expect(testUI.Out).To(Say("Select an org:"))
-									Expect(testUI.Out).To(Say("1. some-org-name1"))
-									Expect(testUI.Out).To(Say("2. some-org-name2"))
+									Expect(testUI.Out).To(Say("1. 1234"))
+									Expect(testUI.Out).To(Say("2. some-org-name1"))
+									Expect(testUI.Out).To(Say("3. some-org-name2"))
 									Expect(testUI.Out).To(Say(`Org \(enter to skip\):`))
 									Expect(executeErr).ToNot(HaveOccurred())
 								})

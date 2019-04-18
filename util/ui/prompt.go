@@ -78,6 +78,8 @@ func (ui *UI) DisplayPasswordPrompt(template string, templateValues ...map[strin
 	return string(password), err
 }
 
+// DisplayTextMenu lets the user choose from a list of options, either by name
+// or by number.
 func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateValues ...map[string]interface{}) (string, error) {
 	for i, c := range choices {
 		t := fmt.Sprintf("%d. %s", i+1, c)
@@ -111,11 +113,11 @@ func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateV
 		if contains(choices, value) {
 			return value, nil
 		}
-		return "", InvalidChoiceError{Choice: value} //some org not found
+		return "", InvalidChoiceError{Choice: value}
 	}
 
 	if i > len(choices) || i <= 0 {
-		return "", ErrInvalidIndex // list position out of range
+		return "", ErrInvalidIndex
 	}
 	return choices[i-1], nil
 }
