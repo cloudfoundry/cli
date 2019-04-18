@@ -59,7 +59,6 @@ var _ = Describe("set-label command", func() {
 			helpers.CreateOrg(orgName)
 		})
 
-
 		When("assigning label to app", func() {
 			BeforeEach(func() {
 				spaceName = helpers.NewSpaceName()
@@ -129,7 +128,7 @@ var _ = Describe("set-label command", func() {
 				})
 			})
 		})
-		
+
 		When("assigning label to org", func() {
 			It("sets the specified labels on the org", func() {
 				session := helpers.CF("set-label", "org", orgName, "pci=true", "public-facing=false")
@@ -147,7 +146,7 @@ var _ = Describe("set-label command", func() {
 				Expect(org.Metadata.Labels["pci"]).To(Equal("true"))
 				Expect(org.Metadata.Labels["public-facing"]).To(Equal("false"))
 			})
-			
+
 			When("the org is unknown", func() {
 				It("displays an error", func() {
 					session := helpers.CF("set-label", "org", "non-existent-org", "some-key=some-value")
