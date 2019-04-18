@@ -13,7 +13,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks
-    tag_filter: v7.*
+    tag_filter: v8.*
 - name: cli-ci
   type: git
   source:
