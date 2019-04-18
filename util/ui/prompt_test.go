@@ -294,6 +294,17 @@ var _ = Describe("Prompts", func() {
 			})
 		})
 
+		When("the user enters the last list index", func() {
+			BeforeEach(func() {
+				_, err := inBuffer.Write([]byte("4\n"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns the value at that list position", func() {
+				Expect(choice).To(Equal("choice-4"))
+			})
+		})
+
 		When("the user enters a valid list display value", func() {
 			BeforeEach(func() {
 				_, err := inBuffer.Write([]byte("choice-3\n"))

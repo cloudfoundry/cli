@@ -114,7 +114,7 @@ func (ui *UI) DisplayTextMenu(choices []string, promptTemplate string, templateV
 		return "", InvalidChoiceError{Choice: value} //some org not found
 	}
 
-	if i >= len(choices) || i <= 0 {
+	if i > len(choices) || i <= 0 {
 		return "", ErrInvalidIndex // list position out of range
 	}
 	return choices[i-1], nil
