@@ -80,5 +80,7 @@ func (cmd StacksCommand) displayTable(stacks []v7action.Stack) {
 		}
 
 		cmd.UI.DisplayTableWithHeader("", keyValueTable, ui.DefaultTableSpacePadding)
+	} else {
+		cmd.UI.DisplayText("No stacks found.")
 	}
 }
