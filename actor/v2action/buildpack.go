@@ -286,6 +286,14 @@ func (actor *Actor) UpdateBuildpackByNameAndStack(name, currentStack string, pos
 	}
 
 	buildpack = buildpacks[0]
+	if len(buildpacks) > 1 && newStack != "" {
+		for _, b := range buildpacks {
+			if b.NoStack() {
+				buildpack = b
+			}
+		}
+	}
+
 	if position != buildpack.Position || locked != buildpack.Enabled || enabled != buildpack.Enabled || newStack != buildpack.Stack {
 		buildpack.Position = position
 		buildpack.Locked = locked

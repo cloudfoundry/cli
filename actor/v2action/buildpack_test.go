@@ -693,19 +693,29 @@ var _ = Describe("Buildpack", func() {
 
 						When("there are multiple buildpacks with the same name and one has no stack association", func() {
 							BeforeEach(func() {
+								currentStack = ""
+								newStack = "some-new-stack"
 								fakeCloudControllerClient.GetBuildpacksReturns([]ccv2.Buildpack{
 									ccv2.Buildpack{
 										Stack: "some-stack-name",
 										Name:  "some-bp-name",
+										GUID:  "wrong-id",
 									},
 									ccv2.Buildpack{
 										Name: "some-bp-name",
+										GUID: "right-id",
 									}}, ccv2.Warnings{"warning-1", "warning-2"}, nil)
 							})
 
 							It("succeeds and returns all warnings", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 								Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+							})
+
+							It("updates the buildpack that had no stack association", func() {
+								Expect(fakeCloudControllerClient.UpdateBuildpackCallCount()).To(Equal(1))
+								ccv2Buildpack := fakeCloudControllerClient.UpdateBuildpackArgsForCall(0)
+								Expect(ccv2Buildpack.GUID).To(Equal("right-id"))
 							})
 						})
 					})
