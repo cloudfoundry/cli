@@ -431,7 +431,7 @@ var _ = Describe("marketplace Command", func() {
 			fakeSharedActor.IsOrgTargetedReturns(true)
 			fakeSharedActor.IsSpaceTargetedReturns(true)
 
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "org-a"})
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "org-guid", Name: "org-a"})
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "space-a", GUID: "space-guid"})
 		})
 
@@ -500,6 +500,13 @@ var _ = Describe("marketplace Command", func() {
 
 					It("outputs any warnings", func() {
 						Expect(testUI.Err).To(Say("warning"))
+					})
+
+					It("gets services for the correct space", func() {
+						spaceGUID, serviceName, orgGUID := fakeActor.GetServiceSummaryForSpaceByNameArgsForCall(0)
+						Expect(spaceGUID).To(Equal("space-guid"))
+						Expect(serviceName).To(Equal("service-a"))
+						Expect(orgGUID).To(Equal("org-guid"))
 					})
 				})
 
@@ -676,7 +683,9 @@ var _ = Describe("marketplace Command", func() {
 					})
 
 					It("gets services for the correct space", func() {
-						Expect(fakeActor.GetServicesSummariesForSpaceArgsForCall(0)).To(Equal("space-guid"))
+						spaceGUID, orgGUID := fakeActor.GetServicesSummariesForSpaceArgsForCall(0)
+						Expect(spaceGUID).To(Equal("space-guid"))
+						Expect(orgGUID).To(Equal("org-guid"))
 					})
 
 					It("outputs a header", func() {
@@ -728,7 +737,9 @@ var _ = Describe("marketplace Command", func() {
 					})
 
 					It("gets services for the correct space", func() {
-						Expect(fakeActor.GetServicesSummariesForSpaceArgsForCall(0)).To(Equal("space-guid"))
+						spaceGUID, orgGUID := fakeActor.GetServicesSummariesForSpaceArgsForCall(0)
+						Expect(spaceGUID).To(Equal("space-guid"))
+						Expect(orgGUID).To(Equal("org-guid"))
 					})
 
 					It("outputs a header", func() {
