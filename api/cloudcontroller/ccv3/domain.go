@@ -3,6 +3,7 @@ package ccv3
 import (
 	"bytes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/types"
 	"encoding/json"
@@ -101,4 +102,29 @@ func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
 	err = client.connection.Make(request, &response)
 
 	return ccDomain, response.Warnings, err
+}
+
+func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetDomainsRequest,
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullDomainsList []Domain
+	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
+		if domain, ok := item.(Domain); ok {
+			fullDomainsList = append(fullDomainsList, domain)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Domain{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullDomainsList, warnings, err
 }

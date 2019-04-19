@@ -74,4 +74,56 @@ var _ = Describe("Domain Actions", func() {
 			))
 		})
 	})
+
+	Describe("list domains for org", func() {
+		var (
+			ccv3Domains []ccv3.Domain
+			domains     []Domain
+
+			domain1Name string
+			domain1Guid string
+
+			domain2Name string
+			domain2Guid string
+
+			domain3Name string
+			domain3Guid string
+
+			org1Guid          = "some-org-guid"
+			sharedFromOrgGuid = "another-org-guid"
+			warnings          Warnings
+			executeErr        error
+		)
+
+		BeforeEach(func() {
+			ccv3Domains = []ccv3.Domain{
+				{Name: domain1Name, GUID: domain1Guid, OrganizationGuid: org1Guid},
+				{Name: domain2Name, GUID: domain2Guid, OrganizationGuid: org1Guid},
+				{Name: domain3Name, GUID: domain3Guid, OrganizationGuid: sharedFromOrgGuid},
+			}
+		})
+
+		JustBeforeEach(func() {
+			domains, warnings, executeErr = actor.GetOrganizationDomains(org1Guid)
+		})
+
+		When("the GetOrganizationDomains call is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationDomainsReturns(
+					ccv3Domains,
+					ccv3.Warnings{"some-domain-warning"}, nil)
+			})
+
+			It("returns back the domains and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(domains).To(ConsistOf(
+					Domain{Name: domain1Name, GUID: domain1Guid, OrganizationGuid: org1Guid},
+					Domain{Name: domain2Name, GUID: domain2Guid, OrganizationGuid: org1Guid},
+					Domain{Name: domain3Name, GUID: domain3Guid, OrganizationGuid: sharedFromOrgGuid},
+				))
+				Expect(warnings).To(ConsistOf("some-domain-warning"))
+				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
+			})
+		})
+	})
 })
