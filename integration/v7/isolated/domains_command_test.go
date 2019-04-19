@@ -84,7 +84,7 @@ var _ = FDescribe("domains command", func() {
 				sharedDomain2.CreateShared()
 			})
 
-			When("the targeted org has shared domains", func() {
+			FWhen("the targeted org has shared domains", func() {
 				It("displays the shared domains and denotes that they are shared", func() {
 					session := helpers.CF("domains")
 

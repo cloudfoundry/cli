@@ -13,7 +13,7 @@ import (
 //go:generate counterfeiter . DomainsActor
 
 type DomainsActor interface {
-	GetDomains() ([]v7action.Domain, v7action.Warnings, error)
+	GetOrganizationDomains(string) ([]v7action.Domain, v7action.Warnings, error)
 }
 
 type DomainsCommand struct {
@@ -51,12 +51,13 @@ func (cmd DomainsCommand) Execute(args []string) error {
 		return err
 	}
 
+	targetedOrg := cmd.Config.TargetedOrganization()
 	cmd.UI.DisplayTextWithFlavor("Getting domains in org {{.OrgName}} as {{.UserName}}...\n", map[string]interface{}{
-		"OrgName":  cmd.Config.TargetedOrganization().Name,
+		"OrgName":  targetedOrg.Name,
 		"UserName": currentUser.Name,
 	})
 
-	domains, warnings, err := cmd.Actor.GetDomains()
+	domains, warnings, err := cmd.Actor.GetOrganizationDomains(targetedOrg.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

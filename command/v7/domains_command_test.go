@@ -94,7 +94,7 @@ var _ = Describe("domains Command", func() {
 			BeforeEach(func() {
 				warnings := v7action.Warnings{"warning-1", "warning-2"}
 				expectedErr = errors.New("some-error")
-				fakeActor.GetDomainsReturns(nil, warnings, expectedErr)
+				fakeActor.GetOrganizationDomainsReturns(nil, warnings, expectedErr)
 			})
 
 			It("prints that error with warnings", func() {
@@ -116,7 +116,7 @@ var _ = Describe("domains Command", func() {
 					{Name: "domain2", GUID: "domain-guid-2", Internal: types.NullBool{IsSet: true, Value: false}},
 				}
 
-				fakeActor.GetDomainsReturns(
+				fakeActor.GetOrganizationDomainsReturns(
 					domains,
 					v7action.Warnings{"actor-warning-1", "actor-warning-2", "actor-warning-3"},
 					nil,
@@ -129,7 +129,7 @@ var _ = Describe("domains Command", func() {
 			})
 
 			It("asks the DomainsActor for a list of domains", func() {
-				Expect(fakeActor.GetDomainsCallCount()).To(Equal(1))
+				Expect(fakeActor.GetOrganizationDomainsCallCount()).To(Equal(1))
 			})
 
 			It("prints warnings", func() {
@@ -157,7 +157,7 @@ var _ = Describe("domains Command", func() {
 			BeforeEach(func() {
 				domains = []v7action.Domain{}
 
-				fakeActor.GetDomainsReturns(
+				fakeActor.GetOrganizationDomainsReturns(
 					domains,
 					v7action.Warnings{"actor-warning-1", "actor-warning-2", "actor-warning-3"},
 					nil,
@@ -170,7 +170,7 @@ var _ = Describe("domains Command", func() {
 			})
 
 			It("asks the DomainsActor for a list of domains", func() {
-				Expect(fakeActor.GetDomainsCallCount()).To(Equal(1))
+				Expect(fakeActor.GetOrganizationDomainsCallCount()).To(Equal(1))
 			})
 
 			It("prints warnings", func() {

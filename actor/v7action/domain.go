@@ -37,9 +37,11 @@ func (actor Actor) CreatePrivateDomain(domainName string, orgName string) (Warni
 	return allWarnings, err
 }
 
-// TODO: filter by targeted org
-func (actor Actor) GetDomains() ([]Domain, Warnings, error) {
-	ccv3Domains, warnings, err := actor.CloudControllerClient.GetDomains()
+func (actor Actor) GetOrganizationDomains(orgGuid string) ([]Domain, Warnings, error) {
+	ccv3Domains, warnings, err := actor.CloudControllerClient.GetDomains(
+		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGuid}},
+	)
+
 	if err != nil {
 		return nil, Warnings(warnings), err
 	}
@@ -50,3 +52,16 @@ func (actor Actor) GetDomains() ([]Domain, Warnings, error) {
 	}
 	return domains, Warnings(warnings), nil
 }
+
+//func (actor Actor) GetDomains() ([]Domain, Warnings, error) {
+//	ccv3Domains, warnings, err := actor.CloudControllerClient.GetDomains()
+//	if err != nil {
+//		return nil, Warnings(warnings), err
+//	}
+//
+//	var domains []Domain
+//	for _, domain := range ccv3Domains {
+//		domains = append(domains, Domain(domain))
+//	}
+//	return domains, Warnings(warnings), nil
+//}

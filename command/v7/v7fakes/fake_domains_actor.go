@@ -9,16 +9,17 @@ import (
 )
 
 type FakeDomainsActor struct {
-	GetDomainsStub        func() ([]v7action.Domain, v7action.Warnings, error)
-	getDomainsMutex       sync.RWMutex
-	getDomainsArgsForCall []struct {
+	GetOrganizationDomainsStub        func(string) ([]v7action.Domain, v7action.Warnings, error)
+	getOrganizationDomainsMutex       sync.RWMutex
+	getOrganizationDomainsArgsForCall []struct {
+		arg1 string
 	}
-	getDomainsReturns struct {
+	getOrganizationDomainsReturns struct {
 		result1 []v7action.Domain
 		result2 v7action.Warnings
 		result3 error
 	}
-	getDomainsReturnsOnCall map[int]struct {
+	getOrganizationDomainsReturnsOnCall map[int]struct {
 		result1 []v7action.Domain
 		result2 v7action.Warnings
 		result3 error
@@ -27,58 +28,66 @@ type FakeDomainsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDomainsActor) GetDomains() ([]v7action.Domain, v7action.Warnings, error) {
-	fake.getDomainsMutex.Lock()
-	ret, specificReturn := fake.getDomainsReturnsOnCall[len(fake.getDomainsArgsForCall)]
-	fake.getDomainsArgsForCall = append(fake.getDomainsArgsForCall, struct {
-	}{})
-	fake.recordInvocation("GetDomains", []interface{}{})
-	fake.getDomainsMutex.Unlock()
-	if fake.GetDomainsStub != nil {
-		return fake.GetDomainsStub()
+func (fake *FakeDomainsActor) GetOrganizationDomains(arg1 string) ([]v7action.Domain, v7action.Warnings, error) {
+	fake.getOrganizationDomainsMutex.Lock()
+	ret, specificReturn := fake.getOrganizationDomainsReturnsOnCall[len(fake.getOrganizationDomainsArgsForCall)]
+	fake.getOrganizationDomainsArgsForCall = append(fake.getOrganizationDomainsArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("GetOrganizationDomains", []interface{}{arg1})
+	fake.getOrganizationDomainsMutex.Unlock()
+	if fake.GetOrganizationDomainsStub != nil {
+		return fake.GetOrganizationDomainsStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.getDomainsReturns
+	fakeReturns := fake.getOrganizationDomainsReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeDomainsActor) GetDomainsCallCount() int {
-	fake.getDomainsMutex.RLock()
-	defer fake.getDomainsMutex.RUnlock()
-	return len(fake.getDomainsArgsForCall)
+func (fake *FakeDomainsActor) GetOrganizationDomainsCallCount() int {
+	fake.getOrganizationDomainsMutex.RLock()
+	defer fake.getOrganizationDomainsMutex.RUnlock()
+	return len(fake.getOrganizationDomainsArgsForCall)
 }
 
-func (fake *FakeDomainsActor) GetDomainsCalls(stub func() ([]v7action.Domain, v7action.Warnings, error)) {
-	fake.getDomainsMutex.Lock()
-	defer fake.getDomainsMutex.Unlock()
-	fake.GetDomainsStub = stub
+func (fake *FakeDomainsActor) GetOrganizationDomainsCalls(stub func(string) ([]v7action.Domain, v7action.Warnings, error)) {
+	fake.getOrganizationDomainsMutex.Lock()
+	defer fake.getOrganizationDomainsMutex.Unlock()
+	fake.GetOrganizationDomainsStub = stub
 }
 
-func (fake *FakeDomainsActor) GetDomainsReturns(result1 []v7action.Domain, result2 v7action.Warnings, result3 error) {
-	fake.getDomainsMutex.Lock()
-	defer fake.getDomainsMutex.Unlock()
-	fake.GetDomainsStub = nil
-	fake.getDomainsReturns = struct {
+func (fake *FakeDomainsActor) GetOrganizationDomainsArgsForCall(i int) string {
+	fake.getOrganizationDomainsMutex.RLock()
+	defer fake.getOrganizationDomainsMutex.RUnlock()
+	argsForCall := fake.getOrganizationDomainsArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeDomainsActor) GetOrganizationDomainsReturns(result1 []v7action.Domain, result2 v7action.Warnings, result3 error) {
+	fake.getOrganizationDomainsMutex.Lock()
+	defer fake.getOrganizationDomainsMutex.Unlock()
+	fake.GetOrganizationDomainsStub = nil
+	fake.getOrganizationDomainsReturns = struct {
 		result1 []v7action.Domain
 		result2 v7action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeDomainsActor) GetDomainsReturnsOnCall(i int, result1 []v7action.Domain, result2 v7action.Warnings, result3 error) {
-	fake.getDomainsMutex.Lock()
-	defer fake.getDomainsMutex.Unlock()
-	fake.GetDomainsStub = nil
-	if fake.getDomainsReturnsOnCall == nil {
-		fake.getDomainsReturnsOnCall = make(map[int]struct {
+func (fake *FakeDomainsActor) GetOrganizationDomainsReturnsOnCall(i int, result1 []v7action.Domain, result2 v7action.Warnings, result3 error) {
+	fake.getOrganizationDomainsMutex.Lock()
+	defer fake.getOrganizationDomainsMutex.Unlock()
+	fake.GetOrganizationDomainsStub = nil
+	if fake.getOrganizationDomainsReturnsOnCall == nil {
+		fake.getOrganizationDomainsReturnsOnCall = make(map[int]struct {
 			result1 []v7action.Domain
 			result2 v7action.Warnings
 			result3 error
 		})
 	}
-	fake.getDomainsReturnsOnCall[i] = struct {
+	fake.getOrganizationDomainsReturnsOnCall[i] = struct {
 		result1 []v7action.Domain
 		result2 v7action.Warnings
 		result3 error
@@ -88,8 +97,8 @@ func (fake *FakeDomainsActor) GetDomainsReturnsOnCall(i int, result1 []v7action.
 func (fake *FakeDomainsActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getDomainsMutex.RLock()
-	defer fake.getDomainsMutex.RUnlock()
+	fake.getOrganizationDomainsMutex.RLock()
+	defer fake.getOrganizationDomainsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
