@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -1138,6 +1139,39 @@ var _ = Describe("login command", func() {
 					Eventually(session).Should(Exit(1))
 				})
 			})
+		})
+	})
+
+	Describe("Authenticating as a user, through a custom client", func() {
+		var accessTokenExpiration time.Duration
+		BeforeEach(func() {
+			customClientID, customClientSecret := helpers.SkipIfCustomClientCredentialsNotSet()
+
+			helpers.LoginCF()
+			username, password := helpers.CreateUser()
+
+			helpers.SetConfig(func(config *configv3.Config) {
+				config.ConfigFile.UAAOAuthClient = customClientID
+				config.ConfigFile.UAAOAuthClientSecret = customClientSecret
+				config.ConfigFile.UAAGrantType = ""
+			})
+
+			session := helpers.CF("login", "-u", username, "-p", password)
+			Eventually(session).Should(Exit(0))
+			accessTokenExpiration = 120 // this was configured in the pipeline
+		})
+
+		It("expects access token validity to match custom client", func() {
+			config := helpers.GetConfig()
+
+			jwt := helpers.ParseTokenString(config.ConfigFile.AccessToken)
+			expires, expIsSet := jwt.Claims().Expiration()
+			Expect(expIsSet).To(BeTrue())
+
+			iat, iatIsSet := jwt.Claims().IssuedAt()
+
+			Expect(iatIsSet).To(BeTrue())
+			Expect(expires.Sub(iat)).To(Equal(accessTokenExpiration * time.Second))
 		})
 	})
 })
