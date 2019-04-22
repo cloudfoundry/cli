@@ -13,7 +13,7 @@ type Domain struct {
 	GUID             string         `json:"guid,omitempty"`
 	Name             string         `json:"name"`
 	Internal         types.NullBool `json:"internal,omitempty"`
-	OrganizationGuid string         `json:"orgguid,omitempty"`
+	OrganizationGUID string         `json:"orgguid,omitempty"`
 }
 
 func (d Domain) MarshalJSON() ([]byte, error) {
@@ -48,8 +48,8 @@ func (d Domain) MarshalJSON() ([]byte, error) {
 		ccDom.GUID = d.GUID
 	}
 
-	if d.OrganizationGuid != "" {
-		ccDom.Relationships = &OrgRelationship{OrgData{Data{GUID: d.OrganizationGuid}}}
+	if d.OrganizationGUID != "" {
+		ccDom.Relationships = &OrgRelationship{OrgData{Data{GUID: d.OrganizationGUID}}}
 	}
 	return json.Marshal(ccDom)
 }
@@ -75,7 +75,7 @@ func (d *Domain) UnmarshalJSON(data []byte) error {
 	d.GUID = alias.GUID
 	d.Name = alias.Name
 	d.Internal = alias.Internal
-	d.OrganizationGuid = alias.Relationships.Organization.Data.GUID
+	d.OrganizationGUID = alias.Relationships.Organization.Data.GUID
 	return nil
 }
 
@@ -107,6 +107,32 @@ func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
 func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDomainsRequest,
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullDomainsList []Domain
+	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
+		if domain, ok := item.(Domain); ok {
+			fullDomainsList = append(fullDomainsList, domain)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Domain{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullDomainsList, warnings, err
+}
+
+func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]Domain, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		URIParams:   internal.Params{"organization_guid": orgGUID},
+		RequestName: internal.GetOrganizationDomainsRequest,
 		Query:       query,
 	})
 	if err != nil {

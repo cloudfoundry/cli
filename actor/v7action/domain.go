@@ -7,6 +7,10 @@ import (
 
 type Domain ccv3.Domain
 
+func (domain Domain) Shared() bool {
+	return domain.OrganizationGUID == ""
+}
+
 func (actor Actor) CreateSharedDomain(domainName string, internal bool) (Warnings, error) {
 	_, warnings, err := actor.CloudControllerClient.CreateDomain(ccv3.Domain{
 		Name:     domainName,
@@ -25,7 +29,7 @@ func (actor Actor) CreatePrivateDomain(domainName string, orgName string) (Warni
 	}
 	_, apiWarnings, err := actor.CloudControllerClient.CreateDomain(ccv3.Domain{
 		Name:             domainName,
-		OrganizationGuid: organization.GUID,
+		OrganizationGUID: organization.GUID,
 	})
 
 	actorWarnings := Warnings(apiWarnings)
@@ -38,9 +42,7 @@ func (actor Actor) CreatePrivateDomain(domainName string, orgName string) (Warni
 }
 
 func (actor Actor) GetOrganizationDomains(orgGuid string) ([]Domain, Warnings, error) {
-	ccv3Domains, warnings, err := actor.CloudControllerClient.GetDomains(
-		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGuid}},
-	)
+	ccv3Domains, warnings, err := actor.CloudControllerClient.GetOrganizationDomains(orgGuid)
 
 	if err != nil {
 		return nil, Warnings(warnings), err
@@ -50,18 +52,6 @@ func (actor Actor) GetOrganizationDomains(orgGuid string) ([]Domain, Warnings, e
 	for _, domain := range ccv3Domains {
 		domains = append(domains, Domain(domain))
 	}
+
 	return domains, Warnings(warnings), nil
 }
-
-//func (actor Actor) GetDomains() ([]Domain, Warnings, error) {
-//	ccv3Domains, warnings, err := actor.CloudControllerClient.GetDomains()
-//	if err != nil {
-//		return nil, Warnings(warnings), err
-//	}
-//
-//	var domains []Domain
-//	for _, domain := range ccv3Domains {
-//		domains = append(domains, Domain(domain))
-//	}
-//	return domains, Warnings(warnings), nil
-//}

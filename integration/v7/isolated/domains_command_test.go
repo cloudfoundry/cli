@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("domains command", func() {
+var _ = Describe("domains command", func() {
 	Describe("help", func() {
 		When("--help flag is set", func() {
 			It("displays command usage to output", func() {
@@ -84,7 +84,7 @@ var _ = FDescribe("domains command", func() {
 				sharedDomain2.CreateShared()
 			})
 
-			FWhen("the targeted org has shared domains", func() {
+			When("the targeted org has shared domains", func() {
 				It("displays the shared domains and denotes that they are shared", func() {
 					session := helpers.CF("domains")
 

@@ -112,7 +112,7 @@ var _ = Describe("domains Command", func() {
 			BeforeEach(func() {
 				domains = []v7action.Domain{
 					{Name: "domain1", GUID: "domain-guid-1", Internal: types.NullBool{IsSet: true, Value: true}},
-					{Name: "domain3", GUID: "domain-guid-3", Internal: types.NullBool{IsSet: false, Value: false}, OrganizationGuid: "owning-org-guid"},
+					{Name: "domain3", GUID: "domain-guid-3", Internal: types.NullBool{IsSet: false, Value: false}, OrganizationGUID: "owning-org-guid"},
 					{Name: "domain2", GUID: "domain-guid-2", Internal: types.NullBool{IsSet: true, Value: false}},
 				}
 

@@ -64,7 +64,7 @@ var _ = Describe("create-private-domain command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("domains")
-					Eventually(session).Should(Say(`%s\s+owned`, domainName))
+					Eventually(session).Should(Say(`%s\s+private`, domainName))
 					Eventually(session).Should(Exit(0))
 				})
 			})

@@ -69,7 +69,7 @@ var _ = Describe("Domain Actions", func() {
 			Expect(passedDomain).To(Equal(
 				ccv3.Domain{
 					Name:             "private-domain-name",
-					OrganizationGuid: "org-guid",
+					OrganizationGUID: "org-guid",
 				},
 			))
 		})
@@ -97,9 +97,9 @@ var _ = Describe("Domain Actions", func() {
 
 		BeforeEach(func() {
 			ccv3Domains = []ccv3.Domain{
-				{Name: domain1Name, GUID: domain1Guid, OrganizationGuid: org1Guid},
-				{Name: domain2Name, GUID: domain2Guid, OrganizationGuid: org1Guid},
-				{Name: domain3Name, GUID: domain3Guid, OrganizationGuid: sharedFromOrgGuid},
+				{Name: domain1Name, GUID: domain1Guid, OrganizationGUID: org1Guid},
+				{Name: domain2Name, GUID: domain2Guid, OrganizationGUID: org1Guid},
+				{Name: domain3Name, GUID: domain3Guid, OrganizationGUID: sharedFromOrgGuid},
 			}
 		})
 
@@ -108,26 +108,28 @@ var _ = Describe("Domain Actions", func() {
 		})
 
 		When("the API layer call is successful", func() {
-
-			expectedArgs := []ccv3.Query{{Key: ccv3.OrganizationGUIDFilter, Values: []string{"some-org-guid"}}}
+			expectedOrgGUID := "some-org-guid"
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetDomainsReturns(
+				fakeCloudControllerClient.GetOrganizationDomainsReturns(
 					ccv3Domains,
-					ccv3.Warnings{"some-domain-warning"}, nil)
+					ccv3.Warnings{"some-domain-warning"},
+					nil,
+				)
 			})
 
 			It("returns back the domains and warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
-				actualArgs := fakeCloudControllerClient.GetDomainsArgsForCall(0)
-				Expect(actualArgs).To(Equal(expectedArgs))
+				Expect(fakeCloudControllerClient.GetOrganizationDomainsCallCount()).To(Equal(1))
+				actualOrgGuid, actualQuery := fakeCloudControllerClient.GetOrganizationDomainsArgsForCall(0)
+				Expect(actualOrgGuid).To(Equal(expectedOrgGUID))
+				Expect(actualQuery).To(BeNil())
 
 				Expect(domains).To(ConsistOf(
-					Domain{Name: domain1Name, GUID: domain1Guid, OrganizationGuid: org1Guid},
-					Domain{Name: domain2Name, GUID: domain2Guid, OrganizationGuid: org1Guid},
-					Domain{Name: domain3Name, GUID: domain3Guid, OrganizationGuid: sharedFromOrgGuid},
+					Domain{Name: domain1Name, GUID: domain1Guid, OrganizationGUID: org1Guid},
+					Domain{Name: domain2Name, GUID: domain2Guid, OrganizationGUID: org1Guid},
+					Domain{Name: domain3Name, GUID: domain3Guid, OrganizationGUID: sharedFromOrgGuid},
 				))
 				Expect(warnings).To(ConsistOf("some-domain-warning"))
 
@@ -136,7 +138,7 @@ var _ = Describe("Domain Actions", func() {
 
 		When("when the API layer call returns an error", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetDomainsReturns(
+				fakeCloudControllerClient.GetOrganizationDomainsReturns(
 					[]ccv3.Domain{},
 					ccv3.Warnings{"some-domain-warning"},
 					errors.New("list-error"),
@@ -148,7 +150,7 @@ var _ = Describe("Domain Actions", func() {
 				Expect(warnings).To(ConsistOf("some-domain-warning"))
 				Expect(domains).To(ConsistOf([]Domain{}))
 
-				Expect(fakeCloudControllerClient.GetDomainsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetOrganizationDomainsCallCount()).To(Equal(1))
 			})
 
 		})

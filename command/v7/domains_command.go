@@ -52,9 +52,9 @@ func (cmd DomainsCommand) Execute(args []string) error {
 	}
 
 	targetedOrg := cmd.Config.TargetedOrganization()
-	cmd.UI.DisplayTextWithFlavor("Getting domains in org {{.OrgName}} as {{.UserName}}...\n", map[string]interface{}{
-		"OrgName":  targetedOrg.Name,
-		"UserName": currentUser.Name,
+	cmd.UI.DisplayTextWithFlavor("Getting domains in org {{.CurrentOrg}} as {{.CurrentUser}}...\n", map[string]interface{}{
+		"CurrentOrg":  targetedOrg.Name,
+		"CurrentUser": currentUser.Name,
 	})
 
 	domains, warnings, err := cmd.Actor.GetOrganizationDomains(targetedOrg.GUID)
@@ -75,21 +75,25 @@ func (cmd DomainsCommand) Execute(args []string) error {
 
 func (cmd DomainsCommand) displayDomainsTable(domains []v7action.Domain) {
 	var domainsTable = [][]string{
-		{"name", "availability", "internal"},
+		{
+			cmd.UI.TranslateText("name"),
+			cmd.UI.TranslateText("availability"),
+			cmd.UI.TranslateText("internal"),
+		},
 	}
 
 	for _, domain := range domains {
 		var availability string
-		var internal = ""
+		var internal string
 
-		if domain.OrganizationGuid == "" {
-			availability = "shared"
+		if domain.Shared() {
+			availability = cmd.UI.TranslateText("shared")
 		} else {
-			availability = "private"
+			availability = cmd.UI.TranslateText("private")
 		}
 
 		if domain.Internal.IsSet && domain.Internal.Value {
-			internal = "true"
+			internal = cmd.UI.TranslateText("true")
 		}
 
 		domainsTable = append(domainsTable, []string{

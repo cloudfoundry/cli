@@ -535,6 +535,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetOrganizationDomainsStub        func(string, ...ccv3.Query) ([]ccv3.Domain, ccv3.Warnings, error)
+	getOrganizationDomainsMutex       sync.RWMutex
+	getOrganizationDomainsArgsForCall []struct {
+		arg1 string
+		arg2 []ccv3.Query
+	}
+	getOrganizationDomainsReturns struct {
+		result1 []ccv3.Domain
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getOrganizationDomainsReturnsOnCall map[int]struct {
+		result1 []ccv3.Domain
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetOrganizationsStub        func(...ccv3.Query) ([]ccv3.Organization, ccv3.Warnings, error)
 	getOrganizationsMutex       sync.RWMutex
 	getOrganizationsArgsForCall []struct {
@@ -3315,6 +3331,73 @@ func (fake *FakeCloudControllerClient) GetOrganizationDefaultIsolationSegmentRet
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetOrganizationDomains(arg1 string, arg2 ...ccv3.Query) ([]ccv3.Domain, ccv3.Warnings, error) {
+	fake.getOrganizationDomainsMutex.Lock()
+	ret, specificReturn := fake.getOrganizationDomainsReturnsOnCall[len(fake.getOrganizationDomainsArgsForCall)]
+	fake.getOrganizationDomainsArgsForCall = append(fake.getOrganizationDomainsArgsForCall, struct {
+		arg1 string
+		arg2 []ccv3.Query
+	}{arg1, arg2})
+	fake.recordInvocation("GetOrganizationDomains", []interface{}{arg1, arg2})
+	fake.getOrganizationDomainsMutex.Unlock()
+	if fake.GetOrganizationDomainsStub != nil {
+		return fake.GetOrganizationDomainsStub(arg1, arg2...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.getOrganizationDomainsReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationDomainsCallCount() int {
+	fake.getOrganizationDomainsMutex.RLock()
+	defer fake.getOrganizationDomainsMutex.RUnlock()
+	return len(fake.getOrganizationDomainsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationDomainsCalls(stub func(string, ...ccv3.Query) ([]ccv3.Domain, ccv3.Warnings, error)) {
+	fake.getOrganizationDomainsMutex.Lock()
+	defer fake.getOrganizationDomainsMutex.Unlock()
+	fake.GetOrganizationDomainsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationDomainsArgsForCall(i int) (string, []ccv3.Query) {
+	fake.getOrganizationDomainsMutex.RLock()
+	defer fake.getOrganizationDomainsMutex.RUnlock()
+	argsForCall := fake.getOrganizationDomainsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationDomainsReturns(result1 []ccv3.Domain, result2 ccv3.Warnings, result3 error) {
+	fake.getOrganizationDomainsMutex.Lock()
+	defer fake.getOrganizationDomainsMutex.Unlock()
+	fake.GetOrganizationDomainsStub = nil
+	fake.getOrganizationDomainsReturns = struct {
+		result1 []ccv3.Domain
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationDomainsReturnsOnCall(i int, result1 []ccv3.Domain, result2 ccv3.Warnings, result3 error) {
+	fake.getOrganizationDomainsMutex.Lock()
+	defer fake.getOrganizationDomainsMutex.Unlock()
+	fake.GetOrganizationDomainsStub = nil
+	if fake.getOrganizationDomainsReturnsOnCall == nil {
+		fake.getOrganizationDomainsReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Domain
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getOrganizationDomainsReturnsOnCall[i] = struct {
+		result1 []ccv3.Domain
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetOrganizations(arg1 ...ccv3.Query) ([]ccv3.Organization, ccv3.Warnings, error) {
 	fake.getOrganizationsMutex.Lock()
 	ret, specificReturn := fake.getOrganizationsReturnsOnCall[len(fake.getOrganizationsArgsForCall)]
@@ -5341,6 +5424,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getIsolationSegmentsMutex.RUnlock()
 	fake.getOrganizationDefaultIsolationSegmentMutex.RLock()
 	defer fake.getOrganizationDefaultIsolationSegmentMutex.RUnlock()
+	fake.getOrganizationDomainsMutex.RLock()
+	defer fake.getOrganizationDomainsMutex.RUnlock()
 	fake.getOrganizationsMutex.RLock()
 	defer fake.getOrganizationsMutex.RUnlock()
 	fake.getPackageMutex.RLock()

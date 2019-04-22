@@ -46,6 +46,7 @@ type CloudControllerClient interface {
 	GetIsolationSegmentOrganizations(isolationSegmentGUID string) ([]ccv3.Organization, ccv3.Warnings, error)
 	GetIsolationSegments(query ...ccv3.Query) ([]ccv3.IsolationSegment, ccv3.Warnings, error)
 	GetOrganizationDefaultIsolationSegment(orgGUID string) (ccv3.Relationship, ccv3.Warnings, error)
+	GetOrganizationDomains(orgGUID string, query ...ccv3.Query) ([]ccv3.Domain, ccv3.Warnings, error)
 	GetOrganizations(query ...ccv3.Query) ([]ccv3.Organization, ccv3.Warnings, error)
 	GetPackage(guid string) (ccv3.Package, ccv3.Warnings, error)
 	GetPackages(query ...ccv3.Query) ([]ccv3.Package, ccv3.Warnings, error)
