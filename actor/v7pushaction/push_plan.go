@@ -17,6 +17,7 @@ type PushPlan struct {
 	ApplicationNeedsUpdate bool
 
 	NoStart           bool
+	NoRouteFlag       bool
 	SkipRouteCreation bool
 
 	DockerImageCredentials            v7action.DockerImageCredentials

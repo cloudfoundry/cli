@@ -15,14 +15,13 @@ import (
 
 var _ = Describe("push with a manifest and an app name", func() {
 	var (
-		appName                   string
-		randomHostName            string
-		tempDir                   string
-		pathToManifestWithNoRoute string
+		appName                  string
+		randomHostName           string
+		tempDir                  string
+		pathToManifestForNoRoute string
 	)
 
 	BeforeEach(func() {
-		Skip("Waiting for no-route changes to be made on the API")
 		appName = helpers.NewAppName()
 		domainName := helpers.DefaultSharedDomain()
 		randomHostName = helpers.RandomName()
@@ -51,12 +50,11 @@ var _ = Describe("push with a manifest and an app name", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		pathToManifestWithNoRoute = filepath.Join(tempDir, "no-route-manifest.yml")
-		helpers.WriteManifest(pathToManifestWithNoRoute, map[string]interface{}{
+		pathToManifestForNoRoute = filepath.Join(tempDir, "no-route-manifest.yml")
+		helpers.WriteManifest(pathToManifestForNoRoute, map[string]interface{}{
 			"applications": []map[string]interface{}{
 				{
-					"name":     appName,
-					"no-route": true,
+					"name": appName,
 					"routes": []map[string]string{
 						{"route": fmt.Sprintf("%s.%s", randomHostName, domainName)},
 					},
@@ -74,8 +72,8 @@ var _ = Describe("push with a manifest and an app name", func() {
 			session := helpers.CustomCF(
 				helpers.CFEnv{WorkingDirectory: dir},
 				PushCommandName, appName,
-				"-f", pathToManifestWithNoRoute,
-				"--no-start")
+				"-f", pathToManifestForNoRoute,
+				"--no-start", "--no-route")
 			Eventually(session).Should(Exit(0))
 		})
 

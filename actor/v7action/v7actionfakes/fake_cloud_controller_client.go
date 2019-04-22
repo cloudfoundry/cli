@@ -868,11 +868,12 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	UpdateSpaceApplyManifestStub        func(string, []byte) (ccv3.JobURL, ccv3.Warnings, error)
+	UpdateSpaceApplyManifestStub        func(string, []byte, ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)
 	updateSpaceApplyManifestMutex       sync.RWMutex
 	updateSpaceApplyManifestArgsForCall []struct {
 		arg1 string
 		arg2 []byte
+		arg3 []ccv3.Query
 	}
 	updateSpaceApplyManifestReturns struct {
 		result1 ccv3.JobURL
@@ -4768,7 +4769,7 @@ func (fake *FakeCloudControllerClient) UpdateProcessReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifest(arg1 string, arg2 []byte) (ccv3.JobURL, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifest(arg1 string, arg2 []byte, arg3 ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error) {
 	var arg2Copy []byte
 	if arg2 != nil {
 		arg2Copy = make([]byte, len(arg2))
@@ -4779,11 +4780,12 @@ func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifest(arg1 string, arg
 	fake.updateSpaceApplyManifestArgsForCall = append(fake.updateSpaceApplyManifestArgsForCall, struct {
 		arg1 string
 		arg2 []byte
-	}{arg1, arg2Copy})
-	fake.recordInvocation("UpdateSpaceApplyManifest", []interface{}{arg1, arg2Copy})
+		arg3 []ccv3.Query
+	}{arg1, arg2Copy, arg3})
+	fake.recordInvocation("UpdateSpaceApplyManifest", []interface{}{arg1, arg2Copy, arg3})
 	fake.updateSpaceApplyManifestMutex.Unlock()
 	if fake.UpdateSpaceApplyManifestStub != nil {
-		return fake.UpdateSpaceApplyManifestStub(arg1, arg2)
+		return fake.UpdateSpaceApplyManifestStub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -4798,17 +4800,17 @@ func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestCallCount() int {
 	return len(fake.updateSpaceApplyManifestArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestCalls(stub func(string, []byte) (ccv3.JobURL, ccv3.Warnings, error)) {
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestCalls(stub func(string, []byte, ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)) {
 	fake.updateSpaceApplyManifestMutex.Lock()
 	defer fake.updateSpaceApplyManifestMutex.Unlock()
 	fake.UpdateSpaceApplyManifestStub = stub
 }
 
-func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestArgsForCall(i int) (string, []byte) {
+func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestArgsForCall(i int) (string, []byte, []ccv3.Query) {
 	fake.updateSpaceApplyManifestMutex.RLock()
 	defer fake.updateSpaceApplyManifestMutex.RUnlock()
 	argsForCall := fake.updateSpaceApplyManifestArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeCloudControllerClient) UpdateSpaceApplyManifestReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {

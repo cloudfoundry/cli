@@ -15,6 +15,8 @@ const (
 	GUIDFilter QueryKey = "guids"
 	// NameFilter is a query parameter for listing objects by name.
 	NameFilter QueryKey = "names"
+	// NoRouteFilter is a query parameter for skipping route creation and unmapping existing routes.
+	NoRouteFilter QueryKey = "no_route"
 	// OrganizationGUIDFilter is a query parameter for listing objects by Organization GUID.
 	OrganizationGUIDFilter QueryKey = "organization_guids"
 	// SequenceIDFilter is a query parameter for listing objects by sequence ID.

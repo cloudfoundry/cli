@@ -413,9 +413,22 @@ var _ = Describe("Actualize", func() {
 			})
 		})
 
-		When("skipping default route creation", func() {
+		When("skipping default route creation from manifest", func() {
 			BeforeEach(func() {
 				plan.SkipRouteCreation = true
+			})
+
+			It("never attempts to create a route", func() {
+				Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Or(Equal(CreatingAndMappingRoutes), Equal(CreatedRoutes)))
+				Consistently(fakeV2Actor.GetApplicationRoutesCallCount).Should(BeZero())
+				Consistently(fakeV2Actor.CreateRouteCallCount).Should(BeZero())
+			})
+		})
+
+		When("skipping default route creation from overrides", func() {
+			BeforeEach(func() {
+				plan.SkipRouteCreation = false
+				plan.NoRouteFlag = true
 			})
 
 			It("never attempts to create a route", func() {

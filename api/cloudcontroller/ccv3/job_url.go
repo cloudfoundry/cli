@@ -2,7 +2,6 @@ package ccv3
 
 import (
 	"bytes"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -58,10 +57,10 @@ func (client *Client) UpdateApplicationApplyManifest(appGUID string, rawManifest
 // (1) Finding or creating this app.
 // (2) Applying manifest properties to this app.
 
-func (client *Client) UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte) (JobURL, Warnings, error) {
-
+func (client *Client) UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte, query ...Query) (JobURL, Warnings, error) {
 	request, requestExecuteErr := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostSpaceActionApplyManifestRequest,
+		Query:       query,
 		URIParams:   map[string]string{"space_guid": spaceGUID},
 		Body:        bytes.NewReader(rawManifest),
 	})

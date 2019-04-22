@@ -1,12 +1,13 @@
 package ccv3_test
 
 import (
+	"net/http"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
-	"net/http"
 )
 
 var _ = Describe("Job URL", func() {
@@ -193,6 +194,8 @@ var _ = Describe("Job URL", func() {
 		var (
 			manifestBody []byte
 
+			query Query
+
 			responseJobURL JobURL
 			warnings       Warnings
 			executeErr     error
@@ -204,6 +207,7 @@ var _ = Describe("Job URL", func() {
 			responseJobURL, warnings, executeErr = client.UpdateSpaceApplyManifest(
 				"some-space-guid",
 				manifestBody,
+				query,
 			)
 		})
 
@@ -214,9 +218,10 @@ var _ = Describe("Job URL", func() {
 
 		When("applying the manifest to the space succeeds", func() {
 			BeforeEach(func() {
+				query = Query{Key: NoRouteFilter, Values: []string{"true"}}
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/spaces/some-space-guid/actions/apply_manifest"),
+						VerifyRequest(http.MethodPost, "/v3/spaces/some-space-guid/actions/apply_manifest", "no_route=true"),
 						VerifyHeaderKV("Content-type", "application/x-yaml"),
 						VerifyBody(manifestBody),
 						RespondWith(http.StatusAccepted, "", http.Header{

@@ -31,7 +31,7 @@ func (actor Actor) PrepareSpace(pushPlans []PushPlan, manifestParser ManifestPar
 				return
 			}
 			eventStream <- ApplyManifest
-			warnings, err = actor.V7Actor.SetSpaceManifest(pushPlans[0].SpaceGUID, manifest)
+			warnings, err = actor.V7Actor.SetSpaceManifest(pushPlans[0].SpaceGUID, manifest, pushPlans[0].NoRouteFlag)
 			successEvent = ApplyManifestComplete
 		} else {
 			_, warnings, err = actor.V7Actor.CreateApplicationInSpace(pushPlans[0].Application, pushPlans[0].SpaceGUID)

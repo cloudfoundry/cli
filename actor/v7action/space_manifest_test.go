@@ -2,6 +2,7 @@ package v7action_test
 
 import (
 	"errors"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v7action"
@@ -26,6 +27,7 @@ var _ = Describe("Application Manifest Actions", func() {
 
 	Describe("SetSpaceManifest", func() {
 		var (
+			noRouteFlag = true
 			spaceGUID   string
 			rawManifest []byte
 
@@ -39,7 +41,7 @@ var _ = Describe("Application Manifest Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.SetSpaceManifest(spaceGUID, rawManifest)
+			warnings, executeErr = actor.SetSpaceManifest(spaceGUID, rawManifest, noRouteFlag)
 		})
 
 		When("applying the manifest succeeds", func() {
@@ -64,9 +66,16 @@ var _ = Describe("Application Manifest Actions", func() {
 					Expect(warnings).To(ConsistOf("apply-manifest-1-warning", "poll-1-warning"))
 
 					Expect(fakeCloudControllerClient.UpdateSpaceApplyManifestCallCount()).To(Equal(1))
-					guidInCall, appManifest := fakeCloudControllerClient.UpdateSpaceApplyManifestArgsForCall(0)
+					guidInCall, appManifest, actualNoRouteQuery := fakeCloudControllerClient.UpdateSpaceApplyManifestArgsForCall(0)
 					Expect(guidInCall).To(Equal("some-space-guid"))
 					Expect(appManifest).To(Equal(rawManifest))
+					Expect(actualNoRouteQuery).To(Equal(
+						[]ccv3.Query{
+							{
+								Key:    ccv3.NoRouteFilter,
+								Values: []string{strconv.FormatBool(noRouteFlag)},
+							},
+						}))
 
 					Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
 					jobURL := fakeCloudControllerClient.PollJobArgsForCall(0)

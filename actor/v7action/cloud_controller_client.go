@@ -68,7 +68,7 @@ type CloudControllerClient interface {
 	UpdateOrganization(org ccv3.Organization) (ccv3.Organization, ccv3.Warnings, error)
 	UpdateOrganizationDefaultIsolationSegmentRelationship(orgGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	UpdateProcess(process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
-	UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte) (ccv3.JobURL, ccv3.Warnings, error)
+	UpdateSpaceApplyManifest(spaceGUID string, rawManifest []byte, query ...ccv3.Query) (ccv3.JobURL, ccv3.Warnings, error)
 	UpdateSpaceIsolationSegmentRelationship(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	UpdateTaskCancel(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	UploadBitsPackage(pkg ccv3.Package, matchedResources []ccv3.Resource, newResources io.Reader, newResourcesLength int64) (ccv3.Package, ccv3.Warnings, error)

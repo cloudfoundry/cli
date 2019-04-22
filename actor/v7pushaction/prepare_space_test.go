@@ -194,7 +194,7 @@ var _ = Describe("PrepareSpace", func() {
 				Consistently(fakeV7Actor.CreateApplicationInSpaceCallCount).Should(Equal(0))
 				Eventually(getPrepareNextEvent(pushPlansStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
 				Eventually(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(1))
-				actualSpaceGuid, actualManifest := fakeV7Actor.SetSpaceManifestArgsForCall(0)
+				actualSpaceGuid, actualManifest, _ := fakeV7Actor.SetSpaceManifestArgsForCall(0)
 				Expect(actualSpaceGuid).To(Equal(spaceGUID))
 				Expect(actualManifest).To(Equal(manifest))
 				Eventually(warningsStream).Should(Receive(Equal(Warnings{"apply-manifest-warnings"})))
@@ -209,7 +209,7 @@ var _ = Describe("PrepareSpace", func() {
 		When("There is a single pushPlan", func() {
 
 			BeforeEach(func() {
-				pushPlans = []PushPlan{{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}}}
+				pushPlans = []PushPlan{{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}, NoRouteFlag: true}}
 				fakeManifestParser.ContainsManifestReturns(true)
 				fakeManifestParser.RawAppManifestReturns(manifest, nil)
 				fakeV7Actor.SetSpaceManifestReturns(v7action.Warnings{"apply-manifest-warnings"}, nil)
@@ -222,12 +222,13 @@ var _ = Describe("PrepareSpace", func() {
 				actualAppName := fakeManifestParser.RawAppManifestArgsForCall(0)
 				Expect(actualAppName).To(Equal(appName1))
 				Eventually(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(1))
-				actualSpaceGUID, actualManifest := fakeV7Actor.SetSpaceManifestArgsForCall(0)
+				actualSpaceGUID, actualManifest, actualNoRoute := fakeV7Actor.SetSpaceManifestArgsForCall(0)
 				Expect(actualManifest).To(Equal(manifest))
 				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualNoRoute).To(BeTrue())
 				Eventually(warningsStream).Should(Receive(Equal(Warnings{"apply-manifest-warnings"})))
 				Eventually(pushPlansStream).Should(Receive(ConsistOf(PushPlan{
-					SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1},
+					SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}, NoRouteFlag: true,
 				})))
 				Eventually(getPrepareNextEvent(pushPlansStream, eventStream, warningsStream)).Should(Equal(ApplyManifestComplete))
 			})
@@ -250,9 +251,10 @@ var _ = Describe("PrepareSpace", func() {
 				Eventually(getPrepareNextEvent(pushPlansStream, eventStream, warningsStream)).Should(Equal(ApplyManifest))
 				Eventually(fakeManifestParser.FullRawManifestCallCount).Should(Equal(1))
 				Eventually(fakeV7Actor.SetSpaceManifestCallCount).Should(Equal(1))
-				actualSpaceGUID, actualManifest := fakeV7Actor.SetSpaceManifestArgsForCall(0)
+				actualSpaceGUID, actualManifest, actualNoRoute := fakeV7Actor.SetSpaceManifestArgsForCall(0)
 				Expect(actualManifest).To(Equal(manifest))
 				Expect(actualSpaceGUID).To(Equal(spaceGUID))
+				Expect(actualNoRoute).To(BeFalse())
 				Eventually(warningsStream).Should(Receive(Equal(Warnings{"apply-manifest-warnings"})))
 				Eventually(pushPlansStream).Should(Receive(ConsistOf(
 					PushPlan{SpaceGUID: spaceGUID, Application: v7action.Application{Name: appName1}},
