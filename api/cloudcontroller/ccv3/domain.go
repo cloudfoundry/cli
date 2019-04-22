@@ -17,6 +17,25 @@ type Domain struct {
 }
 
 func (d Domain) MarshalJSON() ([]byte, error) {
+	type Data struct {
+		GUID string `json:"guid,omitempty"`
+	}
+
+	type OrgData struct {
+		Data Data `json:"data,omitempty"`
+	}
+
+	type OrgRelationship struct {
+		Org OrgData `json:"organization,omitempty"`
+	}
+
+	type ccDomain struct {
+		GUID          string           `json:"guid,omitempty"`
+		Name          string           `json:"name"`
+		Internal      *bool            `json:"internal,omitempty"`
+		Relationships *OrgRelationship `json:"relationships,omitempty"`
+	}
+
 	ccDom := ccDomain{
 		Name: d.Name,
 	}
@@ -58,25 +77,6 @@ func (d *Domain) UnmarshalJSON(data []byte) error {
 	d.Internal = alias.Internal
 	d.OrganizationGuid = alias.Relationships.Organization.Data.GUID
 	return nil
-}
-
-type Data struct {
-	GUID string `json:"guid,omitempty"`
-}
-
-type OrgData struct {
-	Data Data `json:"data,omitempty"`
-}
-
-type OrgRelationship struct {
-	Org OrgData `json:"organization,omitempty"`
-}
-
-type ccDomain struct {
-	GUID          string           `json:"guid,omitempty"`
-	Name          string           `json:"name"`
-	Internal      *bool            `json:"internal,omitempty"`
-	Relationships *OrgRelationship `json:"relationships,omitempty"`
 }
 
 func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
