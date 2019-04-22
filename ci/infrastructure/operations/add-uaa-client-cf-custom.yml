@@ -8,4 +8,4 @@
     override: true
     refresh-token-validity: 2592000
     scope: network.admin,network.write,cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write,doppler.firehose,uaa.user,routing.router_groups.read,routing.router_groups.write,cloud_controller.admin_read_only,cloud_controller.global_auditor,perm.admin,clients.read
-    secret: ""
+    secret: ((custom-client-secret))
