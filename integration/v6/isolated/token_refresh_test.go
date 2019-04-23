@@ -189,5 +189,27 @@ var _ = Describe("Token Refreshing", func() {
 				})
 			})
 		})
+
+		When("the CLI has authenticated with --client-credentials", func() {
+			When("the user has manually stored the client credentials in the config file and the token is expired", func() {
+				BeforeEach(func() {
+					clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
+
+					helpers.SetConfig(func(config *configv3.Config) {
+						config.ConfigFile.UAAGrantType = "client_credentials"
+						config.ConfigFile.UAAOAuthClient = clientID
+						config.ConfigFile.UAAOAuthClientSecret = clientSecret
+					})
+
+					helpers.SetConfig(func(config *configv3.Config) {
+						config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
+					})
+				})
+
+				It("automatically gets a new access token", func() {
+					Eventually(helpers.CF("orgs")).Should(Exit(0))
+				})
+			})
+		})
 	})
 })
