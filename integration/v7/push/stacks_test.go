@@ -22,12 +22,11 @@ var _ = Describe("stack", func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir},
 					PushCommandName, appName,
-					"--stack", "cflinuxfs2",
+					"--stack", WindowsStack,
+					"--no-start",
 				)
-
-				Eventually(session).Should(Say(`name:\s+%s`, appName))
-				Eventually(session).Should(Say(`stack:\s+cflinuxfs2`))
 				Eventually(session).Should(Exit(0))
+				Expect(helpers.AppJSON(appName)).To(MatchRegexp(`"stack":\s*"%s"`, WindowsStack))
 			})
 		})
 

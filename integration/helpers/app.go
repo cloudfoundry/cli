@@ -174,6 +174,13 @@ func AppGUID(appName string) string {
 	return strings.TrimSpace(string(session.Out.Contents()))
 }
 
+func AppJSON(appName string) string {
+	appGUID := AppGUID(appName)
+	session := CF("curl", fmt.Sprintf("/v3/apps/%s", appGUID))
+	Eventually(session).Should(Exit(0))
+	return strings.TrimSpace(string(session.Out.Contents()))
+}
+
 // WriteManifest will write out a YAML manifest file at the specified path.
 func WriteManifest(path string, manifest map[string]interface{}) {
 	body, err := yaml.Marshal(manifest)

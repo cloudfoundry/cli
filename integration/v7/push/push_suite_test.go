@@ -18,6 +18,7 @@ const (
 	CFConsistentlyTimeout = 500 * time.Millisecond
 	PushCommandName       = "push"
 	PublicDockerImage     = "cloudfoundry/diego-docker-app-custom"
+	WindowsStack          = "windows2012R2"
 )
 
 var (
