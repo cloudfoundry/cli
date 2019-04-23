@@ -11,6 +11,7 @@ outputs:
 
 params:
   CLIENT_SECRET:
+  CUSTOM_CLIENT_SECRET:
 
 run:
   path: sh
@@ -21,4 +22,5 @@ run:
 
     cat << EOF > vars_path/vars.yml
     client-secret: $CLIENT_SECRET
+    custom-client-secret: $CUSTOM_CLIENT_SECRET
     EOF
