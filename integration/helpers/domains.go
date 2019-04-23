@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -37,10 +38,16 @@ func DefaultSharedDomain() string {
 		Eventually(session).Should(Exit(0))
 
 		regex := regexp.MustCompile(`(.+?)\s+shared`)
-		matches := regex.FindStringSubmatch(string(session.Out.Contents()))
-		Expect(matches).To(HaveLen(2))
 
-		foundDefaultDomain = matches[1]
+		output := strings.Split(string(session.Out.Contents()), "\n")
+		for _, line := range output[3:] {
+			if line != "" && !strings.HasPrefix(line, "integration-") {
+				matches := regex.FindStringSubmatch(line)
+				Expect(matches).To(HaveLen(2))
+				foundDefaultDomain = matches[1]
+				break
+			}
+		}
 	}
 	return foundDefaultDomain
 }
