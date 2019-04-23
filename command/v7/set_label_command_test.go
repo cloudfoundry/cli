@@ -350,7 +350,7 @@ var _ = Describe("set-label command", func() {
 		})
 
 		It("errors", func() {
-			Expect(executeErr).To(MatchError("Unsupported resource type of unrecognized-resource"))
+			Expect(executeErr).To(MatchError("Unsupported resource type of 'unrecognized-resource'"))
 		})
 	})
 
