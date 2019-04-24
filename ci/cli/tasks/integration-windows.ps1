@@ -12,7 +12,7 @@ $Env:CF_INT_PASSWORD=(Get-Content $pwd\cf-credentials\cf-password -Raw).trim()
 $Env:CF_INT_OIDC_PASSWORD=(Get-Content $pwd\cf-credentials\uaa-oidc-password -Raw).trim()
 $Env:CF_INT_OIDC_USERNAME="admin-oidc"
 $Env:CF_INT_CUSTOM_CLIENT_SECRET=(Get-Content $pwd\cf-credentials\uaa-custom-client-secret -Raw).trim()
-$Env:CF_INT_OIDC_USERNAME="cf-custom"
+$Env:CF_INT_CUSTOM_CLIENT_ID="cf-custom"
 $Env:CF_INT_API="https://api.$DOMAIN"
 $Env:SKIP_SSL_VALIDATION="false"
 
