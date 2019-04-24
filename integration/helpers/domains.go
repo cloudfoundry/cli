@@ -40,14 +40,16 @@ func DefaultSharedDomain() string {
 		regex := regexp.MustCompile(`(.+?)\s+shared`)
 
 		output := strings.Split(string(session.Out.Contents()), "\n")
-		for _, line := range output[3:] {
+		for _, line := range output {
 			if line != "" && !strings.HasPrefix(line, "integration-") {
 				matches := regex.FindStringSubmatch(line)
-				Expect(matches).To(HaveLen(2))
-				foundDefaultDomain = matches[1]
-				break
+				if len(matches) == 2 {
+					foundDefaultDomain = matches[1]
+					break
+				}
 			}
 		}
+		Expect(foundDefaultDomain).ToNot(BeEmpty())
 	}
 	return foundDefaultDomain
 }
