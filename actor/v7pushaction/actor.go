@@ -53,6 +53,7 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 		actor.UpdateRoutesForApplication,
 		actor.ScaleWebProcessForApplication,
 		actor.UpdateWebProcessForApplication,
+		actor.CreateAndUploadPackageForApplication,
 	}
 	return actor
 }

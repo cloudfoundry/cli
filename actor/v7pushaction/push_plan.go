@@ -34,6 +34,9 @@ type PushPlan struct {
 	Archive      bool
 	BitsPath     string
 	AllResources []sharedaction.V3Resource
+
+	PackageGUID string
+	BuildGUID   string
 }
 
 type FlagOverrides struct {

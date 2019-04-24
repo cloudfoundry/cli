@@ -19,6 +19,5 @@ func (actor Actor) UpdateWebProcessForApplication(pushPlan PushPlan, eventStream
 		return pushPlan, Warnings(warnings), nil
 	}
 
-
 	return pushPlan, nil, nil
 }

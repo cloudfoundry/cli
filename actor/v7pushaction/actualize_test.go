@@ -468,8 +468,8 @@ var _ = Describe("Actualize", func() {
 				It("sets the docker image", func() {
 					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetDockerImage))
 					Eventually(fakeV7Actor.CreateDockerPackageByApplicationCallCount).Should(Equal(1))
-					Eventually(warningsStream).Should(Receive(ConsistOf("some-package-warnings")))
 					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetDockerImageComplete))
+					Eventually(warningsStream).Should(Receive(ConsistOf("some-package-warnings")))
 
 					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
 					Eventually(fakeV7Actor.StageApplicationPackageCallCount).Should(Equal(1))
@@ -646,8 +646,8 @@ var _ = Describe("Actualize", func() {
 
 									It("returns an upload complete event and warnings", func() {
 										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-										Eventually(warningsStream).Should(Receive(ConsistOf("some-upload-package-warning")))
 										Eventually(eventStream).Should(Receive(Equal(UploadWithArchiveComplete)))
+										Eventually(warningsStream).Should(Receive(ConsistOf("some-good-good-resource-match-warnings", "some-create-package-warning", "some-upload-package-warning")))
 									})
 
 									When("the upload errors", func() {
@@ -661,16 +661,14 @@ var _ = Describe("Actualize", func() {
 
 											It("should send a RetryUpload event and retry uploading", func() {
 												Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-												Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
 												Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
 
 												Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-												Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
 												Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
 
 												Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-												Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
 												Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(RetryUpload))
+												Eventually(warningsStream).Should(Receive(ConsistOf("some-good-good-resource-match-warnings", "some-create-package-warning", "upload-warnings-1", "upload-warnings-2", "upload-warnings-1", "upload-warnings-2", "upload-warnings-1", "upload-warnings-2")))
 
 												Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
 												Eventually(fakeV7Actor.UploadBitsPackageCallCount).Should(Equal(3))
@@ -686,9 +684,9 @@ var _ = Describe("Actualize", func() {
 
 											It("sends warnings and errors, then stops", func() {
 												Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadingApplicationWithArchive))
-												Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-												Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
+												Eventually(warningsStream).Should(Receive(ConsistOf("some-good-good-resource-match-warnings", "some-create-package-warning", "upload-warnings-1", "upload-warnings-2")))
 												Eventually(errorStream).Should(Receive(MatchError("dios mio")))
+												Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(EqualEither(RetryUpload, UploadWithArchiveComplete, Complete))
 											})
 										})
 									})
@@ -701,6 +699,7 @@ var _ = Describe("Actualize", func() {
 
 									It("returns an error", func() {
 										Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ReadingArchive))
+										Eventually(warningsStream).Should(Receive())
 										Eventually(errorStream).Should(Receive(MatchError("the bits")))
 									})
 								})
@@ -714,7 +713,7 @@ var _ = Describe("Actualize", func() {
 								It("it returns errors and warnings", func() {
 									Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingPackage))
 
-									Eventually(warningsStream).Should(Receive(ConsistOf("package-creation-warning")))
+									Eventually(warningsStream).Should(Receive(ConsistOf("some-good-good-resource-match-warnings", "package-creation-warning")))
 									Eventually(errorStream).Should(Receive(MatchError("the bits")))
 								})
 							})
@@ -727,7 +726,7 @@ var _ = Describe("Actualize", func() {
 
 							It("returns an error and exits", func() {
 								Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingArchive))
-
+								Eventually(warningsStream).Should(Receive())
 								Eventually(errorStream).Should(Receive(MatchError("oh no")))
 							})
 						})
@@ -798,7 +797,7 @@ var _ = Describe("Actualize", func() {
 							Expect(actualProgressReader).To(BeNil())
 							Expect(actualSize).To(BeZero())
 
-							Eventually(warningsStream).Should(Receive(ConsistOf("upload-warning")))
+							Eventually(warningsStream).Should(Receive(ConsistOf("some-good-good-resource-match-warnings", "upload-warning")))
 							Eventually(errorStream).Should(Receive(MatchError("upload-error")))
 						})
 					})
@@ -848,7 +847,7 @@ var _ = Describe("Actualize", func() {
 
 			It("returns warnings", func() {
 				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadWithArchiveComplete))
-				Eventually(warningsStream).Should(Receive(ConsistOf("some-poll-package-warning")))
+				Eventually(warningsStream).Should(Receive(ConsistOf("some-good-good-resource-match-warnings", "some-poll-package-warning")))
 			})
 		})
 
@@ -862,7 +861,7 @@ var _ = Describe("Actualize", func() {
 
 			It("returns errors and warnings", func() {
 				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(UploadWithArchiveComplete))
-				Eventually(warningsStream).Should(Receive(ConsistOf("some-poll-package-warning")))
+				Eventually(warningsStream).Should(Receive(ConsistOf("some-good-good-resource-match-warnings", "some-poll-package-warning")))
 				Eventually(errorStream).Should(Receive(MatchError(someErr)))
 			})
 		})

@@ -1,7 +1,5 @@
 package v7pushaction
 
-
-
 func (actor Actor) UpdateRoutesForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
 	if !(pushPlan.SkipRouteCreation || pushPlan.NoRouteFlag) {
 		eventStream <- CreatingAndMappingRoutes
@@ -11,7 +9,7 @@ func (actor Actor) UpdateRoutesForApplication(pushPlan PushPlan, eventStream cha
 			return pushPlan, warnings, err
 		}
 		eventStream <- CreatedRoutes
-		return pushPlan, Warnings(warnings), err
+		return pushPlan, warnings, err
 	}
 	return pushPlan, nil, nil
 }
