@@ -382,8 +382,6 @@ jobs:
       params: &integration_params
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ((client-secret))
-        CF_INT_CUSTOM_CLIENT_ID: 'cf-custom'
-        CF_INT_CUSTOM_CLIENT_SECRET: ((custom-client-secret))
         CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
         CF_INT_DOCKER_USERNAME: ((dockerhub-username))
         CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
