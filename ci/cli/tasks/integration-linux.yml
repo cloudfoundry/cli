@@ -50,6 +50,8 @@ run:
         export CF_INT_PASSWORD=$(credhub get -n /bosh-$ENV/cf/cf_admin_password | bosh interpolate --path /value -)
         export CF_INT_OIDC_USERNAME="admin-oidc"
         export CF_INT_OIDC_PASSWORD=$(credhub get -n /bosh-$ENV/cf/uaa_oidc_admin_password | bosh interpolate --path /value -)
+        export CF_INT_CUSTOM_CLIENT_ID="cf-custom"
+        export CF_INT_CUSTOM_CLIENT_SECRET="$(credhub get -n /bosh-${ENV}/cf/custom-client-secret | bosh interpolate --path /value -)"
         credhub get --name /bosh-$ENV/cf/router_ca | bosh interpolate - --path /value/certificate > $SSL_CERT_DIR/$ENV.router.ca
       fi
 
