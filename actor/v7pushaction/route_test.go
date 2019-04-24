@@ -11,7 +11,6 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("Routes", func() {
@@ -84,40 +83,6 @@ var _ = Describe("Routes", func() {
 				It("returns the error", func() {
 					Expect(executeErr).To(MatchError("some-error"))
 					Expect(warnings).To(ConsistOf("domain-warning", "route-warning"))
-				})
-			})
-
-			PDescribe("sanitization", func() {
-				When("the app name is partially sanitized", func() {
-					BeforeEach(func() {
-						application.Name = "a--b"
-					})
-
-					// Test name taken from the v6 version of push
-					It("generates a route whose hostname is a sanitized app name and two randomly generated words", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(1))
-						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(0)).To(MatchFields(IgnoreExtras,
-							Fields{
-								"Host": Equal("to-be-determined"),
-							}))
-					})
-				})
-
-				When("the app name is fully sanitized", func() {
-					BeforeEach(func() {
-						application.Name = "@@@"
-					})
-
-					// Test name taken from the v6 version of push
-					It("generates a route whose hostname is a sanitized app name and two randomly generated words", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(1))
-						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(0)).To(MatchFields(IgnoreExtras,
-							Fields{
-								"Host": Equal("to-be-determined"),
-							}))
-					})
 				})
 			})
 
