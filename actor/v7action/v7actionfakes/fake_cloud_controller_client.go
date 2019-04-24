@@ -715,6 +715,20 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	SharePrivateDomainToOrgsStub        func(string, ccv3.SharedOrgs) (ccv3.Warnings, error)
+	sharePrivateDomainToOrgsMutex       sync.RWMutex
+	sharePrivateDomainToOrgsArgsForCall []struct {
+		arg1 string
+		arg2 ccv3.SharedOrgs
+	}
+	sharePrivateDomainToOrgsReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	sharePrivateDomainToOrgsReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	ShareServiceInstanceToSpacesStub        func(string, []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	shareServiceInstanceToSpacesMutex       sync.RWMutex
 	shareServiceInstanceToSpacesArgsForCall []struct {
@@ -4127,6 +4141,70 @@ func (fake *FakeCloudControllerClient) SetApplicationDropletReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) SharePrivateDomainToOrgs(arg1 string, arg2 ccv3.SharedOrgs) (ccv3.Warnings, error) {
+	fake.sharePrivateDomainToOrgsMutex.Lock()
+	ret, specificReturn := fake.sharePrivateDomainToOrgsReturnsOnCall[len(fake.sharePrivateDomainToOrgsArgsForCall)]
+	fake.sharePrivateDomainToOrgsArgsForCall = append(fake.sharePrivateDomainToOrgsArgsForCall, struct {
+		arg1 string
+		arg2 ccv3.SharedOrgs
+	}{arg1, arg2})
+	fake.recordInvocation("SharePrivateDomainToOrgs", []interface{}{arg1, arg2})
+	fake.sharePrivateDomainToOrgsMutex.Unlock()
+	if fake.SharePrivateDomainToOrgsStub != nil {
+		return fake.SharePrivateDomainToOrgsStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.sharePrivateDomainToOrgsReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) SharePrivateDomainToOrgsCallCount() int {
+	fake.sharePrivateDomainToOrgsMutex.RLock()
+	defer fake.sharePrivateDomainToOrgsMutex.RUnlock()
+	return len(fake.sharePrivateDomainToOrgsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) SharePrivateDomainToOrgsCalls(stub func(string, ccv3.SharedOrgs) (ccv3.Warnings, error)) {
+	fake.sharePrivateDomainToOrgsMutex.Lock()
+	defer fake.sharePrivateDomainToOrgsMutex.Unlock()
+	fake.SharePrivateDomainToOrgsStub = stub
+}
+
+func (fake *FakeCloudControllerClient) SharePrivateDomainToOrgsArgsForCall(i int) (string, ccv3.SharedOrgs) {
+	fake.sharePrivateDomainToOrgsMutex.RLock()
+	defer fake.sharePrivateDomainToOrgsMutex.RUnlock()
+	argsForCall := fake.sharePrivateDomainToOrgsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) SharePrivateDomainToOrgsReturns(result1 ccv3.Warnings, result2 error) {
+	fake.sharePrivateDomainToOrgsMutex.Lock()
+	defer fake.sharePrivateDomainToOrgsMutex.Unlock()
+	fake.SharePrivateDomainToOrgsStub = nil
+	fake.sharePrivateDomainToOrgsReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) SharePrivateDomainToOrgsReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.sharePrivateDomainToOrgsMutex.Lock()
+	defer fake.sharePrivateDomainToOrgsMutex.Unlock()
+	fake.SharePrivateDomainToOrgsStub = nil
+	if fake.sharePrivateDomainToOrgsReturnsOnCall == nil {
+		fake.sharePrivateDomainToOrgsReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.sharePrivateDomainToOrgsReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpaces(arg1 string, arg2 []string) (ccv3.RelationshipList, ccv3.Warnings, error) {
 	var arg2Copy []string
 	if arg2 != nil {
@@ -5448,6 +5526,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.resourceMatchMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()
 	defer fake.setApplicationDropletMutex.RUnlock()
+	fake.sharePrivateDomainToOrgsMutex.RLock()
+	defer fake.sharePrivateDomainToOrgsMutex.RUnlock()
 	fake.shareServiceInstanceToSpacesMutex.RLock()
 	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()

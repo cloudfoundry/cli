@@ -73,6 +73,7 @@ const (
 	PostServiceInstanceRelationshipsSharedSpacesRequest         = "PostServiceInstanceRelationshipsSharedSpaces"
 	PostSpaceActionApplyManifestRequest                         = "PostSpaceActionApplyManifest"
 	PutTaskCancelRequest                                        = "PutTaskCancel"
+	SharePrivateDomainRequest                                   = "SharePrivateDomainRequest"
 )
 
 // APIRoutes is a list of routes used by the router to construct request URLs.
@@ -109,6 +110,7 @@ var APIRoutes = []Route{
 	{Resource: DeploymentsResource, Path: "/:deployment_guid/actions/cancel", Method: http.MethodPost, Name: PostApplicationDeploymentActionCancelRequest},
 	{Resource: DomainsResource, Path: "/", Method: http.MethodPost, Name: PostDomainRequest},
 	{Resource: DomainsResource, Path: "/", Method: http.MethodGet, Name: GetDomainsRequest},
+	{Resource: DomainsResource, Path: "/:domain_guid/relationships/shared_organizations", Method: http.MethodPost, Name: SharePrivateDomainRequest},
 	{Resource: DropletsResource, Path: "/", Method: http.MethodGet, Name: GetDropletsRequest},
 	{Resource: DropletsResource, Path: "/:droplet_guid", Method: http.MethodGet, Name: GetDropletRequest},
 	{Resource: FeatureFlagsResource, Path: "/:name", Method: http.MethodGet, Name: GetFeatureFlagRequest},

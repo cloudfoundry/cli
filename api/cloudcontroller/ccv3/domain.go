@@ -2,11 +2,12 @@ package ccv3
 
 import (
 	"bytes"
+	"encoding/json"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 	"code.cloudfoundry.org/cli/types"
-	"encoding/json"
 )
 
 type Domain struct {
@@ -76,6 +77,54 @@ func (d *Domain) UnmarshalJSON(data []byte) error {
 	d.Name = alias.Name
 	d.Internal = alias.Internal
 	d.OrganizationGUID = alias.Relationships.Organization.Data.GUID
+	return nil
+}
+
+type SharedOrgs struct {
+	GUIDs []string
+}
+
+func (sharedOrgs SharedOrgs) MarshalJSON() ([]byte, error) {
+	type Org struct {
+		GUID string `json:"guid,omitempty"`
+	}
+
+	type Data = []Org
+
+	type sharedOrgsRelationship struct {
+		Data Data `json:"data"`
+	}
+
+	var orgs []Org
+	for _, sharedOrgGUID := range sharedOrgs.GUIDs {
+		orgs = append(orgs, Org{GUID: sharedOrgGUID})
+	}
+
+	relationship := sharedOrgsRelationship{
+		Data: orgs,
+	}
+
+	return json.Marshal(relationship)
+}
+
+func (sharedOrgs *SharedOrgs) UnmarshalJSON(data []byte) error {
+	var alias struct {
+		Data []struct {
+			GUID string `json:"guid,omitempty"`
+		} `json:"data,omitempty"`
+	}
+
+	err := cloudcontroller.DecodeJSON(data, &alias)
+	if err != nil {
+		return err
+	}
+
+	var guids []string
+	for _, org := range alias.Data {
+		guids = append(guids, org.GUID)
+	}
+
+	sharedOrgs.GUIDs = guids
 	return nil
 }
 
@@ -153,4 +202,31 @@ func (client Client) GetOrganizationDomains(orgGUID string, query ...Query) ([]D
 	})
 
 	return fullDomainsList, warnings, err
+}
+
+func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs SharedOrgs) (Warnings, error) {
+	bodyBytes, err := json.Marshal(sharedOrgs)
+
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		URIParams:   internal.Params{"domain_guid": domainGuid},
+		RequestName: internal.SharePrivateDomainRequest,
+		Body:        bytes.NewReader(bodyBytes),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var ccSharedOrgs SharedOrgs
+	response := cloudcontroller.Response{
+		DecodeJSONResponseInto: &ccSharedOrgs,
+	}
+
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
 }

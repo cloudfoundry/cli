@@ -1,10 +1,11 @@
 package ccv3_test
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/types"
 	"fmt"
 	"net/http"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/types"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
@@ -228,54 +229,54 @@ var _ = Describe("Domain", func() {
 		When("domains exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
-	"pagination": {
-		"next": {
-			"href": "%s/v3/domains?page=2&per_page=2"
-		}
-	},
-  "resources": [
-    {
-      	"name": "domain-name-1",
-      	"guid": "domain-guid-1",
-      	"relationships": {
-            "organization": {
-                "data": {
-                    "guid": "owning-org-1"
-                }
-            }
-         }
-    },
-    {
-      	"name": "domain-name-2",
-      	"guid": "domain-guid-2",
-		"relationships": {
-            "organization": {
-                "data": {
-                    "guid": "owning-org-2"
-                }
-            }
-         }
-    }
-  ]
-}`, server.URL())
+		"pagination": {
+			"next": {
+				"href": "%s/v3/domains?page=2&per_page=2"
+			}
+		},
+	  "resources": [
+	    {
+	      	"name": "domain-name-1",
+	      	"guid": "domain-guid-1",
+	      	"relationships": {
+	            "organization": {
+	                "data": {
+	                    "guid": "owning-org-1"
+	                }
+	            }
+	         }
+	    },
+	    {
+	      	"name": "domain-name-2",
+	      	"guid": "domain-guid-2",
+			"relationships": {
+	            "organization": {
+	                "data": {
+	                    "guid": "owning-org-2"
+	                }
+	            }
+	         }
+	    }
+	  ]
+	}`, server.URL())
 				response2 := `{
-	"pagination": {
-		"next": null
-	},
-	"resources": [
-	  {
-		"name": "domain-name-3",
-         "guid": "domain-guid-3",
-		"relationships": {
-            "organization": {
-                "data": {
-                    "guid": "owning-org-3"
-                }
-            }
-         }
-		}
-	]
-}`
+		"pagination": {
+			"next": null
+		},
+		"resources": [
+		  {
+			"name": "domain-name-3",
+	         "guid": "domain-guid-3",
+			"relationships": {
+	            "organization": {
+	                "data": {
+	                    "guid": "owning-org-3"
+	                }
+	            }
+	         }
+			}
+		]
+	}`
 
 				server.AppendHandlers(
 					CombineHandlers(
@@ -308,19 +309,19 @@ var _ = Describe("Domain", func() {
 		When("the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
-  "errors": [
-    {
-      "code": 10008,
-      "detail": "The request is semantically invalid: command presence",
-      "title": "CF-UnprocessableEntity"
-    },
-		{
-      "code": 10010,
-      "detail": "Isolation segment not found",
-      "title": "CF-ResourceNotFound"
-    }
-  ]
-}`
+	  "errors": [
+	    {
+	      "code": 10008,
+	      "detail": "The request is semantically invalid: command presence",
+	      "title": "CF-UnprocessableEntity"
+	    },
+			{
+	      "code": 10010,
+	      "detail": "Isolation segment not found",
+	      "title": "CF-ResourceNotFound"
+	    }
+	  ]
+	}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/domains"),
@@ -486,6 +487,95 @@ var _ = Describe("Domain", func() {
 						{
 							Code:   10010,
 							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("SharePrivateDomainToOrgs", func() {
+		var (
+			orgGUID    = "some-org-guid"
+			domainGUID = "some-domain-guid"
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.SharePrivateDomainToOrgs(
+				domainGUID,
+				SharedOrgs{GUIDs: []string{orgGUID}},
+			)
+		})
+
+		When("the request succeeds", func() {
+			BeforeEach(func() {
+				response := `{"data": 
+								[{
+									"guid": "some-org-guid"
+								}]
+						}`
+
+				expectedBody := `{
+					"data": [
+						{"guid": "some-org-guid"}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/domains/some-domain-guid/relationships/shared_organizations"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns all warnings", func() {
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(executeErr).To(BeNil())
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+  	"errors": [
+    	{
+      		"code": 10008,
+      		"detail": "The request is semantically invalid: command presence",
+      		"title": "CF-UnprocessableEntity"
+    	},
+		{
+			"code": 10010,
+      		"detail": "Organization not found",
+      		"title": "CF-ResourceNotFound"
+    	}
+  	]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/domains/some-domain-guid/relationships/shared_organizations"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Organization not found",
 							Title:  "CF-ResourceNotFound",
 						},
 					},
