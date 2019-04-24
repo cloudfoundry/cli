@@ -885,8 +885,9 @@ var _ = Describe("Actualize", func() {
 
 			It("returns a polling build event and warnings", func() {
 				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(StartingStaging))
-				Eventually(warningsStream).Should(Receive(ConsistOf("some-staging-warning")))
 				Eventually(eventStream).Should(Receive(Equal(PollingBuild)))
+				Eventually(eventStream).Should(Receive(Equal(StagingComplete)))
+				Eventually(warningsStream).Should(Receive(ConsistOf("some-staging-warning")))
 			})
 		})
 
@@ -929,9 +930,8 @@ var _ = Describe("Actualize", func() {
 				When("Stopping the app succeeds", func() {
 					It("Uploads a package and exits", func() {
 						Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(StoppingApplication))
-						Eventually(warningsStream).Should(Receive(ConsistOf("some-stopping-warning")))
 						Eventually(eventStream).Should(Receive(Equal(StoppingApplicationComplete)))
-						Consistently(getNextEvent(planStream, eventStream, warningsStream)).ShouldNot(Equal(StartingStaging))
+						Eventually(warningsStream).Should(Receive(ConsistOf("some-stopping-warning")))
 
 						Expect(fakeV7Actor.StopApplicationCallCount()).To(Equal(1))
 						actualGUID := fakeV7Actor.StopApplicationArgsForCall(0)
@@ -971,8 +971,8 @@ var _ = Describe("Actualize", func() {
 
 			It("returns a staging complete event and warnings", func() {
 				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(PollingBuild))
-				Eventually(warningsStream).Should(Receive(ConsistOf("some-poll-build-warning")))
 				Eventually(eventStream).Should(Receive(Equal(StagingComplete)))
+				Eventually(warningsStream).Should(Receive(ConsistOf("some-poll-build-warning")))
 			})
 		})
 
@@ -1000,8 +1000,8 @@ var _ = Describe("Actualize", func() {
 
 			It("returns a SetDropletComplete event and warnings", func() {
 				Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SettingDroplet))
-				Eventually(warningsStream).Should(Receive(ConsistOf("some-set-droplet-warning")))
 				Eventually(eventStream).Should(Receive(Equal(SetDropletComplete)))
+				Eventually(warningsStream).Should(Receive(ConsistOf("some-set-droplet-warning")))
 			})
 		})
 

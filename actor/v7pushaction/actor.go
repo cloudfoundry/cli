@@ -18,6 +18,8 @@ type Actor struct {
 	PushPlanFuncs []UpdatePushPlanFunc
 
 	ChangeApplicationFuncs []ChangeApplicationFunc
+	StartFuncs             []ChangeApplicationFunc
+	NoStartFuncs           []ChangeApplicationFunc
 
 	startWithProtocol *regexp.Regexp
 	urlValidator      *regexp.Regexp
@@ -55,5 +57,15 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 		actor.UpdateWebProcessForApplication,
 		actor.CreateAndUploadPackageForApplication,
 	}
+
+	actor.StartFuncs = []ChangeApplicationFunc{
+		actor.StagePackageForApplication,
+		actor.SetDropletForApplication,
+	}
+
+	actor.NoStartFuncs = []ChangeApplicationFunc{
+		actor.StopApplication,
+	}
+
 	return actor
 }

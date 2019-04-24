@@ -36,7 +36,7 @@ type PushPlan struct {
 	AllResources []sharedaction.V3Resource
 
 	PackageGUID string
-	BuildGUID   string
+	DropletGUID string
 }
 
 type FlagOverrides struct {
