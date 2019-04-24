@@ -237,8 +237,8 @@ var _ = Describe("Actualize", func() {
 
 				It("returns warnings and continues", func() {
 					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcess))
-					Eventually(warningsStream).Should(Receive(ConsistOf("scaling-warnings")))
 					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(ScaleWebProcessComplete))
+					Eventually(warningsStream).Should(Receive(ConsistOf("scaling-warnings")))
 
 					Expect(fakeV7Actor.ScaleProcessByApplicationCallCount()).To(Equal(1))
 					passedAppGUID, passedProcess := fakeV7Actor.ScaleProcessByApplicationArgsForCall(0)
@@ -307,8 +307,8 @@ var _ = Describe("Actualize", func() {
 
 				It("sets the process config and returns warnings", func() {
 					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfiguration))
-					Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
 					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(SetProcessConfigurationComplete))
+					Eventually(warningsStream).Should(Receive(ConsistOf("health-check-warnings")))
 
 					Expect(fakeV7Actor.UpdateProcessByTypeAndApplicationCallCount()).To(Equal(1))
 					passedProcessType, passedAppGUID, passedProcess := fakeV7Actor.UpdateProcessByTypeAndApplicationArgsForCall(0)
@@ -382,8 +382,8 @@ var _ = Describe("Actualize", func() {
 
 				It("creates the route, maps it to the app, and returns any warnings", func() {
 					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatingAndMappingRoutes))
-					Eventually(warningsStream).Should(Receive(ConsistOf("domain-warning", "route-warning", "route-create-warning", "map-warning")))
 					Eventually(getNextEvent(planStream, eventStream, warningsStream)).Should(Equal(CreatedRoutes))
+					Eventually(warningsStream).Should(Receive(ConsistOf("domain-warning", "route-warning", "route-create-warning", "map-warning")))
 				})
 			})
 

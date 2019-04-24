@@ -31,35 +31,17 @@ func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) (
 		defer close(errorStream)
 
 		var err error
-
-		plan, err = actor.updateApplication(plan, warningsStream)
-		if err != nil {
-			errorStream <- err
-			return
-		}
-		planStream <- plan
-
-		if !(plan.SkipRouteCreation || plan.NoRouteFlag) {
-			eventStream <- CreatingAndMappingRoutes
-			routeWarnings, routeErr := actor.CreateAndMapDefaultApplicationRoute(plan.OrgGUID, plan.SpaceGUID, plan.Application)
-			warningsStream <- routeWarnings
-			if routeErr != nil {
-				errorStream <- routeErr
+		var wrgs Warnings
+		for _, changeAppFunc := range actor.ChangeApplicationFuncs {
+			plan, wrgs, err = changeAppFunc(plan, eventStream, progressBar)
+			// (NEW) events can happen here now
+			warningsStream <- wrgs
+			if err != nil {
+				errorStream <- err
 				return
 			}
-			eventStream <- CreatedRoutes
-		}
-
-		err = actor.ScaleProcess(plan, warningsStream, eventStream)
-		if err != nil {
-			errorStream <- err
-			return
-		}
-
-		err = actor.UpdateProcess(plan, warningsStream, eventStream)
-		if err != nil {
-			errorStream <- err
-			return
+			// (OLD) used to happen here
+			planStream <- plan
 		}
 
 		pkg, err := actor.CreatePackage(plan, progressBar, warningsStream, eventStream)
@@ -194,23 +176,6 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 	return pkg, nil
 }
 
-func (actor Actor) updateApplication(plan PushPlan, warningsStream chan Warnings) (PushPlan, error) {
-	if !plan.ApplicationNeedsUpdate {
-		return plan, nil
-	}
-
-	log.WithField("Name", plan.Application.Name).Info("updating app")
-
-	application, warnings, err := actor.V7Actor.UpdateApplication(plan.Application)
-	plan.Application = application
-	warningsStream <- Warnings(warnings)
-	if err != nil {
-		return plan, err
-	}
-
-	return plan, nil
-}
-
 func (actor Actor) CreatePackage(plan PushPlan, progressBar ProgressBar, warningsStream chan Warnings, eventStream chan Event) (v7action.Package, error) {
 	if plan.DockerImageCredentialsNeedsUpdate {
 		eventStream <- SetDockerImage
@@ -237,37 +202,4 @@ func (actor Actor) GetArchivePath(plan PushPlan, unmatchedResources []sharedacti
 		return actor.SharedActor.ZipArchiveResources(plan.BitsPath, v2Resources)
 	}
 	return actor.SharedActor.ZipDirectoryResources(plan.BitsPath, v2Resources)
-}
-
-func (actor Actor) ScaleProcess(plan PushPlan, warningsStream chan Warnings, eventStream chan Event) error {
-	if plan.ScaleWebProcessNeedsUpdate {
-		log.Info("Scaling Web Process")
-		eventStream <- ScaleWebProcess
-
-		scaleWarnings, err := actor.V7Actor.ScaleProcessByApplication(plan.Application.GUID, plan.ScaleWebProcess)
-		warningsStream <- Warnings(scaleWarnings)
-		if err != nil {
-			return err
-		}
-		eventStream <- ScaleWebProcessComplete
-	}
-
-	return nil
-}
-
-func (actor Actor) UpdateProcess(plan PushPlan, warningsStream chan Warnings, eventStream chan Event) error {
-	if plan.UpdateWebProcessNeedsUpdate {
-		log.Info("Setting Web Process's Configuration")
-		eventStream <- SetProcessConfiguration
-
-		log.WithField("Process", plan.UpdateWebProcess).Debug("Update process")
-		warnings, err := actor.V7Actor.UpdateProcessByTypeAndApplication(constant.ProcessTypeWeb, plan.Application.GUID, plan.UpdateWebProcess)
-		warningsStream <- Warnings(warnings)
-		if err != nil {
-			return err
-		}
-		eventStream <- SetProcessConfigurationComplete
-	}
-
-	return nil
 }

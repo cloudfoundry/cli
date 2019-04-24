@@ -4,23 +4,20 @@ package v7pushaction
 
 import (
 	"regexp"
-
-	"code.cloudfoundry.org/cli/util/manifestparser"
 )
-
-// UpdatePushPlanFunc is a function that is used by CreatePushPlans to setup
-// push plans for the push command.
-type UpdatePushPlanFunc func(pushPlan PushPlan, overrides FlagOverrides, manifestApp manifestparser.Application) (PushPlan, error)
 
 // Warnings is a list of warnings returned back from the cloud controller
 type Warnings []string
 
 // Actor handles all business logic for Cloud Controller v2 operations.
 type Actor struct {
-	SharedActor   SharedActor
-	V2Actor       V2Actor
-	V7Actor       V7Actor
+	SharedActor SharedActor
+	V2Actor     V2Actor
+	V7Actor     V7Actor
+
 	PushPlanFuncs []UpdatePushPlanFunc
+
+	ChangeApplicationFuncs []ChangeApplicationFunc
 
 	startWithProtocol *regexp.Regexp
 	urlValidator      *regexp.Regexp
@@ -51,5 +48,11 @@ func NewActor(v2Actor V2Actor, v3Actor V7Actor, sharedActor SharedActor) *Actor 
 		SetupUpdateWebProcessForPushPlan,
 	}
 
+	actor.ChangeApplicationFuncs = []ChangeApplicationFunc{
+		actor.UpdateApplication,
+		actor.UpdateRoutesForApplication,
+		actor.ScaleWebProcessForApplication,
+		actor.UpdateWebProcessForApplication,
+	}
 	return actor
 }
