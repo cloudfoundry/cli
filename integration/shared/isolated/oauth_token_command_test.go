@@ -54,8 +54,8 @@ var _ = Describe("oauth-token command", func() {
 		When("the oauth client ID and secret combination is invalid", func() {
 			BeforeEach(func() {
 				helpers.SetConfig(func(conf *configv3.Config) {
-					conf.ConfigFile.UAAOAuthClient = "foo"
-					conf.ConfigFile.UAAOAuthClientSecret = "bar"
+					conf.ConfigFile.UAAOAuthClient = "non-existent-client"
+					conf.ConfigFile.UAAOAuthClientSecret = "some-secret"
 				})
 			})
 
@@ -86,8 +86,8 @@ var _ = Describe("oauth-token command", func() {
 		When("the oauth client ID and secret combination is invalid", func() {
 			BeforeEach(func() {
 				helpers.SetConfig(func(conf *configv3.Config) {
-					conf.ConfigFile.UAAOAuthClient = "foo"
-					conf.ConfigFile.UAAOAuthClientSecret = "bar"
+					conf.ConfigFile.UAAOAuthClient = "non-existent-client"
+					conf.ConfigFile.UAAOAuthClientSecret = "some-secret"
 				})
 			})
 
@@ -107,20 +107,52 @@ var _ = Describe("oauth-token command", func() {
 				})
 			})
 
-			It("refreshes the access token and displays it", func() {
-				session := helpers.CF("oauth-token")
+			When("the client credentials have been manually added to the config", func() {
+				BeforeEach(func() {
+					clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
 
-				Eventually(session).Should(Say("bearer .+"))
-				Eventually(session).Should(Exit(0))
+					helpers.SetConfig(func(conf *configv3.Config) {
+						conf.ConfigFile.UAAOAuthClient = clientID
+						conf.ConfigFile.UAAOAuthClientSecret = clientSecret
+					})
+				})
+
+				It("re-authenticates and displays the new access token", func() {
+					session := helpers.CF("oauth-token")
+
+					Eventually(session).Should(Say("bearer .+"))
+					Eventually(session).Should(Exit(0))
+				})
 			})
+
+			When("the client credentials are not present in the config", func() {
+				It("displays an error and exits 1", func() {
+					session := helpers.CF("oauth-token")
+
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say(`Credentials were rejected, please try again\.`))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
 		})
 
 		When("the oauth creds are valid", func() {
-			It("refreshes the access token and displays it", func() {
-				session := helpers.CF("oauth-token")
+			When("the client credentials have been manually added to the config", func() {
+				BeforeEach(func() {
+					clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
 
-				Eventually(session).Should(Say("bearer .+"))
-				Eventually(session).Should(Exit(0))
+					helpers.SetConfig(func(conf *configv3.Config) {
+						conf.ConfigFile.UAAOAuthClient = clientID
+						conf.ConfigFile.UAAOAuthClientSecret = clientSecret
+					})
+				})
+				It("re-authenticates and displays the new access token", func() {
+					session := helpers.CF("oauth-token")
+
+					Eventually(session).Should(Say("bearer .+"))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 	})

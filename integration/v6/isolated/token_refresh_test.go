@@ -160,31 +160,31 @@ var _ = Describe("Token Refreshing", func() {
 
 			When("running a v6 refactored command", func() {
 				When("the cloud controller client encounters an invalid token response", func() {
-					It("refreshes the token", func() {
+					It("displays an error and exits 1", func() {
 						session := helpers.CF("unbind-service", "app", "service")
-						Eventually(session.Err).Should(Say("App 'app' not found"))
+						Eventually(session.Err).Should(Say(`Credentials were rejected, please try again\.`))
 						Eventually(session).Should(Exit(1))
 					})
 				})
 
 				When("the UAA client encounters an invalid token response", func() {
-					It("refreshes the token", func() {
+					It("displays an error and exits 1", func() {
 						username := helpers.NewUsername()
 						session := helpers.CF("create-user", username, helpers.NewPassword())
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Exit(0))
+						Eventually(session.Err).Should(Say(`Credentials were rejected, please try again\.`))
+						Eventually(session).Should(Exit(1))
 					})
 				})
 			})
 
 			When("running a v6 unrefactored command", func() {
 				When("the cloud controller client encounters an invalid token response", func() {
-					It("refreshes the token", func() {
+					It("displays an error and exits 1", func() {
 						username, _ := helpers.GetCredentials()
 						session := helpers.CF("quotas")
 						Eventually(session).Should(Say("Getting quotas as %s", username))
-						Eventually(session).Should(Say("OK"))
-						Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Say("Bad credentials"))
+						Eventually(session).Should(Exit(1))
 					})
 				})
 			})

@@ -59,7 +59,7 @@ func (cmd AuthCommand) Execute(args []string) error {
 		}
 	}
 
-	username, password, err := cmd.checkEnvVariables()
+	username, password, err := cmd.getUsernamePassword()
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (cmd AuthCommand) Execute(args []string) error {
 	return nil
 }
 
-func (cmd AuthCommand) checkEnvVariables() (string, string, error) {
+func (cmd AuthCommand) getUsernamePassword() (string, string, error) {
 	var (
 		userMissing     bool
 		passwordMissing bool

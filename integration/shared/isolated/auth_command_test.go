@@ -1,6 +1,9 @@
 package isolated
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"path/filepath"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/uaa/uaaversion"
@@ -212,6 +215,23 @@ var _ = Describe("auth command", func() {
 				Eventually(session).Should(Say("Use 'cf target' to view or set your target org and space"))
 
 				Eventually(session).Should(Exit(0))
+			})
+
+			It("writes the client id but does not write the client secret to the config file", func() {
+				clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
+				session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
+				Eventually(session).Should(Exit(0))
+
+				rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+				Expect(err).NotTo(HaveOccurred())
+
+				var configFile configv3.JSONConfig
+				err = json.Unmarshal(rawConfig, &configFile)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(configFile.UAAOAuthClient).To(Equal(clientID))
+				Expect(configFile.UAAOAuthClientSecret).To(BeEmpty())
+				Expect(configFile.UAAGrantType).To(Equal("client_credentials"))
 			})
 		})
 	})
