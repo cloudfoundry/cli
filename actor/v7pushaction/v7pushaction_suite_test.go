@@ -8,8 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v7pushaction/v7pushactionfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/types"
-
 	"testing"
 
 	log "github.com/sirupsen/logrus"
@@ -25,15 +23,6 @@ var _ = BeforeEach(func() {
 	log.SetLevel(log.PanicLevel)
 })
 
-func EqualEither(events ...Event) GomegaMatcher {
-	var equals []GomegaMatcher
-	for _, event := range events {
-		equals = append(equals, Equal(event))
-	}
-
-	return Or(equals...)
-}
-
 func getCurrentDir() string {
 	pwd, err := os.Getwd()
 	Expect(err).NotTo(HaveOccurred())
@@ -46,4 +35,28 @@ func getTestPushActor() (*Actor, *v7pushactionfakes.FakeV2Actor, *v7pushactionfa
 	fakeSharedActor := new(v7pushactionfakes.FakeSharedActor)
 	actor := NewActor(fakeV2Actor, fakeV7Actor, fakeSharedActor)
 	return actor, fakeV2Actor, fakeV7Actor, fakeSharedActor
+}
+
+func EventFollower(wrapper func(eventStream chan<- Event)) []Event {
+	eventStream := make(chan Event)
+	closed := make(chan bool)
+
+	var events []Event
+
+	go func() {
+		for {
+			event, ok := <-eventStream
+			if !ok {
+				close(closed)
+				return
+			}
+			events = append(events, event)
+		}
+	}()
+
+	wrapper(eventStream)
+	close(eventStream)
+
+	<-closed
+	return events
 }

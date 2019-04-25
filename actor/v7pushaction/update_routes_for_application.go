@@ -4,7 +4,6 @@ func (actor Actor) UpdateRoutesForApplication(pushPlan PushPlan, eventStream cha
 	if !(pushPlan.SkipRouteCreation || pushPlan.NoRouteFlag) {
 		eventStream <- CreatingAndMappingRoutes
 		warnings, err := actor.CreateAndMapDefaultApplicationRoute(pushPlan.OrgGUID, pushPlan.SpaceGUID, pushPlan.Application)
-
 		if err != nil {
 			return pushPlan, warnings, err
 		}
