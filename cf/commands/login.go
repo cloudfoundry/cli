@@ -2,6 +2,7 @@ package commands
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -175,6 +176,13 @@ func (cmd Login) authenticateSSO(c flags.FlagContext) error {
 
 	credentials := make(map[string]string)
 	passcode := prompts["passcode"]
+
+	if passcode.DisplayName == "" {
+		passcode = coreconfig.AuthPrompt{
+			Type:        coreconfig.AuthPromptTypePassword,
+			DisplayName: fmt.Sprintf("Temporary Authentication Code ( Get one at %s/passcode )", cmd.config.AuthenticationEndpoint()),
+		}
+	}
 
 	for i := 0; i < maxLoginTries; i++ {
 		if c.IsSet("sso-passcode") && i == 0 {
