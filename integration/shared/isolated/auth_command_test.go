@@ -225,6 +225,8 @@ var _ = Describe("auth command", func() {
 				rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
 				Expect(err).NotTo(HaveOccurred())
 
+				Expect(string(rawConfig)).ToNot(ContainSubstring(clientSecret))
+
 				var configFile configv3.JSONConfig
 				err = json.Unmarshal(rawConfig, &configFile)
 
