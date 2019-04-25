@@ -94,7 +94,7 @@ var _ = Describe("Auth Actions", func() {
 					grantType = constant.GrantTypeClientCredentials
 				})
 
-				It("stores the grant type and the client credentials", func() {
+				It("stores the grant type and the client id", func() {
 					Expect(fakeConfig.SetUAAClientCredentialsCallCount()).To(Equal(1))
 					clientID, clientSecret := fakeConfig.SetUAAClientCredentialsArgsForCall(0)
 					Expect(clientID).To(Equal("some-username"))

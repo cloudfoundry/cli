@@ -31,7 +31,7 @@ func (actor Actor) Authenticate(credentials map[string]string, origin string, gr
 	}
 
 	if grantType == constant.GrantTypeClientCredentials {
-		actor.Config.SetUAAClientCredentials(credentials["client_id"], credentials["client_secret"])
+		actor.Config.SetUAAClientCredentials(credentials["client_id"], "")
 	}
 
 	return nil
