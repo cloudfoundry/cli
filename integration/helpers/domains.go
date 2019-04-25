@@ -59,6 +59,10 @@ func (d Domain) Create() {
 	Eventually(CF("domains")).Should(And(Exit(0), Say(d.Name)))
 }
 
+func (d Domain) CreatePrivate() {
+	Eventually(CF("create-private-domain", d.Org, d.Name)).Should(Exit(0))
+}
+
 func (d Domain) CreateShared() {
 	Eventually(CF("create-shared-domain", d.Name)).Should(Exit(0))
 }

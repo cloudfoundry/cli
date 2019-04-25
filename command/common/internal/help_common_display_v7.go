@@ -40,7 +40,7 @@ var CommonHelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "Route and domain management:",
 		CommandList: [][]string{
-			{"routes", "delete-route", "create-domain"},
+			{"routes", "delete-route", "create-private-domain"},
 			{"domains", "map-route", ""},
 			{"create-route", "unmap-route", ""},
 		},

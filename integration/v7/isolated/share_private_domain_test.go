@@ -43,7 +43,7 @@ var _ = Describe("share-private-domain command", func() {
 			helpers.SetupCF(orgName, spaceName)
 			helpers.CreateOrg(sharedWithOrgName)
 			domain := helpers.NewDomain(orgName, domainName)
-			domain.Create()
+			domain.CreatePrivate()
 		})
 
 		It("should create the shared domain", func() {

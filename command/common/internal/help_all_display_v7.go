@@ -54,7 +54,7 @@ var HelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "DOMAINS:",
 		CommandList: [][]string{
-			{"domains", "create-domain", "delete-domain", "create-shared-domain", "delete-shared-domain"},
+			{"domains", "create-private-domain", "delete-domain", "create-shared-domain", "delete-shared-domain"},
 			{"router-groups"},
 		},
 	},
