@@ -4,8 +4,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const PushRetries = 3
-
 func (actor Actor) Actualize(plan PushPlan, progressBar ProgressBar) (
 	<-chan PushPlan, <-chan Event, <-chan Warnings, <-chan error,
 ) {

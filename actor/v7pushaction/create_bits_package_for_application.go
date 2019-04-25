@@ -9,17 +9,23 @@ import (
 	"os"
 )
 
-func (actor Actor) CreateAndUploadPackageForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
-	pkg, warnings, err := actor.CreatePackage(pushPlan, progressBar, eventStream)
-	if err != nil {
-		return pushPlan, warnings, err
+const PushRetries = 3
+
+func (actor Actor) CreateBitsPackageForApplication(pushPlan PushPlan, eventStream chan<- Event, progressBar ProgressBar) (PushPlan, Warnings, error) {
+	if !pushPlan.DockerImageCredentialsNeedsUpdate {
+		pkg, warnings, err := actor.CreateAndUploadApplicationBits(pushPlan, progressBar, eventStream)
+		if err != nil {
+			return pushPlan, warnings, err
+		}
+
+		polledPackage, pollWarnings, err := actor.V7Actor.PollPackage(pkg)
+
+		pushPlan.PackageGUID = polledPackage.GUID
+
+		return pushPlan, append(warnings, pollWarnings...), err
 	}
 
-	polledPackage, pollWarnings, err := actor.V7Actor.PollPackage(pkg)
-
-	pushPlan.PackageGUID = polledPackage.GUID
-
-	return pushPlan, append(warnings, pollWarnings...), err
+	return pushPlan, nil, nil
 }
 
 func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar ProgressBar, eventStream chan<- Event) (v7action.Package, Warnings, error) {
@@ -43,7 +49,7 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 
 	if len(unmatchedResources) > 0 {
 		eventStream <- CreatingArchive
-		archivePath, archiveErr := actor.GetArchivePath(plan, unmatchedResources)
+		archivePath, archiveErr := actor.CreateAndReturnArchivePath(plan, unmatchedResources)
 		if archiveErr != nil {
 			return v7action.Package{}, allWarnings, archiveErr
 		}
@@ -92,21 +98,7 @@ func (actor Actor) CreateAndUploadApplicationBits(plan PushPlan, progressBar Pro
 	return pkg, allWarnings, nil
 }
 
-func (actor Actor) CreatePackage(plan PushPlan, progressBar ProgressBar, eventStream chan<- Event) (v7action.Package, Warnings, error) {
-	if plan.DockerImageCredentialsNeedsUpdate {
-		eventStream <- SetDockerImage
-		pkg, warnings, err := actor.V7Actor.CreateDockerPackageByApplication(plan.Application.GUID, plan.DockerImageCredentials)
-		if err != nil {
-			return v7action.Package{}, Warnings(warnings), err
-		}
-		eventStream <- SetDockerImageComplete
-		return pkg, Warnings(warnings), nil
-	}
-
-	return actor.CreateAndUploadApplicationBits(plan, progressBar, eventStream)
-}
-
-func (actor Actor) GetArchivePath(plan PushPlan, unmatchedResources []sharedaction.V3Resource) (string, error) {
+func (actor Actor) CreateAndReturnArchivePath(plan PushPlan, unmatchedResources []sharedaction.V3Resource) (string, error) {
 	// translate between v3 and v2 resources
 	var v2Resources []sharedaction.Resource
 	for _, resource := range unmatchedResources {

@@ -2,6 +2,7 @@ package v7pushaction
 
 import "code.cloudfoundry.org/cli/actor/sharedaction"
 
+// MatchResources returns back a list of matched and unmatched resources for the provided resources.
 func (actor Actor) MatchResources(resources []sharedaction.V3Resource) ([]sharedaction.V3Resource, []sharedaction.V3Resource, Warnings, error) {
 	matches, warnings, err := actor.V7Actor.ResourceMatch(resources)
 
