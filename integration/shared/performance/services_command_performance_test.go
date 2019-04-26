@@ -34,6 +34,10 @@ var _ = Describe("services command performance", func() {
 			return
 		}
 
+		/* Display some useful information */
+		fmt.Printf("Number of samples (MAX_EXECUTIONS): %d\n", maxExecutions)
+		fmt.Printf("Number of service instances (NUMBER_OF_SERVICE_INSTANCES): %d\n", numberOfServices)
+
 		domain := helpers.DefaultSharedDomain()
 		broker = helpers.CreateBroker(domain, serviceName, servicePlan)
 
