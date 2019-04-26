@@ -79,6 +79,10 @@ func (d Domain) Share() {
 	Eventually(CF("share-private-domain", d.Org, d.Name)).Should(Exit(0))
 }
 
+func (d Domain) V7Share(orgName string) {
+	Eventually(CF("share-private-domain", orgName, d.Name)).Should(Exit(0))
+}
+
 func (d Domain) Delete() {
 	Eventually(CF("delete-domain", d.Name, "-f")).Should(Exit(0))
 }
