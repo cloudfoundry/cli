@@ -63,7 +63,7 @@ func (cmd SetLabelCommand) Execute(args []string) error {
 	case "org":
 		err = cmd.executeOrg(username, labels)
 	default:
-		err = fmt.Errorf("Unsupported resource type of %s", cmd.RequiredArgs.ResourceType)
+		err = fmt.Errorf("Unsupported resource type of '%s'", cmd.RequiredArgs.ResourceType)
 	}
 
 	if err != nil {
