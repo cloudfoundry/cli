@@ -120,6 +120,11 @@ func (cmd *LoginCommand) Execute(args []string) error {
 		return translatableerror.UnrefactoredCommandError{}
 	}
 	cmd.UI.DisplayWarning("Using experimental login command, some behavior may be different")
+
+	if cmd.Config.UAAOAuthClient() != "cf" || cmd.Config.UAAOAuthClientSecret() != "" {
+		cmd.UI.DisplayWarning("Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead.")
+	}
+
 	var err error
 
 	err = cmd.getAPI()
