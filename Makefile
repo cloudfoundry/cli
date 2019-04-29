@@ -106,6 +106,14 @@ integration-isolated-shared: integration-shared-isolated
 integration-shared-isolated: build integration-cleanup ## Run all parallel-enabled integration tests that are shared between v6 and v7
 	$(ginkgo_int) -nodes $(NODES) integration/shared/isolated
 
+ip: integration-performance
+integration-performance: build integration-cleanup integration-shared-performance
+
+isp: integration-shared-performance
+integration-performance-shared: integration-shared-performance
+integration-shared-performance: build integration-cleanup
+	$(ginkgo_int) integration/shared/performance
+
 ivi: integration-versioned-isolated
 integration-isolated-versioned: integration-versioned-isolated
 integration-versioned-isolated: build integration-cleanup ## Run all parallel-enabled integration tests, both versioned and shared across versions
