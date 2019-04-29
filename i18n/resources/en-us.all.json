@@ -54,5 +54,9 @@
   {
     "id": "space:api version:",
     "translation": "space:api version:"
+  },
+  {
+    "id": "Temporary Authentication Code ( Get one at {{.AuthenticationEndpoint}}/passcode )",
+    "translation": "Temporary Authentication Code ( Get one at {{.AuthenticationEndpoint}}/passcode )"
   }
 ]

@@ -68,5 +68,10 @@
       "id": "user:",
       "translation": "user:",
       "modified": false
+   },
+   {
+     "id": "Temporary Authentication Code ( Get one at {{.AuthenticationEndpoint}}/passcode )",
+     "translation": "Temporärer Authentifizierungscode ( Hier erhalten {{.AuthenticationEndpoint}}/passcode )",
+     "modified": false
    }
 ]
