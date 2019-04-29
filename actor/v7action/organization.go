@@ -6,7 +6,15 @@ import (
 )
 
 // Organization represents a V3 actor organization.
-type Organization ccv3.Organization
+type Organization struct {
+	// GUID is the unique organization identifier.
+	GUID string
+	// Name is the name of the organization.
+	Name string
+
+	// Metadata is used for custom tagging of API resources
+	Metadata *Metadata
+}
 
 // GetOrganizationByName returns the organization with the given name.
 func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, error) {
@@ -21,5 +29,29 @@ func (actor Actor) GetOrganizationByName(name string) (Organization, Warnings, e
 		return Organization{}, Warnings(warnings), actionerror.OrganizationNotFoundError{Name: name}
 	}
 
-	return Organization(orgs[0]), Warnings(warnings), nil
+	return actor.convertCCToActorOrganization(orgs[0]), Warnings(warnings), nil
+}
+
+// UpdateOrganization updates the labels of an organization
+func (actor Actor) UpdateOrganization(org Organization) (Organization, Warnings, error) {
+	ccOrg := ccv3.Organization{
+		GUID:     org.GUID,
+		Name:     org.Name,
+		Metadata: (*ccv3.Metadata)(org.Metadata),
+	}
+
+	updatedOrg, warnings, err := actor.CloudControllerClient.UpdateOrganization(ccOrg)
+	if err != nil {
+		return Organization{}, Warnings(warnings), err
+	}
+
+	return actor.convertCCToActorOrganization(updatedOrg), Warnings(warnings), nil
+}
+
+func (actor Actor) convertCCToActorOrganization(org ccv3.Organization) Organization {
+	return Organization{
+		GUID:     org.GUID,
+		Name:     org.Name,
+		Metadata: (*Metadata)(org.Metadata),
+	}
 }

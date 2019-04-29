@@ -1,9 +1,32 @@
 package v7action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/types"
 )
+
+func (actor *Actor) GetApplicationLabels(appName string, spaceGUID string) (map[string]types.NullString, Warnings, error) {
+	var labels map[string]types.NullString
+	resource, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return labels, warnings, err
+	}
+	if resource.Metadata != nil {
+		labels = resource.Metadata.Labels
+	}
+	return labels, warnings, nil
+}
+
+func (actor *Actor) GetOrganizationLabels(orgName string) (map[string]types.NullString, Warnings, error) {
+	var labels map[string]types.NullString
+	resource, warnings, err := actor.GetOrganizationByName(orgName)
+	if err != nil {
+		return labels, warnings, err
+	}
+	if resource.Metadata != nil {
+		labels = resource.Metadata.Labels
+	}
+	return labels, warnings, nil
+}
 
 func (actor *Actor) UpdateApplicationLabelsByApplicationName(appName string, spaceGUID string, labels map[string]types.NullString) (Warnings, error) {
 	app, appWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
@@ -20,7 +43,7 @@ func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, l
 	if err != nil {
 		return warnings, err
 	}
-	org.Metadata = &ccv3.Metadata{Labels: labels}
-	_, updateWarnings, err := actor.CloudControllerClient.UpdateOrganization(ccv3.Organization(org))
+	org.Metadata = &Metadata{Labels: labels}
+	_, updateWarnings, err := actor.UpdateOrganization(org)
 	return append(warnings, updateWarnings...), err
 }
