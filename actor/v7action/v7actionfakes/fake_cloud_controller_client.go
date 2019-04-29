@@ -745,6 +745,20 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UnsharePrivateDomainFromOrgStub        func(string, string) (ccv3.Warnings, error)
+	unsharePrivateDomainFromOrgMutex       sync.RWMutex
+	unsharePrivateDomainFromOrgArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	unsharePrivateDomainFromOrgReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	unsharePrivateDomainFromOrgReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	UpdateApplicationStub        func(ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
 	updateApplicationMutex       sync.RWMutex
 	updateApplicationArgsForCall []struct {
@@ -4277,6 +4291,70 @@ func (fake *FakeCloudControllerClient) ShareServiceInstanceToSpacesReturnsOnCall
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UnsharePrivateDomainFromOrg(arg1 string, arg2 string) (ccv3.Warnings, error) {
+	fake.unsharePrivateDomainFromOrgMutex.Lock()
+	ret, specificReturn := fake.unsharePrivateDomainFromOrgReturnsOnCall[len(fake.unsharePrivateDomainFromOrgArgsForCall)]
+	fake.unsharePrivateDomainFromOrgArgsForCall = append(fake.unsharePrivateDomainFromOrgArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("UnsharePrivateDomainFromOrg", []interface{}{arg1, arg2})
+	fake.unsharePrivateDomainFromOrgMutex.Unlock()
+	if fake.UnsharePrivateDomainFromOrgStub != nil {
+		return fake.UnsharePrivateDomainFromOrgStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.unsharePrivateDomainFromOrgReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) UnsharePrivateDomainFromOrgCallCount() int {
+	fake.unsharePrivateDomainFromOrgMutex.RLock()
+	defer fake.unsharePrivateDomainFromOrgMutex.RUnlock()
+	return len(fake.unsharePrivateDomainFromOrgArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UnsharePrivateDomainFromOrgCalls(stub func(string, string) (ccv3.Warnings, error)) {
+	fake.unsharePrivateDomainFromOrgMutex.Lock()
+	defer fake.unsharePrivateDomainFromOrgMutex.Unlock()
+	fake.UnsharePrivateDomainFromOrgStub = stub
+}
+
+func (fake *FakeCloudControllerClient) UnsharePrivateDomainFromOrgArgsForCall(i int) (string, string) {
+	fake.unsharePrivateDomainFromOrgMutex.RLock()
+	defer fake.unsharePrivateDomainFromOrgMutex.RUnlock()
+	argsForCall := fake.unsharePrivateDomainFromOrgArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeCloudControllerClient) UnsharePrivateDomainFromOrgReturns(result1 ccv3.Warnings, result2 error) {
+	fake.unsharePrivateDomainFromOrgMutex.Lock()
+	defer fake.unsharePrivateDomainFromOrgMutex.Unlock()
+	fake.UnsharePrivateDomainFromOrgStub = nil
+	fake.unsharePrivateDomainFromOrgReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) UnsharePrivateDomainFromOrgReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.unsharePrivateDomainFromOrgMutex.Lock()
+	defer fake.unsharePrivateDomainFromOrgMutex.Unlock()
+	fake.UnsharePrivateDomainFromOrgStub = nil
+	if fake.unsharePrivateDomainFromOrgReturnsOnCall == nil {
+		fake.unsharePrivateDomainFromOrgReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.unsharePrivateDomainFromOrgReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UpdateApplication(arg1 ccv3.Application) (ccv3.Application, ccv3.Warnings, error) {
 	fake.updateApplicationMutex.Lock()
 	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
@@ -5530,6 +5608,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.sharePrivateDomainToOrgsMutex.RUnlock()
 	fake.shareServiceInstanceToSpacesMutex.RLock()
 	defer fake.shareServiceInstanceToSpacesMutex.RUnlock()
+	fake.unsharePrivateDomainFromOrgMutex.RLock()
+	defer fake.unsharePrivateDomainFromOrgMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.updateApplicationApplyManifestMutex.RLock()

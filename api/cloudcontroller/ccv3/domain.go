@@ -230,3 +230,19 @@ func (client Client) SharePrivateDomainToOrgs(domainGuid string, sharedOrgs Shar
 
 	return response.Warnings, err
 }
+
+func (client Client) UnsharePrivateDomainFromOrg(domainGuid string, orgGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		URIParams:   internal.Params{"domain_guid": domainGuid, "org_guid": orgGUID},
+		RequestName: internal.DeleteSharedOrgFromDomainRequest,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var response cloudcontroller.Response
+
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}

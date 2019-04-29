@@ -76,28 +76,52 @@ func (actor Actor) GetDomainByName(domainName string) (Domain, Warnings, error) 
 }
 
 func (actor Actor) SharePrivateDomain(domainName string, orgName string) (Warnings, error) {
-	allWarnings := Warnings{}
-	org, warnings, err := actor.GetOrganizationByName(orgName)
-	allWarnings = append(allWarnings, warnings...)
+	orgGUID, domainGUID, warnings, err := actor.GetDomainAndOrgGUIDsByName(domainName, orgName)
 
 	if err != nil {
-		return allWarnings, err
-	}
-
-	domain, warnings, err := actor.GetDomainByName(domainName)
-	allWarnings = append(allWarnings, warnings...)
-
-	if err != nil {
-		return allWarnings, err
+		return warnings, err
 	}
 
 	apiWarnings, err := actor.CloudControllerClient.SharePrivateDomainToOrgs(
-		domain.GUID,
-		ccv3.SharedOrgs{GUIDs: []string{org.GUID}},
+		domainGUID,
+		ccv3.SharedOrgs{GUIDs: []string{orgGUID}},
 	)
 
-	actorWarnings := Warnings(apiWarnings)
-	allWarnings = append(allWarnings, actorWarnings...)
+	allWarnings := append(warnings, Warnings(apiWarnings)...)
 
 	return allWarnings, err
+}
+
+func (actor Actor) UnsharePrivateDomain(domainName string, orgName string) (Warnings, error) {
+	orgGUID, domainGUID, warnings, err := actor.GetDomainAndOrgGUIDsByName(domainName, orgName)
+
+	if err != nil {
+		return warnings, err
+	}
+
+	apiWarnings, err := actor.CloudControllerClient.UnsharePrivateDomainFromOrg(
+		domainGUID,
+		orgGUID,
+	)
+
+	allWarnings := append(warnings, Warnings(apiWarnings)...)
+
+	return allWarnings, err
+}
+
+func (actor Actor) GetDomainAndOrgGUIDsByName(domainName string, orgName string) (string, string, Warnings, error) {
+	org, getOrgWarnings, err := actor.GetOrganizationByName(orgName)
+
+	if err != nil {
+		return "", "", getOrgWarnings, err
+	}
+
+	domain, getDomainWarnings, err := actor.GetDomainByName(domainName)
+	allWarnings := append(getOrgWarnings, getDomainWarnings...)
+
+	if err != nil {
+		return "", "", allWarnings, err
+	}
+
+	return org.GUID, domain.GUID, allWarnings, nil
 }
