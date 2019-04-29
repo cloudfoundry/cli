@@ -520,6 +520,22 @@ var _ = Describe("login Command", func() {
 							})
 						})
 					})
+
+					When("custom client ID and client secret are set in the config file", func() {
+						BeforeEach(func() {
+							fakeConfig.UAAOAuthClientReturns("some-other-client-id")
+							fakeConfig.UAAOAuthClientSecretReturns("some-secret")
+						})
+
+						It("prints a deprecation warning", func() {
+							deprecationMessage := "Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."
+							Expect(testUI.Err).To(Say(deprecationMessage))
+						})
+
+						It("still attempts to log in", func() {
+							Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
+						})
+					})
 				})
 			})
 		})

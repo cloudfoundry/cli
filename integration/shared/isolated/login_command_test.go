@@ -1143,12 +1143,19 @@ var _ = Describe("login command", func() {
 	})
 
 	Describe("Authenticating as a user, through a custom client", func() {
-		var accessTokenExpiration time.Duration
+		var (
+			accessTokenExpiration time.Duration
+			username              string
+			password              string
+			customClientID        string
+			customClientSecret    string
+		)
+
 		BeforeEach(func() {
-			customClientID, customClientSecret := helpers.SkipIfCustomClientCredentialsNotSet()
+			customClientID, customClientSecret = helpers.SkipIfCustomClientCredentialsNotSet()
 
 			helpers.LoginCF()
-			username, password := helpers.CreateUser()
+			username, password = helpers.CreateUser()
 
 			helpers.SetConfig(func(config *configv3.Config) {
 				config.ConfigFile.UAAOAuthClient = customClientID
@@ -1158,10 +1165,11 @@ var _ = Describe("login command", func() {
 
 			session := helpers.CF("login", "-u", username, "-p", password)
 			Eventually(session).Should(Exit(0))
-			accessTokenExpiration = 120 // this was configured in the pipeline
 		})
 
-		It("access token validity matches custom client configuration", func() {
+		It("gets a token whose settings match those of the custom client", func() {
+			accessTokenExpiration = 120 // this was configured in the pipeline
+
 			config := helpers.GetConfig()
 
 			jwt := helpers.ParseTokenString(config.ConfigFile.AccessToken)
@@ -1172,6 +1180,15 @@ var _ = Describe("login command", func() {
 
 			Expect(iatIsSet).To(BeTrue())
 			Expect(expires.Sub(iat)).To(Equal(accessTokenExpiration * time.Second))
+		})
+
+		It("warns the user that this configuration is deprecated", func() {
+			helpers.TurnOnExperimentalLogin()
+			deprecationMessage := "Deprecation warning: Manually writing your client credentials to the config.json is deprecated and will be removed in the future. For similar functionality, please use the `cf auth --client-credentials` command instead."
+
+			session := helpers.CF("login", "-u", username, "-p", password)
+			Eventually(session.Err).Should(Say(deprecationMessage))
+			Eventually(session).Should(Exit(0))
 		})
 
 		When("the token has expired", func() {
