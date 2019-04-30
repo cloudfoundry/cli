@@ -54,5 +54,15 @@
   {
     "id": "space:api version:",
     "translation": "space:api version:"
-  }
+  },
+  {
+     "id": "Email",
+     "translation": "Email",
+     "modified": false
+  },
+  {
+     "id": "Password",
+     "translation": "Password",
+     "modified": false
+ }
 ]
