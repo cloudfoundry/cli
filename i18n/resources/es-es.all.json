@@ -68,5 +68,15 @@
       "id": "user:",
       "translation": "user:",
       "modified": false
+   },
+   {
+      "id": "Email",
+      "translation": "Correo electrónico",
+      "modified": false
+   },
+   {
+      "id": "Password",
+      "translation": "Contraseña",
+      "modified": false
    }
 ]

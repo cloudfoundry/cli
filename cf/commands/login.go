@@ -220,7 +220,7 @@ func (cmd Login) authenticate(c flags.FlagContext) error {
 		if prompts["username"].Type == coreconfig.AuthPromptTypeText && usernameFlagValue != "" {
 			credentials["username"] = usernameFlagValue
 		} else {
-			credentials["username"] = cmd.ui.Ask(value.DisplayName)
+			credentials["username"] = cmd.ui.Ask(T(value.DisplayName))
 		}
 	}
 
@@ -234,7 +234,7 @@ func (cmd Login) authenticate(c flags.FlagContext) error {
 		} else if key == "username" {
 			continue
 		} else {
-			credentials[key] = cmd.ui.Ask(prompt.DisplayName)
+			credentials[key] = cmd.ui.Ask(T(prompt.DisplayName))
 		}
 	}
 
@@ -246,12 +246,12 @@ func (cmd Login) authenticate(c flags.FlagContext) error {
 				credentials["password"] = passwordFlagValue
 				passwordFlagValue = ""
 			} else {
-				credentials["password"] = cmd.ui.AskForPassword(passPrompt.DisplayName)
+				credentials["password"] = cmd.ui.AskForPassword(T(passPrompt.DisplayName))
 			}
 		}
 
 		for _, key := range passwordKeys {
-			credentials[key] = cmd.ui.AskForPassword(prompts[key].DisplayName)
+			credentials[key] = cmd.ui.AskForPassword(T(prompts[key].DisplayName))
 		}
 
 		credentialsCopy := make(map[string]string, len(credentials))
