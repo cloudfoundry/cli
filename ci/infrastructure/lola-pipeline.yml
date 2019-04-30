@@ -99,7 +99,7 @@ jobs:
       input1: cf-deployment
       input2: cli-ci
     params:
-      COPY_PATHS: "input1/operations/scale-to-one-az.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input1/operations/use-compiled-releases.yml input2/ci/infrastructure/operations/default-app-memory.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml input2/ci/infrastructure/operations/uaa-vm_type-override.yml input2/ci/infrastructure/operations/add-uaa-client-credentials.yml input2/ci/infrastructure/operations/add-dummy-windows-stack.yml input2/ci/infrastructure/operations/reduce-async-service-polling.yml input2/ci/infrastructure/operations/add-oidc-provider.yml input2/ci/infrastructure/operations/adjust-user-retry-attempts.yml input2/ci/infrastructure/operations/give-cf-admin-clients-read-scope.yml"
+      COPY_PATHS: "input1/operations/scale-to-one-az.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input1/operations/use-compiled-releases.yml input2/ci/infrastructure/operations/default-app-memory.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml input2/ci/infrastructure/operations/uaa-vm_type-override.yml input2/ci/infrastructure/operations/add-uaa-client-credentials.yml input2/ci/infrastructure/operations/add-uaa-client-cf-custom.yml input2/ci/infrastructure/operations/add-dummy-windows-stack.yml input2/ci/infrastructure/operations/reduce-async-service-polling.yml input2/ci/infrastructure/operations/add-oidc-provider.yml input2/ci/infrastructure/operations/adjust-user-retry-attempts.yml input2/ci/infrastructure/operations/give-cf-admin-clients-read-scope.yml"
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
@@ -109,7 +109,7 @@ jobs:
       ops-files: combine_inputs_output
     params:
       SYSTEM_DOMAIN: ((stack-name)).cli.fun
-      OPS_FILES: "add-persistent-isolation-segment-diego-cell.yml use-compiled-releases.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml uaa-vm_type-override.yml add-uaa-client-credentials.yml add-dummy-windows-stack.yml reduce-async-service-polling.yml adjust-user-retry-attempts.yml give-cf-admin-clients-read-scope.yml"
+      OPS_FILES: "add-persistent-isolation-segment-diego-cell.yml use-compiled-releases.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml uaa-vm_type-override.yml add-uaa-client-credentials.yml add-uaa-client-cf-custom.yml add-dummy-windows-stack.yml reduce-async-service-polling.yml adjust-user-retry-attempts.yml give-cf-admin-clients-read-scope.yml"
       USE_VARS_STORE: false
       VARS_FILES: vars.yml
       BBL_STATE_DIR: ci/infrastructure/((stack-name))
