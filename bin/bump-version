@@ -38,4 +38,4 @@ echo "Committing change"
 git reset .
 git add BUILD_VERSION
 
-git ci -m "Bump version to $version"
+git commit -m "Bump version to $version"
