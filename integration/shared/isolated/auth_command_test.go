@@ -348,7 +348,7 @@ var _ = Describe("auth command", func() {
 			accessTokenExpiration = 120 // this was configured in the pipeline
 		})
 
-		It("expects access token validity to match custom client", func() {
+		It("access token validity matches custom client configuration", func() {
 			config := helpers.GetConfig()
 
 			jwt := helpers.ParseTokenString(config.ConfigFile.AccessToken)
@@ -359,6 +359,19 @@ var _ = Describe("auth command", func() {
 
 			Expect(iatIsSet).To(BeTrue())
 			Expect(expires.Sub(iat)).To(Equal(accessTokenExpiration * time.Second))
+		})
+
+		When("the token has expired", func() {
+			BeforeEach(func() {
+				helpers.SetConfig(func(config *configv3.Config) {
+					config.ConfigFile.AccessToken = helpers.ExpiredAccessToken()
+				})
+			})
+
+			It("re-authenticates using the custom client", func() {
+				session := helpers.CF("orgs")
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 })
