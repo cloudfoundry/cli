@@ -46,6 +46,8 @@ configure_infrastructure_pipeline() {
 configure_bosh_lite_pool_pipeline() {
   local name=$1
 
+  printf "configuring the $name pipeline...\n"
+
   fly -t ci set-pipeline \
     -p $name \
     -c $pipelines_path/cli-dev-bosh-lite/pipeline.yml \
