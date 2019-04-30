@@ -576,6 +576,7 @@
     "code.cloudfoundry.org/ykk",
     "github.com/SermoDigital/jose/crypto",
     "github.com/SermoDigital/jose/jws",
+    "github.com/SermoDigital/jose/jwt",
     "github.com/blang/semver",
     "github.com/cloudfoundry/bosh-cli/director/template",
     "github.com/cloudfoundry/cli-plugin-repo/web",
