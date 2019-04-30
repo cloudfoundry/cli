@@ -31,7 +31,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 				"-k", "300M",
 				"-i", "2",
 				"-m", "70M",
-				"-s", "cflinuxfs2",
+				"-s", "cflinuxfs3",
 				"-t", "180",
 			)
 			Eventually(session).Should(Say(`Getting app info\.\.\.`))
@@ -44,7 +44,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 			Eventually(session).Should(Say(`\s+health check type:\s+port`))
 			Eventually(session).Should(Say(`\s+instances:\s+2`))
 			Eventually(session).Should(Say(`\s+memory:\s+70M`))
-			Eventually(session).Should(Say(`\s+stack:\s+cflinuxfs2`))
+			Eventually(session).Should(Say(`\s+stack:\s+cflinuxfs3`))
 			Eventually(session).Should(Say(`\s+routes:`))
 			Eventually(session).Should(Say(`(?i)\+\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
 			Eventually(session).Should(Say(`Mapping routes\.\.\.`))
@@ -58,12 +58,11 @@ var _ = Describe("push with various flags and no manifest", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		// output is different from when API version is below 3.27.0
 		time.Sleep(5 * time.Second)
 		session := helpers.CF("app", appName)
 		Eventually(session).Should(Say(`name:\s+%s`, appName))
 		Eventually(session).Should(Say(`last uploaded:\s+\w{3} \d{1,2} \w{3} \d{2}:\d{2}:\d{2} \w{3} \d{4}`))
-		Eventually(session).Should(Say(`stack:\s+cflinuxfs2`))
+		Eventually(session).Should(Say(`stack:\s+cflinuxfs3`))
 		Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 		Eventually(session).Should(Say(`type:\s+web`))
 		Eventually(session).Should(Say(`instances:\s+2/2`))
@@ -83,7 +82,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 				"-k", "300M",
 				"-i", "2",
 				"-m", "70M",
-				"-s", "cflinuxfs2",
+				"-s", "cflinuxfs3",
 				"-t", "180",
 			)
 
@@ -98,7 +97,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 			Eventually(session).Should(Say(`\s+health check type:\s+http`))
 			Eventually(session).Should(Say(`\s+instances:\s+2`))
 			Eventually(session).Should(Say(`\s+memory:\s+70M`))
-			Eventually(session).Should(Say(`\s+stack:\s+cflinuxfs`))
+			Eventually(session).Should(Say(`\s+stack:\s+cflinuxfs3`))
 			Eventually(session).Should(Say(`\s+routes:`))
 			Eventually(session).Should(Say(`(?i)\+\s+%s.%s`, appName, helpers.DefaultSharedDomain()))
 			Eventually(session).Should(Say(`Mapping routes\.\.\.`))
@@ -118,7 +117,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 		session := helpers.CF("app", appName)
 		Eventually(session).Should(Say(`name:\s+%s`, appName))
 		Eventually(session).Should(Say(`last uploaded:\s+\w{3} \d{1,2} \w{3} \d{2}:\d{2}:\d{2} \w{3} \d{4}`))
-		Eventually(session).Should(Say(`stack:\s+cflinuxfs`))
+		Eventually(session).Should(Say(`stack:\s+cflinuxfs3`))
 		Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 		Eventually(session).Should(Say(`type:\s+web`))
 		Eventually(session).Should(Say(`instances:\s+2/2`))
