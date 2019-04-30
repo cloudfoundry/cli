@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 
 	"fmt"
+	"strings"
+
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"strings"
 )
 
 type ccStacks struct {
@@ -33,6 +34,18 @@ func FetchStacks() []string {
 	}
 
 	return stacks
+}
+
+func PreferredStack() string {
+	stacks := FetchStacks()
+
+	for _, name := range stacks {
+		if name == "cflinuxfs3" {
+			return name
+		}
+	}
+
+	return "cflinuxfs2"
 }
 
 func CreateStack(names ...string) string {

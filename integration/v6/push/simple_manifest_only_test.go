@@ -15,13 +15,15 @@ import (
 
 var _ = Describe("push with a simple manifest and no flags", func() {
 	var (
-		appName  string
-		username string
+		appName   string
+		username  string
+		stackName string
 	)
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
 		username, _ = helpers.GetCredentials()
+		stackName = helpers.PreferredStack()
 	})
 
 	When("the app is new", func() {
@@ -46,7 +48,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 									},
 									"instances":                  2,
 									"memory":                     "70M",
-									"stack":                      "cflinuxfs3",
+									"stack":                      stackName,
 									"health-check-type":          "http",
 									"health-check-http-endpoint": "/",
 									"timeout":                    180,
@@ -68,7 +70,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						Eventually(session).Should(Say(`\s+health check type:\s+http`))
 						Eventually(session).Should(Say(`\s+instances:\s+2`))
 						Eventually(session).Should(Say(`\s+memory:\s+70M`))
-						Eventually(session).Should(Say(`\s+stack:\s+cflinuxfs3`))
+						Eventually(session).Should(Say(`\s+stack:\s+%s`, stackName))
 						Eventually(session).Should(Say(`\s+env:`))
 						Eventually(session).Should(Say(`\+\s+key1`))
 						Eventually(session).Should(Say(`\+\s+key2`))
@@ -92,7 +94,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 					session := helpers.CF("app", appName)
 					Eventually(session).Should(Say(`name:\s+%s`, appName))
 					Eventually(session).Should(Say(`last uploaded:\s+\w{3} \d{1,2} \w{3} \d{2}:\d{2}:\d{2} \w{3} \d{4}`))
-					Eventually(session).Should(Say(`stack:\s+cflinuxfs3`))
+					Eventually(session).Should(Say(`stack:\s+%s`, stackName))
 					Eventually(session).Should(Say(`buildpacks:\s+staticfile`))
 					Eventually(session).Should(Say(`type:\s+web`))
 					Eventually(session).Should(Say(`instances:\s+2/2`))
