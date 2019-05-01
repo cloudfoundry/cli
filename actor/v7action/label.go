@@ -24,3 +24,13 @@ func (actor *Actor) UpdateOrganizationLabelsByOrganizationName(orgName string, l
 	_, updateWarnings, err := actor.CloudControllerClient.UpdateOrganization(ccv3.Organization(org))
 	return append(warnings, updateWarnings...), err
 }
+
+func (actor *Actor) UpdateSpaceLabelsBySpaceName(spaceName string, orgGUID string, labels map[string]types.NullString) (Warnings, error) {
+	space, warnings, err := actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+	if err != nil {
+		return warnings, err
+	}
+	space.Metadata = &ccv3.Metadata{Labels: labels}
+	_, updateWarnings, err := actor.CloudControllerClient.UpdateSpace(ccv3.Space(space))
+	return append(warnings, updateWarnings...), err
+}

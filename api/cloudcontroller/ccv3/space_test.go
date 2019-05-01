@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"code.cloudfoundry.org/cli/types"
 	"fmt"
 	"net/http"
 
@@ -158,5 +159,75 @@ var _ = Describe("Spaces", func() {
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
+	})
+
+	Describe("UpdateSpace", func() {
+		var (
+			spaceToUpdate Space
+			updatedSpace  Space
+			warnings      Warnings
+			executeErr    error
+		)
+
+		JustBeforeEach(func() {
+			updatedSpace, warnings, executeErr = client.UpdateSpace(spaceToUpdate)
+		})
+
+		When("the organization is updated successfully", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-space-guid",
+					"name": "some-space-name",
+					"metadata": {
+						"labels": {
+							"k1":"v1",
+							"k2":"v2"
+						}
+					}
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "some-space-name",
+					"metadata": map[string]interface{}{
+						"labels": map[string]string{
+							"k1": "v1",
+							"k2": "v2",
+						},
+					},
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/spaces/some-guid"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+
+				spaceToUpdate = Space{
+					Name: "some-space-name",
+					GUID: "some-guid",
+					Metadata: &Metadata{
+						Labels: map[string]types.NullString{
+							"k1": types.NewNullString("v1"),
+							"k2": types.NewNullString("v2"),
+						},
+					},
+				}
+			})
+
+			It("should include the labels in the JSON", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(server.ReceivedRequests()).To(HaveLen(3))
+				Expect(len(warnings)).To(Equal(0))
+				Expect(updatedSpace.Metadata.Labels).To(BeEquivalentTo(
+					map[string]types.NullString{
+						"k1": types.NewNullString("v1"),
+						"k2": types.NewNullString("v2"),
+					}))
+			})
+
+		})
+
 	})
 })
