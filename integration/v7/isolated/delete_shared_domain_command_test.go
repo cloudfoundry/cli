@@ -58,10 +58,10 @@ var _ = Describe("delete-shared-domain command", func() {
 
 				It("it asks for confirmation and deletes the domain", func() {
 					session := helpers.CFWithStdin(buffer, "delete-shared-domain", domainName)
+					Eventually(session).Should(Say("This action impacts all orgs using this domain."))
+					Eventually(session).Should(Say("Deleting the domain will remove associated routes which will make apps with this domain, in any org, unreachable."))
+					Eventually(session).Should(Say(`Really delete the shared domain %s\?`, domainName))
 					Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting domain %s as %s...`), domainName, username))
-					Eventually(session).Should(Say("\n\nThis action impacts all orgs using this domain."))
-					Eventually(session).Should(Say("Deleting it will remove associated routes and could make any app with this domain, in any org, unreachable."))
-					Eventually(session).Should(Say(`Are you sure you want to delete the domain %s\?`, domainName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -75,10 +75,10 @@ var _ = Describe("delete-shared-domain command", func() {
 
 				It("it asks for confirmation and does not delete the domain", func() {
 					session := helpers.CFWithStdin(buffer, "delete-shared-domain", domainName)
-					Eventually(session).Should(Say(regexp.QuoteMeta(`Deleting domain %s as %s...`), domainName, username))
-					Eventually(session).Should(Say("\n\nThis action impacts all orgs using this domain."))
-					Eventually(session).Should(Say("Deleting it will remove associated routes and could make any app with this domain, in any org, unreachable."))
-					Eventually(session).Should(Say(`Are you sure you want to delete the domain %s\?`, domainName))
+					Eventually(session).Should(Say("This action impacts all orgs using this domain."))
+					Eventually(session).Should(Say("Deleting the domain will remove associated routes which will make apps with this domain, in any org, unreachable."))
+					Eventually(session).Should(Say(`Really delete the shared domain %s\?`, domainName))
+					Eventually(session).Should(Say(`'%s' has not been deleted`, domainName))
 					Consistently(session).ShouldNot(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})

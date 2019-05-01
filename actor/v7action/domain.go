@@ -37,9 +37,23 @@ func (actor Actor) CreatePrivateDomain(domainName string, orgName string) (Warni
 
 	actorWarnings := Warnings(apiWarnings)
 	allWarnings = append(allWarnings, actorWarnings...)
+
+	return allWarnings, err
+}
+
+func (actor Actor) DeleteSharedDomain(domainName string) (Warnings, error) {
+	allWarnings := Warnings{}
+	domain, warnings, err := actor.GetDomainByName(domainName)
+	allWarnings = append(allWarnings, warnings...)
+
 	if err != nil {
 		return allWarnings, err
 	}
+
+	_, apiWarnings, err := actor.CloudControllerClient.DeleteDomain(domain.GUID)
+
+	actorWarnings := Warnings(apiWarnings)
+	allWarnings = append(allWarnings, actorWarnings...)
 
 	return allWarnings, err
 }

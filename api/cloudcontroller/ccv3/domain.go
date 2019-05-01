@@ -153,6 +153,23 @@ func (client Client) CreateDomain(domain Domain) (Domain, Warnings, error) {
 	return ccDomain, response.Warnings, err
 }
 
+func (client Client) DeleteDomain(domainGUID string) (JobURL, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		URIParams: map[string]string{
+			"domain_guid": domainGUID,
+		},
+		RequestName: internal.DeleteDomainRequest,
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return JobURL(response.ResourceLocationURL), response.Warnings, err
+}
+
 func (client Client) GetDomains(query ...Query) ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDomainsRequest,

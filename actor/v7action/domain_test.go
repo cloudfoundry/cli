@@ -76,6 +76,31 @@ var _ = Describe("Domain Actions", func() {
 		})
 	})
 
+	Describe("delete shared domain", func() {
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetDomainsReturns(
+				[]ccv3.Domain{
+					{Name: "the-domain.com", GUID: "domain-guid"},
+				},
+				ccv3.Warnings{"get-domains-warning"},
+				nil,
+			)
+		})
+
+		It("delegates to the cloud controller client", func() {
+			fakeCloudControllerClient.DeleteDomainReturns(ccv3.JobURL("https://job.com"), ccv3.Warnings{"delete-warning"}, errors.New("delete-error"))
+
+			warnings, executeErr := actor.DeleteSharedDomain("the-domain.com")
+			Expect(executeErr).To(MatchError("delete-error"))
+			Expect(warnings).To(ConsistOf("get-domains-warning", "delete-warning"))
+
+			Expect(fakeCloudControllerClient.DeleteDomainCallCount()).To(Equal(1))
+			passedDomainGuid := fakeCloudControllerClient.DeleteDomainArgsForCall(0)
+
+			Expect(passedDomainGuid).To(Equal("domain-guid"))
+		})
+	})
+
 	Describe("list domains for org", func() {
 		var (
 			ccv3Domains []ccv3.Domain

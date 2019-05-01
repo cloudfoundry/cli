@@ -214,6 +214,87 @@ var _ = Describe("Domain", func() {
 		})
 	})
 
+	Describe("DeleteDomain", func() {
+		var (
+			domainGUID   string
+			jobURLString string
+			jobURL       JobURL
+			warnings     Warnings
+			executeErr   error
+		)
+
+		JustBeforeEach(func() {
+			jobURL, warnings, executeErr = client.DeleteDomain(domainGUID)
+		})
+
+		When("domain exists", func() {
+			domainGUID = "domain-guid"
+			jobURLString = "https://api.test.com/v3/jobs/job-guid"
+
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/domains/domain-guid"),
+						RespondWith(http.StatusAccepted, nil, http.Header{
+							"X-Cf-Warnings": {"this is a warning"},
+							"Location":      {jobURLString},
+						}),
+					),
+				)
+			})
+
+			It("returns all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+				Expect(jobURL).To(Equal(JobURL(jobURLString)))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		When("the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+	  "errors": [
+	    {
+	      "code": 10008,
+	      "detail": "The request is semantically invalid: command presence",
+	      "title": "CF-UnprocessableEntity"
+	    },
+			{
+	      "code": 10010,
+	      "detail": "Isolation segment not found",
+	      "title": "CF-ResourceNotFound"
+	    }
+	  ]
+	}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/domains/domain-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(ccerror.MultiError{
+					ResponseCode: http.StatusTeapot,
+					Errors: []ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "Isolation segment not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("GetDomains", func() {
 		var (
 			query      Query

@@ -24,6 +24,7 @@ type CloudControllerClient interface {
 	DeleteApplication(guid string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (ccv3.Warnings, error)
 	DeleteBuildpack(buildpackGUID string) (ccv3.JobURL, ccv3.Warnings, error)
+	DeleteDomain(domainGUID string) (ccv3.JobURL, ccv3.Warnings, error)
 	DeleteIsolationSegment(guid string) (ccv3.Warnings, error)
 	DeleteIsolationSegmentOrganization(isolationSegmentGUID string, organizationGUID string) (ccv3.Warnings, error)
 	DeleteServiceInstanceRelationshipsSharedSpace(serviceInstanceGUID string, sharedToSpaceGUID string) (ccv3.Warnings, error)

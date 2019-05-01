@@ -80,7 +80,7 @@ type commandList struct {
 	DeleteServiceBroker                v6.DeleteServiceBrokerCommand                `command:"delete-service-broker" description:"Delete a service broker"`
 	DeleteServiceKey                   v6.DeleteServiceKeyCommand                   `command:"delete-service-key" alias:"dsk" description:"Delete a service key"`
 	DeleteService                      v6.DeleteServiceCommand                      `command:"delete-service" alias:"ds" description:"Delete a service instance"`
-	DeleteSharedDomain                 v6.DeleteSharedDomainCommand                 `command:"delete-shared-domain" description:"Delete a shared domain"`
+	DeleteSharedDomain                 v7.DeleteSharedDomainCommand                 `command:"delete-shared-domain" description:"Delete a shared domain"`
 	DeleteSpaceQuota                   v6.DeleteSpaceQuotaCommand                   `command:"delete-space-quota" description:"Delete a space quota definition and unassign the space quota from all spaces"`
 	DeleteSpace                        v6.DeleteSpaceCommand                        `command:"delete-space" description:"Delete a space"`
 	DeleteUser                         v6.DeleteUserCommand                         `command:"delete-user" description:"Delete a user"`

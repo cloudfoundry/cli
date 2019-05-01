@@ -207,6 +207,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	DeleteDomainStub        func(string) (ccv3.JobURL, ccv3.Warnings, error)
+	deleteDomainMutex       sync.RWMutex
+	deleteDomainArgsForCall []struct {
+		arg1 string
+	}
+	deleteDomainReturns struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
+	deleteDomainReturnsOnCall map[int]struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteIsolationSegmentStub        func(string) (ccv3.Warnings, error)
 	deleteIsolationSegmentMutex       sync.RWMutex
 	deleteIsolationSegmentArgsForCall []struct {
@@ -1908,6 +1923,72 @@ func (fake *FakeCloudControllerClient) DeleteBuildpackReturnsOnCall(i int, resul
 		})
 	}
 	fake.deleteBuildpackReturnsOnCall[i] = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteDomain(arg1 string) (ccv3.JobURL, ccv3.Warnings, error) {
+	fake.deleteDomainMutex.Lock()
+	ret, specificReturn := fake.deleteDomainReturnsOnCall[len(fake.deleteDomainArgsForCall)]
+	fake.deleteDomainArgsForCall = append(fake.deleteDomainArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("DeleteDomain", []interface{}{arg1})
+	fake.deleteDomainMutex.Unlock()
+	if fake.DeleteDomainStub != nil {
+		return fake.DeleteDomainStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.deleteDomainReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) DeleteDomainCallCount() int {
+	fake.deleteDomainMutex.RLock()
+	defer fake.deleteDomainMutex.RUnlock()
+	return len(fake.deleteDomainArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteDomainCalls(stub func(string) (ccv3.JobURL, ccv3.Warnings, error)) {
+	fake.deleteDomainMutex.Lock()
+	defer fake.deleteDomainMutex.Unlock()
+	fake.DeleteDomainStub = stub
+}
+
+func (fake *FakeCloudControllerClient) DeleteDomainArgsForCall(i int) string {
+	fake.deleteDomainMutex.RLock()
+	defer fake.deleteDomainMutex.RUnlock()
+	argsForCall := fake.deleteDomainArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCloudControllerClient) DeleteDomainReturns(result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteDomainMutex.Lock()
+	defer fake.deleteDomainMutex.Unlock()
+	fake.DeleteDomainStub = nil
+	fake.deleteDomainReturns = struct {
+		result1 ccv3.JobURL
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteDomainReturnsOnCall(i int, result1 ccv3.JobURL, result2 ccv3.Warnings, result3 error) {
+	fake.deleteDomainMutex.Lock()
+	defer fake.deleteDomainMutex.Unlock()
+	fake.DeleteDomainStub = nil
+	if fake.deleteDomainReturnsOnCall == nil {
+		fake.deleteDomainReturnsOnCall = make(map[int]struct {
+			result1 ccv3.JobURL
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.deleteDomainReturnsOnCall[i] = struct {
 		result1 ccv3.JobURL
 		result2 ccv3.Warnings
 		result3 error
@@ -5536,6 +5617,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteApplicationProcessInstanceMutex.RUnlock()
 	fake.deleteBuildpackMutex.RLock()
 	defer fake.deleteBuildpackMutex.RUnlock()
+	fake.deleteDomainMutex.RLock()
+	defer fake.deleteDomainMutex.RUnlock()
 	fake.deleteIsolationSegmentMutex.RLock()
 	defer fake.deleteIsolationSegmentMutex.RUnlock()
 	fake.deleteIsolationSegmentOrganizationMutex.RLock()

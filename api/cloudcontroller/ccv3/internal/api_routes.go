@@ -13,6 +13,7 @@ const (
 	DeleteApplicationRequest                                    = "DeleteApplication"
 	DeleteSharedOrgFromDomainRequest                            = "DeleteSharedOrgFromDomain"
 	DeleteBuildpackRequest                                      = "DeleteBuildpack"
+	DeleteDomainRequest                                         = "DeleteDomainRequest"
 	DeleteIsolationSegmentRelationshipOrganizationRequest       = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                               = "DeleteIsolationSegment"
 	DeleteServiceInstanceRelationshipsSharedSpaceRequest        = "DeleteServiceInstanceRelationshipsSharedSpace"
@@ -111,6 +112,7 @@ var APIRoutes = []Route{
 	{Resource: DeploymentsResource, Path: "/:deployment_guid/actions/cancel", Method: http.MethodPost, Name: PostApplicationDeploymentActionCancelRequest},
 	{Resource: DomainsResource, Path: "/", Method: http.MethodPost, Name: PostDomainRequest},
 	{Resource: DomainsResource, Path: "/", Method: http.MethodGet, Name: GetDomainsRequest},
+	{Resource: DomainsResource, Path: "/:domain_guid", Method: http.MethodDelete, Name: DeleteDomainRequest},
 	{Resource: DomainsResource, Path: "/:domain_guid/relationships/shared_organizations", Method: http.MethodPost, Name: SharePrivateDomainRequest},
 	{Resource: DomainsResource, Path: "/:domain_guid/relationships/shared_organizations/:org_guid", Method: http.MethodDelete, Name: DeleteSharedOrgFromDomainRequest},
 	{Resource: DropletsResource, Path: "/", Method: http.MethodGet, Name: GetDropletsRequest},
