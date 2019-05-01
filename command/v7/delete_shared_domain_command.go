@@ -19,7 +19,7 @@ type DeleteSharedDomainCommand struct {
 	RequiredArgs    flag.Domain `positional-args:"yes"`
 	Force           bool        `short:"f" description:"Force deletion without confirmation"`
 	usage           interface{} `usage:"CF_NAME delete-shared-domain DOMAIN [-f]"`
-	relatedCommands interface{} `related_commands:"delete-domain, domains"`
+	relatedCommands interface{} `related_commands:"delete-private-domain, domains"`
 
 	UI          command.UI
 	Config      command.Config

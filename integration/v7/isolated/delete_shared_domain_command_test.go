@@ -22,7 +22,7 @@ var _ = Describe("delete-shared-domain command", func() {
 			Eventually(session).Should(Say("OPTIONS:"))
 			Eventually(session).Should(Say(`\s+-f\s+Force deletion without confirmation`))
 			Eventually(session).Should(Say("SEE ALSO:"))
-			Eventually(session).Should(Say(`\s+delete-domain, domains`))
+			Eventually(session).Should(Say(`\s+delete-private-domain, domains`))
 			Eventually(session).Should(Exit(0))
 		})
 	})
